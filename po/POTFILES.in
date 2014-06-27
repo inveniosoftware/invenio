@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,9 +21,11 @@ modules/bibauthorid/lib/bibauthorid_templates.py
 modules/bibauthorid/lib/bibauthorid_webinterface.py
 modules/bibcatalog/lib/bibcatalog_templates.py
 modules/bibcheck/web/admin/bibcheckadmin.py
+modules/bibcirculation/lib/bibcirculation.py
 modules/bibcirculation/lib/bibcirculation_templates.py
 modules/bibcirculation/lib/bibcirculation_utils.py
 modules/bibcirculation/lib/bibcirculation_webinterface.py
+modules/bibcirculation/lib/bibcirculationadminlib.py
 modules/bibclassify/doc/admin/bibclassify-admin-guide.webdoc
 modules/bibclassify/lib/bibclassify_templates.py
 modules/bibclassify/lib/bibclassify_webinterface.py
@@ -56,6 +58,11 @@ modules/bibformat/lib/bibformat_engine_unit_tests.py
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_aid_authors.py
+modules/bibformat/lib/elements/bfe_authority_author.py
+modules/bibformat/lib/elements/bfe_authority_control_no.py
+modules/bibformat/lib/elements/bfe_authority_institute.py
+modules/bibformat/lib/elements/bfe_authority_journal.py
+modules/bibformat/lib/elements/bfe_authority_subject.py
 modules/bibformat/lib/elements/bfe_authors.py
 modules/bibformat/lib/elements/bfe_edit_files.py
 modules/bibformat/lib/elements/bfe_edit_record.py
@@ -82,7 +89,7 @@ modules/bibrank/bin/bibrankgkb.in
 modules/bibrank/doc/admin/bibrank-admin-guide.webdoc
 modules/bibrank/lib/bibrank_citation_grapher.py
 modules/bibrank/lib/bibrank_citation_indexer.py
-modules/bibrank/lib/bibrank_citation_indexer_unit_tests.py
+modules/bibrank/lib/bibrank_citation_indexer_regression_tests.py
 modules/bibrank/lib/bibrank_citation_searcher.py
 modules/bibrank/lib/bibrank_citation_searcher_unit_tests.py
 modules/bibrank/lib/bibrank_downloads_grapher.py
@@ -110,6 +117,9 @@ modules/bibupload/doc/admin/bibupload-admin-guide.webdoc
 modules/bibupload/lib/batchuploader_engine.py
 modules/bibupload/lib/batchuploader_templates.py
 modules/bibupload/lib/batchuploader_webinterface.py
+modules/docextract/bin/refextract.in
+modules/docextract/lib/refextract.py
+modules/docextract/lib/refextract_config.py
 modules/elmsubmit/bin/elmsubmit.in
 modules/elmsubmit/doc/admin/elmsubmit-admin-guide.webdoc
 modules/elmsubmit/lib/elmsubmit.py
@@ -139,9 +149,6 @@ modules/oaiharvest/doc/admin/oaiharvest-admin-guide.webdoc
 modules/oaiharvest/lib/oai_harvest_admin.py
 modules/oaiharvest/lib/oai_harvest_templates.py
 modules/oairepository/lib/oai_repository_admin.py
-modules/refextract/bin/refextract.in
-modules/refextract/lib/refextract.py
-modules/refextract/lib/refextract_config.py
 modules/webaccess/bin/authaction.in
 modules/webaccess/bin/webaccessadmin.in
 modules/webaccess/lib/access_control_admin.py
@@ -187,6 +194,9 @@ modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py
 modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py
 modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py
 modules/webjournal/web/admin/webjournaladmin.py
+modules/weblinkback/lib/weblinkback_templates.py
+modules/weblinkback/lib/weblinkbackadminlib.py
+modules/weblinkback/web/admin/weblinkbackadmin.py
 modules/webmessage/bin/webmessageadmin.in
 modules/webmessage/doc/admin/webmessage-admin-guide.webdoc
 modules/webmessage/lib/webmessage.py
@@ -197,11 +207,16 @@ modules/webmessage/lib/webmessage_templates.py
 modules/webmessage/lib/webmessage_webinterface.py
 modules/websearch/bin/webcoll.in
 modules/websearch/doc/admin/websearch-admin-guide.webdoc
+modules/websearch/doc/hacking/search-services.webdoc
 modules/websearch/doc/search-guide.webdoc
 modules/websearch/doc/search-tips.webdoc
 modules/websearch/lib/search_engine.py
 modules/websearch/lib/search_engine_config.py
 modules/websearch/lib/search_engine_unit_tests.py
+modules/websearch/lib/services/CollectionNameSearchService.py
+modules/websearch/lib/services/FAQKBService.py
+modules/websearch/lib/services/SubmissionNameSearchService.py
+modules/websearch/lib/services/WeatherService.py
 modules/websearch/lib/websearch_external_collections.py
 modules/websearch/lib/websearch_external_collections_templates.py
 modules/websearch/lib/websearch_templates.py

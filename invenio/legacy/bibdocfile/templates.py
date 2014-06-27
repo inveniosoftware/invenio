@@ -59,7 +59,7 @@ class Template:
         'subformat': (str, ""), # the subformat
         'download': (int, 0), # download as attachment
         }
-    def tmpl_display_bibrecdocs(self, bibrecdocs, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
+    def tmpl_display_bibrecdocs(self, bibrecdocs, docname="", version="", doctype=None, ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
         """
         Returns an HTML representation of the the attached documents.
 
@@ -90,6 +90,7 @@ class Template:
         if bibdocs:
             types = list_types_from_array(bibdocs)
             fulltypes = []
+
             for mytype in types:
                 if mytype in ('Plot', 'PlotMisc'):
                     # FIXME: quick hack to ignore plot-like doctypes
@@ -102,9 +103,9 @@ class Template:
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.get_type():
                         bibdoc_display = self.tmpl_display_bibdoc(bibdoc, version,
-                                                     ln=ln, display_hidden=display_hidden,
-                                                     recid=bibrecdocs.id, docname=bibrecdocs.get_docname(bibdoc.id),
-                                                     status=bibdoc.status)
+                                                    ln=ln, display_hidden=display_hidden,
+                                                    recid=bibrecdocs.id, docname=bibrecdocs.get_docname(bibdoc.id),
+                                                    status=bibdoc.status)
                         if bibdoc_display:
                             fulltype['content'].append(bibdoc_display)
                 if fulltype['content']:

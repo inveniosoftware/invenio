@@ -21,7 +21,7 @@
 
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
-from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 from invenio.legacy.bibedit.utils import user_can_edit_record_collection
 
 
@@ -40,7 +40,7 @@ def format_element(bfo, style):
         if style != '':
             linkattrd['style'] = style
         out += create_html_link(
-            CFG_SITE_SECURE_URL +
+            CFG_BASE_URL +
             '/%s/edit/?ln=%s#state=edit&recid=%s' % (CFG_SITE_RECORD, bfo.lang,
                                                      str(bfo.recID)),
             {},

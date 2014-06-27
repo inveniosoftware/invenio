@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -85,7 +85,7 @@ def get_dependent_records_for_recID(recID):
 
 def guess_authority_types(recID):
     """
-    guesses the type(s) (e.g. AUTHOR, INSTITUTION, etc.)
+    guesses the type(s) (e.g. AUTHOR, INSTITUTE, etc.)
     of an authority record (should only have one value)
 
     @param recID: the record ID of the authority record
@@ -286,4 +286,3 @@ def get_index_strings_by_control_no(control_no):
             string_list = list_union(new_strings, string_list)
     #return
     return string_list
-

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-## Ranking of records using different parameters and methods on the fly.
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,33 +17,39 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+"""Ranking of records using different parameters and methods on the fly."""
 
-import string
 import time
-import math
 import re
 import ConfigParser
-import copy
 
+from operator import itemgetter
 from six import iteritems
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
-from invenio.legacy.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
+     CFG_ETCDIR, \
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD, \
+     CFG_ETCDIR, \
+     CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD
+from invenio.legacy.dbquery import run_sql, \
+                                   deserialize_via_marshal, \
+                                   wash_table_column_name
 from invenio.ext.logging import register_exception
-from invenio.legacy.webpage import adderrorbox
-from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
-from invenio.legacy.bibrank.citation_searcher import get_cited_by, get_cited_by_weight
+from invenio.legacy.bibrank.citation_searcher import get_cited_by, \
+                                                     get_cited_by_weight
 from intbitset import intbitset
 from invenio.legacy.bibrank.word_searcher import find_similar
-# Do not remove these lines, it is necessary for func_object = globals().get(function)
+# Do not remove these lines
+# it is necessary for func_object = globals().get(function)
 from invenio.legacy.bibrank.word_searcher import word_similarity
 from invenio.legacy.miscutil.solrutils_bibrank_searcher import word_similarity_solr
 from invenio.legacy.miscutil.xapianutils_bibrank_searcher import word_similarity_xapian
 from invenio.modules.ranker.registry import configuration
+
+METHODS = {}
 
 
 def compare_on_val(first, second):
@@ -64,31 +69,31 @@ def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
             return ""
         if int(term):
             return ""
-    except StandardError as e:
+    except StandardError:
         pass
     return "true"
 
 
 def create_external_ranking_settings(rank_method_code, config):
-    methods[rank_method_code]['fields'] = dict()
+    METHODS[rank_method_code]['fields'] = dict()
     sections = config.sections()
     field_pattern = re.compile('field[0-9]+')
     for section in sections:
         if field_pattern.search(section):
             field_name = config.get(section, 'name')
-            methods[rank_method_code]['fields'][field_name] = dict()
+            METHODS[rank_method_code]['fields'][field_name] = dict()
             for option in config.options(section):
                 if option != 'name':
-                    create_external_ranking_option(section, option, methods[rank_method_code]['fields'][field_name], config)
+                    create_external_ranking_option(section, option, METHODS[rank_method_code]['fields'][field_name], config)
 
         elif section == 'find_similar_to_recid':
-            methods[rank_method_code][section] = dict()
+            METHODS[rank_method_code][section] = dict()
             for option in config.options(section):
-                create_external_ranking_option(section, option, methods[rank_method_code][section], config)
+                create_external_ranking_option(section, option, METHODS[rank_method_code][section], config)
 
         elif section == 'field_settings':
             for option in config.options(section):
-                create_external_ranking_option(section, option, methods[rank_method_code], config)
+                create_external_ranking_option(section, option, METHODS[rank_method_code], config)
 
 
 def create_external_ranking_option(section, option, dictionary, config):
@@ -101,65 +106,61 @@ def create_external_ranking_option(section, option, dictionary, config):
 def create_rnkmethod_cache():
     """Create cache with vital information for each rank method."""
 
-    global methods
     bibrank_meths = run_sql("SELECT name from rnkMETHOD")
-    methods = {}
-    global voutput
-    voutput = ""
 
     for (rank_method_code,) in bibrank_meths:
+        filepath = configuration.get(rank_method_code + '.cfg', '')
+        config = ConfigParser.ConfigParser()
         try:
-            config_file = configuration.get(rank_method_code + '.cfg', '')
-            config = ConfigParser.ConfigParser()
-            config.readfp(open(config_file))
-        except StandardError as e:
+            config.readfp(open(filepath))
+        except IOError:
             pass
 
         cfg_function = config.get("rank_method", "function")
         if config.has_section(cfg_function):
-            methods[rank_method_code] = {}
-            methods[rank_method_code]["function"] = cfg_function
-            methods[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
-            methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
-            methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
+            METHODS[rank_method_code] = {}
+            METHODS[rank_method_code]["function"] = cfg_function
+            METHODS[rank_method_code]["prefix"] = config.get(cfg_function, "relevance_number_output_prologue")
+            METHODS[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
+            METHODS[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
         else:
             raise Exception("Error in configuration config_file: %s" % (config_file + ".cfg", ))
 
         i8n_names = run_sql("""SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s""", (rank_method_code,))
         for (ln, value) in i8n_names:
-            methods[rank_method_code][ln] = value
+            METHODS[rank_method_code][ln] = value
 
         if config.has_option(cfg_function, "table"):
-            methods[rank_method_code]["rnkWORD_table"] = config.get(cfg_function, "table")
-            query = "SELECT count(*) FROM %sR" % wash_table_column_name(methods[rank_method_code]["rnkWORD_table"][:-1])
-            methods[rank_method_code]["col_size"] = run_sql(query)[0][0]
+            METHODS[rank_method_code]["rnkWORD_table"] = config.get(cfg_function, "table")
+            query = "SELECT count(*) FROM %sR" % wash_table_column_name(METHODS[rank_method_code]["rnkWORD_table"][:-1])
+            METHODS[rank_method_code]["col_size"] = run_sql(query)[0][0]
 
         if config.has_option(cfg_function, "stemming") and config.get(cfg_function, "stemming"):
             try:
-                methods[rank_method_code]["stemmer"] = config.get(cfg_function, "stemming")
-            except Exception as e:
+                METHODS[rank_method_code]["stemmer"] = config.get(cfg_function, "stemming")
+            except KeyError:
                 pass
 
         if config.has_option(cfg_function, "stopword"):
-            methods[rank_method_code]["stopwords"] = config.get(cfg_function, "stopword")
+            METHODS[rank_method_code]["stopwords"] = config.get(cfg_function, "stopword")
 
         if config.has_section("find_similar"):
-            methods[rank_method_code]["max_word_occurence"] = float(config.get("find_similar", "max_word_occurence"))
-            methods[rank_method_code]["min_word_occurence"] = float(config.get("find_similar", "min_word_occurence"))
-            methods[rank_method_code]["min_word_length"] = int(config.get("find_similar", "min_word_length"))
-            methods[rank_method_code]["min_nr_words_docs"] = int(config.get("find_similar", "min_nr_words_docs"))
-            methods[rank_method_code]["max_nr_words_upper"] = int(config.get("find_similar", "max_nr_words_upper"))
-            methods[rank_method_code]["max_nr_words_lower"] = int(config.get("find_similar", "max_nr_words_lower"))
-            methods[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
+            METHODS[rank_method_code]["max_word_occurence"] = float(config.get("find_similar", "max_word_occurence"))
+            METHODS[rank_method_code]["min_word_occurence"] = float(config.get("find_similar", "min_word_occurence"))
+            METHODS[rank_method_code]["min_word_length"] = int(config.get("find_similar", "min_word_length"))
+            METHODS[rank_method_code]["min_nr_words_docs"] = int(config.get("find_similar", "min_nr_words_docs"))
+            METHODS[rank_method_code]["max_nr_words_upper"] = int(config.get("find_similar", "max_nr_words_upper"))
+            METHODS[rank_method_code]["max_nr_words_lower"] = int(config.get("find_similar", "max_nr_words_lower"))
+            METHODS[rank_method_code]["default_min_relevance"] = int(config.get("find_similar", "default_min_relevance"))
 
         if cfg_function in ('word_similarity_solr', 'word_similarity_xapian'):
             create_external_ranking_settings(rank_method_code, config)
 
         if config.has_section("combine_method"):
             i = 1
-            methods[rank_method_code]["combine_method"] = []
+            METHODS[rank_method_code]["combine_method"] = []
             while config.has_option("combine_method", "method%s" % i):
-                methods[rank_method_code]["combine_method"].append(string.split(config.get("combine_method", "method%s" % i), ","))
+                METHODS[rank_method_code]["combine_method"].append(config.get("combine_method", "method%s" % i).split(","))
                 i += 1
 
 def is_method_valid(colID, rank_method_code):
@@ -199,7 +200,7 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
         create_rnkmethod_cache()
 
     avail_methods = []
-    for (rank_method_code, options) in iteritems(methods):
+    for rank_method_code, options in iteritems(METHODS):
         if "function" in options and is_method_valid(colID, rank_method_code):
             if ln in options:
                 avail_methods.append((rank_method_code, options[ln]))
@@ -209,19 +210,47 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
                 avail_methods.append((rank_method_code, rank_method_code))
     return avail_methods
 
-def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0, field='', rg=None, jrec=None):
-    """rank_method_code, e.g. `jif' or `sbr' (word frequency vector model)
-       rank_limit_relevance, e.g. `23' for `nbc' (number of citations) or `0.10' for `vec'
-       hitset, search engine hits;
-       pattern, search engine query or record ID (you check the type)
-       verbose, verbose level
-       output:
-       list of records
-       list of rank values
-       prefix
-       postfix
-       verbose_output"""
 
+def citation(rank_method_code, related_to, hitset, rank_limit_relevance, verbose):
+    """Sort records by number of citations"""
+    if related_to:
+        from invenio.legacy.search_engine import search_pattern
+        hits = intbitset()
+        for pattern in related_to:
+            hits |= hitset & intbitset(search_pattern(p='refersto:%s' % pattern))
+    else:
+        hits = hitset
+    return rank_by_citations(hits, verbose)
+
+
+def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], verbose=0, field='', rg=None, jrec=None):
+    """Sorts given records or related records according to given method
+
+       Parameters:
+        - rank_method_code: Sort records using this method
+                            e.g. `jif' or `sbr' (word frequency vector model)
+        - rank_limit_relevance: A parameter given to the sorting method
+                                e.g. `23' for `nbc' (number of citations)
+                                     or `0.10' for `vec'
+                                     This is ignored when sorting by
+                                     citations. But I don't know what it means.
+        - hitset: records to sort
+        - related_to: if specified, instead of sorting given records,
+                      we first fetch the related records ("related" being
+                      defined by the method), then we sort these related
+                      records
+        - verbose, verbose level
+        - field: stuff
+        - rg: more stuff
+        - jrec: even more stuff
+
+       Output:
+       - list of records
+       - list of rank values
+       - prefix, useless it is always '('
+       - postfix, useless it is always ')'
+       - verbose_output
+    """
     voutput = ""
     configcreated = ""
 
@@ -230,30 +259,26 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     aftermap = starttime - time.time()
 
     try:
-        hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
+        # We are receiving a global hitset
+        hitset_global = hitset
+        hitset = intbitset(hitset_global)
+
         if 'methods' not in globals():
             create_rnkmethod_cache()
 
-        function = methods[rank_method_code]["function"]
-        #we get 'citation' method correctly here
+        function = METHODS[rank_method_code]["function"]
+        # Check if we have specific function for sorting by this method
         func_object = globals().get(function)
 
         if verbose > 0:
             voutput += "function: %s <br/> " % function
-            voutput += "pattern:  %s <br/>" % str(pattern)
+            voutput += "related_to:  %s <br/>" % str(related_to)
 
-        if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
-            result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose, methods)
-        elif rank_method_code == "citation":
-            #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
-            p = ""
-            if pattern and pattern[0]:
-                p = pattern[0][6:]
-            result = find_citations(rank_method_code, p, hitset, verbose)
-
+        if func_object and related_to and related_to[0][0:6] == "recid:" and function == "word_similarity":
+            result = find_similar(rank_method_code, related_to[0][6:], hitset, rank_limit_relevance, verbose, METHODS)
         elif func_object:
             if function == "word_similarity":
-                result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose, methods)
+                result = func_object(rank_method_code, related_to, hitset, rank_limit_relevance, verbose, METHODS)
             elif function in ("word_similarity_solr", "word_similarity_xapian"):
                 if not rg:
                     rg = CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
@@ -269,47 +294,49 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
                 if function == "word_similarity_solr":
                     if verbose > 0:
                         voutput += "In Solr part:<br/>"
-                    result = word_similarity_solr(pattern, hitset, methods[rank_method_code], verbose, field, ranked_result_amount)
+                    result = word_similarity_solr(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
                 if function == "word_similarity_xapian":
                     if verbose > 0:
                         voutput += "In Xapian part:<br/>"
-                    result = word_similarity_xapian(pattern, hitset, methods[rank_method_code], verbose, field, ranked_result_amount)
+                    result = word_similarity_xapian(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
             else:
-                result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
+                result = func_object(rank_method_code, related_to, hitset, rank_limit_relevance, verbose)
         else:
-            result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
+            result = rank_by_method(rank_method_code, related_to, hitset, rank_limit_relevance, verbose)
     except Exception as e:
         register_exception()
+        from invenio.legacy.webpage import adderrorbox
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
 
     afterfind = time.time() - starttime
 
     if result[0] and result[1]: #split into two lists for search_engine
-        results_similar_recIDs = map(lambda x: x[0], result[0])
-        results_similar_relevances = map(lambda x: x[1], result[0])
-        result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s" % configcreated + result[3])
-        aftermap = time.time() - starttime;
+        results_similar_recIDs = [x[0] for x in result[0]]
+        results_similar_relevances = [x[1] for x in result[0]]
+        result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s%s" % (configcreated, result[3]))
+        aftermap = time.time() - starttime
     else:
         result = (None, None, result[1], result[2], result[3])
 
     #add stuff from here into voutput from result
     tmp = voutput+result[4]
     if verbose > 0:
-        tmp += "<br/>Elapsed time after finding: "+str(afterfind)+"\nElapsed after mapping: "+str(aftermap)
-    result = (result[0],result[1],result[2],result[3],tmp)
+        tmp += "<br/>Elapsed time after finding: %s\nElapsed after mapping: %s" % (afterfind, aftermap)
+    result = (result[0], result[1], result[2], result[3], tmp)
 
     #dbg = string.join(map(str,methods[rank_method_code].items()))
-    #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
+    #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput)
     return result
 
-def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
+
+def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose):
     """combining several methods into one based on methods/percentage in config file"""
 
-    global voutput
+    voutput = ""
     result = {}
     try:
-        for (method, percent) in methods[rank_method_code]["combine_method"]:
-            function = methods[method]["function"]
+        for (method, percent) in METHODS[rank_method_code]["combine_method"]:
+            function = METHODS[method]["function"]
             func_object = globals().get(function)
             percent = int(percent)
 
@@ -326,10 +353,11 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbo
         result = result.items()
         result.sort(lambda x, y: cmp(x[1], y[1]))
         return (result, "(", ")", voutput)
-    except Exception as e:
+    except Exception:
         return (None, "Warning: %s method cannot be used for ranking your query." % rank_method_code, "", voutput)
 
-def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
+
+def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance, verbose):
     """Ranking of records based on predetermined values.
     input:
     rank_method_code - the code of the method, from the name field in rnkMETHOD, used to get predetermined values from
@@ -344,7 +372,6 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     postfix - what to show after the rank value
     voutput - contains extra information, content dependent on verbose value"""
 
-    global voutput
     voutput = ""
     rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name=%s", (rank_method_code,))
 
@@ -362,8 +389,8 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             if not lwords_hitset:
                 lwords_hitset = intbitset()
             lword = lwords[j][6:]
-            if string.find(lword, "->") > -1:
-                lword = string.split(lword, "->")
+            if lword.find("->") > -1:
+                lword = lword.split("->")
                 if int(lword[0]) >= max_recid or int(lword[1]) >= max_recid + 1:
                     return (None, "Warning: Given record IDs are out of range.", "", voutput)
                 for i in range(int(lword[0]), int(lword[1])):
@@ -404,40 +431,32 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
         voutput += "Number of records not ranked: %s<br />" % len(reclist_addend)
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
-    return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
+    return (reclist_addend + reclist, METHODS[rank_method_code]["prefix"], METHODS[rank_method_code]["postfix"], voutput)
 
-def find_citations(rank_method_code, recID, hitset, verbose):
-    """Rank by the amount of citations."""
-    #calculate the cited-by values for all the members of the hitset
-    #returns: ((recordid,weight),prefix,postfix,message)
 
-    global voutput
+def rank_by_citations(hitset, verbose):
+    """Rank by the amount of citations.
+
+    Calculate the cited-by values for all the members of the hitset
+    Rreturns: ((recordid,weight),prefix,postfix,message)
+    """
     voutput = ""
 
-    #If the recID is numeric, return only stuff that cites it. Otherwise return
-    #stuff that cites hitset
-
-    #try to convert to int
-    recisint = True
-    recidint = 0
-    try:
-        recidint = int(recID)
-    except:
-        recisint = False
-    ret = []
-    if recisint:
-        myrecords = get_cited_by(recidint) #this is a simple list
-        ret = get_cited_by_weight(myrecords)
+    if len(hitset) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+        cites_counts = get_citation_dict('citations_counts')
+        ret = [(recid, weight) for recid, weight in cites_counts
+                                                        if recid in hitset]
+        recids_without_cites = hitset - get_citation_dict('citations_keys')
+        ret.extend([(recid, 0) for recid in recids_without_cites])
+        ret = list(reversed(ret))
     else:
         ret = get_cited_by_weight(hitset)
-    ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
+        ret.sort(key=itemgetter(1))
 
     if verbose > 0:
-        voutput = voutput+"\nrecID "+str(recID)+" is int: "+str(recisint)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
-
-    #voutput = voutput + str(ret)
+        voutput += "\nhitset %s\nrank_by_citations ret %s" % (hitset, ret)
 
     if ret:
-        return (ret,"(", ")", "")
+        return ret, "(", ")", voutput
     else:
-        return ((),"", "", "")
+        return [], "", "", voutput

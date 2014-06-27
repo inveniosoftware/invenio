@@ -181,7 +181,7 @@ class IdxINDEXData(DataSet):
 
     class IdxINDEX_13:
         last_updated = None
-        description = u'This index contains words/phrases from institutional affiliation fields.'
+        description = u'This index contains words/phrases from affiliation fields.'
         stemming_language = u''
         id = 13
         indexer = u'native'
@@ -285,11 +285,11 @@ class IdxINDEXData(DataSet):
 
     class IdxINDEX_21:
         last_updated = None
-        description = u'This index contains words/phrases from institution authority records.'
+        description = u'This index contains words/phrases from institute authority records.'
         stemming_language = u''
         id = 21
         indexer = u'native'
-        name = u'authorityinstitution'
+        name = u'authorityinstitute'
         synonym_kbrs = u''
         remove_stopwords = u'No'
         remove_html_markup = u'No'

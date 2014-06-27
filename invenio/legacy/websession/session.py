@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,15 +38,19 @@ from uuid import uuid4
 
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.legacy.dbquery import run_sql, blob_to_string
-from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
-    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS, \
-    CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
-from invenio.legacy.websession.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
-    CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
-    CFG_WEBSESSION_ENABLE_LOCKING
-#from invenio.session_flask import InvenioSession as FlaskInvenioSession
+from invenio.config import (CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER,
+                            CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT,
+                            CFG_SITE_URL,
+                            CFG_SITE_SECURE_URL,
+                            CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS,
+                            CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS,
+                            CFG_WEBSESSION_STORAGE)
+from invenio.legacy.websession.websession_config import (CFG_WEBSESSION_COOKIE_NAME,
+                                      CFG_WEBSESSION_ONE_DAY,
+                                      CFG_WEBSESSION_CLEANUP_CHANCE)
+from invenio.utils.redis import get_redis
 from invenio.utils.hash import md5
+
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
@@ -79,7 +83,8 @@ def get_session(req, sid=None):
         req._session = session
     return req._session
 
-class InvenioSession(dict):
+
+class InvenioSessionBase(dict):
     """
     This class implements a Session handling based on MySQL.
 
@@ -110,6 +115,7 @@ class InvenioSession(dict):
         self._http_ip = None
         self._https_ip = None
         self.__need_https = False
+        self._cleanup_function = None
 
         dict.__init__(self)
 
@@ -202,10 +208,9 @@ class InvenioSession(dict):
         """
         session_dict = None
         invalid = False
-        res = run_sql("SELECT session_object FROM session "
-                        "WHERE session_key=%s AND session_expiry>=UTC_TIMESTAMP()", (self._sid, ))
+        res = self.load_from_storage(self._sid)
         if res:
-            session_dict = cPickle.loads(zlib.decompress(blob_to_string(res[0][0])))
+            session_dict = cPickle.loads(blob_to_string(res))
             remote_ip = self._req.remote_ip
             if self._req.is_https():
                 if session_dict['_https_ip'] is not None:
@@ -269,30 +274,17 @@ class InvenioSession(dict):
                     "_timeout" : self._timeout,
                     "_http_ip" : self._http_ip,
                     "_https_ip" : self._https_ip,
-                    "_permanent" : self._remember_me
-                    }
-            session_key = self._sid
+                    "_remember_me" : self._remember_me
+            }
             session_object = cPickle.dumps(session_dict, -1)
-            session_expiry = time.time() + self._timeout + CFG_WEBSESSION_ONE_DAY
-            session_expiry = convert_datestruct_to_datetext(time.gmtime(session_expiry))
 
-            run_sql("""
-                INSERT session(
-                    session_key,
-                    session_expiry,
-                    session_object,
-                    uid
-                ) VALUE(%s,
-                    %s,
-                    %s,
-                    %s
-                ) ON DUPLICATE KEY UPDATE
-                    session_expiry=%s,
-                    session_object=%s,
-                    uid=%s
-            """, (session_key, session_expiry, session_object, uid,
-                session_expiry, session_object, uid))
-            add_cookies(self._req, self.make_cookies())
+            self.save_in_storage(self._sid,
+                                 session_object,
+                                 self._timeout,
+                                 uid)
+
+            for cookie in self.make_cookies():
+                self._req.set_cookie(cookie)
         ## No more dirty :-)
         self._dirty = False
 
@@ -300,7 +292,7 @@ class InvenioSession(dict):
         """
         Delete the session.
         """
-        run_sql("DELETE LOW_PRIORITY FROM session WHERE session_key=%s", (self._sid, ))
+        self.delete_from_storage(self._sid)
         self.clear()
 
     def invalidate(self):
@@ -396,16 +388,8 @@ class InvenioSession(dict):
         """
         Perform the database session cleanup.
         """
-        def session_cleanup():
-            """
-            Session cleanup procedure which to be executed at the end
-            of the request handling.
-            """
-            run_sql("""
-                DELETE LOW_PRIORITY FROM session
-                WHERE session_expiry<=UTC_TIMESTAMP()
-            """)
-        self._req.register_cleanup(session_cleanup)
+        if self._cleanup_function:
+            self._req.register_cleanup(self._cleanup_function)
         self._req.log_error("InvenioSession: registered database cleanup.")
 
     def __del__(self):
@@ -497,6 +481,72 @@ def _mkip(ip):
     Compute a numerical value for a dotted IP
     """
     num = 0L
-    for i in map (int, ip.split ('.')):
-        num = (num << 8) + i
+    for i in ip.split('.'):
+        num = (num << 8) + int(i)
     return num
+
+
+
+class InvenioSessionMySQL(InvenioSessionBase):
+    def __init__(self, req, sid=None):
+
+        def cb_session_cleanup(data=None):
+            """
+            Session cleanup procedure which to be executed at the end
+            of the request handling.
+            """
+            run_sql("""DELETE LOW_PRIORITY FROM session
+                       WHERE session_expiry <= UTC_TIMESTAMP()""")
+
+        self.cleanup_function = cb_session_cleanup
+        super(InvenioSessionMySQL, self).__init__(req, sid)
+
+    def load_from_storage(self, sid):
+        ret = run_sql("""SELECT session_object FROM session
+                         WHERE session_key = %s""", [sid])
+        if ret:
+            return ret[0][0]
+
+    def delete_from_storage(self, sid):
+        return run_sql("""DELETE LOW_PRIORITY FROM session
+                          WHERE session_key=%s""", [sid])
+
+    def save_in_storage(self, sid, session_object, timeout, uid):
+        session_key = sid
+        session_expiry = time.time() + timeout + CFG_WEBSESSION_ONE_DAY
+        session_expiry = convert_datestruct_to_datetext(time.gmtime(session_expiry))
+
+        run_sql("""INSERT INTO session(
+                                    session_key,
+                                    session_expiry,
+                                    session_object,
+                                    uid
+                    ) VALUES (%s, %s, %s, %s)
+                   ON DUPLICATE KEY UPDATE
+                        session_expiry=%s,
+                        session_object=%s,
+                        uid=%s
+        """, (session_key, session_expiry, session_object, uid,
+            session_expiry, session_object, uid))
+
+
+class InvenioSessionRedis(InvenioSessionBase):
+
+    def generate_key(self, sid):
+        return 'session_%s' % sid
+
+    def load_from_storage(self, sid):
+        return get_redis().get(self.generate_key(sid))
+
+    def delete_from_storage(self, sid):
+        return get_redis().delete(self.generate_key(sid))
+
+    def save_in_storage(self, sid, session_object, timeout, uid):  # pylint: disable=W0613
+        return get_redis().setex(self.generate_key(sid),
+                                 session_object,
+                                 timeout)
+
+if CFG_WEBSESSION_STORAGE == 'mysql':
+    InvenioSession = InvenioSessionMySQL
+elif CFG_WEBSESSION_STORAGE == 'redis':
+    InvenioSession = InvenioSessionRedis

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,7 +39,7 @@ from invenio.utils.url import wash_url_argument
 from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language, wash_language, language_list_long
 from invenio.legacy.search_engine import perform_request_search
-import invenio.modules.formatter.api as bibformat_dblayer
+import invenio.legacy.bibformat.dblayer as bibformat_dblayer
 from invenio.modules.formatter import engine as bibformat_engine
 from invenio.modules.formatter import registry
 from invenio.utils.text import encode_for_xml
@@ -167,9 +167,9 @@ def perform_request_format_template_show(bft, ln=CFG_SITE_LANG, code=None,
     content_types.extend([content_type for content_type in standard_content_types
                           if content_type not in content_types])
 
-    return bibformat_templates.tmpl_admin_format_template_show(ln, format_template['attrs']['name'],
-                                                               format_template['attrs']['description'],
-                                                               code, bft,
+    return bibformat_templates.tmpl_admin_format_template_show(ln,
+                                                               code,
+                                                               bft,
                                                                ln_for_preview=ln_for_preview,
                                                                pattern_for_preview=pattern_for_preview,
                                                                editable=editable,
@@ -287,7 +287,7 @@ def perform_request_format_template_show_short_doc(ln=CFG_SITE_LANG, search_doc_
 
 
 
-    return bibformat_templates.tmpl_admin_format_template_show_short_doc(ln, elements)
+    return bibformat_templates.tmpl_admin_format_template_show_short_doc(elements)
 
 def perform_request_format_elements_documentation(ln=CFG_SITE_LANG):
     """
@@ -602,12 +602,11 @@ def perform_request_output_format_show(bfo, ln=CFG_SITE_LANG, r_fld=[], r_val=[]
     editable = can_write_output_format(bfo)
 
     return bibformat_templates.tmpl_admin_output_format_show(ln,
-                                                            bfo,
-                                                            name,
-                                                            rules,
-                                                            default,
-                                                            format_templates,
-                                                            editable)
+                                                             bfo,
+                                                             rules,
+                                                             default,
+                                                             format_templates,
+                                                             editable)
 
 def perform_request_output_format_show_dependencies(bfo, ln=CFG_SITE_LANG):
     """
@@ -1509,7 +1508,7 @@ def check_format_template(filename, checking=0):
                             if len(recIDs) > 0:
                                 recID = recIDs[0]
                                 bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
-                                (result, errors_) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
+                                result, errors_ = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
                                 errors.extend(errors_)
 
     else:# Template cannot be read
@@ -1553,7 +1552,7 @@ def check_format_element(name):
                     recID = recIDs[0]
                     bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
                     element = bibformat_engine.get_format_element(name)
-                    (result, errors_) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
+                    result, errors_ = bibformat_engine.eval_format_element(element, bfo, verbose=7)
                     errors.extend(errors_)
             except Exception as e:
                 try:

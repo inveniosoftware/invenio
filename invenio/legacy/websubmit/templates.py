@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ import re
 import operator
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
-     CFG_SITE_SECURE_URL
+     CFG_SITE_SECURE_URL, CFG_INSPIRE_SITE
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.url import create_html_link
@@ -545,7 +545,7 @@ class Template:
                  'mainmenu' : cgi.escape(mainmenu),
                  'images' : CFG_SITE_URL + '/img',
                  'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
-                 'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
+                 'explain_summary' : not CFG_INSPIRE_SITE and  '(2) ' + _("Mandatory fields appear in red in the SUMMARY window.") or ''
                }
         return out
 
@@ -657,6 +657,7 @@ class Template:
         nbFields = len(upload)
         # if there is a file upload field, we change the encoding type
         out = """<script language="JavaScript1.1" type="text/javascript">
+        /*<![CDATA[*/
               """
         for i in range(0, nbFields):
             if upload[i] == 1:
@@ -738,7 +739,9 @@ class Template:
                     for val in vals:
                         if tmp != "":
                             tmp += " || "
-                        tmp += "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % (val, val)
+                        tmp += "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % \
+                          (escape_javascript_string(val, escape_for_html=False),
+                           escape_javascript_string(val, escape_for_html=False))
                     if tmp != "":
                         out += """
                                  <!--SELECT field found-->
@@ -759,18 +762,16 @@ class Template:
                                 el.checked=true;
                               }""" % {
                                 'fieldname' : fieldname,
-                                'text' : cgi.escape(str(text)).replace('"', '\\"'),
+                                'text' : escape_javascript_string(text, escape_for_html=False),
                               }
                 elif upload[i] == 0:
-                    text = text.replace('"','\"')
-                    text = text.replace("\n","\\n")
                     # If the field is not an upload element
                     out += """<!--input field found-->
                                el = document.forms[0].elements['%(fieldname)s'];
                                el.value="%(text)s";
                            """ % {
                              'fieldname' : fieldname,
-                             'text' : cgi.escape(str(text)).replace('"', '\\"'),
+                             'text': escape_javascript_string(text, escape_for_html=False),
                            }
         out += """<!--End Fill in section-->
                """
@@ -797,6 +798,7 @@ class Template:
                        }
             else:
                 out += """ if (tester2()) {
+                             $(this).attr("disabled", true);
                              document.forms[0].action="/submit";
                              document.forms[0].step.value=1;
                              user_must_confirm_before_leaving_page = false;
@@ -805,7 +807,7 @@ class Template:
                              return false;
                            }
                          }"""
-        out += """</script>"""
+        out += """ /*]]>*/</script>"""
         return out
 
     def tmpl_page_do_not_leave_submission_js(self, ln, enabled=CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION):

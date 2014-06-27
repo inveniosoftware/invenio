@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,16 @@
 
 __revision__ = "$Id$"
 
+try:
+    import cPickle as Pickle
+except ImportError:
+    import Pickle
+import zlib
+
+from datetime import datetime, timedelta
+
 from invenio.legacy.dbquery import run_sql
+
 
 def get_name_tags_all():
     """Return a dictionary of all MARC tag's textual names."""
@@ -70,7 +79,7 @@ def get_record_last_modification_date(recid):
     """Return last modification date, as timetuple, of record RECID."""
     sql_res = run_sql('SELECT max(job_date) FROM  hstRECORD WHERE id_bibrec=%s',
                       (recid, ))
-    if sql_res[0][0] == None:
+    if sql_res[0][0] is None:
         return None
     else:
         return sql_res[0][0].timetuple()
@@ -92,8 +101,16 @@ def get_hp_update_xml(changeId):
     """
     Get the MARC XML of the Holding Pen update
     """
-    return run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN WHERE
-                      changeset_id=%s""", (str(changeId),))[0]
+    res = run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN WHERE
+                      changeset_id=%s""", (changeId,))
+    if res:
+        try:
+            changeset_xml = zlib.decompress(res[0][0])
+            return changeset_xml, res[0][1]
+        except zlib.error:
+            # Legacy: the xml can be in TEXT format, leave it unchanged
+            pass
+        return res[0]
 
 def delete_hp_change(changeId):
     """
@@ -125,3 +142,74 @@ def get_record_revision_author(recid, td):
         return result[0]
     else:
         return ""
+
+
+# Cache Related functions
+
+def cache_exists(recid, uid):
+    """Check if the BibEdit cache file exists."""
+    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    return bool(r)
+
+
+def cache_active(recid, uid):
+    """Check if the BibEdit cache is active (an editor is opened)."""
+    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s
+                   AND is_active = 1""", (recid, uid))
+    return bool(r)
+
+
+def deactivate_cache(recid, uid):
+    """Mark BibEdit cache as non active."""
+    return run_sql("""UPDATE bibEDITCACHE SET is_active = 0
+                      WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+
+def update_cache_post_date(recid, uid):
+    """Touch a BibEdit cache file. This should be used to indicate that the
+    user has again accessed the record, so that locking will work correctly.
+
+    """
+    run_sql("""UPDATE bibEDITCACHE SET post_date = NOW(), is_active = 1
+               WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+def get_cache(recid, uid):
+    """Return a BibEdit cache object from the database."""
+    r = run_sql("""SELECT data FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    if r:
+        return Pickle.loads(r[0][0])
+
+def update_cache(recid, uid, data):
+    data_str = Pickle.dumps(data)
+    r = run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
+                   VALUES (%s, %s, %s, NOW())
+                   ON DUPLICATE KEY UPDATE data = %s, post_date = NOW(), is_active = 1""",
+                   (recid, uid, data_str, data_str))
+
+def get_cache_post_date(recid, uid):
+    r = run_sql("""SELECT post_date FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    if r:
+        return r[0][0]
+
+def delete_cache(recid, uid):
+    run_sql("""DELETE FROM bibEDITCACHE
+               WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+def uids_with_active_caches(recid):
+    """Return list of uids with active caches for record RECID. Active caches
+    are caches that have been modified a number of seconds ago that is less than
+    the one given by CFG_BIBEDIT_TIMEOUT.
+
+    """
+    from invenio.config import CFG_BIBEDIT_TIMEOUT
+    datecut = datetime.now() - timedelta(seconds=CFG_BIBEDIT_TIMEOUT)
+    rows = run_sql("""SELECT uid FROM bibEDITCACHE
+                      WHERE id_bibrec = %s AND post_date > %s""",
+                      (recid, datecut))
+    return [int(row[0]) for row in rows]
+
+# End of cache related functions

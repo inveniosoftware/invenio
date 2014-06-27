@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,15 +22,23 @@
     bibauthorid_bdinterface in order to make it usable by the
     frontend so to keep it as clean as possible.
 '''
+import re
+from invenio.legacy.bibauthorid.name_utils import most_relevant_name
+from invenio.legacy.bibauthorid.name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.name_utils import soft_compare_names
+from invenio.legacy.bibauthorid.name_utils import create_normalized_name  # emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.search_engine import find_personids_by_name
+import invenio.legacy.bibauthorid.dbinterface as dbinter
 from cgi import escape
 from itertools import groupby
 from operator import itemgetter
 
-from invenio.legacy.bibauthorid.name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.name_utils import soft_compare_names
-from invenio.legacy.bibauthorid import dbinterface as dbinter
+# Well this is bad, BUT otherwise there must 100+ lines
+# of the form from dbinterface import ...  # emitting
+from invenio.legacy.bibauthorid.dbinterface import *  # pylint:  disable-msg=W0614
 
-from invenio.legacy.bibauthorid.dbinterface import *
+canonical_name_type = re.compile("\S*[.](\d)+$")
+
 
 def set_person_data(person_id, tag, value, user_level=None):
     '''
@@ -43,22 +51,32 @@ def set_person_data(person_id, tag, value, user_level=None):
     @param user_level:
     @type user_level: int
     '''
-    old = dbinter.get_personid_row(person_id, tag)
+    old = dbinter.get_author_data(person_id, tag)
     old_data = [tup[0] for tup in old]
     if value not in old_data:
-        dbinter.set_personid_row(person_id, tag, value, opt2=user_level)
+        dbinter.add_author_data(person_id, tag, value, opt2=user_level)
 
 
-def get_person_data(person_id, tag):
-    res = dbinter.get_personid_row(person_id, tag)
-    if res:
-        return (res[1], res[0])
-    else:
-        return []
+def get_persons_data(person_id_list, tag=None):
+    '''
+    @param person_id_list:
+    @type person_id_list: list
+    @param tag:
+    @type tag: string
+    @return: persons_data
+    @rtype: dict(tuple,)
+    '''
+    persons_data = dict()
+
+    for person_id in person_id_list:
+        res = dbinter.get_author_data(person_id, tag)
+        persons_data[person_id] = res
+
+    return persons_data
 
 
 def del_person_data(tag, person_id=None, value=None):
-    dbinter.del_personid_row(tag, person_id, value)
+    dbinter.remove_author_data(tag, person_id, value)
 
 
 def get_bibrefrec_name_string(bibref):
@@ -104,7 +122,10 @@ def get_person_papers_to_be_manually_reviewed(pid):
     Returns the set of papers awaiting for manual review for a person for bibref assignment
     @param pid: the personid, int
     '''
-    return get_person_data(pid, 'paper_needs_bibref_manual_confirm')
+    res = get_persons_data([pid], 'paper_needs_bibref_manual_confirm')
+    if res[pid]:
+        return [res[pid][0][1],res[0][0]]
+    return list()
 
 
 def del_person_papers_needs_manual_review(pid, bibrec):
@@ -129,22 +150,21 @@ def set_processed_external_recids(pid, recid_list_str):
 def assign_person_to_uid(uid, pid):
     '''
     Assigns a person to a userid. If person already assigned to someone else, create new person.
-    Returns the peron id assigned.
+    Returns two value. Firstly the person id assigned and secondly if uid was succesfully assigned to given pid.
+    If parameter pid equals to -1 then we assign the uid to a new person
     @param uid: user id, int
     @param pid: person id, int, if -1 creates new person.
-    @return: pid int
+    @return: pid int, bool
     '''
     if pid == -1:
-        pid = dbinter.create_new_person_from_uid(uid)
-        return pid
+        pid = dbinter.create_new_author_by_uid(uid, uid_is_owner=True)
+        return pid, True
     else:
-        current_uid = get_person_data(pid, 'uid')
-        if len(current_uid) == 0:
-            set_person_data(pid, 'uid', str(uid))
-            return pid
-        else:
-            pid = dbinter.create_new_person_from_uid(uid)
-            return pid
+        current_uid = get_persons_data([pid], 'uid')
+        if len(current_uid[pid]) == 0:
+            dbinter.add_userid_to_author(pid,  str(uid))
+            return pid, True
+        return -1, False
 
 
 def get_processed_external_recids(pid):
@@ -153,20 +173,23 @@ def get_processed_external_recids(pid):
     @param pid: pid
     @return: [str]
     '''
-    db_data = get_person_data(pid, "processed_external_recids")
+    db_data = get_persons_data([pid], "processed_external_recids")
     recid_list_str = ''
 
-    if db_data and db_data[0] and db_data[0][1]:
-        recid_list_str = db_data[0][1]
+    if pid in db_data.keys() and db_data[pid] and db_data[pid][0][0]:
+        recid_list_str = db_data[pid][0][0]
 
     return recid_list_str
 
 
 def get_all_personids_recs(pid, claimed_only=False):
-    return dbinter.get_all_paper_records(pid, claimed_only)
+    return dbinter.get_papers_of_author(pid, claimed_only)
 
+def mark_internal_id_as_old(person_id, uid):
+    remove_author_data('uid', pid=person_id, value = uid)
+    add_author_data(person_id, 'uid-old', value = uid)
 
-def find_personIDs_by_name_string(target):
+def fallback_find_personids_by_name_string(target):
     '''
     Search engine to find persons matching the given string
     The matching is done on the surname first, and names if present.
@@ -182,7 +205,7 @@ def find_personIDs_by_name_string(target):
     splitted_name = split_name_parts(target)
     family = splitted_name[0]
 
-    levels = (#target + '%', #this introduces a weird problem: different results for mele, salvatore and salvatore mele
+    levels = (# target + '%', #this introduces a weird problem: different results for mele, salvatore and salvatore mele
               family + ',%',
               family[:-2] + '%',
               '%' + family + ',%',
@@ -192,13 +215,14 @@ def find_personIDs_by_name_string(target):
         levels = [levels[0], levels[2]]
 
     for lev in levels:
-        names = dbinter.get_all_personids_by_name(lev)
+        names = dbinter.get_authors_by_name_regexp(lev)
         if names:
+            print "%s" % lev
             break
 
     is_canonical = False
     if not names:
-        names = dbinter.get_personids_by_canonical_name(target)
+        names = dbinter.get_authors_by_canonical_name_regexp(target)
         is_canonical = True
 
     names = groupby(sorted(names))
@@ -216,14 +240,57 @@ def find_personIDs_by_name_string(target):
     return names
 
 
-def find_top5_personid_for_new_arXiv_user(bibrecs, name):
+def person_search_engine_query(query_string):
+    '''
+    docstring
+
+    @param query_string:
+    @type query_string:
+
+    @return:
+    @rtype:
+    '''
+    personid_names_list = list()
+
+    search_engine_status = dbinter.search_engine_is_operating()
+
+    personids_list = list()
+    if search_engine_status:
+        personids_list = find_personids_by_name(query_string)
+        personid_names_list = [(i, []) for i in personids_list]
+
+    if canonical_name_type.match(query_string):
+        canonical_name_matches = list(get_authors_by_canonical_name_regexp(query_string))
+
+        if canonical_name_matches:
+            canonical_name_matches = [i for i in canonical_name_matches if int(i[0]) not in personids_list]
+            personid_names_list = canonical_name_matches + personid_names_list
+
+    if '@' in query_string:
+        uid = dbinter.get_user_id_by_email(query_string)
+        if uid is not None:
+            pid = dbinter.get_author_by_uid(uid)
+            if pid and pid not in personids_list:
+                personid_names_list = [(pid, [])] + personid_names_list
+
+    if personid_names_list:
+        return personid_names_list
+
+    return fallback_find_personids_by_name_string(query_string)
+
+
+def find_personIDs_by_name_string(query_string):
+    return person_search_engine_query(query_string)
+
+
+def find_top5_personid_for_new_arxiv_user(bibrecs, name):
 
     top5_list = []
 
-    pidlist = dbinter.get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=name)
+    pidlist = get_author_to_papers_mapping(bibrecs, limit_by_name=name)
 
     for p in pidlist:
-        if not dbinter.get_uid_from_personid(p[0]):
+        if not get_uid_of_author(p[0]):
             top5_list.append(p[0])
             if len(top5_list) > 4:
                 break
@@ -238,7 +305,7 @@ def find_top5_personid_for_new_arXiv_user(bibrecs, name):
     pidlist = find_personIDs_by_name_string(escaped_name)
 
     for p in pidlist:
-        if not dbinter.get_uid_from_personid(p[0]) and not p[0] in top5_list:
+        if not get_uid_of_author(p[0]) and not p[0] in top5_list:
             top5_list.append(p[0])
             if len(top5_list) > 4:
                 break
@@ -249,10 +316,36 @@ def find_top5_personid_for_new_arXiv_user(bibrecs, name):
 def check_personids_availability(picked_profile, uid):
 
     if picked_profile == -1:
-        return dbinter.create_new_person(uid, uid_is_owner=True)
+        return create_new_author_by_uid(uid, uid_is_owner=True)
     else:
-        if not dbinter.get_uid_from_personid(picked_profile):
-            dbinter.set_personid_row(picked_profile, 'uid', uid)
+        if not get_uid_of_author(picked_profile):
+            dbinter.add_author_data(picked_profile, 'uid', uid)
             return picked_profile
         else:
-            return dbinter.create_new_person(uid, uid_is_owner=True)
+            return create_new_author_by_uid(uid, uid_is_owner=True)
+
+
+def find_most_compatible_person(bibrecs, name_variants):
+    '''
+    Find if a profile in inspire matches to the profile that the user has in arXiv
+    (judging from the papers the name etc)
+
+
+    @param bibrecs: external system's record ids
+    @type bibrecs: list
+
+    @param name_variants: names of the user
+    @type name_variants: list
+
+    @return: person id of the most compatible person
+    @rtype: int
+    '''
+    if name_variants:
+        relevant_name = most_relevant_name(name_variants)
+
+        pidlist = get_author_to_papers_mapping(bibrecs, limit_by_name=relevant_name)
+
+        for p in pidlist:
+            if not get_uid_of_author(p[0]):
+                return p[0]
+    return -1

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,10 +26,11 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
+from operator import itemgetter
 
-from invenio.config import CFG_INSPIRE_SITE
-from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
-from invenio.legacy.bibrank.selfcites_indexer import get_self_citations_count
+from invenio.config import CFG_INSPIRE_SITE, \
+                           CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD
+from invenio.legacy.bibrank.citation_searcher import get_citation_dict
 from six import iteritems, StringIO
 
 from invenio.legacy.search_engine import search_pattern, perform_request_search
@@ -62,89 +63,152 @@ CFG_CITESUMMARY_FAME_THRESHOLDS = [
                                    ]
 
 
-def render_self_citations(d_recids, ln):
-    """Render the html displayed for self-citations"""
-    d_total_cites = {}
-    d_avg_cites = {}
-
-    for coll, recids in iteritems(d_recids):
-        if recids:
-            d_total_cites[coll] = get_self_citations_count(recids)
-            d_avg_cites[coll] = d_total_cites[coll] * 1.0 / len(recids)
-        else:
-            d_total_cites[coll] = 0
-            d_avg_cites[coll] = 0
-
-    return websearch_templates.tmpl_citesummary_minus_self_cites(d_total_cites,
-                                                                 d_avg_cites,
-                                                                 ln)
-
-
-def render_citations_breakdown(req, ln, collections, d_recid_citers,
-                                                search_patterns, searchfield):
+def render_citations_breakdown(req, ln, collections, stats,
+                               search_patterns, searchfield):
     "Render citations break down by fame"
     header = websearch_templates.tmpl_citesummary_breakdown_header(ln)
     req.write(header)
 
     for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
-        d_cites = {}
-        for coll, citers in iteritems(d_recid_citers):
-            d_cites[coll] = 0
-            for dummy, lciters in citers:
-                numcites = 0
-                if lciters:
-                    numcites = len(lciters)
-                if numcites >= low and numcites <= high:
-                    d_cites[coll] += 1
+        counts = {}
+        for coll, dummy in collections:
+            counts[coll] = stats[coll]['breakdown'][fame]
         fame_info = websearch_templates.tmpl_citesummary_breakdown_by_fame(
-                                d_cites, low, high, fame, collections,
+                                counts, low, high, fame, collections,
                                 search_patterns, searchfield, ln)
         req.write(fame_info)
 
 
-def render_citation_summary(req, ln, recids, collections, searchpattern,
-                                                                  searchfield):
+def compute_citations_counts(recids, dict_name):
+    """Compute # cites for each recid
+
+    Input
+    - d_recids: list of recids for each collection
+           {'HEP': [1,2,3,5,8]}
+    Output:
+    - citers_counts: list of # cites/recid
+           {'HEP': [(1, 10), (2, 5), (3, 23), (5, 0), (8, 0)]}
+    """
+    cites_count = get_citation_dict(dict_name)
+    counts = [(recid, cites_count.get(recid, 0)) for recid in recids]
+    counts.sort(key=itemgetter(1), reverse=True)
+    return counts
+
+
+def compute_citation_stats(recids, citers_counts):
+    # Total citations
+    total_cites = 0
+    h_index = 0
+    h_index_done = False
+    total_recids_without_cites = len(recids)
+
+    # Breakdown
+    breakdown = {}
+    for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
+        breakdown[fame] = 0
+
+    for recid, citecount in citers_counts:
+        if recid in recids:
+            # Total
+            total_cites += citecount
+
+            # Recids without cites
+            total_recids_without_cites -= 1
+
+            # h-index
+            if not h_index_done:
+                h_index += 1
+                if h_index > citecount:
+                    h_index -= 1
+                    h_index_done = True
+
+            # Breakdown
+            for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
+                if low <= citecount <= high:
+                    breakdown[fame] += 1
+
+    for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
+        if low == 0:
+            breakdown[fame] += total_recids_without_cites
+
+    # Average citations
+    try:
+        avg_cites = float(total_cites) / len(recids)
+    except ZeroDivisionError:
+        avg_cites = 0
+
+    return {'total_cites': total_cites,
+            'avg_cites': avg_cites,
+            'h-index': h_index,
+            'breakdown': breakdown}
+
+
+def get_cites_counts(recids):
+    if len(recids) < CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+        cites_counts = compute_citations_counts(recids, 'citations_weights')
+    else:
+        cites_counts = get_citation_dict('citations_counts')
+    return cites_counts
+
+
+def generate_citation_summary(recids, collections=CFG_CITESUMMARY_COLLECTIONS):
+
+    coll_recids = get_recids(recids, collections)
+    cites_counts = get_cites_counts(recids)
+
+    stats = {}
+    for coll, dummy in collections:
+        stats[coll] = compute_citation_stats(coll_recids[coll], cites_counts)
+
+    return coll_recids, stats
+
+def render_citation_summary(req, ln, recids, searchpattern, searchfield,
+                            stats, collections=CFG_CITESUMMARY_COLLECTIONS):
     title = websearch_templates.tmpl_citesummary_title(ln)
     req.write(title)
 
-    d_recids = get_recids(recids, collections)
-    d_recid_citers = get_citers(d_recids)
     search_patterns = dict([(coll, searchpattern) \
                                                for coll, dummy in collections])
+
+    if stats is None:
+        status = generate_citation_summary(recids, collections)
+
+    coll_recids, stats = stats
+
     render_citesummary_prologue(req,
                                 ln,
                                 recids,
                                 collections,
                                 search_patterns,
                                 searchfield,
-                                d_recids)
+                                coll_recids)
     render_citesummary_overview(req,
                                 ln,
                                 collections,
-                                d_recids,
-                                d_recid_citers)
+                                stats)
     render_citations_breakdown(req,
                                ln,
                                collections,
-                               d_recid_citers,
+                               stats,
                                search_patterns,
                                searchfield)
 
-    render_h_index(req, ln, collections, d_recid_citers)
+    render_h_index(req, ln, collections, stats)
 
-    eplilogue = websearch_templates.tmpl_citesummary_epilogue(ln)
+    eplilogue = websearch_templates.tmpl_citesummary_epilogue()
     req.write(eplilogue)
 
     links = websearch_templates.tmpl_citesummary_more_links(searchpattern, ln)
     req.write(links)
 
 
-def render_extended_citation_summary(req, ln, recids, initial_collections,
+def render_extended_citation_summary(req, ln, recids, collections,
                                                    searchpattern, searchfield):
     title = websearch_templates.tmpl_citesummary2_title(searchpattern, ln)
     req.write(title)
 
-    d_recids = get_recids(recids, initial_collections)
+    initial_collections = collections
+    collections_recids = get_recids(recids, collections)
 
     def coll_self_cites(name):
         return name + '<br />excluding self cites'
@@ -156,10 +220,10 @@ def render_extended_citation_summary(req, ln, recids, initial_collections,
     if CFG_INSPIRE_SITE:
         notrpp_searchpattern = searchpattern + ' -title:rpp'
         notrpp_recids = intbitset(perform_request_search(p=notrpp_searchpattern))
-    for coll, coll_recids in list(iteritems(d_recids)):
-        d_recids[coll_self_cites(coll)] = coll_recids
+    for coll, coll_recids in collections_recids.items():
+        collections_recids[coll_self_cites(coll)] = coll_recids
         if CFG_INSPIRE_SITE:
-            d_recids[coll_not_rpp(coll)] = notrpp_recids & coll_recids
+            collections_recids[coll_not_rpp(coll)] = notrpp_recids & coll_recids
     # Add self cites collections
     collections = []
     search_patterns = {}
@@ -178,54 +242,59 @@ def render_extended_citation_summary(req, ln, recids, initial_collections,
                 (coll, query),
                 (coll_self_cites(coll), query),
             ]
-    d_recid_citers = get_citers(d_recids)
+
+    cites_counts = get_cites_counts(recids)
+
+    if len(recids) < CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+        selfcites_counts = compute_citations_counts(recids, 'selfcites_weights')
+    else:
+        selfcites_counts = get_citation_dict('selfcites_counts')
+
+    citers_counts = {}
+
     for coll, dummy in initial_collections:
-        d_recid_citers[coll_self_cites(coll)] = [
-            (recid, range(get_self_citations_count([recid]))) \
-                                                for recid in d_recids[coll]
-        ]
+        citers_counts[coll] = cites_counts
+        citers_counts[coll_self_cites(coll)] = selfcites_counts
+        citers_counts[coll_not_rpp(coll)] = cites_counts
+
+    stats = {}
+    for coll, dummy in collections:
+        stats[coll] = compute_citation_stats(collections_recids[coll], citers_counts[coll])
+
     render_citesummary_prologue(req,
                                 ln,
                                 recids,
                                 collections,
                                 search_patterns,
                                 searchfield,
-                                d_recids)
+                                collections_recids)
     render_citesummary_overview(req,
                                 ln,
                                 collections,
-                                d_recids,
-                                d_recid_citers)
+                                stats)
     render_citations_breakdown(req,
                                ln,
                                collections,
-                               d_recid_citers,
+                               stats,
                                search_patterns,
                                searchfield)
-    for coll, dummy in initial_collections:
-        d_recid_citers[coll_self_cites(coll)] = None
-    render_h_index(req, ln, collections, d_recid_citers)
+    render_h_index(req, ln, collections, stats)
 
     # 6) hcs epilogue:
-    eplilogue = websearch_templates.tmpl_citesummary_epilogue(ln)
+    eplilogue = websearch_templates.tmpl_citesummary_epilogue()
     req.write(eplilogue)
 
     back_link = websearch_templates.tmpl_citesummary_back_link(searchpattern, ln)
     req.write(back_link)
 
 
-def render_citesummary_overview(req, ln, collections, recids, recid_citers):
+def render_citesummary_overview(req, ln, collections, stats):
     """Citations overview: total citations"""
-    total_cites = {}
     avg_cites = {}
-
-    for coll, citers in iteritems(recid_citers):
-        total_cites[coll] = sum([len(lciters) for dummy, lciters in citers])
-        try:
-            avg_cites[coll] = float(total_cites[coll]) / len(recids[coll])
-        except ZeroDivisionError:
-            avg_cites[coll] = 0
-
+    total_cites = {}
+    for coll, dummy in collections:
+        avg_cites[coll] = stats[coll]['avg_cites']
+        total_cites[coll] = stats[coll]['total_cites']
     overview = websearch_templates.tmpl_citesummary_overview(collections,
                                                              total_cites,
                                                              avg_cites,
@@ -244,19 +313,11 @@ def get_recids(recids, collections):
     return d_recids
 
 
-def get_citers(d_recids):
-    """For each recid fetches the list of citing papers"""
-    d_recid_citers = {}
-    for coll, recids in iteritems(d_recids):
-        d_recid_citers[coll] = get_cited_by_list(recids)
-    return d_recid_citers
-
-
 def render_citesummary_prologue(req, ln, recids, collections, search_patterns,
-                                                        searchfield, d_recids):
+                                                     searchfield, coll_recids):
     total_count = len(recids)
     citable_recids = recids & search_pattern(p='collection:citeable')
-    prologue = websearch_templates.tmpl_citesummary_prologue(d_recids,
+    prologue = websearch_templates.tmpl_citesummary_prologue(coll_recids,
                                                              collections,
                                                              search_patterns,
                                                              searchfield,
@@ -266,41 +327,14 @@ def render_citesummary_prologue(req, ln, recids, collections, search_patterns,
     req.write(prologue)
 
 
-def render_h_index(req, ln, collections, d_recid_citers):
+def render_h_index(req, ln, collections, stats):
     "Calculate and Render h-hep index"
-    d_recid_citecount_l = {}
-    for coll, citers in iteritems(d_recid_citers):
-        if citers is None:
-            d_recid_citecount_l[coll] = None
-        else:
-            d_recid_citecount_l[coll] = []
-            for recid, lciters in citers:
-                d_recid_citecount_l[coll].append((recid, len(lciters)))
-
-    d_h_factors = {}
-
-    def comparator(x, y):
-        if x[1] > y[1]:
-            return -1
-        elif x[1] == y[1]:
-            return 0
-        else:
-            return 1
-    for coll, citecount in iteritems(d_recid_citecount_l):
-        if citecount is None:
-            d_h_factors[coll] = 'n/a'
-        else:
-            d_h_factors[coll] = 0
-            d_recid_citecount_l[coll].sort(cmp=comparator)
-            for citecount in citecount:
-                d_h_factors[coll] += 1
-                if d_h_factors[coll] > citecount[1]:
-                    d_h_factors[coll] -= 1
-                    break
+    h_indexes = {}
+    for coll, dummy in collections:
+        h_indexes[coll] = stats[coll]['h-index']
     h_idx = websearch_templates.tmpl_citesummary_h_index(collections,
-                                                         d_h_factors,
+                                                         h_indexes,
                                                          ln)
-
     req.write(h_idx)
 
 
@@ -311,26 +345,34 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="",
        for instance p='Smith, Paul' and f='author'.  They are used for links.
        REQ is the Apache/mod_python request object.
     """
+    # Workaround a intbitset segfault when this is not a intbitset
+    if not isinstance(recids, intbitset):
+        recids = intbitset(recids)
+
     if of == 'xcs':
-        # this is XML cite summary
-        citedbylist = get_cited_by_list(recids)
-        return render_citation_summary_xml(citedbylist)
+        # This is XML cite summary
+        return render_citation_summary_xml(recids)
 
     has_req = req is not None
     if not has_req:
         req = StringIO()
 
     if of == 'hcs':
-        renderer = render_citation_summary
+        stats = generate_citation_summary(recids, collections)
+        render_citation_summary(req=req,
+                                ln=ln,
+                                recids=recids,
+                                collections=collections,
+                                searchpattern=searchpattern,
+                                searchfield=searchfield,
+                                stats=stats)
     else:
-        renderer = render_extended_citation_summary
-
-    renderer(req,
-             ln,
-             recids,
-             collections,
-             searchpattern,
-             searchfield)
+        render_extended_citation_summary(req=req,
+                                         ln=ln,
+                                         recids=recids,
+                                         collections=collections,
+                                         searchpattern=searchpattern,
+                                         searchfield=searchfield)
 
     req.write(websearch_templates.tmpl_citesummary_footer())
 
@@ -341,59 +383,43 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="",
 
 
 # For citation summary, code xcs/hcs (unless changed)
-def render_citation_summary_xml(citedbylist):
+def render_citation_summary_xml(recids):
     """Prints citation summary in xml."""
-    alldict = calculate_citations(citedbylist)
-    avgstr = str(alldict['avgcites'])
-    totalcites = str(alldict['totalcites'])
-    # format avg so that it does not span 10 digits
-    avgstr = avgstr[0:4]
-    reciddict = alldict['reciddict']
+    total_cites, recids_breakdown = calculate_citations(recids)
+
     # output formatting
-    outp = "<citationsummary records=\"" + str(len(citedbylist))
-    outp += "\" citations=\"" + str(totalcites) + "\">"
+    out = ["<citationsummary records=\"%s\" citations=\"%s\">" \
+                                                  % (len(recids), total_cites)]
     for dummy, dummy, name in CFG_CITESUMMARY_FAME_THRESHOLDS:
         # get the name, print the value
-        if name in reciddict:
-            recs = reciddict[name]
-            outp += "<citationclass>" + name
-            outp += "<records>%s</records>" % recs
-            outp += "</citationclass>\n"
-    outp = outp + "</citationsummary>"
-    return outp  # just to return something
+        if name in recids_breakdown:
+            out += ["<citationclass>%s<records>%s</records></citationclass>\n"\
+                                              % (name, recids_breakdown[name])]
+    out += ["</citationsummary>"]
+    return '\n'.join(out)
 
 
-def calculate_citations(citedbylist):
+def calculate_citations(recids):
     """calculates records in classes of citations
        defined by thresholds. returns a dictionary that
        contains total, avg, records and a dictionary
        of threshold names and number corresponding to it"""
-    totalcites = 0
-    avgcites = 0
-    reciddict = {}
-    for recid, cites in citedbylist:
-        numcites = 0
-        if cites:
-            numcites = len(cites)
-        totalcites = totalcites + numcites
-        # take the numbers in CFG_CITESUMMARY_FAME_THRESHOLDS
-        for low, high, name in CFG_CITESUMMARY_FAME_THRESHOLDS:
-            if (numcites >= low) and (numcites <= high):
-                if name in reciddict:
-                    tmp = reciddict[name]
-                    tmp.append(recid)
-                    reciddict[name] = tmp
-                else:
-                    reciddict[name] = [recid]
-    if (len(citedbylist) == 0):
-        avgcites = 0
-    else:
-        avgcites = totalcites * 1.0 / len(citedbylist)
+    total_cites = 0
+    recids_breakdown = {}
 
-    # create a dictionary that contains all the values
-    alldict = {}
-    alldict['records'] = len(citedbylist)
-    alldict['totalcites'] = totalcites
-    alldict['avgcites'] = avgcites
-    alldict['reciddict'] = reciddict
-    return alldict
+    if len(recids) < CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+        cites_counts = compute_citations_counts(recids, 'citations_weights')
+    else:
+        cites_counts = get_citation_dict('citations_counts')
+
+    for recid, numcites in cites_counts:
+        if recid in recids:
+            total_cites += numcites
+            for low, high, name in CFG_CITESUMMARY_FAME_THRESHOLDS:
+                if low <= numcites <= high:
+                    recids_breakdown.setdefault(name, []).append(recid)
+                if low == 0:
+                    non_cited = recids - get_citation_dict("citations_keys")
+                    recids_breakdown.setdefault(name, []).extend(non_cited)
+
+    return total_cites, recids_breakdown

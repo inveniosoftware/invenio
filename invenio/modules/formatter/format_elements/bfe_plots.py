@@ -3,7 +3,7 @@
 ## $Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,59 +20,74 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibFormat element - Display image of the plot if we are in selected plots collection
 """
-__revision__ = "$Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $"
 
 from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.utils.url import create_html_link
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_RECORD
+from invenio.base.i18n import gettext_set_language
 
-def format_element(bfo, width="", caption="yes", max="-1"):
+try:
+    from invenio.config import CFG_BASE_URL
+except ImportError:
+    from invenio.config import CFG_SITE_URL
+    CFG_BASE_URL = CFG_SITE_URL
+
+
+def format_element(bfo, width="", caption="yes", max_plots="3"):
     """
     Display image of the plot if we are in selected plots collections
 
+    To achieve this, we take the pngs associated with this document
+
     @param width: the width of the returned image (Eg: '100px')
     @param caption: display the captions or not?
-    @param max: the maximum number of plots to display (-1 is all plots)
+    @param max_plots: the maximum number of plots to display (-1 is all plots)
     """
-    ## To achieve this, we take the pngs associated with this document
+    _ = gettext_set_language(bfo.lang)
 
     img_files = []
-    max = int(max)
+    try:
+        max_plots = int(max_plots)
+    except ValueError:
+        # Someone tried to squeeze in something non-numerical. Hah!
+        max_plots = 3
 
+    link = ""
     bibarchive = BibRecDocs(bfo.recID)
 
     if width != "":
         width = 'width="%s"' % width
 
-    for doc in bibarchive.list_bibdocs():
+    for doc in bibarchive.list_bibdocs(doctype="Plot"):
         for _file in doc.list_latest_files():
-            if _file.get_type() == "Plot":
+            if _file.subformat == "context":
+                # Ignore context files
+                continue
 
-                try:
-                    caption_text = _file.get_description()[5:]
-                    index = int(_file.get_description()[:5])
-                    img_location = _file.get_url()
-                except:
-                    # FIXME: we have hit probably a plot context file,
-                    # so ignore this document; but it would be safer
-                    # to check subformat type, so that we don't mask
-                    # other eventual errors here.
-                    continue
+            caption_text = _file.get_description()[5:]
+            index = int(_file.get_description()[:5])
+            img_location = _file.get_url()
 
-                img = '<img src="%s" title="%s" %s/>' % \
-                      (img_location, caption_text, width)
+            img = '<img style="vertical-align:middle;" src="%s" title="%s" %s/>' % \
+                  (img_location, caption_text, width)
 
-                link = create_html_link(urlbase='%s/%s/%s/plots#%d' %
-                                                (CFG_SITE_URL, CFG_SITE_RECORD, bfo.recID,\
-                                                 index),
+            plotlink = create_html_link(urlbase='%s/%s/%s/plots#%d' %
+                                        (CFG_BASE_URL,
+                                         CFG_SITE_RECORD,
+                                         bfo.recID,
+                                         index),
                                         urlargd={},
                                         link_label=img)
 
-                img_files.append((index, link))
+            img_files.append((index, plotlink))
 
     img_files = sorted(img_files, key=lambda x: x[0])
-    if max > 0:
-        img_files = img_files[:max]
+    if max_plots > 0:
+        img_files = img_files[:max_plots]
+
+    if len(img_files) >= max_plots:
+        link = "<a href='/%s/%s/plots'>%s</a>" % \
+               (CFG_SITE_RECORD, bfo.recID, _("Show more plots"))
 
     for index in range(len(img_files)):
         img_files[index] = img_files[index][1]
@@ -80,8 +95,9 @@ def format_element(bfo, width="", caption="yes", max="-1"):
     if len(img_files) == 0:
         return ''
 
-    return '<div style="overflow-x:scroll;width=100%;white-space:nowrap">' +\
-           " ".join(img_files) + '</div>'
+    return '<div style="overflow-x:auto;display:inline;width:100%;">' +\
+           " ".join(img_files) + ' ' + link + '</div>'
+
 
 def escape_values(bfo):
     """

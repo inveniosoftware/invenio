@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,5 +21,5 @@
     to extract information about the authors.
 '''
 
-from invenio.legacy.bibauthorid.dbinterface import get_person_bibrecs                  #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import get_personids_from_bibrec           #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_confirmed_papers_of_author                  #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_authors_of_claimed_paper           #emitting #pylint: disable-msg=W0611

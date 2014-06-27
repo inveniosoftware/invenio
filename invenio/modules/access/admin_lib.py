@@ -617,13 +617,12 @@ def perform_userarea(req, email_user_pattern=''):
                 for col in [(('add', 'addroleuser'),
                             ('remove', 'deleteuserrole')),
                             (('show details', 'showuserdetails'), )]:
-                    users[-1].append('<a href="%s?email_user_pattern=%s&amp;'
-                        'id_user=%s">%s</a>' % (col[0][1],
-                        email_user_pattern, id, col[0][0]))
+                    users[-1].append('<a href="%s?'
+                        'id_user=%s">%s</a>' % (col[0][1], id, col[0][0]))
                     for (str, function) in col[1:]:
-                        users[-1][-1] += ' / <a href="%s?email_user_pattern' \
-                            '=%s&amp;id_user=%s&amp;reverse=1">%s</a>' % \
-                            (function, email_user_pattern, id, str)
+                        users[-1][-1] += ' / <a href="%s?' \
+                            'id_user=%s&amp;reverse=1">%s</a>' % \
+                            (function, id, str)
 
             output += '<p>found <strong>%s</strong> matching users:</p>' % \
                 (len(users1), )

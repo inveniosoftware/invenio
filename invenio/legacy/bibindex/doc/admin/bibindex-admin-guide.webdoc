@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,7 +51,7 @@
 <strong>2. <a href="#2">Configure Metadata Tags and Fields</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Configure Physical MARC Tags</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Configure Logical Fields</a><br/>
-<strong>3. <a href="#3">Configure Word/Phrase Indexes</a></strong><br/>
+<strong>3. <a href="#3">Configure Normal Word/Phrase Indexes</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Define New Index</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Configure Word-Breaking Procedure</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Configure Stopwords List</a><br/>
@@ -61,11 +61,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8 <a href="#3.8">Configure Fulltext Indexing</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8.1 <a href="#3.8.1">Configure Solr Fulltext Indexing</a><br/>
-<strong>4. <a href="#4">Run BibIndex Daemon</a></strong><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Reindexing</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4 <a href="#4.4">Solr fulltext indexing</a><br/>
+<strong>4. <a href="#4">Configure Virtual Word/Phrase Indexes</a></strong><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Define New Virtual Index</a><br/>
+<strong>5. <a href="#5">Run BibIndex Daemon</a></strong><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5.1 <a href="#5.1">Run BibIndex daemon</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5.2 <a href="#5.2">Checking and repairing indexes</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5.3 <a href="#5.3">Reindexing</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 5.4 <a href="#5.4">Solr fulltext indexing</a><br/>
 
 <a name="1"></a><h2>1. Overview</h2>
 <a name="2"></a><h2>2. Configure Metadata Tags and Fields</h2>
@@ -200,9 +202,34 @@ UPDATE idxINDEX SET indexer='SOLR' WHERE name='fulltext'
 </pre>
 </blockquote>
 
-<a name="4"></a><h2>4. Run BibIndex Daemon</h2>
+<a name="4"></a><h2>4. Configure Virtual Word/Phrase Indexes</h2>
 
-<a name="4.1"></a><h3>4.1 Run BibIndex daemon</h3>
+<a name="4.1"></a><h3>4.1 Define New Virtual Index</h3>
+
+<p>An index can be <em>virtual</em> in which case it is composed of
+other <em>normal</em> indexes that were described in the preceding
+section.  For example, the <em>global</em> index is by default virtual
+and it is composed of several normal indexes such
+as <em>title</em>, <em>author</em>, <em>abstract</em>, etc.</p>
+
+<p>When indexing a virtual index, the indexer does not tokenises terms
+anew as is the case for normal index.  Rather, the indexer simply
+collects terms that were generated previously when dependent normal
+indexes were running.  When a normal index run, say title, it created
+list of terms from title fields and it updated not only its own title
+index, but it also submitted its terms to the overall global index's
+processing queue.  When the global index process runs, it simply
+processes its incoming queue and updates its term list, without any
+record lookups.</p>
+
+<p>In this manner, a site can run several parallel indexing processes
+for independent normal indexes, and several parallel indexing
+processes for various virtual indexes, taking full advantage of
+multi-core multi-node architecture.</p>
+
+<a name="5"></a><h2>5. Run BibIndex Daemon</h2>
+
+<a name="5.1"></a><h3>5.1 Run BibIndex daemon</h3>
 
 <p>To index your newly created or modified documents, bibindex must be
 run periodically via bibsched.  This is achieved by the sleep option
@@ -210,7 +237,7 @@ run periodically via bibsched.  This is achieved by the sleep option
 href="howto-run">HOWTO Run</a> admin guide.</p>
 
 
-<a name="4.2"></a><h3>4.2 Checking and repairing indexes</h3>
+<a name="5.2"></a><h3>5.2 Checking and repairing indexes</h3>
 
 <p>Upon each indexing run, bibindex checks and reports any
 inconsistencies in the indexes.  You can also manually check for the
@@ -237,7 +264,7 @@ the index checking procedure (-k) and, if successful, continue with
 the normal web site operation.  However, a full reindexing should be
 scheduled for the forthcoming night or weekend.</p>
 
-<a name="4.3"></a><h3>4.3 Reindexing</h3>
+<a name="5.3"></a><h3>5.3 Reindexing</h3>
 
 <p>The procedure of reindexing is taking place into the real indexes that
 are also used for searching.  Therefore the end users will feel
@@ -325,7 +352,7 @@ if reindexing takes several hours in your installation (e.g. if you
 have 1,000,000 records), you may want to mysqlhotcopy your tables and
 run reindexing on those copies yourself.</p>
 
-<a name="4.4"></a><h3>4.4 Solr fulltext indexing</h3>
+<a name="5.4"></a><h3>5.4 Solr fulltext indexing</h3>
 
 <p>If Solr is used for both fulltext and ranking, only the <code>BibRank</code>
 daemon shall run. Since Solr documents can only be overriden and not updated, the

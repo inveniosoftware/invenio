@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -863,7 +863,9 @@ class MARCTranslator:
             parameters = {}
         bfo = BibFormatObject(self.recID)
         format_element = get_format_element(function_name)
-        (value, dummy) = eval_format_element(format_element, bfo, parameters)
+        value, dummy = eval_format_element(format_element,
+                                           bfo,
+                                           parameters)
         #to do: check errors from function call
         return value
 

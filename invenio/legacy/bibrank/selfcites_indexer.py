@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,7 +39,6 @@ from invenio.legacy.bibrank.citation_indexer import tagify
 from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.bibauthorid.searchinterface import get_personids_from_bibrec
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
 from invenio.modules.ranker.registry import configuration
 
@@ -61,7 +60,7 @@ def get_personids_from_record(record):
     We limit the result length to 20 authors, after which it returns an
     empty set for performance reasons
     """
-    ids = get_personids_from_bibrec(record)
+    ids = get_authors_of_claimed_paper(record)
     if 0 < len(ids) <= 20:
         person_ids = set(ids)
     else:
@@ -106,7 +105,7 @@ def get_authors_from_record(recID, tags,
              get_fieldvalues(recID, tags['first_author']),
              get_fieldvalues(recID, tags['additional_author']),
              get_fieldvalues(recID, tags['alternative_author_name']))
-        authors = set(hash(author) for author in list(authors_list)[:20])
+        authors = set(hash(author) for author in list(authors_list)[:21])
 
     return authors
 
@@ -322,11 +321,11 @@ def store_record_coauthors(recid, authors, deleted_authors,
         to_process = added_authors
 
     for personid in get_author_coauthors_list(deleted_authors, config):
-        run_sql('DELETE FROM rnkEXTENDEDAUTHORS WHERE'\
+        run_sql('DELETE FROM rnkEXTENDEDAUTHORS WHERE'
                 ' id = %s AND authorid = %s', (recid, personid))
 
     for personid in get_author_coauthors_list(to_process, config):
-        run_sql('INSERT IGNORE INTO rnkEXTENDEDAUTHORS (id, authorid) ' \
+        run_sql('INSERT IGNORE INTO rnkEXTENDEDAUTHORS (id, authorid) '
                 'VALUES (%s,%s)', (recid, personid))
 
 
@@ -338,6 +337,8 @@ def get_record_coauthors(recid):
     sql = 'SELECT authorid FROM rnkEXTENDEDAUTHORS WHERE id = %s'
     return (r[0] for r in run_sql(sql, (recid, )))
 
+
+SELFCITES_CONFIG = load_config_file('selfcites')
 
 ALL_ALGORITHMS = {
     'friends': compute_friends_self_citations,

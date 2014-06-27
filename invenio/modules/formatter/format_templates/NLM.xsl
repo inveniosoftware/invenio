@@ -155,7 +155,7 @@ exclude-result-prefixes="marc fn">
           </lpage>
           <self-uri xmlns:xlink="http://www.w3.org/1999/xlink/" >
                 <xsl:attribute name="xlink:href">
-                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
                 </xsl:attribute>
           </self-uri>
           <xsl:for-each select="datafield[@tag='856' and @ind1='4' and @ind2=' ']/subfield[@code='u' or @code='q']">
@@ -241,7 +241,7 @@ exclude-result-prefixes="marc fn">
           </pub-date>
           <self-uri xmlns:xlink="http://www.w3.org/1999/xlink/" >
                 <xsl:attribute name="xlink:href">
-                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+                <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
                 </xsl:attribute>
           </self-uri>
           <xsl:for-each select="datafield[@tag='856' and @ind1='4' and @ind2=' ']/subfield[@code='u' or @code='q']">
@@ -298,7 +298,7 @@ exclude-result-prefixes="marc fn">
 
           <self-uri xmlns:xlink="http://www.w3.org/1999/xlink/" >
                 <xsl:attribute name="xlink:href">
-                    <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+                    <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
                 </xsl:attribute>
           </self-uri>
           <xsl:for-each select="datafield[@tag='856' and @ind1='4' and @ind2=' ']/subfield[@code='u' or @code='q']">

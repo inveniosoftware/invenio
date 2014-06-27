@@ -125,6 +125,7 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
         not to index past this point.
     @see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
     """
+    url = url.strip()
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
 
@@ -431,12 +432,15 @@ def string_to_numeric_char_reference(string):
         out += "&#" + str(ord(char)) + ";"
     return out
 
-def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None):
+def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None, quote_path=False):
     """
     Given an Invenio URL returns a tuple with two elements. The first is the
     canonical URL, that is the original URL with CFG_SITE_URL prefix, and
     where the ln= argument stripped. The second element element is mapping,
     language code -> alternate URL
+
+    @param quote_path: if True, the path section of the given C{url}
+                       is quoted according to RFC 2396
     """
     dummy_scheme, dummy_netloc, path, dummy_params, query, fragment = urlparse(url)
     canonical_scheme, canonical_netloc = urlparse(cfg.get('CFG_SITE_URL'))[0:2]
@@ -446,6 +450,8 @@ def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None):
         canonical_parsed_query = no_ln_parsed_query
     else:
         canonical_parsed_query = parsed_query
+    if quote_path:
+        path = urllib.quote(path)
     canonical_query = urlencode(canonical_parsed_query)
     canonical_url = urlunparse((canonical_scheme, canonical_netloc, path, dummy_params, canonical_query, fragment))
     alternate_urls = {}
@@ -853,3 +859,29 @@ def auto_version_url(file_path):
     except IOError:
         pass
     return file_path + "?%s" % file_md5
+
+def get_relative_url(url):
+    """
+    Returns the relative URL from a URL. For example:
+
+    'http://web.net' -> ''
+    'http://web.net/' -> ''
+    'http://web.net/1222' -> '/1222'
+    'http://web.net/wsadas/asd' -> '/wsadas/asd'
+
+    It will never return a trailing "/".
+
+    @param url: A url to transform
+    @type url: str
+
+    @return: relative URL
+    """
+    # remove any protocol info before
+    stripped_site_url = url.replace("://", "")
+    baseurl = "/" + "/".join(stripped_site_url.split("/")[1:])
+
+    # remove any trailing slash ("/")
+    if baseurl[-1] == "/":
+        return baseurl[:-1]
+    else:
+        return baseurl

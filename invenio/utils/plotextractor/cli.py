@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ from invenio.utils.shell import run_shell_command, Timeout, run_process_with_tim
 from invenio.utils.connector import InvenioConnector
 from invenio.utils.text import wrap_text_in_a_box, \
                                wait_for_user
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL, \
+from invenio.config import CFG_TMPSHAREDDIR, CFG_SITE_URL, \
                            CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
                            CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
@@ -79,18 +79,23 @@ def main():
     extract_text_param = 'extract-text'
     force_param = 'force'
     upload_param = 'call-bibupload'
+    upload_mode_param = 'upload-mode'
     yes_i_know_param = 'yes-i-know'
     recid_param = 'recid'
+    with_docname_param = 'with-docname'
+    with_doctype_param = 'with-doctype'
+    with_docformat_param = 'with-docformat'
     arXiv_param = 'arXiv'
     squash_param = 'squash'
     refno_url_param = 'refno-url'
     refno_param = 'skip-refno'
     clean_param = 'clean'
-    param_abbrs = 'h:t:d:s:i:a:l:xfuyrqck'
+    param_abbrs = 'h:t:d:s:i:a:l:xfuyr:qck'
     params = [help_param, tarball_param + '=', tardir_param + '=',
               sdir_param + '=', infile_param + '=', arXiv_param + '=', refno_url_param + '=',
-              extract_text_param, force_param, upload_param, yes_i_know_param, recid_param,
-              squash_param, clean_param]
+              extract_text_param, force_param, upload_param, yes_i_know_param, recid_param + '=',
+              squash_param, clean_param, refno_param, with_docname_param + '=',
+              with_doctype_param + '=', with_docformat_param + '=', upload_mode_param + '=']
     try:
         opts, args = getopt.getopt(sys.argv[1:], param_abbrs, params)
     except getopt.GetoptError as err:
@@ -109,56 +114,74 @@ def main():
     squash_path = ""
     yes_i_know = False
     recids = None
+    with_docname = None
+    with_doctype = None
+    with_docformat = None
     arXiv = None
     clean = False
     refno_url = CFG_SITE_URL
     skip_refno = False
+    upload_mode = 'append'
 
     for opt, arg in opts:
-        if opt in ['-h', help_param]:
+        if opt in ['-h', '--' + help_param]:
             usage()
             sys.exit()
-        elif opt in ['-t', tarball_param]:
+        elif opt in ['-t', '--' + tarball_param]:
             tarball = arg
-        elif opt in ['-d', tardir_param]:
+        elif opt in ['-d', '--' + tardir_param]:
             tdir = arg
-        elif opt in ['-i', infile_param]:
+        elif opt in ['-i', '--' + infile_param]:
             infile = arg
-        elif opt in ['-r', recid_param]:
+        elif opt in ['-r', '--' + recid_param]:
             recids = arg
-        elif opt in ['-a', arXiv_param]:
+        elif opt in ['-a', '--' + arXiv_param]:
             arXiv = arg
-        elif opt in ['-s', sdir_param]:
+        elif opt in ['--' + with_docname_param]:
+            with_docname = arg
+        elif opt in ['--' + with_doctype_param]:
+            with_doctype = arg
+        elif opt in ['--' + with_docformat_param]:
+            with_docformat = arg
+        elif opt in ['-s', '--' + sdir_param]:
             sdir = arg
-        elif opt in ['-x', extract_text_param]:
+        elif opt in ['-x', '--' + extract_text_param]:
             xtract_text = True
-        elif opt in ['-f', force_param]:
+        elif opt in ['-f', '--' + force_param]:
             force = True
-        elif opt in ['-u', upload_param]:
+        elif opt in ['-u', '--' + upload_param]:
             upload_plots = True
-        elif opt in ['-q', squash_param]:
+        elif opt in ['--' + upload_mode_param]:
+            upload_mode = arg
+        elif opt in ['-q', '--' + squash_param]:
             squash = True
-        elif opt in ['-y', yes_i_know_param]:
+        elif opt in ['-y', '--' + yes_i_know_param]:
             yes_i_know = True
-        elif opt in ['-c', clean_param]:
+        elif opt in ['-c', '--' + clean_param]:
             clean = True
-        elif opt in ['-l', refno_url_param]:
+        elif opt in ['-l', '--' + refno_url_param]:
             refno_url = arg
-        elif opt in ['-k', refno_param]:
+        elif opt in ['-k', '--' + refno_param]:
             skip_refno = True
         else:
             usage()
             sys.exit()
 
+    allowed_upload_modes = ('insert', 'append', 'correct', 'replace')
+    if not upload_mode in allowed_upload_modes:
+        write_message('Specified upload mode %s is not valid. Must be in %s' % \
+                      (upload_mode, ', '.join(allowed_upload_modes)))
+        usage()
+        sys.exit()
+
     if sdir is None:
-        sdir = CFG_TMPDIR
+        sdir = CFG_TMPSHAREDDIR
     elif not os.path.isdir(sdir):
         try:
             os.makedirs(sdir)
         except:
             write_message('Error: We can\'t use this sdir.  using ' +
-                          'CFG_TMPDIR')
-            sdir = CFG_TMPDIR
+            sdir = CFG_TMPSHAREDDIR
 
     if skip_refno:
         refno_url = ""
@@ -174,7 +197,7 @@ def main():
     if infile:
         tars_and_gzips.extend(parse_and_download(infile, sdir))
     if recids:
-        tars_and_gzips.extend(tarballs_by_recids(recids, sdir))
+        tars_and_gzips.extend(tarballs_by_recids(recids, sdir, with_docname, with_doctype, with_docformat))
     if arXiv:
         tars_and_gzips.extend(tarballs_by_arXiv_id([arXiv], sdir))
     if not tars_and_gzips:
@@ -188,23 +211,25 @@ def main():
         os.close(squash_fd)
 
     for tarball in tars_and_gzips:
+        recid = None
+        if isinstance(tarball, tuple):
+            tarball, recid = tarball
         process_single(tarball, sdir=sdir, xtract_text=xtract_text,
                        upload_plots=upload_plots, force=force, squash=squash_path,
                        yes_i_know=yes_i_know, refno_url=refno_url,
-                       clean=clean)
+                       clean=clean, recid=recid, upload_mode=upload_mode)
     if squash:
         squash_fd = open(squash_path, "a")
         squash_fd.write("</collection>\n")
         squash_fd.close()
         write_message("generated %s" % (squash_path,))
         if upload_plots:
-            upload_to_site(squash_path, yes_i_know)
+            upload_to_site(squash_path, yes_i_know, upload_mode)
 
-
-def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False,
+def process_single(tarball, sdir=CFG_TMPSHAREDIR, xtract_text=False,
                    upload_plots=False, force=False, squash="",
                    yes_i_know=False, refno_url="",
-                   clean=False, direct_xml_output=False):
+                   clean=False, recid=None, upload_mode='append'):
     """
     Processes one tarball end-to-end.
 
@@ -226,11 +251,12 @@ def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False,
     @param: refno_url: URL to the invenio-instance to query for refno.
     @param: clean: if True, everything except the original tarball, plots and
             context- files will be removed
-    @param: direct_xml_output: Allow you to retrieve directly the xml source
-            value instead of a path to a file !
+    @param recid: the record ID linked to this tarball. Overrides C{refno_url}
+    @param upload_mode: the mode in which to call bibupload (when C{upload_plots}
+                        is set to True.
     @return: marc_name(string): path to generated marcxml file
     """
-    sub_dir, refno = get_defaults(tarball, sdir, refno_url)
+    sub_dir, refno = get_defaults(tarball, sdir, refno_url, recid)
     if not squash:
         marc_name = os.path.join(sub_dir, '%s.xml' % (refno,))
         if force or not os.path.exists(marc_name):
@@ -285,7 +311,7 @@ def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False,
             if not squash:
                 write_message('generated %s' % (marc_name,))
                 if upload_plots:
-                    upload_to_site(marc_name, yes_i_know)
+                    upload_to_site(marc_name, yes_i_know, upload_mode)
     if clean:
         clean_up(extracted_files_list, image_list)
 
@@ -309,7 +335,7 @@ def clean_up(extracted_files_list, image_list):
             run_shell_command('rm %s', (extracted_file,))
 
 
-def get_defaults(tarball, sdir, refno_url):
+def get_defaults(tarball, sdir, refno_url, recid=None):
     """
     A function for parameter-checking.
 
@@ -318,20 +344,23 @@ def get_defaults(tarball, sdir, refno_url):
         conversions, and the ultimate destination of the MARCXML
     @param: refno_url (string): server location on where to look for refno
 
+    @param recid: (int) if set, overrides C{refno_url} and consider this record
     @return sdir, refno (string, string): the same
         arguments it was sent as is appropriate.
     """
 
-    if sdir is None:
+    if not sdir or recid:
         # Missing sdir: using default directory: CFG_TMPDIR
-        sdir = CFG_TMPDIR
+        sdir = CFG_TMPSHAREDDIR
     else:
         sdir = os.path.split(tarball)[0]
 
     # make a subdir in the scratch directory for each tarball
     sdir = make_single_directory(sdir,
                                  os.path.split(tarball)[-1] + '_' + PLOTS_DIR)
-    if refno_url != "":
+    if recid:
+        refno = str(recid)
+    elif refno_url != "":
         refno = get_reference_number(tarball, refno_url)
         if refno is None:
             refno = os.path.basename(tarball)
@@ -1202,10 +1231,10 @@ def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
     return files_included
 
 
-def upload_to_site(marcxml, yes_i_know):
+def upload_to_site(marcxml, yes_i_know, upload_mode="append"):
     """
     makes the appropriate calls to bibupload to get the MARCXML record onto
-    the site.
+    the site. Uploads in "correct" mode.
 
     @param: marcxml (string): the absolute location of the MARCXML that was
         generated by this programme
@@ -1218,7 +1247,7 @@ def upload_to_site(marcxml, yes_i_know):
     if not yes_i_know:
         wait_for_user(wrap_text_in_a_box('You are going to upload new ' +
                                          'plots to the server.'))
-    task_low_level_submission('bibupload', 'admin', '-a', marcxml)
+    task_low_level_submission('bibupload', 'admin', upload_mode and '--' + upload_mode or '', marcxml)
 
 help_string = """
     name: plotextractor
@@ -1271,6 +1300,11 @@ help_string = """
             if you want to upload the plots, ask to call bibupload.  appending
             the --yes-i-know flag bypasses bibupload's prompt to upload
 
+        --upload-mode=
+            if you use --call-bibupload option, allows to specify in which
+            mode BibUpload should process the input. Can take values:
+            'insert', 'append', 'correct' or 'replace'
+
         -l, --refno-url
             Specify an URL to the invenio-instance to query for refno.
             Defaults to CFG_SITE_URL.
@@ -1281,6 +1315,18 @@ help_string = """
         -r, --recid=
             if you want to process the tarball of one recid, use this tag.  it
             will also accept ranges (i.e. --recid=13-20)
+
+        --with-docname=
+            allow to choose files to process on the basis of their docname,
+            when used with --recid option
+
+        --with-doctype=
+            allow to choose files to process on the basis of their doctype,
+            when used with --recid option
+
+        --with-docformat=
+            allow to choose files to process on the basis of their format,
+            when used with --recid option
 
         -a, --arXiv=
             if you want to process the tarball of one arXiv id, use this tag.

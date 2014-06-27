@@ -1,7 +1,7 @@
 #!@OPENOFFICE_PYTHON@
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,7 +48,11 @@ import time
 import signal
 import errno
 
-from invenio.legacy.websubmit.file_converter import CFG_OPENOFFICE_TMPDIR
+if 'CFG_OPENOFFICE_TMPDIR' in os.environ:
+    CFG_OPENOFFICE_TMPDIR = os.getenv('CFG_OPENOFFICE_TMPDIR')
+    print("OK")
+else:
+    from invenio.legacy.websubmit.file_converter import CFG_OPENOFFICE_TMPDIR
 
 CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
 
@@ -122,6 +126,12 @@ def find_offices():
                           glob.glob('/usr/local/ooo*') + \
                           glob.glob('/usr/local/lib/libreoffice*')
 
+    if os.name in ( 'mac', ) or sys.platform in ( 'darwin', ):
+        programdir = 'MacOS'
+    else:
+        programdir = 'program'
+
+
     ### Find a working set for python UNO bindings
     for basepath in extrapaths:
         if os.name in ( 'nt', 'os2' ):
@@ -144,8 +154,8 @@ def find_offices():
         libpath = 'error'
         for basis in ( 'basis-link', 'basis', '' ):
             for lib in officelibraries:
-                if os.path.isfile(os.path.join(basepath, basis, 'program', lib)):
-                    libpath = os.path.join(basepath, basis, 'program')
+                if os.path.isfile(os.path.join(basepath, basis, programdir, lib)):
+                    libpath = os.path.join(basepath, basis, programdir)
                     officelibrary = os.path.join(libpath, lib)
                     info(3, "Found %s in %s" % (lib, libpath))
                     # Break the inner loop...
@@ -162,8 +172,8 @@ def find_offices():
         unopath = 'error'
         for basis in ( 'basis-link', 'basis', '' ):
             for bin in officebinaries:
-                if os.path.isfile(os.path.join(basepath, basis, 'program', bin)):
-                    unopath = os.path.join(basepath, basis, 'program')
+                if os.path.isfile(os.path.join(basepath, basis, programdir, bin)):
+                    unopath = os.path.join(basepath, basis, programdir)
                     officebinary = os.path.join(unopath, bin)
                     info(3, "Found %s in %s" % (bin, unopath))
                     # Break the inner loop...

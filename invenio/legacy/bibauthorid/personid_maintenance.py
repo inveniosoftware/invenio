@@ -22,19 +22,18 @@ aidPersonID maintenance algorithms.
 """
 from invenio.legacy.bibauthorid.name_utils import split_name_parts
 from invenio.legacy.bibauthorid.name_utils import create_normalized_name
-from invenio.legacy.bibauthorid.backinterface import get_name_by_bibrecref
-from invenio.legacy.bibauthorid.backinterface import copy_personids                       #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_name_by_bibref
+from invenio.legacy.bibauthorid.backinterface import back_up_author_paper_associations                       #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.backinterface import compare_personid_tables              #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.backinterface import group_personid
-from invenio.legacy.bibauthorid.backinterface import check_personid_papers                #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import repair_personid                      #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import check_results                        #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import check_merger                         #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import restore_personids                    #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import get_full_personid_papers             #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import get_full_results                     #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.backinterface import personid_get_recids_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import check_author_paper_associations                #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import repair_author_paper_associations                      #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import duplicated_tortoise_results_exist                        #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import merger_errors_exist                         #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import restore_author_paper_associations                    #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_all_author_paper_associations             #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_clusters                     #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.backinterface import get_papers_affected_since as get_recids_affected_since #emitting #pylint: disable-msg=W0611
 
 
 def convert_personid():
@@ -73,7 +72,7 @@ def convert_personid():
             bibref, rec = row[2].split(',')
             tab, ref = bibref.split(':')
             try:
-                name = get_name_by_bibrecref((int(tab), int(ref), int(rec)))
+                name = get_name_by_bibref((int(tab), int(ref), int(rec)))
             except:
                 continue
             name = split_name_parts(name)
@@ -100,7 +99,7 @@ def convert_personid():
 
 def compare_personids(path):
     '''
-    Use this function with copy_personids() to diff personids.
+    Use this function with back_up_author_paper_associations() to diff personids.
     '''
     fp = open(path, "w")
     pid1_p, pid1_d = group_personid("aidPERSONIDPAPERS_copy", "aidPERSONIDDATA_copy")

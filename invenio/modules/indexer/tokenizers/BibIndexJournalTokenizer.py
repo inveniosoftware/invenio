@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,11 +26,10 @@
 """
 
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.indexer.tokenizers.BibIndexEmptyTokenizer import BibIndexEmptyTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
 from invenio.config import \
     CFG_CERN_SITE, \
     CFG_INSPIRE_SITE
-
 
 if CFG_CERN_SITE:
     CFG_JOURNAL_TAG = '773__%'
@@ -46,11 +45,14 @@ else:
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 
 
-
-class BibIndexJournalTokenizer(BibIndexEmptyTokenizer):
+class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
     """
-        Tokenizer for journal index. It returns joined title/volume/year/page as a word from journal tag.
-        (In fact it's an aggregator.)
+        Tokenizer for journal index.
+        Returns joined title/volume/year/page as a word from journal tag.
+
+        Tokenizer works on multiple tags.
+        For more information on tokenizers working on per-record basis
+        take a look on BibIndexJournalTokenizer base class.
     """
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):

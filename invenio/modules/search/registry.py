@@ -17,8 +17,36 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask.ext.registry import RegistryProxy
+"""Registries for search module."""
+
+from flask.ext.registry import RegistryError, ModuleAutoDiscoveryRegistry, \
+    RegistryProxy
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 
+
+searchext = RegistryProxy('searchext', ModuleAutoDiscoveryRegistry,
+                          'searchext')
+
 facets = RegistryProxy('facets', ModuleAutoDiscoverySubRegistry, 'facets')
+
+
+class SearchServiceRegistry(ModuleAutoDiscoverySubRegistry):
+
+    """Search Service Registry."""
+
+    __required_plugin_API_version__ = "Search Service Plugin API 1.0"
+
+    def register(self, item):
+        """Check plugin version and instantiate search service plugin."""
+        if item.__plugin_version__ != self.__required_plugin_API_version__:
+            raise RegistryError(
+                'Invalid plugin version {0} required {1}'.format(
+                    item.__plugin_version__,
+                    self.__required_plugin_API_version__
+                ))
+        service = getattr(item, item.__name__.split('.')[-1])
+        return super(SearchServiceRegistry, self).register(service())
+
+services = RegistryProxy('searchext.services', SearchServiceRegistry,
+                         'services', registry_namespace=searchext)

@@ -231,6 +231,9 @@ def log_new_pending_submission(doctype, action, subm_id, email):
            """VALUES (%s, %s, %s, 'pending', %s, '', NOW(), NOW())"""
     qres = run_sql(qstr, (email, doctype, action, subm_id))
     ## return the number of rows inserted:
+    if qres is None:
+        ## Database in real only mode?
+        return 0
     return int(qres)
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,10 +33,11 @@ import os
 import gzip
 import time
 
-from invenio.legacy.search_engine import get_collection_reclist
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.search_engine import get_collection_reclist, get_all_restricted_recids
 from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
-    CFG_SITE_RECORD, CFG_SITE_LANGS
+    CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_TMPSHAREDDIR
 from intbitset import intbitset
 from invenio.legacy.websearch.webcoll import Collection
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
@@ -67,22 +68,37 @@ DEFAULT_CHANGEFREQ_COLLECTIONS = 'hourly'
 MAX_RECORDS = 50000
 MAX_SIZE = 10000000
 
+_CFG_FORCE_RECRAWLING_TIMESTAMP_PATH = os.path.join(CFG_TMPSHAREDDIR, "bibexport_sitemap_force_recrawling_timestamp.txt")
+
+def get_minimum_timestamp():
+    """
+    Return the minimum timestamp to be used when exporting.
+    """
+    if os.path.exists(_CFG_FORCE_RECRAWLING_TIMESTAMP_PATH):
+        return datetime.fromtimestamp(os.path.getmtime(_CFG_FORCE_RECRAWLING_TIMESTAMP_PATH))
+    else:
+        return datetime(1970, 1, 1)
+
 def get_all_public_records(collections):
     """ Get all records which exist (i.e. not suppressed ones) and are in
     accessible collection.
     returns list of (recid, last_modification) tuples
     """
+    all_restricted_recids = get_all_restricted_recids()
     recids = intbitset()
+    minimum_timestamp = get_minimum_timestamp()
     for collection in collections:
         recids += get_collection_reclist(collection)
+    recids = recids.difference(all_restricted_recids)
     query = 'SELECT id, modification_date FROM bibrec'
     res = run_sql(query)
-    return [(recid, lastmod) for (recid, lastmod) in res if recid in recids]
+    return [(recid, max(lastmod, minimum_timestamp)) for (recid, lastmod) in res if recid in recids]
 
 def get_all_public_collections(base_collections):
     """  Return a list of (collection.name, last_modification) tuples for all
     collections and subcollections of base_collections
     """
+    minimum_timestamp = get_minimum_timestamp()
     def get_collection_last_modification(collection):
         """ last modification = modification date fo latest added record """
         last_mod = None
@@ -96,7 +112,7 @@ def get_all_public_collections(base_collections):
 
         if res and res[0][0]:
             last_mod = res[0][0]
-        return last_mod
+        return max(minimum_timestamp, last_mod)
 
     output = []
     for coll_name in base_collections:
@@ -118,6 +134,7 @@ def filter_fulltexts(recids, fulltext_type=None):
     """ returns list of records having a fulltext of type fulltext_type.
     If fulltext_type is empty, return all records having a fulltext"""
     recids = dict(recids)
+    minimum_timestamp = get_minimum_timestamp()
     if fulltext_type:
         query = """SELECT id_bibrec, max(modification_date)
                    FROM bibrec_bibdoc
@@ -131,30 +148,31 @@ def filter_fulltexts(recids, fulltext_type=None):
                    LEFT JOIN bibdoc ON bibrec_bibdoc.id_bibdoc=bibdoc.id
                    GROUP BY id_bibrec"""
         res = run_sql(query)
-    return [(recid, lastmod) for (recid, lastmod) in res if recid in recids]
+    return [(recid, max(lastmod, minimum_timestamp)) for (recid, lastmod) in res if recid in recids and BibRecDocs(recid).list_latest_files(list_hidden=False)]
 
 
 def filter_comments(recids):
     """ Retrieve recids having a comment. return (recid, last_review_date)"""
+    minimum_timestamp = get_minimum_timestamp()
     recids = dict(recids)
     query = """SELECT id_bibrec, max(date_creation)
                FROM cmtRECORDCOMMENT
                WHERE star_score=0
                GROUP BY id_bibrec"""
     res = run_sql(query)
-    return [(recid, lastmod) for (recid, lastmod) in res if recid in recids]
+    return [(recid, max(minimum_timestamp, lastmod)) for (recid, lastmod) in res if recid in recids]
 
 
 def filter_reviews(recids):
     """ Retrieve recids having a review. return (recid, last_review_date)"""
+    minimum_timestamp = get_minimum_timestamp()
     recids = dict(recids)
     query = """SELECT id_bibrec, max(date_creation)
                FROM cmtRECORDCOMMENT
                WHERE star_score>0
                GROUP BY id_bibrec"""
     res = run_sql(query)
-    return [(recid, lastmod) for (recid, lastmod) in res if recid in recids]
-
+    return [(recid, max(lastmod, minimum_timestamp)) for (recid, lastmod) in res if recid in recids]
 
 
 SITEMAP_HEADER = """\
@@ -171,14 +189,21 @@ SITEMAP_FOOTER = '\n</urlset>\n'
 class SitemapWriter(object):
     """ Writer for sitemaps"""
 
-    def __init__(self, sitemap_id):
+    def __init__(self, sitemap_id, base_dir=None, name=None):
         """ Constructor.
         name: path to the sitemap file to be created
         """
         self.header = SITEMAP_HEADER
         self.footer = SITEMAP_FOOTER
         self.sitemap_id = sitemap_id
-        self.name = os.path.join(CFG_WEBDIR, 'sitemap-%02d.xml.gz' % sitemap_id)
+        if name:
+            sitemap_name = name
+        else:
+            sitemap_name = 'sitemap'
+        if base_dir:
+            self.name = os.path.join(base_dir, sitemap_name + '-%02d.xml.gz' % sitemap_id)
+        else:
+            self.name = os.path.join(CFG_WEBDIR, sitemap_name + '-%02d.xml.gz' % sitemap_id)
         self.filedescriptor = gzip.open(self.name + '.part', 'w')
         self.num_urls = 0
         self.file_size = 0
@@ -228,7 +253,7 @@ class SitemapWriter(object):
 
     def get_sitemap_url(self):
         """ Returns the sitemap URL"""
-        return CFG_SITE_URL + '/' + os.path.basename(self.name)
+        return self.name.replace(CFG_WEBDIR, CFG_SITE_URL, 1)
 
     def __del__(self):
         """ Writes the whole sitemap """
@@ -295,7 +320,8 @@ def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''
         writer.add_url(CFG_SITE_URL + '/?ln=%s' % lang,
                        lastmod=datetime.today(),
                        changefreq=DEFAULT_CHANGEFREQ_HOME,
-                       priority=DEFAULT_PRIORITY_HOME)
+                       priority=DEFAULT_PRIORITY_HOME,
+                       alternate=True)
         nb_urls += 1
     write_message("... Getting all public records...")
     recids = get_all_public_records(collection_names)
@@ -389,7 +415,7 @@ def run_export_method(jobname):
     """Main function, reading params and running the task."""
     write_message("bibexport_sitemap: job %s started." % jobname)
 
-    collections = get_config_parameter(jobname=jobname, parameter_name="collection", is_parameter_collection = True)
+    collections = get_config_parameter(jobname=jobname, parameter_name="collection", is_parameter_collection=True)
     fulltext_type = get_config_parameter(jobname=jobname, parameter_name="fulltext_status")
 
     generate_sitemaps_index(collections, fulltext_type)

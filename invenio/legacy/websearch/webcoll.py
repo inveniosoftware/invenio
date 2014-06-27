@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,7 +43,8 @@ from invenio.config import \
      CFG_SITE_LANGS, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_SCOAP3_SITE
 from invenio.base.i18n import gettext_set_language, language_list_long
 from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
@@ -139,8 +140,10 @@ class Collection:
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_updated_since_start = 0 # to check if webpage cache need rebuilding
         self.reclist_with_nonpublic_subcolls = intbitset()
-        # used to store the temporary result of the calculation of nbrecs of an external collection
-        self.nbrecs_tmp = None
+        # temporary counters for the number of records in hosted collections
+        self.nbrecs_tmp = None # number of records in a hosted collection
+        self.nbrecs_from_hosted_collections = 0 # total number of records from
+                                                # descendant hosted collections
         if not name:
             self.name = CFG_SITE_NAME # by default we are working on the home page
             self.id = 1
@@ -199,6 +202,45 @@ class Collection:
             out += self.name
         out += epilog
         return out
+
+    def get_collectionbox_name(self, ln=CFG_SITE_LANG, box_type="r"):
+        """
+        Return collection-specific labelling of 'Focus on' (regular
+        collection), 'Narrow by' (virtual collection) and 'Latest
+        addition' boxes.
+
+        If translation for given language does not exist, use label
+        for CFG_SITE_LANG. If no custom label is defined for
+        CFG_SITE_LANG, return default label for the box.
+
+        @param ln: the language of the label
+        @param box_type: can be 'r' (=Narrow by), 'v' (=Focus on), 'l' (=Latest additions)
+        """
+        i18name = ""
+        res = run_sql("SELECT value FROM collectionboxname WHERE id_collection=%s AND ln=%s AND type=%s", (self.id, ln, box_type))
+        try:
+            i18name = res[0][0]
+        except IndexError:
+            res = run_sql("SELECT value FROM collectionboxname WHERE id_collection=%s AND ln=%s AND type=%s", (self.id, CFG_SITE_LANG, box_type))
+            try:
+                i18name = res[0][0]
+            except IndexError:
+                pass
+
+        if not i18name:
+            # load the right message language
+            _ = gettext_set_language(ln)
+            if box_type == "v":
+                i18name = _('Focus on:')
+            elif box_type == "r":
+                if CFG_SCOAP3_SITE:
+                    i18name = _('Narrow by publisher/journal:')
+                else:
+                    i18name = _('Narrow by collection:')
+            elif box_type == "l":
+                i18name = _('Latest additions:')
+
+        return i18name
 
     def get_ancestors(self):
         "Returns list of ancestors of the current collection."
@@ -286,7 +328,6 @@ class Collection:
             sys.exit(1)
         # print user info:
         write_message("... creating %s" % fullfilename, verbose=6)
-        sys.stdout.flush()
         # print page body:
         cPickle.dump(filebody, f, cPickle.HIGHEST_PROTOCOL)
         # close file:
@@ -455,6 +496,8 @@ class Collection:
                     recIDs = sort_records(None, recIDs, '269__c')
                 elif self.name in ['LHCb Talks']:
                     recIDs = sort_records(None, recIDs, 'reportnumber')
+                elif self.name in ['CERN Yellow Reports']:
+                    recIDs = sort_records(None, recIDs, '084__a')
             # CERN hack ends.
 
             total = len(recIDs)
@@ -516,10 +559,10 @@ class Collection:
             # CERN hack: display the records in a grid layout
             if CFG_CERN_SITE and self.name in ['Videos']:
                 return websearch_templates.tmpl_instant_browse(
-                    aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True)
+                    aas=aas, ln=ln, recids=passIDs, more_link=url, grid_layout=True, father=self)
 
             return websearch_templates.tmpl_instant_browse(
-                aas=aas, ln=ln, recids=passIDs, more_link=url)
+                aas=aas, ln=ln, recids=passIDs, more_link=url, father=self)
 
         return websearch_templates.tmpl_box_no_records(ln=ln)
 
@@ -623,7 +666,7 @@ class Collection:
                         fieldname = 'sc',
                         css_class = 'address',
                         values = [
-                                  {'value' : '1' , 'text' : _("split by collection")},
+                                  {'value' : '1' , 'text' : CFG_SCOAP3_SITE and _("split by publisher/journal") or _("split by collection")},
                                   {'value' : '0' , 'text' : _("single list")}
                                  ]
                        )
@@ -737,24 +780,51 @@ class Collection:
         )
 
     def calculate_reclist(self):
-        """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""
-        if self.calculate_reclist_run_already or str(self.dbquery).startswith("hostedcollection:"):
-            # do we have to recalculate?
-            return (self.reclist, self.reclist_with_nonpublic_subcolls)
+        """
+        Calculate, set and return the (reclist,
+                                       reclist_with_nonpublic_subcolls,
+                                       nbrecs_from_hosted_collections)
+        tuple for the given collection."""
+
+        if str(self.dbquery).startswith("hostedcollection:"):
+            # we don't normally use this function to calculate the reclist
+            # for hosted collections. In case we do, recursively for a regular
+            # ancestor collection, then quickly return the object attributes.
+            return (self.reclist,
+                    self.reclist_with_nonpublic_subcolls,
+                    self.nbrecs)
+
+        if self.calculate_reclist_run_already:
+            # do we really have to recalculate? If not,
+            # then return the object attributes
+            return (self.reclist,
+                    self.reclist_with_nonpublic_subcolls,
+                    self.nbrecs_from_hosted_collections)
+
         write_message("... calculating reclist of %s" % self.name, verbose=6)
+
         reclist = intbitset() # will hold results for public sons only; good for storing into DB
         reclist_with_nonpublic_subcolls = intbitset() # will hold results for both public and nonpublic sons; good for deducing total
-                                                   # number of documents
+                                                      # number of documents
+        nbrecs_from_hosted_collections = 0 # will hold the total number of records from descendant hosted collections
+
         if not self.dbquery:
             # A - collection does not have dbquery, so query recursively all its sons
             #     that are either non-restricted or that have the same restriction rules
             for coll in self.get_sons():
-                coll_reclist, coll_reclist_with_nonpublic_subcolls = coll.calculate_reclist()
+                coll_reclist,\
+                coll_reclist_with_nonpublic_subcolls,\
+                coll_nbrecs_from_hosted_collection = coll.calculate_reclist()
+
                 if ((coll.restricted_p() is None) or
                     (coll.restricted_p() == self.restricted_p())):
                     # add this reclist ``for real'' only if it is public
                     reclist.union_update(coll_reclist)
                 reclist_with_nonpublic_subcolls.union_update(coll_reclist_with_nonpublic_subcolls)
+
+                # increment the total number of records from descendant hosted collections
+                nbrecs_from_hosted_collections += coll_nbrecs_from_hosted_collection
+
         else:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
@@ -764,14 +834,20 @@ class Collection:
             else:
                 reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"', ap=-9) #ap=-9 allow queries containing hidden tags
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
+
         # store the results:
-        self.nbrecs = len(reclist_with_nonpublic_subcolls)
+        self.nbrecs_from_hosted_collections = nbrecs_from_hosted_collections
+        self.nbrecs = len(reclist_with_nonpublic_subcolls) + \
+                      nbrecs_from_hosted_collections
         self.reclist = reclist
         self.reclist_with_nonpublic_subcolls = reclist_with_nonpublic_subcolls
         # last but not least, update the speed-up flag:
         self.calculate_reclist_run_already = 1
-        # return the two sets:
-        return (self.reclist, self.reclist_with_nonpublic_subcolls)
+        # return the two sets, as well as
+        # the total number of records from descendant hosted collections:
+        return (self.reclist,
+                self.reclist_with_nonpublic_subcolls,
+                self.nbrecs_from_hosted_collections)
 
     def calculate_nbrecs_for_external_collection(self, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
         """Calculate the total number of records, aka nbrecs, for given external collection."""
@@ -849,13 +925,13 @@ def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
     em - code to display just part of the page
     show_help_boxes - whether to show the help boxes or not"""
     # check and update cache if necessary
+    cachedfile = open("%s/collections/%s-ln=%s.html" %
+                      (CFG_CACHEDIR, colname, ln), "rb")
     try:
-        cachedfile = open("%s/collections/%s-ln=%s.html" % \
-                        (CFG_CACHEDIR, colname, ln), "rb")
         data = cPickle.load(cachedfile)
-        cachedfile.close()
-    except:
+    except ValueError:
         data = get_collection(colname).update_webpage_cache(ln)
+    cachedfile.close()
     # check em value to return just part of the page
     if em != "":
         if EM_REPOSITORY["search_box"] not in em:
@@ -936,7 +1012,10 @@ def get_database_last_updated_timestamp():
     """
     database_tables_timestamps = []
     database_tables_timestamps.append(get_table_update_time('bibrec'))
-    database_tables_timestamps.append(get_table_update_time('bibfmt'))
+    ## In INSPIRE bibfmt is on innodb and there is not such configuration
+    bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
+    if bibfmt_last_update and bibfmt_last_update[0][0]:
+        database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))
     except ValueError:

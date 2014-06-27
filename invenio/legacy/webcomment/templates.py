@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,6 +31,7 @@ from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.mail import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
+                           CFG_BASE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
@@ -174,6 +175,7 @@ class Template:
         Displays a page when bad or missing record ID was given.
         @param status:  'missing'   : no recID was given
                         'inexistant': recID doesn't have an entry in the database
+                        'deleted':  : recID has been deleted
                         'nan'       : recID is not a number
                         'invalid'   : recID is an error code, i.e. in the interval [-99,-1]
         @param return: body of the page
@@ -181,6 +183,8 @@ class Template:
         _ = gettext_set_language(ln)
         if status == 'inexistant':
             body = _("Sorry, the record %(x_rec)s does not seem to exist.", x_rec=(recID,))
+        elif status in ('deleted'):
+            body = _("The record has been deleted.")
         elif status in ('nan', 'invalid'):
             body = _("Sorry, %(x_rec)s is not a valid ID value.", x_rec=(recID,))
         else:
@@ -555,14 +559,14 @@ class Template:
         out += '''
 <div class="webcomment_review_box">
   <div class="webcomment_review_box_inner">
-    <img src="%(siteurl)s/img/%(star_score_img)s" alt="%(star_score)s/>
+    <img src="%(baseurl)s/img/%(star_score_img)s" alt="%(star_score)s/>
       <div class="webcomment_review_title">%(title)s</div>
       <div class="webcomment_review_label_reviewed">%(reviewed_label)s</div>
       <div class="webcomment_review_label_useful">%(useful_label)s</div>
   %(body)s
   </div>
 </div>
-%(abuse)s''' % {'siteurl'        : CFG_SITE_URL,
+%(abuse)s''' % {'baseurl'      : CFG_BASE_URL,
                'star_score_img': star_score_img,
                'star_score'    : star_score,
                'title'         : cgi.escape(title),
@@ -2110,7 +2114,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        url = '%s/%s/%s/reviews/add?ln=%s&amp;action=%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, ln, action)
+        url = '%s/%s/%s/reviews/add?ln=%s&amp;action=%s' % (CFG_BASE_URL, CFG_SITE_RECORD, recID, ln, action)
 
         if avg_score > 0:
             score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
@@ -2332,6 +2336,8 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        from invenio.legacy.search_engine import record_exists
+
         your_comments_order_by_options = (('ocf', _("Oldest comment first")),
                                           ('lcf', _("Latest comment first")),
                                           ('grof', _("Group by record, oldest commented first")),
@@ -2433,14 +2439,17 @@ class Template:
                     # Close previous group
                     out += "</div></div>"
                     nb_record_groups += 1
-                #You might want to hide this information if user does
-                #not have access, though it would make sense that he
-                #can at least know on which page is comment appears..
+                # You might want to hide this information if user does
+                # not have access, though it would make sense that he
+                # can at least know on which page his comment appears..
+                if record_exists(id_bibrec) == -1:
+                    record_info_html = '<em>%s</em>' % _("The record has been deleted.")
+                else:
+                    record_info_html = format_record(id_bibrec, of="HS")
                 out += '''<div class="yourcommentsrecordgroup" id="yourcomments-record-group-%(recid)s">
                 <div class="yourcommentsrecordgroup%(recid)sheader">&#149; ''' % {'recid': id_bibrec} + \
-                       format_record(id_bibrec, of="HS") + '</div><div style="padding-left: 20px;">'
+                       record_info_html + '</div><div style="padding-left: 20px;">'
             if selected_display_format_option != 'ro':
-
                 final_body = email_quoted_txt2html(body)
                 title = '<a name="C%s" id="C%s"></a>' % (comid, comid)
                 if status == "dm":

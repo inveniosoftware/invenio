@@ -60,6 +60,25 @@
  </xsl:template>
 
 
+ <!-- FUNCTION   output-0247-subfields -->
+ <xsl:template name="output-0247-subfields">
+      <xsl:param name="list" />
+      <xsl:variable name="newlist" select="concat(normalize-space($list), ' ')" />
+      <xsl:variable name="first" select="substring-before($newlist, ' ')" />
+      <xsl:variable name="remaining" select="substring-after($newlist, ' ')" />
+      <xsl:if test="not($first='')">
+         <datafield tag="024" ind1="7" ind2=" ">
+           <subfield code="2">DOI</subfield>
+           <subfield code="a"><xsl:value-of select="$first" /></subfield>
+         </datafield>
+      </xsl:if>
+      <xsl:if test="$remaining">
+          <xsl:call-template name="output-0247-subfields">
+              <xsl:with-param name="list" select="$remaining" />
+          </xsl:call-template>
+      </xsl:if>
+ </xsl:template>
+
  <!-- FUNCTION   output-695a-subfields -->
  <xsl:template name="output-695a-subfields">
       <xsl:param name="list" />
@@ -196,7 +215,7 @@
  </xsl:template>
 
 
- <!-- FUNCTION cern-detect : returns the appropriatate 690C subfield if it is a CERN parper and nothing otherwise -->
+ <!-- FUNCTION cern-detect : returns the appropriatate 690C subfield if it is a CERN paper and nothing otherwise -->
  <xsl:template name="cern-detect">
     <xsl:param name="reportnumber"/>
     <xsl:if test="contains($reportnumber, 'CERN') or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:affiliation[.='CERN']">
@@ -211,7 +230,7 @@
     <xsl:for-each select="./OAI-PMH:header/OAI-PMH:setSpec"><xsl:value-of select="."/>;</xsl:for-each>
  </xsl:template>
 
- <!-- FUNCTION cern-detect9 : returns the appropriatate 690C subfield if it is a CERN parper and nothing otherwise -->
+ <!-- FUNCTION cern-detect9 : returns the appropriatate 690C subfield if it is a CERN paper and nothing otherwise -->
  <xsl:template name="cern-detect9">
     <xsl:param name="reportnumber"/>
     <xsl:if test="contains($reportnumber, 'CERN') or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:affiliation[.='CERN']">
@@ -318,13 +337,21 @@
          <xsl:value-of select="$node/arXiv:affiliation"/>
        </xsl:when>
        <xsl:when test="contains($knlowfn, 'collab') or contains($knlowfn, 'team') or contains($knlowfn,'group') or contains($knlowfn, 'for the')">
-         <xsl:value-of select="concat($node/arXiv:keyname , ' ', $node/arXiv:forenames)"/>
+         <xsl:value-of select="$node/arXiv:keyname"/>
+	 <xsl:if test="$node/arXiv:forenames and $node/arXiv:keyname"><xsl:text> </xsl:text></xsl:if>
+	 <xsl:value-of select="$node/arXiv:forenames"/>
        </xsl:when>
        <xsl:when test="contains($knlowkn, 'collab') or contains($knlowkn, 'team') or contains($knlowkn,'group') or contains($knlowkn, 'for the')">
-         <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname)"/>
+	 <xsl:value-of select="$node/arXiv:forenames"/>
+	 <xsl:if test="$node/arXiv:forenames and $node/arXiv:keyname"><xsl:text> </xsl:text></xsl:if>
+         <xsl:value-of select="$node/arXiv:keyname"/>
        </xsl:when>
        <xsl:otherwise>
-         <xsl:value-of select="concat($node/arXiv:forenames, ' ', $node/arXiv:keyname, ' ', $node/arXiv:affiliation)"/>
+         <xsl:value-of select="$node/arXiv:forenames"/>
+	 <xsl:if test="$node/arXiv:forenames and $node/arXiv:keyname"><xsl:text> </xsl:text></xsl:if>
+         <xsl:value-of select="$node/arXiv:keyname"/>
+	 <xsl:if test="$node/arXiv:keyname and $node/arXiv:affiliation"><xsl:text> </xsl:text></xsl:if>
+         <xsl:value-of select="$node/arXiv:affiliation"/>
        </xsl:otherwise>
      </xsl:choose>
 
@@ -425,7 +452,7 @@
 
 
 
-    <!-- KEEPING ONLY RECORDS THAT ARE USEFULL FOR CERN -->
+    <!-- KEEPING ONLY RECORDS THAT ARE USEFUL FOR CERN -->
     <xsl:variable name="setspec">
       <xsl:value-of select="substring-after(./OAI-PMH:header/OAI-PMH:setSpec,':')"/>
     </xsl:variable>
@@ -490,6 +517,12 @@
            <!-- MARC FIELD 003  -->
            <controlfield tag="003">SzGeCERN</controlfield>
 
+           <!-- MARC FIELD 0247_$$2,a (DOI)-->
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
+                <xsl:call-template name="output-0247-subfields">
+                    <xsl:with-param name="list"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi"/></xsl:with-param>
+                </xsl:call-template>
+           </xsl:if>
 
            <!-- MARC FIELD 035_$$9,a  = metadata/header/identifier  -->
            <xsl:if test="./OAI-PMH:header/OAI-PMH:identifier">
@@ -555,8 +588,7 @@
              <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH')">
                <datafield tag="084" ind1 = " " ind2 = " ">
                  <subfield code="a">
-                   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-TH/')"/>
-                   TH-<xsl:choose>
+                   <xsl:variable name="reportdate" select="substring-after($RN3, 'CERN-PH-TH-')"/>TH-<xsl:choose>
                    <xsl:when test="contains($reportdate,',')">
                      <xsl:value-of select="substring-before($reportdate, ',')"/>
                    </xsl:when>
@@ -570,13 +602,18 @@
                <datafield tag="710" ind1 = " " ind2 = " ">
                  <subfield code="5">PH-TH</subfield>
                </datafield>
+               <datafield tag="595" ind1=" " ind2=" ">
+                 <subfield code="a">OA</subfield>
+               </datafield>
+               <datafield tag="595" ind1=" " ind2=" ">
+                 <subfield code="a">CERN-TH</subfield>
+               </datafield>
              </xsl:if>
 
              <xsl:if test="contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP')">
                <datafield tag="084" ind1 = " " ind2 = " ">
                  <subfield code="a">
-                   <xsl:variable name="reportdate" select="substring-after(./OAI-PMH:metadata/arXiv:arXiv/arXiv:report-no, 'CERN-PH-EP/')"/>
-                   PH-EP-<xsl:choose>
+                   <xsl:variable name="reportdate" select="substring-after($RN3, 'CERN-PH-EP-')"/>PH-EP-<xsl:choose>
                    <xsl:when test="contains($reportdate,',')">
                      <xsl:value-of select="substring-before($reportdate, ',')"/>
                    </xsl:when>
@@ -669,11 +706,10 @@
              </datafield>
            </xsl:if>
 
-
            <!-- MARC FIELD  269$$c / date  -->
            <!-- RE-MARC FIELD Same treatement for all bases, subfileds a and b addeb by babbage.py later  -->
-           <xsl:if test="./OAI-PMH:header/OAI-PMH:datestamp">
-             <xsl:variable name="datebase" select="./OAI-PMH:header/OAI-PMH:datestamp"/>
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:created">
+             <xsl:variable name="datebase" select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:created"/>
              <xsl:variable name="year" select="substring-before($datebase,'-')"/>
              <xsl:variable name="month" select="substring-before(substring-after($datebase,'-'),'-')"/>
              <xsl:variable name="day" select="substring-after(substring-after($datebase,'-'),'-')"/>
@@ -755,14 +791,9 @@
            </xsl:if>
 
            <!-- MARC FIELD 773$$p  - publication detection in comments field -->
-           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
                <datafield tag="773" ind1=" " ind2=" ">
-                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
-                      <subfield code="o"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
-                  </xsl:if>
-                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
-                    <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi"/></subfield>
-                  </xsl:if>
+		 <subfield code="o"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
                </datafield>
            </xsl:if>
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ import re
 import cgi
 import gc
 import inspect
+import socket
 from fnmatch import fnmatch
 from six.moves.urllib.parse import urlparse, urlunparse
 from six import iteritems
@@ -290,6 +291,12 @@ class SimulatedModPythonRequest(object):
                         self.__bytes_sent += the_len
                         self.__write(chunk[:the_len])
                         break
+        except socket.error as e:
+            if e.errno == 54:
+                # Client disconnected, ignore
+                pass
+            else:
+                raise
         except IOError as err:
             if "failed to write data" in str(err) or "client connection closed" in str(err):
                 ## Let's just log this exception without alerting the admin:

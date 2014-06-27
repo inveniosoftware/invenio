@@ -1,9 +1,7 @@
-
-
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -198,7 +196,7 @@ class FieldData(DataSet):
         name = u'authority author'
 
     class Field_34:
-        code = u'authorityinstitution'
+        code = u'authorityinstitute'
         id = 34
         name = u'authority institution'
 
@@ -228,8 +226,28 @@ class FieldData(DataSet):
         name = u'miscellaneous'
 
     class Field_40:
-        code = u'tag'
+        code = u'referstoexcludingselfcites'
         id = 40
+        name = u'refers to excluding self cites'
+
+    class Field_41:
+        code = u'citedbyexcludingselfcites'
+        id = 41
+        name = u'cited by excluding self cites'
+
+    class Field_42:
+        code = u'cataloguer'
+        id = 42
+        name = u'cataloguer nickname'
+
+    class Field_43:
+        code = u'filename'
+        id = 43
+        name = u'file name'
+
+    class Field_44:
+        code = u'tag'
+        id = 44
         name = u'tag'
 
 
@@ -1308,7 +1326,7 @@ class TagData(DataSet):
     class Tag_217:
         id = 217
         value = u'110__0'
-        name = u'institution control'
+        name = u'institute control'
 
     class Tag_218:
         id = 218
@@ -1323,7 +1341,7 @@ class TagData(DataSet):
     class Tag_220:
         id = 220
         value = u'260__0'
-        name = u'additional institution control'
+        name = u'additional institute control'
 
     class Tag_221:
         id = 221

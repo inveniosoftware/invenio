@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,8 +21,16 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_INSPIRE_SITE
 from invenio.base.i18n import gettext_set_language
+
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
+
+try:
+    BIBCATALOG_SYSTEM.ticket_search(0)
+    CFG_CAN_SEARCH_FOR_TICKET = True
+except NotImplementedError:
+    CFG_CAN_SEARCH_FOR_TICKET = False
 
 class Template:
 
@@ -66,9 +74,6 @@ class Template:
             '            <td colspan="2">%(btnSubmit)s</td>\n' \
             '            <td colspan="2">%(btnCancel)s</td>\n' \
             '          </tr>\n' \
-            '          <tr>\n' \
-            '            <td id="tickets" colspan="4"><!--filled by bibedit_menu.js--></td>\n' \
-            '          </tr>\n' \
             '          <tr class="bibEditMenuMore">\n' \
             '            <td>%(imgDeleteRecord)s</td>\n' \
             '            <td colspan="3">%(btnDeleteRecord)s</td>\n' \
@@ -108,6 +113,29 @@ class Template:
             'btnSwitchReadOnly' : button('button', 'Read-only',
                                          id='btnSwitchReadOnly')
             }
+
+        if CFG_CAN_SEARCH_FOR_TICKET:
+            ticketsmenu = '<div class="bibEditMenuSectionHeader">\n' \
+                '          %(imgCompressMenuSection)sTickets\n' \
+                '          </div>\n' \
+                '          <div id="loadingTickets">\n' \
+                '          %(imgTicketsLoader)s\n<span>loading...</span>' \
+                '          </div>\n' \
+                '          <div class="bibEditTicketsMenuSection">\n' \
+                '          <table class="bibEditMenuMore">\n' \
+                '            <col width="136px">\n' \
+                '            <tr class="bibEditMenuMore">\n' \
+                '              <td id="tickets"></td>'\
+                '            </tr>\n' \
+                '          </table>\n' \
+                '        </div>\n' % {
+                'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                        'bibEditImgCompressMenuSection', id='ImgTicketsMenu'),
+                'imgTicketsLoader': img('/img/indicator.gif',
+                                'bibEditImgTicketsLoader', id='ImgTicketsLoader')
+                }
+        else:
+            ticketsmenu = ''
 
         fieldmenu = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgCompressMenuSection)sFields\n' \
@@ -199,11 +227,10 @@ class Template:
 
         holdingpenpanel = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgCompressMenuSection)sHolding Pen\n' \
-            '<table class="bibEditMenuMore">\n<tr><td>' \
+            '</div><table class="bibEditMenuMore">\n<tr><td>' \
             '   <div id="bibEditHoldingPenToolbar"> '  \
             '      <div id="bibeditHPChanges"></div>' \
-            ' </div> </td></tr></table>' \
-            '        </div>\n'  % \
+            ' </div> </td></tr></table>' % \
             { 'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
                             'bibEditImgCompressMenuSection', id='ImgHoldingPenMenu') }
 
@@ -236,6 +263,9 @@ class Template:
             '      <div class="bibEditMenuSection">\n' \
             '        %(recordmenu)s\n' \
             '      </div>\n' \
+            '       <div class="bibEditMenuSection">\n' \
+            '         %(ticketsmenu)s\n' \
+            '       </div>\n' \
             '      <div class="bibEditMenuSection">\n' \
             '        %(fieldmenu)s\n' \
             '      </div>\n' \
@@ -260,6 +290,7 @@ class Template:
             '      </div>\n' \
             '    </div>\n' % {
                 'recordmenu': recordmenu,
+                'ticketsmenu': ticketsmenu,
                 'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
                 'statusarea': statusarea,
@@ -271,15 +302,18 @@ class Template:
                 'circulationmenu': bibcirculationpanel
                 }
 
-    def history_comparebox(self, ln, revdate, revdate_cmp, comparison):
+    def history_comparebox(self, ln, revdate, revdate_cmp, person1, person2, comparison):
         """ Display the bibedit history comparison box. """
         _ = gettext_set_language(ln)
-        title = '<b>%(comp)s</b><br /><span class="diff_field_added">%(rev)s %(revdate)s</span>\
-        <br /><span class="diff_field_deleted">%(rev)s %(revdate_cmp)s</span>' % {
+        title = '<b>%(comp)s</b><br /><span class="diff_field_added">\
+        %(rev)s %(revdate)s %(person1)s</span><br /><span class="diff_field_deleted">\
+        %(rev)s %(revdate_cmp)s %(person2)s</span>' % {
             'comp': _('Comparison of:'),
             'rev': _('Revision'),
             'revdate': revdate,
-            'revdate_cmp': revdate_cmp}
+            'revdate_cmp': revdate_cmp,
+            'person1': person1 and 'by ' + person1 or '',
+            'person2': person2 and 'by ' + person2 or ''}
         return '''
        <div class="bibEditHistCompare">
          <p>%s</p>
@@ -304,6 +338,18 @@ class Template:
         return value
 
     def focuson(self):
+        """ Returns the html of the display options box on the left panel. """
+
+        curator_display_html = ""
+        if CFG_INSPIRE_SITE:
+            curator_display_html = """
+            <hr>
+            <li>
+                <input type="checkbox" name="curator" id="focuson_curator" value="curator"/>
+                <label for="focuson_curator">Curator view</label>
+            </li>
+            """
+
         html = """
         <div id='display_div'>
             <strong>Display</strong> <br />
@@ -320,9 +366,13 @@ class Template:
                     <input type="checkbox" name="others" id="focuson_others" value="others" checked/>
                     <label for="focuson_others">Others</label>
                 </li>
+                %(curator_display_html)s
             </ul>
         </div>
-        """
+        """ % {
+            'curator_display_html' : curator_display_html
+        }
+
         return html
 
 def img(src, _class='', **kargs):

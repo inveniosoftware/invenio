@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints institution data from an Authority Record.
+"""BibFormat element - Prints institute data from an Authority Record.
 """
 
 __revision__ = "$Id$"
@@ -34,7 +34,7 @@ from invenio.legacy.search_engine import \
     get_record
 
 def format_element(bfo, detail='no'):
-    """ Prints the data of an institution authority record in HTML. By default prints
+    """ Prints the data of an institute authority record in HTML. By default prints
     brief version.
 
     @param detail: whether the 'detailed' rather than the 'brief' format
@@ -58,7 +58,7 @@ def format_element(bfo, detail='no'):
             out += "<p>" + "<strong>" + _("Variant(s)") + "</strong>" + ": " + ", ".join(sees) + "</p>"
         see_also_dicts = bfo.fields('510%%')
         cc_val = CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
-        c_val = "Authority Institution"
+        c_val = "Institutes"
         record_url_pattern = "/record/" + "%s"
         search_url_pattern = "/search?" + \
             "cc=" + "%s" + \
@@ -104,7 +104,7 @@ def get_main_htmls(see_also_dicts, cc_val, c_val, record_url_pattern,
             w_subfield = see_also_dict.get('w')
             # $4 contains control_no of linked authority record
             _4_subfield = see_also_dict.get('4')
-            # $a contains the name of the linked institution
+            # $a contains the name of the linked institute
             out_string = see_also_dict.get('a') or _4_subfield
             # if we have something to display
             if out_string:

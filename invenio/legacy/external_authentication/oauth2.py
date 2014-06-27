@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ __revision__ = \
 
 import requests
 from urllib import urlencode
+from rauth.service import process_token_request
 
 from invenio.utils.json import json_unicode_to_utf8
 from invenio.config import CFG_SITE_SECURE_URL
@@ -106,33 +107,31 @@ class ExternalOAuth2(ExternalAuth):
 
         provider = OAuth2Service(
                                  name = req.g['oauth2_provider_name'],
-                                 consumer_key = config['consumer_key'],
-                                 consumer_secret = config['consumer_secret'],
+                                 client_id = config['consumer_key'],
+                                 client_secret = config['consumer_secret'],
                                  access_token_url = config['access_token_url'],
-                                 authorize_url = config['authorize_url'],
-                                 header_auth=True)
+                                 authorize_url = config['authorize_url'])
 
         data = dict(code = args['code'],
                     client_id = config['consumer_key'],
                     client_secret = config['consumer_secret'],
+                    grant_type = "authorization_code",
                     # Construct redirect uri without having '/' character at the
                     # left most of SITE_SECURE_URL
                     redirect_uri =  CFG_SITE_SECURE_URL + '/youraccount/login?' +
                         urlencode({'login_method': 'oauth2', 'provider': req.g['oauth2_provider_name']}))
-
+        headers = dict(Accept = "application/json")
+        kwargs = dict(data = data, headers = headers)
         # Get the access token
-        token = provider.get_access_token('POST', data=data)
+        r = provider.get_raw_access_token(method='POST', **kwargs)
 
-        ## This is to ease exception frame analysis
-        token_content = token.content
-
-        if 'error' in token.content or 'access_token' not in token_content:
-            if token_content.get('error') == 'access_denied':
-                req.g['oauth2_msg'] = 21
-                return None, None
-            else:
-                req.g['oauth2_msg'] = 22
-                return None, None
+        keys = ['access_token', 'orcid']
+        try:
+            access_token, orcid = process_token_request(r, json.loads, *keys)
+            token_content = {'access_token': access_token, 'orcid': orcid}
+        except:
+            req.g['oauth2_msg'] = 22
+            return None, None
 
         req.g['oauth2_access_token'] = token_content['access_token']
 
@@ -244,13 +243,27 @@ class ExternalOAuth2(ExternalAuth):
         from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
         profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=req.g['oauth2_orcid']), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % req.g['oauth2_access_token']})
-        orcid_record = req.g['orcid_record'] = json_unicode_to_utf8(profile.json)['orcid-profile']
+        orcid_record = req.g['orcid_record'] = json_unicode_to_utf8(profile.json())['orcid-profile']
         id = orcid_record['orcid']['value']
         emails = orcid_record['orcid-bio'].get('contact-details', {}).get('email', [])
         if emails:
             return emails[0], id
         else:
             return None, id
+
+    @staticmethod
+    def get_limited_access_data_from_orcid(orcid_id, access_token):
+        """
+        Since we are dealing with orcid we can fetch tons of information
+        from the user profile.
+        """
+        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+
+        profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=orcid_id), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % access_token})
+        if profile.status_code != 200:
+            raise NotImplementedError()
+        orcid_data = json_unicode_to_utf8(profile.json())['orcid-profile']
+        return orcid_data
 
     @staticmethod
     def get_msg(req):

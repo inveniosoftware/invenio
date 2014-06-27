@@ -41,8 +41,6 @@ from invenio.modules.formatter import format_record
 from .helpers import record_to_draft, make_record, \
     deposition_record
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
-    bibtask_allocate_sequenceid
 from invenio.modules.pidstore.models import PersistentIdentifier
 
 
@@ -494,6 +492,8 @@ def upload_record_sip():
     def create(obj, dummy_eng):
         #FIXME change share tmp directory
         from invenio.config import CFG_TMPSHAREDDIR
+        from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
+            bibtask_allocate_sequenceid
         d = Deposition(obj)
 
         sip = d.get_latest_sip(sealed=False)

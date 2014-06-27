@@ -227,7 +227,7 @@ class Template:
     &nbsp;&nbsp;<span class="italics">%(txt_time)s:</span>
     <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
     <span class="italics">%(txt_example)s: 2012-12-20 19:22:18</span>
-    <div>%(txt_email_logs_to)s: <input type="text" name="email_logs_to" value=%(email_logs_to)s />
+    <div>%(txt_email_logs_to)s: <input type="text" name="email_logs_to" value=%(email_logs_to)s size=%(email_len)s/>
     </div>
     <div><i>%(txt_mandatory)s</i></div>
     <div> <input type="submit" value="Upload" class="adminbutton"> </div>
@@ -255,7 +255,8 @@ class Template:
         'site_url': CFG_SITE_URL,
         'submit_date': cgi.escape(submit_date, True),
         'submit_time': cgi.escape(submit_time, True),
-        'email_logs_to': cgi.escape(email_logs_to, True)}
+        'email_logs_to': cgi.escape(email_logs_to, True),
+        'email_len': len(email_logs_to) + 5}
 
         body_content += """</form></div>"""
         return body_content
@@ -453,7 +454,7 @@ class Template:
             &nbsp;&nbsp;<span class="italics">%(txt7)s:</span>
             <input type="text" name="submit_time" id="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
             <span class="italics">%(txt8)s: 2009-12-20 19:22:18</span>
-            <div>%(txt_email_logs_to)s: <input type="text" name="email_logs_to" value=%(email_logs_to)s />
+            <div>%(txt_email_logs_to)s: <input type="text" name="email_logs_to" value=%(email_logs_to)s size=%(email_len)s />
             <br/>
             <div><i>%(txt9)s</i></div>
         </div>
@@ -475,6 +476,7 @@ class Template:
                         {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>',},
                 'txt_email_logs_to': _("Email logs to"),
                 'email_logs_to': cgi.escape(email_logs_to, True),
+                'email_len': len(email_logs_to) + 5,
                }
         return body_content
 
@@ -508,7 +510,7 @@ class Template:
             if not errors_upload:
                 errors_textarea = '<div class="clean_ok">No errors were found during the upload simulation</div><br/>'
 
-        marcxml_textarea = """<textarea style="background-color: lightyellow" name="metafile" rows="20" cols="80">%(filecontent)s</textarea> """ % {'filecontent': escape_html(metafile.value)}
+        marcxml_textarea = """<textarea style="background-color: lightyellow" name="metafile" rows="20" cols="80">%(filecontent)s</textarea> """ % {'filecontent': escape_html(metafile)}
 
         body_content = """<form class="uploadform" method="post" action="%(site_url)s/batchuploader/metasubmit">""" \
                                        % {'site_url': CFG_SITE_URL}
@@ -546,12 +548,12 @@ class Template:
                                'filetype': filetype,
                                'filename': file_name,
                                'marcxml_textarea': marcxml_textarea,
-                               'filecontent': metafile.value,
+                               'filecontent': metafile,
                                'priority_num': priority,
                                'email_logs_to': email_logs_to,
                                'priority_txt': priority_map[priority],
                                'mode': mode,
-                               'num_rec': metafile.value.count('<record>'),
+                               'num_rec': metafile.count('<record>'),
                                'submit_date': submit_date,
                                'submit_time': submit_time,
                                'errors_textarea': errors_textarea,

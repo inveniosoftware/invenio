@@ -111,6 +111,7 @@ re_unicode_lowercase_u = re.compile(unicode(r"(?u)[úùüû]", "utf-8"))
 re_unicode_lowercase_y = re.compile(unicode(r"(?u)[ýÿ]", "utf-8"))
 re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
 re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
+re_unicode_lowercase_ss = re.compile(unicode(r"(?u)[ß]", "utf-8"))
 re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
 re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
 re_unicode_uppercase_oe = re.compile(unicode(r"(?u)[Œ]", "utf-8"))
@@ -627,8 +628,9 @@ def translate_to_ascii(values):
     @return: sequence with values transformed to ascii
     @rtype: sequence
     """
-    if not values:
+    if not values and not type(values) == str:
         return values
+
     if type(values) == str:
         values = [values]
     for index, value in enumerate(values):
@@ -727,6 +729,7 @@ def strip_accents(x):
     y = re_unicode_lowercase_y.sub("y", y)
     y = re_unicode_lowercase_c.sub("c", y)
     y = re_unicode_lowercase_n.sub("n", y)
+    y = re_unicode_lowercase_ss.sub("ss", y)
     # asciify Latin-1 uppercase characters:
     y = re_unicode_uppercase_a.sub("A", y)
     y = re_unicode_uppercase_ae.sub("AE", y)
@@ -752,15 +755,31 @@ def slugify(text, delim=u'-'):
     return unicode(delim.join(result))
 
 
-def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
+def show_diff(original, modified, prefix='', suffix='',
+            prefix_unchanged=' ',
+            suffix_unchanged='',
+            prefix_removed='-',
+            suffix_removed='',
+            prefix_added='+',
+            suffix_added=''):
     """
-    Returns the diff view between source and changed strings.
+    Returns the diff view between original and modified strings.
     Function checks both arguments line by line and returns a string
-    with additional css classes for difference view
+    with a:
+    - prefix_unchanged when line is common to both sequences
+    - prefix_removed when line is unique to sequence 1
+    - prefix_added when line is unique to sequence 2
+    and a corresponding suffix in each line
     @param original: base string
     @param modified: changed string
     @param prefix: prefix of the output string
-    @param sufix: sufix of the output string
+    @param suffix: suffix of the output string
+    @param prefix_unchanged: prefix of the unchanged line
+    @param suffix_unchanged: suffix of the unchanged line
+    @param prefix_removed: prefix of the removed line
+    @param suffix_removed: suffix of the removed line
+    @param prefix_added: prefix of the added line
+    @param suffix_added: suffix of the added line
 
     @return: string with the comparison of the records
     @rtype: string
@@ -771,17 +790,16 @@ def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
     result = [prefix]
     for line in differ.compare(modified.splitlines(), original.splitlines()):
         if line[0] == ' ':
-            result.append(line.strip())
+            # Mark as unchanged
+            result.append(prefix_unchanged + line[2:].strip() + suffix_unchanged)
         elif line[0] == '-':
-            # Mark as deleted
-            result.append('<strong class="diff_field_deleted">' + line[2:].strip() + "</strong>")
+            # Mark as removed
+            result.append(prefix_removed + line[2:].strip() + suffix_removed)
         elif line[0] == '+':
             # Mark as added/modified
-            result.append('<strong class="diff_field_added">' + line[2:].strip() + "</strong>")
-        else:
-            continue
+            result.append(prefix_added + line[2:].strip() + suffix_added)
 
-    result.append(sufix)
+    result.append(suffix)
     return '\n'.join(result)
 
 
@@ -808,3 +826,25 @@ def transliterate_ala_lc(value):
         text = translate_to_ascii(value)
         text = text.pop()
     return text
+
+
+def escape_latex(text):
+    """
+    This function takes the given text and escapes characters
+    that have a special meaning in LaTeX: # $ % ^ & _ { } ~ \
+    """
+    text = unicode(text.decode('utf-8'))
+    CHARS = {
+        '&':  r'\&',
+        '%':  r'\%',
+        '$':  r'\$',
+        '#':  r'\#',
+        '_':  r'\_',
+        '{':  r'\{',
+        '}':  r'\}',
+        '~':  r'\~{}',
+        '^':  r'\^{}',
+        '\\': r'\textbackslash{}',
+    }
+    escaped = "".join([CHARS.get(char, char) for char in text])
+    return escaped.encode('utf-8')

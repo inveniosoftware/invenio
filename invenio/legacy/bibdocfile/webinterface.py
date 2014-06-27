@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_SITE_RECORD
+     CFG_SITE_RECORD, \
+     CFG_INSPIRE_SITE
 from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
@@ -55,7 +56,7 @@ from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_str
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
@@ -194,7 +195,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                 docfile = doc.get_file(docformat, version)
                             except InvenioBibDocFileError as msg:
                                 req.status = apache.HTTP_NOT_FOUND
-                                if req.headers_in.get('referer'):
+                                if not CFG_INSPIRE_SITE and req.headers_in.get('referer'):
                                     ## There must be a broken link somewhere.
                                     ## Maybe it's good to alert the admin
                                     register_exception(req=req, alert_admin=True)
@@ -250,15 +251,20 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             link_ln = ''
             if ln != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % ln
-            tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
+            tabs = [(unordered_tabs[tab_id]['label'],
+                     '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln),
                      tab_id == 'files',
-                     unordered_tabs[tab_id]['enabled']) \
+                     unordered_tabs[tab_id]['enabled'])
                     for (tab_id, dummy_order) in ordered_tabs_id
-                    if unordered_tabs[tab_id]['visible'] == True]
+                    if unordered_tabs[tab_id]['visible'] is True]
+
+            tabs_counts = get_detailed_page_tabs_counts(self.recid)
             top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                    tabs,
-                                                                   args['ln'])
+                                                                   args['ln'],
+                                                                   citationnum=tabs_counts['Citations'],
+                                                                   referencenum=tabs_counts['References'],
+                                                                   discussionnum=tabs_counts['Discussions'])
             bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
                                                                          tabs,
                                                                          args['ln'])
@@ -382,17 +388,24 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
             working_dir = os.path.join(CFG_TMPSHAREDDIR,
                                        'websubmit_upload_interface_config_' + str(uid),
                                        argd['access'])
-            move_uploaded_files_to_storage(working_dir=working_dir,
-                                           recid=argd['recid'],
-                                           icon_sizes=['180>','700>'],
-                                           create_icon_doctypes=['*'],
-                                           force_file_revision=False)
-            # Clean temporary directory
-            shutil.rmtree(working_dir)
+            if not os.path.isdir(working_dir):
+                # We accessed the url without preliminary steps
+                # (we did not upload a file)
+                # Our working dir does not exist
+                # Display the file manager
+                argd['do'] = 0
+            else:
+                move_uploaded_files_to_storage(working_dir=working_dir,
+                                               recid=argd['recid'],
+                                               icon_sizes=['180>', '700>'],
+                                               create_icon_doctypes=['*'],
+                                               force_file_revision=False)
+                # Clean temporary directory
+                shutil.rmtree(working_dir)
 
-            # Confirm modifications
-            body += '<p style="color:#0f0">%s</p>' % \
-                    (_('Your modifications to record #%(x_num)i have been submitted', x_num=argd['recid']))
+                # Confirm modifications
+                body += '<p style="color:#0f0">%s</p>' % \
+                        (_('Your modifications to record #%i have been submitted') % argd['recid'])
         elif argd['cancel']:
             # Clean temporary directory
             working_dir = os.path.join(CFG_TMPSHAREDDIR,

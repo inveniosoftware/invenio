@@ -51,7 +51,7 @@ class CnumSeq(SequenceGenerator):
                           LIKE %s AND seq_name=%s""",
                           (value + "%", self.seq_name))
 
-    def _next_value(self, recid=None, xml_record=None):
+    def _next_value(self, recid=None, xml_record=None, start_date=None):
         """
         Returns the next cnum for the given recid
 
@@ -61,22 +61,28 @@ class CnumSeq(SequenceGenerator):
         @param xml_record: record in xml format
         @type xml_record: string
 
+        @param start_date: use given start date
+        @type start_date: string
+
         @return: next cnum for the given recid. Format is Cyy-mm-dd.[.1n]
         @rtype: string
 
         @raises ConferenceNoStartDateError: No date information found in the
         given recid
         """
+        bibrecord = None
         if recid is None and xml_record is not None:
             bibrecord = create_record(xml_record)[0]
-        else:
+        elif recid is not None:
             bibrecord = get_bibrecord(recid)
 
-        start_date = record_get_field_value(bibrecord,
-                                            tag="111",
-                                            ind1="",
-                                            ind2="",
-                                            code="x")
+        if start_date is None and bibrecord is not None:
+            start_date = record_get_field_value(bibrecord,
+                                                tag="111",
+                                                ind1="",
+                                                ind2="",
+                                                code="x")
+
         if not start_date:
             raise ConferenceNoStartDateError
 

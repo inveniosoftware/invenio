@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,11 +21,10 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import MySQLdb
-
 from invenio.legacy.bibformat import adminlib as bibformatadminlib
 from invenio.modules.formatter import engine as bibformat_engine
-import invenio.modules.formatter.api as bibformat_dblayer
+import invenio.legacy.bibformat.dblayer as bibformat_dblayer
+from invenio.modules.formatter import format_with_format_template
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.webpage import page, error_page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
@@ -35,7 +34,7 @@ from invenio.legacy.search_engine import search_pattern, \
                            create_basic_search_units
 from invenio.modules.formatter.config import InvenioBibFormatError, InvenioBibFormatWarning
 from invenio.ext.logging import register_exception
-from invenio.config import CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
 
 def index(req, ln=CFG_SITE_LANG):
     """
@@ -826,10 +825,10 @@ def format_template_show_preview_or_save(req, bft, ln=CFG_SITE_LANG, code=None,
                                                search_pattern = keywords,
                                                xml_record = None,
                                                user_info = user_info)
-        body = bibformat_engine.format_with_format_template(bft,
-                                                            bfo,
-                                                            verbose=7,
-                                                            format_template_code=code)
+        body = format_with_format_template(bft,
+                                           bfo,
+                                           verbose=7,
+                                           format_template_code=code)
 
         if content_type_for_preview == 'text/html':
             #Standard page display with CDS headers, etc.
@@ -1129,7 +1128,6 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
 
     return page(title="",
                 body = bibformat_templates.tmpl_admin_dialog_box(url,
-                                                                 ln,
                                                                  title,
                                                                  message,
                                                                  options),

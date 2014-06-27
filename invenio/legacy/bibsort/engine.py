@@ -711,7 +711,8 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
             for recid in bucket_insert.get(bucket_no, []):
                 bucket_data.add(recid)
             for recid in bucket_delete.get(bucket_no, []):
-                bucket_data.remove(recid)
+                if recid in bucket_data:
+                    bucket_data.remove(recid)
             if update_timestamp:
                 date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 run_sql("UPDATE bsrMETHODDATABUCKET \

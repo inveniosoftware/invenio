@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.utils.url import create_html_link
 from invenio.base.i18n import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 from invenio.modules.access.engine import acc_authorize_action
 
 def format_element(bfo, style):
@@ -44,11 +44,11 @@ def format_element(bfo, style):
         if style != '':
             linkattrd['style'] = style
 
-        out += create_html_link(CFG_SITE_URL + '/%s/managedocfiles' % CFG_SITE_RECORD,
-                         urlargd={'ln': bfo.lang,
-                                  'recid': str(bfo.recID)},
-                         link_label=_("Manage Files of This Record"),
-                         linkattrd=linkattrd)
+        out += create_html_link(CFG_BASE_URL + '/%s/managedocfiles' % CFG_SITE_RECORD,
+                                urlargd={'ln': bfo.lang,
+                                         'recid': str(bfo.recID)},
+                                link_label=_("Manage Files of This Record"),
+                                linkattrd=linkattrd)
     return out
 
 def escape_values(bfo):

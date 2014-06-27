@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,8 +29,9 @@ from six import iteritems
 
 from invenio.config import \
      CFG_PATH_CONVERT, \
-     CFG_SITE_LANG
-from invenio.legacy.bibdocfile.api import decompose_file
+     CFG_SITE_LANG, \
+     CFG_BIBDOCFILE_FILEDIR
+from invenio.legacy.bibdocfile.api import decompose_file, decompose_file_with_version
 from invenio.ext.logging import register_exception
 from invenio.legacy.websubmit.file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
@@ -40,11 +41,15 @@ from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import get_record
 from invenio.legacy.bibrecord import record_get_field_values, record_get_field_value
 
-def createRelatedFormats(fullpath, overwrite=True, debug=False):
+def createRelatedFormats(fullpath, overwrite=True, debug=False, consider_version=False):
     """Given a fullpath, this function extracts the file's extension and
     finds in which additional format the file can be converted and converts it.
     @param fullpath: (string) complete path to file
     @param overwrite: (bool) overwrite already existing formats
+    @param consider_version: (bool) if True, consider the version info
+                             in C{fullpath} to find missing format
+                             for that specific version, if C{fullpath}
+                             contains version info
     Return a list of the paths to the converted files
     """
     file_converter_logger = get_file_converter_logger()
@@ -53,15 +58,29 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
         file_converter_logger.setLevel(DEBUG)
     try:
         createdpaths = []
-        basedir, filename, extension = decompose_file(fullpath)
+        if consider_version:
+            try:
+                basedir, filename, extension, version = decompose_file_with_version(fullpath)
+            except:
+                basedir, filename, extension = decompose_file(fullpath)
+                version = 0
+        else:
+            basedir, filename, extension = decompose_file(fullpath)
+            version = 0
         extension = extension.lower()
         if debug:
             print("basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension), file=sys.stderr)
 
-        filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
-        if debug:
-            print("filelist: %s" % filelist, file=sys.stderr)
-        missing_formats = get_missing_formats(filelist)
+        if overwrite:
+            missing_formats = get_missing_formats([fullpath])
+        else:
+            if version:
+                filelist = glob.glob(os.path.join(basedir, '%s*;%s' % (filename, version)))
+            else:
+                filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
+            if debug:
+                print("filelist: %s" % filelist, file=sys.stderr)
+            missing_formats = get_missing_formats(filelist)
         if debug:
             print("missing_formats: %s" % missing_formats, file=sys.stderr)
         for path, formats in iteritems(missing_formats):
@@ -74,7 +93,12 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
                 if debug:
                     print("...... newpath: %s" % newpath, file=sys.stderr)
                 try:
-                    convert_file(path, newpath)
+                    if CFG_BIBDOCFILE_FILEDIR in basedir:
+                        # We should create the new files in a temporary location, not
+                        # directly inside the BibDoc directory.
+                        newpath = convert_file(path, output_format=aformat)
+                    else:
+                        convert_file(path, newpath)
                     createdpaths.append(newpath)
                 except InvenioWebSubmitFileConverterError as msg:
                     if debug:
@@ -176,7 +200,7 @@ def get_nice_bibsched_related_message(curdir, ln=CFG_SITE_LANG):
     ## WRT informing the user.
     _ = gettext_set_language(ln)
     res = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING'")
-    pre = _("Note that your submission as been inserted into the bibliographic task queue and is waiting for execution.\n")
+    pre = _("Note that your submission has been inserted into the bibliographic task queue and is waiting for execution.\n")
     if server_pid():
         ## BibSched is up and running
         msg = _("The task queue is currently running in automatic mode, and there are currently %(x_num)s tasks waiting to be executed. Your record should be available within a few minutes and searchable within an hour or thereabouts.\n", x_num=(len(res)))

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,12 +22,10 @@ from __future__ import print_function
 import os
 import re
 import sys
-import pkg_resources
 
 from invenio.utils.text import encode_for_xml, wash_for_utf8
 from invenio.legacy.bibrecord import field_xml_output
 
-DUMMY_IMAGE_TMP = pkg_resources.resource_filename(__name__, 'plotextractor_dummy.png')
 
 def write_message(message):
     print(message)
@@ -277,63 +284,62 @@ def create_MARC(extracted_image_data, tarball, refno):
     root_dir = os.path.dirname(tarball) + os.sep + os.path.basename(tarball) + \
                  '_plots' + os.sep
 
-    # For building result MARCXML
-    marcxml = ['<record>']
-
-    # Datafield := (subfields, ind1, ind2, controlfield)
-    # Subfield := (code, value)
-
-    #FIXME: Determine what to do without refno
-    if refno and refno.isdigit():
-        field = (None, ' ', ' ', refno)
-        marcxml.append(field_xml_output(field, '001'))
-
+    marcxml_fft = []
     index = 0
     for (image_location, caption, dummy, contexts) in extracted_image_data:
-        if image_location == '':
-            # we don't know the image, but the captions are for separate things
-            for cap in caption.split(' : '):
-                # Add DUMMY-PLOT MARCXML per loose captions
-                subfields = []
-                subfields.append(('a', DUMMY_IMAGE_TMP))
-                subfields.append(('t', "PlotMisc"))
-                subfields.append(('d', "%05d %s" % (index, cap)))
-                subfields.append(('n', "fig%05d" % (index,)))
-                subfields.append(('o', "HIDDEN"))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-                index = index + 1
+        if len(image_location) < 3:
+            # If not useful URL -> move on to next
+            continue
+
+        # Merge subfolder into docname, until root directory
+        relative_image_path = image_location.replace(root_dir, '')
+        docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_').replace(';', '').replace(':', '')
+
+        if type(caption) == list:
+            caption = " ".join(caption)
+
+        if len(caption) < 3:
+            subfields = []
+            subfields.append(('a', image_location))
+            subfields.append(('t', "PlotMisc"))
+            subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+            subfields.append(('n', docname))
+            subfields.append(('o', "HIDDEN"))
+            marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
         else:
-            # Merge subfolder into docname, until root directory
-            relative_image_path = image_location.replace(root_dir, '')
-            docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_')
-            if len(caption) < 3:
+            # Add PLOT MARCXML
+            subfields = []
+            subfields.append(('a', image_location))
+            subfields.append(('t', "Plot"))
+            subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+            subfields.append(('n', docname))
+            marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+            if contexts:
+                # Add CONTEXT MARCXML
                 subfields = []
-                subfields.append(('a', image_location))
-                subfields.append(('t', "PlotMisc"))
-                subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+                subfields.append(('a', "%s.context" % (image_location,)))
+                subfields.append(('t', "Plot"))
+                subfields.append(('f', ".png;context"))
                 subfields.append(('n', docname))
                 subfields.append(('o', "HIDDEN"))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-            else:
-                # Add PLOT MARCXML
-                subfields = []
-                subfields.append(('a', image_location))
-                subfields.append(('t', "Plot"))
-                subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
-                subfields.append(('n', docname))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-                if contexts:
-                    # Add CONTEXT MARCXML
-                    subfields = []
-                    subfields.append(('a', "%s.context" % (image_location,)))
-                    subfields.append(('t', "Plot"))
-                    subfields.append(('f', ".png;context"))
-                    subfields.append(('n', docname))
-                    subfields.append(('o', "HIDDEN"))
-                    marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-            index = index + 1
-    marcxml.append('</record>')
-    return '\n'.join(marcxml)
+                marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+        index += 1
+
+    if marcxml_fft:
+        # For building result MARCXML
+        marcxml_header = ['<record>']
+
+        # Datafield := (subfields, ind1, ind2, controlfield)
+        # Subfield := (code, value)
+
+        #FIXME: Determine what to do without refno
+        if refno and refno.isdigit():
+            field = (None, ' ', ' ', refno)
+            marcxml_header.append(field_xml_output(field, '001'))
+        marcxml = marcxml_header + marcxml_fft
+        marcxml.append('</record>')
+        return '\n'.join(marcxml)
+    return ""
 
 def get_image_location(image, sdir, image_list, recurred=False):
     """

@@ -53,10 +53,8 @@ class BibClassifyTestCase(InvenioTestCase):
 
     def setUp(self):
         """Initialize stuff"""
-        ## NOTE next time please make sure that you change global variables
-        ## back to initial values in tearDown. Thank you!!!
         from invenio import config
-        self.__CFG_TMPDIR = config.CFG_TMPDIR
+        self.original_tmpdir = config.CFG_TMPDIR
         config.CFG_TMPDIR = tempfile.gettempdir()
 
         self.oldstdout = sys.stdout
@@ -74,11 +72,11 @@ class BibClassifyTestCase(InvenioTestCase):
 
     def tearDown(self):
         from invenio import config
+        config.CFG_TMPDIR = self.original_tmpdir
         if self.stdout:
             self.unredirect()
         from invenio.legacy.bibclassify import config as bconfig
         bconfig.set_global_level(self.log_level)
-        config.CFG_TMPDIR = self.__CFG_TMPDIR
 
     def redirect(self):
         # just for debugging in Eclipse (to see messages printed)

@@ -98,7 +98,7 @@ search_also, with context -%}
   {%- block index_right -%}
   {% if collection.collection_children_r %}
     <div class="col-md-{{ '4' if collection.collection_children_v else '8' }} collection clearfix">
-      <h4>{{ _("Narrow by collection:") }}</h4>
+      <h4>{{ collection.get_collectionbox_name(box_type='r') }}</h4>
       {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
     </div>
   {% else %}
@@ -132,7 +132,7 @@ search_also, with context -%}
   {%- block index_left -%}
   {% if collection.collection_children_v %}
     <div class="col-md-4 collection clearfix">
-      <h4>{{ _("Focus on:") }}</h4>
+      <h4>{{ collection.get_collectionbox_name(box_type='v') }}</h4>
       {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list clearfix") }}
 
       {{ search_also(collection.externalcollections_2) }}

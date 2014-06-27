@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,19 +22,12 @@ bibauthorid_cli
     This module provides a command-line interface for BibAuthorID.
 """
 
-from invenio.legacy.bibauthorid.general_utils import bibauthor_print
 
 def main():
-    """Main function """
-    try:
-        import invenio.legacy.bibauthorid.daemon as daemon
-    except ImportError:
-        bibauthor_print("Hmm...No Daemon process running.")
-        return
-
+    """Main function."""
+    import invenio.legacy.bibauthorid.daemon as daemon
     daemon.bibauthorid_daemon()
 
 
 if __name__ == '__main__':
     main()
-

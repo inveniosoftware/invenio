@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 ## import interesting modules:
+import traceback
 import string
 import os
 import sys
@@ -604,9 +605,6 @@ def interface(req,
         if os.path.exists(os.path.join(curdir, full_field['name'])):
             file = open(os.path.join(curdir, full_field['name']), "r");
             text = file.read()
-            text = re.compile("[\n\r]*$").sub("", text)
-            text = re.compile("\n").sub("\\n", text)
-            text = re.compile("\r").sub("", text)
             file.close()
 
         values.append(text)
@@ -1758,7 +1756,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                                     ## InvenioWebSubmitFunctionError and raise it:
                                     msg = "Unhandled TypeError caught when " \
                                         "calling [%s] WebSubmit function: " \
-                                        "[%s]" % (function_name, str(err))
+                                        "[%s]: \n%s" % (function_name, str(err), traceback.format_exc())
                                     raise InvenioWebSubmitFunctionError(msg)
                         except InvenioWebSubmitFunctionWarning as err:
                             ## There was an unexpected behaviour during the

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@
 <p>The “CFG BIBAUTHORITY AUTOSUGGEST OPTIONS” dictionary gives us the remaining configurations, specific only to the auto-suggest functionality. The value for the 'index' key determines which index type will be used find the authority records that will populate the drop-down with a list of suggestions (cf. the following paragraph on configuring the BibIndex for authority records). The value of the 'insert_here_field' determines which authority record field contains the value that should be used both for constructing the strings of the entries in the drop-down list as well as the value to be inserted directly into the edited subfield if the user clicks on one of the drop-down entries. <!-- The value of the 'sort' key tells INVENIO how to sort the entries in the drop-down list. If a popularity sort is chosen, the drop-down entries will be sorted according to how often the associated authority record is referenced in this particular INVENIO instance. -->Finally, the value for the 'disambiguation_fields' key is an ordered list of authority record fields that are used, in the order in which they appear in the list, to disambiguate between authority records with exactly the same value in their 'insert_here_field'.</p>
 
 <h2>BibIndex</h2>
-<p>As an admin of INVENIO, you have the possibility of configuring how indexing works in regards to authority records that are referenced by bibliographic records. When a bibliographic record is indexed for a particular index type, and if that index type contains MARC fields which are under authority control in this particular INVENIO instance (as configured by the, “CFG BIBAUTHORITY CONTROLLED FIELDS” dictionary in the bibauthority_config.py configuration file, mentioned above), then the indexer will include authority record data from specific MARC fields of these authority records in the same index. Which authority record fields are to be used to enrich the indexes for bibliographic records can be configured by the “CFG BIBAUTHORITY AUTHORITY SUBFIELDS TO INDEX” dictionary. In the example below each of the 4 authority record types ('AUTHOR', 'INSTITUTION', 'JOURNAL' and 'SUBJECT') is given a list of authority record MARC fields which are to be scanned for data that is to be included in the indexed terms of the dependent bibliographic records. For the 'AUTHOR' authority records, the example specifies that the values of the fields '100__a', '100__d', '100__q', '400__a', '400__d', and '400__q' (i.e. name, alternative names, and year of birth) should all be included in the data to be indexed for any bibliographic records referencing these authority records in their authority-controlled subfields.</p>
+<p>As an admin of INVENIO, you have the possibility of configuring how indexing works in regards to authority records that are referenced by bibliographic records. When a bibliographic record is indexed for a particular index type, and if that index type contains MARC fields which are under authority control in this particular INVENIO instance (as configured by the, “CFG BIBAUTHORITY CONTROLLED FIELDS” dictionary in the bibauthority_config.py configuration file, mentioned above), then the indexer will include authority record data from specific MARC fields of these authority records in the same index. Which authority record fields are to be used to enrich the indexes for bibliographic records can be configured by the “CFG BIBAUTHORITY AUTHORITY SUBFIELDS TO INDEX” dictionary. In the example below each of the 4 authority record types ('AUTHOR', 'INSTITUTE', 'JOURNAL' and 'SUBJECT') is given a list of authority record MARC fields which are to be scanned for data that is to be included in the indexed terms of the dependent bibliographic records. For the 'AUTHOR' authority records, the example specifies that the values of the fields '100__a', '100__d', '100__q', '400__a', '400__d', and '400__q' (i.e. name, alternative names, and year of birth) should all be included in the data to be indexed for any bibliographic records referencing these authority records in their authority-controlled subfields.</p>
 
 <h2>Configuration File Overview</h2>
 <p>The configuration file for the BibAuthority module can be found at <code>invenio/lib/python/invenio.legacy.bibauthority.config.py</code>. Below is a commented example configuration to show how one would typically configure the parameters for BibAuthority. The details of how this works were explained in the paragraphs above.</p>
@@ -41,7 +41,7 @@
 CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD = '035__a'
 
 &#35; Separator to be used in control numbers to separate the authority type
-&#35; PREFIX (e.g. "INSTITUTION") from the control_no (e.g. "(CERN)abc123"
+&#35; PREFIX (e.g. "INSTITUTE") from the control_no (e.g. "(CERN)abc123"
 CFG_BIBAUTHORITY_PREFIX_SEP = '|'
 
 &#35; the ('980__a') string that identifies an authority record
@@ -65,7 +65,7 @@ CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE = \
 &#35; ... including the 980__a subfields of all authority records
 &#35; ... and the $0 subfields of the bibliographic fields under authority control
 CFG_BIBAUTHORITY_TYPE_NAMES = {
-    'INSTITUTION': 'INSTITUTION',
+    'INSTITUTE': 'INSTITUTE',
     'AUTHOR': 'AUTHOR',
     'JOURNAL': 'JOURNAL',
     'SUBJECT': 'SUBJECT',
@@ -77,13 +77,13 @@ CFG_BIBAUTHORITY_TYPE_NAMES = {
 &#35; ... authority record (must conform to the keys of CFG_BIBAUTHORITY_TYPE_NAMES)
 CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC = {
     '100__a': 'AUTHOR',
-    '100__u': 'INSTITUTION',
-    '110__a': 'INSTITUTION',
+    '100__u': 'INSTITUTE',
+    '110__a': 'INSTITUTE',
     '130__a': 'JOURNAL',
     '150__a': 'SUBJECT',
-    '260__b': 'INSTITUTION',
+    '260__b': 'INSTITUTE',
     '700__a': 'AUTHOR',
-    '700__u': 'INSTITUTION',
+    '700__u': 'INSTITUTE',
 }
 
 &#35; CFG_BIBAUTHORITY_CONTROLLED_FIELDS_AUTHORITY
@@ -92,11 +92,11 @@ CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC = {
 &#35; authority record subfields use the $4 field for the control_no (not $0)
 CFG_BIBAUTHORITY_CONTROLLED_FIELDS_AUTHORITY = {
     '500__a': 'AUTHOR',
-    '510__a': 'INSTITUTION',
+    '510__a': 'INSTITUTE',
     '530__a': 'JOURNAL',
     '550__a': 'SUBJECT',
-    '909C1u': 'INSTITUTION', # used in bfe_affiliation
-    '920__v': 'INSTITUTION', # used by FZ Juelich demo data
+    '909C1u': 'INSTITUTE', # used in bfe_affiliation
+    '920__v': 'INSTITUTE', # used by FZ Juelich demo data
 }
 
 &#35; constants for CFG_BIBEDIT_AUTOSUGGEST_TAGS
@@ -123,8 +123,8 @@ CFG_BIBAUTHORITY_AUTOSUGGEST_CONFIG = {
         'sort_by': CFG_BIBAUTHORITY_AUTOSUGGEST_SORT_POPULAR,
         'disambiguation_fields': ['100__d', '270__m'],
     },
-    'INSTITUTION':{
-        'field': 'authorityinstitution',
+    'INSTITUTE':{
+        'field': 'authorityinstitute',
         'insert_here_field': '110__a',
         'sort_by': CFG_BIBAUTHORITY_AUTOSUGGEST_SORT_ALPHA,
         'disambiguation_fields': ['270__b'],
@@ -153,7 +153,7 @@ CFG_BIBAUTHORITY_AUTHORITY_SUBFIELDS_TO_INDEX = {
         '400__d', #(See From Tracing) (R, NR)
         '400__q', #(See From Tracing) (R, NR)
     ],
-    'INSTITUTION': [
+    'INSTITUTE': [
         '110__a', #(NR, NR)
         '410__a', #(R, NR)
     ],

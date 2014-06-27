@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,18 +22,18 @@ __revision__ = "$Id$"
 import os
 import tempfile
 
-from invenio.config import CFG_TMPSHAREDDIR, CFG_WEBDIR, CFG_SITE_URL, CFG_BIBRANK_SHOW_CITATION_GRAPHS,\
-    CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS,\
-    CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
+from invenio.config import (CFG_TMPSHAREDDIR, CFG_WEBDIR, CFG_SITE_URL,
+    CFG_BIBRANK_SHOW_CITATION_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS,
+    CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION)
 
 ## test gnuplot presence:
-cfg_gnuplot_available = 1
+CFG_GNUPLOT_AVAILABLE = 1
 try:
     import Gnuplot
 except ImportError as e:
-    cfg_gnuplot_available = 0
+    CFG_GNUPLOT_AVAILABLE = 0
 
-GRAPH_TYPES = ((1, 'GNU plot'),(2, 'Flot'))
+GRAPH_TYPES = ((1, 'GNU plot'), (2, 'Flot'))
 
 def write_coordinates_in_tmp_file(lists_coordinates):
     """write the graph coordinates in a temporary file for reading it later
@@ -50,12 +50,12 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     """
     max_y_datas = 0
     (fd, fname) = tempfile.mkstemp(prefix='bibrank_grapher_', dir=CFG_TMPSHAREDDIR)
-    file_dest = os.fdopen(fd, 'a')
+    file_dest = os.fdopen(fd, 'w')
     for list_elem in lists_coordinates:
         y_axe = []
         #prepare data and store them in a file
         for key_value in list_elem:
-            file_dest.write("%s %s\n"%(key_value[0], key_value[1]))
+            file_dest.write("%s %s\n" % (key_value[0], key_value[1]))
             y_axe.append(key_value[1])
         max_tmp = 0
         if y_axe:
@@ -65,9 +65,11 @@ def write_coordinates_in_tmp_file(lists_coordinates):
         file_dest.write("\n\n")
     file_dest.close()
 
-    return [fname, max_y_datas]
+    return (fname, max_y_datas)
 
-def create_temporary_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals):
+def create_temporary_image(recid, kind_of_graph, data_file, x_label, y_label,
+                           origin_tuple, y_max, docid_list, graphe_titles,
+                           intervals, dest_dir=os.path.join(CFG_WEBDIR, 'img')):
     """From a temporary file, draw a gnuplot or flot graph
     The arguments are as follows:
     recid          - record ID
@@ -85,31 +87,66 @@ def create_temporary_image(recid, kind_of_graph, data_file, x_label, y_label, or
     docid_list     - In download_history case, docid_list is used to plot multiple curves.
     graphe_titles  - List of graph titles. It's used to name the curve in the legend.
     intervals      - x tics location and xrange specification"""
+    fd, graph_tmp_file = tempfile.mkstemp(prefix='tmp_%s_%s_' % (kind_of_graph, recid),
+                                          suffix='.png',
+                                          dir=dest_dir)
+    os.close(fd)
+
     if (kind_of_graph == "citation" and CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1) or \
         (kind_of_graph == "download_history" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1) or \
         (kind_of_graph == "download_users" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION == 1):
-        if cfg_gnuplot_available == 0:
-            return (None, None)
-        #Graphe name: file to store graph
-        graphe_name = "tmp_%s_%s_stats.png" % (kind_of_graph, recid)
-        create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, graphe_name)
+        if CFG_GNUPLOT_AVAILABLE == 0:
+            return None
+        # Graphe name: file to store graph
+        if kind_of_graph == 'citation':
+            # Rename is done outside of this function
+            dest_graph_name = None
+        else:
+            dest_graph_name = "tmp_%s_%s_stats.png" % (kind_of_graph, recid)
+        create_temporary_gnuplot_image(kind_of_graph, data_file, x_label,
+                                       y_label, origin_tuple, y_max,
+                                       docid_list, graphe_titles, intervals,
+                                       dest=graph_tmp_file)
     elif (kind_of_graph == "citation" and CFG_BIBRANK_SHOW_CITATION_GRAPHS == 2) or \
         (kind_of_graph == "download_history" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2) or \
         (kind_of_graph == "download_users" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION == 2):
-        graphe_name = "tmp_%s_%s_stats.html" % (kind_of_graph, recid)
-        create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, graphe_name)
+        dest_graph_name = "tmp_%s_%s_stats.html" % (kind_of_graph, recid)
+        create_temporary_flot_image(kind_of_graph, data_file, x_label,
+                                    y_label, origin_tuple, y_max, docid_list,
+                                    graphe_titles, intervals,
+                                    dest=graph_tmp_file)
     else:
-        graphe_name = "tmp_error.html"
-        open(CFG_WEBDIR + "/img/" + graphe_name, 'w').write("Error, select a correct format")
-    return (graphe_name, data_file)
+        dest_graph_name = "tmp_error.html"
+        f = open(graph_tmp_file, 'w')
+        try:
+            f.write("Error, select a correct format")
+        finally:
+            f.close()
 
-def create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, graphe_name):
+    if os.stat(graph_tmp_file).st_size == 0:
+        # Somehow the graph was not generated properly
+        return None
+
+    if dest_graph_name:
+        dest = os.path.join(dest_dir, dest_graph_name)
+        try:
+            os.rename(graph_tmp_file, dest)
+        except OSError:
+            os.unlink(graph_tmp_file)
+    else:
+        dest = graph_tmp_file
+
+    return dest
+
+def create_temporary_gnuplot_image(kind_of_graph, data_file, x_label, y_label,
+                                   origin_tuple, y_max, docid_list,
+                                   graphe_titles, intervals, dest):
     #For different curves
     color_line_list = ['4', '3', '2', '9', '6']
     #Gnuplot graphe object
     g = Gnuplot.Gnuplot()
     g('set terminal png small')
-    g('set output "%s/img/%s"' % (CFG_WEBDIR, graphe_name))
+    g('set output "%s"' % dest)
     len_intervals = len(intervals)
     len_docid_list = len(docid_list)
     # Standard options
@@ -131,27 +168,27 @@ def create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_l
     plot_text = ""
 
     if kind_of_graph == 'download_history':
-        g('set xdata time') #Set x scale as date
-        g('set timefmt "%m/%Y"') #Inform about format in file .dat
-        g('set format x "%b %y"') #Format displaying
+        g('set xdata time')        # Set x scale as date
+        g('set timefmt "%m/%Y"')   # Inform about format in file .dat
+        g('set format x "%b %y"')  # Format displaying
         if len(intervals) > 1 :
             g('set xrange ["%s":"%s"]' % (intervals[0], intervals[len_intervals-1]))
         y_offset = max(3, float(y_max)/60)
         g('set yrange [0:%s]' %str(y_max + y_offset))
         if len_intervals > 1 and len_intervals <= 12:
-            g('set xtics rotate %s' % str(tuple(intervals)))#to prevent duplicate tics
+            g('set xtics rotate %s' % str(tuple(intervals)))  # to prevent duplicate tics
         elif len_intervals > 12 and len_intervals <= 24:
-            g('set xtics rotate "%s", 7776000, "%s"' % (intervals[0], intervals[len_intervals-1]))              #3 months intervalls
+            g('set xtics rotate "%s", 7776000, "%s"' % (intervals[0], intervals[len_intervals-1]))  # 3 months intervalls
         else :
-            g('set xtics rotate "%s",15552000, "%s"' % (intervals[0], intervals[len_intervals-1]))              #6 months intervalls
+            g('set xtics rotate "%s",15552000, "%s"' % (intervals[0], intervals[len_intervals-1]))  # 6 months intervalls
 
-        if len_docid_list <= 1: #Only one curve
+        if len_docid_list <= 1:  # Only one curve
             #g('set style fill solid 0.25')
             if len(intervals)<=4:
                 plot_text = plot_command(1, data_file, (0, 0), "", "imp", color_line_list[0], 20)
             else:
                 plot_text = plot_command(1, data_file, (0, 0), "", "linespoint", color_line_list[0], 1, "pt 26", "ps 0.5")
-        elif len_docid_list > 1: #Multiple curves
+        elif len_docid_list > 1:  # Multiple curves
             if len(intervals)<=4:
                 plot_text = plot_command(1, data_file, (0, 0), graphe_titles[0], "imp", color_line_list[0], 20)
             else:
@@ -162,7 +199,7 @@ def create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_l
                 else :
                     plot_text += plot_command(0, data_file, (d, d) , graphe_titles[d], "linespoint", color_line_list[d], 1, "pt 26", "ps 0.5")
             if len(intervals)>2:
-                plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2 )
+                plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "", "impulses", 0, 2)
                 plot_text += plot_command(0, data_file, (len_docid_list, len_docid_list), "TOTAL", "lines", 0, 5)
 
     elif kind_of_graph == 'download_users':
@@ -175,7 +212,7 @@ def create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_l
         g('set style fill solid 0.25')
         plot_text = 'plot "%s" using 1:2 title "" with boxes lt 7 lw 2' % data_file
 
-    else: #citation
+    else:  # citation
         g('set boxwidth 0.6 relative')
         g('set style fill solid 0.250000 border -1')
         g('set xtics rotate')
@@ -188,7 +225,7 @@ def create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_l
 
     g('%s' % plot_text)
 
-def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, graphe_name):
+def create_temporary_flot_image(kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, dest):
     out = """
               <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/js/excanvas.min.js"></script><![endif]-->
               <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
@@ -237,14 +274,14 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
                points: { show: false }
             },
 """
-        if len(docid_list) > 1: #Multiple curves
+        if len(docid_list) > 1:  # Multiple curves
             options += """,
             legend: { show : true}"""
             for d in range(1, len(docid_list)):
-                out += """var d%s = ["""%d
+                out += """var d%s = [""" % d
                 first = 0
                 while True:
-                    x,_,y = data.readline().partition(' ')
+                    x, _, y = data.readline().partition(' ')
                     if y == '':
                         data.readline()
                         break
@@ -253,7 +290,7 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
                     else:
                         out += ', '
                         out += '[parseDate%s("%s"),%s]' % \
-                            (kind_of_graph, x,y.strip())
+                            (kind_of_graph, x, y.strip())
                 out += """];
                            """
             out += """
@@ -271,7 +308,7 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
                          legend: { show : false},
 """ % kind_of_graph
         lines = 'bars'
-    else: #citation
+    else:  # citation
         tics += """xaxis: { mode:"time",min:parseDate%s("%s"),max:parseDate%s("%s")},
                          yaxis: { min: 0, max: %s},""" % (kind_of_graph, str(intervals[0]),
                                 kind_of_graph, str(intervals[len(intervals)-1]), str(y_max+2))
@@ -283,7 +320,7 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
                          },
                          legend: { show : false},
 """ % (kind_of_graph, tics)
-    if docid_list is None or len(docid_list) <= 1: #Only one curve
+    if docid_list is None or len(docid_list) <= 1:  # Only one curve
         out += """var d1 = ["""
         if kind_of_graph == 'download_users':
             out += '[1,%s], [2,%s]' % (data.readline().partition(' ')[2].strip(),
@@ -291,7 +328,7 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
         else:
             first = 0
             for line in data:
-                x,_,y = line.partition(' ')
+                x, _, y = line.partition(' ')
                 if y == '':
                     break
                 if first == 0:
@@ -306,7 +343,9 @@ def create_temporary_flot_image(recid, kind_of_graph, data_file, x_label, y_labe
     options += """grid: { hoverable: true, clickable: true },
             selection: { mode: "xy" } };"""
     # Generate also the gnuplot image in case javascript is disabled
-    create_temporary_gnuplot_image(recid, kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, graphe_name[:-4] + "png")
+    create_temporary_gnuplot_image(kind_of_graph, data_file, x_label, y_label,
+                                   origin_tuple, y_max, docid_list,
+                                   graphe_titles, intervals, dest=dest)
     # Write the plot method in javascript
     out += """%(options)s
     var startData%(graph)s = getData%(graph)s();
@@ -386,16 +425,19 @@ $("#overview%(graph)s").bind("plotselected", function (event, ranges) {
             </script>""" % {'graph' : kind_of_graph}
     # Support for disabled javascript
     out += "<noscript>"
-    out += """<img src='%s/img/%s' align="center" alt="">"""% (CFG_SITE_URL, graphe_name[:-4] + "png")
+    out += """<img src='%s/img/%s' align="center" alt="">"""% (CFG_SITE_URL, os.path.basename(dest))
     out += "</noscript>"
-    open(CFG_WEBDIR + "/img/" + graphe_name, 'w').write(out)
+    open(dest, 'w').write(out)
     data.close()
-def remove_old_img(prefix_file_name):
-    """Detele all the images older than 10 minutes to prevent to much storage
+
+def remove_old_img(prefix_file_name, directory="%s/img/" % CFG_WEBDIR):
+    """Delete all the images older than 10 minutes to prevent to much storage
     Takes 0.0 seconds for 50 files to delete"""
 
-    command = "find %s/img/ -name tmp_%s*.png -amin +10 -exec rm -f {} \;" % (CFG_WEBDIR, prefix_file_name)
+    command = "find %s -name tmp_%s*.png -amin +10 -exec rm -f {} \\;" \
+                                                % (directory, prefix_file_name)
     return os.system(command)
+
 
 def plot_command(first_line, file_source, indexes, title, style, line_type, line_width, point_type="", point_size=""):
     """Return a string of a gnuplot plot command.Particularly useful when multiple curves

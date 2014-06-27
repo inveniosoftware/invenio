@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,7 @@
 
 import cgi
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
 from invenio.legacy.search_engine import record_public_p
 from invenio.utils.html import escape_javascript_string
 from invenio.modules.formatter.format_elements.bfe_sciencewise import create_sciencewise_url, \
@@ -86,7 +86,7 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
     url = '%(siteurl)s/%(record)s/%(recid)s' % \
           {'recid': bfo.recID,
            'record': CFG_SITE_RECORD,
-           'siteurl': CFG_SITE_URL}
+           'siteurl': CFG_BASE_URL}
 
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
@@ -119,7 +119,7 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
 </script>
 <!-- JQuery Bookmark Button END -->
 """ % {
-        'siteurl': CFG_SITE_URL,
+        'siteurl': CFG_BASE_URL,
         'sciencewise': sciencewise_script,
         'title': escape_javascript_string(title,
                                           escape_for_html=False,

@@ -44,7 +44,8 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_virtual_index_building_blocks, \
     get_index_name_from_index_id, \
     get_all_index_names_and_column_values, \
-    is_index_virtual
+    is_index_virtual, \
+    get_index_virtual_indexes
 from invenio.utils.datastructures import LazyDict
 
 _TOKENIZERS = LazyDict(load_tokenizers)
@@ -1106,13 +1107,16 @@ def perform_modifydependentindexes(idxID, ln=CFG_SITE_LANG, newIDs=[], callback=
         elif idxID > -1 and confirm in [1, "1"]:
             output += "</br>"
             to_add, to_remove = find_dependent_indexes_to_change(idxID, newIDs)
-            res = modify_dependent_indexes(idxID, to_add, to_remove)
+            # NOTE: we don't need to take care of indexes to remove, because
+            # -w <<virutal_index>> --remove-dependent-index will take care of everything
+            # so it's enough to just post a message
+            res = modify_dependent_indexes(idxID, to_add)
             output += write_outcome(res)
             if len(to_remove) + len(to_add) > 0:
                 output += """<br /><span class="info">Please note you should run as soon as possible:"""
-            for index in to_add:
+            if len(to_add) > 0:
                 output += """<pre>$> %s/bibindex --reindex -w %s</pre>
-                          """ % (CFG_BINDIR, index)
+                          """ % (CFG_BINDIR, get_index_name_from_index_id(idxID))
             for index in to_remove:
                 output += """<pre>$> %s/bibindex -w %s --remove-dependent-index %s</pre>
                           """ % (CFG_BINDIR, get_index_name_from_index_id(idxID), index)
@@ -1665,7 +1669,8 @@ def perform_modifytokenizer(idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', 
 
 
         tokenizer_element = """<select name="idxTOK" class="admin_w200">"""
-        for key in _TOKENIZERS:
+        tokenizers = [tokenizer for tokenizer in _TOKENIZERS if _TOKENIZERS[tokenizer]().implemented]
+        for key in tokenizers:
             if key == idxTOK:
                 tokenizer_element += """<option value="%s" selected ="selected">%s</option>""" % (key, key)
             else:
@@ -2404,6 +2409,7 @@ def delete_virtual_idx(idxID):
                    WHERE id=%s""", (idxID, ))
         run_sql("""DELETE FROM idxINDEX_idxINDEX
                    WHERE id_virtual=%s""", (idxID, ))
+        drop_queue_tables(idxID)
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2459,7 +2465,8 @@ def add_idx(idxNAME):
                             id_bibrec mediumint(9) unsigned NOT NULL,
                             termlist longblob,
                             type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                            PRIMARY KEY (id_bibrec,type)
+                            PRIMARY KEY (id_bibrec,type),
+                            KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dF (
@@ -2474,7 +2481,8 @@ def add_idx(idxNAME):
                             id_bibrec mediumint(9) unsigned NOT NULL,
                             termlist longblob,
                             type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                            PRIMARY KEY (id_bibrec,type)
+                            PRIMARY KEY (id_bibrec,type),
+                            KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE%02dF (
@@ -2489,7 +2497,8 @@ def add_idx(idxNAME):
                             id_bibrec mediumint(9) unsigned NOT NULL default '0',
                             termlist longblob,
                             type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                            PRIMARY KEY  (id_bibrec,type)
+                            PRIMARY KEY  (id_bibrec,type),
+                            KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("SELECT id from idxINDEX WHERE id=%s", (idxID, ))
@@ -2507,6 +2516,40 @@ def add_idx(idxNAME):
         return (0, e)
 
 
+def create_queue_tables(index_id):
+    """Creates queue tables for virtual index.
+       Queue tables store orders for virtual index
+       from its dependent indexes.
+       @param index_id: id of the index we want to create queue tables for
+    """
+    query = """
+        CREATE TABLE IF NOT EXISTS idx%s%02dQ (
+            id mediumint(10) unsigned NOT NULL auto_increment,
+            runtime datetime NOT NULL default '0000-00-00 00:00:00',
+            id_bibrec_low mediumint(9) unsigned NOT NULL,
+            id_bibrec_high mediumint(9) unsigned NOT NULL,
+            index_name varchar(50) NOT NULL default '',
+            mode varchar(50) NOT NULL default 'update',
+            PRIMARY KEY (id),
+            INDEX (index_name),
+            INDEX (runtime)
+        ) ENGINE=MyISAM;"""
+    run_sql(query % ("WORD", int(index_id)))
+    run_sql(query % ("PAIR", int(index_id)))
+    run_sql(query % ("PHRASE", int(index_id)))
+
+
+def drop_queue_tables(index_id):
+    """
+        Drops queue tables.
+        @param index_id: id of the index we want to drop tables for
+    """
+    query = """DROP TABLE IF EXISTS idx%s%02dQ"""
+    run_sql(query % ("WORD", int(index_id)))
+    run_sql(query % ("PAIR", int(index_id)))
+    run_sql(query % ("PHRASE", int(index_id)))
+
+
 def add_virtual_idx(id_virtual, id_normal):
     """Adds new virtual index and its first dependent index.
        Doesn't change index's settings, but they're not
@@ -2517,20 +2560,24 @@ def add_virtual_idx(id_virtual, id_normal):
     try:
         run_sql("""UPDATE idxINDEX SET indexer='virtual'
                    WHERE id=%s""", (id_virtual, ))
+        create_queue_tables(id_virtual)
         return add_dependent_index(id_virtual, id_normal)
     except StandardError as e:
         return (0, e)
 
 
-def modify_dependent_indexes(idxID, indexes_to_add, indexes_to_remove):
-    """Adds and removes dependent indexes"""
+def modify_dependent_indexes(idxID, indexes_to_add=[]):
+    """
+        Adds indexes to a list of dependent indexes of
+        a specific virtual index.
+        @param idxID: id of the virtual index
+        @param indexes_to_add: list of names of indexes which
+                               should be added as new dependent
+                               indexes for a virtual index
+    """
     all_indexes = dict(get_all_index_names_and_column_values("id"))
     for index_name in indexes_to_add:
         res = add_dependent_index(idxID, all_indexes[index_name])
-        if res[0] == 0:
-            return res
-    for index_name in indexes_to_remove:
-        res = remove_dependent_index(idxID, all_indexes[index_name])
         if res[0] == 0:
             return res
     return (1, "")
@@ -2545,21 +2592,6 @@ def add_dependent_index(id_virtual, id_normal):
         return (1, "")
     except StandardError as e:
         return (0, e)
-
-
-def remove_dependent_index(id_virtual, id_normal):
-    """Remove dependent index to specific virtual index"""
-    try:
-        query = """DELETE FROM idxINDEX_idxINDEX
-                   WHERE id_virtual=%s AND
-                         id_normal=%s
-                """ % (id_virtual, id_normal)
-        res = run_sql(query)
-        return (1, "")
-    except StandardError as e:
-        return (0, e)
-
-
 
 
 def add_fld(name, code):
@@ -2617,15 +2649,41 @@ def add_idx_fld(idxID, fldID):
     except StandardError as e:
         return (0, e)
 
+
+def update_all_queue_tables_with_new_name(idxID, idxNAME_new, idxNAME_old):
+    """
+        Updates queue tables for all virtual indexes connected to this index
+        with new name of this index.
+        @param idxID: id of the index
+        @param idxNAME_new: new name for specified index
+        @param idxNAME_old: old name of specified index
+    """
+    virtual_indexes = get_index_virtual_indexes(idxID)
+    for index in virtual_indexes:
+        id_virtual, name = index
+        query = """UPDATE idxWORD%02dQ SET index_name=%%s WHERE index_name=%%s""" % id_virtual
+        run_sql(query, (idxNAME_new, idxNAME_old))
+        query = """UPDATE idxPAIR%02dQ SET index_name=%%s WHERE index_name=%%s""" % id_virtual
+        run_sql(query, (idxNAME_new, idxNAME_old))
+        query = """UPDATE idxPHRASE%02dQ SET index_name=%%s WHERE index_name=%%s""" % id_virtual
+        run_sql(query, (idxNAME_new, idxNAME_old))
+
+
 def modify_idx(idxID, idxNAME, idxDESC):
     """Modify index name or index description in idxINDEX table"""
-
-    try:
-        res = run_sql("UPDATE idxINDEX SET name=%s WHERE id=%s", (idxNAME, idxID))
-        res = run_sql("UPDATE idxINDEX SET description=%s WHERE ID=%s", (idxDESC, idxID))
-        return (1, "")
-    except StandardError as e:
-        return (0, e)
+    query = """SELECT proc,status FROM schTASK WHERE proc='bibindex' AND status='RUNNING'"""
+    res = run_sql(query)
+    if len(res) == 0:
+        idxNAME_old = get_index_name_from_index_id(idxID)
+        try:
+            update_all_queue_tables_with_new_name(idxID, idxNAME, idxNAME_old)
+            res = run_sql("UPDATE idxINDEX SET name=%s WHERE id=%s", (idxNAME, idxID))
+            res = run_sql("UPDATE idxINDEX SET description=%s WHERE ID=%s", (idxDESC, idxID))
+            return (1, "")
+        except StandardError as e:
+            return (0, e)
+    else:
+        return (0, "Try again later. Cannot change details of an index when bibindex is running.")
 
 def modify_idx_stemming(idxID, idxSTEM):
     """Modify the index stemming language in idxINDEX table"""

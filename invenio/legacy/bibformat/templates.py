@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,12 +29,11 @@ from flask import url_for
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.base.i18n import language_list_long
-from invenio.config import CFG_PATH_PHP
 
 MAX_MAPPINGS = 100 #show max this number of mappings on one page
 
 
-class Template:
+class Template(object):
     """Templating class, refer to bibformat.py for examples of call"""
 
     def tmpl_admin_index(self, ln, warnings, is_admin):
@@ -69,7 +68,7 @@ class Template:
         if not is_admin:
             out += '''You need to
             <a href="%(siteurl)s/youraccount/login?referer=%(siteurl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
-         ''' % {'siteurl':CFG_SITE_URL}
+         ''' % {'siteurl': CFG_SITE_URL}
 
         out += '''
         </p>
@@ -90,193 +89,7 @@ class Template:
         <dt><a href="%(siteurl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
         <dd>Documentation about BibFormat administration</dd>
         </dl>
-        '''% {'siteurl':CFG_SITE_URL, 'ln':ln}
-
-        if CFG_PATH_PHP:
-            #Show PHP admin only if PHP is enabled
-            out += '''
-            <br/><br/><br/><br/>
-            <div style="background-color:rgb(204, 204, 204);">
-
-            <h2><span style="color:rgb(204, 0, 0);">Old</span>
-            BibFormat admin interface (in gray box)</h2>
-            <em>
-            <p>The BibFormat admin interface enables you to specify how the
-            bibliographic data is presented to the end user in the search
-            interface and search results pages.  For example, you may specify that
-            titles should be printed in bold font, the abstract in small italic,
-            etc.  Moreover, the BibFormat is not only a simple bibliographic data
-            <em>output formatter</em>, but also an automated <em>link
-            constructor</em>.  For example, from the information on journal name
-            and pages, it may automatically create links to publisher's site based
-            on some configuration rules.
-
-            <h2>Configuring BibFormat</h2>
-
-            <p>By default, a simple HTML format based on the most common fields
-            (title, author, abstract, keywords, fulltext link, etc) is defined.
-            You certainly want to define your own ouput formats in case you have a
-            specific metadata structure.
-
-            <p>Here is a short guide of what you can configure:
-
-            <blockquote>
-            <dl>
-
-            <dt><a href="BEH_display.php">Behaviours</a>
-
-            <dd>Define one or more output BibFormat behaviours.  These are then
-            passed as parameters to the BibFormat modules while executing
-            formatting.
-
-            <br /><em>Example:</em> You can tell BibFormat that is has to enrich the
-            incoming metadata file by the created format, or that it only has to
-            print the format out.
-
-            <dt><a href="OAIER_display.php">Extraction Rules</a>
-
-            <dd>Define how the metadata tags from input are mapped into internal
-            BibFormat variable names.  The variable names can afterwards be used
-            in formatting and linking rules.
-
-            <br /><em>Example:</em> You can tell that <code>100 $a</code> field
-            should be mapped into <code>$100.a</code> internal variable that you
-            could use later.
-
-            <dt><a href="LINK_display.php">Link Rules</a>
-
-            <dd>Define rules for automated creation of URI links from mapped
-            internal variables.
-
-            <br /><em>Example:</em> You can tell a rule how to create a link to
-            People database out of the <code>$100.a</code> internal variable
-            repesenting author's name.  (The <code>$100.a</code> variable was mapped
-            in the previous step, see the Extraction Rules.)
-
-            <dt><a href="LINK_FORMAT_display.php">File Formats</a>
-
-            <dd>Define file format types based on file extensions.  This will be
-            used when proposing various fulltext services.
-
-            <br /><em>Example:</em> You can tell that <code>*.pdf</code> files will
-            be treated as PDF files.
-
-            <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
-
-            <dd>Define your own functions that you can reuse when creating your
-            own output formats.  This enables you to do complex formatting without
-            ever touching the BibFormat core code.
-
-            <br /><em>Example:</em> You can define a function how to match and
-            extract email addresses out of a text file.
-
-            <dt><a href="FORMAT_display.php">Formats</a>
-
-            <dd>Define the output formats, i.e. how to create the output out of
-            internal BibFormat variables that were extracted in a previous step.
-            This is the functionality you would want to configure most of the
-            time.  It may reuse formats, user defined functions, knowledge bases,
-            etc.
-
-            <br /><em>Example:</em> You can tell that authors should be printed in
-            italic, that if there are more than 10 authors only the first three
-            should be printed, etc.
-
-            <dt><a href="KB_display.php">Knowledge Bases (KBs)</a>
-
-            <dd>Define one or more knowledge bases that enables you to transform
-            various forms of input data values into the unique standard form on
-            the output.
-
-            <br /><em>Example:</em> You can tell that <em>Phys Rev D</em> and
-            <em>Physical Review D</em> are both the same journal and that these
-            names should be standardized to <em>Phys Rev : D</em>.
-
-            <dt><a href="test.php">Execution Test</a>
-
-            <dd>Enables you to test your formats on your sample data file.  Useful
-            when debugging newly created formats.
-
-            </dl>
-            </blockquote>
-
-            <p>To learn more on BibFormat configuration, you can consult the <a
-            href="guide.html">BibFormat Admin Guide</a>.</small>
-
-            <h2>Running BibFormat</h2>
-
-            <h3>From the Web interface</h3>
-            <p>
-            Run <a href="BIBREFORMAT_display.php">Reformat Records</a> tool.
-            This tool permits you to update stored formats for bibliographic records.
-            <br />
-            It should normally be used after configuring BibFormat's
-            <a href="BEH_display.php">Behaviours</a> and
-            <a href="FORMAT_display.php">Formats</a>.
-            When these are ready, you can choose to rebuild formats for selected
-            collections or you can manually enter a search query and the web interface
-            will accomplish all necessary formatting steps.
-            <br />
-            <i>Example:</i> You can request Photo collections to have their HTML
-            brief formats rebuilt, or you can reformat all the records written by Ellis.
-
-            <h3>From the command-line interface</h3>
-
-            <p>Consider having an XML MARC data file that is to be uploaded into
-            the Invenio.  (For example, it might have been harvested from other
-            sources and processed via <a href="../bibconvert/">BibConvert</a>.)
-            Having configured BibFormat and its default output type behaviour, you
-            would then run this file throught BibFormat as follows:
-
-            <blockquote>
-            <pre>
-            $ bibformat < /tmp/sample.xml > /tmp/sample_with_fmt.xml
-            <pre>
-            </blockquote>
-
-            that would create default HTML formats and would "enrich" the input
-            XML data file by this format.  (You would then continue the upload
-            procedure by calling successively <a
-            href="../bibupload/">BibUpload</a> and <a
-            href="../bibindex/">BibIndex</a>.)
-
-            <p>Now consider a different situation.  You would like to add a new
-            possible format, say "HTML portfolio" and "HTML captions" in order to
-            nicely format multiple photographs in one page.  Let us suppose that
-            these two formats are called <code>hp</code> and <code>hc</code> and
-            are already loaded in the <code>collection_format</code> table.
-            (TODO: describe how this is done via WebAdmin.)  You would then
-            proceed as follows: firstly, you would prepare the corresponding <a
-            href="BEH_display.php">output behaviours</a> called <code>HP</code>
-            and <code>HC</code> (TODO: note the uppercase!) that would not enrich
-            the input file but that would produce an XML file with only
-            <code>001</code> and <code>FMT</code> tags.  (This is in order not to
-            update the bibliographic information but the formats only.)  You would
-            also prepare corresponding <a href="FORMAT_display.php">formats</a>
-            at the same time.  Secondly, you would launch the formatting as
-            follows:
-
-            <blockquote>
-            <pre>
-            $ bibformat otype=HP,HC < /tmp/sample.xml > /tmp/sample_fmts_only.xml
-            <pre>
-            </blockquote>
-
-            that should give you an XML file containing only 001 and FMT tags.
-            Finally, you would upload the formats:
-
-            <blockquote>
-            <pre>
-            $ bibupload < /tmp/sample_fmts_only.xml
-            <pre>
-            </blockquote>
-
-            and that's it. The new formats should now appear in <a
-            href="%(siteurl)s">WebSearch</a>.
-            </em>
-            </div>
-
-            ''' % {'siteurl':CFG_SITE_URL, 'ln':ln}
+        '''% {'siteurl': CFG_SITE_URL, 'ln': ln}
 
         return out
 
@@ -312,9 +125,9 @@ class Template:
         <td>3.&nbsp;<small><a href="format_template_show_dependencies?ln=%(ln)s&amp;bft=%(filename)s">%(check_dependencies)s</a></small>&nbsp;</td>
         </tr>
         </table><br/>
-        ''' % {'ln':ln,
-               'menu':_("Menu"),
-               'filename':filename,
+        ''' % {'ln': ln,
+               'menu': _("Menu"),
+               'filename': filename,
                'close_editor': _("Close Editor"),
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
@@ -329,8 +142,8 @@ class Template:
 
         out += '''
         <form action="format_template_update_attributes?ln=%(ln)s&amp;bft=%(filename)s" method="POST">
-        ''' % {'ln':ln,
-               'filename':filename}
+        ''' % {'ln': ln,
+               'filename': filename}
 
         if new:
             #Offer the possibility to make a duplicate of existing format template code
@@ -342,10 +155,10 @@ class Template:
             <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
             <option value="">None (Blank Page)</option>
             <option value="" disabled="disabled">-------------</option>
-            ''' %  {'siteurl': CFG_SITE_URL,
-                    'readonly':readonly}
-            for (o_filename, o_name) in all_templates:
-                out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
+            ''' % {'siteurl': CFG_SITE_URL,
+                   'readonly': readonly}
+            for o_filename, o_name in all_templates:
+                out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name': o_name,
                                                                                                  'template_filename': o_filename}
             out += ''' </select>
             </td></tr></table>'''
@@ -363,13 +176,11 @@ class Template:
         <input type="hidden" value="%(filename)s"/>
         </td>
         </tr>
-        ''' % {"name": name,
-               'ln':ln,
-               'filename':filename,
-               'disabled':disabled,
-               'readonly':readonly,
+        ''' % {'name': name,
+               'filename': filename,
+               'readonly': readonly,
                'name_label': _("Name"),
-               'siteurl':CFG_SITE_URL
+               'siteurl': CFG_SITE_URL
                }
 
         out += '''
@@ -383,13 +194,10 @@ class Template:
         </tr>
         </table></form>
         ''' % {"description": description,
-               'ln':ln,
-               'filename':filename,
-               'disabled':disabled,
-               'readonly':readonly,
+               'disabled': disabled,
+               'readonly': readonly,
                'description_label': _("Description"),
                'update_format_attributes': _("Update Format Attributes"),
-               'siteurl':CFG_SITE_URL
                }
 
         return out
@@ -425,14 +233,14 @@ class Template:
         </tr>
         <tr>
         <td valign="top">&nbsp;<br/>
-        ''' % {'ln':ln,
-               'filename':filename,
+        ''' % {'ln': ln,
+               'filename': filename,
                'menu': _("Menu"),
                'close_editor': _("Close Editor"),
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
-               'name': name }
+               'name': name}
 
         #Print output formats
         if len(output_formats) == 0:
@@ -441,9 +249,9 @@ class Template:
         for output_format in output_formats:
             name = output_format['names']['generic']
             filename = output_format['filename']
-            out += ''' <a href="output_format_show?ln=%(ln)s&amp;bfo=%(filename)s">%(name)s</a>''' % {'filename':filename,
-                                                                                                  'name':name,
-                                                                                                  'ln':ln}
+            out += ''' <a href="output_format_show?ln=%(ln)s&amp;bfo=%(filename)s">%(name)s</a>''' % {'filename': filename,
+                                                                                                      'name': name,
+                                                                                                      'ln': ln}
             if len(output_format['tags']) > 0:
                 out += "("+", ".join(output_format['tags'])+")"
             out += "<br/>"
@@ -454,9 +262,9 @@ class Template:
             out += '<p align="center"><i>This format template uses no format element.</i></p>'
         for format_element in format_elements:
             name = format_element['name']
-            out += ''' <a href="format_elements_doc?ln=%(ln)s#%(anchor)s">%(name)s</a>''' % {'name':"bfe_"+name.lower(),
-                                                                                           'anchor':name.upper(),
-                                                                                           'ln':ln}
+            out += ''' <a href="format_elements_doc?ln=%(ln)s#%(anchor)s">%(name)s</a>''' % {'name': "bfe_"+name.lower(),
+                                                                                           'anchor': name.upper(),
+                                                                                           'ln': ln}
             if len(format_element['tags']) > 0:
                 out += "("+", ".join(format_element['tags'])+")"
             out += "<br/>"
@@ -465,7 +273,7 @@ class Template:
         if len(tags) == 0:
             out += '<p align="center"><i>This format template uses no tag.</i></p>'
         for tag in tags:
-            out += '''%(tag)s<br/>''' % { 'tag':tag}
+            out += '''%(tag)s<br/>''' % {'tag': tag}
         out += '''
         </td>
         </tr>
@@ -474,7 +282,10 @@ class Template:
         '''
         return out
 
-    def tmpl_admin_format_template_show(self, ln, name, description, code, filename, ln_for_preview, pattern_for_preview, editable, content_type_for_preview, content_types):
+    def tmpl_admin_format_template_show(self, ln, code, filename,
+                                        ln_for_preview, pattern_for_preview,
+                                        editable, content_type_for_preview,
+                                        content_types):
         """
         Returns the editor for format templates. Edit format with given X{name}
 
@@ -576,14 +387,10 @@ class Template:
         <tr>
         <td>0.&nbsp;<small><a href="format_templates_manage?ln=%(ln)s">%(close_editor)s</a></small>&nbsp;</td>
         <td>1.&nbsp;<small>%(template_editor)s</small>&nbsp;</td>
-        ''' % {'ln': ln, 'filename': filename,
+        ''' % {'ln': ln,
                'menu': _("Menu"),
-               'label_show_doc': _("Show Documentation"),
-               'label_hide_doc': _("Hide Documentation"),
                'close_editor': _("Close Editor"),
-               'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
-               'check_dependencies': _("Check Dependencies"),
                'nb_menu_options': nb_menu_options,
                'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL,
                'leave_editor_message': _('Your modifications will not be saved.').replace('"', '\\"'),
@@ -594,15 +401,10 @@ class Template:
         if not filename.endswith('.xsl'):
             out +='''<td>2.&nbsp;<small><a href="format_template_show_attributes?ln=%(ln)s&amp;bft=%(filename)s">%(modify_template_attributes)s</a></small>&nbsp;</td>
             <td>3.&nbsp;<small><a href="format_template_show_dependencies?ln=%(ln)s&amp;bft=%(filename)s">%(check_dependencies)s</a></small>&nbsp;</td>
-            ''' % {'ln': ln, 'filename': filename,
-               'menu': _("Menu"),
-               'label_show_doc': _("Show Documentation"),
-               'label_hide_doc': _("Hide Documentation"),
-               'close_editor': _("Close Editor"),
-               'modify_template_attributes': _("Modify Template Attributes"),
-               'template_editor': _("Template Editor"),
-               'check_dependencies': _("Check Dependencies"),
-               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
+            ''' % {'ln': ln,
+                   'filename': filename,
+                   'modify_template_attributes': _("Modify Template Attributes"),
+                   'check_dependencies': _("Check Dependencies"),
                }
 
         out +='''
@@ -625,15 +427,8 @@ class Template:
 
         </script>
 
-        ''' % {'ln': ln, 'filename': filename,
-               'menu': _("Menu"),
-               'label_show_doc': _("Show Documentation"),
+        ''' % {'label_show_doc': _("Show Documentation"),
                'label_hide_doc': _("Hide Documentation"),
-               'close_editor': _("Close Editor"),
-               'modify_template_attributes': _("Modify Template Attributes"),
-               'template_editor': _("Template Editor"),
-               'check_dependencies': _("Check Dependencies"),
-               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
                }
 
         disabled = ""
@@ -676,20 +471,19 @@ class Template:
         <tr><td align="right" valign="top" style="font-size: small;">
         <nobr>
         <label for="content_type_for_preview">Content-type (MIME):</label> <select id="content_type_for_preview" name="content_type_for_preview" style="font-size: x-small;">
-        ''' %  {'ln':ln,
-                'siteurl':CFG_SITE_URL,
-                'filename':filename,
-                'label_hide_doc':_("Hide Documentation"),
-                'code':code,
-                'readonly':readonly,
-                'disabled':disabled,
-                'toolbar':toolbar}
+        ''' % {'ln': ln,
+               'filename': filename,
+               'label_hide_doc': _("Hide Documentation"),
+               'code': code,
+               'readonly': readonly,
+               'disabled': disabled,
+               'toolbar': toolbar}
 
         for content_type in content_types:
             if content_type == content_type_for_preview:
-                out += '''<option value="%(content_type)s" selected="selected">%(content_type)s</option>''' % {'content_type':content_type}
+                out += '''<option value="%(content_type)s" selected="selected">%(content_type)s</option>''' % {'content_type': content_type}
             else:
-                out += '''<option value="%(content_type)s">%(content_type)s</option>''' % {'content_type':content_type}
+                out += '''<option value="%(content_type)s">%(content_type)s</option>''' % {'content_type': content_type}
 
         out += '''
         </select></nobr>
@@ -698,10 +492,10 @@ class Template:
 
         for lang in language_list_long():
             if lang[0] == ln_for_preview:
-                out += '''<option value="%(ln)s" selected="selected">%(language)s</option>''' % {'ln':lang[0],
-                                                                                                 'language':lang[1]}
+                out += '''<option value="%(ln)s" selected="selected">%(language)s</option>''' % {'ln': lang[0],
+                                                                                                 'language': lang[1]}
             else:
-                out += '''<option value="%(ln)s">%(language)s</option>''' % {'ln':lang[0], 'language':lang[1]}
+                out += '''<option value="%(ln)s">%(language)s</option>''' % {'ln': lang[0], 'language': lang[1]}
 
 
         out += '''
@@ -719,10 +513,10 @@ class Template:
         </table>
         </form>
         </td>
-        ''' % {'code':code, 'ln':ln,
-               'siteurl':CFG_SITE_URL, 'filename':filename,
-               'ln_for_preview':ln_for_preview,
-               'pattern_for_preview':pattern_for_preview
+        ''' % {'ln': ln,
+               'siteurl': CFG_SITE_URL, 'filename': filename,
+               'ln_for_preview': ln_for_preview,
+               'pattern_for_preview': pattern_for_preview
                }
 
 
@@ -748,11 +542,11 @@ class Template:
         </td>
         </tr>
         </table>
-        ''' % {'siteurl':CFG_SITE_URL, 'ln':ln}
+        ''' % {'siteurl': CFG_SITE_URL, 'ln': ln}
 
         return out
 
-    def tmpl_admin_format_template_show_short_doc(self, ln, format_elements):
+    def tmpl_admin_format_template_show_short_doc(self, format_elements):
         """
         Prints the format element documentation in a condensed way to display
         inside format template editor.
@@ -866,27 +660,23 @@ class Template:
                     onclick="insert_my_code_into_container('%s')"
                     >''' % code
 
-                params_names = ""
-                for param in format_attributes['params']:
-                    params_names += "<b>"+param['name'] +'</b> '
-
                 row_content += '''
                 <code> <b>&lt;BFE_%(name)s/&gt;</b><br/></code>
                 <small>%(description)s.</small>
                 <div id="params" style="display:none;">
                 <ul>
-                ''' % {'params_names':params_names, 'name':name, 'description':description}
+                ''' % {'name': name, 'description': description}
 
                 for param in format_attributes['params']:
                     row_content += '''
                     <li><small><b>%(name)s</b>:&nbsp;%(description)s</small></li>
-                    ''' % {'name':param['name'],
-                           'description':param['description']}
+                    ''' % {'name': param['name'],
+                           'description': param['description']}
                 for param in format_attributes['builtin_params']:
                     row_content += '''
                     <li><small><b>%(name)s</b>:&nbsp;%(description)s</small></li>
-                    ''' % {'name':param['name'],
-                           'description':param['description']}
+                    ''' % {'name': param['name'],
+                           'description': param['description']}
 
                 row_content += '</ul></div>'
                 if line % 2:
@@ -939,17 +729,17 @@ class Template:
         <th class="adminheaderleft" >%(last_modification_date)s</th>
         <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#formatTemplates">?</a>]</th>
         </tr>
-        ''' % {'name':_("Name"),
-               'description':_("Description"),
+        ''' % {'name': _("Name"),
+               'description': _("Description"),
                'menu': _("Menu"),
-               'status':_("Status"),
-               'last_modification_date':_("Last Modification Date"),
-               'action':_("Action"),
-               'ln':ln,
-               'manage_output_formats':_("Manage Output Formats"),
-               'manage_format_templates':_("Manage Format Templates"),
-               'format_elements_documentation':_("Format Elements Documentation"),
-               'siteurl':CFG_SITE_URL}
+               'status': _("Status"),
+               'last_modification_date': _("Last Modification Date"),
+               'action': _("Action"),
+               'ln': ln,
+               'manage_output_formats': _("Manage Output Formats"),
+               'manage_format_templates': _("Manage Format Templates"),
+               'format_elements_documentation': _("Format Elements Documentation"),
+               'siteurl': CFG_SITE_URL}
 
         #table content: formats names, description and buttons
         if len(formats) == 0:
@@ -992,15 +782,15 @@ class Template:
                 </form>
                 </td>
                 </tr>
-                ''' % {'filename':filename,
-                       'name':name,
-                       'description':description,
-                       'ln':ln,
-                       'style':style,
-                       'disabled':disabled,
-                       'last_mod_date':last_mod_date,
-                       'status':status,
-                       'delete':_("Delete")
+                ''' % {'filename': filename,
+                       'name': name,
+                       'description': description,
+                       'ln': ln,
+                       'style': style,
+                       'disabled': disabled,
+                       'last_mod_date': last_mod_date,
+                       'status': status,
+                       'delete': _("Delete")
                        }
                 out += row_content
 
@@ -1022,9 +812,9 @@ class Template:
         </tr>
         </table>
 
-        ''' % {'ln':ln,
-               'add_format_template':_("Add New Format Template"),
-               'extensive_checking':_("Check Format Templates Extensively")}
+        ''' % {'ln': ln,
+               'add_format_template': _("Add New Format Template"),
+               'extensive_checking': _("Check Format Templates Extensively")}
 
         return out
 
@@ -1063,18 +853,18 @@ class Template:
         <th class="adminheaderleft" >%(last_modification_date)s</th>
         <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#outputFormats">?</a>]</th>
         </tr>
-        ''' %  {'code':_("Code"),
-                'name':_("Name"),
-                'description':_("Description"),
-                'status':_("Status"),
-                'last_modification_date':_("Last Modification Date"),
-                'action':_("Action"),
-                'ln':ln,
-                'manage_output_formats':_("Manage Output Formats"),
-                'manage_format_templates':_("Manage Format Templates"),
-                'format_elements_documentation':_("Format Elements Documentation"),
-                'menu': _("Menu"),
-                'siteurl':CFG_SITE_URL}
+        ''' % {'code': _("Code"),
+               'name': _("Name"),
+               'description': _("Description"),
+               'status': _("Status"),
+               'last_modification_date': _("Last Modification Date"),
+               'action': _("Action"),
+               'ln': ln,
+               'manage_output_formats': _("Manage Output Formats"),
+               'manage_format_templates': _("Manage Format Templates"),
+               'format_elements_documentation': _("Format Elements Documentation"),
+               'menu': _("Menu"),
+               'siteurl': CFG_SITE_URL}
 
         #table content: formats names, description and buttons
         if len(output_formats) == 0:
@@ -1124,14 +914,14 @@ class Template:
                 </form>
                 </td>
                 </tr>
-                ''' % {'style':style,
-                       'code':code,
-                       'description':description,
-                       'name':name,
-                       'ln':ln,
-                       'disabled':disabled,
-                       'last_mod_date':last_mod_date,
-                       'status':status}
+                ''' % {'style': style,
+                       'code': code,
+                       'description': description,
+                       'name': name,
+                       'ln': ln,
+                       'disabled': disabled,
+                       'last_mod_date': last_mod_date,
+                       'status': status}
 
                 out += row_content
 
@@ -1145,12 +935,13 @@ class Template:
         </td>
         </tr>
         </table>
-        ''' % {'ln':ln,
-               'add_output_format':_("Add New Output Format")}
+        ''' % {'ln': ln,
+               'add_output_format': _("Add New Output Format")}
 
         return out
 
-    def tmpl_admin_output_format_show(self, ln, code, name, rules, default, format_templates, editable):
+    def tmpl_admin_output_format_show(self, ln, code, rules, default,
+                                      format_templates, editable):
         """
         Returns the content of an output format
 
@@ -1182,13 +973,13 @@ class Template:
         </table>
         <p>Define here the rules the specifies which template to use for a given record.</p>
 
-        ''' % {'code':code,
-               'ln':ln,
-               'menu':_("menu"),
-               'close_output_format':_("Close Output Format"),
-               'rules':_("Rules"),
-               'modify_output_format_attributes':_("Modify Output Format Attributes"),
-               'check_dependencies':_("Check Dependencies")
+        ''' % {'code': code,
+               'ln': ln,
+               'menu': _("menu"),
+               'close_output_format': _("Close Output Format"),
+               'rules': _("Rules"),
+               'modify_output_format_attributes': _("Modify Output Format Attributes"),
+               'check_dependencies': _("Check Dependencies")
                }
 
         out += '''
@@ -1196,7 +987,7 @@ class Template:
         <table>
         <tr>
         <td>
-        ''' % {'ln': ln, 'code':code}
+        ''' % {'ln': ln, 'code': code}
 
         disabled = ""
         readonly = ""
@@ -1219,15 +1010,15 @@ class Template:
             if line > 1:
                 out += '''
                 <input type="image" src="%(siteurl)s/img/smallup.gif" alt="Increase priority of rule %(row)s" name="+ %(row)s" value="+ %(row)s" %(disabled)s/></div>
-                ''' % {'siteurl':CFG_SITE_URL, 'row':line, 'disabled':disabled}
+                ''' % {'siteurl': CFG_SITE_URL, 'row': line, 'disabled': disabled}
 
-            out += '''<div>%(row)s</div>''' % { 'row':line}
+            out += '''<div>%(row)s</div>''' % {'row': line}
             if line < len(rules):
                 out += '''
                 <input type="image" src="%(siteurl)s/img/smalldown.gif" alt="Decrease priority of rule %(row)s" name="- %(row)s" value="- %(row)s" %(disabled)s/>
-                ''' % {'siteurl':CFG_SITE_URL,
-                       'row':line,
-                       'disabled':disabled}
+                ''' % {'siteurl': CFG_SITE_URL,
+                       'row': line,
+                       'disabled': disabled}
 
             out += '''</td>
             <td class="adminheaderleft">&nbsp;</td>
@@ -1235,7 +1026,7 @@ class Template:
 
             out += '''
             <td class="adminheaderleft" style="white-space: nowrap;">
-            Use template&nbsp;<select name="r_tpl" %(disabled)s>''' % {'disabled':disabled}
+            Use template&nbsp;<select name="r_tpl" %(disabled)s>''' % {'disabled': disabled}
 
 
             for template in format_templates:
@@ -1256,17 +1047,6 @@ class Template:
                 out += '''<option value="%s" selected="selected">%s</option>''' % (rule['template'],
                                                                                    rule['template'])
 
-            ################ FIXME remove when migration is done ####################
-            #Let the user choose a non existing template, that is a placeholder
-            #meaning that the template has not been migrated
-            selected = ''
-            if rule['template'] == 'migration_in_progress':
-                selected = 'selected="selected"'
-            if CFG_PATH_PHP or selected != '':
-                out += '''<option disabled="disabled">For Migration:</option>'''
-                out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
-            ################               END FIXME             ####################
-
             out += '''</select>&nbsp;if field
             &nbsp;<input type="text" name="r_fld" value="%(field)s" size="10" %(readonly)s/>&nbsp;is equal to&nbsp;<input type="text" value="%(value)s" name="r_val" %(readonly)s/>
             </td>
@@ -1274,10 +1054,10 @@ class Template:
             &nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#rulesOutputFormat">?</a>]
             </td>
             </tr>
-            ''' % {'siteurl':CFG_SITE_URL,
+            ''' % {'siteurl': CFG_SITE_URL,
                    'field': rule['field'],
-                   'value':rule['value'],
-                   'readonly':readonly}
+                   'value': rule['value'],
+                   'readonly': readonly}
 
             out += '''
             <tr>
@@ -1287,8 +1067,8 @@ class Template:
             </tr>
             </table>
             ''' % {'remove_rule_label': _("Remove Rule"),
-                   'row':line,
-                   'disabled':disabled}
+                   'row': line,
+                   'disabled': disabled}
             line += 1
 
         out += '''
@@ -1298,7 +1078,7 @@ class Template:
 
         out += '''
         <td width="30" class="adminheaderleft">&nbsp;</td>
-        <td class="adminheaderleft">By default use <select id="default" name="default" %(disabled)s>''' % {'disabled':disabled}
+        <td class="adminheaderleft">By default use <select id="default" name="default" %(disabled)s>''' % {'disabled': disabled}
 
         for template in format_templates:
             attrs = format_templates[template]['attrs']
@@ -1312,21 +1092,10 @@ class Template:
             else:
                 out += '''<option value="%(template)s" selected="selected">%(name)s</option>''' % attrs
 
-        if default not in format_templates and default!= "":
+        if default not in format_templates and default != "":
             #case where a non existing format tempate is use in output format
             #we need to add it as option (only if it is not empty string)
-            out += '''<option value="%s" selected="selected">%s</option>''' % (default,default)
-
-        ################ FIXME remove when migration is done ####################
-        #Let the user choose a non existing template, that is a placeholder
-        #meaning that the template has not been migrated
-        selected = ''
-        if default == 'migration_in_progress':
-            selected = 'selected="selected"'
-        if CFG_PATH_PHP or selected != '':
-            out += '''<option disabled="disabled">For Migration:</option>'''
-            out += '''<option value="migration_in_progress" %s>defined in old BibFormat</option>''' % selected
-        ################               END FIXME             ####################
+            out += '''<option value="%s" selected="selected">%s</option>''' % (default, default)
 
         out += '''</select></td>
         </tr>
@@ -1339,9 +1108,9 @@ class Template:
         </tr>
         </table>
         </form>
-        ''' % {'add_new_rule_label':_("Add New Rule"),
-             'save_changes_label':_("Save Changes"),
-             'disabled':disabled
+        ''' % {'add_new_rule_label': _("Add New Rule"),
+             'save_changes_label': _("Save Changes"),
+             'disabled': disabled
              }
 
         return out
@@ -1383,13 +1152,13 @@ class Template:
         <td>3.&nbsp;<small><a href="output_format_show_dependencies?ln=%(ln)s&amp;bfo=%(code)s">%(check_dependencies)s</a></small>&nbsp;</td>
         </tr>
         </table><br/>
-        ''' % {'ln':ln,
-               'code':code,
-               'close_output_format':_("Close Output Format"),
-               'rules':_("Rules"),
-               'modify_output_format_attributes':_("Modify Output Format Attributes"),
-               'check_dependencies':_("Check Dependencies"),
-               'menu':_("Menu")
+        ''' % {'ln': ln,
+               'code': code,
+               'close_output_format': _("Close Output Format"),
+               'rules': _("Rules"),
+               'modify_output_format_attributes': _("Modify Output Format Attributes"),
+               'check_dependencies': _("Check Dependencies"),
+               'menu': _("Menu")
                }
 
         disabled = ""
@@ -1420,13 +1189,13 @@ class Template:
         <td><input tabindex="3" name="name" type="text" id="outputFormatName" size="25" value="%(name)s" %(readonly)s/></td>
         </tr>
         ''' % {'name': name,
-               'ln':ln,
-               'code':code,
-               'content_type':content_type,
-               'readonly':readonly,
-               'siteurl':CFG_SITE_URL,
-               'visibility': visible==1 and 'checked="checked"' or '',
-               'disabled':disabled}
+               'ln': ln,
+               'code': code,
+               'content_type': content_type,
+               'readonly': readonly,
+               'siteurl': CFG_SITE_URL,
+               'visibility': visible == 1 and 'checked="checked"' or '',
+               'disabled': disabled}
 
         #Add translated names
         i = 3
@@ -1436,10 +1205,10 @@ class Template:
             <tr>
             <td class="admintdright"><label for="outputFormatName%(i)s">%(lang)s Name</label>:&nbsp;</td>
             <td><input tabindex="%(i)s" name="names_trans" type="text" id="outputFormatName%(i)s" size="25" value="%(name)s" %(readonly)s/></td>
-            </tr>''' % {'name':name_trans['trans'],
-                        'lang':name_trans['lang'],
-                        'i':i,
-                        'readonly':readonly}
+            </tr>''' % {'name': name_trans['trans'],
+                        'lang': name_trans['lang'],
+                        'i': i,
+                        'readonly': readonly}
         #Description and end of page
         out += '''
         <tr>
@@ -1455,8 +1224,8 @@ class Template:
         ''' % {'description': description,
                'tabindexdesc': i + 1,
                'tabindexbutton': i + 2,
-               'readonly':readonly,
-               'disabled':disabled}
+               'readonly': readonly,
+               'disabled': disabled}
 
         return out
 
@@ -1490,11 +1259,11 @@ class Template:
         </tr>
         ''' % {'name': name,
                'code': code,
-               'ln':ln,
-               'close_output_format':_("Close Output Format"),
-               'rules':_("Rules"),
-               'modify_output_format_attributes':_("Modify Output Format Attributes"),
-               'check_dependencies':_("Check Dependencies"),
+               'ln': ln,
+               'close_output_format': _("Close Output Format"),
+               'rules': _("Rules"),
+               'modify_output_format_attributes': _("Modify Output Format Attributes"),
+               'check_dependencies': _("Check Dependencies"),
                'menu': _("Menu")
                }
 
@@ -1506,20 +1275,20 @@ class Template:
             name = format_template['name']
             filename = format_template['filename']
             out += '''<tr><td><a href="format_template_show?bft=%(filename)s&amp;ln=%(ln)s">%(name)s</a></td>
-            <td>&nbsp;</td><td>&nbsp;</td></tr>''' % {'filename':filename,
-                                                      'name':name,
-                                                      'ln':ln}
+            <td>&nbsp;</td><td>&nbsp;</td></tr>''' % {'filename': filename,
+                                                      'name': name,
+                                                      'ln': ln}
             for format_element in format_template['elements']:
                 name = format_element['name']
                 filename = format_element['filename']
                 out += '''<tr><td>&nbsp;</td>
                 <td><a href="format_elements_doc?ln=%(ln)s#%(anchor)s">%(name)s</a></td>
-                <td>&nbsp;</td></tr>''' % {'anchor':name.upper(),
-                                           'name':name,
-                                           'ln':ln}
+                <td>&nbsp;</td></tr>''' % {'anchor': name.upper(),
+                                           'name': name,
+                                           'ln': ln}
                 for tag in format_element['tags']:
                     out += '''<tr><td>&nbsp;</td><td>&nbsp;</td>
-                    <td>%(tag)s</td></tr>''' % {'tag':tag}
+                    <td>%(tag)s</td></tr>''' % {'tag': tag}
 
         out += '''
         </table>
@@ -1553,11 +1322,11 @@ class Template:
 
 
         <p>Here you can read the APIs of the formats elements, the elementary bricks for formats.</p>
-        ''' % {'ln':ln,
+        ''' % {'ln': ln,
                'menu': _("Menu"),
-               'manage_output_formats':_("Manage Output Formats"),
-               'manage_format_templates':_("Manage Format Templates"),
-               'format_elements_documentation':_("Format Elements Documentation"),
+               'manage_output_formats': _("Manage Output Formats"),
+               'manage_format_templates': _("Manage Format Templates"),
+               'format_elements_documentation': _("Format Elements Documentation"),
                }
 
 
@@ -1620,7 +1389,7 @@ class Template:
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<em>%(description)s.</em><br/><br/>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>Parameters:</b><br/>
         ''' % {'params_names': params_names,
-               'name':name,
+               'name': name,
                'description': attributes['description']}
         for param in attributes['params']:
             out += '''
@@ -1659,7 +1428,7 @@ class Template:
                 element_name = element.split('.')[0].upper()
                 out += '''
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="#%(name)s">Element <em>%(name)s</em></a><br/>''' % {'name':element_name}
+                <a href="#%(name)s">Element <em>%(name)s</em></a><br/>''' % {'name': element_name}
             out += '''
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href ="format_element_show_dependencies?ln=%(ln)s&amp;bfe=%(bfe)s">Dependencies of this element</a><br/>
@@ -1667,7 +1436,7 @@ class Template:
             <a href ="validate_format?ln=%(ln)s&amp;bfe=%(bfe)s">The correctness of this element</a><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <a href ="format_element_test?ln=%(ln)s&amp;bfe=%(bfe)s">Test this element</a><br/>
-            ''' % {'ln':ln, 'bfe':name}
+            ''' % {'ln': ln, 'bfe': name}
 
         return out
 
@@ -1683,7 +1452,7 @@ class Template:
         """
         out = '''
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
-        ''' % {'ln':ln, 'name':name.upper()}
+        ''' % {'ln': ln, 'name': name.upper()}
 
         out += ''' <table width="90%" class="admin_wvar" cellspacing="0"><tr>'''
         out += '''
@@ -1701,9 +1470,9 @@ class Template:
         for format_template in format_templates:
             name = format_template['name']
             filename = format_template['filename']
-            out += '''<a href="format_template_show?ln=%(ln)s&amp;bft=%(filename)s">%(name)s</a><br/>''' % {'filename':filename,
-                                                                                                        'name':name,
-                                                                                                        'ln':ln}
+            out += '''<a href="format_template_show?ln=%(ln)s&amp;bft=%(filename)s">%(name)s</a><br/>''' % {'filename': filename,
+                                                                                                        'name': name,
+                                                                                                        'ln': ln}
 
         #Print tags
         out += "</td><td>&nbsp;<br/>"
@@ -1711,7 +1480,7 @@ class Template:
             out += '''<p align="center">
             <i>This format element uses no tag.</i></p>'''
         for tag in tags:
-            out += '''%(tag)s<br/>''' % {'tag':tag}
+            out += '''%(tag)s<br/>''' % {'tag': tag}
         out += '''
         </td>
         </tr>
@@ -1736,7 +1505,7 @@ class Template:
 
         out = '''
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
-        ''' % {'ln':ln, 'name':bfe.upper()}
+        ''' % {'ln': ln, 'name': bfe.upper()}
 
         out += '''
         <h3>&lt;BFE_%(bfe)s /&gt;</h3>
@@ -1744,7 +1513,7 @@ class Template:
         <table width="100%%"><tr><td>
         <form method="post" action="format_element_test?ln=%(ln)s&amp;bfe=%(bfe)s">
         <table>
-        ''' % {'bfe':bfe, 'ln':ln, 'description':description }
+        ''' % {'bfe': bfe, 'ln': ln, 'description': description}
 
         for i in range(len(param_names)):
             out += '''
@@ -1753,9 +1522,9 @@ class Template:
             <td class="admintdright"><input type="text" name="param_values" value="%(value)s"/></td>
             <td class="admintdleft">%(description)s&nbsp;</td>
             </tr>
-            ''' % {'name':cgi.escape(param_names[i]),
-                   'value':cgi.escape(param_values[i], quote=True),
-                   'description':param_descriptions[i]}
+            ''' % {'name': cgi.escape(param_names[i]),
+                   'value': cgi.escape(param_values[i], quote=True),
+                   'description': param_descriptions[i]}
 
         out += '''
         <tr><td colspan="2" class="admintdright"><input type="submit" class="adminbutton" value="Test!"/></td>
@@ -1766,7 +1535,7 @@ class Template:
         <fieldset style="display:inline;margin-left:auto;margin-right:auto;">
         <legend>Result:</legend>%(result)s</fieldset>
 
-        ''' % {'result':result}
+        ''' % {'result': result}
 
         out += '''
         </td></tr><tr><td>
@@ -1787,7 +1556,7 @@ class Template:
         out = '''
         <p>To add a new basic element (only fetch the value of a field, without special post-processing), go to the <a href="%(siteurl)sadmin/bibindex/bibindexadmin.py/field">BibEdit "Manage Logical Fields"</a> page and add a name for a field. Make sure that the name is unique and corresponds well to the field. For example, to add an element that fetch the value of field 245__%%, add a new logical field with name "title" and field "245__%%". Then in your template, call BFE_TITLE to print the title.</p>
         <p>To add a new complex element (for eg. special formatting of the field, condition on the value, etc.) you must go to the lib/python/invenio/bibformat_elements directory of your Invenio installation, and add a new format element file. Read documentation for more information.</p>
-        ''' % {'siteurl':CFG_SITE_URL}
+        ''' % {'siteurl': CFG_SITE_URL}
 
         return out
 
@@ -1895,8 +1664,8 @@ class Template:
         </table>
         </body>
         </html>
-        ''' % {'docs': ', '.join(["'"+x+"'" for x in docs_list]).replace('\n','\\n'),
-               'codes': ', '.join(["'"+x+"'" for x in codes_list]).replace('\n','\\n'),
+        ''' % {'docs': ', '.join(["'"+x+"'" for x in docs_list]).replace('\n', '\\n'),
+               'codes': ', '.join(["'"+x+"'" for x in codes_list]).replace('\n', '\\n'),
                'names': '\n'.join(['<option value="'+x+'">'+x+'</option>' for x in names_list])}
 
         return out
@@ -1925,7 +1694,7 @@ class Template:
 
         return out
 
-    def tmpl_admin_dialog_box(self, url, ln, title, message, options):
+    def tmpl_admin_dialog_box(self, url, title, message, options):
         """
         Prints a dialog box with given title, message and options
 
@@ -1944,12 +1713,12 @@ class Template:
         <legend>%(title)s:</legend>
         <p>%(message)s</p>
         <form method="post" action="%(url)s">
-        ''' % {'title':title,
-               'message':message,
-               'url':url}
+        ''' % {'title': title,
+               'message': message,
+               'url': url}
 
         for option in options:
-            out += '''<input type="submit" class="adminbutton" name="chosen_option" value="%(value)s" />&nbsp;''' % {'value':option}
+            out += '''<input type="submit" class="adminbutton" name="chosen_option" value="%(value)s" />&nbsp;''' % {'value': option}
 
         out += '''</form></fieldset></div>'''
         return out

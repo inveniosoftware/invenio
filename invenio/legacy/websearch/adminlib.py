@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -77,7 +77,7 @@ from invenio.modules.access.control import acc_get_action_id
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.ext.logging import register_exception
 from intbitset import intbitset
-from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
+from invenio.legacy.bibrank.citation_searcher import get_cited_by, get_cited_by_count
 from invenio.legacy.bibrecord import record_get_field_instances
 
 def getnavtrail(previous = ''):
@@ -99,14 +99,19 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
     """Modify the translations of a collection
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
-
     output = ''
     subtitle = ''
     sitelangs = get_languages()
+    if sel_type in ('r', 'v', 'l'):
+        table = 'collectionbox'
+        identifier_column = "id_collection"
+    else:
+        table = 'collection'
+        identifier_column = None
     if type(trans) is str:
         trans = [trans]
     if confirm in ["2", 2] and colID:
-        finresult = modify_translations(colID, sitelangs, sel_type, trans, "collection")
+        finresult = modify_translations(colID, sitelangs, sel_type, trans, table, identifier_column)
     col_dict = dict(get_def_name('', "collection"))
 
     if colID and int(colID) in col_dict:
@@ -120,6 +125,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
         actions = []
 
         types = get_col_nametypes()
+        types.extend([('v', '"Focus on" box'), ('r', '"Narrow by" box'), ('l', '"Latest additions" box')])
         if len(types) > 1:
             text  = """
             <span class="adminlabel">Name type</span>
@@ -144,7 +150,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
             trans = []
             for (key, value) in sitelangs:
                 try:
-                    trans_names = get_name(colID, key, sel_type, "collection")
+                    trans_names = get_name(colID, key, sel_type, table, identifier_column)
                     trans.append(trans_names[0][0])
                 except StandardError as e:
                     trans.append('')
@@ -2009,7 +2015,7 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
+    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
 
     if mtype == "":
         fin_output += """<br /><br /><b><span class="info">To manage the collections, select an item from the menu.</span><b><br />"""
@@ -2047,7 +2053,6 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     elif mtype == "perform_checkexternalcollections" or mtype == "perform_showall":
         fin_output += perform_checkexternalcollections(colID, ln, callback='')
 
-    body = [fin_output]
     body = [fin_output]
 
     return addadminbox('<b>Menu</b>', body)
@@ -2872,7 +2877,7 @@ def get_col_nametypes():
     """Return a list of the various translationnames for the collections"""
 
     type = []
-    type.append(('ln', 'Long name'))
+    type.append(('ln', 'Collection name'))
     return type
 
 def find_last(tree, start_son):
@@ -3404,6 +3409,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 9},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 10},
             'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 11},
+            'hepdata'   : {'label': _('HepData'),          'visible': False, 'enabled': True, 'order': 12},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
@@ -3484,11 +3490,24 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             if recID in get_collection_reclist("Books & Proceedings"):
                 tabs['holdings']['visible'] = True
                 tabs['holdings']['enabled'] = True
+        # now treating the HEP data -> we have to check if there is HepData
+        # associated with the record and if so, make the tab visible and enabled
+
+        has_hepdata = record_has_hepdata_attached(recID)
+        tabs['hepdata']['visible'] = has_hepdata
+        tabs['hepdata']['enabled'] = has_hepdata
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
 
     return tabs
+
+
+
+def record_has_hepdata_attached(recID):
+    """returns True or False depending if there is HepData attached or not"""
+    from invenio.legacy.search_engine import search_pattern
+    return len(search_pattern(p="786__w:%s" % (str(recID)))) > 0
 
 def get_detailed_page_tabs_counts(recID):
     """
@@ -3513,7 +3532,13 @@ def get_detailed_page_tabs_counts(recID):
                    }
     from invenio.legacy.search_engine import get_field_tags, get_record
     if CFG_BIBRANK_SHOW_CITATION_LINKS:
-        tabs_counts['Citations'] = get_cited_by_count(recID)
+        if CFG_INSPIRE_SITE:
+            from invenio.legacy.search_engine import search_unit
+            citers_recids = intbitset(get_cited_by(recID))
+            citeable_recids = search_unit(p='citeable', f='collection')
+            tabs_counts['Citations'] = len(citers_recids & citeable_recids)
+        else:
+            tabs_counts['Citations'] = get_cited_by_count(recID)
     if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
         reftag = ""
         reftags = get_field_tags("reference")

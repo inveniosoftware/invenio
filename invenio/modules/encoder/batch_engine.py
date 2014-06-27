@@ -584,7 +584,9 @@ def process_batch_job(batch_job_file):
                                        1,
                                        bibdoc_slave_video_docname)
                           )
-                bibdoc_video._build_file_list()
+                #bibdoc_video._build_file_list()
+                bibdoc_video.touch()
+                bibdoc_video._sync_to_db()
                 bibdoc_video_format = compose_format(bibdoc_video_extension,
                                                      bibdoc_video_subformat)
                 if getval(job, 'bibdoc_comment'):

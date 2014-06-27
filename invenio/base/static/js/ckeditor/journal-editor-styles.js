@@ -10,7 +10,7 @@ CKEDITOR.stylesSet.add( 'journal-editor-style',
 [
 
     // Inline styles
-    { name : 'Article Header', element : 'span', attributes : { 'class' : 'articleHeader' } },
+    { name : 'Article Header', element : 'p', attributes : { 'class' : 'articleHeader' } },
     { name : 'Caption', element : 'span', styles : { 'class' : 'articleHeader' } },
     { name : 'Computer Code', element : 'code' },
     { name : 'Keyboard Phrase', element : 'kbd' },

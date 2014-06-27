@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,19 +23,19 @@ from itertools import groupby, chain, imap, izip
 from invenio.legacy.bibauthorid.general_utils import update_status \
                                     , update_status_final
 from invenio.legacy.bibauthorid.matrix_optimization import maximized_mapping
-from invenio.legacy.bibauthorid.backinterface import update_personID_canonical_names
-from invenio.legacy.bibauthorid.backinterface import get_existing_result_clusters
-from invenio.legacy.bibauthorid.backinterface import get_lastname_results
-from invenio.legacy.bibauthorid.backinterface import personid_name_from_signature
-from invenio.legacy.bibauthorid.backinterface import personid_from_signature
+from invenio.legacy.bibauthorid.backinterface import update_canonical_names_of_authors
+from invenio.legacy.bibauthorid.backinterface import get_cluster_names
+from invenio.legacy.bibauthorid.backinterface import get_clusters_by_surname
+from invenio.legacy.bibauthorid.backinterface import get_author_info_of_confirmed_paper
+from invenio.legacy.bibauthorid.backinterface import get_author_and_status_of_confirmed_paper
 from invenio.legacy.bibauthorid.backinterface import move_signature
-from invenio.legacy.bibauthorid.backinterface import get_claimed_papers
-from invenio.legacy.bibauthorid.backinterface import get_new_personid
-from invenio.legacy.bibauthorid.backinterface import find_conflicts
-from invenio.legacy.bibauthorid.backinterface import get_free_pids as backinterface_get_free_pids
-from invenio.legacy.bibauthorid.backinterface import get_signature_info
-from invenio.legacy.bibauthorid.backinterface import delete_empty_persons
-from invenio.legacy.bibauthorid.backinterface import get_bibrefrec_to_pid_flag_mapping
+from invenio.legacy.bibauthorid.backinterface import get_claimed_papers_of_author
+from invenio.legacy.bibauthorid.backinterface import get_free_author_id
+from invenio.legacy.bibauthorid.backinterface import get_signatures_of_paper_and_author
+from invenio.legacy.bibauthorid.backinterface import get_free_author_ids as backinterface_get_free_pids
+from invenio.legacy.bibauthorid.backinterface import get_ordered_author_and_status_of_signature
+from invenio.legacy.bibauthorid.backinterface import remove_empty_authors
+from invenio.legacy.bibauthorid.backinterface import get_paper_to_author_and_status_mapping
 
 def merge_static_classy():
     '''
@@ -99,15 +99,15 @@ def merge_static_classy():
             if sig.isassigned():
                 sig.change_pid(other.pid)
 
-    last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())
+    last_names = frozenset(name[0].split('.')[0] for name in get_cluster_names())
 
-    personid = get_bibrefrec_to_pid_flag_mapping()
+    personid = get_paper_to_author_and_status_mapping()
     free_pids = backinterface_get_free_pids()
 
     for idx, last in enumerate(last_names):
         update_status(float(idx) / len(last_names), "Merging, %d/%d current: %s" % (idx, len(last_names), last))
 
-        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_lastname_results(last))
+        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
         results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
@@ -171,8 +171,8 @@ def merge_static_classy():
     update_status_final("Merging done.")
 
     update_status_final()
-    delete_empty_persons()
-    update_personID_canonical_names()
+    remove_empty_authors()
+    update_canonical_names_of_authors()
 
 def merge_static():
     '''
@@ -181,15 +181,15 @@ def merge_static():
         This function is static: if aid* tables are changed while it's running,
         probably everything will crash and a black hole will open, eating all your data.
     '''
-    last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())
+    last_names = frozenset(name[0].split('.')[0] for name in get_cluster_names())
 
     def get_free_pids():
         while True:
-            yield get_new_personid()
+            yield get_free_author_id()
 
     free_pids = get_free_pids()
 
-    current_mapping = get_bibrefrec_to_pid_flag_mapping()
+    current_mapping = get_paper_to_author_and_status_mapping()
 
     def move_sig_and_update_mapping(sig, old_pid_flag, new_pid_flag):
         move_signature(sig, new_pid_flag[0])
@@ -213,7 +213,7 @@ def merge_static():
             newpid = free_pids.next()
             move_sig_and_update_mapping(sig, assigned[0], (newpid, assigned[0][1]))
         else:
-            conflicts = find_conflicts(sig, target_pid)
+            conflicts = get_signatures_of_paper_and_author(sig, target_pid)
             if not conflicts:
                 move_sig_and_update_mapping(sig, assigned[0], (target_pid, assigned[0][1]))
             else:
@@ -230,7 +230,7 @@ def merge_static():
     for idx, last in enumerate(last_names):
         update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
 
-        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_lastname_results(last))
+        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
         results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
@@ -271,8 +271,8 @@ def merge_static():
                         try_move_signature(sig, pid)
 
     update_status_final()
-    delete_empty_persons()
-    update_personID_canonical_names()
+    remove_empty_authors()
+    update_canonical_names_of_authors()
 
 def merge_dynamic():
     '''
@@ -282,18 +282,18 @@ def merge_dynamic():
         hence the claiming faciity for example can stay online during the merge. This comfort
         however is paid off in term of speed.
     '''
-    last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())
+    last_names = frozenset(name[0].split('.')[0] for name in get_cluster_names())
 
     def get_free_pids():
         while True:
-            yield get_new_personid()
+            yield get_free_author_id()
 
     free_pids = get_free_pids()
 
     def try_move_signature(sig, target_pid):
         """
         """
-        paps = get_signature_info(sig)
+        paps = get_ordered_author_and_status_of_signature(sig)
         rejected = filter(lambda p: p[1] <= -2, paps)
         assigned = filter(lambda p:-2 < p[1] and p[1] < 2, paps)
         claimed = filter(lambda p: 2 <= p[1] and p[0] == target_pid, paps)
@@ -303,10 +303,10 @@ def merge_dynamic():
 
         assert len(assigned) == 1
 
-        if rejected:
+        if int(target_pid) in [int(x[0]) for x in rejected]:
             move_signature(sig, free_pids.next())
         else:
-            conflicts = find_conflicts(sig, target_pid)
+            conflicts = get_signatures_of_paper_and_author(sig, target_pid)
             if not conflicts:
                 move_signature(sig, target_pid)
             else:
@@ -320,7 +320,7 @@ def merge_dynamic():
     for idx, last in enumerate(last_names):
         update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
 
-        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_lastname_results(last))
+        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
 
         # [(last name number, [bibrefrecs])]
         results = [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
@@ -333,25 +333,23 @@ def merge_dynamic():
         old_pids = set()
 
         for k, ds in results:
-            pids = []
-            claim = []
+            pids = list()
             for d in ds:
-                pid_flag = personid_from_signature(d)
+                pid_flag = get_author_and_status_of_confirmed_paper(d)
                 if pid_flag:
                     pid, flag = pid_flag[0]
                     pids.append(pid)
                     old_pids.add(pid)
-                    if flag > 1:
-                        claim.append((d, pid))
 
             matr.append(dict((k, len(list(d))) for k, d in groupby(sorted(pids))))
 
         # We cast it to list in order to ensure the order persistence.
         old_pids = list(old_pids)
+        #best_match = cluster,pid_idx,n
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, _ in best_match]
-        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), best_match))
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, score in best_match if score > 0]
+        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), [x for x in best_match if x[2] > 0]))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
 
         for sigs, pid in chain(matched_clusters, not_matched_clusters):
@@ -359,15 +357,15 @@ def merge_dynamic():
                 try_move_signature(sig, pid)
 
     update_status_final()
-    delete_empty_persons()
-    update_personID_canonical_names()
+    remove_empty_authors()
+    update_canonical_names_of_authors()
 
 def matched_claims(inspect=None):
     '''
         Checks how many claims are violated in aidRESULTS.
         Returs the number of preserved and the total number of claims.
     '''
-    last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())
+    last_names = frozenset(name[0].split('.')[0] for name in get_cluster_names())
     r_match = 0
     r_total = 0
 
@@ -376,14 +374,14 @@ def matched_claims(inspect=None):
             continue
 
         results_dict = dict(((row[1], row[2], row[3]), int(row[0].split(".")[1]))
-                        for row in get_lastname_results(lname))
+                        for row in get_clusters_by_surname(lname))
 
         results_clusters = max(results_dict.values()) + 1
         assert frozenset(results_dict.values()) == frozenset(range(results_clusters))
 
-        pids = frozenset(x[0] for x in chain.from_iterable(personid_name_from_signature(r) for r in results_dict.keys()))
+        pids = frozenset(x[0] for x in chain.from_iterable(get_author_info_of_confirmed_paper(r) for r in results_dict.keys()))
 
-        matr = ((results_dict[x] for x in get_claimed_papers(pid) if x in results_dict) for pid in pids)
+        matr = ((results_dict[x] for x in get_claimed_papers_of_author(pid) if x in results_dict) for pid in pids)
         matr = (dict((k, len(list(d))) for k, d in groupby(sorted(row))) for row in matr)
         matr = [[row.get(i, 0) for i in xrange(results_clusters)] for row in matr]
 

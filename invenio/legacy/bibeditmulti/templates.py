@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSI
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
+from invenio.utils.url import auto_version_url
 
 
 class Template:
@@ -844,8 +845,8 @@ div .boxleft_2 {
 
         result = ""
         for script in scripts:
-            result += '<script type="text/javascript" src="%s/js/%s">' \
-            '</script>\n' % (CFG_SITE_URL, script)
+            result += '<script type="text/javascript" src="%s/%s">' \
+            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
 
         return result
 

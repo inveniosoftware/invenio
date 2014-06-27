@@ -30,7 +30,7 @@ record representation.
 If you have a MARCXML representation of the record to be handled, you can use
 the create_record function to obtain a bibrecord internal representation::
 
-    from invenio.bibrecord import create_record
+    from invenio.legacy.bibrecord import create_record
     record = create_record(marcxml)[0]
 
 
@@ -38,7 +38,7 @@ If you want to handle a record stored in the system and you know the record ID,
 then you can easily exploit Invenio search_engine API to obtain the
 corresponding marcxml::
 
-    from invenio.bibrecord import create_record
+    from invenio.legacy.bibrecord import create_record
     from invenio.legacy.search_engine import print_record
     marcxml = print_record(rec_id, 'xm')
     record = create_record(marcxml)[0]
@@ -62,7 +62,7 @@ bibrecord functions like
 At the end, if you want the MARCXML representation of the record you can use
 record_xml_output::
 
-   from invenio.bibrecord import create_record
+   from invenio.legacy.bibrecord import create_record
    from invenio.legacy.search_engine import print_record
    marcxml = print_record(rec_id, 'xm')
    record = create_record(marcxml)[0]
@@ -341,7 +341,30 @@ def filter_field_instances(field_instances, filter_subcode, filter_value,
     return matched
 
 
-def records_identical(rec1, rec2, skip_005=True, ignore_subfield_order=False,
+def record_drop_duplicate_fields(record):
+    """
+    Return a record where all the duplicate fields have been removed.
+    Fields are considered identical considering also the order of their
+    subfields.
+    """
+    out = {}
+    position = 0
+    tags = sorted(record.keys())
+    for tag in tags:
+        fields = record[tag]
+        out[tag] = []
+        current_fields = set()
+        for full_field in fields:
+            field = (tuple(full_field[0]),) + full_field[1:4]
+            if field not in current_fields:
+                current_fields.add(field)
+                position += 1
+                out[tag].append(full_field[:4] + (position,))
+    return out
+
+
+def records_identical(rec1, rec2, skip_005=True, ignore_field_order=False,
+                      ignore_subfield_order=False,
                       ignore_duplicate_subfields=False,
                       ignore_duplicate_controlfields=False):
     """
@@ -357,8 +380,6 @@ def records_identical(rec1, rec2, skip_005=True, ignore_subfield_order=False,
     if rec1_keys != rec2_keys:
         return False
     for key in rec1_keys:
-        # We sort the fields, first by indicators, then by global position and
-        # then by anything else
         if ignore_duplicate_controlfields and key.startswith('00'):
             if set(field[3] for field in rec1[key]) != \
                     set(field[3] for field in rec2[key]):
@@ -370,12 +391,14 @@ def records_identical(rec1, rec2, skip_005=True, ignore_subfield_order=False,
         if len(rec1_fields) != len(rec2_fields):
             # They already differs in length...
             return False
-        rec1_fields = sorted(rec1_fields,
-                             key=lambda elem: (elem[1], elem[2], elem[4],
-                                               elem[3], elem[0]))
-        rec2_fields = sorted(rec2_fields,
-                             key=lambda elem: (elem[1], elem[2], elem[4],
-                                               elem[3], elem[0]))
+        if ignore_field_order:
+            ## We sort the fields, first by indicators and then by anything else
+            rec1_fields = sorted(rec1_fields, key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
+            rec2_fields = sorted(rec2_fields, key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
+        else:
+            ## We sort the fields, first by indicators, then by global position and then by anything else
+            rec1_fields = sorted(rec1_fields, key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
+            rec2_fields = sorted(rec2_fields, key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
         for field1, field2 in zip(rec1_fields, rec2_fields):
             if ignore_duplicate_subfields:
                 if field1[1:4] != field2[1:4] or \
@@ -459,7 +482,7 @@ def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
     :return: the global field position of the newly inserted field or -1 if the
              operation failed
     """
-    error = validate_record_field_positions_global(rec)
+    error = _validate_record_field_positions_global(rec)
     if error:
         # FIXME one should write a message here
         pass
@@ -603,7 +626,7 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ',
     :param field_position_local: the local field position (tag wise)
     :return: the list of deleted fields
     """
-    error = validate_record_field_positions_global(rec)
+    error = _validate_record_field_positions_global(rec)
     if error:
         # FIXME one should write a message here.
         pass
@@ -1364,6 +1387,57 @@ def record_find_field(rec, tag, field, strict=False):
 
     return (None, None)
 
+def record_match_subfields(rec, tag, ind1=" ", ind2=" ", sub_key=None,
+                           sub_value='', sub_key2=None, sub_value2='',
+                           case_sensitive=True):
+    """ Finds subfield instances in a particular field and tests
+    values in 1 of 3 possible ways:
+     - Does a subfield code exist? (ie does 773__a exist?)
+     - Does a subfield have a particular value? (ie 773__a == 'PhysX')
+     - Do a pair of subfields have particular values?
+        (ie 035__2 == 'CDS' and 035__a == '123456')
+
+    Parameters:
+     * rec - dictionary: a bibrecord structure
+     * tag - string: the tag of the field (ie '773')
+     * ind1, ind2 - char: a single characters for the MARC indicators
+     * sub_key - char: subfield key to find
+     * sub_value - string: subfield value of that key
+     * sub_key2 - char: key of subfield to compare against
+     * sub_value2 - string: expected value of second subfield
+     * case_sensitive - bool: be case sensitive when matching values
+
+    Returns: false if no match found, else provides the field position (int) """
+    if sub_key is None:
+        raise TypeError("None object passed for parameter sub_key.")
+
+    if sub_key2 is not None and sub_value2 is '':
+        raise TypeError("Parameter sub_key2 defined but sub_value2 is None, "
+                        + "function requires a value for comparrison.")
+    ind1, ind2 = _wash_indicators(ind1, ind2)
+
+    if not case_sensitive:
+        sub_value = sub_value.lower()
+        sub_value2 = sub_value2.lower()
+
+    for field in record_get_field_instances(rec, tag, ind1, ind2):
+        subfields = dict(field_get_subfield_instances(field))
+        if not case_sensitive:
+            for k, v in subfields.iteritems():
+                subfields[k] = v.lower()
+
+        if sub_key in subfields:
+            if sub_value is '':
+                return field[4]
+            else:
+                if sub_value == subfields[sub_key]:
+                    if sub_key2 is None:
+                        return field[4]
+                    else:
+                        if sub_key2 in subfields:
+                            if sub_value2 == subfields[sub_key2]:
+                                return field[4]
+    return False
 
 def record_strip_empty_volatile_subfields(rec):
     """Remove unchanged volatile subfields from the record."""
@@ -1458,6 +1532,12 @@ def record_order_subfields(rec, tag=None):
             rec[tag][i] = (ordered_subfields, field[1], field[2], field[3],
                            field[4])
 
+
+def record_empty(rec):
+    for key in rec.iterkeys():
+        if key not in ('001', '005'):
+            return False
+    return True
 
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 def _compare_fields(field1, field2, strict=True):
@@ -1580,7 +1660,7 @@ def _tag_matches_pattern(tag, pattern):
     return True
 
 
-def validate_record_field_positions_global(record):
+def _validate_record_field_positions_global(record):
     """
     Check if the global field positions in the record are valid.
 

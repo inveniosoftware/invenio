@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -64,7 +64,9 @@ webdoc_dirs = {'help':('',
                'admin':('admin',
                         '%s/webdoc/admin-pages' % CFG_CACHEDIR),
                'hacking':('hacking',
-                          '%s/webdoc/hacking-pages' % CFG_CACHEDIR)}
+                          '%s/webdoc/hacking-pages' % CFG_CACHEDIR),
+               'info':('info',
+                       '%s/webdoc/info-pages' % CFG_CACHEDIR)}
 
 # Regular expression for finding text to be translated
 translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
@@ -153,7 +155,8 @@ def get_webdoc_parts(webdoc,
                      categ="",
                      update_cache_mode=1,
                      ln=CFG_SITE_LANG,
-                     verbose=0):
+                     verbose=0,
+                     req=None):
     """
     Returns the html of the specified 'webdoc' part(s).
 
@@ -197,7 +200,13 @@ def get_webdoc_parts(webdoc,
 
     for part in parts:
         if categ != "":
-            locations = [webdoc_dirs.get(categ, ('',''))]
+            if categ == 'info':
+                uri_parts = req.uri.split(os.sep)
+                locations = list(webdoc_dirs.get(categ, ('','')))
+                locations[0] = locations[0] + os.sep + os.sep.join(uri_parts[uri_parts.index('info')+1:-1])
+                locations = [tuple(locations)]
+            else:
+                locations = [webdoc_dirs.get(categ, ('',''))]
         else:
             locations = webdoc_dirs.values()
 
@@ -248,11 +257,14 @@ def get_webdoc_parts(webdoc,
             # Could not find/read the folder where cache should
             # be. Generate on-the-fly, get all the parts at the
             # same time, and return
+            dirs = None
+            if categ == "info":
+                dirs = locations
             (webdoc_source_path, \
              webdoc_cache_dir, \
              webdoc_name,\
              webdoc_source_modification_date, \
-             webdoc_cache_modification_date) = get_webdoc_info(webdoc)
+             webdoc_cache_modification_date) = get_webdoc_info(webdoc, dirs=dirs)
             if webdoc_source_path is not None:
                 try:
                     webdoc_source = file(webdoc_source_path, 'r').read()
@@ -442,7 +454,7 @@ def read_webdoc_source(webdoc):
 
     return (webdoc_source, webdoc_cache_dir, webdoc_name)
 
-def get_webdoc_info(webdoc):
+def get_webdoc_info(webdoc, dirs=None):
     """
     Locate the file corresponding to given webdoc and return its
     path, the path to its cache directory (even if it does not exist
@@ -508,7 +520,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     _ = gettext_set_language(ln)
 
     topics = {}
-    ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
+    ln_link = '?ln=' + ln
 
     for category in categ:
         if category not in webdoc_dirs:
@@ -640,13 +652,9 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
         # 3 step
         ## Print current language 'en', 'fr', .. instead of
         ## <lang:current /> tags and '?ln=en', '?ln=fr', .. instead of
-        ## <lang:link /> if ln is not default language
-        if ln != CFG_SITE_LANG:
-            localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
-                                                             localized_webdoc)
-        else:
-            localized_webdoc = pattern_lang_link_current.sub('',
-                                                             localized_webdoc)
+        ## <lang:link />
+        localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
+                                                         localized_webdoc)
         localized_webdoc = pattern_lang_current.sub(ln, localized_webdoc)
 
         # 4 step

@@ -26,7 +26,7 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 
 # current MathJax version and packages
 # See also modules/miscutil/lib/htmlutils.py (get_mathjax_header)
-MJV = 2.1
+MJV = 2.3
 MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 
 # current CKeditor version
@@ -167,10 +167,10 @@ install-jquery-plugins:
 	mkdir -p $(prefix)/var/www/css
 	mkdir -p $(prefix)/var/www/img
 	(cd ${prefix}/var/www/js && \
-	wget http://code.jquery.com/jquery-1.7.1.min.js && \
+	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
 	mv jquery-1.7.1.min.js jquery.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
+    wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
@@ -201,10 +201,20 @@ install-jquery-plugins:
 	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip -d tablesorter && \
+	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
+	unzip jquery.fileTree-1.01.zip && \
+	rm jquery.fileTree-1.01.zip && \
+	wget http://invenio-software.org/download/jquery/ColVis.min.js && \
+	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
 	wget http://invenio-software.org/download/jquery/flot-0.6.zip && \
+	wget http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
+	rm -rf jquery-lightbox && \
+	unzip -u jquery-lightbox-0.5.zip -d jquery-lightbox && \
+	sed -i 's/images\//\/js\/jquery-lightbox\/images\//g' jquery-lightbox/js/jquery.lightbox-0.5.js && \
+	rm -rf jquery-lightbox-0.5.zip && \
 	wget -O jquery-ui-timepicker-addon.js http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js && \
 	unzip -u flot-0.6.zip && \
 	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
@@ -215,7 +225,7 @@ install-jquery-plugins:
 	rm uploadify.zip && rm -r uploadify && \
 	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js -O jquery.hotkeys.js && \
-	wget http://jquery.bassistance.de/treeview/jquery.treeview.zip && \
+	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
 	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
@@ -223,6 +233,11 @@ install-jquery-plugins:
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
+	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
+	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
+	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
@@ -255,6 +270,7 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
+		rm -f jquery.dataTables.ColVis.min.js && \
         rm -f jquery.hotkeys.js && \
         rm -f jquery.tablesorter.min.js && \
         rm -f jquery-ui-1.7.3.custom.min.js && \
@@ -574,7 +590,10 @@ update-v0.99.6-tables:
 update-v0.99.7-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.7 and v0.99.8."
 
-update-v0.99.8-tables: # from v0.99.8 to v1.0.0-rc0
+update-v0.99.8-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.8 and v0.99.9."
+
+update-v0.99.9-tables: # from v0.99.9 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	cat $(top_srcdir)/invenio/legacy/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec

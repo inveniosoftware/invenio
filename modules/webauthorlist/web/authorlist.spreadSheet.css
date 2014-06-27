@@ -1,0 +1,191 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2011, 2012, 2013 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+.SpreadSheet {
+	font-family : Helvetica, Arial, sans-serif;
+	font-size : 10pt;
+}
+
+.dataTables_wrapper {
+    min-height : 0px;
+    height : auto;
+    margin : 20px 0px;
+}
+
+div.ColVis {
+	width : 15px;
+}
+
+table.SpreadSheet {
+	border-spacing : 0px;
+	border-collapse : collapse;
+}
+
+table.SpreadSheet > thead > tr > th {
+    border-bottom : 1px solid #9EB6CE;
+}
+
+table.SpreadSheet > tbody > tr > td:not(.ui-state-default) {
+    border : 1px solid #D0D7E5;
+}
+
+table.SpreadSheet td {
+    padding : 0px !important;
+}
+
+table.SpreadSheet td.Clickable {
+    vertical-align : top;
+}
+
+div.Wrapper {
+    position : relative;
+}
+
+table.Content {
+    width : 100%;
+    padding : 0px;
+    border-spacing : 0px;
+    border-collapse: collapse;
+}
+
+td.Extendable {
+    width : 36px;
+}
+
+span.SpreadSheet.Extendable.ui-icon-plus {
+    margin-left : 3px;
+}
+
+div.Increment {
+    height : 17px;
+    text-align : center;
+}
+
+input.SpreadSheet.Text {
+    outline : none;
+    width : 100%;
+    height : 17px;
+    margin : 0px;
+    padding : 0px;
+    text-align : left;
+    border : 0px transparent;
+}
+
+input.SpreadSheet.Text.Readonly {
+    background-color : transparent
+}
+
+div.SpreadSheet.Edit {
+    width : 48px;
+    margin : 0px auto;
+}
+
+span.ui-icon.ui-icon-carat-1-n {
+    float : left;
+}
+
+span.ui-icon.ui-icon-carat-1-s {
+    float : left;
+}
+
+span.ui-icon.ui-icon-close {
+    float : left;
+}
+
+span.SpreadSheet.ui-icon {
+    float : left;
+}
+
+span.SpreadSheet.Checkbox {
+    float : none;
+    margin : 0px auto;
+}
+
+div.SpreadSheet.Select {
+    position : relative;
+}
+
+select.AuthorlistSelect {
+    width : 100%;
+    margin : 0;
+    border : 0px;
+}
+
+span.AuthorlistText {
+    position : absolute;
+    top : 0;
+    left : 0;
+    margin-top : 1px;
+    width : 100%;
+    text-align : left;
+}
+
+span.AuthorlistIcon.ui-icon.ui-icon-triangle-1-s {
+    position : absolute;
+    top : 0;
+    right : 0;
+    margin-top : 1px;
+}
+
+table.TextSelect {
+    width : 100%;
+    border-spacing : 0px;
+    border-collapse : collapse;
+}
+
+td.TextSelectText {
+    border-right : 1px solid #D0D7E5;
+}
+
+div.Select {
+    margin-left : 5px;
+}
+
+div.ColVis {
+    z-index : 1100;
+}
+
+div.Cursor {
+    position : absolute;
+    z-index : 500;
+    background : #D0D7E5;
+}
+
+div.CursorTop {
+    height : 2px;
+}
+
+div.CursorRight {
+    width : 2px;
+}
+
+div.CursorBottom {
+    height : 2px;
+}
+
+div.CursorLeft {
+    width : 2px;
+}
+
+div.CursorCube {
+    height : 5px;
+    width : 5px;
+    top : -2px;
+    border : 2px solid white;
+}

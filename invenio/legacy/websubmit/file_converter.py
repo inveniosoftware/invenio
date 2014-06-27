@@ -801,8 +801,7 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     @return [string] output_file input_file
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
-
-    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf;pdfa')
 
     if title is None:
         stdout = execute_command(CFG_PATH_PDFINFO, input_file)
@@ -929,7 +928,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
 
-    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
+    input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf;pdfa')
     if input_file.endswith('.gz'):
         new_input_file = os.path.join(working_dir, 'input.ps')
         execute_command(CFG_PATH_GUNZIP, '-c', input_file, filename_out=new_input_file)
@@ -950,7 +949,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     clean_working_dir(working_dir)
     return output_file
 
-def ps2pdf(input_file, output_file=None, pdfopt=True, **dummy):
+def ps2pdf(input_file, output_file=None, pdfopt=None, **dummy):
     """
     Transform any PS into a PDF
     @param input_file [string] the input file name
@@ -959,6 +958,9 @@ def ps2pdf(input_file, output_file=None, pdfopt=True, **dummy):
     @return [string] output_file input_file
     raise InvenioWebSubmitFileConverterError in case of errors.
     """
+    if pdfopt is None:
+        pdfopt = bool(CFG_PATH_PDFOPT)
+
     input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
     if input_file.endswith('.gz'):
         new_input_file = os.path.join(working_dir, 'input.ps')
@@ -1365,7 +1367,18 @@ def execute_command(*args, **argd):
     """Wrapper to run_process_with_timeout."""
     get_file_converter_logger().debug("Executing: %s" % (args, ))
     args = [str(arg) for arg in args]
-    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'), sudo=argd.get('sudo'))
+    sudo = argd.get('sudo') or None
+    if sudo:
+        pass
+        # May be forbidden by sudo
+        # args = ['CFG_OPENOFFICE_TMPDIR="%s"' % CFG_OPENOFFICE_TMPDIR] + args
+    else:
+        os.putenv('CFG_OPENOFFICE_TMPDIR', CFG_OPENOFFICE_TMPDIR)
+    res, stdout, stderr = run_process_with_timeout(args,
+                                        cwd=argd.get('cwd'),
+                                        filename_out=argd.get('filename_out'),
+                                        filename_err=argd.get('filename_err'),
+                                        sudo=sudo)
     get_file_converter_logger().debug('res: %s, stdout: %s, stderr: %s' % (res, stdout, stderr))
     if res != 0:
         message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)

@@ -174,6 +174,66 @@ class BibRecordParsersTest(InvenioTestCase):
             record = bibrecord._create_record_minidom(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
+class BibRecordDropDuplicateFieldsTest(InvenioTestCase):
+    def test_drop_duplicate_fields(self):
+        """bibrecord - testing record_drop_duplicate_fields()"""
+        record = """
+        <record>
+        <controlfield tag="001">123</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield cde="a">On the foo and bar</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        </record>
+        """
+        record_result = """
+        <record>
+        <controlfield tag="001">123</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe, John</subfield>
+        <subfield code="u">Foo University</subfield>
+        <subfield code="a">Doe, John</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield cde="a">On the foo and bar</subfield>
+        </datafield>
+        </record>
+        """
+        rec = bibrecord.create_record(record)[0]
+        rec = bibrecord.record_drop_duplicate_fields(rec)
+        rec2 = bibrecord.create_record(record_result)[0]
+        self.maxDiff = None
+        self.assertEqual(rec, rec2)
+
+
 class BibRecordBadInputTreatmentTest(InvenioTestCase):
     """ bibrecord - testing for bad input treatment """
     def test_empty_collection(self):
@@ -1174,6 +1234,71 @@ class BibRecordMoveSubfieldTest(InvenioTestCase):
             bibrecord.record_move_subfield, self.rec, "100", 999, 0,
             field_position_global=3)
 
+
+class BibRecordCompareSubfieldTest(InvenioTestCase):
+    """ bibrecord -  """
+    
+    def setUp(self):
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        <subfield code="c">fisk</subfield>
+        <subfield code="d">eple</subfield>
+        <subfield code="e">hammer</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        </record>
+        """
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
+        # For simplicity, create an alias of the function
+        self._func = bibrecord.record_match_subfields
+
+    def test_check_subfield_exists(self):
+        self.assertEqual(self._func(self.rec, '100', sub_key='a'), 3)
+        self.assertEqual(self._func(self.rec, '100', sub_key='e'), 3)
+        self.assertFalse(self._func(self.rec, '245', sub_key='a'))
+        self.assertEqual(self._func(self.rec, '245', ind2='1', sub_key='a'), 4)
+        self.assertFalse(self._func(self.rec, '999', sub_key='x'))
+        self.assertFalse(self._func(self.rec, '100', sub_key='x'))
+
+    def test_check_subfield_values(self):
+        self.assertEqual(self._func(self.rec, '100', sub_key='b',
+            sub_value='editor'), 3)
+        self.assertEqual(self._func(self.rec, '245', ind2='1', sub_key='a',
+            sub_value='On the foo and bar1'), 4)
+        self.assertEqual(self._func(self.rec, '100', sub_key='e',
+            sub_value='ponies suck'), False)
+        self.assertEqual(self._func(self.rec, '100', sub_key='c',
+            sub_value='FISK'), False)
+        self.assertEqual(self._func(self.rec, '100', sub_key='c',
+            sub_value='FISK', case_sensitive=False), 3)
+
+    def test_compare_subfields(self):
+        self.assertEqual(self._func(self.rec, '100', sub_key='c',
+            sub_value='fisk', sub_key2='d', sub_value2='eple'), 3)
+        self.assertFalse(self._func(self.rec, '100', sub_key='c',
+            sub_value='fisk', sub_key2='d', sub_value2='tom'))
+        self.assertEqual(self._func(self.rec, '100', sub_key='c',
+            sub_value='fiSk', sub_key2='d', sub_value2='Eple',
+            case_sensitive=False), 3)
+
+    def test_error_conditions(self):
+        self.assertRaises(TypeError,
+            self._func, self.rec, '100')
+        self.assertRaises(TypeError,
+            self._func, self.rec, '100', sub_key='a',
+                sub_value='fiSk', sub_key2='d')
+
+
 class BibRecordSpecialTagParsingTest(InvenioTestCase):
     """ bibrecord - parsing special tags (FMT, FFT)"""
 
@@ -1661,6 +1786,7 @@ TEST_SUITE = make_test_suite(
     BibRecordModifySubfieldTest,
     BibRecordDeleteSubfieldFromTest,
     BibRecordMoveSubfieldTest,
+    BibRecordCompareSubfieldTest,
     BibRecordAccentedUnicodeLettersTest,
     BibRecordSpecialTagParsingTest,
     BibRecordPrintingTest,
@@ -1670,6 +1796,7 @@ TEST_SUITE = make_test_suite(
     BibRecordSingletonTest,
     BibRecordNumCharRefTest,
     BibRecordExtractIdentifiersTest,
+    BibRecordDropDuplicateFieldsTest
     )
 
 if __name__ == '__main__':

@@ -64,6 +64,9 @@ def Make_Record(parameters, curdir, form, user_info=None):
     else:
         raise InvenioWebSubmitFunctionError("Cannot create database record")
 
+    if not rectext:
+        raise InvenioWebSubmitFunctionError("Empty record!")
+
     # Escape XML-reserved chars and clean the unsupported ones (mainly
     # control characters)
     rectext = wash_for_xml(rectext)

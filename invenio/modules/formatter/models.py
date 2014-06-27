@@ -154,6 +154,8 @@ class Bibfmt(db.Model):
 
     value = db.Column(db.iLargeBinary)
 
+    needs_2nd_pass = db.Column(db.TinyInteger(1), server_default='0')
+
     bibrec = db.relationship(Bibrec, backref='bibfmt')
 
 __all__ = [

@@ -3,7 +3,7 @@
 ## $Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,8 +23,7 @@
 __revision__ = "$Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $"
 
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.utils.url import create_html_link
-from invenio.config import CFG_SITE_URL
+
 
 def format_element(bfo):
     """

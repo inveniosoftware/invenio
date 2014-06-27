@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,35 +28,40 @@ import os
 import subprocess
 from itertools import chain
 
-from invenio.legacy.refextract.config import \
-            CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-            CFG_REFEXTRACT_MARKER_CLOSING_VOLUME, \
-            CFG_REFEXTRACT_MARKER_CLOSING_YEAR, \
-            CFG_REFEXTRACT_MARKER_CLOSING_PAGE, \
-            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
-            CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
-            CFG_REFEXTRACT_MARKER_CLOSING_SERIES
+from .config import (
+    CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM,
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL,
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND,
+    CFG_REFEXTRACT_MARKER_CLOSING_VOLUME,
+    CFG_REFEXTRACT_MARKER_CLOSING_YEAR,
+    CFG_REFEXTRACT_MARKER_CLOSING_PAGE,
+    CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID,
+    CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL,
+    CFG_REFEXTRACT_MARKER_CLOSING_TITLE,
+    CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
 
 # make refextract runnable without requiring the full Invenio installation:
 from invenio.config import CFG_PATH_GFILE
 
-from invenio.legacy.refextract.tag import tag_reference_line, \
-    sum_2_dictionaries, identify_and_tag_DOI, identify_and_tag_URLs
-from invenio.legacy.refextract.xml import create_xml_record, \
-                                   build_xml_citations
+from .tag import (
+    tag_reference_line,
+    sum_2_dictionaries,
+    identify_and_tag_DOI,
+    identify_and_tag_URLs,
+    find_numeration,
+    extract_series_from_volume)
+from .record import build_record, build_references
 from invenio.legacy.docextract.pdf import convert_PDF_to_plaintext
 from invenio.legacy.docextract.utils import write_message
-from invenio.legacy.refextract.kbs import get_kbs
-from invenio.legacy.refextract.linker import find_referenced_recid
-from invenio.legacy.refextract.regexs import get_reference_line_numeration_marker_patterns, \
-                                  regex_match_list, \
-                                  re_tagged_citation, \
-                                  re_numeration_no_ibid_txt, \
-                                  re_roman_numbers, \
-                                  re_recognised_numeration_for_title_plus_series
+from .kbs import get_kbs
+from .linker import find_referenced_recid
+from .regexs import (
+    get_reference_line_numeration_marker_patterns,
+    regex_match_list,
+    re_tagged_citation,
+    re_numeration_no_ibid_txt,
+    re_roman_numbers,
+    re_recognised_numeration_for_title_plus_series)
 
 
 description = """
@@ -137,12 +142,12 @@ def handle_special_journals(citation_elements, kbs):
     """
     for el in citation_elements:
         if el['type'] == 'JOURNAL' and el['title'] in kbs['special_journals'] \
-                and re.match('\d{1,2}$', el['volume']):
+                and re.match(r'\d{1,2}$', el['volume']):
 
             # Sometimes the page is omitted and the year is written in its place
             # We can never be sure but it's very likely that page > 1900 is
             # actually a year, so we skip this reference
-            if el['year'] == '' and re.match('(19|20)\d{2}$', el['page']):
+            if el['year'] == '' and re.match(r'(19|20)\d{2}$', el['page']):
                 el['type'] = 'MISC'
                 el['misc_txt'] = "%s,%s,%s" \
                                      % (el['title'], el['volume'], el['page'])
@@ -202,20 +207,16 @@ def look_for_books(citation_elements, kbs):
     Create book tags by using the authors and the title to find books
     in our knowledge base
     """
-    authors = None
     title = None
-    for el in citation_elements:
-        if el['type'] == 'AUTH':
-            authors = el
-            break
     for el in citation_elements:
         if el['type'] == 'QUOTED':
             title = el
             break
 
-    if authors and title:
-        if title['title'].upper() in kbs['books']:
-            line = kbs['books'][title['title'].upper()]
+    if title:
+        normalized_title = title['title'].upper()
+        if normalized_title in kbs['books']:
+            line = kbs['books'][normalized_title]
             el = {'type': 'BOOK',
                   'misc_txt': '',
                   'authors': line[0],
@@ -283,6 +284,20 @@ def balance_authors(splitted_citations, new_elements):
         current_citation.insert(0, el)
 
 
+def associate_recids(citation_elements):
+    for el in citation_elements:
+        try:
+            el['recid'] = find_referenced_recid(el).pop()
+        except (IndexError, KeyError):
+            el['recid'] = None
+    return citation_elements
+
+
+def associate_recids_catchup(splitted_citations):
+    for citation_elements in splitted_citations:
+        associate_recids(citation_elements)
+
+
 def split_citations(citation_elements):
     """Split a citation line in multiple citations
 
@@ -292,8 +307,13 @@ def split_citations(citation_elements):
     splitted_citations = []
     new_elements = []
     current_recid = None
+    current_doi = None
 
     def check_ibid(current_elements, trigger_el):
+        for el in new_elements:
+            if el['type'] == 'AUTH':
+                return
+
         # Check for ibid
         if trigger_el.get('is_ibid', False):
             if splitted_citations:
@@ -311,41 +331,60 @@ def split_citations(citation_elements):
         splitted_citations.append(new_elements[:])
         del new_elements[:]
 
-    to_merge = None
     for el in citation_elements:
-        if to_merge:
-            el['misc_txt'] = to_merge + " " + el.get('misc_txt', '')
-            to_merge = None
-
         try:
-            el_recid = find_referenced_recid(el).pop()
-        except (IndexError, KeyError):
+            el_recid = el['recid']
+        except KeyError:
             el_recid = None
 
         if current_recid and el_recid and current_recid == el_recid:
             # Do not start a new citation
             pass
-        elif current_recid and el_recid and current_recid != el_recid:
+        elif current_recid and el_recid and current_recid != el_recid \
+                or current_doi and el['type'] == 'DOI' and \
+                                            current_doi != el['doi_string']:
             start_new_citation()
             # Some authors may be found in the previous citation
             balance_authors(splitted_citations, new_elements)
-        elif ';' in el['misc_txt'] and valid_citation(new_elements):
-            el['misc_txt'], to_merge = el['misc_txt'].rsplit(';', 1)
+        elif ';' in el['misc_txt']:
+            misc_txt, el['misc_txt'] = el['misc_txt'].split(';', 1)
+            if misc_txt:
+                new_elements.append({'type': 'MISC',
+                                     'misc_txt': misc_txt})
             start_new_citation()
+            # In case el['recid'] is None, we want to reset it
+            # because we are starting a new reference
+            current_recid = el_recid
+            while ';' in el['misc_txt']:
+                misc_txt, el['misc_txt'] = el['misc_txt'].split(';', 1)
+                if misc_txt:
+                    new_elements.append({'type': 'MISC',
+                                         'misc_txt': misc_txt})
+                    start_new_citation()
+                    current_recid = None
 
         if el_recid:
             current_recid = el_recid
 
+        if el['type'] == 'DOI':
+            current_doi = el['doi_string']
+
         check_ibid(new_elements, el)
         new_elements.append(el)
 
-    if to_merge:
-        new_elements[-1]['misc_txt'] += " " + to_merge
-        new_elements[-1]['misc_txt'] = new_elements[-1]['misc_txt'].strip()
-
     splitted_citations.append(new_elements)
 
-    return splitted_citations
+    return [el for el in splitted_citations if not empty_citation(el)]
+
+
+def empty_citation(citation):
+    els_to_remove = ('MISC', )
+    for el in citation:
+        if el['type'] not in els_to_remove:
+            return False
+        if el['misc_txt']:
+            return False
+    return True
 
 
 def valid_citation(citation):
@@ -363,7 +402,7 @@ def remove_invalid_references(splitted_citations):
         else:
             el['misc_txt'] += " " + txt
 
-    splitted_citations = [citation for citation in splitted_citations \
+    splitted_citations = [citation for citation in splitted_citations
                                                                    if citation]
 
     # We merge some elements in here which means it only makes sense when
@@ -383,7 +422,37 @@ def remove_invalid_references(splitted_citations):
 
             previous_citation = citation
 
-    return [citation for citation in splitted_citations \
+    return [citation for citation in splitted_citations
+                                                   if valid_citation(citation)]
+
+
+def merge_invalid_references(splitted_citations):
+    def add_misc(el, txt):
+        if not el.get('misc_txt'):
+            el['misc_txt'] = txt
+        else:
+            el['misc_txt'] += " " + txt
+
+    splitted_citations = [citation for citation in splitted_citations
+                                                                   if citation]
+
+    # We merge some elements in here which means it only makes sense when
+    # we have at least 2 elements to merge together
+    if len(splitted_citations) > 1:
+        previous_citation = None
+        previous_citation_valid = True
+        for citation in splitted_citations:
+            current_citation_valid = valid_citation(citation)
+            if not current_citation_valid:
+                # Merge to previous one misc txt
+                if not previous_citation_valid and not current_citation_valid:
+                    for el in citation:
+                        add_misc(previous_citation[-1], el['misc_txt'])
+
+            previous_citation = citation
+            previous_citation_valid = current_citation_valid
+
+    return [citation for citation in splitted_citations
                                                    if valid_citation(citation)]
 
 
@@ -408,6 +477,83 @@ def add_year_elements(splitted_citations):
     return splitted_citations
 
 
+def look_for_implied_ibids(splitted_citations):
+    def look_for_journal(els):
+        for el in els:
+            if el['type'] == 'JOURNAL':
+                return True
+        return False
+
+    current_journal = None
+    for citation in splitted_citations:
+        if current_journal and not look_for_journal(citation):
+            for el in citation:
+                if el['type'] == 'MISC':
+                    numeration = find_numeration(el['misc_txt'])
+                    if numeration:
+                        if not numeration['series']:
+                            numeration['series'] = extract_series_from_volume(current_journal['volume'])
+                        if numeration['series']:
+                            volume = numeration['series'] + numeration['volume']
+                        else:
+                            volume = numeration['volume']
+                        ibid_el = {'type'       : 'JOURNAL',
+                                   'misc_txt'   : '',
+                                   'title'      : current_journal['title'],
+                                   'volume'     : volume,
+                                   'year'       : numeration['year'],
+                                   'page'       : numeration['page'],
+                                   'page_end'   : numeration['page_end'],
+                                   'is_ibid'    : True,
+                                   'extra_ibids': []}
+                        citation.append(ibid_el)
+                        el['misc_txt'] = el['misc_txt'][numeration['len']:]
+
+        current_journal = None
+        for el in citation:
+            if el['type'] == 'JOURNAL':
+                current_journal = el
+
+    return splitted_citations
+
+
+def remove_duplicated_authors(splitted_citations):
+    for citation in splitted_citations:
+        found_author = False
+        for el in citation:
+            if el['type'] == 'AUTH':
+                if found_author:
+                    el['type'] = 'MISC'
+                    el['misc_txt'] = el['misc_txt'] + " " + el['auth_txt']
+                else:
+                    found_author = True
+
+    return splitted_citations
+
+
+def remove_duplicated_dois(splitted_citations):
+    for citation in splitted_citations:
+        found_doi = False
+        for el in citation[:]:
+            if el['type'] == 'DOI':
+                if found_doi:
+                    citation.remove(el)
+                else:
+                    found_doi = True
+
+    return splitted_citations
+
+
+def add_recid_elements(splitted_citations):
+    for citation in splitted_citations:
+        for el in citation:
+            if el.get('recid', None):
+                citation.append({'type': 'RECID',
+                                 'recid': el['recid'],
+                                 'misc_txt': ''})
+                break
+
+
 ## End of elements transformations
 
 
@@ -427,11 +573,11 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
     @output parsed references (a list of elements objects)
     """
     # Strip the 'marker' (e.g. [1]) from this reference line:
-    (line_marker, ref_line) = remove_reference_line_marker(ref_line)
+    line_marker, ref_line = remove_reference_line_marker(ref_line)
     # Find DOI sections in citation
-    (ref_line, identified_dois) = identify_and_tag_DOI(ref_line)
+    ref_line, identified_dois = identify_and_tag_DOI(ref_line)
     # Identify and replace URLs in the line:
-    (ref_line, identified_urls) = identify_and_tag_URLs(ref_line)
+    ref_line, identified_urls = identify_and_tag_URLs(ref_line)
     # Tag <cds.JOURNAL>, etc.
     tagged_line, bad_titles_count = tag_reference_line(ref_line,
                                                        kbs,
@@ -451,28 +597,143 @@ def parse_reference_line(ref_line, kbs, bad_titles_count={}):
                                     identified_urls)
 
     # Transformations on elements
-    citation_elements = split_volume_from_journal(citation_elements)
-    citation_elements = format_volume(citation_elements)
-    citation_elements = handle_special_journals(citation_elements, kbs)
-    citation_elements = format_report_number(citation_elements)
-    citation_elements = format_author_ed(citation_elements)
-    citation_elements = look_for_books(citation_elements, kbs)
-    citation_elements = format_hep(citation_elements)
-    citation_elements = remove_b_for_nucl_phys(citation_elements)
-    citation_elements = mangle_volume(citation_elements)
+    split_volume_from_journal(citation_elements)
+    format_volume(citation_elements)
+    handle_special_journals(citation_elements, kbs)
+    format_report_number(citation_elements)
+    format_author_ed(citation_elements)
+    look_for_books(citation_elements, kbs)
+    format_hep(citation_elements)
+    remove_b_for_nucl_phys(citation_elements)
+    mangle_volume(citation_elements)
+    associate_recids(citation_elements)
 
     # Split the reference in multiple ones if needed
     splitted_citations = split_citations(citation_elements)
 
+    # Look for books in misc field
+    look_for_undetected_books(splitted_citations, kbs)
+    # Look for implied ibids
+    look_for_implied_ibids(splitted_citations)
+    # Associate recids to the newly added ibids/books
+    associate_recids_catchup(splitted_citations)
     # Remove references with only misc text
-    splitted_citations = remove_invalid_references(splitted_citations)
+    # splitted_citations = remove_invalid_references(splitted_citations)
+    # Merge references with only misc text
+    # splitted_citations = merge_invalid_references(splitted_citations)
     # Find year
-    splitted_citations = add_year_elements(splitted_citations)
+    add_year_elements(splitted_citations)
+    # Remove duplicate authors
+    remove_duplicated_authors(splitted_citations)
+    # Remove duplicate DOIs
+    remove_duplicated_dois(splitted_citations)
+    # Add recid elements
+    add_recid_elements(splitted_citations)
     # For debugging puposes
     print_citations(splitted_citations, line_marker)
 
     return splitted_citations, line_marker, counts, bad_titles_count
 
+
+
+def look_for_undetected_books(splitted_citations, kbs):
+    for citation in splitted_citations:
+        if is_unknown_citation(citation):
+            search_for_book_in_misc(citation, kbs)
+
+
+def search_for_book_in_misc(citation, kbs):
+    """Searches for books in the misc_txt field if the citation is not recognized as anything like a journal, book, etc.
+    """
+    for citation_element in citation:
+        if citation_element['type'] == 'MISC':
+            write_message('* Unknown citation found. Searching for book title in: %s' % citation_element['misc_txt'], verbose=9)
+            for title in kbs['books']:
+                startIndex = find_substring_ignore_special_chars(citation_element['misc_txt'], title)
+                if startIndex != -1:
+                    line = kbs['books'][title.upper()]
+                    book_year = line[2].strip(';')
+                    book_authors = line[0]
+                    book_found = False
+                    if citation_element['misc_txt'].find(book_year) != -1:
+                        # For now consider the citation as valid, we are using
+                        # an exact search, we don't need to check the authors
+                        # However, the code below will be useful if we decide
+                        # to introduce fuzzy matching.
+                        book_found = True
+
+                        for author in get_possible_author_names(citation):
+                            if find_substring_ignore_special_chars(book_authors, author) != -1:
+                                book_found = True
+
+                        for author in re.findall('[a-zA-Z]{4,}', book_authors):
+                            if find_substring_ignore_special_chars(citation_element['misc_txt'], author) != -1:
+                                book_found = True
+
+                        if book_found is True:
+                            write_message('* Book found: %s' % title, verbose=9)
+                            book_element = {'type': 'BOOK',
+                                            'misc_txt': '',
+                                            'authors': book_authors,
+                                            'title': line[1],
+                                            'year': book_year}
+                            citation.append(book_element)
+                            citation_element['misc_txt'] = cut_substring_with_special_chars(citation_element['misc_txt'], title, startIndex)
+                            return True
+
+            write_message('  * Book not found!', verbose=9)
+    return False
+
+def get_possible_author_names(citation):
+    for citation_element in citation:
+        if citation_element['type'] == 'AUTH':
+            return re.findall('[a-zA-Z]{4,}', citation_element['auth_txt'])
+    return []
+
+def find_substring_ignore_special_chars(s, substr):
+    s = s.upper()
+    substr = substr.upper()
+    clean_s, subs_in_s = re.subn('[^A-Z0-9]', '', s)
+    clean_substr, subs_in_substr = re.subn('[^A-Z0-9]', '', substr)
+    startIndex = clean_s.find(clean_substr)
+    if startIndex != -1:
+        i = 0
+        re_alphanum = re.compile('[A-Z0-9]')
+        for real_index, char in enumerate(s):
+            if re_alphanum.match(char):
+                i += 1
+            if i > startIndex:
+                break
+
+        return real_index
+    else:
+        return -1
+
+def cut_substring_with_special_chars(s, sub, startIndex):
+    counter = 0
+    subPosition = 0
+    s_Upper = s.upper()
+    sub = sub.upper()
+    clean_sub = re.sub('[^A-Z0-9]', '', sub)
+    for char in s_Upper[startIndex:]:
+        if char == clean_sub[subPosition]:
+            subPosition += 1
+        counter += 1
+        #end of substrin reached?
+        if subPosition >= len(clean_sub):
+            #include everything till a space, open bracket or a normal character
+            counter += len(re.split('[ [{(a-zA-Z0-9]',s[startIndex+counter:],1)[0])
+
+            return s[0:startIndex].strip()+ ' ' +s[startIndex+counter:].strip()
+
+def is_unknown_citation(citation):
+    """Checks if the citation got recognized as one of the known types.
+    """
+    knownTypes = ['BOOK', 'JOURNAL', 'DOI', 'ISBN', 'RECID']
+    for citation_element in citation:
+        if citation_element['type'] in knownTypes:
+            return False
+    return True
 
 def parse_references_elements(ref_sect, kbs):
     """Passed a complete reference section, process each line and attempt to
@@ -866,6 +1127,13 @@ def parse_tagged_reference_line(line_marker,
                                     cur_misc_txt,
                                     'publisher')
 
+        elif tag_type == "COLLABORATION":
+            identified_citation_element, processed_line, cur_misc_txt = \
+                map_tag_to_subfield(tag_type,
+                                    processed_line[tag_match_end:],
+                                    cur_misc_txt,
+                                    'collaboration')
+
         if identified_citation_element:
             # Append the found tagged data and current misc text
             citation_elements.append(identified_citation_element)
@@ -1029,30 +1297,7 @@ def get_plaintext_document_body(fpath, keep_layout=False):
     return (textbody, status)
 
 
-def build_xml_references(citations):
-    """Build marc xml from a references list
-
-    Transform the reference elements into marc xml
-    """
-    xml_references = []
-
-    for c in citations:
-        # Now, run the method which will take as input:
-        # 1. A list of lists of dictionaries, where each dictionary is a piece
-        # of citation information corresponding to a tag in the citation.
-        # 2. The line marker for this entire citation line (mulitple citation
-        # 'finds' inside a single citation will use the same marker value)
-        # The resulting xml line will be a properly marked up form of the
-        # citation. It will take into account authors to try and split up
-        # references which should be read as two SEPARATE ones.
-        xml_lines = build_xml_citations(c['elements'],
-                                        c['line_marker'])
-        xml_references.extend(xml_lines)
-
-    return xml_references
-
-
-def parse_references(reference_lines, recid=1, kbs_files=None):
+def parse_references(reference_lines, recid=None, kbs_files=None):
     """Parse a list of references
 
     Given a list of raw reference lines (list of strings),
@@ -1061,9 +1306,9 @@ def parse_references(reference_lines, recid=1, kbs_files=None):
     # RefExtract knowledge bases
     kbs = get_kbs(custom_kbs_files=kbs_files)
     # Identify journal titles, report numbers, URLs, DOIs, and authors...
-    (processed_references, counts, dummy_bad_titles_count) = \
+    processed_references, counts, dummy_bad_titles_count = \
                                 parse_references_elements(reference_lines, kbs)
     # Generate marc xml using the elements list
-    xml_out = build_xml_references(processed_references)
+    fields = build_references(processed_references)
     # Generate the xml string to be outputted
-    return create_xml_record(counts, recid, xml_out)
+    return build_record(counts, fields, recid=recid)

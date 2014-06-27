@@ -547,6 +547,14 @@ class WordTable:
         write_message("%s fetching existing words for records #%d-#%d ended" % \
                 (self.tablename, low, high), verbose=3)
 
+    def check_bad_words(self):
+        """
+        Finds bad words in reverse tables. Returns the number of bad words.
+        """
+        query = """SELECT count(1) FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" % (self.tablename[:-1])
+        res = run_sql(query)
+        return res[0][0]
+
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. rnkWORD01R) for
         interesting states such as 'TEMPORARY' state.
@@ -560,56 +568,27 @@ class WordTable:
         else:
             nb_words = 0
 
-        # find number of records:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR""" % (self.tablename[:-1])
-        res = run_sql(query, None, 1)
-        if res:
-            nb_records = res[0][0]
-        else:
-            nb_records = 0
-
         # report stats:
-        write_message("%s contains %d words from %d records" % (self.tablename, nb_words, nb_records))
+        write_message("%s contains %d words" % (self.tablename, nb_words))
 
         # find possible bad states in reverse tables:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
-        res = run_sql(query)
-        if res:
-            nb_bad_records = res[0][0]
-        else:
-            nb_bad_records = 999999999
-        if nb_bad_records:
-            write_message("EMERGENCY: %s needs to repair %d of %d index records" % \
-                (self.tablename, nb_bad_records, nb_records))
+        nb_bad_words = self.check_bad_words()
+        if nb_bad_words:
+            write_message("EMERGENCY: %s needs to repair %d of %d index records" %
+                          (self.tablename, nb_bad_words, nb_words))
         else:
             write_message("%s is in consistent state" % (self.tablename))
-
-        return nb_bad_records
 
     def repair(self):
         """Repair the whole table"""
         # find possible bad states in reverse tables:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR WHERE type <> 'CURRENT'""" % (self.tablename[:-1])
-        res = run_sql(query, None, 1)
-        if res:
-            nb_bad_records = res[0][0]
-        else:
-            nb_bad_records = 0
-
-        # find number of records:
-        query = """SELECT COUNT(DISTINCT(id_bibrec)) FROM %sR""" % (self.tablename[:-1])
-        res = run_sql(query)
-        if res:
-            nb_records = res[0][0]
-        else:
-            nb_records = 0
-
-        if nb_bad_records == 0:
+        if self.check_bad_words() == 0:
             return
-        query = """SELECT id_bibrec FROM %sR WHERE type <> 'CURRENT' ORDER BY id_bibrec""" \
+
+        query = """SELECT id_bibrec FROM %sR WHERE type in ('TEMPORARY','FUTURE')""" \
                 % (self.tablename[:-1])
-        res = run_sql(query)
-        recIDs = create_range_list([row[0] for row in res])
+        res = intbitset(run_sql(query))
+        recIDs = create_range_list(list(res))
 
         flush_count = 0
         records_done = 0

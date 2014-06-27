@@ -73,6 +73,7 @@ bibdocfile command line tool.</p>
     <tr> <td>Shift+l</td> <td>Clone</td> <td>Clone the record.</td> </tr>
     <tr> <td>Shift+t</td> <td>Tags</td> <td>Toggle MARC/human tags.</td> </tr>
     <tr> <td>a</td> <td>Add field</td> <td>Add a new, empty field.</td> </tr>
+    <tr> <td>s</td> <td>Open first field</td> <td>Opens first field for editing.</td> </tr>
     <tr> <td>Del</td> <td>Delete selected</td> <td>Deletes all selected
 	fields.</td> </tr>
   </tbody>
@@ -97,6 +98,21 @@ bibdocfile command line tool.</p>
   </thead>
   <tbody>
     <tr> <td>Esc</td> <td>Cancel</td> <td>Cancel edition of subfield</td> </tr>
+    <tr> <td>Ctrl+*</td> <td>Jump next</td> <td>Jump to next marc field</td> </tr>
+    <tr> <td>Ctrl+/</td> <td>Jump previous</td> <td>Jump to previous marc field</td> </tr>
+  </tbody>
+</table>
+
+<h4>Display modes</h4>
+<table border="1" width="600px">
+  <thead>
+    <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
+  </thead>
+  <tbody>
+    <tr> <td>Ctrl+Shift+r</td> <td>References</td> <td>Display only references</td> </tr>
+    <tr> <td>Ctrl+Shift+a</td> <td>Authors</td> <td>Display only authors</td> </tr>
+    <tr> <td>Ctrl+Shift+o</td> <td>Others</td> <td>Display only other fields</td> </tr>
+    <tr> <td>Ctrl+Shift+d</td> <td>All</td> <td>Display all fields</td> </tr>
   </tbody>
 </table>
 
@@ -106,9 +122,9 @@ bibdocfile command line tool.</p>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
-    <tr> <td>alt+s</td> <td>Selection mode</td> <td>Toggle selection mode.</td> </tr>
     <tr> <td>Ctrl+Shift+z</td> <td>Undo</td> <td>Undo last action.</td> </tr>
     <tr> <td>Ctrl+Shift+y</td> <td>Redo</td> <td>Redo last action.</td> </tr>
+    <tr> <td>Shift+p</td> <td>Open PDF</td> <td>Open attached PDF</td> </tr>
   </tbody>
 </table>
 

@@ -43,8 +43,6 @@ It is possible to enqueue a BibTask via API call by means of
 task_low_level_submission.
 """
 
-__revision__ = "$Id$"
-
 import getopt
 import getpass
 import marshal
@@ -61,19 +59,30 @@ import logging.handlers
 import random
 
 from flask import current_app
+from intbitset import intbitset
 from socket import gethostname
 
 from invenio.legacy.dbquery import run_sql, _db_login
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.config import CFG_BINDIR, CFG_LOGDIR, \
-    CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_PREFIX, \
+                           CFG_BINDIR, \
+                           CFG_BIBSCHED_PROCESS_USER, \
+                           CFG_TMPDIR, \
+                           CFG_SITE_SUPPORT_EMAIL, \
+                           CFG_VERSION, \
+                           CFG_BIBSCHED_FLUSH_LOGS
 from invenio.ext.logging import register_exception
 
 from invenio.modules.access.local_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.legacy.webuser import get_user_preferences, get_email
-from invenio.legacy.bibsched.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
-    CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
+from invenio.legacy.bibsched.bibtask_config import (
+    CFG_BIBTASK_VALID_TASKS,
+    CFG_BIBTASK_DEFAULT_TASK_SETTINGS,
+    CFG_BIBTASK_FIXEDTIMETASKS,
+    CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS,
+    CFG_BIBSCHED_LOGDIR,
+    CFG_BIBTASK_LOG_FORMAT)
 from invenio.utils.date import parse_runtime_limit
 from invenio.utils.shell import escape_shell_arg
 from invenio.ext.email import send_email
@@ -82,27 +91,7 @@ from invenio.legacy.bibsched.cli import bibsched_set_host, \
 
 
 # Global _TASK_PARAMS dictionary.
-_TASK_PARAMS = {
-        'version': '',
-        'task_stop_helper_fnc': None,
-        'task_name': os.path.basename(sys.argv[0]),
-        'task_specific_name': '',
-        'task_id': 0,
-        'user': '',
-        # If the task is not initialized (usually a developer debugging
-        # a single method), output all messages.
-        'verbose': 9,
-        'sleeptime': '',
-        'runtime': time.strftime("%Y-%m-%d %H:%M:%S"),
-        'priority': 0,
-        'runtime_limit': None,
-        'profile': [],
-        'post-process': [],
-        'sequence-id':None,
-        'stop_queue_on_error': False,
-        'fixed_time': False,
-        'email_logs_to': [],
-        }
+_TASK_PARAMS = dict(CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS)
 
 # Global _OPTIONS dictionary.
 _OPTIONS = {}
@@ -110,6 +99,15 @@ _OPTIONS = {}
 # Which tasks don't need to ask the user for authorization?
 CFG_VALID_PROCESSES_NO_AUTH_NEEDED = ("bibupload", )
 CFG_TASK_IS_NOT_A_DEAMON = ("bibupload", )
+
+
+class RecoverableError(StandardError):
+    pass
+
+class InvalidParams(StandardError):
+    def __init__(self, err=None):
+        self.err = err
+        StandardError.__init__(self)
 
 def fix_argv_paths(paths, argv=None):
     """Given the argv vector of cli parameters, and a list of path that
@@ -124,6 +122,31 @@ def fix_argv_paths(paths, argv=None):
             if path == argv[count]:
                 argv[count] = os.path.abspath(path)
     return argv
+
+
+def get_sleeptime(argv):
+    """Try to get the runtime by analysing the arguments."""
+    sleeptime = ""
+    argv = list(argv)
+    while True:
+        try:
+            opts, dummy_args = getopt.gnu_getopt(argv, 's:', ['sleeptime='])
+        except getopt.GetoptError, err:
+            ## We remove one by one all the non recognized parameters
+            if len(err.opt) > 1:
+                argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+            else:
+                argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+        else:
+            break
+    for opt in opts:
+        if opt[0] in ('-s', '--sleeptime'):
+            try:
+                sleeptime = opt[1]
+            except ValueError:
+                pass
+    return sleeptime
+
 
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
@@ -150,7 +173,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'P:', ['priority='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'P:', ['priority='])
             except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -173,7 +196,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'N:', ['name='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'N:', ['name='])
             except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -193,7 +216,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 't:', ['runtime='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 't:', ['runtime='])
             except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -210,36 +233,13 @@ def task_low_level_submission(name, user, *argv):
                     pass
         return runtime
 
-    def get_sleeptime(argv):
-        """Try to get the runtime by analysing the arguments."""
-        sleeptime = ""
-        argv = list(argv)
-        while True:
-            try:
-                opts, args = getopt.gnu_getopt(argv, 's:', ['sleeptime='])
-            except getopt.GetoptError as err:
-                ## We remove one by one all the non recognized parameters
-                if len(err.opt) > 1:
-                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
-                else:
-                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
-            else:
-                break
-        for opt in opts:
-            if opt[0] in ('-s', '--sleeptime'):
-                try:
-                    sleeptime = opt[1]
-                except ValueError:
-                    pass
-        return sleeptime
-
     def get_sequenceid(argv):
         """Try to get the sequenceid by analysing the arguments."""
         sequenceid = None
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
             except getopt.GetoptError as err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -255,6 +255,29 @@ def task_low_level_submission(name, user, *argv):
                 except ValueError:
                     pass
         return sequenceid
+
+    def get_host(argv):
+        """Try to get the sequenceid by analysing the arguments."""
+        host = ''
+        argv = list(argv)
+        while True:
+            try:
+                opts, dummy_args = getopt.gnu_getopt(argv, '', ['host='])
+            except getopt.GetoptError as err:
+                ## We remove one by one all the non recognized parameters
+                if len(err.opt) > 1:
+                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+                else:
+                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+            else:
+                break
+        for opt in opts:
+            if opt[0] in ('--host',):
+                try:
+                    host = opt[1]
+                except ValueError:
+                    pass
+        return host
 
     task_id = None
     try:
@@ -272,6 +295,7 @@ def task_low_level_submission(name, user, *argv):
         runtime = get_runtime(argv)
         sleeptime = get_sleeptime(argv)
         sequenceid = get_sequenceid(argv)
+        host = get_host(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
 
         if special_name:
@@ -280,10 +304,11 @@ def task_low_level_submission(name, user, *argv):
         verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
 
         ## submit task:
-        task_id = run_sql("""INSERT INTO schTASK (proc,user,
+        task_id = run_sql("""INSERT INTO schTASK (proc,host,user,
             runtime,sleeptime,status,progress,arguments,priority,sequenceid)
-            VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
-            (name, user, runtime, sleeptime, verbose_argv[:254], marshal.dumps(argv), priority, sequenceid))
+            VALUES (%s,%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
+            (name, host, user, runtime, sleeptime, verbose_argv,
+             marshal.dumps(argv), priority, sequenceid))
 
     except Exception:
         register_exception(alert_admin=True)
@@ -313,53 +338,127 @@ def bibtask_allocate_sequenceid(curdir=None):
             access = fd.readline().strip()
             fd.close()
             return access.replace("_", "")[-9:]
-        except:
+        except (IOError, OSError):
             return 0
     else:
         return random.randrange(1, 4294967296)
 
 
-def setup_loggers(task_id=None):
-    """Sets up the logging system."""
-    logger = logging.getLogger()
-    for handler in logger.handlers:
-        ## Let's clean the handlers in case some piece of code has already
-        ## fired any write_message, i.e. any call to debug, info, etc.
-        ## which triggered a call to logging.basicConfig()
-        logger.removeHandler(handler)
-    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
-    if task_id is not None:
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
-        log_logger.setFormatter(formatter)
-        log_logger.setLevel(logging.DEBUG)
-        err_logger.setFormatter(formatter)
-        err_logger.setLevel(logging.WARNING)
-        logger.addHandler(err_logger)
-        logger.addHandler(log_logger)
+def task_log_path(task_id, log_type):
+    """Returns the path to the log files of given task
+
+    Args:
+     - task_id
+     - log_type: either 'log' or 'err' to indiciate which type of log we want
+    """
+    sub_dir = str(task_id / 10000)
+    dest_dir = os.path.join(CFG_BIBSCHED_LOGDIR, sub_dir)
+
+    return os.path.join(dest_dir, 'bibsched_task_%d.%s' % (task_id, log_type))
+
+
+def get_and_create_task_log_path(task_id, log_type):
+    """Returns and creates the path to the log files of given task
+
+    @see task_log_path
+    """
+    log_dest = task_log_path(task_id, log_type)
+
+    # log_dest and err_dest are in the same folder
+    dest_dir = os.path.dirname(log_dest)
+    try:
+        os.makedirs(dest_dir)
+    except OSError, e:
+        # If directory already exists, ignore error
+        if e.errno != 17:
+            raise
+
+    return log_dest
+
+
+def create_logfiles_handlers(task_id, formatter):
+    """Create log handlers to write into tasks log files
+
+    Args:
+     - task_id
+     - Formatter is an instance of logging.Formatter
+    Returns:
+     - log handler for standard log
+     - log handler for error log
+    """
+    std_dest = get_and_create_task_log_path(task_id, 'log')
+    err_dest = get_and_create_task_log_path(task_id, 'err')
+
+    std_logger = logging.handlers.RotatingFileHandler(std_dest, 'a', 5*1024*1024, 10)
+    err_logger = logging.handlers.RotatingFileHandler(err_dest, 'a', 5*1024*1024, 10)
+
+    std_logger.setFormatter(formatter)
+    err_logger.setFormatter(formatter)
+
+    std_logger.setLevel(logging.DEBUG)
+    err_logger.setLevel(logging.WARNING)
+
+    return std_logger, err_logger
+
+
+def create_streams_handlers(formatter):
+    """Create log handlers to print to stdout/stderr
+
+    Args:
+     - Formatter is an instance of logging.Formatter
+    Returns:
+     - log handler for standard log
+     - log handler for error log
+    """
     stdout_logger = logging.StreamHandler(sys.stdout)
     stdout_logger.setFormatter(formatter)
     stdout_logger.setLevel(logging.DEBUG)
+
     stderr_logger = logging.StreamHandler(sys.stderr)
     stderr_logger.setFormatter(formatter)
     stderr_logger.setLevel(logging.WARNING)
-    logger.addHandler(stderr_logger)
+
+    return stdout_logger, stderr_logger
+
+
+def setup_loggers(task_id=None):
+    """Sets up the logging system."""
+    logger = logging.getLogger()
+
+    # Let's clean the handlers in case some piece of code has already
+    # fired any write_message, i.e. any call to debug, info, etc.
+    # which triggered a call to logging.basicConfig()
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
+
+    formatter = logging.Formatter(*CFG_BIBTASK_LOG_FORMAT)
+
+    # Log files
+    if task_id is not None:
+        log_logger, err_logger = create_logfiles_handlers(task_id, formatter)
+        logger.addHandler(err_logger)
+        logger.addHandler(log_logger)
+
+    # Stream handlers
+    stdout_logger, stderr_logger = create_streams_handlers(formatter)
     logger.addHandler(stdout_logger)
+    logger.addHandler(stderr_logger)
+
+    # Default log level
     logger.setLevel(logging.INFO)
     return logger
 
 
-def task_init(
-    authorization_action="",
-    authorization_msg="",
-    description="",
-    help_specific_usage="",
-    version=__revision__,
-    specific_params=("", []),
-    task_stop_helper_fnc=None,
-    task_submit_elaborate_specific_parameter_fnc=None,
-    task_submit_check_options_fnc=None,
-    task_run_fnc=None):
+def task_init(authorization_action="",
+              authorization_msg="",
+              description="",
+              help_specific_usage="",
+              version=CFG_VERSION,
+              specific_params=("", []),
+              task_stop_helper_fnc=None,
+              task_submit_elaborate_specific_parameter_fnc=None,
+              task_submit_check_options_fnc=None,
+              task_run_fnc=None):
     """ Initialize a BibTask.
     @param authorization_action: is the name of the authorization action
     connected with this task;
@@ -395,11 +494,12 @@ def task_init(
         "sequence-id": None,
         "stop_queue_on_error": False,
         "fixed_time": False,
+        "host": '',
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         _TASK_PARAMS['task_id'] = int(sys.argv[1])
-        argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
+        argv = task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
         to_be_submitted = False
     else:
         argv = sys.argv
@@ -419,11 +519,23 @@ def task_init(
         # where stored in DB and _OPTIONS dictionary was stored instead.
         _OPTIONS = argv
     else:
+        _OPTIONS = {}
+        if task_name in CFG_BIBTASK_DEFAULT_TASK_SETTINGS:
+            _OPTIONS.update(CFG_BIBTASK_DEFAULT_TASK_SETTINGS[task_name])
+
         try:
-            _task_build_params(_TASK_PARAMS['task_name'], argv, description,
-                help_specific_usage, version, specific_params,
-                task_submit_elaborate_specific_parameter_fnc,
-                task_submit_check_options_fnc)
+            params = _task_build_params(_TASK_PARAMS['task_name'],
+                                argv, specific_params,
+                                task_submit_elaborate_specific_parameter_fnc,
+                                task_submit_check_options_fnc)
+        except InvalidParams, e:
+            if e.err:
+                err_msg = str(e.err)
+            else:
+                err_msg = ""
+            _usage(1, err_msg,
+                   help_specific_usage=help_specific_usage,
+                   description=description)
         except (SystemExit, Exception) as err:
             if not to_be_submitted:
                 register_exception(alert_admin=True)
@@ -432,9 +544,19 @@ def task_init(
                 task_update_status("ERROR")
             raise
 
+        _TASK_PARAMS.update(params)
+
     write_message('argv=%s' % (argv, ), verbose=9)
     write_message('_OPTIONS=%s' % (_OPTIONS, ), verbose=9)
     write_message('_TASK_PARAMS=%s' % (_TASK_PARAMS, ), verbose=9)
+
+    if params.get('display_help'):
+        _usage(0, help_specific_usage=help_specific_usage, description=description)
+
+    if params.get('display_version'):
+        print(_TASK_PARAMS["version"])
+        sys.exit(0)
+
 
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
@@ -479,7 +601,7 @@ def task_init(
                                 profile_dump.append(strstream.getvalue())
                         profile_dump = '\n'.join(profile_dump)
                         profile_dump += '\nYou can use profile=%s' % existing_sorts
-                        open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
+                        open(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
                         os.remove(filename)
                     except ImportError:
                         ret = _task_run(task_run_fnc)
@@ -489,25 +611,31 @@ def task_init(
                 if not ret:
                     write_message("Error occurred.  Exiting.", sys.stderr)
             except Exception as e:
+                # We want to catch all exceptions here because:
+                # We set the task status to error and we want to display
+                # an error traceback
+                if isinstance(e, SystemExit) and e.code == 0:
+                    raise
                 register_exception(alert_admin=True)
                 write_message("Unexpected error occurred: %s." % e, sys.stderr)
                 write_message("Traceback is:", sys.stderr)
                 write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
                 write_message("Exiting.", sys.stderr)
-                task_update_status("ERROR")
+                if task_get_task_param('stop_queue_on_error'):
+                    task_update_status("ERROR")
+                elif isinstance(e, RecoverableError) and task_get_task_param('email_logs_to'):
+                    task_update_status("ERRORS REPORTED")
+                else:
+                    task_update_status("CERROR")
         finally:
             _task_email_logs()
             logging.shutdown()
 
-def _task_build_params(
-    task_name,
-    argv,
-    description="",
-    help_specific_usage="",
-    version=__revision__,
-    specific_params=("", []),
-    task_submit_elaborate_specific_parameter_fnc=None,
-    task_submit_check_options_fnc=None):
+def _task_build_params(task_name,
+                       argv,
+                       specific_params=("", []),
+                       task_submit_elaborate_specific_parameter_fnc=None,
+                       task_submit_check_options_fnc=None):
     """ Build the BibTask params.
     @param argv: a list of string as in sys.argv
     @param description: is the generic description printed in the usage page;
@@ -519,11 +647,7 @@ def _task_build_params(
     @param task_submit_check_options: must check the validity of options (via
     bibtask_get_option) once all the options where parsed;
     """
-    global _OPTIONS
-    _OPTIONS = {}
-
-    if task_name in CFG_BIBTASK_DEFAULT_TASK_SETTINGS:
-        _OPTIONS.update(CFG_BIBTASK_DEFAULT_TASK_SETTINGS[task_name])
+    params = {}
 
     # set user-defined options:
     try:
@@ -545,56 +669,65 @@ def _task_build_params(
                 "stop-on-error",
                 "continue-on-error",
                 "fixed-time",
-                "email-logs-to="
+                "email-logs-to=",
+                "host=",
             ] + long_params)
     except getopt.GetoptError as err:
-        _usage(1, err, help_specific_usage=help_specific_usage, description=description)
+        raise InvalidParams(err)
     try:
         for opt in opts:
             if opt[0] in ("-h", "--help"):
-                _usage(0, help_specific_usage=help_specific_usage, description=description)
+                params["display_help"] = True
+                break
             elif opt[0] in ("-V", "--version"):
-                print(_TASK_PARAMS["version"])
-                sys.exit(0)
+                params["display_version"] = True
+                break
             elif opt[0] in ("-u", "--user"):
-                _TASK_PARAMS["user"] = opt[1]
+                params["user"] = opt[1]
             elif opt[0] in ("-v", "--verbose"):
-                _TASK_PARAMS["verbose"] = int(opt[1])
+                params["verbose"] = int(opt[1])
             elif opt[0] in ("-s", "--sleeptime"):
                 if task_name not in CFG_TASK_IS_NOT_A_DEAMON:
                     get_datetime(opt[1]) # see if it is a valid shift
-                    _TASK_PARAMS["sleeptime"] = opt[1]
+                    params["sleeptime"] = opt[1]
             elif opt[0] in ("-t", "--runtime"):
-                _TASK_PARAMS["runtime"] = get_datetime(opt[1])
+                params["runtime"] = get_datetime(opt[1])
             elif opt[0] in ("-P", "--priority"):
-                _TASK_PARAMS["priority"] = int(opt[1])
+                params["priority"] = int(opt[1])
             elif opt[0] in ("-N", "--name"):
-                _TASK_PARAMS["task_specific_name"] = opt[1]
+                params["task_specific_name"] = opt[1]
             elif opt[0] in ("-L", "--limit"):
-                _TASK_PARAMS["runtime_limit"] = parse_runtime_limit(opt[1])
+                params["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
-                _TASK_PARAMS["profile"] += opt[1].split(',')
+                params.setdefault("profile", []).extend(opt[1].split(','))
             elif opt[0] in ("--post-process", ):
-                _TASK_PARAMS["post-process"] += [opt[1]]
-            elif opt[0] in ("-I","--sequence-id"):
-                _TASK_PARAMS["sequence-id"] = opt[1]
+                params.setdefault("post-process", []).append(opt[1])
+            elif opt[0] in ("-I", "--sequence-id"):
+                params["sequence-id"] = opt[1]
             elif opt[0] in ("--stop-on-error", ):
-                _TASK_PARAMS["stop_queue_on_error"] = True
+                params["stop_queue_on_error"] = True
             elif opt[0] in ("--continue-on-error", ):
-                _TASK_PARAMS["stop_queue_on_error"] = False
+                params["stop_queue_on_error"] = False
             elif opt[0] in ("--fixed-time", ):
-                _TASK_PARAMS["fixed_time"] = True
+                params["fixed_time"] = True
             elif opt[0] in ("--email-logs-to",):
-                _TASK_PARAMS["email_logs_to"] = opt[1].split(',')
+                params["email_logs_to"] = opt[1].split(',')
+            elif opt[0] in ("--host",):
+                params["host"] = opt[1]
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
-                    opt[1], opts, args):
-                _usage(1, help_specific_usage=help_specific_usage, description=description)
+                                                                 opt[1],
+                                                                 opts,
+                                                                 args):
+                raise InvalidParams()
     except StandardError as e:
-        _usage(e, help_specific_usage=help_specific_usage, description=description)
+        raise InvalidParams(e)
+
     if callable(task_submit_check_options_fnc):
         if not task_submit_check_options_fnc():
-            _usage(1, help_specific_usage=help_specific_usage, description=description)
+            raise InvalidParams()
+
+    return params
 
 def task_set_option(key, value):
     """Set an value to key in the option dictionary of the task"""
@@ -644,7 +777,7 @@ def task_update_progress(msg):
     write_message("Updating task progress to %s." % msg, verbose=9)
     if "task_id" in _TASK_PARAMS:
         return run_sql("UPDATE schTASK SET progress=%s where id=%s",
-            (msg, _TASK_PARAMS["task_id"]))
+            (msg[:255], _TASK_PARAMS["task_id"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
@@ -659,7 +792,7 @@ def task_read_status():
         (_TASK_PARAMS['task_id'],), 1)
     try:
         out = res[0][0]
-    except:
+    except IndexError:
         out = 'UNKNOWN'
     return out
 
@@ -691,7 +824,11 @@ def write_message(msg, stream=None, verbose=1):
     else:
         logging.debug(msg)
 
-_RE_SHIFT = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+    if CFG_BIBSCHED_FLUSH_LOGS:
+        for handler in logging.root.handlers:
+            handler.flush()
+
+_RE_SHIFT = re.compile(r"([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S", now=None):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
@@ -723,7 +860,7 @@ def task_sleep_now_if_required(can_stop_too=False):
     if status == 'ABOUT TO SLEEP':
         write_message("sleeping...")
         task_update_status("SLEEPING")
-        signal.signal(signal.SIGTSTP, _task_sig_dumb)
+        signal.signal(signal.SIGTSTP, cb_task_sig_dumb)
         os.kill(os.getpid(), signal.SIGSTOP)
         time.sleep(1)
         if task_read_status() == 'NOW STOP':
@@ -737,23 +874,13 @@ def task_sleep_now_if_required(can_stop_too=False):
         else:
             write_message("... continuing...")
             task_update_status("CONTINUING")
-        signal.signal(signal.SIGTSTP, _task_sig_sleep)
+        signal.signal(signal.SIGTSTP, cb_task_sig_sleep)
     elif status == 'ABOUT TO STOP':
         if can_stop_too:
             write_message("stopped")
             task_update_status("STOPPED")
             sys.exit(0)
-        else:
-            ## I am a capricious baby. At least I am going to sleep :-)
-            write_message("sleeping...")
-            task_update_status("SLEEPING")
-            signal.signal(signal.SIGTSTP, _task_sig_dumb)
-            os.kill(os.getpid(), signal.SIGSTOP)
-            time.sleep(1)
-            ## Putting back the status to "ABOUT TO STOP"
-            write_message("... continuing...")
-            task_update_status("ABOUT TO STOP")
-            signal.signal(signal.SIGTSTP, _task_sig_sleep)
+
     if can_stop_too:
         runtime_limit = task_get_option("limit")
         if runtime_limit is not None:
@@ -761,6 +888,17 @@ def task_sleep_now_if_required(can_stop_too=False):
                 write_message("stopped (outside runtime limit)")
                 task_update_status("STOPPED")
                 sys.exit(0)
+
+def get_modified_records_since(modification_date):
+    """
+    Return the set of modified record since the given
+    modification_date.
+    @param modification_date: Return records modified after this date
+    @type modification_date datetime
+    """
+    results = run_sql("SELECT id FROM bibrec WHERE modification_date >= %s",
+                      (modification_date,))
+    return intbitset(results)
 
 def authenticate(user, authorization_action, authorization_msg=""):
     """Authenticate the user against the user database.
@@ -858,17 +996,19 @@ def _task_submit(argv, authorization_action, authorization_msg):
     write_message("storing task options %s\n" % argv, verbose=9)
     verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
     _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
-                                           runtime,sleeptime,status,progress,arguments,priority,sequenceid)
-                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
+                                           runtime,sleeptime,status,progress,arguments,priority,sequenceid,host)
+                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s,%s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
-         _TASK_PARAMS["sleeptime"], verbose_argv, marshal.dumps(argv), _TASK_PARAMS['priority'], _TASK_PARAMS['sequence-id']))
+         _TASK_PARAMS["sleeptime"], verbose_argv[:255], marshal.dumps(argv),
+         _TASK_PARAMS['priority'], _TASK_PARAMS['sequence-id'],
+         _TASK_PARAMS['host']))
 
     ## update task number:
     write_message("Task #%d submitted." % _TASK_PARAMS['task_id'])
     return _TASK_PARAMS['task_id']
 
 
-def _task_get_options(task_id, task_name):
+def task_get_options(task_id, task_name):
     """Returns options for the task 'id' read from the BibSched task
     queue table."""
     out = {}
@@ -876,8 +1016,8 @@ def _task_get_options(task_id, task_name):
         (task_id, task_name+'%'))
     try:
         out = marshal.loads(res[0][0])
-    except:
-        write_message("Error: %s task %d does not seem to exist." \
+    except ValueError:
+        write_message("Error: %s task %d does not seem to exist."
             % (task_name, task_id), sys.stderr)
         task_update_status('ERROR')
         sys.exit(1)
@@ -897,7 +1037,7 @@ def _task_email_logs():
     task_name = task_get_task_param('task_name')
     task_specific_name = task_get_task_param('task_specific_name')
     if task_specific_name:
-        task_name += ':' + task_specific_name
+        task_name += '%s:%s' % (task_name, task_specific_name)
     runtime = task_get_task_param('runtime')
 
     title = "Execution of %s: %s" % (task_name, status)
@@ -909,9 +1049,31 @@ runtime: %s
 options: %s
 status: %s
 """ % (task_name, _TASK_PARAMS['task_id'], runtime, _OPTIONS, status)
-    err_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id'])
-    log_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id'])
-    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body, attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
+    log_file = task_log_path(_TASK_PARAMS['task_id'], 'log')
+    err_file = task_log_path(_TASK_PARAMS['task_id'], 'err')
+    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body,
+                      attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
+
+
+def get_task_old_runtime(task_params):
+    """Fetch from the database the last time this task ran
+
+    Here we check if the task can shift away or has to be run at a fixed time.
+    """
+    if task_params['fixed_time'] or \
+                        task_params['task_name'] in CFG_BIBTASK_FIXEDTIMETASKS:
+        sql = "SELECT runtime FROM schTASK WHERE id=%s"
+        old_runtime = run_sql(sql, (task_params['task_id'], ))[0][0]
+    else:
+        old_runtime = None
+    return old_runtime
+
+
+def get_task_new_runtime(task_params):
+    """Compute the next time this task should run"""
+    return get_datetime(task_params['sleeptime'],
+                        now=get_task_old_runtime(task_params))
+
 
 def _task_run(task_run_fnc):
     """Runs the task by fetching arguments from the BibSched task queue.
@@ -947,9 +1109,11 @@ def _task_run(task_run_fnc):
         return False
 
     time_now = datetime.datetime.now()
-    if _TASK_PARAMS['runtime_limit'] is not None and os.environ.get('BIBSCHED_MODE', 'manual') != 'manual':
+    if _TASK_PARAMS['runtime_limit'] is not None:
         if not _TASK_PARAMS['runtime_limit'][0][0] <= time_now <= _TASK_PARAMS['runtime_limit'][0][1]:
-            if time_now <= _TASK_PARAMS['runtime_limit'][0][0]:
+            if task_get_option('fixed_time'):
+                new_runtime = get_task_new_runtime(_TASK_PARAMS)
+            elif time_now <= _TASK_PARAMS['runtime_limit'][0][0]:
                 new_runtime = _TASK_PARAMS['runtime_limit'][0][0].strftime("%Y-%m-%d %H:%M:%S")
             else:
                 new_runtime = _TASK_PARAMS['runtime_limit'][1][0].strftime("%Y-%m-%d %H:%M:%S")
@@ -958,7 +1122,7 @@ def _task_run(task_run_fnc):
                 progress = progress[0][0]
             else:
                 progress = ''
-            g =  re.match(r'Postponed (\d+) time\(s\)', progress)
+            g = re.match(r'Postponed (\d+) time\(s\)', progress)
             if g:
                 postponed_times = int(g.group(1))
             else:
@@ -982,12 +1146,12 @@ def _task_run(task_run_fnc):
         bibsched_set_host(_TASK_PARAMS['task_id'], gethostname())
 
     ## initialize signal handler:
-    signal.signal(signal.SIGUSR2, signal.SIG_IGN)
-    signal.signal(signal.SIGTSTP, _task_sig_sleep)
-    signal.signal(signal.SIGTERM, _task_sig_stop)
-    signal.signal(signal.SIGQUIT, _task_sig_stop)
-    signal.signal(signal.SIGABRT, _task_sig_suicide)
-    signal.signal(signal.SIGINT, _task_sig_stop)
+    signal.signal(signal.SIGUSR2, cb_task_sig_debug)
+    signal.signal(signal.SIGTSTP, cb_task_sig_sleep)
+    signal.signal(signal.SIGTERM, cb_task_sig_stop)
+    signal.signal(signal.SIGQUIT, cb_task_sig_stop)
+    signal.signal(signal.SIGABRT, cb_task_sig_suicide)
+    signal.signal(signal.SIGINT, cb_task_sig_stop)
     ## we can run the task now:
     write_message("Task #%d started." % _TASK_PARAMS['task_id'])
     task_update_status("RUNNING")
@@ -996,38 +1160,24 @@ def _task_run(task_run_fnc):
 
     sleeptime = _TASK_PARAMS['sleeptime']
     try:
-        try:
-            if callable(task_run_fnc) and task_run_fnc():
-                task_update_status("DONE")
-            else:
-                task_update_status("DONE WITH ERRORS")
-        except SystemExit:
-            pass
-        except:
-            write_message(traceback.format_exc()[:-1])
-            register_exception(alert_admin=True)
-            if task_get_task_param('stop_queue_on_error'):
-                task_update_status("ERROR")
-            else:
-                task_update_status("CERROR")
+        if callable(task_run_fnc) and task_run_fnc():
+            task_update_status("DONE")
+        elif task_get_task_param('email_logs_to'):
+            task_update_status("ERRORS REPORTED")
+        else:
+            task_update_status("DONE WITH ERRORS")
     finally:
         task_status = task_read_status()
         if sleeptime:
-            argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
+            argv = task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
             verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
 
-            # Here we check if the task can shift away of has to be run at
-            # a fixed time
-            if task_get_task_param('fixed_time') or _TASK_PARAMS['task_name'] in CFG_BIBTASK_FIXEDTIMETASKS:
-                old_runtime = run_sql("SELECT runtime FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))[0][0]
-            else:
-                old_runtime = None
-            new_runtime = get_datetime(sleeptime, now=old_runtime)
+            new_runtime = get_task_new_runtime(_TASK_PARAMS)
 
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=%s WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['host'], _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
                 run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host='' WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
@@ -1096,11 +1246,12 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified\n\t\t\tbibtasklet with the given parameters between square\n\t\t\tbrackets.\n")
     sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr=\n\t\t\t'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',\n\t\t\tcontent='help']\"\n")
     sys.stderr.write("  --email-logs-to=EMAILS Sends an email with the results of the execution\n\t\t\tof the task, and attached the logs (EMAILS could be a comma-\n\t\t\tseparated lists of email addresses)\n")
+    sys.stderr.write("  --host=HOSTNAME Bind the task to the specified host, it will only ever run on that host.\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
 
-def _task_sig_sleep(sig, frame):
+def cb_task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     write_message("task_sig_sleep(), got signal %s frame %s"
@@ -1109,7 +1260,7 @@ def _task_sig_sleep(sig, frame):
     _db_login(relogin=1)
     task_update_status("ABOUT TO SLEEP")
 
-def _task_sig_stop(sig, frame):
+def cb_task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame), verbose=9)
@@ -1117,7 +1268,7 @@ def _task_sig_stop(sig, frame):
     _db_login(relogin=1) # To avoid concurrency with an interrupted run_sql call
     task_update_status("ABOUT TO STOP")
 
-def _task_sig_suicide(sig, frame):
+def cb_task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     write_message("task_sig_suicide(), got signal %s frame %s"
             % (sig, frame), verbose=9)
@@ -1128,11 +1279,21 @@ def _task_sig_suicide(sig, frame):
     task_update_status("SUICIDED")
     sys.exit(1)
 
-def _task_sig_dumb(sig, frame):
+def cb_task_sig_debug(sig, frame):
+    """Signal handler for the 'debug' signal sent by BibSched.
+
+    This spawn a remote console server we can connect to to check
+    the task behavior at runtime."""
+    write_message("task_sig_debug(), got signal %s frame %s"
+            % (sig, frame), verbose=9)
+    from rfoo.utils import rconsole
+    rconsole.spawn_server()
+
+def cb_task_sig_dumb(sig, frame):
     """Dumb signal handler."""
     pass
 
-_RE_PSLINE = re.compile('^\s*(\w+)\s+(\w+)')
+_RE_PSLINE = re.compile(r'^\s*(\w+)\s+(\w+)')
 def guess_apache_process_user_from_ps():
     """Guess Apache process user by parsing the list of running processes."""
     apache_users = []
@@ -1143,7 +1304,7 @@ def guess_apache_process_user_from_ps():
             if g:
                 username = g.group(1)
                 process = os.path.basename(g.group(2))
-                if process in ('apache', 'apache2', 'httpd') :
+                if process in ('apache', 'apache2', 'httpd'):
                     if username not in apache_users and username != 'root':
                         apache_users.append(username)
     except Exception as e:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -425,6 +425,12 @@ def get_mathjax_header(https=False):
             mathjax_path = "http://cdn.mathjax.org/mathjax/2.1-latest"
     else:
         mathjax_path = "/MathJax"
+
+    if cfg['CFG_MATHJAX_RENDERS_MATHML']:
+        mathjax_config = "TeX-AMS-MML_HTMLorMML"
+    else:
+        mathjax_config = "TeX-AMS_HTML"
+
     return """<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$']],
@@ -433,9 +439,10 @@ MathJax.Hub.Config({
   messageStyle: "none"
 });
 </script>
-<script src="%(mathjax_path)s/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+<script src="%(mathjax_path)s/MathJax.js?config=%(mathjax_config)s" type="text/javascript">
 </script>""" % {
-    'mathjax_path': mathjax_path
+    'mathjax_path': mathjax_path,
+    'mathjax_config': mathjax_config,
 }
 
 def is_html_text_editor_installed():

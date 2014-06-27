@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,10 +22,9 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from flask import url_for
-
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, \
+                           CFG_SITE_RECORD, CFG_SITE_URL
 from invenio.legacy.search_engine import guess_primary_collection_of_a_record
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
@@ -34,6 +33,7 @@ from invenio.utils.url import redirect_to_url
 from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
 from invenio.legacy.bibmerge.engine import perform_request_init, \
                                     perform_request_ajax
+from invenio.utils.url import auto_version_url
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_SECURE_URL
@@ -66,10 +66,20 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             json_data = json_unicode_to_utf8(json_data)
             ajax_request = True
             json_response = {}
-            if 'recID1' in json_data:
-                recid1 = json_data['recID1']
-            if 'recID2' in json_data:
-                recid2 = json_data['recID2']
+            try:
+                if json_data.has_key('recID1'):
+                    recid1 = int(json_data['recID1'])
+                    json_data['recID1'] = recid1
+                if json_data.has_key('recID2'):
+                    if json_data.get('record2Mode') == "recid":
+                        recid2 = int(json_data['recID2'])
+                        json_data['recID2'] = recid2
+            except ValueError:
+                json_response.update({'resultCode': 1, 'resultText': 'Invalid record ID!'})
+                return json.dumps(json_response)
+            if json_data.has_key("duplicate"):
+                if json_data.get('record2Mode') == "recid":
+                    json_data["duplicate"] = int(json_data["duplicate"])
 
         # Authorization.
         user_info = collect_user_info(req)
@@ -91,7 +101,8 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         elif self.recid:
             # Handle RESTful call by storing recid and redirecting to
             # generic URL.
-            redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD) )
+            redirect_to_url(req, '%s/%s/merge/' % (CFG_SITE_SECURE_URL,
+                                                   CFG_SITE_RECORD))
 
         if recid1 is not None:
             # Authorize access to record 1.
@@ -113,10 +124,13 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         if not ajax_request:
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
-            metaheaderadd = """<script type="text/javascript" src="%(site)s/js/json2.js"></script>
-  <script type="text/javascript" src="%(url)s"></script>""" % {'site': url_for('merger.static', filename='js/merger/engine.js')}
-            title = 'Record Merger'
-            return page(title         = title,
+
+            scripts = ["json2.js", "merger/engine.js"]
+            metaheaderadd = ""
+            for script in scripts:
+                metaheaderadd += '<script type="text/javascript" src="%s/%s"></script>' % (CFG_SITE_URL, auto_version_url("js/" + script))
+
+            return page(title         = 'Record Merger',
                         metaheaderadd = metaheaderadd,
                         body          = body,
                         errors        = errors,

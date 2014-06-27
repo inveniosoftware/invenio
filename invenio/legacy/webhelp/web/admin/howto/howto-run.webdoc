@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -70,7 +70,17 @@ $ bibsort -s5m
 </blockquote>
 </p>
 
-<p>It is imperative to have the above five tasks permanently in your
+<p>Note that if you are using virtual index facility, such as for
+the <em>global</em> index, then you should schedule them apart:
+
+<blockquote>
+<pre>
+$ bibindex -w global -f50000 -s5m
+</pre>
+</blockquote>
+</p>
+
+<p>It is imperative to have the above tasks run permanently in your
 BibSched queue so that newly submitted documents will be processed
 automatically.
 </p>

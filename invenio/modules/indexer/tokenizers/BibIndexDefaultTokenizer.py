@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,11 +34,11 @@ from invenio.legacy.bibindex.engine_utils import latex_formula_re, \
      re_punctuation, \
      re_separators, \
      re_arxiv
-from invenio.modules.indexer.tokenizers.BibIndexTokenizer import BibIndexTokenizer
+from invenio.modules.indexer.tokenizers.BibIndexStringTokenizer import BibIndexStringTokenizer
 
 
 
-class BibIndexDefaultTokenizer(BibIndexTokenizer):
+class BibIndexDefaultTokenizer(BibIndexStringTokenizer):
     """
         It's a standard tokenizer. It is useful for most of the indexes.
         Its behaviour depends on stemming, remove stopwords, remove html markup and remove latex markup parameters.

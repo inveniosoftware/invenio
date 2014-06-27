@@ -44,6 +44,8 @@ def do_upgrade():
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexAuthorCountTokenizer' WHERE name='authorcount'""")
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexJournalTokenizer' WHERE name='journal'""")
     run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexYearTokenizer' WHERE name='year'""")
+    run_sql("""UPDATE idxINDEX SET tokenizer='BibIndexDefaultTokenizer' WHERE tokenizer = ''""")
+
 
 def estimate():
     return 1

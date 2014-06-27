@@ -54,7 +54,7 @@ def extract_references_from_fulltext(fulltext):
         ## No References
         refs = []
         status = 4
-        write_message("* extract_references_from_fulltext: " \
+        write_message("* extract_references_from_fulltext: "
                          "ref_sect_start is None", verbose=2)
     else:
         # If a reference section was found, however weak
@@ -67,7 +67,7 @@ def extract_references_from_fulltext(fulltext):
             # No End to refs? Not safe to extract
             refs = []
             status = 5
-            write_message("* extract_references_from_fulltext: " \
+            write_message("* extract_references_from_fulltext: "
                              "no end to refs!", verbose=2)
         else:
             # If the end of the reference section was found.. start extraction
@@ -76,8 +76,7 @@ def extract_references_from_fulltext(fulltext):
                                        ref_sect_end,
                                        ref_sect_start["title_string"],
                                        ref_sect_start["marker_pattern"],
-                                       ref_sect_start["title_marker_same_line"],
-                                       ref_sect_start["marker"])
+                                       ref_sect_start["title_marker_same_line"])
 
     return refs, status, how_found_start
 
@@ -87,8 +86,7 @@ def get_reference_lines(docbody,
                         ref_sect_end_line,
                         ref_sect_title,
                         ref_line_marker_ptn,
-                        title_marker_same_line,
-                        ref_line_marker):
+                        title_marker_same_line):
     """After the reference section of a document has been identified, and the
        first and last lines of the reference section have been recorded, this
        function is called to take the reference lines out of the document body.
@@ -118,7 +116,7 @@ def get_reference_lines(docbody,
         title_start = docbody[start_idx].find(ref_sect_title)
         if title_start != -1:
             # Set the first line with no title
-            docbody[start_idx] = docbody[start_idx][title_start + \
+            docbody[start_idx] = docbody[start_idx][title_start +
                                                     len(ref_sect_title):]
     elif ref_sect_title is not None:
         # Set the start of the reference section to be after the title line
@@ -131,19 +129,20 @@ def get_reference_lines(docbody,
 
     if ref_sect_title:
         ref_lines = strip_footer(ref_lines, ref_sect_title)
-    if not ref_line_marker or not ref_line_marker.isdigit():
-        ref_lines = strip_pagination(ref_lines)
     # Now rebuild reference lines:
     # (Go through each raw reference line, and format them into a set
     # of properly ordered lines based on markers)
     return rebuild_reference_lines(ref_lines, ref_line_marker_ptn)
 
 
-def strip_pagination(ref_lines):
+def match_pagination(ref_line):
     """Remove footer pagination from references lines"""
-    pattern = ur'\(?\[?\d{0,3}\]?\)?\.?\s*$'
+    pattern = ur'\(?\[?(\d{1,4})\]?\)?\.?\s*$'
     re_footer = re.compile(pattern, re.UNICODE)
-    return [l for l in ref_lines if not re_footer.match(l)]
+    match = re_footer.match(ref_line)
+    if match:
+        return int(match.group(1))
+    return None
 
 
 def strip_footer(ref_lines, section_title):
@@ -179,89 +178,114 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
        @return: (list) of strings - the rebuilt reference section. Each string
         in the list represents a complete reference line.
     """
-    ## initialise some vars:
-    rebuilt_references = []
-    working_ref = []
+    indentation_splitting = False
 
-    strip_before = True
-    if ref_line_marker_ptn is None or \
-           type(ref_line_marker_ptn) not in (str, unicode):
+    # This should be moved the function detecting the pattern!
+    if not ref_line_marker_ptn:
         if test_for_blank_lines_separating_reference_lines(ref_sectn):
-            ## Use blank lines to separate ref lines
+            # Use blank lines to separate ref lines
             ref_line_marker_ptn = ur'^\s*$'
         else:
-            ## No ref line dividers: unmatchable pattern
-            #ref_line_marker_ptn = ur'^A$^A$$'
-            # I am adding a new format, hopefully
-            # this case wasn't useful
+            # No ref line dividers
+            # We are guessing this the format:
             # Reference1
             #      etc
             # Reference2
             #      etc
             # We split when there's no identation
+            indentation_splitting = True
             ref_line_marker_ptn = ur'^[^\s]'
-            strip_before = False
 
     write_message('* references separator %s' % ref_line_marker_ptn, verbose=2)
     p_ref_line_marker = re.compile(ref_line_marker_ptn, re.I|re.UNICODE)
-    # Work backwards, starting from the last 'broken' reference line
+
+    # Start from ref 1
     # Append each fixed reference line to rebuilt_references
-    current_ref = None
-    line_counter = 0
+    # and rebuild references as we go
+    current_ref = 0
+    rebuilt_references = []
+    working_ref = []
 
     def prepare_ref(working_ref):
+        working_ref = working_ref[:CFG_REFEXTRACT_MAX_LINES]
         working_line = ""
-        for l in reversed(working_ref):
-            working_line = join_lines(working_line, l)
+        for l in working_ref:
+            working_line = join_lines(working_line, l.strip())
         working_line = working_line.rstrip()
         return wash_and_repair_reference_line(working_line)
 
-    for line in reversed(ref_sectn):
-        # Try to find the marker for the reference line
-        if strip_before:
-            current_string = line.strip()
-            m_ref_line_marker = p_ref_line_marker.search(current_string)
-        else:
-            m_ref_line_marker = p_ref_line_marker.search(line)
-            current_string = line.strip()
+    lower_case_start = re.compile(ur'[a-z]')
+    continuing_line_markers = re.compile(ur'[,&-]$')
 
-        if m_ref_line_marker and (not current_ref \
-                or current_ref == int(m_ref_line_marker.group('marknum')) + 1):
-            # Reference line marker found! : Append this reference to the
-            # list of fixed references and reset the working_line to 'blank'
-            if current_string != '':
-                ## If it's not a blank line to separate refs
-                working_ref.append(current_string)
-            # Append current working line to the refs list
-            if line_counter < CFG_REFEXTRACT_MAX_LINES:
-                rebuilt_references.append(prepare_ref(working_ref))
+    for line in ref_sectn:
+        # Can't find a good way to distinguish between
+        # pagination and the page number of a journal numeration that
+        # happens to be alone in a new line
+        # m = match_pagination(line)
+        # if m and current_ref and current_ref != m + 1:
+        #     continue
+
+        # Try to find the marker for the reference line
+        m_ref_line_marker = p_ref_line_marker.search(line)
+
+        if m_ref_line_marker:
             try:
-                current_ref = int(m_ref_line_marker.group('marknum'))
+                marknum = int(m_ref_line_marker.group('marknum'))
             except IndexError:
-                pass  # this line doesn't have numbering
-            working_ref = []
-            line_counter = 0
-        elif current_string != u'':
+                marknum = None
+            except ValueError:
+                # If the mark is a unicode character category [Nd],
+                # it is not always convertible to int by int()
+                # We can't use its numerical value, but we still accept it
+                # as numeration
+                pass
+
+            new_line_detected = False
+            if marknum is None or current_ref + 1 == marknum:
+                new_line_detected = True
+            if indentation_splitting:
+                if lower_case_start.match(line.strip()):
+                    new_line_detected = False
+                if working_ref and \
+                       continuing_line_markers.search(working_ref[-1].strip()):
+                    new_line_detected = False
+
+            if new_line_detected:
+                # Reference line marker found! : Append this reference to the
+                # list of fixed references and reset the working_line to 'blank'
+                start = m_ref_line_marker.start()
+                if line[:start]:
+                    # If it's not a blank line to separate refs
+                    # Only append from the start of the marker
+                    # For this case:
+                    # [1] hello
+                    # hello2 [2] foo
+                    working_ref.append(line[:start])
+
+                # Append current working line to the refs list
+                if working_ref:
+                    rebuilt_references.append(prepare_ref(working_ref))
+
+                current_ref = marknum
+                working_ref = []
+                if line[start:]:
+                    working_ref.append(line[start:])
+
+            else:
+                # Our marker does not match the counting
+                # Either we missed one, the author missed one or
+                # it is not a line marker
+                # For now we assume it is not line marker
+                working_ref.append(line)
+
+        elif line:
             # Continuation of line
-            working_ref.append(current_string)
-            line_counter += 1
+            working_ref.append(line)
 
     if working_ref:
         # Append last line
         rebuilt_references.append(prepare_ref(working_ref))
 
-    # A list of reference lines has been built backwards - reverse it:
-    rebuilt_references.reverse()
-
-    # Make sure mulitple markers within references are correctly
-    # in place (compare current marker num with current marker num +1)
-    # rebuilt_references = correct_rebuilt_lines(rebuilt_references, \
-    #                                            p_ref_line_marker)
-
-    # For each properly formated reference line, try to identify cases
-    # where there is more than one citation in a single line. This is
-    # done by looking for semi-colons, which could be used to
-    # separate references
     return rebuilt_references
 
 
@@ -325,7 +349,7 @@ def test_for_blank_lines_separating_reference_lines(ref_sect):
     # Now from the number of blank lines & the number of text lines, if
     # num_lines > 3, & num_blanks = num_lines, or num_blanks = num_lines - 1,
     # then we have blank line separators between reference lines
-    if (num_lines > 3) and ((num_blanks == num_lines) or \
+    if (num_lines > 3) and ((num_blanks == num_lines) or
                             (num_blanks == num_lines - 1)) and \
                             (multi_nonblanks_found):
         blank_line_separators = 1

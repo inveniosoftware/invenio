@@ -31,7 +31,8 @@ class TestGetEmergencyRecipients(InvenioTestCase):
         """errorlib - test return of proper set of recipients"""
         from invenio.legacy.bibsched.cli import get_emergency_recipients
 
-        now = datetime.datetime.today()
+        now = datetime.datetime(year=2000, month=1, day=20,
+                                hour=14, minute=0)
         tomorrow = now + datetime.timedelta(days=1)
         diff_day = now + datetime.timedelta(days=4)
         later = now.replace(hour=(now.hour + 1) % 24)
@@ -65,15 +66,15 @@ class TestGetEmergencyRecipients(InvenioTestCase):
         constraint_day = "%s" % now.strftime("%A")
         constraint_diff_day = "%s" % diff_day.strftime("%A")
         test_config = {
-            constraint_now:      'now@example.com',
-            constraint_tomorrow: 'tomorrow@example.com',
-            constraint_time:     'time@example.com',
-            constraint_day:      'day@example.com,day@foobar.com',
-            constraint_diff_day: 'diff_day@example.com',
+            constraint_now:       'now@example.com',
+            constraint_tomorrow:  'tomorrow@example.com',
+            constraint_time:      'time@example.com',
+            constraint_day:       'day@example.com,day@foobar.com',
+            constraint_diff_day:  'diff_day@example.com',
             constraint_near_miss: 'near_miss@example.com',
-            '*':                 'fallback@example.com',
+            '*':                  'fallback@example.com',
         }
-        result = get_emergency_recipients(recipient_cfg=test_config)
+        result = get_emergency_recipients(recipient_cfg=test_config, now=now)
         expected = ['now@example.com', 'time@example.com',
                     'day@example.com,day@foobar.com', 'fallback@example.com']
         self.assertEqual(set(result), set(expected))

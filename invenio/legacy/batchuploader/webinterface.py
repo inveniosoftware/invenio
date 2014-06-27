@@ -36,7 +36,7 @@ from invenio.legacy.webpage import page
 from invenio.legacy.batchuploader.engine import metadata_upload, cli_upload, \
      get_user_metadata_uploads, get_user_document_uploads, document_upload, \
      get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record, \
-     user_authorization, perform_upload_check
+     user_authorization, perform_upload_check, _transform_input_to_marcxml
 
 try:
     import invenio.legacy.template
@@ -68,7 +68,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             return cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'], argd['nonce'], argd['special_treatment'])
 
         if component == 'robotupload':
-            if path and path[0] in ('insert', 'replace', 'correct', 'append'):
+            if path and path[0] in ('insert', 'replace', 'correct', 'append', 'insertorreplace'):
                 return restupload, None
             else:
                 return legacyrobotupload, None
@@ -257,6 +257,11 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             redirect_to_url(req, "%s/batchuploader/metadata"
             % (CFG_SITE_SECURE_URL))
 
+        metafile = argd['metafile'].value
+        if argd['filetype'] != 'marcxml':
+            metafile = _transform_input_to_marcxml(file_input=metafile)
+
+
         date = argd['submit_date'] not in ['yyyy-mm-dd', ''] \
                 and argd['submit_date'] or ''
         time = argd['submit_time'] not in ['hh:mm:ss', ''] \
@@ -266,10 +271,10 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
         skip_simulation = argd['skip_simulation'] == "skip"
         if not skip_simulation:
-            errors_upload = perform_upload_check(argd['metafile'].value, argd['mode'])
+            errors_upload = perform_upload_check(metafile, argd['mode'])
 
         body = batchuploader_templates.tmpl_display_confirm_page(argd['ln'],
-                                                                 argd['metafile'], argd['filetype'], argd['mode'], date,
+                                                                 metafile, argd['filetype'], argd['mode'], date,
                                                                  time, argd['filename'], argd['priority'], errors_upload,
                                                                  skip_simulation, argd['email_logs_to'])
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,6 +31,7 @@ create_Indico_request_url = lazy_import('invenio.utils.url:create_Indico_request
 create_html_link = lazy_import('invenio.utils.url:create_html_link')
 create_html_mailto = lazy_import('invenio.utils.url:create_html_mailto')
 create_url = lazy_import('invenio.utils.url:create_url')
+get_relative_url = lazy_import('invenio.utils.url:get_relative_url')
 make_canonical_urlargd = lazy_import('invenio.utils.url:make_canonical_urlargd')
 rewrite_to_secure_url = lazy_import('invenio.utils.url:rewrite_to_secure_url')
 same_urls_p = lazy_import('invenio.utils.url:same_urls_p')
@@ -314,11 +315,36 @@ class TestEmailObfuscationMode(InvenioTestCase):
                          {'CFG_SITE_URL': CFG_SITE_URL})
 
 
+
+class TestRelativeURL(InvenioTestCase):
+    """Tests the get_relative_url function with different input strings"""
+
+    def test_relative_url(self):
+        """urlutils - test get_relative_url"""
+        url_normal = "http://web.net"
+        self.assertEqual("", get_relative_url(url_normal))
+
+        url_normal_trailing = "http://web.net/"
+        self.assertEqual("", get_relative_url(url_normal_trailing))
+
+        url_more = "http://web.net/asd"
+        self.assertEqual("/asd", get_relative_url(url_more))
+
+        url_more_trailing = "http://web.net/asd/"
+        self.assertEqual("/asd", get_relative_url(url_more_trailing))
+
+        url_adv = "http://web.net/asd/qwe"
+        self.assertEqual("/asd/qwe", get_relative_url(url_adv))
+
+        url_adv_trailing = "http://web.net/asd/qwe/"
+        self.assertEqual("/asd/qwe", get_relative_url(url_adv_trailing))
+
 TEST_SUITE = make_test_suite(TestWashUrlArgument,
                              TestUrls,
                              TestHtmlLinks,
                              TestEmailObfuscationMode,
-                             TestSecureUrlRewrite)
+                             TestSecureUrlRewrite,
+                             TestRelativeURL)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

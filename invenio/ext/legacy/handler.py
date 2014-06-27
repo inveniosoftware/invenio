@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,6 +51,8 @@ from invenio.legacy.webuser import get_preferred_user_language, isGuestUser, \
     getUid, isUserSuperAdmin, collect_user_info, setUid
 from invenio.legacy.wsgi.utils import StringField
 from invenio.modules import apikeys as web_api_key
+from invenio.legacy.wsgi.utils import StringField
+from invenio.modules.access.engine import acc_authorize_action
 
 
 ## The following variable is True if the installation make any difference

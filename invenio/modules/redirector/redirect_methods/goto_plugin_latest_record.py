@@ -26,7 +26,7 @@ from invenio.config import CFG_SITE_NAME, CFG_SITE_RECORD
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 
-def goto(cc=CFG_SITE_NAME, p='', f='', sf='', so='d', docname='', format=''):
+def goto(cc=CFG_SITE_NAME, p='', f='', sf='date', so='d', docname='', format=''):
     """
     Redirect the user to the latest record in the given collection,
     optionally within the specified pattern and field. If docname
@@ -37,8 +37,9 @@ def goto(cc=CFG_SITE_NAME, p='', f='', sf='', so='d', docname='', format=''):
     """
     recids = perform_request_search(cc=cc, p=p, f=f, sf=sf, so=so)
     if recids:
-        ## We shall take the last recid. This is the last one
-        recid = recids[-1]
+        # The first is the most recent because they are sorted by date
+        # descending.
+        recid = recids[0]
         url = '/%s/%s' % (CFG_SITE_RECORD, recid)
         if format:
             bibrecdocs = BibRecDocs(recid)

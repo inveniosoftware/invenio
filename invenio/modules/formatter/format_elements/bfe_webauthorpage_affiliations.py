@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,8 @@
 """
 
 from cgi import escape
-import pickle
+from invenio.legacy.webauthorprofile.config import serialize
+
 
 def format_element(bfo):
     """
@@ -32,17 +33,14 @@ def format_element(bfo):
     recid = bfo.recID
 
     for f in fields + fields2:
-        if 'a' in f:
-            if 'u' in f:
-                u = f['u']
-            else:
-                u = ''
+        if 'a' in f and 'u' in f and f['u']:
+            u = f['u']
             try:
-                dic[f['a']] += u
+                dic[f['a']].append(u)
             except KeyError:
                 dic[f['a']] = [u]
 
-    return pickle.dumps([recid, dic])
+    return serialize([recid, dic])
 
 #    for field in fields:
 #        if field.has_key('a') and field.has_key('u'):

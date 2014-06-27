@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,7 +34,6 @@ if sys.hexversion < 0x2040000:
 
 from six import iteritems
 
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from invenio.utils.url import create_html_link
 
 CFG_CERN_LICENSE_URL = 'http://copyright.cern.ch/'

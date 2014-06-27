@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import urllib2, time, os, sys, re
+import time, os, sys, re
 from invenio.config import CFG_TMPDIR, \
                            CFG_PLOTEXTRACTOR_SOURCE_BASE_URL, \
                            CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER, \
@@ -26,13 +26,14 @@ from invenio.config import CFG_TMPDIR, \
 from .config import CFG_PLOTEXTRACTOR_DESY_BASE, \
                                          CFG_PLOTEXTRACTOR_DESY_PIECE
 from invenio.legacy.search_engine import get_record
+from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.legacy.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 from invenio.utils.shell import run_shell_command
 from .output_utils import write_message
-from invenio.utils.url import make_invenio_opener
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.utils.filedownload import download_url, InvenioFileDownloadError
 
-PLOTEXTRACTOR_OPENER = make_invenio_opener('plotextractor')
 
 PDF_EXTENSION = '.pdf'
 
@@ -230,16 +231,23 @@ def get_list_of_all_matching_files(basedir, filetypes):
 
     return file_paths
 
-def tarballs_by_recids(recids, sdir):
+def tarballs_by_recids(recids, sdir, docname=None, doctype=None, docformat=None):
     """
     Take a string representing one recid or several and get the associated
-    tarballs for those ids.
+    tarballs for those ids. By default look for files with names matching
+    the report number and with source field 'arXiv'. This can be changed
+    with C{docname}, C{doctype}, C{docformat}
 
     @param: recids (string): the record id or ids
     @param: sdir (string): where the tarballs should live
-
+    @param docname: select tarball for given recid(s) that match docname
+    @param doctype: select tarball for given recid(s) that match doctype
+    @param docformat: select tarball for given recid(s) that match docformat
     @return: tarballs ([string, string, ...]): locations of tarballs
     """
+    if not recids:
+        return []
+
     list_of_ids = []
 
     if ',' in recids:
@@ -258,16 +266,34 @@ def tarballs_by_recids(recids, sdir):
             low, high = recid.split('-')
             list_of_ids = range(int(low), int(high))
         else:
-            list_of_ids = int(recid)
+            list_of_ids = [int(recids)]
 
     arXiv_ids = []
-
+    local_files = []
     for recid in list_of_ids:
         rec = get_record(recid)
-        for afieldinstance in record_get_field_instances(rec, tag='037'):
-            if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
-                arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
-                arXiv_ids.append(arXiv_id)
+        if not doctype and not docname and not docformat:
+            for afieldinstance in record_get_field_instances(rec, tag='037'):
+                if len(field_get_subfield_values(afieldinstance, '9')) > 0:
+                    if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
+                        arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
+                        arXiv_ids.append(arXiv_id)
+        else:
+            bibarchive = BibRecDocs(recid)
+            all_files = bibarchive.list_latest_files()
+            if doctype:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_type() == doctype]
+            if docname:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_name() == docname]
+            if docformat:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_format() == docformat]
+            local_files.extend([(docfile.get_path(), recid) for docfile in all_files])
+
+    if doctype or docname or docformat:
+        return local_files
 
     return tarballs_by_arXiv_id(arXiv_ids, sdir)
 
@@ -321,7 +347,10 @@ def parse_and_download(infile, sdir):
             # hurray!
             url = line
             filename = url.split('/')[-1]
-            if not download(url, tardir, filename):
+            abs_path = os.path.join(tardir, filename)
+            if not download_url(url=url,
+                                content_type='tar',
+                                download_to_file=abs_path):
                 write_message(filename + ' may already exist')
                 write_message(sys.exc_info()[0])
             filename = os.path.join(tardir, filename)
@@ -363,13 +392,25 @@ def harvest_single(single, to_dir, selection=("tarball", "pdf")):
         abs_path = os.path.join(individual_dir, individual_file)
         tarball = abs_path
         pdf = abs_path + '.pdf'
-        write_message('download ' + url_for_file + ' to ' + abs_path)
-        if "tarball" in selection and not download(url_for_file, individual_file, individual_dir):
-            write_message('download of tarball failed/skipped')
+
+        try:
+            if "tarball" in selection:
+                write_message('downloading ' + url_for_file + ' to ' + tarball)
+                tarball = download_url(url=url_for_file,
+                                       content_type='tar',
+                                       download_to_file=tarball)
+        except InvenioFileDownloadError:
             tarball = None
-        if "pdf" in selection and not download(url_for_pdf, individual_file + '.pdf', individual_dir):
-            write_message('download of pdf failed/skipped')
+
+        try:
+            if "pdf" in selection:
+                write_message('downloading ' + url_for_pdf + ' to ' + pdf)
+                pdf = download_url(url=url_for_pdf,
+                                   content_type="pdf",
+                                   download_to_file=pdf)
+        except InvenioFileDownloadError:
             pdf = None
+
         return (tarball, pdf)
 
     elif single.find('arXiv') > -1 and CFG_PLOTEXTRACTOR_SOURCE_BASE_URL != '':
@@ -396,8 +437,14 @@ def harvest_single(single, to_dir, selection=("tarball", "pdf")):
         elif CFG_PLOTEXTRACTOR_SOURCE_BASE_URL.startswith('http') and "tarball" in selection:
             url_for_file = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + single
             individual_file = os.path.join(to_dir, single)
-            download(url_for_file, individual_file, to_dir)
-            return (individual_file, None)
+            abs_path = os.path.join(to_dir, individual_file)
+            try:
+                abs_path = download_url(url=url_for_file,
+                                        content_type='tar',
+                                        download_to_file=abs_path)
+            except InvenioFileDownloadError:
+                abs_path = None
+            return (abs_path, None)
 
         # well, I don't know what to do with it
         else:
@@ -422,10 +469,15 @@ def harvest_single(single, to_dir, selection=("tarball", "pdf")):
         url_for_file = CFG_PLOTEXTRACTOR_DESY_BASE + year + \
                        CFG_PLOTEXTRACTOR_DESY_PIECE + id_no
         individual_file = id_no
-        write_message('download ' + url_for_file + ' to ' + \
-                os.path.join(individual_dir, individual_file))
-        download(url_for_file, individual_file, individual_dir)
-        return (None, individual_file)
+        abs_path = os.path.join(individual_dir, individual_file)
+        write_message('download ' + url_for_file + ' to ' + abs_path)
+        try:
+            abs_path = download_url(url=url_for_file,
+                                    content_type='pdf',
+                                    download_to_file=abs_path)
+        except InvenioFileDownloadError:
+            abs_path = None
+        return (None, abs_path)
     write_message('END')
     return (None, None)
 
@@ -531,14 +583,17 @@ def old_URL_harvest(from_date, to_date, to_dir, area):
 
             full_url = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER + \
                        area[URL] + next_to_harvest
-            if not download(full_url, \
-                area[AREA_STRING_INDEX] + next_to_harvest, individual_dir):
+            abs_path = os.path.join(individual_dir, area[AREA_STRING_INDEX] + next_to_harvest)
+            if not download_url(url=full_url,
+                                content_type='tar',
+                                download_to_file=abs_path):
                 break
             full_pdf_url = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER + \
                            area[URL] + next_to_harvest
-            download(full_pdf_url, \
-                area[AREA_STRING_INDEX] + next_to_harvest + PDF_EXTENSION, \
-                individual_dir)
+            abs_path = os.path.join(individual_dir, area[AREA_STRING_INDEX] + next_to_harvest + PDF_EXTENSION)
+            download_url(url=full_pdf_url,
+                         content_type='pdf',
+                         download_to_file=abs_path)
             time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT)
         if yearmonthindex % 100 == 12:
            # we reached the end of the year!
@@ -585,49 +640,21 @@ def new_URL_harvest(from_date, from_index, to_dir):
 
             full_url = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_TARBALL_FOLDER + \
                        next_to_harvest
-            if not download(full_url, ARXIV_HEADER + next_to_harvest, \
-                individual_dir):
+            abs_path = os.path.join(individual_dir, ARXIV_HEADER + next_to_harvest)
+            if not download_url(url=full_url,
+                                content_type='tar',
+                                download_to_file=abs_path):
                 break
 
             full_pdf_url = CFG_PLOTEXTRACTOR_SOURCE_BASE_URL + CFG_PLOTEXTRACTOR_SOURCE_PDF_FOLDER + \
                            next_to_harvest
-            download(full_pdf_url, \
-                ARXIV_HEADER + next_to_harvest + PDF_EXTENSION, \
-                individual_dir)
+            abs_path = os.path.join(individual_dir, ARXIV_HEADER + next_to_harvest + PDF_EXTENSION)
+            download_url(url=full_pdf_url,
+                         content_type='pdf',
+                         download_to_file=abs_path)
             time.sleep(CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT) # be nice to remote server
 
         if yearmonthindex % 100 == 12:
             # we reached the end of the year!
             yearmonthindex = yearmonthindex + FIX_FOR_YEAR_END
         yearmonthindex = yearmonthindex + 1
-
-def download(url, filename, to_dir):
-    """
-        Actually does the call and download given a URL and desired output
-        filename.
-
-        @param: url (string): where the file lives on the interwebs
-        @param: filename (string): where the file should live after download
-        @param: to_dir (string): the dir where our new files will live
-
-        @output: a file in to_dir
-
-        @return: True on success, False on failure
-    """
-    new_file = os.path.join(to_dir, filename)
-
-    try:
-        conn = PLOTEXTRACTOR_OPENER.open(url)
-        response = conn.read()
-        conn.close()
-        new_file_fd = open(new_file, 'w')
-        new_file_fd.write(response)
-        new_file_fd.close()
-        write_message('Downloaded to ' + new_file)
-        return True
-    except (IOError, urllib2.URLError) as e:
-        # this could be a permissions error, but it probably means that
-        # there's nothing left in that section YYMM
-        write_message('Error downloading from %s: \n%s\n' % (url, str(e)))
-        return False
-

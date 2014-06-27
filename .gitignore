@@ -2,6 +2,7 @@
 *.cmucl.core
 *.fas
 *.fasl
+*.kdev4
 *.kdevelop
 *.kdevses
 *.lib
@@ -11,6 +12,7 @@
 *.x86f
 *~
 .coverage
+.kdev4/
 .noseids
 .project
 .pydevproject

@@ -58,7 +58,7 @@ UNDESIRABLE_CHAR_REPLACEMENTS = {
         u'\uFFFB' : u"",
         u'\uFFFC' : u"",
         u'\uFEFF' : u"",
-        # Remove the result of an bad UTF-8 character
+        # Remove the result of a bad UTF-8 character
         u'\uFFFF' : u"",
         # Language Tag Code Points:
         u"\U000E0000" : u"",
@@ -379,6 +379,11 @@ UNDESIRABLE_CHAR_REPLACEMENTS = {
         u'\u0060I' : u'\u00CC',
         u'\u0060O' : u'\u00D2',
         u'\u0060U' : u'\u00D9',
+        u'a´': u'á',
+        u'i´': u'í',
+        u'e´': u'é',
+        u'u´': u'ú',
+        u'o´': u'ó',
         # \02C7 : caron
         u'\u02C7C' : u'\u010C',
         u'\u02C7c' : u'\u010D',
@@ -392,6 +397,7 @@ UNDESIRABLE_CHAR_REPLACEMENTS = {
         # \030 : cedilla
         u'\u0327c' : u'\u00E7',
         u'\u0327C' : u'\u00C7',
+        u'¸c': u'ç',
         # \02DC : tilde
         u'\u02DCn' : u'\u00F1',
         u'\u02DCN' : u'\u00D1',
@@ -400,7 +406,18 @@ UNDESIRABLE_CHAR_REPLACEMENTS = {
         u'\u02DCa' : u'\u00E3',
         u'\u02DCA' : u'\u00C3',
         u'\u02DCs' : u'\u0303s',  # Combining tilde with 's'
-    }
+        # Circumflex accent (caret accent)
+        u'aˆ': u'â',
+        u'iˆ': u'î',
+        u'eˆ': u'ê',
+        u'uˆ': u'û',
+        u'oˆ': u'ô',
+        u'ˆa': u'â',
+        u'ˆi': u'î',
+        u'ˆe': u'ê',
+        u'ˆu': u'û',
+        u'ˆo': u'ô',
+}
 
 UNDESIRABLE_STRING_REPLACEMENTS = [
     (u'\u201c ', '"'),
@@ -415,6 +432,7 @@ def replace_undesirable_characters(line):
     @return: (string) the text line after the bad characters have been
                       replaced.
     """
+    # These are separate because we want a particular order
     for bad_string, replacement in UNDESIRABLE_STRING_REPLACEMENTS:
         line = line.replace(bad_string, replacement)
 
