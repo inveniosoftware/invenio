@@ -963,7 +963,8 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
             test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
-                                  expected_text="[96, 92, 88, 81, 74, 72, 67, 54, 53, 52, 51, 50, 48, 46, 17, 11, 10, 9]"))
+                                  expected_text=[],
+                                  unexpected_text="[96, 92, 88, 81, 74, 72, 71, 67, 55, 54, 53, 52, 51, 50, 48, 47, 46, 44, 18, 17, 16, 14, 13, 12, 11, 10, 9, 8]"))
 
     def test_wildcard_limit_correctly_not_active(self):
         """websearch - wildcard limit is not active when there is no wildcard query"""
