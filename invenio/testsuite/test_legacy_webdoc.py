@@ -136,7 +136,7 @@ class WebDocVariableReplacementTest(InvenioTestCase):
 
         # ?ln=.. is returned only if not cfg['CFG_SITE_LANG']
         result = transform('<lang:link />', languages=[cfg['CFG_SITE_LANG']])
-        self.assertEqual(result[0][1], '')
+        self.assertEqual(result[0][1], '?ln=%s' % cfg['CFG_SITE_LANG'])
 
         result = transform('<lang:link />', languages=['fr'])
         self.assertEqual(result[0][1], '?ln=fr')
