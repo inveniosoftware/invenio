@@ -75,8 +75,8 @@ class Record(SmartJson):
         record_sql = RecordModel.query.get(recid)
         if record_sql is None or blob is None:
             return None
-        additional_info = record_sql_model.additional_info \
-            if record_sql_model.additional_info \
+        additional_info = record_sql.additional_info \
+            if record_sql.additional_info \
             else {'master_format': 'marc'}
         record = cls.create(blob, **additional_info)
         record['modification_date'] = record_sql.modification_date
