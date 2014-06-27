@@ -169,5 +169,6 @@ def register_manager(manager):
     from invenio.ext.collect import collect
     collect.init_script(manager)
 
-    from invenio.ext.assets import command
+    from invenio.ext.assets import command, bower
     manager.add_command("assets", command)
+    manager.command(bower)

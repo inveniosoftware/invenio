@@ -22,18 +22,6 @@
 from invenio.ext.assets import Bundle
 
 
-jquery = Bundle(
-    "js/jquery.js",
-    "js/jquery.jeditable.mini.js",
-    "js/jquery.tokeninput.js",
-    "js/bootstrap.js",
-    "js/hogan.js",
-    "js/translate.js",
-    output="gen/jquery.js",
-    filters="uglifyjs",
-    name="10-jquery.js"
-)
-
 invenio = Bundle(
     "js/invenio.js",
     output="gen/invenio.js",
@@ -62,12 +50,35 @@ styles = Bundle(
 #if config.CFG_WEBSTYLE_TEMPLATE_SKIN != "default":
 #    styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
 
+
+jquery = Bundle(
+    "js/jquery.js",
+    "js/jquery.jeditable.mini.js",
+    "js/jquery.tokeninput.js",
+    "js/bootstrap.js",
+    "js/hogan.js",
+    "js/translate.js",
+    output="gen/jquery.js",
+    filters="uglifyjs",
+    name="10-jquery.js",
+    bower={
+        "jquery": "2.1.0",
+        "bootstrap": "3.2.0",
+        "hogan": "3.0.0",
+        "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
+        "jquery.tokeninput": "*"
+    }
+)
+
 # if ASSETS_DEBUG and not LESS_RUN_IN_DEBUG
 lessjs = Bundle(
     "js/less.js",
     output="gen/less.js",
     filters="uglifyjs",
-    name="00-less.js"
+    name="00-less.js",
+    bower={
+        "less": "1.7.0"
+    }
 )
 
 # if ASSETS_DEBUG and not REQUIRESJS_RUN_IN_DEBUG
@@ -76,7 +87,10 @@ requirejs = Bundle(
     "js/settings.js",
     output="gen/require.js",
     filters="uglifyjs",
-    name="00-require.js"
+    name="00-require.js",
+    bower={
+        "requirejs": "latest"
+    }
 )
 # else
 almondjs = Bundle(
@@ -84,5 +98,8 @@ almondjs = Bundle(
     "js/settings.js",
     output="gen/almond.js",
     filters="uglifyjs",
-    name="00-require.almond.js"
+    name="00-require.almond.js",
+    bower={
+        "almond": "latest"
+    }
 )

@@ -39,17 +39,41 @@ Additional extensions and functions for the `flask.ext.assets` module.
 """
 
 import six
+import pkg_resources
 from webassets.bundle import is_url
-from flask import current_app
+from flask import current_app, json
 from flask.ext.assets import Environment, FlaskResolver
 
 from .extensions import BundleExtension, CollectionExtension
+from .registry import bundles
 from .wrappers import Bundle, Command
 
 
-__all__ = ("setup_app", "command", "registry", "Bundle")
+__all__ = ("bower", "bundles", "command", "setup_app", "Bundle")
 
 command = Command()
+
+
+def bower():
+    """Generate a bower.json file.
+
+    It comes with default values for the ignore. Name and version are set to
+    be invenio's.
+
+    """
+    output = {
+        "name": "invenio",
+        "version": pkg_resources.get_distribution("invenio").version,
+        "ignore": [".jshintrc", "**/*.txt"],
+        "dependencies": {},
+    }
+
+    for pkg, bundle in bundles:
+        if bundle.bower:
+            current_app.logger.info((pkg, bundle.bower))
+        output['dependencies'].update(bundle.bower)
+
+    print(json.dumps(output, indent=4))
 
 
 class InvenioResolver(FlaskResolver):

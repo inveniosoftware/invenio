@@ -30,9 +30,11 @@ from werkzeug.utils import import_string
 class Bundle(BundleBase):
 
     """
-    Bundle extension with a name.
+    Bundle extension with a name and bower dependencies.
 
     The name is only used for assets ordering and requirements.
+
+    The bower dependencies are used to generate a bower.json file.
     """
 
     def __init__(self, *contents, **options):
@@ -41,8 +43,11 @@ class Bundle(BundleBase):
 
         :param name: name of the bundle
         :type name: str
+        :param bower: bower dependencies
+        :type bower: dict
         """
         self.name = options.pop("name", None)
+        self.bower = options.pop("bower", {})
         super(Bundle, self).__init__(*contents, **options)
 
         # ease the bundle modification
