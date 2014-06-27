@@ -36,7 +36,6 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 lang_english_configured = True
 lang_slovak_configured = True
 
-
 def format_timestamp(t):
     return t.strftime("%Y-%m-%d %H:%M:%S")
 
@@ -91,13 +90,10 @@ class ConvertIntoDateGUITest(InvenioTestCase):
     if lang_slovak_configured:
         def test_convert_good_to_dategui_sk(self):
             """dateutils - conversion of good text date into Slovak GUI date"""
-            from invenio.base.i18n import gettext_set_language
-            ln = 'sk'
-            _ = gettext_set_language(ln)
             datetext = "2006-07-16 18:36:01"
-            dategui_sk_expected = "16 %s 2006, 18:36" % _('Jul')
+            dategui_sk_expected = "16 júl 2006, 18:36"
             dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                               ln=ln)
+                                                               ln='sk')
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
     if lang_english_configured:
@@ -155,21 +151,21 @@ class ConvertDateStructIntoGUI(InvenioTestCase):
     if lang_slovak_configured:
         def test_convert_datestruct_to_dategui_sk(self):
             expected = '16 júl 2005, 15:11'
-            struct = struct_time((2005, 7, 16, 15, 11, 44, 2, 320, 0))
+            struct = struct_time((2005, 7, 16, 15, 11, 44, 2, 320, 1))
             result = dateutils.convert_datestruct_to_dategui(struct, "sk")
             self.assertEqual(expected, result)
 
         def test_convert_incomplete_datestruct_to_dategui_sk(self):
-                expected = 'nepríst.'
-                struct = struct_time((0, 11, 16, 15, 11, 44, 2, 320, 0))
-                result = dateutils.convert_datestruct_to_dategui(struct, "sk")
-                self.assertEqual(expected, result)
+            expected = 'nepríst.'
+            struct = struct_time((0, 11, 16, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "sk")
+            self.assertEqual(expected, result)
 
         def test_convert_buggy_datestruct_to_dategui_sk(self):
-                expected = 'nepríst.'
-                struct = struct_time((-1, 11, 16, 15, 11, 44, 2, 320, 0))
-                result = dateutils.convert_datestruct_to_dategui(struct, "sk")
-                self.assertEqual(expected, result)
+            expected = 'nepríst.'
+            struct = struct_time((-1, 11, 16, 15, 11, 44, 2, 320, 0))
+            result = dateutils.convert_datestruct_to_dategui(struct, "sk")
+            self.assertEqual(expected, result)
 
 
 class ParseRuntimeLimitTest(InvenioTestCase):
