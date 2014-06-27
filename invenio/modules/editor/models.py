@@ -144,6 +144,21 @@ class HstRECORD(db.Model):
     affected_fields = db.Column(db.Text, nullable=True)
 
 
+class BibEDITCACHE(db.Model):
+
+    """Represent a BibEDITCACHE record."""
+
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                          db.ForeignKey(Bibrec.id), autoincrement=False,
+                          nullable=False, primary_key=True)
+    uid = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                    nullable=False, autoincrement=False)
+    data = db.Column(db.iBinary, nullable=False)
+    post_date = db.Column(db.DateTime, nullable=False, index=True)
+    is_active = db.Column(db.TinyInteger(1, unsigned=True),
+                          server_default='1', nullable=False)
+
+
 # GENERATED
 
 class Bib00x(db.Model):
