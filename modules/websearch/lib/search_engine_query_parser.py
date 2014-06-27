@@ -1018,7 +1018,7 @@ class SpiresToInvenioSyntaxConverter:
         def create_replacement_pattern(match):
             """method used for replacement with regular expression"""
             return '(' \
-            + match.group('searchop') + ' ' + match.group('search_content')+ '->9999' \
+            + match.group('searchop') + ' ' + match.group('search_content')+ '->9999-01-01' \
             + ' AND NOT ' + match.group('searchop') + ' ' + match.group('search_content') \
             + ')'
 
