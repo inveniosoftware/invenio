@@ -67,7 +67,7 @@ def index():
     return dict(collection=collection, orphans=orphans)
 
 
-@blueprint.route('/modifycollectiontree', methods=['GET', 'POST'])
+@blueprint.route('/modifycollectiontree', methods=['POST'])
 @login_required
 @permission_required('cfgwebsearch')
 def modifycollectiontree():
@@ -76,13 +76,13 @@ def modifycollectiontree():
     """
 
     # Get the requests parameters
-    id_son = request.args.get('id_son', 0, type=int)
-    id_dad = request.args.get('id_dad', 0, type=int)
-    id_new_dad = request.args.get('id_new_dad', 0, type=int)
-    score = request.args.get('score', 0, type=int)
+    id_son = request.form.get('id_son', 0, type=int)
+    id_dad = request.form.get('id_dad', 0, type=int)
+    id_new_dad = request.form.get('id_new_dad', 0, type=int)
+    score = request.form.get('score', 0, type=int)
     #if id_dad == id_new_dad:
     #    score = score + 1
-    type = request.args.get('type', 'r')
+    type = request.form.get('type', 'r')
 
     # Check if collection exits.
     Collection.query.get_or_404(id_son)
