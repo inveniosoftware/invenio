@@ -1136,6 +1136,8 @@ def cli_cmd_create_apache_conf(conf):
                             'invenio-apache-vhost.conf'
     apache_vhost_ssl_file = apache_conf_dir + os.sep + \
                              'invenio-apache-vhost-ssl.conf'
+    virtual_env = os.environ.get('VIRTUAL_ENV')
+    python_path = 'python-path={0}'.format(sys.path[-1]) if virtual_env else ''
     apache_vhost_body = """\
 AddDefaultCharset UTF-8
 ServerSignature Off
@@ -1174,7 +1176,7 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
-        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000 %(python_path)s
         WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
@@ -1199,6 +1201,7 @@ WSGIRestrictStdout Off
        'directory_www_directive': directory_www_directive,
        'directory_wsgi_directive': directory_wsgi_directive,
        'deflate_directive': deflate_directive,
+       'python_path': python_path
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
