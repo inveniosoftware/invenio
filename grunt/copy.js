@@ -38,9 +38,8 @@ module.exports = {
     },
     less_bootstrap: {
         expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>',
-        src: ['bootstrap/less/*.less'],
+        cwd: '<%= globalConfig.bower_path %>/bootstrap/less/',
+        src: ['*.less', '**/*.less'],
         dest: '<%= globalConfig.installation_path %>/less/bootstrap'
     },
     less_fontawesome: {
