@@ -30,7 +30,7 @@
     "DataTables": "1_9",
     "jquery-flot": "*",
     "form": "https://raw.github.com/malsup/form/master/jquery.form.js",
-    "jquery.hotkeys": "*",
+    "jquery.hotkeys": "http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js",
     "uploadify": "*",
     "json2": "*",
     "prism": "gh-pages",

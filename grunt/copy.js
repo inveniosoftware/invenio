@@ -96,7 +96,6 @@ module.exports = {
             'jquery-flot/excanvas.min.js',
             'jquery-flot/jquery.flot.js',
             'jquery-flot/jquery.flot.selection.js',
-            'jquery.hotkeys/jquery.hotkeys.js',
             'json2/json2.js',
             'prism/prism.js',
             'requirejs/require.js',
@@ -282,6 +281,18 @@ module.exports = {
         rename: function(dest, src) {
             if (src === 'index.js') {
                 return dest + 'jquery.jeditable.mini.js';
+            }
+            return dest + src;
+        }
+    },
+    jqueryhotkeys: {
+        expand: true,
+        cwd: '<%= globalConfig.bower_path %>/jquery.hotkeys/',
+        src: ['index.js'],
+        dest: '<%= globalConfig.installation_path %>/js/',
+        rename: function(dest, src) {
+            if (src === 'index.js') {
+                return dest + 'jquery.hotkeys.js';
             }
             return dest + src;
         }
