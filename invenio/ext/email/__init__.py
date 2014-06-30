@@ -227,7 +227,6 @@ def send_email(fromaddr,
     if type(bccaddr) is not list:
         bccaddr = bccaddr.strip().split(',')
 
-
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
                        html_footer, ln, charset, replytoaddr, attachments,
@@ -335,7 +334,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         headers['Reply-To'] = replytoaddr
     if usebcc:
         headers['Bcc'] = bccaddr
-        kwargs['bcc'] = bccaddr.split(',')
+        kwargs['bcc'] = toaddr.split(',') + bccaddr.split(',')
         kwargs['to'] = ['Undisclosed.Recipients:']
     else:
         kwargs['to'] = toaddr.split(',')
