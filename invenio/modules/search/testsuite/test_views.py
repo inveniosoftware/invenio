@@ -40,14 +40,6 @@ class SearchViewTest(InvenioTestCase):
         response = self.client.get(url_for('search.search'))
         self.assert200(response)
 
-    def test_extended(self):
-        from invenio.legacy.search_engine.summarizer import summarize_records
-        summarize_records(intbitset(range(1, 100)), 'hcs2', 'en')
-
-    def test_xml(self):
-        from invenio.legacy.search_engine.summarizer import summarize_records
-        summarize_records(intbitset(range(1, 100)), 'xcs', 'en')
-
 
 TEST_SUITE = make_test_suite(SearchViewTest)
 
