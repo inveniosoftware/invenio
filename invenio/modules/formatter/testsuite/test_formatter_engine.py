@@ -190,21 +190,21 @@ class FormatElementTest(InvenioTestCase):
         #Test loading incorrect elements
         try:
             element_3 = bibformat_engine.get_format_element("test 3", with_built_in_params=True)
-        except bibformat_engine.InvenioBibFormatError, e:
+        except bibformat_engine.InvenioBibFormatError as e:
             self.assertEqual(str(e), 'Format element test 3 could not be found.')
         else:
             self.fail("Should have raised InvenioBibFormatError")
 
         try:
             element_4 = bibformat_engine.get_format_element("test 4", with_built_in_params=True)
-        except SyntaxError:
-            self.assertEqual(str(e), 'Format element test 3 could not be found.')
+        except bibformat_engine.InvenioBibFormatError as e:
+            self.assertEqual(str(e), 'Format element test 4 could not be found.')
         else:
             self.fail("Should have raised SyntaxError")
 
         try:
             unknown_element = bibformat_engine.get_format_element("TEST_NO_ELEMENT", with_built_in_params=True)
-        except bibformat_engine.InvenioBibFormatError, e:
+        except bibformat_engine.InvenioBibFormatError as e:
             self.assertEqual(str(e), 'Format element TEST_NO_ELEMENT could not be found.')
         else:
             self.fail("Should have raised InvenioBibFormatError")
@@ -243,7 +243,7 @@ class FormatElementTest(InvenioTestCase):
         #Test non existing element
         try:
             non_existing_element = bibformat_engine.get_format_element("BFE_NON_EXISTING_ELEMENT")
-        except bibformat_engine.InvenioBibFormatError, e:
+        except bibformat_engine.InvenioBibFormatError as e:
             self.assertEqual(str(e), 'Format element BFE_NON_EXISTING_ELEMENT could not be found.')
         else:
             self.fail("Should have raised InvenioBibFormatError")
@@ -862,6 +862,7 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(needs_2nd_pass, True)
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
+                                                      xml_record=self.xml_text_2,
                                                       template=result)
         self.assertEqual(out, "helloworld\n")
 
@@ -896,6 +897,7 @@ class FormatTest(InvenioTestCase):
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
                                                       template=result,
+                                                      xml_record=self.xml_text_2,
                                                       ln='en')
         self.assertEqual(out, 'Title en\nhelloworld\n<input type="button" value="Record"/>')
 
@@ -912,6 +914,7 @@ class FormatTest(InvenioTestCase):
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
                                                       template=result,
+                                                      xml_record=self.xml_text_2,
                                                       ln=ln)
         self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="%s"/>' % _('Record'))
 
@@ -983,9 +986,8 @@ class BibFormat2ndPassTest(InvenioTestCase):
         del self.app.extensions['registry']['format_elements']
 
     def test_format_2_passes(self):
-        result = bibformat_engine.format_record(recID=None,
-                                                of="test6",
-                                                xml_record=self.xml_text)
+        from invenio.modules.formatter import format_record
+        result = format_record(recID=None, of="test6", xml_record=self.xml_text)
         self.assertEqual(result, "helloworld\n")
 
 
