@@ -53,6 +53,10 @@ def run(name, input_file, master_format='marc', reader_info={}, **kwargs):
         example char encoding or special characters.
     :type reader_info: dict
     :param kwargs:
+        * force:
+        * pretend:
+        * sync: False by default, if set to True the hole process will be
+        teated synchronously
     """
     signals.uploader_started.send(mode=name,
                                   blob=input_file,
