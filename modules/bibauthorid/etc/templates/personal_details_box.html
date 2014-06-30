@@ -25,7 +25,7 @@
 		</thead>
 		<tbody>
 			{% for institution in (items[:limit] if limit > 0 else items) %}
-			<tr{{ ' class="warning"' if institution.rank == "PHD" }}>
+			<tr>
 				{% if institution.start and institution.end %}
 				<td>{{ institution.start }}&nbsp;&ndash;&nbsp;{{ institution.end }}</td>
 				{% else %}
