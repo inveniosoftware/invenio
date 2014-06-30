@@ -211,12 +211,21 @@ PERSONID_EXTERNAL_IDENTIFIER_MAP = {'Inspire': 'INSPIREID', 'Orcid': 'ORCID'}
 # Priority values are ordered: smallest first and largest last.
 # {} signifies that all identifiers should be displayed.
 # e.g. { "arxiv": 1 } signals arxiv identifiers with highest priority.
-PROFILE_IDENTIFIER_WHITELIST = {}
+PROFILE_IDENTIFIER_WHITELIST = {
+    "bai": 1,
+    "inspire": 2,
+    "orcid": 3,
+    "googlescholar": 4,
+    "arxiv": 5
+}
 
 # Used to define URL mappings for identifiers in lowercase
 # Identifiers will be placed where {} is found in the mapping.
 # e.g. { "orcid": "https://orcid.org/{}"}
-PROFILE_IDENTIFIER_URL_MAPPING = {}
+PROFILE_IDENTIFIER_URL_MAPPING = {
+    "bai": "http://inspirehep.net/author/profile/{}",
+    "orcid": "https://orcid.org/{}"
+}
 
 NON_EMPTY_PERSON_TAGS = ['canonical_name']
 
