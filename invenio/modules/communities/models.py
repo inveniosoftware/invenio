@@ -526,7 +526,7 @@ class Community(db.Model):
 
         c_fmt = CollectionFormat(
             collection=collection,
-            format=fmt,
+            id_format=fmt.id,
         )
         db.session.add(c_fmt)
         return c_fmt
@@ -637,7 +637,7 @@ class Community(db.Model):
                     userrole = ur
 
         if not userrole:
-            userrole = UserAccROLE(user=self.owner, role=role)
+            userrole = UserAccROLE(id_user=self.id_user, role=role)
             db.session.add(userrole)
 
         # Authorization

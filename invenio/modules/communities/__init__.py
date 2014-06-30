@@ -19,8 +19,10 @@
 
 from .receivers import post_handler_database_create
 from invenio.base.scripts.database import create as database_create
+from invenio.base.scripts.database import recreate as database_recreate
 from invenio.base.scripts.demosite import populate as demosite_populate
 from invenio.base.signals import post_command
 
 post_command.connect(post_handler_database_create, sender=database_create)
+post_command.connect(post_handler_database_create, sender=database_recreate)
 post_command.connect(post_handler_database_create, sender=demosite_populate)
