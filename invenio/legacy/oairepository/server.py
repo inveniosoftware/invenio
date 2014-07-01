@@ -96,6 +96,10 @@ CFG_ERRORS = {
     "noSetHierarchy": "The repository does not support sets:"
 }
 
+CFG_MIN_DATE = localtime_to_utc("1970-01-01 00:00:00")
+CFG_MAX_DATE = localtime_to_utc("9999-12-31 23:59:59")
+
+
 def oai_error(argd, errors):
     """
     Return a well-formatted OAI-PMH error
@@ -183,9 +187,9 @@ def get_earliest_datestamp():
     """Get earliest datestamp in the database
     Return empty string if no records or earliest datestamp in UTC.
     """
-    out = ""
+    out = CFG_MIN_DATE
     res = run_sql("SELECT DATE_FORMAT(MIN(creation_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
-    if res:
+    if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
 
@@ -193,9 +197,9 @@ def get_latest_datestamp():
     """Get latest datestamp in the database
     Return empty string if no records or latest datestamp in UTC.
     """
-    out = ""
+    out = CFG_MAX_DATE
     res = run_sql("SELECT DATE_FORMAT(MAX(modification_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
-    if res:
+    if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
 
