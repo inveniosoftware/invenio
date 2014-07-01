@@ -23,8 +23,6 @@
                            + config.CFG_OAUTH1_PROVIDERS * config.CFG_OAUTH1_AUTHENTICATION
                            + config.CFG_OAUTH2_PROVIDERS * config.CFG_OAUTH2_AUTHENTICATION %}
 
-{%- css url_for('webaccount.static', filename='css/accounts/login.css'), '10-login' -%}
-
 {%- macro external_login_button(provider, referer='', icon_size=48,
                                classes="", label="%(provider)s username") %}
 {%- block external_login_button scoped -%}

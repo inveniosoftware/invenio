@@ -70,6 +70,17 @@ jquery = Bundle(
     }
 )
 
+# jQuery UI
+jqueryui = Bundle(
+    "js/jqueryui/jquery-ui.js",
+    filters="uglifyjs",
+    output="gen/jquery-ui.js",
+    name="11-jquery-ui.js",
+    bower={
+        "jqueryui": "1.11.0",
+    }
+)
+
 # if ASSETS_DEBUG and not LESS_RUN_IN_DEBUG
 lessjs = Bundle(
     "js/less.js",

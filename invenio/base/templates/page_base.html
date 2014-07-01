@@ -99,7 +99,7 @@
 
   {%- for bundle in get_bundle('css') -%}
     {%- assets bundle %}
-      <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ ASSET_URL }}"/>
+      <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ url_for("static", filename=ASSET_URL) }}"/>
     {%- endassets %}
   {%- endfor -%}
   {{ css_bundle() }}
@@ -160,7 +160,7 @@
 {%- block _bottom_assets %}
   {%- for bundle in get_bundle('js') -%}
     {%- assets bundle %}
-      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+      <script type="text/javascript" src="{{ url_for("static", filename=ASSET_URL) }}"></script>
     {%- endassets %}
   {%- endfor -%}
   {{ js_bundle() }}

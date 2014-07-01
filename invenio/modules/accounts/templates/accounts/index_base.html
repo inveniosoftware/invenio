@@ -21,6 +21,19 @@
 {% extends "page.html" %}
 {% set title = _('Your Account') %}
 
+{%- block global_bundles -%}
+  {{ super() }}
+  {%- bundles "11-jquery-ui.js" -%}
+{%- endblock -%}
+
+{%- block _top_assets %}
+  {{ super() }}
+  {# FIXME: jQueryUI comes with many linked images and thus is sensitive to
+   # relocation. No bundles for this guy.
+   #}
+  <link rel="stylesheet" type="text/stylesheet" href="{{ url_for("static", filename="js/jqueryui/jquery-ui.css") }}"/>
+{% endblock _top_assets %}
+
 {% block title %}
 <div class="page-header">
   <h1>{{ title }}
@@ -37,9 +50,6 @@
 
 {% block header %}
   {{ super() }}
-  {%- css url_for("static", filename="js/jqueryui/jquery-ui.css") -%}
-  {%- js url_for("static", filename="js/jqueryui/jquery-ui.js") -%}
-
 <style>
 #widgets li .thumbnail {
   background: white;
