@@ -1745,7 +1745,19 @@ var ticketbox = {
  */
 jQuery(function($) {
 
-    function jsBootstraper($el) {
+    var Ticket = ticketbox.module("ticket"),
+        Body = ticketbox.module("body"),
+        app = ticketbox.app,
+        ticketView = new Ticket.View(),
+        bodyView = new Body.View(),
+        $personalDetails = $("#hepdata"),
+        jsBootstrapper =
+        disabledHandler =
+        disableLinks =
+        updater = null;
+
+
+    jsBootstrapper = function jsBootstraper($el) {
         // Check if element selected, non-false
 
         if ($el.html()) {
@@ -1757,35 +1769,24 @@ jQuery(function($) {
                 jQuery.globalEval(data.other);
             }
         }
-    }
+    };
 
-    var disabledHandler = function(event) {
+    disabledHandler = function disabledHandler(event) {
         event.preventDefault();
         return false;
     };
 
-    function disableLinks($el) {
+    disableLinks = function disableLinks($el) {
         $el.attr('disabled', 'disabled');
         $el.live("click", disabledHandler);
-    }
+    };
 
-    // Dependencies
-    var Ticket = ticketbox.module("ticket");
-    var Body = ticketbox.module("body");
-//    var PidSearch = ticketbox.module("PidSearch");
-
-    // Shorthands
-    var app = ticketbox.app;
-
-    // Instantiate
-    var ticketView = new Ticket.View();
-    var bodyView = new Body.View();
 
     // Bootstrap data from server
-    jsBootstraper($("#jsbootstrap"));
+    jsBootstrapper($("#jsbootstrap"));
 
     // Window focus event binding
-    var updater = (function() {
+    updater = (function() {
         app.hasFocus = true;
         $(window).focus(function(event) {
             app.hasFocus = true;
@@ -1802,19 +1803,9 @@ jQuery(function($) {
         });
     })();
 
-    var $personalDetails = $("#hepdata");
     if ($personalDetails) {
       ticketbox.personalDetails($personalDetails);
     }
-
-
-//    // PidSearch test
-//    var searchModel = new PidSearch.SearchModel();
-//    var searchInterface = new PidSearch.SearchInterface({model: searchModel});
-
-    // Debugging references
-//    app.search = searchModel;
-//    app.searchView = searchInterface;
 
 });
 
