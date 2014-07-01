@@ -88,6 +88,8 @@ def profile():
 
 
 @blueprint.route("/profile/lost", methods=['GET', 'POST'])
+@ssl_required
+@login_required
 @register_breadcrumb(
     blueprint, 'breadcrumbs.settings.profile.lost', _('Lost password')
 )
