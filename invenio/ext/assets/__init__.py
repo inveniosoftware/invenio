@@ -38,6 +38,7 @@ Additional extensions and functions for the `flask.ext.assets` module.
     lazy loaded.
 """
 
+import os
 import six
 import pkg_resources
 from webassets.bundle import is_url
@@ -68,9 +69,14 @@ def bower():
         "dependencies": {},
     }
 
+    if os.path.exists("bower.json"):
+        current_app.logger.debug("updating bower.json")
+        with open("bower.json") as f:
+            output = json.load(f)
+
     for pkg, bundle in bundles:
         if bundle.bower:
-            current_app.logger.info((pkg, bundle.bower))
+            current_app.logger.debug((pkg, bundle.bower))
         output['dependencies'].update(bundle.bower)
 
     print(json.dumps(output, indent=4))

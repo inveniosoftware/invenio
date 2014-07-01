@@ -117,8 +117,8 @@ class Command(ManageAssets):
 
         from .registry import bundles
         for pkg, bundle in bundles:
-            current_app.logger.info("{0}: {1.name} -> {1.output}"
-                                    .format(pkg, bundle))
+            current_app.logger.debug("{0}: {1.name} -> {1.output}"
+                                     .format(pkg, bundle))
             self.env.register(bundle.name, bundle)
 
         return super(Command, self).run(args)
