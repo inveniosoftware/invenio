@@ -2500,8 +2500,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                 'connect_author_with_hepname',
                 'connect_author_with_hepname_ajax',
                 'suggest_orcid',
-                'suggest_orcid_ajax',
-                ('contact-us', 'contact_us')]
+                'suggest_orcid_ajax']
 
     def _lookup(self, component, path):
         '''
@@ -2964,54 +2963,6 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     keywords="%s, Internal Error" % BIBAUTHORID_CFG_SITE_NAME,
                     language=ln,
                     req=req)
-
-    def contact_us(self,req, form):
-        argd = wash_urlargd(
-            form,
-            {'ln': (str, CFG_SITE_LANG),
-             'incomplete_params': (str, None)})
-
-        ln = argd['ln']
-        # ln = wash_language(argd['ln'])
-        _ = gettext_set_language(ln)
-
-        incomplete_params = argd['incomplete_params']
-
-        if not CFG_INSPIRE_SITE:
-            return page_not_authorized(req, text=_("This page is not accessible directly."))
-
-        webapi.session_bareinit(req)
-        session = get_session(req)
-        pinfo = session['personinfo']
-
-        name_to_prefill = ''
-        if "user_last_name" in pinfo:
-            name_to_prefill = pinfo["user_last_name"]
-
-        if "user_first_name" in pinfo:
-            name_to_prefill += pinfo["user_first_name"]
-
-        email_to_prefill = ''
-        if "user_email" in pinfo:
-            email_to_prefill = pinfo["user_email"]
-
-        last_page_visited = webapi.history_get_last_visited_url(pinfo['visit_diary'])
-
-        # Create Page Markup
-        page_title = "Contact Us"
-        contact_page = WebProfilePage("profile", page_title)
-        context = {
-            "name_prefill": name_to_prefill,
-            "email_prefill": email_to_prefill,
-            "last_page_visited": last_page_visited
-        }
-        body = contact_page.get_wrapped_body("contact_us", context)
-        return page(title=page_title,
-                    metaheaderadd=contact_page.get_head().encode('utf-8'),
-                    body=body.encode('utf-8'),
-                    req=req,
-                    language=ln,
-                    show_title_p=False)
 
     index = __call__
 

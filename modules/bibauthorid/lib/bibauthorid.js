@@ -1751,8 +1751,11 @@ jQuery(function($) {
         ticketView = new Ticket.View(),
         bodyView = new Body.View(),
         $personalDetails = $("#hepdata"),
+        pathSlugs = window.location.pathname.split('/'),
+        $contactTrigger = $(".contactTrigger"),
         jsBootstrapper =
         disabledHandler =
+        contactModalInit =
         disableLinks =
         updater = null;
 
@@ -1803,8 +1806,76 @@ jQuery(function($) {
         });
     })();
 
+    contactModalInit = function contactModalInit(e) {
+        var bodyModel = ticketbox.app.bodyModel,
+            modalContent = Handlebars.templates.contactModal(),
+            modal =
+            callbacks = null;
+
+        callbacks = {
+            "show.bs.modal": function(e) {
+                var $modal = $("#ticket-modal"),
+                    $form = $("form#contactForm"),
+                    $submit = $("a.submit"),
+                    $successMsg = $(".msg-success"),
+                    $errorMsg = $(".msg-error"),
+                    $defaultMsg = $(".msg-default"),
+                    parsleyObj = null;
+
+                parsleyObj = $form.parsley();
+
+                $submit.click(function (e) {
+                    var isValid = parsleyObj.validate(),
+                        formSerialised = $form.serializeArray();
+
+                    formSerialised.push({name: "send_message", value: ""});
+                    formSerialised.push({name: "last_page_visited", value: window.location.toString()});
+
+                    if (isValid) {
+                        $defaultMsg.toggleClass("hidden", true);
+                        $form.toggleClass("hidden", true);
+                        $.ajax({
+                            url: "/author/claim/action",
+                            action: "POST",
+                            data: formSerialised,
+                            success: function() {
+                                $successMsg.toggleClass("hidden", false);
+                                $errorMsg.toggleClass("hidden", true);
+                                $modal.find(".modal-header>.modal-title").text("Thank You");
+                            },
+                            error: function() {
+                                $successMsg.toggleClass("hidden", true);
+                                $errorMsg.toggleClass("hidden", false);
+                                $modal.find(".modal-header>.modal-title").text("Try again later");
+                            },
+                            complete: function() {
+                                $modal.find(".modal-footer>a.submit").remove();
+                                $modal.find(".modal-footer>a.back").text("Close");
+                            }
+                        });
+                    }
+                    return e.preventDefault();
+                });
+
+            }
+        }
+
+        modal = {
+          prompt: true,
+          shown: false,
+          content: modalContent,
+          callbacks: callbacks
+        };
+        bodyModel.set( { modal: modal } );
+        return e.preventDefault();
+    };
+
     if ($personalDetails) {
       ticketbox.personalDetails($personalDetails);
+    }
+
+    if ($contactTrigger) {
+       $contactTrigger.click(contactModalInit);
     }
 
 });

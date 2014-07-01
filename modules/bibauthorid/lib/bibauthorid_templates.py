@@ -2380,7 +2380,7 @@ This list contains all your publications that were automatically assigned to you
         html_support = _(
             "Please contact our user support in case you need help or you just want to suggest some new ideas. We will get back to you. </br>")
 
-        html_support += '<br><a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (help_link, help_text)
+        html_support += '<br><a rel="nofollow" href="%s" class="btn btn-default contactTrigger">%s</a>' % (help_link, help_text)
         if loading:
             html_support = self.loading_html()
         if add_box:
