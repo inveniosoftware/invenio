@@ -89,13 +89,6 @@ def _include_sqlalchemy(obj, engine=None):
     #        setattr(obj, key,
     #                getattr(module, key))
 
-    def default_enum(f):
-        def decorated(*args, **kwargs):
-            kwargs['native_enum'] = engine == 'mysql'  # False
-            return f(*args, **kwargs)
-        return decorated
-
-    obj.Enum.__init__ = default_enum(obj.Enum.__init__)
     obj.AsBINARY = AsBINARY
     obj.MarshalBinary = MarshalBinary
     obj.PickleBinary = PickleBinary
