@@ -45,6 +45,27 @@ function program3(depth0,data) {
     + "\n\n                </textarea>\n            </div>\n        </div>\n\n    </form>\n\n</div>\n\n\n<div class=\"modal-footer\">\n    <a href=\"#\" data-dismiss=\"modal\" class=\"btn btn-default back\">Go Back</a>\n    <a href=\"#\" class=\"btn btn-primary continue\">Continue</a>\n</div>\n";
   return buffer;
   });
+templates['contactModal'] = template(function (Handlebars,depth0,helpers,partials,data) {
+  this.compilerInfo = [4,'>= 1.0.0'];
+helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, functionType="function", escapeExpression=this.escapeExpression;
+
+
+  buffer += "<div class=\"modal-header\">\n    <h2 class=\"modal-title\">Contact Us</h2>\n</div>\n\n<div class=\"modal-body contactContainer\" data-bai-cname=\"";
+  if (helper = helpers.cname) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.cname); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">\n\n      <div class=\"msg-success hidden\">\n        <p class=\"text-center\"><span class=\"glyphicon glyphicon-send\" style=\"font-size: 3em;\"></span></p>\n        <p class=\"text-center\"><strong>Your message has been sent.</strong></p>\n      </div>\n\n      <div class=\"msg-error hidden\">\n        <p class=\"text-center\"><span class=\"glyphicon glyphicon-ban-circle\" style=\"font-size: 3em;\"></span></p>\n        <p class=\"text-center\"><strong>Your message has not been sent, please try again later.</strong></p>\n      </div>\n\n      <p class=\"msg-default\">If you are having issues with profile related operations, please fill out the contact form\n      below to seek assistance from INSPIRE.</p>\n\n      <form id=\"contactForm\" novalidate=\"novalidate\" role=\"form\" action=\"/author/claim/action\" method=\"POST\">\n        <hr>\n        <!-- Text input-->\n        <div class=\"form-group\">\n            <label class=\"control-label\" for=\"Name\">Full Name</label>\n            <input id=\"Name\" name=\"Name\" placeholder=\"e.g John Smith\" class=\"form-control input-md\" required=\"true\" data-parsley-trigger=\"change keyup focusin focusout\" data-parsley-required-message=\"This field is required.\" data-parsley-minlength=\"2\" data-parsley-minlength-message=\"Your input is too short.\" type=\"text\" value=\"";
+  if (helper = helpers.name_prefill) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.name_prefill); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">\n        </div>\n\n        <!-- Text input-->\n        <div class=\"form-group\">\n            <label class=\"control-label\" for=\"E-mail\">Email</label>\n            <input id=\"E-mail\" name=\"E-mail\" placeholder=\"e.g. john@smith.com\" class=\"form-control input-md\" required=\"true\" data-parsley-trigger=\"change keyup focusin focusout\"\n                   data-parsley-required-message=\"This field is required.\" data-parsley-minlength=\"3\"\n                   data-parsley-type-message=\"Please enter a valid email address.\"\n                   type=\"email\" value=\"";
+  if (helper = helpers.email_prefill) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.email_prefill); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  buffer += escapeExpression(stack1)
+    + "\">\n        </div>\n\n        <!-- Textarea -->\n        <div class=\"form-group\">\n            <label class=\"control-label\" for=\"Comment\">Comments</label>\n            <textarea class=\"form-control\" id=\"Comment\" name=\"Comment\" required=\"true\" data-parsley-trigger=\"change keyup focusin focusout\" data-parsley-minlength=\"3\" data-parsley-maxlength=\"10000\" cols=\"30\" rows=\"10\"></textarea>\n        </div>\n\n      </form>\n\n</div>\n\n<div class=\"modal-footer\">\n    <a href=\"#\" data-dismiss=\"modal\" class=\"btn btn-default back\">Go Back</a>\n    <a href=\"#\" class=\"btn btn-primary submit\">Submit</a>\n</div>\n";
+  return buffer;
+  });
 templates['discardModal'] = template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
