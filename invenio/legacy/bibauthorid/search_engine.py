@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,9 +19,9 @@
 
 """ Author search engine. """
 
-from invenio.legacy.bibauthorid.config import QGRAM_LEN, MATCHING_QGRAMS_PERCENTAGE, \
-        MAX_T_OCCURANCE_RESULT_LIST_CARDINALITY, MIN_T_OCCURANCE_RESULT_LIST_CARDINALITY, \
-        NAME_SCORE_COEFFICIENT
+from .config import QGRAM_LEN, MATCHING_QGRAMS_PERCENTAGE, \
+    MAX_T_OCCURANCE_RESULT_LIST_CARDINALITY, MIN_T_OCCURANCE_RESULT_LIST_CARDINALITY, \
+    NAME_SCORE_COEFFICIENT
 
 from Queue import Queue
 from threading import Thread
@@ -31,9 +31,9 @@ from msgpack import unpackb as deserialize
 
 from invenio.utils.text import translate_to_ascii
 from intbitset import intbitset
-from invenio.bibauthorid_name_utils import create_indexable_name, distance, split_name_parts
-from bibauthorid_dbinterface import get_confirmed_name_to_authors_mapping, get_authors_data_from_indexable_name_ids, get_inverted_lists, \
-                                    set_inverted_lists_ready, set_dense_index_ready, populate_table, search_engine_is_operating
+from .name_utils import create_indexable_name, distance, split_name_parts
+from .dbinterface import get_confirmed_name_to_authors_mapping, get_authors_data_from_indexable_name_ids, get_inverted_lists, \
+                         set_inverted_lists_ready, set_dense_index_ready, populate_table, search_engine_is_operating
 
 
 def get_qgrams_from_string(string, q):
@@ -369,7 +369,7 @@ def find_personids_by_name1(query_string):
         return list()
 
     name_score_list = calculate_name_score(asciified_query_string, nameids)
-    
+
     return name_score_list
     #name_ranking_list = sorted(name_score_list, key=itemgetter(1), reverse=True)
 
@@ -383,16 +383,16 @@ def find_personids_by_name1(query_string):
 
 def find_personids_by_name(query_string):
     query_string_surname = split_name_parts(query_string)[0]
-    
+
     name_score_list = set(find_personids_by_name1(query_string) + find_personids_by_name1(query_string_surname))
     name_ranking_list = sorted(name_score_list, key=itemgetter(1), reverse=True)
-    
+
     pid_score_list = calculate_pid_score(name_ranking_list)
     pids_ranking_list = sorted(pid_score_list, key=itemgetter(2), reverse=True)
 
     ranked_pid_name_list = [pid for pid, name, final_score in pids_ranking_list]
 
-    return ranked_pid_name_list    
+    return ranked_pid_name_list
 
 
 
