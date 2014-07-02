@@ -134,7 +134,7 @@ extras_require = {
         "urllib3",  # extra=cloud?
     ],
     "sso": [
-        "flask-sso==0.1"
+        "Flask-SSO>=0.1"
     ]
 }
 
