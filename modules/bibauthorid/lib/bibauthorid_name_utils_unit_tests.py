@@ -89,7 +89,7 @@ class Test_split_name_parts(InvenioTestCase):
         'test, s. still be': ['test', ['s', 's', 'b'], ['still', 'be'], [1, 2]],
         'with .[+)* ] just but without comma test': ['test', ['w', '[', '*', ']', 'j', 'b', 'w', 'c'],
                              ['with', '[+', 'just', 'but', 'without', 'comma'], [0, 1, 4, 5, 6, 7]],
-        'test-dash': ['test-dash', [], [], []],
+        'test-dash': ['test dash', [], [], []],
         'test-dash,': ['test-dash', [], [], []]
     }
 
