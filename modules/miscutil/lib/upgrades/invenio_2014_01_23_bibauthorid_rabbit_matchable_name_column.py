@@ -25,6 +25,8 @@ from invenio.bibauthorid_rabbit import rabbit
 
 depends_on = ['invenio_2013_11_28_bibauthorid_search_engine_column_changes']
 
+Logger.override_stdout_config(verbose=True)
+
 def info():
     return "Updates the columns of aidPERSONIDPAPERS, adds the rabbit matchable name, assigns default value to columns."
 
