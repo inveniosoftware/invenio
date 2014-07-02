@@ -143,6 +143,9 @@ def setup_app(app):
         """Displays login page when user is not authorised."""
         if request.is_xhr:
             return g._("Authorization failure"), 401
+        secure_url = url_for(request.endpoint, _external=True, _scheme='https')
+        if not request.base_url == secure_url:
+            return redirect(secure_url)
         if current_user.is_guest:
             flash(g._("Please sign in to continue."), 'info')
         else:
