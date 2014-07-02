@@ -73,6 +73,7 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
             tagList = $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
+            holdingpen.oTable.fnDraw(false);
         });
 
         $("#tags").on('itemAdded', function (event) {
