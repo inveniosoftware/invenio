@@ -1,10 +1,6 @@
 -e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
 -e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
 -e git+https://github.com/miracle2k/flask-assets.git#egg=Flask-Assets-dev
--e git+https://github.com/inveniosoftware/flask-breadcrumbs.git#egg=Flask-Breadcrumbs
--e git+https://github.com/inveniosoftware/flask-menu.git#egg=Flask-Menu
--e git+https://github.com/inveniosoftware/flask-registry.git#egg=Flask-Registry
--e git+git://github.com/jirikuncar/flask-sso.git#egg=flask-sso
 -e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
 # requires numpy before it can be installed
 #-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py
