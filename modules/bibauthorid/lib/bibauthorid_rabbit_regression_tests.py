@@ -45,6 +45,7 @@ from invenio.bibauthorid_dbinterface import _add_external_id_to_author
 from invenio.bibauthorid_dbinterface import _remove_external_id_from_author
 from invenio.bibauthorid_name_utils import create_matchable_name
 from invenio.testutils import InvenioTestCase, run_test_suite, make_test_suite
+import invenio.config as config
 
 from copy import deepcopy
 from mock import patch
@@ -265,7 +266,6 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             rabbit([self.main_bibrec], verbose=True)
             personid_to_test = get_authors_by_name(self.author_name)[0]
 
-            # PERSONID_EXTERNAL_IDENTIFIER_MAP.values() TODO
             _add_external_id_to_author(personid_to_test, 'INSPIREID', self.ext_id)
 
             self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record,
@@ -280,12 +280,13 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
 
         def test_rabbit_mark_record_as_deleted():
             '''
-            A record is deleted. Rabbit should understant that and remove the author from the aidPERSON* tables.
+            A record is deleted. Rabbit should understand that and remove the author from the aidPERSON* tables.
             '''
             number_of_personids_before = get_count_of_pids()
-            self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record,
-                                                                  author_name=self.heavily_modified_name,
-                                                                  ext_id=self.ext_id)
+            if config.CFG_BIBAUTHORID_ENABLED:
+                self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record,
+                                                                      author_name=self.heavily_modified_author_name,
+                                                                      ext_id=self.ext_id)
             self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record,
                                                      opt_mode='delete')
             rabbit([self.main_bibrec], verbose=True)
@@ -300,7 +301,8 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
         test_rabbit_slightly_modify_author()
         test_rabbit_heavily_modify_author()
         test_rabbit_claim_record()
-        test_rabbit_add_inspireID()
+        if config.CFG_INSPIRE_SITE:
+            test_rabbit_add_inspireID()
         test_rabbit_mark_record_as_deleted()
 
 
@@ -480,6 +482,7 @@ class CoauthorsRabbitTestCase(BibAuthorIDRabbitTestCase):
                 self.assertTrue(person_in_aidpersoniddata(coauthor_name))
             self.assertFalse(is_test_paper_claimed(self.main_bibrec, 700))
 
+
         def test_rabbit_add_inspireID_to_coauthors():
             pass
             # TODO this needs a bit of work
@@ -503,7 +506,8 @@ class CoauthorsRabbitTestCase(BibAuthorIDRabbitTestCase):
         test_rabbit_slightly_modify_coauthors()
         test_rabbit_heavily_modify_coauthors()
         test_rabbit_claim_record()
-        test_rabbit_add_inspireID_to_coauthors()
+        if config.CFG_INSPIRE_SITE:
+            test_rabbit_add_inspireID_to_coauthors()
         test_rabbit_mark_record_as_deleted()
 
 
