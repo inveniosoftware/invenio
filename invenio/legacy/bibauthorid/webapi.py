@@ -28,7 +28,7 @@ from copy import deepcopy
 import invenio.legacy.bibauthorid.config as bconfig
 import invenio.legacy.bibauthorid.frontinterface as dbapi
 import invenio.legacy.bibauthorid.name_utils as nameapi
-import invenio.webauthorprofile_interface as webauthorapi
+import invenio.legacy.webauthorprofile.interface as webauthorapi
 from invenio.legacy.bibauthorid.general_utils import defaultdict
 
 import invenio.legacy.search_engine as search_engine
@@ -37,8 +37,9 @@ from invenio.legacy.search_engine import perform_request_search
 from cgi import escape
 from invenio.utils.date import strftime
 from time import time, gmtime, ctime
+from flask import session
 from invenio.modules.access.control import acc_find_user_role_actions
-from invenio.legacy.webuser import collect_user_info, get_session, getUid, email_valid_p
+from invenio.legacy.webuser import collect_user_info, getUid, email_valid_p
 from invenio.legacy.webuser import isUserSuperAdmin, get_nickname
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_get_role_id, acc_get_user_roles
@@ -2618,7 +2619,6 @@ def ticket_review(req, needs_review):
     return bibrefs_auto_assigned, bibrefs_to_confirm
 
 def add_user_data_to_ticket(req):
-    session = get_session(req)
     uid = getUid(req)
     userinfo = collect_user_info(uid)
     pinfo = session["personinfo"]
@@ -2678,7 +2678,6 @@ def can_commit_ticket(req):
 
 
     '''
-    session = get_session(req)
     pinfo = session["personinfo"]
     ticket = pinfo["ticket"]
     ticket = [row for row in ticket if not "execution_result" in row]
@@ -2706,7 +2705,6 @@ def can_commit_ticket(req):
 #    '''
 #    Removes from a ticket the transactions with an execution_result flag
 #    '''
-#    session = get_session(req)
 #    pinfo = session["personinfo"]
 #    ticket = pinfo["ticket"]
 #    for t in list(ticket):
@@ -2722,7 +2720,6 @@ def is_ticket_review_handling_required(req):
     @type req: Apache request object
     '''
 
-    session = get_session(req)
     pinfo = session["personinfo"]
 
     # if check is needed
@@ -2738,7 +2735,6 @@ def handle_ticket_review_results(req, autoclaim):
     @type req: Apache request object
     '''
 
-    session = get_session(req)
     pinfo = session["personinfo"]
     ticket = pinfo["ticket"]
     # for every bibref in need of review
@@ -2801,7 +2797,6 @@ def is_ticket_review_required(req):
     @return: returns if review is required plus the list of the tickets to be reviewed
     @rtype: tuple(boolean, list)
     '''
-    session = get_session(req)
     pinfo = session["personinfo"]
     ticket = pinfo["ticket"]
     needs_review = []
@@ -2823,7 +2818,6 @@ def restore_users_open_tickets(req):
     @type req: Apache request object
     '''
     session_bareinit(req)
-    session = get_session(req)
     ticket = session['personinfo']['ticket']
     temp_storage = session['personinfo']['users_open_tickets_storage']
 
@@ -2839,7 +2833,6 @@ def store_users_open_tickets(req):
     @type req: Apache request object
     '''
     session_bareinit(req)
-    session = get_session(req)
     ticket = session['personinfo']['ticket']
     temp_storage = session['personinfo']['users_open_tickets_storage']
     for t in list(ticket):
@@ -2854,7 +2847,6 @@ def store_incomplete_autoclaim_tickets(req, failed_to_autoclaim_tickets):
     @type req: Apache request object
     '''
     session_bareinit(req)
-    session = get_session(req)
     temp_storage = session['personinfo']['incomplete_autoclaimed_tickets_storage']
 
     for incomplete_ticket in failed_to_autoclaim_tickets:
@@ -2868,7 +2860,6 @@ def restore_incomplete_autoclaim_tickets(req):
     @type req: Apache request object
     '''
     session_bareinit(req)
-    session = get_session(req)
     ticket = session['personinfo']['ticket']
     temp_storage = session['personinfo']['incomplete_autoclaimed_tickets_storage']
 
@@ -2883,7 +2874,6 @@ def get_stored_incomplete_autoclaim_tickets(req):
     @type req: Apache request object
     '''
     session_bareinit(req)
-    session = get_session(req)
     temp_storage = session['personinfo']['incomplete_autoclaimed_tickets_storage']
     return temp_storage
 
@@ -3314,7 +3304,6 @@ def history_log_visit(req, page, pid=None, params=None):
     @param parameters: string (?param=aoeuaoeu&param2=blabla)
     """
     session_bareinit(req)
-    session = get_session(req)
     pinfo = session['personinfo']
     my_diary = pinfo['visit_diary']
 
@@ -3394,7 +3383,6 @@ def set_marked_visit_link(req, page, pid = None, params = None):
     @type: string
     '''
     session_bareinit(req)
-    session = get_session(req)
     pinfo = session['personinfo']
     if not page:
         pinfo['marked_visit'] = None
@@ -3421,7 +3409,6 @@ def get_marked_visit_link(req):
     @rtype: string
     '''
     session_bareinit(req)
-    session = get_session(req)
     pinfo = session['personinfo']
 
     return pinfo['marked_visit']

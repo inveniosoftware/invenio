@@ -23,9 +23,9 @@ __revision__ = "$Id$"
 import os
 import cPickle
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.utils import hepdata as hepdatautils
-from invenio.hepdatautils import Dataset
+from invenio.utils.hepdata import Dataset
 from invenio.legacy import bibrecord
 
 

@@ -27,7 +27,7 @@ from invenio.legacy.bibauthorid import config as bconfig
 def main():
     """ Main function """
     try:
-        from invenio import webauthorprofile_daemon as daemon
+        from . import daemon
     except ImportError:
         bconfig.LOGGER.error("Hmm...No Daemon process running.")
         return

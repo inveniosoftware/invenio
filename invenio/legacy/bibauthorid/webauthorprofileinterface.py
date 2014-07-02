@@ -27,15 +27,20 @@ from invenio.legacy.bibauthorid.frontinterface import get_bibrefrec_name_string 
 
 from invenio.legacy.bibauthorid.webapi import search_person_ids_by_name #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import get_papers_by_person_id #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import get_person_db_names_count #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import get_existing_personids #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_names_of_author #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_existing_authors #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import get_person_redirect_link #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import is_valid_canonical_id #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import get_person_id_from_paper #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import get_person_id_from_canonical_id #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import  get_names_count_of_author #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import get_canonical_id_from_personid #emitting #pylint: disable-msg=W0611
-from invenio.legacy.bibauthorid.dbinterface import get_coauthor_pids #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_names_count_of_author #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_canonical_name_of_author#emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_coauthors_of_author #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_confirmed_papers_of_author #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_title_of_paper #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.dbinterface import get_orcid_id_of_author, get_arxiv_papers_of_author #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.webapi import get_hepnames
+from invenio.legacy.bibauthorid.backinterface import remove_empty_authors
 
 from invenio.legacy.bibauthorid.name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.name_utils import split_name_parts #emitting #pylint: disable-msg=W0611

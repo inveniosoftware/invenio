@@ -28,12 +28,12 @@ try:
 except ImportError:
     import elementtree.ElementTree as ET
 
-from invenio.webuser import page_not_authorized
-from invenio.access_control_engine import acc_authorize_action
+from invenio.legacy.webuser import page_not_authorized
+from invenio.modules.access.engine import acc_authorize_action
 import invenio.authorlist_config as cfg
 from invenio.legacy.search_engine import perform_request_search, record_exists
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.bibedit_utils import get_record
+from invenio.legacy.bibedit.utils import get_record
 # from lxml import etree
 from invenio.authorlist_dblayer import get_owner
 from invenio.utils.text import escape_latex

@@ -28,7 +28,7 @@ from itertools import chain
 import signal
 import textwrap
 
-from invenio.bibtask_config import \
+from invenio.legacy.bibsched.bibtask_config import \
     CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBSCHED_LOGDIR
 from invenio.config import \
@@ -45,7 +45,7 @@ from invenio.config import \
      CFG_BIBSCHED_EDITOR
 from invenio.legacy.dbquery import run_sql
 from invenio.utils.text import wrap_text_in_a_box
-from invenio.bibsched import bibsched_get_status, \
+from invenio.legacy.bibsched.cli import bibsched_get_status, \
                              bibsched_set_host, \
                              bibsched_set_progress, \
                              bibsched_set_status, \

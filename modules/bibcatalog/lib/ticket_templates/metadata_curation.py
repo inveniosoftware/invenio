@@ -24,7 +24,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.legacy.bibrecord import \
     record_get_field_values, \
     record_get_field_value
-from invenio.bibcatalog_utils import \
+from invenio.legacy.bibcatalog.utils import \
     record_in_collection, \
     record_get_value_with_provenence, \
     record_id_from_record, \

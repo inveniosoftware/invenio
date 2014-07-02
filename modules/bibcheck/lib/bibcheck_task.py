@@ -54,13 +54,13 @@ from invenio.legacy.search_engine import \
     perform_request_search, \
     search_unit_in_bibxxx, \
     search_pattern
-from invenio.bibedit_utils import get_bibrecord
+from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_xml_output, record_add_field
 from invenio.pluginutils import PluginContainer
 from intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
-from invenio.shellutils import split_cli_ids_arg
+from invenio.utils.shell import split_cli_ids_arg
 from invenio.utils.json import json
 
 CFG_BATCH_SIZE = 1000

@@ -37,7 +37,7 @@ class WebInterfaceDisabledPages(WebInterfaceDirectory):
     _exports = ['']
     def __call__(self, req, form):
         try:
-            from invenio.webpage import page
+            from invenio.legacy.webpage import page
         except ImportError:
             register_exception()
             page = lambda * args: args[1]

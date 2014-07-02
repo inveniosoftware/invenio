@@ -4760,7 +4760,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio.bibclassify_webinterface import main_page
+                        from invenio.legacy.bibclassify.webinterface import main_page
                         main_page(req, recid, tabs, ln,
                                   webstyle_templates)
                     elif tab == 'plots':
@@ -4941,7 +4941,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     if format.startswith('recjson'):
         import json
-        from invenio.bibfield import get_record as get_recjson
+        from invenio.modules.records.api import get_record as get_recjson
         if ot:
             ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
             return json.dumps(dict(get_recjson(recID, fields=ot)))
@@ -6738,7 +6738,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
         if of in ['hcs', 'hcs2']:
             prs_summarize_records(kwargs=kwargs, **kwargs)
         elif of in ['hcv', 'htcv', 'tlcv'] and CFG_INSPIRE_SITE:
-            from invenio.search_engine_cvifier import cvify_records
+            from invenio.legacy.search_engine.cvifier import cvify_records
             cvify_records(results_final_for_all_selected_colls, of, req, so)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)

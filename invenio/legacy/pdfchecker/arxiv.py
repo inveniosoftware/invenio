@@ -31,13 +31,13 @@ from tempfile import NamedTemporaryFile
 from xml.dom import minidom
 import socket
 
-from invenio.bibdocfilecli import bibupload_ffts
-from invenio.docextract_task import store_last_updated, \
+from invenio.legacy.bibdocfile.cli import bibupload_ffts
+from invenio.legacy.docextract.task import store_last_updated, \
                                     fetch_last_updated
-from invenio.shellutils import split_cli_ids_arg
+from invenio.utils.shell import split_cli_ids_arg
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
-from invenio.refextract_api import record_has_fulltext, \
+from invenio.legacy.refextract.api import record_has_fulltext, \
                                    check_record_for_refextract
 from invenio.legacy.bibsched.bibtask import task_init, \
                             write_message, \
@@ -54,8 +54,7 @@ from invenio.config import CFG_VERSION, \
 from invenio.legacy.docextract.record import get_record
 from invenio.legacy.bibdocfile.api import BibRecDocs, \
                                calculate_md5
-from invenio.oai_harvest_dblayer import get_oai_src
-from invenio import oai_harvest_daemon
+from invenio.legacy.oaiharvest import utils as oai_harvest_daemon
 from invenio.utils.filedownload import (download_external_url,
                                        InvenioFileDownloadError)
 
@@ -210,13 +209,13 @@ def download_one(recid, version):
 def oai_harvest_query(arxiv_id, prefix='arXivRaw', verb='GetRecord',
                       max_retries=5, repositories=[]):
     """Wrapper of oai_harvest_daemon.oai_harvest_get that handles retries"""
-    if not repositories:
-        repositories.extend(get_oai_src(params={'name': 'arxiv'}))
-
-    try:
+    if not len(repositories):
+        from invenio.modules.oaiharvester.models import OaiHARVEST
+        repository = OaiHARVEST.query.filter(
+            OaiHARVEST.name == 'arxiv'
+        ).first().todict()
+    else:
         repository = repositories[0]
-    except IndexError:
-        raise Exception('arXiv repository information missing from database')
 
     harvestpath = os.path.join(CFG_TMPDIR, "arxiv-pdf-checker-oai-")
 

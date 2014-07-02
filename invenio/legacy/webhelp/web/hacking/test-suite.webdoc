@@ -139,7 +139,7 @@ An example for testing search engine query parameter washing function:
 $ cat /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
 [...]
 import search_engine
-from invenio.testutils import InvenioTestCase
+from invenio.testsuite import InvenioTestCase
 
 class TestWashQueryParameters(InvenioTestCase):
     """Test for washing of search query parameters."""

@@ -913,7 +913,7 @@ def cli_cmd_create_apache_conf(conf):
     Create Apache conf files for this site, keeping previous
     files in a backup copy.
     """
-    from invenio.apache_manager import main
+    from invenio.base.scripts.apache import main
 
     warn('inveniocfg --create-apache-conf is deprecated. Using instead: inveniomanage apache create-config')
 
@@ -1191,7 +1191,7 @@ def main(*cmd_args):
     (options, dummy_args) = parser.parse_args(list(cmd_args))
 
     if getattr(options, 'stop_on_error', False):
-        from invenio.testutils import wrap_failfast
+        from invenio.testsuite import wrap_failfast
         wrap_failfast()
 
     if getattr(options, 'version', False):

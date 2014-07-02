@@ -523,8 +523,8 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                            (recID, of),
                            alert_admin=True)
         #Failsafe execution mode
-        import invenio.template
-        websearch_templates = invenio.template.load('websearch')
+        import invenio.legacy.template
+        websearch_templates = invenio.legacy.template.load('websearch')
         if verbose == 9:
             out += """\n<br/><span class="quicknote">
             An error occured while formatting record %s. (%s)

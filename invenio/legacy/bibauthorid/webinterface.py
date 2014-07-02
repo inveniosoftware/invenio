@@ -82,7 +82,7 @@ from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canoni
 from invenio.legacy.bibauthorid.templates import WebProfileMenu, WebProfilePage
 
 # Imports related to hepnames update form
-from invenio.bibedit_utils import get_bibrecord
+from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_value, record_get_field_values, \
                               record_get_field_instances, field_get_subfield_values
 
@@ -3652,7 +3652,7 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
                 'search_ajax',
                 'ticket']
 
-    from invenio.webauthorprofile_webinterface import WebAuthorPages
+    from invenio.legacy.webauthorprofile.webinterface import WebAuthorPages
 
     claim = WebInterfaceBibAuthorIDClaimPages()
     profile = WebAuthorPages()

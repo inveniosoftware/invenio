@@ -38,7 +38,7 @@ from invenio.utils.html import nmtoken_from_string
 
 if CFG_CERN_SITE:
     try:
-        from invenio.websubmit_functions.GENSBM_config import SUBMISSIONS_CONFIG as CERN_GENSBM_SUBMISSIONS_CONFIG
+        from invenio.legacy.websubmit.functions.GENSBM_config import SUBMISSIONS_CONFIG as CERN_GENSBM_SUBMISSIONS_CONFIG
     except:
         CERN_GENSBM_SUBMISSIONS_CONFIG = {}
 __plugin_version__ = "Search Service Plugin API 1.0"

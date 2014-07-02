@@ -36,7 +36,7 @@ from invenio.legacy.bibrecord import record_get_field_instances, \
                               record_modify_subfield, \
                               create_record, \
                               record_get_field_values
-from invenio.shellutils import run_shell_command
+from invenio.utils.shell import run_shell_command
 from invenio.utils.text import translate_latex2unicode
 from invenio.legacy.bibsched.bibtask import write_message
 

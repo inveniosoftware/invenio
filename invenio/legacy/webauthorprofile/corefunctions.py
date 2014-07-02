@@ -48,7 +48,7 @@ from .config import CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
     CFG_WEBAUTHORPROFILE_ALLOWED_FIELDCODES, CFG_WEBAUTHORPROFILE_KEYWORD_TAG, \
     CFG_WEBAUTHORPROFILE_FKEYWORD_TAG, CFG_WEBAUTHORPROFILE_COLLABORATION_TAG, \
     CFG_WEBAUTHORPROFILE_FIELDCODE_TAG
-from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_id, \
+from invenio.legacy.bibauthorid.webauthorprofileinterface import get_papers_by_person_id, \
     get_names_of_author, create_normalized_name, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
     gathered_names_by_personid, get_canonical_name_of_author, get_coauthors_of_author, \
@@ -58,7 +58,7 @@ from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_i
 from invenio.legacy.bibauthorid.general_utils import get_title_of_doi, get_title_of_arxiv_pubid
 from .dbapi import get_cached_element, precache_element, cache_element, \
     expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
-from invenio.legacy.search_engine_summarizer import summarize_records
+from invenio.legacy.search_engine.summarizer import summarize_records
 from invenio.legacy.search_engine import get_most_popular_field_values
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.search_engine.summarizer import generate_citation_summary

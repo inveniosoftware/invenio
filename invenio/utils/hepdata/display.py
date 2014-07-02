@@ -686,7 +686,7 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
             c.append("</div></td>" % args)
             c.append("</tr>")
         else:
-            from invenio.hepdatautils import create_hepdata_ticket
+            from invenio.utils.hepdata import create_hepdata_ticket
             create_hepdata_ticket(dataset.recid, 'Data missing in 8564_u')
 
         # rendering column titles

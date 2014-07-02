@@ -257,7 +257,7 @@ class ExternalOAuth2(ExternalAuth):
         Since we are dealing with orcid we can fetch tons of information
         from the user profile.
         """
-        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+        from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
         profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=orcid_id), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % access_token})
         if profile.status_code != 200:

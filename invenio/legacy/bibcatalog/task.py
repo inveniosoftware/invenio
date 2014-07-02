@@ -36,7 +36,7 @@ from invenio.legacy.bibsched.bibtask import \
 from invenio.config import \
     CFG_VERSION, \
     CFG_PYLIBDIR
-from invenio.docextract_task import \
+from invenio.legacy.docextract.task import \
     split_ids, \
     fetch_last_updated, \
     store_last_updated
@@ -44,11 +44,11 @@ from invenio.legacy.search_engine import \
     get_collection_reclist, \
     perform_request_search
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
-from invenio.bibcatalog_utils import record_id_from_record
-from invenio.bibcatalog_dblayer import \
+from invenio.legacy.bibcatalog.utils import record_id_from_record
+from invenio.legacy.bibcatalog.dblayer import \
     get_all_new_records, \
     get_all_modified_records
-from invenio.bibedit_utils import get_bibrecord
+from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.pluginutils import PluginContainer
 
 

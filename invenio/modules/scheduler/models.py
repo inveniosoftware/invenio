@@ -72,5 +72,18 @@ class SchTASK(db.Model):
                            db.ForeignKey(SeqSTORE.id))
 
 
+# FIXME To be moved to redis when available
+class SchSTATUS(db.Model):
+
+    """Represent a SchSTATUS record."""
+
+    __tablename__ = 'schSTATUS'
+
+    name = db.Column(db.String(50), primary_key=True)
+    value = db.Column(db.iMediumBinary)
+
+
 __all__ = ['HstTASK',
-           'SchTASK']
+           'SchTASK',
+           'SchSTATUS',
+           ]

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import requests
-from invenio.bibauthorid_general_utils import get_doi
+from invenio.legacy.bibauthorid.general_utils import get_doi
 
 try:
     import json
@@ -96,7 +96,7 @@ def _get_access_token_from_orcid(scope, extra_params=None, response_format='json
     @rtype: str
     '''
     # TODO: when we already have a valid access token return that instead of creating a new one
-    from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+    from invenio.modules.access.local_config import CFG_OAUTH2_CONFIGURATIONS
 
     payload = {'client_id': CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_key'],
                'client_secret': CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_secret'],

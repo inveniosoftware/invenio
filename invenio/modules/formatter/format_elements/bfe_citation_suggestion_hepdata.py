@@ -45,7 +45,7 @@ def hepdata_cite_as(bfo):
         Cite as: The ATLAS Collaboration (2013) HepData, doi: 10.1234/123456
     """
 
-    from invenio.bibformat_engine import BibFormatObject
+    from invenio.modules.formatter.engine import BibFormatObject
 
     colls = []
     for coll in bfo.fields("710__g"):
@@ -111,7 +111,7 @@ def inspire_cite_as(bfo):
     INSPIRE format example:
         Cite as: The ATLAS Collaboration (2013) INSPIRE, doi: 10.1234/123456
     """
-    from invenio.bibformat_engine import BibFormatObject
+    from invenio.modules.formatter.engine import BibFormatObject
 
     colls = []
     for coll in bfo.fields("710__g"):

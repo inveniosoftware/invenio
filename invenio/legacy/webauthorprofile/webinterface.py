@@ -33,7 +33,7 @@ from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canoni
     is_valid_bibref, get_person_id_from_paper, get_person_id_from_canonical_id, \
     search_person_ids_by_name, get_papers_by_person_id, get_person_redirect_link, \
     author_has_papers
-from invenio.bibauthorid_webapi import history_log_visit
+from invenio.legacy.bibauthorid.webapi import history_log_visit
 
 from .corefunctions import get_pubs, get_person_names_dicts, \
     get_institute_pubs, get_pubs_per_year, get_coauthors, get_summarize_records, \

@@ -3841,7 +3841,7 @@ class Template:
             try:
                 publisher = get_fieldvalues(dataset.recid, '520__9')[0]
             except IndexError:
-                from invenio.hepdatautils import create_hepdata_ticket
+                from invenio.utils.hepdata import create_hepdata_ticket
                 create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
                 continue
             if publisher == "HEPDATA" and flag_hepdata == 0:
@@ -3884,7 +3884,7 @@ class Template:
             try:
                 publisher = get_fieldvalues(dataset.recid, '520__9')[0]
             except IndexError:
-                from invenio.hepdatautils import create_hepdata_ticket
+                from invenio.utils.hepdata import create_hepdata_ticket
                 create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
                 continue
             if publisher == "HEPDATA":

@@ -27,9 +27,9 @@ try:
 except ImportError, e:
     CFG_ICON_CREATION_FORMAT_MAPPINGS = {'*': ['jpg']}
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
-from invenio.websubmit_icon_creator import create_icon, CFG_ALLOWED_FILE_EXTENSIONS
-from invenio.bibdocfilecli import cli_fix_marc
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+from invenio.legacy.websubmit.icon_creator import create_icon, CFG_ALLOWED_FILE_EXTENSIONS
+from invenio.legacy.bibdocfile.cli import cli_fix_marc
 from invenio.legacy.bibsched.bibtask import write_message, \
                             task_update_progress, \
                             task_sleep_now_if_required

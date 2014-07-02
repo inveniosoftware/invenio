@@ -1972,7 +1972,7 @@ def create_hepdata_ticket(recid, msg, queue="Data_Exceptions"):
     Creates a ticket when something goes wrong in rendering HepData
     records.
     """
-    from invenio.bibcatalog_task import BibCatalogTicket
+    from invenio.legacy.bibcatalog.task import BibCatalogTicket
     subject = "Problem in data record %s: %s" % (str(recid),
                                                  msg[:30])
     body = """

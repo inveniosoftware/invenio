@@ -24,8 +24,8 @@ from invenio.legacy.docextract.record import (BibRecord,
                                        BibRecordSubField,
                                        BibRecordField,
                                        BibRecordControlField)
-from invenio.testutils import InvenioXmlTestCase
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import InvenioXmlTestCase
+from invenio.testsuite import make_test_suite, run_test_suite
 
 
 class BibRecordTest(InvenioXmlTestCase):

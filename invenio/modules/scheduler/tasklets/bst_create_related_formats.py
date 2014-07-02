@@ -27,10 +27,10 @@ from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.legacy.bibsched.bibtask import write_message, \
      task_sleep_now_if_required, \
      task_update_progress
-from invenio.bibdocfile_managedocfiles import get_description_and_comment
-from invenio.websubmit_functions.Shared_Functions import \
+from invenio.legacy.bibdocfile.managedocfiles import get_description_and_comment
+from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
-from invenio.bibdocfilecli import cli_fix_marc
+from invenio.legacy.bibdocfile.cli import cli_fix_marc
 
 def bst_create_related_formats(recid, docnames=None, force=0):
     """

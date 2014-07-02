@@ -44,7 +44,7 @@ from intbitset import intbitset
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.search_engine.summarizer import render_citation_summary
 from invenio.utils.url import create_html_link
-from invenio.bibauthorid_webapi import get_person_info_by_pid
+from invenio.legacy.bibauthorid.webapi import get_person_info_by_pid
 
 import invenio.legacy.template
 bibauthorid_templates = invenio.legacy.template.load('bibauthorid')

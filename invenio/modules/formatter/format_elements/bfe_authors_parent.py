@@ -66,7 +66,7 @@ def format_element(bfo, limit, separator='; ',
     import re
     from invenio.base.i18n import gettext_set_language
     from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
-    from invenio.bibformat_engine import BibFormatObject
+    from invenio.modules.formatter.engine import BibFormatObject
 
     _ = gettext_set_language(bfo.lang)    # load the right message language
 

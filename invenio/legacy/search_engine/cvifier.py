@@ -26,10 +26,10 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
-from invenio.bibformat import format_records
+from invenio.modules.formatter import format_records
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
-import invenio.template
-websearch_templates = invenio.template.load('websearch')
+import invenio.legacy.template
+websearch_templates = invenio.legacy.template.load('websearch')
 
 def cvify_records(recids, of, req=None, so='d'):
     """

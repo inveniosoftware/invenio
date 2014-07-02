@@ -34,7 +34,7 @@ NOTE:
 __revision__ = "$Id$"
 
 
-from invenio import bibdocfile_managedocfiles
+from invenio.legacy.bibdocfile import managedocfiles as bibdocfile_managedocfiles
 
 def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
     """

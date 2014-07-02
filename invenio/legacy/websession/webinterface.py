@@ -843,7 +843,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         # If user has logged in to ORCID through oauth2, store his ORCID id
         if uid > 0 and args['login_method'] == 'oauth2' and args['provider'] == 'orcid':
-            from invenio.bibauthorid_webapi import get_pid_from_uid, add_orcid_to_pid
+            from invenio.legacy.bibauthorid.webapi import get_pid_from_uid, add_orcid_to_pid
 
             CFG_EXTERNAL_AUTHENTICATION['oauth2'].auth_user(None, None, req)
 

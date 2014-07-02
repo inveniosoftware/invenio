@@ -138,7 +138,7 @@ def force_recrawling():
     date to export to crawlers. (useful e.g. in case of major update of
     the interface).
     """
-    from invenio.bibexport_method_sitemap import _CFG_FORCE_RECRAWLING_TIMESTAMP_PATH
+    from invenio.legacy.bibexport.sitemap import _CFG_FORCE_RECRAWLING_TIMESTAMP_PATH
     open(_CFG_FORCE_RECRAWLING_TIMESTAMP_PATH, "w").write("DUMMY")
 
 def main():

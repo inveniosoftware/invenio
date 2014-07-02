@@ -40,7 +40,7 @@ Usage: %s [options]
 __revision__ = "$Id$"
 
 try:
-    from invenio.bibexport import main
+    from invenio.legacy.bibexport.daemon import main
 except ImportError as e:
     print("Error: %s" % e)
     import sys

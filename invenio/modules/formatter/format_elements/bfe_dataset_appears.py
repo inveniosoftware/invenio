@@ -26,7 +26,7 @@ def format_element(bfo):
     Prints the list of papers containing the dataset by title.
     """
     
-    from invenio.bibformat_engine import BibFormatObject
+    from invenio.modules.formatter.engine import BibFormatObject
     from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 
     parent_recid = bfo.field("786__w")
