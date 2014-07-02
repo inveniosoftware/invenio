@@ -38,8 +38,7 @@ from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_LOGGER
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.bibauthorid_name_utils import (soft_compare_names,
-                                            string_partition)
+from invenio.bibauthorid_name_utils import soft_compare_names
 from invenio.textutils import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
@@ -851,7 +850,7 @@ def get_reversed_string_variants(s, sep=','):
     @rtype: tuple
     """
     # Extract the different parts of the name using partition function.
-    left, sep, right = string_partition(s, sep)
+    left, sep, right = s.partition(sep)
     return (left + sep + right, right + sep + left)
 
 def _get_grouped_pairs(first_list, second_list):
