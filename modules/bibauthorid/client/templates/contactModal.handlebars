@@ -1,0 +1,50 @@
+<div class="modal-header">
+    <h2 class="modal-title">Contact Us</h2>
+</div>
+
+<div class="modal-body contactContainer" data-bai-cname="{{ cname }}">
+
+      <div class="msg-success hidden">
+        <p class="text-center"><span class="glyphicon glyphicon-send" style="font-size: 3em;"></span></p>
+        <p class="text-center"><strong>Your message has been sent.</strong></p>
+      </div>
+
+      <div class="msg-error hidden">
+        <p class="text-center"><span class="glyphicon glyphicon-ban-circle" style="font-size: 3em;"></span></p>
+        <p class="text-center"><strong>Your message has not been sent, please try again later.</strong></p>
+      </div>
+
+      <p class="msg-default">If you are having issues with profile related operations, please fill out the contact form
+      below to seek assistance from INSPIRE.</p>
+
+      <form id="contactForm" novalidate="novalidate" role="form" action="/author/claim/action" method="POST">
+        <hr>
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="control-label" for="Name">Full Name</label>
+            <input id="Name" name="Name" placeholder="e.g John Smith" class="form-control input-md" required="true" data-parsley-trigger="change keyup focusin focusout" data-parsley-required-message="This field is required." data-parsley-minlength="2" data-parsley-minlength-message="Your input is too short." type="text" value="{{ name_prefill }}">
+        </div>
+
+        <!-- Text input-->
+        <div class="form-group">
+            <label class="control-label" for="E-mail">Email</label>
+            <input id="E-mail" name="E-mail" placeholder="e.g. john@smith.com" class="form-control input-md" required="true" data-parsley-trigger="change keyup focusin focusout"
+                   data-parsley-required-message="This field is required." data-parsley-minlength="3"
+                   data-parsley-type-message="Please enter a valid email address."
+                   type="email" value="{{ email_prefill }}">
+        </div>
+
+        <!-- Textarea -->
+        <div class="form-group">
+            <label class="control-label" for="Comment">Comments</label>
+            <textarea class="form-control" id="Comment" name="Comment" required="true" data-parsley-trigger="change keyup focusin focusout" data-parsley-minlength="3" data-parsley-maxlength="10000" cols="30" rows="10"></textarea>
+        </div>
+
+      </form>
+
+</div>
+
+<div class="modal-footer">
+    <a href="#" data-dismiss="modal" class="btn btn-default back">Go Back</a>
+    <a href="#" class="btn btn-primary submit">Submit</a>
+</div>
