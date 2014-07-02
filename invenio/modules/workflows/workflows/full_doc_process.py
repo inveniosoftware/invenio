@@ -26,8 +26,8 @@ from ..tasks.marcxml_tasks import (convert_record_with_repository,
                                    approve_record)
 from ..tasks.workflows_tasks import log_info
 from ..tasks.logic_tasks import workflow_if, workflow_else
-from invenio.config import CFG_PREFIX
 from invenio.modules.workflows.utils import WorkflowBase
+
 
 class full_doc_process(WorkflowBase):
 
@@ -103,13 +103,14 @@ class full_doc_process(WorkflowBase):
             if bwo.version == ObjectVersion.INITIAL:
                 message = categories = "The process has not started!!!"
             else:
-                message= categories = "The process CRASHED!!! \n {0}".format(str(e.message))
+                message = categories = "The process CRASHED!!! \n {0}".format(str(e.message))
 
         from flask import render_template
         return render_template('workflows/styles/harvesting_record.html',
                                categories=categories,
                                identifiers=final_identifiers,
                                message=message)
+
     @staticmethod
     def formatter(bwo, **kwargs):
 

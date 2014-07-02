@@ -92,8 +92,12 @@ def maintable():
 
     if 'tags' in session:
         my_tags += session['tags']
+    else:
+        session['tags'] = my_tags
     if 'workflows_version_showing' in session:
         my_tags += session['workflows_version_showing']
+    else:
+        session['workflows_version_showing'] = my_tags
     if 'version' in request.args:
         try:
             if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
@@ -195,9 +199,10 @@ def load_table():
         if "initial" in req:
             version_showing.append(ObjectVersion.INITIAL)
         session['workflows_version_showing'] = version_showing
+        if req == []:
+            version_showing = ObjectVersion.MAPPING.keys()
     elif 'workflows_version_showing' in session:
         version_showing = session.get('workflows_version_showing', [])
-
     try:
         i_sortcol_0 = request.args.get('iSortCol_0')
         s_sortdir_0 = request.args.get('sSortDir_0')
@@ -217,19 +222,17 @@ def load_table():
             s_search = s_search.split(',') + req_search
         else:
             s_search = s_search.split(',') + session["tags"]
-    else:
-        if req_search:
-            s_search = req_search
-        elif "tags" in session:
-            s_search = session["tags"]
-        else:
-            s_search = []
+    elif req_search:
+        s_search = req_search
+
+    if s_search is [u'']:
+        s_search = []
     bwolist = get_holdingpen_objects(ssearch=s_search,
                                      version_showing=version_showing)
     if 'iSortCol_0' in session:
         i_sortcol_0 = int(i_sortcol_0)
         if i_sortcol_0 != session['iSortCol_0'] \
-           or s_sortdir_0 != session['sSortDir_0']:
+                or s_sortdir_0 != session['sSortDir_0']:
             bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
     session['iDisplayStart'] = i_display_start
     session['iDisplayLength'] = i_display_length
@@ -268,7 +271,6 @@ def load_table():
                 record = dict(record)
             except:
                 record = {}
-
         if not workflows_uuid:
             title = "No title"
             description = "No description"
@@ -277,7 +279,6 @@ def load_table():
             title = workflows_cache[workflows_uuid].get_title(bwo)
             description = workflows_cache[workflows_uuid].get_description(bwo)
             extra_data = bwo.get_extra_data()
-
         row = render_template('workflows/row_formatter.html',
                               title=title,
                               object=bwo,
@@ -293,7 +294,6 @@ def load_table():
         for key, value in REG_TD.findall(row):
             d[key] = value.strip()
 
-
         table_data['aaData'].append(
             [d['id'],
              d['checkbox'],
@@ -308,6 +308,7 @@ def load_table():
     table_data['iTotalRecords'] = len(bwolist)
     table_data['iTotalDisplayRecords'] = len(bwolist)
     return jsonify(table_data)
+
 
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
 @login_required
@@ -669,7 +670,6 @@ def get_holdingpen_objects(isortcol_0=None,
 
     if isortcol_0:
         isortcol_0 = int(isortcol_0)
-
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent == None
     ).filter(not version_showing or BibWorkflowObject.version.in_(
@@ -708,10 +708,12 @@ def get_holdingpen_objects(isortcol_0=None,
 
             for term in ssearch:
                 for function in checking_functions:
-                    if check_ssearch_over_data(term, checking_functions[function](
-                                               **dict((checking_functions[function].func_code.co_varnames[i],
-                                                       all_parameters[checking_functions[function].func_code.co_varnames[i]])
-                                               for i in range(0, checking_functions[function].func_code.co_argcount)))):
+                    function = checking_functions[function]
+                    func_code = function.func_code
+                    if check_ssearch_over_data(term, function(
+                                               **dict((func_code.co_varnames[i],
+                                                       all_parameters[func_code.co_varnames[i]])
+                                                      for i in range(0, func_code.co_argcount)))):
                         confirm += 1
                 if confirm == 0:
                     to_add = False

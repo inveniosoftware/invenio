@@ -20,13 +20,18 @@
 
 from ...workflows.tasks.marcxml_tasks import (approve_record, convert_record,
                                               add_metadata_to_extra_data)
+from invenio.modules.workflows.utils import WorkflowBase
 
 
-class marcxml_workflow(object):
+class marcxml_workflow(WorkflowBase):
     """
     This workflow will run various tasks required to ingesting
     MARCXML records.
     """
+    @staticmethod
+    def formatter(bwo, **kwargs):
+        return ""
+
     workflow = [convert_record(stylesheet='oaiarxiv2marcxml.xsl'),
                 add_metadata_to_extra_data,
                 approve_record]
