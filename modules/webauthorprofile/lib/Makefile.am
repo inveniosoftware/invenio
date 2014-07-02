@@ -31,12 +31,6 @@ pylib_DATA = webauthorprofile_corefunctions.py \
              webauthorprofile_unit_tests.py \
              webauthorprofile_orcidutils.py
 
-
-jsdir=$(localstatedir)/www/js
-
-js_DATA = webauthorprofile.js
-
-EXTRA_DIST = $(pylib_DATA) \
-             $(js_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

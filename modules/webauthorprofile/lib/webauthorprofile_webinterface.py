@@ -292,14 +292,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         profile_page = WebProfilePage("profile", webapi.get_longest_name_from_pid(self.person_id))
         profile_page.add_profile_menu(menu)
 
-        gboxstatus = self.person_id
-        gpid = self.person_id
-        gNumOfWorkers = 3   # to do: read it from conf file
-        gReqTimeout = 5000
-        gPageTimeout = 120000
-
         profile_page.add_bootstrapped_data(json.dumps({
-            "other": "var gBOX_STATUS = '%s';var gPID = '%s'; var gNumOfWorkers= '%s'; var gReqTimeout= '%s'; var gPageTimeout= '%s';" % (gboxstatus, gpid, gNumOfWorkers, gReqTimeout, gPageTimeout),
             "backbone": """
             (function(ticketbox) {
                 var app = ticketbox.app;

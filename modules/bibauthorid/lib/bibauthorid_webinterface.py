@@ -224,12 +224,6 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         full_name = webapi.get_longest_name_from_pid(self.person_id)
         page_title = '%s - Publications Management' % full_name
 
-        gboxstatus = self.person_id
-        gpid = self.person_id
-        gNumOfWorkers = 3   # to do: read it from conf file
-        gReqTimeout = 10000
-        gPageTimeout = 12000
-
         guest_prompt = 'true'
         if not CFG_INSPIRE_SITE:
             guest_prompt = 'false'
@@ -243,8 +237,6 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         session.dirty = True
 
         profile_page.add_bootstrapped_data(json.dumps({
-            "other": "var gBOX_STATUS = '%s';var gPID = '%s'; var gNumOfWorkers= '%s'; var gReqTimeout= '%s'; var gPageTimeout= '%s';" %
-            (gboxstatus, gpid, gNumOfWorkers, gReqTimeout, gPageTimeout),
             "backbone": """
             (function(ticketbox) {
                 var app = ticketbox.app;
@@ -1570,8 +1562,6 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         profile_page = WebProfilePage("search", title, no_cache=True)
 
         profile_page.add_bootstrapped_data(json.dumps({
-            "other":
-            "var gBOX_STATUS = '10';var gPID = '10'; var gNumOfWorkers= '10'; var gReqTimeout= '10'; var gPageTimeout= '10';",
             "backbone": """
             (function(ticketbox) {
                  var app = ticketbox.app;
@@ -2565,12 +2555,12 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         '''
-            Generate SSO landing/author management page
+        Generate SSO landing/author management page
 
-            @param req: Apache request object
-            @type req: Apache request object
-            @param form: GET/POST request params
-            @type form: dict
+        @param req: Apache request object
+        @type req: Apache request object
+        @param form: GET/POST request params
+        @type form: dict
         '''
         webapi.session_bareinit(req)
         session = get_session(req)
@@ -2632,15 +2622,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         profile_page = WebProfilePage("manage_profile", long_name, no_cache=True)
         profile_page.add_profile_menu(menu)
 
-        gboxstatus = self.person_id
-        gpid = self.person_id
-        gNumOfWorkers = 3   # to do: read it from conf file
-        gReqTimeout = 3000
-        gPageTimeout = 12000
-
         profile_page.add_bootstrapped_data(json.dumps({
-            "other": "var gBOX_STATUS = '%s';var gPID = '%s'; var gNumOfWorkers= '%s'; var gReqTimeout= '%s'; var gPageTimeout= '%s';" %
-            (gboxstatus, gpid, gNumOfWorkers, gReqTimeout, gPageTimeout),
             "backbone": """
             (function(ticketbox) {
                  var app = ticketbox.app;

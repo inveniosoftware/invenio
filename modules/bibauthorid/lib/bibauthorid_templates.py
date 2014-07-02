@@ -177,7 +177,7 @@ class WebProfilePage():
         ]
 
         self.legacy_stylesheets = ["jquery-ui/themes/smoothness/jquery-ui.css",
-                                   "datatables_jquery-ui.css", ]
+                                   "datatables_jquery-ui.css"]
 
         self.stylesheets = [
             "bootstrap.min.css",
@@ -211,9 +211,6 @@ class WebProfilePage():
         self.bootstrap_data = data
 
     def get_head(self):
-        if self.page.lower() != 'profile' and "webauthorprofile.js" in self.scripts:
-            self.scripts.remove("webauthorprofile.js")
-
         return WebProfilePage.environment.get_template("head.html").render({
             'no_cache': self.no_cache,
             'scripts': self.scripts,
@@ -324,9 +321,6 @@ class WebProfilePage():
             'selfcite_link': '%s/search?ln=en&p=author:%s&of=hcs2' % (CFG_BASE_URL, canonical_name),
             'published_only_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:published'),
         })
-
-    def _format_citations_summary_search_link():
-        pass
 
     @staticmethod
     def render_publications_box_content(template_vars):
