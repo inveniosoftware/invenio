@@ -48,7 +48,7 @@ EXTENSIONS = [
     'invenio.ext.gravatar',
     'invenio.ext.collect',
     'invenio.ext.restful',
-    'flask.ext.menu:Menu',
+    'invenio.ext.menu',
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
 ]
@@ -286,8 +286,8 @@ CFG_BIBINDEX_SPLASH_PAGES = {
     "http://documents\.cern\.ch/setlink\?.*": ".*",
     "http://ilcagenda\.linearcollider\.org/subContributionDisplay\.py\?.*|"
     "http://ilcagenda\.linearcollider\.org/contributionDisplay\.py\?.*":
-        "http://ilcagenda\.linearcollider\.org/getFile\.py/access\?.*|"
-        "http://ilcagenda\.linearcollider\.org/materialDisplay\.py\?.*",
+    "http://ilcagenda\.linearcollider\.org/getFile\.py/access\?.*|"
+    "http://ilcagenda\.linearcollider\.org/materialDisplay\.py\?.*",
 }
 CFG_BIBINDEX_SYNONYM_KBRS = {
     'global': ['INDEX-SYNONYM-TITLE', 'exact'],
