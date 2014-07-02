@@ -38,7 +38,7 @@ var ticketbox = {
         };
     }(),
 
-    app: { debug: true, hasFocus: false },
+    app: { debug: false, hasFocus: false },
 
     sureUpdate: function() {
         var time = 1000;
@@ -2066,7 +2066,6 @@ $(document).ready(function() {
 
         } );
 
-        console.log("[DISPATCH] name: " + source);
         $.ajax(requestConfig);
 
       };
@@ -2096,8 +2095,6 @@ $(document).ready(function() {
 
           });
         }
-        console.log( state.inProgressCount );
-        console.log( state.toLoad );
       };
 
       init( this );
