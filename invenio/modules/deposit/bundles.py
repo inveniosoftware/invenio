@@ -25,6 +25,7 @@ from invenio.base.bundles import styles as _styles
 
 js = Bundle(
     "plupload/plupload.full.min.js",
+    "js/deposit/dynamic_field_list.js",
     "js/deposit/form.js",
     "js/deposit/templates.js",
     output="deposit.js",
