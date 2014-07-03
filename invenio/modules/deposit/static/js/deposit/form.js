@@ -884,8 +884,8 @@ var DEPOSIT_FORM = (function( $ ){
       pasted: serialize_and_save,
     };
 
-    $(selector).each(function(){
-      field_lists[this.id] = $(this).dynamicFieldList(opts);
+    $(selector).dynamicFieldList(opts).each(function(index, fieldList){
+      field_lists[fieldList.element.id] = fieldList;
     });
   }
 
