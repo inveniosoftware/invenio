@@ -25,84 +25,151 @@ define(function(require, exports, module) {
         Hogan = require('hogan')
 
   /**
+   * Constructor.
    *
+   * @param element DOM element/jQuery selector on which the plugin will
+   *   be applied
+   * @param options options dictionary
+   * @constructor
    */
-  $.fn.dynamicFieldList = function(opts) {
-    var options = $.extend({}, $.fn.dynamicFieldList.defaults, opts);
-    if (options.prefix === null) {
-      options.prefix = this.attr('id');
+  function DynamicFieldList(element, options) {
+
+    // ensure that there is jQuery selector available
+    this.$element = $(element);
+    // DOM element
+    this.element = this.$element[0];
+    this.options = $.extend({}, $.fn.dynamicFieldList.defaults, options);
+
+    if (this.options.prefix === null) {
+      this.options.prefix = this.$element.attr('id');
     }
-    var template = this.find('.' + options.empty_cssclass);
-    var last_index = $("#" + options.prefix + options.sep +  options.last_index);
-    var field_regex = new RegExp("(" + options.prefix + options.sep + "(\\d+|" + options.index_suffix + "))"+ options.sep +"(.+)");
+    this.$template = this.$element.find('.' + this.options.empty_cssclass);
+    this.last_index = $("#" + this.options.prefix + this.options.sep + this.options.last_index);
+    this.field_regex = new RegExp(
+      "(" + this.options.prefix + this.options.sep + "(\\d+|" +
+        this.options.index_suffix + "))" + this.options.sep + "(.+)"
+    );
     // Get template name from options or the empty elements data attribute
-    var tag_template = Hogan.compile($(this).data('tagTemplate') || '');
+    this.tag_template = Hogan.compile($(this).data('tagTemplate') || '');
+
+  }
+
+  DynamicFieldList.prototype = {
+
+    /**
+     * Here initialization stuff. Especially the one which needs the plugin
+     * to be already applied.
+     */
+    init: function () {
+
+      // Make list sortable
+      if (this.options.sortable) {
+        var sortable_options = {
+          items: "." + this.options.element_css_class,
+          update: this.sort_element,
+        };
+
+        if (this.$element.find("." + this.options.sort_cssclass).length !== 0) {
+          sortable_options.handle = "." + this.options.sort_cssclass;
+        }
+        this.$element.sortable(sortable_options);
+      }
+    },
+
+    /**
+     * Connecting events to functions, separated just to have them in one
+     * place.
+     */
+    connectEvents: function () {
+
+      // to have access to the class inside the events
+      var that = this;
+
+      // Hook add/remove buttons on already rendered elements
+      $('#' + this.options.prefix + " ." + this.options.element_css_class + " ." + this.options.remove_cssclass)
+        .click(function (event) {
+          that.remove_element($(this), event);
+        });
+      $('#' + this.options.prefix + " ." + this.options.add_cssclass)
+        .click(function (event) {
+          that.append_element();
+        });
+
+      // Hook for detecting on paste events
+      if (this.options.on_paste !== null && this.options.on_paste_elements !== null) {
+        this.options.on_paste = this.create_paste_handler(that.options.on_paste);
+        $('#' + this.options.prefix + " " + this.options.on_paste_elements).on('paste', function (event) {
+          that.on_paste(event);
+        });
+      }
+    },
 
     /**
      * Get next index
      */
-    var get_next_index = function(){
-      return parseInt(last_index.val(), 10) + 1;
-    };
+    get_next_index: function () {
+      return parseInt(this.last_index.val(), 10) + 1;
+    },
 
     /**
      * Set value of last index
      */
-    var set_last_index = function(idx){
-      return last_index.val(idx);
-    };
+    set_last_index: function (idx) {
+      return this.last_index.val(idx);
+    },
 
     /**
      * Update attributes in a single tag
      */
-    var update_attr_index = function(tag, idx) {
-      var id_regex = new RegExp("(" + options.prefix + options.sep + "(\\d+|" + options.index_suffix + "))");
-      var new_id = options.prefix + options.sep + idx;
+    update_attr_index: function (tag, idx) {
+      var id_regex = new RegExp("(" + this.options.prefix + this.options.sep + "(\\d+|" + this.options.index_suffix + "))");
+      var new_id = this.options.prefix + this.options.sep + idx;
       ['for', 'id', 'name'].forEach(function(attr_name){
         if($(tag).attr(attr_name)){
           $(tag).attr(attr_name, $(tag).attr(attr_name).replace(id_regex, new_id));
         }
       });
-    };
+    },
 
     /**
      * Update index in attributes for a single element (i.e all tags inside
      * element)
      */
-    var update_element_index = function(element, idx) {
-      update_attr_index(element, idx);
+    update_element_index: function (element, idx) {
+      this.update_attr_index(element, idx);
+      var that = this;
       $(element).find('*').each(function(){
-        update_attr_index(this, idx);
+        that.update_attr_index(this, idx);
       });
-    };
+    },
 
     /**
      * Update indexes of all elements
      */
-    var update_elements_indexes = function(){
+    update_elements_indexes: function () {
       // Update elements indexes of all other elements
-      var all_elements = $('#' + options.prefix + " ." + options.element_css_class);
+      var all_elements = $('#' + this.options.prefix + " ." + this.options.element_css_class);
       var num_elements = all_elements.length;
       for (var i=0; i<num_elements; i++) {
-        update_element_index(all_elements[i], i);
+        this.update_element_index(all_elements[i], i);
       }
-      set_last_index(num_elements-1);
-    };
+      this.set_last_index(num_elements - 1);
+    },
 
     /**
      * Update values of fields for an element
      */
-    var update_element_values = function (root, data, field_prefix_index, selector_prefix){
+    update_element_values: function (root, data, field_prefix_index, selector_prefix) {
       var field_prefix, newdata;
 
       if(selector_prefix ===undefined){
-        selector_prefix = '#'+options.prefix+options.sep+options.index_suffix+options.sep;
+        selector_prefix = '#' + this.options.prefix + this.options.sep + this.options.index_suffix + this.options.sep;
       }
 
       if(field_prefix_index === undefined){
-        field_prefix = options.prefix+options.sep+options.index_suffix+options.sep;
+        field_prefix = this.options.prefix + this.options.sep + this.options.index_suffix + this.options.sep;
       } else {
-        field_prefix = options.prefix+options.sep+field_prefix_index+options.sep;
+        field_prefix = this.options.prefix + this.options.sep + field_prefix_index + this.options.sep;
       }
       if(root === null) {
         root = $(document);
@@ -128,154 +195,161 @@ define(function(require, exports, module) {
             }
           });
         } else {
-          newdata['value'] = data;
-          var input = root.find('#'+options.prefix+options.sep+options.index_suffix);
+          newdata.value = data;
+          var input = root.find('#' + this.options.prefix + this.options.sep + this.options.index_suffix);
           if(input.length !== 0) {
             // Keep old value
             input.val(input.val()+data);
           }
         }
 
-        root.find("."+options.tag_title_cssclass).html(
-          tag_template.render(newdata)
+        root.find("." + this.options.tag_title_cssclass).html(
+          this.tag_template.render(newdata)
         );
       }
-    };
+    },
 
-    var get_field_name = function(name_or_id) {
-      result = field_regex.exec(name_or_id);
+    get_field_name: function (name_or_id) {
+      var result = this.field_regex.exec(name_or_id);
       if(result !== null){
         return result[3];
       }
       return null;
-    };
+    },
 
-    var get_field_prefix = function(name_or_id) {
-      result = field_regex.exec(name_or_id);
+    get_field_prefix: function (name_or_id) {
+      var result = this.field_regex.exec(name_or_id);
       if(result !== null){
         return result[1];
       }
       return null;
-    };
+    },
 
     /**
      * Handler for remove element events
      */
-    var remove_element = function(e){
+    remove_element: function ($element, e) {
       //
       // Delete action
       //
       e.preventDefault();
 
       // Find and remove element
-      var old_element = $(this).parents("." + options.element_css_class);
+      var old_element = $element.parents("." + this.options.element_css_class);
+      var that = this;
       old_element.hide('fast', function(){
         // Give hide animation time to complete
         old_element.remove();
-        update_elements_indexes();
+        that.update_elements_indexes();
 
         // Callback
-        if (options.removed) {
-          options.removed(options, old_element);
+        if (that.options.removed) {
+          that.options.removed(that.options, old_element);
         }
       });
-    };
+    },
 
     /**
      * Handler for sort element events
      */
-    var sort_element = function (e, ui) {
-      update_elements_indexes();
+    sort_element: function (e, ui) {
+      this.update_elements_indexes();
       // Callback
-      if (options.updated) {
-        options.updated(options, ui.item);
+      if (this.options.updated) {
+        this.options.updated(this.options, ui.item);
       }
-    };
+    },
 
-    var update_element = function (data, idx){
+    update_element: function (data, idx) {
       //
       // Update action
       //
 
       // Update elements indexes of all other elements
-      var all_elements = $('#' + options.prefix + " ." + options.element_css_class);
+      var all_elements = $('#' + this.options.prefix + " ." + this.options.element_css_class);
       var num_elements = all_elements.length;
       if (idx < num_elements){
-        element = $(all_elements[idx]);
-        update_element_values(element, data, idx, '#'+options.prefix+options.sep+idx+options.sep);
+        this.element = $(all_elements[idx]);
+        this.update_element_values(this.$element, data, idx, '#' + this.options.prefix + this.options.sep + idx + this.options.sep);
       }
-    };
+    },
 
     /**
      * Handler for add new element events
      */
-    var append_element = function (data, field_prefix_index){
+    append_element: function (data, field_prefix_index) {
       //
       // Append action
       //
-      var new_element = template.clone();
-      var next_index = get_next_index();
+      var new_element = this.$template.clone();
+      var next_index = this.get_next_index();
       // Remove class
-      new_element.removeClass(options.empty_cssclass);
-      new_element.addClass(options.element_css_class);
+      new_element.removeClass(this.options.empty_cssclass);
+      new_element.addClass(this.options.element_css_class);
       // Pre-populate field values
-      update_element_values(new_element, data, field_prefix_index);
+      this.update_element_values(new_element, data, field_prefix_index);
       // Update ids
-      update_element_index(new_element, next_index);
+      this.update_element_index(new_element, next_index);
       // Insert before template element
       new_element.hide();
-      new_element.insertBefore($(template));
+      new_element.insertBefore(this.$template);
       new_element.show('fast');
       // Update last_index
-      set_last_index(next_index);
+      this.set_last_index(next_index);
+      var that = this;
       // Add delete button handler
-      new_element.find('.' + options.remove_cssclass).click(remove_element);
+      new_element.find('.' + this.options.remove_cssclass).click(function (event) {
+        that.remove_element($(this), event);
+      });
       // Add paste handler for some fields
-      if( options.on_paste !== null && options.on_paste_elements !== null) {
-        new_element.find(options.on_paste_elements).on('paste', on_paste);
+      if (this.options.on_paste !== null && this.options.on_paste_elements !== null) {
+        new_element.find(this.options.on_paste_elements).on('paste', function (event) {
+          that.on_paste(event);
+        });
       }
       // Callback
-      if (options.added) {
-        options.added(options, new_element);
+      if (this.options.added) {
+        this.options.added(this.options, new_element);
       }
-    };
+    },
 
     /**
      * On paste event handler, wrapping the user-defined paste handler to
      * for ease of use.
      */
-    var on_paste = function (e){
+    on_paste: function (e) {
       var element = $(e.target);
-      var root_element = element.parents("." + options.element_css_class);
+      var root_element = element.parents("." + this.options.element_css_class);
       var data = e.originalEvent.clipboardData.getData("text/plain");
-      var field_name = get_field_name(element.attr("id"));
-      var prefix = "#" + get_field_prefix(element.attr("id")) + options.sep;
+      var field_name = this.get_field_name(element.attr("id"));
+      var prefix = "#" + this.get_field_prefix(element.attr("id")) + this.options.sep;
 
-      if(options.on_paste !== null && data !== null) {
-        if(options.on_paste(root_element, element, prefix, field_name, data, append_element)) {
+      if (this.options.on_paste !== null && data !== null) {
+        if (this.options.on_paste(root_element, element, prefix, field_name, data, this.append_element)) {
           e.preventDefault();
         }
       }
-    };
+    },
 
     /**
      * Factory method for creating on paste event handlers. Allow handlers to
      * only care about splitting string into data elements.
      */
-    var create_paste_handler = function (splitter){
+    create_paste_handler: function (splitter) {
       var on_paste_handler = function(root_element, element, selector_prefix, field, clipboard_data, append_element){
         var elements_values = splitter(field, clipboard_data);
+        var that = this;
         if(elements_values.length > 0) {
           $.each(elements_values, function(idx, clipboard_data){
             if(idx === 0) {
-              update_element_values(root_element, clipboard_data, undefined, selector_prefix);
+              that.update_element_values(root_element, clipboard_data, undefined, selector_prefix);
             } else {
-              append_element(clipboard_data);
+              that.append_element(clipboard_data);
             }
           });
           // Callback
-          if (options.pasted) {
-            options.pasted(options);
+          if (this.options.pasted) {
+            this.options.pasted(this.options);
           }
           return true;
         } else {
@@ -284,46 +358,30 @@ define(function(require, exports, module) {
       };
 
       return on_paste_handler;
-    };
+    }
 
-    var create = function(item){
-      // Hook add/remove buttons on already rendered elements
-      $('#' + options.prefix + " ." + options.element_css_class + " ." + options.remove_cssclass).click(remove_element);
-      $('#' + options.prefix + " ." + options.add_cssclass).click(append_element);
+  }
 
-      // Hook for detecting on paste events
-      if( options.on_paste !== null && options.on_paste_elements !== null) {
-        options.on_paste = create_paste_handler(options.on_paste);
-        $('#' + options.prefix + " " + options.on_paste_elements).on('paste', on_paste);
+  $.fn.dynamicFieldList = function (option) {
+
+    var $elements = this;
+    var dataLabel = 'dynamic-field-list';
+
+    return $elements.map(function (idx, element) {
+      var $element = $(element);
+      var object = $element.data(dataLabel)
+      var options = typeof option == 'object' && option;
+      // attach jQuery plugin
+      if (!object) {
+        object = new DynamicFieldList($element, options)
+        $element.data(dataLabel, object)
+        object.init();
+        object.connectEvents();
       }
-
-      // Make list sortable
-      if(options.sortable){
-        var sortable_options = {
-          items: "." + options.element_css_class,
-          update: sort_element,
-        };
-
-        if($(item).find("."+options.sort_cssclass).length !== 0){
-          sortable_options.handle = "." + options.sort_cssclass;
-        }
-
-        $(item).sortable(sortable_options);
-      }
-
-      return item;
-    };
-
-    create(this);
-
-    return {
-      append_element: append_element,
-      update_element: update_element,
-      options: options,
-    };
+      return object;
+    });
   };
 
-  /** Field list plugin defaults */
   $.fn.dynamicFieldList.defaults = {
     prefix: null,
     sep: '-',
