@@ -176,7 +176,7 @@ DEBUG_PROCESS_PEAK_MEMORY = False
 # their use explicit.
 DEBUG_CHECKS = False
 
-TORTOISE_FILES_PATH = '/opt/tortoise_cache/'
+TORTOISE_FILES_PATH = '/opt/invenio/var/cache/bibauthorid/tortoise_cache'
 
 # force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True
