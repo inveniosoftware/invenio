@@ -114,11 +114,13 @@ class Command(ManageAssets):
         """
         if not self.env:
             self.env = current_app.jinja_env.assets_environment
+            self.log = current_app.logger
 
         from .registry import bundles
         for pkg, bundle in bundles:
-            current_app.logger.debug("{0}: {1.name} -> {1.output}"
-                                     .format(pkg, bundle))
+            self.log.info("{0}: {1.name} -> {1.output}".format(pkg, bundle))
+            for content in bundle.contents:
+                self.log.info("{0}: {1.name}: {2}".format(pkg, bundle, content))
             self.env.register(bundle.name, bundle)
 
         return super(Command, self).run(args)
