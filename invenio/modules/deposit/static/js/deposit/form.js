@@ -879,7 +879,7 @@ var DEPOSIT_FORM = (function( $ ){
     };
 
     $(selector).each(function(){
-      field_lists[$(this).attr('id')] = $(this).dynamicFieldList(opts);
+      field_lists[$(this).attr('id')] = $(this).dynamicFieldList(opts)[0];
     });
   }
 
