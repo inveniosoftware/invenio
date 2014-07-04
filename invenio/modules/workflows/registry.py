@@ -24,7 +24,8 @@ from flask.ext.registry import RegistryError, RegistryProxy
 
 class WorkflowsRegistry(DictModuleAutoDiscoverySubRegistry):
     def keygetter(self, key, orig_value, class_):
-        return class_.__name__ if key is None else key
+        return class_.__name__ \
+            if hasattr(class_, '__name__') and key is None else key
 
     def valuegetter(self, class_or_module):
         if inspect.ismodule(class_or_module):
@@ -41,7 +42,9 @@ class WorkflowsRegistry(DictModuleAutoDiscoverySubRegistry):
                 if len(all_) == 0:
                     raise RegistryError(
                         "Workflow class not found. Class name must match "
-                        "module name or be first element in  __all__."
+                        "module name or be first element in  __all__. "
+                        "Please check: {0}.{1}".format(class_or_module,
+                                                       attr_name)
                     )
                 return getattr(class_or_module, all_[0])
         return class_or_module
