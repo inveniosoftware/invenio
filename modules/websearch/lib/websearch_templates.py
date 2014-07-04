@@ -121,19 +121,14 @@ def tmpl_citesummary_get_link_for_rep_breakdown(search_pattern_for_coll, searchf
                 p = searchfield + ':"' + p + '"'
             else:
                 p = searchfield + ':' + p
-            link_url += quote(p) + '%20AND%20'
-        if colldef:
-            link_url += quote(colldef) + '%20AND%20'
-        if low == 0 and high == 0:
-            link_url += quote('%s:0' % keyword)
-        else:
-            link_url += quote('%s:%i->%i' % (keyword, low, high))
+        link_url += quote(p) + '%20AND%20'
+    if colldef:
+        link_url += quote(colldef) + '%20AND%20'
+    if low == 0 and high == 0:
+        link_url += quote('%s:0' % keyword)
+    else:
+        link_url += quote('%s:%i->%i' % (keyword, low, high))
     return link_url
-
-
-
-
-
 
 class Template:
 
