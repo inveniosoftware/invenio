@@ -51,13 +51,18 @@ styles = Bundle(
 #    styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
 
 
+
 jquery = Bundle(
     "js/jquery.js",
     "js/jquery.jeditable.mini.js",
     "js/jquery.tokeninput.js",
+    "js/jquery-caret.js",
+    "js/typeahead.js",
     "js/bootstrap.js",
+    "js/bootstrap-select.js",
     "js/hogan.js",
     "js/translate.js",
+
     output="gen/jquery.js",
     filters="uglifyjs",
     name="10-jquery.js",

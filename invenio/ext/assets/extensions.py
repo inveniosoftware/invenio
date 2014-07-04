@@ -152,6 +152,7 @@ class BundleExtension(Extension):
             requirejs_debug = suffix is "js" and env.debug and \
                 not current_app.config.get("REQUIREJS_RUN_IN_DEBUG", True)
 
+            static_url_path = current_app.static_url_path + "/"
             for bundle in sorted(current_app.jinja_env.bundles):
                 if bundle.endswith(suffix):
                     b = _bundles[bundle]
@@ -160,6 +161,8 @@ class BundleExtension(Extension):
                         b.extra.update(rel="stylesheet/less")
                     if requirejs_debug:
                         b.filters = None
+                    if less_debug or requirejs_debug:
+                        b.extra.update(static_url_path=static_url_path)
                     yield b
 
         return dict(get_bundle=get_bundle)
