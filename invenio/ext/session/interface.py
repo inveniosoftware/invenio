@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,8 +31,7 @@ import zlib
 from datetime import timedelta, datetime
 from flask import current_app, request
 from flask.helpers import locked_cached_property
-from flask.sessions import SessionInterface as FlaskSessionInterface, \
-    SecureCookieSession
+from flask.sessions import SessionInterface as FlaskSessionInterface
 from uuid import uuid4
 from werkzeug.utils import import_string
 from werkzeug.exceptions import BadRequest
@@ -100,17 +99,16 @@ class SessionInterface(FlaskSessionInterface):
             sid = self.generate_sid()
             return self.session_class(sid=sid)
         try:
-            data = self.serializer.loads(self.backend.get(sid))
-
-            session = self.session_class(data, sid=sid)
-            if session.check_ip(request):
-                return session
-        except Exception as err:
-            current_app.logger.warning("Detected error: %s" % err)
-            pass
+            data = self.backend.get(sid)
+            if data:
+                session = self.session_class(self.serializer.loads(data),
+                                             sid=sid)
+                if session.check_ip(request):
+                    return session
         except:
-            current_app.logger.warning("Error: loading session object")
-        current_app.logger.warning("returning empty session")
+            current_app.logger.warning(
+                "Load session error. Returning empty session.",
+                exc_info=True)
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
