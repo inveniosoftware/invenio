@@ -503,8 +503,8 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     @param kbtname: name of the taxonony kb
     @param tag: name of tag whose content
     @param searchwith: a term to search with
+
     """
-    from lxml import etree
     #get the actual file based on the kbt name
     kb_id = get_kb_id(kbtname)
     if not kb_id:
@@ -513,8 +513,8 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
     if not os.path.exists(rdfname):
         return []
-    #parse the doc with static xslt
-    styledoc = etree.XML("""
+
+    xsl = """\
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -537,11 +537,28 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
    <xsl:apply-templates />
   </xsl:template>
 
-</xsl:stylesheet>
-    """)
-    style = etree.XSLT(styledoc)
-    doc = etree.parse(open(rdfname, 'r'))
-    strres = str(style(doc))
+</xsl:stylesheet>"""
+
+    if processor_type == 1:
+        styledoc = etree.XML(xsl)
+        style = etree.XSLT(styledoc)
+        doc = etree.parse(open(rdfname, 'r'))
+        strres = str(style(doc))
+
+    elif processor_type == 2:
+        styledoc = libxml2.parseDoc(xsl)
+        style = libxslt.parseStylesheetDoc(styledoc)
+        doc = libxml2.parseFile(rdfname)
+        result = style.applyStylesheet(doc, None)
+        strres = style.saveResultToString(result)
+        style.freeStylesheet()
+        doc.freeDoc()
+        result.freeDoc()
+
+    else:
+        # no xml parser found
+        strres = ""
+
     ritems = []
     if len(strres) == 0:
         return []
