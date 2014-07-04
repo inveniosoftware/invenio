@@ -19,13 +19,13 @@
 
 """Tests for communities views."""
 
-from flask import url_for, current_app
-from invenio.testsuite import InvenioTestCase, make_test_suite, \
-    run_test_suite
+from flask import url_for
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class CommunitiesViewTest(InvenioTestCase):
-    """ Test communities view functions. """
+
+    """Test communities view functions."""
 
     def test_home_communities_page_availability(self):
         """communities - availability of main page"""
@@ -41,7 +41,8 @@ class CommunitiesViewTest(InvenioTestCase):
 
     def test_new_community_page_unauthorized(self):
         """communities - new communities restricted to logged in users"""
-        response = self.client.get(url_for('communities.new'))
+        response = self.client.get(url_for('communities.new'),
+                                   follow_redirects=True)
         self.assert401(response)
 
 

@@ -266,7 +266,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         from invenio.modules.oauthclient.models import RemoteAccount
         RemoteAccount.create(1, 'testid', None)
 
-        self.assert401(self.client.get(url_for('oauthclient_settings.index')))
+        self.assert401(self.client.get(url_for('oauthclient_settings.index'),
+                                       follow_redirects=True))
         self.login("admin", "")
 
         res = self.client.get(url_for('oauthclient_settings.index'))

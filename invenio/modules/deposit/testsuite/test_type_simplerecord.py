@@ -79,7 +79,8 @@ class SimpleRecordTest(DepositionTestCase):
         pass
 
     def test_registration(self):
-        self.assert401(self.client.get(url_for('webdeposit.index')))
+        self.assert401(self.client.get(url_for('webdeposit.index'),
+                                       follow_redirects=True))
         self.login("admin", "")
 
         res = self.client.get(url_for('webdeposit.index'))

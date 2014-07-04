@@ -43,7 +43,8 @@ class WorkflowViewTest(InvenioTestCase):
         """Test if admin view is avaiable."""
         from flask import url_for
 
-        response = self.client.get(url_for('workflows.index'))
+        response = self.client.get(url_for('workflows.index'),
+                                   follow_redirects=True)
         # FIXME: tmp 401 due to missing file
         self.assert401(response)
 
@@ -51,7 +52,8 @@ class WorkflowViewTest(InvenioTestCase):
         """Test if workflow list view is avaiable."""
         from flask import url_for
 
-        response = self.client.get(url_for('workflows.show_workflows'))
+        response = self.client.get(url_for('workflows.show_workflows'),
+                                   follow_redirects=True)
         # FIXME: tmp 401 due to missing file
         self.assert401(response)
 
