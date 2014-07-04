@@ -18,41 +18,35 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
+Annotations.
 
-    invenio.modules.annotations
-    ---------------------------
+invenio.modules.annotations
+---------------------------
 
-    To enable the module, make sure to remove it from ``PACKAGES_EXCLUDE``,
-    where it is placed by default.
+To enable the module, make sure to remove it from ``PACKAGES_EXCLUDE``,
+where it is placed by default.
 
-    To enable Web page annotations, add the following to your templates:
+To enable Web page annotations, add the following to your templates:
 
-    .. code-block:: jinja
+.. code-block:: jinja
 
-        {%- from "annotations/macros.html" import annotations_toolbar,
-                                                  annotations_js,
-                                                  annotations_css -%}
+    {%- from "annotations/macros.html" import annotations_toolbar  -%}
 
-        {%- block global_css -%}
-          {{ super() }}
-          {{ annotations_css() }}
-        {%- endblock global_css -%}
+    {%- block global_bundles -%}
+      {{ super() }}
+      {% bundle "30-annotations.js", "30-annotations.css" %}
+    {%- endblock global_javascript -%}
 
-        {%- block global_javascript -%}
-          {{ super() }}
-          {{ annotations_js() }}
-        {%- endblock global_javascript -%}
+    {%- block page_body -%}
+      {{ annotations_toolbar() }}
+      {{ super() }}
+    {%- endblock page_body -%}
 
-        {%- block page_body -%}
-          {{ annotations_toolbar() }}
-          {{ super() }}
-        {%- endblock page_body -%}
+To enable document annotations, along with the previewer, set the following
+configuration variables to ``True``:
 
-    To enable document annotations, along with the previewer, set the following
-    configuration variables to ``True``:
+.. code-block:: python
 
-    .. code-block:: python
-
-        ANNOTATIONS_NOTES_ENABLED = True
-        ANNOTATIONS_PREVIEW_ENABLED = True
+    ANNOTATIONS_NOTES_ENABLED = True
+    ANNOTATIONS_PREVIEW_ENABLED = True
 """

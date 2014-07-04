@@ -20,16 +20,13 @@
 {%- import "annotations/notes_fragment.html" as nf -%}
 {%- from "previewer/pdf_base.html" import pdf_pane with context -%}
 
-{%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- css url_for('previewer.static', filename='css/previewer/pdf_viewer.css'), '20-previews' -%}
-{%- endif -%}
-
-{%- js url_for('annotations.static', filename='js/annotations/notes_popover.js'), '10-comments' -%}
-{%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- js url_for('previews.static', filename='js/previewer/pdf_viewer.js'), '110-annos' -%}
-  {%- js url_for('annotations.static', filename='js/annotations/pdf_notes_helpers.js'), '110-annos' -%}
-{%- endif -%}
-
+{%- block global_bundles -%}
+  {{ super() }}
+  {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
+    {%- bundles "20-previewer.css", "20-previewer.js"}
+  {%- endif -%}
+  {%- bundles "10-comments.css", "30-annotations.js" -%}
+{%- endblock -%}
 
 {%- block custom -%}
   <div>

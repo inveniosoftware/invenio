@@ -21,11 +21,9 @@
 
 {% from "search/results.html" import render_search_results with context %}
 
-{% block global_css %}
+{% block global_bundles %}
   {{ super() }}
-  {%- css url_for('static', filename='css/formatter/templates_brief.css'), '00-search' -%}
-  {%- css url_for('static', filename='css/search/search.css'), '00-search' -%}
-  {%- js url_for('webtag.static', filename='js/tags/record_editor.js'), '00-search' -%}
+  {% bundles "60-formatter.css", "20-tags.js" %}
 {% endblock %}
 
 {%- set portalboxes = dict() -%}

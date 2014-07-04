@@ -22,11 +22,6 @@
 {%- endif -%}
 
 {% bundles "10-comments.js", "10-comments.css" %}
-{# FIXME: This hack should be done from the annotations module itself.
-{%- if config.ANNOTATIONS_NOTES_ENABLED -%}
-  {% css url_for('annotations.static', filename='css/annotations/annotations.css', '10-comments.css') %}
-{%- endif -%}
-#}
 
 {%- macro controls() -%}
   <div class="pull-right">

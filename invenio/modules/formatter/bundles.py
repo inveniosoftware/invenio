@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -16,3 +15,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Formatter bundles."""
+
+from invenio.ext.assets import Bundle
+
+
+css = Bundle(
+    "css/formatter/templates_brief.css",
+    "css/formatter/templates_detailed.css",
+    output="gen/formatter.js",
+    name="60-formatter.css",
+    filters="cleancss"
+)

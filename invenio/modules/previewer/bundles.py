@@ -1,6 +1,7 @@
-{#
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,19 +16,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#}
-{% from "search/helpers.html" import search_form_javascript with context %}
-{% extends "page.html" %}
-{# set title = collection.name_ln if collection.id > 1 else None #}
+
+"""Previewer bundles."""
 
 
-{% block body %}
-  {%- include "search/form/index.html" -%}
+from invenio.ext.assets import Bundle
 
-  {% block inner_content %}{% endblock %}
-{% endblock %}
+pdfjs = Bundle(
+    "js/previewer/pdf_viewer.js",
+    filters="uglifyjs",
+    output="gen/previewer/pdf.js",
+    name="20-previewer-pdf.js"
+)
 
-{% block javascript %}
-  {{ super() }}
-  {{ search_form_javascript(collection) }}
-{% endblock %}
+pdfcss = Bundle(
+    "css/previewer/pdf_viewer.css",
+    filters="cleancss",
+    output="gen/previewer/pdf.css",
+    name="20-previewer-pdf.css"
+)

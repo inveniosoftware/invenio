@@ -33,19 +33,6 @@
   </button>
 {%- endmacro -%}
 
-
-{%- macro annotations_js() -%}
-  {%- js 'plupload/plupload.full.min.js', '100-annotation' -%}
-  {%- js url_for('annotations.static', filename='js/annotations/annotations.js'), '100-annotation' -%}
-  {%- js url_for('annotations.static', filename='js/annotations/plupload_helper.js'), '100-annotation' -%}
-{%- endmacro -%}
-
-
-{%- macro annotations_css() -%}
-  {%- css url_for('annotations.static', filename='css/annotations/annotations.css'), '100-annotation' -%}
-{%- endmacro -%}
-
-
 {%- macro add() -%}
   {{ flashed_messages() }}
   <div class="row">

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -16,3 +15,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""Search bundles."""
+
+from invenio.base.bundles import invenio as _js, styles as _css
+
+
+_js.contents += ('js/search/search_parser.js',
+                 'js/search/typeahead.js',
+                 'js/search/default_typeahead_configuration.js',
+                 'js/search/facet.js')
+
+_css.contents += ('css/typeahead.js-bootstrap.css',
+                  'css/search/search.css',
+                  'css/search/searchbar.css')

@@ -56,4 +56,4 @@ po/POTFILES
 po/POTFILES-py
 po/POTFILES-webdoc
 po/stamp-po
-tags
+/tags
