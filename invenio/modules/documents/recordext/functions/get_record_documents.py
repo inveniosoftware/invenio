@@ -17,24 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-recids:
-    """List of record Ids that the document belong to."""
-    schema:
-        {'recids': {
-            'type': 'list',
-            'force': True,
-            'default': lambda: list()
-            }
-        }
+def get_record_documents(record):
+    """@todo: Docstring for get_record_documents.
 
-format:
-    """Document format.
+    :record: @todo
+    :returns: @todo
 
-    Optional field, if not set, deduced from the `source` field
     """
-    schema:
-        {'format': {
-            'type': 'string',
-            'default': lambda: ''
-            }
-        }
+    from invenio.modules.documents import api
+    return [api.Document.get_document(d[1]) for d in record.get('_files', [])]

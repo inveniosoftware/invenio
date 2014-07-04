@@ -17,24 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-recids:
-    """List of record Ids that the document belong to."""
-    schema:
-        {'recids': {
-            'type': 'list',
-            'force': True,
-            'default': lambda: list()
-            }
-        }
+UPLOADER_WORKFLOWS = {
+    'insert': 'invenio.modules.uploader.workflows.insert:insert'
+}
 
-format:
-    """Document format.
+UPLOADER_VALIDATION_MODE = 'strict'
 
-    Optional field, if not set, deduced from the `source` field
-    """
-    schema:
-        {'format': {
-            'type': 'string',
-            'default': lambda: ''
-            }
-        }
+UPLOADER_NUMBER_RECORD_PER_WORKER = 10

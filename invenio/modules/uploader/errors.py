@@ -17,24 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-recids:
-    """List of record Ids that the document belong to."""
-    schema:
-        {'recids': {
-            'type': 'list',
-            'force': True,
-            'default': lambda: list()
-            }
-        }
 
-format:
-    """Document format.
+class UploaderException(Exception):
+    """Base exception"""
+    pass
 
-    Optional field, if not set, deduced from the `source` field
-    """
-    schema:
-        {'format': {
-            'type': 'string',
-            'default': lambda: ''
-            }
-        }
+
+class UploaderWorkflowException(UploaderException):
+    """Raised by the workflows containing useful information to undo"""
+    def __init__(self, step, msg):
+        super(UploaderWorkflowException, self).__init__(msg)
+        self.step = step

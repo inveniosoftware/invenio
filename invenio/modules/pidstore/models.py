@@ -138,7 +138,7 @@ class PersistentIdentifier(db.Model):
 
         try:
             obj = cls(pid_type=provider.pid_type,
-                      pid_value=pid_value,
+                      pid_value=provider.create_new_pid(pid_value),
                       pid_provider=pid_provider,
                       status=cfg['PIDSTORE_STATUS_NEW'])
             obj._provider = provider
@@ -149,7 +149,6 @@ class PersistentIdentifier(db.Model):
         except SQLAlchemyError:
             db.session.rollback()
             obj.log("CREATE", "Failed to created. Already exists.")
-            return None
             return None
 
     @classmethod

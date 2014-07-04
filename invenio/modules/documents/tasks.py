@@ -17,24 +17,28 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-recids:
-    """List of record Ids that the document belong to."""
-    schema:
-        {'recids': {
-            'type': 'list',
-            'force': True,
-            'default': lambda: list()
-            }
-        }
+"""Document tasks."""
 
-format:
-    """Document format.
+from invenio.celery import celery
 
-    Optional field, if not set, deduced from the `source` field
+from . import api
+
+
+@celery.task
+def set_document_contents(document_id, source, name, **kwargs):
+    """Set content of a document using the Document API.
+
+    :see:`~invenio.modules.documents.api`
+
+    :document_id: Id of the document already created.
+    :source: as in :meth:`~invenio.modules.documents.api:Document.setcontents`
+    :name: as in :meth:`~invenio.modules.documents.api:Document.setcontents`
+    :**kwargs: Any other parameter that could be used by
+        :meth:`invenio.modules.documents.api:Document.setcontents`
+
     """
-    schema:
-        {'format': {
-            'type': 'string',
-            'default': lambda: ''
-            }
-        }
+    document = api.Document.get_document(document_id)
+    document.setcontents(source, name, kwargs)
+    return document['_id']
+
+__all__ = ['set_document_contents', ]
