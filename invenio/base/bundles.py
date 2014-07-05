@@ -77,12 +77,14 @@ jquery = Bundle(
 
 # jQuery UI
 jqueryui = Bundle(
-    "js/jqueryui/jquery-ui.js",
+    "js/jqueryui/jquery-ui.custom.js",
+    "js/jquery-ui-timepicker-addon.js",
     filters="uglifyjs",
     output="gen/jquery-ui.js",
     name="11-jquery-ui.js",
     bower={
         "jqueryui": "1.11.0",
+        "jquery.ui.timepicker": "http://invenoi-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js"
     }
 )
 
