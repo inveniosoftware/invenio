@@ -19,11 +19,15 @@
 {% from "_formhelpers.html" import render_field with context %}
 {% extends "page.html" %}
 {% set title = _("Write a message") %}
+
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "11-jquery-ui.js"}
+{% endblock %}
+
 {% block header %}
   {{ super() }}
-  {%- css url_for("static", filename="js/jquery-ui/jquery-ui.css") -%}
-  {%- js url_for("static", filename="js/jquery-ui.js") -%}
-  {%- js url_for("static", filename="js/jquery-ui-timepicker-addon.js") -%}
+  <link rel="stylesheet" href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.css") }}"/>
 {% endblock header %}
 {% block javascript %}
     <script type="text/javascript">

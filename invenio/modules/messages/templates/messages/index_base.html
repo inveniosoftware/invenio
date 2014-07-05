@@ -19,9 +19,15 @@
 {% from "_formhelpers.html" import th with context %}
 {% from "_formhelpers.html" import render_filter_form with context %}
 {% extends "page.html" %}
-{%- js url_for('webmessage.static', filename='js/messages/messages.js'),'70-comments' -%}
 {% set title = _("Your Messages") %}
 {% set personalize_selected = True %}
+
+{% block global_bundles %}
+  {{ super() }}
+  {% bundle "70-comments.js" %}
+{% endlbock %}
+
+
 {% block body %}
 
 {% if not no_quota %}
@@ -94,8 +100,4 @@
   </tbody>
 </table>
 </form>
-{% endblock %}
-
-{% block javacript %}
-{{ super() }}
 {% endblock %}
