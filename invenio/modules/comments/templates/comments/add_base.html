@@ -47,7 +47,7 @@
 {%- if not request.is_xhr -%}
   {% extends "records/base.html" %}
   {%- if config.ANNOTATIONS_NOTES_ENABLED -%}
-    {%- js url_for('annotations.static', filename='js/annotations/notes_popover.js'), '20-annotations' -%}
+    {% bundle "10-comments.js" %}
   {%- endif -%}
   {% block record_content %}
   {{ add_comment() }}

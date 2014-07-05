@@ -20,14 +20,7 @@
 {%- from "previewer/pdf_base.html" import pdf_pane with context -%}
 
 {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- css url_for('previewer.static', filename='css/previewer/pdf_viewer.css'), '20-previews' -%}
-{%- endif -%}
-
-{%- if config.ANNOTATIONS_NOTES_ENABLED -%}
-  {%- js url_for('annotations.static', filename='js/annotations/notes_popover.js'), '10-comments' -%}
-{%- endif -%}
-{%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-  {%- js url_for('previews.static', filename='js/previewer/pdf_viewer.js'), '10-comments' -%}
+  {% bundles "20-previewer-pdf.css", "20-previewer-pdf.js"  %}
 {%- endif -%}
 
 
