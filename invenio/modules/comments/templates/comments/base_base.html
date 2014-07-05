@@ -16,7 +16,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% from "_macros.html" import js_bundle, css_bundle with context %}
 {%- if not request.is_xhr -%}
   {%- extends "records/base.html" -%}
 {%- endif -%}
@@ -121,7 +120,5 @@
 {%- endblock record_content -%}
 
 {%- if request.is_xhr -%}
-  {{ css_bundle() }}
-  {{ js_bundle() }}
   <script type="text/javascript"> bindModals(); </script>
 {%- endif -%}

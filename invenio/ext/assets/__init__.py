@@ -45,7 +45,7 @@ from webassets.bundle import is_url
 from flask import current_app, json
 from flask.ext.assets import Environment, FlaskResolver
 
-from .extensions import BundleExtension, CollectionExtension
+from .extensions import BundleExtension
 from .registry import bundles
 from .wrappers import Bundle, Command
 
@@ -136,11 +136,10 @@ class InvenioResolver(FlaskResolver):
 
         return abspath
 
-Environment.resolver_class = InvenioResolver
-
 
 def setup_app(app):
     """Initialize Assets extension."""
+    Environment.resolver_class = InvenioResolver
     env = Environment(app)
     env.url = app.static_url_path + "/"
     env.directory = app.static_folder
@@ -149,39 +148,7 @@ def setup_app(app):
     app.config.setdefault("LESS_RUN_IN_DEBUG", True)
     app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
 
-    # FIXME to be removed
-    def _jinja2_new_bundle(tag, collection, name=None, filters=None):
-        if len(collection):
-            name = "invenio" if name is None else name
-            sig = hash(",".join(collection) + "|" + str(filters))
-            kwargs = {
-                "output": "{0}/{1}-{2}.{0}".format(tag, name, sig),
-                "filters": filters,
-                "extra": {"rel": "stylesheet"}
-            }
-
-            if tag is "css" and env.debug and \
-                    not app.config.get("LESS_RUN_IN_DEBUG"):
-                kwargs["extra"]["rel"] = "stylesheet/less"
-                kwargs["filters"] = None
-
-            if tag is "js" and filters and "requirejs" in filters:
-                if env.debug and \
-                        not app.config.get("REQUIREJS_RUN_IN_DEBUG"):
-                    # removing the filters to avoid the default "merge" filter.
-                    kwargs["filters"] = None
-                else:
-                    # removing the initial "/", r.js would get confused
-                    # otherwise
-                    collection = [c[1:] for c in collection]
-
-            return Bundle(*collection, **kwargs)
-
-    app.jinja_env.extend(new_bundle=_jinja2_new_bundle,
-                         default_bundle_name='90-invenio')
     app.jinja_env.add_extension(BundleExtension)
     app.context_processor(BundleExtension.inject)
-    # FIXME: remove me
-    app.jinja_env.add_extension(CollectionExtension)
 
     return app

@@ -98,8 +98,6 @@ def inject_utils():
     # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
     return dict(
         current_user=user,
-        get_css_bundle=current_app.jinja_env.get_css_bundle,
-        get_js_bundle=current_app.jinja_env.get_js_bundle,
         is_language_rtl=is_language_rtl,
         canonical_url=canonical_url,
         alternate_urls=alternate_urls,

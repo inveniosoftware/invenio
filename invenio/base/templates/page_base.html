@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- from "_macros.html" import flashed_messages, css_bundle, js_bundle with context -%}
+{%- from "_macros.html" import flashed_messages with context -%}
 
 {# List here the required bundles. The ordering will be made using their names.
  # New bundles should be defined in the bundles.py file of each module.
@@ -102,7 +102,6 @@
       <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"/>
     {%- endassets %}
   {%- endfor -%}
-  {{ css_bundle() }}
   {%- block _top_assets %}{% endblock _top_assets %}
   {%- block css %}{% endblock css %}
   {%- endblock head %}
@@ -163,7 +162,6 @@
       <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
     {%- endassets %}
   {%- endfor -%}
-  {{ js_bundle() }}
 {%- endblock _bottom_assets %}
 {%- block javascript %}{% endblock javascript %}
 {%- block body_end %}{% endblock body_end %}
