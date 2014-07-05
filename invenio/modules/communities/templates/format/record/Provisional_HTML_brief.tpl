@@ -18,7 +18,8 @@
 #}
 
 {% from "communities/helpers.html" import curation_buttons with context %}
-{% js url_for('communities.static', filename='js/communities/custom.js'), 'provisional-custom' %}
+
+{% bundle "91-communities.js" %}
 
 {% macro render_record_footer(number_of_displayed_authors) %}
     <p>
