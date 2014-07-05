@@ -27,10 +27,10 @@
 {% endif %}
 {% set personalize_selected = True %}
 
-{% block header %}
+{% block global_bundles %}
   {{ super() }}
-  {%- js url_for("static", filename="js/jqueryui/jquery-ui.custom.min.js") -%}
-{% endblock header %}
+  {% bundle "11-jquery-ui.js" %}
+{% endblock -%}
 
 {% block body %}
 <div class="tabbable">

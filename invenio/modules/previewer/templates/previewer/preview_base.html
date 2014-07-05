@@ -28,37 +28,20 @@
 ## and body when extending this base.
 #}
 
-{# Global CSS files #}
-{%- css url_for('static', filename='css/bootstrap.css'), '00-invenio' -%}
-{%- css url_for('static', filename='css/bootstrap-responsive.min.css'), '00-invenio' -%}
-{%- css url_for('static', filename='css/token-input.css'), '00-invenio' -%}
-{%- css url_for('static', filename='css/token-input-facebook.css'), '00-invenio' -%}
-
-{# Global Javascript files #}
-{%- js url_for('static', filename='js/jquery.js'), '00-invenio' -%}
-{%- js url_for('static', filename='js/jquery-migrate.js'), '00-invenio' -%}
-{%- js url_for('static', filename='js/bootstrap.js'), '00-invenio' -%}
-{%- js url_for('static', filename='js/jquery.tokeninput.js'), '00-invenio' -%}
-{%- js url_for('static', filename='js/invenio.js'), '00-invenio' -%}
-
+{%- bundles "10-jquery.js",
+            "90-invenio.js",
+            "50-invenio.css" %}
 
 <!DOCTYPE html>
 <html>
   <head>
     <title>Preview</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% for bundle in get_css_bundle(iterate=True) %}
-    {% assets bundle %}
-      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
-    {% endassets %}
-    {% endfor %}
-
-    {% for bundle in get_js_bundle(iterate=True) %}
-    {% assets bundle %}
-      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-    {% endfor %}
-
+    {%- for bundle in get_bundle('css') -%}
+      {%- assets bundle %}
+        <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"/>
+      {%- endassets %}
+    {%- endfor -%}
     {% block head %}
     {% endblock %}
   </head>
@@ -73,4 +56,9 @@
       </div>
       {% include 'previewer/bottom.html' %}
   </body>
+  {%- for bundle in get_bundle('js') -%}
+    {%- assets bundle %}
+      <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
+    {%- endassets %}
+  {%- endfor -%}
 </html>

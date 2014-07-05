@@ -24,9 +24,13 @@
 {% extends "page.html" %}
 {% set title = _("WebSearch Admin") %}
 
+{% block global_bundles %}
+  {{ super() }}
+  {% bundle "11-jquery-ui.js" %}
+{% endblock -%}
+
 {% block header %}
   {{ super() }}
-  {%- js url_for("static", filename="js/jqueryui/jquery-ui.js") -%}
 
 <style type="text/css">
     /* This minimal height is important to be able to attach
