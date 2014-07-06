@@ -293,7 +293,7 @@ def build_icon(path_workingdir,
         delay_info = "-delay %s" % escape_shell_arg(str(multipage_icon_delay))
 
     ## Command for icon creation:
-    cmd_create_icon = "%(convert)s -colorspace rgb -scale %(scale)s %(delay)s " \
+    cmd_create_icon = "%(convert)s -colorspace rgb -auto-orient -scale %(scale)s %(delay)s " \
                       "%(source-file-path)s %(icon-file-path)s 2>/dev/null" \
                       % { 'convert'          : CFG_PATH_CONVERT,
                           'scale'            : \

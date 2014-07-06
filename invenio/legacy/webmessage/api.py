@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -57,7 +57,7 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
     if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
         try:
-            raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+            raise InvenioWebMessageError(_('Sorry, this message is not in your mailbox.'))
         except InvenioWebMessageError as exc:
             register_exception()
             body = webmessage_templates.tmpl_error(exc.message, ln)
@@ -138,7 +138,7 @@ def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
     if (db.check_user_owns_message(uid, msgid) == 0):
         # The user doesn't own this message
         try:
-            raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+            raise InvenioWebMessageError(_('Sorry, this message is not in your mailbox.'))
         except InvenioWebMessageError as exc:
             register_exception()
             body = webmessage_templates.tmpl_error(exc.message, ln)
@@ -204,7 +204,7 @@ def perform_request_write(uid,
         if (db.check_user_owns_message(uid, msg_reply_id) == 0):
             # The user doesn't own this message
             try:
-                raise InvenioWebMessageError(_('Sorry, this message in not in your mailbox.'))
+                raise InvenioWebMessageError(_('Sorry, this message is not in your mailbox.'))
             except InvenioWebMessageError as exc:
                 register_exception()
                 body = webmessage_templates.tmpl_error(exc.message, ln)
@@ -382,8 +382,9 @@ def perform_request_send(uid,
         problem = True
 
     if len(msg_body) > CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE:
-        warnings.append(_("Your message is too long, please edit it. Maximum size allowed is %(x_size)i characters.",
-                    x_size=(CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,)))
+        warnings.append(_("Your message is too long, please shorten it. "
+                          "Maximum size allowed is %(x_size)i characters.",
+                          x_size=(CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,)))
         problem = True
 
     if use_email_address == 0:
@@ -448,7 +449,7 @@ def perform_request_send(uid,
             def listing(name1, name2):
                 """ name1, name2 => 'name1, name2' """
                 return str(name1) + ", " + str(name2)
-            warning = _("Your message could not be sent to the following recipients due to their quota:") + " "
+            warning = _("Your message could not be sent to the following recipients as it would exceed their quotas:") + " "
             warnings.append(warning + reduce(listing, usernames_problem))
 
         if len(uids_from_group) != len(uid_problem):

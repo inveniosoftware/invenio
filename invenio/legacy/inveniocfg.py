@@ -157,7 +157,8 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
 
     ## 3abis) special cases: real regexps
     if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES',
-                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS']:
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS',
+                       'CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN']:
         option_value = 'r"' + option_value[1:-1] + '"'
 
     ## 3b) special cases: True, False, None

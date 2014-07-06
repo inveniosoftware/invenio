@@ -21,7 +21,9 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import \
+     CFG_SITE_URL, \
+     CFG_SITE_RECORD
 
 
 def format_element(bfo, with_ln="yes"):
@@ -30,7 +32,7 @@ def format_element(bfo, with_ln="yes"):
 
     @param with_ln: if "yes" include "ln" attribute in the URL
     """
-    url = CFG_SITE_URL + "/record/" + bfo.control_field('001')
+    url = CFG_SITE_URL + "/" + CFG_SITE_RECORD + "/" + bfo.control_field('001')
 
     if with_ln.lower() == "yes":
         url += "?ln=" + bfo.lang

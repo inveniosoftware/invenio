@@ -90,15 +90,18 @@ from invenio.legacy.bibrecord import create_record, print_rec, record_add_field,
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
     record_strip_controlfields, record_order_subfields, \
-    field_add_subfield, field_get_subfield_values
+    field_add_subfield, field_get_subfield_values, field_xml_output, \
+    record_extract_dois
 
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
-    CFG_INSPIRE_SITE
+    CFG_INSPIRE_SITE, CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN, \
+    CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL
 from invenio.legacy.search_engine import record_exists, perform_request_search
 from invenio.legacy.webuser import session_param_get, session_param_set
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
+from invenio.legacy.bibcatalog.system import get_bibcat_from_prefs
 from invenio.legacy.webpage import page
 from invenio.utils.html import get_mathjax_header
 from invenio.utils.text import wash_for_xml, show_diff
@@ -225,6 +228,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     data = {'gRECORD_TEMPLATES': record_templates,
             'gTAG_NAMES': tag_names,
             'gPROTECTED_FIELDS': protected_fields,
+            'gINTERNAL_DOI_PROTECTION_LEVEL': CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL,
             'gSITE_URL': '"' + CFG_SITE_URL + '"',
             'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
             'gCERN_SITE': cern_site,
@@ -755,6 +759,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             number_of_physical_copies = get_number_copies(recid)
             bibcirc_details_URL = create_item_details_url(recid, ln)
             can_have_copies = can_record_have_physical_copies(recid)
+            managed_DOIs = [doi for doi in record_extract_dois(record) if \
+                            re.compile(CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN).match(doi)]
 
             # For some collections, merge template with record
             template_to_merge = extend_record_with_template(recid)
@@ -786,6 +792,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 read_only_mode, pending_changes, disabled_hp_changes, \
                 undo_list, redo_list
             response['numberOfCopies'] = number_of_physical_copies
+            response['managed_DOIs'] = managed_DOIs
             response['bibCirculationUrl'] = bibcirc_details_URL
             response['canRecordHavePhysicalCopies'] = can_have_copies
             # Set tag format from user's session settings.
