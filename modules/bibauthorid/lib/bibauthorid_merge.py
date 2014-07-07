@@ -305,12 +305,10 @@ def merge_dynamic():
         logger.log(paps, rejected, assigned, claimed, sig, target_pid)        
         
         if claimed or not assigned or assigned[0][0] == target_pid or int(target_pid) in [int(x[0]) for x in rejected]:
-            logger.log("I return", claimed, assigned)
             return
 
         assert len(assigned) == 1
         
-
 
         conflicts = get_signatures_of_paper_and_author(sig, target_pid)
         if not conflicts:

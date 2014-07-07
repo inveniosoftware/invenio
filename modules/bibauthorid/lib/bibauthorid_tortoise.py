@@ -36,7 +36,6 @@ except:
 
 from invenio.bibauthorid_logutils import Logger
 
-# override_stdout_config(fileout=True, stdout=False)
 
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
@@ -110,10 +109,12 @@ def tortoise(pure=False,
         logger.log("Preparing cluster sets.")
         clusters, _lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
         logger.log("Building all matrices.")
+        clusters = [(s,) for s in clusters]
         schedule_workers(lambda x: force_create_matrix(x, force=force_matrix_creation), clusters)
 
     logger.log("Preparing cluster sets.")
     clusters, _lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
+    clusters = [(s(),) for s in clusters]
     logger.log("Starting disambiguation.")
     schedule_workers(wedge_and_store, clusters)
 
@@ -131,14 +132,17 @@ def tortoise_last_name(name, wedge_threshold=None, from_mark=True, pure=False):
         logger.log(' ... from pid, pure=%s' % str(pure))
         clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure)
         logger.log(' ... delayed pure done!')
-
-    idx = lnames.index(lname)
-    cluster = clusters[idx]
-    size = sizes[idx]
-    cluster_set = cluster()
-    logger.log("Found, %s(%s). Total number of bibs: %d." % (name, lname, size))
-    create_matrix(cluster_set, False)
-    wedge_and_store(cluster_set)
+        
+    try:      
+        idx = lnames.index(lname)
+        cluster = clusters[idx]
+        size = sizes[idx]
+        cluster_set = cluster()
+        logger.log("Found, %s(%s). Total number of bibs: %d." % (name, lname, size))
+        create_matrix(cluster_set, False)
+        wedge_and_store(cluster_set)
+    except (IndexError, ValueError):
+        logger.log("Sorry, %s not found in the last name clusters" % (lname))
 
 
 def tortoise_last_names(names_args_list):
@@ -243,7 +247,6 @@ def tortoise_coefficient_statistics(pickle_output=None, generate_graphs=True):
         ax.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3, ncol=6, mode="expand", borderaxespad=0.)
         plt.savefig(filename)
 
-    logger.verbose = True
 
     files = ['/tmp/baistats/' + x for x in os.listdir('/tmp/baistats/') if x.startswith('cluster_status_report_pid')]
     fnum = float(len(files))
