@@ -95,6 +95,7 @@ module.exports = {
             'jquery-flot/excanvas.min.js',
             'jquery-flot/jquery.flot.js',
             'jquery-flot/jquery.flot.selection.js',
+            'jquery-form/jquery.form.js',
             'json2/json2.js',
             'prism/prism.js',
             'requirejs/require.js',
@@ -209,18 +210,6 @@ module.exports = {
         rename: function(dest, src) {
             var res = src.replace(src.substring(0),
                                   'jquery.ajaxPager.js');
-            return dest + res;
-        }
-    },
-    form: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['form/index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'jquery.form.js');
             return dest + res;
         }
     },
