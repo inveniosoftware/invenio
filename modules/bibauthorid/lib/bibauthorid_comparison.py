@@ -38,8 +38,8 @@ import random
 
 CFG_MEMOIZE_DICT_SIZE = 1000000
 
-logger = Logger('metadata_comparison')
-logger.verbose = bconfig.DEBUG_METADATA_COMPARISON_OUTPUT
+logger = Logger('metadata_comparison',
+                verbose=bconfig.DEBUG_METADATA_COMPARISON_OUTPUT)
 
 # This module is not thread safe!
 # Be sure to use processes instead of
