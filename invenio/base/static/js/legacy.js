@@ -17,14 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require.config({
-    baseUrl: '/',
-    paths: {
-        jquery: 'js/jquery',
-        'jquery.form': 'js/jquery.form',
-    },
-    shim: {
-        jquery: { exports: '$' },
-        'jquery.form': [ 'jquery' ]
-    }
+require(['jquery', 'jquery.form'], function($) {
+    // loading all the jQuery modules for the not require.js ready scripts
+    // everywhere.
 })

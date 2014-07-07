@@ -34,6 +34,7 @@
     },
     paths: {
         jquery: 'empty:',
+        'jquery.form': 'js/jquery.form'
     },
     shim: {
         jquery: { exports: '$' }
