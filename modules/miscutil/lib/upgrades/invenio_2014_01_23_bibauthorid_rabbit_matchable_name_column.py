@@ -25,7 +25,7 @@ from invenio.bibauthorid_rabbit import rabbit
 
 depends_on = ['invenio_2013_11_28_bibauthorid_search_engine_column_changes']
 
-Logger.override_stdout_config(verbose=True)
+Logger.override_verbosity(True)
 
 def info():
     return "Updates the columns of aidPERSONIDPAPERS, adds the rabbit matchable name, assigns default value to columns."
@@ -43,9 +43,8 @@ def do_upgrade():
 
     total_updates = len(present_bibrefs)
 
-
     records_for_rabbit = set()
-    for i,bibref in enumerate(present_bibrefs):
+    for i, bibref in enumerate(present_bibrefs):
         logger.update_status(float(i)/total_updates, '%s out of %s (%s)' % (str(i), str(total_updates), str(bibref)))
         try:
             name = get_name_by_bibref(bibref)

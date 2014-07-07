@@ -156,27 +156,33 @@ RABBIT_USE_CACHED_PID = True
 LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = True
 
 
-# BibAuthorID debugging options
+# Bibauthorid logging options.
 
-# This flag triggers the basic output.
-DEBUG_OUTPUT = False
+# Get frequent status updates from daemons.
+LOG_UPDATE_STATUS = True
 
-DEBUG_UPDATE_STATUS_THREAD_SAFE = False
-DEBUG_LOG_TO_PIDFILE = False
+# General messages logged by applications. Use for extra monitoring.
+LOG_VERBOSE = False
+
+# Log to files.
+LOG_TO_PIDFILE = False
+
+LOG_UPDATE_STATUS_THREAD_SAFE = False
 
 # The following options trigger the output for parts of
-# bibauthorid which normally generate too much output
+# bibauthorid which normally generate too much output. Use when debugging.
 DEBUG_NAME_COMPARISON_OUTPUT = False
 DEBUG_METADATA_COMPARISON_OUTPUT = False
 DEBUG_WEDGE_OUTPUT = False
 DEBUG_PROCESS_PEAK_MEMORY = False
+
 
 # Keep in mind that you might use an assert instead of this option.
 # Use DEBUG_CHECKS to guard heavy computations in order to make
 # their use explicit.
 DEBUG_CHECKS = False
 
-TORTOISE_FILES_PATH = '/opt/invenio/var/cache/bibauthorid/tortoise_cache'
+TORTOISE_FILES_PATH = '/opt/invenio/var/cache/bibauthorid/tortoise_cache/'
 
 # force skip ui arxiv stub page (specific for inspire)
 BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE = True

@@ -45,8 +45,8 @@ except ImportError:
 
 from Levenshtein import distance
 
-logger = Logger("name comparison")
-logger.verbose = bconfig.DEBUG_NAME_COMPARISON_OUTPUT
+logger = Logger("name comparison",
+                verbose=bconfig.DEBUG_NAME_COMPARISON_OUTPUT)
 
 artifact_removal = re.compile("[^a-zA-Z0-9]")
 surname_cleaning = re.compile("-([a-z])")

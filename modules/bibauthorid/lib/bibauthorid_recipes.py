@@ -31,9 +31,6 @@ def initial_disambiguation():
     assert duplicated_tortoise_results_exist()
 
 
-# This is a super safe call to tortoise.
-# For the moment tortoise is in experimental phase so
-# it is mandatory.
 def safe_disambiguation_iteration():
     from invenio.bibauthorid_tortoise import tortoise
     from invenio.bibauthorid_rabbit import rabbit
