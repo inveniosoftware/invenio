@@ -40,6 +40,7 @@
   {%- js url_for('base.static', filename='js/translate.js'), '01-jquery' -%}
   {# invenio related code. #}
   {%- js url_for('base.static', filename='js/invenio.js'), '90-invenio', 'requirejs' -%}
+  {%- js url_for('base.static', filename='js/legacy.js'), '91-invenio-legacy', 'requirejs' -%}
 
   {%- if config.get('ASSETS_DEBUG') -%}
     {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
@@ -103,12 +104,9 @@
   {%- endfor -%}
   {%- endblock head_apple_icons -%}
   {%- endblock head_links %}
-
-  {%- block header %}{{ metaheaderadd|safe }}{%- block metaheader %}{%- endblock metaheader -%}{%- endblock header -%}
-
   {{ css_bundle() }}
-
   {%- block _top_assets %}{% endblock _top_assets %}
+  {%- block header %}{{ metaheaderadd|safe }}{%- block metaheader %}{%- endblock metaheader -%}{%- endblock header -%}
   {%- block css %}{% endblock css %}
   {%- endblock head %}
 </head>
