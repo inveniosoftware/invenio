@@ -5,6 +5,7 @@ from cPickle import dump, load, UnpicklingError
 from invenio.bibauthorid_dbinterface import get_db_time
 from invenio.bibauthorid_logutils import Logger
 import h5py
+import errno
 
 
 class Bib_matrix(object):
@@ -135,7 +136,13 @@ class Bib_matrix(object):
             self._matrix = self._f['array']
 
         except (IOError, UnpicklingError, KeyError, OSError) as e:
-            self.logger.log('Bib_matrix: error occurred while loading bibmap, cleaning... ', str(type(e)), str(e))
+
+            if e.errno == errno.ENOENT:  # The file has not been created yet. If this the first time bib_matrix runs, it is fine.
+                self.logger.log("Warning: The bibmap serialized file ",
+                                self.get_map_path(),
+                                "is not present. Will not load bibmap.")
+            else:
+                self.logger.log('Unexpected error occurred while loading bibmap, cleaning... ', str(type(e)), str(e))
             self._bibmap = dict()
             self._matrix = None
 

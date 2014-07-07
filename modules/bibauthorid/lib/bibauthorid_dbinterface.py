@@ -1241,7 +1241,7 @@ def get_author_to_papers_mapping(recs, limit_by_name=None):  # get_personids_and
     surname = None
     if limit_by_name:
         try:
-            surname = create_normalized_name(split_name_parts(limit_by_name)[0])
+            surname = create_normalized_name(split_name_parts(limit_by_name))
         except IndexError:
             pass
 

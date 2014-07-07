@@ -1254,6 +1254,21 @@ def institution_history(record):
     return institutions
 
 
+class HepNamesIdentifierError(Exception):
+
+    def __init__(self, msg, value=None):
+        self.msg = msg
+        self.value = value
+
+    def __str__(self):
+        error_str = self.msg
+
+        if self.value:
+            error_str = '%s - %s' % (self.msg, repr(self.value))
+
+        return error_str
+
+
 def hepnames_ids(record):
 
     def extract_identifier(sub_fields):
@@ -1264,23 +1279,31 @@ def hepnames_ids(record):
         return map_subfields(sub_fields, mapping) or None
 
     field_instances = record_get_field_instances(record, '035', '', '')
+    record_id = record_get_field_value(record, '001', '', '', '')
     ids = [extract_identifier(x[0]) for x in field_instances if extract_identifier(x[0]) is not None]
+
+    for identifier in ids:
+        identifier.update({'hepnames_recid': record_id})
 
     return ids
 
 
 def author_profile_from_hepnames(identifiers):
-    test = lambda item: item['type'] == "BAI"
-    bai = filter(test, identifiers)
-
     try:
+        test = lambda item: item['type'] == "BAI"
+        bai = filter(test, identifiers)
         return bai.pop()['value']
     except (IndexError, KeyError):
         return None
 
 
 def identifier_permitted_for_display(identifier):
-    return identifier['type'].lower() in PROFILE_IDENTIFIER_WHITELIST
+    try:
+        id_type_lower = identifier['type'].lower()
+    except KeyError:
+        raise HepNamesIdentifierError("Malformed, missing key: type", identifier)
+
+    return id_type_lower in PROFILE_IDENTIFIER_WHITELIST
 
 
 def link_identifier(identifier):
@@ -1291,19 +1314,37 @@ def link_identifier(identifier):
     else:
         return None
 
-def identifier_context_for(identifier):
-    id_type = identifier['type'].lower()
+def identifier_priority_of(identifier_type):
+    '''
+    Retrieves priority of identifier based on identifier type.
+
+    Default is 0 if not set which is the highest priority.
+    '''
+    id_type_lower = identifier_type.lower()
     try:
-        priority = PROFILE_IDENTIFIER_WHITELIST[id_type.lower()]
+        return PROFILE_IDENTIFIER_WHITELIST[id_type_lower]
     except KeyError:
-        priority = 0
+        return 0
+
+def identifier_context_for(identifier):
+    '''
+    Creates a rendering context for a single ID from a HepNames record.
+
+    Input identifier must contain a `type` and `value` key.
+    '''
+    try:
+        id_type = identifier['type']
+        id_value = identifier['value']
+    except KeyError, e:
+        raise HepNamesIdentifierError("Malformed or missing keys", identifier)
 
     id_context = {
-        "priority": priority,
-        "label": identifier['type'],
-        "type": id_type,
-        "value": identifier['value']
+        "priority": identifier_priority_of(id_type),
+        "label": id_type,
+        "type": id_type.lower(),
+        "value":id_value
     }
+
     link = link_identifier(identifier)
     if link:
         id_context['link'] = link
@@ -1327,15 +1368,19 @@ def context_for_identifiers(identifiers):
     identifiers_with_context = []
     if identifiers:
         for identifier in identifiers:
-            context = identifier_context(identifier)
-            if context:
-                identifiers_with_context.append(context)
+            try:
+                context = identifier_context(identifier)
+                if context:
+                    identifiers_with_context.append(context)
+            except HepNamesIdentifierError:
+                pass # log/email bad identifiers
+
     return identifiers_with_context
 
 
 def hepnames_context(record):
     '''
-    Generates template a context using a HepNames record.
+    Generates template context of a HepNames record.
     '''
     identifiers = hepnames_ids(record)
     context = {

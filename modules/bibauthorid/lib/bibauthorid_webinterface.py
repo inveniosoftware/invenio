@@ -2751,18 +2751,23 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                 session.dirty = True
 
         template_parameters = {
-            "arxiv": html_arxiv,
-            "orcid": html_orcid,
             "autoclaim_successful_recids": autoclaim_successful_recs,
             "autoclaim_unsuccessful_recids": autoclaim_unsuccessful_recs,
             "review_autoclaim_link": "%s/author/ticket/review_autoclaim" % CFG_SITE_URL,
-            "hepnames": html_hepnames,
             "merge": TEMPLATE.tmpl_merge_box(merge_data, ln, add_box=False, loading=False),
-            "contact": html_support,
             "external_ids_box_html": ids_box_html,
             "user_level": ulevel,
             "base_url": CFG_BASE_URL
         }
+        
+
+        # Inspire specific endpoints.
+        if CFG_INSPIRE_SITE:
+            template_parameters["hepnames"] = html_hepnames
+            template_parameters["arxiv"] = html_arxiv
+            template_parameters["orcid"] = html_orcid
+            template_parameters["contact"] = html_support
+
         body = profile_page.get_wrapped_body("manage_profile", template_parameters)
         # body = profile_page.get_wrapped_body("generic", {'html': content})
 
