@@ -104,7 +104,7 @@ class BundleExtension(Extension):
 
         environment.extend(bundles=set())
 
-    def _update(self, bundles, caller):
+    def _update(self, filename, bundles, caller):
         """Update the environment bundles.
 
         :return: empty html or html comment in debug mode.
@@ -112,17 +112,15 @@ class BundleExtension(Extension):
         """
         self.environment.bundles.update(bundles)
         if current_app.debug:
-            return '<!-- bundles: {0} -->'.format(', '.join(bundles))
+            return "<!-- {0}: {1} -->\n".format(filename, ", ".join(bundles))
         else:
             return ''
 
     def parse(self, parser):
-        """Parse the bundles block and feed the bundles environemnt.
+        """Parse the bundles block and feed the bundles environment.
 
-        Bundles entries are remplaced by an empty string.
+        Bundles entries are replaced by an empty string.
         """
-        # not usefull unless you have many tags
-        #tag = parser.stream.current.value
         lineno = next(parser.stream).lineno
 
         bundles = []
@@ -131,7 +129,8 @@ class BundleExtension(Extension):
             bundles.append(value)
             parser.stream.skip_if("comma")
 
-        call = self.call_method("_update", args=[nodes.List(bundles)])
+        call = self.call_method("_update", args=[nodes.Const(parser.name),
+                                                 nodes.List(bundles)])
         call_block = nodes.CallBlock(call, [], [], '')
         call_block.set_lineno(lineno)
         return call_block
