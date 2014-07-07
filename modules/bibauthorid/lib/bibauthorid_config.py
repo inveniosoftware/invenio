@@ -220,11 +220,11 @@ PROFILE_IDENTIFIER_WHITELIST = {
 }
 
 # Used to define URL mappings for identifiers in lowercase
-# Identifiers will be placed where {} is found in the mapping.
-# e.g. { "orcid": "https://orcid.org/{}"}
+# Identifiers will be placed where {0} is found in the mapping.
+# e.g. { "orcid": "https://orcid.org/{0}"}
 PROFILE_IDENTIFIER_URL_MAPPING = {
-    "bai": "http://inspirehep.net/author/profile/{}",
-    "orcid": "https://orcid.org/{}"
+    "bai": "http://inspirehep.net/author/profile/{0}",
+    "orcid": "https://orcid.org/{0}"
 }
 
 NON_EMPTY_PERSON_TAGS = ['canonical_name']
