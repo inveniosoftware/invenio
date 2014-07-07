@@ -21,7 +21,9 @@
 
 import six
 
-from sqlalchemy.orm.exc import NoResultFound
+from flask import current_app
+from sqlalchemy import or_
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from werkzeug.utils import cached_property
 
 from invenio.modules.jsonalchemy.reader import Reader
@@ -94,10 +96,14 @@ class Record(SmartJson):
         #FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
-        blobs = Bibfmt.query.filter_by(id_bibrec=recid, kind='master')
-        if blobs is None:
-            return None
-        return [decompress(blob.value) for blob in blobs]
+        try:
+            blob = Bibfmt.query.filter(
+                Bibfmt.id_bibrec == recid,
+                or_(Bibfmt.kind == 'master', Bibfmt.format == 'xm')).one()
+            return decompress(blob.value)
+        except (NoResultFound, MultipleResultsFound):
+            current_app.logger.exception(
+                'Error retrieving the blob for recid {0}'.format(recid))
 
     @property
     def blob(self):
