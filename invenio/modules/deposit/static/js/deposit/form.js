@@ -74,10 +74,9 @@ var DEPOSIT_FORM = (function( $ ){
   function serialize_form(selector){
       // Sync CKEditor before serializing
       if (typeof CKEDITOR !== 'undefined') {
-        for (var instance in CKEDITOR.instances) {
-          var editor = CKEDITOR.instances[instance];
-          $('#'+instance).val(editor.getData());
-        }
+        $.each(CKEDITOR.instances, function(instance, editor) {
+          $("#" + instance).val(editor.getData())
+        });
       }
       fields = $(selector).serializeArray();
       if(uploader !== null){
