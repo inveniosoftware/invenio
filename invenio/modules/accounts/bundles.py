@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -18,8 +19,8 @@
 
 """Accounts bundles."""
 
-
 from invenio.base.bundles import styles as _styles
+
 
 # The underscore makes it "hidden" for the bundle collector.
 _styles.contents += ('css/accounts/login.css',)

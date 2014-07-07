@@ -19,7 +19,6 @@
 
 """Comments bundles."""
 
-
 from invenio.ext.assets import Bundle
 
 

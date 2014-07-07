@@ -19,7 +19,6 @@
 
 """Annotations bundles."""
 
-
 from invenio.ext.assets import Bundle
 
 from invenio.modules.previewer.bundles import pdfjs as _pdfjs
@@ -31,7 +30,6 @@ _pdfjs.contents += ("js/annotations/pdf_notes_helpers.js",)
 
 _commentsjs.contents += ("js/annotations/notes_popover.js",)
 _commentscss.contents += ("css/annotations/annotations.css",)
-
 
 js = Bundle(
     "plupload/moxie.js",

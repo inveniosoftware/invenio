@@ -19,8 +19,8 @@
 
 """Previewer bundles."""
 
-
 from invenio.ext.assets import Bundle
+
 
 pdfjs = Bundle(
     "js/previewer/pdf_viewer.js",

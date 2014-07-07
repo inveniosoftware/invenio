@@ -19,7 +19,6 @@
 
 """Messages bundles."""
 
-
 from invenio.ext.assets import Bundle
 
 
