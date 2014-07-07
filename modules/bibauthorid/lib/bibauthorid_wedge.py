@@ -47,8 +47,7 @@ wedge_thrsh = ''
 h5file = None
 
 
-logger = Logger("wedge")
-logger.verbose=bconfig.DEBUG_WEDGE_OUTPUT
+logger = Logger("wedge", verbose=bconfig.DEBUG_WEDGE_OUTPUT)
 
 import os
 PID = lambda: str(os.getpid())

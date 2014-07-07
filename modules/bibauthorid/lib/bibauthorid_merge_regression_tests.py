@@ -285,7 +285,7 @@ class BibauthoridSymetricMergerTestCase(BibauthoridBaseMergerTestCase):
     
         recs_two = set([self.sigs[9][2]])
                 
-        self.assertMergeResults(recs_one, recs_two)
+        self.assertMergeResults(recs_one, recs_two, non_deterministic=True)
 
    
 class BibauthoridSplitMergerTestCase(BibauthoridBaseMergerTestCase):

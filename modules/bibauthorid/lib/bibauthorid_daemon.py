@@ -81,12 +81,8 @@ Examples:
                             option is exclusive with --record-ids.
 
     Options for disambiguate
-      (default)             Performs full disambiguation of all records in the
-                            current personid tables with respect to the user
-                            decisions.
-
-      --from-scratch        Ignores the current information in the personid
-                            tables and disambiguates everything from scratch.
+      (default)             Performs full disambiguation of all records using
+                            data from the marc tables.
 
       --last-names          Performs disambiguation only for specific last names.
                             This is useful for testing or to fix a broken last name cluster.
@@ -179,7 +175,7 @@ def _task_run_core():
 
     if bibtask.task_get_option("disambiguate"):
         last_names = bibtask.task_get_option('last-names')
-        from_scratch = bool(bibtask.task_get_option("from_scratch"))
+        from_scratch = True   # TODO Pay attention to this after we are sure we want aid_tables disambiguation. 
         single_threaded = bool(bibtask.task_get_option("single-threaded"))
         if single_threaded and not last_names:
             bibtask.write_message("""--single-threaded will not be considered
