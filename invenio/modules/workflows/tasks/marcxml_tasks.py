@@ -490,59 +490,56 @@ def quick_match_record(obj, eng):
                                                  find_records_from_extoaiid,
                                                  find_record_from_oaiid,
                                                  find_record_from_doi)
+    from invenio.modules.records.api import Record
 
-    function_dictionnary_emergency = {'recid': find_record_from_recid,
-                                      'system_number': find_record_from_sysno,
-                                      'oaiid': find_record_from_oaiid,
-                                      'system_number_external': find_records_from_extoaiid,
-                                      'doi': find_record_from_doi}
+    identifier_function_to_check = {'recid': find_record_from_recid,
+                                    'system_number': find_record_from_sysno,
+                                    'oaiid': find_record_from_oaiid,
+                                    'system_number_external': find_records_from_extoaiid,
+                                    'doi': find_record_from_doi}
 
-    identifiers = {}
-
+    record = Record(obj.data.dumps())
     try:
-        from invenio.modules.records.api import Record
-        identifiers = Record(obj.data.dumps()).persistent_identifiers
-
-        function_dictionnary = []
-        for i in identifiers:
-            function_dictionnary.append(i.keys())
+        identifiers = record.persistent_identifiers
     except Exception as e:
         # if anything goes wrong, assume we need to get it manually.
-        eng.log.error("Problem with getting identifiers: %s"
+        eng.log.error("Problem with getting identifiers: %s\n%s"
                       % (str(e), traceback.format_exc()))
-        function_dictionnary = ['recid', 'system_number', 'oaiid', 'system_number_external', 'doi']
+        identifiers = []
 
-        for key in function_dictionnary:
-            if key in obj.data:
-                temp_result = obj.data[key]
-                if isinstance(temp_result, dict):
-                    temp_result = temp_result["value"]
-                identifiers[key] = temp_result
+    obj.extra_data["persistent_ids"] = identifiers
 
-    if not identifiers:
-        obj.log.info("No identifiers found. Cannot match.")
-        return False
-    else:
-        obj.extra_data["persistent_ids"] = identifiers
+    identifier_dict = {}
+    for name, value in identifiers:
+        value_dict = {}
+        for dic in value:
+            value_dict.update(dic)
+        identifier_dict[name] = value_dict
 
-    if "recid" not in identifiers:
-        for identifier in identifiers:
-            try:
-                recid = function_dictionnary_emergency[identifier](
-                    identifiers[identifier])
-            except:
-                recid = None
-
-            if recid:
-                if 'recid' not in obj.data:
-                    obj.data['recid'] = {'value': recid}
-                else:
-                    obj.data['recid']['value'] = recid
-                obj.extra_data["persistent_ids"]["recid"] = recid
-                return True
-        return False
-    else:
+    if "recid" in identifier_dict:
+        # If there is a recid, we are good, right?
+        obj.extra_data["persistent_ids"]["recid"] = identifier_dict["recid"]
         return True
+
+    # So if there is no explicit recid key, then maybe we can find the record
+    # using any of the other stable identifiers defined.
+    found_recid = False
+    for name, func in identifier_function_to_check.iteritems():
+        if name in identifier_dict:
+            if name in identifier_dict[name]:
+                # To get {"doi": {"doi": val}}
+                found_recid = func(identifier_dict[name][name])
+            elif "value" in identifier_dict[name]:
+                # To get {"doi": {"value": val}}
+                found_recid = func(identifier_dict[name]["value"])
+
+            if found_recid:
+                break
+
+    if found_recid:
+        obj.extra_data["persistent_ids"]["recid"] = found_recid
+        return True
+    return False
 
 
 def upload_record(mode="ir"):
