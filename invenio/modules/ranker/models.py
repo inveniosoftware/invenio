@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -73,14 +73,13 @@ class RnkMETHODNAME(db.Model):
                                                            lazy='dynamic'))
 
 
-class RnkCITATIONDATA(db.Model):
-    """Represents a RnkCITATIONDATA record."""
-    __tablename__ = 'rnkCITATIONDATA'
-    id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True)
-    object_name = db.Column(db.String(20), unique=True, nullable=False)
-    object_value = db.Column(db.iLargeBinary, nullable=True)
-    last_updated = db.Column(db.DateTime, nullable=False,
-                             server_default='1900-01-01 00:00:00')
+class RnkCITATIONDICT(db.Model):
+    """Represents a RnkCITATIONDICT record."""
+    __tablename__ = 'rnkCITATIONDICT'
+    citee = db.Column(db.Integer(10, unsigned=True), primary_key=True)
+    citer = db.Column(db.Integer(10, unsigned=True), primary_key=True)
+    __table_args__ = (db.Index('reverse', citer, citee),
+                      db.Model.__table_args__)
 
 
 class RnkCITATIONDATAERR(db.Model):
@@ -208,7 +207,7 @@ class CollectionRnkMETHOD(db.Model):
 __all__ = ['RnkMETHOD',
            'RnkMETHODDATA',
            'RnkMETHODNAME',
-           'RnkCITATIONDATA',
+           'RnkCITATIONDICT',
            'RnkCITATIONDATAERR',
            'RnkCITATIONDATAEXT',
            'RnkAUTHORDATA',
