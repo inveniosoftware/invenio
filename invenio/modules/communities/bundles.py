@@ -25,7 +25,6 @@ from invenio.ext.assets import Bundle
 js = Bundle(
     "js/communities/custom.js",
     filters="uglifyjs",
-    output="gen/communities.js",
-    name="communities.js",
+    output="communities.js",
     weight=91
 )

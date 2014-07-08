@@ -25,15 +25,13 @@ from invenio.ext.assets import Bundle
 pdfjs = Bundle(
     "js/previewer/pdf_viewer.js",
     filters="uglifyjs",
-    output="gen/previewer/pdf.js",
-    name="previewer-pdf.js",
+    output="previewer/pdf.js",
     weight=20
 )
 
 pdfcss = Bundle(
     "css/previewer/pdf_viewer.css",
     filters="cleancss",
-    output="gen/previewer/pdf.css",
-    name="previewer-pdf.css",
+    output="previewer/pdf.css",
     weight=20
 )

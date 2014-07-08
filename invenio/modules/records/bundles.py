@@ -24,8 +24,7 @@ from invenio.ext.assets import Bundle
 
 js = Bundle(
     "js/records/records.js",
-    output="gen/records.js",
-    name="records.js",
+    output="records.js",
     weight=20,
     filters="uglifyjs"
 )

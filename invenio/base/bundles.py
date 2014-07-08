@@ -24,9 +24,8 @@ from invenio.ext.assets import Bundle
 
 invenio = Bundle(
     "js/invenio.js",
-    output="gen/invenio.js",
+    output="invenio.js",
     filters="requirejs",
-    name="invenio.js",
     weight=90
 )
 
@@ -35,16 +34,12 @@ styles = Bundle(
     "css/token-input-facebook.css",
     "less/base.less",
     "css/tags/popover.css",
-    output="gen/invenio.css",
+    output="invenio.css",
     depends=[
         "less/base.less",
         "less/base/**/*.less"
     ],
-    extra={
-        "rel": "stylesheet/less"
-    },
     filters="less,cleancss",
-    name="invenio.css",
 )
 
 # FIXME
@@ -61,10 +56,8 @@ jquery = Bundle(
     "js/bootstrap-select.js",
     "js/hogan.js",
     "js/translate.js",
-
-    output="gen/jquery.js",
+    output="jquery.js",
     filters="uglifyjs",
-    name="jquery.js",
     weight=10,
     bower={
         "jquery": "2.1.0",
@@ -80,8 +73,7 @@ jqueryui = Bundle(
     "js/jqueryui/jquery-ui.custom.js",
     "js/jquery-ui-timepicker-addon.js",
     filters="uglifyjs",
-    output="gen/jquery-ui.js",
-    name="jquery-ui.js",
+    output="jquery-ui.js",
     weight=11,
     bower={
         "jqueryui": "1.11.0",
@@ -92,9 +84,8 @@ jqueryui = Bundle(
 # if ASSETS_DEBUG and not LESS_RUN_IN_DEBUG
 lessjs = Bundle(
     "js/less.js",
-    output="gen/less.js",
+    output="less.js",
     filters="uglifyjs",
-    name="less.js",
     weight=0,
     bower={
         "less": "1.7.0"
@@ -105,9 +96,8 @@ lessjs = Bundle(
 requirejs = Bundle(
     "js/require.js",
     "js/settings.js",
-    output="gen/require.js",
+    output="require.js",
     filters="uglifyjs",
-    name="require.js",
     weight=0,
     bower={
         "requirejs": "latest"
@@ -117,9 +107,8 @@ requirejs = Bundle(
 almondjs = Bundle(
     "js/almond.js",
     "js/settings.js",
-    output="gen/almond.js",
+    output="almond.js",
     filters="uglifyjs",
-    name="almond.js",
     weight=0,
     bower={
         "almond": "latest"

@@ -37,8 +37,7 @@ js = Bundle(
     "js/annotations/annotations.js",
     "js/annotations/plupload_helper.js",
     filters="uglifyjs",
-    output="gen/annotations.js",
-    name="annotations.js",
+    output="annotations.js",
     weight=30,
     bower={
         "plupload": "latest"

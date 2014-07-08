@@ -25,8 +25,7 @@ from invenio.ext.assets import Bundle
 css = Bundle(
     "css/formatter/templates_brief.css",
     "css/formatter/templates_detailed.css",
-    output="gen/formatter.css",
-    name="formatter.css",
+    output="formatter.css",
     weight=60,
     filters="cleancss"
 )

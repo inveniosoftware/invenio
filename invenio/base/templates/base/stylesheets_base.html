@@ -20,7 +20,7 @@
 
 {%- for bundle in get_bundle('css') %}
   {%- if config.get("DEBUG") %}
-  <!-- {{ bundle.weight }}: {{ bundle.name }} -->
+  <!-- {{ bundle.weight }}: {{ bundle.output }} -->
   {%- endif %}
   {%- assets bundle %}
   <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"/>

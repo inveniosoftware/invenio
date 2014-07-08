@@ -19,8 +19,6 @@
 """Custom modified classes."""
 
 
-import os
-
 from flask import current_app
 from flask.ext.assets import Bundle as BundleBase, ManageAssets
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
@@ -49,7 +47,6 @@ class Bundle(BundleBase):
         :param weight: weight of the bundle, lighter are loaded first.
         :type weight: int
         """
-        self.name = options.pop("name", None)
         self.bower = options.pop("bower", {})
         self.weight = int(options.pop("weight", 50))
         super(Bundle, self).__init__(*contents, **options)
@@ -57,8 +54,13 @@ class Bundle(BundleBase):
         # ease the bundle modification
         self.contents = list(self.contents)
         self.app = options.pop("app", None)
-        if self.name is None:
-            self.name = os.path.basename(self.output)
+
+    def has_filter(self, *filters):
+        """Tell whether a given filter is set up for this bundle."""
+        for f in self.filters:
+            if f.name in filters:
+                return True
+        return False
 
 
 class BundlesAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
@@ -122,9 +124,10 @@ class Command(ManageAssets):
 
         from .registry import bundles
         for pkg, bundle in bundles:
-            self.log.info("{0}: {1.name} -> {1.output}".format(pkg, bundle))
+            output = "{0}: {1.output}:".format(pkg, bundle)
             for content in bundle.contents:
-                self.log.info("{0}: {1.name}: {2}".format(pkg, bundle, content))
-            self.env.register(bundle.name, bundle)
+                output += "\n - {0}".format(content)
+            self.log.info(output)
+            self.env.register(bundle.output, bundle)
 
         return super(Command, self).run(args)

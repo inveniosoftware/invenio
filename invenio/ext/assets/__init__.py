@@ -39,11 +39,8 @@ Additional extensions and functions for the `flask.ext.assets` module.
 """
 
 import os
-import six
 import pkg_resources
-from webassets.bundle import is_url
 from flask import current_app, json
-from flask.ext.assets import Environment, FlaskResolver
 
 from .extensions import BundleExtension
 from .registry import bundles
@@ -82,73 +79,16 @@ def bower():
     print(json.dumps(output, indent=4))
 
 
-class InvenioResolver(FlaskResolver):
-
-    """Custom resource resolver for webassets."""
-
-    def resolve_source(self, ctx, item):
-        """Return the absolute path of the resource.
-
-        .. seealso:: :py:function:`webassets.env.Resolver:resolve_source`
-        """
-        if not isinstance(item, six.string_types) or is_url(item):
-            return item
-        if item.startswith(ctx.url):
-            item = item[len(ctx.url):]
-        return self.search_for_source(ctx, item)
-
-    def resolve_source_to_url(self, ctx, filepath, item):
-        """Return the url of the resource.
-
-        Displaying them as is in debug mode as the webserver knows where to
-        search for them.
-
-        .. seealso::
-
-            :py:function:`webassets.env.Resolver:resolve_source_to_url`
-        """
-        if ctx.debug:
-            return item
-        return super(InvenioResolver, self).resolve_source_to_url(ctx,
-                                                                  filepath,
-                                                                  item)
-
-    def search_for_source(self, ctx, item):
-        """Return absolute path of the resource.
-
-        :param item: resource filename
-        :return: absolute path
-        .. seealso:: :py:function:`webassets.env.Resolver:search_for_source`
-        """
-        try:
-            abspath = super(InvenioResolver, self).search_env_directory(ctx,
-                                                                        item)
-        except:  # FIXME do not catch all!
-            # If a file is missing in production (non-debug mode), we want
-            # to not break and will use /dev/null instead. The exception
-            # is caught and logged.
-            if not current_app.debug:
-                error = "Error loading asset file: {0}".format(item)
-                current_app.logger.exception(error)
-                abspath = "/dev/null"
-            else:
-                raise
-
-        return abspath
-
-
 def setup_app(app):
-    """Initialize Assets extension."""
-    Environment.resolver_class = InvenioResolver
-    env = Environment(app)
-    env.url = app.static_url_path + "/"
-    env.directory = app.static_folder
-    # The filters less and requirejs don't have the same behaviour by default.
-    # Respecting that.
-    app.config.setdefault("LESS_RUN_IN_DEBUG", True)
-    app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
+    """Initialize Assets extension.
 
-    app.jinja_env.add_extension(BundleExtension)
-    app.context_processor(BundleExtension.inject)
+    Use the ``ASSETS_BUNDLES_DIR`` option to change the name of the directory
+    where the assets are generated (by default ``gen``).
+
+    :param app: Flask application
+    """
+    app.config.setdefault("ASSETS_BUNDLES_DIR", "gen")
+
+    BundleExtension.install(app)
 
     return app
