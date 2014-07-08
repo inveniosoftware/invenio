@@ -19,6 +19,7 @@ Extensions
    ext/elasticsearch
    ext/login
    ext/sqlalchemy
+   ext/template
 
 Modules
 -------

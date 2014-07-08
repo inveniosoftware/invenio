@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,12 +16,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.ext.template.extensions
-    -----------------------------
 
-    This module contains custom `Jinja2` extensions.
-"""
+"""Custom `Jinja2` extensions."""
 
 from jinja2 import nodes
 from jinja2.ext import Extension
@@ -28,12 +25,13 @@ from flask import g
 
 
 class LangExtension(Extension):
-    """ Ease transition from legacy BibFormat templates using <lang>...</lang>
-        for internationalization.
-    """
+
+    """Ease transition from legacy templates using ``<lang>...</lang>``."""
+
     tags = set(['lang'])
 
     def parse(self, parser):
+        """Parse the template."""
         lineno = parser.stream.next().lineno
 
         body = parser.parse_statements(['name:endlang'], drop_needle=True)
@@ -43,6 +41,6 @@ class LangExtension(Extension):
 
     @staticmethod
     def _lang(caller):
-        """Returns corrent language string using `filter_languages`."""
+        """Return current language string using `filter_languages`."""
         from invenio.modules.formatter.engine import filter_languages
         return filter_languages('<lang>' + caller() + '</lang>', g.ln)

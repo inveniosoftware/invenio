@@ -19,54 +19,60 @@
     granted to it by virtue of its status as an Intergovernmental Organization
     or submit itself to any jurisdiction.
 
-:orphan:
-
-=========
- Aliases
-=========
-
-Sometimes *Sphinx* is confused so we have to help him a bit.
+.. _ext_templates:
 
 
-Jinja2
-======
+.. py:currentmodule:: invenio.ext.template
 
-.. py:class:: jinja2.bccache.MemcachedBytecodeCache
-
-    :py:class:`jinja:jinja2.MemcachedBytecodeCache`
-
-Flask
-=====
-
-.. py:class:: flask.templating.DispatchingJinjaLoader
-
-    A loader that looks for templates in the application and all the blueprint
-    folders.
-
-Flask-Assets
-============
-
-.. py:class:: flask_assets.FlaskResolver
-
-    A subclass of the webassets resolver.
-
-.. py:class:: flask_assets.ManageAssets
-
-
-    A Flask-Script command for managing assets, see:
-    :ref:`webassets:script-commands`
-
-Flask-Login
-===========
-
-.. py:class:: flask_login.UserMixin
-
-   Sorry not valid intersphinx were found for: ``flask.ext.login.UserMixin``.
-
-Webassets
+Templates
 =========
 
-.. py:class:: webassets.bundle.Bundle
+.. automodule:: invenio.ext.template
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-    A webasset :ref:`Bundle <webassets:bundles>` that combines resources such a
-    JavaScript or CSS stylesheets.
+
+Jinja2 extensions
+-----------------
+
+.. automodule:: invenio.ext.template.extensions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Config
+------
+
+.. automodule:: invenio.ext.template.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Loader
+------
+
+.. automodule:: invenio.ext.template.loader
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+BCCache
+--------
+
+.. automodule:: invenio.ext.template.bccache
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Context Processor
+-----------------
+
+.. automodule:: invenio.ext.template.context_processor
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,38 +16,36 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.ext.template
-    --------------------
 
-    This module provides additional extensions and filters for `jinja2` module
-    used in Invenio.
-"""
+"""Additional extensions and filters for jinja2 module."""
 
+import re
 import six
 
 from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
 from .loader import OrderAwareDispatchingJinjaLoader
-from flask import g, request, current_app, _request_ctx_stack, url_for
-from jinja2 import FileSystemLoader, ChoiceLoader
+from flask import g, request, _request_ctx_stack, url_for
+from jinja2 import ChoiceLoader
 from six import iteritems
 
 ENV_PREFIX = '_collected_'
 
 
 def render_template_to_string(input, _from_string=False, **context):
-    """Renders a template from the template folder with the given
-    context and return the string.
+    """
+    Render a template from the template folder with the given context.
+
+    Code based on
+    `<https://github.com/mitsuhiko/flask/blob/master/flask/templating.py>`_
 
     :param input: the string template, or name of the template to be
                   rendered, or an iterable with template names
                   the first one existing will be rendered
     :param context: the variables that should be available in the
                     context of the template.
+    :return: a string
 
-    :note: code based on
-    [https://github.com/mitsuhiko/flask/blob/master/flask/templating.py]
     """
     ctx = _request_ctx_stack.top
     ctx.app.update_template_context(context)
@@ -59,20 +58,20 @@ def render_template_to_string(input, _from_string=False, **context):
 
 def inject_utils():
     """
-    This will add some more variables and functions to the Jinja2 to execution
-    context. In particular it will add:
+    Inject variables and functions to jinja execution context.
 
-    - `url_for`: an Invenio specific wrapper of Flask url_for, that will let
-                 you obtain URLs for non Flask-native handlers (i.e. not yet
-                 ported Invenio URLs)
-    - `_`: this can be used to automatically translate a given string.
-    - `is_language_rtl`: True if the chosen language should be read right to
-                         left.
+    In particular it will add:
+
+    - ``url_for``: an Invenio specific wrapper of Flask url_for, that will let
+      you obtain URLs for non Flask-native handlers (i.e. not yet ported
+      Invenio URLs)
+    - ``_``: this can be used to automatically translate a given string.
+    - ``is_language_rtl``: True if the chosen language should be read right to
+      left.
     """
     from werkzeug.routing import BuildError
 
     from invenio.base.i18n import is_language_rtl
-    from flask.ext.babel import get_translations
     from flask.ext.login import current_user
     from invenio.utils.url import create_url, get_canonical_and_alternates_urls
 
@@ -80,11 +79,12 @@ def inject_utils():
         try:
             return url_for(endpoint, **values)
         except BuildError:
-            if endpoint.startswith('http://') or endpoint.startswith('https://'):
+            if re.match("https?://", endpoint, re.IGNORECASE):
                 return endpoint
             if endpoint.startswith('.'):
                 endpoint = request.blueprint + endpoint
-            return create_url('/' + '/'.join(endpoint.split('.')), values, False).decode('utf-8')
+            url = create_url('/' + endpoint.replace('.', '/'), values, False)
+            return url.decode('utf-8')
 
     user = current_user._get_current_object()
     canonical_url, alternate_urls = get_canonical_and_alternates_urls(
@@ -92,10 +92,10 @@ def inject_utils():
     alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                           for ln, alternate_url in iteritems(alternate_urls))
     try:
-        from invenio.modules.records.api import get_record  # should not be global due to bibfield_config
+        # should not be global due to bibfield_config
+        from invenio.modules.records.api import get_record
     except:
         get_record = lambda *args, **kwargs: None
-    # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
     return dict(
         current_user=user,
         is_language_rtl=is_language_rtl,
@@ -103,22 +103,21 @@ def inject_utils():
         alternate_urls=alternate_urls,
         get_record=get_record,
         url_for=invenio_url_for,
-        #**TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
-        )
+    )
 
 
 def setup_app(app):
     """
-    Extends application template filters with custom filters and fixes.
+    Extend application template filters with custom filters and fixes.
 
     List of applied filters:
-    ------------------------
-    * filesizeformat
-    * path_join
-    * quoted_txt2html
-    * invenio_format_date
-    * invenio_pretty_date
-    * invenio_url_args
+
+    - filesizeformat
+    - path_join
+    - quoted_txt2html
+    - invenio_format_date
+    - invenio_pretty_date
+    - invenio_url_args
     """
     import os
     from datetime import datetime
@@ -168,9 +167,7 @@ def setup_app(app):
 
     @app.template_filter('sentences')
     def _sentences(value, limit, separator='. '):
-        """
-        Returns first `limit` number of sentences ending by `separator`.
-        """
+        """Return first `limit` number of sentences ending by `separator`."""
         return separator.join(value.split(separator)[:limit])
 
     @app.template_filter('path_join')
@@ -186,21 +183,24 @@ def setup_app(app):
     @app.template_filter('invenio_format_date')
     def _format_date(date):
         """
-        This is a special Jinja2 filter that will call
-        convert_datetext_to_dategui to print a human friendly date.
+        Format a date into a human friendly format.
+
+        It uses :py:func:`invenio.utils.date.convert_datetext_to_dategui`
         """
         if isinstance(date, datetime):
             return convert_datestruct_to_dategui(
                 date.timetuple(),
                 getattr(g, 'ln', app.config['CFG_SITE_LANG'])).decode('utf-8')
         return convert_datetext_to_dategui(
-            date, getattr(g, 'ln', app.config['CFG_SITE_LANG'])).decode('utf-8')
+            date, getattr(g, 'ln', app.config['CFG_SITE_LANG'])
+        ).decode('utf-8')
 
     @app.template_filter('invenio_pretty_date')
     def _pretty_date(date):
         """
-        This is a special Jinja2 filter that will call
-        pretty_date to print a human friendly timestamp.
+        Format a timestamp into a human friendly format.
+
+        It uses :py:func:`invenio.utils.date.pretty_date`
         """
         if isinstance(date, datetime) or isinstance(date, six.string_types):
             return pretty_date(
