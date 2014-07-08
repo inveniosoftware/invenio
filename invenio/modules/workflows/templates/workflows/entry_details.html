@@ -19,7 +19,7 @@
 {% extends "workflows/admin_base.html" %}
 {% import 'workflows/utils.html' as utils %}
 
-{% js url_for('workflows.static', filename='js/workflows/entry_details.js'), '50-workflows' %}
+{% bundles "workflows.js" %}
 
 {% block javascript %}
     {{ super() }}

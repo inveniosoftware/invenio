@@ -20,14 +20,11 @@
 
 {%- block header%}
     {{ super() }}
-    {% css url_for('static', filename='css/prettify.css') %}
+    {% bundles "workflows.js", "vendors.js", "vendors.css" %}
 {%- endblock header %}
 
 {%- block javascript %}
     {{ super() }}
-    {%- block action_assets %}
-        {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
-    {%- endblock action_assets %}
 {%- endblock javascript %}
 
 {% block hpbody %}
