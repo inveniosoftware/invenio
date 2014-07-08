@@ -148,6 +148,7 @@ class BibEDITCACHE(db.Model):
 
     """Represent a BibEDITCACHE record."""
 
+    __tablename__ = 'bibEDITCACHE'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                           db.ForeignKey(Bibrec.id), autoincrement=False,
                           nullable=False, primary_key=True)
@@ -3264,6 +3265,7 @@ class BibrecBib99x(db.Model):
 
 __all__ = ['Bibrec',
            'Bibfmt',
+           'BibEDITCACHE',
            'BibHOLDINGPEN',
            'Bibdoc',
            'BibdocBibdoc',
