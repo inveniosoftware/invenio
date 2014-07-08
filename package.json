@@ -8,6 +8,7 @@
     "grunt-contrib-clean": "*",
     "grunt-contrib-copy": "*",
     "grunt-contrib-cssmin": "*",
+    "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-less": "*",
     "grunt-contrib-requirejs": "*",
     "grunt-contrib-uglify": "*",

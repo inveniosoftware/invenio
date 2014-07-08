@@ -1,5 +1,5 @@
 /*
- * This file is part of Invenio.
+  This file is part of Invenio.
  * Copyright (C) 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
@@ -18,6 +18,19 @@
  */
 
 module.exports = {
-    first: ['newer:copy'],
-    second: ['newer:uglify', 'jshint']
-};
+    all:{
+        options:{
+            // See more http://www.jshint.com/docs/options/
+            camelcase: true,
+            undef: true,
+            unused: true,
+            browser: true,
+            // :P :D :P
+            indent: 4,
+            globals:{
+                jQuery: true
+            }
+        },
+        src: ['test/**/*.js', 'invenio/base/static/js/**/*.js', 'invenio/modules/**/*.js'],
+    }
+}
