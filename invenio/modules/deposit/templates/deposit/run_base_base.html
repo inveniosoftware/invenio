@@ -19,32 +19,19 @@
 
 {%- extends "page.html" -%}
 
-{%- block global_css %}
+{% block global_bundles %}
   {{ super() }}
-  {% block deposit_css %}
-    {%- css url_for('static', filename='css/typeahead.js-bootstrap.css'), '51-webdeposit' -%}
-    {%- css url_for('static', filename='css/deposit/form.css'), '51-webdeposit' -%}
-    {%- css url_for('static', filename='img/jquery-ui/themes/base/jquery.ui.theme.css'), '01-jquery-ui' -%}
-    {%- css url_for('static', filename='img/jquery-ui/themes/base/jquery.ui.datepicker.css'), '01-jquery-ui' -%}
-  {% endblock deposit_css %}
-{%- endblock global_css %}
+  {% bundles "jquery-ui.js", "deposit.js" %}
+{% endblock %}
 
-{%- block global_javascript %}
+{%- block header %}
   {{ super() }}
-  {% block deposit_js %}
-    {%- js url_for('static', filename='js/jqueryui/jquery-ui.js'), '01-jquery-ui' -%}
-    {%- js url_for('static', filename='js/jqueryui/jquery.ui.core.js'), '01-jquery-ui' -%}
-    {%- js url_for('static', filename='js/jqueryui/jquery.ui.widget.js'), '01-jquery-ui' -%}
-    {%- js url_for('static', filename='js/jqueryui/jquery.ui.mouse.js'), '01-jquery-ui' -%}
-    {%- js url_for('static', filename='js/jqueryui/jquery.ui.sortable.js'), '01-jquery-ui' -%}
-    {%- js url_for('static', filename='plupload/plupload.full.min.js'), '51-webdeposit' -%}
-    {%- js url_for('webdeposit.static', filename='js/deposit/form.js'), '51-webdeposit' -%}
-    {%- js url_for('webdeposit.static', filename='js/deposit/templates.js'), '51-webdeposit' -%}
-    {%- js url_for('static', filename='ckeditor/ckeditor.js'), '50-ckeditor' -%}
-    {%- js url_for('static', filename='js/ckeditor/invenio-ckeditor-config.js'), '50-ckeditor' -%}
-    {%- js url_for('static', filename='js/typeahead.js'), '10-invenio' -%}
-  {% endblock deposit_js %}
-{%- endblock global_javascript %}
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.theme.css") }}"/>
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.datepicker.css") }}"/>
+{% endblock header %}
+
 
 {% macro form_action_bar(margin="") -%}{% block form_action_bar scoped %}
     {% include "deposit/run_action_bar.html" %}
@@ -156,9 +143,14 @@
 {% endblock %}
 
 
-
 {% block javascript %}
-{{ super() }}
+  {{ super() }}
+  {# The ckEditor loads dynamically other files and thus cannot be safely
+   # bundled with the others.
+   #}
+  <script type="text/javascript" src="{{ url_for("static", filename="ckeditor/ckeditor.js" )}}"></script>
+  <script type="text/javascript" src="{{ url_for("static", filename="js/ckeditor/invenio-ckeditor-config.js" )}}"></script>
+
 {%- block form_script_options %}
 <script type="text/javascript">
 var date_options = {dateFormat: 'yy-mm-dd'}

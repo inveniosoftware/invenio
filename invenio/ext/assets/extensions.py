@@ -111,21 +111,27 @@ class BundleExtension(Extension):
             for bundle_name in current_app.jinja_env.bundles:
                 if bundle_name.endswith(suffix):
                     bundle = _bundles[bundle_name]
+                    if suffix == "css":
+                        bundle.extra.update(rel="stylesheet")
                     bundles.append((bundle.weight, bundle))
 
             for _, bundle in sorted(bundles):
-                if env.debug and (
-                        less_debug and bundle.has_filter("less") or
-                        requirejs_debug and bundle.has_filter("requirejs")):
+                # A little bit of madness to readd the "/" at the
+                # beginning of the assets in ran in debug mode as well as
+                # killing the filters if they are not wanted in debug mode.
+                if env.debug:
                     bundle.extra.update(static_url_path=static_url_path)
-                if suffix is "css":
-                    bundle.extra.update(rel="stylesheet")
-                    if less_debug and bundle.has_filter("less"):
-                        bundle.filters = None
-                        bundle.extra.update(rel="stylesheet/less")
-                if suffix is "js" and requirejs_debug and \
-                        bundle.has_filter("requirejs"):
-                    bundle.filters = None
+                    if bundle.has_filter("less"):
+                        if less_debug:
+                            bundle.filters = None
+                            bundle.extra.update(rel="stylesheet/less")
+                        else:
+                            bundle.extra.update(static_url_path="")
+                    if bundle.has_filter("requirejs"):
+                        if requirejs_debug:
+                            bundle.filters = None
+                        else:
+                            bundle.extra.update(static_url_path="")
                 yield bundle
 
         return dict(get_bundle=get_bundle)

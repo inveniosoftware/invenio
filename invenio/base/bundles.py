@@ -32,6 +32,7 @@ invenio = Bundle(
 styles = Bundle(
     "css/token-input.css",
     "css/token-input-facebook.css",
+    "css/typeahead.js-bootstrap.css",
     "less/base.less",
     "css/tags/popover.css",
     output="invenio.css",
