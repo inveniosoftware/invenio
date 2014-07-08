@@ -18,19 +18,23 @@
 <!-- WebDoc-Page-Title: _(Admin Area)_ -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
-<p>Welcome to the Admin Area of the <CFG_SITE_NAME>.  You'll find here
+<p><lang><en>Welcome to the Admin Area of the <CFG_SITE_NAME>.  You'll find here
 pointers to the available runtime admin-level interfaces and
 admin-level guides on how to configure and run the Invenio
-system.</p>
+system.</en><el>Καλως ήρθατε στην περιοχή διαχειριστών της σελίδας του Ινστιτούτου Φανταστικών Επιστημών Ατλαντίδος .Εδώ θα βρείτε συνδέσμους ως προς τα διαθέσιμα επίπεδα διαχειριστών διεπαφής καθως
+και οδηγούς για το πως να επεξεργαστήτε ή/και να τρέξετε το συστημα του Invenio </el></lang></p>
 
 
-<p>Invenio comes as a suite of several more or less independent
+<p><lang><en>Invenio comes as a suite of several more or less independent
 modules.  You'll find brief descriptions for each admin module below.
 (More background information on each module may be read in the <a
-href="<CFG_SITE_URL>/help/hacking/modules-overview">modules overview</a> article.)
-</p>
+href="<CFG_SITE_URL>/help/hacking/modules-overview">modules overview</a> article.)</en>
+<el>Το Invenio περιέχει μια ακολουθία απο περισσότερο ή λιγότερο ανεξάρτητες ενότητες.Θα βρείτε σύντομες περιγραφές για καθε ενότητα παρακάτω.
+(Περισσότερες πληροφορίες για καθε ενότητα μπορειτε να διαβάσετε στο άρθρο <a
+href="<CFG_SITE_URL>/help/hacking/modules-overview">επισκόπηση ενοτήτων</a>.
+</el></lang></p>
 
-<h3>Admin HOWTO guides</h3>
+<h3><lang><en>Admin HOWTO guides</en><el>Οδηγός Διαχειρηστών</el></lang></h3>
 
 <p><a href="<CFG_SITE_URL>/help/admin/howto">Admin HOWTO Guides</a> give you
 you both short and not-so-short recipes and thoughts on some of the
