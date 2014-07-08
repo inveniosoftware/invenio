@@ -2670,7 +2670,7 @@ class Template:
             #elif nb_found = -963:
             #    out += """<td class="searchresultsboxheader" align="center">
             #              %(recs_found)s &nbsp;""" % {
-            #             'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
+            #             'recs_found' : _("%(x_num)s records found", x_num=('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>'))
             #           }
         else:
             out += "<small>"
@@ -4801,7 +4801,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         out = ""
-        out += _('For some unknown reason multiple records matching the specified DOI "%s" have been found.') % cgi.escape(doi)
+        out += _('For some unknown reason multiple records matching the specified DOI "%(x_doi)s" have been found.', x_doi=cgi.escape(doi))
         out += '<br/>' + _('The system administrators have been alerted.')
         out += '<br/>' + _('In the meantime you can pick one of the retrieved candidates:')
         out += '<br/><ul>' + '\n'.join(['<li>' + format_record(recid, of='hb', verbose=verbose) + '<br/>' + \

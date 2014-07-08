@@ -39,25 +39,25 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import \
-     CFG_SITE_URL, \
-     CFG_SITE_NAME, \
-     CFG_CACHEDIR, \
-     CFG_SITE_LANG, \
-     CFG_SITE_SECURE_URL, \
-     CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
-     CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
-     CFG_WEBSEARCH_RSS_TTL, \
-     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
-     CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
-     CFG_WEBDIR, \
-     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
-     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
-     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
-     CFG_INSPIRE_SITE, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT, \
-     CFG_SITE_RECORD
+    CFG_SITE_URL, \
+    CFG_SITE_NAME, \
+    CFG_CACHEDIR, \
+    CFG_SITE_LANG, \
+    CFG_SITE_SECURE_URL, \
+    CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
+    CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
+    CFG_WEBSEARCH_RSS_TTL, \
+    CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
+    CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
+    CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
+    CFG_WEBDIR, \
+    CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
+    CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
+    CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+    CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
+    CFG_INSPIRE_SITE, \
+    CFG_WEBSEARCH_WILDCARD_LIMIT, \
+    CFG_SITE_RECORD
 from invenio.legacy.dbquery import Error
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -71,22 +71,22 @@ from invenio.legacy.bibcirculation.webinterface import WebInterfaceHoldingsPages
 from invenio.legacy.webpage import page, pageheaderonly, create_error_box
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import check_user_can_view_record, \
-     collection_reclist_cache, \
-     collection_restricted_p, \
-     create_similarly_named_authors_link_box, \
-     get_colID, \
-     get_coll_i18nname, \
-     get_most_popular_field_values, \
-     get_mysql_recid_from_aleph_sysno, \
-     guess_primary_collection_of_a_record, \
-     page_end, \
-     page_start, \
-     perform_request_cache, \
-     perform_request_log, \
-     perform_request_search, \
-     restricted_collection_cache, \
-     get_coll_normalised_name, \
-     EM_REPOSITORY
+    collection_reclist_cache, \
+    collection_restricted_p, \
+    create_similarly_named_authors_link_box, \
+    get_colID, \
+    get_coll_i18nname, \
+    get_most_popular_field_values, \
+    get_mysql_recid_from_aleph_sysno, \
+    guess_primary_collection_of_a_record, \
+    page_end, \
+    page_start, \
+    perform_request_cache, \
+    perform_request_log, \
+    perform_request_search, \
+    restricted_collection_cache, \
+    get_coll_normalised_name, \
+    EM_REPOSITORY
 from invenio.legacy.websearch.webcoll import perform_display_collection
 from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
@@ -120,6 +120,7 @@ try:
 except KeyError:
     output_formats = ['xd', 'xm', 'hd', 'hb', 'hs', 'hx']
 output_formats.extend(['hm', 't', 'h'])
+
 
 def wash_search_urlargd(form):
     """
@@ -159,6 +160,7 @@ def wash_search_urlargd(form):
 
     return argd
 
+
 class WebInterfaceUnAPIPages(WebInterfaceDirectory):
     """ Handle /unapi set of pages."""
     _exports = ['']
@@ -194,6 +196,7 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
             return websearch_templates.tmpl_unapi(formats)
 
     index = __call__
+
 
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /CFG_SITE_RECORD/<recid> URL fragment """
@@ -303,6 +306,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     index = __call__
 
+
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
@@ -392,6 +396,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
     index = __call__
+
 
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     """ Handling of the /search URL and its sub-pages. """
@@ -571,6 +576,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
     index = __call__
 
+
 class WebInterfaceLegacySearchPages(WebInterfaceDirectory):
     """ Handling of the /search.py URL and its sub-pages. """
 
@@ -662,7 +668,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
             return answer, []
 
-
         elif component == CFG_SITE_RECORD and path and path[0] == 'merge':
             return WebInterfaceMergePages(), path[1:]
 
@@ -744,6 +749,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return redirecter, []
         elif component == 'doi':
             doi = '/'.join(path)
+
             def doi_answer(req, form):
                 """Resolve DOI"""
                 argd = wash_urlargd(form, {'verbose': (int, 0),})
@@ -807,6 +813,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         target += make_canonical_urlargd(argd, legacy_collection_default_urlargd)
         return redirect_to_url(req, target)
+
 
 def display_collection(req, c, aas, verbose, ln, em=""):
     """Display search interface page for collection c by looking
@@ -932,6 +939,7 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                 show_header=em == "" or EM_REPOSITORY["header"] in em,
                 show_footer=em == "" or EM_REPOSITORY["footer"] in em)
 
+
 def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
     """
     Redirect to given DOI, or display error page when DOI cannot be
@@ -961,11 +969,10 @@ def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
         return redirect_to_url(req, CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recids[0]))
     elif len(recids) == 0:
         # No corresponding record found
-        page_body = '<p>' + (_("Sorry, DOI %s could not be resolved.") % \
-                             ('<strong>' + str(doi) + '</strong>')) + '</p>'
+        page_body = '<p>' + (_("Sorry, DOI %(x_doi)s could not be resolved.", x_doi=('<strong>' + str(doi) + '</strong>'))) + '</p>'
         if req.header_only:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
-        return page(title=_('DOI "%s" Not Found') % cgi.escape(doi),
+        return page(title=_('DOI "%(x_doi)s" Not Found', x_doi=cgi.escape(doi)),
                     body=page_body,
                     description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(doi))),
                     keywords="%s" % CFG_SITE_NAME,
@@ -980,7 +987,7 @@ def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
         except Exception, e:
             register_exception(req=req, alert_admin=True)
         page_body = websearch_templates.tmpl_multiple_dois_found_page(doi, recids, ln)
-        return page(title=_('Found multiple records matching DOI %s') % cgi.escape(doi),
+        return page(title=_('Found multiple records matching DOI %(x_doi)s', x_doi=cgi.escape(doi)),
                     body=page_body,
                     description=(CFG_SITE_NAME + ' - ' + _("Found multiple records matching DOI") + ': ' + cgi.escape(str(doi))),
                     keywords="%s" % CFG_SITE_NAME,
@@ -989,6 +996,7 @@ def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
                     req=req,
                     navmenuid='search')
     return
+
 
 class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
     """RSS 2.0 feed service pages."""

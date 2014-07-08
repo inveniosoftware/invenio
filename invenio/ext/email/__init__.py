@@ -79,7 +79,6 @@ def setup_app(app):
     return app
 
 
-
 def scheduled_send_email(fromaddr,
                          toaddr,
                          subject="",
@@ -115,7 +114,8 @@ def scheduled_send_email(fromaddr,
     @param replytoaddr: [string or list-of-strings] to be used for the
                         reply-to header of the email (if string, then
                         receivers are separated by ',')
-    @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
+    @param bccaddr: [string or list-of-strings] to be used for BCC header
+                     of the email
                     (if string, then receivers are separated by ',')
     @return: the scheduled bibtasklet
     """
@@ -234,7 +234,10 @@ def send_email(fromaddr,
 
     if attempt_times < 1 or not toaddr:
         try:
-            raise EmailError(g._('The system is not attempting to send an email from %s, to %s, with body %s.') % (fromaddr, toaddr, body))
+            raise EmailError(g._(
+                'The system is not attempting to send an email from %(x_from)s'
+                ', to %(x_to)s, with body %(x_body)s.', x_from=fromaddr,
+                x_to=toaddr, x_body=body))
         except EmailError:
             register_exception()
         return False
@@ -263,7 +266,9 @@ def send_email(fromaddr,
                 sleep(attempt_sleeptime)
     if not sent:
         try:
-            raise EmailError(g._('Error in sending email from %s to %s with body %s.') % (fromaddr, toaddr, body))
+            raise EmailError(g._(
+                'Error in sending email from %(x_from)s to %(x_to)s with body'
+                '%(x_body)s.', x_from=fromaddr, x_to=toaddr, x_body=body))
         except EmailError:
             register_exception()
     return sent
@@ -440,6 +445,7 @@ def remove_temporary_emails(emails):
         return ','.join(emails)
     else:
         return [email for email in emails if not _RE_TEMPORARY_EMAIL.match(email)]
+
 
 def get_mail_header(value):
     """

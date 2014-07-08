@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ I18N interfaces.  Typical usage in the caller code is:
    def square(x, ln=CFG_SITE_LANG):
        _ = gettext_set_language(ln)
        print _("Hello there!")
-       print _("The square of %s is %s.") % (x, x*x)
+       print _("The square of %(x_num)s is %(x_value)s.", x_num=x, x_value=x*x)
 
 In the caller code, all output strings should be made translatable via
 the _() convention.

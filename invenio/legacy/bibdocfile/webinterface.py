@@ -125,7 +125,6 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     return page_not_authorized(req, "../", \
                                                text = auth_message)
 
-
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
 
             # From now on: either the user provided a specific file
@@ -405,7 +404,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
 
                 # Confirm modifications
                 body += '<p style="color:#0f0">%s</p>' % \
-                        (_('Your modifications to record #%i have been submitted') % argd['recid'])
+                        (_('Your modifications to record #%(x_redid)i have been submitted', x_redid=argd['recid']))
         elif argd['cancel']:
             # Clean temporary directory
             working_dir = os.path.join(CFG_TMPSHAREDDIR,

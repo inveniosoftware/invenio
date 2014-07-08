@@ -333,6 +333,7 @@ class WebProfilePage():
 
 import xml.sax.saxutils
 
+
 class Template:
     """Templating functions used by aid"""
 
@@ -368,7 +369,6 @@ class Template:
         h('</div>')
 
         return "\n".join(html)
-
 
     def tmpl_transaction_box(self, teaser_key, messages, show_close_btn=True):
         '''
@@ -426,7 +426,6 @@ class Template:
             h('</div>')
 
         return "\n".join(html)
-
 
     def tmpl_merge_transaction_box(self, teaser_key, messages, show_close_btn=True):
         '''
@@ -527,8 +526,6 @@ class Template:
 
         return "\n".join(html)
 
-
-
     def tmpl_notification_box(self, teaser_key, message_key, bibrefs, show_close_btn=True):
         '''
         Creates a notification box based on the jQuery UI style
@@ -578,7 +575,6 @@ class Template:
 
         return "\n".join(html)
 
-
     def tmpl_error_box(self, teaser_key, message_key, show_close_btn=True):
         '''
         Creates an error box based on the jQuery UI style
@@ -617,7 +613,6 @@ class Template:
         h('</div>')
 
         return "\n".join(html)
-
 
     def tmpl_ticket_box(self, teaser_key, message_key, trans_no, show_close_btn=True):
         '''
@@ -717,7 +712,6 @@ class Template:
 
         return "\n".join(html)
 
-
     def tmpl_merge_ticket_box(self, teaser_key, message_key, primary_cname):
 
         message = self._('When you merge a set of profiles, all the information stored will be assigned to the primary profile. This includes papers, ids or citations.'
@@ -760,7 +754,6 @@ class Template:
         h('<p>&nbsp;</p>')
 
         return "\n".join(html)
-
 
     def tmpl_meta_includes(self, kill_browser_cache=False):
         '''
@@ -812,7 +805,6 @@ class Template:
                                              filename='js/authorids/base.js')))
         return "\n".join(result)
 
-
     def tmpl_author_confirmed(self, bibref, pid, verbiage_dict={'alt_confirm':'Confirmed.',
                                                                        'confirm_text':'This record assignment has been confirmed.',
                                                                        'alt_forget':'Forget decision!',
@@ -861,7 +853,6 @@ class Template:
                     'to_other_text':verbiage_dict['to_other_text'],
                     'alt_to_other':verbiage_dict['alt_to_other']}))
 
-
     def tmpl_author_repealed(self, bibref, pid, verbiage_dict={'alt_confirm':'Confirm!',
                                                                        'confirm_text':'Confirm record assignment.',
                                                                        'alt_forget':'Forget decision!',
@@ -902,7 +893,6 @@ class Template:
                     'repeal_text':verbiage_dict['repeal_text'],
                     'to_other_text':verbiage_dict['to_other_text'],
                     'alt_to_other':verbiage_dict['alt_to_other']}))
-
 
     def tmpl_author_undecided(self, bibref, pid, verbiage_dict={'alt_confirm':'Confirm!',
                                                                        'confirm_text':'Confirm record assignment.',
@@ -2329,9 +2319,12 @@ class Template:
 
         h('<ul>')
         if probable_profile_suggestion_info:
-            probable_profile_message = self._("Out of %s paper(s) claimed to your arXiv account, %s match this profile: " %
-                                               (probable_profile_suggestion_info['num_of_arXiv_papers'],
-                                                probable_profile_suggestion_info['num_of_recids_intersection']))
+            probable_profile_message = self._(
+                "Out of %(x_num)s paper(s) claimed to your arXiv account,"
+                "%(x_num_of_matches)s match this profile: ",
+                x_num=probable_profile_suggestion_info['num_of_arXiv_papers'],
+                x_num_of_matches=probable_profile_suggestion_info['num_of_recids_intersection']
+                )
             h('<li>')
             h('%s %s ' % (probable_profile_message, probable_profile_suggestion_info['name_string']))
             h('<a href="%s/author/profile/%s" target="_blank"> %s </a>' % (CFG_SITE_URL, probable_profile_suggestion_info['canonical_id'],
@@ -2954,7 +2947,7 @@ It holds a record of all your research activities. You can add your ORCiD to all
         html_orcid = ""
 
         if orcid_data['orcids']:
-            html_orcid += _('This profile is already connected to the following ORCiD: <strong>%s</strong></br>' % (",".join(orcid_data['orcids']),))
+            html_orcid += _('This profile is already connected to the following ORCiD: <strong>%(x_orcid)s</strong></br>', x_orcid=(",".join(orcid_data['orcids']),))
             if orcid_data['arxiv_login'] and orcid_data['own_profile']:
                 html_orcid += '<br><span class=\"bsw\"><a rel="nofollow" href="%s" class="btn">%s</a></span>' % ("%s/author/manage_profile/import_orcid_pubs" % CFG_SITE_SECURE_URL, _("Import your publications from ORCID") )
                 html_orcid += '<br><br><span class=\"bsw\"><a rel="nofollow" href="http://orcid.org/%s" class="btn">%s</a></span>' % (orcid_data['orcids'][0], _("Visit your profile in ORCID") )
@@ -3113,7 +3106,7 @@ This list contains all your publications that were automatically assigned to you
 #
 #                message = ''
 #                if autoclaim_data["num_of_unsuccessfull_recids"] > 1:
-#                    message = _("The following %s publications need your review before they can be assigned to your profile:" % (str(autoclaim_data["num_of_unsuccessfull_recids"]),))
+#                   message = _("The following %(x_num)s publications need your review before they can be assigned to your profile:", x_num=(str(autoclaim_data["num_of_unsuccessfull_recids"]),))
 #                else:
 #                    message = _("The following publications need your review before they can be assigned to your profile:")
 #                html_autoclaim += "<br><span id=\"autoClaimUnSuccessMessage\">%s</span></br>"% (message,)

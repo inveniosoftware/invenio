@@ -50,7 +50,7 @@
          |
         <a href="{{ url_for('search.search', p="refersto:recid:%d" % recid) }}">
            <i class="glyphicon glyphicon-share"></i>
-          {{ _("%i citations") % num_citations if num_citations > 1 else _("1 citation") }}
+          {{ _("%(x_num_of_citations)i citations", x_num_of_citations=num_citations if num_citations > 1 else _("1 citation")) }}
         </a>
         {%- endif -%}
       {%- endif -%}
@@ -62,7 +62,7 @@
          |
         <a href="{{ url_for('comments.comments', recid=recid) }}">
           <i class="glyphicon glyphicon-comment"></i>
-          {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
+          {{ _("%(x_num_of_comments)i comments", x_num_of_comments=num_comments if num_comments > 1 else _("1 comment")) }}
         </a>
         {%- endif -%}
       {%- endif -%}
@@ -74,7 +74,7 @@
          |
         <a href="{{ url_for('comments.reviews', recid=recid) }}">
           <i class="glyphicon glyphicon-eye-open"></i>
-          {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
+          {{ _("%(x_num_of_reviews)i reviews", x_num_of_reviews=num_reviews if num_reviews > 1 else _("1 review")) }}
         </a>
         {%- endif -%}
       {%- endif -%}

@@ -4231,7 +4231,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
             if of.startswith('h'):
-                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
+                write_warning(_("Sorry, %(x_option)s does not seem to be a valid sort option. The records will not be sorted.", x_option=cgi.escape(error_field)), "Error", req=req)
             return slice_records(recIDs, jrec, rg)
     elif tags:
         for sort_method in sorting_methods:

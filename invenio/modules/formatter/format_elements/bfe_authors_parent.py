@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2011 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,23 +22,24 @@
 """
 __revision__ = "$Id$"
 
+
 def format_element(bfo, limit, separator='; ',
-           extension='[...]',
-           print_links = "yes",
-           print_affiliations='no',
-           affiliation_prefix = ' (',
-           affiliation_suffix = ')',
-           print_affiliation_first='no',
-           interactive="no",
-           highlight="no",
-           affiliations_separator=" ; ",
-           name_last_first = "yes",
-           collaboration = "yes",
-           id_links = "no",
-           markup = "html",
-           link_extension = "no",
-           suffix = ''
-           ):
+                   extension='[...]',
+                   print_links="yes",
+                   print_affiliations='no',
+                   affiliation_prefix=' (',
+                   affiliation_suffix=')',
+                   print_affiliation_first='no',
+                   interactive="no",
+                   highlight="no",
+                   affiliations_separator=" ; ",
+                   name_last_first="yes",
+                   collaboration="yes",
+                   id_links="no",
+                   markup="html",
+                   link_extension="no",
+                   suffix=''
+                   ):
     """
     Prints the list of authors of a record.
 
@@ -315,7 +316,7 @@ def format_element(bfo, limit, separator='; ',
 
         </script>
         ''' % {'show_less': _("Hide"),
-               'show_more': _("Show all %i authors") % nb_authors,
+               'show_more': _("Show all %(x_num_of_authors)i authors", x_num_of_authors=nb_authors),
                'extension': extension}
 
 #        out += '<a name="show_hide" />'

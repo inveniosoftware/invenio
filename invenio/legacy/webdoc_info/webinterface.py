@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -170,6 +170,7 @@ class WebInterfaceInfoPages(WebInterfaceDirectory):
 
         return ''.join(file_html_list)
 
+
 def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     """Display webdoc page WEBDOCNAME in language LN."""
 
@@ -203,9 +204,9 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     # set page body:
     page_body = page_parts.get('body', '')
     if not page_body:
-        page_body = '<p>' + (_("Sorry, page %s does not seem to exist.") %
-                    ('<strong>' + cgi.escape(webdocname) + '</strong>')) + \
-                    '</p>'
+        page_body = '<p>' + (_("Sorry, page %(x_page)s does not seem to exist.",
+                    x_page=('<strong>' + cgi.escape(webdocname) + '</strong>'))
+            ) + '</p>'
 
     # set page description:
     page_description = page_parts.get('description', '')
@@ -278,6 +279,7 @@ def perform_request_init_info_interface():
 
     return body, errors, warnings
 
+
 def perform_request_edit_file(filename):
     """ Handles the edit request of a file. Gets the file content and
     returns it inside of a textarea """
@@ -295,6 +297,7 @@ def perform_request_edit_file(filename):
         button_div = "<div id='button_div'><input class='formbutton' id='savebtn' type='button' value='Save changes'></div>"
         response["html_content"] = editor + button_div
     return response
+
 
 def perform_request_save_file(filename, filecontent):
     """ Handles the save request for the given file name and file content
@@ -327,6 +330,7 @@ def perform_request_save_file(filename, filecontent):
     except IOError:
         response["status"] = "error_file_not_writable"
     return response
+
 
 def file_in_info_space(location):
     """ Checks if location is under the info file system hierarchy """
