@@ -26,5 +26,6 @@ js = Bundle(
     "js/communities/custom.js",
     filters="uglifyjs",
     output="gen/communities.js",
-    name="91-communities.js"
+    name="communities.js",
+    weight=91
 )

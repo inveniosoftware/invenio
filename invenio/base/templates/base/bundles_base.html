@@ -21,21 +21,21 @@
 {# List here the required bundles. The ordering will be made using their names.
  # New bundles should be defined in the bundles.py file of each module.
  #}
-{%- bundles "10-jquery.js",
-            "90-invenio.js",
-            "50-invenio.css"
+{%- bundles "jquery.js",
+            "invenio.js",
+            "invenio.css"
 -%}
 {# almond.js, require.js and LessCSS libraries for both debug and production
  # modes.
  #}
 {%- if config.get("ASSETS_DEBUG") -%}
   {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
-    {% bundle "00-less.js" %}
+    {% bundle "less.js" %}
   {%- endif -%}
   {%- if not config.get("REQUIREJS_RUN_IN_DEBUG") -%}
-    {% bundle "00-require.js" %}
+    {% bundle "require.js" %}
   {%- endif -%}
-{%- else -%}
+{%- endif -%}
 {%- if not config.get("ASSETS_DEBUG") or config.get("REQUIREJS_RUN_IN_DEBUG") -%}
-  {%- bundle "00-require.almond.js" -%}
+  {%- bundle "almond.js" -%}
 {%- endif -%}

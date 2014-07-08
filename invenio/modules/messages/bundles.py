@@ -25,6 +25,7 @@ from invenio.ext.assets import Bundle
 js = Bundle(
     'js/messages/messages.js',
     output='gen/messages.js',
-    name='70-messages.js',
+    name='messages.js',
+    weight=70,
     filters='uglifyjs'
 )

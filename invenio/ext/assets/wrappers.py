@@ -32,7 +32,8 @@ class Bundle(BundleBase):
     """
     Bundle extension with a name and bower dependencies.
 
-    The name is only used for assets ordering and requirements.
+    The name is only used for the requirements from the templates and the
+    weight does the bundle ordering.
 
     The bower dependencies are used to generate a bower.json file.
     """
@@ -45,9 +46,12 @@ class Bundle(BundleBase):
         :type name: str
         :param bower: bower dependencies
         :type bower: dict
+        :param weight: weight of the bundle, lighter are loaded first.
+        :type weight: int
         """
         self.name = options.pop("name", None)
         self.bower = options.pop("bower", {})
+        self.weight = int(options.pop("weight", 50))
         super(Bundle, self).__init__(*contents, **options)
 
         # ease the bundle modification

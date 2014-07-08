@@ -26,12 +26,14 @@ pdfjs = Bundle(
     "js/previewer/pdf_viewer.js",
     filters="uglifyjs",
     output="gen/previewer/pdf.js",
-    name="20-previewer-pdf.js"
+    name="previewer-pdf.js",
+    weight=20
 )
 
 pdfcss = Bundle(
     "css/previewer/pdf_viewer.css",
     filters="cleancss",
     output="gen/previewer/pdf.css",
-    name="20-previewer-pdf.css"
+    name="previewer-pdf.css",
+    weight=20
 )

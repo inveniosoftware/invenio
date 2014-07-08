@@ -23,9 +23,9 @@
 {%- block global_bundles -%}
   {{ super() }}
   {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-    {%- bundles "20-previewer.css", "20-previewer.js"}
+    {%- bundles "previewer.css", "previewer.js"}
   {%- endif -%}
-  {%- bundles "10-comments.css", "30-annotations.js" -%}
+  {%- bundles "comments.css", "annotations.js" -%}
 {%- endblock -%}
 
 {%- block custom -%}

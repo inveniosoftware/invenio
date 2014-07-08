@@ -25,6 +25,7 @@ from invenio.ext.assets import Bundle
 js = Bundle(
     "js/tags/record_editor.js",
     output="gen/tags.js",
-    name="20-tags.js",
+    name="tags.js",
+    weight=20,
     filters="uglifyjs"  # beautify couldn't do anything here ;-)
 )

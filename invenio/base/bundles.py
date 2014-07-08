@@ -26,7 +26,8 @@ invenio = Bundle(
     "js/invenio.js",
     output="gen/invenio.js",
     filters="requirejs",
-    name="90-invenio.js"
+    name="invenio.js",
+    weight=90
 )
 
 styles = Bundle(
@@ -43,7 +44,7 @@ styles = Bundle(
         "rel": "stylesheet/less"
     },
     filters="less,cleancss",
-    name="50-invenio.css"
+    name="invenio.css",
 )
 
 # FIXME
@@ -63,7 +64,8 @@ jquery = Bundle(
 
     output="gen/jquery.js",
     filters="uglifyjs",
-    name="10-jquery.js",
+    name="jquery.js",
+    weight=10,
     bower={
         "jquery": "2.1.0",
         "bootstrap": "3.2.0",
@@ -79,7 +81,8 @@ jqueryui = Bundle(
     "js/jquery-ui-timepicker-addon.js",
     filters="uglifyjs",
     output="gen/jquery-ui.js",
-    name="11-jquery-ui.js",
+    name="jquery-ui.js",
+    weight=11,
     bower={
         "jqueryui": "1.11.0",
         "jquery.ui.timepicker": "http://invenoi-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js"
@@ -91,7 +94,8 @@ lessjs = Bundle(
     "js/less.js",
     output="gen/less.js",
     filters="uglifyjs",
-    name="00-less.js",
+    name="less.js",
+    weight=0,
     bower={
         "less": "1.7.0"
     }
@@ -103,7 +107,8 @@ requirejs = Bundle(
     "js/settings.js",
     output="gen/require.js",
     filters="uglifyjs",
-    name="00-require.js",
+    name="require.js",
+    weight=0,
     bower={
         "requirejs": "latest"
     }
@@ -114,7 +119,8 @@ almondjs = Bundle(
     "js/settings.js",
     output="gen/almond.js",
     filters="uglifyjs",
-    name="00-require.almond.js",
+    name="almond.js",
+    weight=0,
     bower={
         "almond": "latest"
     }

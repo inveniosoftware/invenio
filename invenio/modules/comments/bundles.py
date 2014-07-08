@@ -26,11 +26,15 @@ js = Bundle(
     'js/comments/comments.js',
     'js/comments/collapse.js',
     output='gen/comments.js',
-    name='10-comments.js',
+    name='comments.js',
+    weight=10,
+    filters='uglifyjs'
 )
 
 css = Bundle(
     'css/comments/comments.css',
     output='gen/comments.css',
-    name='10-comments.css'
+    name='comments.css',
+    weight=10,
+    filters='cleancss'
 )
