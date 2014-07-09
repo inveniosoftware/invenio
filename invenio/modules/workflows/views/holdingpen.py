@@ -31,6 +31,7 @@ import re
 import collections
 
 from six import iteritems, text_type
+
 from flask import (render_template, Blueprint, request, jsonify,
                    url_for, flash, session)
 from flask.ext.login import login_required
@@ -83,11 +84,6 @@ def maintable():
     """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
-    action_static = []
-    for name, action in iteritems(actions):
-        if getattr(action, "static", None):
-            action_static.extend(action.static)
-
     my_tags = []
 
     if 'tags' in session:
@@ -118,53 +114,7 @@ def maintable():
                 tags_to_print += tag + ','
     return dict(bwolist=bwolist,
                 action_list=action_list,
-                action_static=action_static,
                 tags=tags_to_print)
-
-
-@blueprint.route('/batch_action', methods=['GET', 'POST'])
-@login_required
-@wash_arguments({'bwolist': (text_type, "")})
-def batch_action(bwolist):
-    """Render action accepting single or multiple records."""
-    from ..utils import parse_bwids
-
-    bwolist = parse_bwids(bwolist)
-
-    try:
-        bwolist = map(int, bwolist)
-    except ValueError:
-        # Bad ID, we just pass for now
-        pass
-
-    objlist = []
-    workflow_func_list = []
-    w_metadata_list = []
-    info_list = []
-    actionlist = []
-    bwo_parent_list = []
-    logtext_list = []
-
-    objlist = [BibWorkflowObject.query.get(i) for i in bwolist]
-
-    for bwobject in objlist:
-        extracted_data = extract_data(bwobject)
-        bwo_parent_list.append(extracted_data['bwparent'])
-        logtext_list.append(extracted_data['logtext'])
-        info_list.append(extracted_data['info'])
-        w_metadata_list.append(extracted_data['w_metadata'])
-        workflow_func_list.append(extracted_data['workflow_func'])
-        if bwobject.get_action() not in actionlist:
-            actionlist.append(bwobject.get_action())
-
-    action_form = actions[actionlist[0]]
-
-    result = action_form().render(objlist, bwo_parent_list, info_list,
-                                  logtext_list, w_metadata_list,
-                                  workflow_func_list)
-    url, parameters = result
-
-    return render_template(url, **parameters)
 
 
 @blueprint.route('/load_table', methods=['GET', 'POST'])
@@ -254,23 +204,30 @@ def load_table():
     # This will be simplified once Redis is utilized.
     records_showing = 0
     for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
+        records_showing += 1
+
         action_name = bwo.get_action()
         action_message = bwo.get_action_message()
         if not action_message:
             action_message = ""
 
         action = actions.get(action_name, None)
-        records_showing += 1
+
         workflows_uuid = bwo.id_workflow
         if workflows_uuid and workflows_uuid not in workflows_cache:
             workflows_cache[workflows_uuid] = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]()
-        mini_action = getattr(action, "mini_action", None)
+
+        mini_action = None
+        if action:
+            mini_action = getattr(action, "render_mini", None)
+
         record = bwo.get_data()
         if not hasattr(record, "get"):
             try:
                 record = dict(record)
             except:
                 record = {}
+
         if not workflows_uuid:
             title = "No title"
             description = "No description"
@@ -279,6 +236,7 @@ def load_table():
             title = workflows_cache[workflows_uuid].get_title(bwo)
             description = workflows_cache[workflows_uuid].get_description(bwo)
             extra_data = bwo.get_extra_data()
+
         row = render_template('workflows/row_formatter.html',
                               title=title,
                               object=bwo,
@@ -337,6 +295,14 @@ def details(objectid):
         formatted_data = ""
 
     extracted_data = extract_data(bwobject)
+
+    action_name = bwobject.get_action()
+    if action_name:
+        action = actions[action_name]
+        rendered_actions = action().render(bwobject)
+    else:
+        rendered_actions = {}
+
     if bwobject.id_parent:
         hbwobject_db_request = BibWorkflowObject.query.filter(
             db.or_(BibWorkflowObject.id_parent == bwobject.id_parent,
@@ -371,6 +337,7 @@ def details(objectid):
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
+                           rendered_actions=rendered_actions,
                            hbwobject=hbwobject_final,
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
@@ -435,89 +402,19 @@ def delete_multi(bwolist):
     return 'Records Deleted'
 
 
-@blueprint.route('/action/<objectid>', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.action', _("Action"))
-@login_required
-def show_action(objectid):
-    """Render the action assigned to a specific record."""
-    from sqlalchemy import or_
-
-    bwobject = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id == objectid).first_or_404()
-
-    action = bwobject.get_action()
-    # FIXME: add case here if no action
-    action_form = actions[action]
-    extracted_data = extract_data(bwobject)
-    result = action_form().render([bwobject],
-                                  [extracted_data['bwparent']],
-                                  [extracted_data['info']],
-                                  [extracted_data['logtext']],
-                                  [extracted_data['w_metadata']],
-                                  [extracted_data['workflow_func']])
-    url, parameters = result
-
-    if bwobject.id_parent:
-        hbwobject_db_request = BibWorkflowObject.query.filter(
-            or_(BibWorkflowObject.id_parent == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id_parent,
-                BibWorkflowObject.id == bwobject.id)).all()
-
-    else:
-        hbwobject_db_request = BibWorkflowObject.query.filter(
-            or_(BibWorkflowObject.id_parent == bwobject.id,
-                BibWorkflowObject.id == bwobject.id)).all()
-
-    hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
-                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
-
-    for hbobject in hbwobject_db_request:
-        hbwobject[hbobject.version].append({"id": hbobject.id,
-                                            "version": hbobject.version,
-                                            "date": pretty_date(hbobject.created),
-                                            "true_date": hbobject.modified})
-
-    for list_of_object in hbwobject:
-        hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
-
-    hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
-        hbwobject[ObjectVersion.HALTED] + \
-        hbwobject[ObjectVersion.FINAL]
-
-    results = []
-    for label, res in bwobject.get_tasks_results().iteritems():
-        res_dicts = [item.to_dict() for item in res]
-        results.append((label, res_dicts))
-
-    parameters["message"] = bwobject.get_action_message()
-    parameters["hbwobject"] = hbwobject_final
-    parameters["task_results"] = results
-    return render_template(url, **parameters)
-
-
 @blueprint.route('/resolve', methods=['GET', 'POST'])
 @login_required
-@wash_arguments({'objectid': (text_type, '-1'),
-                 'action': (text_type, 'default')})
-def resolve_action(objectid, action):
+@wash_arguments({'objectid': (text_type, '-1')})
+def resolve_action(objectid):
     """Resolve the action taken.
 
     Will call the run() function of the specific action.
     """
-    action_form = actions[action]
-    action_form().run(objectid)
-    return "Done"
-
-
-@blueprint.route('/resolve_edit', methods=['GET', 'POST'])
-@login_required
-@wash_arguments({'objectid': (text_type, '0'),
-                 'form': (text_type, '')})
-def resolve_edit(objectid, form):
-    """Perform the changes to the record."""
-    if request:
-        edit_record(request.form)
-    return 'Record Edited'
+    bwobject = BibWorkflowObject.query.get(int(objectid))
+    action_name = bwobject.get_action()
+    action_form = actions[action_name]
+    res = action_form().resolve(bwobject)
+    return jsonify(res)
 
 
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
@@ -561,15 +458,12 @@ def get_context():
         "url_restart_record": url_for('holdingpen.restart_record'),
         "url_restart_record_prev": url_for('holdingpen.restart_record_prev'),
         "url_continue_record": url_for('holdingpen.continue_record'),
-        "url_resolve_edit": url_for('holdingpen.resolve_edit')
     }
     try:
         context['version_showing'] = session['workflows_version_showing']
     except KeyError:
         context['version_showing'] = ObjectVersion.HALTED
 
-    context['actions'] = [name for name, action in iteritems(actions)
-                          if getattr(action, "static", None)]
     return jsonify(context)
 
 
@@ -624,13 +518,6 @@ def extract_data(bwobject):
     return extracted_data
 
 
-
-def edit_record(form):
-    """Call the edit record action."""
-    for key in form.iterkeys():
-        pass
-
-
 def get_action_list(object_list):
     """Return a dict of action names mapped to halted objects.
 
@@ -653,7 +540,7 @@ def get_action_list(object_list):
             action_nicename = action_name
         else:
             action = actions[action_name]
-            action_nicename = getattr(action, "__title__", action_name)
+            action_nicename = getattr(action, "name", action_name)
         action_dict[action_nicename] = found_actions.count(action_name)
     return action_dict
 

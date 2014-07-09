@@ -344,15 +344,16 @@ class BibWorkflowObject(db.Model):
         return self.get_extra_data()["_tasks_results"]
 
     def add_action(self, action, message):
-        """Save a action for holdingpen.
+        """Save an action for holdingpen for this object.
 
-        Assign a widget to this object for an action to be taken
-        in holdingpen. The widget is reffered to by a string with
-        the filename minus extension. Ex: approval_widget.
+        Assign an special "action" to this object to be taken
+        in consideration in holdingpen. The widget is referred to
+        by a string with the filename minus extension.
 
+        Ex: 'approval' for an action 'approval.py'.
 
         A message is also needed to tell the user the action
-        required.
+        required in a textual way.
 
         :param action: name of the action to add (i.e. "approval")
         :type action: string
@@ -387,7 +388,7 @@ class BibWorkflowObject(db.Model):
             return None
 
     def get_action_message(self):
-        """ Retrive the currently assigned widget, if any."""
+        """ Retrieve the currently assigned widget, if any."""
         try:
             return self.get_extra_data()["_message"]
         except KeyError:
@@ -424,7 +425,7 @@ class BibWorkflowObject(db.Model):
             del extra_data["_widget"]
         self.set_extra_data(extra_data)
 
-    def start_workflow(self, workflow_name, **kwargs):
+    def start_workflow(self, workflow_name, delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will start a new workflow execution for the object using
@@ -432,13 +433,18 @@ class BibWorkflowObject(db.Model):
 
         :param workflow_name: name of workflow to run
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import start
-
+        if delayed:
+            from .api import start_delayed as start_func
+        else:
+            from .api import start as start_func
         self.save()
-        return start(workflow_name, data=[self], **kwargs)
+        return start_func(workflow_name, data=[self], **kwargs)
 
-    def continue_workflow(self, start_point="continue_next", **kwargs):
+    def continue_workflow(self, start_point="continue_next", delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will continue a previous execution for the object using
@@ -449,15 +455,21 @@ class BibWorkflowObject(db.Model):
            * continue_next: will continue to the next task
            * restart_task: will restart the current task
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import continue_oid
         from .errors import WorkflowAPIError
 
         self.save()
         if not self.id_workflow:
             raise WorkflowAPIError("No workflow associated with object: %r"
                                    % (repr(self),))
-        return continue_oid(self.id, start_point, **kwargs)
+        if delayed:
+            from .api import continue_oid_delayed as continue_func
+        else:
+            from .api import continue_oid as continue_func
+        return continue_func(self.id, start_point, **kwargs)
 
     def change_status(self, message):
         """Change the status."""

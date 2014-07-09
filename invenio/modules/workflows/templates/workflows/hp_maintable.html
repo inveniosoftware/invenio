@@ -36,10 +36,6 @@
             success: function(data) {
                 WORKFLOWS_HOLDINGPEN.init(data);
                 WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
-                for (var i = data.actions.length - 1; i >= 0; i--) {
-                    window[data.actions[i]] = window[data.actions[i]](window.jQuery, WORKFLOWS_HOLDINGPEN);
-                    window[data.actions[i]].init(data);
-                };
             }
         });
     });
@@ -47,7 +43,6 @@
 {% endblock javascript %}
 
 {% block hpbody %}
-    <div id="alert-message"></div>
     <nav class="navbar navbar-default navbar-static-top" role="navigation">
       <!-- Brand and toggle get grouped for better mobile display -->
 
