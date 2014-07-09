@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,22 +17,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Cloud Application Blueprint"""
+"""Cloud Application Blueprint."""
 
 import math
 
-from fs.opener import fsopen
 from flask import Blueprint, render_template, session, request, flash, \
-    redirect, url_for, current_app
+    redirect, url_for, current_app, make_response
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.login import login_required
+from flask_menu import register_menu
+from fs.opener import fsopen
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from flask_menu import register_menu
 
-from .factory import CloudServiceFactory
 from .errors import CloudRedirectUrl
+from .factory import CloudServiceFactory
 
 
 blueprint = Blueprint('cloudutils', __name__, url_prefix="/cloud",
@@ -62,25 +62,31 @@ def connect_cloud(error):
 def general_error(error):
     #FIXME add logging
     #register_exception()
+    current_app.logger.exception(error)
+
     flash(_('Unexpected error.'), 'error')
     return redirect(url_for('.index'))
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
+@register_menu(blueprint, 'personalize.cloudconnector',
+               _('Your Cloud Applications'))
+def index():
+    return render_template('cloudconnector/browser.html')
+
+
 @blueprint.route('/<service>', methods=['GET', 'POST'])
 @login_required
 @register_breadcrumb(blueprint, '.', _('Your Cloud Applications'))
-@register_menu(blueprint, 'personalize.cloudconnector',
-               _('Your Cloud Applications'))
-def index(service=None):
-    if service is None:
-        return render_template('cloudconnector/browser.html')
-
+def view(service):
     #FIXME [dict(text=service_pretty_name(service),
     #             url=url_for('cloudutils.index', service=service))]
-
-    filesystem = _build_file_system(service)
-
+    # try:
+    try:
+        filesystem = _build_file_system(service)
+    except Exception as e:
+        current_app.logger.exception(e)
+        raise
     if 'files_to_upload' in session:
         return upload(service)
 
@@ -90,33 +96,41 @@ def index(service=None):
 @blueprint.route('/<service>/callback', methods=['GET', 'POST'])
 @login_required
 def callback(service):
-    # Check that we can build filesystem for given service.
+    """Check that we can build a filesystem from the given service."""
     _build_file_system(service)
-    return redirect(url_for('cloudutils.index', service=service))
+    return redirect(url_for('cloudutils.view', service=service))
 
 
 @blueprint.route('/<service>/download', methods=['GET', 'POST'])
 @login_required
 def download(service):
+    """Download a file."""
     filesystem = _build_file_system(service)
-    return filesystem.getcontents(request.args.get('path'))
+
+    if filesystem.haspathurl(request.args.get('path')):
+        url = filesystem.getpathurl(request.args.get('path'))
+        return redirect(url)
+    else:
+        return make_response(filesystem.open(
+            request.args.get('path'), 'rb').read())
 
 
 @blueprint.route('/<service>/delete', methods=['GET', 'POST'])
 @login_required
 def delete(service):
+    """Delete a file."""
     filesystem = _build_file_system(service)
-
     if filesystem.isdir(request.args.get('path')):
         filesystem.removedir(request.args.get('path'))
     else:
         filesystem.remove(request.args.get('path'))
-    return redirect(url_for('cloudutils.index', service=service))
+    return redirect(url_for('cloudutils.view', service=service))
 
 
 @blueprint.route('/<service>/upload', methods=['GET', 'POST'])
 @login_required
 def upload(service):
+    """Upload a file."""
     if 'files' in request.form:
         session['return_url'] = request.form['return_url']
         files = request.form['files']
@@ -146,25 +160,28 @@ def _build_file_system(service):
 
 
 def _build_page(filesystem, service):
-    folder_metadata = filesystem.listdirinfo(request.args.get('path', ""))
+    folder_metadata = filesystem.listdirinfo(request.args.get('path', "/"))
+
     number_of_pages = int(math.ceil(float(len(folder_metadata)) /
                                     cfg['CFG_CLOUD_UTILS_ROWS_PER_PAGE']))
+
     current_page = int(request.args.get('page', '1'))
     account_info = filesystem.about()
 
     if current_page == 1 and number_of_pages > 1:
-        folder_metadata = folder_metadata[0:cfg['CFG_CLOUD_UTILS_ROWS_PER_PAGE']]
+        folder_metadata = folder_metadata[0:
+                                          cfg['CFG_CLOUD_UTILS_ROWS_PER_PAGE']]
     elif number_of_pages > 1 and current_page <= number_of_pages:
         folder_metadata = folder_metadata[
             cfg['CFG_CLOUD_UTILS_ROWS_PER_PAGE']*(current_page-1):
             cfg['CFG_CLOUD_UTILS_ROWS_PER_PAGE']*current_page]
-
     return render_template('cloudconnector/browser.html',
                            service_name=[service, filesystem.__name__],
                            service=service,
                            parent="/".join(
                                request.args.get('path', "/").split("/")[:-1]),
-                           folder_metadata=folder_metadata,
+                           folder_metadata=map(lambda x: x[1],
+                                               folder_metadata),
                            account_info=account_info,
                            number_of_pages=number_of_pages,
                            current_page=current_page,

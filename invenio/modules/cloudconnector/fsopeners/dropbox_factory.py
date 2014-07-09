@@ -18,7 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-DropBox Filesystem Factory
+DropBox Filesystem Factory.
+
 --------------------------
 A factory for dropbox file system.
 
@@ -62,8 +63,12 @@ from invenio.modules.oauthclient.views.client import oauth
 
 
 class Factory(object):
+
+    """Dropbox Factory."""
+
     def build_fs(self, current_user, credentials, root=None,
                  callback_url=None, request=None, session=None):
+        """Build dropbox filesystem."""
         url = url_for('oauthclient.login', remote_app='dropbox')
 
         client_id = oauth.remote_apps['dropbox'].consumer_key

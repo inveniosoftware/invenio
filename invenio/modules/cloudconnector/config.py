@@ -27,7 +27,6 @@ CFG_SERVICE_PRETTY_NAME = {'dropbox': "Dropbox",
                            'onedrive': "OneDrive",
                            }
 
-CFG_CLOUD_UTILS_ENABLED_SERVICES = ['dropbox', 'google_drive', 'onedrive']
 
 # Dropbox configuration
 CFG_DROPBOX_KEY = ""
@@ -35,7 +34,6 @@ CFG_DROPBOX_SECRET = ""
 CFG_DROPBOX_ACCESS_TYPE = "app_folder"
 CFG_DROPBOX_ROOT = "/"
 CFG_DROPBOX_CSRF_TOKEN = "dropbox_auth_csrf_token"
-
 
 
 # Google drive configuration

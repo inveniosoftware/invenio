@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,145 +17,88 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""A factory for google drive file system"""
+"""
+Google drive Filesystem Factory.
 
-from datetime import datetime
+--------------------------------
+A factory for google drive file system.
+
+You might need to add following config variable::
+
+    OAUTHCLIENT_REMOTE_APPS = dict(
+        google_drive=dict(  # name of remote app used in urls
+            title='Google Drive', # This is used in the linked account view to
+                                  # display a name and a description.
+            description='Data collaboration platform.',
+            params=dict(
+                # usually important to define which scopes you want to request.
+                request_token_params={"scope":"openid profile email
+                https://www.googleapis.com/auth/drive"},
+                base_url='https://accounts.google.com/',
+                request_token_url=None,
+                access_token_url="https://accounts.google.com/o/oauth2/token",
+                authorize_url="https://accounts.google.com/o/oauth2/auth",
+                access_token_method='POST',
+                app_key="GOOGLE_DRIVE_APP_CREDENTIALS",
+                # defines which other config variable stores the client
+                # key/secret
+            )
+        ),
+    )
+
+    GOOGLE_DRIVE_APP_CREDENTIALS = dict(
+        consumer_key="changeme",
+        consumer_secret="changeme",
+    )
+
+"""
+
+from flask import url_for
 from fs.errors import ResourceNotFoundError
-from oauth2client.client import OAuth2WebServerFlow
 
-from invenio.base.globals import cfg
 from invenio.ext.fs.cloudfs.googledrivefs import GoogleDriveFS
-from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
-from invenio.modules.cloudconnector.errors import (CloudRedirectUrl,
-                                                   ErrorBuildingFS)
+from invenio.modules.cloudconnector.errors import CloudRedirectUrl
+from invenio.modules.oauthclient.views.client import oauth
+from invenio.modules.oauthclient.models import RemoteToken
 
 
 class Factory(object):
 
-    def build_fs(self, current_user, credentials, root=None, callback_url=None,
-                 request=None, session=None):
-        if request is None and not credentials.get('access_token') and \
-                callback_url is None:
-            #Google drive can't work if request and access_token are None
-            raise ErrorBuildingFS("Insufficient data provided.")
-        elif credentials.get('access_token') is not None:
+    """Google drive Factory."""
+
+    def build_fs(self, current_user, credentials, root=None,
+                 callback_url=None, request=None, session=None):
+        """Build google drive filesystem."""
+        url = url_for('oauthclient.login', remote_app='google_drive')
+
+        client_id = oauth.remote_apps['google_drive'].consumer_key
+        client_secret = oauth.remote_apps['google_drive'].consumer_secret
+        user_id = current_user.get_id()
+        token = RemoteToken.get(user_id, client_id)
+
+        if token is not None:
+            credentials = {'access_token': token.access_token,
+                           'client_id': client_id,
+                           'client_secret': client_secret,
+                           'refresh_token': None,
+                           'token_expiry': None,
+                           'token_uri':
+                           'https://accounts.google.com/o/oauth2/token'
+                           }
             try:
                 filesystem = GoogleDriveFS(root, credentials)
-                filesystem.getinfo(root)
+                filesystem.about()
                 return filesystem
-            except ResourceNotFoundError as e:
+            except ResourceNotFoundError:
                 if(root != "/"):
                     filesystem = GoogleDriveFS("/", credentials)
+                filesystem.makedir(root, recursive=True)
+                filesystem = GoogleDriveFS(root, token)
                 resp = filesystem.makedir("/invenio")
-                filesystem = GoogleDriveFS(resp, credentials)
                 credentials['root'] = resp
-                self._update_cloudutils_settings(current_user,
-                                                 {'google_drive': credentials})
+                filesystem = GoogleDriveFS(resp, credentials)
                 return filesystem
-            except Exception as e:
-
-                import traceback
-                traceback.print_exc()
-
-                new_data = {
-                    'google_drive': {
-                        'access_token': None,
-                        'client_id': None,
-                        'client_secret': None,
-                        'refresh_token': None,
-                        'token_expiry': None,
-                        'token_uri': None,
-                        'user_agent': None,
-                        'root': credentials.get("root", "/")
-                        }
-                    }
-                self._update_cloudutils_settings(current_user, new_data)
-
-                flow = OAuth2WebServerFlow(
-                    cfg['CFG_GOOGLE_DRIVE_CLIENT_ID'],
-                    cfg['CFG_GOOGLE_DRIVE_CLIENT_SECRET'],
-                    cfg['CFG_GOOGLE_DRIVE_SCOPE'],
-                    callback_url,
-                    approval_prompt='force',
-                )
-                url = flow.step1_get_authorize_url()
+            except Exception:
                 raise CloudRedirectUrl(url, __name__)
-        elif 'code' in request.args:
-            try:
-                flow = OAuth2WebServerFlow(cfg['CFG_GOOGLE_DRIVE_CLIENT_ID'],
-                                           cfg['CFG_GOOGLE_DRIVE_CLIENT_SECRET'],
-                                           cfg['CFG_GOOGLE_DRIVE_SCOPE'],
-                                           callback_url,
-                                           approval_prompt='force')
-                credentials_new = flow.step2_exchange(request.args['code'])
-            except Exception as e:
-                raise ErrorBuildingFS(e)
-
-
-            new_data = {
-                'google_drive': {
-                    'access_token': credentials_new.access_token,
-                    'client_id': credentials_new.client_id,
-                    'client_secret': credentials_new.client_secret,
-                    'refresh_token': credentials_new.refresh_token,
-                    'token_expiry': datetime.strftime(credentials_new.token_expiry, "%Y, %m, %d, %H, %M, %S, %f" ),
-                    'token_uri': credentials_new.token_uri,
-                    'user_agent': credentials_new.user_agent,
-                    'root': credentials.get("root", "/")
-                }
-            }
-
-
-            self._update_cloudutils_settings(current_user, new_data)
-
-            # Retry with new data, request is now None, we don't want it to process
-            # the request again.
-            return self.build_fs(current_user,
-                                 new_data.get('google_drive'),
-                                 new_data.get('google_drive').get('root'),
-                                 callback_url,
-                                 None,
-                                 )
-        elif( callback_url != None ):
-            new_data = {
-                    'google_drive': {
-                        'access_token': None,
-                        'client_id': None,
-                        'client_secret': None,
-                        'refresh_token': None,
-                        'token_expiry': None,
-                        'token_uri': None,
-                        'user_agent': None,
-                        'root': credentials.get("root", "/")
-                        }
-                    }
-            self._update_cloudutils_settings(current_user, new_data)
-            flow = OAuth2WebServerFlow(cfg['CFG_GOOGLE_DRIVE_CLIENT_ID'],
-                                       cfg['CFG_GOOGLE_DRIVE_CLIENT_SECRET'],
-                                       cfg['CFG_GOOGLE_DRIVE_SCOPE'],
-                                       callback_url,
-                                       approval_prompt='force',
-                                       )
-            url = flow.step1_get_authorize_url()
+        else:
             raise CloudRedirectUrl(url, __name__)
-        else:
-            raise ErrorBuildingFS("Insufficient data provided to the cloud builder")
-
-    def _update_cloudutils_settings(self, current_user, new_data):
-        # Updates cloudutils settings in DataBase and refreshes current user
-        user = User.query.get(current_user.get_id())
-        settings = user.settings
-        cloudutils_settings = settings.get("cloudutils_settings")
-
-        if( cloudutils_settings ):
-            cloudutils_settings.update( new_data )
-
-            settings.update(settings)
-        else:
-            settings.update({"cloudutils_settings" : new_data})
-
-        user.settings = settings
-        db.session.merge(user)
-        db.session.commit()
-        current_user.reload()
