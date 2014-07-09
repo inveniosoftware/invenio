@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 This tool extracts sentences to be translated from HTML / WML source
 files.
@@ -34,11 +36,11 @@ _ws_re = re.compile('\s+')
 
 def print_usage():
     """Print usage info."""
-    print """Usage: %s <dirname> <potfiles-filename>
+    print("""Usage: %s <dirname> <potfiles-filename>
 Description: Extract translatable strings from the list of files read
              from potfiles-filename.  The files specified there are
              relative to dirname.  Print results on stdout.
-"""
+""")
     return
 
 def quote(text):
@@ -84,7 +86,7 @@ def extract_from_wml_files(dirname, potfiles_filename):
             db.setdefault(word, []).append(ref)
 
     ## print po header:
-    print r'''
+    print(r'''
     # # This file is part of Invenio.
     # # Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
     # #
@@ -113,17 +115,17 @@ def extract_from_wml_files(dirname, potfiles_filename):
     "Content-Transfer-Encoding: 8bit\n"
     "Generated-By: pygettext.py 1.5\n"
 
-    '''
+    ''')
 
     ## print po content from db:
     for original, refs in db.items():
 
         for ref in refs:
-            print "#: %s" % ref
+            print("#: %s" % ref)
 
-        print 'msgid "%s"' % quote(original)
-        print 'msgstr ""'
-        print
+        print('msgid "%s"' % quote(original))
+        print('msgstr ""')
+        print()
 
     return
 
@@ -132,11 +134,11 @@ if __name__ == "__main__":
         dirname = sys.argv[1]
         potfiles_filename = sys.argv[2]
         if not os.path.isdir(dirname):
-            print "ERROR: %s is not a directory." % dirname
+            print("ERROR: %s is not a directory." % dirname)
             print_usage()
             sys.exit(1)
         elif not os.path.isfile(potfiles_filename):
-            print "ERROR: %s is not a file." % potfiles_filename
+            print("ERROR: %s is not a file." % potfiles_filename)
             print_usage()
             sys.exit(1)
         else:

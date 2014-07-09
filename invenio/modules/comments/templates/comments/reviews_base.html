@@ -1,0 +1,132 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- if not request.is_xhr -%}
+  {% extends "records/base.html" %}
+{%- endif -%}
+
+{% bundle "10-comments.js" %}
+
+{% block record_content %}
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+  <div class="page-header">
+    <h4>
+      {{ _("Reviews") }}
+      <small>
+      {% if current_user.is_guest %}
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+      {% else %}
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
+      {% endif %}
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
+        </a>
+
+      </small>
+    </h4>
+  </div>
+
+  {%- if comments -%}
+
+  <ul class="list-unstyled">
+  {%- for c in comments -%}
+  <li name="{{ c.id }}">
+    <div>
+    <h4>
+    {{ c.title }}
+    <small>
+       /
+      {{ ('<i class="glyphicon glyphicon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="glyphicon glyphicon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
+      {%- if c.nb_votes_total > 0 -%}
+        {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
+        {%- if votes > 0 -%}
+        / <span class="badge badge-success">+{{ votes }}</span>
+        {%- elif votes < 0 -%}
+        / <span class="badge badge-important">{{ votes }}</span>
+        {%- endif -%}
+      {%- endif -%}
+      <a class="pull-right" title="{{ _('Permalink to this review') }}" href="#{{ c.id }}">¶</a>
+    </small>
+    </h4>
+    <blockquote>
+      <p>
+      {{ c.body }}
+      </p>
+      <small>
+
+        {%- if c.user -%}
+        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
+        <a href="{{ url_for('webmessage.add', sent_to_user_nicks=c.user.nickname) }}">
+          {{ c.user.nickname }}
+        </a>
+        {%- else -%}
+        <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
+          {{ _('Guest') }}
+        {%- endif -%} &nbsp;
+        - <i class="glyphicon glyphicon-time"></i> {{ c.date_creation }}
+        - <i class="glyphicon glyphicon-question-sign"></i> {{ _('Was it helpful?') }}
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
+            referer=request.url
+          ) }}">
+          <i class="glyphicon glyphicon-thumbs-up"></i>
+          {{ _('yes') }}
+          </a> /
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
+            referer=request.url
+          ) }}">
+          <i class="glyphicon glyphicon-thumbs-down"></i>
+          {{ _('no') }}
+          </a>
+          -
+          <a href="{{ url_for('comments.report', recid=recid, id=c.id,
+            referer=request.url
+          ) }}">
+            <i class="glyphicon glyphicon-exclamation-sign"></i>
+            {{ _('report abuse') }}
+          </a>
+      </small>
+    </blockquote>
+    </div>
+  </li>
+  {%- endfor -%}
+  </ul>
+
+  {% if current_user.is_guest %}
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
+        </a>
+      {% else %}
+        <a class="btn btn-default pull-right" data-toggle="modal" data-target="#" href="{{ url_for('comments.add_review', recid=recid) }}">
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
+        </a>
+      {% endif %}
+  {%- else -%}
+  <div class="alert alert-info">
+    {{ _('There are no reviews. Be the first reviewing this record.') }}
+  </div>
+  {%- endif -%}
+
+  <div style="clear:both"/></div>
+
+{% endblock %}
+
+{%- if request.is_xhr -%}
+  <script type="text/javascript"> bindModals(null, 'input:text:visible:first'); </script>
+{%- endif -%}

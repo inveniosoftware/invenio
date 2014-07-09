@@ -2,7 +2,7 @@ import invenio.bibauthorid_config as bconfig
 import os
 import shutil
 from cPickle import dump, load, UnpicklingError
-from invenio.bibauthorid_dbinterface import get_db_time
+from invenio.legacy.bibauthorid.dbinterface import get_db_time
 import h5py
 
 

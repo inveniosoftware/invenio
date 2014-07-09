@@ -1,0 +1,57 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+
+{%- macro panel_start(title, icon="", btn_text='', btn='', btn_icon='', btn_href='', btn_class='btn-default', btn_name='', id="", with_body=True) %}
+{%- block panel_start scoped %}
+<div class="panel-group panel-bot-margin"{% if id %} id="{{id}}"{% endif %}>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <strong>{%if icon %}<i class="{{icon}}"></i>{% endif %} {{title}}</strong>
+            {%- if btn and (btn_href or btn_text) -%}
+            <div class="pull-right">
+            {%- if btn_text %}
+                <small class="text-muted" style="padding-right: 10px;">(updated {{last_sync}})</small>
+            {%- endif %}
+            {%- if btn_href %}
+            <a class="pull-right btn btn-xs {{btn_class}}" href="{{btn_href}}">{% if btn_icon%}<i class="{{btn_icon}}"></i> {% endif %}{{btn}}</a>
+            {%- else %}
+            {%- if btn_name %}
+            <button name="{{btn_name}}" class="btn btn-xs {{btn_class}}">{% if btn_icon %}<i class="{{btn_icon}}"></i> {% endif %}{{btn}}</button>
+            {%- endif %}
+            {%- endif %}
+            </div>
+            {%- endif -%}
+        </div>
+        {%- if with_body %}
+        <div class="panel-body">
+        {%- endif %}
+{%- endblock %}
+{%- endmacro %}
+
+
+{%- macro panel_end(with_body=True) %}
+{%- block panel_end scoped %}
+        {%- if with_body %}
+        </div>
+        {%- endif %}
+    </div>
+</div>
+{%- endblock %}
+{%- endmacro %}

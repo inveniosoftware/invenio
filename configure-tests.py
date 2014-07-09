@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import print_function
+
 """
 Test the suitability of Python core and the availability of various
 Python modules for running Invenio.  Warn the user if there are
@@ -23,9 +25,9 @@ running from configure.ac.
 """
 
 ## minimally recommended/required versions:
-cfg_min_python_version = "2.6"
-cfg_max_python_version = "2.9.9999"
-cfg_min_mysqldb_version = "1.2.1_p2"
+CFG_MIN_PYTHON_VERSION = (2, 6)
+CFG_MAX_PYTHON_VERSION = (2, 9, 9999)
+CFG_MIN_MYSQLDB_VERSION = "1.2.1_p2"
 
 ## 0) import modules needed for this testing:
 import string
@@ -42,14 +44,14 @@ def wait_for_user(msg):
     try:
         raw_input(msg)
     except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
+        print("\n\nInstallation aborted.")
         sys.exit(1)
     except EOFError:
-        print " (continuing in batch mode)"
+        print(" (continuing in batch mode)")
         return
 
 ## 1) check Python version:
-if sys.version < cfg_min_python_version:
+if sys.version_info < CFG_MIN_PYTHON_VERSION:
     error_messages.append(
     """
     *******************************************************
@@ -65,10 +67,11 @@ if sys.version < cfg_min_python_version:
     **                                                   **
     ** Please upgrade your Python before continuing.     **
     *******************************************************
-    """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
+    """ % (string.replace(sys.version, "\n", ""),
+           '.'.join(CFG_MIN_PYTHON_VERSION))
     )
 
-if sys.version > cfg_max_python_version:
+if sys.version_info > CFG_MAX_PYTHON_VERSION:
     error_messages.append(
     """
     *******************************************************
@@ -85,14 +88,15 @@ if sys.version > cfg_max_python_version:
     **                                                   **
     ** Installation aborted.                             **
     *******************************************************
-    """ % (string.replace(sys.version, "\n", ""), cfg_max_python_version)
+    """ % (string.replace(sys.version, "\n", ""),
+           '.'.join(CFG_MAX_PYTHON_VERSION))
     )
 
 ## 2) check for required modules:
 try:
     import MySQLdb
     import base64
-    import cPickle
+    from six.moves import cPickle
     import cStringIO
     import cgi
     import copy
@@ -114,7 +118,35 @@ try:
     import urllib
     import zlib
     import wsgiref
-except ImportError, msg:
+    import sqlalchemy
+    import werkzeug
+    import jinja2
+    import flask
+    import fixture
+    import flask.ext.assets
+    import flask.ext.cache
+    import flask.ext.sqlalchemy
+    import flask.ext.testing
+    import wtforms
+    import flask.ext.wtf
+    import flask.ext.admin
+
+    ## Check Werkzeug version
+    werkzeug_ver = werkzeug.__version__.split(".")
+    if werkzeug_ver[0] == "0" and int(werkzeug_ver[1]) < 8:
+        error_messages.append(
+    """
+    *****************************************************
+    ** Werkzeug version %s detected
+    *****************************************************
+    ** Your are using an outdated version of Werkzeug  **
+    ** with known problems. Please upgrade Werkzeug to **
+    ** at least v0.8 by running e.g.:                  **
+    **   pip install Werkzeug --upgrade                **
+    *****************************************************
+    """ % werkzeug.__version__
+        )
+except ImportError as msg:
     error_messages.append("""
     *************************************************
     ** IMPORT ERROR %s
@@ -127,10 +159,11 @@ except ImportError, msg:
     """ % msg
     )
 
+
 ## 3) check for recommended modules:
 try:
     import rdflib
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -150,7 +183,7 @@ except ImportError, msg:
 
 try:
     import pyRXP
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -168,7 +201,7 @@ except ImportError, msg:
 
 try:
     import dateutil
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -187,7 +220,7 @@ except ImportError, msg:
 
 try:
     import libxml2
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append("""
     *****************************************************
     ** IMPORT WARNING %s
@@ -206,7 +239,7 @@ except ImportError, msg:
 
 try:
     import libxslt
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -225,7 +258,7 @@ except ImportError, msg:
 
 try:
     import Gnuplot
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -246,7 +279,7 @@ except ImportError, msg:
 
 try:
     import rauth
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -266,7 +299,7 @@ except ImportError, msg:
 
 try:
     import openid
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -288,7 +321,7 @@ try:
     import magic
     if not hasattr(magic, "open"):
         raise StandardError
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -325,7 +358,7 @@ except StandardError:
 
 try:
     import reportlab
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -348,7 +381,7 @@ try:
         import PyPDF2
     except ImportError:
         import pyPdf
-except ImportError, msg:
+except ImportError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -387,7 +420,7 @@ except ImportError, msg:
     )
 
 ## 4) check for versions of some important modules:
-if MySQLdb.__version__ < cfg_min_mysqldb_version:
+if MySQLdb.__version__ < CFG_MIN_MYSQLDB_VERSION:
     error_messages.append(
     """
     *****************************************************
@@ -398,14 +431,14 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** before continuing.  Please see the INSTALL file **
     ** for more details.                               **
     *****************************************************
-    """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
+    """ % (MySQLdb.__version__, CFG_MIN_MYSQLDB_VERSION)
     )
 
 try:
     import Stemmer
     try:
         from Stemmer import algorithms
-    except ImportError, msg:
+    except ImportError as msg:
         error_messages.append(
         """
         *****************************************************
@@ -429,7 +462,7 @@ try:
     path_to_python_h = get_python_inc() + os.sep + 'Python.h'
     if not os.path.exists(path_to_python_h):
         raise StandardError, "Cannot find %s" % path_to_python_h
-except StandardError, msg:
+except StandardError as msg:
     error_messages.append(
     """
     *****************************************************
@@ -472,7 +505,7 @@ try:
     else:
         if not set(CONFIGURATION_REQUIRED).issubset(options):
             raise StandardError, set(CONFIGURATION_REQUIRED).difference(options)
-except StandardError, msg:
+except StandardError as msg:
     warning_messages.append(
     """
     *****************************************************
@@ -488,45 +521,45 @@ except StandardError, msg:
     )
 
 if warning_messages:
-    print """
+    print("""
     ******************************************************
     ** WARNING MESSAGES                                 **
     ******************************************************
-    """
+    """)
     for warning in warning_messages:
-        print warning
+        print(warning)
 
 if error_messages:
-    print """
+    print("""
     ******************************************************
     ** ERROR MESSAGES                                   **
     ******************************************************
-    """
+    """)
     for error in error_messages:
-        print error
+        print(error)
 
 if warning_messages and error_messages:
-    print """
+    print("""
     There were %(n_err)s error(s) found that you need to solve.
     Please see above, solve them, and re-run configure.
     Note that there are also %(n_wrn)s warnings you may want
     to look into.  Aborting the installation.
     """ % {'n_wrn': len(warning_messages),
-           'n_err': len(error_messages)}
+           'n_err': len(error_messages)})
 
     sys.exit(1)
 elif error_messages:
-    print """
+    print("""
     There were %(n_err)s error(s) found that you need to solve.
     Please see above, solve them, and re-run configure.
     Aborting the installation.
-    """ % {'n_err': len(error_messages)}
+    """ % {'n_err': len(error_messages)})
 
     sys.exit(1)
 elif warning_messages:
-    print """
+    print("""
     There were %(n_wrn)s warnings found that you may want to
     look into, solve, and re-run configure before you
     continue the installation.  However, you can also continue
     the installation now and solve these issues later, if you wish.
-    """ % {'n_wrn': len(warning_messages)}
+    """ % {'n_wrn': len(warning_messages)})

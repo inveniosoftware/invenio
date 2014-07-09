@@ -1,0 +1,756 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% macro record_brief_links(record) %}{% block record_brief_links scoped %}
+  <p>
+    {%- set recID = record['recid'] -%}
+    {%- set i = recID %}
+    {%- set similar = "recid:%s" % recID -%}
+    {%- if config.CFG_WEBSEARCH_USE_ALEPH_SYSNOS -%}
+      {%- set alephsysnos = record['system_number'] -%}
+      {%- if len(alephsysnos) > 0 -%}
+        {%- set recID = alephsysnos[0] -%}
+        {%- set similar = "sysno:%d" % recID -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {% block record_brief_links_details scoped %}
+    <a class="text-success"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}v"
+       href="{{ url_for('record.metadata', recid=recID) }}">
+      {{ _("Detailed record") }}
+    </a>
+     -
+    <a class="text-success"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}s"
+       href="{{ url_for('search.search', p=similar, rm='wrd') }}">
+      {{ _("Similar records") }}
+    </a>
+    {% endblock record_brief_links_details %}
+
+  {# Citations link #}
+  {% block record_brief_links_citations scoped %}
+  {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
+    {%- set num_citations = record['_cited_by_count'] -%}
+    {%- if num_citations -%}
+     -
+    <a href="{{ url_for('search.search', p="refersto:recid:%d" % recID) }}"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}r">
+      {{ _("Cited by %(x_num)i records", x_num=num_citations) if num_citations > 1 else _("Cited by 1 record") }}
+    </a>
+    {%- endif -%}
+  {%- endif -%}
+  {% endblock record_brief_links_citations %}
+
+  {# Comments link #}
+  {% block record_brief_links_comments scoped %}
+  {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
+    {%- set num_comments = record['_number_of_comments'] -%}
+    {%- if num_comments -%}
+     -
+    <a href="{{ url_for('comments.comments', recid=recID) }}"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}c">
+      <i class="glyphicon glyphicon-comment"></i>
+      {{ _("%(x_num)i comments", x_num=num_comments) if num_comments > 1 else _("1 comment") }}
+    </a>
+    {%- endif -%}
+  {%- endif -%}
+  {% endblock record_brief_links_comments %}
+
+  {# Reviews link #}
+  {% block record_brief_links_reviews scoped %}
+  {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
+    {%- set num_reviews = record['_number_of_reviews'] -%}
+    {%- if num_reviews -%}
+     -
+    <a href="{{ url_for('comments.reviews', recid=recID) }}">
+      <i class="glyphicon glyphicon-eye-open"></i>
+      {{ _("%(x_num)i reviews", x_num=num_reviews) if num_reviews > 1 else _("1 review") }}
+    </a>
+    {%- endif -%}
+  {%- endif -%}
+  {% endblock record_brief_links_reviews %}
+  </p>
+{% endblock record_brief_links %}{% endmacro %}
+
+
+{%- macro collection_tree(collections, limit=None) %}
+{%- set macrokwargs = kwargs %}
+{%- block collection_tree scoped %}
+{%- set idxs = [0] -%}
+<ul {{ macrokwargs|xmlattr }}>
+{% for collection in collections recursive %}
+  <li>
+    {# Do not show checkboxes in new UI
+    {% if idxs|length == 1 %}
+    <input type="checkbox" name="c" value="{{ collection.name }}" checked/>
+    {% endif %}
+    #}
+    <a href="{{ url_for(".collection", name=collection.name, ln=g.ln, _external=True) }}">
+      {{ collection.name_ln }}
+    </a>
+    <small class="text-muted">({{ collection.nbrecs }})</small>&nbsp;
+  {% if collection.collection_children and idxs|length < limit %}
+    {%- do idxs.append(loop.index) -%}
+    <ul {{ macrokwargs|xmlattr }}>
+      {{ loop(collection.collection_children) }}
+    </ul>
+    {%- do idxs.pop() -%}
+  {% endif %}
+  </li>
+{% endfor %}
+</ul>
+{% endblock collection_tree %}
+{% endmacro %}
+
+{% macro portalbox_sidebar(portalboxes, width=2) %}{% set macrokwargs = kwargs %}{% block portalbox_sidebar scoped %}
+  {% if portalboxes %}
+  <div {{ macrokwargs|xmlattr }}>
+    {% for cp in portalboxes %}
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h5>{{ cp.portalbox.title }}</h5>
+        <p>{{ cp.portalbox.body|safe }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+{% endblock portalbox_sidebar %}{% endmacro %}
+
+{% macro search_also(externalcollections) %}{% block search_also scoped %}
+  {% if externalcollections %}
+    <h4>{{ _("Search also:") }}</h4>
+    <ul>
+    {% for ex in externalcollections %}
+      <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">
+        <img src="{{ url_for("static", filename="img/external-icon-light-8x8.gif")}}" alt="{{ ex.engine.base_url }}"/>
+        </a></li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock search_also %}{% endmacro %}
+
+{% macro _search_hidden_options() %}
+
+  {%- for name in ['rg', 'of', 'so', 'sf', 'rm'] -%}
+  {%- if request.args.get(name) -%}
+  <input type="hidden" name="{{ name }}" value="{{ request.args.get(name, '') }}" />
+  {%- endif -%}
+  {%- endfor -%}
+
+{% endmacro %}
+
+
+{% macro _search_simple_box(collection, easy_search_form) %}
+  {% block _search_simple_box scoped %}
+    {% for f in easy_search_form if not f.name=='csrf_token' %}
+    <div class="form-group">
+      <label class="col-md-2 col-sm-3 control-label" for="{{ f.label.field_id }}">
+        {{ f.label.text }}
+      </label>
+      <div class="col-md-10 col-sm-9">
+        {{ f(class_='form-control') }}
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9">
+        <div class="pull-right">
+          <button name="action_browse" class="btn">
+            <i class="glyphicon glyphicon-list"></i> {{ _("Browse") }}
+          </button>
+          <button name="action_search" type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-search"></i> {{ _("Search") }}
+          </button>
+        </div>
+      </div>
+    </div>
+  {% endblock _search_simple_box %}
+{% endmacro %}
+
+
+{% macro _search_advanced_box(collection) %}
+{% block _search_advanced_box scoped %}
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label" for="p1">
+        {{ _('what') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <input type="text" id="p1" name="p1" value="" class="form-control"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label" for="p2">
+        {{ _('where') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <select class="form-control" id="p2" name="f">
+          {% for (code, name) in collection.search_within %}
+          <option value="{{ code }}">
+            {{ name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label" for="m1">
+        {{ _('how') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <select name="m1" id="m1" class="form-control">
+          {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES|sort(attribute='order') -%}
+            <option value="{{ v.code }}">{{ _(v.title)|safe }}</option>
+          {%- endfor -%}
+        </select>
+      </div>
+    </div>
+
+    {% for id, soo in collection.search_options|groupby('id_field') %}
+    <hr/>
+    <div class="form-group">
+      <label class="control-label col-sm-3 col-md-2" for="{{ soo[0].field.code }}">
+        {{- soo[0].field.name_ln -}}
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <div class="input-group">
+          <select class="form-control" id="{{ soo[0].field.code }}" name="{{ soo[0].field.code }}">
+            <option value="">*** {{ _('select') }} ***</option>
+            {% for so in soo %}
+            <option value="{{ so.fieldvalue.value }}">
+              {{ so.fieldvalue.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
+            <i class="glyphicon glyphicon-ok"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9">
+        <div class="pull-left">
+          <button id="add_to_search-button" class="btn">
+            <i class="glyphicon glyphicon-plus"></i> {{ _("Add to search") }}
+          </button>
+        </div>
+        <div class="pull-right">
+          <button name="action_browse" class="btn">
+            <i class="glyphicon glyphicon-list"></i> {{ _("Browse") }}
+          </button>
+          <button name="action_search" type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-search"></i> {{ _("Search") }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+{% endblock _search_advanced_box %}
+{% endmacro %}
+
+{% macro search_box(collection, easy_search_form) %}
+{% block search_box scoped %}
+  <div class="form-horizontal add_to_search-form">
+    <div class="form-group _tab-form-group">
+      <label class="col-sm-3 col-md-2 control-label">
+        {{ _('Add to search') }}
+      </label>
+      <div class="col-md-10 col-sm-9" data-toggle="buttons">
+        <div class="btn-group pull-left" id="add_type-btn-group" data-toggle="buttons">
+          <label class="btn btn-sm btn-default active">
+            <input type="radio" name="op1" value="a" active/>{{ _('AND') }}
+          </label>
+          <label class="btn btn-sm btn-default">
+            <input type="radio" name="op1" value="o"/>{{ _('OR') }}
+          </label>
+          <label class="btn btn-sm btn-default">
+            <input type="radio" name="op1" value="n"/>{{ _('AND NOT') }}
+          </label>
+        </div>
+
+        <div class="pull-right">
+          <ul class="nav nav-tabs pull-right tab-buttons">
+            <li class="active">
+              <a href="#simple-search" id="simple-search-tab-button" data-toggle="tab">{{ _('simple') }}</a>
+            </li>
+            <li>
+              <a href="#advanced-search" id="advanced-search-tab-button" data-toggle="tab">{{ _('advanced') }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="simple-search">
+        {{ _search_simple_box(collection, easy_search_form) }}
+      </div>
+      <div class="tab-pane" id="advanced-search">
+        {{ _search_advanced_box(collection) }}
+      </div>
+    </div>
+  </div>
+{% endblock search_box %}
+{% endmacro %}
+
+
+{% macro searchsettings_form(collection) %}
+{% block searchsettings_form scoped %}
+
+  <form action="{{ url_for('search.search') }}"
+    name="settings"
+    method="get"
+    class="form-horizontal">
+    <div class="row">
+    <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
+    <div class="form-group col-md-6">
+      <label class="control-label col-sm-6 col-xs-5">{{ _('Display on page') }}</label>
+      <div class="col-sm-6 col-xs-7">
+        <select
+          name="rg"
+          class="btn-sm form-control">
+          {%- for i in [10, 25, 50, 100, 250, 500] -%}
+            {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
+              <option value="{{ i }}"{{ ' selected' if request.args.get('rg',10)==i.__str__() }}>{{ i }} {{ _('results') }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Output format') }}</label>
+    <div class="col-sm-6 col-xs-7">
+      <select
+              name="of"
+              class="btn-sm form-control">
+      {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
+        <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
+      {%- endfor -%}
+      </select>
+    </div>
+  </div>
+
+  {% if collection.rnkMETHODs|length %}
+  <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Ranking') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7">
+      <select name='rm'
+              class="btn-xs form-control">
+      {% for rnk_method in collection.rnkMETHODs %}
+        <option value="{{ rnk_method.rnkMETHOD.name }}">
+          {{ rnk_method.rnkMETHOD.get_name_ln() }}
+        </option>
+      {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Sort by most') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7" data-toggle="buttons">
+    {%- for (k,v,vv) in [('recent', 'rm', ''), ('cited', 'rm', 'citation'), ('relevant', 'rm', 'wrd')] -%}
+      <label class="btn btn-sm btn-default {{ 'active' if request.args.get(v,'') == vv}}">
+        <input
+          type="radio"
+          name="{{ v }}"
+          value="{{ vv }}"
+          {{ 'checked="checked"'|safe if request.args.get(v,'') == vv}}>
+        {{ _(k) }}
+      </label>
+    {%- endfor -%}
+    </div>
+  </div>
+
+   <div class="form-group col-md-6">
+    <label class="col-sm-6 control-label col-xs-5">{{ _('Search form') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7" data-toggle="buttons">
+      {%- for (k,v) in [(_('Simple'), 'simple'), (_('Advanced'), 'advanced')] -%}
+      {%- set active = v=='simple' -%}
+      <label class="btn btn-sm btn-default">
+        <input
+          type="radio"
+          name="box"
+          value="{{ v }}"
+          {{ 'checked="checked"'|safe if active}}>
+        {{ k }}
+      </label>
+      {%- endfor -%}
+    </div>
+  </div>
+  </div>
+
+  <div class="form-group col-md-6 pull-right">
+    {%- if not current_user.is_guest -%}
+    <button name="action_save"
+      rel="tooltip"
+      title="{{ _('store permanently in user settings') }}"
+      data-placement="bottom"
+      class="btn btn-primary btn-sm pull-left">
+      <i class="glyphicon glyphicon-hdd"></i> {{ _('Save') }}
+    </button>
+    {%- endif -%}
+    <button name="action_search"
+      rel="tooltip"
+      title="{{ _('use settings in current search') }}"
+      data-placement="bottom"
+      class="btn btn-sm pull-right">
+      <i class="glyphicon glyphicon-ok"></i> {{ _('Apply') }}
+    </button>
+  </div>
+
+  </form>
+
+{% endblock searchsettings_form %}{% endmacro %}
+
+
+{% macro search_form_javascript(collection) %}{% block search_form_javascript %}
+  <script>
+  $(function () {
+
+    $("form[name=search]").submit(function() {
+      $('.add_to_search-form').remove();
+      return true; // ensure form still submits
+    })
+
+    // side buttons for results number field
+    $('form[name=settings] select[name="of"]').buttonSelect({
+      button: '<div class="btn btn-sm btn-default" />'
+    , span: '<span class="btn btn-sm btn-default" style="width: 100px;" />'
+    , next: '<i class="glyphicon glyphicon-chevron-right"></i>'
+    , prev: '<i class="glyphicon glyphicon-chevron-left"></i>'
+    })
+
+    // side buttons for output format field
+    $('form[name=settings] select[name="rg"]').buttonSelect({
+      button: '<div class="btn btn-sm btn-default" />'
+    , span: '<span class="btn btn-sm btn-default" style="width: 100px;" />'
+    , next: '<i class="glyphicon glyphicon-plus"></i>'
+    , prev: '<i class="glyphicon glyphicon-minus"></i>'
+    })
+
+    // if (!("autofocus" in $("form[name=search] input[name=q]"))) {
+    //  // ensure we get the focus always in search input
+    //  $("form[name=search] input[name=q]").focus();
+    // }
+
+    //--------------------
+
+    /**
+     * Allows to deactivate a radio buttons (like check-buttons)
+     * and make them behave as radio ones when the another one is clicked
+     *
+     * @method radio_checkbox_hybrid
+     * @param radioButtons jQuerySelector for all the buttons in a group
+     */
+    var radio_checkbox_hybrid = function (radioButtons) {
+
+      radioButtons.click(function () {
+        var buttons = $(this).siblings();
+        if (buttons.hasClass("active")) {
+          buttons.click();
+        }
+      });
+    }
+
+    radio_checkbox_hybrid($(".invenio-collapsable-tabs a"))
+
+    //---------------------
+
+    var op1_fn = {'a': 'AND ', 'o': 'OR ', 'n': 'AND NOT '},
+        m1_fn = {
+        {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES -%}
+          '{{ v.code }}': function(val, f) {
+            {{ v.tokenize|safe }}
+          }{{ ',' if not loop.last }}
+        {%- endfor -%}
+        };
+
+    // the visible search field
+    var $search_query_field = $('form[name=search] input[name=p]');
+
+    // all fields containg search query, there are some hidden ones too
+    var $all_search_query_fields = $('[name=p]');
+
+    /**
+     * Sets value of the main search field. Should be used
+     * instead of jQuery's val() to update typeahead's
+     * internal query.
+     *
+     * @method setSearchFieldValue
+     * @param {String} val value to be set
+     */
+    function setSearchFieldValue(val) {
+      $search_query_field.data('search_typeahead').setFieldValue(val);
+      $all_search_query_fields.val(val);
+    }
+
+    /**
+     * Merges value from 'advanced' tab in 'Add to search' form
+     * with the current search query
+     *
+     * @method addAdvancedQuery
+     * @returns {String} search query after adding the form content
+     */
+    function getAdvancedQuery() {
+      var m1 = $('[name=m1]').val(),
+          p1 = $('[name=p1]').val(),
+          f = $('[name=f]').val(),
+          p = $('[name=p]');
+      if (p1 === "") {
+        return '';
+      }
+      if (f !== "") {
+        f +=':';
+      }
+      return m1_fn[m1](p1,f);
+    };
+
+    /**
+     * Removes query value from 'what?' field in 'advanced' tab
+     *
+     * @method cleanAdvancedQuery
+     */
+    function cleanAdvancedQueryForm() {
+      $('[name=p1]').val('');
+    }
+
+    /**
+     * Creates search query from 'simple' tab in 'Add to search' form
+     *
+     * @method getSimpleQuery
+     * @returns {String} query from the form content
+     *
+     */
+    function getSimpleQuery() {
+        var query_str = '';
+
+        // get values
+        var p = $('[name=p]'),
+            op1 = $('#add_type-btn-group .active').children(':first').val(),
+            author = $('#author').val(),
+            title = $('#title').val(),
+            rn = $('#rn').val(),
+            aff = $('#aff').val()
+            cn = $('#cn').val(),
+            k = $('#k').val(),
+            //eprinttype = $('#eprint-type').val(),
+            //eprintnumber = $('#eprint-number').val(),
+            j = $('#journal-name').val(),
+            jvol = $('#journal-vol').val(),
+            jpage = $('#journal-page').val();
+
+        // filter and build
+        var query = [];
+        if (author !== '') { query.push('author:' + author); }
+        if (title !== '') { query.push('title:' + title); }
+        if (rn !== '') { query.push('reportnumber:' + rn); }
+        if (aff !== '') { query.push('affiliation:' + aff); }
+        if (cn !== '') { query.push('collaboration:' + cn); }
+        if (k !== '') { query.push('keyword:' + k); }
+        if (j !== '') { query.push('journal:' + j); }
+        if (jvol !== '') { query.push('909C4v:' + jvol); }
+        if (jpage !== '') { query.push('909C4c:' + jpage); }
+
+        if (query.length > 0) {
+          query_str = query.join(' '+op1_fn[op1])
+        }
+
+        return query_str;
+    };
+
+    /**
+     * Adds query from 'advanced' tab to the search field
+     *
+     * @method addAdvancedQueryToSearch
+     */
+    function addAdvancedQueryToSearch() {
+      var current_query = $.trim($search_query_field.val());
+      var new_part = getAdvancedQuery();
+      cleanAdvancedQueryForm();
+      setSearchFieldValue(mergeQuery(current_query, new_part));
+    }
+
+    /**
+     * Merges new part to old query using currently
+     * chosen logic function
+     *
+     * @method mergeQuery
+     * @param {String} old_query old query
+     * @param {String} new_part a string which user is going to merge
+     */
+    function mergeQuery(current_query, new_part) {
+      var op1 = $('#add_type-btn-group .active').children(':first').val();
+      var op = (op1=='a' && current_query=="")?'':op1_fn[op1];
+
+      if (current_query !== "" && new_part !== "") {
+        current_query += ' ' + op;
+      }
+
+      return current_query + new_part;
+    }
+
+    /**
+     * Updates query value in the search field
+     *
+     * @method makeSearchQuery
+     */
+    function makeSearchQuery() {
+      var active_tab = $('.add_to_search-form .tab-buttons li.active a').attr('href');
+
+      if (active_tab === '#simple-search') {
+        var current_query = $.trim($search_query_field.val());
+        var new_part = getSimpleQuery();
+        setSearchFieldValue(mergeQuery(current_query, new_part));
+      } else {
+        addAdvancedQueryToSearch();
+        $('.add_to_search-form .appender').trigger('click');
+      }
+    }
+
+    // search buttons
+    $('.add_to_search-form button[name=action_search]').on('click', function(e) {
+      makeSearchQuery();
+      e.stopPropagation();
+    });
+
+    // browse buttons
+    $('.add_to_search-form button[name=action_browse]').on('click', function(e) {
+      makeSearchQuery();
+      var $main_search_button = $('#searchform-input-group button[name=action_search]');
+      $main_search_button.attr('name', 'action_browse');
+      $main_search_button.trigger('click');
+    });
+
+    $('#add_to_search-button').on('click', function(e) {
+      addAdvancedQueryToSearch();
+      return false;
+    });
+
+    $('.add_to_search-form #advanced-search [name=p1]').keypress(function(event) {
+      // on 'return' key
+      if ( event.which == 13 ) {
+        addAdvancedQueryToSearch();
+        return false;
+      }
+    });
+
+    $('.add_to_search-form #advanced-search .appender').on('click', function(e) {
+        var op1 = $('#add_type-btn-group .active').children(':first').val(),
+            btn = $(this),
+            source = $('[name='+btn.attr('data-source')+']'),
+            target = $('[name='+btn.attr('data-target')+']'),
+            val = $.trim(target.val()),
+            op = (op1=='a' && val=="")?'':op1_fn[op1];
+        if (val !== "") {
+          val += ' ' + op;
+        }
+        if (source.val() === "") { return false }
+        if (source.val().length > 0) {
+          target.val(val+source.attr('name')+':"'+source.val()+'"');
+          source.val('');
+        }
+        e.stopPropagation();
+        return false;
+    });
+
+
+    // -------------- SEARCH FIELD TYPEAHEAD ----------------
+
+    var searchField = $('form[name=search] input[name=p]');
+
+    var area_keywords = $.map({{ collection.search_within[1:]|tojson|safe }},
+      function(val, i) {
+        return val[0];
+      }
+    );
+
+    {%- for id, soo in collection.search_options|groupby('id_field') -%}
+      area_keywords.push('{{ soo[0].field.code }}:');
+    {%- endfor -%}
+
+    {% block searchfield_typeahead_configuration %}
+
+      var parser_options = getDefaultParserConf(area_keywords);
+
+      searchField.searchTypeahead({
+        value_hints_url: '/list/%TYPE?q=%QUERY',
+        options_sets: {
+          invenio: parser_options
+        },
+        default_set: 'invenio'
+      });
+
+    {% endblock searchfield_typeahead_configuration %}
+
+
+    // END -------------- SEARCH FIELD TYPEAHEAD -------------- END
+
+    // ------------ typeahead for "Add to search" form ----------------
+
+    $('[data-provide="typeahead-url"]').each(function (i, field) {
+
+      var $field = $(field);
+
+      var engine = new Bloodhound({
+        datumTokenizer: function(d) {
+          return Bloodhound.tokenizers.whitespace(d.value);
+        },
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        limit: 10,
+        remote: {
+          url: $field.data('source'),
+          replace: function(url, query) {
+            return url + '?q=' + query;
+          },
+          filter: function(response) {
+            return response.results;
+          }
+        }
+      });
+
+      engine.initialize();
+
+      $field.typeahead({
+        minLength: 3
+      },
+      {
+        source: engine.ttAdapter(),
+        displayKey: 'value'
+      });
+    });
+
+    // ---------------------------------------------------------------
+
+  });
+ </script>
+{% endblock search_form_javascript %}{% endmacro %}

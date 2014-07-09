@@ -1,0 +1,278 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- from "_formhelpers.html" import render_field with context %}
+{%- extends "page.html" %}
+{%- set title = None %}
+{%- set activated_providers = config.CFG_OPENID_PROVIDERS * config.CFG_OPENID_AUTHENTICATION
+                           + config.CFG_OAUTH1_PROVIDERS * config.CFG_OAUTH1_AUTHENTICATION
+                           + config.CFG_OAUTH2_PROVIDERS * config.CFG_OAUTH2_AUTHENTICATION %}
+
+{%- macro external_login_button(provider, referer='', icon_size=48,
+                               classes="", label="%(provider)s username") %}
+{%- block external_login_button scoped -%}
+
+  {% if provider in config.CFG_OPENID_PROVIDERS %}
+    {% set type = 'openid' %}
+  {% elif provider in config.CFG_OAUTH2_PROVIDERS %}
+    {% set type = 'oauth2' %}
+  {% elif provider in config.CFG_OAUTH1_PROVIDERS %}
+    {% set type = 'oauth1' %}
+  {% else %}
+    {% set type = 'login' %}
+  {% endif %}
+
+  {% set handler = url_for('youraccount.' + type, provider=provider) %}
+  {% if referer %}
+    {% if not url_for('webaccount.login') in referer %}
+        {% set handler = url_for('youraccount.' + type, provider=provider, referer=referer) %}
+    {% endif %}
+  {% endif %}
+
+  <li class="{{ classes }}" id="{{ provider }}_login_button">
+    <a class="thumbnail" id="{{ provider }}_login"
+       rel="tooltip" title="{{ provider }}" data-placement="top"
+       href="{{ handler|safe }}">
+      <img class="external_provider {{ classes }}"
+           src="{{ url_for('static', filename="/img/%s_icon_%s.png"|format(provider, icon_size)) }}" />
+    </a>
+  </li>
+{%- endblock external_login_button -%}
+{% endmacro %}
+
+{% macro external_login_form(provider, referer='', icon_size=48,
+                             classes="", label="%(provider)s username") %}
+  {#
+  Template of the login form for providers which need an username for
+  verification.
+
+  @param provider: The name of the provider
+  @type provider: str
+
+  @param referer: The referer URL - will be redirected upon after login
+  @type referer: str
+
+  @param icon_size: The size of the icon of the provider
+  @type icon_size: int
+
+  @param classes: Additional classes for the login form
+  @type classes: str
+
+  @param label: The label for text input.
+  @param label: str
+
+  @rtype: str
+  #}
+  {%- block external_login_form scoped -%}
+  {% if provider in config.CFG_OPENID_PROVIDERS %}
+    {% set type = 'openid' %}
+  {% elif provider in config.CFG_OAUTH2_PROVIDERS %}
+    {% set type = 'oauth2' %}
+  {% elif provider in config.CFG_OAUTH1_PROVIDERS %}
+    {% set type = 'oauth1' %}
+  {% else %}
+    {% set type = 'login' %}
+  {% endif %}
+
+  <li class="{{ classes }} login_form" id="{{ provider }}_verify_form">
+    <a class="thumbnail" id="{{ provider }}_login_img"
+       rel="tooltip" title="{{ provider }}" data-placement="top"
+       onclick="show_username_form('#{{ provider }}_verifier')" href="#{{ provider }}_verify_form">
+      <img class="external_provider {{ classes }}"
+           src="{{ url_for('static', filename="/img/%s_icon_%s.png"|format(provider, icon_size)) }}" />
+    </a>
+    <div class="login_content with_label" id="{{ provider }}_verifier" hidden="hidden">
+      <form method="get" accept-charset="UTF-8" action="{{ url_for('youraccount.' + type)|safe }}">
+        <input type="hidden" name="provider" value="{{ provider }}">
+        <input type="hidden" name="referer" value="{{ referer }}">
+        <input class="input-block-level" id="{{ provider }}_username_field"
+               style="background: url({{ url_for('static', filename="/img/%s_icon_%s.png"|format(provider, 24)) }});
+                      background-repeat: no-repeat;
+                      background-position: 2px center;
+                      padding-left: 30px;
+                      height: 30px;
+                      box-sizing: border-box;"
+               type="text" name="identifier" value=""
+               placeholder="{{ label|format(provider=provider) }}">
+        <button class="btn btn-info btn-block" type="submit">
+          {{ _('Continue') }}&nbsp;<i class="glyphicon glyphicon-chevron-right"></i>
+        </button>
+      </form>
+    </div>
+  </li>
+  {%- endblock external_login_form -%}
+{% endmacro %}
+
+{% macro construct_button(provider, size, button_class) %}
+{%- block construct_button scoped -%}
+  {% set c = config.CFG_OPENID_CONFIGURATIONS.get(provider, {}) %}
+  {% set identifier = c.get('identifier', '') %}
+
+  {% if "{0}" in identifier %}
+      {% set label = config.CFG_EXTERNAL_LOGIN_FORM_LABELS.get(provider, "%(provider)s username") %}
+      {{ external_login_form(provider, form.referer.data, size, button_class, _(label)) }}
+  {% else %}
+      {{ external_login_button(provider, form.referer.data, size, button_class) }}
+  {% endif %}
+{%- endblock construct_button -%}
+{% endmacro %}
+
+
+{% block body %}
+{%- block form_header scoped -%}
+<div class="row">
+{% if config.CFG_EXTERNAL_AUTH_USING_SSO %}{% block form_header_sso scoped %}
+  <div class="col-md-8 col-md-offset-2">
+    <p class="lead text-center">
+    {% autoescape false %}
+    {{ _("You can login using %(x_url_open)sSingle-Sign-On%(x_url_close)s",
+      x_url_open='<a href="'+url_for('sso_login', _external=True, _scheme='https', referer=request.values.get('referer'))+'">',
+      x_url_close='</a>') }}
+    {% endautoescape %}
+    </p>
+    <hr/>
+  </div>
+{% endblock form_header_sso %}{% endif %}
+
+  {%- block form_header_message scoped -%}
+  <div class="col-md-8 col-md-offset-2">
+    {% set x_url_open = '<a href="%s">'|format(url_for('webaccount.register')) %}
+    <p class="lead text-center">{{ _("If you already have an account, please login using the form below.") }}</p>
+    <p class="text-center">{{ _("If you don't own an account yet, please %(x_url_open)s register",
+                                x_url_open=x_url_open|safe) }}
+    {{ _("%(x_url_close)s an internal account.", x_url_close='</a>'|safe) }}</p>
+
+    <hr/>
+  </div>
+  {%- endblock form_header_message -%}
+</div>
+{%- endblock form_header -%}
+{%- block form_body scoped -%}
+<div class="row">
+  {%- block form_auth_internal scoped -%}
+  <div class="col-md-4 col-md-offset-{{ '2' if activated_providers else '4' }}">
+    {%- block form_auth_internal_form scoped -%}
+    <legend>{{ _('Please Sign In') }}</legend>
+    <form class="form-signin" action="{{ url_for('webaccount.login', _external=True, _scheme='https') }}" method="POST">
+    {{ form.referer }}
+    {{ form.login_method }}
+    <div class="form-group{% if form.nickname.errors%} has-error{% endif %}">
+    {{ form.nickname(placeholder=_('Username or email'), class_="form-control", type="text") }}
+    {%- if form.nickname.errors %}{% for error in form.nickname.errors %}
+        <span class="help-block">{{ error }}</span>
+    {%- endfor %}{% endif %}
+    </div>
+    <div class="form-group{% if form.password.errors%} has-error{% endif %}">
+    {{ form.password(placeholder=_('Password'), class_="form-control", type="password") }}
+    {%- if form.password.errors %}{% for error in form.password.errors %}
+        <span class="help-block">{{ error }}</span>
+    {%- endfor %}{% endif %}
+
+      <label class="checkbox">
+        {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
+      </label>
+      {{ form.submit(class_="btn btn-info btn-block") }}
+    </form>
+    <p class="text-center"><small>
+      <a href="{{ url_for('webaccount.lost') }}">
+        {{ _('Lost your password?') }}
+      </a>
+    </small></p>
+    {%- endblock form_auth_internal_form -%}
+  </div>
+  {%- endblock form_auth_internal -%}
+  {%- block form_auth_external scoped -%}
+  {%- if activated_providers %}
+  <style>
+  .auth_providers.thumbnails {
+    margin-left: 0px;
+  }
+
+  .auth_providers.thumbnails>li {
+    margin: 0px;
+    margin-right: 1px;
+    float: left!important;
+  }
+
+  .auth_providers .thumbnail {
+    padding: 0px;
+    border: none;
+  }
+  </style>
+    <div class="col-md-1 hidden-xs" style="height: 200px; padding: 0px; display: block; float: left; width: 1px;
+    border-right: 1px solid #ccc;">&nbsp;</div>
+
+
+    <div class="col-md-4">
+      <legend style="font-size: 90%;">{{ _('or Select Your Authentication Provider:') }}</legend>
+
+      <ul class="auth_providers thumbnails">
+      {% for provider in config.CFG_EXTERNAL_LOGIN_LARGE %}
+        {% if provider in activated_providers %}
+            {{ construct_button(provider, 48, "large") }}
+        {% endif %}
+      {% endfor %}
+
+      {% set providers = config.CFG_EXTERNAL_LOGIN_BUTTON_ORDER %}
+
+      {% if (activated_providers|length - CFG_EXTERNAL_LOGIN_LARGE|length) != providers|length %}
+        {# Not all the providers ordered. Add the unsorted ones to the end. #}
+        {% for provider in activated_providers|sort %}
+          {% if not provider in providers %}
+            {% do providers.append(provider) %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+
+      {% for provider in providers %}
+        {% if not provider in config.CFG_EXTERNAL_LOGIN_LARGE %}
+          {{ construct_button(provider, 24, "") }}
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
+    <div id="#form_field"></div>
+  {% endif %}
+  {%- endblock form_auth_external -%}
+</div>
+{%- endblock form_body -%}
+{%- block form_footer scoped -%}{%- endblock form_footer -%}
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript">
+  function show_username_form(element) {
+    $('#form_field').html($(element).html())
+    return false
+  }
+
+  (function($) {
+    $('[rel=tooltip]').tooltip();
+    $('#nickname').popover({
+      title: '<strong>{{ _('Note') }}</strong>',
+      content: '{{ _('You can use your nickname or your email address to login.') }}',
+      trigger: 'focus',
+      html: true,
+      container: 'body',
+      placement: '{% block nickname_popover_placement %}right{% endblock%}'
+
+    });
+  })(jQuery);
+</script>
+{% endblock %}

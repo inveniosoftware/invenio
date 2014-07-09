@@ -19,8 +19,8 @@
 
 """ Bibcheck plugin add the DOIs (from crossref) """
 
-from invenio.bibrecord import record_add_field
-from invenio.crossrefutils import get_doi_for_records
+from invenio.legacy.bibrecord import record_add_field
+from invenio.utils.crossref import get_doi_for_records
 from invenio.bibupload import find_record_from_doi
 
 

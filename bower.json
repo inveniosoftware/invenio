@@ -1,0 +1,52 @@
+{
+  "name": "invenio-grunt",
+  "version": "0.1.0",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {
+    "bootstrap": "3.2.0",
+    "less": "1.7.0",
+    "jquery": "2.1.0",
+    "font-awesome": "~4.0.3",
+    "requirejs": "latest",
+    "almond": "latest",
+    "ckeditor": "latest"
+  },
+  "devDependencies": {
+    "typeahead.js": "0.10.2",
+    "hogan": "3.0.0",
+    "jquery-tokeninput": "*",
+    "MathJax": "v2.1-latest",
+    "jquery_jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
+    "jquery.treeview": "1.4.1",
+    "jquery.tablesorter": "http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip",
+    "jqueryui": "1.10.4",
+    "jquery.ui.timepicker": "http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js",
+    "jquery.multifile": "http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js",
+    "jquery.ajaxpager": "http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js",
+    "jquery.bookmark": "http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip",
+    "DataTables": "~1.10",
+    "jquery-flot": "*",
+    "jquery-form": "*",
+    "jquery.hotkeys": "http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js",
+    "uploadify": "*",
+    "json2": "*",
+    "prism": "gh-pages",
+    "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
+    "datatables-colvis": "*",
+    "typeahead.js-bootstrap3.less": "0.2.3",
+    "DataTables-Plugins": "https://github.com/greut/Plugins.git#amdify",
+    "plupload": "*",
+    "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
+    "font-awesome": "*",
+    "bootstrap-tagsinput": "*",
+    "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
+    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js"
+  },
+  "resolutions": {
+    "jquery": "2.1.0",
+    "bootstrap": "3.2.0"
+  }
+}

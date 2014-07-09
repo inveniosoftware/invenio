@@ -36,8 +36,8 @@ The CERN development team currently consists of:
      Contributions to the Italian translation.
 
  - Jiri Kuncar <jiri.kuncar@cern.ch>
-     Fix for demo site installation.  Contributions to the Czech
-     translation.
+     General system architecture of Invenio 2.0. Contributions to
+     the Czech translation.
 
  - Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
      Initial release of WebApiKey, enhancements for WebSubmit.
@@ -84,10 +84,10 @@ The CERN development team currently consists of:
      Mechanize compatibility for Invenio Connector.
 
  - Annette Holtkamp <annette.holtkamp@cern.ch>
-     Updates to `Howto MARC' guide.
+     Updates to "Howto MARC" guide.
 
  - Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
-     Updates to `Howto MARC' guide.
+     Updates to "Howto MARC" guide.
 
 The EPFL development team currently consists of:
 

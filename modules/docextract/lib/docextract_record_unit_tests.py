@@ -17,15 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.docextract_record import (BibRecord,
+from invenio.legacy.docextract.record import (BibRecord,
                                        get_record,
                                        create_record,
                                        create_records,
                                        BibRecordSubField,
                                        BibRecordField,
                                        BibRecordControlField)
-from invenio.testutils import InvenioXmlTestCase
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import InvenioXmlTestCase
+from invenio.testsuite import make_test_suite, run_test_suite
 
 
 class BibRecordTest(InvenioXmlTestCase):

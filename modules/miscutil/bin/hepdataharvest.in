@@ -24,7 +24,7 @@ HepDataHarvest: Retrieve all the content of HEPData and injest it into
 """
 
 try:
-    from invenio.hepdatautils import hepdata_harvest_main
+    from invenio.utils.hepdata import hepdata_harvest_main
 except ImportError, e:
     print "Error: %s" % e
     import sys
