@@ -16,35 +16,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{#
-## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#}
 <div id="{{field_id}}" class="well pluploader" id="filebox">
-<span class="pull-right"><small id="upload_speed" class="muted" style="margin-right: 10px;"></small>&nbsp;<a class="btn btn-default btn-xs" id="pickfiles">Choose files...</a>&nbsp;<a class="btn btn-success btn-xs disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a>&nbsp;<a class="btn btn-danger btn-mini" style="display:none;" id="stopupload"><i class="icon-stop icon-white"></i> Stop upload</a>
+<span class="pull-right"><small id="upload_speed" class="muted" style="margin-right: 10px;"></small>&nbsp;<a class="btn btn-default btn-xs" id="pickfiles">{{ _('Choose files...') }}</a>&nbsp;<a class="btn btn-success btn-xs disabled" id="uploadfiles"><i class="icon-upload icon-white"></i>{{ _('Start upload') }}</a>&nbsp;<a class="btn btn-danger btn-mini" style="display:none;" id="stopupload"><i class="icon-stop icon-white"></i>{{ _('Stop upload') }}</a>
 </span>
-<h4>Files</h4>
+<h4>{{ _('Files') }}</h4>
 <table class="table table-striped" id="file-table">
 <thead>
-    <tr><th>Filename</th><th>Size</th><td></td><td></td></tr>
+    <tr><th>{{ _('Filename') }}</th><th>Size</th><td></td><td></td></tr>
 </thead>
 <tbody id="filelist">
 </tbody>
 </table>
-<p class="text-muted" align="center"><small>Drag and drop files to upload</small></p>
+<p class="text-muted" align="center"><small>{{ _('Drag and drop files to upload') }}</small></p>
 <div id="upload-errors"></div>
 </div>
