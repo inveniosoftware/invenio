@@ -16,13 +16,18 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/invenio/search_services
+pylibexampledir = $(libdir)/python/invenio/search_services_examples
 
-pylib_DATA = \
-	__init__.py \
+pylib_DATA = __init__.py
+
+pylibexample_DATA = \
 	CollectionNameSearchService.py \
 	FAQKBService.py \
-	SubmissionNameSearchService.py
+	LHCBeamStatusService.py \
+	MathCalculatorService.py \
+	SubmissionNameSearchService.py \
+	WeatherService.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) $(pylibexample_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
