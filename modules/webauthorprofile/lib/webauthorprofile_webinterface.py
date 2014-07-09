@@ -285,7 +285,12 @@ class WebAuthorPages(WebInterfaceDirectory):
         debug = "verbose" in argd and argd["verbose"] > 0
 
         # Create Page Markup and Menu
-        cname = webapi.get_canonical_id_from_person_id(self.person_id)
+        try:
+            int(self.person_id)
+        except ValueError:
+            cname = self.person_id
+        else:
+            cname = webapi.get_canonical_id_from_person_id(self.person_id)
         menu = WebProfileMenu(str(cname), "profile", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
 
 
