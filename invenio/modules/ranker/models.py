@@ -49,7 +49,7 @@ class RnkMETHOD(db.Model):
         try:
             if ln is None:
                 ln = g.ln
-            return self.names.filter_by(ln=g.ln, type='ln').one().value
+            return self.name.filter_by(ln=g.ln, type='ln').one().value
         except:
             return self.name
 
@@ -88,7 +88,6 @@ class RnkCITATIONDICT(db.Model):
     __table_args__ = (db.Index('reverse', citer, citee),
                       db.Model.__table_args__)
 
-
 class RnkCITATIONDATAERR(db.Model):
 
     """Represent a RnkCITATIONDATAERR record."""
@@ -98,6 +97,19 @@ class RnkCITATIONDATAERR(db.Model):
                      primary_key=True)
     citinfo = db.Column(db.String(255), primary_key=True, server_default='')
 
+class RnkCITATIONLOG(db.Model):
+
+    """Represents a RnkCITATIONLOG record."""
+
+    __tablename__ = 'rnkCITATIONLOG'
+    id = db.Column(db.Integer(11, unsigned=True), primary_key=True,
+                   autoincrement=True, nullable=False)
+    citee = db.Column(db.Integer(10, unsigned=True), nullable=False)
+    citer = db.Column(db.Integer(10, unsigned=True), nullable=False)
+    type = db.Column(db.Enum('added', 'removed'), nullable=True)
+    action_date = db.Column(db.DateTime, nullable=False)
+    __table_args__ = (db.Index('citee', citee), db.Index('citer', citer),
+                      db.Model.__table_args__)
 
 class RnkCITATIONDATAEXT(db.Model):
 
@@ -222,6 +234,19 @@ class RnkSELFCITES(db.Model):
     references = db.Column(db.Text, nullable=False)
     last_updated = db.Column(db.DateTime, nullable=False)
 
+class RnkSELFCITEDICT(db.Model):
+
+    """Represents a RnkSELFCITEDICT record."""
+
+    __tablename__ = 'rnkSELFCITEDICT'
+    citee = db.Column(db.Integer(10, unsigned=True), nullable=False,
+                      primary_key=True, autoincrement=False)
+    citer = db.Column(db.Integer(10, unsigned=True), nullable=False,
+                      primary_key=True, autoincrement=False)
+    last_updated = db.Column(db.DateTime, nullable=False)
+    __table_args__ = (db.Index('reverse', citer, citee),
+                      db.Model.__table_args__)
+
 
 class CollectionRnkMETHOD(db.Model):
 
@@ -246,6 +271,7 @@ __all__ = ('RnkMETHOD',
            'RnkCITATIONDICT',
            'RnkCITATIONDATAERR',
            'RnkCITATIONDATAEXT',
+           'RnkCITATIONLOG',
            'RnkAUTHORDATA',
            'RnkDOWNLOADS',
            'RnkPAGEVIEWS',
@@ -254,5 +280,6 @@ __all__ = ('RnkMETHOD',
            'RnkEXTENDEDAUTHORS',
            'RnkRECORDSCACHE',
            'RnkSELFCITES',
+           'RnkSELFCITEDICT',
            'CollectionRnkMETHOD',
            )
