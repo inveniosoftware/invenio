@@ -65,7 +65,6 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
         $('.version-selection').on('click', function () {
             if ($.inArray($(this)[0].name, tagList) <= -1) {
                 $('#tags').tagsinput('add', $(this)[0].text);
-                WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
 
@@ -73,7 +72,6 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
             tagList = $("#tags").val().split(',');
             tagList = taglist_translation(tagList);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
-            holdingpen.oTable.fnDraw(false);
         });
 
         $("#tags").on('itemAdded', function (event) {
@@ -102,7 +100,6 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
     var closeTag = function (tag_name) {
         tagList.splice(tagList.indexOf(tag_name), 1);
         $('#tags').tagsinput('remove', tag_name);
-        WORKFLOWS_HP_UTILITIES.requestNewObjects();
     };
 
     return {
