@@ -708,10 +708,12 @@ def get_holdingpen_objects(isortcol_0=None,
 
             for term in ssearch:
                 for function in checking_functions:
-                    if check_ssearch_over_data(term, checking_functions[function](
-                                               **dict((checking_functions[function].func_code.co_varnames[i],
-                                                       all_parameters[checking_functions[function].func_code.co_varnames[i]])
-                                               for i in range(0, checking_functions[function].func_code.co_argcount)))):
+                    function = checking_functions[function]
+                    func_code = function.func_code
+                    if check_ssearch_over_data(term, function(
+                                               **dict((func_code.co_varnames[i],
+                                                       all_parameters[func_code.co_varnames[i]])
+                                                      for i in range(0, func_code.co_argcount)))):
                         confirm += 1
                 if confirm == 0:
                     to_add = False
@@ -759,5 +761,3 @@ def get_pretty_date(bwo):
 def get_type(bwo):
     """Get the type of the Object."""
     return bwo.data_type
-
-

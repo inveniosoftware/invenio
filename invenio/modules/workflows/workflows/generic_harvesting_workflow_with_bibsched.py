@@ -53,29 +53,27 @@ class generic_harvesting_workflow_with_bibsched(WorkflowBase):
 
             if '_tasks_results' in extra_data and '_workflows_reviews' in \
                     extra_data['_tasks_results']:
-                result_temp = \
-                    extra_data["_tasks_results"]["_workflows_reviews"][0].to_dict()[
-                        'result']
+                result_temp = extra_data["_tasks_results"]
+                result_temp = result_temp["_workflows_reviews"]
+                result_temp = result_temp[0].to_dict()['result']
                 result_progress = {
-                     'success': (result_temp['finished'] - result_temp['failed']),
+                    'success': (result_temp['finished'] - result_temp['failed']),
                     'failed': result_temp['failed'],
-                    'success_per': (result_temp['finished'] - result_temp[
-                        'failed']) * 100 /
-                                   result_temp['total'],
+                    'success_per': ((result_temp['finished'] - result_temp['failed'])
+                                    * 100 / result_temp['total']),
                     'failed_per': result_temp['failed'] * 100 / result_temp[
                         'total'],
                     'total': result_temp['total']}
             elif '_tasks_results' in extra_data and '_wait_for_a_workflow_to_complete' in \
                     extra_data['_tasks_results']:
-                result_temp = \
-                    extra_data["_tasks_results"]["_wait_for_a_workflow_to_complete"][
-                        0].to_dict()['result']
+                result_temp = extra_data["_tasks_results"]
+                result_temp = result_temp["_wait_for_a_workflow_to_complete"]
+                result_temp = result_temp[0].to_dict()['result']
                 result_progress = {
                     'success': (result_temp['finished'] - result_temp['failed']),
                     'failed': result_temp['failed'],
-                    'success_per': (result_temp['finished'] - result_temp[
-                        'failed']) * 100 /
-                                   result_temp['total'],
+                    'success_per': ((result_temp['finished'] - result_temp['failed'])
+                                    * 100 / result_temp['total']),
                     'failed_per': result_temp['failed'] * 100 / result_temp[
                         'total'],
                     'total': result_temp['total']}
