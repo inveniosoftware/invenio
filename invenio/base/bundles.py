@@ -65,7 +65,7 @@ jquery = Bundle(
         "bootstrap": "3.2.0",
         "hogan": "3.0.0",
         "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
-        "jquery.tokeninput": "*"
+        "jquery-tokeninput": "*"
     }
 )
 
@@ -78,7 +78,7 @@ jqueryui = Bundle(
     weight=11,
     bower={
         "jqueryui": "1.11.0",
-        "jquery.ui.timepicker": "http://invenoi-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js"
+        "jquery.ui.timepicker": "http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js"
     }
 )
 
