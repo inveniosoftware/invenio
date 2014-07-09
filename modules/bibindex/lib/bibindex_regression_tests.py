@@ -38,9 +38,11 @@ from invenio.bibindex_engine import WordTable, \
     re_prefix
 from invenio.bibindex_engine_utils import get_index_id_from_index_name, \
     get_index_tags, \
-    get_tag_indexes, \
     get_all_indexes, \
-    make_prefix
+    make_prefix, \
+    get_marc_tag_indexes, \
+    get_nonmarc_tag_indexes, \
+    get_all_indexes
 from invenio.bibindex_engine_config import \
     CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
@@ -189,6 +191,13 @@ def remove_reindexed_word_testtables(index_name, prefix = 'test_'):
     query_drop_reversed_index_table = """DROP TABLE IF EXISTS %sR""" % test_tablename
     run_sql(query_drop_forward_index_table)
     run_sql(query_drop_reversed_index_table)
+
+
+def is_part_of(container, content):
+    """checks if content is a part of container"""
+    ctr = set(container)
+    cont = set(content)
+    return cont.issubset(ctr)
 
 
 class BibIndexRemoveStopwordsTest(InvenioTestCase):
@@ -1142,50 +1151,70 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
 
 
 class BibIndexFindingIndexesForTags(InvenioTestCase):
-    """ Tests function 'get_tag_indexes' """
+    """ Tests function 'get_marc_tag_indexes' """
 
     def test_fulltext_tag_virtual_indexes_on(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 8564_u will find only 'fulltext' index"""
-        self.assertEqual(('fulltext',), zip(*get_tag_indexes('8564_u'))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 8564_u will find only 'fulltext' index"""
+        self.assertEqual(('fulltext',), zip(*get_marc_tag_indexes('8564_u'))[1])
 
     def test_title_tag_virtual_indexes_on(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 245__% will find also 'global' index"""
-        self.assertEqual(('title', 'exacttitle', 'global'), zip(*get_tag_indexes('245__%'))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 245__% will find also 'global' index"""
+        self.assertEqual(('title', 'exacttitle', 'global'), zip(*get_marc_tag_indexes('245__%'))[1])
 
     def test_title_tag_virtual_indexes_off(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 245__% wont find 'global' index (with virtual=False)"""
-        self.assertEqual(('title', 'exacttitle'), zip(*get_tag_indexes('245__%', virtual=False))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 245__% wont find 'global' index (with virtual=False)"""
+        self.assertEqual(('title', 'exacttitle'), zip(*get_marc_tag_indexes('245__%', virtual=False))[1])
 
     def test_author_tag_virtual_indexes_on(self):
-        """bibindex - checks 'get_tag_indexes' for tag '100'"""
+        """bibindex - checks 'get_marc_tag_indexes' for tag '100'"""
         self.assertEqual(('author', 'affiliation', 'exactauthor', 'firstauthor',
                           'exactfirstauthor', 'authorcount', 'authorityauthor',
                           'miscellaneous', 'global'),
-                         zip(*get_tag_indexes('100'))[1])
+                         zip(*get_marc_tag_indexes('100'))[1])
 
     def test_author_exact_tag_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag '100__a'"""
+        """bibindex - checks 'get_marc_tag_indexes' for tag '100__a'"""
         self.assertEqual(('author', 'exactauthor', 'firstauthor',
                           'exactfirstauthor', 'authorcount',
                           'authorityauthor', 'miscellaneous'),
-                         zip(*get_tag_indexes('100__a', virtual=False))[1])
+                         zip(*get_marc_tag_indexes('100__a', virtual=False))[1])
 
     def test_wide_tag_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag like '86%'"""
-        self.assertEqual(('miscellaneous',), zip(*get_tag_indexes('86%', virtual=False))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag like '86%'"""
+        self.assertEqual(('miscellaneous',), zip(*get_marc_tag_indexes('86%', virtual=False))[1])
 
     def test_909_tags_in_misc_index(self):
         """bibindex - checks connection between misc index and tags: 909C1%, 909C4%"""
-        self.assertEqual(('miscellaneous',), zip(*get_tag_indexes('909C1%', virtual=False))[1])
-        self.assertEqual('miscellaneous' in zip(*get_tag_indexes('909C4%', virtual=False))[1], False)
+        self.assertEqual(('miscellaneous',), zip(*get_marc_tag_indexes('909C1%', virtual=False))[1])
+        self.assertEqual('miscellaneous' in zip(*get_marc_tag_indexes('909C4%', virtual=False))[1], False)
 
     def test_year_tag_virtual_indexes_on(self):
-        """bibindex - checks 'get_tag_indexes' for tag 909C0y"""
-        self.assertEqual(('year', 'global'), zip(*get_tag_indexes('909C0y'))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag 909C0y"""
+        self.assertEqual(('year', 'global'), zip(*get_marc_tag_indexes('909C0y'))[1])
 
     def test_wide_tag_authority_index_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag like '15%'"""
-        self.assertEqual(('authoritysubject', 'miscellaneous'), zip(*get_tag_indexes('15%',virtual=False))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag like '15%'"""
+        self.assertEqual(('authoritysubject', 'miscellaneous'), zip(*get_marc_tag_indexes('15%',virtual=False))[1])
+
+    def test_nonmarc_tag_title_additional_virtual_indexes_on(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'title_additional'"""
+        self.assertEqual(('title', 'exacttitle', 'global'),
+                         zip(*get_nonmarc_tag_indexes('title_additional'))[1])
+
+    def test_nonmarc_tag_isbn_virtual_indexes_off(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'isbn'"""
+        self.assertEqual(('miscellaneous', ),
+                        zip(*get_nonmarc_tag_indexes('isbn', virtual=False))[1])
+
+    def test_nonmarc_tag_report_number_virtual_indexes_on(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'report_number.report_number'"""
+        self.assertEqual(('reportnumber', 'global' ),
+                        zip(*get_nonmarc_tag_indexes('report_number.report_number'))[1])
+
+    def test_nonmarc_tag_that_doesnt_exist(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for MARC tag"""
+        self.assertEqual(tuple(),
+                         get_nonmarc_tag_indexes('8564_u'))
 
 
 class BibIndexFindingTagsForIndexes(InvenioTestCase):
@@ -1193,29 +1222,60 @@ class BibIndexFindingTagsForIndexes(InvenioTestCase):
 
 
     def test_tags_for_author_index(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'author' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'author' index """
         self.assertEqual(get_index_tags('author'), ['100__a', '700__a'])
 
     def test_tags_for_global_index_virtual_indexes_off(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'global' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
         self.assertEqual(get_index_tags('global', virtual=False),[])
 
     def test_tags_for_global_index_virtual_indexes_on(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'global' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
         tags = get_index_tags('global')
         self.assertEqual('86%' in tags, True)
         self.assertEqual('100__a' in tags, True)
         self.assertEqual('245__%' in tags, True)
 
+    def test_tags_for_authority_author(self):
+        """bibindex - checks if 'get_index_tags' finds marc tag values for authority author"""
+        tags = get_index_tags('authorityauthor')
+        self.assertEqual(tags, ['100__a', '500__a', '400__a'])
+
+    def test_nonmarc_tag_values_for_title(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for title index"""
+        tags = get_index_tags('title', tagtype='nonmarc')
+        self.assertEqual(tags , ['title', 'title_additional'])
+
+    def test_nonmarc_tag_values_for_authorcount(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for authorcount index"""
+        tags = get_index_tags('authorcount', tagtype='nonmarc')
+        self.assertEqual(tags, ['authors[0].full_name', 'contributor.full_name'])
+
+    def test_nonmarc_tag_values_for_keyword(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for keyword index"""
+        tags = get_index_tags('keyword', tagtype='nonmarc')
+        self.assertEqual(tags, ['keywords.term'])
+
+    def test_nonmarc_tag_values_for_year(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for year index"""
+        tags = get_index_tags('year', tagtype='nonmarc')
+        self.assertEqual(tags, ['year'])
+
+    def test_nonmarc_tag_values_for_misc_inside_global(self):
+        """bibindex - checks if nonmarc/recjson tag values from misc index are also inside global index"""
+        tags_misc = get_index_tags('miscellaneous', tagtype='nonmarc')
+        tags_global = get_index_tags('global', tagtype='nonmarc')
+        self.assertEqual(is_part_of(tags_global, tags_misc), True)
+
+    def test_nonmarc_tag_values_for_title_inside_global(self):
+        """bibindex - checks if nonmarc/recjson tag values from title index are also inside global index"""
+        tags_title = get_index_tags('title', tagtype='nonmarc')
+        tags_global = get_index_tags('global', tagtype='nonmarc')
+        self.assertEqual(is_part_of(tags_global, tags_title), True)
+
 
 class BibIndexGlobalIndexContentTest(InvenioTestCase):
     """ Tests if virtual global index is correctly indexed"""
-
-    def is_part_of(self, container, content):
-        """checks if content is a part of container"""
-        ctr = set(container)
-        cont = set(content)
-        return cont.issubset(ctr)
 
     def test_title_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in title and global index, reversed table"""
@@ -1230,7 +1290,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_title), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_title), True)
 
     def test_abstract_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in abstract and global index, reversed table"""
@@ -1245,7 +1305,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_abstract), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_abstract), True)
 
     def test_misc_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in misc and global index, reversed table"""
@@ -1260,7 +1320,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_misc), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_misc), True)
 
     def test_journal_index_compatibility_forward_table(self):
         """bibindex - checks if the same words are in journal and global index, forward table"""
@@ -1270,7 +1330,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxWORD%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
     def test_keyword_index_compatibility_forward_table(self):
         """bibindex - checks if the same pairs are in keyword and global index, forward table"""
@@ -1280,7 +1340,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxPAIR%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
     def test_affiliation_index_compatibility_forward_table(self):
         """bibindex - checks if the same phrases are in affiliation and global index, forward table"""
@@ -1290,7 +1350,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxPHRASE%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
 
 class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
@@ -1710,7 +1770,7 @@ class BibIndexSpecialTagsTest(InvenioTestCase):
         """bibindex - special tags for title"""
         index_name = 'title'
         wt = WordTable(index_name, CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-        wt.fields_to_index = ['8564_u']
+        wt.tags = ['8564_u']
         wt.special_tags = wt._handle_special_tags()
         self.assertNotEqual(wt.default_tokenizer_function.__self__.__class__.__name__,
                             wt.special_tags['8564_u'].__self__.__class__.__name__)

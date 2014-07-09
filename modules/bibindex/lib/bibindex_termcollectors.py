@@ -21,10 +21,10 @@ BibIndex termcollectors.
 """
 
 import fnmatch
-from time import time
 
 from invenio.bibindex_engine_utils import list_union, \
-    UnknownTokenizer
+    UnknownTokenizer, \
+    get_values_recursively
 from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZER_TYPE
 from invenio.dbquery import run_sql
 from invenio.bibdocfile import BibRecDocs
@@ -41,6 +41,10 @@ class TermCollector(object):
     Objects of this class take care of collecting phrases from
     records metadata and tokenizing them in order to get
     termslists which can be store in databse.
+
+    They collect terms from MARC tags ONLY.
+    Please don't use it for other standards, of course
+    you can, but it won't work. Use NonmarcTermCollector instead.
     """
     def __init__(self, tokenizer,
                        tokenizer_type,
@@ -128,6 +132,8 @@ class TermCollector(object):
         @param tag: MARC tag
         @param recIDs: list of specific recIDs (not range)
         """
+        if len(recIDs) == 0:
+            return ()
         bibXXx = "bib" + tag[0] + tag[1] + "x"
         bibrec_bibXXx = "bibrec_" + bibXXx
         query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -156,3 +162,48 @@ class TermCollector(object):
                     for string_value in new_strings:
                         phrases.add((recID, string_value))
         return phrases
+
+
+class NonmarcTermCollector(TermCollector):
+    """
+        TermCollector for standards other than MARC.
+        Uses bibfield's records and fields.
+    """
+
+    def __init__(self, tokenizer,
+                       tokenizer_type,
+                       table_type,
+                       tags,
+                       recIDs_range):
+        super(NonmarcTermCollector, self).__init__(tokenizer,
+                                                   tokenizer_type,
+                                                   table_type,
+                                                   tags,
+                                                   recIDs_range)
+        self.tokenizing_function = \
+            self.tokenizer.get_nonmarc_tokenizing_function(table_type)
+
+
+    def _collect_string(self, recIDs, termslist):
+        """
+        Collects terms from specific tags or fields.
+        Used together with string tokenizer.
+        """
+        tags = self.tags
+        for recID in recIDs:
+            rec = get_record(recID)
+            new_words = []
+            extend = new_words.extend
+            for tag in tags:
+                tokenizing_function = self.special_tags.get(tag, self.tokenizing_function)
+                phrases = []
+                recjson_field = rec.get(tag)
+                get_values_recursively(recjson_field, phrases)
+                for phrase in phrases:
+                    extend(tokenizing_function(phrase))
+            if recID not in termslist and new_words:
+                termslist[recID] = []
+            if new_words:
+                termslist[recID] = list_union(new_words, termslist[recID])
+        return termslist
+

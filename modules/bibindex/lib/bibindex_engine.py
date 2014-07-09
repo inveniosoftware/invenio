@@ -45,14 +45,14 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_BIBINDEX_SPECIAL_TAGS
 from invenio.bibauthority_config import \
     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
-from invenio.bibauthority_engine import get_index_strings_by_control_no, \
+from invenio.bibauthority_engine import \
      get_control_nos_from_recID
-from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
      search_pattern, \
      search_unit_in_bibrec
+
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
 from invenio.bibindex_engine_washer import wash_index_term
@@ -70,7 +70,9 @@ from invenio.bibindex_termcollectors import TermCollector
 from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     get_index_tags, \
-    get_tag_indexes, \
+    get_field_tags, \
+    get_marc_tag_indexes, \
+    get_nonmarc_tag_indexes, \
     get_all_indexes, \
     get_index_virtual_indexes, \
     get_virtual_index_building_blocks, \
@@ -85,9 +87,11 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     filter_for_virtual_indexes, \
     get_records_range_for_index, \
     make_prefix, \
-    list_union
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibfield import get_record
+    list_union, \
+    recognize_marc_tag
+from invenio.bibindex_termcollectors import \
+    TermCollector, \
+    NonmarcTermCollector
 from invenio.memoiseutils import Memoise
 
 
@@ -300,12 +304,11 @@ def remove_subfields(s):
 
 def get_field_indexes(field):
     """Returns indexes names and ids corresponding to the given field"""
-    if field[0:3].isdigit():
+    if recognize_marc_tag(field):
         #field is actually a tag
-        return get_tag_indexes(field, virtual=False)
+        return get_marc_tag_indexes(field, virtual=False)
     else:
-        #future implemeptation for fields
-        return []
+        return get_nonmarc_tag_indexes(field, virtual=False)
 
 
 get_field_indexes_memoised = Memoise(get_field_indexes)
@@ -1212,7 +1215,10 @@ class WordTable(AbstractIndexTable):
             max_char_length parameter of wash_index_term()
         """
         AbstractIndexTable.__init__(self, index_name, table_type, table_prefix, wash_index_terms)
-        self.fields_to_index = get_index_tags(index_name, virtual=False)
+        self.tags = get_index_tags(index_name, virtual=False)
+        self.nonmarc_tags = get_index_tags(index_name,
+                                           virtual=False,
+                                           tagtype="nonmarc")
         self.timestamp = datetime.now()
 
         self.virtual_indexes = get_index_virtual_indexes(self.index_id)
@@ -1244,7 +1250,8 @@ class WordTable(AbstractIndexTable):
             tokenizer is independent of index.
         """
         special_tags = {}
-        for tag in self.fields_to_index:
+        fields = self.tags + self.nonmarc_tags
+        for tag in fields:
             if tag in CFG_BIBINDEX_SPECIAL_TAGS:
 
                 for t in CFG_BIBINDEX_INDEX_TABLE_TYPE:
@@ -1416,14 +1423,23 @@ class WordTable(AbstractIndexTable):
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
-        collector = TermCollector(self.tokenizer,
-                                  self.tokenizer_type,
-                                  self.table_type,
-                                  self.fields_to_index,
-                                  [recID1, recID2])
-        collector.set_special_tags(self.special_tags)
-        wlist = collector.collect(xrange(recID1, recID2 + 1), wlist)
-
+        marc, nonmarc = self.find_nonmarc_records(recID1, recID2)
+        if marc:
+            collector = TermCollector(self.tokenizer,
+                                      self.tokenizer_type,
+                                      self.table_type,
+                                      self.tags,
+                                      [recID1, recID2])
+            collector.set_special_tags(self.special_tags)
+            wlist = collector.collect(marc, wlist)
+        if nonmarc:
+            collector = NonmarcTermCollector(self.tokenizer,
+                                             self.tokenizer_type,
+                                             self.table_type,
+                                             self.nonmarc_tags,
+                                             [recID1, recID2])
+            collector.set_special_tags(self.special_tags)
+            wlist = collector.collect(nonmarc, wlist)
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()
@@ -1466,6 +1482,28 @@ class WordTable(AbstractIndexTable):
             for w in wlist[recID]:
                 put(recID, w, 1)
         return len(recIDs)
+
+    def find_nonmarc_records(self, recID1, recID2):
+        """Divides recID range into two different tables,
+           first one contains only recIDs of the records that
+           are Marc type and the second one contains records
+           of nonMarc type"""
+        marc = range(recID1, recID2 + 1)
+        nonmarc = []
+        query = """SELECT id FROM %s WHERE master_format <> 'marc'
+                   AND id BETWEEN %%s AND %%s""" % "bibrec"
+        res = run_sql(query, (recID1, recID2))
+        if res:
+            nonmarc = list(zip(*res)[0])
+            if len(nonmarc) == (recID2 - recID1 + 1):
+                nonmarc = xrange(recID1, recID2 + 1)
+                marc = []
+            else:
+                for recID in nonmarc:
+                    marc.remove(recID)
+        else:
+            marc = xrange(recID1, recID2 + 1)
+        return [marc, nonmarc]
 
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.

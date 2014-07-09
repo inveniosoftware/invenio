@@ -30,7 +30,8 @@ from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMult
 from invenio.config import \
     CFG_CERN_SITE, \
     CFG_INSPIRE_SITE
-
+from invenio.bibindex_engine_utils import get_values_recursively
+from invenio.bibfield import get_record
 
 if CFG_CERN_SITE:
     CFG_JOURNAL_TAG = '773__%'
@@ -59,6 +60,7 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
         self.tag = CFG_JOURNAL_TAG
+        self.nonmarc_tag = 'journal_info'
         self.journal_pubinfo_standard_form = CFG_JOURNAL_PUBINFO_STANDARD_FORM
         self.journal_pubinfo_standard_form_regexp_check = CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
@@ -108,5 +110,33 @@ class BibIndexJournalTokenizer(BibIndexMultiFieldTokenizer):
         # return list of words and pubinfos:
         return lwords
 
+    def tokenize_via_recjson(self, recID):
+        """
+        Tokenizes for journal info.
+        Uses bibfield.
+        """
+        phrases = []
+        rec = get_record(recID)
+        recjson_field = rec.get(self.nonmarc_tag)
+        get_values_recursively(recjson_field, phrases)
+        final = []
+        append = final.append
+        for phrase in phrases:
+            info = phrase.split("-", 1)
+            append(info[0])
+        return final
+
+    def tokenize_for_words(self, recID):
+        return self.tokenize(recID)
+
+    def tokenize_for_pairs(self, recID):
+        return self.tokenize(recID)
+
+    def tokenize_for_phrases(self, recID):
+        return self.tokenize(recID)
+
     def get_tokenizing_function(self, wordtable_type):
         return self.tokenize
+
+    def get_nonmarc_tokenizing_function(self, table_type):
+        return self.tokenize_via_recjson

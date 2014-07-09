@@ -24,7 +24,7 @@ pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_unit_t
              bibindex_engine_tokenizer_unit_tests.py \
              bibindexadmin_regression_tests.py bibindex_engine_washer.py \
              bibindex_regression_tests.py bibindex_engine_utils.py \
-             bibindex_termcollectors.py
+             bibindex_termcollectors.py bibindex_termcollectors_regression_tests.py
 EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ from invenio.testutils import InvenioTestCase
 from invenio import bibindex_engine
 from invenio.bibindex_engine_utils import load_tokenizers, list_union
 from invenio.testutils import make_test_suite, run_test_suite
-
+from invenio.bibindex_engine_utils import get_values_recursively
 
 _TOKENIZERS = load_tokenizers()
 
@@ -211,12 +211,56 @@ class TestGetAuthorFamilyNameWords(InvenioTestCase):
                          tokenizer.get_author_family_name_words_from_phrase('Campbell-Wilson, D'))
 
 
+class TestGetValuesFromRecjson(InvenioTestCase):
+    """Tests for get_values_recursively function which finds values for tokenization
+       in recjson record"""
+
+    @classmethod
+    def setUp(self):
+        self.dict1 = {'all': {'vehicles': {'cars':{'car1':('flat tyre', 'windscreen'),
+                                                   'car2':('engine',)
+                                                  },
+                                           'planes':['Airplane', 'x,y - plane'],
+                                           'ufo':{}
+                                          },
+                              'people': ['Frank', 'Theodor', 'Richard'],
+                              'vikings': ['Odin', 'Eric'],
+                             }
+                      }
+        self.dict2 = {'all': {'name':([(['name1', 'name2', {'name3': 'name4'}], )], )} }
+
+    def test_dict1_all_fields(self):
+        """bibindex termcollectors - get_field_values - complicated field"""
+        fields = self.dict1
+        phrases =[]
+        get_values_recursively(fields['all'], phrases)
+        self.assertEqual(phrases, ['engine', 'flat tyre', 'windscreen', 'Airplane', 'x,y - plane',
+                                   'Odin', 'Eric', 'Frank', 'Theodor', 'Richard'])
+
+    def test_dict1_subfield(self):
+        """bibindex termcollectors - get_field_values - simple field"""
+        fields = self.dict1
+        phrases =[]
+        get_values_recursively(fields['all']['people'], phrases)
+        self.assertEqual(phrases, ['Frank', 'Theodor', 'Richard'])
+
+
+    def test_dict2_all_fields(self):
+        """bibindex termcollectors - get_field_values - nested field"""
+        fields = self.dict2
+        phrases =[]
+        get_values_recursively(fields['all'], phrases)
+        self.assertEqual(phrases, ['name1', 'name2', 'name4'])
+
+
+
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
                              TestGetWordsFromPhrase,
                              TestGetPairsFromPhrase,
                              TestGetWordsFromDateTag,
-                             TestGetAuthorFamilyNameWords,)
+                             TestGetAuthorFamilyNameWords,
+                             TestGetValuesFromRecjson,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
