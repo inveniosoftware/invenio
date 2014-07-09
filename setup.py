@@ -89,7 +89,7 @@ install_requires = [
     "reportlab==2.5",
     "requests==1.2.3",
     "setuptools>=2.0",  # dad?
-    "setuptools-bower==0.1",
+    "setuptools-bower>=0.2,<1.0",
     "six>=1.7.2",
     "Sphinx",
     "SQLAlchemy==0.8.3",
