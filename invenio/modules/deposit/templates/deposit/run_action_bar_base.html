@@ -22,8 +22,8 @@
     <span class="pull-right">
         <span class="loader hide"><img src="{{ url_for('static', filename='img/loading.gif' ) }}" /></span>
         <span class="status-indicator text-muted"></span>&nbsp;
-        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="fa fa-file-o"></i> Save</button>
-        <button title="{{_('Press "Submit" to finalize your upload.')}}" class="btn btn-primary form-submit"><i class="fa fa-check fa-inverse "></i> Submit</button>
+        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="fa fa-file-o"></i> {{ _('Save') }}</button>
+        <button title="{{_('Press "Submit" to finalize your upload.')}}" class="btn btn-primary form-submit"><i class="fa fa-check fa-inverse "></i> {{ _('Submit') }}</button>
     </span>
     <span class="clearfix"></span>
 </div>

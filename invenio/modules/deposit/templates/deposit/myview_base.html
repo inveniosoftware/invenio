@@ -18,14 +18,14 @@
 #}
 
 <div class="well">
-    <h2>My uploads</h2>
+    <h2>{{ _('My uploads') }}</h2>
     {% if not my_depositions %}
-    <p class="text-muted">You currently have no uploads.</p>
+    <p class="text-muted">{{ _('You currently have no uploads.') }}</p>
     {% else %}
     {% for dep in my_depositions if not dep.has_sip() %}
     {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
     {%- if loop.first %}
-    <h4>Unsubmitted</h4>
+    <h4>{{ _('Unsubmitted') }}</h4>
     <table class="table table-striped">
     {%- endif %}
     <tr>
@@ -45,7 +45,7 @@
     {% for dep in my_depositions if dep.has_sip() %}
     {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
     {%- if loop.first %}
-    <h4>Submitted</h4>
+    <h4>{{ _('Submitted') }}</h4>
     <table class="table table-striped">
     {% endif %}
     <tr>
