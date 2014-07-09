@@ -36,17 +36,21 @@ href="<CFG_SITE_URL>/help/hacking/modules-overview">επισκόπηση ενο�
 
 <h3><lang><en>Admin HOWTO guides</en><el>Οδηγός Διαχειρηστών</el></lang></h3>
 
-<p><a href="<CFG_SITE_URL>/help/admin/howto">Admin HOWTO Guides</a> give you
+<p><lang><en><a href="<CFG_SITE_URL>/help/admin/howto">Admin HOWTO Guides</a> give you
 you both short and not-so-short recipes and thoughts on some of the
 most frequently encountered administrative tasks.  They tend to answer
 various admin-level questions of a rather general level.  The specific
 tasks are better addressed by module-specific guides and interfaces
-presented below.
-</p>
+presented below.</en>
+<el>
+<a href="<CFG_SITE_URL>/help/admin/howto">Ο οδηγός διαχειρηστών</a> σας δίνει αμφότερα σύντομες και επί μακρόν συνταγές και ιδεές σε κάποια απο τα συχνότερα διαχειριστικά
+ καθήκοντα.Τείνουν να απαντούν διάφορες ερωτήσεις σε σχέση με τα επίπεδα διαχείρησης σε κάπως γενικο επίπεδο.Για συγκεκριμένα καθήκοντα μπορούν να βρεθούν στον
+καθορισμένο οδηγό ενοτήτων και διεπαφών που βρίσκεται παρακάτω.
+</el></lang></p>
 
-<h3>Data acquisition related modules</h3>
+<h3><lang><en>Data acquisition related modules</en><el>Δεδομένα απόκτησης σχετικών ενοτήτων</el></lang></h3>
 
-<p>The metadata input into a running Invenio system can be done in two
+<p><lang><en>The metadata input into a running Invenio system can be done in two
 ways: <em>(i) admin-oriented batch mode</em>,
 i.e. <strong>OAI Harvest</strong> to get data from OAI repositories,
 <strong>BibConvert</strong> to convert any input data into XML MARC,
@@ -54,16 +58,21 @@ and <strong>BibUpload</strong> to upload XML MARC files into Invenio;
 and <em>(ii) author-oriented interactive mode</em>,
 i.e. <strong>WebSubmit</strong> to submit documents via Web.  Once the
 data are uploaded in Invenio, you may want to modify them via
-<strong>BibEdit</strong> to edit the metadata.
-</p>
+<strong>BibEdit</strong> to edit the metadata.</en><el>
+Τα μεταδεδομένα εισόδου σε ενεργό συστημά Invenio μπορούν να γίνουν με δύο τρόπους:<em>(i)Batch mode προσαρμοσμένο ως προς τον διαχειρηστή</em>,
+ π.χ <strong>OAI Harvest</strong> ώστε να δέχεται δεδομένα απο OAL αποθετήρια,<strong>BibConvert</strong> ώστε να μετατρέπει δεδομένα εισόδου σε XML MARC,
+ και <strong>BibUpload</strong> ώστε να ανεβαίνουν XML MARC αρχεία στο Invenio;και <em>(ii)Συγγραφοστραφής διαδραστικό επίπεδο</em>,
+ π.χ <strong>WebSubmit</strong> ώστε να υποβάλλουμε αρχεία μεσω ιστού.Μόλις τα αρχεία ανέβουν στο Invenio,θα πρέπει να τροποποιηθούν μέσω<strong>BibEdit</strong>
+ ώστε να τροποποιούμε τα μεταδεδομένα. 
+</el></lang></p>
 
 <table border="1" cellpadding="2">
 
 <tr>
- <th class="searchboxheader">Admin Module</th>
- <th class="searchboxheader">Admin Description</th>
- <th class="searchboxheader">Admin Interface</th>
- <th class="searchboxheader">Admin Guide</th>
+ <th class="searchboxheader"><lang><en>Admin Module</en><el>Διαχειριστική Ενότητα</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Description</en><el>Περιγραφή</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Interface</en><el></el>Διεπαφή</lang></th>
+ <th class="searchboxheader"><lang><en>Admin Guide</en><el></el>Οδηγός</lang></th>
 </tr>
 
 <tr>
@@ -71,19 +80,24 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>OAI Harvest Admin</strong>
 </td>
 <td>
-
+<lang><en>
   Enables you to configure OAI metadata harvestor for eventual
   periodical batch upload of data.  For example, you can define from
   where to harvest, with what periodicity, how to transform data
   before uploading them into Invenio, etc. See also
    <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OAI Repository Admin</a>
-   to expose your data to other harvesters.
+   to expose your data to other harvesters.</en>
+<el>Δίνει την δυνατότητα ρύθμισης OAI μεταδεδομένων συλλέκτη για ενδεχομένος περιοδικό ανέβασμα δεδομένων batch.Για παράδειγμα, μπορούμε να ορίσουμε
+ απο που γίνεται συγκομιδή, με τι περίοδο, πως να μετατραπούν τα δεδομένα πριν το ανέβασμα στο Invenio κτλ. Δείτε επίσης 
+<a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OΑΙ αποθετήριο διαχείρησης</a> για να εκθέσετε τα δεδομένα σας απο άλλους συλλέκτες. </el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a>
+ <lang><en><a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a></en>
+<el><a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">Διεπαφή του OAI Harvest Admin</a></el></lang>
 </td>
 <td>
-  <a href="oaiharvest-admin-guide">OAI Harvest Admin Guide</a>
+ <lang><en><a href="oaiharvest-admin-guide">OAI Harvest Admin Guide</a></en>
+<el><a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">Οδηγός του OAI Harvest Admin</a></el></lang>
 </td>
 </tr>
 
@@ -92,17 +106,28 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibConvert Admin</strong>
 </td>
 <td>
+<lang><en>
     Explains how to use bibliographic data convertor. Useful for batch
     upload of data.  For example, when migrating the metadata from
     your old system, or when integrating metadata acquisitions from
     non-OAI sources, or just about any line-based
     not-so-well-structured metadata.
+</en>
+<el>
+Εξηγεί πως γίνεται η χρήση του μετατροπέα βιβλιογραφικών δεδομένων. Χρήσιμο για batch ανέβασμα δεδομένων. Για παράδειγμα, όταν μεταφέρουμε δεδομένα
+απο ένα παλιό σύστημα , ή όταν ενσοματώνουμε μεταδεδομένα που αποκτήθηκαν απο μη OAI-πηγές, ή οταν απλως ενσοματώνουμε οποιαδήποτε line-based τα οποία 
+δεν ειναι τόσο καλά δομημένα μεταδεδομένα
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line program</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
 <td>
-  <a href="bibconvert-admin-guide">BibConvert Admin Guide</a>
+<lang><en>
+  <a href="bibconvert-admin-guide">BibConvert Admin Guide</a></en>
+  <el><a href="bibconvert-admin-guide">Οδηγός του BibConvert Admin</a></el></lang>
 </td>
 </tr>
 
@@ -111,14 +136,25 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibMatch Admin</strong>
 </td>
 <td>
+<lang><en>
     Tools for matching XML MARC files against the repository content.
     Useful when importing third-party metadata files.
+</en>
+<el>
+	Εργαλεία για το ταίριασμα XML MARC αρχείων αντίθετα με αυτά του περιεχομένου του αποθετηριού
+	Χρήσιμο όταν εισάγουμε αρχεία μεταδεδομένων τρίτων.
+	</el></lang>
 </td>
 <td>
-  <small class="note">command-line program</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
+
 <td>
-  <a href="bibmatch-admin-guide">BibMatch Admin Guide</a>
+<lang><en>
+  <a href="bibconvert-admin-guide">BibMatch Admin Guide</a></en>
+  <el><a href="bibconvert-admin-guide">Οδηγός του BibMatch Admin</a></el></lang>
 </td>
 </tr>
 
@@ -127,14 +163,24 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibUpload Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to configure eventual local special operations to be
-    done on the data being uploaded.
+    done on the data being uploaded.</en>
+<el>
+    Δίνει την δυνατότητα ρύθμισης ενδεχόμενων τοπικών εργασίας
+    κατα το ανέβασμα δεδομένων.
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line program</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
 <td>
-  <a href="bibupload-admin-guide">BibUpload Admin Guide</a>
+<lang><en>
+  <a href="bibupload-admin-guide">BibUpload Admin Guide</a></en>
+<el><a href="bibupload-admin-guide">Οδηγός του BibUpload Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -143,16 +189,26 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>WebSubmit Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to configure the submit interface and logic for various document types.
     For example, you can define which metadata fields should be submitted for various
     doctypes, what to do with the inputted values before uploading,
-    possible peer review and approval strategy, etc.
+    possible peer review and approval strategy, etc.</en>
+<el>
+    Δίνει την δυνατότητα ρύθμισης της διεπαφής υποβολής και λογικής για διάφορους τύπους εγγράφων.
+    Για παράδειγμα, μπορούμε να ορίσουμε σε ποία πεδία μεταδεδομένων πρέπει να υποβληθούν  διαφορετικοί τύποι εγγράφων,
+   τι να κάνουμε με τις εισαγόμενες τιμές πρίν το ανέβασμα , πιθανές αξιολογήσης απο ομότιμους και στρατιγικές έγκρισης, κλπ.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py">WebSubmit Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py">WebSubmit Admin Interface</a></en>
+<el><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py">Διεπαφή WebSubmit Admin</a></el></lang>
 </td>
 <td>
-  <a href="websubmit-admin-guide">WebSubmit Admin Guide</a>
+<lang><en>
+  <a href="websubmit-admin-guide">WebSubmit Admin Guide</a></en>
+<el><a href="websubmit-admin-guide">Οδηγός του WebSubmit Admin</a></el></lang>
 </td>
 </tr>
 
@@ -161,13 +217,19 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>ElmSubmit Admin</strong>
 </td>
 <td>
-    Enables you to configure the submission of documents by electronic mail.
+<lang><en>
+    Enables you to configure the submission of documents by electronic mail.</en>
+<el>Δίνει την δυνατότητα ρύθμισης της υποβολής των εγγράφων από ηλεκτρονικό ταχυδρομείο.</el></lang>
 </td>
 <td>
-  <small class="note">command-line program</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
 <td>
-  <a href="elmsubmit-admin-guide">ElmSubmit Admin Guide</a>
+<lang><en>
+  <a href="elmsubmit-admin-guide">ElmSubmit Admin Guide</a></en>
+<el><a href="elmsubmit-admin-guide">Οδηγός του ElmSubmit Admin</a></el></lang>
 </td>
 </tr>
 
@@ -176,14 +238,25 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibEdit Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to directly manipulate bibliographic data, edit a single
-  record, do global replacements, and other cataloguing tasks.
+  record, do global replacements, and other cataloguing tasks.</en>
+<el>
+   Δίνει την δυνατότητα να χειριστούμε άμεσα βιβλιογραφικά δεδομένα, συντάξουμε μια
+μοναδική εγγραφή, να κάνουμε καθολικές αντικαταστάσης και άλλες εργασίες καταλογογράφησης.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Admin Interface</a></en>
+<el><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">Διεπαφή BibEdit Admin</a></el></lang>
 </td>
 <td>
-  <a href="bibedit-admin-guide">BibEdit Admin Guide</a>
+<lang><en>
+  <a href="bibedit-admin-guide">BibEdit Admin Guide</a></en>
+<el>
+<a href="bibedit-admin-guide">Οδηγός του BibEdit Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -192,15 +265,24 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibCheck Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to manage BibCheck configuration files. BibCheck is used to verify and
-    correct records.
-
+    correct records.</en>
+<el>
+    Δίνει την δυνατότητα διαχείρησης των αρχείων ρύθμισης του BibCheck. Το BibCheck χρησιμοποιείται για την επαλήθευση
+και την διόρθωση των εγγραφών
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">BibCheck Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">BibCheck Admin Interface</a></en>
+<el><a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">Διεπαφή BibCheck Admin</a></el></lang>
 </td>
 <td>
-  <a href="bibcheck-admin-guide">BibCheck Admin Guide</a>
+<lang><en>
+  <a href="bibcheck-admin-guide">BibCheck Admin Guide</a></en>
+<el><a href="bibcheck-admin-guide">Οδηγός του BibCheck Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -209,13 +291,23 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>Publiline Admin</strong>
 </td>
 <td>
-  Enables you to approve documents by using a complex approval workflow.
+<lang><en>
+  Enables you to approve documents by using a complex approval workflow.</en>
+<el>
+Δίνει την δυνατότητα έγκρισης εγγράφων χρησιμοποιόντας σύνθετη έγκριση ροής εργασίας.
+</el></lang>
 </td>
 <td>
-  None
+<lang><en>
+  None</en>
+<el>Καμία Διεπαφή</el></lang>
 </td>
 <td>
-  <a href="publiline-admin-guide">Publiline Admin Guide</a>
+<lang><en>
+  <a href="publiline-admin-guide">Publiline Admin Guide</a></en>
+<el>
+ <a href="publiline-admin-guide">Οδηγός του Publiline Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -225,57 +317,94 @@ data are uploaded in Invenio, you may want to modify them via
   <strong>BibAuthority Admin</strong>
 </td>
 <td>
-  Enables you to configure Authority Control in Invenio.
+<lang><en>
+  Enables you to configure Authority Control in Invenio.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης Ελέγχου Εξουσίας στο Invenio.
+</el></lang>
 </td>
 <td>
-  None
+<lang><en>
+  None.</en>
+<el>
+Καμία Διεπαφή.
+</el></lang>
 </td>
 <td>
-  <a href="bibauthority-admin-guide">Authority Record Admin Guide</a>
+<lang><en>
+  <a href="bibauthority-admin-guide">Authority Record Admin Guide</a></en>
+<el>
+ <a href="bibauthority-admin-guide">Οδηγός του Authority Record Admin</a>
+</el></lang>
 </td>
 </tr>
 
 
 </table>
 
-<h3>Data provision related modules</h3>
+<h3><lang><en>Data provision related modules</en><el>Ενότητες σχετικές με τα προβλεπομενα Δεδομένα</el></lang></h3>
 
-<p>The metadata output from a running Invenio system to the end-user
+
+<p><lang><en>The metadata output from a running Invenio system to the end-user
 is covered by several modules: <strong>BibIndex</strong> to index the
 metadata, <strong>BibRank</strong> to eventually rank them,
 <strong>BibFormat</strong> to format them for the output,
 <strong>WebSearch</strong> to provide search interfaces and search
-engine.
+engine.</en>
+<el>
+Τα μεταδεδομένα εξόδου τα οποία τρέχουν στο σύστημα του Invenio και δίνονται στον τελικό χρήστη καλύπτονται απο
+ορισμένες ενότητες: <strong>BibIndex</strong> για να κατατάσσει σε πίνακα τα μεταδεδομένα, <strong>BibRank</strong> ώστε ενδεχομένως να τα ταξινομεί,
+<strong>BibFormat</strong> ώστε να τα σχηματοποίει για έξοδο , <strong>WebSearch</strong> ώστε να παρέχει αναζήτηση διεπαφών και μηχανή αναζήτησης.
+</el></lang>
 </p>
 
 <table border="1">
 
 <tr>
- <th class="searchboxheader">Admin Module</th>
- <th class="searchboxheader">Admin Description</th>
- <th class="searchboxheader">Admin Interface</th>
- <th class="searchboxheader">Admin Guide</th>
+ <th class="searchboxheader"><lang><en>Admin Module</en><el>Διαχειριστική Ενότητα</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Description</en><el>Περιγραφή</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Interface</en><el></el>Διεπαφή</lang></th>
+ <th class="searchboxheader"><lang><en>Admin Guide</en><el></el>Οδηγός</lang></th>
 </tr>
+
 
 <tr>
 <td>
   <strong>BibIndex Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to configure "word files", i.e. to define which
   bibliographic fields are indexed into which word indexes.  The word
   indexes are then used by the search interface.  For example, you can
   define that the logical author index is constructed from physical
   <code>100 $a</code> and <code>700 $a</code> bibliographic tags, you
-  can force reindexing of the fulltext index, etc.
+  can force reindexing of the fulltext index, etc.</en>
+<el>
+Δίνει την δυνατότητα παραμετροποίησης "αρχείων κειμενου", π.χ για να ορίσουμε ποιά βιβλιογραφικά πεδία
+πρέπει να καταταχθούν σε ποιό πίνακα κειμένου. Στην συνέχεια οι πίνακες κειμένου χρησιμοποιούνται στην αναζήτηση διεπαφών.
+ Για παράδειγμα, μπορούμε να ορίσουμε τους πίνακες λογικών συγγραφέων ώστε να κατασκευάζονται απο φυσικές <code>100 $a</code>
+και <code>700 $a</code> βιβλιογραφικές ετικέτες, μπορούμε να εξαναγκάσουμε αναδημιουργία ενός γεμάτου κειμένου πίνακα, κτλ.
+</el></lang>
 </td>
 <td>
+<lang><en>
   <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">Manage indexes</a>
   <p>
   <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a>
+</en>
+<el>
+ <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">Διαχείρηση πινάκων</a>
+  <p>
+  <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Διαχείρηση λογικών πεδίων</a>
+</el></lang>
 </td>
 <td>
-  <a href="bibindex-admin-guide">BibIndex Admin Guide</a>
+<lang><en>
+  <a href="bibindex-admin-guide">BibIndex Admin Guide</a></en>
+<el>
+<a href="bibindex-admin-guide">Οδηγός του BibIndex Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -284,14 +413,27 @@ engine.
   <strong>BibRank Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to configure various ranking methods to be used by the search engine.
-  You can rebalance existing ranking sets, create new ranking methods, etc.
+  You can rebalance existing ranking sets, create new ranking methods, etc.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης διαφόρων μεθόδων ταξινόμησης που θα χρησιμοποιηθούν απο την μηχανή αναζήτησης.
+ Μπορόυμε να αναδιοργανώσουμε ομάδες ταξινομήσεων, να φτιάξουμε νεές μεθόδους ταξινόμησης, κλπ.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a></en>
+<el>
+<a href="<CFG_SITE_URL>/admin/bibrank/bibrankadmin.py">Διεπαφή BibRank Admin</a>
+</el></lang>
 </td>
 <td>
-  <a href="bibrank-admin-guide">BibRank Admin Guide</a>
+<lang><en>
+  <a href="bibrank-admin-guide">BibRank Admin Guide</a></en>
+<el>
+ <a href="bibrank-admin-guide">Οδηγός του BibRank Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -300,15 +442,27 @@ engine.
   <strong>BibSort Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to configure the sorting methods displayed to the user. You can update
   the sorting data for a particular set of records, you can rebalance all the sorting
-  data, you can remove all the sorting data associated with a method.
+  data, you can remove all the sorting data associated with a method.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης μεθόδων ταξινόμησης που θα δείχνονται στον χρήστη. Μπορούμε
+να ανανεώνουμε τα ταξινομημένα δεδομένα για ενα συγκεκριμένο σύνολο εγγραφών, μπορούμε να αναδιοργανώσουμε
+όλα τα ταξινομημένα δεδομένα, μπορούμε να αφαιρέσουμε όλα τα ταξινομημένα δεδομένα που σχετίζονται με μια μέθοδο.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibsort/bibsortadmin.py">BibSort Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/bibsort/bibsortadmin.py">BibSort Admin Interface</a></en>
+<el><a href="<CFG_SITE_URL>/admin/bibsort/bibsortadmin.py">Διεπαφή BibSort Admin</a>
+</el></lang>
 </td>
 <td>
-  <a href="bibsort-admin-guide">BibSort Admin Guide</a>
+<lang><en>
+  <a href="bibsort-admin-guide">BibSort Admin Guide</a></en>
+<el><a href="bibsort-admin-guide">Οδηγός BibSort Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -317,14 +471,25 @@ engine.
   <strong>BibClassify Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to automatically classify documents according to
-  keyword taxonomies and thesauri.
+  keyword taxonomies and thesauri.</en>
+<el>
+Δίνει την δυνατότητα αυτόματου χαρακτηρισμού εγγράφου σύμφωνα με τις λέξεις-κλειδία
+"taxonomies" και "thesauri".
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line configuration</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
 <td>
-  <a href="bibclassify-admin-guide">BibClassify Admin Guide</a>
+<lang><en>
+  <a href="bibclassify-admin-guide">BibClassify Admin Guide</a></en>
+<el>
+<a href="bibclassify-admin-guide">Οδηγός του BibClassify Admin</a></en>
+</el></lang>
 </td>
 </tr>
 
@@ -333,17 +498,30 @@ engine.
   <strong>BibFormat Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to specify how the bibliographic data is presented to
     the end user in the search interface.  You can decide that titles should be
     presented in bold font, that for each author an automatic link to
-    author's home page should be created according to some receipt, etc.
-
+    author's home page should be created according to some receipt, etc.</en>
+<el>
+Δίνει την δυνατότητα καθορισμού παρουσίασης των βιβλιογραφικών δεδομένων στον τελικό χρήστη στην μηχανή αναζήτησης.
+ Μπορούμε να αποφασίσουμε άν οι τίτλοι θα παρουσιάζονται σε έντονη γραμματοσείρα, άν για κάθε συγγραφέα θα δημιουργείται αυτόματα
+σύνδεσμος στην προσωπική του σελίδα , κλπ.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">BibFormat Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">BibFormat Admin Interface</a></en>
+<el>
+ <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">Διεπαφή BibFormat Admin</a>
+</el></lang>
 </td>
 <td>
-  <a href="bibformat-admin-guide">BibFormat Admin Guide</a>
+<lang><en>
+  <a href="bibformat-admin-guide">BibFormat Admin Guide</a></en>
+<el>
+<a href="bibformat-admin-guide">Οδηγός του BibFormat Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -352,17 +530,33 @@ engine.
     <strong>BibSword Client Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to consult and refresh the status of the forwared
     record to any SWORD Remote Server. It also gives information about
     the SWORD configuration and credential of the Remote Server.
     Finally, this function allows admin to forward record from
-    Invenio to any configured Remote Server.
+    Invenio to any configured Remote Server.</en>
+<el>
+Δίνει την δυνατότητα να συμβουλευτειτέ και να ανανεώσετε την κατάσταση μίας προωθημένης εγγραφής
+σε οποιοδήποτε Απομακρυσμένο Εξυπηρετητή SWORD. Δίνει ακόμα πληροφορίες όσο αναφορά τις ρυθμίσεις
+του SWORD και το πιστοποιητικό του Απομακρισμένου Εξυπηρετητή.
+Τέλος, αύτη η λειτουργία δίνει την δυνατότητα στον διαχειρηστή να προωθήσει μια εγγραφή απο το Invenio
+σε οποιοδήποτε Απομακρυσμένο Εξυπηρετητή.
+</el></lang>
 </td>
 <td>
-    <a href="<CFG_SITE_URL>/bibsword/">BibSword Client Admin Interface</a>
+<lang><en>
+    <a href="<CFG_SITE_URL>/bibsword/">BibSword Client Admin Interface</a></en>
+<el>
+<a href="<CFG_SITE_URL>/bibsword/">Διεπαφή BibSword Client Admin</a>
+</el></lang>
 </td>
 <td>
-   <a href="bibsword-client-admin-guide">BibSword Client Admin Guide</a>
+<lang><en>
+   <a href="bibsword-client-admin-guide">BibSword Client Admin Guide</a></en>
+<el>
+<a href="bibsword-client-admin-guide">Οδηγός του BibSword Client Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -371,17 +565,31 @@ engine.
   <strong>OAI Repository Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to define which records should be tagged to be exposed
     via the OAI Repository gateway, so that other other repositories
     can harvest your records. See also
     <a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin</a>
-    to import data into your repository.
+    to import data into your repository.</en>
+<el>
+Δίνει την δυνατότητα ορισμού ποιά εγγραφή πρέπει σημειώθει ώστε να την εξάγει το OAI Αποθετήριο μεσω του gateway του,
+έτσι ώστε τα άλλα αποθετήρια να μπορέσου να συλλέξουν τις εγγραφές μας. Δείτε επίσης 
+ <a href="<CFG_SITE_URL>/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin</a> για την είσοδο των δεδομένων στα αποθετήριο σας.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OAI Repository Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">OAI Repository Admin Interface</a></en>
+<el>
+ <a href="<CFG_SITE_URL>/admin/oairepository/oairepositoryadmin.py">Διεπαφή OAI Repository Admin</a></en>
+</el></lang>
 </td>
 <td>
-  <a href="oairepository-admin-guide">OAI Repository Admin Guide</a>
+<lang><en>
+  <a href="oairepository-admin-guide">OAI Repository Admin Guide</a></en>
+<el>
+<a href="oairepository-admin-guide">Οδηγός του OAI Repository Admin</a><
+</el></lang>
 </td>
 </tr>
 
@@ -390,17 +598,31 @@ engine.
   <strong>WebSearch Admin</strong>
 </td>
 <td>
+<lang><en>
     Enables you to configure the search interface for various metadata
     collections.  You can define new collections and organize them in
     the tree, you can define various portalboxes that would appear on
     the screen, you can define search options and search fields to
-    present, etc.
+    present, etc.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης της αναζήτησης διεπαφών σε διάφορες συλλόγες μεταδεδομένων.
+ Μπορούμε να ορίσουμε νεές συλλογές και να τις οργρανώσουμε σε δέντρο, μπορούμε να ορίζουμε διάφορα
+portalboxes τα οποία θα εμφανίζονται στην οθόνη, μπορούμε να ορίσουμε επιλογές αναζήτησης και αναζήτηση πεδίων για παρουσίαση, κτλ.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/websearch/websearchadmin.py">WebSearch Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/websearch/websearchadmin.py">WebSearch Admin Interface</a></en>
+<el>
+ <a href="<CFG_SITE_URL>/admin/websearch/websearchadmin.py">Διεπαφή WebSearch Admin</a>
+</el></lang>
 </td>
 <td>
-  <a href="websearch-admin-guide">WebSearch Admin Guide</a>
+<lang><en>
+  <a href="websearch-admin-guide">WebSearch Admin Guide</a></en>
+<el>
+ <a href="websearch-admin-guide">Οδηγός του WebSearch Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -409,13 +631,23 @@ engine.
   <strong>WebStat Admin</strong>
 </td>
 <td>
-  Enables you to configure the usage statistics reporting system.
+<lang><en>
+  Enables you to configure the usage statistics reporting system.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης του συστήματος αναφοράς χρήσης  στατιστικών.
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line configuration</small>
+<lang><en>
+  <small class="note">command-line program</small></en>
+  <el><small class="note">πρόγραμμα command-line</small></el></lang>
 </td>
 <td>
-  <a href="webstat-admin-guide">WebStat Admin Guide</a>
+<lang><en>
+  <a href="webstat-admin-guide">WebStat Admin Guide</a></en>
+<el>
+ <a href="webstat-admin-guide">Οδηγός του WebStat Admin</a>
+</el></lang>
 </td>
 </tr>
 
@@ -424,52 +656,84 @@ engine.
   <strong>WebJournal Admin</strong>
 </td>
 
-<td> Enables you to configure and run an online journal hosted on your
+<td>
+<lang><en>
+ Enables you to configure and run an online journal hosted on your
  Invenio server, using the same tools and concepts at those you
- use to manage bibliographic data.  </td>
+ use to manage bibliographic data.  </en>
+<el>
+Δίνει την δυνατότητα ρύθμισης και τρεξίματος ενώς online ημερολογίου στον εξυπηρετητή του Invenio,
+ χρησιμοποιώντας τα ίδια εργαλεία και τις ίδια γενική ιδέα με εκείνο που χρησιμοποιόυσαμε για να χειριστούμε τα 
+βιβλιογραφικά δεδομένα.
+</el></lang>
+</td>
 
 <td>
-  <a href="<CFG_SITE_URL>/admin/webjournal/webjournaladmin.py">WebJournal Admin Interface</a>
+<lang><en>
+  <a href="<CFG_SITE_URL>/admin/webjournal/webjournaladmin.py">WebJournal Admin Interface</a></en>
+<el>
+<a href="<CFG_SITE_URL>/admin/webjournal/webjournaladmin.py">Διεπαφή WebJournal Admin</a>
+</el></lang>
 </td>
 <td>
+<lang><en>
   <a href="webjournal-admin-guide">WebJournal Admin Guide</a><br/><br/>
-  <a href="webjournal-editor-guide">WebJournal Editor Guide</a>
+  <a href="webjournal-editor-guide">WebJournal Editor Guide</a></en>
+<el>
+  <a href="webjournal-admin-guide">Οδηγός του WebJournal Admin</a><br/><br/>
+  <a href="webjournal-editor-guide">Οδηγός του συντάκτη του WebJournal </a>
+</el></lang>
 </td>
 </tr>
 </table>
 
-<h3>Personalization related modules</h3>
+<h3><lang><en>Personalization related modules</en><el></el>Ενότητες Σχετικές με την Εξατομίκευση</lang></h3>
 
-<p>Invenio interface can be personalized to suit different needs
+<p><lang><en>Invenio interface can be personalized to suit different needs
 of different end-users.  This functionality is covered by several
 modules: <strong>WebSession</strong> to identify users and their
 personal configurations, <strong>WebBasket</strong> to provide
 personal baskets or document carts, and <strong>WebAlert</strong> to
-set up personal email notification alerts.
+set up personal email notification alerts.</en>
+<el>Οι διεπαφές του Invenio μπορούν να εξατομικευτούν ώστε να ταιριάζουν σε διαφορετικές αναγκές διαφορετικών τελικών χρηστών.
+ Αυτή η λειτουργεία καλύπτεται απο διάφορες ενότητες: <strong>WebSession</strong> αναγνωρίζει του χρήστες και τις προσωπικες τους ρυθμίσεις,
+<strong>WebBasket</strong> προσφέρει προσωπικά καλάθια εγγράφων και <strong>WebAlert</strong> για το στήσιμο προσωπικών ειδοποιήσεων ηλεκτρονικού ταχυδρομείου.
+</el></lang>
 </p>
 
 <table border="1">
 
 <tr>
- <th class="searchboxheader">Admin Module</th>
- <th class="searchboxheader">Admin Description</th>
- <th class="searchboxheader">Admin Interface</th>
- <th class="searchboxheader">Admin Guide</th>
+ <th class="searchboxheader"><lang><en>Admin Module</en><el>Διαχειριστική Ενότητα</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Description</en><el>Περιγραφή</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Interface</en><el></el>Διεπαφή</lang></th>
+ <th class="searchboxheader"><lang><en>Admin Guide</en><el></el>Οδηγός</lang></th>
 </tr>
+
 
 <tr>
 <td>
   <strong>WebSession Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to inspect the status of guest sessions and to expire
-  them; the status and details on registered users, etc.
+  them; the status and details on registered users, etc.</en>
+<el>
+Δίνει την δυνατότητα ελέγχου της κατάσταστης των συνεδριάσεων επισκεπτών και τις λήξης αυτών,
+την κατάσταση και λεπτομέρειες για εγγεγραμένους χρήστες.
+</el></lang>
 </td>
 <td>
-  <small class="note">not available, but see the guide for the command-line way</small>
+<lang><en>
+  <small class="note">not available, but see the guide for the command-line way</small></en>
+<el>
+ <small class="note">Δεν έιναι διαθέσιμο,ελέγξετε όμως τον οδηγό για τον τροπο με command-line</small>
+</el></lang>
 </td>
 <td>
-  <a href="websession-admin-guide">WebSession Admin Guide</a>
+<lang>
+  <a href="websession-admin-guide"><en>WebSession Admin Guide</en><el>Οδηγός του WebSession Admin</el></a></lang>
 </td>
 </tr>
 
@@ -478,14 +742,25 @@ set up personal email notification alerts.
   <strong>WebBasket Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to inspect and manipulate user baskets set up on the
   system, to make them public/private, etc.
+</en>
+<el>
+Δίνει την δυνατότητα επίβλεψης και χειραγώγησης των καλαθίων χρηστών που έχουν στηθεί στο σύστημα,
+μπορούμε να τα κάνουμε δημόσια/ιδιωτίκα κλπ.
+</el></lang>
 </td>
 <td>
-  <small class="note">not available, but see the guide for the command-line way</small>
+<lang><en>
+  <small class="note">not available, but see the guide for the command-line way</small></en>
+<el>
+ <small class="note">Δεν έιναι διαθέσιμο,ελέγξετε όμως τον οδηγό για τον τροπο με command-line</small>
+</el></lang>
 </td>
 <td>
-  <a href="webbasket-admin-guide">WebBasket Admin Guide</a>
+<lang>
+  <a href="webbasket-admin-guide"><en>WebBasket Admin Guide</en><el>Οδηγός του WebBasket Admin</el></a></lang>
 </td>
 </tr>
 
@@ -494,14 +769,24 @@ set up personal email notification alerts.
   <strong>WebAlert Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to inspect and manipulate user alerts set up on the
-  system, to run the alert engine, etc.
+  system, to run the alert engine, etc.</en>
+<el>
+Δίνει την δυνατότητα επιτήρησης και χειραγώγησης ειδοποιήσεων που έχουν στήθει στο σύστημα,
+να τρέξουμε την μήχανη ειδοποιήσεων κτλ.
+</el></lang>
 </td>
 <td>
-  <small class="note">not available, but see the guide for the command-line way</small>
+<lang><en>
+  <small class="note">not available, but see the guide for the command-line way</small></en>
+<el>
+ <small class="note">Δεν έιναι διαθέσιμο,ελέγξετε όμως τον οδηγό για τον τροπο με command-line</small>
+</el></lang>
 </td>
 <td>
-  <a href="webalert-admin-guide">WebAlert Admin Guide</a>
+<lang>
+  <a href="webalert-admin-guide"><en>WebAlert Admin Guide</en><el>Οδηγός του WebAlert Admin</el></a></lang>
 </td>
 </tr>
 
@@ -510,14 +795,21 @@ set up personal email notification alerts.
   <strong>WebComment Admin</strong>
 </td>
 <td>
+<lang><en>
   Enables you to manipulate readers comments and reviews,
-  see which ones were reported as abuse/spam, delete them, etc.
+  see which ones were reported as abuse/spam, delete them, etc.</en>
+<el>
+Δίνει την δυνατότητα χειραγώγησης σχολίων και ανταποκρίσεων των αναγνωστών,
+μπορούμε να δουμε ποιές εγγραφές εχουν αναφερθεί ως spam/υβριστικά και να τα σβήσουμε , κλπ.
+</el></lang>
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/webcomment/webcommentadmin.py">WebComment Admin Interface</a>
+<lang>
+  <a href="<CFG_SITE_URL>/admin/webcomment/webcommentadmin.py"><en>WebComment Admin Interface</en><el>Διεπαφή WebComment Admin</el></a></lang>
 </td>
 <td>
-  <a href="webcomment-admin-guide">WebComment Admin Guide</a>
+<lang>
+  <a href="webcomment-admin-guide"><en>WebComment Admin Guide</en><el>Οδηγός του WebComment Admin</el></a></lang>
 </td>
 </tr>
 
@@ -526,49 +818,73 @@ set up personal email notification alerts.
   <strong>WebMessage Admin</strong>
 </td>
 <td>
-  Enables you to configure the messaging system.
+<lang><en>
+  Enables you to configure the messaging system.</en>
+<el>
+Δίνει την δυνατότητα ρύθμισης του συστήματος μυνημάτων.
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line configuration</small>
+<lang>
+  <small class="note"><en>command-line configuration</en><el>Διαμόρφωση command-line</el></small></lang>
 </td>
 <td>
-  <a href="webmessage-admin-guide">WebMessage Admin Guide</a>
+<lang>
+  <a href="webmessage-admin-guide"><en>WebMessage Admin Guide</en><el>Οδηγός του WebMessage Admin</el></a></lang>
 </td>
 </tr>
 
 </table>
+<lang>
+<h3><en>System glue modules</en><el>Ενότητες Συνδέσης Συστήματος</el></h3></lang>
 
-<h3>System glue modules</h3>
-
-<p>Modules that provide the necessary glue for those presented above
+<lang>
+<p>
+<en>Modules that provide the necessary glue for those presented above
 are: <strong>BibSched</strong> to manage and schedule bibliographic
 tasks, <strong>WebAccess</strong> to define role-based access control
 system to all Invenio services, and <strong>WebStyle</strong> to
-define a common look and feel of Invenio web pages.
-</p>
+define a common look and feel of Invenio web pages.</en>
+<el>
+Ενότητες οι οποίες προσφέρουν την απαραίτητη σύνδεση για αυτες που παρουσιάστηκαν παραπάνω
+ειναι: <strong>BibSched</strong> διαχείριζεται και προγραμματίζει τις βιβλιογραφικές εργασίες,
+ <strong>WebAccess</strong> ορίζει τον έλεγχο ρόλων πρόσβασης συστήματος σε ολές της υπηρεσίες του Invenio και <strong>WebStyle</strong>
+ ορίζει την κοίνη όψη και αίσθηση των σέλιδων του Invenio.
+</el>
+</p></lang>
 
 <table border="1">
 
 <tr>
- <th class="searchboxheader">Admin Module</th>
- <th class="searchboxheader">Admin Description</th>
- <th class="searchboxheader">Admin Interface</th>
- <th class="searchboxheader">Admin Guide</th>
+ <th class="searchboxheader"><lang><en>Admin Module</en><el>Διαχειριστική Ενότητα</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Description</en><el>Περιγραφή</el></lang></th>
+ <th class="searchboxheader"><lang><en>Admin Interface</en><el></el>Διεπαφή</lang></th>
+ <th class="searchboxheader"><lang><en>Admin Guide</en><el></el>Οδηγός</lang></th>
 </tr>
+
 
 <tr>
 <td>
   <strong>BibSched Admin</strong>
 </td>
 <td>
+<lang>
+<en>
   Enables you to inspect bibliographic task queue, to postpone or
   reschedule jobs, to make priorities, to run periodical tasks, etc.
+</en>
+<el>
+Δίνει την δυνατότητα ελέγχου της ουράς βιβλιογραφικών εργασίων, δυνατότητα ακύρωσης ή επαναπρογραμμάτισης δουλειών,
+φτίαχνει προρτεραιότητες, τρέξιμο περιοδικών πινάκων, κλπ.  
+</el></lang>
 </td>
 <td>
-  <small class="note">command-line program</small>
+<lang>
+  <small class="note"><en>command-line program</en><el>πρόγραμμα command-line</el></small></lang>
 </td>
 <td>
-  <a href="bibsched-admin-guide">BibSched Admin Guide</a>
+<lang>
+  <a href="bibsched-admin-guide"><en>BibSched Admin Guide</en><el>Οδηγός του BibSched Admin</el></a></lang>
 </td>
 </tr>
 
@@ -577,12 +893,22 @@ define a common look and feel of Invenio web pages.
   <strong>WebAccess Admin</strong>
 </td>
 <td>
+<lang>
+<en>
     Enables you to define who has got access or admin rights on various Invenio modules.
     For example, you can define that John is the bibliographic
     data manager, that Jim can modify the search interface pages, that
     Jill is the submission approval editor, etc.
+</en>
+<el>
+Δίνει την δυνατότητα ορισμού ποιός έχει άδεια ή δικαιώματα διαχειρηστών σε διάφορες ενότητες του Invenio.
+Για παράδειγμα, μπορούμε να ορίσουμε οτι ο John έιναι διαχειρηστής των βιβλιογραφικών δεδομένων , ο Jim μπορεί να 
+τροποποιήσει τις σελίδες αναζήτησης διεπαφών , η Jill έιναι συντάκτητης υποβολών έγκρισης , κλπ.
+</el></lang>
 </td>
 <td>
+<lang>
+<en>
   <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py">WebAccess Admin Interface - Full functionality</a>
    <br /><small>Full interface. Manage, grant, revoke any right.</small>
   <p>
@@ -591,9 +917,21 @@ define a common look and feel of Invenio web pages.
   <p>
   <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py/manageaccounts">Manage Accounts</a>
    <br /><small>Enable, disable, and modify accounts.</small>
+</en>
+<el>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py">Διεπαφή WebAccess Admin - Πλήρης λειτουργικότητα</a>
+   <br /><small>Πλήρης διεπαφή. Διαχείρηση, χορήγηση , ανακάλεση οποιόδηποτε δικαιωμάτων.</small>
+  <p>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Δικαιώματα αντιπροσόπευσης - Με περιορισμούς</a>
+   <br /><small>Αντιπροσόπευσης των δικαιώματων για ορισμένους ρόλους.</small>
+  <p>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py/manageaccounts">Διαχέιρηση Λογιαριασμών</a>
+   <br /><small>Ενεργοποιήση , Απενεργοποιήση και τροποποιήση λογαριασμών.</small>
+</el></lang>
 </td>
 <td>
-  <a href="webaccess-admin-guide">WebAccess Admin Guide</a>
+<lang>
+  <a href="webaccess-admin-guide"><en>WebAccess Admin Guide</en><el>Οδηγός του WebAccess Admin</el></a></lang>
 </td>
 </tr>
 
@@ -602,13 +940,22 @@ define a common look and feel of Invenio web pages.
   <strong>WebStyle Admin</strong>
 </td>
 <td>
+<lang>
+<en>
   Enables you to customize default Invenio page style and the CSS style sheet.
+</en>
+<el>
+Δίνει την δυνατότητα προσαρμογής της προκαθορισμένης εμφάνισης σελίδων του Invenio και των CSS style sheets.
+</el></lang>
 </td>
 <td>
-  <small class="note">not available, but see the guide for the command-line way</small>
+<lang>
+  <small class="note"><en>not available, but see the guide for the command-line way</en><el>Δεν έιναι διαθέσιμο,ελέγξετε όμως τον οδηγό για τον τροπο με command-line
+</el></small></lang>
 </td>
 <td>
-  <a href="webstyle-admin-guide">WebStyle Admin Guide</a>
+<lang>
+  <a href="webstyle-admin-guide"><en>WebStyle Admin Guide</en><el>Οδηγός του WebStyle Admin</el></a></lang>
 </td>
 </tr>
 
