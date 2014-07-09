@@ -422,7 +422,7 @@ class BibWorkflowObject(db.Model):
             del extra_data["_widget"]
         self.set_extra_data(extra_data)
 
-    def start_workflow(self, workflow_name, **kwargs):
+    def start_workflow(self, workflow_name, delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will start a new workflow execution for the object using
@@ -430,13 +430,18 @@ class BibWorkflowObject(db.Model):
 
         :param workflow_name: name of workflow to run
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import start
-
+        if delayed:
+            from .api import start_delayed as start_func
+        else:
+            from .api import start as start_func
         self.save()
-        return start(workflow_name, data=[self], **kwargs)
+        return start_func(workflow_name, data=[self], **kwargs)
 
-    def continue_workflow(self, start_point="continue_next", **kwargs):
+    def continue_workflow(self, start_point="continue_next", delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will continue a previous execution for the object using
@@ -447,15 +452,21 @@ class BibWorkflowObject(db.Model):
            * continue_next: will continue to the next task
            * restart_task: will restart the current task
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import continue_oid
         from .errors import WorkflowAPIError
 
         self.save()
         if not self.id_workflow:
             raise WorkflowAPIError("No workflow associated with object: %r"
                                    % (repr(self),))
-        return continue_oid(self.id, start_point, **kwargs)
+        if delayed:
+            from .api import continue_oid_delayed as continue_func
+        else:
+            from .api import continue_oid as continue_func
+        return continue_func(self.id, start_point, **kwargs)
 
     def change_status(self, message):
         """Change the status."""
