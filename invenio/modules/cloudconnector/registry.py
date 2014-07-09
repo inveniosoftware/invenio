@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014, 2015 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,25 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Configuration for all cloud services and general cloudutils config."""
+"""Implement a registry for cloud services."""
 
-from werkzeug import secure_filename
+from flask.ext.registry import RegistryProxy, ImportPathRegistry
 
-from invenio.base.config import CFG_SITE_NAME
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 
-# General configuration
-CLOUDCONNECTOR_ROWS_PER_PAGE = 10
+cloud_modules = RegistryProxy('cloudconnector', ImportPathRegistry,
+                              initial=['invenio.modules.cloudconnector'])
 
-CLOUDCONNECTOR_SERVICE_NAME_MAPPING = {
-    'dropbox': "Dropbox",
-    'google_drive': "Google Drive",
-    'onedrive': "OneDrive",
-}
-
-CLOUDCONNECTOR_UPLOAD_FOLDER = secure_filename(CFG_SITE_NAME)
-
-# OneDrive configuration
-CFG_ONEDRIVE_CLIENT_ID = ""
-CFG_ONEDRIVE_CLIENT_SECRET = ""
-CFG_ONEDRIVE_SCOPE = ["wl.skydrive", "wl.skydrive_update", "wl.offline_access"]
-CFG_ONEDRIVE_ROOT = secure_filename(CFG_SITE_NAME)
+fsopeners = RegistryProxy('cloudconnector.fsopeners',
+                          ModuleAutoDiscoverySubRegistry,
+                          'fsopeners',
+                          registry_namespace=cloud_modules)

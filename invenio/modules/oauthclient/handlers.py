@@ -87,13 +87,19 @@ def oauth1_token_setter(remote, resp, token_type='', extra_data=None):
 
 
 def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
-    """Set an OAuth2 token."""
+    """Set an OAuth2 token.
+
+    The refresh_token can be used to obtain a new access_token after
+    the old one is expired. It is saved in the database for long term use.
+    A refresh_token will be present only if `access_type=offline` is included
+    in the authorization code request.
+    """
     return token_setter(
         remote,
         resp['access_token'],
         secret='',
         token_type=token_type,
-        extra_data=extra_data,
+        extra_data={'refresh_token': resp.get('refresh_token')},
     )
 
 
@@ -123,7 +129,7 @@ def token_setter(remote, token, secret='', token_type='', extra_data=None):
 def token_getter(remote, token=''):
     """Retrieve OAuth access token.
 
-    Ued by flask-oauthlib to get the access token when making requests.
+    Used by flask-oauthlib to get the access token when making requests.
 
     :param token: Type of token to get. Data passed from ``oauth.request()`` to
          identify which token to retrieve.

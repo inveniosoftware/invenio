@@ -18,14 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-    Factory for OneDrive
-    --------------------
+Factory for OneDrive.
 
-    Please note, when using onedrive and this factory the redirect url has
-    to be a real web site e.g. "https://invenio.com" and not localhost.
+--------------------
+
+Please note, when using onedrive and this factory the redirect url has
+to be a real web site e.g. "https://invenio.com" and not localhost.
 """
 
-from onedrive import api_v5
 from fs.errors import ResourceNotFoundError
 
 from invenio.base.globals import cfg
@@ -37,11 +37,13 @@ from invenio.modules.cloudconnector.errors import (CloudRedirectUrl,
 
 
 class Factory(object):
-    """OneDrive Factory"""
+
+    """OneDrive Factory."""
 
     def build_fs(self, current_user, credentials, root=None,
                  callback_url=None, request=None, session=None):
-        """Builds OneDrive filesystem."""
+        """Build OneDrive filesystem."""
+        from onedrive import api_v5
 
         if root == "/":
             root = cfg['CFG_ONEDRIVE_ROOT']
@@ -156,7 +158,7 @@ class Factory(object):
                 "Insufficient data provided to the cloud builder")
 
     def _update_cloudutils_settings(self, current_user, new_data):
-        """Updates cloudutils settings for current user."""
+        """Update cloudutils settings for current user."""
         user = User.query.get(current_user.get_id())
         settings = user.settings
         cloudutils_settings = settings.get("cloudutils_settings")

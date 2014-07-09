@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,18 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    Google Drive file system
-    ------------------------
+"""Google Drive file system.
 
-    Installation::
+Installation:: pip install invenio[google_drive]
 
-        pip install apiclient oauth2client urllib3 google-api-python-clien
+Known issues:
 
-    Known issues:
-
-    * Flush and close, both call write contents and because of that
-      the file on cloud is overwrite twice...
+* Flush and close, both call write contents and because of that
+  the file on cloud is overwrite twice...
 """
 
 import six
@@ -62,14 +58,16 @@ GD_FOLDER = "application/vnd.google-apps.folder"
 
 
 class CacheItem(object):
+
     """Represents a path in the cache.
 
     There are two components to a path. It's individual metadata,
     and the children contained within it.
-
     """
+
     def __init__(self, metadata=None, children=None, timestamp=None,
                  parents=None):
+        """Initialize a CacheItem instance."""
         self.metadata = metadata
         self.children = children
         self.parents = parents
@@ -78,6 +76,7 @@ class CacheItem(object):
         self.timestamp = timestamp
 
     def add_child(self, name, client=None):
+        """Add a child."""
         if self.children is None:
             if client is not None:
                 # This is a fix. When you add a child to a folder that
@@ -93,6 +92,7 @@ class CacheItem(object):
                 self.children.append(name)
 
     def del_child(self, name):
+        """Delete a child."""
         if self.children is None:
             return
         try:
@@ -107,15 +107,21 @@ class CacheItem(object):
     expired = property(_get_expired)
 
     def renew(self):
+        """Renew."""
         self.timestamp = time.time()
 
 
 class GoogleDriveCache(UserDict):
+
+    """Represent the google drive cache."""
+
     def __init__(self, client):
+        """Initialize a GoogleDriveCache instance."""
         self._client = client
         UserDict.__init__(self)
 
     def set(self, path, metadata, children=None, parents=None):
+        """Set metadata."""
         self[path] = CacheItem(metadata, children=children, parents=parents)
         if parents is not None:
             for parent in parents:
@@ -123,6 +129,7 @@ class GoogleDriveCache(UserDict):
                     self.get(parent).add_child(path, self._client)
 
     def pop(self, path, default=None):
+        """Pop data of a given path."""
         value = UserDict.pop(self, path, default)
         if value.parents is not None:
             for parent in value.parents:
@@ -132,7 +139,11 @@ class GoogleDriveCache(UserDict):
 
 
 class GoogleDriveClient(object):
+
+    """Represent the google drive client."""
+
     def __init__(self, credentials):
+        """Initialize a GoogleDriveClient instance."""
         self.credentials = credentials
         self.service = self._build_service()
         self.cache = GoogleDriveCache(self)
@@ -145,12 +156,11 @@ class GoogleDriveClient(object):
         return service
 
     def _retry_operation(self, method, *args):
-        """Method retries a operation.
+        """Method retries an operation.
 
         Sometimes access_token expires and we need to rebuild it using
         the refresh token. This method does that and retries the
         operation that failed.
-
         """
         if self._retry < 5:
             self._retry += 1
@@ -162,6 +172,7 @@ class GoogleDriveClient(object):
                 "or user credentials are invalid.")
 
     def get_file(self, path):
+        """Get file of a given path."""
         item = self.cache.get(path)
         if not item or item.metadata is None or item.expired:
             try:
@@ -186,7 +197,7 @@ class GoogleDriveClient(object):
             raise OperationFailedError(opname="get_file", msg=str(resp))
 
     def metadata(self, path):
-        """Gets metadata for a given path."""
+        """Get metadata of a given path."""
         item = self.cache.get(path)
         if not item or item.metadata is None or item.expired:
             try:
@@ -206,7 +217,7 @@ class GoogleDriveClient(object):
         return dict(item.metadata.items())
 
     def children(self, path):
-        """Gets children of a given path."""
+        """Get children of a given path."""
         update = False
         item = self.cache.get(path)
         if item:
@@ -224,13 +235,10 @@ class GoogleDriveClient(object):
                 metadata = self.service.files().get(fileId=path).execute()
                 if metadata["mimeType"] != GD_FOLDER:
                     raise ResourceInvalidError(path)
-                param = {"q":  "'%s' in parents" % path}
+                param = {"q": "trashed=false and '%s' in parents" % path}
                 children = []
                 filesResource = self.service.files().list(**param).execute()
-                contents = filesResource.pop('items')
-                for child in contents:
-                    if child.get('trashed', False):
-                        continue
+                for child in filesResource['items']:
                     children.append(child['id'])
                     self.cache[child['id']] = CacheItem(child, parents=[path])
                 item = self.cache[path] = CacheItem(metadata, children)
@@ -274,6 +282,7 @@ class GoogleDriveClient(object):
         return metadata
 
     def file_copy(self, file_id, parent_id):
+        """Copy a file to a folder of a given id."""
         body = {"parents": [{"id": parent_id}]}
 
         try:
@@ -282,8 +291,8 @@ class GoogleDriveClient(object):
                                                  ).execute()
         except errors.HttpError as e:
             if e.resp.status == 404:
-                raise ResourceNotFoundError("Parent or source " +
-                                            "file don't exist")
+                raise ResourceNotFoundError(
+                    "Parent or source file don't exist.")
             raise OperationFailedError(opname='file_copy', msg=e.resp.reason)
         except:
             return self._retry_operation(self.file_copy, file_id, parent_id)
@@ -292,14 +301,15 @@ class GoogleDriveClient(object):
         return metadata
 
     def update_file(self, file_id, new_file):
+        """Update the file's contents of the given id."""
         try:
             metadata = self.service.files().update(fileId=file_id,
                                                    body=new_file
                                                    ).execute()
         except errors.HttpError as e:
             if e.resp.status == 404:
-                raise ResourceNotFoundError("Parent or source " +
-                                            "file don't exist")
+                raise ResourceNotFoundError(
+                    "Parent or source file don't exist.")
             raise OperationFailedError(opname='update_file',
                                        msg=e.resp.reason)
         except:
@@ -315,7 +325,7 @@ class GoogleDriveClient(object):
         self.cache.set(metadata['id'], metadata, parents=new_parents)
 
     def update_file_content(self, file_id, content):
-        """ Updates a file on google drive """
+        """Update the file's contents of the given id on google drive."""
         item = self.cache.get(file_id, None)
         if not item or item.metadata is None or item.expired:
             try:
@@ -349,6 +359,7 @@ class GoogleDriveClient(object):
         return updated_file
 
     def file_delete(self, path):
+        """Delete a file."""
         try:
             self.service.files().delete(fileId=path).execute()
         except errors.HttpError as e:
@@ -361,6 +372,7 @@ class GoogleDriveClient(object):
         self.cache.pop(path, None)
 
     def put_file(self, parent_id, title, content, description=None):
+        """Add a file to folder of the given id."""
         media_body = MediaInMemoryUpload(content)
         body = {
             'title': title,
@@ -382,7 +394,9 @@ class GoogleDriveClient(object):
         return metadata
 
     def about(self):
+        """Get info about the service."""
         try:
+            # FIXME check if the access_token has expired
             info = self.service.about().get().execute()
             return info
         except:
@@ -390,7 +404,8 @@ class GoogleDriveClient(object):
 
 
 class GoogleDriveFS(FS):
-    """Google drive file system
+
+    """Google drive file system.
 
     @attention: when setting variables in os.environ please note that
     GD_TOKEN_EXPIRY has to be in format: "%Y, %m, %d, %H, %M, %S, %f"
@@ -407,10 +422,11 @@ class GoogleDriveFS(FS):
              'atomic.copy': True,
              'atomic.makedir': True,
              'atomic.rename': True,
-             'atomic.setconetns': True,
+             'atomic.setcontents': True,
              }
 
     def __init__(self, root=None, credentials=None, thread_synchronize=True):
+        """Initialize a GoogleDriveFS instance."""
         self._root = root
 
         def _getDateTimeFromString(time):
@@ -421,14 +437,14 @@ class GoogleDriveFS(FS):
             else:
                 return None
 
-        if credentials == None:
+        if credentials is None:
             # Get credentials need to build the google drive service
             if ("GD_ACCESS_TOKEN" not in os.environ or
                 "GD_CLIENT_ID" not in os.environ or
                 "GD_CLIENT_SECRET" not in os.environ or
                 "GD_TOKEN_EXPIRY" not in os.environ or
                 "GD_TOKEN_URI" not in os.environ,
-                "GD_REFRESH_TOKEN" not in os.environ):
+               "GD_REFRESH_TOKEN" not in os.environ):
                 raise CreateFailedError("You need to set:\n"
                                         "GD_ACCESS_TOKEN, "
                                         "GD_CLIENT_ID, "
@@ -465,7 +481,7 @@ class GoogleDriveFS(FS):
 
         if self._root is None or root == '' or self._root == "/":
             # Root fix, if root is not set get the root folder id
-            # from the user information returned by about
+            # from the user information returned by 'about'
             about = self.client.about()
             self._root = about.get("rootFolderId")
 
@@ -475,22 +491,23 @@ class GoogleDriveFS(FS):
             )
 
     def __repr__(self):
+        """Represent the google_drive filesystem and the root."""
         args = (self.__class__.__name__, self._root)
         return '<FileSystem: %s - Root Directory: %s>' % args
 
     __str__ = __repr__
 
     def __unicode__(self):
+        """Represent the google_drive filesystem and the root (unicode)."""
         args = (self.__class__.__name__, self._root)
         return u'<FileSystem: %s - Root Directory: %s>' % args
 
     def _update(self, path, contents):
-        """Updates contents of an existing file
+        """Update contents of an existing file.
 
-        @param path: Id of the file for which to update content
-        @param contents: Contents to write to the file
-        @return: Id of the updated file
-
+        :param path: Id of the file for which to update content
+        :param contents: Contents to write to the file
+        :return: Id of the updated file
         """
         path = self._normpath(path)
 
@@ -506,20 +523,20 @@ class GoogleDriveFS(FS):
         return self.client.update_file_content(path, string_data)['id']
 
     def setcontents(self, path, contents="", chunk_size=64*1024, **kwargs):
-        """Sets new content to remote file
+        """Set new content to remote file.
 
         Method works only with existing files and sets
-            new content to them.
-        @param path: Id of the file in which to write the new content
-        @param contents: File contents as a string, or any object with
+        new content to them.
+
+        :param path: Id of the file in which to write the new content
+        :param contents: File contents as a string, or any object with
             read and seek methods
-        @param kwargs: additional parameters like:
+        :param kwargs: additional parameters like:
             encoding: the type of encoding to use if data is text
             errors: encoding errors
-        @param chunk_size: Number of bytes to read in a chunk,
+        :param chunk_size: Number of bytes to read in a chunk,
             if the implementation has to resort to a read copy loop
-        @return: Id of the updated file
-
+        :return: Id of the updated file
         """
         encoding = kwargs.get("encoding", None)
         errors = kwargs.get("errors", None)
@@ -530,66 +547,61 @@ class GoogleDriveFS(FS):
         return self._update(path, contents)
 
     def createfile(self, path, wipe=True, **kwargs):
-        """Creates an empty file always.
+        """Create always an empty file.
 
         Even if another file with the same name exists it will create
-            a file with the same name.
-        @param path: path to the new file. It has to be in one of
-            following forms:
-            - parent_id/file_title.ext
-            - file_title.ext or /file_title.ext - In this cases root
-                directory is the parent
-        @param wipe: New file with empty content.
+        a file with the same name.
+
+        :param path: path to the new file. It has to be in one of
+            following forms: parent_id/file_title.ext, file_title.ext or
+            /file_title.ext - in this cases root directory is the parent.
+        :param wipe: New file with empty content.
             In the case of google drive it will always be True
-        @param kwargs: Additional parameters like:
+        :param kwargs: Additional parameters like:
             description - a short description of the new file
-        @raise ResourceNotFoundError: If parent doesn't exist.
-        @attention: Root directory is the current root directory
+        :raises ResourceNotFoundError: If parent doesn't exist.
+
+        :attention: Root directory is the current root directory
             of this instance of filesystem and not the root of
             your Google Drive.
-        @return: Id of the created file
 
+        :return: Id of the created file
         """
-
         # Google drive doesn't work with paths. So a slight
         # work around is needed.
+        path = self._normpath(path)
+
         parts = path.split("/")
-        if parts[0] == "":
-            parent_id = self._root
-            title = parts[1]
-        elif len(parts) == 2:
-            parent_id = parts[0]
-            title = parts[1]
-            if not self.exists(parent_id):
-                raise ResourceNotFoundError("parent with the id " +
-                                            "'%s' doesn't exist" % parent_id)
-        else:
-            parent_id = self._root
-            title = parts[0]
-
         description = kwargs.get('description', '')
-
-        return self.client.put_file(parent_id, title, "", description)['id']
+        if len(parts) == 1 and parts[0] == self._root:
+            raise ResourceNotFoundError("Please, specify a filename.")
+        elif len(parts) == 1:
+            return self.client.put_file(self._root,
+                                        parts[0], "", description)['id']
+        else:
+            title = parts.pop()
+            parent_id = self.makedir(parts, True)
+            return self.client.put_file(parent_id,
+                                        title, "", description)['id']
 
     def open(self, path, mode='r',  buffering=-1, encoding=None,
              errors=None, newline=None, line_buffering=False, **kwargs):
-        """ Open the named file in the given mode.
+        """Open the named file in the given mode.
 
-        This method downloads the file contents into a local temporary
-            file so that it can be worked on efficiently.  Any changes
-            made to the file are only sent back to cloud storage when
-            the file is flushed or closed.
-        @param path: Id of the file to be opened
-        @param mode: In which mode to open the file
-        @raise ResourceNotFoundError: If given path doesn't exist and
+        This method downloads the file contents into a local temporary file so
+        that it can be worked on efficiently.  Any changes made to the file are
+        only sent back to cloud storage when the file is flushed or closed.
+
+        :param path: Id of the file to be opened
+        :param mode: In which mode to open the file
+        :raises ResourceNotFoundError: If given path doesn't exist and
             'w' is not in mode
-        @return: RemoteFileBuffer object
-
+        :return: RemoteFileBuffer object
         """
         path = self._normpath(path)
         spooled_file = SpooledTemporaryFile(mode=mode, bufsize=MAX_BUFFER)
 
-        #  Truncate the file if requested
+        # Truncate the file if requested
         if "w" in mode:
             try:
                 self._update(path, "")
@@ -607,9 +619,9 @@ class GoogleDriveFS(FS):
         return RemoteFileBuffer(self, path, mode, spooled_file)
 
     def is_root(self, path):
-        """Checks if the given path is the root folder of this
-            instance of GoogleDriveFS
-        @param path: Id of the folder to check
+        """Check if the given path is the root folder.
+
+        :param path: Id of the folder to check
         """
         path = self._normpath(path)
 
@@ -619,31 +631,33 @@ class GoogleDriveFS(FS):
             return False
 
     def copy(self, src, dst, overwrite=False, chunk_size=1024 * 64):
-        """
-        @param src: Id of the file to be copied
-        @param dst: Id of the folder in which to copy the file
-        @param overwrite: This is never true for GoogleDrive
+        """Copy a file to another folder.
+
+        :param src: Id of the file to be copied
+        :param dst: Id of the folder in which to copy the file
+        :param overwrite: This is never true for GoogleDrive
             because there can be many files with the same name
             in one folder.
-        @return: Id of the copied file
+        :return: Id of the copied file
         """
         return self.client.file_copy(src, dst)['id']
 
     def copydir(self, src, dst, overwrite=False, ignore_errors=False,
                 chunk_size=16384):
-        """
+        """Copy of folders is not supported.
+
         @attention: Google drive doesn't support copy of folders.
-            And to implement it over copy method will be
-            very inefficient
+        To implement it over copy method will be very inefficient.
         """
         raise NotImplemented("If implemented method will be very inefficient")
 
     def rename(self, src, dst):
-        """
-        @param src: Id of the file to be renamed
-        @param dst: New title of the file
-        @raise UnsupportedError: If trying to rename the root directory
-        @return: Id of the renamed file
+        """Rename a file of a given path.
+
+        :param src: Id of the file to be renamed
+        :param dst: New title of the file
+        :raises UnsupportedError: If trying to rename the root directory
+        :return: Id of the renamed file
         """
         if self.is_root(path=src):
             raise UnsupportedError("Can't rename the root directory")
@@ -652,9 +666,10 @@ class GoogleDriveFS(FS):
         return self.client.update_file(src, f)['id']
 
     def remove(self, path):
-        """
-        @param path: id of the file to be deleted
-        @return: None if removal was successful
+        """Remove a file of a given path.
+
+        :param path: id of the file to be deleted
+        :return: None if removal was successful
         """
         path = self._normpath(path)
 
@@ -666,9 +681,10 @@ class GoogleDriveFS(FS):
         self.client.file_delete(path)
 
     def removedir(self, path):
-        """
-        @param path: id of the folder to be deleted
-        @return: None if removal was successful
+        """Remove a directory of a given path.
+
+        :param path: id of the folder to be deleted
+        :return: None if removal was successful
         """
         path = self._normpath(path)
 
@@ -679,64 +695,58 @@ class GoogleDriveFS(FS):
         self.client.file_delete(path)
 
     def makedir(self, path, recursive=False, allow_recreate=False):
-        """
-        @param path: path to the folder you want to create.
-            it has to be in one of the following forms:
-                - parent_id/new_folder_name  (when recursive is False)
-                - parent_id/new_folder1/new_folder2...
-                    (when recursive is True)
-                - /new_folder_name to create a new folder in
-                    root directory
-                - /new_folder1/new_folder2... to recursively
-                    create a new folder in root
-        @param recursive: allows recursive creation of directories
-        @param allow_recreate: for google drive this param is
+        """Create a directory of a given path.
+
+        :param path: path to the folder you want to create.
+            It has to be in one of the following forms:
+            ``parent_id/new_folder_name`` when recursive is False,
+            ``parent_id/new_folder1/new_folder2`` when recursive is True,
+            ``/new_folder_name`` to create a new folder in root directory,
+            ``/new_folder1/new_folder2`` to recursively create a new folder
+            in root directory.
+        :param recursive: allows recursive creation of directories
+        :param allow_recreate: for google drive this param is
             always False, it will never recreate a directory with
             the same id ( same names are allowed )
-        @return: Id of the created directory
-
+        :return: Id of the created directory
         """
-        parts = path.split("/")
-        if parts[0] == "":
-            parent_id = self._root
-        elif len(parts) >= 2:
-            parent_id = parts[0]
-            if not self.exists(parent_id):
-                raise ResourceNotFoundError("parent with the id "
-                                            "'%s' doesn't exist" % parent_id)
-
-        if len(parts) > 2:
-            if recursive:
-                for i in range(len(parts) - 1):
-                    title = parts[i+1]
-                    resp = self.client.file_create_folder(parent_id, title)
-                    parent_id = resp["id"]
-            else:
-                raise UnsupportedError("recursively create a folder")
-            return resp['id']
+        path = self._normpath(path)
+        if '/' in path:
+            parts = path.split("/")
         else:
-            if len(parts) == 1:
-                title = parts[0]
-                parent_id = self._root
+            parts = path
+
+        if len(parts) == 1 and parts[0] == self._root:
+            raise ResourceNotFoundError("Please, specify a folder name.")
+        elif len(parts) == 1:
+            return self.client.file_create_folder(self._root, parts[0])['id']
+        else:
+            if recursive:
+                resp = self.client.file_create_folder(self._root, parts[0])
+                for folder in parts[1:]:
+                    if folder != '':
+                        resp = self.client.file_create_folder(resp['id'],
+                                                              folder)
+                return resp['id']
             else:
-                title = parts[1]
-            return self.client.file_create_folder(parent_id, title)['id']
+                raise UnsupportedError("Recursively create a folder.")
 
     def move(self, src, dst, overwrite=False, chunk_size=16384):
-        """
-        @note: Google drive can have many parents for one file,
-            when using this method a file will be moved from all
-            current parents to the new parent 'dst'
+        """Move a file to another folder.
 
-        @param src: id of the file to be moved
-        @param dst: id of the folder in which the file will be moved
-        @param overwrite: for Google drive it is always false
-        @param chunk_size: if using chunk upload
-        @return: Id of the moved file
+        .. note:: Google Drive can have many parents for one file,
+            when using this method a file will be moved from all
+            current parents to the new parent 'dst'.
+
+        :param src: id of the file to be moved
+        :param dst: id of the folder in which the file will be moved
+        :param overwrite: for Google drive it is always false
+        :param chunk_size: if using chunk upload
+        :return: Id of the moved file
         """
         if self.isdir(src):
-            raise ResourceInvalidError("Specified src is a directory. " +
-                                       "Please use movedir.")
+            raise ResourceInvalidError(
+                "Specified src is a directory. Please use movedir.")
 
         f = self.client.get_file(src)
         f['parents'] = [{"id": dst}]
@@ -744,45 +754,49 @@ class GoogleDriveFS(FS):
 
     def movedir(self, src, dst, overwrite=False, ignore_errors=False,
                 chunk_size=16384):
-        """
-        @note: google drive can have many parents for one folder,
+        """Move a folder to another folder.
+
+        .. note:: Google Drive can have many parents for one folder,
             when using this method a folder will be moved from all
-            current parents to the new parent 'dst'
-        @param src: id of the folder to be moved
-        @param dst: id of the folder in which the file will be moved
-        @param overwrite: for Google drive it is always false
-        @param chunk_size: if using chunk upload
-        @return: Id of the moved folder
+            current parents to the new parent 'dst'.
+
+        :param src: id of the folder to be moved
+        :param dst: id of the folder in which the file will be moved
+        :param overwrite: for Google drive it is always false
+        :param chunk_size: if using chunk upload
+        :return: Id of the moved folder
         """
         if self.isfile(src):
-            raise ResourceInvalidError("Specified src is a file. " +
-                                       "Please use move.")
+            raise ResourceInvalidError(
+                "Specified src is a file. Please use move.")
         f = self.client.get_file(src)
         f['parents'] = [{"id": dst}]
 
         return self.client.update_file(src, f)['id']
 
     def isdir(self, path):
-        """ Checks if a the specified path is a directory
-        @param path: Id of the file/folder to check
+        """Check if a the specified path is a directory.
+
+        :param path: Id of the file/folder to check
         """
         path = self._normpath(path)
         info = self.getinfo(path)
         return info['isdir']
 
     def isfile(self, path):
-        """ Checks if a the specified path is a file
+        """
+        Check if a the specified path is a file.
 
-        @param path: Id of the file/folder to check
+        :param path: Id of the file/folder to check
         """
         path = self._normpath(path)
         info = self.getinfo(path)
         return not info['isdir']
 
     def exists(self, path):
-        """ Checks if a the specified path exists
+        """Check if a the specified path exists.
 
-        @param path: Id of the file/folder to check
+        :param path: Id of the file/folder to check
         """
         path = self._normpath(path)
         try:
@@ -795,25 +809,25 @@ class GoogleDriveFS(FS):
 
     def listdir(self, path=None, wildcard=None, full=False, absolute=False,
                 dirs_only=False, files_only=False, overrideCache=False):
-        """ Lists the the files and directories under a given path.
+        """List the files and directories under a given path.
 
         The directory contents are returned as a list of unicode paths
 
-        @param path: id of the folder to list
-        @type path: string
-        @param wildcard: Only returns paths that match this wildcard
-        @type wildcard: string containing a wildcard, or a callable
+        :param path: id of the folder to list
+        :type path: string
+        :param wildcard: Only returns paths that match this wildcard
+        :type wildcard: string containing a wildcard, or a callable
             that accepts a path and returns a boolean
-        @param full: returns full paths (relative to the root)
-        @type full: bool
-        @param absolute: returns absolute paths
+        :param full: returns full paths (relative to the root)
+        :type full: bool
+        :param absolute: returns absolute paths
             (paths beginning with /)
-        @type absolute: bool
-        @param dirs_only: if True, only return directories
-        @type dirs_only: bool
-        @param files_only: if True, only return files
-        @type files_only: bool
-        @return: a list of unicode paths
+        :type absolute: bool
+        :param dirs_only: if True, only return directories
+        :type dirs_only: bool
+        :param files_only: if True, only return files
+        :type files_only: bool
+        :return: a list of unicode paths
         """
         path = self._normpath(path)
         flist = self.client.children(path)
@@ -824,46 +838,45 @@ class GoogleDriveFS(FS):
 
     def listdirinfo(self, path=None, wildcard=None, full=False, absolute=False,
                     dirs_only=False, files_only=False):
-        """Retrieves a list of paths and path info under a given path.
+        """Retrieve a list of paths and path info under a given path.
 
         This method behaves like listdir() but instead of just returning the
         name of each item in the directory, it returns a tuple of the name and
         the info dict as returned by getinfo.
 
-        @param path: id of the folder
-        @param wildcard: filter paths that match this wildcard
-        @param dirs_only: only retrieve directories
-        @type dirs_only: bool
-        @param files_only: only retrieve files
-        @type files_only: bool
-        @return: tuple of the name and the info dict as
+        :param path: id of the folder
+        :param wildcard: filter paths that match this wildcard
+        :param dirs_only: only retrieve directories
+        :type dirs_only: bool
+        :param files_only: only retrieve files
+        :type files_only: bool
+        :return: tuple of the name and the info dict as
             returned by getinfo.
-
         """
         return [(p, self.getinfo(p)) for p in self.listdir(
             path, wildcard=wildcard, full=full, absolute=absolute,
             dirs_only=dirs_only, files_only=files_only)]
 
     def getinfo(self, path):
-        """Returned information is metadata from cloud service and
-        few more fields with standard names for some parts of the metadata.
+        """Returned information is metadata from cloud service.
 
-        @param path: file id for which to return informations
-        @return: dictionary with informations about the specific file
+        A few more fields with standard names for some parts of the metadata.
+        :param path: file id for which to return informations
+        :return: dictionary with informations about the specific file
         """
         path = self._normpath(path)
         return self._metadata_to_info(self.client.metadata(path))
 
     def getpathurl(self, path, allow_none=False):
-        """
-        @param path: id of the file for which to return the url path
-        @param allow_none: if true, this method can return None if
-            there is no URL form of the given path
-        @type allow_none: bool
-        @raises `fs.errors.NoPathURLError`: If no URL form exists,
-            and allow_none is False (the default)
-        @return: url that corresponds to the given path, if one exists
+        """Get the url of a given path.
 
+        :param path: id of the file for which to return the url path
+        :param allow_none: if true, this method can return None if
+            there is no URL form of the given path
+        :type allow_none: bool
+        :raises `fs.errors.NoPathURLError`: If no URL form exists,
+            and allow_none is False (the default)
+        :return: url that corresponds to the given path, if one exists
         """
         url = None
         try:
@@ -878,15 +891,17 @@ class GoogleDriveFS(FS):
         return url
 
     def desc(self, path):
-        """
-        @return: The title for the given path.
+        """Get the title of a given path.
+
+        :return: The title for the given path.
         """
         info = self.getinfo(path)
         return info["title"]
 
     def about(self):
-        """
-        @return: information about the current user
+        """Get user information and settings.
+
+        :return: information about the current user
             with whose credentials is the file system instantiated.
         """
         info = self.client.about()
@@ -897,34 +912,29 @@ class GoogleDriveFS(FS):
         return info
 
     def _normpath(self, path):
-        """ Method normalises the path for google drive.
+        """Method normalises the path for google drive.
 
-        @return: normaliesed path as a string
+        :return: normaliesed path as a string
         """
-        if path is None or path == "":
-            return self._root
-        elif len(path.split("/")) > 2:
-            return path.split("/")[-1]
-        elif path[0] == "/" and len(path) == 1:
+        if path is None or path == "" or path == '/' or len(path) == 0:
             return self._root
         elif path[0] == "/":
             return path[1:]
-        elif len(path) == 0:
-            return self._root
-
-        return path
+        else:
+            return path
 
     def _metadata_to_info(self, metadata, localtime=False):
-        """ Returns modified metadata
+        """Return modified metadata.
 
         Method adds a few standard names to the metadata:
-            size - the size of the file/folder
-            isdir - is something a file or a directory
-            created_time - the time of the creation
-            path - path to the object which metadata are we showing
-            revision - google drive doesn't have a revision parameter
-            modified - time of the last modification
-        @return: The full metadata and a few more fields
+        * size - the size of the file/folder
+        * isdir - is something a file or a directory
+        * created_time - the time of the creation
+        * path - path to the object which metadata are we showing
+        * revision - google drive doesn't have a revision parameter
+        * modified - time of the last modification
+
+        :return: The full metadata and a few more fields
             with standard names.
         """
         isdir = metadata.get("mimeType", None) == GD_FOLDER
@@ -937,4 +947,5 @@ class GoogleDriveFS(FS):
             'modified': metadata.get("modifiedDate", 0)
             }
         info.update(metadata)
+
         return info

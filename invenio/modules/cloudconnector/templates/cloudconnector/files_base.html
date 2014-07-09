@@ -17,22 +17,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {% macro upload_files( files, request ) -%}
-	{{ caller() }}
-	<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  {{ caller() }}
+  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h3>Select a cloud service</h3>
       </div>
       <div class="modal-body row" style="text-align: center">
-      	{% for service_name in config.CFG_CLOUD_UTILS_ENABLED_SERVICES %}
+        {% for service_name in config.CLOUDCONNECTOR_SERVICE_NAME_MAPPING.keys() %}
           <form style="display:inline-block; margin-left: 15px" action="{{ url_for('cloudutils.upload', service=service_name) }}" method="POST">
               <input type="hidden" name="files"  value="{{files}}" />
               <input type="hidden" name="return_url"  value="{{request.url}}" />
               <input type='image'
                      width="150" height="140"
-                     title="{{ config.CFG_SERVICE_PRETTY_NAME }}"
+                     title="{{ config.CLOUDCONNECTOR_SERVICE_NAME_MAPPING }}"
                      src="{{ url_for('cloudutils.static', filename='img/cloudconnector/%s_icon.png'|format(service_name)) }}"
-                     alt="{{ config.CFG_SERVICE_PRETTY_NAME }}" />
+                     alt="{{ config.CLOUDCONNECTOR_SERVICE_NAME_MAPPING }}" />
           </form>
         {% endfor %}
       </div>
