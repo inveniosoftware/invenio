@@ -41,7 +41,7 @@ See http://handle.net/rfc/rfc3651.html
 """
 
 arxiv_post_2007_regexp = re.compile(
-    "arXiv:(\d{4})\.(\d{4})(v\d+)?$",
+    "(?:arXiv:)?(\d{4})\.(\d{4})(v\d+)?$",
     flags=re.I
 )
 """
