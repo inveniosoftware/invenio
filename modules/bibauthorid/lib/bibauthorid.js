@@ -2208,7 +2208,19 @@ $(document).ready(function() {
 
         return e.preventDefault();
 
-      } );
+      } ).popover({
+        html: true,
+        placement: "bottom",
+        trigger: "hover",
+        content: $("#recomputeProfile").data("baiProfileMsg")
+      });
+
+      $("#recomputeProfile-disabled").popover({
+        html: true,
+        placement: "bottom",
+        trigger: "hover",
+        content: $("#recomputeProfile-disabled").data("baiProfileMsg")
+      });
 
 
     } else {

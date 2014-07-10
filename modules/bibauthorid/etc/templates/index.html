@@ -59,11 +59,11 @@
         <div class="col-md-2 clearfix">
             {% if last_computed %}
             {% if possible_to_recompute %}
-            <button class="btn btn-default btn-sm pull-right" id="recomputeProfile" type="button">
+            <button class="btn btn-default btn-sm pull-right" id="recomputeProfile" type="button" data-bai-profile-msg="This is the date your profile was last generated.">
                 <span class="glyphicon glyphicon-refresh"></span>&nbsp {{ last_computed }}
             </button>
             {% else %}
-            <button class="btn btn-default btn-sm pull-right" id="recomputeProfile-disabled" type="button" disabled>
+            <button class="btn btn-default btn-sm pull-right disabled" id="recomputeProfile-disabled" type="button" data-bai-profile-msg="This profile was generated less than 30 minutes ago.">
                 <span class="glyphicon glyphicon-time"></span>&nbsp {{ last_computed }}
             </button>
 	    {% endif %}
