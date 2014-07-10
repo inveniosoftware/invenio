@@ -233,24 +233,13 @@ def empty_redis():
 
 
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
-    #from invenio.modules.workflows.views.holdingpen import (get_title,
-    #                                                        get_identifiers,
-    #                                                        get_subject_categories
-    #)
     should_we_reverse = False
     if sSortDir_0 == 'desc':
         should_we_reverse = True
-
     if iSortCol_0 == 0:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    #elif iSortCol_0 == 2:
-    #    bwolist.sort(key=lambda x: get_title(x.get_data()), reverse=should_we_reverse)
-    #elif iSortCol_0 == 3:
-    #    bwolist.sort(key=lambda x: get_identifiers(x.get_data()), reverse=should_we_reverse)
-    #elif iSortCol_0 == 4:
-    #    bwolist.sort(key=lambda x: get_subject_categories(x.get_data()), reverse=should_we_reverse)
     elif iSortCol_0 == 4:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
     elif iSortCol_0 == 5:
