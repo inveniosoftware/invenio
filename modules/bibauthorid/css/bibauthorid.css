@@ -769,6 +769,10 @@ ul.pub-tabs, .pub-tabs li {
     border-top: none;
 }
 
+#recomputeProfile-disabled {
+    pointer-events: auto;
+}
+
 /*
 .addToMergeButton {
 /*    font-size: 11px;
