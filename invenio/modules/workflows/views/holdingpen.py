@@ -47,7 +47,6 @@ from ..registry import actions, workflows
 from ..utils import get_workflow_definition, sort_bwolist, WorkflowBase
 from ..api import continue_oid_delayed, start_delayed
 
-
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       template_folder='../templates',
                       static_folder='../static')
@@ -86,186 +85,64 @@ def maintable():
     action_list = get_action_list(bwolist)
     my_tags = []
 
-    if 'tags' in session:
-        my_tags += session['tags']
-    else:
-        session['tags'] = my_tags
-    if 'workflows_version_showing' in session:
-        my_tags += session['workflows_version_showing']
-    else:
-        session['workflows_version_showing'] = my_tags
+    if 'holdingpen_tags' in session:
+        my_tags = session["holdingpen_tags"]
+
     if 'version' in request.args:
-        try:
-            if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
-                my_tags += [int(request.args.get('version'))]
-            if int(request.args.get('version')) not in session["workflows_version_showing"]:
-                session["workflows_version_showing"] += [int(request.args.get('version'))]
-        except Exception:
-            if request.args.get('version') not in my_tags:
-                my_tags += [request.args.get('version')]
-            if [request.args.get('version')] not in session["tags"]:
-                session["workflows_version_showing"] += [request.args.get('version')]
+        if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
+            my_tags += ObjectVersion.MAPPING[[int(request.args.get('version'))]]
     tags_to_print = ""
     for tag in my_tags:
-        try:
-            tags_to_print += ObjectVersion.MAPPING[tag]
-        except:
-            if tag:
-                tags_to_print += tag + ','
+        if tag:
+            tags_to_print += tag + ','
     return dict(bwolist=bwolist,
                 action_list=action_list,
                 tags=tags_to_print)
 
 
-@blueprint.route('/load_table', methods=['GET', 'POST'])
+@blueprint.route('/batch_action', methods=['GET', 'POST'])
 @login_required
-@templated('workflows/hp_maintable.html')
-def load_table():
-    """Get JSON data for the Holdingpen table.
+@wash_arguments({'bwolist': (text_type, "")})
+def batch_action(bwolist):
+    """Render action accepting single or multiple records."""
+    from ..utils import parse_bwids
 
-    Function used for the passing of JSON data to the DataTable
-    1] First checks for what record version to show
-    2] then sorting direction,
-    3] then if the user searched for something
-    and finally it builds the JSON to send.
-    """
-    workflows_cache = {}
-    version_showing = []
-    req = None
-    req_search = []
-    if request.json:
-        if "version" in request.json:
-            req = request.json["version"]
-        if "tags" in request.json:
-            req_search = request.json["tags"]
-            session["tags"] = req_search
-    if req is not None:
-        if "final" in req:
-            version_showing.append(ObjectVersion.FINAL)
-        if "halted" in req:
-            version_showing.append(ObjectVersion.HALTED)
-        if "running" in req:
-            version_showing.append(ObjectVersion.RUNNING)
-        if "initial" in req:
-            version_showing.append(ObjectVersion.INITIAL)
-        session['workflows_version_showing'] = version_showing
-        if req == []:
-            version_showing = ObjectVersion.MAPPING.keys()
-    elif 'workflows_version_showing' in session:
-        version_showing = session.get('workflows_version_showing', [])
+    bwolist = parse_bwids(bwolist)
+
     try:
-        i_sortcol_0 = request.args.get('iSortCol_0')
-        s_sortdir_0 = request.args.get('sSortDir_0')
-        i_display_start = int(request.args.get('iDisplayStart'))
-        i_display_length = int(request.args.get('iDisplayLength'))
-        sEcho = int(request.args.get('sEcho')) + 1
-    except:
-        i_sortcol_0 = session.get('iSortCol_0', 0)
-        s_sortdir_0 = session.get('sSortDir_0', None)
-        i_display_start = session.get('iDisplayLength', 10)
-        i_display_length = session.get('iDisplayLength', 0)
-        sEcho = session.get('sEcho', 0) + 1
+        bwolist = map(int, bwolist)
+    except ValueError:
+        # Bad ID, we just pass for now
+        pass
 
-    s_search = request.args.get('sSearch', None)
-    if s_search:
-        if req_search:
-            s_search = s_search.split(',') + req_search
-        else:
-            s_search = s_search.split(',') + session["tags"]
-    elif req_search:
-        s_search = req_search
+    objlist = []
+    workflow_func_list = []
+    w_metadata_list = []
+    info_list = []
+    actionlist = []
+    bwo_parent_list = []
+    logtext_list = []
 
-    if s_search is [u'']:
-        s_search = []
-    bwolist = get_holdingpen_objects(ssearch=s_search,
-                                     version_showing=version_showing)
-    if 'iSortCol_0' in session:
-        i_sortcol_0 = int(i_sortcol_0)
-        if i_sortcol_0 != session['iSortCol_0'] \
-                or s_sortdir_0 != session['sSortDir_0']:
-            bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
-    session['iDisplayStart'] = i_display_start
-    session['iDisplayLength'] = i_display_length
-    session['iSortCol_0'] = i_sortcol_0
-    session['sSortDir_0'] = s_sortdir_0
-    session['sEcho'] = sEcho
+    objlist = [BibWorkflowObject.query.get(i) for i in bwolist]
 
-    table_data = {
-        "aaData": []
-    }
-    try:
-        table_data['iTotalRecords'] = len(bwolist)
-        table_data['iTotalDisplayRecords'] = len(bwolist)
-    except TypeError:
-        bwolist = get_holdingpen_objects(version_showing=version_showing)
-        table_data['iTotalRecords'] = len(bwolist)
-        table_data['iTotalDisplayRecords'] = len(bwolist)
+    for bwobject in objlist:
+        extracted_data = extract_data(bwobject)
+        bwo_parent_list.append(extracted_data['bwparent'])
+        logtext_list.append(extracted_data['logtext'])
+        info_list.append(extracted_data['info'])
+        w_metadata_list.append(extracted_data['w_metadata'])
+        workflow_func_list.append(extracted_data['workflow_func'])
+        if bwobject.get_action() not in actionlist:
+            actionlist.append(bwobject.get_action())
 
-    # This will be simplified once Redis is utilized.
-    records_showing = 0
-    for bwo in bwolist[i_display_start:i_display_start + i_display_length]:
-        records_showing += 1
+    action_form = actions[actionlist[0]]
 
-        action_name = bwo.get_action()
-        action_message = bwo.get_action_message()
-        if not action_message:
-            action_message = ""
+    result = action_form().render(objlist, bwo_parent_list, info_list,
+                                  logtext_list, w_metadata_list,
+                                  workflow_func_list)
+    url, parameters = result
 
-        action = actions.get(action_name, None)
-
-        workflows_uuid = bwo.id_workflow
-        if workflows_uuid and workflows_uuid not in workflows_cache:
-            workflows_cache[workflows_uuid] = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]()
-
-        mini_action = None
-        if action:
-            mini_action = getattr(action, "render_mini", None)
-
-        record = bwo.get_data()
-        if not hasattr(record, "get"):
-            try:
-                record = dict(record)
-            except:
-                record = {}
-
-        if not workflows_uuid:
-            title = "No title"
-            description = "No description"
-            extra_data = bwo.get_extra_data()
-        else:
-            title = workflows_cache[workflows_uuid].get_title(bwo)
-            description = workflows_cache[workflows_uuid].get_description(bwo)
-            extra_data = bwo.get_extra_data()
-
-        row = render_template('workflows/row_formatter.html',
-                              title=title,
-                              object=bwo,
-                              record=record,
-                              extra_data=extra_data,
-                              description=description,
-                              action=action,
-                              mini_action=mini_action,
-                              action_message=action_message,
-                              pretty_date=pretty_date,
-                              )
-        d = {}
-        for key, value in REG_TD.findall(row):
-            d[key] = value.strip()
-
-        table_data['aaData'].append(
-            [d['id'],
-             d['checkbox'],
-             d['title'],
-             d['description'],
-             d['pretty_date'],
-             d['version'],
-             d['type'],
-             d['action']]
-        )
-    table_data['sEcho'] = sEcho
-    table_data['iTotalRecords'] = len(bwolist)
-    table_data['iTotalDisplayRecords'] = len(bwolist)
-    return jsonify(table_data)
+    return render_template(url, **parameters)
 
 
 @blueprint.route('/get_version_showing', methods=['GET', 'POST'])
@@ -290,7 +167,7 @@ def details(objectid):
     #formatted_data = bwobject.get_formatted_data(of)
     workflows_uuid = bwobject.id_workflow
     if workflows_uuid:
-        formatted_data = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]().formatter(bwobject, formatter=None, format=of)
+        formatted_data = workflows[Workflow.query.get(workflows_uuid).name]().formatter(bwobject, formatter=None, format=of)
     else:
         formatted_data = ""
 
@@ -434,7 +311,7 @@ def entry_data_preview(objectid, of):
 
     workflows_uuid = bwobject.id_workflow
     if workflows_uuid:
-        formatted_data = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]().formatter(bwobject, formatter=None, format=of)
+        formatted_data = workflows[Workflow.query.get(workflows_uuid).name]().formatter(bwobject, formatter=None, format=of)
     else:
         formatted_data = ""
     if isinstance(formatted_data, dict):
@@ -545,39 +422,158 @@ def get_action_list(object_list):
     return action_dict
 
 
-def get_holdingpen_objects(isortcol_0=None,
-                           ssortdir_0=None,
-                           ssearch=None,
-                           version_showing=(ObjectVersion.HALTED,)):
+@blueprint.route('/load_table', methods=['GET', 'POST'])
+@login_required
+@templated('workflows/hp_maintable.html')
+def load_table():
+    """Get JSON data for the Holdingpen table.
+
+    Function used for the passing of JSON data to the DataTable
+    1] First checks for what record version to show
+    2] then sorting direction,
+    3] then if the user searched for something
+    and finally it builds the JSON to send.
+    """
+    import time
+    StartA = time.time()
+    try:
+        workflows_cache = {}
+        if request.method == "POST":
+            if "holdingpen_tags" not in session:
+                session["holdingpen_tags"] = []
+            if request.json and "tags" in request.json:
+                tags = request.json["tags"]
+                session["holdingpen_tags"] = tags
+            elif "holdingpen_tags" in session:
+                tags = session["holdingpen_tags"]
+            else:
+                tags = []
+                session["holdingpen_tags"] = []
+                print "global request  {0}".format(time.time() - StartA)
+            return None
+        else:
+            if "holdingpen_tags" in session:
+                tags = session["holdingpen_tags"]
+            else:
+                tags = []
+                session["holdingpen_tags"] = []
+
+        i_sortcol_0 = request.args.get('iSortCol_0', session.get('iSortCol_0', 0))
+        s_sortdir_0 = request.args.get('sSortDir_0', session.get('sSortDir_0', None))
+
+        session["holdingpen_iDisplayStart"] = int(request.args.get('iDisplayStart', session.get('iDisplayLength', 10)))
+        session["holdingpen_iDisplayLength"] = int(request.args.get('iDisplayLength', session.get('iDisplayLength', 0)))
+        session["holdingpen_sEcho"] = int(request.args.get('sEcho', session.get('sEcho', 0))) + 1
+        bwolist = get_holdingpen_objects(tags)
+        print "get holdingpen object {0}".format(time.time() - StartA)
+        if 'iSortCol_0' in session and "sSortDir_0" in session:
+            i_sortcol_0 = int(str(i_sortcol_0))
+            if i_sortcol_0 != session['iSortCol_0'] or s_sortdir_0 != session['sSortDir_0']:
+                bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
+        session["holdingpen_iSortCol_0"] = i_sortcol_0
+        session["holdingpen_sSortDir_0"] = s_sortdir_0
+
+        table_data = {'aaData': [],
+                      'iTotalRecords': len(bwolist),
+                      'iTotalDisplayRecords': len(bwolist),
+                      'sEcho': session["holdingpen_sEcho"]}
+
+        # This will be simplified once Redis is utilized.
+        records_showing = 0
+        for bwo in bwolist[session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"] + session["holdingpen_iDisplayLength"]]:
+            action_name = bwo.get_action()
+            action_message = bwo.get_action_message()
+            if not action_message:
+                action_message = ""
+
+            action = actions.get(action_name, None)
+            records_showing += 1
+            workflows_uuid = bwo.id_workflow
+            if workflows_uuid and workflows_uuid not in workflows_cache:
+                workflows_cache[workflows_uuid] = workflows[Workflow.query.get(workflows_uuid).name]()
+            mini_action = getattr(action, "mini_action", None)
+            record = bwo.get_data()
+            if not hasattr(record, "get"):
+                try:
+                    record = dict(record)
+                except:
+                    record = {}
+            if not workflows_uuid:
+                title = "No title"
+                description = "No description"
+                extra_data = bwo.get_extra_data()
+            else:
+                title = workflows_cache[workflows_uuid].get_title(bwo)
+                description = workflows_cache[workflows_uuid].get_description(bwo)
+                extra_data = bwo.get_extra_data()
+            row = render_template('workflows/row_formatter.html',
+                                  title=title,
+                                  object=bwo,
+                                  record=record,
+                                  extra_data=extra_data,
+                                  description=description,
+                                  action=action,
+                                  mini_action=mini_action,
+                                  action_message=action_message,
+                                  pretty_date=pretty_date,
+                                  )
+            d = {}
+            for key, value in REG_TD.findall(row):
+                d[key] = value.strip()
+
+            table_data['aaData'].append(
+                [d['id'],
+                 d['checkbox'],
+                 d['title'],
+                 d['description'],
+                 d['pretty_date'],
+                 d['version'],
+                 d['type'],
+                 d['action']]
+            )
+        print "global request  {0}".format(time.time() - StartA)
+        return jsonify(table_data)
+    except Exception as e:
+        print e
+
+
+def get_holdingpen_objects(ptags=[]):
     """Get BibWorkflowObject's for display in Holding Pen.
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
+    import time
     workflows_cache = {}
+    tags = ptags[:]
+    temp_list = ["New", "Done", "Need action", "In process"]
+    version_showing = []
+    for i in range(len(tags) - 1, -1, -1):
+        if tags[i] in temp_list:
+            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags[i]])
+            del tags[i]
 
-    if isortcol_0:
-        isortcol_0 = int(isortcol_0)
+    if version_showing is None:
+        version_showing = ObjectVersion.MAPPING.keys()
+    ssearch = tags
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent == None
     ).filter(not version_showing or BibWorkflowObject.version.in_(
         version_showing)).all()
+
     if ssearch:
+        if not isinstance(ssearch, list):
+            if "," in ssearch:
+                ssearch = ssearch.split(",")
+            else:
+                ssearch = [ssearch]
+
         bwobject_list_tmp = []
         for bwo in bwobject_list:
-            extra_data = bwo.get_extra_data()
-            data = bwo.get_data()
-            if not isinstance(data, collections.Mapping):
-                data = {}
+            startA = time.time()
             workflows_uuid = bwo.id_workflow
             if workflows_uuid and workflows_uuid not in workflows_cache:
-                workflows_cache[workflows_uuid] = workflows[Workflow.query.filter(Workflow.uuid == workflows_uuid).one().name]()
-            all_parameters = {"record": data, "extra_data": extra_data,
-                              "bwo": bwo}
-            if not isinstance(ssearch, list):
-                if "," in ssearch:
-                    ssearch = ssearch.split(",")
-                else:
-                    ssearch = [ssearch]
+                workflows_cache[workflows_uuid] = workflows[Workflow.query.get(workflows_uuid).name]()
+
             if workflows_uuid:
                 checking_functions = {"title": workflows_cache[workflows_uuid].get_title,
                                       "description": workflows_cache[workflows_uuid].get_description,
@@ -590,28 +586,18 @@ def get_holdingpen_objects(isortcol_0=None,
                                       "created": get_pretty_date,
                                       "type": get_type
                                       }
-            confirm = 0
-            to_add = True
+            startB = time.time()
+            for function in checking_functions:
+                if check_ssearch_over_data(ssearch, checking_functions[function](bwo)):
+                    bwobject_list_tmp.append(bwo)
+                    break
+            else:
+                print "A {0}, B {1}, ratio {2}".format(time.time() - startA,time.time() - startB,(time.time() - startB)/(time.time() - startA))
+                break  # executed if the loop ended normally (no break)
+            print "A {0}, B {1}, ratio {2}".format(time.time() - startA,time.time() - startB,(time.time() - startB)/(time.time() - startA))
+            continue
 
-            for term in ssearch:
-                for function in checking_functions:
-                    function = checking_functions[function]
-                    func_code = function.func_code
-                    if check_ssearch_over_data(term, function(
-                                               **dict((func_code.co_varnames[i],
-                                                       all_parameters[func_code.co_varnames[i]])
-                                                      for i in range(0, func_code.co_argcount)))):
-                        confirm += 1
-                if confirm == 0:
-                    to_add = False
-                confirm = 0
-
-            if to_add:
-                bwobject_list_tmp.append(bwo)
         bwobject_list = bwobject_list_tmp
-    if isortcol_0 == -6:
-        if ssortdir_0 == 'desc':
-            bwobject_list.reverse()
     return bwobject_list
 
 
@@ -630,15 +616,15 @@ def check_ssearch_over_data(ssearch, data):
             ssearch = [ssearch]
     if not isinstance(data, list):
         data = [data]
-    count = 0
+
+    result = True
+
     for terms in ssearch:
         for datum in data:
-            if terms.lower() in datum.lower():
-                count += 1
-    if count > 0:
-        return True
-    else:
-        return False
+            if terms.lower() not in datum.lower():
+                result = False
+                break
+    return result
 
 
 def get_pretty_date(bwo):

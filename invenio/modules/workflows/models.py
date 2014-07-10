@@ -37,7 +37,6 @@ from .logger import get_logger, BibWorkflowLogHandler
 
 
 class ObjectVersion(object):
-
     """Specify the different ObjectVersion possible."""
 
     INITIAL = 0
@@ -45,7 +44,9 @@ class ObjectVersion(object):
     HALTED = 2
     RUNNING = 3
     MAPPING = {0: "New,", 1: "Done,", 2: "Need action,",
-                             3: "In process,"}
+               3: "In process,"}
+    REVERSE_MAPPING = {"New": 0, "Done": 1, "Need action": 2,
+                       "In process": 3}
 
 
 def get_default_data():
@@ -69,7 +70,6 @@ def get_default_extra_data():
 
 
 class Workflow(db.Model):
-
     """It is a class representing a workflow."""
 
     __tablename__ = "bwlWORKFLOW"
@@ -225,7 +225,6 @@ class Workflow(db.Model):
 
 
 class BibWorkflowObject(db.Model):
-
     """Represent a BibWorkflowObject."""
 
     # db table definition
@@ -307,10 +306,10 @@ class BibWorkflowObject(db.Model):
         """ Enable equal operators on BibWorkflowObjects."""
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
-                    self._extra_data == other._extra_data and \
-                    self.id_workflow == other.id_workflow and \
-                    self.version == other.version and \
-                    self.id_parent == other.id_parent and \
+                            self._extra_data == other._extra_data and \
+                            self.id_workflow == other.id_workflow and \
+                            self.version == other.version and \
+                            self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
                 return True
@@ -378,6 +377,7 @@ class BibWorkflowObject(db.Model):
             extra_data = self.get_extra_data()
             if "_widget" in extra_data:
                 import warnings
+
                 warnings.warn("Widget's are now stored in '_action'",
                               DeprecationWarning)
                 # Migrate to new naming
@@ -594,7 +594,6 @@ class BibWorkflowObject(db.Model):
 
 
 class BibWorkflowObjectLog(db.Model):
-
     """Represent a BibWorkflowObjectLog.
 
     This class represent a record of a log emit by an object
@@ -658,7 +657,6 @@ class BibWorkflowObjectLog(db.Model):
 
 
 class BibWorkflowEngineLog(db.Model):
-
     """ Represent a BibWorkflowEngineLog object."""
 
     __tablename__ = "bwlWORKFLOWLOGGING"

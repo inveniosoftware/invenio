@@ -51,7 +51,6 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
             this.tag.init();
             this.datatable = window.WORKFLOWS_HP_SELECTION;
             this.utilities = window.WORKFLOWS_HP_UTILITIES;
-            this.utilities.init();
             this.datatable.init(this.oTable, this.oSettings);
             this.utilities.autorefresh();
         },
