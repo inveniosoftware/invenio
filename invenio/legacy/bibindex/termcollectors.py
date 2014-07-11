@@ -22,19 +22,18 @@ BibIndex termcollectors.
 
 import fnmatch
 
-from invenio.bibindex_engine_utils import list_union, \
+from invenio.legacy.bibindex.engine_utils import list_union, \
     UnknownTokenizer, \
     get_values_recursively
-from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZER_TYPE
-from invenio.dbquery import run_sql
-from invenio.bibdocfile import BibRecDocs
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_TOKENIZER_TYPE
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibdocfile.api import BibRecDocs
+from invenio.legacy.search_engine.utils import get_fieldvalues
 
-from invenio.bibauthority_engine import get_index_strings_by_control_no
-from invenio.bibauthority_config import \
+from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no
+from invenio.legacy.bibauthority.config import \
     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
-from invenio.bibfield import get_record
-
+from invenio.modules.records.api import get_record
 
 class TermCollector(object):
     """
@@ -206,4 +205,3 @@ class NonmarcTermCollector(TermCollector):
             if new_words:
                 termslist[recID] = list_union(new_words, termslist[recID])
         return termslist
-
