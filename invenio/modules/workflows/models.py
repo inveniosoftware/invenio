@@ -18,33 +18,33 @@
 
 """Models for BibWorkflow Objects."""
 
-import collections
 import os
 import tempfile
 import base64
 import logging
 from six.moves import cPickle
-from six import string_types, iteritems, callable
+from six import iteritems, callable
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 
-from .utils import (redis_create_search_entry, WorkflowsTaskResult,
+from .utils import (WorkflowsTaskResult,
                     session_manager)
 from .logger import get_logger, BibWorkflowLogHandler
 
 
 class ObjectVersion(object):
-    """Specify the different ObjectVersion possible."""
+
+    """Specify the different versions possible."""
 
     INITIAL = 0
     FINAL = 1
     HALTED = 2
     RUNNING = 3
-    MAPPING = {0: "New,", 1: "Done,", 2: "Need action,",
-               3: "In process,"}
+    MAPPING = {0: "New", 1: "Done", 2: "Need action",
+               3: "In process"}
     REVERSE_MAPPING = {"New": 0, "Done": 1, "Need action": 2,
                        "In process": 3}
 
@@ -70,7 +70,11 @@ def get_default_extra_data():
 
 
 class Workflow(db.Model):
-    """It is a class representing a workflow."""
+
+    """Represents a workflow instance.
+
+    Used by BibWorkflowEngine to store the state of the workflow.
+    """
 
     __tablename__ = "bwlWORKFLOW"
 
@@ -225,7 +229,36 @@ class Workflow(db.Model):
 
 
 class BibWorkflowObject(db.Model):
-    """Represent a BibWorkflowObject."""
+
+    """Represents a BibWorkflowObject.
+
+    Main object being passed around in the workflows module
+    when using the workflows API.
+
+    It can be instantiated like this:
+
+        >>> obj = BibWorkflowObject()
+
+    Or, like this:
+
+        >>> obj = BibWorkflowObject.create_object()
+
+    This object provides some handy functions such as:
+
+        >>> obj.set_data("<xml ..... />")
+        >>> obj.get_data() == "<xml ..... />"
+        >>> obj.set_extra_data({"param": value})
+        >>> obj.get_extra_data() == {"param": value}
+        >>> obj.add_task_result(name="myresult", result=1)
+
+    Then to finally save the object
+
+        >>> obj.save()
+
+    Now you can for example run it in a workflow:
+
+        >>> obj.start_workflow("sample_workflow")
+    """
 
     # db table definition
     __tablename__ = "bwlOBJECT"
@@ -294,6 +327,19 @@ class BibWorkflowObject(db.Model):
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
 
+    def get_formatted_data(self, of="hd"):
+        """Get the formatted representation for this object."""
+        from .registry import workflows
+        try:
+            workflow_definition = workflows[Workflow.query.get(self.id_workflow).name]
+            formatted_data = workflow_definition().formatter(self, formatter=None, format=of)
+        except AttributeError:
+            # Somehow the workflow does not exist (.name)
+            from invenio.ext.logging import register_exception
+            register_exception(alert_admin=True)
+            formatted_data = ""
+        return formatted_data
+
     def __repr__(self):
         """Represent a BibWorkflowObject."""
         return "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
@@ -306,10 +352,10 @@ class BibWorkflowObject(db.Model):
         """ Enable equal operators on BibWorkflowObjects."""
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
-                            self._extra_data == other._extra_data and \
-                            self.id_workflow == other.id_workflow and \
-                            self.version == other.version and \
-                            self.id_parent == other.id_parent and \
+                    self._extra_data == other._extra_data and \
+                    self.id_workflow == other.id_workflow and \
+                    self.version == other.version and \
+                    self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
                 return True
@@ -534,8 +580,6 @@ class BibWorkflowObject(db.Model):
             if version != self.version:
                 self.modified = datetime.now()
             self.version = version
-            if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
-                redis_create_search_entry(self)
         if id_workflow is not None:
             self.id_workflow = id_workflow
         db.session.add(self)
@@ -594,12 +638,12 @@ class BibWorkflowObject(db.Model):
 
 
 class BibWorkflowObjectLog(db.Model):
-    """Represent a BibWorkflowObjectLog.
+
+    """Represents a log entry for BibWorkflowObjects.
 
     This class represent a record of a log emit by an object
-    into the database the object must be saved before using
-    this class. Indeed it needs the id of the object into
-    the database.
+    into the database. The object must be saved before using
+    this class as it requires the object id.
     """
 
     __tablename__ = 'bwlOBJECTLOGGING'
@@ -657,7 +701,13 @@ class BibWorkflowObjectLog(db.Model):
 
 
 class BibWorkflowEngineLog(db.Model):
-    """ Represent a BibWorkflowEngineLog object."""
+
+    """Represents a log entry for BibWorkflowEngine.
+
+    This class represent a record of a log emit by an object
+    into the database. The object must be saved before using
+    this class as it requires the object id.
+    """
 
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)
