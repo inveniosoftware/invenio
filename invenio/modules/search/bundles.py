@@ -25,7 +25,8 @@ from invenio.base.bundles import invenio as _js, styles as _css
 _js.contents += ('js/search/search_parser.js',
                  'js/search/typeahead.js',
                  'js/search/default_typeahead_configuration.js',
-                 'js/search/facet.js')
+                 'js/search/facet.js',
+                 'js/search/search.js')
 
 _css.contents += ('css/typeahead.js-bootstrap.css',
                   'css/search/search.css',
