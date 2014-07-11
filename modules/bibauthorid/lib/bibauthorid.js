@@ -1891,7 +1891,7 @@ $(document).ready(function() {
       this.boxes = _.toArray( $( "div[data-box-source]" ) );
       this.hooks = {};
 
-      this.minTime = minTime || 2500; // Default to 2.5 seconds.
+      this.minTime = minTime || 5000; // Default to 5 seconds.
       this.concurrentRequests = num || 8; // Default to 8.
       this.baseUrl = "/author/profile/";
 
@@ -1930,7 +1930,6 @@ $(document).ready(function() {
 
           var $item = $( item );
           $item.data( {
-
             "boxDispatched": false,
             "boxLoaded": false,
             "boxDispatchTimestamp": 0
@@ -1986,13 +1985,17 @@ $(document).ready(function() {
 
               $box.data( "boxLoaded", false );
 
+
           },
 
           "complete": function ( jqXHR, textStatus ) {
+            var boxStates = loader.loadingState(loader),
+                delayedLoad = boxStates.delayedLoad.length > 0 && boxStates.toLoad.length < 1;
 
             // If the box didn't load, reset the dispatched flag.
             if ( $box.data( "boxLoaded" ) === false ) {
               $box.data( "boxDispatched", false );
+
             } else {
 
               runHook( $box, loader );
@@ -2001,6 +2004,11 @@ $(document).ready(function() {
 
             // Invoke loader to process any remaining boxes.
             loader.load();
+
+            // Use timer to give rate limited boxes a chance to load.
+            if (delayedLoad) {
+              setTimeout($.proxy(loader.load, loader), loader.minTime);
+            }
 
           }
         };
@@ -2016,14 +2024,14 @@ $(document).ready(function() {
 
       };
 
-      loadingState = function getLoadingState( obj ) {
+      this.loadingState = function getLoadingState( obj ) {
 
-        var inProgress = 0, queue;
+        var inProgress = 0, queue, delayed = null;
 
         // Generate list of boxes to load
         queue = _.filter( obj.boxes, function( box ) {
-
-          var toLoad = false, $box = $( box );
+          var toLoad = false,
+              $box = $( box );
 
           // Count number requests currently in progress.
           if ( $( box ).data( "boxDispatched" ) && ! $( box ).data( "boxLoaded" ) ) {
@@ -2040,11 +2048,30 @@ $(document).ready(function() {
 
         });
 
+        // Generate list of boxes that should load but are time limited
+        delayed = _.filter( obj.boxes, function( box ) {
+          var toLoad = false,
+              $box = $( box );
+
+          // Count number requests currently in progress.
+          if ( $( box ).data( "boxDispatched" ) && ! $( box ).data( "boxLoaded" ) ) {
+
+            inProgress ++;
+
+          }
+
+          toLoad = ! $box.data( "boxLoaded" ); // Boxes that aren't loaded.
+          toLoad &= ! $box.data( "boxDispatched" ); // And boxes that aren't dispatched already.
+          toLoad &= ! requestAllowed( box, obj.minTime );
+
+          return toLoad;
+
+        });
+
         return {
-
           "inProgressCount": inProgress,
-          "toLoad": queue
-
+          "toLoad": queue,
+          "delayedLoad": delayed
         };
 
       };
@@ -2079,7 +2106,7 @@ $(document).ready(function() {
       this.load = function loadBoxes() {
 
         var loader = this,
-            state = loadingState( this ),
+            state = this.loadingState( this ),
             inProgress = state.inProgressCount,
             queue = state.toLoad,
             qtyToLoad = ( this.concurrentRequests - inProgress ),
@@ -2090,7 +2117,6 @@ $(document).ready(function() {
           var randSample = _.sample( queue, qtyToLoad );
 
           _.map( randSample, function(item) {
-
             dispatch( item, loader );
 
           });
