@@ -741,6 +741,7 @@ class Tag(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     value = db.Column(db.Char(6), nullable=False)
+    recjson_value = db.Column(db.Text)
 
     def __init__(self, tup=None, *args, **kwargs):
         if tup is not None and isinstance(tup, tuple):
