@@ -39,7 +39,6 @@ from invenio.config import CFG_SOLR_URL
 from invenio.legacy.bibindex.engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_MYSQL_THREAD_TIMEOUT, \
      CFG_CHECK_MYSQL_THREADS, \
-     CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
@@ -51,10 +50,6 @@ from invenio.legacy.bibauthority.config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no,\
      get_control_nos_from_recID
-from invenio.legacy.bibindex.adminlib import get_idx_remove_html_markup, \
-                                     get_idx_remove_latex_markup, \
-                                     get_idx_remove_stopwords
-from invenio.legacy.bibdocfile.api import BibRecDocs
 from invenio.legacy.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms, \
@@ -74,10 +69,13 @@ from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_TAG, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+from invenio.legacy.bibindex.termcollectors import TermCollector
 from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_all_index_names_and_column_values, \
     get_index_tags, \
-    get_tag_indexes, \
+    get_field_tags, \
+    get_marc_tag_indexes, \
+    get_nonmarc_tag_indexes, \
     get_all_indexes, \
     get_index_virtual_indexes, \
     get_virtual_index_building_blocks, \
@@ -85,13 +83,27 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes, \
+    get_all_synonym_knowledge_bases, \
+    get_index_remove_stopwords, \
+    get_index_remove_html_markup, \
+    get_index_remove_latex_markup, \
     filter_for_virtual_indexes, \
     get_records_range_for_index, \
     make_prefix, \
-    UnknownTokenizer
-from invenio.legacy.bibrecord import get_fieldvalues
+    list_union, \
+    recognize_marc_tag
 from invenio.modules.records.api import get_record
 from invenio.utils.memoise import Memoise
+from invenio.legacy.bibindex.termcollectors import \
+    TermCollector, \
+    NonmarcTermCollector
+
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable=W0622
+    from sets import Set as set
+    # pylint: enable=W0622
+
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -107,22 +119,13 @@ _last_word_table = None
 _TOKENIZERS = load_tokenizers()
 
 
-def list_union(list1, list2):
-    "Returns union of the two lists."
-    union_dict = {}
-    for e in list1:
-        union_dict[e] = 1
-    for e in list2:
-        union_dict[e] = 1
-    return union_dict.keys()
-
-
 def list_unique(_list):
     """Returns a _list with duplicates removed."""
     _dict = {}
     for e in _list:
         _dict[e] = 1
     return _dict.keys()
+
 
 ## safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS,
@@ -305,67 +308,14 @@ def remove_subfields(s):
 
 def get_field_indexes(field):
     """Returns indexes names and ids corresponding to the given field"""
-    if field[0:3].isdigit():
+    if recognize_marc_tag(field):
         #field is actually a tag
-        return get_tag_indexes(field, virtual=False)
+        return get_marc_tag_indexes(field, virtual=False)
     else:
-        #future implemeptation for fields
-        return []
+        return get_nonmarc_tag_indexes(field, virtual=False)
+
 
 get_field_indexes_memoised = Memoise(get_field_indexes)
-
-
-def get_all_synonym_knowledge_bases():
-    """
-        Returns a dictionary of name key and knowledge base name
-        and match type tuple value information of all defined words indexes
-        that have knowledge base information.
-        Returns empty dictionary in case there are no tags indexed.
-        Example: output['global'] = ('INDEX-SYNONYM-TITLE', 'exact'),
-                 output['title'] = ('INDEX-SYNONYM-TITLE', 'exact').
-    """
-    res = get_all_index_names_and_column_values("synonym_kbrs")
-    out = {}
-    for row in res:
-        kb_data = row[1]
-        # ignore empty strings
-        if len(kb_data):
-            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
-    return out
-
-
-def get_index_remove_stopwords(index_id):
-    """Returns value of a remove_stopword field from idxINDEX database table
-       if it's not 'No'. If it's 'No' returns False.
-       Just for consistency with WordTable.
-       @param index_id: id of the index
-    """
-    result = get_idx_remove_stopwords(index_id)
-    if isinstance(result, tuple):
-        return False
-    if result == 'No' or result == '':
-        return False
-    return result
-
-
-def get_index_remove_html_markup(index_id):
-    """ Gets remove_html_markup parameter from database ('Yes' or 'No') and
-        changes it  to True, False.
-        Just for consistency with WordTable."""
-    result = get_idx_remove_html_markup(index_id)
-    if result == 'Yes':
-        return True
-    return False
-
-
-def get_index_remove_latex_markup(index_id):
-    """ Gets remove_latex_markup parameter from database ('Yes' or 'No') and
-        changes it  to True, False.
-        Just for consistency with WordTable."""
-    result = get_idx_remove_latex_markup(index_id)
-    if result == 'Yes':
-        return True
-    return False
 
 
 def get_index_tokenizer(index_id):
@@ -1256,19 +1206,23 @@ class WordTable(AbstractIndexTable):
         For furher reading see description of this method.
     """
 
-    def __init__(self, index_name, fields_to_index, table_type, table_prefix="", wash_index_terms=50):
+    def __init__(self, index_name, table_type, table_prefix="", wash_index_terms=50):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
-        @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
         @param table_type: type of the wordtable: Words, Pairs, Phrases
+        @param table_prefix: prefix for table name, indexing will be performed
+            on table: <<table_prefix>>idx<<wordtable_type>>XXF
         @param wash_index_terms: do we wash index terms, and if yes (when >0),
             how many characters do we keep in the index terms; see
             max_char_length parameter of wash_index_term()
         """
         AbstractIndexTable.__init__(self, index_name, table_type, table_prefix, wash_index_terms)
-        self.fields_to_index = fields_to_index
+        self.tags = get_index_tags(index_name, virtual=False)
+        self.nonmarc_tags = get_index_tags(index_name,
+                                           virtual=False,
+                                           tagtype="nonmarc")
         self.timestamp = datetime.now()
 
         self.virtual_indexes = get_index_virtual_indexes(self.index_id)
@@ -1300,7 +1254,8 @@ class WordTable(AbstractIndexTable):
             tokenizer is independent of index.
         """
         special_tags = {}
-        for tag in self.fields_to_index:
+        fields = self.tags + self.nonmarc_tags
+        for tag in fields:
             if tag in CFG_BIBINDEX_SPECIAL_TAGS:
 
                 for t in CFG_BIBINDEX_INDEX_TABLE_TYPE:
@@ -1472,38 +1427,23 @@ class WordTable(AbstractIndexTable):
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
-        tokenizing_function = self.default_tokenizer_function
-        if self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["recjson"]:
-            # use bibfield instead of directly consulting bibrec
-            for recID in range(recID1, recID2 + 1):
-                record = get_record(recID)
-                if record:
-                    new_words = tokenizing_function(record)
-                    if recID not in wlist:
-                        wlist[recID] = []
-                    wlist[recID] = list_union(new_words, wlist[recID])
-        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["multifield"]:
-            # tokenizers operating on multiple fields/tags at a time
-            for recID in range(recID1, recID2 + 1):
-                new_words = tokenizing_function(recID)
-                if recID not in wlist:
-                    wlist[recID] = []
-                wlist[recID] = list_union(new_words, wlist[recID])
-        elif self.tokenizer_type == CFG_BIBINDEX_TOKENIZER_TYPE["string"]:
-            # tokenizers operating on one field/tag and phrase at a time
-            for tag in self.fields_to_index:
-                tokenizing_function = self.special_tags.get(tag, self.default_tokenizer_function)
-                phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
-                for row in sorted(phrases):
-                    recID, phrase = row
-                    if recID not in wlist:
-                        wlist[recID] = []
-                    new_words = tokenizing_function(phrase)
-                    wlist[recID] = list_union(new_words, wlist[recID])
-        else:
-            raise UnknownTokenizer("Tokenizer has not been recognized: %s" \
-                                    % self.tokenizer.__class__.__name__)
-
+        marc, nonmarc = self.find_nonmarc_records(recID1, recID2)
+        if marc:
+            collector = TermCollector(self.tokenizer,
+                                      self.tokenizer_type,
+                                      self.table_type,
+                                      self.tags,
+                                      [recID1, recID2])
+            collector.set_special_tags(self.special_tags)
+            wlist = collector.collect(marc, wlist)
+        if nonmarc:
+            collector = NonmarcTermCollector(self.tokenizer,
+                                             self.tokenizer_type,
+                                             self.table_type,
+                                             self.nonmarc_tags,
+                                             [recID1, recID2])
+            collector.set_special_tags(self.special_tags)
+            wlist = collector.collect(nonmarc, wlist)
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()
@@ -1547,42 +1487,27 @@ class WordTable(AbstractIndexTable):
                 put(recID, w, 1)
         return len(recIDs)
 
-
-    def get_phrases_for_tokenizing(self, tag, first_recID, last_recID):
-        """Gets phrases for later tokenization for a range of records and
-           specific tag.
-           @param tag: MARC tag
-           @param first_recID: first recID from the range of recIDs to index
-           @param last_recID: last recID from the range of recIDs to index
-        """
-        bibXXx = "bib" + tag[0] + tag[1] + "x"
-        bibrec_bibXXx = "bibrec_" + bibXXx
-        query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
-                   WHERE bb.id_bibrec BETWEEN %%s AND %%s
-                   AND bb.id_bibxxx=b.id AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
-        phrases = run_sql(query, (first_recID, last_recID, tag))
-        if tag == '8564_u':
-            ## FIXME: Quick hack to be sure that hidden files are
-            ## actually indexed.
-            phrases = set(phrases)
-            for recid in xrange(int(first_recID), int(last_recID) + 1):
-                for bibdocfile in BibRecDocs(recid).list_latest_files():
-                    phrases.add((recid, bibdocfile.get_url()))
-        #authority records
-        pattern = tag.replace('%', '*')
-        matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
-        if not len(matches):
-            return phrases
-        phrases = set(phrases)
-        for tag_match in matches:
-            authority_tag = tag_match[0:3] + "__0"
-            for recID in xrange(int(first_recID), int(last_recID) + 1):
-                control_nos = get_fieldvalues(recID, authority_tag)
-                for control_no in control_nos:
-                    new_strings = get_index_strings_by_control_no(control_no)
-                    for string_value in new_strings:
-                        phrases.add((recID, string_value))
-        return phrases
+    def find_nonmarc_records(self, recID1, recID2):
+        """Divides recID range into two different tables,
+           first one contains only recIDs of the records that
+           are Marc type and the second one contains records
+           of nonMarc type"""
+        marc = range(recID1, recID2 + 1)
+        nonmarc = []
+        query = """SELECT id FROM %s WHERE master_format <> 'marc'
+                   AND id BETWEEN %%s AND %%s""" % "bibrec"
+        res = run_sql(query, (recID1, recID2))
+        if res:
+            nonmarc = list(zip(*res)[0])
+            if len(nonmarc) == (recID2 - recID1 + 1):
+                nonmarc = xrange(recID1, recID2 + 1)
+                marc = []
+            else:
+                for recID in nonmarc:
+                    marc.remove(recID)
+        else:
+            marc = xrange(recID1, recID2 + 1)
+        return [marc, nonmarc]
 
     def log_progress(self, start, done, todo):
         """Calculate progress and store it.
@@ -2129,8 +2054,8 @@ def remove_dependent_index(virtual_indexes, dependent_index):
         return
 
     id_dependent = get_index_id_from_index_name(dependent_index)
-    wordTables = get_word_tables(virtual_indexes)
-    for index_id, index_name, index_tags in wordTables:
+    for index_name in virtual_indexes:
+        index_id = get_index_id_from_index_name(index_name)
         for type_ in CFG_BIBINDEX_INDEX_TABLE_TYPE.itervalues():
             vit = VirtualIndexTable(index_name, type_)
             vit.remove_dependent_index(dependent_index)
@@ -2139,6 +2064,7 @@ def remove_dependent_index(virtual_indexes, dependent_index):
         query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
 
+
 def should_update_virtual_indexes():
     """
         Decides if any virtual indexes should be updated.
@@ -2146,6 +2072,7 @@ def should_update_virtual_indexes():
         from CLI.
     """
     return task_get_option("all-virtual") or task_get_option("windex")
+
 
 def update_virtual_indexes(virtual_indexes, reindex=False):
     """
@@ -2193,31 +2120,24 @@ def task_run_core():
     virtual_indexes = filter_for_virtual_indexes(indexes)
     regular_indexes = list(set(indexes) - set(virtual_indexes))
 
-
     # check tables consistency
     if task_get_option("cmd") == "check":
-        wordTables = get_word_tables(indexes)
-        for index_id, index_name, index_tags in wordTables:
+        for index_name in indexes:
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   wash_index_terms=100)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                                   wash_index_terms=0)
             _last_word_table = wordTable
@@ -2247,19 +2167,19 @@ def task_run_core():
                                                        task_get_option("reindex") or \
                                                        task_get_option("cmd") == "del"))
 
-    wordTables = get_word_tables(recIDs_for_index.keys())
-    if not wordTables:
+    if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")
 
+
     # Let's work on single words!
-    for index_id, index_name, index_tags in wordTables:
+    for index_name in recIDs_for_index.keys():
+        index_id = get_index_id_from_index_name(index_name)
         reindex_prefix = ""
         if task_get_option("reindex"):
             reindex_prefix = "tmp_"
             init_temporary_reindex_tables(index_id, reindex_prefix)
 
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=50)
@@ -2299,7 +2219,6 @@ def task_run_core():
 
         # Let's work on pairs now
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=100)
@@ -2339,7 +2258,6 @@ def task_run_core():
 
         # Let's work on phrases now
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                               table_prefix=reindex_prefix,
                               wash_index_terms=0)

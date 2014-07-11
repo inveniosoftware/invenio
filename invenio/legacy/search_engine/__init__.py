@@ -110,7 +110,8 @@ from invenio.legacy.bibrank.downloads_similarity import register_page_view_event
 from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 from invenio.modules.indexer.tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
-from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search
+from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search, \
+    get_field_tags
 from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
 from invenio.legacy.bibindex.adminlib import get_idx_indexer
@@ -3729,18 +3730,6 @@ def get_field_name(code):
     else:
         return ""
 
-def get_field_tags(field):
-    """Returns a list of MARC tags for the field code 'field'.
-       Returns empty list in case of error.
-       Example: field='author', output=['100__%','700__%']."""
-    out = []
-    query = """SELECT t.value FROM tag AS t, field_tag AS ft, field AS f
-                WHERE f.code=%s AND ft.id_field=f.id AND t.id=ft.id_tag
-                ORDER BY ft.score DESC"""
-    res = run_sql(query, (field, ))
-    for val in res:
-        out.append(val[0])
-    return out
 
 def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
     """Return buffer of ALEPH sequential-like textual format with fields found

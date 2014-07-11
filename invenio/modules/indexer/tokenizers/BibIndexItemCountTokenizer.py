@@ -43,6 +43,14 @@ class BibIndexItemCountTokenizer(BibIndexRecJsonTokenizer):
             return []
         return [str(count)]
 
+    def tokenize_for_words(self, record):
+        return self.tokenize(record)
+
+    def tokenize_for_pairs(self, record):
+        return self.tokenize(record)
+
+    def tokenize_for_phrases(self, record):
+        return self.tokenize(record)
 
     def get_tokenizing_function(self, wordtable_type):
         return self.tokenize

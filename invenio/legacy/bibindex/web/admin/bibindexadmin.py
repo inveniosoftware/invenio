@@ -50,7 +50,7 @@ def deletetag(req, fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm=-1
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addtag(req, fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback='yes', confirm=-1):
+def addtag(req, fldID, ln=CFG_SITE_LANG, name='', value='', recjson_value='', existing_tag=-1, callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (CFG_SITE_URL)
 
     try:
@@ -63,7 +63,9 @@ def addtag(req, fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback='yes',
         return page(title="Edit Logical Field",
                     body=bic.perform_addtag(fldID=fldID,
                                             ln=ln,
+                                            existing_tag=existing_tag,
                                             value=value,
+                                            recjson_value=recjson_value,
                                             name=name,
                                             callback=callback,
                                             confirm=confirm),
@@ -451,7 +453,7 @@ def modifytokenizer(req, idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', con
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='yes', confirm=-1):
+def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', recjson_value='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (CFG_SITE_URL)
 
     try:
@@ -467,6 +469,7 @@ def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='
                                                ln=ln,
                                                name=name,
                                                value=value,
+                                               recjson_value=recjson_value,
                                                callback=callback,
                                                confirm=confirm),
                     uid=uid,

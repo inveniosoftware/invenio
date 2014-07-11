@@ -32,6 +32,7 @@ from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
+from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -58,7 +59,6 @@ def load_tokenizers():
         getattr(module, module.__name__.split('.')[-1], ''))
         for module in tokenizers)
 
-
 def get_all_index_names_and_column_values(column_name):
     """Returns a list of tuples of name and another column of all defined words indexes.
        Returns empty list in case there are no tags indexed in this index or in case
@@ -74,6 +74,61 @@ def get_all_index_names_and_column_values(column_name):
         write_message("Exception caught for SQL statement: %s; column %s might not exist" % (query, column_name), sys.stderr)
     return out
 
+
+def get_all_synonym_knowledge_bases():
+    """Returns a dictionary of name key and knowledge base name and match type tuple value
+        information of all defined words indexes that have knowledge base information.
+        Returns empty dictionary in case there are no tags indexed.
+        Example: output['global'] = ('INDEX-SYNONYM-TITLE', 'exact'), output['title'] = ('INDEX-SYNONYM-TITLE', 'exact')."""
+    res = get_all_index_names_and_column_values("synonym_kbrs")
+    out = {}
+    for row in res:
+        kb_data = row[1]
+        # ignore empty strings
+        if len(kb_data):
+            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
+    return out
+
+
+def get_index_remove_stopwords(index_id):
+    """Returns value of a remove_stopword field from idxINDEX database table
+       if it's not 'No'. If it's 'No' returns False.
+       Just for consistency with WordTable.
+       @param index_id: id of the index
+    """
+    try:
+        result = run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'No' or result == '':
+        return False
+    return result
+
+
+def get_index_remove_html_markup(index_id):
+    """ Gets remove_html_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    try:
+        result = run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'Yes':
+        return True
+    return False
+
+
+def get_index_remove_latex_markup(index_id):
+    """ Gets remove_latex_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    try:
+        result = run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'Yes':
+        return True
+    return False
 
 
 def author_name_requires_phrase_search(p):
@@ -232,19 +287,36 @@ def get_index_name_from_index_id(index_id):
     return ''
 
 
-def get_field_tags(field):
-    """Returns a list of MARC tags for the field code 'field'.
+def get_field_tags(field, tagtype="marc"):
+    """Returns a list of tags for the field code 'field'. Works
+       for both MARC and nonMARC tags.
        Returns empty list in case of error.
-       Example: field='author', output=['100__%','700__%']."""
+       Example: field='author', output=['100__%','700__%'].
+       @param tagtype: can be: "marc" or "nonmarc", default value
+            is "marc" for backward compatibility
+    """
     out = []
-    query = """SELECT t.value FROM tag AS t, field_tag AS ft, field AS f
-                WHERE f.code=%s AND ft.id_field=f.id AND t.id=ft.id_tag
+    query = """SELECT t.%s FROM tag AS t,
+                                field_tag AS ft,
+                                field AS f
+                WHERE f.code=%%s AND
+                ft.id_field=f.id AND
+                t.id=ft.id_tag
                 ORDER BY ft.score DESC"""
-    res = run_sql(query, (field,))
-    return [row[0] for row in res]
+    if tagtype == "marc":
+        query = query % "value"
+        res = run_sql(query, (field,))
+        return [row[0] for row in res]
+    else:
+        query = query % "recjson_value"
+        res = run_sql(query, (field,))
+        values = []
+        for row in res:
+            values.extend(row[0].split(","))
+        return values
 
 
-def get_tag_indexes(tag, virtual=True):
+def get_marc_tag_indexes(tag, virtual=True):
     """Returns indexes names and ids corresponding to the given tag
        @param tag: MARC tag in one of the forms:
             'xx%', 'xxx', 'xxx__a', 'xxx__%'
@@ -282,21 +354,64 @@ def get_tag_indexes(tag, virtual=True):
             response.extend(run_sql(query))
             return tuple(response)
         return res
-    return None
+    return ()
 
 
-def get_index_tags(indexname, virtual=True):
+def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
+    """Returns index names and ids corresponding to the given nonmarc tag
+       (nonmarc tag can be also called 'bibfield field').
+       If param 'virtual' is set to True function will also return
+       virtual indexes"""
+    query = """SELECT DISTINCT w.id, w.name FROM idxINDEX AS w,
+                                                 idxINDEX_field AS wf,
+                                                 field_tag AS ft,
+                                                 tag as t
+               WHERE (t.recjson_value LIKE %s OR
+                      t.recjson_value LIKE %s OR
+                      t.recjson_value LIKE %s OR
+                      t.recjson_value=%s) AND
+                     t.id=ft.id_tag AND
+                     ft.id_field=wf.id_field AND
+                     wf.id_idxINDEX=w.id"""
+
+    at_the_begining = nonmarc_tag + ',%%'
+    in_the_middle = '%%,' + nonmarc_tag + ',%%'
+    at_the_end = '%%,' + nonmarc_tag
+
+    res = run_sql(query, (at_the_begining, in_the_middle, at_the_end, nonmarc_tag))
+    if res:
+        if virtual:
+            response = list(res)
+            index_ids = map(str, zip(*res)[0])
+            query = """SELECT DISTINCT v.id_virtual,w.name FROM idxINDEX_idxINDEX AS v,
+                                                                idxINDEX as w
+                       WHERE v.id_virtual=w.id AND
+                             v.id_normal IN ("""
+            query = query + ", ".join(index_ids) + ")"
+            response.extend(run_sql(query))
+            return tuple(response)
+        return res
+    return ()
+
+
+def get_index_tags(indexname, virtual=True, tagtype="marc"):
     """Returns the list of tags that are indexed inside INDEXNAME.
        Returns empty list in case there are no tags indexed in this index.
        Note: uses get_field_tags() defined before.
-       Example: field='author', output=['100__%', '700__%']."""
+       Example: field='author', output=['100__%', '700__%'].
+       @param tagtype: can be: "marc" or "nonmarc", default value
+            is "marc" for backward compatibility
+    """
     out = []
-    query = """SELECT f.code FROM idxINDEX AS w, idxINDEX_field AS wf,
-    field AS f WHERE w.name=%s AND w.id=wf.id_idxINDEX
-    AND f.id=wf.id_field"""
+    query = """SELECT f.code FROM idxINDEX AS w,
+                                  idxINDEX_field AS wf,
+                                  field AS f
+               WHERE w.name=%s AND
+                     w.id=wf.id_idxINDEX AND
+                     f.id=wf.id_field"""
     res = run_sql(query, (indexname,))
     for row in res:
-        out.extend(get_field_tags(row[0]))
+        out.extend(get_field_tags(row[0], tagtype))
     if not out and virtual:
         index_id = get_index_id_from_index_name(indexname)
         try:
@@ -311,8 +426,9 @@ def get_index_tags(indexname, virtual=True):
         query = query + ", ".join(dependent_indexes) + ")"
         res = run_sql(query)
         for row in res:
-            tags |= set(get_field_tags(row[0]))
-        return list(tags)
+            tags |= set(get_field_tags(row[0], tagtype))
+        out = list(tags)
+    out = [tag for tag in out if tag]
     return out
 
 
@@ -368,3 +484,70 @@ def make_prefix(index_name):
 
 class UnknownTokenizer(Exception):
     pass
+
+
+def list_union(list1, list2):
+    "Returns union of the two lists."
+    union_dict = {}
+    for e in list1:
+        union_dict[e] = 1
+    for e in list2:
+        union_dict[e] = 1
+    return union_dict.keys()
+
+
+def get_index_fields(index_id):
+    """Returns fields that are connected to index specified by
+       index_id.
+    """
+    query = """SELECT f.id, f.name FROM field as f,
+                                        idxINDEX as w,
+                                        idxINDEX_field as wf
+               WHERE f.id=wf.id_field AND
+                     wf.id_idxINDEX=w.id AND
+                     w.id=%s
+            """
+    index_fields = run_sql(query, (index_id, ) )
+    return index_fields
+
+
+def recognize_marc_tag(tag):
+    """Checks if tag is a MARC tag or not"""
+    tag_len = len(tag)
+    if 3 <= tag_len <= 6  and tag[0:3].isdigit():
+        return True
+    if tag_len == 3 and tag[0:2].isdigit() and tag[2] == '%':
+        return True
+    return False
+
+
+def _is_collection(subfield):
+    """Checks if a type is a collection;
+       get_values_recursively internal function."""
+    return hasattr(subfield, '__iter__')
+
+
+def _get_values(subfield):
+    """Returns values of a subfield suitable for later tokenizing;
+       get_values_recursively internal function."""
+    if type(subfield) == dict:
+        return subfield.values()
+    else:
+        return subfield
+
+
+def get_values_recursively(subfield, phrases):
+    """Finds all values suitable for later tokenizing in
+       field/subfield of bibfield record.
+       @param subfield: name of the field/subfield
+       @param phrases: container for phrases (for example empty list)
+
+       FIXME: move this function to bibfield!
+       As soon as possible. Note that journal tokenizer
+       also needs to be changed.
+    """
+    if _is_collection(subfield):
+        for s in _get_values(subfield):
+            get_values_recursively(s, phrases)
+    elif subfield is not None:
+        phrases.append(str(subfield))

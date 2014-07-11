@@ -76,3 +76,10 @@ class BibIndexFilteringTokenizer(BibIndexMultiFieldTokenizer):
         except KeyError:
             return []
         return phrases
+
+    def tokenize_via_recjson(self, recID):
+        """
+        TODO: implementation needs to be introduced
+        in order to work with non-marc standards.
+        """
+        return []

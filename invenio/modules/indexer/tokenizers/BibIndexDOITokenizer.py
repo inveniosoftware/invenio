@@ -34,3 +34,20 @@ class BibIndexDOITokenizer(BibIndexFilteringTokenizer):
     def get_tokenizing_function(self, wordtable_type):
         """Returns proper tokenizing function"""
         return self.tokenize
+
+    def tokenize_via_recjson(self, recID):
+        """
+        Nonmarc version of tokenize function for DOI.
+        Note: with nonmarc we don't need to filter anymore.
+        We just need to take value from record because we
+        use bibfield here.
+        """
+        rec = get_record(recID)
+        values = rec.get('doi', [])
+        return values
+
+    def get_nonmarc_tokenizing_function(self, table_type):
+        """
+        Returns proper tokenizing function for non-marc records.
+        """
+        return self.tokenize_via_recjson

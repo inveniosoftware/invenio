@@ -3509,7 +3509,8 @@ CREATE TABLE IF NOT EXISTS field_tag (
 CREATE TABLE IF NOT EXISTS tag (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
-  value char(6) NOT NULL,
+  value varchar(6) default '',
+  recjson_value text,
   PRIMARY KEY  (id)
 ) ENGINE=MyISAM;
 
