@@ -23,6 +23,8 @@ Annotations.
 invenio.modules.annotations
 ---------------------------
 
+**FIXME: Outdated documentation.**
+
 To enable the module, make sure to remove it from ``PACKAGES_EXCLUDE``,
 where it is placed by default.
 

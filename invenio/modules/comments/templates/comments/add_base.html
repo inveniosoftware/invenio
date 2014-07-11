@@ -47,7 +47,7 @@
 {%- if not request.is_xhr -%}
   {% extends "records/base.html" %}
   {%- if config.ANNOTATIONS_NOTES_ENABLED -%}
-    {% bundle "10-comments.js" %}
+    {% bundle "comments.js" %}
   {%- endif -%}
   {% block record_content %}
   {{ add_comment() }}
