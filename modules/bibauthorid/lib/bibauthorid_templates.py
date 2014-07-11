@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
 # Copyright (C) 2011 CERN.
@@ -277,9 +277,9 @@ class WebProfilePage():
         for category in citations['breakdown_categories']:
             limits = category.split(')')[0].split('(')[1].strip('+').split('-')
             low = int(limits[0])
-            if len(limits) > 1 and limits[0] is not 0:
+            if len(limits) > 1 and int(limits[0]) != 0:
                 high = int(limits[1])
-            elif limits[0] is 0:
+            elif int(limits[0]) == 0:
                 high = 0
             else:
                 high = 1000000
