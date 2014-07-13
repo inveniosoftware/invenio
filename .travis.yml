@@ -53,7 +53,12 @@ install:
   - "sudo su -c \"npm install --silent -g bower grunt-cli less clean-css uglify-js requirejs\""
   - "npm install --silent"
   - "bower install"
-  - "travis_retry grunt"
+  - "travis_retry grunt" # Cheating to get assets in both places, it should be done in the overlay
+  - "rm bower.json"
+  - "echo {\\\"directory\\\": \\\"invenio/base/static/vendors\\\"} > .bowerrc"
+  - "echo {\\\"resolutions\\\": {\\\"jquery\\\": \\\"~1.11\\\", \\\"bootstrap\\\": \\\"~3.2\\\"}} > bower.json"
+  - "inveniomanage bower -i bower.json -x"
+  - "bower install"
   - "inveniomanage collect"
   - "inveniomanage assets build"
   - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things

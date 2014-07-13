@@ -153,20 +153,25 @@ For the rest of the tutorial you will need to check that you have ``git-new-work
     $ export PATH+=:$HOME/bin
 
 
-3. Quick instructions for the impatient Invenio admin
-------------------------------------------------------
+3. Quick instructions for the impatient Invenio developer
+---------------------------------------------------------
+
+This installation process is tailored for running the development version of
+Invenio, check **TODO** out for the production setup.
 
 3.1. Installation
 ~~~~~~~~~~~~~~~~~
 
 The first step of the installation is to download the development version of
-Invenio. This development is done in the ``pu`` branch.
+Invenio and the Invenio Demosite. This development is done in the ``pu``
+branch.
 
 .. code-block:: console
 
     $ cd $HOME/src/
     $ export BRANCH=pu
     $ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio.git
+    $ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio-demosite.git
 
 We recommend to work using
 `virtual environments <http://www.virtualenv.org/>`_ so packages are installed
@@ -183,19 +188,21 @@ locally and it will make your live easier. ``(invenio)$`` tells your that the
     $ workon invenio
     (invenio)$ # That's all there is to know about it.
 
-Let's install Invenio in the environment just created.
+Let's put Invenio and the Invenio Demosite in the environment just created.
 
 .. code-block:: console
 
     (invenio)$ cdvirtualenv
-    (invenio)$ mkdir src; cd src
+    (invenio)$ mkdir src
+    (invenio)$ cd src
     (invenio)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
-    (invenio)$ cd invenio
+    (invenio)$ git-new-workdir $HOME/src/invenio-demosite/ invenio-demosite $BRANCH
 
 Installing Invenio.
 
 .. code-block:: console
 
+    (invenio)$ cdvirtualenv src/invenio
     (invenio)$ pip install -r requirements.txt
 
 Some modules may require specific dependencies listed as ``extras``. Pick the
@@ -217,23 +224,63 @@ translations manually.
 
 Installing the npm dependencies and the external JavaScript and CSS libraries.
 
-..  FIXME
-    bower / grunt / inveniomanage collect should be run after the demosite has
-    been installed and only there.
+.. admonition:: FIXME
+
+    This will not be required anymore.
+    `#1842 <https://github.com/inveniosoftware/invenio/issues/1842>`_
 
 .. code-block:: console
 
     (invenio)$ npm install
     (invenio)$ bower install
 
-``grunt`` and ``inveniomanage collect`` will create the static folder with all
-the required assets (JavaScript, CSS and images) from each module static folder
-and bower.
+``grunt`` will copy the libraries from ``bower_components`` to the instance
+path.
 
 .. code-block:: console
 
     (invenio)$ grunt
-    (invenio)$ inveniomanage collect
+
+Installing Invenio Demosite. ``exists-action i`` stands for `ignore`, it means
+that it'll will skip any previous installation found. Because the Invenio
+Demosite depends on Invenio, it would have tried to reinstall it without this
+option. If you omit it, ``pip`` will ask you what action you want to take.
+
+.. code-block:: console
+
+    (invenio)$ cdvirtualenv src/invenio-demosite
+    (invenio)$ pip install -r requirements.txt --exists-action i
+
+Installing the required assets (JavaScript, CSS, etc.) via bower. The file
+``.bowerrc`` is telling where bower will download the files and ``bower.json``
+what to download.
+
+.. code-block:: console
+
+    (invenio)$ inveniomanage bower -i bower.json-base -x
+    Generates or update bower.json for you.
+    (invenio)$ cat .bowerrc
+    {
+        "directory": "invenio_demosite/base/static/vendors"
+    }
+    (invenio)$ bower install
+    (invenio)$ ls invenio_demosite/base/static/vendors
+    almond
+    bootstrap
+    ckeditor
+    hogan
+    jquery
+    jquery-tokeninput
+    jquery.jeditable
+    jquery.ui.timepicker
+    jqueryui
+    less
+    plupload
+    requirejs
+    ...
+
+The last step, which is very important will be to collect all the assets, but
+it will be done after the configuration step.
 
 
 3.2. Configuration
@@ -273,18 +320,28 @@ they are not in the environment ``$PATH`` already.
     (invenio)$ inveniomanage config set REQUIREJS_BIN `find $PWD/node_modules -iname r.js | head -1`
     (invenio)$ inveniomanage config set UGLIFYJS_BIN `find $PWD/node_modules -iname uglifyjs | head -1`
 
-Invenio comes with default demo site configuration examples that you can use
-for quick start.
+.. admonition:: FIXME
+
+    If grunt disappears, the local installation will be very similar to the
+    local one but require then to be installed locally (no ``sudo ... -g``).
+    `#1842 <https://github.com/inveniosoftware/invenio/issues/1842>`_
+
+All the assets that are spread among every invenio module or external libraries
+will be collected into the instance directory. By default, it create copies of
+the original files. As a developer you may want to have symbolic links instead.
 
 .. code-block:: console
 
-    (invenio)$ cd $HOME/src/
-    (invenio)$ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio-demosite.git
-    (invenio)$ cdvirtualenv src
-    (invenio)$ git-new-workdir ~/src/invenio-demosite/ invenio-demosite $BRANCH
-    (invenio)$ cd invenio-demosite
-    (invenio)$ pip install -r requirements.txt --exists-action i
-
+    (invenio)$ inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link
+    (invenio)$ inveniomanage collect
+    ...
+    Done collecting.
+    (invenio)$ cdvirtualenv var/invenio.base-instance/static
+    (invenio)$ ls -l
+    css
+    js
+    vendors
+    ...
 
 3.3. Development
 ~~~~~~~~~~~~~~~~
