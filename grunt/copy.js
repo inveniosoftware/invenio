@@ -27,42 +27,12 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>',
-        src: ['jquery-tokeninput/styles/token-input-facebook.css'
-               ,'jquery-tokeninput/styles/token-input.css'
-               ,'jquery.bookmark/jquery.bookmark.css'
+        src: ['jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
                ,'prism/themes/prism.css'
                ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
-    },
-    less_bootstrap: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/bootstrap/less/',
-        src: ['*.less', '**/*.less'],
-        dest: '<%= globalConfig.installation_path %>/less/bootstrap'
-    },
-    less_fontawesome: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>',
-        src: ['font-awesome/less/*.less'],
-        dest: '<%= globalConfig.installation_path %>/less/font-awesome'
-    },
-    jquery_css: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>',
-        src: ['jqueryui/themes/base/jquery.ui.datepicker.css'
-             ,'jqueryui/themes/base/jquery.ui.theme.css'],
-        dest: '<%= globalConfig.installation_path %>/img/jquery-ui/themes/base/'
-    },
-    jquery_imgs: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>',
-        src: ['jqueryui/themes/base/images/ui-bg_flat_75_ffffff_40x100.png'],
-        dest: '<%= globalConfig.installation_path %>/img/jquery-ui/themes/base/images/'
     },
     img: {
         expand: true,
@@ -79,18 +49,11 @@ module.exports = {
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
         src: [
-            'almond/almond.js',
-            'bootstrap/dist/js/bootstrap.js',
-            'bootstrap/dist/js/bootstrap.min.js',
             'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js',
             'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js.map',
             'datatables-colvis/js/dataTables.colVis.js',
             'DataTables/media/js/jquery.dataTables.js',
             'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
-            'jquery/dist/jquery.js',
-            'jquery/dist/jquery.min.js',
-            'jquery/dist/jquery.min.map',
-            'jquery-tokeninput/src/jquery.tokeninput.js',
             'jquery.bookmark/jquery.bookmark.min.js',
             'jquery-flot/excanvas.min.js',
             'jquery-flot/jquery.flot.js',
@@ -105,32 +68,6 @@ module.exports = {
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
-    js_bootstrap: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/bootstrap/js',
-        src: ['*.js'],
-        dest: '<%= globalConfig.installation_path %>/js/bootstrap/'
-    },
-    fonts: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['bootstrap/dist/fonts/glyphicons-halflings-regular.*'
-             ,'font-awesome/fonts/*'],
-        dest: '<%= globalConfig.installation_path %>/fonts/'
-    },
-    typeahead: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['typeahead.js/dist/typeahead.bundle.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'typeahead.js');
-            return dest + res;
-        }
-    },
     typeaheadBootstrap3Css: {
         expand: true,
         flatten: true,
@@ -143,30 +80,6 @@ module.exports = {
             return dest + res;
         }
     },
-    hogan: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/hogan/web/builds/3.0.2',
-        src: ['hogan-?.?.?.js', 'hogan-?.?.?.amd.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            return dest + src.replace(/-[\d\.]+(?=\.)/, '')
-        }
-    },
-    jqueryUI: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/jqueryui',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/js/jqueryui'
-    },
-    jqueryUISortable: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.ui/ui/jquery.ui.sortable.js'],
-        dest: '<%= globalConfig.installation_path %>/js/'
-    },
     jqueryTimePicker: {
         expand: true,
         flatten: true,
@@ -176,18 +89,6 @@ module.exports = {
         rename: function(dest, src) {
             var res = src.replace(src.substring(0),
                                   'jquery-ui-timepicker-addon.js');
-            return dest + res;
-        }
-    },
-    jqueryCaret: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.caret/dist/jquery.caret-1.5.0.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'jquery-caret.js');
             return dest + res;
         }
     },
@@ -231,13 +132,6 @@ module.exports = {
         cwd: '<%= globalConfig.bower_path %>/MathJax/',
         src: ['**'],
         dest: '<%= globalConfig.installation_path %>/MathJax/'
-    },
-    ckeditor: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/ckeditor/',
-        src: ['**', '!**_samples/**', '!**_source/**', '!**php**',
-              '!**_**', '!**pack**', '!**ckeditor.asp'],
-        dest: '<%= globalConfig.installation_path %>/ckeditor/'
     },
     jqueryTreeview: {
         expand: true,
@@ -287,12 +181,6 @@ module.exports = {
             return dest + src;
         }
     },
-    plupload: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/plupload/js',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/plupload/'
-    },
     jqueryMigrate: {
         expand: true,
         cwd: '<%= globalConfig.bower_path %>/jquery-migrate',
@@ -303,15 +191,6 @@ module.exports = {
                 src = 'jquery-migrate.js'
             }
             return dest + src;
-        }
-    },
-    lesscss: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/less/dist',
-        src: ['less-1.7.0.*'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            return dest + src.replace(/-\d\.\d\.\d/, '');
         }
     }
 };

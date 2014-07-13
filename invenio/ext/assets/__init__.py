@@ -38,45 +38,16 @@ Additional extensions and functions for the `flask.ext.assets` module.
     lazy loaded.
 """
 
-import os
-import pkg_resources
-from flask import current_app, json
-
+from .commands import AssetsCommand, BowerCommand
 from .extensions import BundleExtension
 from .registry import bundles
-from .wrappers import Bundle, Command
+from .wrappers import Bundle
 
 
 __all__ = ("bower", "bundles", "command", "setup_app", "Bundle")
 
-command = Command()
-
-
-def bower():
-    """Generate a bower.json file.
-
-    It comes with default values for the ignore. Name and version are set to
-    be invenio's.
-
-    """
-    output = {
-        "name": "invenio",
-        "version": pkg_resources.get_distribution("invenio").version,
-        "ignore": [".jshintrc", "**/*.txt"],
-        "dependencies": {},
-    }
-
-    if os.path.exists("bower.json"):
-        current_app.logger.debug("updating bower.json")
-        with open("bower.json") as f:
-            output = json.load(f)
-
-    for pkg, bundle in bundles:
-        if bundle.bower:
-            current_app.logger.debug((pkg, bundle.bower))
-        output['dependencies'].update(bundle.bower)
-
-    print(json.dumps(output, indent=4))
+command = AssetsCommand()
+bower = BowerCommand()
 
 
 def setup_app(app):

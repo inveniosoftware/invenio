@@ -26,15 +26,6 @@
   {%- bundles "jquery-ui.js" %}
 {%- endblock %}
 
-{%- block header %}
-  {{ super() }}
-  {# FIXME: jQueryUI comes with many linked images and thus is sensitive to
-   # relocation. No bundles for this guy.
-   #}
-  <link rel="stylesheet" type="text/css"
-        href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.css") }}"/>
-{% endblock %}
-
 {% block title %}
 <div class="page-header">
   <h1>{{ title }}
@@ -51,6 +42,11 @@
 
 {% block header %}
   {{ super() }}
+  {# FIXME: jQueryUI comes with many linked images and thus is sensitive to
+   # relocation. No bundles for this guy.
+   #}
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for("static", filename="vendors/jqueryui/themes/redmond/jquery-ui.css") }}"/>
 <style>
 #widgets li .thumbnail {
   background: white;
@@ -145,6 +141,7 @@
 
 {% block javascript %}
 <script>
+require(['jquery', 'jqueryui'], function($) {
   function saveWidgets() {
     var newOrderLeft = $("#widgetsLeft").sortable('toArray');
     var newOrderMiddle = $("#widgetsMiddle").sortable('toArray');
@@ -195,24 +192,24 @@
   }
 
   function bindDisplayWidgetEvents() {
-    $(".display-widget").die();
-    $(".display-widget").live("click", function() {
+    $(".display-widget").off();
+    $(".display-widget").on("click", function() {
       displayWidget(this.id);
     });
   }
 
   function bindWidgetEvents() {
-    $(".widget").die();
-    $(".widget").live('mouseenter', function() {
+    $(".widget").off();
+    $(".widget").on('mouseenter', function() {
       $(this).find(".close.hide").removeClass("hide");
     });
 
-    $(".widget").live('mouseleave', function() {
+    $(".widget").on('mouseleave', function() {
       $(this).find(".close").addClass("hide");
     });
 
-    $(".close").die();
-    $(".close").live('click', function() {
+    $(".close").off();
+    $(".close").on('click', function() {
       var title = $(this).closest("h4").text().replace("×", " ").trim();
       var id = $(this).closest(".widget").attr("id");
       addToClosedList(title, id);
@@ -263,6 +260,7 @@
     bindDisplayWidgetEvents();
     bindWidgetEvents();
 
-  });
+  })
+})
 </script>
 {% endblock %}

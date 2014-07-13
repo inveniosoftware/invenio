@@ -21,6 +21,10 @@
 
 from invenio.ext.assets import Bundle
 
+from invenio.base.bundles import styles as _css
+
+
+_css.contents.append("css/tags/popover.css")
 
 js = Bundle(
     "js/tags/record_editor.js",

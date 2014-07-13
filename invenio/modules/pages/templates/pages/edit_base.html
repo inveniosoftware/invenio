@@ -18,27 +18,28 @@
 #}
 
 {% extends 'admin/model/edit.html' %}
- 
+
 {% block tail %}
-    {{ super() }}
-    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
-    <script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
-    <script>
-	    $(function() {
-	    	CKEDITOR.replace("content", {
-	    	toolbar:[
-	             ['PasteText', 'PasteFromWord'],
-	             ['Bold', 'Italic', 'Strike', '-', 'Subscript', 'Superscript', ],
-	             ['NumberedList', 'BulletedList'],
-	             ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
-	             ['SpecialChar', 'ScientificChar'], ['Source'], ['Maximize'],
-	             ],
-	         disableNativeSpellChecker:false,
-	         extraPlugins:'scientificchar',
-	         removePlugins:'elementspath'
-	    	});
-	    });
-	   	$(".form-group .col-md-4").removeClass("col-md-4").addClass("col-md-8");
-		$('input[data-role="datetimepicker"]').parent().removeClass("col-md-2").addClass("col-md-4")
-    </script>
+  {{ super() }}
+  <script type="text/javascript" src="/vendors/ckeditor/ckeditor.js"></script>
+  <script>
+    $(function() {
+      CKEDITOR.replace("content", {
+        toolbar:[
+          ['PasteText', 'PasteFromWord'],
+          ['Bold', 'Italic', 'Strike', '-', 'Subscript', 'Superscript', ],
+          ['NumberedList', 'BulletedList'],
+          ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
+          ['SpecialChar', 'ScientificChar'], ['Source'], ['Maximize'],
+        ],
+        disableNativeSpellChecker:false,
+        extraPlugins:'scientificchar',
+        removePlugins:'elementspath'
+      })
+      $(".form-group .col-md-4").removeClass("col-md-4")
+                                .addClass("col-md-8")
+      $('input[data-role="datetimepicker"]').parent().removeClass("col-md-2")
+                                                     .addClass("col-md-4")
+    });
+  </script>
 {% endblock %}

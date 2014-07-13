@@ -18,9 +18,9 @@
 
 """Custom modified classes."""
 
+from __future__ import absolute_import, print_function, unicode_literals
 
-from flask import current_app
-from flask.ext.assets import Bundle as BundleBase, ManageAssets
+from flask.ext.assets import Bundle as BundleBase
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
 from werkzeug.utils import import_string
 
@@ -105,29 +105,3 @@ class BundlesAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
                 bundle = getattr(bundles, var)
                 if isinstance(bundle, Bundle):
                     self.register((module, bundle))
-
-
-class Command(ManageAssets):
-
-    """Command-line operation for assets."""
-
-    def run(self, args):
-        """Run the command-line.
-
-        It loads the bundles from the :py:data:`bundles registry
-        <invenio.ext.assets.registry.bundles>`.
-
-        """
-        if not self.env:
-            self.env = current_app.jinja_env.assets_environment
-            self.log = current_app.logger
-
-        from .registry import bundles
-        for pkg, bundle in bundles:
-            output = "{0}: {1.output}:".format(pkg, bundle)
-            for content in bundle.contents:
-                output += "\n - {0}".format(content)
-            self.log.info(output)
-            self.env.register(bundle.output, bundle)
-
-        return super(Command, self).run(args)

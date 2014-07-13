@@ -538,7 +538,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
         /* Load the script only once, or else multiple instance of the editor on the same page will not work */
         var INVENIO_CKEDITOR_ALREADY_LOADED
             if (INVENIO_CKEDITOR_ALREADY_LOADED != 1) {
-                document.write('<script type="text/javascript" src="%(CFG_SITE_URL)s/ckeditor/ckeditor.js"><\/script>');
+                document.write('<script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/ckeditor/ckeditor.js"><\/script>');
                 INVENIO_CKEDITOR_ALREADY_LOADED = 1;
             }
         //]]></script>

@@ -17,21 +17,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require.config({
-    baseUrl: '/',
-    paths: {
-        jquery: 'vendors/jquery/dist/jquery',
-        jqueryui: 'vendors/jqueryui/jquery-ui',
-        'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/src/jquery-ui-timepicker-addon',
-        'jquery.form': 'js/jquery.form',
-        hgn: 'vendors/requirejs-hogan-plugin/hgn',
-        hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
-        text: 'vendors/requirejs-hogan-plugin/text'
-    },
-    shim: {
-        jquery: { exports: '$' },
-        jqueryui: [ 'jquery' ],
-        'jqueryui-timepicker': [ 'jqueryui' ],
-        'jquery.form': [ 'jquery' ]
-    }
+require(['jquery', 'jqueryui', 'jqueryui-timepicker'], function ($) {
+    // loading the jQuery UI modules globally.
 })

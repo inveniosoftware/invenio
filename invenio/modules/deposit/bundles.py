@@ -23,7 +23,8 @@ from invenio.ext.assets import Bundle
 
 
 js = Bundle(
-    "plupload/plupload.full.min.js",
+    "vendors/plupload/js/moxie.js",
+    "vendors/plupload/js/plupload.dev.js",
     "js/deposit/init.js",
     output="deposit.js",
     filters="requirejs",

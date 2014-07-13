@@ -32,8 +32,8 @@ _commentsjs.contents += ("js/annotations/notes_popover.js",)
 _commentscss.contents += ("css/annotations/annotations.css",)
 
 js = Bundle(
-    "plupload/moxie.js",
-    "plupload/plupload.dev.js",
+    "vendors/plupload/js/moxie.js",
+    "vendors/plupload/js/plupload.dev.js",
     "js/annotations/annotations.js",
     "js/annotations/plupload_helper.js",
     filters="uglifyjs",
