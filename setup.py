@@ -88,8 +88,6 @@ install_requires = [
     "redis==2.8.0",  # Is it explicitly required?
     "reportlab==2.5",
     "requests==1.2.3",
-    "setuptools>=2.0",  # dad?
-    "setuptools-bower>=0.2,<1.0",
     "six>=1.7.2",
     "Sphinx",
     "SQLAlchemy==0.8.3",
@@ -107,7 +105,9 @@ extras_require = {
         "sphinx_rtd_theme"
     ],
     "development": [
-        "Flask-DebugToolbar==0.9.0"
+        "Flask-DebugToolbar==0.9.0",
+        "setuptools>=2.0",  # dad?
+        "setuptools-bower>=0.2,<1.0",
     ],
     "elasticsearch": [
         "pyelasticsearch>=0.6.1"
