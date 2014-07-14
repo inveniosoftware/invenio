@@ -21,10 +21,12 @@
 {# List here the required bundles. The ordering will be made using their names.
  # New bundles should be defined in the bundles.py file of each module.
  #}
-{%- bundles "jquery.js",
-            "invenio.js",
-            "invenio.css"
--%}
+{%- block bundles -%}
+  {%- bundles "jquery.js",
+              "invenio.js",
+              "invenio.css"
+  -%}
+{%- endblock bundles -%}
 {# almond.js, require.js and LessCSS libraries for both debug and production
  # modes.
  #}
