@@ -101,14 +101,14 @@ class Workflow(db.Model):
     child_logs = db.relationship("BibWorkflowEngineLog")
 
     def __repr__(self):
-        """ Represent a workflow object."""
+        """Represent a workflow object."""
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
                "id_user: %s, status: %s)>" % \
                (str(self.name), str(self.module_name), str(self.created),
                 str(self.modified), str(self.id_user), str(self.status))
 
     def __str__(self):
-        """ Print a workflow object."""
+        """Print a workflow object."""
         return """Workflow:
 
         Uuid: %s
@@ -135,14 +135,19 @@ class Workflow(db.Model):
         A wrapper for the filter and filter_by functions of sqlalchemy.
         Define a dict with which columns should be filtered by which values.
 
-        e.g. Workflow.get(uuid=uuid)
-             Workflow.get(Workflow.uuid != uuid)
+        .. code-block:: python
+
+            Workflow.get(uuid=uuid)
+            Workflow.get(Workflow.uuid != uuid)
 
         The function supports also "hybrid" arguments.
-        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
-                          user_id=user_id)
 
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        .. code-block:: python
+
+            Workflow.get(Workflow.module_name != 'i_hate_this_module',
+                         user_id=user_id)
+
+        See also SQLAlchemy BaseQuery's filter and filter_by documentation.
         """
         return cls.query.filter(*criteria).filter_by(**filters)
 
@@ -167,16 +172,16 @@ class Workflow(db.Model):
         return cls.get(Workflow.uuid == uuid).one().objects
 
     def get_extra_data(self, user_id=0, uuid=None, key=None, getter=None):
-        """Get the unpickle extra_data.
+        """Get the extra_data for the object.
 
-        Returns a json of the column extra_data or
+        Returns a JSON of the column extra_data or
         if any of the other arguments are defined,
         a specific value.
+
         You can define either the key or the getter function.
 
         :param key: the key to access the desirable value
-        :param getter: a callable that takes a dict as param and returns a
-        value
+        :param getter: a callable that takes a dict as param and returns a value
         """
         extra_data = Workflow.get(Workflow.id_user == self.id_user,
                                   Workflow.uuid == self.uuid).one()._extra_data
@@ -193,7 +198,7 @@ class Workflow(db.Model):
                        key=None, value=None, setter=None):
         """Replace extra_data.
 
-        Modifies the json of the column extra_data or
+        Modifies the JSON of the column extra_data or
         if any of the other arguments are defined, a specific value.
         You can define either the key, value or the setter function.
 
@@ -230,34 +235,44 @@ class Workflow(db.Model):
 
 class BibWorkflowObject(db.Model):
 
-    """Represents a BibWorkflowObject.
+    """Data model for wrapping data being run in the workflows.
 
     Main object being passed around in the workflows module
     when using the workflows API.
 
     It can be instantiated like this:
 
-        >>> obj = BibWorkflowObject()
+    .. code-block:: python
+
+        obj = BibWorkflowObject()
 
     Or, like this:
 
-        >>> obj = BibWorkflowObject.create_object()
+    .. code-block:: python
+
+        obj = BibWorkflowObject.create_object()
 
     This object provides some handy functions such as:
 
-        >>> obj.set_data("<xml ..... />")
-        >>> obj.get_data() == "<xml ..... />"
-        >>> obj.set_extra_data({"param": value})
-        >>> obj.get_extra_data() == {"param": value}
-        >>> obj.add_task_result(name="myresult", result=1)
+    .. code-block:: python
+
+        obj.set_data("<xml ..... />")
+        obj.get_data() == "<xml ..... />"
+        obj.set_extra_data({"param": value})
+        obj.get_extra_data() == {"param": value}
+        obj.add_task_result(name="myresult", result=1)
 
     Then to finally save the object
 
-        >>> obj.save()
+    .. code-block:: python
+
+        obj.save()
 
     Now you can for example run it in a workflow:
 
-        >>> obj.start_workflow("sample_workflow")
+    .. code-block:: python
+
+        obj.start_workflow("sample_workflow")
     """
 
     # db table definition
@@ -298,7 +313,7 @@ class BibWorkflowObject(db.Model):
 
     @property
     def log(self):
-        """ Allow logging functionnality."""
+        """Access logger object for this instance."""
         if not self._log:
             db_handler_obj = BibWorkflowLogHandler(BibWorkflowObjectLog, "id")
             self._log = get_logger(logger_name="object.%s" %
@@ -309,21 +324,22 @@ class BibWorkflowObject(db.Model):
         return self._log
 
     def get_data(self):
-        """Main method to retrieve data saved to the object. """
+        """Get data saved in the object."""
         return cPickle.loads(base64.b64decode(self._data))
 
     def set_data(self, value):
-        """Main method to update data saved to the object."""
+        """Save data to the object."""
         self._data = base64.b64encode(cPickle.dumps(value))
 
     def get_extra_data(self):
-        """Main method to retrieve data saved to the object."""
+        """Get extra data saved to the object."""
         return cPickle.loads(base64.b64decode(self._extra_data))
 
     def set_extra_data(self, value):
-        """Main method to update data saved to the object.
+        """Save extra data to the object.
 
-        :param value: value that you want to replace extra_data
+        :param value: what you want to replace extra_data with.
+        :type value: dict
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
 
@@ -349,7 +365,7 @@ class BibWorkflowObject(db.Model):
                   str(self.get_extra_data()))
 
     def __eq__(self, other):
-        """ Enable equal operators on BibWorkflowObjects."""
+        """Enable equal operators on BibWorkflowObjects."""
         if isinstance(other, BibWorkflowObject):
             if self._data == other._data and \
                     self._extra_data == other._extra_data and \
@@ -364,7 +380,7 @@ class BibWorkflowObject(db.Model):
         return NotImplemented
 
     def __ne__(self, other):
-        """ Enable equal operators on BibWorkflowObjects."""
+        """Enable equal operators on BibWorkflowObjects."""
         return not self.__eq__(other)
 
     def add_task_result(self, name, result):
@@ -474,14 +490,18 @@ class BibWorkflowObject(db.Model):
     def start_workflow(self, workflow_name, delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
-        Will start a new workflow execution for the object using
-        workflows.api.
+        Will start workflows execution for the object using
+        :py:func:`.api.start` (or :py:func:`.api.start_delayed`
+        if `delayed=True`).
+
 
         :param workflow_name: name of workflow to run
-        :type str
+        :type workflow_name: str
 
         :param delayed: should the workflow run asynchronously?
-        :type bool
+        :type delayed: bool
+
+        :return: BibWorkflowEngine (or AsynchronousResultWrapper).
         """
         if delayed:
             from .api import start_delayed as start_func
@@ -490,20 +510,30 @@ class BibWorkflowObject(db.Model):
         self.save()
         return start_func(workflow_name, data=[self], **kwargs)
 
-    def continue_workflow(self, start_point="continue_next", delayed=False, **kwargs):
-        """Run the workflow specified on the object.
+    def continue_workflow(self, start_point="continue_next",
+                          delayed=False, **kwargs):
+        """Continue the workflow for this object.
 
         Will continue a previous execution for the object using
-        workflows.api.
+        :py:func:`.api.continue_oid` (or :py:func:`.api.continue_oid_delayed`
+        if `delayed=True`).
 
-        :param start_point: where should the workflow start from? One of:
-           * restart_prev: will restart from the previous task
-           * continue_next: will continue to the next task
-           * restart_task: will restart the current task
-        :type str
+        The parameter `start_point` allows you to specify the point of where
+        the workflow shall continue:
+
+        * restart_prev: will restart from the previous task
+
+        * continue_next: will continue to the next task
+
+        * restart_task: will restart the current task
+
+        :param start_point: where should the workflow start from?
+        :type start_point: str
 
         :param delayed: should the workflow run asynchronously?
-        :type bool
+        :type delayed: bool
+
+        :return: BibWorkflowEngine (or AsynchronousResultWrapper).
         """
         from .errors import WorkflowAPIError
 
@@ -588,19 +618,24 @@ class BibWorkflowObject(db.Model):
 
     @classmethod
     def get(cls, *criteria, **filters):
-        """Wrapper of Sqlalchemy to get a BibWorkflowObject.
+        """Wrapper of SQLAlchemy to get a BibWorkflowObject.
 
-        A wrapper for the filter and filter_by functions of sqlalchemy.
+        A wrapper for the filter and filter_by functions of SQLAlchemy.
         Define a dict with which columns should be filtered by which values.
 
-        e.g. Workflow.get(uuid=uuid)
-             Workflow.get(Workflow.uuid != uuid)
+        .. code-block:: python
+
+            Workflow.get(uuid=uuid)
+            Workflow.get(Workflow.uuid != uuid)
 
         The function supports also "hybrid" arguments.
-        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
-                          user_id=user_id)
 
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        .. code-block:: python
+
+            Workflow.get(Workflow.module_name != 'i_hate_this_module',
+                         user_id=user_id)
+
+        See also SQLAlchemy BaseQuery's filter and filter_by documentation.
         """
         return cls.query.filter(*criteria).filter_by(**filters)
 
@@ -674,12 +709,12 @@ class BibWorkflowObjectLog(db.Model):
 
     @classmethod
     def get(cls, *criteria, **filters):
-        """ Sqlalchemy wrapper to get BibworkflowLogs.
+        """SQLAlchemy wrapper to get BibworkflowLogs.
 
-        A wrapper for the filter and filter_by functions of sqlalchemy.
+        A wrapper for the filter and filter_by functions of SQLAlchemy.
         Define a dict with which columns should be filtered by which values.
 
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        See also SQLAlchemy BaseQuery's filter and filter_by documentation.
         """
         return cls.query.filter(*criteria).filter_by(**filters)
 

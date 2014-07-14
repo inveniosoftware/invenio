@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013, 2014 CERN.
 ##
@@ -68,8 +69,7 @@ WORKER = WorkerBackend()
 
 
 def start(workflow_name, data, **kwargs):
-    """
-    Start a workflow by given name for specified data *immediately*.
+    """Start a workflow by given name for specified data.
 
     The name of the workflow to start is considered unique and it is
     equal to the name of a file containing the workflow definition.
@@ -84,11 +84,11 @@ def start(workflow_name, data, **kwargs):
 
     The workflow engine object generated is returned upon completion.
 
-    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name: str
 
-    :param data: the workflow name to run. Ex: "my_workflow"
-    :type data: list of objects/dicts
+    :param data: the workflow name to run. Ex: "my_workflow".
+    :type data: list
 
     :return: BibWorkflowEngine that ran the workflow.
     """
@@ -98,21 +98,25 @@ def start(workflow_name, data, **kwargs):
 
 
 def start_delayed(workflow_name, data, **kwargs):
-    """
-    Start a *delayed* workflow by using one of the defined workers.
+    """Start a workflow by given name for specified data, asynchronously.
 
-    For example, enqueue the execution of the workflow in
+    Similar behavior as :py:func:`.start`, except it starts the
+    workflow *delayed* by using one of the defined workers available.
+
+    For example, it may enqueue the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    Otherwise, see documentation of start().
+    This function returns a sub-classed AsynchronousResultWrapper that
+    holds a reference to the workflow id via the object
+    `AsynchronousResultWrapper.get`.
 
-    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name:  str
 
-    :param data: the workflow name to run. Ex: "my_workflow"
-    :type data: list of objects/dicts
+    :param data: the workflow name to run. Ex: "my_workflow".
+    :type data: list
 
-    :return: BibWorkflowEngine that ran the workflow.
+    :return: AsynchronousResultWrapper
     """
     if not CFG_BIBWORKFLOW_WORKER:
         raise WorkflowWorkerError('No worker configured')
@@ -134,16 +138,15 @@ def start_delayed(workflow_name, data, **kwargs):
 
 
 def start_by_wid(wid, **kwargs):
-    """
-    Will re-start given workflow, by workflow uuid (wid).
+    """Re-start given workflow, by workflow uuid (wid).
 
     It is restarted from the beginning with the original data given.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
+    such as a task-id from BibSched, the current user etc.
 
-    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
+    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000".
     :type wid: str
 
     :return: BibWorkflowEngine that ran the workflow.
@@ -154,45 +157,45 @@ def start_by_wid(wid, **kwargs):
 
 
 def start_by_wid_delayed(wid, **kwargs):
-    """
-    Will re-start given workflow, by workflow uuid (wid).
+    """Re-start given workflow, by workflow uuid (wid), asynchronously.
 
-    It is restarted from the beginning with the original data given.
+    Similar behavior as :py:func:`.start_by_wid`, except it starts the
+    workflow *delayed* by using one of the defined workers available.
 
-    Starts the workflow *delayed* by using one of the defined workers
-    available. For example, enqueueing the execution of the workflow in
+    For example, it may enqueue the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    Special custom keyword arguments can be given to the workflow engine
-    in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
+    This function returns a sub-classed AsynchronousResultWrapper that
+    holds a reference to the workflow id via the function
+    `AsynchronousResultWrapper.get`.
 
-    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000"
+    :param wid: the workflow uuid. Ex: "550e8400-e29b-41d4-a716-446655440000".
     :type wid: str
 
-    :return: BibWorkflowEngine that ran the workflow.
+    :return: AsynchronousResultWrapper
     """
     return WORKER().restart_worker(wid, **kwargs)
 
 
 def start_by_oids(workflow_name, oids, **kwargs):
-    """
-    Start given workflow, by name, with the given list of BibWorkflowObject ids.
+    """Start workflow by name with :py:class:`.models.BibWorkflowObject` ids.
+
+    Wrapper to call :py:func:`.start` with list of
+    :py:class:`.models.BibWorkflowObject` ids.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
+    such as a task-id from BibSched, the current user etc.
 
-    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name: str
 
-    :param oids: list of BibWorkflowObject id's to run.
-    :type oids: list of str or integers
+    :param oids: BibWorkflowObject id's to run.
+    :type oids: list
 
     :return: BibWorkflowEngine that ran the workflow.
     """
     if not oids:
-        # oids is not defined!
         from .errors import WorkflowAPIError
         raise WorkflowAPIError("No Object IDs are defined")
 
@@ -203,25 +206,30 @@ def start_by_oids(workflow_name, oids, **kwargs):
 
 
 def start_by_oids_delayed(workflow_name, oids, **kwargs):
-    """
-    Start given workflow, by name,with the given list of BibWorkflowObject.
+    """Start asynchronously workflow by name with :py:class:`.models.BibWorkflowObject` ids.
 
-    Special custom keyword arguments can be given to the workflow engine
-    in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
+    Similar behavior as :py:func:`.start_by_oids`, except it calls
+    :py:func:`.start_delayed`.
 
-    Starts the workflow *delayed* by using one of the defined workers
-    available. For example, enqueueing the execution of the workflow in
+    For example, it may enqueue the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
 
-    :param workflow_name: the workflow name to run. Ex: "my_workflow"
+    This function returns a sub-classed AsynchronousResultWrapper that
+    holds a reference to the workflow id via the function
+    `AsynchronousResultWrapper.get`.
+
+    :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name: str
 
     :param oids: list of BibWorkflowObject id's to run.
-    :type oids: list of str or int
+    :type oids: list
 
-    :return: BibWorkflowEngine that ran the workflow.
+    :return: AsynchronousResultWrapper.
     """
+    if not oids:
+        from .errors import WorkflowAPIError
+        raise WorkflowAPIError("No Object IDs are defined")
+
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id.in_(list(oids))
     ).all()
@@ -230,18 +238,14 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
 
 
 def continue_oid(oid, start_point="continue_next", **kwargs):
-    """
-    Continue workflow asociated with object given by object id (oid).
+    """Continue workflow for given object id (oid).
 
-    It can start from previous, current or next task.
+    Depending on `start_point` it may start from previous, current or
+    next task.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
-
-    Starts the workflow *delayed* by using one of the defined workers
-    available. For example, enqueueing the execution of the workflow in
-    a task queue such as Celery (http://celeryproject.org).
+    such as a task-id from BibSched, the current user etc.
 
     :param oid: id of BibWorkflowObject to run.
     :type oid: str
@@ -260,18 +264,17 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
 
 
 def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
-    """
-    Continue workflow associated with object given by object id (oid).
+    """Continue workflow for given object id (oid), asynchronously.
 
-    It can start from previous, current or next task.
+    Similar behavior as :py:func:`.continue_oid`, except it runs it
+    asynchronously.
 
-    Special custom keyword arguments can be given to the workflow engine
-    in order to pass certain variables to the tasks in the workflow execution,
-    such as a taskid from BibSched, the current user etc.
-
-    Starts the workflow *delayed* by using one of the defined workers
-    available. For example, enqueueing the execution of the workflow in
+    For example, it may enqueue the execution of the workflow in
     a task queue such as Celery (http://celeryproject.org).
+
+    This function returns a sub-classed AsynchronousResultWrapper that
+    holds a reference to the workflow id via the function
+    `AsynchronousResultWrapper.get`.
 
     :param oid: id of BibWorkflowObject to run.
     :type oid: str
@@ -282,7 +285,7 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
         * restart_task: will restart the current task
     :type start_point: str
 
-    :return: BibWorkflowEngine that ran the workflow
+    :return: AsynchronousResultWrapper.
     """
     return WORKER().continue_worker(oid, start_point, **kwargs)
 

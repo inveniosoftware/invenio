@@ -48,11 +48,7 @@ class WorkflowStatus(object):
 
 class BibWorkflowEngine(GenericWorkflowEngine):
 
-    """
-    Subclass of GenericWorkflowEngine representing a workflow.
-
-    Subclass of GenericWorkflowEngine representing a workflow
-    in the workflows module.
+    """GenericWorkflowEngine with DB persistence for py:mod:`invenio.workflows`.
 
     Adds a SQLAlchemy database model to save workflow states and
     workflow data.
@@ -63,19 +59,35 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     """
 
     def __init__(self, name=None, uuid=None, curr_obj=0,
-                 workflow_object=None, id_user=0, module_name="Unknown",
-                 **kwargs):
-        """
-        Init function to init a new BibWorkflowEngine object.
+                 workflow_object=None, id_user=0,
+                 module_name="Unknown", **kwargs):
+        """Instantiate a new BibWorkflowEngine object.
 
-        This will create a new BibWorkflowEngine object. This engine
-        is needed to run a workflow and control the workflow, like steps,
-        processing and control object manipulation inside this workflow.
+        This object is needed to run a workflow and control the workflow,
+        like at which step of the workflow execution is currently at, as well
+        as control object manipulation inside the workflow.
 
-        You can pass several parameter to the init function to personalize
-        your engine but most of the time you shouldn't create yourself a
-        BibWorkflowEngine but you should instead use the API which will
-        create it for you.
+        You can pass several parameters to personalize your engine,
+        but most of the time you will not need to create this object yourself
+        as the :py:mod:`.api` is there to do it for you.
+
+        :param name: name of workflow to run.
+        :type name: str
+
+        :param uuid: pass a uuid to an existing workflow.
+        :type uuid: str
+
+        :param curr_obj: internal id of current object being processed.
+        :type curr_obj: int
+
+        :param workflow_object: existing instance of a Workflow object.
+        :type workflow_object: Workflow
+
+        :param id_user: id of user to associate with workflow
+        :type id_user: int
+
+        :param module_name: label used to query groups of workflows.
+        :type module_name: str
         """
         super(BibWorkflowEngine, self).__init__()
 
@@ -276,12 +288,16 @@ BibWorkflowEngine
         super(BibWorkflowEngine, self).process(objects)
 
     def restart(self, obj, task):
-        """Restart the workflow engine after it was deserialized.
+        """Restart the workflow engine at given object and task.
 
-        :param task: can be prev for previous task or current for the current
-        task or next for the next task.
-        :param obj: the object which shoulld be restarted. Can be like for task
-        prev, current or next.
+        Will restart the workflow engine instance at given object and task
+        relative to current state.
+
+        :param obj: the object which should be restarted ("prev","current","next")
+        :type obj: str
+
+        :param task: the task which should be restarted ("prev","current","next")
+        :type task: str
         """
         self.log.debug("Restarting workflow from %s object and %s task" %
                        (str(obj), str(task),))
@@ -324,10 +340,7 @@ BibWorkflowEngine
         Default processing factory, will process objects in order.
 
         :param objects: list of objects (passed in by self.process()).
-
-        :keyword cls: engine object itself, because this method may
-            be implemented by the standalone function, we pass the
-            self also as a cls argument.
+        :type objects: list
 
         As the WFE proceeds, it increments the internal counter, the
         first position is the number of the element. This pointer increases
@@ -420,7 +433,7 @@ BibWorkflowEngine
         self.after_processing(objects, self)
 
     def execute_callback(self, callback, obj):
-        """Execute the callback - override this method to implement logging."""
+        """Execute the callback (workflow tasks)."""
         obj.data = obj.get_data()
         obj.extra_data = obj.get_extra_data()
         obj.extra_data["_last_task_name"] = self.get_current_taskname()
@@ -435,7 +448,7 @@ BibWorkflowEngine
             obj.set_extra_data(obj.extra_data)
 
     def get_current_taskname(self):
-        """Will attempt to return name of current task/step."""
+        """Get name of current task/step in the workflow (if applicable)."""
         callback_list = self.getCallbacks()
         if callback_list:
             for i in self.getCurrTaskId():
@@ -455,7 +468,21 @@ BibWorkflowEngine
         return self._objects[obj_id]
 
     def halt(self, msg, action=None):
-        """Halt the workflow (stop also any parent wfe."""
+        """Halt the workflow by raising WorkflowHalt.
+
+        Halts the currently running workflow by raising WorkflowHalt.
+
+        You can provide a message and the name of an action to be taken
+        (from an action in actions registry).
+
+        :param msg: message explaining the reason for halting.
+        :type msg: str
+
+        :param action: name of valid action in actions registry.
+        :type action: str
+
+        :raises: WorkflowHalt
+        """
         raise WorkflowHalt(message=msg,
                            action=action,
                            id_workflow=self.uuid)
@@ -470,7 +497,7 @@ BibWorkflowEngine
         """Initiate the counters of object states.
 
         :param obj_count: Number of objects to process.
-        :type obj_count int.
+        :type obj_count: int
         """
         self.db_obj.counter_initial = obj_count
         self.db_obj.counter_halted = 0
@@ -496,7 +523,7 @@ BibWorkflowEngine
         by looking in the registry the name passed in parameter.
 
         :param workflow_name: name of the workflow.
-        :type workflow_name: str.
+        :type workflow_name: str
         """
         from .registry import workflows
         if workflow_name not in workflows:
@@ -510,10 +537,8 @@ BibWorkflowEngine
     def set_extra_data_params(self, **kwargs):
         """Add keys/value in extra_data.
 
-        Allows the addition of value in the extra_data dictionnary,
+        Allows the addition of value in the extra_data dictionary,
         all the data must be passed as "key=value".
-
-        :param kwargs: pair key/value dictionnary comprehensive.
         """
         tmp = self.get_extra_data()
         if not tmp:

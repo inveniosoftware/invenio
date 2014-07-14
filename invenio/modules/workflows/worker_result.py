@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -19,22 +20,29 @@
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass
 
+
 @add_metaclass(ABCMeta)
 class AsynchronousResultWrapper(object):
-    """
+
+    """Wrap results from asynchronous results.
+
     This class is an abstract class. When you inherit it you should
     absolutely implement all the functions.
 
     This class is here for two reason, get and unified interface for all
-    the worker and so allow to switch from one to another seemslessly,
+    the worker and so allow to switch from one to another seamlessly,
     and also add feature to functions.
 
     For example the get method now allow a post processing
     on the result.
 
-    :param asynchronousresult: the async result that you want to wrap.
     """
+
     def __init__(self, asynchronousresult):
+        """Instantiate a AsynchronousResultWrapper around a given result object.
+
+        :param asynchronousresult: the async result that you want to wrap.
+        """
         self.asyncresult = asynchronousresult
 
     @abstractmethod
