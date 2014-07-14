@@ -73,7 +73,7 @@
                             {{ multi_value_row("Experiments", item.experiments) if item.experiments }}
 			            </table>
 			            {% endif %}
-					    {{ institution_history(item.institution_history, reverse_chrono=True, limit=3) }}
+					    {{ institution_history(item.institution_history, reverse_chrono=True, limit=3) if item.institution_history else "No institution history."}}
 					</div>
 				</div>
 				{% endif %}
