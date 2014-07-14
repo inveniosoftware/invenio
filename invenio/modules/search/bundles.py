@@ -27,6 +27,8 @@ _js.contents += ('js/search/search_parser.js',
                  'js/search/default_typeahead_configuration.js',
                  'js/search/facet.js',
                  'js/search/search.js')
+_js.bower['requirejs-hogan-plugin'] = 'latest'
+
 
 _css.contents += ('css/typeahead.js-bootstrap.css',
                   'css/search/search.css',

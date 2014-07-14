@@ -33,7 +33,10 @@
     },
     paths: {
         jquery: 'empty:',
-        'jquery.form': 'js/jquery.form'
+        'jquery.form': 'js/jquery.form',
+        hgn: 'js/hgn',
+        hogan: 'js/hogan.amd',
+        text: 'js/text'
     },
     shim: {
         jquery: { exports: '$' }

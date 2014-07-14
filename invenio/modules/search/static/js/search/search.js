@@ -18,7 +18,15 @@
  */
 
 
-define('js/search/search', ['jquery'], function($) {
+define(
+    'js/search/search',
+    ['require', 'jquery',
+     'hgn!./templates/action',
+     'hgn!./templates/box',
+     'hgn!./templates/button',
+     'hgn!./templates/row'],
+    function(require, $) {
+
     return function(facets) {
         // side facet list
         var facet_list = $(facets.elem)
@@ -27,7 +35,6 @@ define('js/search/search', ['jquery'], function($) {
             keyboard: false,
             backdrop: 'static'
         }).modal('hide');
-
 
         if (facet_list.length && typeof facets !== undefined) {
             var parent = facet_list.closest('.container, .row'),
@@ -44,35 +51,32 @@ define('js/search/search', ['jquery'], function($) {
 
             facet_list.facet({
                 button_builder: function(title) {
-                    return '<a style="cursor:pointer" class="text-muted"><small>'+title+' ...</small></a> ';
+                    return require('hgn!./templates/button')({
+                        title: title
+                    })
                 },
                 row_builder: function(data, name) {
                     var title = data[(data.length==3) ? 2 : 0],
                     counter = data[1]
-                    return '<li class="controls" style="display:none">'+
-                        '<a class="expandable" style="cursor:pointer" ' +
-                        'data-target="#facet_list" ' +
-                        'data-facet="toggle" ' +
-                        'data-facet-action="+" '+
-                        'data-facet-key="' + name + '" '+
-                        'data-facet-value="' + data[0] + '">' +
-                        title +
-                        '</a> <small class="text-muted">('+counter+')</small>' +
-                        '</li>'
+                    return require('hgn!./templates/row')({
+                        target: facets.elem,
+                        key: name,
+                        value: data[0],
+                        title: title,
+                        counter: counter
+                    })
                 },
                 box_builder: function(name, title) {
-                    return '<div class="'+name+'">' +
-                        '<a style="cursor:pointer" ' +
-                        'data-facet="reset-key" '+
-                        'data-target="#facet_list" ' +
-                        'data-facet-key="'+ name +'"><strong>'+
-                        title + '</strong></a>' +
-                        '<ul class="context list-unstyled"><ul></div>'
+                    return require('hgn!./templates/box')({
+                        target: facets.elem,
+                        key: name,
+                        title: title
+                    })
                 },
                 facets: facets.data
             }).on('updated', function(event) {
-                var p = $('#facet_filter input[name=p]').val()
-                    , facet = $('#facet_list').data('facet')
+                var p = $('#facet_filter input[name=p]').val(),
+                    facet = facet_list.data('facet')
 
                 $('#search-box-main input[name=p]').val(p+' '+facet.queryString());
 
@@ -104,8 +108,8 @@ define('js/search/search', ['jquery'], function($) {
 
             }).on('loaded', function(event) {
 
-                var typeahead = $('form[name=search] input[name=p]').data('typeahead')
-                    , facet = $('#facet_list').data('facet')
+                var typeahead = $('form[name=search] input[name=p]').data('typeahead'),
+                    facet = facet_list.data('facet')
 
                 // Move out from library
                     var expand = jQuery.grep(facet.filter, function (a) {
@@ -115,81 +119,68 @@ define('js/search/search', ['jquery'], function($) {
                         facet.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
                     });
 
-                    // doesnt work with the current typeahead
-
-                    /*if ($.inArray(event.name+':', typeahead.options.source)<0) {
-                      typeahead.options.source.push(event.name+':');
-                      }
-
-                      if (! typeahead.options.sources ) {
-                      typeahead.options.sources = {}
-                      }
-
-                      typeahead.options.sources[event.name] = $.map(event.facet, function(i) {
-                      return i[0];
-                      });*/
-
                     $('[data-facet="toggle"]')
-                    .filter('[data-facet-key="'+event.name+'"]')
-                    .addClass('muted').each(function(i) {
+                        .filter('[data-facet-key="'+event.name+'"]')
+                        .addClass('muted').each(function(i) {
 
-                        var $e = $(this),
-                        filterContent = function() {
-                            return facets.labels.action + '<br/><a class="btn btn-sm btn-error" style="cursor:pointer" ' +
-                                'data-target="#facet_list" ' +
-                                'data-facet="toggle" ' +
-                                'data-facet-action="-" '+
-                                'data-facet-key="' + $e.attr('data-facet-key') + '" '+
-                                'data-facet-value="' + $e.attr('data-facet-value') + '">' +
-                                facets.labels.exclude + '</a>'
-                        }
-
-                        $e.popover({
-                            html: true,
-                            placement: 'right',
-                            trigger: 'manual',
-                            content: filterContent,
-                            title: facets.labels.didyouknow
-                        }).on('mouseenter', function() {
-                            var popupFunc = function() {$e.popover('show')}
-                            if (popupTimer) {
-                                clearTimeout(popupTimer)
-                            }
-                            popupTimer = setTimeout(popupFunc, 2000)
-                        }).on('click', function() {
-                            if (popupTimer) {
-                                clearTimeout(popupTimer)
-                            }
-                            $e.popover('hide')
-                        }).parent().on('mouseleave', function() {
-                            if (popupTimer) {
-                                clearTimeout(popupTimer)
-                            }
-                            $e.popover('hide')
-                        })
-
-                    }).on('click', function(event) {
-                        var $el_clicked = $(this),
-                        options = $('#facet_list').data('facet').options
-
-                        if (!$el_clicked.hasClass('expandable') && $el_clicked.attr('data-facet-key') === 'collection') {
-                            if ($el_clicked.parent().has('ul')) {
-                                var $ul = $el_clicked.parent().find('ul')
-                                $ul.each(function(i, ul) {
-                                    $(this).find('[data-facet="toggle"]').each(function() {
-                                        $('#facet_list').data('facet').delete('+', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                                        $('#facet_list').data('facet').delete('-', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
+                            var toggle = $(this),
+                                filterContent = $.proxy(function() {
+                                    return facets.labels.action +
+                                        require('hgn!./templates/action')({
+                                        targe: facets.elem,
+                                        key: this.data('facet-key'),
+                                        value: this.data('facet-value'),
+                                        title: facets.labels.exclude
                                     })
-                                })
+                                }, toggle)
 
-                                if ($el_clicked.hasClass('text-info') || $el_clicked.hasClass('text-danger')) {
-                                    $ul.remove()
-                                    $el_clicked.addClass('expandable')
-                                    $('#facet_list').data('facet').filter = $('#facet_list').data('facet').exclude('!', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
+                            toggle.popover({
+                                html: true,
+                                placement: 'right',
+                                trigger: 'manual',
+                                content: filterContent,
+                                title: facets.labels.didyouknow
+                            }).on('mouseenter', function() {
+                                if (popupTimer) {
+                                    clearTimeout(popupTimer)
+                                }
+                                popupTimer = setTimeout(function() {
+                                    toggle.popover('show')
+                                }, 2000)
+                            }).on('click', function() {
+                                if (popupTimer) {
+                                    clearTimeout(popupTimer)
+                                }
+                                toggle.popover('hide')
+                            }).parent().on('mouseleave', function() {
+                                if (popupTimer) {
+                                    clearTimeout(popupTimer)
+                                }
+                                toggle.popover('hide')
+                            })
+
+                        }).on('click', function(event) {
+                            var $el_clicked = $(this),
+                            options = facet_list.data('facet').options
+
+                            if (!$el_clicked.hasClass('expandable') && $el_clicked.attr('data-facet-key') === 'collection') {
+                                if ($el_clicked.parent().has('ul')) {
+                                    var $ul = $el_clicked.parent().find('ul')
+                                    $ul.each(function(i, ul) {
+                                        $(this).find('[data-facet="toggle"]').each(function() {
+                                            facet_list.data('facet').delete('+', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
+                                            facet_list.data('facet').delete('-', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
+                                        })
+                                    })
+
+                                    if ($el_clicked.hasClass('text-info') || $el_clicked.hasClass('text-danger')) {
+                                        $ul.remove()
+                                        $el_clicked.addClass('expandable')
+                                        facet_list.data('facet').filter = facet_list.data('facet').exclude('!', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
+                                    }
                                 }
                             }
-                        }
-                    })
+                        })
 
                     // on hover add button in popover
                     //$('[data-facet="reset-key"]').addClass('text-info')
@@ -206,12 +197,8 @@ define('js/search/search', ['jquery'], function($) {
                     })
 
 
-                    $('#search_results').css('min-height', $('#facet_list').height())
-                    $('#facet_list').affix('checkPosition');
-
-                    //if (document.location.hash.length > 2) {
-                    //  $(window).trigger('hashchange');
-                    //}
+                    $('#search_results').css('min-height', facet_list.height())
+                    facet_list.affix('checkPosition');
 
                     // When we load data we should select facets from filter.
                     if (facet.findByKey(event.name).length > 0) {
@@ -262,32 +249,22 @@ define('js/search/search', ['jquery'], function($) {
                 .each(function() {
 
                     var $el_clicked = $(this),
-                    options = $('#facet_list').data('facet').options
+                    options = facet_list.data('facet').options
 
                     $el_clicked.removeClass('expandable')
 
                     if (event.key === 'collection') {
-                        //if ($el_clicked.parent().has('ul').length > 0) {
-                        //  $el_clicked.parent().find('ul').each(function(i, ul) {
-                        //    $(this).find('[data-facet="toggle"]').each(function() {
-                        //      $('#facet_list').data('facet').delete('+', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                        //      $('#facet_list').data('facet').delete('-', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                        //    })
-                        //  }).remove()
-                        //} else {
-                        // do cleaning first
                         $(this).parent().find('ul').remove()
                         var facet = {url: options.url_map[event.key]
                             , facet: event.key}
                             , data = {parent: event.value}
                             , $ul = $('<ul class="context list-unstyled"><ul>').clone().appendTo($el_clicked.parent())
 
-                        var data_facet = $('#facet_list').data('facet')
+                        var data_facet = facet_list.data('facet')
                         if (data_facet.find('!', event.key, event.value).length == 0) {
                             data_facet.filter.push(['!', event.key, event.value])
                         }
                         data_facet.createFacetBox(facet, $ul, data)
-                        //}
                     }
                 })
 

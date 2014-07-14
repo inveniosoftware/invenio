@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "typeahead.js": "0.10.2",
-    "hogan": "3.0.0",
+    "hogan": "~3",
     "jquery-tokeninput": "*",
     "MathJax": "v2.1-latest",
     "jquery_jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
@@ -43,7 +43,8 @@
     "font-awesome": "*",
     "bootstrap-tagsinput": "*",
     "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
-    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js"
+    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js",
+    "requirejs-hogan-plugin": "latest"
   },
   "resolutions": {
     "jquery": "2.1.0",
