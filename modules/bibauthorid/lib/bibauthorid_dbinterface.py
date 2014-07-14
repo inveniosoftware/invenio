@@ -4650,7 +4650,7 @@ def remove_all_signatures_from_authors(pids):  # remove_personid_papers
                 % pids_sqlstr)
 
 
-def get_authors_by_surname(surname):  # find_pids_by_name
+def get_authors_by_surname(surname, limit_to_recid=False):  # find_pids_by_name
     '''
     Gets all authors who carry records with the specified surname.
 
@@ -4660,10 +4660,16 @@ def get_authors_by_surname(surname):  # find_pids_by_name
     @return: author identifier and name set((pid, name),)
     @rtype: set set((int, str),)
     '''
-    return set(run_sql("""select personid, name
-                          from aidPERSONIDPAPERS
+
+    if not limit_to_recid:
+        select_query = "select personid, name "
+    else:
+        select_query = "select personid "
+        
+    return set(run_sql(select_query +
+                       """from aidPERSONIDPAPERS
                           where name like %s""",
-              (surname + ',%',)))
+                       (surname + ',%',)))
 
 
 # could be useful to optimize rabbit. Still unused and untested, Watch out!

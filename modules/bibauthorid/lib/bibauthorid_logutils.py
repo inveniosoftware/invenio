@@ -9,6 +9,9 @@ import multiprocessing as mp
 
 
 class Logger(object):
+    """
+    The class that is responsible for the logging throughout the module.
+    """
 
     _pid = os.getpid
     _print_output = bconfig.LOG_VERBOSE
@@ -100,7 +103,6 @@ class Logger(object):
     def verbose(self, val):
         self._verbose = val
 
-
     @staticmethod
     def override_verbosity(verbose):
         '''
@@ -109,7 +111,6 @@ class Logger(object):
         with mp.Lock():
             Logger._print_output = verbose
 
-
     @staticmethod
     def override_stdout(stdout):
         '''
@@ -117,9 +118,8 @@ class Logger(object):
         '''
         with mp.Lock():
             Logger._file_only = not stdout
-     
 
-    @staticmethod       
+    @staticmethod
     def override_fileout(fileout):
         '''
         Globally configure stdout logging.
@@ -127,9 +127,8 @@ class Logger(object):
         with mp.Lock():
             if fileout and (Logger._print_output or Logger._update_status):
                 Logger._file_out = True
-                
 
-    @staticmethod            
+    @staticmethod
     def override_update_status(update_status):
         '''
         Globally configure update_status logging.
