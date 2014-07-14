@@ -41,6 +41,7 @@ styles = Bundle(
         "less/base/**/*.less"
     ],
     filters="less,cleancss",
+    weight=50
 )
 
 # FIXME

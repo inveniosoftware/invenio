@@ -35,4 +35,8 @@ js = Bundle(
     }
 )
 
-_styles.contents.append("css/deposit/form.css")
+styles = Bundle(
+    "css/deposit/form.css",
+    output="deposit.css",
+    weight=51,
+)

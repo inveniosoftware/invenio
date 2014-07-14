@@ -20,6 +20,10 @@
 {% extends "page.html" %}
 {# set title = collection.name_ln if collection.id > 1 else None #}
 
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "search.js", "search.css" %}
+{% endblock %}
 
 {% block body %}
   {%- include "search/form/index.html" -%}

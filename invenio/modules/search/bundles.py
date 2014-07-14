@@ -19,17 +19,25 @@
 
 """Search bundles."""
 
-from invenio.base.bundles import invenio as _js, styles as _css
+from invenio.ext.assets import Bundle
 
+js = Bundle(
+    'js/search/search_parser.js',
+    'js/search/typeahead.js',
+    'js/search/default_typeahead_configuration.js',
+    'js/search/facet.js',
+    'js/search/init.js',
+    bower={
+        'requirejs-hogan-plugin': 'latest'
+    },
+    output="search.js",
+    weight=50,
+)
 
-_js.contents += ('js/search/search_parser.js',
-                 'js/search/typeahead.js',
-                 'js/search/default_typeahead_configuration.js',
-                 'js/search/facet.js',
-                 'js/search/init.js')
-_js.bower['requirejs-hogan-plugin'] = 'latest'
-
-
-_css.contents += ('css/typeahead.js-bootstrap.css',
-                  'css/search/search.css',
-                  'css/search/searchbar.css')
+styles = Bundle(
+    'css/typeahead.js-bootstrap.css',
+    'css/search/search.css',
+    'css/search/searchbar.css',
+    output="search.css",
+    weight=60,
+)
