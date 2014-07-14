@@ -42,7 +42,7 @@ class WebInterfaceDisabledPages(WebInterfaceDirectory):
             register_exception()
             page = lambda * args: args[1]
         req.status = apache.HTTP_SERVICE_UNAVAILABLE
-        msg = "<p>This functionality is currently unavailable due to a service maintenance.</p>"
+        msg = "<p>We are currently updating our author pages. Please come back tomorrow to enjoy them in their new design. Thanks for your patience!</p>"
         try:
             from invenio.config import CFG_SITE_ADMIN_EMAIL
             msg += """<p>You can contact <code>%s</code>
@@ -436,8 +436,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         bibsword = WebInterfaceSword()
         ping = WebInterfacePingPages()
         linkbacks = WebInterfaceRecentLinkbacksPages()
-        author = WebInterfaceAuthor()
-        person = WebInterfacePerson()
+        author = WebInterfaceDisabledPages() #WebInterfaceAuthor()
+        person = WebInterfaceDisabledPages() #WebInterfacePerson()
         textmining = WebInterfaceDocExtract()
         yourcomments = WebInterfaceYourCommentsPages()
         goto = WebInterfaceGotoPages()
