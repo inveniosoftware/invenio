@@ -35,6 +35,7 @@ from invenio.bibauthorid_backinterface import get_free_author_ids as backinterfa
 from invenio.bibauthorid_backinterface import get_ordered_author_and_status_of_signature
 from invenio.bibauthorid_backinterface import remove_empty_authors
 from invenio.bibauthorid_backinterface import get_paper_to_author_and_status_mapping
+from invenio.bibauthorid_backinterface import get_authors_by_surname
 
 logger = Logger("merge")
 
@@ -323,40 +324,15 @@ def merge_dynamic():
 
     for idx, last in enumerate(last_names):
         logger.update_status(float(idx) / len(last_names), "%d/%d current: %s" % (idx, len(last_names), last))
+        
+        results = get_signatures_for_merge_cluster_by_surname(last)
+        
+        best_match, old_pids = get_merge_matching_matrix_and_pids(results)
+        
+        matched_clusters = get_matched_clusters(best_match, results, old_pids)
+        
+        not_matched_clusters = get_unmatched_clusters(best_match, results)
 
-        results = ((int(row[0].split(".")[1]), row[1:4]) for row in get_clusters_by_surname(last))
-
-        # [(last name number, [bibrefrecs])]
-        results = [(k, map(itemgetter(1), d))
-                   for k, d in groupby(sorted(results, key=itemgetter(0)), key=itemgetter(0))]
-
-        # List of dictionaries.
-        # [{new_pid -> N}]
-        matr = []
-
-        # Set of all old pids.
-        old_pids = set()
-
-        for k, ds in results:
-            pids = list()
-            for d in ds:
-                pid_flag = get_author_and_status_of_confirmed_paper(d)
-                if pid_flag:
-                    pid, flag = pid_flag[0]
-                    pids.append(pid)
-                    old_pids.add(pid)
-
-            matr.append(dict((k, len(list(d))) for k, d in groupby(sorted(pids))))
-
-        # We cast it to list in order to ensure the order persistence.
-        old_pids = list(old_pids)
-        # best_match = cluster,pid_idx,n
-        best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
-
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx])
-                            for new_idx, old_idx, score in best_match if score > 0]
-        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(
-            imap(itemgetter(0), [x for x in best_match if x[2] > 0]))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
         
         for sigs, pid in chain(matched_clusters, not_matched_clusters):
@@ -366,6 +342,96 @@ def merge_dynamic():
     logger.update_status_final()
     remove_empty_authors()
     update_canonical_names_of_authors()
+
+
+def get_signatures_for_merge_cluster_by_surname(last):
+    '''
+        Returns the serial number of the person in aidRESULTS along with the
+        signatures assigned to him by tortoise.
+        
+        For example:
+        get_signatures_for_cluster_by_surname("last_name") -->
+        [0, [sigs of person 0],
+        1, [sigs of person 1],
+        ...,
+        n ,[sigs of person n]]
+    '''
+    results = ((int(row[0].split(".")[1]),
+                row[1:4]) for row in get_clusters_by_surname(last))
+
+    # [(last name number, [bibrefrecs])]
+    return [(k, map(itemgetter(1), d)) for k, d in groupby(sorted(results,
+            key=itemgetter(0)), key=itemgetter(0))]
+      
+
+def get_merge_matching_matrix_and_pids(results):
+    '''
+        Returns a maximized matrix with the total matches of personids in
+        aidRESULTS for a given cluster and persons in aidPERSONIDPAPERS
+        followed by the number of common records.
+        
+        The input should be in the following format:
+                   [0, [sigs of person 0],
+                    1, [sigs of person 1],
+                    ...,
+                    n ,[sigs of person n]]
+                    
+        Consider using get_signatures_for_merge_cluster_by_surname(last_name)
+        to generate them.
+    '''
+    # List of dictionaries.
+    # [{new_pid -> N}]
+    matr = []
+
+    # Set of all old pids.
+    old_pids = set()
+
+    for k, ds in results:
+        pids = list()
+        for d in ds:
+            pid_flag = get_author_and_status_of_confirmed_paper(d)
+            if pid_flag:
+                pid, flag = pid_flag[0]
+                pids.append(pid)
+                old_pids.add(pid)
+
+        matr.append(dict((k, len(list(d))) for k, d in groupby(sorted(pids))))
+
+    # We cast it to list in order to ensure the order persistence.
+    old_pids = list(old_pids)
+    best_match = maximized_mapping([[row.get(old, 0)for old in old_pids] for row in matr])
+    
+    return best_match, old_pids
+
+
+def get_matched_clusters(best_match_matrix, results, pids):
+    '''
+        Returns clusters from aidRESULTS that have matching with others in
+        aidPERSONNIDPAPERS.
+    '''
+    return [(results[new_idx][1], pids[old_idx])
+            for new_idx, old_idx, score in best_match_matrix if score > 0]
+    
+    
+def get_unmatched_clusters(best_match_matrix, results):
+    '''
+        Returns clusters from aidRESULTS that have no matchings with others in
+        aidPERSONNIDPAPERS.
+    ''' 
+    return frozenset(xrange(len(results))) - frozenset(
+        imap(itemgetter(0), [x for x in best_match_matrix if x[2] > 0]))
+        
+        
+def get_untouched_personids(surname, pids_in_aidresults):
+    '''
+        For a given surname, returns the personids that are not included in
+        aidRESULTS (the results of the latest disambiguation).
+    '''
+    pids_in_aidpersonidpapers = get_authors_by_surname(surname,
+                                                       limit_to_recid=True)
+    pids_in_aidpersonidpapers = set(p[0] for p in pids_in_aidpersonidpapers)
+                                                       
+    return pids_in_aidpersonidpapers - set(pids_in_aidresults)
 
 
 def matched_claims(inspect=None):
