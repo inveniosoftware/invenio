@@ -57,7 +57,7 @@ install:
   - "inveniomanage collect"
   - "inveniomanage assets build"
   - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
-  - "inveniomanage config set LESS_BIN false"
+  - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
   - "inveniomanage config set REQUIREJS_BIN false"
   - "inveniomanage config set UGLIFYJS_BIN false"
 

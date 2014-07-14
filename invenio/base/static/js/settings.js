@@ -22,6 +22,9 @@ require.config({
     paths: {
         jquery: 'js/jquery',
         'jquery.form': 'js/jquery.form',
+        hgn: 'js/hgn',
+        hogan: 'js/hogan.amd',
+        text: 'js/text'
     },
     shim: {
         jquery: { exports: '$' },

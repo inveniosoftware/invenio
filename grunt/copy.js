@@ -99,6 +99,8 @@ module.exports = {
             'json2/json2.js',
             'prism/prism.js',
             'requirejs/require.js',
+            'requirejs-hogan-plugin/hgn.js',
+            'requirejs-hogan-plugin/text.js',
             'uploadify/jquery.uploadify.min.js'
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
@@ -144,11 +146,11 @@ module.exports = {
     hogan: {
         expand: true,
         flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['hogan/web/builds/2.0.0/hogan-2.0.0.js'],
+        cwd: '<%= globalConfig.bower_path %>/hogan/web/builds/3.0.2',
+        src: ['hogan-?.?.?.js', 'hogan-?.?.?.amd.js'],
         dest: '<%= globalConfig.installation_path %>/js/',
         rename: function(dest, src) {
-            return dest + src.substring(0, src.indexOf('-')) + '.js';
+            return dest + src.replace(/-[\d\.]+(?=\.)/, '')
         }
     },
     jqueryUI: {
