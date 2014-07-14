@@ -131,6 +131,7 @@ def rabbit(bibrecs=None, check_invalid_papers=False,
     updated_pids = set()
     deleted = frozenset(p[0] for p in get_deleted_papers())
 
+    bibrecs = list(bibrecs)
     for idx, rec in enumerate(bibrecs):
 
         logger.log("Considering %s" % str(rec))
