@@ -125,10 +125,10 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
 
-            scripts = ["json2.js", "merger/engine.js"]
+            scripts = ["vendors/json2/json2.js", "js/merger/engine.js"]
             metaheaderadd = ""
             for script in scripts:
-                metaheaderadd += '<script type="text/javascript" src="%s/%s"></script>' % (CFG_SITE_URL, auto_version_url("js/" + script))
+                metaheaderadd += '<script type="text/javascript" src="%s/%s"></script>' % (CFG_SITE_URL, auto_version_url(script))
 
             return page(title         = 'Record Merger',
                         metaheaderadd = metaheaderadd,

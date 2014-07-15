@@ -58,8 +58,6 @@ module.exports = {
             'jquery-flot/excanvas.min.js',
             'jquery-flot/jquery.flot.js',
             'jquery-flot/jquery.flot.selection.js',
-            'jquery-form/jquery.form.js',
-            'json2/json2.js',
             'prism/prism.js',
             'requirejs/require.js',
             'requirejs-hogan-plugin/hgn.js',
@@ -67,18 +65,6 @@ module.exports = {
             'uploadify/jquery.uploadify.min.js'
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
-    },
-    typeaheadBootstrap3Css: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/typeahead.js-bootstrap3.less',
-        src: ['typeahead.css'],
-        dest: '<%= globalConfig.installation_path %>/css/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'typeahead.js-bootstrap.css');
-            return dest + res;
-        }
     },
     jqueryTimePicker: {
         expand: true,
@@ -144,42 +130,6 @@ module.exports = {
         cwd: '<%= globalConfig.bower_path %>/jquery.tablesorter/',
         src: ['**'],
         dest: '<%= globalConfig.installation_path %>/js/tablesorter/'
-    },
-    themesUI: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery.ui/themes/',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/img/jquery-ui/themes'
-    },
-    imagesUI: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery.ui/themes/base/images/',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/img/images/'
-    },
-    jeditable: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery_jeditable/',
-        src: ['index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            if (src === 'index.js') {
-                return dest + 'jquery.jeditable.mini.js';
-            }
-            return dest + src;
-        }
-    },
-    jqueryhotkeys: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery.hotkeys/',
-        src: ['index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            if (src === 'index.js') {
-                return dest + 'jquery.hotkeys.js';
-            }
-            return dest + src;
-        }
     },
     jqueryMigrate: {
         expand: true,

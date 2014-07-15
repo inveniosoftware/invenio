@@ -840,13 +840,15 @@ div .boxleft_2 {
     def scripts(self):
         """Returns the scripts that should be imported."""
 
-        scripts = ["json2.js",
-                   "bibeditmulti.js"]
+        scripts = [
+            "vendors/json2/json2.js",
+            "js/bibeditmulti.js"
+        ]
 
         result = ""
         for script in scripts:
             result += '<script type="text/javascript" src="%s/%s">' \
-            '</script>\n' % (CFG_SITE_URL, auto_version_url("js/" + script))
+            '</script>\n' % (CFG_SITE_URL, auto_version_url(script))
 
         return result
 

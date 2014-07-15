@@ -74,11 +74,13 @@ jquery = Bundle(
     weight=10,
     bower={
         "jquery": "~1.11",
-        "hogan": "~3",
         "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
+        "jquery.hotkeys": "https://github.com/jeresig/jquery.hotkeys.git",
         "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
         "jquery-tokeninput": "latest",
         "jquery-form": "latest",
+        "json2": "latest",
+        "hogan": "~3",
         "typeahead.js": "latest",
 #       "bootstrap": "*", is set by invenio.css already.
     }
