@@ -130,7 +130,7 @@
 		{% endif %}
 	</tbody>
 	</table>
-	{{ institution_history(record.institution_history) }}
+	{{ institution_history(record.institution_history) if record.institution_history }}
 	<div class="bai-details-button pull-right">
 		{% if link_to_record %}
 		<a href="{{ hepnames_link }}{{ record.record_id }}"type="button" class="btn btn-danger">HepNames Record</a>
