@@ -765,9 +765,15 @@ def get_papers_of_author(pid, claimed_only=False, include_rejected=False):  # ge
     query = ('select bibrec '
              'from aidPERSONIDPAPERS '
              'where personid=%s')
-    if claimed_only and include_rejected:
+
+    # Standard case: get all assigned papers excluding rejected
+    if not claimed_only and not include_rejected:
+        query += " and flag>-2"
+    # Get claimed and rejected papers only (human interaction footprint)
+    elif claimed_only and include_rejected:
         query += " and (flag=2 or flag=-2)"
-    elif claimed_only:
+    # Standard case: get only claimed papers
+    elif claimed_only and not include_rejected:
         query += " and flag=2"
 
     return set(run_sql(query, (pid,)))
