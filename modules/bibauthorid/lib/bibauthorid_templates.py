@@ -2321,20 +2321,20 @@ This list contains all your publications that were automatically assigned to you
                 html_autoclaim += self.loading_html()
         else:
             html_autoclaim = ''
-            if "unsuccessfull_recids" in autoclaim_data.keys() and autoclaim_data["unsuccessfull_recids"]:
+            if "unsuccessful_recids" in autoclaim_data.keys() and autoclaim_data["unsuccessful_recids"]:
 
                 message = ''
-                if autoclaim_data["num_of_unsuccessfull_recids"] > 1:
+                if autoclaim_data["num_of_unsuccessful_recids"] > 1:
                     message = _(
                         "The following %s publications need your review before they can be assigned to your profile:" %
-                        (str(autoclaim_data["num_of_unsuccessfull_recids"]),))
+                        (str(autoclaim_data["num_of_unsuccessful_recids"]),))
                 else:
                     message = _(
                         "The following publications need your review before they can be assigned to your profile:")
                 html_autoclaim += "<br><span id=\"autoClaimUnSuccessMessage\">%s</span></br>" % (message,)
                 html_autoclaim += '<div style="border:2px;height:100px;overflow:scroll;overflow-y:auto;overflow-x:auto;">'
                 html_autoclaim += '<br><strong>Publication title</strong> <ol type="1"> <br>'
-                for rec in autoclaim_data['unsuccessfull_recids']:
+                for rec in autoclaim_data['unsuccessful_recids']:
                     html_autoclaim += '<li> <a href="%s/record/%s"> <b> ' % (
                         CFG_SITE_URL,
                         rec) + autoclaim_data['recids_to_external_ids'][rec] + '</b></a></li>\n'
@@ -2345,12 +2345,12 @@ This list contains all your publications that were automatically assigned to you
                 html_autoclaim += '<br><span class=\"bsw\"><a rel="nofollow" href="%s" class="btn btn-default">%s</a></span><br><br>' % (
                     link, text)
 
-            if "successfull_recids" in autoclaim_data.keys() and autoclaim_data["successfull_recids"]:
+            if "successful_recids" in autoclaim_data.keys() and autoclaim_data["successful_recids"]:
                 message = _('The following publications have been successfully assigned to your profile:\n')
                 html_autoclaim += "<span id=\"autoClaimSuccessMessage\">%s</span><br>" % (message,)
                 html_autoclaim += '<div style="border:2px;height:300px;overflow:scroll;overflow-y:auto;overflow-x:auto;">'
                 html_autoclaim += '<br><strong>Publication title</strong> <ol type="1" style="padding-left:20px"> <br>'
-                for rec in autoclaim_data['successfull_recids']:
+                for rec in autoclaim_data['successful_recids']:
                     html_autoclaim += '<li> <a href="%s/record/%s"> <b> ' % (
                         CFG_SITE_URL,
                         rec) + autoclaim_data['recids_to_external_ids'][rec] + '</b></a></li>\n'
