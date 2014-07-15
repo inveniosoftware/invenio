@@ -209,7 +209,7 @@ install-jquery-plugins:
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes -nc http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/base/ && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes -nc http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes -nc http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
-	wget --no-check-certificate https://github.com/DataTables/DataTables/raw/master/media/css/demo_table_jui.css -O datatables_jquery-ui.css && \
+	wget --no-check-certificate -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css -O jquery-ui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif -O calendar.gif && \
 	wget -r -np -nH --cut-dirs=5 -A "png" -nc http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
