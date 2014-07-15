@@ -2759,7 +2759,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             "user_level": ulevel,
             "base_url": CFG_BASE_URL
         }
-        
+
 
         # Inspire specific endpoints.
         if CFG_INSPIRE_SITE:
@@ -3295,13 +3295,13 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
         # Syncing is done here. Entries that have been handled are removed from
-        # unsuccesfull_tickets so that they do not reappear in the next reload.
+        # unsuccessful_tickets so that they do not reappear in the next reload.
         if pinfo['autoclaim']['res']:
-            unsuccessfull_recids = pinfo['autoclaim']['res']['unsuccessful_recids']
+            unsuccessful_recids = pinfo['autoclaim']['res']['unsuccessful_recids']
             for entry in ticket:
                 recid = entry['rec']
-                unsuccessfull_recids = [rec for rec in unsuccessfull_recids if rec[2] != recid]
-                pinfo['autoclaim']['res']['unsuccessful_recids'] = unsuccessfull_recids
+                unsuccessful_recids = [rec for rec in unsuccessful_recids if rec[2] != recid]
+                pinfo['autoclaim']['res']['unsuccessful_recids'] = unsuccessful_recids
 
         webapi.commit_operations_from_ticket(ticket, userinfo, uid, ulevel)
         session.dirty = True
