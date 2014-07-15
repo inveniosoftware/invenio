@@ -811,7 +811,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     body=body,
                     language=ln,
                     metaheaderadd='<link rel="stylesheet" ' \
-                                        'href="%s/js/jqueryui/jquery-ui.css" ' \
+                                        'href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css" ' \
                                         'type="text/css" />' % CFG_SITE_URL,
                     lastupdated=__lastupdated__)
 
@@ -925,7 +925,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -1016,7 +1016,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -1204,7 +1204,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \

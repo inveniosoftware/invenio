@@ -143,7 +143,7 @@ class Template:
         """
 
         styles += """
-        <link type="text/css" href="%(site_url)s/js/jqueryui/jquery-ui.css" rel="stylesheet" />
+        <link type="text/css" href="%(site_url)s/vendors/jquery-ui/jquery-ui.css" rel="stylesheet" />
         <script type="text/javascript">
             function clearText(field){
                 if (field.value == field.defaultValue){
@@ -156,7 +156,7 @@ class Template:
                 }
             }
         </script>
-        <script type="text/javascript" src="%(site_url)s/js/jqueryui/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="%(site_url)s/vendors/jquery-ui/jquery-ui.min.js"></script>
         <script type="text/javascript" src="%(site_url)s/%(script)s"></script>
         """ % {'site_url':CFG_SITE_URL,
                'script': auto_version_url(

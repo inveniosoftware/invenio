@@ -203,7 +203,8 @@ def perform_request_init(uid, ln, req, lastupdated):
                     req         = req)
 
 
-    body += '<link rel="stylesheet" type="text/css" href="/js/jqueryui/jquery-ui.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="/vendors/jquery-ui/themes/redmond/jquery-ui.min.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="/vendors/jquery-ui/themes/redmond/theme.css" />'
     body += '<link rel="stylesheet" type="text/css" href="%s" />' % (
         url_for('editor.static', filename='css/editor/base.css'), )
 
@@ -268,15 +269,26 @@ def perform_request_init(uid, ln, req, lastupdated):
             "   var fieldTemplates = %s\n" % (json.dumps(fieldTemplates), ) + \
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jqueryui/jquery-ui.min.js',  'jquery.jeditable.mini.js',
-               'jquery.hotkeys.js', 'json2.js']
-    bibedit_scripts = ['refextract.js', 'display.js', 'engine.js', 'keys.js',
-                       'menu.js', 'holdingpen.js', 'marcxml.js',
-                       'clipboard.js']
+    scripts = [
+        'vendors/jquery-ui/jquery-ui.min.js',
+        'vendors/jquery.jeditable/index.js',
+        'vendors/jquery.hotkeys/jquery.hotkeys.js',
+        'vendors/json2/json2.js'
+    ]
+    bibedit_scripts = [
+        'refextract.js',
+        'display.js',
+        'engine.js',
+        'keys.js',
+        'menu.js',
+        'holdingpen.js',
+        'marcxml.js',
+        'clipboard.js'
+    ]
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s">' \
-            '</script>\n' % (url_for('static', filename='js/' + script), )
+            '</script>\n' % (url_for('static', filename=script), )
 
     for script in bibedit_scripts:
         body += '    <script type="text/javascript" src="%s">' \
@@ -1734,12 +1746,15 @@ def perform_request_init_template_interface():
     body += '    </script>\n'
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jqueryui/jquery-ui.min.js', 'json2.js']
+    scripts = [
+        'vendors/jquery-ui/jquery-ui.min.js',
+        'vendors/json2/json2.js'
+    ]
     bibedit_scripts = ['display.js', 'template_interface.js']
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s">' \
-            '</script>\n' % (url_for('static', filename='js/' + script), )
+            '</script>\n' % (url_for('static', filename=script), )
 
     for script in bibedit_scripts:
         body += '    <script type="text/javascript" src="%s">' \

@@ -68,6 +68,7 @@ jquery = Bundle(
     "vendors/bootstrap/dist/js/bootstrap.js",
     "js/bootstrap-select.js",
     "js/translate.js",
+    "js/legacy.js",
     output="jquery.js",
     filters="uglifyjs",
     weight=10,
@@ -77,6 +78,7 @@ jquery = Bundle(
         "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
         "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
         "jquery-tokeninput": "latest",
+        "jquery-form": "latest",
         "typeahead.js": "latest",
 #       "bootstrap": "*", is set by invenio.css already.
     }
@@ -89,7 +91,7 @@ jqueryui = Bundle(
     output="jquery-ui.js",
     weight=11,
     bower={
-        "jqueryui": "1.11.0",
+        "jquery-ui": "~1.11.0",
         "jqueryui-timepicker-addon": "latest"
     }
 )

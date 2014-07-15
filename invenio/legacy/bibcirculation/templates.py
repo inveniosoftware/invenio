@@ -916,7 +916,8 @@ class Template:
 
         out = """
         <style type="text/css"> @import url("/css/tablesorter.css"); </style>
-        <link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/theme.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
             <form name="request_form" action="%s/%s/%s/holdings/send" method="post" >
@@ -11436,7 +11437,8 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
         <div class="bibcircbottom">
-        <link rel=\"stylesheet\" href=\"%(site_url)s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%(site_url)s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />
+        <link rel=\"stylesheet\" href=\"%(site_url)s/vendors/jquery-ui/themes/redmond/theme.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript'
                 src="%(site_url)s/js/ui.datepicker.min.js"></script>
         <form name="search_form"

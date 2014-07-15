@@ -46,7 +46,7 @@
    # relocation. No bundles for this guy.
    #}
   <link rel="stylesheet" type="text/css"
-        href="{{ url_for("static", filename="vendors/jqueryui/themes/redmond/jquery-ui.css") }}"/>
+        href="{{ url_for("static", filename="vendors/jquery-ui/themes/redmond/jquery-ui.css") }}"/>
 <style>
 #widgets li .thumbnail {
   background: white;
@@ -141,7 +141,7 @@
 
 {% block javascript %}
 <script>
-require(['jquery', 'jqueryui'], function($) {
+require(['jquery', 'jquery-ui'], function($) {
   function saveWidgets() {
     var newOrderLeft = $("#widgetsLeft").sortable('toArray');
     var newOrderMiddle = $("#widgetsMiddle").sortable('toArray');

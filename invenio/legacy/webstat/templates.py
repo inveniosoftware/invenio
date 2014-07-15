@@ -943,10 +943,12 @@ Distribution across %s
             else:
                 s_date = datetime.datetime.today().date().strftime("%m/%d/%Y %H:%M")
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
-            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/js/jqueryui/jquery-ui.css"
+            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css"
                         type="text/css" />
-                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jqueryui/jquery-ui.min.js"></script>
-                      <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
+                      <link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker.min.css"
+                        type="text/css" />
+                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jquery-ui/jquery-ui.min.js"></script>
+                      <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.min.js"></script>
 
                       <div id="selectDateTxt" style="position:relative;display:none">
                       <table align="center">

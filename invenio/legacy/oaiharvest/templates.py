@@ -333,7 +333,7 @@ class Template:
 
            cnfrm - if given, must check checkbox to confirm
 
-        **hidden - dictionary with name=value pairs for hidden input 
+        **hidden - dictionary with name=value pairs for hidden input
         """
         output  = '<form action="%s" method="post">\n' % (action, )
         output += '<table width="100%">\n<tr><td style="vertical-align: top">'
@@ -678,13 +678,13 @@ class Template:
             returning the HTML headers necessary in order to open the view
             holdingpen page
         """
-        jquery_scripts = ["jqueryui/jquery-ui.min.js",
-                          "jquery-treeview/jquery.treeview.js",
-                          "jquery-treeview/jquery.treeview.async.js",
-                          "jquery.ajaxPager.js"]
+        jquery_scripts = ["vendors/jquery-ui/jquery-ui.min.js",
+                          "js/jquery-treeview/jquery.treeview.js",
+                          "js/jquery-treeview/jquery.treeview.async.js",
+                          "js/jquery.ajaxPager.js"]
         jquery_scripts_strings = []
         for script in jquery_scripts:
-            entry_str = """    <script type="text/javascript" src="%(baseurl)s/js/%(sname)s"></script>\n""" % {
+            entry_str = """    <script type="text/javascript" src="%(baseurl)s/%(sname)s"></script>\n""" % {
                     "baseurl": CFG_SITE_URL,
                     "sname" : script
                 }

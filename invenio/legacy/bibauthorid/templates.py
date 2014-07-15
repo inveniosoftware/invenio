@@ -151,29 +151,29 @@ class WebProfilePage():
     def __init__(self, page, heading, no_cache=False):
         self.css_dir = CFG_BASE_URL + "/img"
         self.img_dir = CFG_BASE_URL + "/img"
-        self.scripts_dir = CFG_BASE_URL + "/js"
+        self.scripts_dir = CFG_BASE_URL
         self.url = CFG_BASE_URL + "/author"
 
         self.scripts = [
-                        "jquery-ui.min.js",
-                        "jquery.form.js",
-                        "jquery.dataTables.min.js",
-                        "jquery-lightbox/js/jquery.lightbox-0.5.js",
-                        "jquery.omniwindow.js",
+                        "vendors/jquery-ui/jquery-ui.min.js",
+                        "vendors/jquery-form/jquery.form.js",
+                        "js/jquery.dataTables.min.js",
+                        "js/jquery-lightbox/js/jquery.lightbox-0.5.js",
+                        "js/jquery.omniwindow.js",
                         # "jquery.blockUI.js",
-                        "spin.min.js",
-                        "sly.min.js",
-                        "parsley.js",
-                        "bootstrap.min.js",
-                        "underscore-min.js",
-                        "backbone.js",
-                        "handlebars.js",
-                        "bibauthorid.js",
-                        "webauthorprofile.js",
+                        "js/spin.min.js",
+                        "js/sly.min.js",
+                        "js/parsley.js",
+                        "vendors/bootstrap/dist/js/bootstrap.min.js",
+                        "js/underscore-min.js",  # meh!?
+                        "js/backbone.js",
+                        "js/handlebars.js",
+                        "js/bibauthorid.js",
+                        "js/webauthorprofile.js",
                         ]
 
         self.stylesheets = [
-                        "jquery-ui/themes/smoothness/jquery-ui.css",
+                        "../vendors/jquery-ui/themes/redmond/jquery-ui.css",
                         "datatables_jquery-ui.css",
                         "bibauthorid.css",
                         "bootstrap.min.css"
@@ -766,7 +766,7 @@ class Template:
         @type kill_browser_cache: boolean
         '''
 
-        js_path = "%s/js" % CFG_SITE_URL
+        js_path = CFG_SITE_URL
         imgcss_path = "%s/img" % CFG_SITE_URL
 
         result = []
@@ -780,14 +780,14 @@ class Template:
                 '<META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">',
                 '<META HTTP-EQUIV="Expires" CONTENT="0">']
 
-        scripts = ["jqueryui/jquery-ui.min.js",
-                   "jquery.form.js",
-                   "jquery.dataTables.min.js",
-                   "bibauthorid.js"]
+        scripts = ["vendors/jquery-ui/jquery-ui.min.js",
+                   "vendors/jquery-form/jquery.form.js",
+                   "js/jquery.dataTables.min.js",
+                   "js/bibauthorid.js"]
 
         result.append('<link rel="stylesheet" type="text/css" href='
-                      '"%s/jquery-ui/themes/smoothness/jquery-ui.css" />'
-                      % (imgcss_path))
+                      '"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css" />'
+                      % (CFG_SITE_URL))
         result.append('<link rel="stylesheet" type="text/css" href='
                       '"%s/datatables_jquery-ui.css" />'
                       % (imgcss_path))

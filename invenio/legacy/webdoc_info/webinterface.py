@@ -235,11 +235,15 @@ def perform_request_init_info_interface():
     body = ''
 
     # Add scripts (the ordering is NOT irrelevant).
-    scripts = ['jquery-ui.min.js',
-               'json2.js', 'info-space-manager.js', 'jqueryFileTree/jqueryFileTree.js']
+    scripts = [
+        'vendors/jquery-ui/jquery-ui.min.js',
+        'vendors/json2/json2.js',
+        'js/info-space-manager.js',
+        'js/jqueryFileTree/jqueryFileTree.js'
+    ]
 
     for script in scripts:
-        body += '<script type="text/javascript" src="%s/js/%s">' \
+        body += '<script type="text/javascript" src="%s/%s">' \
             '</script>\n' % (CFG_SITE_URL, script)
 
     ckeditor_scripts = ['ckeditor.js', 'adapters/jquery.js']

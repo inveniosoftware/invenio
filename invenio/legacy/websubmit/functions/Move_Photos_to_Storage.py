@@ -363,9 +363,8 @@ def create_photos_manager_interface(sysno, session_id, uid,
                    'description': description})
 
     out += '''
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.slider.css" type="text/css" charset="utf-8"/>
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.core.css" type="text/css" charset="utf-8"/>
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui/themes/base/jquery.ui.theme.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css" type="text/css" charset="utf-8"/>
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/jquery-ui/themes/redmond/theme.css" type="text/css" charset="utf-8"/>
     <style type="text/css">
             #sortable { list-style-type: none; margin: 0; padding: 0; }
             #sortable li { margin: auto 3px; padding: 1px; float: left; width: 180px; font-size:small; text-align: center; position: relative;}
@@ -386,7 +385,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
 
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jqueryui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jquery-ui/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/uploadify.css" type="text/css" />
 
     <script type="text/javascript">

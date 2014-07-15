@@ -427,7 +427,7 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -546,7 +546,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
         uid=id_user,
         req=req,
         body=body,
-        metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+        metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
         navtrail=navtrail_previous_links,
         lastupdated=__lastupdated__)
 
@@ -1009,7 +1009,7 @@ def change_due_date_step1(req, barcode, borrower_id, ln=CFG_SITE_LANG):
                 #metaheaderadd = '<link rel="stylesheet" '\
                 #                'href="%s/img/jquery-ui/themes/redmond/ui.theme.css" '\
                 #                'type="text/css" />' % CFG_SITE_SECURE_URL,
-                metaheaderadd = '<link rel="stylesheet" href="%s/js/jqueryui/jquery-ui.css" '\
+                metaheaderadd = '<link rel="stylesheet" href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.css" '\
                                 'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -1177,7 +1177,7 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1700,7 +1700,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid,
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2640,7 +2640,7 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd='<link rel="stylesheet" href="%s/js/jqueryui/jquery-ui.css" '\
+                metaheaderadd='<link rel="stylesheet" href="%s/vendors/jquery-ui/themes/themes/jquery-ui.min.css" '\
                                 'type="text/css" />' % CFG_SITE_SECURE_URL,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -4045,7 +4045,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id,
     return page(title=_("Register ILL request"),
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -4373,7 +4373,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_SECURE_URL),
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_SECURE_URL),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4574,7 +4574,7 @@ def register_purchase_request_step1(req, request_type, recid, title, authors,
                 body=body,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
-                                    'href="%s/js/jqueryui/jquery-ui.css" ' \
+                                    'href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.css" ' \
                                     'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4676,7 +4676,7 @@ def register_purchase_request_step2(req, request_type, recid, title, authors,
                 body=body,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
-                                    'href="%s/js/jqueryui/jquery-ui.css" ' \
+                                    'href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.css" ' \
                                     'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4771,7 +4771,7 @@ def register_purchase_request_step3(req, request_type, recid, title, authors,
                 body=body,
                 language=ln,
                 metaheaderadd='<link rel="stylesheet" ' \
-                                    'href="%s/js/jqueryui/jquery-ui.css" ' \
+                                    'href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.css" ' \
                                     'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4832,7 +4832,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
                 uid=id_user,
                 req=req,
                 metaheaderadd='<link rel="stylesheet" ' \
-                                    'href="%s/js/jqueryui/jquery-ui.css" ' \
+                                    'href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.css" ' \
                                     'type="text/css" />' % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
@@ -4968,7 +4968,7 @@ def purchase_details_step1(req, delete_key, ill_request_id, new_status,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/js/jqueryui/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_SECURE_URL,
                 body=body,
                 language=ln,
                 navtrail=navtrail_previous_links,
@@ -5261,7 +5261,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
                 req=req,
                 body=body,
                 language=ln,
-            metaheaderadd='<link rel="stylesheet" href="%s/js/jqueryui/jquery-ui.css" '\
+            metaheaderadd='<link rel="stylesheet" href="%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css" '\
                                 'type="text/css" />' % CFG_SITE_SECURE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
