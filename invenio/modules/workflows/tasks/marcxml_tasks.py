@@ -929,9 +929,9 @@ def bibclassify_fast(taxonomy, rebuild_cache=False, no_cache=False,
             obj.extra_data["_result"] = {}
 
         if "title" in obj.data:
-            obj.extra_data["_result"][
-                "bibclassify"] = bibclassify_exhaustive_call_text(
-                obj.extra_data["_result"]["pdf"],
+            obj.extra_data["_result"]["bibclassify"] = \
+                bibclassify_exhaustive_call_text(
+                [obj.data["title"], obj.data["abstract"]],
                 taxonomy, rebuild_cache,
                 no_cache,
                 output_mode, output_limit,

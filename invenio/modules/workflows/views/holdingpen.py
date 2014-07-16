@@ -27,8 +27,10 @@ submissions/depositions.
 Note: Currently work-in-progress.
 """
 
-import re
+import msgpack
+import calendar
 
+from redis import Redis
 from six import iteritems, text_type
 
 from flask import (render_template, Blueprint, request, jsonify,
@@ -43,10 +45,9 @@ from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
 from ..registry import actions, workflows
-from ..utils import (sort_bwolist,
-                     get_holdingpen_objects,
-                     extract_data,
-                     get_action_list)
+from ..utils import (sort_bwolist, extract_data, get_action_list,
+                     get_pretty_date, get_type, WorkflowBase,
+                     check_ssearch_over_data, get_holdingpen_objects)
 from ..api import continue_oid_delayed, start_delayed
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -54,8 +55,6 @@ blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       static_folder='../static')
 
 default_breadcrumb_root(blueprint, '.holdingpen')
-
-REG_TD = re.compile("<td title=\"(.+?)\">(.+?)</td>", re.DOTALL)
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -144,17 +143,11 @@ def details(objectid):
     for list_of_object in hbwobject:
         hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
 
-<<<<<<< HEAD
-    hbwobject_final = hbwobject[ObjectVersion.INITIAL] + \
-        hbwobject[ObjectVersion.HALTED] + \
-        hbwobject[ObjectVersion.FINAL]
-=======
     hbwobject_final = (
         hbwobject[ObjectVersion.INITIAL] +
         hbwobject[ObjectVersion.HALTED] +
         hbwobject[ObjectVersion.FINAL]
     )
->>>>>>> 5b06136... workflows: Holding Pen blueprint update
 
     results = []
     for label, res in iteritems(bwobject.get_tasks_results()):
@@ -285,87 +278,6 @@ def get_context():
     return jsonify(context)
 
 
-<<<<<<< HEAD
-def get_info(bwobject):
-    """Parses the hpobject and extracts its info to a dictionary."""
-    info = {}
-    if bwobject.get_extra_data()['owner'] != {}:
-        info['owner'] = bwobject.get_extra_data()['owner']
-    else:
-        info['owner'] = 'None'
-    info['parent id'] = bwobject.id_parent
-    info['workflow id'] = bwobject.id_workflow
-    info['object id'] = bwobject.id
-    info['action'] = bwobject.get_action()
-    return info
-
-
-def extract_data(bwobject):
-    """Extract needed metadata from BibWorkflowObject.
-
-    Used for rendering the Record's holdingpen table row and
-    details and action page.
-    """
-    extracted_data = {}
-    if bwobject.id_parent is not None:
-        extracted_data['bwparent'] = \
-            BibWorkflowObject.query.get(bwobject.id_parent)
-    else:
-        extracted_data['bwparent'] = None
-
-    # TODO: read the logstuff from the db
-    extracted_data['loginfo'] = ""
-    extracted_data['logtext'] = {}
-
-    for log in extracted_data['loginfo']:
-        extracted_data['logtext'][log.get_extra_data()['_last_task_name']] = \
-            log.message
-
-    extracted_data['info'] = get_info(bwobject)
-    try:
-        extracted_data['info']['action'] = bwobject.get_action()
-    except (KeyError, AttributeError):
-        pass
-
-    extracted_data['w_metadata'] = \
-        Workflow.query.filter(Workflow.uuid == bwobject.id_workflow).first()
-    if extracted_data['w_metadata']:
-        workflow_def = get_workflow_definition(extracted_data['w_metadata'].name)
-        extracted_data['workflow_func'] = workflow_def
-    else:
-        extracted_data['workflow_func'] = [None]
-    return extracted_data
-
-
-def get_action_list(object_list):
-    """Return a dict of action names mapped to halted objects.
-
-    Get a dictionary mapping from action name to number of Pending
-    actions (i.e. halted objects). Used in the holdingpen.index page.
-    """
-    action_dict = {}
-    found_actions = []
-
-    # First get a list of all to count up later
-    for bwo in object_list:
-        action_name = bwo.get_action()
-        if action_name is not None:
-            found_actions.append(action_name)
-
-    # Get "real" action name only once per action
-    for action_name in set(found_actions):
-        if action_name not in actions:
-            # Perhaps some old action? Use stored name.
-            action_nicename = action_name
-        else:
-            action = actions[action_name]
-            action_nicename = getattr(action, "name", action_name)
-        action_dict[action_nicename] = found_actions.count(action_name)
-    return action_dict
-
-
-=======
->>>>>>> 5b06136... workflows: Holding Pen blueprint update
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @login_required
 @templated('workflows/hp_maintable.html')
@@ -378,9 +290,6 @@ def load_table():
     3] then if the user searched for something
     and finally it builds the JSON to send.
     """
-    import time
-    StartA = time.time()
-    workflows_cache = {}
     if request.method == "POST":
         if "holdingpen_tags" not in session:
             session["holdingpen_tags"] = []
@@ -392,7 +301,6 @@ def load_table():
         else:
             tags = []
             session["holdingpen_tags"] = []
-            print "global request  {0}".format(time.time() - StartA)
         return None
     else:
         if "holdingpen_tags" in session:
@@ -407,23 +315,104 @@ def load_table():
     session["holdingpen_iDisplayStart"] = int(request.args.get('iDisplayStart', session.get('iDisplayLength', 10)))
     session["holdingpen_iDisplayLength"] = int(request.args.get('iDisplayLength', session.get('iDisplayLength', 0)))
     session["holdingpen_sEcho"] = int(request.args.get('sEcho', session.get('sEcho', 0))) + 1
-    bwolist = get_holdingpen_objects(tags)
-    print "get holdingpen object {0}".format(time.time() - StartA)
-    if 'iSortCol_0' in session and "sSortDir_0" in session:
-        i_sortcol_0 = int(str(i_sortcol_0))
-        if i_sortcol_0 != session['iSortCol_0'] or s_sortdir_0 != session['sSortDir_0']:
-            bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
+
+    workflows_cache = {}
+    tags_copy = tags[:]
+    version_showing = []
+    for i in range(len(tags_copy) - 1, -1, -1):
+        if tags_copy[i] in ObjectVersion.MAPPING.values():
+            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
+            del tags_copy[i]
+
+    if version_showing is None:
+        version_showing = ObjectVersion.MAPPING.keys()
+    ssearch = tags_copy
+    bwobject_list = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id_parent == None  # noqa E711
+    ).filter(not version_showing or BibWorkflowObject.version.in_(
+        version_showing)).all()
+    workflows_name = ""
+
+    R_SERVER = Redis()
+
+    for bwo in bwobject_list:
+        try:
+            if not R_SERVER.get(bwo.id):
+                if bwo.id_workflow:
+                    workflows_name = Workflow.query.get(bwo.id_workflow).name
+
+                if workflows_name and workflows_name not in workflows_cache and hasattr(workflows[workflows_name],'get_description'):
+                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
+                                                         "description": workflows[workflows_name].get_description(bwo),
+                                                         "title": workflows[workflows_name].get_title(bwo),
+                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
+                else:
+                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
+                                                         "description": WorkflowBase.get_description(bwo),
+                                                         "title": WorkflowBase.get_title(bwo),
+                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
+
+        except AttributeError:
+            # No name
+            pass
+    if ssearch and not ssearch == [u""]:
+        if not isinstance(ssearch, list):
+            if "," in ssearch:
+                ssearch = ssearch.split(",")
+            else:
+                ssearch = [ssearch]
+
+        bwobject_list_tmp = []
+        for bwo in bwobject_list:
+            results = {"created": get_pretty_date(bwo), "type": get_type(bwo),
+                  "title": None, "description": None }
+            redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id))
+
+            if redis_cache_object["date"] == calendar.timegm(bwo.modified.timetuple()):
+                results["description"] = redis_cache_object["description"]
+                results["title"] = redis_cache_object["title"]
+            else:
+                if bwo.id_workflow:
+                    workflows_name = Workflow.query.get(bwo.id).name
+
+                if workflows_name and workflows_name not in workflows_cache and hasattr(workflows[workflows_name],'get_description'):
+                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
+                                                         "description": workflows[workflows_name].get_description(bwo),
+                                                         "title": workflows[workflows_name].get_title(bwo),
+                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
+                else:
+                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
+                                                        "description": WorkflowBase.get_description(bwo),
+                                                        "title": WorkflowBase.get_title(bwo),
+                                                        "date": calendar.timegm(bwo.modified.timetuple())}))
+
+            if check_ssearch_over_data(ssearch, results):
+                bwobject_list_tmp.append(bwo)
+            # executed if the loop ended normally (no break)
+        bwobject_list = bwobject_list_tmp
+
+    if (i_sortcol_0 and s_sortdir_0) or ("holdingpen_iSortCol_0" in session and "holdingpen_sSortDir_0" in session):
+        if i_sortcol_0:
+            i_sortcol = int(str(i_sortcol_0))
+        else:
+            i_sortcol = session["holdingpen_iSortCol_0"]
+
+        if not ('holdingpen_iSortCol_0' in session and "holdingpen_sSortDir_0" in session) or i_sortcol != session['holdingpen_iSortCol_0'] or s_sortdir_0 != session['holdingpen_sSortDir_0']:
+            bwobject_list = sort_bwolist(bwobject_list, i_sortcol, s_sortdir_0)
+        else:
+            bwobject_list = sort_bwolist(bwobject_list, session["holdingpen_iSortCol_0"], session["holdingpen_sSortDir_0"])
+
     session["holdingpen_iSortCol_0"] = i_sortcol_0
     session["holdingpen_sSortDir_0"] = s_sortdir_0
 
     table_data = {'aaData': [],
-                  'iTotalRecords': len(bwolist),
-                  'iTotalDisplayRecords': len(bwolist),
+                  'iTotalRecords': len(bwobject_list),
+                  'iTotalDisplayRecords': len(bwobject_list),
                   'sEcho': session["holdingpen_sEcho"]}
-
     # This will be simplified once Redis is utilized.
     records_showing = 0
-    for bwo in bwolist[session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"] + session["holdingpen_iDisplayLength"]]:
+    for bwo in bwobject_list[session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"] + session["holdingpen_iDisplayLength"]]:
+        redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id))
         records_showing += 1
         action_name = bwo.get_action()
         action_message = bwo.get_action_message()
@@ -434,19 +423,13 @@ def load_table():
         mini_action = None
         if action:
             mini_action = getattr(action, "render_mini", None)
-
-        workflows_uuid = bwo.id_workflow
         try:
-            workflow_name = Workflow.query.get(workflows_uuid).name
-            if workflow_name not in workflows_cache:
-                workflows_cache[workflow_name] = workflows[workflow_name]()
-            title = workflows_cache[workflow_name].get_title(bwo)
-            description = workflows_cache[workflow_name].get_description(bwo)
+            title = workflows[redis_cache_object["name"]].get_title(bwo)
+            description = workflows[redis_cache_object["name"]].get_description(bwo)
         except (AttributeError, TypeError):
             # Somehow the workflow does not exist (.name)
             from invenio.ext.logging import register_exception
             register_exception(alert_admin=True)
-            workflow_name = ""
             title = "No title"
             description = "No description"
 
@@ -456,7 +439,7 @@ def load_table():
         if not hasattr(record, "get"):
             try:
                 record = dict(record)
-            except:
+            except (ValueError, TypeError):
                 record = {}
 
         row = render_template('workflows/row_formatter.html',
@@ -470,19 +453,8 @@ def load_table():
                               action_message=action_message,
                               pretty_date=pretty_date,
                               )
-        d = {}
-        for key, value in REG_TD.findall(row):
-            d[key] = value.strip()
 
-        table_data['aaData'].append(
-            [d['id'],
-             d['checkbox'],
-             d['title'],
-             d['description'],
-             d['pretty_date'],
-             d['version'],
-             d['type'],
-             d['action']]
-        )
-    print "global request  {0}".format(time.time() - StartA)
+        row = row.split("<!--sep-->")
+
+        table_data['aaData'].append(row)
     return jsonify(table_data)
