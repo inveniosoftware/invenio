@@ -3628,26 +3628,20 @@ def decompose_bibdocfile_fullpath(fullpath):
     except:
         raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
 
+_RE_BIBDOCFILE_URL = re.compile("(%s|%s)/%s/(?P<recid>\d+)(?P<rest>.*)" % (re.escape(CFG_SITE_URL), re.escape(CFG_SITE_SECURE_URL), re.escape(CFG_SITE_RECORD)))
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
         return decompose_bibdocfile_very_old_url(url)
 
-    if url.startswith('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):
-        recid_file = url[len('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):]
-    elif url.startswith('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):
-        recid_file = url[len('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):]
+    g = _RE_BIBDOCFILE_URL.match(urllib.unquote(url))
+    if g:
+        recid = int(g.group('recid'))
+        rest = g.group('rest')
+        dummy, docname, docformat = decompose_file(rest)
+        return recid, docname, docformat
     else:
         raise InvenioBibDocFileError, "Url %s doesn't correspond to a valid record inside the system." % url
-    recid_file = recid_file.replace('/files/', '/')
-
-    recid, docname, docformat = decompose_file(urllib.unquote(recid_file)) # this will work in the case of URL... not file !
-    if not recid and docname.isdigit():
-        ## If the URL was something similar to CFG_SITE_URL/CFG_SITE_RECORD/123
-        return (int(docname), '', '')
-
-    return (int(recid), docname, docformat)
-
 
 re_bibdocfile_old_url = re.compile(r'/%s/(\d*)/files/' % CFG_SITE_RECORD)
 def decompose_bibdocfile_old_url(url):
