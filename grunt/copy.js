@@ -45,8 +45,7 @@ module.exports = {
         src: [
             'datatables-colvis/js/dataTables.colVis.js',
             'DataTables/media/js/jquery.dataTables.js',
-            'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
-            'jquery.bookmark/jquery.bookmark.min.js',
+            'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js'
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
@@ -61,11 +60,5 @@ module.exports = {
                                   'jquery-ui-timepicker-addon.js');
             return dest + res;
         }
-    },
-    MathJax: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/MathJax/',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/MathJax/'
     }
 };

@@ -204,7 +204,7 @@ class WebProfilePage():
                         messageStyle: "none"
                         });
                 </script>
-                <script src="/MathJax/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+                <script src="/vendors/MathJax/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
                 </script>
 
                 {% if stylesheets %}

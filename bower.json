@@ -7,7 +7,6 @@
   ],
   "dependencies": {
     "jquery": "~1.11",
-    "MathJax": "v2.1-latest",
     "DataTables": "1_9",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git"

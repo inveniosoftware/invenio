@@ -92,6 +92,7 @@ jquery = Bundle(
         "jquery.treeview": "latest",  # orphan, to be replaced by jqTree
         "json2": "latest",  # orphan
         "hogan": "~3",
+        "MathJax": "~2.4",  # orphan
         "swfobject": "latest",  # orphan
         "typeahead.js": "latest",
         "uploadify": "latest"  # orphan

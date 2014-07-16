@@ -424,7 +424,7 @@ def get_mathjax_header(https=False):
         else:
             mathjax_path = "http://cdn.mathjax.org/mathjax/2.1-latest"
     else:
-        mathjax_path = "/MathJax"
+        mathjax_path = "/vendors/MathJax"
 
     if cfg['CFG_MATHJAX_RENDERS_MATHML']:
         mathjax_config = "TeX-AMS-MML_HTMLorMML"
