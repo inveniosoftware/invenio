@@ -1,0 +1,87 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="row" id="profile-page" data-box-pid="{{ person_id }}">
+
+    <div class='col-md-5 col-lg-{{element_width['columns_large']['personal_info']}}'>
+    <!-- HepNames -->
+
+        {% if element_width['columns_large']['personal_info']|int %}
+            <div class="visible-lg well well-sm col-section-title">
+            <!-- Section Title -->
+                <strong><small>Personal Information</small></strong>
+            </div>
+        {% endif %}
+
+        {% block personal_details %}{% endblock %}
+
+        <div class="visible-md">
+            {% block citations_summary %}{% endblock %}
+        </div>
+
+        <div class="hidden-sm">
+            {% block name_variants %}{% endblock %}
+            {% block affiliations %}{% endblock %}
+            {% block collaborations %}{% endblock %}
+        </div>
+
+    </div>
+
+    <div class='col-md-7 col-lg-{{element_width['columns_large']['publications']}}'>
+    <!-- Publications List -->
+
+        {% if element_width['columns_large']['publications']|int %}
+            <div class="visible-lg well well-sm col-section-title">
+            <!-- Section Title -->
+                <strong><small>Publications and Output</small></strong>
+            </div> 
+        {% endif %}
+
+        {% block publications %}{% endblock %}
+
+        <div class="visible-md">
+            {% block publications_graph %}{% endblock %}
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    {% block coauthors %}{% endblock %}
+                    {% block papers %}{% endblock %}
+                </div>
+            </div>
+  
+            <div class="col-md-12">
+                <div class="row">
+                    {% block subject_categories %}{% endblock %}
+                    {% block frequent_keywords %}{% endblock %} 
+                </div>
+            </div>  
+        </div>
+
+    </div>
+
+    <div class='col-md-5 col-lg-{{element_width['columns_large']['stats']}}'>
+    <!-- Citations Summary -->
+
+        {% if element_width['columns_large']['stats']|int %}
+            <div class="visible-lg well well-sm col-section-title">
+            <!-- Section Title -->
+                <strong><small>Stats</small></strong>
+            </div>
+        {% endif %}
+
+        <div class="visible-lg">
+            {{ self.citations_summary() }}
+            {{ self.publications_graph() }}
+        </div>
+        
+    </div>
+
+    <div class="col-md-5 visible-sm">
+        {{ self.name_variants() }}
+        {{ self.affiliations() }}
+        {{ self.collaborations() }}
+    </div>
+
+</div>
+{% endblock %}
