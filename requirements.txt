@@ -1,6 +1,7 @@
 -e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
 -e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
 -e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
+-e git+https://github.com/sunlightlabs/jellyfish#egg=jellyfish-dev
 # requires numpy before it can be installed
 #-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py
 https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP

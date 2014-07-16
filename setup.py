@@ -63,7 +63,7 @@ install_requires = [
     "Flask-WTF==0.9.5",
     "fs==0.4.0",
     "intbitset==2.0",
-    "jellyfish>=0.2",
+    "jellyfish>=0.3",
     "Jinja2==2.7.3",
     "libmagic==1.0",
     "lxml==3.1.2",
