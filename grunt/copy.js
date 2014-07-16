@@ -102,17 +102,5 @@ module.exports = {
         cwd: '<%= globalConfig.bower_path %>/jquery.tablesorter/',
         src: ['**'],
         dest: '<%= globalConfig.installation_path %>/js/tablesorter/'
-    },
-    jqueryMigrate: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery-migrate',
-        src: ['index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            if (src == "index.js") {
-                src = 'jquery-migrate.js'
-            }
-            return dest + src;
-        }
     }
 };

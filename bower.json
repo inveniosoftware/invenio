@@ -16,11 +16,7 @@
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
-    "bootstrap-tagsinput": "*",
-    "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
-    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js",
-    "jquery-migrate": "http://code.jquery.com/jquery-migrate-1.2.1.js",
-    "requirejs-hogan-plugin": "latest"
+    "bootstrap-tagsinput": "*"
   },
   "resolutions": {
     "jquery": "~1.11"
