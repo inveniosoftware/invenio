@@ -1013,6 +1013,24 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             inv_search = 'author:ellis refersto:author:hawking'
             self._compare_searches(inv_search, combo_search)
 
+        def test_find_cc_United_States(self):
+            """SPIRES search syntax - find cc United States"""
+            inv_search = 'country:"United States"'
+            spi_search = 'find cc United States'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_find_cc_Italy(self):
+            """SPIRES search syntax - find cc Italy"""
+            inv_search = 'country:Italy'
+            spi_search = 'find cc Italy'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_find_country_Italy(self):
+            """SPIRES search syntax - find country Italy"""
+            inv_search = 'country:Italy'
+            spi_search = 'find country Italy'
+            self._compare_searches(inv_search, spi_search)
+
     if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
         def test_absorbs_naked_a_search(self):
             """SPIRES search syntax - a ellis"""
