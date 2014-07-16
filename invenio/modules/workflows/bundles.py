@@ -64,29 +64,30 @@ vendors_css = Bundle(
     'css/prettify.css',
     filters="cleancss",
     output='vendors.css',
-    weight=40,
-    bower={
-        #"prism": "*"  # already present in vendors_js
-    }
+    weight=40
 )
 
 dataTables_css = Bundle(
-    'css/dataTables.colVis.css',
-    'css/dataTables.bootstrap.css',
+    'vendors/datatables-colvis/css/dataTables.colVis.css',
+    'vendors/datatables-plugins/integration/bootstrap/3'
+    '/dataTables.bootstrap.css',
     'vendors/bootstrap-tagsinput/dist/bootstrap-tagsinput.less',
     filters="less,cleancss",
     output='dataTables.css',
-    weight=30,
-    bower={
-        #"bootstrap-tagsinput": "*"  # already present in _jquery
-    }
+    weight=30
 )
 
 dataTables_js = Bundle(
-    'js/jquery.dataTables.min.js',
-    'js/dataTables.colVis.js',
-    'js/dataTables.bootstrap.js',
+    'vendors/datatables/media/js/jquery.dataTables.js',
+    'vendors/datatables-colvis/js/dataTables.colVis.js',
+    'vendors/datatables-plugins/integration/bootstrap/3'
+    '/dataTables.bootstrap.js',
     filters="uglifyjs",
     output='dataTables.js',
-    weight=30
+    weight=30,
+    bower={
+        "datatables-colvis": "latest",
+        "datatables": "~1.10",
+        "datatables-plugins": "https://github.com/DataTables/Plugins.git"
+    }
 )

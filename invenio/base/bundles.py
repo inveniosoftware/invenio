@@ -56,7 +56,7 @@ styles = Bundle(
 
 # FIXME
 #if config.CFG_WEBSTYLE_TEMPLATE_SKIN != "default":
-#    styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
+#  styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
 
 jquery = Bundle(
     "vendors/jquery/dist/jquery.js",
@@ -78,6 +78,7 @@ jquery = Bundle(
         "flot": "latest",  # orphan
         "jquery": "~1.11",
         "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
+        "jquery-form": "latest",  # orphan
         "jquery.hotkeys": "https://github.com/jeresig/"  # orphan
                           "jquery.hotkeys.git",
         "jquery.jeditable": "http://invenio-software.org/download/jquery/"
@@ -88,7 +89,6 @@ jquery = Bundle(
         "jquery-tablesorter": "http://invenio-software.org/download/jquery/"
                               "jquery.tablesorter.20111208.zip",  # orphan
         "jquery-tokeninput": "latest",
-        "jquery-form": "latest",  # orphan
         "jquery.treeview": "latest",  # orphan, to be replaced by jqTree
         "json2": "latest",  # orphan
         "hogan": "~3",
@@ -96,7 +96,7 @@ jquery = Bundle(
         "swfobject": "latest",  # orphan
         "typeahead.js": "latest",
         "uploadify": "latest"  # orphan
-#       "bootstrap": "*", is set by invenio.css already.
+        #"bootstrap": "*", is set by invenio.css already.
     }
 )
 
