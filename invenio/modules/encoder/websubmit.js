@@ -74,7 +74,7 @@ $(document).ready(function() {
 	$(form_header_tds[6]).remove();
 	($($($("form")[0]).find('table').find('tr:last')).find('br:last')).remove();
 	($($($("form")[0]).find('table').find('tr:last')).find('br:last')).remove();
-	
+
 	/*
 	 * Initialise the validation plugin
 	 */
@@ -129,7 +129,7 @@ $(document).ready(function() {
 			}
 		}
 	);
-	
+
 	/*
 	 * Initialise the video preview slideshow
 	 */
@@ -138,7 +138,7 @@ $(document).ready(function() {
 	$("[name=Aspect]").change(animate_aspect);
 	$("#AspectX").change(animate_aspect);
 	$("#AspectY").change(animate_aspect);
-	
+
 	/*
 	 * If we are in a submission that has been started before, try to retrieve the
 	 * last ajax response the server send and stored for this submission
@@ -152,14 +152,14 @@ $(document).ready(function() {
 			}
 		});
 	}
-	
+
 	/*
 	 * Initialise the uploadify plugin
 	 */
 	$('#uploadFile').uploadify({
-		'uploader': global_site_url + '/img/uploadify.swf',
+		'uploader': global_site_url + '/vendors/uploadify/uploadify.swf',
 		'script':	'/submit/upload_video',
-		'cancelImg': global_site_url + '/img/cancel.png',
+		'cancelImg': global_site_url + '/vendors/uploadify/uploadify-cancel.png',
 		'multi' : false,
 		'auto' : true,
 		'simUploadLimit': 1,
@@ -168,7 +168,7 @@ $(document).ready(function() {
 		'buttonText': 'Upload Video',
 		'fileDataName': 'NewFile' /* be compatible with FCKeditor */,
 		'onSelectOnce': function(event, data) {
-		
+
 		},
 		'onSelect': function(event, queueID, fileObj, response, data) {
 			$('#uploadify_loading').css("display","block");
@@ -201,7 +201,7 @@ $(document).ready(function() {
  */
 function handle_response(response, status, xhr) {
 	var response_obj = parse_response(response);
-	
+
 	/* If we have the frame filenames in the respone, we are fine */
 	if ("frames" in response_obj) {
 		$("#websubmit_demovid_samples").empty();
@@ -212,11 +212,11 @@ function handle_response(response, status, xhr) {
 		}
 		$('#websubmit_demovid_error').css("display", "none");
 		$('#websubmit_demovid_preview').css("display","block");
-		
+
 		// Set the global to true to validate the form
 		global_upload_success = true;
 	}
-	
+
 	/* Handle metadata extracted by the the server */
 	if (!$("#DEMOVID_TITLE").val()) {
 		if ("meta_title" in response_obj) {
@@ -238,7 +238,7 @@ function handle_response(response, status, xhr) {
 			$("#DEMOVID_DESCR").val(response_obj.meta_description)
 		}
 	};
-	
+
 	/* Handle the aspect ratio that was send in the response */
 	if ("aspx" in response_obj && "aspy" in response_obj) {
 		if (response_obj.aspx == "16" && response_obj.aspy == "9") {

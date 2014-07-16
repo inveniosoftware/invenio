@@ -113,7 +113,7 @@ def websubmit_singlepage(curdir, doctype, uid, access, session_id):
 
 def form_body():
     return """
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/uploadify.css" type="text/css" />
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/uploadify/uploadify.css" type="text/css" />
         <div class="websubmit_demovid_form">
             <label for="DEMOVID_TITLE">Title: </label>
             <input type="text" name="DEMOVID_TITLE" id="DEMOVID_TITLE" size="64" maxlength="50"/>
@@ -170,7 +170,7 @@ def form_body():
 def form_javascript():
     return """
             <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jquery/dist/jquery.min.js"></script>
-            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
+            <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/uploadify/jquery.uploadify.min.js"></script>
             <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/swfobject/swfobject/swfobject.js"></script>
             <script type="text/javascript">
                 var global_resume = %(resume)s;

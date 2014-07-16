@@ -14,7 +14,6 @@
     "jquery.bookmark": "http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip",
     "DataTables": "1_9",
     "jquery-flot": "*",
-    "uploadify": "*",
     "prism": "gh-pages",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",

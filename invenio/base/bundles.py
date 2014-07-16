@@ -73,17 +73,22 @@ jquery = Bundle(
     filters="uglifyjs",
     weight=10,
     bower={
+        # The dependencies marked as *orphan* are not part of any bundles
+        # and loaded manually using the script tag. Usually from legacy pages.
         "jquery": "~1.11",
         "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
-        "jquery.hotkeys": "https://github.com/jeresig/jquery.hotkeys.git",
-        "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
+        "jquery.hotkeys": "https://github.com/jeresig/"  # orphan
+                          "jquery.hotkeys.git",
+        "jquery.jeditable": "http://invenio-software.org/download/jquery/"
+                            "v1.5/js/jquery.jeditable.mini.js",
         "jquery-tokeninput": "latest",
-        "jquery-form": "latest",
-        "jquery.treeview": "latest",  # to be replaced by jqTree or dropped
-        "json2": "latest",
+        "jquery-form": "latest",  # orphan
+        "jquery.treeview": "latest",  # orphan, to be replaced by jqTree
+        "json2": "latest",  # orphan
         "hogan": "~3",
-        "swfobject": "latest",
+        "swfobject": "latest",  # orphan
         "typeahead.js": "latest",
+        "uploadify": "latest"  # orphan
 #       "bootstrap": "*", is set by invenio.css already.
     }
 )

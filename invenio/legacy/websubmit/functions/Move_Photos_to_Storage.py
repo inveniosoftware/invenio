@@ -383,10 +383,10 @@ def create_photos_manager_interface(sysno, session_id, uid,
     </div>
 
 
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
+    <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/uploadify/jquery.uploadify.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/swfobject/swfobject/swfobject.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jquery-ui/jquery-ui.min.js"></script>
-    <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/uploadify.css" type="text/css" />
+    <link rel="stylesheet" href="%(CFG_SITE_URL)s/vendors/uploadify/uploadify.css" type="text/css" />
 
     <script type="text/javascript">
 
@@ -395,9 +395,9 @@ def create_photos_manager_interface(sysno, session_id, uid,
         /* Uploading */
             if (%(can_upload_photos)s) {
             $('#uploadFile').uploadify({
-                    'uploader': '%(CFG_SITE_URL)s/img/uploadify.swf',
+                    'uploader': '%(CFG_SITE_URL)s/vendors/uploadify/uploadify.swf',
                     'script':    '/submit/uploadfile',
-                    'cancelImg': '%(CFG_SITE_URL)s/img/cancel.png',
+                    'cancelImg': '%(CFG_SITE_URL)s/vendors/uploadify/uploadify-cancel.png',
                     'multi' :    true,
                     'auto' :    true,
                     'simUploadLimit': 2,

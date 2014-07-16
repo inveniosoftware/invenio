@@ -31,3 +31,4 @@ recursive-include invenio/utils/data *
 recursive-include invenio/legacy *
 
 recursive-exclude * *.py[co]
+recursive-exclude * *.php

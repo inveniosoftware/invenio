@@ -39,8 +39,6 @@ module.exports = {
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
         src: ['jquery.bookmark/bookmarks.png'
-               ,'uploadify/uploadify*'
-               ,'!uploadify/uploadify.php'
                ,'DataTables-Plugins/integration/bootstrap/3/images/*.png'],
         dest: '<%= globalConfig.installation_path %>/img/'
     },
@@ -59,10 +57,6 @@ module.exports = {
             'jquery-flot/jquery.flot.js',
             'jquery-flot/jquery.flot.selection.js',
             'prism/prism.js',
-            'requirejs/require.js',
-            'requirejs-hogan-plugin/hgn.js',
-            'requirejs-hogan-plugin/text.js',
-            'uploadify/jquery.uploadify.min.js'
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
