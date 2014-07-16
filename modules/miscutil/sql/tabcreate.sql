@@ -2240,6 +2240,21 @@ CREATE TABLE IF NOT EXISTS idxWORD28R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD29F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD29R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(100) default NULL,
@@ -2697,6 +2712,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR28R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR29F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR29R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -3131,6 +3161,21 @@ CREATE TABLE IF NOT EXISTS idxPHRASE28F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE28R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE29F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE29R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -5041,5 +5086,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_varchar20',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
-
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_05_26_new_index_country',NOW());
 -- end of file
