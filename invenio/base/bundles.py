@@ -75,6 +75,7 @@ jquery = Bundle(
     bower={
         # The dependencies marked as *orphan* are not part of any bundles
         # and loaded manually using the script tag. Usually from legacy pages.
+        "flot": "latest",  # orphan
         "jquery": "~1.11",
         "jquery.caret": "https://github.com/acdvorak/jquery.caret.git",
         "jquery.hotkeys": "https://github.com/jeresig/"  # orphan

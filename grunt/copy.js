@@ -53,9 +53,6 @@ module.exports = {
             'DataTables/media/js/jquery.dataTables.js',
             'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
             'jquery.bookmark/jquery.bookmark.min.js',
-            'jquery-flot/excanvas.min.js',
-            'jquery-flot/jquery.flot.js',
-            'jquery-flot/jquery.flot.selection.js',
             'prism/prism.js',
         ],
         dest: '<%= globalConfig.installation_path %>/js/'

@@ -2117,9 +2117,9 @@ def create_graph_trend_flot(trend, path, settings):
     size = settings.get("size", "500,400").split(",")
     title = cgi.escape(settings["title"].replace(" ", "")[:10])
     out = """<!--[if IE]><script language="javascript" type="text/javascript"
-                    src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
+                    src="%(site)s/vendors/flot/excanvas.min.js"></script><![endif]-->
+              <script language="javascript" type="text/javascript" src="%(site)s/vendors/flot/jquery.flot.js"></script>
+              <script language="javascript" type="text/javascript" src="%(site)s/vendors/flot/jquery.flot.selection.js"></script>
               <script id="source" language="javascript" type="text/javascript">
                      document.write('<div style="float:left"><div id="placeholder%(title)s" style="width:%(width)spx;height:%(height)spx"></div></div>'+
               '<div id="miniature%(title)s" style="float:left;margin-left:20px;margin-top:50px">' +

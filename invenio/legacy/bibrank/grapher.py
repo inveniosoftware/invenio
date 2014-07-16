@@ -227,9 +227,9 @@ def create_temporary_gnuplot_image(kind_of_graph, data_file, x_label, y_label,
 
 def create_temporary_flot_image(kind_of_graph, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, dest):
     out = """
-              <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
+              <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/vendors/flot/excanvas.min.js"></script><![endif]-->
+              <script language="javascript" type="text/javascript" src="%(site)s/vendors/flot/jquery.flot.js"></script>
+              <script language="javascript" type="text/javascript" src="%(site)s/vendors/flot/jquery.flot.selection.js"></script>
               <script id="source" language="javascript" type="text/javascript">
                      document.write('<div style="float:left"><div id="placeholder%(graph)s" style="width:500px;height:400px"></div></div>'+
               '<div id="miniature%(graph)s" style="float:left;margin-left:20px;margin-top:50px">' +
