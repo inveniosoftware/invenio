@@ -16,7 +16,6 @@
     "jquery-flot": "*",
     "uploadify": "*",
     "prism": "gh-pages",
-    "swfobject": "https://github.com/swfobject/swfobject/blob/master/swfobject/swfobject.js",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",

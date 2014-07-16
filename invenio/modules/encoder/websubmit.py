@@ -169,9 +169,9 @@ def form_body():
 
 def form_javascript():
     return """
-            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
+            <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/jquery/dist/jquery.min.js"></script>
             <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
-            <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
+            <script type="text/javascript" src="%(CFG_SITE_URL)s/vendors/swfobject/swfobject/swfobject.js"></script>
             <script type="text/javascript">
                 var global_resume = %(resume)s;
                 var global_site_url = "%(CFG_SITE_URL)s";

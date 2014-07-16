@@ -82,6 +82,7 @@ jquery = Bundle(
         "jquery.treeview": "latest",  # to be replaced by jqTree or dropped
         "json2": "latest",
         "hogan": "~3",
+        "swfobject": "latest",
         "typeahead.js": "latest",
 #       "bootstrap": "*", is set by invenio.css already.
     }

@@ -102,17 +102,6 @@ module.exports = {
             return dest + res;
         }
     },
-    swfobject: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['swfobject/index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0), 'swfobject.js');
-            return dest + res;
-        }
-    },
     MathJax: {
         expand: true,
         cwd: '<%= globalConfig.bower_path %>/MathJax/',
