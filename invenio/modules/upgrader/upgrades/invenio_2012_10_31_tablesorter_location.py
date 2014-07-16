@@ -30,9 +30,10 @@ def info():
     return "Standardisation of the jQuery tablesorter location"
 
 def do_upgrade():
-    os.system("wget -O /tmp/jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip")
-    os.system("unzip /tmp/jquery.tablesorter.zip -d %s/js/tablesorter" % CFG_WEBDIR)
-    os.system("rm -f /tmp/jquery.tablesorter.zip")
+    os.system("true")
+    #os.system("wget -O /tmp/jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip")
+    #os.system("unzip /tmp/jquery.tablesorter.zip -d %s/js/tablesorter" % CFG_WEBDIR)
+    #os.system("rm -f /tmp/jquery.tablesorter.zip")
 
 def estimate():
     return 10

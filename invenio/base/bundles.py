@@ -85,6 +85,8 @@ jquery = Bundle(
         "jquery-migrate": "latest",  # orphan
         "jquery-multifile": "svn+http://jquery-multifile-plugin.googlecode.com"
                             "/svn/",  # orphan
+        "jquery-tablesorter": "http://invenio-software.org/download/jquery/"
+                              "jquery.tablesorter.20111208.zip",  # orphan
         "jquery-tokeninput": "latest",
         "jquery-form": "latest",  # orphan
         "jquery.treeview": "latest",  # orphan, to be replaced by jqTree

@@ -8,7 +8,6 @@
   "dependencies": {
     "jquery": "~1.11",
     "MathJax": "v2.1-latest",
-    "jquery.tablesorter": "http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip",
     "DataTables": "1_9",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git"

@@ -27,8 +27,7 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>',
-        src: ['jquery.bookmark/jquery.bookmark.css'
-               ,'datatables-colvis/css/dataTables.colVis.css'
+        src: ['datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
         dest: '<%= globalConfig.installation_path %>/css/'
     },
@@ -36,8 +35,7 @@ module.exports = {
         expand: true,
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.bookmark/bookmarks.png'
-               ,'DataTables-Plugins/integration/bootstrap/3/images/*.png'],
+        src: ['DataTables-Plugins/integration/bootstrap/3/images/*.png'],
         dest: '<%= globalConfig.installation_path %>/img/'
     },
     js: {
@@ -64,28 +62,10 @@ module.exports = {
             return dest + res;
         }
     },
-    ajaxPager: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.ajaxpager/index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'jquery.ajaxPager.js');
-            return dest + res;
-        }
-    },
     MathJax: {
         expand: true,
         cwd: '<%= globalConfig.bower_path %>/MathJax/',
         src: ['**'],
         dest: '<%= globalConfig.installation_path %>/MathJax/'
-    },
-    jqueryTableSorter: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery.tablesorter/',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/js/tablesorter/'
     }
 };
