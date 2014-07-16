@@ -617,6 +617,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibconvert/Makefile \
      modules/bibconvert/bin/Makefile \
      modules/bibconvert/bin/bibconvert \
+     modules/bibconvert/bin/kbload \
      modules/bibconvert/doc/Makefile \
      modules/bibconvert/doc/admin/Makefile \
      modules/bibconvert/doc/hacking/Makefile \
