@@ -377,7 +377,7 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
 
     user_name = get_user_info(uid)[1]
     if to_upload:
-        args = ['bibupload', task_name, '-P', '5', '-r',
+        args = ['bibupload', user_name, '-P', '5', '-r',
                 file_path, '-u', user_name]
         if task_name == "bibedit":
             args += ['--name', 'bibedit']
