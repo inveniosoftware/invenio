@@ -2760,13 +2760,16 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             "base_url": CFG_BASE_URL
         }
 
-
         # Inspire specific endpoints.
         if CFG_INSPIRE_SITE:
             template_parameters["hepnames"] = html_hepnames
             template_parameters["arxiv"] = html_arxiv
             template_parameters["orcid"] = html_orcid
             template_parameters["contact"] = html_support
+            
+        template_parameters["inspire"] = CFG_INSPIRE_SITE
+
+        template_parameters["inspire"] = CFG_INSPIRE_SITE
 
         body = profile_page.get_wrapped_body("manage_profile", template_parameters)
         # body = profile_page.get_wrapped_body("generic", {'html': content})
@@ -3600,6 +3603,7 @@ class WebInterfacePerson(WebInterfaceDirectory):
                                              status, research_field_list,
                                              institution_list, phd_advisor_list,
                                              experiment_list, web_page)
+
         title = "HEPNames"
         return page(title=title,
                     metaheaderadd=TEMPLATE.tmpl_update_hep_name_headers(),
