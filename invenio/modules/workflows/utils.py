@@ -17,6 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import msgpack
+from redis import Redis
+import calendar
 
 def session_manager(orig_func):
     """Decorator to wrap function with the session."""
@@ -211,6 +214,8 @@ class dictproperty(object):
 
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     """Sort a list of BibWorkflowObjects for DataTables."""
+    R_SERVER = Redis()
+
     should_we_reverse = False
     if sSortDir_0 == 'desc':
         should_we_reverse = True
@@ -218,6 +223,10 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
+    elif iSortCol_0 == 2:
+        bwolist.sort(key=lambda x: msgpack.loads(R_SERVER.get(x.id))["title"], reverse=should_we_reverse)
+    elif iSortCol_0 == 3:
+        bwolist.sort(key=lambda x: msgpack.loads(R_SERVER.get(x.id))["description"], reverse=should_we_reverse)
     elif iSortCol_0 == 4:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
     elif iSortCol_0 == 5:
@@ -278,12 +287,9 @@ def get_holdingpen_objects(ptags=[]):
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
-    import time
     from .models import (BibWorkflowObject,
-                         Workflow,
                          ObjectVersion)
     from .registry import workflows
-    workflows_cache = {}
     tags = ptags[:]
     version_showing = []
     for i in range(len(tags) - 1, -1, -1):
@@ -299,55 +305,45 @@ def get_holdingpen_objects(ptags=[]):
     ).filter(not version_showing or BibWorkflowObject.version.in_(
         version_showing)).all()
 
-    if ssearch:
+    if ssearch and not ssearch == [u""]:
         if not isinstance(ssearch, list):
             if "," in ssearch:
                 ssearch = ssearch.split(",")
             else:
                 ssearch = [ssearch]
-
+        R_SERVER = Redis()
         bwobject_list_tmp = []
         for bwo in bwobject_list:
-            startA = time.time()
-            try:
-                if bwo.id_workflow:
-                    workflows_name = Workflow.query.get(bwo.id_workflow).name
-                else:
-                    workflows_name = ""
-            except AttributeError:
-                # No name
-                workflows_name = ""
-            if workflows_name and workflows_name not in workflows_cache:
-                workflows_cache[workflows_name] = workflows[workflows_name]()
+            results = {"created": get_pretty_date(bwo), "type": get_type(bwo),
+                  "title": None, "description": None }
+            redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id_workflow))
+            if redis_cache_object:
+                if not ("title" and "description" in redis_cache_object):
+                    results["description"] = workflows[redis_cache_object["name"]].get_description(bwo)
+                    results["title"] = workflows[redis_cache_object["name"]].get_title(bwo)
+                    redis_cache_object["title"] = results["title"]
+                    redis_cache_object["description"] = results["description"]
 
-            if workflows_name:
-                checking_functions = {
-                    "title": workflows_cache[workflows_name].get_title,
-                    "description": workflows_cache[workflows_name].get_description,
-                    "created": get_pretty_date,
-                    "type": get_type
-                }
+                    redis_cache_object["date"] = calendar.timegm(bwo.modified.timetuple())
+                    R_SERVER.set(bwo.id_workflow, msgpack.dumps(redis_cache_object))
+                else:
+                    if redis_cache_object["date"] == calendar.timegm(bwo.modified.timetuple()):
+                        results["description"] = redis_cache_object["description"]
+                        results["title"] = redis_cache_object["title"]
+                    else:
+                        results["description"] = workflows[redis_cache_object["name"]].get_description(bwo)
+                        results["title"] = workflows[redis_cache_object["name"]].get_title(bwo)
+                        redis_cache_object["title"] = results["title"]
+                        redis_cache_object["description"] = results["description"]
+                        redis_cache_object["date"] = calendar.timegm(bwo.modified.timetuple())
+                        R_SERVER.set(bwo.id_workflow, msgpack.dumps(redis_cache_object))
             else:
-                checking_functions = {
-                    "title": WorkflowBase.get_title,
-                    "description": WorkflowBase.get_description,
-                    "created": get_pretty_date,
-                    "type": get_type
-                }
-            startB = time.time()
-            for function in checking_functions:
-                if check_ssearch_over_data(ssearch, checking_functions[function](bwo)):
-                    bwobject_list_tmp.append(bwo)
-                    break
-            else:
-                print "A {0}, B {1}, ratio {2}".format(time.time() - startA,
-                                                       time.time() - startB,
-                                                       (time.time() - startB)/(time.time() - startA))
-                break  # executed if the loop ended normally (no break)
-            print "A {0}, B {1}, ratio {2}".format(time.time() - startA,
-                                                   time.time() - startB,
-                                                   (time.time() - startB)/(time.time() - startA))
-            continue
+                results["title"] = WorkflowBase.get_title(bwo)
+                results["description"] = WorkflowBase.get_description(bwo)
+
+            if check_ssearch_over_data(ssearch, results):
+                bwobject_list_tmp.append(bwo)
+            # executed if the loop ended normally (no break)
 
         bwobject_list = bwobject_list_tmp
     return bwobject_list
@@ -363,22 +359,13 @@ def check_ssearch_over_data(ssearch, data):
 
     :return: True if present, False otherwise.
     """
-    if not isinstance(ssearch, list):
-        if "," in ssearch:
-            ssearch = ssearch.split(",")
-        else:
-            ssearch = [ssearch]
-    if not isinstance(data, list):
-        data = [data]
-
-    result = True
-
+    total = 0
     for terms in ssearch:
         for datum in data:
-            if terms.lower() not in datum.lower():
-                result = False
+            if terms.lower() in data[datum].lower():
+                total += 1
                 break
-    return result
+    return total == len(ssearch)
 
 
 def get_pretty_date(bwo):

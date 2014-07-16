@@ -16,36 +16,29 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-<td title="id">
+
 {{object.id}}
-</td>
-<td title="checkbox">
+<!--sep-->
 <input type="checkbox" class="hp-check">
-</td>
-<td title="title">
+<!--sep-->
     <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
         {{title}}
     </a>
-</td>
-<td title="description">
+<!--sep-->
 {{description|safe}}
-</td>
-<td title="pretty_date">
+<!--sep-->
 {{ pretty_date(object.created)}}
-</td>
-<td title="version">
+<!--sep-->
 {% if object.version == 1 %}<span class="label label-success">Done</span>
 {% elif object.version == 2 %}<span class="label label-danger">Need action</span>
 {% elif object.version == 3 %}<span class="label label-warning">In process</span>
 {% elif object.version == 0 %}<span class="label label-info">New</span>
 {% endif %}
-</td>
-<td title="type">
+<!--sep-->
 {{object.data_type}}
-</td>
-<td title="action">
+<!--sep-->
 {% if mini_action != None %}
     {% set action = action() %}
     {{ action.render_mini(object)|safe }}
 {% endif %}
-</td>
+
