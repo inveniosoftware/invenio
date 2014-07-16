@@ -54,7 +54,7 @@ from invenio.bibauthorid_templates import WebProfileMenu, WebProfilePage
 from invenio.bibauthorid_webinterface import WebInterfaceAuthorTicketHandling
 import invenio.bibauthorid_webapi as webapi
 from invenio.bibauthorid_dbinterface import get_canonical_name_of_author
-from invenio.bibauthorid_config import CFG_BIBAUTHORID_ENABLED
+from invenio.bibauthorid_config import CFG_BIBAUTHORID_ENABLED, AID_VISIBILITY
 import invenio.template
 import cProfile, pstats, cStringIO
 
@@ -84,6 +84,8 @@ from webauthorprofile_config import CFG_SITE_LANG, CFG_SITE_URL
 
 RECOMPUTE_ALLOWED_DELAY = timedelta(minutes=30)
 
+BOOTSTRAP_WIDTH_WHOLE = 12
+BOOTSTRAP_WIDTH_HALF = 6
 
 def wrap_json_req_profiler(func):
 
@@ -141,6 +143,8 @@ class WebAuthorPages(WebInterfaceDirectory):
         self.cid = None
         self.original_search_parameter = identifier
 
+        self._prepare_render_variables()
+
         if (not CFG_BIBAUTHORID_ENABLED or
             identifier is None or
             not isinstance(identifier, str)):
@@ -172,7 +176,6 @@ class WebAuthorPages(WebInterfaceDirectory):
                 self.cid = get_person_redirect_link(self.person_id)
                 return
 
-
     def _lookup(self, component, path):
         '''
         This handler parses dynamic URLs:
@@ -182,6 +185,105 @@ class WebAuthorPages(WebInterfaceDirectory):
         '''
         if not component in self._exports:
             return WebAuthorPages(component), path
+
+    def _prepare_render_variables(self):
+        '''
+        Computes variables for rendering the profile.
+        Bootstrap's grid model divides the whole screen into 12 units.
+        Here we compute width in units for some of the elements.
+        It allows customising profile page.
+        '''
+
+        if AID_VISIBILITY['coauthors']:
+            coauthors_width = (BOOTSTRAP_WIDTH_WHOLE - BOOTSTRAP_WIDTH_HALF *
+                               AID_VISIBILITY['papers'])
+        else:
+            coauthors_width = 0
+
+        if AID_VISIBILITY['subject_categories']:
+            subject_categories_width = (BOOTSTRAP_WIDTH_WHOLE -
+                                        BOOTSTRAP_WIDTH_HALF *
+                                        AID_VISIBILITY['frequent_keywords'])
+        else:
+            subject_categories_width = 0
+
+        # Indicates whether a box for publications is visible or not
+        publication_box = (AID_VISIBILITY['publications'] or
+                           AID_VISIBILITY['datasets'] or
+                           AID_VISIBILITY['external'])
+
+        # Those three indicate if a column in 'large' view is visible.
+        personal_info_column = (AID_VISIBILITY['personal_details'] or
+                                AID_VISIBILITY['name_variants'] or
+                                AID_VISIBILITY['affiliations'] or
+                                AID_VISIBILITY['collaborations'])
+        publications_column = (publication_box or
+                               AID_VISIBILITY['coauthors'] or
+                               AID_VISIBILITY['papers'] or
+                               AID_VISIBILITY['subject_categories'] or
+                               AID_VISIBILITY['frequent_keywords'])
+        stats_column = (AID_VISIBILITY['citations_summary'] or
+                        AID_VISIBILITY['publications_graph'])
+
+        # Here we compute width for three columns in 'large' view. They
+        # must sum up to 12.
+        if publications_column and personal_info_column and stats_column:
+            columns_large_width = {
+                'personal_info' : '3',
+                'publications' : '5',
+                'stats' : '4'
+            }
+        elif publications_column and personal_info_column:
+            columns_large_width = {
+                'personal_info' : '5',
+                'publications' : '7',
+                'stats' : '0'
+            }
+        elif publications_column and stats_column:
+            columns_large_width = {
+                'personal_info' : '0',
+                'publications' : '7',
+                'stats' : '5'
+            }
+        elif personal_info_column and stats_column:
+            columns_large_width = {
+                'personal_info' : '6',
+                'publications' : '0',
+                'stats' : '6'
+            }
+        elif publications_column:
+            columns_large_width = {
+                'personal_info' : '0',
+                'publications' : str(BOOTSTRAP_WIDTH_WHOLE),
+                'stats' : '0'
+            }
+        elif personal_info_column:
+            columns_large_width = {
+                'personal_info' : str(BOOTSTRAP_WIDTH_WHOLE),
+                'publications' : '0',
+                'stats' : '0'
+            }
+        elif stats_column:
+            columns_large_width = {
+                'personal_info' : '0',
+                'publications' : '0',
+                'stats' : str(BOOTSTRAP_WIDTH_WHOLE)
+            }
+        else:
+            raise ValueError("You can not disable all author identification " +
+                             "module's fields in bibauthorid_config.py!")
+
+        # This dictionary will be passed to html template
+        self.render_width_dict = {
+            'coauthors': str(coauthors_width),
+            'papers': str(BOOTSTRAP_WIDTH_WHOLE - coauthors_width),
+            'subject_categories': str(subject_categories_width),
+            'frequent_keywords': str(BOOTSTRAP_WIDTH_WHOLE -
+                                     subject_categories_width),
+            'publication_box': publication_box,
+            'columns_large': columns_large_width
+        }
+
 
     def _is_profile_owner(self, pid):
         return self.person_id == int(pid)
@@ -241,7 +343,7 @@ class WebAuthorPages(WebInterfaceDirectory):
 
         if recid > -1:
             possible_authors = get_authors_by_name(self.original_search_parameter,
-                                                         limit_to_recid = recid)
+                                                   limit_to_recid=recid)
 
             if len(possible_authors) == 1:
                 self.person_id = possible_authors.pop()
@@ -253,7 +355,7 @@ class WebAuthorPages(WebInterfaceDirectory):
             encoded = '&' + encoded
 
         return redirect_to_url(req, '%s/author/search?q=%s%s' %
-                                    (CFG_SITE_URL, self.original_search_parameter, encoded))
+                               (CFG_SITE_URL, self.original_search_parameter, encoded))
 
 
     def index(self, req, form):
@@ -278,8 +380,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'recompute': (int, 0),
                                    'verbose': (int, 0),
-                                    'trial': (str, None)})
-
+                                   'trial': (str, None)})
 
         ln = argd['ln']
         debug = "verbose" in argd and argd["verbose"] > 0
@@ -311,12 +412,12 @@ class WebAuthorPages(WebInterfaceDirectory):
 
         last_computed = str(self.last_computed())
         context = {
-                    'person_id': self.person_id,
-                    'last_computed': last_computed,
-                    'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
-                    'search_form_url': "%s/author/search" % CFG_BASE_URL,
-                    'possible_to_recompute': self._possible_to_recompute(pinfo)
-                  }
+            'person_id': self.person_id,
+            'last_computed': last_computed,
+            'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
+            'search_form_url': "%s/author/search" % CFG_BASE_URL,
+            'possible_to_recompute': self._possible_to_recompute(pinfo)
+        }
 
         verbose = argd['verbose']
         url_args = dict()
@@ -331,7 +432,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         if CFG_BIBAUTHORID_ENABLED:
             if self.person_id < 0:
                 return redirect_to_url(req, '%s/author/search?q=%s%s' %
-                                            (CFG_SITE_URL, self.original_search_parameter, encoded))
+                                       (CFG_SITE_URL, self.original_search_parameter, encoded))
         else:
             self.person_id = self.original_search_parameter
             profile_page.menu = None
@@ -343,11 +444,14 @@ class WebAuthorPages(WebInterfaceDirectory):
 
         if argd['recompute'] and req.get_method() == 'POST':
             expire_all_cache_for_person(self.person_id)
-            context['last_computed']= str(datetime.now().replace(microsecond=0))
+            context['last_computed'] = str(datetime.now().replace(microsecond=0))
 
         history_log_visit(req, 'profile', pid=self.person_id)
 
         meta = profile_page.get_head()
+
+        context["visible"] = AID_VISIBILITY
+        context["element_width"] = self.render_width_dict
 
         body = profile_page.get_wrapped_body("profile_page", context)
         return page(title=page_title,
@@ -509,9 +613,10 @@ class WebAuthorPages(WebInterfaceDirectory):
                 records, records_cache_status = get_pubs(person_id)
 
                 citations = {'breakdown_categories': ['Renowned papers (500+)', 'Famous papers (250-499)',
-                                                'Very well-known papers (100-249)', 'Well-known papers (50-99)',
-                                                'Known papers (10-49)', 'Less known papers (1-9)',
-                                                'Unknown papers (0)']}
+                                                      'Very well-known papers (100-249)',
+                                                      'Well-known papers (50-99)',
+                                                      'Known papers (10-49)', 'Less known papers (1-9)',
+                                                      'Unknown papers (0)']}
 
                 content = "Data not ready. Please wait..."
                 if cache_status and citation_data and records and records_cache_status:
@@ -622,19 +727,13 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 if datasets_pubs is not None and datasets_pubsStatus is True:
                     datasets_pubs_to_display = sorted([(title, get_inspire_record_url(recid), recid) for recid, title
-                                            in datasets_pubs.iteritems()], key=lambda x: x[2], reverse=True)[0:10]
+                                                       in datasets_pubs.iteritems()], key=lambda x: x[2], reverse=True)[0:10]
                 else:
                     datasets_pubs_to_display = list()
 
-                arxiv_pubs = []
-                doi_pubs = []
-                if external_pubs is not None and external_pubsStatus is True:
-                    if 'arxiv' in external_pubs:
-                        arxiv_pubs = [(title, get_arxiv_url(arxiv_id), 'arxiv') for arxiv_id, title
-                                            in external_pubs['arxiv'].iteritems()]
-
-                    if 'doi' in external_pubs:
-                        doi_pubs = [(title, get_doi_url(doi_id), 'doi') for doi_id, title in external_pubs['doi'].iteritems()]
+                arxiv_pubs = [(title, get_arxiv_url(arxiv_id), 'arxiv') for arxiv_id, title
+                              in external_pubs['arxiv'].iteritems()]
+                doi_pubs = [(title, get_doi_url(doi_id), 'doi') for doi_id, title in external_pubs['doi'].iteritems()]
 
                 external_pubs = arxiv_pubs + doi_pubs
 
@@ -653,22 +752,19 @@ class WebAuthorPages(WebInterfaceDirectory):
                 datasets_search_link = "%s/search?cc=Data&p=%s" % (CFG_BASE_URL, '+or+'.join(datasets_pubs_recs))
 
                 json_response = {
-                            'status': (internal_pubsStatus and external_pubsStatus and datasets_pubsStatus),
-                            'html': WebProfilePage.render_publications_box_content({
-                                "internal_pubs": internal_pubs,
-                                "external_pubs": external_pubs,
-                                "datasets": datasets_pubs_to_display,
-                                "all_pubs_search_link": all_pubs_search_link,
-                                "data_sets_search_link": datasets_search_link,
-                                "base_url": CFG_BASE_URL
-                                })
-                            }
+                    'status': (internal_pubsStatus and external_pubsStatus and datasets_pubsStatus),
+                    'html': WebProfilePage.render_publications_box_content({
+                        "internal_pubs": internal_pubs,
+                        "external_pubs": external_pubs,
+                        "datasets": datasets_pubs_to_display,
+                        "all_pubs_search_link": all_pubs_search_link,
+                        "data_sets_search_link": datasets_search_link,
+                        "base_url": CFG_BASE_URL
+                    })
+                }
 
                 req.content_type = 'application/json'
                 return json.dumps(json_response)
 
-
-
-
     def last_computed(self):
-        return get_person_oldest_date( self.person_id)
+        return get_person_oldest_date(self.person_id)

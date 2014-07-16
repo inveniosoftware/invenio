@@ -76,9 +76,30 @@ PERSONS_PER_PAGE = 5
 # Max amount of recent papers shown to the user
 MAX_NUM_SHOW_PAPERS = 5
 
+# Author's profile boxes visibility
+AID_VISIBILITY = {
+    "personal_details" : False,
+    "publications" : True,
+    "datasets" : False,
+    "external" : False,
+    "citations_summary" : True,
+    "publications_graph" : True,
+    "coauthors" : True,
+    "papers" : True,
+    "subject_categories" : True,
+    "frequent_keywords" : True,
+    "name_variants" : True,
+    "affiliations" : True,
+    "collaborations" : True
+}
+
 # BibAuthorId functionalities should always be enabled for Inspire.
+# Also, all boxes should be shown
 if CFG_INSPIRE_SITE:
     CFG_BIBAUTHORID_ENABLED = True
+    AID_VISIBILITY["personal_details"] = True
+    AID_VISIBILITY["datasets"] = True
+    AID_VISIBILITY["external"] = True
 
 # Globally enable AuthorID Interfaces.
 #     If False: No guest, user or operator will have access to the system.
