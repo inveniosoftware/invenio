@@ -13,7 +13,6 @@
     "jquery.ajaxpager": "http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js",
     "jquery.bookmark": "http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip",
     "DataTables": "1_9",
-    "prism": "gh-pages",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
     "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",

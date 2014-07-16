@@ -45,19 +45,25 @@ actions = Bundle(
 )
 
 vendors_js = Bundle(
-    'js/prism.js',
-    'js/prettify.min.js',
+    'vendors/prism/prism.js',
+    'js/prettify.min.js',  # is https://code.google.com/p/google-code-prettify/
     filters="uglifyjs",
     output='vendors.js',
-    weight=40
+    weight=40,
+    bower={
+        "prism": "gh-pages"
+    }
 )
 
 vendors_css = Bundle(
-    'css/prism.css',
+    'vendors/prism/themes/prism.css',
     'css/prettify.css',
     filters="cleancss",
     output='vendors.css',
-    weight=40
+    weight=40,
+    bower={
+        #"prism": "*"  # already present in vendors_js
+    }
 )
 
 dataTables_css = Bundle(

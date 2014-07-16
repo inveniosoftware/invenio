@@ -30,7 +30,6 @@ module.exports = {
         src: ['jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
-               ,'prism/themes/prism.css'
                ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
@@ -53,7 +52,6 @@ module.exports = {
             'DataTables/media/js/jquery.dataTables.js',
             'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',
             'jquery.bookmark/jquery.bookmark.min.js',
-            'prism/prism.js',
         ],
         dest: '<%= globalConfig.installation_path %>/js/'
     },
