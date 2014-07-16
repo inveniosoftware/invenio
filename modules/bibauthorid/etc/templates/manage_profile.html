@@ -1,16 +1,17 @@
 {% extends "index.html" %}
 {% block content %}
 <div class="row">
-
     <!-- left -->
     <div class="col-md-6">
         <!-- arxiv -->
+        {% if inspire %}
         <div id="arxiv" class="well well-small inspire-well">
             <div class="bai-box-title">
                 <span>arXiv</span>
             </div>
             <div class="bai-box-content">{{ arxiv }}</div>
         </div>
+        {% endif %}
 
         <!-- autoassign -->
         {% if autoclaim_successful_recids or autoclaim_unsuccesful_recids %}
@@ -18,7 +19,7 @@
             <div class="bai-box-title">
                 <span>Automatically Assigned Papers</span>
             </div>
-	    <div class="bai-box-content">{% include "autoclaim_box.html" %}</div>
+            <div class="bai-box-content">{% include "autoclaim_box.html" %}</div>
         </div>
         {% endif %}
 
@@ -45,6 +46,7 @@
     <!-- right -->
     <div class="col-md-6">
         <!-- orcid -->
+        {% if inspire %}
         <div id="orcid" class="well well-small inspire-well">
             <div class="bai-box-title">
                 <span>ORCiD</span>
@@ -52,7 +54,7 @@
             <div class="bai-box-content">{{ orcid }}</div>
         </div>
 
-	<!-- hepnames -->
+        <!-- hepnames -->
         <div id="hepdata" class="well well-small inspire-well">
             <div class="bai-box-title">
                 <span>HepNames</span>
@@ -67,6 +69,7 @@
             </div>
             <div class="bai-box-content">{{ contact }}</div>
         </div>
+        {% endif %}
 
     </div>
 
