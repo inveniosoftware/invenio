@@ -83,6 +83,8 @@ jquery = Bundle(
         "jquery.jeditable": "http://invenio-software.org/download/jquery/"
                             "v1.5/js/jquery.jeditable.mini.js",
         "jquery-migrate": "latest",  # orphan
+        "jquery-multifile": "svn+http://jquery-multifile-plugin.googlecode.com"
+                            "/svn/",  # orphan
         "jquery-tokeninput": "latest",
         "jquery-form": "latest",  # orphan
         "jquery.treeview": "latest",  # orphan, to be replaced by jqTree

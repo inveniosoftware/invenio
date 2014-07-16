@@ -64,18 +64,6 @@ module.exports = {
             return dest + res;
         }
     },
-    MultiFile: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.bower_path %>/',
-        src: ['jquery.multifile/index.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        rename: function(dest, src) {
-            var res = src.replace(src.substring(0),
-                                  'jquery.MultiFile.pack.js');
-            return dest + res;
-        }
-    },
     ajaxPager: {
         expand: true,
         flatten: true,
