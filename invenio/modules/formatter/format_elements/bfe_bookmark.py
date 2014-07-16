@@ -103,13 +103,13 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
     #bookmark_sciencewise li { padding: 2px; width: 25px}
     #bookmark_sciencewise ul, #bookmark ul { list-style-image: none; }
 </style>
-<script type="text/javascript" src="%(siteurl)s/js/jquery.bookmark.min.js"></script>
-<style type="text/css">@import "%(siteurl)s/css/jquery.bookmark.css";</style>
+<script type="text/javascript" src="%(siteurl)s/vendors/jquery.bookmark/jquery.bookmark.min.js"></script>
+<style type="text/css">@import "%(siteurl)s/vendors/jquery.bookmark/jquery.bookmark.css";</style>
 <script type="text/javascript">// <![CDATA[
     %(sciencewise)s
     $('#bookmark').bookmark({
         sites: [%(sites_js)s],
-        icons: '%(siteurl)s/img/bookmarks.png',
+        icons: '%(siteurl)s/vendors/jquery.bookmark/bookmarks.png',
         url: '%(url)s',
         addEmail: true,
         title: "%(title)s",

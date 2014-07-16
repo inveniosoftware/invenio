@@ -27,5 +27,12 @@ css = Bundle(
     "css/formatter/templates_detailed.css",
     output="formatter.css",
     weight=60,
-    filters="cleancss"
+    filters="cleancss",
+    bower={
+        # /!\ 1.4.0 is from 2011 /!\
+        # --------------------------
+        # http://www.keith-wood.name/bookmark.html
+        "jquery.bookmark": "http://invenio-software.org/download/jquery/"
+                           "jquery.bookmark.package-1.4.0.zip"  # orphan
+    }
 )
