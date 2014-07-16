@@ -27,23 +27,20 @@ import sys
 import datetime
 import time
 import os
-try:
-    from invenio.dbquery import run_sql, wash_table_column_name
-    from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
-         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
-         CFG_INSPIRE_SITE
-    from invenio.bibtask import task_init, task_set_option, task_get_option, \
-         write_message, write_messages
-    from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
-    from invenio.access_control_mailcookie import mail_cookie_gc
-    from invenio.bibdocfile import BibDoc
-    from invenio.bibsched import gc_tasks
-    from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
-    from invenio.dateutils import convert_datestruct_to_datetext
-except ImportError, e:
-    print "Error: %s" % (e,)
-    sys.exit(1)
+from invenio.dbquery import run_sql, wash_table_column_name
+from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
+        CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
+        CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
+        CFG_INSPIRE_SITE
+from invenio.bibtask import task_init, task_set_option, task_get_option, \
+        write_message, write_messages
+from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
+from invenio.access_control_mailcookie import mail_cookie_gc
+from invenio.bibdocfile import BibDoc
+from invenio.bibsched import gc_tasks
+from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.intbitset import intbitset
 
 # Add trailing slash to CFG_TMPSHAREDDIR, for find command to work
 # with symlinks
@@ -427,22 +424,24 @@ def guest_user_garbage_collector():
         " non-existent users")
 
     # find user_queries referencing non-existent users
-    write_message("  SELECT DISTINCT uq.id_user\n"
-        "  FROM user_query AS uq LEFT JOIN user AS u\n"
-        "  ON uq.id_user = u.id\n  WHERE u.id IS NULL", verbose=9)
-    result = run_sql("""SELECT DISTINCT uq.id_user
-        FROM user_query AS uq LEFT JOIN user AS u
-        ON uq.id_user = u.id
-        WHERE u.id IS NULL""")
-    write_message(result, verbose=9)
 
+    users_with_queries = intbitset(run_sql("""SELECT DISTINCT id_user
+                                              FROM user_query"""))
+    existing_users = intbitset(run_sql("SELECT id FROM user"))
+    users_with_queries_to_be_deleted = users_with_queries - existing_users
+    write_message("  Users with queries: %s" % len(users_with_queries),
+                  verbose=9)
+    write_message("  Existing users: %s" % len(existing_users),
+                  verbose=9)
+    write_message("  Users with queries to be deleted: %s"
+                  % len(users_with_queries_to_be_deleted), verbose=9)
 
     # delete in user_query one by one
     write_message("  DELETE FROM user_query WHERE"
         " id_user = 'TRAVERSE LAST RESULT' \n", verbose=9)
-    for (id_user,) in result:
-        delcount['user_query'] += run_sql("""DELETE FROM user_query
-            WHERE id_user = %s""" % (id_user,))
+    for id_user in users_with_queries_to_be_deleted:
+        delcount['user_query'] += run_sql("""DELETE FROM user_query WHERE
+                                             id_user=%s""", (id_user, ))
 
     # delete the actual queries
     write_message("- deleting queries not attached to any user")
