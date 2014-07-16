@@ -13,7 +13,6 @@
     "DataTables": "1_9",
     "datatables-colvis": "*",
     "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
-    "bootstrap-switch": "https://github.com/nostalgiaz/bootstrap-switch.git#3.0",
     "bootstrap-tagsinput": "*"
   },
   "resolutions": {
