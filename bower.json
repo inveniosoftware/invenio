@@ -8,7 +8,6 @@
   "dependencies": {
     "jquery": "~1.11",
     "MathJax": "v2.1-latest",
-    "jquery.treeview": "1.4.1",
     "jquery.tablesorter": "http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip",
     "jquery.multifile": "http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js",
     "jquery.ajaxpager": "http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js",

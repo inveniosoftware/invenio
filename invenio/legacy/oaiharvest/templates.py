@@ -679,8 +679,8 @@ class Template:
             holdingpen page
         """
         jquery_scripts = ["vendors/jquery-ui/jquery-ui.min.js",
-                          "js/jquery-treeview/jquery.treeview.js",
-                          "js/jquery-treeview/jquery.treeview.async.js",
+                          "vendors/jquery.treeview/jquery.treeview.js",
+                          "vendors/jquery.treeview/jquery.treeview.async.js",
                           "js/jquery.ajaxPager.js"]
         jquery_scripts_strings = []
         for script in jquery_scripts:
@@ -692,7 +692,7 @@ class Template:
         jquery_scripts_string = "".join(jquery_scripts_strings)
 
         return """ %(scriptsstring)s
-    <link rel="stylesheet" href="%(baseurl)s/js/jquery-treeview/jquery.treeview.css" />
+    <link rel="stylesheet" href="%(baseurl)s/vendors/jquery.treeview/jquery.treeview.css" />
     <link rel="stylesheet" href="%(baseurl)s/css/jquery.ajaxPager.css" />
     <script type="text/javascript">
         var serverAddress = '%(baseurl)s';

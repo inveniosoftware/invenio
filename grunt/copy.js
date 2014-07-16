@@ -119,12 +119,6 @@ module.exports = {
         src: ['**'],
         dest: '<%= globalConfig.installation_path %>/MathJax/'
     },
-    jqueryTreeview: {
-        expand: true,
-        cwd: '<%= globalConfig.bower_path %>/jquery.treeview/',
-        src: ['**'],
-        dest: '<%= globalConfig.installation_path %>/js/jquery-treeview/'
-    },
     jqueryTableSorter: {
         expand: true,
         cwd: '<%= globalConfig.bower_path %>/jquery.tablesorter/',

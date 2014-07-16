@@ -79,6 +79,7 @@ jquery = Bundle(
         "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
         "jquery-tokeninput": "latest",
         "jquery-form": "latest",
+        "jquery.treeview": "latest",  # to be replaced by jqTree or dropped
         "json2": "latest",
         "hogan": "~3",
         "typeahead.js": "latest",
