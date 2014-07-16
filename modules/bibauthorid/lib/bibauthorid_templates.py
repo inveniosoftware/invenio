@@ -270,18 +270,27 @@ class WebProfilePage():
 
     @staticmethod
     def render_citations_summary_content(citations, canonical_name):
+        
+        def _get_breakdown_categories_bounds(pid):
+            """
+            An example of a category string would be 'Famous papers (250-499')
+            This returns (250, 499) which are the lower and upper bound.
+            """
+            
+            bounds_str = category.split(')')[0].split('(')[1]
+            
+            try:
+                return (int(bounds_str), 0)
+            except ValueError:
+                if '+' in bounds_str:
+                    return (int(bounds_str.strip('+')), 1000000)
+                else:
+                    return map(int, bounds_str.split('-'))
 
         citeable_breakdown_queries = dict()
         published_breakdown_queries = dict()
         for category in citations['breakdown_categories']:
-            limits = category.split(')')[0].split('(')[1].strip('+').split('-')
-            low = int(limits[0])
-            if len(limits) > 1 and int(limits[0]) != 0:
-                high = int(limits[1])
-            elif int(limits[0]) == 0:
-                high = 0
-            else:
-                high = 1000000
+            low, high = _get_breakdown_categories_bounds(category)
             citeable_breakdown_queries[
                 category] = tmpl_citesummary_get_link_for_rep_breakdown(
                 canonical_name,
