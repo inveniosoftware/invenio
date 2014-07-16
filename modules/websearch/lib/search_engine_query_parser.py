@@ -468,8 +468,8 @@ class SpiresToInvenioSyntaxConverter:
         'conf-number' : '111__g:',
         'cnum' : '773__w:',
         # country
-        'cc' : '044__a:',
-        'country' : '044__a:',
+        'cc' : 'country:',
+        'country' : 'country:',
         # date
         'date': _DATE_FIELD,
         'd': _DATE_FIELD,
@@ -532,7 +532,6 @@ class SpiresToInvenioSyntaxConverter:
         #postal code
         'postalcode' : 'postalcode:',
         'zip' : 'postalcode:',
-        'cc' : 'postalcode:',
         # ppf subject
         'ppf-subject' : '650__a:',
         'status' : '650__a:',
@@ -643,7 +642,7 @@ class SpiresToInvenioSyntaxConverter:
         '773__y:', # journal-year
         '773__c:', # journal-page
         '773__w:', # cnum
-        '044__a:', # country code
+        'country:', # country code
         'subject:', # field code
         'collection:', # type code
         '035__z:', # texkey

@@ -18,7 +18,7 @@
 kbdir = $(sysconfdir)/bibconvert/KB
 kb_DATA = entdec-to-latin1.kb entdec-to-utf8.kb \
           enthex-to-latin1.kb enthex-to-utf8.kb \
-          latex-to-unicode.kb
+          latex-to-unicode.kb countrycode-to-country.kb
 
 xsldir = $(sysconfdir)/bibconvert/config
 xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl oaiarxiv2marcxml.xsl \
