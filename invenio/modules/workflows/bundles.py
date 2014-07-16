@@ -16,12 +16,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Workflows bundles."""
 
 from invenio.ext.assets import Bundle
 from invenio.base.bundles import jquery as _jquery
 
-_jquery.contents += ('js/bootstrap-tagsinput.min.js',)
+
+_jquery.contents.append('vendors/bootstrap-tagsinput/dist/'
+                        'bootstrap-tagsinput.js')
+_jquery.bower['bootstrap-tagsinput'] = "latest"
 
 js = Bundle(
     'js/workflows/entry_details.js',
@@ -69,10 +73,13 @@ vendors_css = Bundle(
 dataTables_css = Bundle(
     'css/dataTables.colVis.css',
     'css/dataTables.bootstrap.css',
-    'css/bootstrap-tagsinput.css',
-    filters="cleancss",
+    'vendors/bootstrap-tagsinput/dist/bootstrap-tagsinput.less',
+    filters="less,cleancss",
     output='dataTables.css',
-    weight=30
+    weight=30,
+    bower={
+        #"bootstrap-tagsinput": "*"  # already present in _jquery
+    }
 )
 
 dataTables_js = Bundle(

@@ -30,7 +30,6 @@ module.exports = {
         src: ['jquery.bookmark/jquery.bookmark.css'
                ,'datatables-colvis/css/dataTables.colVis.css'
                ,'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.css'
-               ,'bootstrap-tagsinput/dist/bootstrap-tagsinput.css'],
         dest: '<%= globalConfig.installation_path %>/css/'
     },
     img: {
@@ -46,8 +45,6 @@ module.exports = {
         flatten: true,
         cwd: '<%= globalConfig.bower_path %>/',
         src: [
-            'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js',
-            'bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js.map',
             'datatables-colvis/js/dataTables.colVis.js',
             'DataTables/media/js/jquery.dataTables.js',
             'DataTables-Plugins/integration/bootstrap/3/dataTables.bootstrap.js',

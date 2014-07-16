@@ -12,8 +12,7 @@
     "jquery.multifile": "http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js",
     "DataTables": "1_9",
     "datatables-colvis": "*",
-    "DataTables-Plugins": "https://github.com/DataTables/Plugins.git",
-    "bootstrap-tagsinput": "*"
+    "DataTables-Plugins": "https://github.com/DataTables/Plugins.git"
   },
   "resolutions": {
     "jquery": "~1.11"
