@@ -365,6 +365,8 @@ def detect_identifier_schemes(val):
         schemes = filter(lambda x: x != 'handle', schemes)
     elif 'handle' in schemes and 'ark' in schemes:
         schemes = filter(lambda x: x != 'handle', schemes)
+    elif 'handle' in schemes and 'arxiv' in schemes:
+        schemes = filter(lambda x: x != 'handle', schemes)
     return schemes
 
 
@@ -388,6 +390,14 @@ def normalize_pmid(val):
     return m.group(2)
 
 
+def normalize_arxiv(val):
+    if arxiv_pre_2007_regexp.match(val):
+        return val
+    else:
+        m = arxiv_post_2007_regexp.match(val)
+        return "arXiv:" + '.'.join(m.group(1,2))
+
+
 def normalize_pid(val, scheme):
     """
     Normalize a persistent identifier
@@ -406,6 +416,8 @@ def normalize_pid(val, scheme):
         return normalize_ads(val)
     elif scheme == 'pmid':
         return normalize_pmid(val)
+    elif scheme == 'arxiv':
+        return normalize_arxiv(val)
     return val
 
 
