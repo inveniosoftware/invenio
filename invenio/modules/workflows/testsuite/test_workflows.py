@@ -35,29 +35,6 @@ TEST_PACKAGES = [
 ]
 
 
-class WorkflowViewTest(InvenioTestCase):
-
-    """ Test search view functions. """
-
-    def test_main_admin_availability(self):
-        """Test if admin view is avaiable."""
-        from flask import url_for
-
-        response = self.client.get(url_for('workflows.index'),
-                                   follow_redirects=True)
-        # FIXME: tmp 401 due to missing file
-        self.assert401(response)
-
-    def test_workflow_list_availability(self):
-        """Test if workflow list view is avaiable."""
-        from flask import url_for
-
-        response = self.client.get(url_for('workflows.show_workflows'),
-                                   follow_redirects=True)
-        # FIXME: tmp 401 due to missing file
-        self.assert401(response)
-
-
 class WorkflowTasksTestCase(InvenioTestCase):
 
     """ Workflow class for testing."""
@@ -695,7 +672,7 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         start_by_wid(workflow.uuid)
         test_object.delete(test_object.id)
 
-TEST_SUITE = make_test_suite(WorkflowViewTest, WorkflowTasksTestAPI,
+TEST_SUITE = make_test_suite(WorkflowTasksTestAPI,
                              TestWorkflowTasks)
 
 if __name__ == "__main__":
