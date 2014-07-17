@@ -96,7 +96,7 @@ def process_affiliations(record_ids=None, all_records=False):
             break
         process_and_store(chunk)
         processed_records_count += len(chunk)
-        task_update_progress('processed %s out of %s persons' % (processed_records_count, len(records)))
+        task_update_progress('processed %s out of %s records' % (processed_records_count, len(records)))
     if start_time:
         store_last_updated(None, start_time, name)
 
