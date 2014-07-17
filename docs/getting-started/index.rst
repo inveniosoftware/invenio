@@ -12,4 +12,5 @@ Getting Started
     demo
     features
     first-steps
+    overlay
     common-concepts

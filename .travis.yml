@@ -50,14 +50,12 @@ install:
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
   - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
   - "inveniomanage config set CFG_TMPDIR /tmp"
-  - "sudo su -c \"npm install --silent -g bower grunt-cli less clean-css uglify-js requirejs\""
-  - "npm install --silent"
-  - "bower install"
-  - "travis_retry grunt" # Cheating to get assets in both places, it should be done in the overlay
-  - "rm bower.json"
+  - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
+  # All the step below this points are solely for test purposes, don't use them
+  # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
   - "echo {\\\"directory\\\": \\\"invenio/base/static/vendors\\\"} > .bowerrc"
-  - "echo {\\\"resolutions\\\": {\\\"jquery\\\": \\\"~1.11\\\", \\\"bootstrap\\\": \\\"~3.2\\\"}} > bower.json"
-  - "inveniomanage bower -i bower.json -x"
+  - "echo {\\\"resolutions\\\": {\\\"jquery\\\": \\\"~1.11\\\", \\\"bootstrap\\\": \\\"~3.2\\\"}} > bower-base.json"
+  - "inveniomanage bower -i bower-base.json > bower.json"
   - "bower install"
   - "inveniomanage collect"
   - "inveniomanage assets build"

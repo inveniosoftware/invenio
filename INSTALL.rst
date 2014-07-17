@@ -122,22 +122,27 @@ centor
 2.3. Extra tools
 ~~~~~~~~~~~~~~~~
 
-2.3.1. Bower and Grunt
-++++++++++++++++++++++
+2.3.1. Bower
+++++++++++++
 
-Bower and Grunt as used to manage the static assets such as JavaScript
-libraries (e.g., jQuery) and CSS stylesheets (e.g., Bootstrap), it's much
-easier to install them globally.
+Bower is used to manage the static assets such as JavaScript libraries (e.g.,
+jQuery) and CSS stylesheets (e.g., Bootstrap). It's much easier to install them
+globally (``-g``) but you're free to choose your preferred way.
 
 .. code-block:: console
 
-    $ sudo su -c "npm install -g bower grunt-cli"
+    # global installation
+    $ sudo su -c "npm install -g bower"
+    # user installation
+    $ npm install bower
 
 
-2.3.2 ``git-new-workdir``
-++++++++++++++++++++++++++
+2.3.2 ``git-new-workdir`` (optional)
+++++++++++++++++++++++++++++++++++++
 
-For the rest of the tutorial you will need to check that you have ``git-new-workdir``.
+For the rest of the tutorial you may want to use ``git-new-workdir``. It's a
+tool that will let you working on the same repository from different locations.
+Just like you would do with subversion branches.
 
 .. code-block:: console
 
@@ -157,7 +162,8 @@ For the rest of the tutorial you will need to check that you have ``git-new-work
 ---------------------------------------------------------
 
 This installation process is tailored for running the development version of
-Invenio, check **TODO** out for the production setup.
+Invenio, check out the :py:ref:`overlay` documentation for the production
+setup.
 
 3.1. Installation
 ~~~~~~~~~~~~~~~~~
@@ -198,6 +204,12 @@ Let's put Invenio and the Invenio Demosite in the environment just created.
     (invenio)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
     (invenio)$ git-new-workdir $HOME/src/invenio-demosite/ invenio-demosite $BRANCH
 
+If you don't want to use the ``git-new-workdir`` way, you can either:
+
+- create a symbolic link,
+- or clone the repository directly into the virtualenv.
+
+
 Installing Invenio.
 
 .. code-block:: console
@@ -206,7 +218,7 @@ Installing Invenio.
     (invenio)$ pip install -r requirements.txt
 
 Some modules may require specific dependencies listed as ``extras``. Pick the
-ones you need. E.g. to add images support, we can do as follow:
+ones you need. E.g. to add `images` support, we can do as follow:
 
 .. code-block:: console
 
@@ -222,25 +234,6 @@ translations manually.
 .. note:: Translation catalog is compiled automatically if you install
     using `python setup.py install`.
 
-Installing the npm dependencies and the external JavaScript and CSS libraries.
-
-.. admonition:: FIXME
-
-    This will not be required anymore.
-    `#1842 <https://github.com/inveniosoftware/invenio/issues/1842>`_
-
-.. code-block:: console
-
-    (invenio)$ npm install
-    (invenio)$ bower install
-
-``grunt`` will copy the libraries from ``bower_components`` to the instance
-path.
-
-.. code-block:: console
-
-    (invenio)$ grunt
-
 Installing Invenio Demosite. ``exists-action i`` stands for `ignore`, it means
 that it'll will skip any previous installation found. Because the Invenio
 Demosite depends on Invenio, it would have tried to reinstall it without this
@@ -252,12 +245,12 @@ option. If you omit it, ``pip`` will ask you what action you want to take.
     (invenio)$ pip install -r requirements.txt --exists-action i
 
 Installing the required assets (JavaScript, CSS, etc.) via bower. The file
-``.bowerrc`` is telling where bower will download the files and ``bower.json``
-what to download.
+``.bowerrc`` is configuring where bower will download the files and
+``bower.json`` what libraries to download.
 
 .. code-block:: console
 
-    (invenio)$ inveniomanage bower -i bower.json-base -x
+    (invenio)$ inveniomanage bower -i bower-base.json > bower.json
     Generates or update bower.json for you.
     (invenio)$ cat .bowerrc
     {
@@ -265,19 +258,20 @@ what to download.
     }
     (invenio)$ bower install
     (invenio)$ ls invenio_demosite/base/static/vendors
-    almond
     bootstrap
     ckeditor
     hogan
     jquery
     jquery-tokeninput
-    jquery.jeditable
-    jquery.ui.timepicker
-    jqueryui
-    less
+    jquery-ui
     plupload
-    requirejs
     ...
+
+
+We recommend you to only alter ``bower-base.json`` and regenerate
+``bower.json`` with it as needed. The
+:py:class:`invenio.ext.assets.commands.BowerCommand` is aggregating all the
+dependencies defined by each bundle.
 
 The last step, which is very important will be to collect all the assets, but
 it will be done after the configuration step.
@@ -313,18 +307,13 @@ they are not in the environment ``$PATH`` already.
     # Global installation
     $ sudo su -c "npm install -g less clean-css requirejs uglify-js"
 
-    or
+    # or
     # Local installation
+    (invenio)$ npm install less clean-css requirejs uglify-js
     (invenio)$ inveniomanage config set LESS_BIN `find $PWD/node_modules -iname lessc | head -1`
     (invenio)$ inveniomanage config set CLEANCSS_BIN `find $PWD/node_modules -iname cleancss | head -1`
     (invenio)$ inveniomanage config set REQUIREJS_BIN `find $PWD/node_modules -iname r.js | head -1`
     (invenio)$ inveniomanage config set UGLIFYJS_BIN `find $PWD/node_modules -iname uglifyjs | head -1`
-
-.. admonition:: FIXME
-
-    If grunt disappears, the local installation will be very similar to the
-    local one but require then to be installed locally (no ``sudo ... -g``).
-    `#1842 <https://github.com/inveniosoftware/invenio/issues/1842>`_
 
 All the assets that are spread among every invenio module or external libraries
 will be collected into the instance directory. By default, it create copies of
@@ -332,7 +321,10 @@ the original files. As a developer you may want to have symbolic links instead.
 
 .. code-block:: console
 
+    # Developer only
     (invenio)$ inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link
+
+
     (invenio)$ inveniomanage collect
     ...
     Done collecting.
@@ -361,17 +353,17 @@ which must be running alongside with the web server.
 
 .. code-block:: console
 
-    $ # make sure that redis is running
+    # make sure that redis is running
     $ sudo service redis-server status
     redis-server is running
-    $ # or start it with start
+    # or start it with start
     $ sudo service redis-start start
 
-    $ # launch celery
+    # launch celery
     $ workon invenio
     (invenio)$ celeryd -E -A invenio.celery.celery --workdir=$VIRTUAL_ENV
 
-    $ # in a new terminal
+    # in a new terminal
     $ workon invenio
     (invenio)$ inveniomanage runserver
      * Running on http://0.0.0.0:4000/
@@ -380,15 +372,17 @@ which must be running alongside with the web server.
 
 **Troubleshooting:** As a developer, you may want to use the provided
 ``Procfile`` with `honcho <https://pypi.python.org/pypi/honcho>`_. It
-starts all the services at once with nice colors. Be default, it also runs
+starts all the services at once with nice colors. By default, it also runs
 `flower <https://pypi.python.org/pypi/flower>`_ which offers a web interface
 to monitor the *Celery* tasks.
 
 .. code-block:: console
 
-    (invenio)$ pip install flower
+    (invenio)$ pip install honcho flower
+    (invenio)$ cdvirtualenv src/invenio
+    (invenio)$ honcho start
 
-When you have the servers running, it is possible to upload the demo records.
+When all the servers are running, it is possible to upload the demo records.
 
 .. code-block:: console
 

@@ -73,6 +73,10 @@ class BowerCommand(Command):
             "name": "invenio",
             "version": pkg_resources.get_distribution("invenio").version,
             "dependencies": {},
+            "resolutions": {
+                "jquery": "<2",
+                "bootstrap": "~3.2"
+            }
         }
 
         if filename and os.path.exists(filename):

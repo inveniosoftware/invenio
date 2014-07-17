@@ -306,9 +306,10 @@ intersphinx_mapping = {
     'werkzeug': ('http://werkzeug.pocoo.org/docs/', None),
     'flask': ('http://flask.pocoo.org/docs/', None),
     'flaskassets': ('http://flask-assets.readthedocs.org/en/latest/', None),
+    'flaskscript': ('http://flask-script.readthedocs.org/en/latest/', None),
     'sqlalchemy': ('http://docs.sqlalchemy.org/en/latest/', None),
     'jinja': ('http://jinja.pocoo.org/docs/', None),
-    'webassets': ('http://webassets.readthedocs.org/en/latest/', None)
+    'webassets': ('http://webassets.readthedocs.org/en/latest/', None),
     # FIXME not readable due to ValueError: unknown or unsupported inv version
     #'flasklogin': ('http://flask-login.readthedocs.org/en/latest/')
 }

@@ -63,6 +63,13 @@ Flask-Login
 
    Sorry not valid intersphinx were found for: ``flask.ext.login.UserMixin``.
 
+Flask-Script
+============
+
+.. py:class:: flask_script.commands.Command
+
+    :py:class:`flaskscript:flask_script.Command`
+
 Webassets
 =========
 

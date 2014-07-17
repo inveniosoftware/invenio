@@ -31,6 +31,15 @@ Assets
    :show-inheritance:
 
 
+Flask-Script commands
+---------------------
+
+.. automodule:: invenio.ext.assets.commands
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
 Jinja2 extensions
 -----------------
 
