@@ -37,24 +37,6 @@ from invenio.ext.logging import register_exception
 from invenio.utils.json import CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
-from invenio.legacy.bibedit.config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
-    CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
-    CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
-    CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION, \
-    CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR, \
-    CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION, \
-    CFG_BIBEDIT_JS_NEW_CONTENT_COLOR, \
-    CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION, \
-    CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY, \
-    CFG_BIBEDIT_JS_STATUS_ERROR_TIME, CFG_BIBEDIT_JS_STATUS_INFO_TIME, \
-    CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
-    CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
-    CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
-    CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
-    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT, \
-    CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS, \
-    CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS, CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
 
 from invenio.config import (CFG_SITE_LANG, CFG_DEVEL_SITE,
     CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
@@ -119,6 +101,8 @@ from invenio.legacy.refextract.api import FullTextNotAvailable, \
 
 from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
+
+from invenio.base.globals import cfg
 
 import invenio.legacy.template
 bibedit_templates = invenio.legacy.template.load('bibedit')
@@ -200,7 +184,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     record_templates.sort()
     tag_names = get_name_tags_all()
     protected_fields = ['001']
-    protected_fields.extend(CFG_BIBEDIT_PROTECTED_FIELDS.split(','))
+    protected_fields.extend(cfg['CFG_BIBEDIT_PROTECTED_FIELDS'].split(','))
     cern_site = 'false'
 
     if not CFG_JSON_AVAILABLE:
@@ -229,45 +213,53 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gTAG_NAMES': tag_names,
             'gPROTECTED_FIELDS': protected_fields,
             'gINTERNAL_DOI_PROTECTION_LEVEL': CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL,
-            'gSITE_URL': '"' + CFG_SITE_URL + '"',
-            'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
+            'gSITE_URL': CFG_SITE_URL,
+            'gSITE_RECORD': CFG_SITE_RECORD,
             'gCERN_SITE': cern_site,
             'gINSPIRE_SITE': CFG_INSPIRE_SITE,
-            'gHASH_CHECK_INTERVAL': CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL,
-            'gCHECK_SCROLL_INTERVAL': CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL,
-            'gSTATUS_ERROR_TIME': CFG_BIBEDIT_JS_STATUS_ERROR_TIME,
-            'gSTATUS_INFO_TIME': CFG_BIBEDIT_JS_STATUS_INFO_TIME,
+            'gHASH_CHECK_INTERVAL': cfg['CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL'],
+            'gCHECK_SCROLL_INTERVAL': cfg['CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL'],
+            'gSTATUS_ERROR_TIME': cfg['CFG_BIBEDIT_JS_STATUS_ERROR_TIME'],
+            'gSTATUS_INFO_TIME': cfg['CFG_BIBEDIT_JS_STATUS_INFO_TIME'],
             'gCLONED_RECORD_COLOR':
-                '"' + CFG_BIBEDIT_JS_CLONED_RECORD_COLOR + '"',
+                '"' + cfg['CFG_BIBEDIT_JS_CLONED_RECORD_COLOR'] + '"',
             'gCLONED_RECORD_COLOR_FADE_DURATION':
-                CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION,
+                cfg['CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION'],
             'gNEW_ADD_FIELD_FORM_COLOR':
-                '"' + CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR + '"',
+                '"' + cfg['CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR'] + '"',
             'gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION':
-                CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION,
-            'gNEW_CONTENT_COLOR': '"' + CFG_BIBEDIT_JS_NEW_CONTENT_COLOR + '"',
+                cfg['CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION'],
+            'gNEW_CONTENT_COLOR': '"' + cfg['CFG_BIBEDIT_JS_NEW_CONTENT_COLOR'] + '"',
             'gNEW_CONTENT_COLOR_FADE_DURATION':
-                CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION,
+                cfg['CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION'],
             'gNEW_CONTENT_HIGHLIGHT_DELAY':
-                CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY,
-            'gTICKET_REFRESH_DELAY': CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY,
-            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES,
-            'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
-            'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
-            'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"',
-            'gREQUESTS_UNTIL_SAVE' : CFG_BIBEDIT_REQUESTS_UNTIL_SAVE,
+                cfg['CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY'],
+            'gTICKET_REFRESH_DELAY': cfg['CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY'],
+            'gRESULT_CODES': cfg['CFG_BIBEDIT_AJAX_RESULT_CODES'],
+            'gAUTOSUGGEST_TAGS' : cfg['CFG_BIBEDIT_AUTOSUGGEST_TAGS'],
+            'gAUTOCOMPLETE_TAGS' : cfg['CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS'].keys(),
+            'gKEYWORD_TAG' : '"' + cfg['CFG_BIBEDIT_KEYWORD_TAG']  + '"',
+            'gREQUESTS_UNTIL_SAVE' : cfg['CFG_BIBEDIT_REQUESTS_UNTIL_SAVE'],
             'gAVAILABLE_KBS': get_available_kbs(),
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS,
-            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"',
-            'gDisplayReferenceTags': CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS,
-            'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS,
-            'gExcludeCuratorTags': CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS,
+            'gDOILookupField': '"' + cfg['CFG_BIBEDIT_DOI_LOOKUP_FIELD'] + '"',
+            'gDisplayReferenceTags': cfg['CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS'],
+            'gDisplayAuthorTags': cfg['CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS'],
+            'gExcludeCuratorTags': cfg['CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS'],
             'gSHOW_HP_REMOVED_FIELDS': CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
             'gBIBCATALOG_SYSTEM_RT_URL': repr(CFG_BIBCATALOG_SYSTEM_RT_URL)
             }
+
+    def convert(data):
+        """Return JS friendly strings. """
+        if isinstance(data, unicode):
+            return str(data)
+        else:
+            return json.dumps(data)
+
     body += '<script type="text/javascript">\n'
     for key in data:
-        body += '    var %s = %s;\n' % (key, data[key])
+        body += '    var %s = %s;\n' % (key, convert(data[key]))
     body += '    </script>\n'
 
     # Adding the information about field templates
@@ -520,7 +512,7 @@ def perform_request_bibedit_search(data, req):
     pattern = urllib.unquote(pattern)
     result_set = list(perform_request_search(req=req, p=pattern))
     response['resultCode'] = 1
-    response['resultSet'] = result_set[0:CFG_BIBEDIT_MAX_SEARCH_RESULTS]
+    response['resultSet'] = result_set[0:cfg['CFG_BIBEDIT_MAX_SEARCH_RESULTS']]
     return response
 
 
@@ -615,13 +607,13 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             # Import data from external source, using DOI
             doi = data['doi']
             if not doi:
-                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_no_doi_specified']
+                response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_no_doi_specified']
             else:
                 try:
                     marcxml_template = get_marcxml_for_doi(doi)
                 except CrossrefError as inst:
                     response['resultCode'] = \
-                        CFG_BIBEDIT_AJAX_RESULT_CODES_REV[inst.code]
+                        cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV'][inst.code]
                 except:
                     response['resultCode'] = 0
                 else:
@@ -797,7 +789,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['canRecordHavePhysicalCopies'] = can_have_copies
             # Set tag format from user's session settings.
             tagformat_settings = session_param_get(req, 'bibedit_tagformat')
-            tagformat = (tagformat_settings is not None) and tagformat_settings.get(recid, CFG_BIBEDIT_TAG_FORMAT) or CFG_BIBEDIT_TAG_FORMAT
+            tagformat = (tagformat_settings is not None) and tagformat_settings.get(recid, cfg['CFG_BIBEDIT_TAG_FORMAT']) or cfg['CFG_BIBEDIT_TAG_FORMAT']
             response['tagFormat'] = tagformat
             # KB information
             response['KBSubject'] = CFG_BIBEDIT_KB_SUBJECTS
@@ -852,7 +844,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     response['resultCode'] = 4
             except Exception as e:
                 register_exception()
-                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
+                response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV'][
                     'error_wrong_cache_file_format']
                 if CFG_DEVEL_SITE: # return debug information in the request
                     response['exception_message'] = e.__str__()
@@ -892,14 +884,14 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
         if has_copies(recid):
             response['resultCode'] = \
-                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_physical_copies_exist']
+                cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_physical_copies_exist']
         elif existing_cache and cache_expired(recid, uid) and \
                 record_locked_by_other_user(recid, uid):
             response['resultCode'] = \
-                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rec_locked_by_user']
+                cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rec_locked_by_user']
         elif record_locked_by_queue(recid):
             response['resultCode'] = \
-                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rec_locked_by_queue']
+                cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rec_locked_by_queue']
         else:
             if not existing_cache:
                 create_cache(recid, uid)
@@ -951,7 +943,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                                                        undo_list,
                                                        redo_list)
         response['cacheDirty'] = True
-        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['cache_updated_with_references']
+        response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['cache_updated_with_references']
 
     elif request_type == 'prepareRecordMerge':
         # We want to merge the cache with the current DB version of the record,
@@ -994,7 +986,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             create_cache(recid, uid,
                 create_record(response['resultXML'])[0])
             save_xml_record(recid, uid)
-            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV["record_submitted"]
+            response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']["record_submitted"]
 
     return response
 
@@ -1023,7 +1015,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
                 undo_list, redo_list = get_cache_contents(recid, uid)[1:]
         except:
             register_exception()
-            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
+            response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV'][
                 'error_wrong_cache_file_format']
             return response
 
@@ -1082,7 +1074,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
             # An empty request. Might be useful if we want to perform
             # operations that require only the actions performed globally,
             # like modifying the holdingPen changes list
-            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
+            response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV'][
                 'editor_modifications_changed']
         elif request_type == 'deactivateHoldingPenChangeset':
             # the changeset has been marked as processed ( user applied it in
@@ -1093,7 +1085,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
             #          changesets are related to the cache because we want to
             #          cancel the removal every time the cache disappears for
             #          any reason
-            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
+            response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV'][
                 'disabled_hp_changeset']
         elif request_type == 'addField':
             if data['controlfield']:
@@ -1154,7 +1146,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
                                                  field_position_local=int(fieldPosition))
 
             response['resultCode'] = \
-                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['added_positioned_subfields']
+                cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['added_positioned_subfields']
 
         elif request_type == 'modifyField': # changing the field structure
             # first remove subfields and then add new... change the indices
@@ -1291,8 +1283,8 @@ def perform_request_autocomplete(request_type, recid, uid, data):
     if (request_type == 'autokeyword'):
         # call the keyword-form-ontology function
         if fulltag and searchby:
-            items = get_kbt_items_for_bibedit(CFG_BIBEDIT_KEYWORD_TAXONOMY,
-                                              CFG_BIBEDIT_KEYWORD_RDFLABEL,
+            items = get_kbt_items_for_bibedit(cfg['CFG_BIBEDIT_KEYWORD_TAXONOMY'],
+                                              cfg['CFG_BIBEDIT_KEYWORD_RDFLABEL'],
                                               searchby)
             response['autokeyword'] = items
     if (request_type == 'autosuggest'):
@@ -1308,8 +1300,8 @@ def perform_request_autocomplete(request_type, recid, uid, data):
             response['autosuggest'] = new_suggest_vals
     if (request_type == 'autocomplete'):
         # call the values function with the correct kb_name
-        if fulltag in CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS:
-            kbname = CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS[fulltag]
+        if fulltag in cfg['CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS']:
+            kbname = cfg['CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS'][fulltag]
             # check if the seachby field has semicolons. Take all
             # the semicolon-separated items..
             items = []
@@ -1342,7 +1334,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
                 if val in existing_values:
                     new_vals.remove(val)
             response['autocomplete'] = new_vals
-    response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['autosuggestion_scanned']
+    response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['autosuggestion_scanned']
     return response
 
 def perform_request_bibcatalog(request_type, uid, data):
@@ -1388,12 +1380,12 @@ def perform_request_bibcatalog(request_type, uid, data):
             else:
                 # put something in the tickets container, for debug
                 response['tickets'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
-                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+                response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rt_connection']
     # closeTicket usecase
     elif request_type == 'closeTicket':
         if not CFG_BIBCATALOG_SYSTEM or not CFG_CAN_SEARCH_FOR_TICKET:
             response['ticket_closed_description'] = "<!--No ticket system configured-->"
-            response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
+            response['ticket_closed_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_closed']
         elif uid:
             bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
@@ -1403,22 +1395,22 @@ def perform_request_bibcatalog(request_type, uid, data):
                     ticket_closed = BIBCATALOG_SYSTEM.ticket_set_attribute(uid, data['ticketid'], 'status', 'resolved')
                     if ticket_closed == 1:
                         response['ticket_closed_description'] = 'Ticket resolved'
-                        response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_closed']
+                        response['ticket_closed_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['ticket_closed']
                     else:
                         response['ticket_closed_description'] = 'Ticket could not be resolved.Try again'
-                        response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
+                        response['ticket_closed_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_closed']
                 else:
                     response['ticket_closed_description'] = 'RT user does not exist'
-                    response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
+                    response['ticket_closed_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_closed']
             else:
                 #put something in the tickets container, for debug
                 response['ticket_closed_description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
-                response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+                response['ticket_closed_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rt_connection']
         response['ticketid'] = data['ticketid']
     elif request_type == 'openTicket':
         if not CFG_BIBCATALOG_SYSTEM or not CFG_CAN_SEARCH_FOR_TICKET:
             response['ticket_opened_description'] = "<!--No ticket system configured-->"
-            response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+            response['ticket_opened_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_opened']
         elif uid:
             bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
@@ -1427,17 +1419,17 @@ def perform_request_bibcatalog(request_type, uid, data):
                     ticket_opened = BIBCATALOG_SYSTEM.ticket_set_attribute(uid, data['ticketid'], 'status', 'open')
                     if ticket_opened == 1:
                         response['ticket_opened_description'] = 'Ticket opened'
-                        response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_opened']
+                        response['ticket_opened_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['ticket_opened']
                     else:
                         response['ticket_opened_description'] = 'Ticket could not be opened.Try again'
-                        response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+                        response['ticket_opened_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_opened']
                 else:
                     response['ticket_opened_description'] = 'RT user does not exist'
-                    response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+                    response['ticket_opened_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_ticket_opened']
             else:
                 #put something in the tickets container, for debug
                 response['ticket_opened_description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
-                response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+                response['ticket_opened_code'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rt_connection']
         response['ticketid'] = data['ticketid']
     return response
 
@@ -1601,7 +1593,7 @@ def perform_request_preview_record(request_type, recid, uid, data):
             textmarc_record = data['textmarc']
             xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record, uid)
             if xml_conversion_status['resultMsg'] == 'textmarc_parsing_error':
-                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['textmarc_parsing_error']
+                response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['textmarc_parsing_error']
                 response.update(xml_conversion_status)
                 return response
             record = create_record(xml_conversion_status["resultXML"])[0]
@@ -1659,16 +1651,16 @@ def perform_request_get_tableview(recid, uid, data):
     response = {}
     textmarc_record = data['textmarc']
     if not textmarc_record:
-        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['tableview_change_success']
+        response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['tableview_change_success']
     xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record, uid)
     response.update(xml_conversion_status)
 
     if xml_conversion_status['resultMsg'] == 'textmarc_parsing_error':
-        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['textmarc_parsing_error']
+        response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['textmarc_parsing_error']
     else:
         create_cache(recid, uid,
             create_record(xml_conversion_status['resultXML'])[0], data['recordDirty'])
-        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['tableview_change_success']
+        response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['tableview_change_success']
         response['cacheMTime'] = get_cache_mtime(recid, uid)
     return response
 
@@ -1793,7 +1785,7 @@ def perform_doi_search(doi):
     val = {'hdl': doi}
     url_data = urllib.urlencode(val)
     cj = cookielib.CookieJar()
-    header = [('User-Agent', CFG_DOI_USER_AGENT)]
+    header = [('User-Agent', cfg['CFG_DOI_USER_AGENT'])]
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     opener.addheaders = header
     try:
@@ -1807,7 +1799,7 @@ def perform_doi_search(doi):
 
 def check_hide_authors(record):
     """ Check if authors should be hidden by default in the user interface """
-    return sum([len(record.get(tag, [])) for tag in CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS]) > CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
+    return sum([len(record.get(tag, [])) for tag in cfg['CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS']]) > cfg['CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD']
 
 
 def perform_guess_affiliations(uid, data):
@@ -1818,7 +1810,7 @@ def perform_guess_affiliations(uid, data):
 
     # Let's guess affiliations
     result = {}
-    for tag in CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS:
+    for tag in cfg['CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS']:
         result[tag] = {}
         author_field_instances = record_get_field_instances(record, tag)
         for field_pos, instance in enumerate(author_field_instances):

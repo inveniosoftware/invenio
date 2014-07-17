@@ -44,7 +44,8 @@ from invenio.utils.html import remove_html_markup
 from invenio.legacy.bibrecord import create_record, record_xml_output, record_add_field, \
                               record_order_subfields, \
                               record_extract_dois
-from invenio.legacy.bibedit.config import CFG_BIBEDIT_TO_MERGE_SUFFIX
+
+from invenio.base.globals import cfg
 
 import invenio.legacy.template
 bibmerge_templates = invenio.legacy.template.load('bibmerge')
@@ -427,7 +428,7 @@ def _get_record_slave(recid, result, mode=None, uid=None):
 
     elif mode == 'tmpfile':
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
-                                       CFG_BIBEDIT_TO_MERGE_SUFFIX)
+                                       cfg['CFG_BIBEDIT_TO_MERGE_SUFFIX'])
         if not os.path.isfile(file_path): #check if file doesn't exist
             result['resultCode'], result['resultText'] = 1, 'Temporary file doesnt exist'
         else: #open file

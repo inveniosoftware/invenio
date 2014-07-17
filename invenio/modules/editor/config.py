@@ -17,12 +17,6 @@
 
 """BibEdit Configuration."""
 
-__revision__ = "$Id$"
-
-from invenio.config import CFG_ETCDIR, CFG_TMPSHAREDDIR
-
-import os
-
 ## CFG_BIBEDIT_FILENAME - default filename for BibEdit files.
 CFG_BIBEDIT_FILENAME = "bibedit_record"
 
@@ -202,9 +196,6 @@ CFG_BIBEDIT_KEYWORD_TAG = "" # '6531_a'
 #what label inside the RDF file contains the term
 CFG_BIBEDIT_KEYWORD_RDFLABEL = "" #'prefLabel'
 
-#where are BibEdit cache files stored
-CFG_BIBEDIT_CACHEDIR = CFG_TMPSHAREDDIR + '/bibedit-cache'
-
 # CFG_BIBEDIT_DOI_LOOKUP_FIELD - for which tag bibedit should add a link
 # to a DOI name resolver
 CFG_BIBEDIT_DOI_LOOKUP_FIELD = '0247_a'
@@ -228,3 +219,15 @@ CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS = ['035', '041', '520', '540', '595', '650', '6
 # CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD - if number of authors is higher than this number
 # they will be hidden by default
 CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD = 200
+
+## CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS -- whether to show or not
+## the fields and subfields that are removed in holding pen records.
+## 0 for false, 1 for true.
+CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS = 0
+
+# CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL - if DOIs owned/managed by
+# this site (defined in CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN) must:
+# - 0: not be protected
+# - 1: protected with a warning (that can be bypassed)
+# - 2: fully protected (cannot delete internal DOIs field and record)
+CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL = 2

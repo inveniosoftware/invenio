@@ -79,7 +79,7 @@ CFG_WEBDIR = join(CFG_PREFIX, "var/www")
 CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = join(CFG_PREFIX, "etc/bibconvert/config")
 CFG_WEBSUBMIT_COUNTERSDIR = join(CFG_PREFIX, "var/data/submit/counters")
 CFG_WEBSUBMIT_STORAGEDIR = join(CFG_PREFIX, "var/data/submit/storage")
-
+CFG_BIBEDIT_CACHEDIR = join(CFG_PREFIX, "var/tmp-shared/bibedit-cache")
 
 #FIXME check the usage and replace by SQLALCHEMY_URL
 CFG_DATABASE_HOST = "localhost"
