@@ -32,4 +32,4 @@ def setup_app(app):
     @app.before_first_request
     def register_item():
         item = app.extensions['menu'].submenu('main.admin')
-        item.register('admin.index', _('Admin'))
+        item.register('admin.index', _('Admin'), order=3)

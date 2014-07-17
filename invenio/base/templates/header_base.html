@@ -41,27 +41,41 @@
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
         {%- for item in current_menu.submenu('main').children if item.visible recursive %}
-          {%- if item.children -%}
-          <li class="dropdown">
-            <a href="{{ item.url }}" style="display: inline-block; padding-right: 5px;">{{ item.text|safe }}</a>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
-              <b class="caret"></b>
-            </a>
-            <ul class="dropdown-menu pull-right">
-              {{ loop(item.children) }}
-            </ul>
-          </li>
-          {%- else -%}
-          <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
-          {%- endif %}
-        {%- endfor %}
+            {%- if item.children -%}
+              {%- if not current_user.is_guest and item.name == "admin" -%}
+                <li class="dropdown">.
+                  <a href="{{ item.url }}" style="display: inline-block; padding-right: 5px;"> {{ item.text|safe }} </a>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
+                    <b class="caret"></b>
+                  </a>
+                  <ul class="dropdown-menu pull-right">
+                    {{ loop(item.children) }}
+                  </ul>
+                </li>
+              {%- endif -%}
+            {%- else -%}
+            <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            {%- endif -%}
+        {%- endfor -%}
         </ul>
         <ul class="nav navbar-nav navbar-right">
+        {% if current_user.is_guest %}
+          <div style="padding-top: 10px;">
+            <button class="btn btn-sm btn-default" onclick="window.location='{{url_for('webaccount.login')}}'">
+              <i class="fa fa-sign-in"></i> {{ _('Login') }}
+            </button>
+            {% if config.CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS in [0, 1] %}
+              <button class="btn btn-sm btn-warning" onclick="window.location='{{url_for('webaccount.register')}}'">
+                <i class="fa fa-edit"></i> {{ _('Register') }}
+              </button>
+            {% endif %}
+          </div>
+        {% else %}
           <li class="dropdown">
-            {% set user_url = url_for('webaccount.login', referer=request.url) if current_user.is_guest else url_for('webaccount.index') %}
-            <a class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block;" href="{{ user_url }}">
-              <i class="glyphicon glyphicon-user"></i>
-              {{ current_user.nickname|default(current_user.email) if not current_user.is_guest else _('guest') }}
+            <a href="{{ url_for('accounts_settings.profile') }}" style="display: inline-block; padding-right: 5px;">
+              <i class="glyphicon glyphicon-user"></i> {{ current_user.nickname|default(current_user.email) }}
+            </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;" href="#">
               <b class="caret"></b>
             </a>
             <ul class="dropdown-menu">
@@ -73,12 +87,7 @@
                     </div>
                     <div class="col-md-9">
                       <strong>
-                        {% if current_user.is_guest %}
-                          {{ _("guest") }}
-                          <p class="text-muted small"> &nbsp; </p>
-                        {% else %}
-                          {{ current_user.nickname|default(current_user.email) }}
-                        {% endif %}
+                        {{ current_user.nickname|default(current_user.email) }}
                       </strong>
                       <p class="text-muted small"> {{ current_user.email }} </p>
                     </div>
@@ -86,22 +95,15 @@
                 </div>
               </li>
               <li class="divider"></li>
-              {% if current_user.is_guest %}
-              <li>
-                <a href="{{ url_for('webaccount.login', referer=request.url) }}">
-                  <i class="glyphicon glyphicon-lock"></i> {{ _("Login") }}
-                </a>
-              </li>
-              {% else %}
               <li>
                 <a href="{{ url_for('webaccount.logout') }}">
-                  <i class="glyphicon glyphicon-log-out"></i> {{ _("Logout") }}
+                  <i class="glyphicon glyphicon-log-out"></i> {{ _('Logout') }}
                 </a>
               </li>
-            {% endif %}
             </ul>
           </li>
-        </ul>
-      </div>
+        {% endif %}
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
