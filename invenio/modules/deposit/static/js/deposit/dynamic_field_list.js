@@ -253,18 +253,23 @@
       }
     },
 
+    /**
+     * Sets elements values for a row.
+     *
+     * @param idx index of the row o modify
+     * @param data dictionary where keys are columns identifiers,
+     *  and values are the values to set like:
+     *  {
+     *    name: 'name',
+     *    affiliation: 'affiliation'
+     *  }
+     */
     update_element: function (data, idx) {
-      //
-      // Update action
-      //
-
-      // Update elements indexes of all other elements
-      var all_elements = $('#' + this.options.prefix + " ." + this.options.element_css_class);
-      var num_elements = all_elements.length;
-      if (idx < num_elements){
-        this.element = $(all_elements[idx]);
-        this.update_element_values(this.$element, data, idx, '#' + this.options.prefix + this.options.sep + idx + this.options.sep);
-      }
+      var $row_to_update = $(this.$element.find('.field-list-element')[idx])
+      $.each(data, function(key, value) {
+        var $input_field = $row_to_update.find('*[id$="' + key  + '"]');
+        $input_field.val(value);
+      });
     },
 
     /**
@@ -279,13 +284,15 @@
       // Remove class
       new_element.removeClass(this.options.empty_cssclass);
       new_element.addClass(this.options.element_css_class);
-      // Pre-populate field values
-      this.update_element_values(new_element, data, field_prefix_index);
       // Update ids
       this.update_element_index(new_element, next_index);
       // Insert before template element
       new_element.hide();
       new_element.insertBefore(this.$template);
+      // Pre-populate field values
+      if (data) {
+        this.update_element(data, next_index);
+      }
       new_element.show('fast');
       // Update last_index
       this.set_last_index(next_index);
