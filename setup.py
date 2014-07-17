@@ -125,8 +125,6 @@ extras_require = {
     ],
     "development": [
         "Flask-DebugToolbar==0.9.0",
-        "setuptools>=2.0",  # dad?
-        "setuptools-bower>=0.2,<1.0",
     ],
     "elasticsearch": [
         "pyelasticsearch>=0.6.1"
