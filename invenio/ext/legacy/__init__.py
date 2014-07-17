@@ -60,6 +60,7 @@ def setup_app(app):
                     'CFG_PYLIBDIR',
                     'CFG_TMPDIR',
                     'CFG_TMPSHAREDDIR',
+                    'CFG_BIBEDIT_CACHEDIR',
                     'CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS',
                     'CFG_WEBDIR',
                     'CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR',

@@ -43,9 +43,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from invenio.legacy.bibedit.config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_CACHEDIR
 from invenio.legacy.bibedit.db_layer import (get_record_last_modification_date,
     delete_hp_change, cache_exists, update_cache_post_date, get_cache,
     update_cache, get_cache_post_date, uids_with_active_caches,
@@ -86,8 +83,10 @@ from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
 from invenio.modules.knowledge.api import get_kbr_values
 from invenio.modules.editor.registry import field_templates, record_templates
 
+from invenio.base.globals import cfg
+
 # Precompile regexp:
-re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
+re_file_option = re.compile(r'^%s' % cfg['CFG_BIBEDIT_CACHEDIR'])
 re_xmlfilename_suffix = re.compile(r'_(\d+)_\d+\.xml$')
 re_revid_split = re.compile(r'^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile(r'^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
@@ -300,10 +299,10 @@ def _get_file_path(recid, uid, filename=''):
 
     """
     if not filename:
-        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, CFG_BIBEDIT_FILENAME,
+        return '%s%s%s_%s_%s' % (cfg['CFG_BIBEDIT_CACHEDIR'], os.sep, cfg['CFG_BIBEDIT_FILENAME'],
                                  recid, uid)
     else:
-        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, filename, recid, uid)
+        return '%s%s%s_%s_%s' % (cfg['CFG_BIBEDIT_CACHEDIR'], os.sep, filename, recid, uid)
 
 def delete_disabled_changes(used_changes):
     for change_id in used_changes:
@@ -343,15 +342,15 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
 
     # Write XML file.
     if not to_merge:
-        fd, file_path = tempfile.mkstemp(dir=CFG_BIBEDIT_CACHEDIR,
-                                         prefix="%s_" % CFG_BIBEDIT_FILENAME,
+        fd, file_path = tempfile.mkstemp(dir=cfg['CFG_BIBEDIT_CACHEDIR'],
+                                         prefix="%s_" % cfg['CFG_BIBEDIT_FILENAME'],
                                          suffix="_%s_%s.xml" % (recid, uid))
         f = os.fdopen(fd, 'w')
         f.write(xml_to_write)
         f.close()
     else:
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
-                                   CFG_BIBEDIT_TO_MERGE_SUFFIX)
+                                   cfg['CFG_BIBEDIT_TO_MERGE_SUFFIX'])
         xml_file = open(file_path, 'w')
         xml_file.write(xml_to_write)
         xml_file.close()
