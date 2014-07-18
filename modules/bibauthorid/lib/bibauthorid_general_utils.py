@@ -131,7 +131,7 @@ def get_arxiv_url(arxiv):
     @param arxiv: arXiv string
     @return: Resolvable arXiv URL
     """
-    return "http://http://arxiv.org/abs/%s" % arxiv
+    return "http://arxiv.org/abs/%s" % arxiv
 
 
 def get_inspire_record_url(recid):
