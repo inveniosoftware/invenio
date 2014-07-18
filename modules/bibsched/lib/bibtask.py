@@ -625,7 +625,8 @@ def task_init(authorization_action="",
                 register_exception(alert_admin=True)
                 write_message("Unexpected error occurred: %s." % e, sys.stderr)
                 write_message("Traceback is:", sys.stderr)
-                write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
+                from invenio.errorlib import get_pretty_traceback
+                write_messages(get_pretty_traceback(), sys.stderr)
                 write_message("Exiting.", sys.stderr)
                 if task_get_task_param('stop_queue_on_error'):
                     task_update_status("ERROR")
