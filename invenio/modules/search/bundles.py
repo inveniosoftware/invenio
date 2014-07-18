@@ -26,7 +26,8 @@ _js.contents += ('js/search/search_parser.js',
                  'js/search/typeahead.js',
                  'js/search/default_typeahead_configuration.js',
                  'js/search/facet.js',
-                 'js/search/search.js')
+                 'js/search/search.js',
+                 'js/search/form.js')
 _js.bower['requirejs-hogan-plugin'] = 'latest'
 
 
