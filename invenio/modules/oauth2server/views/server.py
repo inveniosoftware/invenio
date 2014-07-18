@@ -129,7 +129,7 @@ def info(oauth_request):
     """
     Test to verify that you have been authenticated.
     """
-    if current_app.debug:
+    if current_app.testing or current_app.debug:
         return jsonify(dict(
             user=oauth_request.user.id,
             client=oauth_request.client.client_id,
@@ -145,7 +145,7 @@ def invalid(oauth_request):
     """
     Test to verify that you have been authenticated.
     """
-    if current_app.debug:
+    if current_app.testing or current_app.debug:
         # Not reachable
         return jsonify(dict(ding="dong"))
     else:

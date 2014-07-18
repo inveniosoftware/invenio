@@ -82,7 +82,7 @@ class Receiver(object):
     def get_hook_url(cls, receiver_id, access_token):
         cls.get(receiver_id)
         # Allow overwriting hook URL in debug mode.
-        if current_app.debug and \
+        if (current_app.debug or current_app.testing) and \
            current_app.config.get('WEBHOOKS_DEBUG_RECEIVER_URLS', None):
             url_pattern = current_app.config[
                 'WEBHOOKS_DEBUG_RECEIVER_URLS'].get(receiver_id, None)
@@ -90,7 +90,7 @@ class Receiver(object):
                 return url_pattern % dict(token=access_token)
         return url_for(
             'receivereventlistresource',
-            receiver_id='github',
+            receiver_id=receiver_id,
             access_token=access_token,
             _external=True
         )

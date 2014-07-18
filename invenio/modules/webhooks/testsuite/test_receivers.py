@@ -20,8 +20,9 @@
 from __future__ import absolute_import
 
 import json
+from flask import url_for
 from flask_registry import RegistryError
-from invenio.testsuite import InvenioTestCase
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 from ..models import Event, Receiver, InvalidPayload, CeleryReceiver, \
@@ -123,15 +124,24 @@ class ReceiverTestCase(InvenioTestCase):
         r = Receiver(self.callable)
         Receiver.register('test-receiver', r)
 
-        assert Receiver.get_hook_url('test-receiver', 'token') != \
-            'http://test.local/?access_token=token'
+        self.assertEqual(
+            Receiver.get_hook_url('test-receiver', 'token'),
+            url_for(
+                'receivereventlistresource',
+                receiver_id='test-receiver',
+                access_token='token',
+                _external=True
+            )
+        )
 
         self.app.config['WEBHOOKS_DEBUG_RECEIVER_URLS'] = {
             'test-receiver': 'http://test.local/?access_token=%(token)s'
         }
 
-        assert Receiver.get_hook_url('test-receiver', 'token') == \
+        self.assertEqual(
+            Receiver.get_hook_url('test-receiver', 'token'),
             'http://test.local/?access_token=token'
+        )
 
     def test_signature_checking(self):
         """
@@ -160,3 +170,10 @@ class ReceiverTestCase(InvenioTestCase):
                    ('X-Hub-Signature', get_hmac("somevalue"))]
         with self.app.test_request_context(headers=headers, data=payload):
             self.assertRaises(InvalidSignature, r.consume_event, 2)
+
+
+TEST_SUITE = make_test_suite(ReceiverTestCase)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

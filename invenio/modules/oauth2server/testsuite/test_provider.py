@@ -24,8 +24,10 @@ import logging
 
 from flask import url_for
 
-from invenio.testsuite import FlaskSQLAlchemyTest
+from invenio.testsuite import InvenioTestCase, make_test_suite, \
+    run_test_suite
 from invenio.ext.sqlalchemy import db
+from invenio.base.globals import cfg
 from mock import MagicMock
 from flask_oauthlib.client import prepare_request
 try:
@@ -38,11 +40,11 @@ from .helpers import create_client
 logging.basicConfig(level=logging.DEBUG)
 
 
-class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
+class OAuth2ProviderTestCase(InvenioTestCase):
     def create_app(self):
         try:
             app = super(OAuth2ProviderTestCase, self).create_app()
-            app.debug = True
+            app.testing = True
             app.config.update(dict(
                 OAUTH2_CACHE_TYPE='simple',
             ))
@@ -82,8 +84,8 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         # Set environment variable DEBUG to true, to allow testing without
         # SSL in oauthlib.
         if self.app.config.get('CFG_SITE_SECURE_URL').startswith('http://'):
-            self.os_debug = os.environ.get('DEBUG', '')
-            os.environ['DEBUG'] = 'true'
+            self.os_debug = os.environ.get('OAUTHLIB_INSECURE_TRANSPORT', '')
+            os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
 
         from ..models import Client
         from invenio.modules.accounts.models import User
@@ -92,14 +94,17 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
 
         # Create needed objects
         u = User(
-            id=1, email='info@invenio-software.org', nickname='tester'
+            email='info@invenio-software.org', nickname='tester'
         )
         u.password = "tester"
 
         u2 = User(
-            id=2, email='abuse@invenio-software.org', nickname='tester2'
+            email='abuse@invenio-software.org', nickname='tester2'
         )
         u2.password = "tester2"
+
+        db.session.add(u)
+        db.session.add(u2)
 
         c1 = Client(
             client_id='dev',
@@ -123,14 +128,12 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
             _default_scopes="user"
         )
 
-        try:
-            db.session.add(u)
-            db.session.add(u2)
-            db.session.add(c1)
-            db.session.add(c2)
-            db.session.commit()
-        except:
-            db.session.rollback()
+        db.session.add(c1)
+        db.session.add(c2)
+
+        db.session.commit()
+
+        self.objects = [u, u2, c1, c2]
 
         # Create a personal access token as well.
         from ..models import Token
@@ -142,8 +145,12 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         super(OAuth2ProviderTestCase, self).tearDown()
         # Set back any previous value of DEBUG environment variable.
         if self.app.config.get('CFG_SITE_SECURE_URL').startswith('http://'):
-            os.environ['DEBUG'] = self.os_debug
+            os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = self.os_debug
         self.base_url = None
+
+        for o in self.objects:
+            db.session.delete(o)
+        db.session.commit()
 
     def parse_redirect(self, location):
         from werkzeug.urls import url_parse, url_decode, url_unparse
@@ -219,7 +226,7 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         r = self.client.get('/oauth2test/test-info')
         self.assert200(r)
         assert r.json.get('client') == 'dev'
-        assert r.json.get('user') == 1
+        assert r.json.get('user') == self.objects[0].id
         assert r.json.get('scopes') == [u'user']
 
         # Access token doesn't provide access to this URL.
@@ -276,22 +283,41 @@ class OAuth2ProviderTestCase(FlaskSQLAlchemyTest):
         self.assertStatus(r, 403)
 
     def test_settings_index(self):
-        # Create a remove account (linked account)
-        self.assert401(self.client.get(url_for('oauth2server_settings.index')))
+        # Create a remote account (linked account)
+        r = self.client.get(
+            url_for('oauth2server_settings.index'),
+            base_url=cfg['CFG_SITE_SECURE_URL'],
+        )
+        self.assertStatus(r, 401)
         self.login("tester", "tester")
 
-        res = self.client.get(url_for('oauth2server_settings.index'))
+        res = self.client.get(
+            url_for('oauth2server_settings.index'),
+            base_url=cfg['CFG_SITE_SECURE_URL'],
+        )
         self.assert200(res)
 
-        res = self.client.get(url_for('oauth2server_settings.client_new'))
+        res = self.client.get(
+            url_for('oauth2server_settings.client_new'),
+            base_url=cfg['CFG_SITE_SECURE_URL'],
+        )
         self.assert200(res)
 
         res = self.client.post(
             url_for('oauth2server_settings.client_new'),
+            base_url=cfg['CFG_SITE_SECURE_URL'],
             data=dict(
                 name='Test',
                 description='Test description',
                 website='http://invenio-software.org',
             )
         )
-        assert res.status_code == 302
+
+        self.assertStatus(res, 302)
+
+
+TEST_SUITE = make_test_suite(OAuth2ProviderTestCase)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

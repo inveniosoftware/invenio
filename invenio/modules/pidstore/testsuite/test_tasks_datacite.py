@@ -21,18 +21,25 @@ from __future__ import absolute_import
 
 import httpretty
 from mock import patch
-from invenio.testsuite import InvenioTestCase
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class DataCiteTasksTest(InvenioTestCase):
     def setUp(self):
+        self.app.config['CFG_DATACITE_URL'] = 'https://mds.example.org/'
+        self.app.config['CFG_DATACITE_USERNAME'] = 'testuser'
+        self.app.config['CFG_DATACITE_PASSWORD'] = 'testpw'
         self.app.config['CFG_DATACITE_DOI_PREFIX'] = "10.1234"
 
         from invenio.modules.pidstore.models import PersistentIdentifier
         self.pid = PersistentIdentifier.create("doi", "10.1234/invenio.1234")
+        if not self.pid:
+            raise RuntimeError("Dirty database state.")
 
     def tearDown(self):
-        from invenio.modules.pidstore.models import PersistentIdentifier
+        from invenio.modules.pidstore.models import PersistentIdentifier, \
+            PidLog
+        PidLog.query.filter_by(id_pid=self.pid.id).delete()
         PersistentIdentifier.query.filter_by(
             pid_value=self.pid.pid_value
         ).delete()
@@ -45,18 +52,18 @@ class DataCiteTasksTest(InvenioTestCase):
                 '10.1234/invenio.1234',
                 'recid': 1,
             },
-            master_format='marc'
+            master_format='json'
         )
         get_record_patch.return_value = r
 
-    @patch('invenio.modules.records.api.get_record')
+    @patch('invenio.modules.pidstore.tasks.datacite.get_record')
     @httpretty.activate
     def test_sync_registered(self, get_record_patch):
         self.patch_get_record(get_record_patch)
 
         httpretty.register_uri(
             httpretty.GET,
-            "https://mds.datacite.org/doi/10.1234/invenio.1234",
+            "https://mds.example.org/doi/10.1234/invenio.1234",
             body='http://invenio-software.org/record/1234',
             status=200
         )
@@ -65,9 +72,17 @@ class DataCiteTasksTest(InvenioTestCase):
         from invenio.modules.pidstore.models import PersistentIdentifier
 
         pid = PersistentIdentifier.get("doi", "10.1234/invenio.1234")
-        assert pid.status == self.app.config['PIDSTORE_STATUS_NEW']
+        self.assertEqual(pid.status, self.app.config['PIDSTORE_STATUS_NEW'])
 
         datacite_sync(1)
 
         pid = PersistentIdentifier.get("doi", "10.1234/invenio.1234")
-        assert pid.status == self.app.config['PIDSTORE_STATUS_REGISTERED']
+        self.assertEqual(pid.status,
+                         self.app.config['PIDSTORE_STATUS_REGISTERED'])
+
+
+TEST_SUITE = make_test_suite(DataCiteTasksTest)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

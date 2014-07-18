@@ -1247,6 +1247,8 @@ def iter_suites():
             continue
         if hasattr(module, 'TEST_SUITE'):
             yield module.TEST_SUITE
+        else:
+            app.logger.warning("%s: No test suite defined." % module.__name__)
 
 
 def suite():

@@ -19,6 +19,8 @@
 
 from __future__ import absolute_import
 
+
+from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.ext.sqlalchemy import db
 from invenio.ext.restful.utils import APITestCase
 
@@ -76,6 +78,7 @@ class WebHooksTestCase(APITestCase):
             'receivereventlistresource',
             urlargs=dict(receiver_id='test-receiver'),
             code=404,
+            user_id=self.user.id,
         )
 
         r = Receiver(self.callable)
@@ -90,6 +93,7 @@ class WebHooksTestCase(APITestCase):
             urlargs=dict(receiver_id='test-receiver'),
             data=payload,
             code=202,
+            user_id=self.user.id,
         )
 
         assert self.called == 1
@@ -106,6 +110,7 @@ class WebHooksTestCase(APITestCase):
             is_json=False,
             headers=[('Content-Type', 'application/python-pickle')],
             code=415,
+            user_id=self.user.id,
         )
 
         # Test invalid payload, with wrong content-type
@@ -117,6 +122,7 @@ class WebHooksTestCase(APITestCase):
             is_json=False,
             headers=[('Content-Type', 'application/json')],
             code=400,
+            user_id=self.user.id,
         )
 
 
@@ -163,4 +169,11 @@ class WebHooksScopesTestCase(APITestCase):
             urlargs=dict(receiver_id='test-receiver-no-scope'),
             data=payload,
             code=403,
+            user_id=self.user.id,
         )
+
+TEST_SUITE = make_test_suite(WebHooksTestCase, WebHooksScopesTestCase)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

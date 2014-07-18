@@ -55,7 +55,6 @@ def error_handler(f):
 # Default decorators
 #
 api_decorators = [
-    require_api_auth(),
     error_handler,
 ]
 
@@ -69,28 +68,29 @@ class ReceiverEventListResource(Resource):
     """
     method_decorators = api_decorators
 
-    def get(self, oauth, receiver_id=None):
+    def get(self, receiver_id=None):
         abort(405)
 
+    @require_api_auth()
     @require_oauth_scopes('webhooks:event')
     def post(self, oauth, receiver_id=None):
         receiver = Receiver.get(receiver_id)
         receiver.consume_event(oauth.access_token.user_id)
         return {'status': 202, 'message': 'Accepted'}, 202
 
-    def put(self, oauth, receiver_id=None):
+    def put(self, receiver_id=None):
         abort(405)
 
-    def delete(self, oauth, receiver_id=None):
+    def delete(self, receiver_id=None):
         abort(405)
 
-    def head(self, oauth, receiver_id=None):
+    def head(self, receiver_id=None):
         abort(405)
 
-    def options(self, oauth, receiver_id=None):
+    def options(self, receiver_id=None):
         abort(405)
 
-    def patch(self, oauth, receiver_id=None):
+    def patch(self, receiver_id=None):
         abort(405)
 
 
