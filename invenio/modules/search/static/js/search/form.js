@@ -18,10 +18,7 @@
  */
 
 
-define(
-    'js/search/form',
-    ['require', 'jquery'],
-    function(require, $) {
+define(['jquery'], function($) {
 
     $("form[name=search]").submit(function() {
         $('.add_to_search-form').remove()

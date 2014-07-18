@@ -18,16 +18,10 @@
  */
 
 
-define(
-    'js/search/search',
-    ['require', 'jquery',
-     'hgn!./templates/action',
-     'hgn!./templates/box',
-     'hgn!./templates/button',
-     'hgn!./templates/row'],
-    function(require, $) {
+define(function(require, exports, module) {
+    var $ = require('jquery')
 
-    return function(facets) {
+    module.exports = function(facets) {
         // side facet list
         var facet_list = $(facets.elem)
 
