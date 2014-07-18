@@ -3578,13 +3578,7 @@ def get_detailed_page_tabs_counts(recID):
                    }
     from invenio.search_engine import get_field_tags, get_record
     if CFG_BIBRANK_SHOW_CITATION_LINKS:
-        if CFG_INSPIRE_SITE:
-            from invenio.search_engine import search_unit
-            citers_recids = intbitset(get_cited_by(recID))
-            citeable_recids = search_unit(p='citeable', f='collection')
-            tabs_counts['Citations'] = len(citers_recids & citeable_recids)
-        else:
-            tabs_counts['Citations'] = get_cited_by_count(recID)
+        tabs_counts['Citations'] = get_cited_by_count(recID)
     if not CFG_CERN_SITE:#FIXME:should be replaced by something like CFG_SHOW_REFERENCES
         reftag = ""
         reftags = get_field_tags("reference")
