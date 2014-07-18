@@ -281,7 +281,6 @@ def process_and_store(recids, config, chunk_size):
     else:
         weights = None
 
-
     return weights
 
 
@@ -598,9 +597,6 @@ def get_citation_informations(recid_list, tags, config,
             write_message(mesg)
             task_update_progress(mesg)
 
-        record = get_record(recid)
-        records_info['record_id'][recid] = [unicode(recid)]
-
         function = config.get("rank_method", "function")
         if config.get(function, 'collections'):
             if recid not in recids_cache(config.get(function, 'collections')):
@@ -615,6 +611,9 @@ def get_citation_informations(recid_list, tags, config,
             # publication info remained the same, so the calls to
             # get_fieldvalues() below would return old values)
             continue
+
+        record = get_record(recid)
+        records_info['record_id'][recid] = [unicode(recid)]
 
         # We ignore all the references of superseeded records
         superseeded = bool(record['78502'])
