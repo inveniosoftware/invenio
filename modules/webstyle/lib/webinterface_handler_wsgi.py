@@ -433,6 +433,10 @@ class SimulatedModPythonRequest(object):
         assert not self.__tainted, "The original WSGI environment is tainted since at least req.write or req.form has been used."
         return self.__environ, self.__start_response
 
+    def get_environ(self):
+        return self.__environ
+
+    environ = property(get_environ)
     content_type = property(get_content_type, set_content_type)
     unparsed_uri = property(get_unparsed_uri)
     uri = property(get_uri)

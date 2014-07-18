@@ -37,7 +37,8 @@ from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
     CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER, \
     CFG_PROPAGATE_EXCEPTIONS, \
-    CFG_ERRORLIB_SENTRY_URI
+    CFG_ERRORLIB_SENTRY_URI, \
+    CFG_VERSION
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -384,10 +385,37 @@ def register_exception(stream='error',
     @return: 1 if successfully wrote to stream, 0 if not
     """
 
-    if CFG_ERRORLIB_SENTRY_URI:
-        from raven import Client
-        client = Client(CFG_ERRORLIB_SENTRY_URI)
-        client.captureException()
+    try:
+        if CFG_ERRORLIB_SENTRY_URI:
+            from raven import Client
+            client = Client(CFG_ERRORLIB_SENTRY_URI)
+            try:
+                if req:
+                    user_info = collect_user_info(req)
+                    client.user_context({'id': user_info['uid'],
+                                        'is_anonymous': user_info['guest'] == '1',
+                                        'is_authenticated': user_info['guest'] == '0',
+                                        'email': user_info['email'],
+                                        'group': user_info['group'],
+                                        'nickname': user_info['nickname']})
+                    client.http_context({'url': user_info['uri'],
+                                        'remote_ip': user_info['remote_ip'],
+                                        'agent': user_info['agent'],
+                                        'referer': user_info['referer'],
+                                        'method': req.method,
+                                        'query_string': req.args,
+                                        'headers': dict(req.headers_in),
+                                        'https': req.is_https(),
+                                        'env': req.environ})
+                    client.extra_context(user_info)
+                filename = _get_filename_and_line(sys.exc_info())[0]
+                client.tags_context({'filename': filename, 'version': CFG_VERSION})
+                client.captureException()
+            finally:
+                client.context.clear()
+    except:
+        ## Sentry troubles...
+        pass
 
     from invenio.webinterface_handler import ClientDisconnected
 
