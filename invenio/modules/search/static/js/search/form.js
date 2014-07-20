@@ -19,6 +19,7 @@
 
 
 define(['jquery'], function($) {
+    "use strict";
 
     $("form[name=search]").submit(function() {
         $('.add_to_search-form').remove()
@@ -172,14 +173,14 @@ define(['jquery'], function($) {
                 author = $('#author').val(),
                 title = $('#title').val(),
                 rn = $('#rn').val(),
-                aff = $('#aff').val()
+                aff = $('#aff').val(),
                 cn = $('#cn').val(),
                 k = $('#k').val(),
                 //eprinttype = $('#eprint-type').val(),
                 //eprintnumber = $('#eprint-number').val(),
                 j = $('#journal-name').val(),
                 jvol = $('#journal-vol').val(),
-                jpage = $('#journal-page').val();
+                jpage = $('#journal-page').val()
 
             if (author !== '') { query.push('author:' + author) }
             if (title !== '') { query.push('title:' + title) }
@@ -284,9 +285,9 @@ define(['jquery'], function($) {
                 source = $('[name=' + btn.data('source') + ']'),
                 target = $('[name=' + btn.data('target') + ']'),
                 val = $.trim(target.val()),
-                op = (op1=='a' && val=="") ? '' : operators[op1]
+                op = (op1 == 'a' && val === '') ? '' : operators[op1]
 
-            if (val !== "") {
+            if (val !== '') {
                 val += ' ' + op
             }
             if (source.val().length > 0) {

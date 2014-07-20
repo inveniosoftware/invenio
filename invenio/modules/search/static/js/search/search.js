@@ -19,6 +19,7 @@
 
 
 define(function(require, exports, module) {
+    "use strict";
     var $ = require('jquery')
 
     module.exports = function(facets) {
@@ -37,7 +38,7 @@ define(function(require, exports, module) {
             facet_list.affix({
                 offset: {
                     top: function () {
-                        return parent.offset()['top']
+                        return parent.offset().top
                     },
                     bottom: 170
                 }
@@ -213,7 +214,7 @@ define(function(require, exports, module) {
 
                 var resetKey = false
                 try {
-                    if ($(this).data('facet').findByKey(event.key).length == 0) {
+                    if ($(this).data('facet').findByKey(event.key).length === 0) {
                         resetKey = true
                     }
                 } catch(err) {
@@ -227,8 +228,9 @@ define(function(require, exports, module) {
 
             }).on('added', function(event) {
 
-                var type = (event.op == '+')?'info':'error'
-                    , other_type = (event.op == '-')?'info':'error'
+                var type = (event.op == '+')?'info':'error',
+                    other_type = (event.op == '-')?'info':'error'
+
                 $('[data-facet-key="'+event.key+'"]')
                 .filter('[data-facet-value="'+event.value+'"]')
                 .each(function(e) {
@@ -243,19 +245,19 @@ define(function(require, exports, module) {
                 .each(function() {
 
                     var $el_clicked = $(this),
-                    options = facet_list.data('facet').options
+                        options = facet_list.data('facet').options
 
                     $el_clicked.removeClass('expandable')
 
                     if (event.key === 'collection') {
                         $(this).parent().find('ul').remove()
-                        var facet = {url: options.url_map[event.key]
-                            , facet: event.key}
-                            , data = {parent: event.value}
-                            , $ul = $('<ul class="context list-unstyled"><ul>').clone().appendTo($el_clicked.parent())
+                        var facet = {url: options.url_map[event.key],
+                            facet: event.key},
+                            data = {parent: event.value},
+                            $ul = $('<ul class="context list-unstyled"><ul>').clone().appendTo($el_clicked.parent())
 
                         var data_facet = facet_list.data('facet')
-                        if (data_facet.find('!', event.key, event.value).length == 0) {
+                        if (data_facet.find('!', event.key, event.value).length === 0) {
                             data_facet.filter.push(['!', event.key, event.value])
                         }
                         data_facet.createFacetBox(facet, $ul, data)
