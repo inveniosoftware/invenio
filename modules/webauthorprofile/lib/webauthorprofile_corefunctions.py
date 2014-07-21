@@ -394,8 +394,9 @@ def _get_external_publications(person_id):
 
         arxiv_pubs = dict()
         for arxiv_pubid in arxiv_pub_ids:
-            recids = perform_request_search(p=arxiv_pubid, f='037', m1='e', cc='HEP', rg=0)
-            if not recids:
+            recids_hep = perform_request_search(p=arxiv_pubid, cc='HEP', rg=0)
+            recids_data = perform_request_search(p=arxiv_pubid, cc='Data', rg=0)
+            if not (recids_hep or recids_data):
                 arxiv_pubs[arxiv_pubid] = get_title_of_arxiv_pubid(arxiv_pubid)
 
             if IS_BATCH_PROCESS:
@@ -417,8 +418,9 @@ def _get_external_publications(person_id):
 
         orcid_pubs = dict()
         for doi in orcid_dois:
-            recids = perform_request_search(p=doi, f='doi', m1='e', cc='HEP', rg=0)
-            if not recids:
+            recids_hep = perform_request_search(p=doi, cc='HEP', rg=0)
+            recids_data = perform_request_search(p=doi, cc='Data', rg=0)
+            if not (recids_hep or recids_data):
                 orcid_pubs[doi] = get_title_of_doi(doi)
 
             if IS_BATCH_PROCESS:
