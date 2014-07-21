@@ -21,6 +21,7 @@ import msgpack
 from redis import Redis
 import calendar
 
+
 def session_manager(orig_func):
     """Decorator to wrap function with the session."""
     from invenio.ext.sqlalchemy import db
@@ -315,7 +316,7 @@ def get_holdingpen_objects(ptags=[]):
         bwobject_list_tmp = []
         for bwo in bwobject_list:
             results = {"created": get_pretty_date(bwo), "type": get_type(bwo),
-                  "title": None, "description": None }
+                       "title": None, "description": None}
             redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id_workflow))
             if redis_cache_object:
                 if not ("title" and "description" in redis_cache_object):

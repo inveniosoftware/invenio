@@ -163,7 +163,6 @@
                   <div id="record-metadata-table" class="collapse">
                       <table class="table table-striped">
                           <tbody>
-                              <!-- {% block record_metadata_table %} -->
                               {% for key, value in info.items() %}
                                   <b>{{ key }}</b> = {{ value }}
                                   <hr>
@@ -177,7 +176,6 @@
                               {% elif bwobject.version == 3  %}
                                   <span class="label label-warning">In process</span>
                               {% endif %}
-                              <!-- {% endblock record_metadata_table %} -->
                           </tbody>
                       </table>
                   </div>

@@ -165,6 +165,38 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         """Return the status."""
         return self.db_obj.status
 
+    @property
+    def objects(self):
+        """Return the objects associated with this workflow."""
+        return self.db_obj.objects
+
+    @property
+    def final_objects(self):
+        """Return the objects associated with this workflow."""
+        results = []
+        for obj in self.db_obj.objects:
+            if obj.version in [ObjectVersion.FINAL]:
+                results.append(obj)
+        return results
+
+    @property
+    def halted_objects(self):
+        """Return the objects associated with this workflow."""
+        results = []
+        for obj in self.db_obj.objects:
+            if obj.version in [ObjectVersion.HALTED]:
+                results.append(obj)
+        return results
+
+    @property
+    def running_objects(self):
+        """Return the objects associated with this workflow."""
+        results = []
+        for obj in self.db_obj.objects:
+            if obj.version in [ObjectVersion.RUNNING]:
+                results.append(obj)
+        return results
+
     def __getstate__(self):
         """Pickling needed functions."""
         if not self._picklable_safe:
@@ -228,7 +260,6 @@ BibWorkflowEngine
             filter(BibWorkflowObject.version.in_([ObjectVersion.INITIAL, ObjectVersion.FINAL])).\
             group_by(BibWorkflowObject.version).all()
         return len(res) == 2 and res[0] == res[1]
-
 
     def save(self, status=None):
         """Save the workflow instance to database."""
