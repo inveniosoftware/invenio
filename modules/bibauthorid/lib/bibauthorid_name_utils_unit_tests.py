@@ -45,7 +45,7 @@ names = [
     'with .[+)* ] just but without comma test']
 
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
-from invenio.bibauthorid_name_utils import split_name_parts, distance, create_canonical_name, create_normalized_name, create_unified_name, soft_compare_names
+from invenio.bibauthorid_name_utils import split_name_parts, distance, create_canonical_name, create_unified_name, soft_compare_names
 from invenio.bibauthorid_name_utils import full_names_are_equal_composites, full_names_are_substrings, surname_compatibility, initials_compatibility, compare_names
 from invenio.bibauthorid_name_utils import create_name_tuples
 from invenio.bibauthorid_name_utils import create_matchable_name, \
@@ -124,31 +124,6 @@ class Test_create_canonical_names(InvenioTestCase):
         for tn in self.names_create_canonical_names.keys():
             self.assertEqual(create_canonical_name(tn), self.names_create_canonical_names[tn])
 
-
-class Test_create_normalized_name(InvenioTestCase):
-    'Test creation of normalized names'
-    tc = {
-        'Hyphened-surname, hyphened-name and normal': 'Hyphened-Surname, Hyphened Name And Normal',
-        'Test, m. e.': 'Test, M. E.',
-        'Test, me': 'Test, Me',
-        'Test, me with m. u. ltiple names a. n. d. initials': 'Test, Me With M. U. Ltiple Names A. N. D. Initials',
-        'Test, me with multiple names': 'Test, Me With Multiple Names',
-        'me test': 'Test, Me',
-        's. s. b. test': 'Test, S. S. B.',
-        'should s. b. test': 'Test, Should S. B.',
-        'should still be test': 'Test, Should Still Be',
-        'test with -aoe}[/])+ junk, but with comma': 'Test With -Aoe}[/])+ Junk, But With Comma',
-        'test,': 'Test',
-        'test, m initials morder': 'Test, M. Initials Morder',
-        'test, mix initials m.': 'Test, Mix Initials M.',
-        'test, mix initials morder': 'Test, Mix Initials Morder',
-        'test, s. s. b.': 'Test, S. S. B.',
-        'test, s. still be': 'Test, S. Still Be',
-        'with .[+)* ] just but without comma test': 'Test, With [+ *. ]. Just But Without Comma'}
-
-    def test_create_normalized_name(self):
-        for tn in self.tc.keys():
-            self.assertEqual(create_normalized_name(split_name_parts(tn), fix_capitalization=True), self.tc[tn])
 
 
 class Test_create_unified_name(InvenioTestCase):
@@ -394,7 +369,6 @@ class TestCleanStringFunction(InvenioTestCase):
 TEST_SUITE = make_test_suite(Test_distance_functions,
                              Test_split_name_parts,
                              Test_create_canonical_names,
-                             Test_create_normalized_name,
                              Test_create_unified_name,
                              Test_soft_name_comparison,
                              Test_name_comparison,

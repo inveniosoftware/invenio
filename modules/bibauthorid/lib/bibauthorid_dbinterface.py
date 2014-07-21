@@ -40,7 +40,6 @@ from invenio.config import CFG_SITE_URL
 
 from invenio.bibauthorid_name_utils import split_name_parts
 from invenio.bibauthorid_name_utils import create_canonical_name
-from invenio.bibauthorid_name_utils import create_normalized_name
 
 from invenio.dbquery import run_sql
 from invenio import bibtask
@@ -1246,10 +1245,7 @@ def get_author_to_papers_mapping(recs, limit_by_name=None):  # get_personids_and
 
     surname = None
     if limit_by_name:
-        try:
-            surname = create_normalized_name(split_name_parts(limit_by_name))
-        except IndexError:
-            pass
+        surname = limit_by_name
 
     if surname:
         pids_papers = run_sql('select personid, bibrec '
@@ -4665,7 +4661,7 @@ def get_authors_by_surname(surname, limit_to_recid=False):  # find_pids_by_name
         select_query = "select personid, name "
     else:
         select_query = "select personid "
-        
+
     return set(run_sql(select_query +
                        """from aidPERSONIDPAPERS
                           where name like %s""",
