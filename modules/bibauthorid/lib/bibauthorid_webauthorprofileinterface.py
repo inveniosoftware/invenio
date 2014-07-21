@@ -50,7 +50,6 @@ from invenio.bibauthorid_dbinterface import get_papers_of_author
 from invenio.bibauthorid_dbinterface import get_pid_to_canonical_name_map
 from invenio.bibauthorid_dbinterface import get_names_to_records_of_author
 
-from invenio.bibauthorid_name_utils import create_normalized_name  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
 # from invenio.bibauthorid_config import CLAIMPAPER_CLAIM_OTHERS_PAPERS
 from invenio.bibauthorid_config import AID_ENABLED  # emitting #pylint: disable-msg=W0611

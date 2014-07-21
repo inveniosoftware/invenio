@@ -978,5 +978,6 @@ def most_relevant_name(name_variants):
 
     return name_variants[most_relevant_name_idx]
 
+
 GLOBAL_gendernames = _load_gender_firstnames_dict()
 GLOBAL_name_variations = _load_firstname_variations()
