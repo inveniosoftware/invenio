@@ -4793,6 +4793,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                         # Citation log
                         entries = get_citers_log(recid)
+                        if verbose > 3:
+                            write_warning("Citation log debug: %s" % len(entries), req=req)
                         req.write(websearch_templates.tmpl_detailed_record_citations_citation_log(ln, entries))
 
 
