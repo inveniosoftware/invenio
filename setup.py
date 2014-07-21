@@ -85,7 +85,7 @@ install_requires = [
     "jellyfish>=0.3.1",
     "Jinja2==2.7.3",
     "libmagic==1.0",
-    "lxml==3.1.2",
+    "lxml>=3.3",
     "mechanize==0.2.5",
     "msgpack-python==0.3.0",
     "MySQL-python==1.2.5",
