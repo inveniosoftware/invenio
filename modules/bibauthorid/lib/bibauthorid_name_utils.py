@@ -964,16 +964,18 @@ def most_relevant_name(name_variants):
     '''
     if not name_variants:
         return None
-    name_parts_list = []
+    name_parts_list = list()
 
     for name in name_variants:
-        name_parts_list.append(create_normalized_name(split_name_parts(name)))
-    sorted_by_relevance_name_list = sorted(
-        sorted(name_parts_list,
-               key=lambda k: len(k[1]),
-               reverse=True),
-        key=lambda k: len(k[2]),
-        reverse=True)
+        name_parts_list.append(split_name_parts(name))
+
+    sorted_by_initials = sorted(name_parts_list,
+                                key=lambda k: len(k[1]),
+                                reverse=True)
+
+    sorted_by_relevance_name_list = sorted(sorted_by_initials,
+                                           key=lambda k: len(k[2]),
+                                           reverse=True)
 
     return sorted_by_relevance_name_list[0]
 
