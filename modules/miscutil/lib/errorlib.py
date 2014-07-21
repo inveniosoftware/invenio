@@ -391,6 +391,7 @@ def register_exception(stream='error',
             client = Client(CFG_ERRORLIB_SENTRY_URI)
             try:
                 if req:
+                    from invenio.webuser import collect_user_info
                     user_info = collect_user_info(req)
                     client.user_context({'id': user_info['uid'],
                                         'is_anonymous': user_info['guest'] == '1',
