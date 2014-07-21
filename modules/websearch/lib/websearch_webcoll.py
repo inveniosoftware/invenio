@@ -457,15 +457,6 @@ class Collection:
                     recIDs = list(self.reclist & \
                                   search_pattern_parenthesised(p='year:%s or year:%s' % \
                                                  (this_year, last_year)))
-                elif self.name in ['VideosXXX']:
-                    # detect recIDs only from this year:
-                    recIDs = list(self.reclist & \
-                                  search_pattern_parenthesised(p='year:%s' % this_year))
-                elif self.name == 'CMS Physics Analysis Summaries' and \
-                         1281585 in self.reclist:
-                    # REALLY, REALLY temporary hack
-                    recIDs = list(self.reclist)
-                    recIDs.remove(1281585)
                 # apply special filters:
                 if self.name in ['Videos']:
                     # select only videos with movies:
@@ -484,16 +475,16 @@ class Collection:
                                  'Restricted Video Rushes',
                                  'LHC First Beam Videos',
                                  'CERN openlab Videos']:
-                    recIDs = sort_records(None, recIDs, '269__c')
+                    recIDs = sort_records(None, recIDs, '269__c', 'a')
                 elif self.name in ['LHCb Talks']:
-                    recIDs = sort_records(None, recIDs, 'reportnumber')
+                    recIDs = sort_records(None, recIDs, 'reportnumber', 'a')
                 elif self.name in ['CERN Yellow Reports']:
-                    recIDs = sort_records(None, recIDs, '084__a')
+                    recIDs = sort_records(None, recIDs, '084__a', 'a')
                 elif self.name in ['CERN Courier Issues',
                                    'CERN Courier Articles',
                                    'CERN Bulletin Issues',
                                    'CERN Bulletin Articles']:
-                    recIDs = sort_records(None, recIDs, '773__y')
+                    recIDs = sort_records(None, recIDs, '773__y', 'a')
             # CERN hack ends.
 
             total = len(recIDs)
