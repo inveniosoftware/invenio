@@ -1635,8 +1635,7 @@ def get_arxiv_info(req, uinfo):
         surname = ''
 
     if surname:
-        session['personinfo']['remote_login_system']['arXiv']['name'] = nameapi.create_normalized_name(
-            nameapi.split_name_parts(surname + ', ' + name))
+        session['personinfo']['remote_login_system']['arXiv']['name'] = '%s, %s' % (surname, name)
     else:
         session['personinfo']['remote_login_system']['arXiv']['name'] = ''
 

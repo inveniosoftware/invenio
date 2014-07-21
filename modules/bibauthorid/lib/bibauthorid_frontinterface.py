@@ -26,7 +26,6 @@ import re
 from invenio.bibauthorid_name_utils import most_relevant_name
 from invenio.bibauthorid_name_utils import split_name_parts  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_name_utils import soft_compare_names
-from invenio.bibauthorid_name_utils import create_normalized_name  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_search_engine import find_personids_by_name
 import invenio.bibauthorid_dbinterface as dbinter
 from invenio.bibauthorid_name_utils import generate_last_name_cluster_str as get_surname

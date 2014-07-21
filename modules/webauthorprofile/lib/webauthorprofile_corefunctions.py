@@ -47,7 +47,7 @@ from invenio.webauthorprofile_config import CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
     CFG_WEBAUTHORPROFILE_FKEYWORD_TAG, CFG_WEBAUTHORPROFILE_COLLABORATION_TAG, \
     CFG_WEBAUTHORPROFILE_FIELDCODE_TAG
 from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_id, \
-    get_names_of_author, create_normalized_name, \
+    get_names_of_author, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
     gathered_names_by_personid, get_canonical_name_of_author, get_coauthors_of_author, \
     get_names_to_records_of_author, get_existing_authors, get_confirmed_papers_of_author, \
@@ -618,7 +618,7 @@ def _get_person_names_dicts_bai(person_id):
     for aname, records in names_to_records.items():
         acount = len(records)
         names_dict[aname] = acount
-        norm_name = create_normalized_name(split_name_parts(aname))
+        norm_name = aname
 
         if len(norm_name) > len(longest_name):
             longest_name = norm_name

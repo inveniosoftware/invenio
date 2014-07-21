@@ -45,6 +45,9 @@ from invenio.bibauthorid_dbinterface import  get_names_count_of_author #emitting
 from invenio.bibauthorid_dbinterface import get_canonical_name_of_author #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import get_coauthors_of_author #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_dbinterface import remove_empty_authors #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_dbinterface import get_papers_of_author
+from invenio.bibauthorid_dbinterface import get_pid_to_canonical_name_map
+from invenio.bibauthorid_dbinterface import get_names_to_records_of_author
 
 from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: disable-msg=W0611
