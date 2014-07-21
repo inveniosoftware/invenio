@@ -82,7 +82,6 @@ from invenio.bibauthorid_general_utils import get_inspire_record_url
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
     record_get_field_instances, field_get_subfield_values
-from invenio.bibauthorid_name_utils import create_normalized_name
 from invenio.bibauthorid_name_utils import split_name_parts
 
 TEMPLATE = load('bibauthorid')
@@ -2251,10 +2250,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         mr_name = most_relevant_name(name_variants)
         if mr_name:
-            relevant_name = create_normalized_name(split_name_parts(mr_name))
-
-            if relevant_name:
-                search_param = relevant_name.split(",")[0]
+            search_param = mr_name.split(",")[0]
 
         merge_data['search_param'] = search_param
         merge_data['canonical_id'] = webapi.get_canonical_id_from_person_id(person_id)
@@ -2766,7 +2762,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             template_parameters["arxiv"] = html_arxiv
             template_parameters["orcid"] = html_orcid
             template_parameters["contact"] = html_support
-            
+
         template_parameters["inspire"] = CFG_INSPIRE_SITE
 
         template_parameters["inspire"] = CFG_INSPIRE_SITE
