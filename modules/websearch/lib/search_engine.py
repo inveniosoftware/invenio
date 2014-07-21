@@ -4704,7 +4704,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         selfcited = get_self_cited_by(recid)
                         selfcited = rank_by_citations(get_self_cited_by(recid), verbose=verbose)
                         selfcited = reversed(selfcited[0])
-                        selfcited = [recid for recid, dummy in selfcited]
+                        # recid is already used, let's use recordid
+                        selfcited = [recordid for recordid, dummy in selfcited]
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
