@@ -17,13 +17,88 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Version information for Invenio
+Version information for Invenio.
 
-This file is imported by ``invenio.__init__``, and parsed by
-``setup.py`` as well as ``docs/conf.py``.
+This file is imported by ``invenio.__init__``, and parsed by ``setup.py``.
 """
 
 # Do not change the format of this next line. Doing so risks breaking
 # setup.py and docs/conf.py
 
-__version__ = "1.9999"
+version = (1, 9999, 0)
+
+
+def build_version(*args):
+    """
+    Build a PEP440 compatible version based on a list of arguments.
+
+    Inspired by Django's django.utils.version
+
+    .. doctest::
+
+        >>> print(build_version(1, 0, 0))
+        1.0
+        >>> print(build_version(1, 1, 1))
+        1.1.1
+        >>> print(build_version(1, 2, 3, 4))
+        1.2.3.4
+        >>> print(build_version(2, 0, 0, 'dev', 1))
+        2.0.dev1
+        >>> print(build_version(2, 0, 0, 'dev'))  # doctest: +ELLIPSIS
+        2.0.dev...
+        >>> print(build_version(2, 0, 1, 'dev'))  # doctest: +ELLIPSIS
+        2.0.1.dev...
+        >>> print(build_version(1, 2, 3, 4, 5, 6, 'dev'))  # doctest: +ELLIPSIS
+        1.2.3.4.5.6.dev...
+
+    """
+    if 'dev' in args:
+        pos = args.index('dev')
+    else:
+        pos = len(args)
+
+    def zero_search(acc, x):
+        """Increment the counter until it stops seeing zeros."""
+        position, searching = acc
+        if searching:
+            if x != 0:
+                searching = False
+            else:
+                position += 1
+
+        return (position, searching)
+
+    last_zero = pos + 1 - reduce(zero_search, reversed(args[:pos]), (1, True))[0]
+    parts = max(2, last_zero)
+    version = '.'.join(str(arg) for arg in args[:parts])
+
+    if len(args) > pos:
+        revision = args[pos + 1] if len(args) > pos + 1 else git_revision()
+        version += '.dev{0}'.format(revision)
+
+    return version
+
+
+def git_revision():
+    """Get the timestamp of the latest git revision."""
+    if not hasattr(git_revision, '_cache'):
+        import datetime
+        import subprocess
+        call = subprocess.Popen(r'git log -1 --pretty=format:%ct --quiet HEAD',
+                                stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                shell=True)
+        stdout, _ = call.communicate()
+        timestamp = int(stdout.decode())
+        try:
+            ts = datetime.datetime.utcfromtimestamp(timestamp)
+        except ValueError:
+            revision = '0'
+        else:
+            revision = ts.strftime('%Y%m%d%H%M%S')
+
+        git_revision._cache = revision
+
+    return git_revision._cache
+
+
+__version__ = build_version(*version)
