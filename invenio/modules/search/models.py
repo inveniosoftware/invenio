@@ -159,7 +159,15 @@ class Collection(db.Model):
     """Represents a Collection record."""
 
     def __repr__(self):
-        return "%s(%s)" % (self.__class__.__name__, self.id)
+        return 'Collection <id: {0.id}, name: {0.name}, dbquery: {0.query}, ' \
+               'nbrecs: {0.nbrecs}>'.format(self)
+
+    def __unicode__(self):
+        suffix = ' ({0})'.format(_('default')) if self.id == 1 else ''
+        return "{0.id}. {0.name}{1}".format(self, suffix)
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     __tablename__ = 'collection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
@@ -846,6 +854,30 @@ class FacetCollection(db.Model):
     def __repr__(self):
         return ('FacetCollection <id: {0.id}, id_collection: {0.id_collection},'
                 ' order: {0.order}, facet_name: {0.facet_name}>'.format(self))
+
+    @classmethod
+    def is_place_taken(cls, id_collection, order):
+        """Check if there is already a facet on the given position.
+
+        .. note:: This works well as a pre-check, however saving can still fail
+            if somebody else creates the same record in other session
+            (phantom reads).
+        """
+        return bool(cls.query.filter(
+            cls.id_collection == id_collection,
+            cls.order == order).count())
+
+    @classmethod
+    def is_duplicated(cls, id_collection, facet_name):
+        """Check if the given facet is already assigned to this collection.
+
+        .. note:: This works well as a pre-check, however saving can still fail
+            if somebody else creates the same record in other session
+            (phantom reads).
+        """
+        return bool(cls.query.filter(
+            cls.id_collection == id_collection,
+            cls.facet_name == facet_name).count())
 
 __all__ = ['Collection',
            'Collectionname',
