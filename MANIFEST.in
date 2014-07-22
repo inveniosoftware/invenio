@@ -1,0 +1,33 @@
+include requirements*.txt ABOUT-NLS AUTHORS ChangeLog COPYING INSTALL.rst NEWS README RELEASE-NOTES THANKS TODO UNINSTALL bower.json Gruntfile.js mapping.cfg package.json Procfile* setup.cfg
+include invenio/invenio.wsgi
+
+recursive-include docs *
+recursive-exclude docs/_build *
+
+recursive-include invenio/testsuite *
+
+recursive-include invenio/base/static *
+recursive-include invenio/base/templates *
+recursive-include invenio/base/translations *.mo *.po *.pot
+
+recursive-include invenio/modules/*/static *
+recursive-include invenio/modules/*/templates *
+recursive-include invenio/modules/*/testsuite *
+recursive-include invenio/modules/*/format_elements *
+recursive-include invenio/modules/*/format_templates *
+recursive-include invenio/modules/*/output_formats *
+recursive-include invenio/modules/*/converterext *
+recursive-include invenio/modules/*/documentext *
+recursive-include invenio/modules/*/editorext *
+recursive-include invenio/modules/*/exportext *
+recursive-include invenio/modules/*/jsonext *
+recursive-include invenio/modules/*/rankext *
+recursive-include invenio/modules/*/recordext/* *
+
+
+recursive-include invenio/modules/authorids/name_authority_files *
+recursive-include invenio/modules/encoder/scripts *
+recursive-include invenio/utils/data *
+recursive-include invenio/legacy *
+
+recursive-exclude * *.py[co]

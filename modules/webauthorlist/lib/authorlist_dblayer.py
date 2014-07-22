@@ -18,7 +18,7 @@
 import time
 import invenio.authorlist_config as cfg
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def now():
     """

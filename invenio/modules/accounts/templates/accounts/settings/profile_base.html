@@ -1,0 +1,42 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "_formhelpers.html" import render_field with context %}
+{%- extends "accounts/settings/index_base.html" -%}
+
+{% block settings_body %}
+{{helpers.panel_start('Profile', icon='fa fa-user fa-fw')}}
+<div class="row">
+    <div class="col-sm-2 col-md-2" align="center"><i class="fa fa-user fa-5x"></i></div>
+    <div class="col-sm-4 col-md-4"><h4 class="media-heading">{{current_user.nickname}}</h4>
+    <p class="text-muted">{{current_user.email}}</p></div>
+</div>
+{{helpers.panel_end()}}
+{{helpers.panel_start('Change password', icon='fa fa-key fa-fw')}}
+<form method="POST" role="form">
+  {%- for field in form -%}
+    {{ render_field(field) }}
+  {%- endfor -%}
+  <div class="form-actions">
+    <input type="submit" value="{{ _("Change Password") }}" class="btn btn-default"/> <a href="{{ url_for('.lost') }}" style="margin-left: 15px"><small>Lost password?</small></a>
+  </div>
+</form>
+{{helpers.panel_end()}}
+{% endblock %}

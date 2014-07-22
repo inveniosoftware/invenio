@@ -1,0 +1,72 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+<td title="id">
+{{object.id}}
+</td>
+<td title="checkbox">
+<input type="checkbox" class="hp-check">
+</td>
+<td title="title">
+{% if action == None %}
+    <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
+        {% for i in title %}
+            <p>{{i}}<p>
+        {% endfor %}
+    </a>
+{% else %}
+{% set action_instance = action() %}
+    <a href="{{url_for('holdingpen.show_action', objectid=object.id)}}">
+        {% for i in title %}
+            <p>{{i}}<p>
+        {% endfor %}
+    </a>
+{% endif %}
+</td>
+<td title="identifiers">
+{{ ", ".join(identifiers) or "No identifiers" }}
+</td>
+<td title="category">
+{{ ", ".join(categories) or "No category" }}
+</td>
+<td title="pretty_date">
+{{ pretty_date(object.created)}}
+</td>
+<td title="version">
+{% if object.version == 1 %}<span class="label label-success">Done</span>
+{% elif object.version == 2 %}<span class="label label-danger">Need action</span>
+{% elif object.version == 3 %}<span class="label label-warning">In process</span>
+{% elif object.version == 0 %}<span class="label label-info">New</span>
+{% endif %}
+</td>
+<td title="type">
+{{object.data_type}}
+</td>
+<td title="action">
+{% if action != None %}
+    {% set action = action() %}
+    {% if mini_action != None %}
+        {% set mini_action = mini_action() %}
+        {% for field in mini_action %}
+            {{ field(objectid=object.id) }}
+        {% endfor %}
+    {% endif %}
+{% else %}
+N/A
+{% endif %}
+</td>

@@ -1,0 +1,11 @@
+.comments .collapsed i.glyphicon-chevron-down {
+    background-position: -456px -72px !important;
+}
+
+.comments hr {
+    margin: 8px;
+}
+
+.comments li {
+    min-height: 10px;
+}

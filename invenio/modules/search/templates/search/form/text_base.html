@@ -1,0 +1,31 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- block search_form_text -%}
+{# Brand and toggle get grouped for better mobile display #}
+{%- set nbrecs = collection.nbrecs -%}
+{%- if not collection.nbrecs -%}
+  {%- set nbrecs = 0 -%}
+{%- endif -%}
+<div class="navbar-header">
+  <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
+    {{- _("Search %(x_num)s records for", x_num=nbrecs) -}}
+  </span>
+</div>
+{%- endblock search_form_text -%}

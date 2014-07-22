@@ -1,0 +1,56 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="col-md-8">
+
+    <div class="well">
+        <span class="pull-right">
+            {%- if deposition.type.editable -%}
+            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="fa fa-pencil"></i>{{ _('Edit') }}</a> &nbsp;
+            {%- endif -%}
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="fa fa-eye"></i>{{ _('View') }}</a>
+        </span>
+        <span class="clearfix"></span>
+    </div>
+
+    <div class="progress progress-striped" style="height: inherit;">
+        <div class="progress-bar progress-bar-warning" style="width: 100%;">
+            <h4>{{ _('Preview') }}</h4>
+        </div>
+    </div>
+    <small class="text-muted">
+        {{ _('This is a preview of your upload. The public version is available on %(x_link)s. '
+             'If you want to remove your upload, please contact %(x_contact)s',
+             x_link='<a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}">' + url_for('record.metadata', recid=sip.metadata['recid'], _external=True) + '</a>',
+             x_contact='<a href="mailto:{email}">{email}</a>'.format(email=config.CFG_SITE_SUPPORT_EMAIL)) }}
+    </small>
+    <hr />
+    {{format_record(recID=sip.metadata['recid'], xml_record=sip.package, of='hd')|safe}}
+    {{format_record(recID=sip.metadata['recid'], xml_record=sip.package, of='hdinfo')|safe}}
+
+    </div>
+    <div class="col-md-4">
+        {% include "deposit/myview.html" %}
+    </div>
+    </div>
+</div>
+{% endblock %}

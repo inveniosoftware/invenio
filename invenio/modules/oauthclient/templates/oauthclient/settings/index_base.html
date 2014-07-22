@@ -1,0 +1,48 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "_formhelpers.html" import render_field with context %}
+{%- extends "accounts/settings/index.html" %}
+
+{% block settings_body %}
+{{helpers.panel_start(
+    'Linked accounts',
+    with_body=False,
+    icon="fa fa-link fa-fw"
+)}}
+<div class="panel-body">
+    <p>Tired of entering password for {{config.CFG_SITE_NAME}} every time you sign in? Setup single sign-on with one or more of the services below:</p>
+</div>
+<ul class="list-group">
+    {%- for s in services %}
+    <li class="list-group-item">
+    <div class="pull-right">
+        {%- if s.account -%}
+        <a href="{{url_for('oauthclient.disconnect', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-times-circle"></i> Disconnect</a>
+        {%- else -%}
+        <a href="{{url_for('oauthclient.login', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-link"></i> Connect</a>
+        {%- endif -%}
+    </div>
+    {% if s.icon %}<i class="{{s.icon}}"></i> {% endif %}{{s.title}}{% if s.account %} <i class="fa fa-check" style="color: #5cb85c;"></i>{% endif %}<br/><small class="text-muted">{{s.description}}</small>
+    </li>
+    {%- endfor %}
+</ul>
+{{helpers.panel_end(with_body=False)}}
+{% endblock %}

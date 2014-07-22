@@ -18,17 +18,17 @@
 """Invenio WebAuthorlistmanager Administrator Interface."""
 
 import sys
-from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
-from invenio.webinterface_handler_wsgi_utils import Field
-from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
+from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
+from invenio.legacy.wsgi.utils import Field
+from invenio.utils.json import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_URL
-from invenio.messages import gettext_set_language
-from invenio.webpage import page
-from invenio.webuser import getUid
-from invenio.urlutils import redirect_to_url
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.webpage import page
+from invenio.legacy.webuser import getUid
+from invenio.utils.url import redirect_to_url
 
-import invenio.template
-authorlist_templates = invenio.template.load('authorlist')
+import invenio.legacy.template
+authorlist_templates = invenio.legacy.template.load('authorlist')
 import invenio.authorlist_engine as authorlist_engine
 import invenio.authorlist_dblayer as authorlist_db
 

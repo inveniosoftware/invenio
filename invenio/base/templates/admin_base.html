@@ -1,0 +1,55 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% import 'admin/layout.html' as layout with context -%}
+{% extends "page.html" %}
+
+{%- block css -%}{% block head_css %}<link href="{{ url_for('admin.static', filename='css/admin.css') }}" rel="stylesheet">{% endblock %}{%- endblock css -%}
+
+{% block header %}{{ super() }}
+    {% block head_meta %}{% endblock -%}
+    {% block head_tail %}{% endblock -%}
+{% endblock header -%}
+
+{% block pagefooteradd -%}
+    {{ super() }}
+{% endblock pagefooteradd -%}
+{%- block _bottom_assets %}
+    {{ super() }}
+    {% block tail %}{% endblock -%}
+{%- endblock _bottom_assets %}
+
+
+{% block page_body %}
+<div class="container">
+<div class="row">
+    <div class="col-md-3">
+        <ul class="nav nav-stacked">
+            {{ layout.menu() }}
+        </ul>
+    </div>
+    <div class="col-md-9">
+        {% if admin_view.name %}<h4>{{admin_view.name}}</h4>{% endif %}
+        {{ layout.messages() }}
+        {% block body %}{% endblock %}
+    </div>
+</div>
+</div>
+{% endblock %}
+
+{% block title %}{% endblock %}

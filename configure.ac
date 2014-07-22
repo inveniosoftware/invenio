@@ -20,9 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT([invenio],
-        m4_esyscmd([./git-version-gen .tarball-version]),
-        [info@invenio-software.org])
+AC_INIT([invenio],[m4_esyscmd(./git-version-gen .tarball-version)],[info@invenio-software.org])
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/invenio.  (Do not use
@@ -37,12 +35,12 @@ test "${prefix%/}" != "" && prefix=${prefix%/}
 AC_PROG_INSTALL
 
 ## Check for gettext support:
-AM_GNU_GETTEXT(external)
-AM_GNU_GETTEXT_VERSION(0.14.4)
+#AM_GNU_GETTEXT(external)
+#AM_GNU_GETTEXT_VERSION(0.14.4)
 
 ## Check for MySQL client:
 AC_MSG_CHECKING(for mysql)
-AC_ARG_WITH(mysql, AC_HELP_STRING([--with-mysql], [path to a specific MySQL binary (optional)]), MYSQL=${withval})
+AC_ARG_WITH(mysql, AS_HELP_STRING([--with-mysql],[path to a specific MySQL binary (optional)]), MYSQL=${withval})
 if test -n "$MYSQL"; then
    AC_MSG_RESULT($MYSQL)
 else
@@ -57,7 +55,7 @@ fi
 
 ## Check for Python:
 AC_MSG_CHECKING(for python)
-AC_ARG_WITH(python, AC_HELP_STRING([--with-python], [path to a specific Python binary (optional)]), PYTHON=${withval})
+AC_ARG_WITH(python, AS_HELP_STRING([--with-python],[path to a specific Python binary (optional)]), PYTHON=${withval})
 if test -n "$PYTHON"; then
    AC_MSG_RESULT($PYTHON)
 else
@@ -72,7 +70,7 @@ fi
 
 ## Check for OpenOffice.org Python binary:
 AC_MSG_CHECKING(for OpenOffice.org Python binary)
-AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
+AC_ARG_WITH(openoffice-python, AS_HELP_STRING([--with-openoffice-python],[path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
 
 if test -z "$OPENOFFICE_PYTHON"; then
    OPENOFFICE_PYTHON=`locate -l 1 -r "o.*office/program/python$"`
@@ -415,7 +413,7 @@ fi
 
 ## Check for CLISP:
 AC_MSG_CHECKING(for clisp)
-AC_ARG_WITH(clisp, AC_HELP_STRING([--with-clisp], [path to a specific CLISP binary (optional)]), CLISP=${withval})
+AC_ARG_WITH(clisp, AS_HELP_STRING([--with-clisp],[path to a specific CLISP binary (optional)]), CLISP=${withval})
 if test -n "$CLISP"; then
    AC_MSG_RESULT($CLISP)
 else
@@ -434,7 +432,7 @@ fi
 
 ## Check for CMUCL:
 AC_MSG_CHECKING(for cmucl)
-AC_ARG_WITH(cmucl, AC_HELP_STRING([--with-cmucl], [path to a specific CMUCL binary (optional)]), CMUCL=${withval})
+AC_ARG_WITH(cmucl, AS_HELP_STRING([--with-cmucl],[path to a specific CMUCL binary (optional)]), CMUCL=${withval})
 if test -n "$CMUCL"; then
    AC_MSG_RESULT($CMUCL)
 else
@@ -457,7 +455,7 @@ fi
 
 ## Check for SBCL:
 AC_MSG_CHECKING(for sbcl)
-AC_ARG_WITH(sbcl, AC_HELP_STRING([--with-sbcl], [path to a specific SBCL binary (optional)]), SBCL=${withval})
+AC_ARG_WITH(sbcl, AS_HELP_STRING([--with-sbcl],[path to a specific SBCL binary (optional)]), SBCL=${withval})
 if test -n "$SBCL"; then
    AC_MSG_RESULT($SBCL)
 else
@@ -553,387 +551,8 @@ AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 ## Define output files:
 AC_CONFIG_FILES([config.nice  \
      Makefile \
-     po/Makefile.in \
      config/Makefile \
-     config/invenio-autotools.conf \
-     modules/Makefile \
-     modules/webauthorprofile/Makefile \
-     modules/webauthorprofile/lib/Makefile \
-     modules/webauthorprofile/bin/Makefile \
-     modules/webauthorprofile/bin/webauthorprofile \
-     modules/bibauthorid/Makefile \
-     modules/bibauthorid/bin/Makefile \
-     modules/bibauthorid/bin/bibauthorid \
-     modules/bibauthorid/doc/Makefile \
-     modules/bibauthorid/doc/admin/Makefile \
-     modules/bibauthorid/doc/hacking/Makefile \
-     modules/bibauthorid/lib/Makefile \
-     modules/bibauthorid/etc/Makefile \
-     modules/bibauthorid/etc/name_authority_files/Makefile \
-     modules/bibauthorid/web/Makefile \
-     modules/bibauthority/Makefile \
-     modules/bibauthority/bin/Makefile \
-     modules/bibauthority/doc/Makefile \
-     modules/bibauthority/doc/admin/Makefile \
-     modules/bibauthority/doc/hacking/Makefile \
-     modules/bibauthority/lib/Makefile \
-     modules/bibauthority/web/Makefile \
-     modules/bibcatalog/Makefile \
-     modules/bibcatalog/bin/Makefile \
-     modules/bibcatalog/bin/bibcatalog \
-     modules/bibcatalog/doc/Makefile \
-     modules/bibcatalog/doc/admin/Makefile \
-     modules/bibcatalog/doc/hacking/Makefile
-     modules/bibcatalog/lib/Makefile \
-     modules/bibcatalog/lib/ticket_templates/Makefile \
-     modules/bibcheck/Makefile \
-     modules/bibcheck/doc/Makefile \
-     modules/bibcheck/doc/hacking/Makefile \
-     modules/bibcheck/etc/Makefile \
-     modules/bibcheck/bin/Makefile \
-     modules/bibcheck/lib/Makefile \
-     modules/bibcheck/lib/plugins/Makefile \
-     modules/bibcheck/bin/bibcheck \
-     modules/bibcirculation/Makefile \
-     modules/bibcirculation/bin/Makefile \
-     modules/bibcirculation/bin/bibcircd \
-     modules/bibcirculation/doc/Makefile \
-     modules/bibcirculation/doc/admin/Makefile \
-     modules/bibcirculation/doc/hacking/Makefile
-     modules/bibcirculation/lib/Makefile \
-     modules/bibcirculation/web/Makefile \
-     modules/bibcirculation/web/admin/Makefile \
-     modules/bibclassify/Makefile \
-     modules/bibclassify/bin/Makefile \
-     modules/bibclassify/bin/bibclassify \
-     modules/bibclassify/doc/Makefile \
-     modules/bibclassify/doc/admin/Makefile \
-     modules/bibclassify/doc/hacking/Makefile \
-     modules/bibclassify/etc/Makefile \
-     modules/bibclassify/lib/Makefile \
-     modules/bibconvert/Makefile \
-     modules/bibconvert/bin/Makefile \
-     modules/bibconvert/bin/bibconvert \
-     modules/bibconvert/doc/Makefile \
-     modules/bibconvert/doc/admin/Makefile \
-     modules/bibconvert/doc/hacking/Makefile \
-     modules/bibconvert/etc/Makefile \
-     modules/bibconvert/lib/Makefile \
-     modules/bibdocfile/Makefile \
-     modules/bibdocfile/bin/bibdocfile \
-     modules/bibdocfile/bin/Makefile \
-     modules/bibdocfile/doc/Makefile \
-     modules/bibdocfile/doc/hacking/Makefile \
-     modules/bibdocfile/lib/Makefile \
-     modules/bibrecord/Makefile \
-     modules/bibrecord/bin/Makefile \
-     modules/bibrecord/bin/xmlmarc2textmarc \
-     modules/bibrecord/bin/textmarc2xmlmarc \
-     modules/bibrecord/bin/xmlmarclint \
-     modules/bibrecord/doc/Makefile \
-     modules/bibrecord/doc/admin/Makefile \
-     modules/bibrecord/doc/hacking/Makefile \
-     modules/bibrecord/etc/Makefile \
-     modules/bibrecord/lib/Makefile \
-     modules/bibedit/Makefile \
-     modules/bibedit/bin/Makefile \
-     modules/bibedit/bin/bibedit \
-     modules/bibedit/doc/Makefile \
-     modules/bibedit/doc/admin/Makefile \
-     modules/bibedit/doc/hacking/Makefile \
-     modules/bibedit/etc/Makefile \
-     modules/bibedit/lib/Makefile \
-     modules/bibedit/web/Makefile \
-     modules/bibencode/Makefile \
-     modules/bibencode/bin/Makefile \
-     modules/bibencode/bin/bibencode \
-     modules/bibencode/lib/Makefile \
-     modules/bibencode/etc/Makefile \
-     modules/bibencode/www/Makefile \
-     modules/bibexport/Makefile \
-     modules/bibexport/bin/Makefile \
-     modules/bibexport/bin/bibexport \
-     modules/bibexport/doc/Makefile \
-     modules/bibexport/doc/admin/Makefile \
-     modules/bibexport/doc/hacking/Makefile
-     modules/bibexport/etc/Makefile \
-     modules/bibexport/lib/Makefile \
-     modules/bibexport/web/Makefile \
-     modules/bibexport/web/admin/Makefile \
-     modules/bibfield/Makefile \
-     modules/bibfield/lib/Makefile \
-     modules/bibfield/lib/functions/Makefile \
-     modules/bibfield/etc/Makefile \
-     modules/bibformat/Makefile \
-     modules/bibformat/bin/Makefile \
-     modules/bibformat/bin/bibreformat \
-     modules/bibformat/doc/Makefile \
-     modules/bibformat/doc/admin/Makefile \
-     modules/bibformat/doc/hacking/Makefile \
-     modules/bibformat/etc/Makefile \
-     modules/bibformat/etc/format_templates/Makefile \
-     modules/bibformat/etc/output_formats/Makefile \
-     modules/bibformat/lib/Makefile \
-     modules/bibformat/lib/elements/Makefile \
-     modules/bibformat/web/Makefile \
-     modules/bibformat/web/admin/Makefile \
-     modules/oaiharvest/Makefile \
-     modules/oaiharvest/bin/Makefile \
-     modules/oaiharvest/bin/oaiharvest \
-     modules/oaiharvest/doc/Makefile \
-     modules/oaiharvest/doc/admin/Makefile \
-     modules/oaiharvest/doc/hacking/Makefile \
-     modules/oaiharvest/lib/Makefile \
-     modules/oaiharvest/web/Makefile \
-     modules/oaiharvest/web/admin/Makefile \
-     modules/oairepository/Makefile \
-     modules/oairepository/bin/Makefile \
-     modules/oairepository/bin/oairepositoryupdater \
-     modules/oairepository/doc/Makefile \
-     modules/oairepository/doc/admin/Makefile \
-     modules/oairepository/doc/hacking/Makefile \
-     modules/oairepository/etc/Makefile \
-     modules/oairepository/lib/Makefile \
-     modules/oairepository/web/Makefile \
-     modules/oairepository/web/admin/Makefile \
-     modules/pdfchecker/Makefile \
-     modules/pdfchecker/bin/Makefile \
-     modules/pdfchecker/bin/arxiv-pdf-checker \
-     modules/pdfchecker/lib/Makefile \
-     modules/bibindex/Makefile \
-     modules/bibindex/bin/Makefile \
-     modules/bibindex/bin/bibindex \
-     modules/bibindex/bin/bibstat \
-     modules/bibindex/doc/Makefile \
-     modules/bibindex/doc/admin/Makefile \
-     modules/bibindex/doc/hacking/Makefile \
-     modules/bibindex/lib/Makefile \
-     modules/bibindex/lib/tokenizers/Makefile \
-     modules/bibindex/web/Makefile \
-     modules/bibindex/web/admin/Makefile \
-     modules/bibknowledge/Makefile \
-     modules/bibknowledge/lib/Makefile \
-     modules/bibknowledge/doc/Makefile \
-     modules/bibknowledge/doc/admin/Makefile \
-     modules/bibknowledge/doc/hacking/Makefile \
-     modules/bibmatch/Makefile \
-     modules/bibmatch/bin/Makefile \
-     modules/bibmatch/bin/bibmatch \
-     modules/bibmatch/doc/Makefile \
-     modules/bibmatch/doc/admin/Makefile \
-     modules/bibmatch/doc/hacking/Makefile \
-     modules/bibmatch/etc/Makefile \
-     modules/bibmatch/lib/Makefile \
-     modules/bibmerge/Makefile \
-     modules/bibmerge/bin/Makefile \
-     modules/bibmerge/doc/Makefile \
-     modules/bibmerge/doc/admin/Makefile \
-     modules/bibmerge/doc/hacking/Makefile \
-     modules/bibmerge/lib/Makefile \
-     modules/bibmerge/web/Makefile \
-     modules/bibmerge/web/admin/Makefile \
-     modules/bibrank/Makefile \
-     modules/bibrank/bin/Makefile \
-     modules/bibrank/bin/bibrank \
-     modules/bibrank/bin/bibrankgkb \
-     modules/bibrank/doc/Makefile \
-     modules/bibrank/doc/admin/Makefile \
-     modules/bibrank/doc/hacking/Makefile \
-     modules/bibrank/etc/Makefile \
-     modules/bibrank/etc/bibrankgkb.cfg \
-     modules/bibrank/etc/demo_jif.cfg \
-     modules/bibrank/etc/template_single_tag_rank_method.cfg \
-     modules/bibrank/lib/Makefile \
-     modules/bibrank/web/Makefile \
-     modules/bibrank/web/admin/Makefile \
-     modules/bibsched/Makefile \
-     modules/bibsched/bin/Makefile \
-     modules/bibsched/bin/bibsched \
-     modules/bibsched/bin/bibtaskex \
-     modules/bibsched/bin/bibtasklet \
-     modules/bibsched/doc/Makefile \
-     modules/bibsched/doc/admin/Makefile \
-     modules/bibsched/doc/hacking/Makefile \
-     modules/bibsched/lib/Makefile \
-     modules/bibsched/lib/tasklets/Makefile \
-     modules/bibupload/Makefile \
-     modules/bibsort/Makefile \
-     modules/bibsort/bin/Makefile \
-     modules/bibsort/bin/bibsort \
-     modules/bibsort/lib/Makefile \
-     modules/bibsort/etc/Makefile \
-     modules/bibsort/doc/Makefile \
-     modules/bibsort/doc/admin/Makefile \
-     modules/bibsort/doc/hacking/Makefile \
-     modules/bibsort/web/Makefile \
-     modules/bibsort/web/admin/Makefile \
-     modules/bibsword/Makefile \
-     modules/bibsword/bin/Makefile \
-     modules/bibsword/bin/bibsword \
-     modules/bibsword/doc/Makefile \
-     modules/bibsword/doc/admin/Makefile \
-     modules/bibsword/doc/hacking/Makefile \
-     modules/bibsword/lib/Makefile \
-     modules/bibsword/etc/Makefile \
-     modules/bibupload/bin/Makefile \
-     modules/bibupload/bin/bibupload \
-     modules/bibupload/bin/batchuploader \
-     modules/bibupload/doc/Makefile \
-     modules/bibupload/doc/admin/Makefile \
-     modules/bibupload/doc/hacking/Makefile \
-     modules/bibupload/lib/Makefile \
-     modules/elmsubmit/Makefile \
-     modules/elmsubmit/bin/Makefile \
-     modules/elmsubmit/bin/elmsubmit \
-     modules/elmsubmit/doc/Makefile \
-     modules/elmsubmit/doc/admin/Makefile \
-     modules/elmsubmit/doc/hacking/Makefile \
-     modules/elmsubmit/etc/Makefile \
-     modules/elmsubmit/etc/elmsubmit.cfg \
-     modules/elmsubmit/lib/Makefile \
-     modules/miscutil/Makefile \
-     modules/miscutil/bin/Makefile \
-     modules/miscutil/bin/dbdump \
-     modules/miscutil/bin/dbexec \
-     modules/miscutil/bin/inveniocfg \
-     modules/miscutil/bin/plotextractor \
-     modules/miscutil/bin/hepdataharvest \
-     modules/miscutil/bin/bibtex \
-     modules/miscutil/demo/Makefile \
-     modules/miscutil/doc/Makefile \
-     modules/miscutil/doc/hacking/Makefile \
-     modules/miscutil/etc/Makefile \
-     modules/miscutil/etc/bash_completion.d/Makefile \
-     modules/miscutil/etc/bash_completion.d/inveniocfg \
-     modules/miscutil/etc/ckeditor_scientificchar/Makefile \
-     modules/miscutil/etc/ckeditor_scientificchar/dialogs/Makefile \
-     modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
-     modules/miscutil/lib/Makefile \
-     modules/miscutil/lib/upgrades/Makefile \
-     modules/miscutil/sql/Makefile \
-     modules/miscutil/web/Makefile \
-     modules/webaccess/Makefile \
-     modules/webaccess/bin/Makefile \
-     modules/webaccess/bin/authaction \
-     modules/webaccess/bin/webaccessadmin \
-     modules/webaccess/doc/Makefile \
-     modules/webaccess/doc/admin/Makefile \
-     modules/webaccess/doc/hacking/Makefile \
-     modules/webaccess/lib/Makefile \
-     modules/webaccess/web/Makefile \
-     modules/webaccess/web/admin/Makefile \
-     modules/webalert/Makefile \
-     modules/webalert/bin/Makefile \
-     modules/webalert/bin/alertengine \
-     modules/webalert/doc/Makefile \
-     modules/webalert/doc/admin/Makefile \
-     modules/webalert/doc/hacking/Makefile \
-     modules/webalert/lib/Makefile \
-     modules/webalert/web/Makefile \
-     modules/webauthorlist/Makefile \
-     modules/webauthorlist/lib/Makefile \
-     modules/webauthorlist/web/Makefile \
-     modules/webbasket/Makefile \
-     modules/webbasket/doc/Makefile \
-     modules/webbasket/doc/admin/Makefile \
-     modules/webbasket/doc/hacking/Makefile \
-     modules/webbasket/lib/Makefile \
-     modules/webbasket/web/Makefile \
-     modules/webcomment/Makefile \
-     modules/webcomment/doc/Makefile \
-     modules/webcomment/doc/admin/Makefile \
-     modules/webcomment/doc/hacking/Makefile \
-     modules/webcomment/lib/Makefile \
-     modules/webcomment/web/Makefile \
-     modules/webcomment/web/admin/Makefile \
-     modules/webhelp/Makefile \
-     modules/webhelp/web/Makefile \
-     modules/webhelp/web/admin/Makefile \
-     modules/webhelp/web/admin/howto/Makefile \
-     modules/webhelp/web/hacking/Makefile \
-     modules/webjournal/Makefile \
-     modules/webjournal/etc/Makefile \
-     modules/webjournal/doc/Makefile \
-     modules/webjournal/doc/admin/Makefile \
-     modules/webjournal/doc/hacking/Makefile \
-     modules/webjournal/lib/Makefile \
-     modules/webjournal/lib/elements/Makefile \
-     modules/webjournal/lib/widgets/Makefile \
-     modules/webjournal/web/Makefile \
-     modules/webjournal/web/admin/Makefile \
-     modules/weblinkback/Makefile \
-     modules/weblinkback/lib/Makefile \
-     modules/weblinkback/web/Makefile \
-     modules/weblinkback/web/admin/Makefile \
-     modules/webmessage/Makefile \
-     modules/webmessage/bin/Makefile \
-     modules/webmessage/bin/webmessageadmin \
-     modules/webmessage/doc/Makefile \
-     modules/webmessage/doc/admin/Makefile \
-     modules/webmessage/doc/hacking/Makefile \
-     modules/webmessage/lib/Makefile \
-     modules/webmessage/web/Makefile \
-     modules/websearch/Makefile \
-     modules/websearch/bin/Makefile \
-     modules/websearch/bin/webcoll \
-     modules/websearch/doc/Makefile \
-     modules/websearch/doc/admin/Makefile \
-     modules/websearch/doc/hacking/Makefile \
-     modules/websearch/lib/Makefile \
-     modules/websearch/lib/services/Makefile \
-     modules/websearch/web/Makefile \
-     modules/websearch/web/admin/Makefile \
-     modules/websession/Makefile \
-     modules/websession/bin/Makefile \
-     modules/websession/bin/inveniogc \
-     modules/websession/doc/Makefile \
-     modules/websession/doc/admin/Makefile \
-     modules/websession/doc/hacking/Makefile \
-     modules/websession/lib/Makefile \
-     modules/websession/web/Makefile \
-     modules/webstat/Makefile \
-     modules/webstat/bin/Makefile \
-     modules/webstat/bin/webstat \
-     modules/webstat/bin/webstatadmin \
-     modules/webstat/doc/Makefile \
-     modules/webstat/doc/admin/Makefile \
-     modules/webstat/doc/hacking/Makefile \
-     modules/webstat/etc/Makefile \
-     modules/webstat/lib/Makefile \
-     modules/webstyle/Makefile \
-     modules/webstyle/bin/Makefile \
-     modules/webstyle/bin/gotoadmin \
-     modules/webstyle/bin/webdoc \
-     modules/webstyle/css/Makefile \
-     modules/webstyle/doc/Makefile \
-     modules/webstyle/doc/admin/Makefile \
-     modules/webstyle/doc/hacking/Makefile \
-     modules/webstyle/etc/Makefile \
-     modules/webstyle/img/Makefile \
-     modules/webstyle/lib/Makefile \
-     modules/webstyle/lib/goto_plugins/Makefile \
-     modules/websubmit/Makefile \
-     modules/websubmit/bin/Makefile \
-     modules/websubmit/bin/inveniounoconv \
-     modules/websubmit/bin/websubmitadmin \
-     modules/websubmit/doc/Makefile \
-     modules/websubmit/doc/admin/Makefile \
-     modules/websubmit/doc/hacking/Makefile \
-     modules/websubmit/etc/Makefile \
-     modules/websubmit/lib/Makefile \
-     modules/websubmit/lib/functions/Makefile \
-     modules/websubmit/web/Makefile \
-     modules/websubmit/web/admin/Makefile \
-     modules/docextract/Makefile \
-     modules/docextract/bin/Makefile \
-     modules/docextract/bin/docextract \
-     modules/docextract/bin/refextract \
-     modules/docextract/bin/convert_journals \
-     modules/docextract/doc/Makefile \
-     modules/docextract/lib/Makefile \
-     modules/docextract/etc/Makefile \
-     modules/docextract/doc/admin/Makefile \
-     modules/docextract/doc/hacking/Makefile \
+     config/invenio-autotools.conf
      ])
 
 ## Finally, write output files:

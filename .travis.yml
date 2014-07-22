@@ -20,14 +20,61 @@
 notifications:
   email: false
 
+services:
+  - mysql
+  - redis
+  - mongodb
+
+language: python
+
 python:
-  - "2.6"
+# FIXME: the build times out on Python 2.6 (inveniosoftware/invenio#1789)
+#  - "2.6"
+  - "2.7"
+
+before_install:
+  - "sudo add-apt-repository -y ppa:chris-lea/node.js"
+  - "sudo apt-get update"
 
 install:
-  - sudo apt-get update
-  - git clone https://github.com/tiborsimko/invenio-devscripts /tmp/invenio-devscripts
-  - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
+  - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
+  - "sudo a2enmod actions"
+  - "sudo a2enmod version || echo ':('"
+  - "sudo a2enmod rewrite"
+  - "sudo mkdir /etc/apache2/ssl"
+  - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
+  - "travis_retry pip install -r requirements-docs.txt --quiet"
+  - "pybabel compile -f -d invenio/base/translations/"
+  - "inveniomanage config create secret-key"
+  - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
+  - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
+  - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
+  - "inveniomanage config set CFG_TMPDIR /tmp"
+  - "sudo su -c \"npm install --silent -g bower grunt-cli less clean-css uglify-js requirejs\""
+  - "npm install --silent"
+  - "bower install"
+  - "travis_retry grunt"
+  - "inveniomanage collect"
+  - "inveniomanage assets build"
+  - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
+  - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
+  - "inveniomanage config set REQUIREJS_BIN false"
+  - "inveniomanage config set UGLIFYJS_BIN false"
+
+before_script:
+  - "inveniomanage apache create-config"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
+  - "sudo /usr/sbin/a2dissite *default* || echo ':('"
+  - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
+  - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
+  - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
+  - "inveniomanage database init --yes-i-know || echo ':('"
+  - "inveniomanage database create || echo ':('"
+#  - "inveniomanage demosite create"
+#  - "inveniomanage demosite populate"
 
 script:
-  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_unit_tests.py
-  - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_regression_tests.py
+  - "sphinx-build -qnNW docs docs/_build/html"
+  - "python setup.py test"
+#  - "wget -O /dev/null http://localhost"

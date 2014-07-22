@@ -21,7 +21,7 @@
 """
 """
 
-from invenio.bibcatalog_task import main as daemon_main
+from invenio.legacy.bibcatalog.task import main as daemon_main
 
 
 if __name__ == '__main__':
