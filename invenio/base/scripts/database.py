@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Database script functions."""
+
 from __future__ import print_function
 
 import os
@@ -45,7 +47,7 @@ option_default_data = manager.option(
 @manager.option('-p', '--password', dest='password', default="")
 @option_yes_i_know
 def init(user='root', password='', yes_i_know=False):
-    """Initializes database and user."""
+    """Initialize database and user."""
     from invenio.ext.sqlalchemy import db
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
@@ -91,8 +93,7 @@ def init(user='root', password='', yes_i_know=False):
 
 @option_yes_i_know
 def drop(yes_i_know=False):
-    """Drops database tables"""
-
+    """Drop database tables."""
     print(">>> Going to drop tables and related data on filesystem ...")
 
     from sqlalchemy import event
@@ -166,8 +167,7 @@ def drop(yes_i_know=False):
 
 @option_default_data
 def create(default_data=True):
-    """Creates database tables from sqlalchemy models"""
-
+    """Create database tables from sqlalchemy models."""
     print(">>> Going to create tables...")
 
     from sqlalchemy import event
@@ -226,8 +226,7 @@ def create(default_data=True):
 
 @manager.command
 def diff():
-    """Diff database against SQLAlchemy models"""
-
+    """Diff database against SQLAlchemy models."""
     try:
         from migrate.versioning import schemadiff  # noqa
     except ImportError:
@@ -243,19 +242,28 @@ def diff():
 @option_yes_i_know
 @option_default_data
 def recreate(yes_i_know=False, default_data=True):
-    """Recreates database tables (same as issuing 'drop' and then 'create')"""
+    """Recreate database tables (same as issuing 'drop' and then 'create')."""
     drop()
     create(default_data)
 
 
 @manager.command
 def uri():
-    """Prints SQLAlchemy database uri."""
+    """Print SQLAlchemy database uri."""
     from flask import current_app
     print(current_app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
+    """Load fixtures.
+
+    Loads classes found in 'packages' to the database. Names of the fixture
+    classes should end with 'Data' suffix.
+
+    :param packages: packages with fixture classes to load
+    :param truncate_tables_first: if True truncates tables before loading
+        the fixtures
+    """
     from invenio.base.utils import import_module_from_packages
     from invenio.ext.sqlalchemy import db, models
     from fixture import SQLAlchemyFixture
@@ -302,8 +310,7 @@ def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
 @manager.option('--truncate', action='store_true',
                 dest='truncate_tables_first', help='use with care!')
 def populate(default_data=True, truncate_tables_first=False):
-    """Populate database with default data"""
-
+    """Populate database with default data."""
     from invenio.config import CFG_PREFIX
     from invenio.base.scripts.config import get_conf
 
@@ -364,10 +371,10 @@ def driver_info(verbose=False):
 @manager.option('-s', '--separator', dest='separator', default="\n")
 @change_command_name
 def mysql_info(separator=None, line_format=None):
-    """
-    Detect and print(MySQL details useful for debugging problems on various OS.
-    """
+    """Detect and print MySQL details.
 
+    Useful for debugging problems on various OS.
+    """
     from invenio.ext.sqlalchemy import db
     if db.engine.name != 'mysql':
         raise Exception('Database engine is not mysql.')
@@ -400,6 +407,7 @@ def mysql_info(separator=None, line_format=None):
 
 
 def main():
+    """Main."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app
