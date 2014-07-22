@@ -57,7 +57,8 @@ install:
   - "echo {\\\"resolutions\\\": {\\\"jquery\\\": \\\"~1.11\\\", \\\"bootstrap\\\": \\\"~3.2\\\"}} > bower-base.json"
   - "inveniomanage bower -i bower-base.json > bower.json"
   - "bower install"
-  - "inveniomanage collect"
+  - "inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link"
+  - "inveniomanage collect > /dev/null"
   - "inveniomanage assets build"
   - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
   - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
