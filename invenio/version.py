@@ -22,10 +22,15 @@ Version information for Invenio.
 This file is imported by ``invenio.__init__``, and parsed by ``setup.py``.
 """
 
-# Do not change the format of this next line. Doing so risks breaking
-# setup.py and docs/conf.py
-
-version = (1, 9999, 0)
+# Respect the following format: major, minor, patch, ..., "dev"?, revision?
+#
+# - major, minor, patch are numbers starting at zero.
+# - you can put as much sub version as you need before 'dev'
+# - dev has to be set in development mode (non-release).
+# - revision can be set if you want to override the date coming from git.
+#
+# See the doctest below.
+version = (1, 9999, 1, 'dev')
 
 
 def build_version(*args):
