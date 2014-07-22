@@ -1,8 +1,36 @@
+..  This file is part of Invenio
+    Copyright (C) 2014 CERN.
+
+    Invenio is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio-Kwalitee; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+    In applying this licence, CERN does not waive the privileges and immunities
+    granted to it by virtue of its status as an Intergovernmental Organization
+    or submit itself to any jurisdiction.
+
 .. _overlay:
 
 ==================================
  How to create an Invenio overlay
 ==================================
+
+.. admonition:: TODO
+
+    - celery/redis/honcho/flower
+    - translations
+    - populate the data
+
 
 What is an overlay
 ==================
@@ -91,7 +119,7 @@ it later on. Here is its minimal content.
 
     setup(
         name="My Overlay",
-        version="0.1dev0",
+        version="0.1.dev0",
         url="http://invenio-software.org/",
         author="Invenio Software",
         author_email="invenio@invenio-software.org",
@@ -155,8 +183,6 @@ Put the required configuration into ``config.py``.
 
 .. code-block:: python
 
-    from myoverlay.instance_config import *
-
     CFG_SITE_LANGS = ["en"]
 
     CFG_SITE_NAME = "My Overlay"
@@ -168,6 +194,12 @@ Put the required configuration into ``config.py``.
         "myoverlay.base",
         "invenio.modules.*",
     ]
+
+    try:
+        from myoverlay.instance_config import *
+    except ImportError:
+        pass
+
 
 Sensitive configuration
 -----------------------
@@ -210,7 +242,7 @@ Database setup
 Assets
 ------
 
-Most of the JavaScript and CSS libraries used are not bundles with invenio
+Most of the JavaScript and CSS libraries used are not bundled with invenio
 itself and needs to be downloaded via `bower <http://bower.io/>`_. Bower is
 configured using two files:
 
@@ -254,13 +286,6 @@ overlay, invenio itself and every libraries it uses.
 
     (myoverlay)$ inveniomanage collect
 
-
-**TODO**
-
-- celery/redis/honcho/flower
-- translations
-- populate the data
-
 Running
 =======
 
@@ -268,15 +293,215 @@ Running
 
     (myoverlay)$ inveniomanage runserver
 
-**TODO**
-
-- Details
-- Procfile
-
 Deployment
 ==========
 
-**TODO**
+Deploying Invenio is almost a piece of cake using `Fabric
+<http://www.fabfile.org/>`_. The following step are inspired by the Flask
+documentation: `Deploying with Fabric
+<http://flask.pocoo.org/docs/patterns/fabric/>`_
 
-- sdist
-- Fabric
+Prerequisites
+-------------
+
+First, you need a server with remote access (SSH), where you've installed all
+the python dependencies (e.g. ``build-essentials``, ``python-dev``,
+``libmysqlclient-dev``, etc.).
+
+Install `fabric` locally,
+
+.. code-block:: console
+
+    $ pip install fabric
+
+and create a boilerplate ``fabfile.py``:
+
+.. code-block:: python
+
+    import json
+
+    from fabric.api import *
+    from fabric.utils import error
+    from fabric.contrib.files import exists
+
+
+    env.user = 'invenio'  # remote username
+    env.directory = '/home/invenio/www'  # remote directory
+    env.hosts = ['yourserver']  # list of servers
+
+
+Preparing the tarball
+---------------------
+
+Before deploying anything, we need to locally prepare the python package to be
+installed. Thanks to our ``setup.py`` file, it's very simple.
+
+Beforehand, we have to generate the static assets into our static folder. By
+doing so, it's not required to install anything related to node.js on your
+server (no ``bower``, ``less``, ``uglifyjs``, etc.).
+
+.. code-block:: python
+
+    @task
+    def pack():
+        """Create a new source distribution as tarball."""
+        with open(".bowerrc") as fp:
+            bower = json.load(fp)
+
+        local("inveniomanage assets build --directory {directory}/gen"
+              .format(**bower))
+        return local("python setup.py sdist --formats=gztar", capture=False) \
+            .succeeded
+
+Try it:
+
+.. code-block:: console
+
+    $ fab pack
+    ...
+    Done
+    $ ls dist/
+    My-Overlay-0.1.dev0.tar.gz
+
+This is the package that will be installed on your server.
+
+Creating the virtual environement
+---------------------------------
+
+We love virtual environments. We recommend you to install each version into its
+own virtual env enabling quick rollbacks.
+
+.. code-block:: python
+
+    @task
+    def create_virtualenv():
+        """Create the virtualenv."""
+        package = local("python setup.py --fullname", capture=True).strip()
+        venv = "{0}/{1}".format(env.directory, package)
+
+        with cd(env.directory):
+            if exists(package):
+                return error("This version {0} is already installed."
+                             .format(package))
+
+            return run("virtualenv {0}".format(package)).succeeded
+
+
+Installing the package
+----------------------
+
+We can now upload the local tarball into the virtualenv, and install everything
+there.
+
+.. code-block:: python
+
+    @task
+    def install():
+        """Install package."""
+        package = local("python setup.py --fullname", capture=True).strip()
+        venv = "{0}/{1}".format(env.directory, package)
+
+        if not exists(venv):
+            return error("Meh? I need a virtualenv first.")
+
+        # Upload the package and put it into our virtualenv.
+        put("dist/{0}.tar.gz".format(package), "/tmp/app.tgz")
+        run("mkdir -p {0}/src".format(venv))
+        with cd("{0}/src".format(venv)):
+            run("tar xzf /tmp/app.tgz")
+            run("rm -rf /tmp/app.tgz")
+
+        # Jump into the virtualenv and install stuff
+        with cd("{0}/src/{1}".format(venv, package)):
+            success = run("{0}/bin/python setup.py install".format(venv)
+
+            if success:
+                # post install
+                run("{0}/bin/inveniomanage collect".format(venv))
+        return success
+
+Combining all the three steps:
+
+.. code-block:: console
+
+    $ fab pack virtualenv install
+
+
+Configuration
+-------------
+
+The setup doesn't have the ``invenio.cfg`` file that is generated via
+``inveniomanage config``. You should do so manually.
+
+
+Running the server
+------------------
+
+uWSGI is super simple and neat, all you need is two files. In the example
+below, we've installed two versions of our overlay and a symbolic link is
+pointing to the one we want to run.
+
+.. code-block:: console
+
+    $ ls www/
+    current -> My-Overlay-0.1
+    My-Overlay-0.1.dev1
+    My-Overlay-0.1.dev2
+    My-Overlay-0.1
+    wsgi.py
+    uwsgi.ini
+
+Let's create the ``wsgi.py`` file.
+
+.. code-block:: python
+
+    from invenio.base.factory import create_wsgi_app
+
+    application = create_wsgi_app()
+
+And the µWSGI configuration:
+
+.. code-block:: python
+
+    [uwsgi]
+    http = 0.0.0.0:4000
+    master = true
+
+    processes = 4
+    die-on-term = true
+    vaccum = true
+
+    chdir = %d
+    virtualenv = %d/current/
+    module = wsgi:application
+    touch-reload = %d/wsgi.py
+
+Let's run it.
+
+.. code-block:: console
+
+    $ pip install uwsgi
+
+    $ uwsgi --ini uwsgi.ini
+    # or in daemon mode
+    $ uwsgi -d uwsgi.log --ini uwsgi.ini
+
+If the new version causes troubles, going back to the old one is as fast as
+changing the symbolic link and restarting the WSGI server.
+
+.. code-block:: console
+
+    $ rm current
+    $ ln -s My-Overlay-0.1.dev1 current
+    $ touch wsgi.py
+
+Dealing with versions
+---------------------
+
+One good idea is to use symlink to point to your current virtualenv and run
+your overlay from there. Doing that via Fabric is left as an exercise to the
+reader.
+
+When installing a new version, copying the ``invenio.cfg`` file over is the
+only requirements. Restarting the WSGI server is usually done by ``touch``-ing
+the ``wsgi.py`` file.
