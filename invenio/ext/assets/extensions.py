@@ -67,6 +67,7 @@ class BundleExtension(Extension):
         env.directory = os.path.join(app.static_folder,
                                      app.config["ASSETS_BUNDLES_DIR"])
         env.append_path(app.static_folder)
+        env.auto_build = app.config.get("ASSETS_AUTO_BUILD", True)
 
         # The filters less and requirejs don't have the same behaviour by
         # default. Make sure we are respecting that.

@@ -64,6 +64,7 @@ install:
   - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
   - "inveniomanage config set REQUIREJS_BIN false"
   - "inveniomanage config set UGLIFYJS_BIN false"
+  - "inveniomanage config set ASSETS_AUTO_BUILD False"
 
 before_script:
   - "inveniomanage apache create-config"
