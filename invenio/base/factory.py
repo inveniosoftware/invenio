@@ -25,7 +25,6 @@ import sys
 import urllib
 import warnings
 
-from flask import Blueprint
 from flask.ext.registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 from pkg_resources import iter_entry_points
@@ -235,21 +234,6 @@ def create_app(instance_path=None, **kwargs_config):
 
     # Legacy conf cleanup
     cleanup_legacy_configuration(app)
-
-    # Register base blueprint for the static files
-    bp = Blueprint("base", __name__, static_folder="static")
-    app.register_blueprint(bp)
-    app.extensions['registry']['blueprints'].register(bp)
-    # Register the base bundles
-    from . import bundles
-    from ..ext.assets import Bundle, registry
-    with app.app_context():
-        variables = getattr(bundles, "__all__", dir(bundles))
-        for var in variables:
-            if not var.startswith('_'):
-                bundle = getattr(bundles, var)
-                if isinstance(bundle, Bundle):
-                    registry.bundles.register((__name__, bundle))
 
     register_legacy_blueprints(app)
 

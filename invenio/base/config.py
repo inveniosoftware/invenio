@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Default configuration values."""
+
 from __future__ import unicode_literals
 
 import distutils.sysconfig
@@ -54,7 +56,8 @@ EXTENSIONS = [
 ]
 
 PACKAGES = [
-    'invenio.modules.*'
+    'invenio.modules.*',
+    'invenio.base',
 ]
 
 PACKAGES_EXCLUDE = [
