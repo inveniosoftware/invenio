@@ -93,10 +93,10 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     list_union, \
     recognize_marc_tag
 from invenio.modules.records.api import get_record
-from invenio.utils.memoise import Memoise
 from invenio.legacy.bibindex.termcollectors import \
     TermCollector, \
     NonmarcTermCollector
+from invenio.utils.memoize import Memoize
 
 
 if sys.hexversion < 0x2040000:
@@ -315,7 +315,7 @@ def get_field_indexes(field):
         return get_nonmarc_tag_indexes(field, virtual=False)
 
 
-get_field_indexes_memoised = Memoise(get_field_indexes)
+get_field_indexes_memoized = Memoize(get_field_indexes)
 
 
 def get_index_tokenizer(index_id):
@@ -560,7 +560,7 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
         indexes_for_recID = set()
         for field in affected_fields:
             if field:
-                field_indexes = get_field_indexes_memoised(field) or []
+                field_indexes = get_field_indexes_memoized(field) or []
                 indexes_names = set([idx[1] for idx in field_indexes])
                 indexes_for_recID |= indexes_names
             else:
@@ -1455,7 +1455,7 @@ class WordTable(AbstractIndexTable):
                     word_synonyms = get_synonym_terms(word,
                                                       synonym_kbrs[self.index_name][0],
                                                       synonym_kbrs[self.index_name][1],
-                                                      use_memoise=True)
+                                                      use_memoize=True)
 
                     if word_synonyms:
                         wlist[recID] = list_union(word_synonyms, wlist[recID])

@@ -207,7 +207,7 @@ sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 
 
-from invenio.utils.memoise import memoize
+from invenio.utils.memoize import Memoize
 
 
 class LazyTemplateContextFunctionsCache(object):
@@ -225,7 +225,7 @@ class LazyTemplateContextFunctionsCache(object):
 
         return elem
 
-    @memoize
+    @Memoize
     def bibformat_elements(self, modules=None):
         """Returns bibformat elements."""
         if modules is None:

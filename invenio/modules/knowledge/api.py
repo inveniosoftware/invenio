@@ -306,7 +306,7 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
                                              searchvalue, searchtype)
 
 def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
-                   use_memoise=False):
+                   use_memoize=False):
     """
     Return a tuple of values from key-value mapping kb.
 
@@ -314,17 +314,17 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
     @param searchkey:   search using this key
     @param searchvalue: search using this value
     @param searchtype:  s=substring; e=exact
-    @param use_memoise: can we memoise while doing lookups?
-    @type use_memoise:  bool
+    @param use_memoize: can we memoize while doing lookups?
+    @type use_memoize:  bool
    """
-    if use_memoise:
-        return bibknowledge_dblayer.get_kbr_values_memoised(kb_name, searchkey,
+    if use_memoize:
+        return bibknowledge_dblayer.get_kbr_values_memoized(kb_name, searchkey,
                                                             searchvalue, searchtype,
-                                                            use_memoise)
+                                                            use_memoize)
     else:
         return bibknowledge_dblayer.get_kbr_values(kb_name, searchkey,
                                                    searchvalue, searchtype,
-                                                   use_memoise)
+                                                   use_memoize)
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """

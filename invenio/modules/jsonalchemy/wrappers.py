@@ -25,7 +25,7 @@ import six
 from flask import current_app
 from werkzeug.utils import import_string
 
-from invenio.utils.memoise import memoize
+from invenio.utils.memoize import Memoize
 from invenio.utils.datastructures import DotableDict, SmartDict
 
 from .parser import FieldParser, ModelParser
@@ -55,7 +55,7 @@ class StorageEngine(type):
         return cls._engine(storagename)
 
     @staticmethod
-    @memoize
+    @Memoize
     def _engine(storagename):
         prefix = storagename.upper()
         engine = current_app.config['{0}_ENGINE'.format(prefix)]

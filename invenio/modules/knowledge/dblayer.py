@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 
 from invenio.legacy.dbquery import run_sql
-from invenio.utils.memoise import Memoise
+from invenio.utils.memoize import Memoize
 
 def get_kbs_info(kbtypeparam="", searchkbname=""):
     """Returns all kbs as list of dictionaries {id, name, description, kbtype}
@@ -82,7 +82,7 @@ def get_kb_id(kb_name):
     else:
         return None
 
-get_kb_id_memoised = Memoise(get_kb_id)
+get_kb_id_memoized = Memoize(get_kb_id)
 
 def get_kb_name(kb_id):
     """Returns the name of the kb with given id
@@ -379,7 +379,7 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
                         AND id_knwKB = %s""",
                   (searchvalue, searchkey, k_id))
 
-def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s', use_memoise=False):
+def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s', use_memoize=False):
     """Returns values from a knowledge base
 
        Note the intentional asymmetry between searchkey and searchvalue:
@@ -391,12 +391,12 @@ def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s', use_m
        @param searchkey search using this key
        @param searchvalue search using this value
        @param searchtype s=substring, e=exact, sw=startswith
-       @param use_memoise: can we memoise while doing lookups?
-       @type use_memoise: bool
+       @param use_memoize: can we memoize while doing lookups?
+       @type use_memoize: bool
        @return a list of values
     """
-    if use_memoise:
-        k_id = get_kb_id_memoised(kb_name)
+    if use_memoize:
+        k_id = get_kb_id_memoized(kb_name)
     else:
         k_id = get_kb_id(kb_name)
     if searchtype == 's':
@@ -413,7 +413,7 @@ def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s', use_m
                         AND id_knwKB = %s""",
                   (searchvalue, searchkey, k_id))
 
-get_kbr_values_memoised = Memoise(get_kbr_values)
+get_kbr_values_memoized = Memoize(get_kbr_values)
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """Returns dicts of 'key' and 'value' from a knowledge base
