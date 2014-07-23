@@ -112,7 +112,11 @@ jqueryui = Bundle(
     }
 )
 
-# if ASSETS_DEBUG and not LESS_RUN_IN_DEBUG
+# less.js is only used when the following configuration is set:
+#
+#  - ASSETS_DEBUG is True
+#  - LESS_RUN_IN_DEBUG is False
+#
 lessjs = Bundle(
     "vendors/less/dist/less-1.7.0.js",
     output="less.js",
@@ -123,7 +127,10 @@ lessjs = Bundle(
     }
 )
 
-# if ASSETS_DEBUG and not REQUIRESJS_RUN_IN_DEBUG
+# require.js is only used when:
+#
+#  - ASSETS_DEBUG is True
+#  - REQUIREJS_RUN_IN_DEBUG is not False
 requirejs = Bundle(
     "vendors/requirejs/require.js",
     "js/settings.js",
@@ -131,10 +138,15 @@ requirejs = Bundle(
     filters="uglifyjs",
     weight=0,
     bower={
-        "requirejs": "latest"
+        "requirejs": "latest",
+        "requirejs-hogan-plugin": "latest"
     }
 )
-# else
+
+# almond.js is only used when:
+#
+#  - ASSETS_DEBUG is False
+#  - or REQUIREJS_RUN_IN_DEBUG is True
 almondjs = Bundle(
     "vendors/almond/almond.js",
     "js/settings.js",

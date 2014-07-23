@@ -27,17 +27,13 @@ js = Bundle(
     'js/search/default_typeahead_configuration.js',
     'js/search/facet.js',
     'js/search/init.js',
-    bower={
-        'requirejs-hogan-plugin': 'latest'
-    },
     output="search.js",
-    weight=50,
+    weight=50
 )
 
 styles = Bundle(
-    'css/typeahead.js-bootstrap.css',
     'css/search/search.css',
     'css/search/searchbar.css',
     output="search.css",
-    weight=60,
+    weight=60
 )
