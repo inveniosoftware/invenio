@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,17 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.babel
-    -----------------
+"""Custom hooks and hacks needed for Flask-Babel."""
 
-    This module provides initialization and configuration for `flask.ext.babel`
-    module.
-"""
+import pkg_resources
 
+from babel import support
 from contextlib import contextmanager
-from flask import g, _request_ctx_stack
+from flask import g, _request_ctx_stack, current_app
 from flask.ext.babel import Babel, gettext
+
+from invenio.utils.datastructures import LaziestDict
 from .selectors import get_locale, get_timezone
 
 babel = Babel()
@@ -35,6 +34,7 @@ babel = Babel()
 
 @contextmanager
 def set_locale(ln):
+    """Set Babel localization in request context."""
     ctx = _request_ctx_stack.top
     locale = getattr(ctx, 'babel_locale', None)
     setattr(ctx, 'babel_locale', ln)
@@ -42,10 +42,42 @@ def set_locale(ln):
     setattr(ctx, 'babel_locale', locale)
 
 
+def get_translation(locale):
+    """Generate translation for given language."""
+    translations = None
+    # NOTE that packages have to be loaded in reversed order!
+    for plugin in reversed(current_app.extensions['registry']['packages']):
+        if not pkg_resources.resource_isdir(plugin, 'translations'):
+            continue
+        dirname = pkg_resources.resource_filename(plugin, 'translations')
+        if translations is None:
+            translations = support.Translations.load(dirname, [locale])
+        else:
+            translations.merge(support.Translations.load(dirname, [locale]))
+    return translations
+
+# Lazy translation cache.
+TRANSLATIONS = LaziestDict(get_translation)
+
+
+def get_translations():
+    """Return the correct gettext translations for this request."""
+    ctx = _request_ctx_stack.top
+    if ctx is None:
+        return None
+    translations = getattr(ctx, 'babel_translations', None)
+    if translations is None:
+        locale = get_locale()
+        translations = TRANSLATIONS.get(locale)
+        ctx.babel_translations = translations
+    current_app.logger.info(translations)
+    return translations
+
+
 def set_translations():
-    """
-    Adds under g._ an already configured internationalization function
-    will be available (configured to return unicode objects).
+    """Add under ``g._`` an already configured internationalization function.
+
+    Translations will be returned as unicode objects.
     """
     ## Well, let's make it global now
     g.ln = get_locale()
@@ -53,7 +85,12 @@ def set_translations():
 
 
 def setup_app(app):
-    """Setup Babel extension."""
+    """Setup Babel extension.
+
+    Replaces implementation of ``get_translations`` in ``flask.ext.babel``.
+    """
+    import flask.ext.babel
+    flask.ext.babel.get_translations = get_translations
 
     babel.init_app(app)
     babel.localeselector(get_locale)
