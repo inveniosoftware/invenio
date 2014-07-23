@@ -22,7 +22,6 @@
 from invenio.ext.assets import Bundle
 from invenio.base.bundles import jquery as _jquery
 
-
 _jquery.contents.append('vendors/bootstrap-tagsinput/dist/'
                         'bootstrap-tagsinput.js')
 _jquery.bower['bootstrap-tagsinput'] = "latest"
@@ -50,7 +49,6 @@ actions = Bundle(
 
 vendors_js = Bundle(
     'vendors/prism/prism.js',
-    'js/prettify.min.js',  # is https://code.google.com/p/google-code-prettify/
     filters="uglifyjs",
     output='vendors.js',
     weight=40,
@@ -61,7 +59,6 @@ vendors_js = Bundle(
 
 vendors_css = Bundle(
     'vendors/prism/themes/prism.css',
-    'css/prettify.css',
     filters="cleancss",
     output='vendors.css',
     weight=40
@@ -88,6 +85,6 @@ dataTables_js = Bundle(
     bower={
         "datatables-colvis": "latest",
         "datatables": "~1.10",
-        "datatables-plugins": "https://github.com/DataTables/Plugins.git"
+        "datatables-plugins": "https://github.com/greut/Plugins.git#amdify"
     }
 )
