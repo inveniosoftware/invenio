@@ -26,6 +26,8 @@ from jinja2 import nodes
 from jinja2.ext import Extension
 from webassets.bundle import is_url
 
+from . import registry
+
 
 class BundleExtension(Extension):
 
@@ -92,8 +94,7 @@ class BundleExtension(Extension):
         def get_bundle(suffix):
             # lazy build the bundles
             if not _bundles:
-                registry = current_app.extensions['registry']['bundles']
-                for pkg, bundle in registry:
+                for pkg, bundle in registry.bundles:
                     if bundle.output in _bundles:
                         raise ValueError("{0} was already defined!"
                                          .format(bundle.output))
