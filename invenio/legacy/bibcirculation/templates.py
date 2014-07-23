@@ -927,7 +927,7 @@ class Template:
         <style type="text/css"> @import url("/css/tablesorter.css"); </style>
         <link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />
         <link rel=\"stylesheet\" href=\"%s/vendors/jquery-ui/themes/redmond/theme.css\" type=\"text/css\" />
-        <script type="text/javascript" src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
             <form name="request_form" action="%s/%s/%s/holdings/send" method="post" >
             <br />
@@ -2424,7 +2424,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/css/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript'>
+            <script type="text/javascript">
             function groupDatePicker(){
                 var index = 0;
                 var datepicker = null;
@@ -2485,7 +2485,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
                           </tr>
                 </table>
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
                 <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                 <thead>
@@ -3190,7 +3190,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
         <form name="request_form" action="%s/admin2/bibcirculation/create_new_request_step4"
               method="post" >
@@ -3688,7 +3688,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
                 <table class="bibcirctable">
                   <tr class="bibcirctableheader">
@@ -4165,7 +4165,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
 
-                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+                <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
                 <table class="bibcirctable">
                   <tr class="bibcirctableheader">
@@ -4311,7 +4311,7 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         out += """
 
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
             <table class="bibcirctable">
               <tr align="left">
@@ -9416,7 +9416,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
             <style type="text/css"> @import url("/css/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
             """% CFG_SITE_URL
 
         out += """
@@ -9634,7 +9634,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    _("ISBN"))
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -10546,7 +10546,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                    _("ISSN"))
 
         out += """
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -11090,8 +11090,8 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                       _("Standard number"), standard_number)
 
         out += """
-            <script type="text/javascript" language='JavaScript'
-                    src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript"
+                    src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -11465,8 +11465,8 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         <div class="bibcircbottom">
         <link rel=\"stylesheet\" href=\"%(site_url)s/vendors/jquery-ui/themes/redmond/jquery-ui.min.css\" type=\"text/css\" />
         <link rel=\"stylesheet\" href=\"%(site_url)s/vendors/jquery-ui/themes/redmond/theme.css\" type=\"text/css\" />
-        <script type="text/javascript" language='JavaScript'
-                src="%(site_url)s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript"
+                src="%(site_url)s/vendors/jquery-ui/jquery-ui.min.js"></script>
         <form name="search_form"
               action="%(site_url)s/admin2/bibcirculation/ill_search_result"
               method="get" >
@@ -11606,8 +11606,8 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
             <style type="text/css"> @import url("/css/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript'
-                    src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript"
+                    src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
             """% CFG_SITE_URL
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
@@ -12581,8 +12581,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         out += """
             <style  type="text/css"> @import url("/css/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript'
-                    src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" src="%s/vendors/jquery-ui/jquery-ui.min.js"></script>
             """% CFG_SITE_URL
 
         (_borrower_id, borrower_name, borrower_email,
