@@ -30,7 +30,6 @@ except ImportError:
 
 from functools import wraps
 from flask import request, abort
-from .models import WebAPIKey
 
 
 def create_new_web_api_key(uid, key_description=None):
@@ -44,6 +43,7 @@ def create_new_web_api_key(uid, key_description=None):
     :param key_description: User's description for the REST API key
     :type key_description: string
     """
+    from .models import WebAPIKey
     WebAPIKey.create_new(uid, key_description)
 
 
@@ -59,6 +59,7 @@ def show_web_api_keys(uid, diff_status=None):
     :type diff_statusparam: string
 
     """
+    from .models import WebAPIKey
     return WebAPIKey.show_keys(uid, diff_status)
 
 
@@ -73,6 +74,7 @@ def mark_web_api_key_as_removed(key_id):
     :param key_id: The id of the REST key that will be "removed"
     :type key_id: string
     """
+    from .models import WebAPIKey
     WebAPIKey.mark_as(key_id, WebAPIKey.CFG_WEB_API_KEY_STATUS['REMOVED'])
 
 
@@ -87,6 +89,7 @@ def get_available_web_api_keys(uid):
     :return: WebAPIKey objects
 
     """
+    from .models import WebAPIKey
     return WebAPIKey.get_available(uid)
 
 
@@ -101,6 +104,7 @@ def acc_get_uid_from_request():
     :return: If everything goes well it returns the user's uid, if not -1
 
     """
+    from .models import WebAPIKey
     return WebAPIKey.acc_get_uid_from_request()
 
 
@@ -135,6 +139,7 @@ def build_web_request(path, params=None, uid=-1, api_key=None, timestamp=True):
     :return: Signed request string or, in case of error, ''
 
     """
+    from .models import WebAPIKey
     return WebAPIKey.build_web_request(path, params, uid, api_key, timestamp)
 
 
@@ -148,6 +153,7 @@ def api_key_required(f):
     @wraps(f)
     def auth_key(*args, **kwargs):
         if 'apikey' in request.values:
+            from .models import WebAPIKey
             from invenio.ext.login import login_user
             user_id = WebAPIKey.acc_get_uid_from_request()
             if user_id == -1:
