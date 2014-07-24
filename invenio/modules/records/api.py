@@ -162,7 +162,7 @@ class Record(SmartJson):
 
     # Legacy methods, try not to use them as they are already deprecated
 
-    def legacy_export_as_marc(self):
+    def legacy_export_as_marc(self, tabsize=4):
         """Create the MARCXML representation using the producer rules."""
         from collections import Iterable
 
@@ -172,7 +172,7 @@ class Record(SmartJson):
                 value = value.encode('utf8')
             return encode_for_xml(str(value))
 
-        export = '<record>'
+        export = '<record>\n'
         marc_dicts = self.produce('json_for_marc')
         for marc_dict in marc_dicts:
             content = ''
@@ -188,7 +188,8 @@ class Record(SmartJson):
                         continue
                     if key.startswith('00') and len(key) == 3:
                         # Control Field (No indicators no subfields)
-                        export += '<controlfield tag="%s">%s</controlfield>\n'\
+                        export += '\t<controlfield tag="%s">%s' \
+                            '</controlfield>\n'.expandtabs(tabsize) \
                             % (key, encode_for_marcxml(v))
                     elif len(key) == 6:
                         if not (tag == key[:3]
@@ -198,21 +199,24 @@ class Record(SmartJson):
                             ind1 = key[3].replace('_', '')
                             ind2 = key[4].replace('_', '')
                             if content:
-                                export += '<datafield tag="%s" ind1="%s"'\
-                                    'ind2="%s">%s</datafield>\n' \
+                                export += '\t<datafield tag="%s" ind1="%s"' \
+                                    'ind2="%s">\n%s\n\t' \
+                                    '</datafield>\n'.expandtabs(tabsize) \
                                     % (tag, ind1, ind2, content)
                                 content = ''
-                        content += '<subfield code="%s">%s</subfield>'\
+                        content += '\t\t<subfield code="%s">%s' \
+                            '</subfield>'.expandtabs(tabsize) \
                             % (key[5], encode_for_marcxml(v))
                     else:
                         pass
 
             if content:
                 export += \
-                    '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>\n'\
+                    '\t<datafield tag="%s" ind1="%s" ind2="%s">\n%s\n\t' \
+                    '</datafield>\n'.expandtabs(tabsize) \
                     % (tag, ind1, ind2, content)
 
-        export += '</record>'
+        export += '</record>\n'
         return export
 
     def legacy_create_recstruct(self):
