@@ -44,7 +44,7 @@ install:
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
   - "travis_retry pip install -r requirements-docs.txt --quiet"
-  - "pybabel compile -f -d invenio/base/translations/"
+  - "python setup.py compile_catalog"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"

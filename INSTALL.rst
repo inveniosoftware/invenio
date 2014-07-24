@@ -205,11 +205,15 @@ ones you need. E.g. to add images support, we can do as follow:
 
     (invenio)$ pip install -e .[img]
 
-Compiling the translations.
+If the Invenio is installed in development mode, you will need to compile the
+translations manually.
 
 .. code-block:: console
 
-    (invenio)$ pybabel compile -fd invenio/base/translations/
+    (invenio)$ python setup.py compile_catalog
+
+.. note:: Translation catalog is compiled automatically if you install
+    using `python setup.py install`.
 
 Installing the npm dependencies and the external JavaScript and CSS libraries.
 
