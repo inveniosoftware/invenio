@@ -512,14 +512,14 @@ class DynamicListWidget(ExtendedListWidget):
         """Render add button."""
         label = getattr(field, 'add_label', None) or \
             "Add %s" % field.label.text
-        return """<div class="row"><div class="col-xs-12">
+        return u"""<div class="row"><div class="col-xs-12">
                     <span class="pull-right">
                         <a class="add-element">
-                            <i class="%s"></i> %s
+                            <i class="{className}"></i> {label}
                         </a>
                     </span>
                     </div>
-                </div>""" % (self.icon_add, label)
+                </div>""".format(className=self.icon_add, label=label)
 
     def item_kwargs(self, field, subfield):
         """Return keyword arguments for a field."""
