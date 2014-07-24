@@ -17,7 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Base bundles."""
+"""Base bundles.
+
+.. note:: `bootstrap.js` bundle must be loaded after jQuery UI to avoid conflicts.
+    You can use `noConflict()` if you need to access functions
+    of jQuery UI covered by `bootstrap.js`.
+"""
 
 import mimetypes
 
@@ -57,7 +62,7 @@ styles = Bundle(
 
 # FIXME
 #if config.CFG_WEBSTYLE_TEMPLATE_SKIN != "default":
-#  styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
+#    styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
 
 jquery = Bundle(
     "vendors/jquery/dist/jquery.js",
@@ -66,8 +71,6 @@ jquery = Bundle(
     "vendors/jquery.caret/dist/jquery.caret-1.5.2.js",
     "vendors/typeahead.js/dist/typeahead.bundle.js",
     "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
-    "vendors/bootstrap/dist/js/bootstrap.js",
-    "js/bootstrap-select.js",
     "js/translate.js",
     "js/legacy.js",
     output="jquery.js",
@@ -97,7 +100,6 @@ jquery = Bundle(
         "swfobject": "latest",  # orphan
         "typeahead.js": "latest",
         "uploadify": "latest"  # orphan
-        #"bootstrap": "*", is set by invenio.css already.
     }
 )
 
@@ -110,6 +112,20 @@ jqueryui = Bundle(
     bower={
         "jquery-ui": "~1.11.0",
         #"jqueryui-timepicker-addon": "latest" is set by styles already
+    }
+)
+
+# must be loaded after jQuery UI to avoid conflicts
+# use noConflict() from bootstrap.js to get the functions of jQuery UI covered
+# by bootstrap.js
+bootstrap = Bundle(
+    "vendors/bootstrap/dist/js/bootstrap.js",
+    "js/bootstrap-select.js",
+    output="bootstrap.js",
+    filters="uglifyjs",
+    weight=jqueryui.weight + 1,
+    bower={
+        #"bootstrap": "*", is set by invenio.css already.
     }
 )
 
