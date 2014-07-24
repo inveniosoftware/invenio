@@ -401,26 +401,50 @@ class BibWorkflowObject(db.Model):
         """Enable equal operators on BibWorkflowObjects."""
         return not self.__eq__(other)
 
-    def add_task_result(self, name, result):
+    def add_task_result(self, name, result, template="workflows/results/default.html"):
         """Save a task result.
 
         Adds given task results to extra_data in order to be accessed
         and displayed later on by Holding Pen templates.
+
+        :param name: The name of the task in human friendly way.
+                     It is used as a label for the result rendering.
+        :type name: string
+
+        :param result: The output of the task
+        :type result: If no template is specified must be a dict.
+
+        :param template: The location of the template to render
+                         the result.
+        :type template: string
         """
-        task_name = self.extra_data["_last_task_name"]
-        res_obj = WorkflowsTaskResult(task_name, name, result)
-        if isinstance(self.extra_data["_tasks_results"], list):
-            if not self.extra_data["_tasks_results"]:
-                self.extra_data["_tasks_results"] = {task_name: result}
+        extra_data = self.get_extra_data()
+        task_name = extra_data["_last_task_name"]
+        result = {"name": name,
+                  "result": result,
+                  "template": template
+                  }
+        if task_name in extra_data["_tasks_results"]:
+            extra_data["_tasks_results"][task_name].append(result)
         else:
-            if task_name in self.extra_data["_tasks_results"]:
-                self.extra_data["_tasks_results"][task_name].append(res_obj)
-            else:
-                self.extra_data["_tasks_results"][task_name] = [res_obj]
+            extra_data["_tasks_results"][task_name] = [result]
+        self.set_extra_data(extra_data)
 
     def get_tasks_results(self):
         """Return the complete set of tasks results."""
-        return self.get_extra_data()["_tasks_results"]
+        results = self.get_extra_data()["_tasks_results"]
+        results_new = {}
+        for task, res in results.iteritems():
+            result_list = []
+            for result in res:
+                if isinstance(result, dict):
+                    result_list.append(result)
+                else:
+                    result = result.to_dict()
+                    result["template"] = "workflows/results/default.html"
+                    result_list.append(result)
+            results_new[task] = result_list
+        return results_new
 
     def add_action(self, action, message):
         """Save an action for holdingpen for this object.

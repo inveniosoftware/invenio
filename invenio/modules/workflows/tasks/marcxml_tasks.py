@@ -469,7 +469,9 @@ def fulltext_download(obj, eng):
             except (KeyError, TypeError):
                 obj.data['fft'] = [new_dict_representation['fft']]
 
-            obj.add_task_result("filesfft", new_dict_representation["fft"])
+            obj.add_task_result("Fulltext",
+                                new_dict_representation["fft"],
+                                "workflows/results/fulltext_download.html")
     else:
         eng.log.info("There was already a pdf register for this record,"
                      "perhaps a duplicate task in you workflow.")
@@ -707,13 +709,12 @@ def refextract(obj, eng):
             obj.extra_data["_result"]["pdf"] = pdf
 
     if os.path.isfile(obj.extra_data["_result"]["pdf"]):
-        cmd_stdout = extract_references_from_file_xml(
+        references_xml = extract_references_from_file_xml(
             obj.extra_data["_result"]["pdf"])
-        references_xml = REGEXP_REFS.search(cmd_stdout)
         if references_xml:
             updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n' \
-                          '<collection>\n<record>' + references_xml.group(1) + \
-                          "</record>\n</collection>"
+                          '<collection>\n' + references_xml + \
+                          "\n</collection>"
 
             new_dict_representation = convert_marcxml_to_bibfield(updated_xml)
             try:
@@ -723,9 +724,9 @@ def refextract(obj, eng):
                 if 'reference' in new_dict_representation:
                     obj.data['reference'] = [
                         new_dict_representation['reference']]
-            obj.add_task_result("reference",
-                                new_dict_representation['reference'])
-
+            obj.add_task_result("References",
+                                new_dict_representation['reference'],
+                                "workflows/results/refextract.html")
     else:
         obj.log.error("Not able to download and process the PDF ")
 

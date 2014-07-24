@@ -30,7 +30,7 @@ Note: Currently work-in-progress.
 from six import iteritems, text_type
 
 from flask import (render_template, Blueprint, request, jsonify,
-                   url_for, flash, session)
+                   url_for, flash, session, send_file)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
@@ -143,9 +143,13 @@ def details(objectid):
     )
 
     results = []
-    for label, res in iteritems(bwobject.get_tasks_results()):
-        res_dicts = [item.to_dict() for item in res]
-        results.append((label, res_dicts))
+    for task, res in iteritems(bwobject.get_tasks_results()):
+        for result in res:
+            template = render_template(result["template"], results=result)
+            if task == "fulltext_download":
+                results.insert(0, (result, template))
+            else:
+                results.append((result, template))
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
@@ -158,6 +162,14 @@ def details(objectid):
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
                            task_results=results)
+
+
+@blueprint.route('/fulltext', methods=['GET', 'POST'])
+@login_required
+def fulltext():
+    """ Sends the fulltext file to user. """
+    filename = request.args.get('filename')
+    return send_file(filename)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])

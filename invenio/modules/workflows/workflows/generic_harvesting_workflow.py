@@ -49,9 +49,8 @@ class generic_harvesting_workflow(WorkflowBase):
             identifiers = extra_data["options"]["identifiers"]
 
         if '_task_results' in extra_data and '_workflows_reviews' in extra_data['_task_results']:
-            result_temp = extra_data["_tasks_results"]
-            result_temp = result_temp["_workflows_reviews"]
-            result_temp = result_temp[0].to_dict()['result']
+            result_temp = bwo.get_tasks_results()
+            result_temp = result_temp['_workflows_reviews'][0]['result']
             result_progress = {
                 'success': (result_temp['total'] - result_temp['failed']),
                 'failed': result_temp['failed'],

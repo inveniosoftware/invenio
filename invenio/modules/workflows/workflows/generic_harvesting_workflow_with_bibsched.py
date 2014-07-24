@@ -53,9 +53,8 @@ class generic_harvesting_workflow_with_bibsched(WorkflowBase):
 
             if '_tasks_results' in extra_data and '_workflows_reviews' in \
                     extra_data['_tasks_results']:
-                result_temp = extra_data["_tasks_results"]
-                result_temp = result_temp["_workflows_reviews"]
-                result_temp = result_temp[0].to_dict()['result']
+                result_temp = bwo.get_tasks_results()
+                result_temp = result_temp['_workflows_reviews'][0]['result']
                 result_progress = {
                     'success': (result_temp['finished'] - result_temp['failed']),
                     'failed': result_temp['failed'],
@@ -66,9 +65,9 @@ class generic_harvesting_workflow_with_bibsched(WorkflowBase):
                     'total': result_temp['total']}
             elif '_tasks_results' in extra_data and '_wait_for_a_workflow_to_complete' in \
                     extra_data['_tasks_results']:
-                result_temp = extra_data["_tasks_results"]
-                result_temp = result_temp["_wait_for_a_workflow_to_complete"]
-                result_temp = result_temp[0].to_dict()['result']
+                result_temp = bwo.get_tasks_results()
+                result_temp = result_temp['_wait_for_a_workflow_to_complete']
+                result_temp = result_temp[0]['result']
                 result_progress = {
                     'success': (result_temp['finished'] - result_temp['failed']),
                     'failed': result_temp['failed'],
