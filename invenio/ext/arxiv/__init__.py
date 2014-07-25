@@ -58,7 +58,8 @@ from invenio.utils.xmlhelpers import etree_to_dict
 response_code = {'success': 200,
                  'notfound': 404,
                  'unsupported_versioning': 415,
-                 'malformed': 422}
+                 'malformed': 422,
+                 'multiplefound': 300}
 
 
 class Arxiv(object):
@@ -165,7 +166,7 @@ class Arxiv(object):
             result = self.get_json(arxiv)
 
         resp = jsonify(result)
-        resp.status_code = response_code[result['query']['status']]
+        resp.status_code = response_code.get(result['query']['status'], 200)
         return resp
 
 __all__ = ("Arxiv", )
