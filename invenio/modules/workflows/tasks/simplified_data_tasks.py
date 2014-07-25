@@ -16,19 +16,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Basic simplified data test functions - NOT FOR XML """
+"""Basic simplified data test functions - NOT FOR XML."""
+
+from functools import wraps
 
 
 def task_a(a):
+    """Function task_a docstring."""
+    @wraps(task_a)
     def _task_a(obj, eng):
-        """Function task_a docstring"""
         eng.log.info("executing task a " + str(a))
         obj.data += a
     return _task_a
 
 
 def task_b(obj, eng):
-    """Function task_b docstring"""
+    """Function task_b docstring."""
     eng.log.info("executing task b")
     if obj.data < 20:
         eng.log.info("data < 20")

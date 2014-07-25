@@ -56,6 +56,14 @@ blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       static_folder='../static')
 
 default_breadcrumb_root(blueprint, '.holdingpen')
+HOLDINGPEN_WORKFLOW_STATES = {
+    ObjectVersion.HALTED: {'message': _('Need Action'), 'class': 'danger'},
+    ObjectVersion.WAITING: {'message': _('Waiting'), 'class': 'warning'},
+    ObjectVersion.ERROR: {'message': _('Error'), 'class': 'danger'},
+    ObjectVersion.FINAL: {'message': _('Done'), 'class': 'success'},
+    ObjectVersion.INITIAL: {'message': _('New'), 'class': 'info'},
+    ObjectVersion.RUNNING: {'message': _('In process'), 'class': 'warning'}
+}
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -92,7 +100,7 @@ def maintable():
         for key, value in ObjectVersion.MAPPING.items():
             if value == int(request.args.get('version')):
                 if key not in tags:
-                    tags += key
+                    tags.append(key)
 
     tags_to_print = ""
     for tag in tags:
@@ -109,9 +117,12 @@ def maintable():
 @permission_required(viewholdingpen.name)
 def details(objectid):
     """Display info about the object."""
+    from ..utils import get_workflow_info
+    from invenio.ext.sqlalchemy import db
+    from itertools import groupby
+
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
-    from invenio.ext.sqlalchemy import db
     if 'holdingpen_current_ids' in session:
         objects = session['holdingpen_current_ids']
     else:
@@ -134,54 +145,49 @@ def details(objectid):
         rendered_actions = {}
 
     if bwobject.id_parent:
-        hbwobject_db_request = BibWorkflowObject.query.filter(
+        history_objects_db_request = BibWorkflowObject.query.filter(
             db.or_(BibWorkflowObject.id_parent == bwobject.id_parent,
                    BibWorkflowObject.id == bwobject.id_parent,
                    BibWorkflowObject.id == bwobject.id)).all()
-
     else:
-        hbwobject_db_request = BibWorkflowObject.query.filter(
+        history_objects_db_request = BibWorkflowObject.query.filter(
             db.or_(BibWorkflowObject.id_parent == bwobject.id,
                    BibWorkflowObject.id == bwobject.id)).all()
 
-    hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
-                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: [],
-                 ObjectVersion.WAITING: [], ObjectVersion.ERROR: []}
+    history_objects = {}
+    temp = groupby(history_objects_db_request,
+                   lambda x: x.version)
+    for key, value in temp:
+        if key != ObjectVersion.RUNNING:
+            value = list(value)
+            value.sort(key=lambda x: x.modified, reverse=True)
+            history_objects[key] = value
 
-    for hbobject in hbwobject_db_request:
-        hbwobject[hbobject.version].append(
-            {"id": hbobject.id,
-             "version": hbobject.version,
-             "date": pretty_date(hbobject.created),
-             "true_date": hbobject.modified}
-        )
-
-    for list_of_object in hbwobject:
-        hbwobject[list_of_object].sort(
-            key=lambda x: x["true_date"], reverse=True
-        )
-
-    hbwobject_final = (
-        hbwobject[ObjectVersion.INITIAL] +
-        hbwobject[ObjectVersion.HALTED] +
-        hbwobject[ObjectVersion.FINAL]
-    )
-
+    history_objects = sum(history_objects.values(), [])
+    for obj in history_objects:
+        obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.version]["class"]
+        obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.version]["message"]
     results = get_rendered_task_results(bwobject)
 
+    workflow_definition = get_workflow_info(extracted_data['workflow_func'])
+    task_history = bwobject.get_extra_data().get('_task_history', [])
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
                            rendered_actions=rendered_actions,
-                           hbwobject=hbwobject_final,
+                           history_objects=history_objects,
                            bwparent=extracted_data['bwparent'],
                            info=extracted_data['info'],
                            log=extracted_data['logtext'],
                            data_preview=formatted_data,
-                           workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
                            task_results=results,
                            previous_object=previous_object,
-                           next_object=next_object)
+                           next_object=next_object,
+                           task_history=task_history,
+                           workflow_definition=workflow_definition,
+                           versions=ObjectVersion,
+                           pretty_date=pretty_date,
+                           )
 
 
 @blueprint.route('/files/<int:objectid>/<path:filename>',
@@ -394,6 +400,7 @@ def load_table():
         mini_action = None
         if action:
             mini_action = getattr(action, "render_mini", None)
+
         extra_data = bwo.get_extra_data()
         record = bwo.get_data()
 
@@ -402,7 +409,8 @@ def load_table():
                 record = dict(record)
             except (ValueError, TypeError):
                 record = {}
-
+        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
+        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
         row = render_template('workflows/row_formatter.html',
                               title=preformatted["title"],
                               object=bwo,
@@ -413,7 +421,7 @@ def load_table():
                               mini_action=mini_action,
                               action_message=action_message,
                               pretty_date=pretty_date,
-                              version=ObjectVersion
+                              version=ObjectVersion,
                               )
 
         row = row.split("<!--sep-->")

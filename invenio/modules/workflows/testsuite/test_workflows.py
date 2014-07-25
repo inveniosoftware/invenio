@@ -128,7 +128,7 @@ distances from it.
         eng = start('halttest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
-        self.assertEqual(ObjectVersion.HALTED, obj.version)
+        self.assertEqual(ObjectVersion.WAITING, obj.version)
         self.assertEqual(WorkflowStatus.HALTED, eng.status)
         self.assertEqual(0, BibWorkflowObjectLog.get(
             id_object=obj.id, log_type=logging.ERROR).count())
@@ -156,7 +156,7 @@ distances from it.
         eng = start('branchtest', data, module_name="unit_tests")
         idx, obj = list(eng.getObjects())[0]
 
-        self.assertEqual(ObjectVersion.HALTED, obj.version)
+        self.assertEqual(ObjectVersion.WAITING, obj.version)
         self.assertEqual(WorkflowStatus.HALTED, eng.status)
         self.assertEqual(0, BibWorkflowObjectLog.get(
             id_object=obj.id, log_type=logging.ERROR).count())
@@ -212,7 +212,7 @@ distances from it.
                        module_name="unit_tests")
 
         self.assertEqual(2, test_object.get_data())
-        self.assertEqual(ObjectVersion.HALTED, test_object.version)
+        self.assertEqual(ObjectVersion.WAITING, test_object.version)
         self.assertEqual(WorkflowStatus.HALTED, engine.status)
 
     def test_workflow_engine_instantiation(self):
@@ -526,7 +526,7 @@ distances from it.
 
         obj_halted = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid,
-            BibWorkflowObject.version == ObjectVersion.HALTED
+            BibWorkflowObject.version == ObjectVersion.WAITING
         ).first()
 
         self.assertTrue(obj_halted)
@@ -537,7 +537,7 @@ distances from it.
                      module_name="unit_tests")
 
         self.assertEqual(1, obj_halted.get_data())
-        self.assertEqual(ObjectVersion.HALTED, obj_halted.version)
+        self.assertEqual(ObjectVersion.WAITING, obj_halted.version)
 
         # We skip to next part, this should work
         continue_oid(oid=obj_halted.id, module_name="unit_tests")

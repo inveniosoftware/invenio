@@ -15,9 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Set of workflow logic tasks."""
 
 from six import callable
+from functools import wraps
 
 
 def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"):
@@ -37,6 +39,7 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
     if order not in ["ASC", "DSC"]:
         order = "ASC"
 
+    @wraps(foreach)
     def _foreach(obj, eng):
         my_list_to_process = []
         step = str(eng.getCurrTaskId())
@@ -92,6 +95,7 @@ def foreach(get_list_function=None, savename=None, cache_data=False, order="ASC"
             new_vector[coordonatex] = coordonatey + 2
             eng.setPosition(eng.getCurrObjId(), new_vector)
 
+    _foreach.hide = True
     return _foreach
 
 
@@ -104,6 +108,7 @@ def simple_for(inita, enda, incrementa, variable_name=None):
     :param variable_name: if needed the name in extra_data where we want to store
     the value
     """
+    @wraps(simple_for)
     def _simple_for(obj, eng):
 
         init = inita
@@ -143,6 +148,7 @@ def simple_for(inita, enda, incrementa, variable_name=None):
             new_vector[coordonatex] = coordonatey + 2
             eng.setPosition(eng.getCurrObjId(), new_vector)
 
+    _simple_for.hide = True
     return _simple_for
 
 
@@ -155,15 +161,19 @@ def end_for(obj, eng):
     eng.setPosition(eng.getCurrObjId(), new_vector)
 
 
+end_for.hide = True
+
+
 def execute_if(fun, *args):
     """Simple conditional execution task."""
+    @wraps(execute_if)
     def _execute_if(obj, eng):
         for rule in args:
             res = rule(obj, eng)
             if not res:
                 eng.jumpCallForward(1)
         fun(obj, eng)
-
+    _execute_if.hide = True
     return _execute_if
 
 
@@ -173,6 +183,7 @@ def workflow_if(cond, neg=False):
     The goal of this function is to allow the creation of if else statement
     without the use of lambda and get a safer way.
     """
+    @wraps(workflow_if)
     def _workflow_if(obj, eng):
         conda = cond
         while callable(conda):
@@ -196,6 +207,8 @@ def workflow_if(cond, neg=False):
             new_vector[coordonatex] = coordonatey + 1
             eng.setPosition(eng.getCurrObjId(), new_vector)
 
+    _workflow_if.hide = True
+    _workflow_if.branch = True
     return _workflow_if
 
 
@@ -219,6 +232,10 @@ def workflow_else(obj, eng):
         eng.setPosition(eng.getCurrObjId(), new_vector)
 
 
+workflow_else.hide = True
+workflow_else.branch = True
+
+
 def compare_logic(a, b, op):
     """Task that can be used in if or something else to compare two values.
 
@@ -232,6 +249,7 @@ def compare_logic(a, b, op):
     - lte A lesser than or equal B
     :return: Boolean: result of the test
     """
+    @wraps(compare_logic)
     def _compare_logic(obj, eng):
         my_a = a
         my_b = b
@@ -271,5 +289,5 @@ def compare_logic(a, b, op):
                     return False
         else:
             return False
-
+    _compare_logic.hide = True
     return _compare_logic

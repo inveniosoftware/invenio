@@ -27,7 +27,6 @@
 
 {% block javascript %}
     {{ super() }}
-
     <script type="text/javascript">
         $(document).ready(function(){
             var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
@@ -52,10 +51,30 @@
               <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Actions') }}<b class="caret"></b></a>
                   <ul class="dropdown-menu" role="menu">
-                      <li><button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>{{ _('Restart workflow from beginning') }}</button></li>
-                      <li><button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>{{ _('Restart current task') }}</button></li>
-                      <li><button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>{{ _('Skip this task') }}</button></li>
-                      <li><a id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button"><i class="icon-trash"></i>{{ _('Delete this record') }}</a></li>
+                      <li>
+                        <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                          <i class="icon-repeat"></i>
+                          {{ _('Restart workflow from beginning') }}
+                        </button>
+                      </li>
+                      <li>
+                        <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                          <i class="icon-step-backward"></i>
+                          {{ _('Restart current task') }}
+                        </button>
+                      </li>
+                      <li>
+                        <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                          <i class="icon-step-forward"></i>
+                          {{ _('Skip this task') }}
+                        </button>
+                      </li>
+                      <li>
+                        <button id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button">
+                          <i class="icon-trash"></i>
+                          {{ _('Delete this record') }}
+                        </button>
+                      </li>
                   </ul>
               </li>
               <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -114,23 +133,45 @@
                 </div>
                 <div class="panel-body">
                   <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
-
-                  <h6 class="pull-right">
-                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#workflow-definition">{{ _('More') }}<span class="caret"></span></a>
+                  {% if task_history %}
+                  <h6 class="pull-left">
+                    <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#completed-tasks">
+                      {{ _('Completed tasks') }}
+                      <span class="caret"></span>
+                    </a>
                   </h6>
-
-                  <div id="workflow-definition" class="collapse">
-                      <table class="table table-striped">
-                          <tbody>
-                              {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
-                          </tbody>
-                      </table>
-                  </div>
+                  {% endif %}
+                  <h6 class="pull-right">
+                    <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#workflow-definition">
+                      {{ _('Definition') }}
+                      <span class="caret"></span>
+                    </a>
+                  </h6>
+                  <table class="table table-striped">
+                      <tbody>
+                          <br/>
+                          <br/>
+                          {% set id = []%}
+                          {% if task_history %}
+                            <div id="completed-tasks" class="collapse">
+                              <div class="muted"><strong>{{_('Completed tasks')}}:</strong></div>
+                              <div class="list-group">
+                                {% for item in task_history %}
+                                    {{ utils.display_task_history(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length) }}
+                                    {% do id.append(1)%}
+                                {% endfor %}
+                              </div>
+                            </div>
+                          {% endif %}
+                          <div id="workflow-definition" class="collapse">
+                              <div class="muted"><strong>{{_('Workflow definition')}}:</strong></div>
+                              {{ utils.display_workflow_definition(workflow_definition, id)}}
+                          </div>
+                      </tbody>
+                  </table>
                 </div>
               </div>
-
               {% if bwobject.get_error_message() %}
-
               <div class="panel panel-danger">
                 <div class="panel-heading">
                   <h3 class="panel-title">{{ _('Error occurred') }}</h3>
@@ -138,7 +179,9 @@
                 <div class="panel-body">
                   <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}</h5>
                   <div class="text-right">
-                      <h6 id="show-more" class="text-right"><a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">Open details</a>
+                      <h6 id="show-more" class="text-right">
+                        <a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">
+                          {{ _('Open details') }}</a>
                       </h6>
                   </div>
 
@@ -171,7 +214,10 @@
                 </div>
                 <div class="panel-body">
                   <h6 class="pull-right">
-                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">{{ _('More') }}<span class="caret"></span></a>
+                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
+                    {{ _('More') }}
+                    <span class="caret"></span>
+                  </a>
                   </h6>
                   <div id="record-metadata-table" class="collapse">
                       <table class="table table-striped">
@@ -180,22 +226,14 @@
                                   <b>{{ key }}</b> = {{ value }}
                                   <hr>
                               {% endfor %}
-                              {% if bwobject.version == 1 %}
-                                  <span class="label label-success">Done</span>
-                              {% elif bwobject.version == 2 %}
-                                  <span class="label label-danger">Need action</span>
-                              {% elif bwobject.version == 0  %}
-                                  <span class="label label-info">New</span>
-                              {% elif bwobject.version == 3  %}
-                                  <span class="label label-warning">In process</span>
-                              {% endif %}
+                              <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
                           </tbody>
                       </table>
                   </div>
                 </div>
               </div>
 
-              {% if hbwobject %}
+              {% if history_objects %}
 
               <div class="panel panel-info">
                 <div class="panel-heading">
@@ -209,22 +247,14 @@
                   <div id="History" class="collapse">
                       <table class="table table-striped">
                           <tbody>
-                          {% for object in hbwobject %}
-                              {% if  object["id"] == bwobject.id %}
-                                 <a href="#"> current </a> -
+                          {% for object in history_objects %}
+                              {% if  object.id == bwobject.id %}
+                                 <a href="#">{{ _('current') }} </a> -
                                  {% else %}
-                                 <a href="{{ url_for('holdingpen.details', objectid=object['id']) }}" >{{object["id"]}}</a> -
+                                 <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{object.id}}</a> -
                               {% endif %}
-                              {% if object["version"] == 1 %}
-                                  <span class="label label-success">Done</span>
-                              {% elif  object["version"] == 2 %}
-                                  <span class="label label-danger">Need action</span>
-                              {% elif  object["version"] == 0  %}
-                                  <span class="label label-info">New</span>
-                              {% elif  object["version"] == 3  %}
-                                  <span class="label label-warning">In process</span>
-                              {% endif %}
-                           {{object["date"]}}
+                              <span class="label label-{{ object._class }}">{{ object.message }}</span>
+                           {{pretty_date(object.modified)}}
                           <hr>
                           {% endfor %}
                           </tbody>

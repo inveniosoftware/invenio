@@ -14,11 +14,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 021111307, USA.
+
 """Workflows task to communicate with bibsched.
 
 The Bibsched logic is separate from other tasks, the goal is to allow
 to run a workflow in another way than with Bibsched.
 """
+
+from functools import wraps
 
 
 def task_update_progress(msg):
@@ -28,6 +31,7 @@ def task_update_progress(msg):
     :type msg: str
     :return:the nested function for the workflow engine
     """
+    @wraps(task_update_progress)
     def _task_update_progress(obj, eng):
         """Update progress information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_progress as task_update_progress_nested
@@ -44,6 +48,7 @@ def task_update_status(msg):
     :type msg: str
     :return:the nested function for the workflow engine
     """
+    @wraps(task_update_status)
     def _task_update_status(obj, eng):
         """Update status information in the BibSched task table."""
         from invenio.legacy.bibsched.bibtask import task_update_status as task_update_status_nested

@@ -15,11 +15,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
+
 """Set of function for sub workflows management."""
 
 from six import callable, string_types
 
 from time import sleep
+from functools import wraps
 from invenio.modules.workflows.errors import WorkflowError
 from invenio.modules.workflows.models import BibWorkflowEngineLog
 
@@ -70,6 +72,7 @@ def num_workflow_running_greater(num):
     :return True if you need to wait ( number of workflow in message queue greater
     than num) or false if you don't need to wait.
     """
+    @wraps(num_workflow_running_greater)
     def _num_workflow_running_greater(obj, eng):
         try:
             if (eng.extra_data["_nb_workflow"] - eng.extra_data["_nb_workflow_finish"]) > num:
@@ -115,6 +118,7 @@ def start_async_workflow(workflow_to_run,
     from ...workflows.models import BibWorkflowObject
     from invenio.modules.workflows.api import start_delayed
 
+    @wraps(start_async_workflow)
     def _start_workflow(obj, eng):
         record_object = BibWorkflowObject.create_object()
         record_object.save()  # Saving to set default extra_data and data
@@ -203,6 +207,7 @@ def wait_for_a_workflow_to_complete(scanning_time=5.0):
     :type scanning_time: number
     :return:
     """
+    @wraps(wait_for_a_workflow_to_complete)
     def _wait_for_a_workflow_to_complete(obj, eng):
         if '_workflow_ids' in eng.extra_data:
             to_wait = None
@@ -289,6 +294,7 @@ def write_something_generic(message, func):
     :param message: the message that you want to propagate
     :type message: list of strings and functions.
     """
+    @wraps(write_something_generic)
     def _write_something_generic(obj, eng):
         if isinstance(message, string_types):
             if isinstance(func, list):
@@ -326,6 +332,7 @@ def write_something_generic(message, func):
                 func(temp)
             return None
 
+    _write_something_generic.hide = True
     return _write_something_generic
 
 
@@ -376,6 +383,7 @@ def workflows_reviews(stop_if_error=False, clean=True):
     if a child workflow has crashed.
     :type stop_if_error: bool
     """
+    @wraps(workflows_reviews)
     def _workflows_reviews(obj, eng):
         if eng.extra_data["_nb_workflow"] == 0:
             raise WorkflowError("Nothing has been harvested ! Look into logs for errors !", eng.uuid, obj.id)
@@ -400,6 +408,7 @@ def workflows_reviews(stop_if_error=False, clean=True):
             eng.extra_data["_nb_workflow"] = 0
             eng.extra_data["_nb_workflow_finish"] = 0
 
+    _workflows_reviews.description = 'Workflows reviews'
     return _workflows_reviews
 
 
@@ -414,10 +423,12 @@ def log_info(message):
     :type message: str or function
     :return:
     """
+    @wraps(log_info)
     def _log_info(obj, eng):
         message_buffer = message
         while callable(message_buffer):
             message_buffer = message_buffer(obj, eng)
         eng.log.info(message_buffer)
 
+    _log_info.description = "Log info"
     return _log_info

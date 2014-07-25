@@ -17,74 +17,100 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro function_display(fun, task_counter, version) -%}
-    <!-- {% set comma2 = joiner(",") %} -->
-    {% set i = 0 %}
-    {% set flag = 0 %}
-    {% for w in fun %}
-        {% if w is not iterable %}
-            {{ function_display_inner(w, task_counter, version, flag) }}
-            {% if w.func_name == task_counter and version == 2 %}
-                {% set flag = 1 %}
-            {% endif %}
-        {% else %}
-            {{ function_display(w, task_counter, version) }}
-        {% endif %}
-            <!-- {{ comma2() }} -->
-        {% set i = i + 1 %}
-    {% endfor %}
-{%- endmacro %}
+{% macro display_task_history(nicename, doc, parameters, name, id) -%}
 
-{% macro function_display_inner(w, task_counter, version, flag) -%}
-  </br>
-
-  {% if flag == 0 %}
-
-  <button type="button" class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#infoModal{{i}}">
-    <span class="glyphicon glyphicon-ok-sign"></span>
-    {% if w.func_name == task_counter and version == 2 %}
-        <strong>{{ w.func_name }}</strong>
-    {% else %}
-        {{ w.func_name }}
-    {% endif %}
-  </button>
-
-  {% else %}
-
-  <button type="button" class="btn btn-default btn-sm" href="#" data-toggle="modal" data-target="#infoModal{{i}}">
-    {{ w.func_name }}
-  </button>
-
-  {% endif %}
-  
-  <div class="modal fade" id="infoModal{{i}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <a class="list-group-item list-group-item-success"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
+      <span class="glyphicon glyphicon-ok-sign"></span>
+      {{ nicename }}
+  </a>
+  <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="myModalLabel">{{ w.func_name }}</h4>
+          <h4 class="modal-title" id="myModalLabel">{{ name }}</h4>
         </div>
         <div class="modal-body">
-          {% if w.func_closure is defined %}
-            {% if w.func_closure is iterable %}
-                {% set comma = joiner(", ") %}
-                {% for arg in w.func_closure %}
-                    {{ comma() }}
-                    <b>Parameter: {{ arg.cell_contents }}</b>
-                {% endfor %}
-                </br>
-            {% endif %}
+          {% if doc %}
+            {{ doc }}
+          {% else %}
+            {{_("Documentation unavailable")}}
           {% endif %}
-          {{ w.func_doc }}
+
+          {% if parameters %}
+            <h5>{{_("Parameters")}}:</h5>
+            <ul class='list-unstyled'>
+              {% for name, value in parameters %}
+                <li><strong>{{ name }}:</strong> {{value }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 
 {%- endmacro %}
+
+{% macro display_workflow_definition(workflow_definition, id) -%}
+ <div class="list-group">
+    {% for item in workflow_definition %}
+        {% if item is mapping %}
+            {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length)  }}
+            {% do id.append(1) %}
+        {% else %}
+        </div>
+        <div class="list-group">
+            {{ display_workflow_definition(item, id) }}
+            {% do id.append(1) %}
+        </div>
+        <div class="list-group">
+        {% endif %}
+    {% endfor %}
+    </div>
+{%- endmacro %}
+
+{% macro display_task(nicename, doc, parameters, name, id) -%}
+
+  <a class="list-group-item list-group-item-info"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
+        <span class="glyphicon glyphicon-question-sign"></span>
+        {{ nicename }}
+  </a>
+
+  <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title" id="myModalLabel">{{  name }}</h4>
+        </div>
+        <div class="modal-body">
+        {{parameteres}}
+          {% if doc %}
+            {{ doc }}
+          {% else %}
+            {{_("Documentation unavailable")}}
+          {% endif %}
+          {% if parameters %}
+            <h5>{{_("Parameters")}}:</h5>
+            <ul class='list-unstyled'>
+              {% for name, value in parameters %}
+                <li><strong>{{ name }}:</strong> {{value }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  {% endmacro %}
+
 
 {% macro render_field(field) %}
   <div class="form-group">
@@ -99,7 +125,7 @@
       <div class="col-sm-10">
         <div class="checkbox">
           <label>
-             <b>Core</b> {{field(**kwargs)|safe}}
+             <strong>{{ _('Core') }}</strong> {{field(**kwargs)|safe}}
           </label>
         </div>
       </div>
@@ -112,5 +138,4 @@
     {% endfor %}
     </ul>
   {% endif %}
-  </dd>
 {% endmacro %}

@@ -23,6 +23,7 @@ import os
 import glob
 import traceback
 
+from functools import wraps
 from six import callable
 
 
@@ -43,7 +44,10 @@ def approve_record(obj, eng):
 
 
 def convert_record_to_bibfield(obj, eng):
-    """Convert a record in data into a 'dictionary' thanks to BibField.
+    """Convert to record from MARCXML.
+
+    Expecting MARCXML, this task converts it using the current configuration to a
+    SmartJSON object.
 
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
@@ -52,9 +56,12 @@ def convert_record_to_bibfield(obj, eng):
     obj.data = convert_marcxml_to_bibfield(obj.data)
     eng.log.info("Field conversion succeeded")
 
+convert_record_to_bibfield.description = 'Get Record from MARCXML'
+
 
 def get_files_list(path, parameter):
     """Function returning the list of file in a directory."""
+    @wraps(get_files_list)
     def _get_files_list(obj, eng):
         if callable(parameter):
             unknown = parameter
@@ -73,6 +80,7 @@ def get_files_list(path, parameter):
 
 def set_obj_extra_data_key(key, value):
     """Task setting the value of an object extra data key."""
+    @wraps(set_obj_extra_data_key)
     def _set_obj_extra_data_key(obj, eng):
         my_value = value
         my_key = key
@@ -89,6 +97,7 @@ def set_obj_extra_data_key(key, value):
 
 def get_obj_extra_data_key(name):
     """Task returning the value of an object extra data key."""
+    @wraps(get_obj_extra_data_key)
     def _get_obj_extra_data_key(obj, eng):
         return obj.extra_data[name]
 
@@ -97,6 +106,7 @@ def get_obj_extra_data_key(name):
 
 def get_eng_extra_data_key(name):
     """Task returning the value of an engine extra data key."""
+    @wraps(get_eng_extra_data_key)
     def _get_eng_extra_data_key(obj, eng):
         return eng.extra_data[name]
 
@@ -109,12 +119,13 @@ def get_data(obj, eng):
 
 
 def convert_record(stylesheet="oaidc2marcxml.xsl"):
-    """Convert the object data, if XML, using the given stylesheet.
+    """Convert the object data to marcxml using the given stylesheet.
 
     :param stylesheet: which stylesheet to use
     :return: function to convert record
     :raise WorkflowError:
     """
+    @wraps(convert_record)
     def _convert_record(obj, eng):
         from invenio.modules.workflows.errors import WorkflowError
         from invenio.legacy.bibconvert.xslt_engine import convert
@@ -138,6 +149,7 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
                                 id_workflow=eng.uuid,
                                 id_object=obj.id)
 
+    _convert_record.description = 'Convert record'
     return _convert_record
 
 
@@ -145,6 +157,7 @@ def update_last_update(repository_list):
     """Perform the update of the update date."""
     from invenio.legacy.oaiharvest.dblayer import update_lastrun
 
+    @wraps(update_last_update)
     def _update_last_update(obj, eng):
         if "_should_last_run_be_update" in obj.extra_data:
             if obj.extra_data["_should_last_run_be_update"]:
@@ -233,6 +246,7 @@ def quick_match_record(obj, eng):
 
 def upload_record(mode="ir"):
     """Perform the upload step."""
+    @wraps(upload_record)
     def _upload_record(obj, eng):
         from invenio.legacy.bibsched.bibtask import task_low_level_submission
         eng.log_info("Saving data to temporary file for upload")

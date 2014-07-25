@@ -471,7 +471,6 @@ BibWorkflowEngine
         """Execute the callback (workflow tasks)."""
         obj.data = obj.get_data()
         obj.extra_data = obj.get_extra_data()
-        obj.extra_data["_last_task_name"] = self.get_current_taskname()
         self.extra_data = self.get_extra_data()
         self.log.debug("Executing callback %s" % (repr(callback),))
         try:
@@ -480,6 +479,8 @@ BibWorkflowEngine
             self.set_extra_data(self.extra_data)
             obj.set_data(obj.data)
             obj.extra_data["_task_counter"] = self._i[1]
+            obj.extra_data["_last_task_name"] = callback.func_name
+            obj.update_task_history(callback)
             obj.set_extra_data(obj.extra_data)
 
     def get_current_taskname(self):

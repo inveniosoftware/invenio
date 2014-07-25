@@ -17,7 +17,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-
 {{object.id}}
 <!--sep-->
 <input type="checkbox" class="hp-check">
@@ -30,13 +29,7 @@
 <!--sep-->
 {{ pretty_date(object.created)}}
 <!--sep-->
-{% if object.version == version.FINAL %}<span class="label label-success">Done</span>
-{% elif object.version == version.HALTED %}<span class="label label-danger">Need action</span>
-{% elif object.version == version.WAITING %}<span class="label label-warning">Waiting</span>
-{% elif object.version == version.RUNNING %}<span class="label label-warning">In process</span>
-{% elif object.version == version.INITIAL %}<span class="label label-info">New</span>
-{% elif object.version == version.ERROR %}<span class="label label-danger">Error</span>
-{% endif %}
+<span class="label label-{{object._class}}">{{ object.message }}</span>
 <!--sep-->
 {{object.data_type}}
 <!--sep-->

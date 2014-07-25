@@ -16,13 +16,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Collection of tasks used for tests."""
 
 import time
 
+from functools import wraps
+
 
 def add_data(data_param):
     """Add data_param to obj.data."""
+    @wraps(add_data)
     def _add_data(obj, eng):
         #due to python 2 way of managing closure
         data = data_param
@@ -57,6 +61,7 @@ def halt_if_data_less_than(threshold):
     Halt workflow execution for this object if its value is less than given
     threshold.
     """
+    @wraps(halt_if_data_less_than)
     def _halt_if_data_less_than(obj, eng):
         if obj.data < threshold:
             eng.halt("Value of data is too small.")
@@ -66,6 +71,7 @@ def halt_if_data_less_than(threshold):
 
 def set_data(data):
     """Task using closure to allow parameters and change data."""
+    @wraps(set_data)
     def _set_data(obj, eng):
         obj.data = data
 
@@ -74,6 +80,7 @@ def set_data(data):
 
 def reduce_data_by_one(times):
     """Task to substract one to data."""
+    @wraps(reduce_data_by_one)
     def _reduce_data_by_one(obj, eng):
         a = times
         while a > 0:
@@ -85,6 +92,7 @@ def reduce_data_by_one(times):
 
 def add_metadata():
     """Task to add metadata."""
+    @wraps(add_metadata)
     def _add_metadata(obj, eng):
         if obj['content_type'] == 'book':
             obj.add_field("meta1", "elefant")
@@ -103,6 +111,7 @@ def task_b(obj, eng):
 
 def sleep_task(t):
     """Task to wait t seconds."""
+    @wraps(sleep_task)
     def _sleep_task(dummy_obj, eng):
         time.sleep(t)
 
@@ -123,6 +132,7 @@ def halt_if_higher_than_20(obj, eng):
 
 def subtract(value):
     """Function subtract value from variable."""
+    @wraps(subtract)
     def _subtract(obj, dummy_eng):
         obj.data -= value
 

@@ -421,3 +421,41 @@ def get_previous_next_objects(object_list, current_object_id):
         next_object_id = object_list[0]
         previous_object_id = None
     return previous_object_id, next_object_id
+
+
+def get_func_info(func):
+    """Retrieve a function's information."""
+    name = func.func_name
+    doc = func.func_doc
+    try:
+        nicename = func.description
+    except AttributeError:
+        if doc:
+            nicename = doc.split('\n')[0]
+            if len(nicename) > 80:
+                nicename = name
+        else:
+            nicename = name
+    parameters = []
+    closure = func.func_closure
+    varnames = func.func_code.co_freevars
+    if closure:
+        for index, arg in enumerate(closure):
+            parameters.append((str(varnames[index]), str(arg.cell_contents)))
+    return {
+        "nicename": nicename,
+        "doc": doc,
+        "parameters": parameters,
+        "name": name
+    }
+
+
+def get_workflow_info(func_list):
+    """Return function info, go through lists recursively."""
+    funcs = []
+    for item in func_list:
+        if isinstance(item, list):
+            funcs.append(get_workflow_info(item))
+        else:
+            funcs.append(get_func_info(item))
+    return funcs

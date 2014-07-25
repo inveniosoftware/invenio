@@ -64,7 +64,8 @@ def get_default_extra_data():
                           "latest_object": -1,
                           "_action": None,
                           "redis_search": {},
-                          "source": ""}
+                          "source": "",
+                          "_task_history": []}
     return base64.b64encode(cPickle.dumps(extra_data_default))
 
 
@@ -361,6 +362,18 @@ class BibWorkflowObject(db.Model):
             pass
         return
 
+    def update_task_history(self, last_task):
+        """Append last task to task history."""
+        from .utils import get_func_info
+        if "_task_history" not in self.extra_data:
+            self.extra_data["_task_history"] = []
+        if hasattr(last_task, 'branch') and last_task.branch:
+            return
+        elif hasattr(last_task, 'hide') and last_task.hide:
+            return
+        else:
+            self.extra_data["_task_history"].append(get_func_info(last_task))
+
     def get_formatted_data(self, of="hd"):
         """Get the formatted representation for this object."""
         from .registry import workflows
@@ -372,7 +385,7 @@ class BibWorkflowObject(db.Model):
                 format=of
             )
         except (KeyError, AttributeError):
-            # Somehow the workflow does not exist (.name)
+            # Somehow the workflow or formatter does not exist
             from invenio.ext.logging import register_exception
             register_exception(alert_admin=True)
             formatted_data = ""
