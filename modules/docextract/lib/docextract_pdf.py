@@ -29,6 +29,7 @@ for and the characters that should be used to replace them.
 replace in plain-text.
 """
 
+import os
 import re
 import subprocess
 
@@ -475,6 +476,9 @@ def convert_PDF_to_plaintext(fpath, keep_layout=False):
     @return: (list) of unicode strings (contents of the PDF file translated
     into plaintext; each string is a line in the document.)
     """
+    if not os.path.isfile(CFG_PATH_PDFTOTEXT):
+        raise Exception('Missing pdftotext executable')
+
     if keep_layout:
         layout_option = "-layout"
     else:
