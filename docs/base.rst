@@ -16,3 +16,8 @@ Factory
 .. automodule:: invenio.base.factory
    :members:
 
+Bundles
+-------
+
+.. automodule:: invenio.base.bundles
+   :members:
