@@ -156,9 +156,9 @@
 var date_options = {dateFormat: 'yy-mm-dd'}
 </script>
 {%- endblock form_script_options %}
-<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
 <script type="text/javascript">
-$(document).ready(function() {
+require(["jquery", "js/deposit/form"], function($, form) {
+$(function() {
     {# Fix issue with typeahead.js drop-down partly cut-off due to overflow #}
     $('#webdeposit_form_accordion').on('hide', function (e) {
         $(e.target).css("overflow","hidden");
@@ -167,8 +167,7 @@ $(document).ready(function() {
         $(e.target).css("overflow", "visible");
     })
     $('#webdeposit_form_accordion .panel-collapse.in.collapse').css("overflow", "visible");
-});
-$(document).ready(function() {
+
     var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
     var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
     var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
@@ -195,5 +194,7 @@ $(document).ready(function() {
     // Date picker
     $(".datepicker").datepicker(date_options);
 });
+});
 </script>
+<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
 {% endblock javascript %}

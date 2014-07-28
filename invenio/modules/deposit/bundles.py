@@ -20,14 +20,13 @@
 """Deposit bundles."""
 
 from invenio.ext.assets import Bundle
-from invenio.base.bundles import styles as _styles
 
 
 js = Bundle(
     "plupload/plupload.full.min.js",
-    "js/deposit/form.js",
-    "js/deposit/templates.js",
+    "js/deposit/init.js",
     output="deposit.js",
+    filters="requirejs",
     weight=51,
     bower={
         "plupload": "latest",
@@ -38,5 +37,6 @@ js = Bundle(
 styles = Bundle(
     "css/deposit/form.css",
     output="deposit.css",
-    weight=51,
+    filters="cleancss",
+    weight=51
 )
