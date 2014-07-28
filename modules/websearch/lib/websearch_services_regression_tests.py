@@ -277,9 +277,11 @@ class WebSearchServicesSubmissionNameSearch(InvenioTestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
-TEST_SUITE = make_test_suite(WebSearchServicesLoading,
-                             WebSearchServicesCollectionNameSearch,
-                             WebSearchServicesSubmissionNameSearch)
+# WebServices are disabled in OPS
+#TEST_SUITE = make_test_suite(WebSearchServicesLoading,
+#                             WebSearchServicesCollectionNameSearch,
+#                             WebSearchServicesSubmissionNameSearch)
+TEST_SUITE = make_test_suite()
 
 
 if __name__ == "__main__":
