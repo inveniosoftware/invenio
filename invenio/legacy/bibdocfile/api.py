@@ -73,6 +73,7 @@ try:
 except ImportError:
     CFG_HAS_MAGIC = 0
 
+from flask import current_app
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
@@ -1749,7 +1750,8 @@ class BibDoc(object):
                 container["extensions"] = set([fname[len(fprefix):].rsplit(";", 1)[0] for fname in filter(lambda x: x.startswith(fprefix), os.listdir(container["basedir"]))])
         except OSError:
             container["extensions"] = []
-            register_exception()
+            current_app.logger.warning("Could not retrieve available formats",
+                                       exc_info=True)
         return container
 
     @staticmethod
