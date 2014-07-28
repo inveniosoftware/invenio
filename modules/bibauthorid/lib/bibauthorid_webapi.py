@@ -1196,11 +1196,14 @@ def get_user_role(req):
 
 
 def display_name_from_hepnames(record):
-    display_name = (record_get_field_value(record, '880', '', '', 'a') or
-                    record_get_field_value(record, '100', '', '', 'q') or
-                    record_get_field_value(record, '100', '', '', 'a'))
+    display_name = (record_get_field_value(record, '100', '', '', 'q') or
+        record_get_field_value(record, '100', '', '', 'a'))
 
     return display_name
+
+
+def native_name_from_hepnames(record):
+    return record_get_field_value(record, '880', '', '', 'a')
 
 
 def main_hepnames_email(record):
@@ -1386,6 +1389,7 @@ def hepnames_context(record):
     context = {
         'record_id': record_get_field_value(record, '001', '', '', ''),
         'display_name': display_name_from_hepnames(record),
+        'native_name': native_name_from_hepnames(record),
         'urls': record_get_field_values(record, '856', '4', '', 'u'),
         'fields': record_get_field_values(record, '650', '1', '7', 'a'),
         'experiments': record_get_field_values(record, '693', '', '', 'e'),
