@@ -40,7 +40,6 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
         }
     });
 
-
     var init = function () {
         $('.task-btn').on('click', function () {
             if ($.inArray($(this)[0].name, tagList) <= -1) {
@@ -54,47 +53,35 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
             }
         });
 
+        $('#option-autorefresh').on('click', function () {
+             console.log($('#option-autorefresh').hasClass("btn-danger"));
+             if($('#option-autorefresh').hasClass("btn-danger")) {
+                $('#option-autorefresh').removeClass("btn-danger");
+             } else {
+                $('#option-autorefresh').addClass("btn-danger");
+             }
+        });
 
         $('.version-selection').on('click', function () {
             if ($.inArray($(this)[0].name, tagList) <= -1) {
                 $('#tags').tagsinput('add', $(this)[0].text);
-                WORKFLOWS_HP_UTILITIES.requestNewObjects();
             }
         });
 
         $("#tags").on('itemRemoved', function (event) {
             tagList = $("#tags").val().split(',');
-            tagList = taglist_translation(tagList);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
 
         $("#tags").on('itemAdded', function (event) {
             tagList =  $("#tags").val().split(',');
-            tagList = taglist_translation(tagList);
             WORKFLOWS_HP_UTILITIES.requestNewObjects();
         });
     };
 
-    function taglist_translation(my_taglist) {
-        var i;
-        for (i = 0; i <= my_taglist.length; i++) {
-            if (my_taglist[i] === 'Done') {
-                my_taglist[i] = 'Completed';
-            } else if (my_taglist[i] === 'Need action') {
-                my_taglist[i] = 'Halted';
-            } else if (my_taglist[i] === 'In process') {
-                my_taglist[i] = 'Running';
-            } else if (my_taglist[i] === 'New') {
-                my_taglist[i] = 'Initial';
-            }
-        }
-        return my_taglist;
-    }
-
     var closeTag = function (tag_name) {
         tagList.splice(tagList.indexOf(tag_name), 1);
         $('#tags').tagsinput('remove', tag_name);
-        WORKFLOWS_HP_UTILITIES.requestNewObjects();
     };
 
     return {

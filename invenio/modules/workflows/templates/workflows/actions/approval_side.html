@@ -16,16 +16,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "page.html" %}
 
-{% block body %}
+{% block approval_action %}
 
-	<div id="alert-message"></div>
+<div id="approval-widget" class="jumbotron">
+  <p>{{message}}</p>
+  <p><a class="btn btn-success btn-lg approval-action"
+        role="button"
+        data-objectid="{{object.id}}"
+        data-value="accept"
+        data-url="{{resolve_url}}">Accept</a></p>
+  <p><a class="btn btn-danger approval-action"
+        data-url="{{resolve_url}}"
+        data-objectid="{{object.id}}"
+        data-value="reject"
+        role="button">Delete</a></p>
 
-    {% block hpbody %}
-    {% endblock %}
-
-    {% block hpmodal %}
-    {% endblock %}
-
+</div>
 {% endblock %}
+

@@ -26,14 +26,6 @@ module.exports = {
         dest: '<%= globalConfig.installation_path %>/js/',
         ext: '.min.js'
     },
-    dataTables: {
-        expand: true,
-        flatten: true,
-        cwd: '<%= globalConfig.installation_path %>/js/',
-        src: ['jquery.dataTables.js'],
-        dest: '<%= globalConfig.installation_path %>/js/',
-        ext: '.dataTables.min.js'
-    },
     jqueryFlot: {
         expand: true,
         flatten: true,

@@ -19,12 +19,17 @@
 from ..tasks.sample_tasks import add_data
 from ..tasks.logic_tasks import execute_if
 from ..tasks.marcxml_tasks import approve_record
+from invenio.modules.workflows.utils import WorkflowBase
 
 
-class sample_workflow(object):
+class sample_workflow(WorkflowBase):
     """
     This is a sample workflow.
     """
+    @staticmethod
+    def formatter(bwo, **kwargs):
+        return ""
+
     workflow = [execute_if(add_data(1), lambda obj, eng: True),
                 approve_record]
     title = "Sample workflow"

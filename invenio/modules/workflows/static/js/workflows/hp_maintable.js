@@ -28,7 +28,8 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         context = {},
         datatable = {},
         tag = {},
-        utilities = {};
+        utilities = {},
+        actions = [];
 
     return {
         oTable: oTable,
@@ -41,22 +42,22 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         context: context,
         datatable: datatable,
         tag: tag,
+        actions: actions,
         utilities: utilities,
 
         init: function (data) {
             this.context = data;
-            this.datatable = window.WORKFLOWS_HP_SELECTION;
-            this.utilities = window.WORKFLOWS_HP_UTILITIES;
-            this.utilities.init();
-            this.datatable.init(this.oTable, this.oSettings);
-            this.init_datatable(this.datatable);
             this.tag = window.WORKFLOWS_HP_TAGS;
             this.tag.init();
+            this.datatable = window.WORKFLOWS_HP_SELECTION;
+            this.utilities = window.WORKFLOWS_HP_UTILITIES;
+            this.datatable.init(this.oTable, this.oSettings);
+            this.utilities.autorefresh();
         },
 
         init_datatable: function (datatable) {
             oSettings = {
-                "sDom": "lf<'clear'>rtip",
+                "dom": '<"top"iflp<"clear">>rt<"bottom"iflp<"clear">>',
                 "bFilter": false,
                 "bJQueryUI": true,
                 "bProcessing": true,
@@ -72,14 +73,17 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
                 "aoColumnDefs": [{'bSortable': false, 'aTargets': [1]},
                                  {'bSearchable': false, 'bVisible': false, 'aTargets': [0]},
                                  {'sWidth': "25%", 'aTargets': [2]},
-                                 {'sWidth': "15%", 'aTargets': [4]}],
+                                 {'sWidth': "25%", 'aTargets': [3]}],
                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                     var id = aData[0];
                     datatable.rememberSelected(nRow, id);
                     nRow.row_id = id;
                     nRow.checkbox = nRow.cells[0].firstChild;
                     $(nRow).on("click", "td", function (event) {
-                        datatable.selectRow(nRow, event, oTable.fnSettings());
+                        console.log(event);
+                        if(event.target.nodeName != "INPUT") {
+                            datatable.selectRow(nRow, event, oTable.fnSettings());
+                        }
                     });
                 },
                 "fnDrawCallback": function () {

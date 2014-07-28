@@ -18,34 +18,35 @@
 
 """Models for BibWorkflow Objects."""
 
-import collections
 import os
 import tempfile
 import base64
 import logging
 from six.moves import cPickle
-from six import string_types, iteritems, callable
+from six import iteritems, callable
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 
-from .utils import (redis_create_search_entry, WorkflowsTaskResult,
+from .utils import (WorkflowsTaskResult,
                     session_manager)
 from .logger import get_logger, BibWorkflowLogHandler
 
 
 class ObjectVersion(object):
 
-    """Specify the different ObjectVersion possible."""
+    """Specify the different versions possible."""
 
     INITIAL = 0
     FINAL = 1
     HALTED = 2
     RUNNING = 3
-    MAPPING = {0: "New,", 1: "Done,", 2: "Need action,",
-                             3: "In process,"}
+    MAPPING = {0: "New", 1: "Done", 2: "Need action",
+               3: "In process"}
+    REVERSE_MAPPING = {"New": 0, "Done": 1, "Need action": 2,
+                       "In process": 3}
 
 
 def get_default_data():
@@ -59,7 +60,7 @@ def get_default_extra_data():
     extra_data_default = {"_tasks_results": {},
                           "owner": {},
                           "_task_counter": {},
-                          "error_msg": "",
+                          "_error_msg": None,
                           "_last_task_name": "",
                           "latest_object": -1,
                           "_action": None,
@@ -70,7 +71,10 @@ def get_default_extra_data():
 
 class Workflow(db.Model):
 
-    """It is a class representing a workflow."""
+    """Represents a workflow instance.
+
+    Used by BibWorkflowEngine to store the state of the workflow.
+    """
 
     __tablename__ = "bwlWORKFLOW"
 
@@ -226,7 +230,35 @@ class Workflow(db.Model):
 
 class BibWorkflowObject(db.Model):
 
-    """Represent a BibWorkflowObject."""
+    """Represents a BibWorkflowObject.
+
+    Main object being passed around in the workflows module
+    when using the workflows API.
+
+    It can be instantiated like this:
+
+        >>> obj = BibWorkflowObject()
+
+    Or, like this:
+
+        >>> obj = BibWorkflowObject.create_object()
+
+    This object provides some handy functions such as:
+
+        >>> obj.set_data("<xml ..... />")
+        >>> obj.get_data() == "<xml ..... />"
+        >>> obj.set_extra_data({"param": value})
+        >>> obj.get_extra_data() == {"param": value}
+        >>> obj.add_task_result(name="myresult", result=1)
+
+    Then to finally save the object
+
+        >>> obj.save()
+
+    Now you can for example run it in a workflow:
+
+        >>> obj.start_workflow("sample_workflow")
+    """
 
     # db table definition
     __tablename__ = "bwlOBJECT"
@@ -295,6 +327,19 @@ class BibWorkflowObject(db.Model):
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
 
+    def get_formatted_data(self, of="hd"):
+        """Get the formatted representation for this object."""
+        from .registry import workflows
+        try:
+            workflow_definition = workflows[Workflow.query.get(self.id_workflow).name]
+            formatted_data = workflow_definition().formatter(self, formatter=None, format=of)
+        except AttributeError:
+            # Somehow the workflow does not exist (.name)
+            from invenio.ext.logging import register_exception
+            register_exception(alert_admin=True)
+            formatted_data = ""
+        return formatted_data
+
     def __repr__(self):
         """Represent a BibWorkflowObject."""
         return "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
@@ -339,16 +384,21 @@ class BibWorkflowObject(db.Model):
             else:
                 self.extra_data["_tasks_results"][task_name] = [res_obj]
 
+    def get_tasks_results(self):
+        """Return the complete set of tasks results."""
+        return self.get_extra_data()["_tasks_results"]
+
     def add_action(self, action, message):
-        """Save a action for holdingpen.
+        """Save an action for holdingpen for this object.
 
-        Assign a widget to this object for an action to be taken
-        in holdingpen. The widget is reffered to by a string with
-        the filename minus extension. Ex: approval_widget.
+        Assign an special "action" to this object to be taken
+        in consideration in holdingpen. The widget is referred to
+        by a string with the filename minus extension.
 
+        Ex: 'approval' for an action 'approval.py'.
 
         A message is also needed to tell the user the action
-        required.
+        required in a textual way.
 
         :param action: name of the action to add (i.e. "approval")
         :type action: string
@@ -373,6 +423,7 @@ class BibWorkflowObject(db.Model):
             extra_data = self.get_extra_data()
             if "_widget" in extra_data:
                 import warnings
+
                 warnings.warn("Widget's are now stored in '_action'",
                               DeprecationWarning)
                 # Migrate to new naming
@@ -383,11 +434,32 @@ class BibWorkflowObject(db.Model):
             return None
 
     def get_action_message(self):
-        """ Retrive the currently assigned widget, if any."""
+        """ Retrieve the currently assigned widget, if any."""
         try:
             return self.get_extra_data()["_message"]
         except KeyError:
             # No widget
+            return ""
+
+    def set_error_message(self, msg):
+        """Set an error message."""
+        extra_data = self.get_extra_data()
+        extra_data["_error_msg"] = msg
+        self.set_extra_data(extra_data)
+
+    def get_error_message(self):
+        """Retrieve the error message, if any."""
+        if "error_msg" in self.get_extra_data():
+            # Backwards compatibility
+            extra_data = self.get_extra_data()
+            msg = extra_data["error_msg"]
+            del extra_data["error_msg"]
+            self.set_extra_data(extra_data)
+            self.set_error_message(msg)
+        try:
+            return self.get_extra_data()["_error_msg"]
+        except KeyError:
+            # No message
             return ""
 
     def remove_action(self):
@@ -399,7 +471,7 @@ class BibWorkflowObject(db.Model):
             del extra_data["_widget"]
         self.set_extra_data(extra_data)
 
-    def start_workflow(self, workflow_name, **kwargs):
+    def start_workflow(self, workflow_name, delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will start a new workflow execution for the object using
@@ -407,13 +479,18 @@ class BibWorkflowObject(db.Model):
 
         :param workflow_name: name of workflow to run
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import start
-
+        if delayed:
+            from .api import start_delayed as start_func
+        else:
+            from .api import start as start_func
         self.save()
-        return start(workflow_name, data=[self], **kwargs)
+        return start_func(workflow_name, data=[self], **kwargs)
 
-    def continue_workflow(self, start_point="continue_next", **kwargs):
+    def continue_workflow(self, start_point="continue_next", delayed=False, **kwargs):
         """Run the workflow specified on the object.
 
         Will continue a previous execution for the object using
@@ -424,15 +501,21 @@ class BibWorkflowObject(db.Model):
            * continue_next: will continue to the next task
            * restart_task: will restart the current task
         :type str
+
+        :param delayed: should the workflow run asynchronously?
+        :type bool
         """
-        from .api import continue_oid
         from .errors import WorkflowAPIError
 
         self.save()
         if not self.id_workflow:
             raise WorkflowAPIError("No workflow associated with object: %r"
                                    % (repr(self),))
-        return continue_oid(self.id, start_point, **kwargs)
+        if delayed:
+            from .api import continue_oid_delayed as continue_func
+        else:
+            from .api import continue_oid as continue_func
+        return continue_func(self.id, start_point, **kwargs)
 
     def change_status(self, message):
         """Change the status."""
@@ -484,57 +567,6 @@ class BibWorkflowObject(db.Model):
         self.data_type = other.data_type
         self.uri = other.uri
 
-    def get_formatted_data(self, format=None, formatter=None):
-        """Return the data in some chewable format."""
-        from invenio.modules.formatter.engine import format_record
-
-        data = self.get_data()
-        if formatter:
-            # A seperate formatter is supplied
-            return formatter(data)
-        from invenio.modules.records.api import Record
-        if isinstance(data, collections.Mapping):
-            # Dicts are cool on its own, but maybe its SmartJson (record)
-            try:
-                data = Record(data.dumps()).legacy_export_as_marc()
-            except (TypeError, KeyError):
-                # Maybe not, submission?
-                return data
-
-        if isinstance(data, string_types):
-            # Its a string type, lets try to convert
-            if format:
-                # We can try formatter!
-                # If already XML, format_record does not like it.
-                if format != 'xm':
-                    try:
-                        return format_record(recID=None,
-                                             of=format,
-                                             xml_record=data)
-                    except TypeError:
-                        # Wrong kind of type
-                        pass
-                else:
-                    # So, XML then
-                    from xml.dom.minidom import parseString
-
-                    try:
-                        pretty_data = parseString(data)
-                        return pretty_data.toprettyxml()
-                    except TypeError:
-                        # Probably not proper XML string then
-                        return "Data cannot be parsed: %s" % (data,)
-                    except Exception:
-                        # Some other parsing error
-                        pass
-
-            # Just return raw string
-            return data
-        if isinstance(data, set):
-            return list(data)
-        # Not any of the above types. How juicy!
-        return data
-
     @session_manager
     def save(self, version=None, task_counter=None, id_workflow=None):
         """Save object to persistent storage."""
@@ -548,8 +580,6 @@ class BibWorkflowObject(db.Model):
             if version != self.version:
                 self.modified = datetime.now()
             self.version = version
-            if version in (ObjectVersion.FINAL, ObjectVersion.HALTED):
-                redis_create_search_entry(self)
         if id_workflow is not None:
             self.id_workflow = id_workflow
         db.session.add(self)
@@ -609,12 +639,11 @@ class BibWorkflowObject(db.Model):
 
 class BibWorkflowObjectLog(db.Model):
 
-    """Represent a BibWorkflowObjectLog.
+    """Represents a log entry for BibWorkflowObjects.
 
     This class represent a record of a log emit by an object
-    into the database the object must be saved before using
-    this class. Indeed it needs the id of the object into
-    the database.
+    into the database. The object must be saved before using
+    this class as it requires the object id.
     """
 
     __tablename__ = 'bwlOBJECTLOGGING'
@@ -673,7 +702,12 @@ class BibWorkflowObjectLog(db.Model):
 
 class BibWorkflowEngineLog(db.Model):
 
-    """ Represent a BibWorkflowEngineLog object."""
+    """Represents a log entry for BibWorkflowEngine.
+
+    This class represent a record of a log emit by an object
+    into the database. The object must be saved before using
+    this class as it requires the object id.
+    """
 
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)

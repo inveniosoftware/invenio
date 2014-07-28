@@ -1,0 +1,19 @@
+{% if message %}
+    {{message}}
+{% endif %}
+
+{% if identifiers %}
+<p><b>identifiers</b>:
+{% for i in identifiers %}
+    {{i}}
+{% endfor %}
+</p>
+{% endif %}
+
+{% if categories %}
+<p><b>categories</b>:
+{% for i in categories %}
+    {{i}}
+{% endfor %}
+</p>
+{% endif %}
