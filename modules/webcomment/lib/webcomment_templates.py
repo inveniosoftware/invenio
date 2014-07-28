@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-## Comments and reviews for records.
-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,28 +22,40 @@
 __revision__ = "$Id$"
 
 import cgi
+import re
+import html2text
+import markdown2
 
 # Invenio imports
+from invenio.webcomment_config import \
+    CFG_WEBCOMMENT_BODY_FORMATS, \
+    CFG_WEBCOMMENT_OUTPUT_FORMATS
 from invenio.urlutils import create_html_link, create_url
-from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
+from invenio.webuser import get_user_info, \
+                            collect_user_info, \
+                            isGuestUser, \
+                            get_email
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
-from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_SECURE_URL, \
-                           CFG_BASE_URL, \
-                           CFG_SITE_LANG, \
-                           CFG_SITE_NAME, \
-                           CFG_SITE_NAME_INTL,\
-                           CFG_SITE_SUPPORT_EMAIL,\
-                           CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-                           CFG_WEBCOMMENT_ALLOW_COMMENTS, \
-                           CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR, \
-                           CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN, \
-                           CFG_WEBCOMMENT_AUTHOR_DELETE_COMMENT_OPTION, \
-                           CFG_CERN_SITE, \
-                           CFG_SITE_RECORD, \
-                           CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-                           CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE
+from invenio.config import \
+    CFG_SITE_URL, \
+    CFG_SITE_SECURE_URL, \
+    CFG_BASE_URL, \
+    CFG_SITE_LANG, \
+    CFG_SITE_NAME, \
+    CFG_SITE_NAME_INTL,\
+    CFG_SITE_SUPPORT_EMAIL,\
+    CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+    CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+    CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR, \
+    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN, \
+    CFG_WEBCOMMENT_AUTHOR_DELETE_COMMENT_OPTION, \
+    CFG_CERN_SITE, \
+    CFG_SITE_RECORD, \
+    CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
+    CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+    CFG_WEBCOMMENT_ENABLE_HTML_EMAILS, \
+    CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING
 from invenio.htmlutils import get_html_text_editor, create_html_select
 from invenio.messages import gettext_set_language
 from invenio.bibformat import format_record
@@ -74,6 +85,7 @@ class Template:
         c_date_creation = 2
         c_body = 3
         c_id = 6
+        c_body_format = 10
 
         warnings = self.tmpl_warnings(warnings, ln)
 
@@ -112,7 +124,8 @@ class Template:
                 reply_link = '%s/%s/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, ln, comment[c_id])
                 comment_rows += self.tmpl_get_comment_without_ranking(req=None, ln=ln, nickname=messaging_link, comment_uid=comment[c_user_id],
                                                                       date_creation=comment[c_date_creation],
-                                                                      body=comment[c_body], status='', nb_reports=0,
+                                                                      body=comment[c_body], body_format=comment[c_body_format],
+                                                                      status='', nb_reports=0,
                                                                       report_link=report_link, reply_link=reply_link, recID=recID)
                 comment_rows += """
                                 <br />
@@ -218,6 +231,7 @@ class Template:
         c_star_score = 6
         c_title = 7
         c_id = 8
+        c_body_format = 14
 
         warnings = self.tmpl_warnings(warnings, ln)
 
@@ -265,6 +279,7 @@ class Template:
                                                                    comment_uid=comment[c_user_id],
                                                                    date_creation=comment[c_date_creation],
                                                                    body=comment[c_body],
+                                                                   body_format=comment[c_body_format],
                                                                    status='', nb_reports=0,
                                                                    nb_votes_total=comment[c_nb_votes_total],
                                                                    nb_votes_yes=comment[c_nb_votes_yes],
@@ -341,7 +356,7 @@ class Template:
                            write_button_form)
         return out
 
-    def tmpl_get_comment_without_ranking(self, req, ln, nickname, comment_uid, date_creation, body, status, nb_reports, reply_link=None, report_link=None, undelete_link=None, delete_links=None, unreport_link=None, recID=-1, com_id='', attached_files=None, collapsed_p=False):
+    def tmpl_get_comment_without_ranking(self, req, ln, nickname, comment_uid, date_creation, body, body_format, status, nb_reports, reply_link=None, report_link=None, undelete_link=None, delete_links=None, unreport_link=None, recID=-1, com_id='', attached_files=None, collapsed_p=False):
         """
         private function
         @param req: request object to fetch user info
@@ -373,7 +388,13 @@ class Template:
         if attached_files is None:
             attached_files = []
         out = ''
-        final_body = email_quoted_txt2html(body)
+
+        final_body = self.tmpl_prepare_comment_body(
+            body,
+            body_format,
+            CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]
+        )
+
         title = nickname
         title += '<a name="C%s" id="C%s"></a>' % (com_id, com_id)
         links = ''
@@ -455,9 +476,9 @@ class Template:
             <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
         </div>
         <div class="collapsible_content" id="collapsible_content_%(comid)i" style="%(collapsible_content_style)s">
-            <blockquote>
-        %(body)s
-            </blockquote>
+            <div class="webcomment_comment_body">
+            %(body)s
+            </div>
         %(attached_files_html)s
 
         <div class="webcomment_comment_options">%(links)s</div>
@@ -478,7 +499,7 @@ class Template:
                  }
         return out
 
-    def tmpl_get_comment_with_ranking(self, req, ln, nickname, comment_uid, date_creation, body, status, nb_reports, nb_votes_total, nb_votes_yes, star_score, title, report_link=None, delete_links=None, undelete_link=None, unreport_link=None, recID=-1):
+    def tmpl_get_comment_with_ranking(self, req, ln, nickname, comment_uid, date_creation, body, body_format, status, nb_reports, nb_votes_total, nb_votes_yes, star_score, title, report_link=None, delete_links=None, undelete_link=None, unreport_link=None, recID=-1):
         """
         private function
         @param req: request object to fetch user info
@@ -510,6 +531,12 @@ class Template:
 
         out = ""
 
+        final_body = self.tmpl_prepare_comment_body(
+            body,
+            body_format,
+            CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]
+        )
+
         date_creation = convert_datetext_to_dategui(date_creation, ln=ln)
         reviewed_label = _("Reviewed by %(x_nickname)s on %(x_date)s") % {'x_nickname': nickname, 'x_date':date_creation}
         ## FIX
@@ -520,10 +547,10 @@ class Template:
         links = ''
         _body = ''
         if body != '':
-            _body = '''
-      <blockquote>
-%s
-      </blockquote>''' % email_quoted_txt2html(body, linebreak_html='')
+             _body = '''
+      <div class="webcomment_comment_body">
+      %s
+      </div>''' % final_body
 
         # Check if user is a comment moderator
         record_primary_collection = guess_primary_collection_of_a_record(recID)
@@ -657,7 +684,8 @@ class Template:
             c_round_name = 11
             c_restriction = 12
             reply_to = 13
-            c_visibility = 14
+            c_body_format = 14
+            c_visibility = 15
             discussion = 'reviews'
             comments_link = '<a href="%s/%s/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
@@ -673,7 +701,8 @@ class Template:
             c_round_name = 7
             c_restriction = 8
             reply_to = 9
-            c_visibility = 10
+            c_body_format = 10
+            c_visibility = 11
             discussion = 'comments'
             comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/%s/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Reviews'), total_nb_reviews)
@@ -830,14 +859,14 @@ class Template:
                     delete_links['auth'] = "%s/admin/webcomment/webcommentadmin.py/del_single_com_auth?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     undelete_link = "%s/admin/webcomment/webcommentadmin.py/undel_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     unreport_link = "%s/admin/webcomment/webcommentadmin.py/unreport_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
-                    comments_rows += self.tmpl_get_comment_without_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_status], comment[c_nb_reports], reply_link, report_link, undelete_link, delete_links, unreport_link, recID, comment[c_id], files, comment[c_visibility])
+                    comments_rows += self.tmpl_get_comment_without_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_body_format], comment[c_status], comment[c_nb_reports], reply_link, report_link, undelete_link, delete_links, unreport_link, recID, comment[c_id], files, comment[c_visibility])
                 else:
                     report_link = '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
                     delete_links['mod'] = "%s/admin/webcomment/webcommentadmin.py/del_single_com_mod?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     delete_links['auth'] = "%s/admin/webcomment/webcommentadmin.py/del_single_com_auth?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     undelete_link = "%s/admin/webcomment/webcommentadmin.py/undel_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
                     unreport_link = "%s/admin/webcomment/webcommentadmin.py/unreport_com?ln=%s&amp;id=%s" % (CFG_SITE_URL, ln, comment[c_id])
-                    comments_rows += self.tmpl_get_comment_with_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_status], comment[c_nb_reports], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title], report_link, delete_links, undelete_link, unreport_link, recID)
+                    comments_rows += self.tmpl_get_comment_with_ranking(req, ln, messaging_link, comment[c_user_id], comment[c_date_creation], comment[c_body], comment[c_body_format], comment[c_status], comment[c_nb_reports], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title], report_link, delete_links, undelete_link, unreport_link, recID)
                     helpful_label = _("Was this review helpful?")
                     report_abuse_label = "(" + _("Report abuse") + ")"
                     yes_no_separator = '<td> / </td>'
@@ -1215,7 +1244,13 @@ class Template:
                  'x_nickname': ' <br /><i>' + display + '</i>'}
 
         if not CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR:
-            note +=  '<br />' + '&nbsp;'*10 + cgi.escape('You can use some HTML tags: <a href>, <strong>, <blockquote>, <br />, <p>, <em>, <ul>, <li>, <b>, <i>')
+            if CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING:
+                note +=  '<br />' + '&nbsp;'*10 + cgi.escape('You can use Markdown syntax to write your comment.')
+            else:
+                # NOTE: Currently we escape all HTML tags before displaying plain text. Should we go back to this approach?
+                #       To go back to this approach we probably simply have to run email_quoted_text2html with wash_p=True
+                #note +=  '<br />' + '&nbsp;'*10 + cgi.escape('You can use some HTML tags: <a href>, <strong>, <blockquote>, <br />, <p>, <em>, <ul>, <li>, <b>, <i>')
+                pass
         #from invenio.search_engine import print_record
         #record_details = print_record(recID=recID, format='hb', ln=ln)
 
@@ -1247,15 +1282,27 @@ class Template:
                               _("Max %i files") % CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
              'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or ''}
 
-        editor = get_html_text_editor(name='msg',
-                                      content=msg,
-                                      textual_content=textual_msg,
-                                      width='100%',
-                                      height='400px',
-                                      enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
-                                      file_upload_url=file_upload_url,
-                                      toolbar_set = "WebComment",
-                                      ln=ln)
+        if CFG_CERN_SITE:
+             editor = get_html_text_editor(name='msg',
+                                          content=msg,
+                                          textual_content=textual_msg,
+                                          width='100%',
+                                          height='400px',
+                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                                          file_upload_url=file_upload_url,
+                                          toolbar_set = "WebComment",
+                                          custom_configurations_path='/ckeditor/cds-ckeditor-config.js',
+                                          ln=ln)
+        else:
+            editor = get_html_text_editor(name='msg',
+                                          content=msg,
+                                          textual_content=textual_msg,
+                                          width='100%',
+                                          height='400px',
+                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                                          file_upload_url=file_upload_url,
+                                          toolbar_set = "WebComment",
+                                          ln=ln)
 
         subscribe_to_discussion = ''
         if not user_is_subscribed_to_discussion:
@@ -1355,15 +1402,27 @@ class Template:
 ##             file_upload_url = '%s/%s/%i/comments/attachments/put' % \
 ##                               (CFG_SITE_URL, CFG_SITE_RECORD, recID)
 
-        editor = get_html_text_editor(name='msg',
-                                      content=msg,
-                                      textual_content=msg,
-                                      width='90%',
-                                      height='400px',
-                                      enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
-#                                      file_upload_url=file_upload_url,
-                                      toolbar_set = "WebComment",
-                                      ln=ln)
+        if CFG_CERN_SITE:
+            editor = get_html_text_editor(name='msg',
+                                          content=msg,
+                                          textual_content=msg,
+                                          width='90%',
+                                          height='400px',
+                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+    #                                      file_upload_url=file_upload_url,
+                                          toolbar_set = "WebComment",
+                                          custom_configurations_path='/ckeditor/cds-ckeditor-config.js',
+                                          ln=ln)
+        else:
+            editor = get_html_text_editor(name='msg',
+                                          content=msg,
+                                          textual_content=msg,
+                                          width='90%',
+                                          height='400px',
+                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+    #                                      file_upload_url=file_upload_url,
+                                          toolbar_set = "WebComment",
+                                          ln=ln)
         form = """%(add_review)s
                 <table style="width: 100%%">
                     <tr>
@@ -1910,6 +1969,7 @@ class Template:
                                                                    cmt_tuple[1],#userid
                                                                    cmt_tuple[2],#date_creation
                                                                    cmt_tuple[3],#body
+                                                                   cmt_tuple[10],#body_format
                                                                    cmt_tuple[9],#status
                                                                    0,
                                                                    cmt_tuple[5],#nb_votes_total
@@ -1923,6 +1983,7 @@ class Template:
                                                                       cmt_tuple[1],#userid
                                                                       cmt_tuple[2],#date_creation
                                                                       cmt_tuple[3],#body
+                                                                      cmt_tuple[6],#body_format
                                                                       cmt_tuple[5],#status
                                                                       0,
                                                                       None,        #reply_link
@@ -2167,10 +2228,17 @@ class Template:
         }
         return out
 
-    def tmpl_email_new_comment_header(self, recID, title, reviews,
-                                      comID, report_numbers,
-                                      can_unsubscribe=True,
-                                      ln=CFG_SITE_LANG, uid=-1):
+    def tmpl_email_new_comment_header(
+            self,
+            recID,
+            title,
+            reviews,
+            comID,
+            report_numbers,
+            can_unsubscribe=True,
+            ln=CFG_SITE_LANG,
+            uid=-1,
+            html_p=False):
         """
         Prints the email header used to notify subscribers that a new
         comment/review was added.
@@ -2193,14 +2261,28 @@ class Template:
                _("The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:")) % \
                {'CFG_SITE_NAME': CFG_SITE_NAME,
                 'user_nickname': user_info['nickname']}
-        out += '\n(<%s>)' % (CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID))
+        if html_p:
+            out += '<br />(&lt;<a href="%s">%s</a>&gt;)' % (CFG_SITE_SECURE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID), CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID))
+        else:
+            out += '\n(<%s>)' % (CFG_SITE_SECURE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID))
+
         out += '\n\n\n'
+
+        if html_p:
+            out = out.replace('\n','<br />')
+
         return out
 
-    def tmpl_email_new_comment_footer(self, recID, title, reviews,
-                                      comID, report_numbers,
-                                      can_unsubscribe=True,
-                                      ln=CFG_SITE_LANG):
+    def tmpl_email_new_comment_footer(
+            self,
+            recID,
+            title,
+            reviews,
+            comID,
+            report_numbers,
+            can_unsubscribe=True,
+            ln=CFG_SITE_LANG,
+            html_p=False):
         """
         Prints the email footer used to notify subscribers that a new
         comment/review was added.
@@ -2213,32 +2295,59 @@ class Template:
         @param can_unsubscribe: True if user can unsubscribe from alert
         @param ln: language
         """
+
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = '\n\n-- \n'
         out += _("This is an automatic message, please don't reply to it.")
         out += '\n'
-        out += _("To post another comment, go to <%(x_url)s> instead.")  % \
-               {'x_url': CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+
+        if html_p:
+            out += _("To post another comment, go to &lt;<a href=\"%(x_url)s\">%(x_url)s</a>&gt; instead.") % \
+               {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
                 (reviews and '/reviews' or '/comments') + '/add'}
-        out += '\n'
+            out += '<br />'
+        else:
+            out += _("To post another comment, go to <%(x_url)s> instead.")  % \
+               {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+                (reviews and '/reviews' or '/comments') + '/add'}
+            out += '\n'
+
         if not reviews:
-            out += _("To specifically reply to this comment, go to <%(x_url)s>")  % \
-                   {'x_url': CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+            if html_p:
+                out += _("To specifically reply to this comment, go to &lt;<a href=\"%(x_url)s\">%(x_url)s</a>&gt;") % \
+                   {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
                     '/comments/add?action=REPLY&comid=' + str(comID)}
-            out += '\n'
+                out += '<br />'
+            else:
+                out += _("To specifically reply to this comment, go to <%(x_url)s>")  % \
+                   {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+                    '/comments/add?action=REPLY&comid=' + str(comID)}
+                out += '\n'
+
         if can_unsubscribe:
-            out += _("To unsubscribe from this discussion, go to <%(x_url)s>")  % \
-                   {'x_url': CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+            if html_p:
+                out += _("To unsubscribe from this discussion, go to &lt;<a href=\"%(x_url)s\">%(x_url)s</a>&gt;") % \
+                   {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
                     '/comments/unsubscribe'}
-            out += '\n'
-        out += _("For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>") % \
+                out += '<br />'
+                out += _("For any question, please use &lt;<a href=\"mailto:%(CFG_SITE_SUPPORT_EMAIL)s\">%(CFG_SITE_SUPPORT_EMAIL)s</a>&gt;") % \
                {'CFG_SITE_SUPPORT_EMAIL': CFG_SITE_SUPPORT_EMAIL}
+            else:
+                out += _("To unsubscribe from this discussion, go to <%(x_url)s>") % \
+                   {'x_url': CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recID) + \
+                    '/comments/unsubscribe'}
+                out += '\n'
+                out += _("For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>") % \
+               {'CFG_SITE_SUPPORT_EMAIL': CFG_SITE_SUPPORT_EMAIL}
+
+        if html_p:
+            out = out.replace('\n','<br />')
 
         return out
 
-    def tmpl_email_new_comment_admin(self, recID):
+    def tmpl_email_new_comment_admin(self, recID, html_p=False):
         """
         Prints the record information used in the email to notify the
         system administrator that a new comment has been posted.
@@ -2259,11 +2368,23 @@ class Template:
         report_nums = ', '.join(report_nums)
         #for rep_num in report_nums:
         #    res_rep_num = res_rep_num + ', ' + rep_num
-        out += "    Title = %s \n" % (title and title[0] or "No Title")
-        out += "    Authors = %s \n" % authors
+        if html_p:
+            out += "<li>Title = %s</li>" % (title and title[0] or "No Title")
+        else:
+            out += "    Title = %s \n" % (title and title[0] or "No Title")
+        if html_p:
+            out += "<li>Authors = %s</li>" % authors
+        else:
+            out += "    Authors = %s \n" % authors
         if dates:
-            out += "    Date = %s \n" % dates[0]
-        out += "    Report number = %s" % report_nums
+            if html_p:
+                out += "<li>Date = %s</li>" % dates[0]
+            else:
+                out += "    Date = %s \n" % dates[0]
+        if html_p:
+            out += "<li>Report number = %s</li>" % report_nums
+        else:
+            out += "    Report number = %s" % report_nums
 
         return  out
 
@@ -2431,7 +2552,7 @@ class Template:
         last_id_bibrec = None
         nb_record_groups = 0
         out += '<div id="yourcommentsmaincontent">'
-        for id_bibrec, comid, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT in comments:
+        for id_bibrec, comid, date_creation, body, body_format, status, in_reply_to_id_cmtRECORDCOMMENT in comments:
             if last_id_bibrec != id_bibrec and selected_display_format_option in ('rc', 'ro'):
                 # We moved to another record. Show some info about
                 # current record.
@@ -2450,7 +2571,13 @@ class Template:
                 <div class="yourcommentsrecordgroup%(recid)sheader">&#149; ''' % {'recid': id_bibrec} + \
                        record_info_html + '</div><div style="padding-left: 20px;">'
             if selected_display_format_option != 'ro':
-                final_body = email_quoted_txt2html(body)
+
+                final_body = self.tmpl_prepare_comment_body(
+                    body,
+                    body_format,
+                    CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]
+                )
+
                 title = '<a name="C%s" id="C%s"></a>' % (comid, comid)
                 if status == "dm":
                     final_body = '<div class="webcomment_deleted_comment_message">%s</div>' % _("Comment deleted by the moderator")
@@ -2479,9 +2606,9 @@ class Template:
                     <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
                 </div>
                 <div class="collapsible_content">
-                    <blockquote>
-                %(body)s
-                    </blockquote>
+                    <div class="webcomment_comment_body">
+                    %(body)s
+                    </div>
                 <div class="webcomment_comment_options">%(links)s</div>
                 </div>
                 <div class="clearer"></div>
@@ -2547,3 +2674,181 @@ class Template:
         out += '<br/><div id="yourcommentsnavigationlinks">' + page_links + '</div>'
 
         return out
+
+    def tmpl_prepare_comment_body(self, body, body_format, output_format):
+        """
+        Prepares the comment's body according to the desired format
+        """
+
+        if body_format == CFG_WEBCOMMENT_BODY_FORMATS["HTML"]:
+
+            if output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]:
+                    # Display stuff as it is. It should already be washed.
+                    pass
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]:
+                    # Prefer inline styles to support most e-mail clients.
+                    body = body.replace(
+                        "<blockquote>",
+                        "<blockquote style=\"padding: 0px 10px 0px 10px; margin: 0px 0px 0px 10px; border-left: 2px solid #3366CC;\">"
+                    )
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["CKEDITOR"]:
+                    # CKEditor needs to have stuff unescaped once more
+                    body = cgi.escape(body)
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            elif output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["TEXTAREA"]:
+                    # Convert HTML to plain text
+                    body = html2text.html2text(body)
+                    # html2text appends 2 unnecessary newlines at the end of the body
+                    if body[-2:] == "\n\n":
+                        body = body[:-2]
+                    # The following doubles ">" at the beginning of each line:
+                    # "> test" --> ">> test", ">>> test" --> ">>>>>> test"
+                    # We currently use single ">" to quote text, so no need
+                    # to use it for now.
+                    #body = re.sub(r"^(>+)", r"\1" * 2, body, count=0, flags=re.M)
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]:
+                    # Convert HTML to plain text
+                    body = html2text.html2text(body)
+                    # html2text appends 2 unnecessary newlines at the end of the body
+                    if body[-2:] == "\n\n":
+                        body = body[:-2]
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            else:
+                # Let's always be on the safe side
+                body = cgi.escape(body)
+
+        elif body_format == CFG_WEBCOMMENT_BODY_FORMATS["TEXT"]:
+
+            if output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]:
+                    # Convert plain text to HTML
+                    body = email_quoted_txt2html(
+                        body,
+                        indent_txt=">",
+                        indent_html=("<blockquote>", "</blockquote>"),
+                        wash_p=False
+                    )
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]:
+                    # Convert plain text to HTML
+                    # Prefer inline styles to support most e-mail clients.
+                    body = email_quoted_txt2html(
+                        body,
+                        indent_txt=">",
+                        indent_html=(
+                            "<blockquote style=\"padding: 0px 10px 0px 10px; margin: 0px 0px 0px 10px; border-left: 2px solid #3366CC;\">",
+                            "</blockquote>"
+                        ),
+                        wash_p=False
+                    )
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["CKEDITOR"]:
+                    # Convert plain text to HTML
+                    body = email_quoted_txt2html(
+                        body,
+                        indent_txt=">",
+                        indent_html=("<blockquote>", "</blockquote>"),
+                        wash_p=False
+                    )
+                    # CKEditor needs to have stuff unescaped once more
+                    body = cgi.escape(body)
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            elif output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["TEXTAREA"]:
+                    # Display stuff as it is. It is escaped before being
+                    # placed in the textarea anyway.
+                    pass
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]:
+                    # Display stuff as it is.
+                    pass
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            else:
+                # Let's always be on the safe side
+                body = cgi.escape(body)
+
+        elif body_format == CFG_WEBCOMMENT_BODY_FORMATS["MARKDOWN"]:
+
+            if output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["WEB"]:
+                    # Convert Markdown to HTML
+                    body = markdown2.markdown(
+                        body,
+                        safe_mode="escape"
+                    )
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]:
+                    # Convert Markdown to HTML
+                    body = markdown2.markdown(
+                        body,
+                        safe_mode="escape"
+                    )
+                    # Prefer inline styles to support most e-mail clients.
+                    body = body.replace(
+                        "<blockquote>",
+                        "<blockquote style=\"padding: 0px 10px 0px 10px; margin: 0px 0px 0px 10px; border-left: 2px solid #3366CC;\">"
+                    )
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["CKEDITOR"]:
+                    # Convert Markdown to HTML
+                    body = markdown2.markdown(
+                        body,
+                        safe_mode="escape"
+                    )
+                    # CKEditor needs to have stuff unescaped once more
+                    body = cgi.escape(body)
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            elif output_format in CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"].values():
+
+                if output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["TEXTAREA"]:
+                    # Display stuff as it is. It is escaped before being
+                    # placed in the textarea anyway.
+                    pass
+
+                elif output_format == CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]:
+                    # Display stuff as it is.
+                    pass
+
+                else:
+                    # Let's always be on the safe side
+                    body = cgi.escape(body)
+
+            else:
+                # Let's always be on the safe side
+                body = cgi.escape(body)
+
+        else:
+            # Let's always be on the safe side
+            body = cgi.escape(body)
+
+        return body

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,6 +28,24 @@ CFG_WEBCOMMENT_ACTION_CODE = {
     'ADD_REVIEW': 'R',
     'VOTE': 'V',
     'REPORT_ABUSE': 'A'
+}
+
+CFG_WEBCOMMENT_BODY_FORMATS = {
+    "HTML"     : "HTML",
+    "TEXT"     : "TXT",
+    "MARKDOWN" : "MD",
+}
+
+CFG_WEBCOMMENT_OUTPUT_FORMATS = {
+    "HTML" : {
+        "WEB"      : "WEB",
+        "EMAIL"    : "HTML_EMAIL",
+        "CKEDITOR" : "CKEDITOR",
+    },
+    "TEXT" : {
+        "EMAIL"    : "TEXT_EMAIL",
+        "TEXTAREA" : "TEXTAREA",
+    },
 }
 
 # Exceptions: errors
