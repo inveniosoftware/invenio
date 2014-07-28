@@ -284,14 +284,15 @@ def require_api_auth(*scopes):
 def require_oauth_scopes(*scopes):
     """Decorator to require a list of OAuth scopes.
 
-    Note, if API key authentication is bypassing this check.
+    Decorator must be preceded by a ``require_api_auth()`` decorator.
+    Note, API key authentication is bypassing this check
     """
     required_scopes = set(scopes)
 
     def wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            # Variable oauth is only defined for oauth requests (see
+            # Variable requests.oauth is only defined for oauth requests (see
             # require_api_auth() above).
             if request.oauth is not None:
                 token_scopes = set(request.oauth.access_token.scopes)

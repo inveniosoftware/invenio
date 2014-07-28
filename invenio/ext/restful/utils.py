@@ -21,7 +21,6 @@
 
 import json
 import six
-import warnings
 from flask import url_for
 from invenio.testsuite import InvenioTestCase
 
@@ -30,8 +29,11 @@ class APITestCase(InvenioTestCase):
 
     """API unit test base class."""
 
-    apikey = None
-    accesstoken = dict()
+    def __init__(self, *args, **kwargs):
+        """Set instance variables."""
+        super(APITestCase, self).__init__(*args, **kwargs)
+        self.accesstoken = dict()
+        self.apikey = None
 
     def create_api_key(self, user_id):
         """Create api-key."""
@@ -65,7 +67,8 @@ class APITestCase(InvenioTestCase):
                 t = Token.query.filter_by(access_token=t).first()
                 if t:
                     db.session.delete(t)
-                    db.session.commit()
+        db.session.commit()
+        self.accesstoken = dict()
 
     def remove_api_key(self):
         """Remove api key."""
@@ -134,10 +137,9 @@ class APITestCase(InvenioTestCase):
             request_args = {}
 
         if user_id is None:
-            tokens = self.accesstoken.values()
-            if len(tokens) > 1:
-                warnings.warn("Please provide a user_id argument.")
-            user_id = tokens[0]
+            if len(self.accesstoken) == 1:
+                user_id = self.accesstoken.keys()[0]
+        assert user_id is not None, "Please provide a user_id argument."
 
         if self.apikey:
             urlargs['apikey'] = self.apikey,
