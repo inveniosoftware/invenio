@@ -48,7 +48,7 @@
 		{% for item in choice_list %}
 		<a href="{{ '%s%s' % (profile_link, item.author_profile) if item.author_profile else '#' }}" class="list-group-item" data-heprecord="{{ item.record_id }}">
 			<h4 class="list-group-item-heading">
-				{{ item.display_name }}
+				{{ item.display_name }}{{ ' (%s)' % item.native_name if item.native_name }}
 			</h4>
 			<div class="list-group-item-text clearfix">
 				{{ (item.institution_history|last).name if item.institution_history else 'Institution not known.' }}
@@ -92,7 +92,7 @@
 	<tbody>
 		<tr>
 		    <th class="no-border">Name</th>
-		    <td class="no-border">{{ record.display_name }}</td>
+		    <td class="no-border">{{ record.display_name }}{{ ' (%s)' % record.native_name if record.native_name }}</td>
 	    </tr>
         {% if record.institution_history -%}
 		<tr>
