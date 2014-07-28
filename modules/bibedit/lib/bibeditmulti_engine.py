@@ -393,7 +393,7 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
     response['search_html'] = multiedit_templates.detailed_record(record_content, language)
     return response
 
-def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, 
+def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display,
                                 language, outputTags, collection="", compute_modifications=0,
                                 upload_mode='-c', req=None, checked_records=None):
     """Returns the results of a test search.
@@ -681,7 +681,11 @@ def _upload_file_with_bibupload(file_path, upload_mode, num_records, req):
     """
     user_info = collect_user_info(req)
     user_name = user_info.get('nickname') or 'multiedit'
+    user_email = user_info.get('email') or None
     task_options = ['bibupload', user_name, '-N', 'multiedit', '-P', '4', upload_mode]
+
+    if user_email:
+        task_options.extend(["--email-logs-to", user_email])
 
     if num_records < CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING:
         task_options.append('%s' % file_path)
