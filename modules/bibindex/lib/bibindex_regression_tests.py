@@ -28,7 +28,6 @@ from time import sleep
 
 from invenio.bibindex_engine import WordTable, \
     VirtualIndexTable, \
-    get_word_tables, \
     find_affected_records_for_index, \
     get_recIDs_by_date_authority, \
     get_recIDs_by_date_bibliographic, \
@@ -1453,19 +1452,16 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         self.counter += 1
         if self.counter == 1:
             self.new_index_name = create_virtual_index(self._id, self.indexes)
-            wtabs = get_word_tables(self.indexes)
-            for index_id, index_name, index_tags in wtabs:
+            for index_name in self.indexes:
                 wordTable = WordTable(index_name=index_name,
-                                    fields_to_index=index_tags,
-                                    table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                    wash_index_terms=50)
+                                      table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      wash_index_terms=50)
                 wordTable.add_recIDs([[1, 113]], 1000)
             vit = VirtualIndexTable(self.new_index_name,
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             vit.run_update()
             #removal part
             vit.remove_dependent_index("authorcount")
-
 
     @classmethod
     def tearDown(self):
