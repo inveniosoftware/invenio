@@ -312,7 +312,7 @@ def require_oauth_scopes(*scopes):
 
     def wrapper(f):
         @wraps(f)
-        def decorated(oauth, bound_instance_, *args, **kwargs):
+        def decorated(bound_instance_, oauth, *args, **kwargs):
             # Variable oauth is only defined for oauth requests (see
             # require_api_auth() above).
             if oauth is not None:
