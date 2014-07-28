@@ -29,16 +29,18 @@ from werkzeug.utils import import_string, find_modules
 from functools import partial
 
 
-
 def import_module_from_packages(name, app=None, packages=None, silent=False):
+    warnings.warn("Use of import_module_from_packages has been deprecated."
+                  " Please use Flask-Registry instead.",  DeprecationWarning)
+
+    if app is None and has_app_context():
+        app = current_app
+    if app is None:
+        raise Exception(
+            'Working outside application context or provide app'
+        )
+
     if packages is None:
-        if app is None and has_app_context():
-            app = current_app
-        if app is None:
-            raise Exception(
-                'Working outside application context or provide app'
-            )
-        #FIXME
         packages = app.config.get('PACKAGES', [])
 
     for package in packages:
@@ -48,27 +50,23 @@ def import_module_from_packages(name, app=None, packages=None, silent=False):
                     yield import_string(module + '.' + name, silent)
                 except ImportError:
                     pass
-                except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-                    app.logger.error('Could not import: "%s.%s: %s',
-                                     module, name, str(e))
-                    pass
+                except Exception:
+                    app.logger.exception("could not import %s.%s",
+                                         package, name)
             continue
         try:
             yield import_string(package + '.' + name, silent)
         except ImportError:
             pass
-        except Exception as e:
-            import traceback
-            traceback.print_exc()
-            app.logger.error('Could not import: "%s.%s: %s',
-                             package, name, str(e))
-            pass
+        except Exception:
+            app.logger.exception("could not import %s.%s", package, name)
 
 
 def import_submodules_from_packages(name, app=None, packages=None,
                                     silent=False):
+    warnings.warn("Use of import_submodules_from_packages has been deprecated."
+                  " Please use Flask-Registry instead.",  DeprecationWarning)
+
     discover = partial(import_module_from_packages, name)
     out = []
     for p in discover(app=app, packages=packages, silent=silent):
@@ -76,9 +74,9 @@ def import_submodules_from_packages(name, app=None, packages=None,
             for m in find_modules(p.__name__):
                 try:
                     out.append(import_string(m, silent))
-                except Exception as e:
+                except Exception:
                     if not silent:
-                        raise e
+                        raise
     return out
 
 
