@@ -722,6 +722,12 @@ class SpiresToInvenioSyntaxConverter:
         # regular expression matching date after pattern
         self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
+        # regular expression matching date greater-or-equal pattern
+        self._re_date_greater_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(>=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
+        # regular expression matching date less-or-equal pattern
+        self._re_date_less_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(<=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
         # match date searches which have been keyword-substituted
         self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |\)|$)', re.IGNORECASE)
 
@@ -772,6 +778,14 @@ class SpiresToInvenioSyntaxConverter:
             query = re.sub(self._re_spires_find_keyword, 'find ', query)
             if not query.startswith('find'):
                 query = 'find ' + query
+
+            # These calls are before the equals signs removal because there is
+            # a '=' in the operators that we want to match.
+            # They are before date_before and date_after replacement
+            # because the regexps that matche the operators '>' and '<' may
+            # also match the operators '>=' and '<='.
+            query = self._convert_spires_date_greater_equal_to_invenio_span_query(query)
+            query = self._convert_spires_date_less_equal_to_invenio_span_query(query)
 
             # a holdover from SPIRES syntax is e.g. date = 2000 rather than just date 2000
             query = self._remove_extraneous_equals_signs(query)
@@ -1038,6 +1052,34 @@ class SpiresToInvenioSyntaxConverter:
 
         query = self._re_date_before_match.sub(create_replacement_pattern, query)
 
+        return query
+
+    def _convert_spires_date_greater_equal_to_invenio_span_query(self, query):
+        """Converts date after SPIRES search term into invenio span query"""
+
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return match.group('searchop') + ' ' \
+                + match.group('search_content') + '->9999-01-01'
+
+        query = self._re_date_greater_equal_match.sub(
+            create_replacement_pattern,
+            query
+        )
+        return query
+
+    def _convert_spires_date_less_equal_to_invenio_span_query(self, query):
+        """Converts date before SPIRES search term into invenio span query"""
+
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return match.group('searchop') + ' 0->'\
+                + match.group('search_content')
+
+        query = self._re_date_less_equal_match.sub(
+            create_replacement_pattern,
+            query
+        )
         return query
 
     def _expand_search_patterns(self, query):
