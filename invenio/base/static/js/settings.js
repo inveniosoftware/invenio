@@ -21,7 +21,7 @@ require.config({
     baseUrl: '/',
     paths: {
         jquery: 'vendors/jquery/dist/jquery',
-        'jqueryui': 'vendors/jquery-ui/jquery-ui',
+        'jquery-ui': 'vendors/jquery-ui/jquery-ui',
         'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/src/jquery-ui-timepicker-addon',
         'jquery-form': 'vendors/jquery-form/jquery.form',
         hgn: 'vendors/requirejs-hogan-plugin/hgn',

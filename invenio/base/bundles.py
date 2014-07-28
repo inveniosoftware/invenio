@@ -37,7 +37,7 @@ invenio = Bundle(
 styles = Bundle(
     "vendors/jquery-tokeninput/styles/token-input.css",
     "vendors/jquery-tokeninput/styles/token-input-facebook.css",
-    "vendors/jqueryui-timepicker-addon/src/jquery-ui-timepicker-addon.css",
+    "vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css",
     "vendors/typeahead.js-bootstrap3.less/typeahead.css",
     "less/base.less",
     output="invenio.css",
@@ -51,6 +51,7 @@ styles = Bundle(
         "bootstrap": "3.2.0",
         "font-awesome": "4.1.0",
         "typeahead.js-bootstrap3.less": "0.2.3",
+        "jqueryui-timepicker-addon": "latest"
     }
 )
 
@@ -102,13 +103,13 @@ jquery = Bundle(
 
 # jQuery UI
 jqueryui = Bundle(
-    "js/jqueryui.js",
+    "js/jquery-ui.js",
     filters="requirejs",
     output="jquery-ui.js",
     weight=11,
     bower={
         "jquery-ui": "~1.11.0",
-        "jqueryui-timepicker-addon": "latest"
+        #"jqueryui-timepicker-addon": "latest" is set by styles already
     }
 )
 

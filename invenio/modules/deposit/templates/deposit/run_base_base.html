@@ -27,9 +27,9 @@
 {%- block header %}
   {{ super() }}
   <link rel="stylesheet" type="text/css"
-        href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.theme.css") }}"/>
+        href="{{ url_for("static", filename="vendors/jquery-ui/themes/base/theme.css") }}"/>
   <link rel="stylesheet" type="text/css"
-        href="{{ url_for("static", filename="js/jquery-ui/jquery-ui.datepicker.css") }}"/>
+        href="{{ url_for("static", filename="vendors/jquery-ui/themes/base/datepicker.css") }}"/>
 {% endblock header %}
 
 {%- block css %}
