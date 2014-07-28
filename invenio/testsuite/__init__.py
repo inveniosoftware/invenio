@@ -1235,13 +1235,15 @@ def build_and_run_flask_test_suite():
 from invenio.base.utils import import_submodules_from_packages
 
 
-def iter_suites():
+def iter_suites(packages=None):
     """Yield all testsuites."""
     app = create_app()
-    packages = ['invenio', 'invenio.base', 'invenio.celery']
-    packages += app.config.get('PACKAGES', [])
 
-    for module in import_submodules_from_packages('testsuite',
+    if packages is None:
+        packages = ['invenio', 'invenio.base', 'invenio.celery']
+        packages += app.config.get('PACKAGES', [])
+
+    for module in import_submodules_from_packages('testsuite', app=app,
                                                   packages=packages):
         if not module.__name__.split('.')[-1].startswith('test_'):
             continue
