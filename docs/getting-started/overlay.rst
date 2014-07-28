@@ -27,9 +27,13 @@
 
 .. admonition:: TODO
 
+    The following items are still missing from this document, feel free to
+    contribute to it.
+
     - celery/redis/honcho/flower
-    - translations
     - populate the data
+
+    Thanks
 
 
 What is an overlay
@@ -292,6 +296,123 @@ Running
 .. code-block:: console
 
     (myoverlay)$ inveniomanage runserver
+
+
+
+Translations
+============
+
+Invenio comes with full internationalization and localization support
+based on `Babel <http://babel.pocoo.org/` library and `Flask-Babel
+<https://pythonhosted.org/Flask-Babel/>`.  All strings you want to
+translate in your overlay have to be marked with ``_()``.
+
+When you have all strings properly marked, it is time to prepare
+catalog that contains all these strings for tranlations to desired
+languages.
+
+
+Configuration
+-------------
+
+First of all, you have to get into the source folder of your overlay and
+create a configuration file for *Babel*.
+
+.. code-block:: ini
+
+    [python: **.py]
+    encoding = utf-8
+
+    [jinja2: **/templates/**]
+    encoding = utf-8
+    extensions = jinja2.ext.autoescape.jinja2.ext.with_
+
+
+Save it as ``babel.cfg`` next to your ``setup.py``. Before we run the
+extraction tool we need to add section to configure translation directory
+to ``setup.cfg``.
+
+.. code-block:: ini
+
+    [compile_catalog]
+    directory = myoverlay/base/translations/
+
+    [extract_messages]
+    output-file = myoverlay/base/translations/myoverlay.pot
+
+    [init_catalog]
+    input-file = myoverlay/base/translations/myoverlay.pot
+    output-dir = myoverlay/base/translations/
+
+    [update_catalog]
+    input-file = myoverlay/base/translations/myoverlay.pot
+    output-dir = myoverlay/base/translations/
+
+Message Extraction
+------------------
+
+Then it’s time to run the Babel string extraction with given
+configuration:
+
+.. code-block:: console
+
+    (myoverlay)$ python setup.py extract_messages
+
+
+Create Catalog for New Language
+-------------------------------
+
+Once all translatable strings are extracted, one need to prepare catalogs
+for new languages. Following example shows how to prepare new catalog for
+French in PO (Portable Object) format.
+
+
+.. code-block:: console
+
+    (myoverlay)$ python setup.py init_catalog -l fr
+
+
+Now edit the ``myoverlay/base/translations/fr/LC_MESSAGES/messages.po``
+file as needed.
+
+
+Compiling Catalog
+-----------------
+
+Next step is to prepare MO (Machine Object) files in the format which is
+defined by the GNU `gettext <http://www.gnu.org/software/gettext/>`_ tools
+and the GNU `translation project
+<http://sourceforge.net/projects/translation>`_.
+
+To compile the translations for use, pybabel integration with distutils
+helps again:
+
+.. code-block:: console
+
+    (myoverlay)$ python setup.py compile_catalog
+
+
+.. note::
+
+    You should tell git to ignore your compliled translation by running:
+
+    .. code-block:: console
+
+        $ echo \*.mo >> .gitignore
+
+
+Updating Strings
+----------------
+
+It is pretty common that your strings in the code will change over the
+time. Pybabel provides support for updating the translation catalog with
+new strings or changing existing ones. What do you have to do? Create a
+new ``myoverlay.pot`` like above and then let pybabel merge the changes:
+
+.. code-block:: console
+
+    $ python setup.py update_catalog
+
 
 Deployment
 ==========
