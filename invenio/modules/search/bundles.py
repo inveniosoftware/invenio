@@ -27,6 +27,7 @@ js = Bundle(
     'js/search/default_typeahead_configuration.js',
     'js/search/facet.js',
     'js/search/init.js',
+    filters="requirejs",
     output="search.js",
     weight=50
 )
@@ -34,6 +35,7 @@ js = Bundle(
 styles = Bundle(
     'css/search/search.css',
     'css/search/searchbar.css',
+    filters="cleancss",
     output="search.css",
     weight=60
 )
