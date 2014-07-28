@@ -27,7 +27,7 @@ from xml.dom.minidom import parse
 from time import sleep
 
 from invenio.config import CFG_ETCDIR, CFG_CROSSREF_USERNAME, \
- CFG_CROSSREF_PASSWORD, CFG_CROSSREF_EMAIL
+ CFG_CROSSREF_PASSWORD, CFG_CROSSREF_EMAIL, CFG_CROSSREF_2MARC
 from invenio.bibconvert_xslt_engine import convert
 from invenio.bibrecord import record_get_field_value
 from invenio.urlutils import make_invenio_opener
@@ -82,7 +82,7 @@ def get_marcxml_for_doi(doi):
     # from bibconvert_xslt_engine file
     # Seting the path to xsl template
     xsl_crossref2marc_config = "%s/bibconvert/config/%s" % \
-    (CFG_ETCDIR, "crossref2marcxml.xsl")
+    (CFG_ETCDIR, CFG_CROSSREF_2MARC)
 
     output = convert(xmltext=content, \
                     template_filename=xsl_crossref2marc_config)

@@ -20,10 +20,7 @@
       <!-- checking different types of documents -->
       <xsl:when test="$doi[@type='journal_article']">
         <datafield tag="980" ind1=" " ind2=" ">
-          <subfield code="a"><xsl:text>Published</xsl:text></subfield>
-        </datafield>
-        <datafield tag="980" ind1=" " ind2=" ">
-          <subfield code="a"><xsl:text>citeable</xsl:text></subfield>
+          <subfield code="a"><xsl:text>ARTICLE</xsl:text></subfield>
         </datafield>
       </xsl:when>
       <xsl:when test="$doi[@type='conference_paper']">
@@ -208,9 +205,5 @@
         <xsl:with-param name="title" select="./crossref:query/crossref:article_title"/>
       </xsl:call-template>
     </xsl:if>
-    <!-- Adding 980__$aHEP field to every record -->
-    <datafield tag="980" ind1=" " ind2=" ">
-      <subfield code="a"><xsl:text>HEP</xsl:text></subfield>
-    </datafield>
   </xsl:template>
 </xsl:stylesheet>
