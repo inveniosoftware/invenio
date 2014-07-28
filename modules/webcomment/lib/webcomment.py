@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,33 +29,39 @@ import shutil
 import cgi
 import re
 from datetime import datetime, timedelta
+from bleach import clean
 
 # Invenio imports:
 
 from invenio.dbquery import run_sql
-from invenio.config import CFG_PREFIX, \
-     CFG_SITE_LANG, \
-     CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-     CFG_SITE_SUPPORT_EMAIL,\
-     CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
-     CFG_SITE_URL,\
-     CFG_SITE_NAME,\
-     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
-     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
-     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-     CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-     CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-     CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
-     CFG_SITE_RECORD, \
-     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
-     CFG_WEBCOMMENT_ROUND_DATAFIELD, \
-     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
-     CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
-from invenio.webmessage_mailutils import \
-     email_quote_txt, \
-     email_quoted_txt2html
-from invenio.htmlutils import tidy_html
+from invenio.config import \
+    CFG_PREFIX, \
+    CFG_SITE_LANG, \
+    CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
+    CFG_SITE_SUPPORT_EMAIL,\
+    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
+    CFG_SITE_URL,\
+    CFG_SITE_SECURE_URL,\
+    CFG_SITE_NAME,\
+    CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+    CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
+    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+    CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
+    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
+    CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
+    CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
+    CFG_SITE_RECORD, \
+    CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
+    CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+    CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
+    CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH, \
+    CFG_WEBCOMMENT_ENABLE_HTML_EMAILS, \
+    CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR, \
+    CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING
+from invenio.webmessage_mailutils import email_quote_txt
+from invenio.htmlutils import \
+    CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
+    CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
 from invenio.webuser import get_user_info, get_email, collect_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
@@ -64,9 +70,12 @@ from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
-     InvenioWebCommentError, \
-     InvenioWebCommentWarning
+from invenio.webcomment_config import \
+    CFG_WEBCOMMENT_ACTION_CODE, \
+    CFG_WEBCOMMENT_BODY_FORMATS, \
+    CFG_WEBCOMMENT_OUTPUT_FORMATS, \
+    InvenioWebCommentError, \
+    InvenioWebCommentWarning
 from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
@@ -74,13 +83,11 @@ from invenio.search_engine import \
      get_collection_reclist, \
      get_colID
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webcomment_washer import EmailWasher
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')
 except:
     pass
-
 
 def perform_request_display_comments_or_remarks(req, recID, display_order='od', display_since='all', nb_per_page=100, page=1, ln=CFG_SITE_LANG, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False, display_comment_rounds=None):
     """
@@ -473,6 +480,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
          id_bibrec,
          id_user,
          cmt_body,
+         cmt_body_format,
          cmt_date,
          cmt_star,
          cmt_vote, cmt_nb_votes_total,
@@ -504,7 +512,9 @@ Comment:    comment_id      = %(cmt_id)s
             %(review_stuff)s
             body            =
 ---start body---
+
 %(cmt_body)s
+
 ---end body---
 
 Please go to the record page %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
@@ -523,7 +533,7 @@ Please go to the record page %(comment_admin_link)s to delete this message if ne
                     'cmt_reported'          : cmt_reported,
                     'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "star score\t= %s\n\treview title\t= %s" % (cmt_star, cmt_title) or "",
-                    'cmt_body'              : cmt_body,
+                    'cmt_body'              : webcomment_templates.tmpl_prepare_comment_body(cmt_body, cmt_body_format, CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]),
                     'comment_admin_link'    : CFG_SITE_URL + "/"+ CFG_SITE_RECORD +"/" + str(id_bibrec) + '/comments#' + str(cmt_id),
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
@@ -531,7 +541,72 @@ Please go to the record page %(comment_admin_link)s to delete this message if ne
         #FIXME to be added to email when websession module is over:
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
 
-        send_email(from_addr, to_addrs, subject, body)
+        if CFG_WEBCOMMENT_ENABLE_HTML_EMAILS:
+            html_content = """
+The following comment has been reported a total of %(cmt_reported)s times.
+
+<p>Author:</p>
+<ul style="list-style-type: none;">
+  <li>nickname = %(nickname)s</li>
+  <li>email    = &lt;<a href="mailto:%(user_email)s">%(user_email)s</a>&gt;</li>
+  <li>user_id  = %(uid)s</li>
+  <li><p>This user has:</p>
+    <ul style="list-style-type: none;">
+      <li>total number of reports = %(user_nb_abuse_reports)s</li>
+      %(votes)s
+    </ul>
+</ul>
+
+<p>Comment:</p>
+<ul style="list-style-type: none;">
+  <li>comment_id      = %(cmt_id)s</li>
+  <li>record_id       = %(id_bibrec)s</li>
+  <li>date written    = %(cmt_date)s</li>
+  <li>nb reports      = %(cmt_reported)s</li>
+  %(review_stuff)s
+  <li>body            =</li>
+</ul>
+
+&lt;---------------&gt;<br /><br />
+
+%(cmt_body)s
+
+<br />&lt;---------------&gt;<br />
+
+<p>Please go to the record page &lt;<a href="%(comment_admin_link)s">%(comment_admin_link)s</a>&gt; to delete this message if necessary.
+   A warning will be sent to the user in question.</p>""" % {
+    'cfg-report_max'        : CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,
+    'nickname'              : cgi.escape(nickname),
+    'user_email'            : user_email,
+    'uid'                   : id_user,
+    'user_nb_abuse_reports' : user_nb_abuse_reports,
+    'user_votes'            : user_votes,
+    'votes'                 : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
+                              "<li>total number of positive votes = %s</li>\n<li>total number of negative votes= %s</li>" % \
+                                  (user_votes, (user_nb_votes_total - user_votes))
+                                                           or "",
+    'cmt_id'                : cmt_id,
+    'id_bibrec'             : id_bibrec,
+    'cmt_date'              : cmt_date,
+    'cmt_reported'          : cmt_reported,
+    'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
+                              "<li>star score = %s</li>\n<li>review title = %s</li>" % (cmt_star, cmt_title)
+                                                           or "",
+    'cmt_body'              : webcomment_templates.tmpl_prepare_comment_body(cmt_body, cmt_body_format, CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]),
+    'comment_admin_link'    : CFG_SITE_URL + "/"+ CFG_SITE_RECORD +"/" + str(id_bibrec) + '/comments#' + str(cmt_id),
+    'user_admin_link'       : "user_admin_link", #! FIXME
+}
+        else:
+            html_content = None
+
+        return int(send_email(
+            fromaddr=from_addr,
+            toaddr=to_addrs,
+            subject=subject,
+            content=body,
+            html_content=html_content
+        ))
+
     return 1
 
 def check_user_can_report(cmt_id, client_ip_address, uid=-1):
@@ -607,6 +682,7 @@ def query_get_comment(comID):
                        id_bibrec,
                        id_user,
                        body,
+                       body_format,
                        DATE_FORMAT(date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
                        star_score,
                        nb_votes_yes,
@@ -727,7 +803,8 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
                       %(ranking)s cmt.id,
                       cmt.round_name,
                       cmt.restriction,
-                      %(reply_to_column)s
+                      %(reply_to_column)s,
+                      cmt.body_format
                FROM   cmtRECORDCOMMENT cmt LEFT JOIN user ON
                                               user.id=cmt.id_user
                WHERE cmt.id_bibrec=%%s
@@ -867,17 +944,21 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param reply_to: the id of the comment we are replying to with this inserted comment.
     @return: integer >0 representing id if successful, integer 0 if not
     """
+
     current_date = calculate_start_date('0d')
-    #change utf-8 message into general unicode
-    msg = msg.decode('utf-8')
-    note = note.decode('utf-8')
-    #change general unicode back to utf-8
-    msg = msg.encode('utf-8')
-    note = note.encode('utf-8')
+
+    # NOTE: Change utf-8 message into general unicode and back to utf-8
+    #       (Why do we do this here?)
+    msg = msg.decode('utf-8').encode('utf-8')
+    note = note.decode('utf-8').encode('utf-8')
+
     msg_original = msg
+
     (restriction, round_name) = get_record_status(recID)
+
     if attached_files is None:
         attached_files = {}
+
     if reply_to and CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH >= 0:
         # Check that we have not reached max depth
         comment_ancestors = get_comment_ancestors(reply_to)
@@ -889,48 +970,31 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         # Inherit restriction and group/round of 'parent'
         comment = query_get_comment(reply_to)
         if comment:
-            (round_name, restriction) = comment[10:12]
-    if editor_type == 'ckeditor':
-        # Here we remove the line feeds introduced by CKEditor (they
-        # have no meaning for the user) and replace the HTML line
-        # breaks by linefeeds, so that we are close to an input that
-        # would be done without the CKEditor. That's much better if a
-        # reply to a comment is made with a browser that does not
-        # support CKEditor.
-        msg = msg.replace('\n', '').replace('\r', '')
+            (round_name, restriction) = comment[11:13]
 
-        # We clean the quotes that could have been introduced by
-        # CKEditor when clicking the 'quote' button, as well as those
-        # that we have introduced when quoting the original message.
-        # We can however not use directly '>>' chars to quote, as it
-        # will be washed/fixed when calling tidy_html(): double-escape
-        # all &gt; first, and use &gt;&gt;
-        msg = msg.replace('&gt;', '&amp;gt;')
-        msg = re.sub('^\s*<blockquote', '<br/> <blockquote', msg)
-        msg = re.sub('<blockquote.*?>\s*<(p|div).*?>', '&gt;&gt;', msg)
-        msg = re.sub('</(p|div)>\s*</blockquote>', '', msg)
-        # Then definitely remove any blockquote, whatever it is
-        msg = re.sub('<blockquote.*?>', '<div>', msg)
-        msg = re.sub('</blockquote>', '</div>', msg)
-        # Tidy up the HTML
-        msg = tidy_html(msg)
-        # We remove EOL that might have been introduced when tidying
-        msg = msg.replace('\n', '').replace('\r', '')
-        # Now that HTML has been cleaned, unescape &gt;
-        msg = msg.replace('&gt;', '>')
-        msg = msg.replace('&amp;gt;', '&gt;')
-        msg = re.sub('<br .*?(/>)', '\n', msg)
-        msg = msg.replace('&nbsp;', ' ')
-        # In case additional <p> or <div> got inserted, interpret
-        # these as new lines (with a sad trick to do it only once)
-        # (note that it has been deactivated, as it is messing up
-        # indentation with >>)
-        #msg = msg.replace('</div><', '</div>\n<')
-        #msg = msg.replace('</p><', '</p>\n<')
+    if editor_type == "ckeditor":
+        msg = clean(
+            msg,
+            tags=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST,
+            attributes=CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST,
+            strip=True
+        )
+        body_format = CFG_WEBCOMMENT_BODY_FORMATS["HTML"]
+
+    elif editor_type == "textarea":
+        if CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING:
+            body_format = CFG_WEBCOMMENT_BODY_FORMATS["MARKDOWN"]
+        else:
+            body_format = CFG_WEBCOMMENT_BODY_FORMATS["TEXT"]
+
+    else:
+        # NOTE: it should really be one of the above 2 types.
+        body_format = CFG_WEBCOMMENT_BODY_FORMATS["TEXT"]
 
     query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
                                            id_user,
                                            body,
+                                           body_format,
                                            date_creation,
                                            star_score,
                                            nb_votes_total,
@@ -938,8 +1002,8 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                            round_name,
                                            restriction,
                                            in_reply_to_id_cmtRECORDCOMMENT)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-    params = (recID, uid, msg, current_date, score, 0, note, round_name, restriction, reply_to or 0)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+    params = (recID, uid, msg, body_format, current_date, score, 0, note, round_name, restriction, reply_to or 0)
     res = run_sql(query, params)
     if res:
         new_comid = int(res)
@@ -968,7 +1032,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
             @param data: contains the necessary parameters in a tuple:
                          (recid, uid, comid, msg, note, score, editor_type, reviews)
             """
-            recid, uid, comid, msg, note, score, editor_type, reviews = data
+            recid, uid, comid, msg, body_format, note, score, editor_type, reviews = data
             # Email this comment to 'subscribers'
             (subscribers_emails1, subscribers_emails2) = \
                                   get_users_subscribed_to_discussion(recid)
@@ -976,12 +1040,13 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                                 emails1=subscribers_emails1,
                                                 emails2=subscribers_emails2,
                                                 comID=comid, msg=msg,
+                                                body_format=body_format,
                                                 note=note, score=score,
                                                 editor_type=editor_type, uid=uid)
 
         # Register our callback to notify subscribed people after
         # having replied to our current user.
-        data = (recID, uid, res, msg, note, score, editor_type, reviews)
+        data = (recID, uid, res, msg, body_format, note, score, editor_type, reviews)
         if req:
             req.register_cleanup(notify_subscribers_callback, data)
         else:
@@ -1152,6 +1217,7 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
 
 def email_subscribers_about_new_comment(recID, reviews, emails1,
                                         emails2, comID, msg="",
+                                        body_format=CFG_WEBCOMMENT_BODY_FORMATS["HTML"],
                                         note="", score=0,
                                         editor_type='textarea',
                                         ln=CFG_SITE_LANG, uid=-1):
@@ -1170,11 +1236,11 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
     @rtype: bool
     @return: True if email was sent okay, False if it was not.
     """
+
     _ = gettext_set_language(ln)
 
     if not emails1 and not emails2:
         return 0
-
     # Get title
     titles = get_fieldvalues(recID, "245__a")
     if not titles:
@@ -1204,67 +1270,101 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                         {'report_number': report_numbers and ('[' + report_numbers[0] + '] ') or '',
                          'title': title}
 
-    washer = EmailWasher()
-    msg = washer.wash(msg)
-    msg = msg.replace('&gt;&gt;', '>')
-    email_content = msg
     if note:
-        email_content = note + email_content
+        email_content = note + msg
+    else:
+        email_content = msg
 
-    # Send emails to people who can unsubscribe
-    email_header = webcomment_templates.tmpl_email_new_comment_header(recID,
-                                                                      title,
-                                                                      reviews,
-                                                                      comID,
-                                                                      report_numbers,
-                                                                      can_unsubscribe=True,
-                                                                      ln=ln,
-                                                                      uid=uid)
+    def send_email_kwargs(
+        recID=recID,
+        title=title,
+        reviews=reviews,
+        comID=comID,
+        report_numbers=report_numbers,
+        can_unsubscribe=True,
+        uid=uid,
+        ln=ln,
+        body_format=body_format,
+        fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+        toaddr=[],
+        subject=email_subject,
+        content=email_content
+    ):
 
-    email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
-                                                                      title,
-                                                                      reviews,
-                                                                      comID,
-                                                                      report_numbers,
-                                                                      can_unsubscribe=True,
-                                                                      ln=ln)
+        tmpl_email_new_comment_footer_kwargs = {
+            "recID"           : recID,
+            "title"           : title,
+            "reviews"         : reviews,
+            "comID"           : comID,
+            "report_numbers"  : report_numbers,
+            "can_unsubscribe" : can_unsubscribe,
+            "ln"              : ln,
+            "html_p"          : False,
+        }
+
+        tmpl_email_new_comment_header_kwargs = tmpl_email_new_comment_footer_kwargs.copy()
+        tmpl_email_new_comment_header_kwargs.update({
+            "uid" : uid,
+        })
+
+        kwargs = {
+            "fromaddr" : fromaddr,
+            "toaddr" : toaddr,
+            "subject" : subject,
+            "content" : webcomment_templates.tmpl_prepare_comment_body(
+                content,
+                body_format,
+                CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]
+            ),
+            "header" : webcomment_templates.tmpl_email_new_comment_header(**tmpl_email_new_comment_header_kwargs),
+            "footer" : webcomment_templates.tmpl_email_new_comment_footer(**tmpl_email_new_comment_footer_kwargs),
+            "html_content" : "",
+            "html_header" : None,
+            "html_footer" : None,
+            "ln" : ln,
+        }
+
+        if CFG_WEBCOMMENT_ENABLE_HTML_EMAILS:
+            tmpl_email_new_comment_footer_kwargs.update({
+                "html_p" : True,
+            })
+            tmpl_email_new_comment_header_kwargs.update({
+                "html_p" : True,
+            })
+            kwargs.update({
+                "html_content" : webcomment_templates.tmpl_prepare_comment_body(
+                    content,
+                    body_format,
+                    CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]
+                ),
+                "html_header"  : webcomment_templates.tmpl_email_new_comment_header(**tmpl_email_new_comment_header_kwargs),
+                "html_footer"  : webcomment_templates.tmpl_email_new_comment_footer(**tmpl_email_new_comment_footer_kwargs),
+            })
+
+        return kwargs
+
+    # First, send emails to people who can unsubscribe.
     res1 = True
     if emails1:
-        res1 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
-                          toaddr=emails1,
-                          subject=email_subject,
-                          content=email_content,
-                          header=email_header,
-                          footer=email_footer,
-                          ln=ln)
+        res1 = send_email(
+            **send_email_kwargs(
+                can_unsubscribe=True,
+                body_format=body_format,
+                toaddr=emails1
+            )
+        )
 
-    # Then send email to people who have been automatically
-    # subscribed to the discussion (they cannot unsubscribe)
-    email_header = webcomment_templates.tmpl_email_new_comment_header(recID,
-                                                                      title,
-                                                                      reviews,
-                                                                      comID,
-                                                                      report_numbers,
-                                                                      can_unsubscribe=False,
-                                                                      ln=ln,
-                                                                      uid=uid)
-
-    email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
-                                                                      title,
-                                                                      reviews,
-                                                                      comID,
-                                                                      report_numbers,
-                                                                      can_unsubscribe=False,
-                                                                      ln=ln)
+    # Then, send emails to people who have been automatically subscribed
+    # to the discussion and cannot unsubscribe.
     res2 = True
     if emails2:
-        res2 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
-                          toaddr=emails2,
-                          subject=email_subject,
-                          content=email_content,
-                          header=email_header,
-                          footer=email_footer,
-                          ln=ln)
+        res2 = send_email(
+            **send_email_kwargs(
+                can_unsubscribe=False,
+                body_format=body_format,
+                toaddr=emails2
+            )
+        )
 
     return res1 and res2
 
@@ -1558,7 +1658,9 @@ def perform_request_add_comment_or_remark(recID=0,
              - html add form if action is display or reply
              - html successful added form if action is submit
     """
+
     _ = gettext_set_language(ln)
+
     if warnings is None:
         warnings = []
 
@@ -1601,6 +1703,7 @@ def perform_request_add_comment_or_remark(recID=0,
             #errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
 
     elif action == 'REPLY':
+
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             try:
                 raise InvenioWebCommentError(_('Cannot reply to a review.'))
@@ -1610,6 +1713,7 @@ def perform_request_add_comment_or_remark(recID=0,
                 return body
             #errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
             return webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files)
+
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             textual_msg = msg
             if comID > 0:
@@ -1617,33 +1721,53 @@ def perform_request_add_comment_or_remark(recID=0,
                 if comment:
                     user_info = get_user_info(comment[2])
                     if user_info:
-                        date_creation = convert_datetext_to_dategui(str(comment[4]))
-                        # Build two msg: one mostly textual, the other one with HTML markup, for the CkEditor.
-                        msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
-                        textual_msg = msg
-                        # 1 For CkEditor input
-                        msg += '\n\n'
-                        msg += comment[3]
-                        msg = email_quote_txt(text=msg)
-                        # Now that we have a text-quoted version, transform into
-                        # something that CkEditor likes, using <blockquote> that
-                        # do still enable users to insert comments inline
-                        msg = email_quoted_txt2html(text=msg,
-                                                    indent_html=('<blockquote><div>', '&nbsp;&nbsp;</div></blockquote>'),
-                                                    linebreak_html="&nbsp;<br/>",
-                                                    indent_block=False)
-                        # Add some space for users to easily add text
-                        # around the quoted message
-                        msg = '<br/>' + msg + '<br/>'
-                        # Due to how things are done, we need to
-                        # escape the whole msg again for the editor
-                        msg = cgi.escape(msg)
+                        date_creation = convert_datetext_to_dategui(str(comment[5]))
+                        user_wrote_on = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
 
-                        # 2 For textarea input
-                        textual_msg += "\n\n"
-                        textual_msg += comment[3]
-                        textual_msg = email_quote_txt(text=textual_msg)
+                        # We want to produce 2 messages here:
+                        # 1. for a rich HTML editor such as CKEditor (msg)
+                        # 2. for a simple HTML textarea (textual_msg)
+
+                        msg = """
+                        <p>%s</p>
+                        <blockquote>
+                        %s
+                        </blockquote>
+                        <p></p>
+                        """ % (
+                            user_wrote_on,
+                            webcomment_templates.tmpl_prepare_comment_body(
+                                comment[3],
+                                comment[4],
+                                CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["CKEDITOR"]
+                            )
+                        )
+
+                        textual_msg = "%s\n\n%s\n\n" % (
+                            user_wrote_on,
+                            email_quote_txt(
+                                webcomment_templates.tmpl_prepare_comment_body(
+                                    comment[3],
+                                    comment[4],
+                                    CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["TEXTAREA"]
+                                ),
+                                # TODO: Maybe always use a single ">" for quotations?
+                                indent_txt=">",
+                                # If we are using CKEditor, then we need to escape
+                                # the textual message before passing it to the
+                                # editor. "email_quote_txt" can do that for us.
+                                # Normally, we could check the "editor_type"
+                                # argument that was passed to this function.
+                                # However, it is usually an empty string since
+                                # it is comming from the "add" interface.
+                                # Instead let's directly use the config variable.
+                                #escape_p=(editor_type == "ckeditor")
+                                escape_p=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR
+                            )
+                        )
+
             return webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg, can_attach_files=can_attach_files, reply_to=comID)
+
         else:
             try:
                 raise InvenioWebCommentError(_('Comments on records have been disallowed by the administrator.'))
@@ -1756,6 +1880,7 @@ def notify_admin_of_new_comment(comID):
          id_bibrec,
          id_user,
          body,
+         body_format,
          date_creation,
          star_score, nb_votes_yes, nb_votes_total,
          title,
@@ -1773,12 +1898,6 @@ def notify_admin_of_new_comment(comID):
     review_stuff = '''
     Star score  = %s
     Title       = %s''' % (star_score, title)
-
-    washer = EmailWasher()
-    try:
-        body = washer.wash(body)
-    except:
-        body = cgi.escape(body)
 
     record_info = webcomment_templates.tmpl_email_new_comment_admin(id_bibrec)
     out = '''
@@ -1798,9 +1917,11 @@ RECORD CONCERNED:
     %(comment_or_review)s ID    = %(comID)s %(review_stuff)s
     Body        =
 <--------------->
+
 %(body)s
 
 <--------------->
+
 ADMIN OPTIONS:
 To moderate the %(comment_or_review)s go to %(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/display?%(arguments)s
     ''' % \
@@ -1815,11 +1936,61 @@ To moderate the %(comment_or_review)s go to %(siteurl)s/%(CFG_SITE_RECORD)s/%(re
             'record_details'        : record_info,
             'comID'                 : comID2,
             'review_stuff'          : star_score > 0 and review_stuff or "",
-            'body'                  : body.replace('<br />','\n'),
-            'siteurl'               : CFG_SITE_URL,
-            'CFG_SITE_RECORD'        : CFG_SITE_RECORD,
+            'body'                  : webcomment_templates.tmpl_prepare_comment_body(body, body_format, CFG_WEBCOMMENT_OUTPUT_FORMATS["TEXT"]["EMAIL"]),
+            'siteurl'               : CFG_SITE_SECURE_URL,
+            'CFG_SITE_RECORD'       : CFG_SITE_RECORD,
             'arguments'             : 'ln=en&do=od#%s' % comID
         }
+
+    if CFG_WEBCOMMENT_ENABLE_HTML_EMAILS:
+        record_info = webcomment_templates.tmpl_email_new_comment_admin(id_bibrec, html_p=True)
+        html_content = """
+The following %(comment_or_review)s has just been posted (%(date)s).
+
+<p>AUTHOR:</p>
+<ul style="list-style-type: none;">
+  <li>Nickname    = %(nickname)s</li>
+  <li>Email       = &lt;<a href="mailto:%(email)s">%(email)s</a>&gt;</li>
+  <li>User ID     = %(uid)s</li>
+</ul>
+
+<p>RECORD CONCERNED:</p>
+<ul style="list-style-type: none;">
+  <li>Record ID   = %(recID)s</li>
+  <li>URL         = &lt;<a href='%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/'>%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/</a>&gt;</li>
+  %(record_details)s
+</ul>
+
+<p>%(comment_or_review_caps)s:</p>
+<ul style="list-style-type: none;">
+  <li>%(comment_or_review)s ID    = %(comID)s %(review_stuff)s</li>
+  <li>Body                        = </li>
+</ul>
+
+&lt;---------------&gt;<br /><br />
+%(body)s
+<br />&lt;---------------&gt;<br />
+
+<br />ADMIN OPTIONS:
+<br />To moderate the %(comment_or_review)s go to &lt;<a href='%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/display?%(arguments)s'>%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/display?%(arguments)s</a>&gt;""" % {
+    'comment_or_review'     : star_score >  0 and 'review' or 'comment',
+    'comment_or_review_caps': star_score > 0 and 'REVIEW' or 'COMMENT',
+    'comments_or_reviews'   : star_score >  0 and 'reviews' or 'comments',
+    'date'                  : date_creation,
+    'nickname'              : nickname,
+    'email'                 : email,
+    'uid'                   : id_user,
+    'recID'                 : id_bibrec,
+    'record_details'        : record_info,
+    'comID'                 : comID2,
+    'review_stuff'          : star_score > 0 and review_stuff or "",
+    'body'                  : webcomment_templates.tmpl_prepare_comment_body(body, body_format, CFG_WEBCOMMENT_OUTPUT_FORMATS["HTML"]["EMAIL"]),
+    'siteurl'               : CFG_SITE_SECURE_URL,
+    'CFG_SITE_RECORD'       : CFG_SITE_RECORD,
+    'arguments'             : 'ln=en&do=od#%s' % comID
+}
+    else:
+        html_content = None
 
     from_addr = '%s WebComment <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
     comment_collection = get_comment_collection(comID)
@@ -1831,7 +2002,13 @@ To moderate the %(comment_or_review)s go to %(siteurl)s/%(CFG_SITE_RECORD)s/%(re
     report_nums = ', '.join(report_nums)
     subject = "A new comment/review has just been posted [%s|%s]" % (rec_collection, report_nums)
 
-    send_email(from_addr, to_addrs, subject, out)
+    send_email(
+        fromaddr=from_addr,
+        toaddr=to_addrs,
+        subject=subject,
+        content=out,
+        html_content=html_content
+    )
 
 def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
     """
@@ -1987,7 +2164,7 @@ def check_user_can_view_comment(user_info, comid, restriction=None):
     if restriction is None:
         comment = query_get_comment(comid)
         if comment:
-            restriction = comment[11]
+            restriction = comment[12]
         else:
             return (1, 'Comment %i does not exist' % comid)
     if restriction == "":
@@ -2160,9 +2337,9 @@ def perform_display_your_comments(user_info,
     elif selected_order_by_option == "ocf":
         query_params += " ORDER BY date_creation ASC"
     elif selected_order_by_option == "grlf":
-        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT max(date_creation) as maxdatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.maxdatecreation DESC, cmt.date_creation DESC"
+        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.body_format, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT max(date_creation) as maxdatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.maxdatecreation DESC, cmt.date_creation DESC"
     elif selected_order_by_option == "grof":
-        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT min(date_creation) as mindatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.mindatecreation ASC"
+        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.body_format, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT min(date_creation) as mindatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.mindatecreation ASC"
 
     if selected_display_number_option.isdigit():
         selected_display_number_option_as_int = int(selected_display_number_option)
@@ -2180,7 +2357,7 @@ def perform_display_your_comments(user_info,
     if selected_order_by_option in ("grlf", "grof"):
         res = run_sql(query + query_params, (user_info['uid'], user_info['uid']))
     else:
-        res = run_sql("SELECT id_bibrec, id, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0" + query_params, (user_info['uid'], ))
+        res = run_sql("SELECT id_bibrec, id, date_creation, body, body_format, status, in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0" + query_params, (user_info['uid'], ))
 
     return webcomment_templates.tmpl_your_comments(user_info, res,
                                                    page_number=page_number,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -131,7 +131,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
 
             if comment:
                 # Figure out if this is a review or a comment
-                c_star_score = 5
+                c_star_score = 6
                 if comment[c_star_score] > 0:
                     reviews = 1
                 else:
@@ -359,11 +359,12 @@ def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False, user_collect
     tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id, status)
     """
     qdict = {'id': 0, 'id_bibrec': 1, 'uid': 2, 'date_creation': 3, 'body': 4,
-    'status': 5, 'nb_abuse_reports': 6, 'nb_votes_yes': 7, 'nb_votes_total': 8,
-             'star_score': 9, 'title': 10, 'email': -2, 'nickname': -1}
+            'status': 5, 'nb_abuse_reports': 6, 'body_format': 7, 'nb_votes_yes': 8, 'nb_votes_total': 9,
+             'star_score': 10, 'title': 11, 'email': -2, 'nickname': -1}
     query = """SELECT c.id, c.id_bibrec, c.id_user,
                       DATE_FORMAT(c.date_creation, '%%Y-%%m-%%d %%H:%%i:%%S'), c.body,
                       c.status, c.nb_abuse_reports,
+                      c.body_format
                       %s
                       u.email, u.nickname
                FROM cmtRECORDCOMMENT c LEFT JOIN user u
@@ -403,14 +404,16 @@ def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False, user_collect
                                  qtuple[qdict['star_score']],
                                  qtuple[qdict['title']],
                                  qtuple[qdict['id']],
-                                 qtuple[qdict['status']])
+                                 qtuple[qdict['status']],
+                                 qtuple[qdict['body_format']])
             else:
                 comment_tuple = (nickname,
                                  qtuple[qdict['uid']],
                                  qtuple[qdict['date_creation']],
                                  qtuple[qdict['body']],
                                  qtuple[qdict['id']],
-                                 qtuple[qdict['status']])
+                                 qtuple[qdict['status']],
+                                 qtuple[qdict['body_format']])
             general_infos_tuple = (nickname,
                                    qtuple[qdict['uid']],
                                    qtuple[qdict['email']],

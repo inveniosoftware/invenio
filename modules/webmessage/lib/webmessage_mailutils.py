@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
@@ -31,7 +31,8 @@ def email_quoted_txt2html(text,
                           linebreak_txt="\n",
                           indent_html=('<div class="commentbox">', "</div>"),
                           linebreak_html='<br/>',
-                          indent_block=True):
+                          indent_block=True,
+                          wash_p=True):
     """
     Takes a typical mail quoted text, e.g.::
         hello,
@@ -42,7 +43,7 @@ def email_quoted_txt2html(text,
         >> No. Now, go away, or I shall taunt you a second time-a!
         I think we're not going to be friends!
 
-    and return an html formatted output, e.g.::
+    and returns HTML formatted output, e.g.::
         hello,<br/>
         you told me:<br/>
         <div>
@@ -89,15 +90,27 @@ def email_quoted_txt2html(text,
     @param indent_block: if indentation should be done per 'block'
                          i.e. only at changes of indentation level
                          (+1, -1) or at each line.
+    @param wash_p: if each line should be washed or simply escaped.
     @return: string containing html formatted output
     """
-    washer = HTMLWasher()
 
-    final_body = ""
+    # If needed, instantiate the HTMLWasher for later
+    if wash_p:
+        washer = HTMLWasher()
+
+    # Some initial values
+    out = ""
     nb_indent = 0
+    (indent_html_open, indent_html_close) = indent_html
+
+    # Clean off any newlines from around the input
     text = text.strip('\n')
+
+    # Iterate over the lines in our input
     lines = text.split(linebreak_txt)
     for line in lines:
+
+        # Calculate how indented this line is
         new_nb_indent = 0
         while True:
             if line.startswith(indent_txt):
@@ -105,42 +118,73 @@ def email_quoted_txt2html(text,
                 line = line[len(indent_txt):]
             else:
                 break
+
+        # In this case we are indenting the entire block
         if indent_block:
+            # This line is more indented than the previous one,
+            # therefore, open some indentation.
             if (new_nb_indent > nb_indent):
                 for dummy in range(nb_indent, new_nb_indent):
-                    final_body += tabs_before*"\t" + indent_html[0] + "\n"
+                    out += tabs_before*"\t" + indent_html_open + "\n"
                     tabs_before += 1
+            # This line is less indented than the previous one,
+            # therefore, close some indentation.
             elif (new_nb_indent < nb_indent):
                 for dummy in range(new_nb_indent, nb_indent):
                     tabs_before -= 1
-                    final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
+                    out += (tabs_before)*"\t" + indent_html_close + "\n"
+            # This line is as indented as the previous one,
+            # therefore, only add the needed tabs.
             else:
-                final_body += (tabs_before)*"\t"
+                out += (tabs_before)*"\t"
+        # And in this case we are indenting each line separately
         else:
-            final_body += tabs_before*"\t" + new_nb_indent * indent_html[0]
-        try:
-            line = washer.wash(line)
-        except HTMLParseError:
-            # Line contained something like "foo<bar"
+            out += tabs_before*"\t" + new_nb_indent * indent_html_open
+
+        # We can wash this line...
+        if wash_p:
+            try:
+                line = washer.wash(line)
+            except HTMLParseError:
+                # Line contained something like "foo<bar"
+                line = cgi.escape(line)
+        # ...or simply escape it as it is.
+        else:
             line = cgi.escape(line)
+
+        # Add the needed tabs for the nicer visual formatting
         if indent_block:
-            final_body += tabs_before*"\t"
-        final_body += line
+            out += tabs_before*"\t"
+
+        # Add the current line to the output
+        out += line
+
+        # In case we are indenting each line separately,
+        # close all previously opened indentation.
         if not indent_block:
-            final_body += new_nb_indent * indent_html[1]
-        final_body += linebreak_html + "\n"
+            out += new_nb_indent * indent_html_close
+
+        # Add the line break to the output after each line
+        out += linebreak_html + "\n"
+
+        # Reset the current line's indentation level
         nb_indent = new_nb_indent
+
+    # In case we are indenting the entire block,
+    # close all previously opened indentation.
     if indent_block:
         for dummy in range(0, nb_indent):
             tabs_before -= 1
-            final_body += (tabs_before)*"\t" + "</div>\n"
-    return final_body
+            out += (tabs_before)*"\t" + indent_html_close + "\n"
 
+    # Return the output
+    return out
 
 def email_quote_txt(text,
                     indent_txt='>>',
                     linebreak_input="\n",
-                    linebreak_output="\n"):
+                    linebreak_output="\n",
+                    escape_p=False):
     """
     Takes a text and returns it in a typical mail quoted format, e.g.::
         C'est un lapin, lapin de bois.
@@ -162,17 +206,29 @@ def email_quote_txt(text,
     @param indent_txt: the string used for quoting (default: '>>')
     @param linebreak_input: in the text param, string used for linebreaks
     @param linebreak_output: linebreak used for output
+    @param escape_p: if True, escape the text before returning it
     @return: the text as a quoted string
     """
-    if (text == ""):
-        return ""
-    lines = text.split(linebreak_input)
-    text = ""
-    for line in lines:
-        text += indent_txt + line + linebreak_output
-    return text
 
-def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
+    out= ""
+
+    if text:
+
+        lines = text.split(linebreak_input)
+
+        for line in lines:
+            out += indent_txt + line + linebreak_output
+
+        if escape_p:
+            out = cgi.escape(out)
+
+    return out
+
+def escape_email_quoted_text(
+        text,
+        indent_txt='>>',
+        linebreak_txt='\n',
+        wash_p=True):
     """
     Escape text using an email-like indenting rule.
     As an example, this text::
@@ -194,8 +250,12 @@ def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
     @param text: the string to escape
     @param indent_txt: the string used for quoting
     @param linebreak_txt: in the text param, string used for linebreaks
+    @param wash_p: if each line should be washed or simply escaped.
     """
-    washer = HTMLWasher()
+
+    if wash_p:
+        washer = HTMLWasher()
+
     lines = text.split(linebreak_txt)
     output = ''
     for line in lines:
@@ -207,6 +267,10 @@ def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
                 line = line[len(indent_txt):]
             else:
                 break
-        output += (nb_indent * indent_txt) + washer.wash(line, render_unallowed_tags=True) + linebreak_txt
+        if wash_p:
+            output += (nb_indent * indent_txt) + washer.wash(line, render_unallowed_tags=True) + linebreak_txt
+        else:
+            output += (nb_indent * indent_txt) + cgi.escape(line) + linebreak_txt
+
         nb_indent = 0
     return output[:-1]
