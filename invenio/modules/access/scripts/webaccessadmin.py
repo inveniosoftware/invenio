@@ -1,6 +1,6 @@
 ## This file is part of Invenio.
 ## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-## 2012, 2013 CERN.
+## 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -60,6 +60,10 @@ def main():
     from invenio.legacy.bibsched.bibtask import authenticate
     from invenio.modules.access.local_config import DEF_DEMO_USER_ROLES, \
         DEF_DEMO_ROLES, DEF_DEMO_AUTHS
+
+    DEF_DEMO_USER_ROLES = cfg.get('DEF_DEMO_USER_ROLES', DEF_DEMO_USER_ROLES)
+    DEF_DEMO_ROLES = cfg.get('DEF_DEMO_ROLES', DEF_DEMO_ROLES)
+    DEF_DEMO_AUTHS = cfg.get('DEF_DEMO_AUTHS', DEF_DEMO_AUTHS)
 
     ## parse command line:
     # set user-defined options:
