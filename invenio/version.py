@@ -93,13 +93,12 @@ def git_revision():
                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                 shell=True)
         stdout, _ = call.communicate()
-        timestamp = int(stdout.decode())
         try:
+            timestamp = int(stdout.decode())
             ts = datetime.datetime.utcfromtimestamp(timestamp)
+            revision = ts.strftime('%Y%m%d%H%M%S')
         except ValueError:
             revision = '0'
-        else:
-            revision = ts.strftime('%Y%m%d%H%M%S')
 
         git_revision._cache = revision
 
