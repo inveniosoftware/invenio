@@ -303,7 +303,7 @@ def make_file_fixture(filename, base64_file):
         file_to_base64() to get the base64 encoding of a file. If not provided
         a PDF file be generated instead, including
     """
-    fp = StringIO.StringIO(binascii.a2b_base64(base64_file)),
+    fp = StringIO.StringIO(binascii.a2b_base64(base64_file))
     return fp, filename
 
 
