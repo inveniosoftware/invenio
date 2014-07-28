@@ -369,22 +369,6 @@ def split_ranges(parse_string):
     return recIDs
 
 
-def get_word_tables(tables):
-    """ Given a list of table names it return a list of tuples
-    (index_id, index_name, index_tags).
-    """
-    wordTables = []
-    if tables:
-        for index in tables:
-            index_id = get_index_id_from_index_name(index)
-            if index_id:
-                wordTables.append((index_id, index, get_index_tags(index)))
-            else:
-                write_message("Error: There is no %s words table." % \
-                               index, sys.stderr)
-    return wordTables
-
-
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
     limits = var.split(",")
