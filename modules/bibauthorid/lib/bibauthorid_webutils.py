@@ -35,7 +35,7 @@ def group_format_number(number):
         '1,234.6'
 
     """
-    if isinstance(number, int) or long:
+    if isinstance(number, int) or isinstance(number, long):
         return locale.format("%d", number, grouping=True)
     elif isinstance(number, float):
         return locale.format("%-.1f", number, grouping=True)
