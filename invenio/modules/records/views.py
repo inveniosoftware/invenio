@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebSearch Flask Blueprint"""
+"""WebSearch Flask Blueprint."""
 
 from functools import wraps
 from six import iteritems
@@ -200,7 +200,8 @@ def files(recid):
 def file(recid, filename):
     from invenio.modules.documents import api
     record = get_record(recid)
-    duuid = [uuid for (k, uuid) in record['_files'] if k == filename]
+    duuid = [uuid for (k, uuid) in record.get('_documents', [])
+             if k == filename]
     if len(duuid) != 1:
         #TODO log
         abort(404)
