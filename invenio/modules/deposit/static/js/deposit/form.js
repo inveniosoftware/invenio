@@ -19,16 +19,18 @@
 
 
 define(function(require, exports, module) {
-    "use strict";
+    'use strict';
 
-    var $ = require("jquery"),
-        tpl_file_entry = require("hgn!./templates/file_entry"),
-        tpl_file_link = require("hgn!./templates/file_link"),
-        tpl_flash_message = require("hgn!./templates/flash_message"),
-        tpl_field_message = require("hgn!./templates/field_message")
+    var $ = require('jquery'),
+        tpl_file_entry = require('hgn!./templates/file_entry'),
+        tpl_file_link = require('hgn!./templates/file_link'),
+        tpl_flash_message = require('hgn!./templates/flash_message'),
+        tpl_field_message = require('hgn!./templates/field_message')
 
     // provides $.fn.dynamicFieldList
     require('./dynamic_field_list')
+    // provides $.fn.sortable
+    require('jquery-ui')
 
     var messages = {
         errors: 'The form was saved, but there were errors. Please see below.',
