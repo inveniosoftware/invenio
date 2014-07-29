@@ -29,8 +29,8 @@ from invenio.utils.url import redirect_to_url
 
 import invenio.legacy.template
 authorlist_templates = invenio.legacy.template.load('authorlist')
-import invenio.authorlist_engine as authorlist_engine
-import invenio.authorlist_dblayer as authorlist_db
+import .engine as authorlist_engine
+import .dblayer as authorlist_db
 
 navtrail = (' <a class="navtrail" href=\"%s/youraccount/display\">Admin Area</a> '
             ) % CFG_SITE_SECURE_URL

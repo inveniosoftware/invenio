@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
 
-import invenio.authorlist_config as cfg
+import .config as cfg
 
 
 class Template:
