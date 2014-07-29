@@ -248,6 +248,13 @@ def require_api_auth(*scopes):
 
     :param scopes: List of required OAuth scopes.
     """
+    # Decorators specified in  ``method_decorators``  in Flask-Restful's
+    # attribute is applied to a bound instance method, where as if you
+    # decorate the class method is applied to an unbound instance. If you
+    # are not accessing *args or **kwargs this doesn't matter. If you are
+    # you can check if the method is bound using the following line:
+    #   is_bound = hasattr(f, '__self__') and f.__self__
+
     def wrapper(f):
         # Wrap function with oauth require decorator
         from invenio.modules.oauth2server.provider import oauth2
