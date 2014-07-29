@@ -53,8 +53,6 @@ install:
   - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
   # All the step below this points are solely for test purposes, don't use them
   # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
-  - "echo {\\\"directory\\\": \\\"invenio/base/static/vendors\\\"} > .bowerrc"
-  - "echo {\\\"resolutions\\\": {\\\"jquery\\\": \\\"~1.11\\\", \\\"bootstrap\\\": \\\"~3.2\\\"}} > bower-base.json"
   - "inveniomanage bower -i bower-base.json > bower.json"
   - "bower install"
   - "inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link"

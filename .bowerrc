@@ -1,0 +1,7 @@
+{
+    "! this ": "NOTE: this file is only intended to be used by Travis CI.",
+    "! is a ": "Follow the INSTALL procedure to set it up for your overlay.",
+    "! note ": "Thank you and have fun!",
+
+    "directory": "invenio/base/static/vendors"
+}
