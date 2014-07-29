@@ -240,8 +240,8 @@ class UTCISODateTimeString(fields.DateTime):
 #
 # Decorators
 #
-def require_api_auth(*scopes):
-    """Decorator to require API authentication using either API key or OAuth 2.0.
+def require_api_auth():
+    """Decorator to require API authentication using OAuth 2.0 or API keys.
 
     Note, API key usage will be deprecated. Personal OAuth access tokens
     provide the same features as API keys.
@@ -253,8 +253,16 @@ def require_api_auth(*scopes):
         from flask_oauthlib.utils import extract_params
         from invenio.modules.oauth2server.provider import oauth2
 
+        # Decorators specified in  ``method_decorators``  in Flask-Restful's
+        # attribute is applied to a bound instance method, where as if you
+        # decorate the class method is applied to an unbound instance. If you
+        # are not accessing *args or **kwargs this doesn't matter.
+        is_bound = hasattr(f, '__self__') and f.__self__
+
         @wraps(f)
         def decorated(*args, **kwargs):
+            args = list(args)
+
             if 'apikey' in request.values:
                 # API key authentication
                 warnings.warn(
@@ -271,9 +279,7 @@ def require_api_auth(*scopes):
                     restful.abort(401)
 
                 login_user(user_id)
-                resp = f(None, *args, **kwargs)
-                session.clear()
-                return resp
+                args.insert(0 if is_bound else 1, None)
             else:
                 # OAuth 2.0 Authentication
                 for func in oauth2._before_request_funcs:
@@ -282,7 +288,7 @@ def require_api_auth(*scopes):
                 server = oauth2.server
                 uri, http_method, body, headers = extract_params()
                 valid, req = server.verify_request(
-                    uri, http_method, body, headers, scopes
+                    uri, http_method, body, headers, []
                 )
 
                 for func in oauth2._after_request_funcs:
@@ -295,10 +301,10 @@ def require_api_auth(*scopes):
                         status=401,
                     )
 
-                resp = f(req, *args, **kwargs)
-                session.clear()
-                return resp
-            restful.abort(401)
+                args.insert(0 if is_bound else 1, req)
+            resp = f(*args, **kwargs)
+            session.clear()
+            return resp
         return decorated
     return wrapper
 
@@ -311,15 +317,19 @@ def require_oauth_scopes(*scopes):
     required_scopes = set(scopes)
 
     def wrapper(f):
+        is_bound = hasattr(f, '__self__') and f.__self__
+
         @wraps(f)
-        def decorated(bound_instance_, oauth, *args, **kwargs):
+        def decorated(*args, **kwargs):
             # Variable oauth is only defined for oauth requests (see
-            # require_api_auth() above).
+            # require_api_auth() above). Also see note on bound vs unbound
+            # decorated methods.
+            oauth = args[0] if is_bound else args[1]
             if oauth is not None:
                 token_scopes = set(oauth.access_token.scopes)
                 if not required_scopes.issubset(token_scopes):
                     restful.abort(403)
-            return f(bound_instance_, oauth, *args, **kwargs)
+            return f(*args, **kwargs)
         return decorated
     return wrapper
 
