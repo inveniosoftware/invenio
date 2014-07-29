@@ -2,18 +2,25 @@
   "name": "invenio-grunt",
   "version": "1.0.0",
   "devDependencies": {
+    "chai": "^1.9.1",
     "grunt": "~0.4.2",
+    "grunt-concurrent": "*",
+    "grunt-contrib-clean": "*",
     "grunt-contrib-copy": "*",
     "grunt-contrib-cssmin": "*",
-    "grunt-contrib-clean": "*",
-    "grunt-contrib-uglify": "*",
+    "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-less": "*",
     "grunt-contrib-requirejs": "*",
-    "load-grunt-config": "*",
+    "grunt-contrib-uglify": "*",
     "grunt-newer": "*",
-    "grunt-concurrent": "*"
+    "load-grunt-config": "*",
+    "mocha": "^1.20.1",
+    "supertest": "^0.13.0"
   },
   "dependencies": {
-     "time-grunt": "*"
+    "time-grunt": "*"
+  },
+  "scripts": {
+    "test": "mocha"
   }
 }
