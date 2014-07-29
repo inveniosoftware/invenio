@@ -17,7 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Base bundles."""
+"""Base bundles.
+
+.. note:: `bootstrap.js` bundle must be loaded after jQuery UI to avoid conflicts.
+    You can use `noConflict()` if you need to access functions
+    of jQuery UI covered by `bootstrap.js`.
+"""
 
 from invenio.ext.assets import Bundle
 
@@ -54,8 +59,6 @@ jquery = Bundle(
     "js/jquery.tokeninput.js",
     "js/jquery-caret.js",
     "js/typeahead.js",
-    "js/bootstrap.js",
-    "js/bootstrap-select.js",
     "js/hogan.js",
     "js/translate.js",
     output="jquery.js",
@@ -63,7 +66,6 @@ jquery = Bundle(
     weight=10,
     bower={
         "jquery": "2.1.0",
-        "bootstrap": "3.2.0",
         "hogan": "3.0.0",
         "jquery.jeditable": "http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js",
         "jquery-tokeninput": "*"
@@ -80,6 +82,20 @@ jqueryui = Bundle(
     bower={
         "jqueryui": "1.11.0",
         "jquery.ui.timepicker": "http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js"
+    }
+)
+
+# must be loaded after jQuery UI to avoid conflicts
+# use noConflict() from bootstrap.js to get the functions of jQuery UI covered
+# by bootstrap.js
+bootstrap = Bundle(
+    "js/bootstrap.js",
+    "js/bootstrap-select.js",
+    output="bootstrap.js",
+    filters="uglifyjs",
+    weight=jqueryui.weight + 1,
+    bower={
+        "bootstrap": "3.2.0",
     }
 )
 
