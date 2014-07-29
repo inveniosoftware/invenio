@@ -125,16 +125,16 @@ AVAILABLE_PARSERS = []
 CFG_BIBRECORD_KEEP_SINGLETONS = True
 
 try:
-    import pyRXP
-    if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-        AVAILABLE_PARSERS.append('pyrxp')
+    from lxml import etree
+    if 'lxml' in CFG_BIBRECORD_PARSERS_AVAILABLE:
+        AVAILABLE_PARSERS.append('lxml')
 except ImportError:
     pass
 
 try:
-    from lxml import etree
-    if 'lxml' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-        AVAILABLE_PARSERS.append('lxml')
+    import pyRXP
+    if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
+        AVAILABLE_PARSERS.append('pyrxp')
 except ImportError:
     pass
 
@@ -266,18 +266,6 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
                                          keep_singletons=keep_singletons)
     except InvenioBibRecordParserError as ex1:
         return (None, 0, str(ex1))
-
-#   _create_record = {
-#       'pyrxp': _create_record_rxp,
-#       'lxml': _create_record_lxml,
-#       '4suite': _create_record_4suite,
-#       'minidom': _create_record_minidom,
-#       }
-
-#   try:
-#       rec = _create_record[parser](marcxml, verbose)
-#   except InvenioBibRecordParserError as ex1:
-#       return (None, 0, str(ex1))
 
     if sort_fields_by_indicators:
         _record_sort_by_indicators(rec)
@@ -2000,6 +1988,7 @@ def _create_record_rxp(marcxml,
                    (CFG_MARC21_DTD, marcxml))
 
     # Create the pyRXP parser.
+    # See: http://pyrxp.readthedocs.org/en/latest/usage.html#list-of-flags
     pyrxp_parser = pyRXP.Parser(ErrorOnValidityErrors=0, ProcessDTD=1,
                                 ErrorOnUnquotedAttributeValues=0,
                                 srcName='string input')

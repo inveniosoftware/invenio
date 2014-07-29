@@ -32,24 +32,25 @@ import os
 import sys
 
 from setuptools import setup, find_packages
-from setuptools.command.install_lib import install_lib as _install_lib
-from distutils.command.build import build as _build
+from setuptools.command.install_lib import install_lib
+from distutils.command.build import build
 
 
-class build(_build):
+class _build(build):
 
     """Compile catalog before building the package."""
 
-    sub_commands = [('compile_catalog', None)] + _build.sub_commands
+    sub_commands = [('compile_catalog', None)] + build.sub_commands
 
 
-class install_lib(_install_lib):
+class _install_lib(install_lib):
 
-    """Compile catalog before runing installation command."""
+    """Custom install_lib command."""
 
     def run(self):
+        """Compile catalog before runing installation command."""
         self.run_command('compile_catalog')
-        _install_lib.run(self)
+        install_lib.run(self)
 
 
 install_requires = [
@@ -95,7 +96,6 @@ install_requires = [
     "pyPDF==1.13",
     "pyPDF2",
     "PyLD>=0.5.2",
-    "pyRXP==1.16",
     "pyStemmer==1.3.0",
     # python-dateutil>=2.0 is only for Python3
     "python-dateutil>=1.5,<2.0",
@@ -152,6 +152,16 @@ extras_require = {
     ],
     "sso": [
         "Flask-SSO>=0.1"
+    ],
+    # Alternative XML parsers
+    #
+    # For pyRXP, the version PyPI many not be the right one.
+    #
+    # $ pip install
+    # >    https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
+    "xml.parsers": [
+        "pyRXP==1.16-daily-unix",
+        "4suite"
     ]
 }
 
@@ -269,7 +279,7 @@ setup(
     test_suite='invenio.testsuite.suite',
     tests_require=tests_require,
     cmdclass={
-        'build': build,
-        'install_lib': install_lib,
+        'build': _build,
+        'install_lib': _install_lib,
     },
 )

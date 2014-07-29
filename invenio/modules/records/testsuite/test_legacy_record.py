@@ -30,16 +30,16 @@ bibrecord = lazy_import('invenio.legacy.bibrecord')
 bibrecord_config = lazy_import('invenio.legacy.bibrecord.bibrecord_config')
 
 try:
-    import pyRXP
-    parser_pyrxp_available = True
-except ImportError:
-    parser_pyrxp_available = False
-
-try:
     from lxml import etree
     parser_lxml_available = True
 except ImportError:
     parser_lxml_available = False
+
+try:
+    import pyRXP
+    parser_pyrxp_available = True
+except ImportError:
+    parser_pyrxp_available = False
 
 try:
     import Ft.Xml.Domlette
@@ -150,16 +150,16 @@ class BibRecordParsersTest(InvenioTestCase):
             '041': [([('a', 'eng')], ' ', ' ', '', 2)]
             }
 
-    if parser_pyrxp_available:
-        def test_pyRXP(self):
-            """ bibrecord - create_record() with pyRXP """
-            record = bibrecord._create_record_rxp(self.xmltext)
-            self.assertEqual(record, self.expected_record)
-
     if parser_lxml_available:
         def test_lxml(self):
             """ bibrecord - create_record() with lxml"""
             record = bibrecord._create_record_lxml(self.xmltext)
+            self.assertEqual(record, self.expected_record)
+
+    if parser_pyrxp_available:
+        def test_pyRXP(self):
+            """ bibrecord - create_record() with pyRXP """
+            record = bibrecord._create_record_rxp(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
     if parser_4suite_available:
@@ -1237,7 +1237,7 @@ class BibRecordMoveSubfieldTest(InvenioTestCase):
 
 class BibRecordCompareSubfieldTest(InvenioTestCase):
     """ bibrecord -  """
-    
+
     def setUp(self):
         """Initialize stuff"""
         xml_example_record = """

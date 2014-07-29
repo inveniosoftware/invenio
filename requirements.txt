@@ -3,7 +3,6 @@
 -e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
 # requires numpy before it can be installed
 #-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py
-https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
 -e git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow
 
 -e .[development]
