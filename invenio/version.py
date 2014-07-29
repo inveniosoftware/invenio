@@ -30,7 +30,7 @@ This file is imported by ``invenio.__init__``, and parsed by ``setup.py``.
 # - revision can be set if you want to override the date coming from git.
 #
 # See the doctest below.
-version = (1, 9999, 1, 'dev')
+version = (1, 9999, 2, 'dev')
 
 
 def build_version(*args):
