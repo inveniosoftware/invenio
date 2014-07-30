@@ -274,7 +274,7 @@ class Collection:
         sons = []
         id_dad = self.id
         query = "SELECT cc.id_son,c.name FROM collection_collection AS cc, collection AS c "\
-                "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score DESC, c.name ASC" % (int(id_dad), type)
+                "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score ASC, c.name ASC" % (int(id_dad), type)
         res = run_sql(query)
         for row in res:
             sons.append(get_collection(row[1]))
@@ -286,7 +286,7 @@ class Collection:
         descendant_ids = intbitset()
         id_dad = self.id
         query = "SELECT cc.id_son,c.name FROM collection_collection AS cc, collection AS c "\
-                "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score DESC" % (int(id_dad), type)
+                "WHERE cc.id_dad=%d AND cc.type='%s' AND c.id=cc.id_son ORDER BY score ASC" % (int(id_dad), type)
         res = run_sql(query)
         for row in res:
             col_desc = get_collection(row[1])

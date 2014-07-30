@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+-- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -624,41 +624,41 @@ INSERT INTO collectionboxname VALUES (9,'en','r','Browse by division:');
 INSERT INTO collectionboxname VALUES (9,'fr','r','Naviguer par division:');
 
 
-INSERT INTO collection_collection VALUES (1,15,'r',60);
-INSERT INTO collection_collection VALUES (1,16,'r',40);
-INSERT INTO collection_collection VALUES (1,17,'r',30);
--- INSERT INTO collection_collection VALUES (1,23,'r',20);
--- INSERT INTO collection_collection VALUES (1,24,'r',10);
-INSERT INTO collection_collection VALUES (15,6,'r',20);
-INSERT INTO collection_collection VALUES (15,2,'r',10);
-INSERT INTO collection_collection VALUES (15,32,'r',10);
-INSERT INTO collection_collection VALUES (15,26,'r',10);
-INSERT INTO collection_collection VALUES (16,3,'r',30);
-INSERT INTO collection_collection VALUES (16,4,'r',20);
-INSERT INTO collection_collection VALUES (16,5,'r',10);
-INSERT INTO collection_collection VALUES (17,8,'r',30);
-INSERT INTO collection_collection VALUES (17,18,'r',20);
-INSERT INTO collection_collection VALUES (17,22,'r',10);
-INSERT INTO collection_collection VALUES (17,33,'r',30);
-INSERT INTO collection_collection VALUES (22,19,'r',30);
-INSERT INTO collection_collection VALUES (22,20,'r',20);
-INSERT INTO collection_collection VALUES (22,21,'r',10);
-INSERT INTO collection_collection VALUES (1,9,'v',20);
-INSERT INTO collection_collection VALUES (1,10,'v',10);
-INSERT INTO collection_collection VALUES (9,11,'r',10);
-INSERT INTO collection_collection VALUES (9,12,'r',20);
-INSERT INTO collection_collection VALUES (10,13,'r',10);
-INSERT INTO collection_collection VALUES (10,14,'r',20);
-INSERT INTO collection_collection VALUES (13,30,'r',20);
--- INSERT INTO collection_collection VALUES (13,31,'r',10); -- ISOLDE Internal Notes
-INSERT INTO collection_collection VALUES (14,27,'r',20);
-INSERT INTO collection_collection VALUES (14,28,'r',10);
-INSERT INTO collection_collection VALUES (14,29,'r',10);
-INSERT INTO collection_collection VALUES (1,34,'v',5);
-INSERT INTO collection_collection VALUES (34,35,'r',4);
-INSERT INTO collection_collection VALUES (34,36,'r',3);
-INSERT INTO collection_collection VALUES (34,37,'r',2);
-INSERT INTO collection_collection VALUES (34,38,'r',1);
+INSERT INTO collection_collection VALUES (1,15,'r',0);
+INSERT INTO collection_collection VALUES (1,16,'r',1);
+INSERT INTO collection_collection VALUES (1,17,'r',2);
+-- INSERT INTO collection_collection VALUES (1,23,'r',0);
+-- INSERT INTO collection_collection VALUES (1,24,'r',1);
+INSERT INTO `collection_collection` VALUES (15,6,'r',0);
+INSERT INTO `collection_collection` VALUES (15,2,'r',1);
+INSERT INTO `collection_collection` VALUES (15,32,'r',3);
+INSERT INTO `collection_collection` VALUES (15,26,'r',2);
+INSERT INTO `collection_collection` VALUES (16,3,'r',0);
+INSERT INTO `collection_collection` VALUES (16,4,'r',1);
+INSERT INTO `collection_collection` VALUES (16,5,'r',2);
+INSERT INTO `collection_collection` VALUES (17,8,'r',1);
+INSERT INTO `collection_collection` VALUES (17,18,'r',2);
+INSERT INTO `collection_collection` VALUES (17,22,'r',3);
+INSERT INTO `collection_collection` VALUES (17,33,'r',0);
+INSERT INTO `collection_collection` VALUES (22,19,'r',0);
+INSERT INTO `collection_collection` VALUES (22,20,'r',1);
+INSERT INTO `collection_collection` VALUES (22,21,'r',2);
+INSERT INTO `collection_collection` VALUES (1,9,'v',3);
+INSERT INTO `collection_collection` VALUES (1,10,'v',4);
+INSERT INTO `collection_collection` VALUES (9,11,'r',1);
+INSERT INTO `collection_collection` VALUES (9,12,'r',0);
+INSERT INTO `collection_collection` VALUES (10,13,'r',1);
+INSERT INTO `collection_collection` VALUES (10,14,'r',0);
+INSERT INTO `collection_collection` VALUES (13,30,'r',0);
+-- INSERT INTO collection_collection VALUES (13,31,'r',0); -- ISOLDE Internal Notes
+INSERT INTO `collection_collection` VALUES (14,27,'r',0);
+INSERT INTO `collection_collection` VALUES (14,28,'r',2);
+INSERT INTO `collection_collection` VALUES (14,29,'r',1);
+INSERT INTO `collection_collection` VALUES (1,34,'v',5);
+INSERT INTO `collection_collection` VALUES (34,35,'r',0);
+INSERT INTO `collection_collection` VALUES (34,36,'r',1);
+INSERT INTO `collection_collection` VALUES (34,37,'r',2);
+INSERT INTO `collection_collection` VALUES (34,38,'r',3);
 
 INSERT INTO collection_example VALUES (1,1,1);
 INSERT INTO collection_example VALUES (1,5,2);
