@@ -17,15 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-def is_local_url(url):
-    """Checks if the current url is local using CFG_SITE_URL"""
-    import re
 
+def is_local_url(url):
+    """Check if the current url is local using CFG_SITE_URL."""
+    import re
     from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
+
     try:
         if re.match(CFG_SITE_URL, url) or re.match(CFG_SITE_SECURE_URL, url):
             return True
     except:
         pass
     return False
-

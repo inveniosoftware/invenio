@@ -83,8 +83,9 @@ class Storage(object):
         """
         Return a dictionary of field values for field for the given ids.
 
-        As in :meth:`get_field_values` but in this case returns a dictionary
-        with each of the fields and the list of field values.
+        As in :meth:`~invenio.modules.jsonalchemy.storage.Storage.get_field_values`
+        but in this case returns a dictionary with each of
+        the fields and the list of field values.
         """
         raise NotImplemented
 

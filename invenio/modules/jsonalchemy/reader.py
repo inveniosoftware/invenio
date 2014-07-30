@@ -67,6 +67,7 @@ class Reader(object):  # pylint: disable=R0921
     """Base reader."""
 
     def __new__(cls, json, blob=None, **kwargs):  # pylint: disable=W0613
+        """Implement object's instantiation."""
         try:
             master_format = json.additional_info.master_format
             return super(Reader, cls).__new__(readers[master_format])
@@ -74,6 +75,7 @@ class Reader(object):  # pylint: disable=R0921
             raise KeyError("Not reader found for '%s'" % (e.message, ))
 
     def __init__(self, json, blob=None, **kwargs):
+        """Implement initializer for the class."""
         self._blob = blob if blob is not None or kwargs.get('no_blob', False) \
             else json.get_blob()
         self._json = json
@@ -81,7 +83,8 @@ class Reader(object):  # pylint: disable=R0921
 
     @staticmethod
     def split_blob(blob, schema=None, **kwargs):
-        """
+        """Specify how to split the blob by single record.
+
         In case of several records inside the blob this method specify how to
         split then and work one by one afterwards.
         """
@@ -89,9 +92,9 @@ class Reader(object):  # pylint: disable=R0921
 
     @classmethod
     def translate(cls, blob, json_class, master_format='json', **kwargs):
-        """
-        Transforms the incoming blob into a json structure (``json_class``)
-        using the rules describes in the field and model definitions.
+        """Transform the incoming blob into a json structure (``json_class``).
+
+        It uses the rules described in the field and model definitions.
 
         :param blob: incoming blob (like MARC)
         :param json_class: Any subclass of
@@ -119,9 +122,10 @@ class Reader(object):  # pylint: disable=R0921
 
     @classmethod
     def add(cls, json, fields, blob=None, fetch_model_info=False):
-        """
-        Adds the list of fields to the json structure, if fields is ``None``
-        it adds all the possible fields from the current model.
+        """Add the list of fields to the json structure.
+
+        If fields is ``None`` it adds all the possible fields from the current
+        model.
 
         :param json: Any ``SmartJson`` object
         :param fields: Dict of fields to be added to the json structure
@@ -188,7 +192,7 @@ class Reader(object):  # pylint: disable=R0921
     @classmethod
     def update(cls, json, fields, blob=None, update_db=False):
         """
-        Updates the fields given from the json structure.
+        Update the fields given from the json structure.
 
         :param json: Any ``SmartJson`` object
         :param blob: incoming blob (like MARC), if ``None``, ``json.get_blob``
@@ -453,7 +457,7 @@ class Reader(object):  # pylint: disable=R0921
         set_default_type(field_name, schema)
 
     def _remove_none_values(self, obj):
-        """Handy method to remove recursively None values from obj."""
+        """Handy method to remove recursively ``None`` values from ``obj``."""
         if isinstance(obj, dict):
             for key in list(obj.keys()):
                 if obj[key] is None:
@@ -468,7 +472,7 @@ class Reader(object):  # pylint: disable=R0921
                     self._remove_none_values(element)
 
     def _update(self, fields):
-        """From the list of field names it tries to update their content."""
+        """From the list of field names try to update their content."""
         # TODO
         raise NotImplementedError('Missing implementation in current version')
 
@@ -562,10 +566,9 @@ class Reader(object):  # pylint: disable=R0921
 
     def _update_meta_metadata(self, fields=None, section=None,
                               keep_core_values=True, store_backup=True):
-        """
-        Given one field definition fills up the parallel dictionary with the
-        needed meta-metadata, including field extensions and after decorators.
+        """Fill up the parallel dictionary with the needed meta-metadata.
 
+        Meta-metadata will include also field extensions and after decorators.
         If there is some information about this field in the json structure it
         will keep some core information like the source format.
         """
@@ -573,7 +576,7 @@ class Reader(object):  # pylint: disable=R0921
         raise NotImplementedError('Missing implementation on this version')
 
     def _evaluate_before_decorators(self, field_def):
-        """Evaluates all the before decorators (they must return a boolean)."""
+        """Evaluate all the before decorators (they must return a boolean)."""
         for name, content in six.iteritems(field_def['decorators']['before']):
             if not FieldParser.decorator_before_extensions()[name]\
                     .evaluate(self, content):
@@ -581,7 +584,7 @@ class Reader(object):  # pylint: disable=R0921
         return True
 
     def _evaluate_on_decorators(self, field_def, master_value):
-        """Evaluates all the on decorators (they must return a boolean."""
+        """Evaluate all the on decorators (they must return a boolean."""
         for name, content in six.iteritems(field_def['decorators']['on']):
             if not FieldParser.decorator_on_extensions()[name]\
                     .evaluate(master_value,
@@ -590,7 +593,7 @@ class Reader(object):  # pylint: disable=R0921
         return True
 
     def _evaluate_after_decorators(self, field_name):
-        """Evaluates all the after decorators."""
+        """Evaluate all the after decorators."""
         if field_name not in self._json._dict_bson:
             return
         for ext, args in \

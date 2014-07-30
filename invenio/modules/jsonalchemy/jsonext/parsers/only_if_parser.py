@@ -26,8 +26,11 @@ from invenio.modules.jsonalchemy.parser import \
 
 
 class OnlyIfParser(DecoratorBeforeEvalBaseExtensionParser):
+
     """
-    Handles the @only_if decorator::
+    Handle the ``@only_if`` decorator.
+
+    .. code-block:: ini
 
         number_of_copies:
             creator:
@@ -41,8 +44,7 @@ class OnlyIfParser(DecoratorBeforeEvalBaseExtensionParser):
     def parse_element(cls, indent_stack):
         return (Keyword("@only_if").suppress() +
                 originalTextFor(nestedExpr())
-               ).setResultsName("only_if")\
-               .setParseAction(lambda toks: toks[0])
+                ).setResultsName("only_if").setParseAction(lambda toks: toks[0])
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
@@ -50,14 +52,15 @@ class OnlyIfParser(DecoratorBeforeEvalBaseExtensionParser):
 
     @classmethod
     def evaluate(cls, reader, args):
-        """
+        """Evaluate parser.
+
         This is a special case where the real evaluation of the decorator
-        happened before the evaluation, :see:create_element
+        is happening before the evaluation.
         """
         from invenio.modules.jsonalchemy.registry import functions
-        evaluated = try_to_eval(args,
-                functions(reader._json.additional_info.namespace),
-                self=reader._json)
+        evaluated = try_to_eval(
+            args, functions(reader._json.additional_info.namespace),
+            self=reader._json)
         if not isinstance(evaluated, (list, tuple)):
             return evaluated
         else:

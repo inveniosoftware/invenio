@@ -24,8 +24,9 @@ from invenio.modules.jsonalchemy.parser import \
 
 
 class DependsOnParser(DecoratorBeforeEvalBaseExtensionParser):
+
     """
-    Handles the @depends_on decorator::
+    Handle the @depends_on decorator::
 
         authors:
             derived:
@@ -37,11 +38,11 @@ class DependsOnParser(DecoratorBeforeEvalBaseExtensionParser):
 
     @classmethod
     def parse_element(cls, indent_stack):
-        return (Keyword("@depends_on").suppress() + \
+        return (Keyword("@depends_on").suppress() +
                 Literal('(').suppress() +
                 delimitedList(quotedString.setParseAction(removeQuotes)) +
                 Literal(')').suppress()
-               ).setResultsName("depends_on")
+                ).setResultsName("depends_on")
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):

@@ -24,9 +24,13 @@ from invenio.base.utils import try_to_eval
 from invenio.modules.jsonalchemy.parser import \
     DecoratorOnEvalBaseExtensionParser
 
+
 class OnlyIfMasterValueParser(DecoratorOnEvalBaseExtensionParser):
+
     """
-    Handles the @only_if_master_value decorator::
+    Handle the ``@only_if_master_value`` decorator.
+
+    .. code-block:: ini
 
         files_to_upload:
             creator:
@@ -41,22 +45,22 @@ class OnlyIfMasterValueParser(DecoratorOnEvalBaseExtensionParser):
 
     @classmethod
     def parse_element(cls, indent_stack):
-        """Sets ``only_if_master_value`` attribute to the rule"""
+        """Set ``only_if_master_value`` attribute to the rule."""
         return (Keyword("@only_if_master_value").suppress() +
                 originalTextFor(nestedExpr())
-               ).setResultsName("only_if_master_value")\
-               .setParseAction(lambda toks: toks[0])
+                ).setResultsName("only_if_master_value").setParseAction(
+                    lambda toks: toks[0])
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
-        """Simply returns the list of boolean expressions"""
+        """Simply return the list of boolean expressions."""
         return compile(content, '', 'eval')
 
     @classmethod
     def evaluate(cls, value, namespace, args):
-        """
-        Evaluates ``args`` with the master value from the input and returns a
-        boolean depending on them.
+        """Evaluate ``args`` with the master value from the input.
+
+        :returns: a boolean depending on evaluated ``value``.
         """
         from invenio.modules.jsonalchemy.registry import functions
         evaluated = try_to_eval(args, functions(namespace), value=value)

@@ -17,12 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""General extensions for JSON objects.
+r"""General extensions for JSON objects.
 
 JSONAlchemy allows the developer to extend the behavior or capabilities of the
 JSON objects using `extensions`. For more information about how extensions
-works check
-:class:`~.jsonext.parsers.extension_model_parser.ExtensionModelParser`.
+works check :class:`invenio.modules.jsonalchemy.jsonext.parsers.\
+extension_model_parser.ExtensionModelParser`.
 """
 
 

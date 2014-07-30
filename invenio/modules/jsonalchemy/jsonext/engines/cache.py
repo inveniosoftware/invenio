@@ -17,25 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.engines.cache
-    -----------------------------------------
-
-    This module wraps Flask-Cache as engine for JSONAlchemy.
-"""
+"""Wrapper for *Flask-Cache* as engine for *JSONAlchemy*."""
 
 from invenio.ext.cache import cache
 from invenio.modules.jsonalchemy.storage import Storage
 
 
 class CacheStorage(Storage):
-    """
-    Implements storage engine for Flask-Cache useful for testing.
-    """
+
+    """Implement storage engine for Flask-Cache useful for testing."""
 
     def __init__(self, **kwargs):
         """
-        See also :meth:`~invenio.modules.jsonalchemy.storage:Storage.__init__`
+        See also :meth:`~invenio.modules.jsonalchemy.storage.Storage.__init__`
         """
         self._prefix = kwargs.get('model', '')
 
@@ -48,19 +42,19 @@ class CacheStorage(Storage):
             raise KeyError()
 
     def save_one(self, data, id=None):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.save_one`"""
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.save_one`"""
         if id is not None:
             data['_id'] = id
         self._set(data)
         return data
 
     def save_many(self, jsons, ids=None):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.save_many`
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.save_many`
         """
         return map(lambda k: self.save_one(*k), zip(jsons, ids))
 
     def update_one(self, data, id=None):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_one`
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.update_one`
         """
         if id is not None:
             data['_id'] = id
@@ -71,30 +65,34 @@ class CacheStorage(Storage):
         return old_data
 
     def update_many(self, jsons, ids=None):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.update_many`
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.update_many`
         """
         return map(lambda k: self.update_one(*k), zip(jsons, ids))
 
     def get_one(self, id):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_one`"""
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.get_one`"""
         return self._get(id)
 
     def get_many(self, ids):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.get_many`"""
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.get_many`"""
         return map(self.get_one, ids)
 
     def get_field_values(self, ids, field, repetitive_values=True, count=False,
                          include_recid=False, split_by=0):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:\
-        Storage.get_field_values`"""
+        """
+        See
+        :meth:`~invenio.modules.jsonalchemy.storage.Storage.get_field_values`
+        """
         raise NotImplementedError()
 
     def get_fields_values(self, ids, fields, repetitive_values=True,
                           count=False, include_recid=False, split_by=0):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:\
-        Storage.get_fields_values`"""
+        """
+        See
+        :meth:`~invenio.modules.jsonalchemy.storage.Storage.get_fields_values`
+        """
         raise NotImplementedError()
 
     def search(self, query):
-        """See :meth:`~invenio.modules.jsonalchemy.storage:Storage.search`"""
+        """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.search`"""
         raise NotImplementedError()

@@ -27,27 +27,30 @@ from invenio.modules.jsonalchemy.parser import FieldBaseExtensionParser, \
 
 
 class SchemaParser(FieldBaseExtensionParser):
+
     """
-    Parses the schema definitions for fields, using cerberus::
+    Parse the schema definitions for fields, using cerberus.
+
+    .. code-block:: ini
+
         modification_date:
             schema:
-                {'modification_date': {'type': 'datetime',
-                                       'required': True,
-                                       'default': lambda: __import__('datetime').datetime.now()}}
+                {'modification_date': {
+                    'type': 'datetime',
+                    'required': True,
+                    'default': lambda: __import__('datetime').datetime.now()}}
     """
 
     @classmethod
     def parse_element(cls, indent_stack):
-        """Sets the ``schema`` attribute inside the rule"""
+        """Set the ``schema`` attribute inside the rule."""
         return (Keyword('schema:').suppress() +
                 indentedBlock(DICT_DEF, indent_stack)
-               ).setParseAction(lambda toks: toks[0])\
-               .setResultsName('schema')
-
+                ).setParseAction(lambda toks: toks[0]).setResultsName('schema')
 
     @classmethod
     def create_element(cls, rule, namespace):
-        """Just evaluates the content of the schema to a python dictionary"""
+        """Just evaluate the content of the schema to a python dictionary."""
         return try_to_eval(rule.schema, functions(namespace))
 
 parser = SchemaParser

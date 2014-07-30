@@ -19,11 +19,11 @@
 
 """Fields and models configuration loader.
 
-This module uses `pyparsing <http://pyparsing.wikispaces.com/>` to read
+This module uses `pyparsing <http://pyparsing.wikispaces.com/>`_ to read
 from thedifferent configuration files the field and model definitions.
 
 Default extensions to both parsers could be added inside
-:mod:`~.jsonext.parsers`
+:mod:`invenio.modules.jsonalchemy.jsonext.parsers`
 """
 import os
 import six
@@ -110,7 +110,7 @@ def _create_field_parser():
         calculated ::= [decorators] expr
 
     To check the syntactics of the parser extensions or decorators please go to
-    :mod:`~.jsonext.parsers`
+    :mod:`invenio.modules.jsonalchemy.jsonext.parsers`
     """
     indent_stack = [1]
 
@@ -148,7 +148,7 @@ def _create_field_parser():
         'function': compile(toks[-1].strip(), '', 'eval'),
         'type': 'creator',
         'decorators': toks.decorators.asDict()}
-        ).setResultsName('creator_def', listAllMatches=True)
+    ).setResultsName('creator_def', listAllMatches=True)
     creator = (Keyword('creator:').suppress() +
                indentedBlock(OneOrMore(creator_body), indent_stack))
 

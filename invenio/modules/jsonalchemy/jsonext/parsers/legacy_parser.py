@@ -26,8 +26,11 @@ from invenio.modules.jsonalchemy.parser import FieldParser, \
 
 
 class LegacyParser(DecoratorOnEvalBaseExtensionParser):
+
     """
-    Handles the @legacy decorator::
+    Handle the ``@legacy`` decorator.
+
+    .. code-block:: ini
 
         doi:
             creator:
@@ -48,19 +51,21 @@ class LegacyParser(DecoratorOnEvalBaseExtensionParser):
                 @parse_first(('recid', ))
                 {'url': 'http://example.org'}
     """
+
     __parsername__ = 'legacy'
 
     @classmethod
     def parse_element(cls, indent_stack):
         return (Keyword("@legacy").suppress() +
                 originalTextFor(nestedExpr("(", ")"))
-               ).setResultsName("legacy", listAllMatches=True)
+                ).setResultsName("legacy", listAllMatches=True)
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
-        """
-        Especial case of decorator, it creates the legacy rules dictionary and
-        it doesn't have any effect to the field definitions::
+        """Special case of decorator.
+
+        It creates the legacy rules dictionary and it doesn't have any effect
+        to the field definitions::
 
             {'100'   : ['authors[0]'],
              '100__' : ['authors[0]'],
@@ -75,16 +80,16 @@ class LegacyParser(DecoratorOnEvalBaseExtensionParser):
         for legacy_rule in content:
             legacy_rule = eval(legacy_rule[0])
 
-            if field_def['source_format']  in ('derived', 'calculated'):
+            if field_def['source_format'] in ('derived', 'calculated'):
                 inner_source_format = legacy_rule[0]
                 legacy_rule = legacy_rule[1:]
             else:
                 inner_source_format = field_def['source_format']
 
-            if not inner_source_format in \
+            if inner_source_format not in \
                     FieldParser._legacy_field_matchings[namespace]:
-                FieldParser._legacy_field_matchings[namespace]\
-                    [inner_source_format] = {}
+                FieldParser._legacy_field_matchings[namespace][
+                    inner_source_format] = {}
 
             for field_legacy_rule in legacy_rule:
                 #Allow string and tuple in the config file
@@ -96,19 +101,20 @@ class LegacyParser(DecoratorOnEvalBaseExtensionParser):
                     json_field = '.'.join((json_field, field_legacy_rule[-1]))
 
                 for legacy_field in legacy_fields:
-                    if not legacy_field in \
-                            FieldParser._legacy_field_matchings[namespace]\
-                            [inner_source_format]:
-                        FieldParser._legacy_field_matchings[namespace]\
-                            [inner_source_format][legacy_field] = []
-                    FieldParser._legacy_field_matchings[namespace]\
-                        [inner_source_format][legacy_field].append(json_field)
+                    if legacy_field not in FieldParser._legacy_field_matchings[
+                            namespace][inner_source_format]:
+                        FieldParser._legacy_field_matchings[
+                            namespace][inner_source_format][legacy_field] = []
+                    FieldParser._legacy_field_matchings[
+                        namespace][inner_source_format][legacy_field]\
+                        .append(json_field)
 
     @classmethod
     def evaluate(cls, value, namespace, args):
-        """
+        """Evaluate parser.
+
         This is a special case where the real evaluation of the decorator
-        happened before the evaluation, :see:create_element
+        happened before the evaluation.
         """
         return True
 

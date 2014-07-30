@@ -32,8 +32,11 @@ from invenio.modules.jsonalchemy.registry import functions
 
 
 class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):
+
     """
-    Handles the @memoze decorator::
+    Handle the ``@memoze`` decorator.
+
+    .. code-block:: ini
 
         number_of_comments:
             calculated:
@@ -94,18 +97,18 @@ class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):
 
     @classmethod
     def parse_element(cls, indent_stack):
-        """Sets ``memoize`` attribute to the rule"""
+        """Set ``memoize`` attribute to the rule."""
         return (Keyword("@memoize").suppress() +
                 Literal('(').suppress() +
                 SkipTo(')') +
                 Literal(')').suppress()
-               ).setResultsName("memoize")
+                ).setResultsName("memoize")
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
-        """
-        Tries to evaluate the memoize value to int if it fails it sets the
-        default value from ``DEFAULT_TIMEOUT``
+        """Try to evaluate the memoize value to int.
+
+        If it fails it sets the default value from ``DEFAULT_TIMEOUT``.
         """
         try:
             return int(content[0])
@@ -121,29 +124,31 @@ class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):
 
     @classmethod
     def evaluate(cls, json, field_name, action, args):
-        """
+        """Evaluate the parser.
+
         When getting a json field compare the timestamp and the lifetime of it
         and, if it the lifetime is over calculate its value again.
 
         If the value of the field has changed since the last time it gets
         updated in the DB.
         """
-        if cls.__cache == None:
+        if cls.__cache is None:
             cls.__cache = import_string(cfg.get('CFG_JSONALCHEMY_CACHE',
                                                 'invenio.ext.cache:cache'))
+
         @cls.__cache.memoize(timeout=args)
         def memoize(_id, field_name):
-            func = reduce(lambda obj, key: obj[key], \
-                              json.meta_metadata[field_name]['function'], \
-                              FieldParser.field_definitions(
-                                  json.additional_info.namespace))
+            func = reduce(lambda obj, key: obj[key],
+                          json.meta_metadata[field_name]['function'],
+                          FieldParser.field_definitions(
+                              json.additional_info.namespace))
             return try_to_eval(func, functions(json.additional_info.namespace),
                                self=json)
 
         if args == cls.DEFAULT_TIMEOUT:
             return
         if action == 'get':
-            if args == 0: # No cached version is stored, retrieve it
+            if args == 0:  # No cached version is stored, retrieve it
                 func = reduce(lambda obj, key: obj[key],
                               json.meta_metadata[field_name]['function'],
                               FieldParser.field_definitions(
@@ -156,7 +161,7 @@ class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):
                 json._dict_bson[field_name] = memoize(json.get('_id'),
                                                       field_name)
         elif action == 'set':
-            if args >= 0: # Don't store anything
+            if args >= 0:  # Don't store anything
                 json._dict_bson[field_name] = None
 
 parser = MemoizeParser

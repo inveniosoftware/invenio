@@ -25,8 +25,11 @@ from invenio.modules.jsonalchemy.parser import \
 
 
 class ParseFirstParser(DecoratorBeforeEvalBaseExtensionParser):
+
     """
-    Handles the @parse_first decorator::
+    Handle the ``@parse_first`` decorator.
+
+    .. code-block:: ini
 
         author_aggregation:
             derived:
@@ -38,11 +41,11 @@ class ParseFirstParser(DecoratorBeforeEvalBaseExtensionParser):
 
     @classmethod
     def parse_element(cls, indent_stack):
-        return (Keyword("@parse_first").suppress() + \
+        return (Keyword("@parse_first").suppress() +
                 Literal('(').suppress() +
                 delimitedList(quotedString.setParseAction(removeQuotes)) +
                 Literal(')').suppress()
-               ).setResultsName("parse_first")
+                ).setResultsName("parse_first")
 
     @classmethod
     def create_element(cls, rule, field_def, content, namespace):
@@ -50,7 +53,7 @@ class ParseFirstParser(DecoratorBeforeEvalBaseExtensionParser):
 
     @classmethod
     def evaluate(cls, reader, args):
-        """Tries to parse args first and return always True"""
+        """Try to parse ``args`` first and return always ``True``."""
         map(reader._unpack_rule, args)
         return True
 
