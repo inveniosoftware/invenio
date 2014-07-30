@@ -44,11 +44,19 @@ from invenio.bibauthorid_dbinterface import get_authors_by_name
 from invenio.bibauthorid_dbinterface import _add_external_id_to_author
 from invenio.bibauthorid_dbinterface import _remove_external_id_from_author
 from invenio.bibauthorid_name_utils import create_matchable_name
-from invenio.testutils import InvenioTestCase, run_test_suite, make_test_suite
+from invenio.testutils import (InvenioTestCase,
+                               run_test_suite,
+                               make_test_suite,
+                               nottest)
 import invenio.config as config
 
 from copy import deepcopy
 from mock import patch
+
+
+is_test_paper_claimed = nottest(is_test_paper_claimed)
+get_modified_marc_for_test = nottest(get_modified_marc_for_test)
+claim_test_paper = nottest(claim_test_paper)
 
 
 class BibAuthorIDRabbitTestCase(InvenioTestCase):
