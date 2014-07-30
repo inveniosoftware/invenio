@@ -17,23 +17,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.models.jsonalchemy.bases
-    --------------------------------
+"""General extensions for JSON objects.
 
-    General model extensions.
+JSONAlchemy allows the developer to extend the behavior or capabilities of the
+JSON objects using `extensions`. For more information about how extensions
+works check
+:class:`~.jsonext.parsers.extension_model_parser.ExtensionModelParser`.
 """
 
 
 class Versionable(object):
-    """
-    Versionable behavior for JSONAlchemy models.
-    """
+
+    """Versionable behavior for JSONAlchemy models."""
 
     def update(self):
-        """
-        Creates new revision of the object and saves link to the old one.
-        """
+        """Create new revision of the object and saves link to the old one."""
         #  We need a copy not to modify references to the old object!
         cls = self.__class__
         data = self.dumps()

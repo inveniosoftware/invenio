@@ -17,11 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.jsonalchemy.jsonext.readers.json_reader
-    --------------------------------------------------------
+"""Json Reader."""
 
-"""
 import re
 
 from invenio.modules.jsonalchemy.reader import ModelParser
@@ -29,7 +26,7 @@ from invenio.modules.jsonalchemy.reader import Reader
 
 
 class JsonReader(Reader):
-    """Default reader"""
+    """JSON reader."""
 
     __master_format__ = 'json'
 
