@@ -40,7 +40,9 @@
     <small class="text-muted">
         {{ _('This is a preview of your upload. The public version is available on %(x_link)s. '
              'If you want to remove your upload, please contact %(x_contact)s',
-             x_link='<a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}">' + url_for('record.metadata', recid=sip.metadata['recid'], _external=True) + '</a>',
+             x_link='<a href="{url}">{url}</a>'.format(
+                url=url_for('record.metadata', recid=sip.metadata['recid'], _external=True)
+             ),
              x_contact='<a href="mailto:{email}">{email}</a>'.format(email=config.CFG_SITE_SUPPORT_EMAIL)) }}
     </small>
     <hr />
