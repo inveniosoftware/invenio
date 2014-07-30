@@ -29,3 +29,4 @@ nydus==0.10.6
 Cerberus==0.5
 HTMLParser==0.0.2
 h5py==2.3.1
+unittest2==0.5.1
