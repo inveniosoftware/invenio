@@ -124,36 +124,13 @@ AVAILABLE_PARSERS = []
 # has been deleted.
 CFG_BIBRECORD_KEEP_SINGLETONS = True
 
-try:
-    from lxml import etree
-    if 'lxml' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-        AVAILABLE_PARSERS.append('lxml')
-except ImportError:
-    pass
+from lxml import etree
+AVAILABLE_PARSERS.append('lxml')
 
 try:
     import pyRXP
     if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         AVAILABLE_PARSERS.append('pyrxp')
-except ImportError:
-    pass
-
-try:
-    import Ft.Xml.Domlette
-    if '4suite' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-        AVAILABLE_PARSERS.append('4suite')
-except ImportError:
-    pass
-except Exception as err:
-    from warnings import warn
-    warn("Error when importing 4suite: %s" % err)
-    pass
-
-try:
-    import xml.dom.minidom
-    import xml.parsers.expat
-    if 'minidom' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-        AVAILABLE_PARSERS.append('minidom')
 except ImportError:
     pass
 
@@ -255,15 +232,9 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
         if parser == 'pyrxp':
             rec = _create_record_rxp(marcxml, verbose, correct,
                                      keep_singletons=keep_singletons)
-        elif parser == 'lxml':
+        else:
             rec = _create_record_lxml(marcxml, verbose, correct,
                                       keep_singletons=keep_singletons)
-        elif parser == '4suite':
-            rec = _create_record_4suite(marcxml,
-                                        keep_singletons=keep_singletons)
-        elif parser == 'minidom':
-            rec = _create_record_minidom(marcxml,
-                                         keep_singletons=keep_singletons)
     except InvenioBibRecordParserError as ex1:
         return (None, 0, str(ex1))
 
@@ -332,6 +303,7 @@ def filter_field_instances(field_instances, filter_subcode, filter_value,
 def record_drop_duplicate_fields(record):
     """
     Return a record where all the duplicate fields have been removed.
+
     Fields are considered identical considering also the order of their
     subfields.
     """
@@ -380,13 +352,22 @@ def records_identical(rec1, rec2, skip_005=True, ignore_field_order=False,
             # They already differs in length...
             return False
         if ignore_field_order:
-            ## We sort the fields, first by indicators and then by anything else
-            rec1_fields = sorted(rec1_fields, key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
-            rec2_fields = sorted(rec2_fields, key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
+            # We sort the fields, first by indicators and then by anything else
+            rec1_fields = sorted(
+                rec1_fields,
+                key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
+            rec2_fields = sorted(
+                rec2_fields,
+                key=lambda elem: (elem[1], elem[2], elem[3], elem[0]))
         else:
-            ## We sort the fields, first by indicators, then by global position and then by anything else
-            rec1_fields = sorted(rec1_fields, key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
-            rec2_fields = sorted(rec2_fields, key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
+            # We sort the fields, first by indicators, then by global position
+            # and then by anything else
+            rec1_fields = sorted(
+                rec1_fields,
+                key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
+            rec2_fields = sorted(
+                rec2_fields,
+                key=lambda elem: (elem[1], elem[2], elem[4], elem[3], elem[0]))
         for field1, field2 in zip(rec1_fields, rec2_fields):
             if ignore_duplicate_subfields:
                 if field1[1:4] != field2[1:4] or \
@@ -1375,11 +1356,14 @@ def record_find_field(rec, tag, field, strict=False):
 
     return (None, None)
 
+
 def record_match_subfields(rec, tag, ind1=" ", ind2=" ", sub_key=None,
                            sub_value='', sub_key2=None, sub_value2='',
                            case_sensitive=True):
-    """ Finds subfield instances in a particular field and tests
-    values in 1 of 3 possible ways:
+    """
+    Find subfield instances in a particular field.
+
+    It tests values in 1 of 3 possible ways:
      - Does a subfield code exist? (ie does 773__a exist?)
      - Does a subfield have a particular value? (ie 773__a == 'PhysX')
      - Do a pair of subfields have particular values?
@@ -1395,7 +1379,8 @@ def record_match_subfields(rec, tag, ind1=" ", ind2=" ", sub_key=None,
      * sub_value2 - string: expected value of second subfield
      * case_sensitive - bool: be case sensitive when matching values
 
-    Returns: false if no match found, else provides the field position (int) """
+    :return: false if no match found, else provides the field position (int)
+    """
     if sub_key is None:
         raise TypeError("None object passed for parameter sub_key.")
 
@@ -1426,6 +1411,7 @@ def record_match_subfields(rec, tag, ind1=" ", ind2=" ", sub_key=None,
                             if sub_value2 == subfields[sub_key2]:
                                 return field[4]
     return False
+
 
 def record_strip_empty_volatile_subfields(rec):
     """Remove unchanged volatile subfields from the record."""
@@ -1503,7 +1489,7 @@ def record_order_subfields(rec, tag=None):
     :param rec: bibrecord
     :type rec: bibrec
     :param tag: tag where the subfields will be ordered
-    :type tag: string
+    :type tag: str
     """
     if rec is None:
         return rec
@@ -1522,10 +1508,12 @@ def record_order_subfields(rec, tag=None):
 
 
 def record_empty(rec):
+    """TODO."""
     for key in rec.iterkeys():
         if key not in ('001', '005'):
             return False
     return True
+
 
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 def _compare_fields(field1, field2, strict=True):
@@ -2050,90 +2038,6 @@ def _create_record_rxp(marcxml,
             field_position_global += 1
 
     return record
-
-
-def _create_record_from_document(
-        document,
-        keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
-    """
-    Create a record from the document.
-
-    Of type xml.dom.minidom.Document or Ft.Xml.Domlette.Document).
-    """
-    root = None
-    for node in document.childNodes:
-        if node.nodeType == node.ELEMENT_NODE:
-            root = node
-            break
-
-    if root is None:
-        return {}
-
-    if root.tagName == 'collection':
-        children = _get_children_by_tag_name(root, 'record')
-        if not children:
-            return {}
-        root = children[0]
-
-    field_position_global = 1
-    record = {}
-
-    for controlfield in _get_children_by_tag_name(root, "controlfield"):
-        tag = controlfield.getAttributeNS(None, "tag").encode('utf-8')
-
-        text_nodes = controlfield.childNodes
-        value = ''.join([n.data for n in text_nodes]).encode("utf-8")
-
-        if value or keep_singletons:
-            field = ([], " ", " ", value, field_position_global)
-            record.setdefault(tag, []).append(field)
-            field_position_global += 1
-
-    for datafield in _get_children_by_tag_name(root, "datafield"):
-        subfields = []
-
-        for subfield in _get_children_by_tag_name(datafield, "subfield"):
-            value = _get_children_as_string(subfield.childNodes) \
-                .encode("utf-8")
-            if value or keep_singletons:
-                code = subfield.getAttributeNS(None, 'code').encode("utf-8")
-                subfields.append((code or '!', value))
-
-        if subfields or keep_singletons:
-            tag = datafield.getAttributeNS(None, "tag").encode("utf-8") or '!'
-
-            ind1 = datafield.getAttributeNS(None, "ind1").encode("utf-8")
-            ind2 = datafield.getAttributeNS(None, "ind2").encode("utf-8")
-            ind1, ind2 = _wash_indicators(ind1, ind2)
-            field = (subfields, ind1, ind2, "", field_position_global)
-
-            record.setdefault(tag, []).append(field)
-            field_position_global += 1
-
-    return record
-
-
-def _create_record_minidom(marcxml,
-                           keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
-    """Create a record using minidom."""
-    try:
-        dom = xml.dom.minidom.parseString(marcxml)
-    except xml.parsers.expat.ExpatError as ex1:
-        raise InvenioBibRecordParserError(str(ex1))
-
-    return _create_record_from_document(dom, keep_singletons=keep_singletons)
-
-
-def _create_record_4suite(marcxml,
-                          keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
-    """Create a record using the 4suite parser."""
-    try:
-        dom = Ft.Xml.Domlette.NonvalidatingReader.parseString(marcxml,
-                                                              "urn:dummy")
-    except Ft.Xml.ReaderException as ex1:
-        raise InvenioBibRecordParserError(ex1.message)
-
-    return _create_record_from_document(dom, keep_singletons=keep_singletons)
 
 
 def _concat(alist):

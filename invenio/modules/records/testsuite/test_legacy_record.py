@@ -29,11 +29,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 bibrecord = lazy_import('invenio.legacy.bibrecord')
 bibrecord_config = lazy_import('invenio.legacy.bibrecord.bibrecord_config')
 
-try:
-    from lxml import etree
-    parser_lxml_available = True
-except ImportError:
-    parser_lxml_available = False
+from lxml import etree
 
 try:
     import pyRXP
@@ -41,18 +37,6 @@ try:
 except ImportError:
     parser_pyrxp_available = False
 
-try:
-    import Ft.Xml.Domlette
-    parser_4suite_available = True
-except ImportError:
-    parser_4suite_available = False
-
-try:
-    import xml.dom.minidom
-    import xml.parsers.expat
-    parser_minidom_available = True
-except ImportError:
-    parser_minidom_available = False
 
 class BibRecordSuccessTest(InvenioTestCase):
     """ bibrecord - demo file parsing test """
@@ -150,11 +134,10 @@ class BibRecordParsersTest(InvenioTestCase):
             '041': [([('a', 'eng')], ' ', ' ', '', 2)]
             }
 
-    if parser_lxml_available:
-        def test_lxml(self):
-            """ bibrecord - create_record() with lxml"""
-            record = bibrecord._create_record_lxml(self.xmltext)
-            self.assertEqual(record, self.expected_record)
+    def test_lxml(self):
+        """ bibrecord - create_record() with lxml"""
+        record = bibrecord._create_record_lxml(self.xmltext)
+        self.assertEqual(record, self.expected_record)
 
     if parser_pyrxp_available:
         def test_pyRXP(self):
@@ -162,17 +145,6 @@ class BibRecordParsersTest(InvenioTestCase):
             record = bibrecord._create_record_rxp(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
-    if parser_4suite_available:
-        def test_4suite(self):
-            """ bibrecord - create_record() with 4suite """
-            record = bibrecord._create_record_4suite(self.xmltext)
-            self.assertEqual(record, self.expected_record)
-
-    if parser_minidom_available:
-        def test_minidom(self):
-            """ bibrecord - create_record() with minidom """
-            record = bibrecord._create_record_minidom(self.xmltext)
-            self.assertEqual(record, self.expected_record)
 
 class BibRecordDropDuplicateFieldsTest(InvenioTestCase):
     def test_drop_duplicate_fields(self):
@@ -1632,22 +1604,6 @@ class BibRecordSingletonTest(InvenioTestCase):
             '100': [([('a', 'Some value')], ' ', ' ', '', 2)],
             }
 
-    if parser_minidom_available:
-        def test_singleton_removal_minidom(self):
-            """bibrecord - enforcing singleton removal with minidom"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='minidom',
-                                           keep_singletons=False)[0][0]
-            self.assertEqual(rec, self.rec_expected)
-
-    if parser_4suite_available:
-        def test_singleton_removal_4suite(self):
-            """bibrecord - enforcing singleton removal with 4suite"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='4suite',
-                                           keep_singletons=False)[0][0]
-            self.assertEqual(rec, self.rec_expected)
-
     if parser_pyrxp_available:
         def test_singleton_removal_pyrxp(self):
             """bibrecord - enforcing singleton removal with pyrxp"""
@@ -1656,13 +1612,12 @@ class BibRecordSingletonTest(InvenioTestCase):
                                            keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
-    if parser_lxml_available:
-        def test_singleton_removal_lxml(self):
-            """bibrecord - enforcing singleton removal with lxml"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='lxml',
-                                           keep_singletons=False)[0][0]
-            self.assertEqual(rec, self.rec_expected)
+    def test_singleton_removal_lxml(self):
+        """bibrecord - enforcing singleton removal with lxml"""
+        rec = bibrecord.create_records(self.xml, verbose=1,
+                                       correct=1, parser='lxml',
+                                       keep_singletons=False)[0][0]
+        self.assertEqual(rec, self.rec_expected)
 
 class BibRecordNumCharRefTest(InvenioTestCase):
     """ bibrecord - testing numerical character reference expansion"""
@@ -1682,20 +1637,6 @@ class BibRecordNumCharRefTest(InvenioTestCase):
             '123': [([('a', '\xce\xa3 & \xce\xa3'), ('a', 'use &amp; in XML'),], ' ', ' ', '', 2)],
             }
 
-    if parser_minidom_available:
-        def test_numcharref_expansion_minidom(self):
-            """bibrecord - numcharref expansion with minidom"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='minidom')[0][0]
-            self.assertEqual(rec, self.rec_expected)
-
-    if parser_4suite_available:
-        def test_numcharref_expansion_4suite(self):
-            """bibrecord - numcharref expansion with 4suite"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='4suite')[0][0]
-            self.assertEqual(rec, self.rec_expected)
-
     if parser_pyrxp_available:
         def test_numcharref_expansion_pyrxp(self):
             """bibrecord - but *no* numcharref expansion with pyrxp (see notes)
@@ -1714,12 +1655,12 @@ class BibRecordNumCharRefTest(InvenioTestCase):
             #self.assertEqual(rec, self.rec_expected)
             self.assertEqual(rec, None)
 
-    if parser_lxml_available:
-        def test_numcharref_expansion_lxml(self):
-            """bibrecord - numcharref expansion with lxml"""
-            rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='lxml')[0][0]
-            self.assertEqual(rec, self.rec_expected)
+    def test_numcharref_expansion_lxml(self):
+        """bibrecord - numcharref expansion with lxml"""
+        rec = bibrecord.create_records(self.xml, verbose=1,
+                                       correct=1, parser='lxml')[0][0]
+        self.assertEqual(rec, self.rec_expected)
+
 
 class BibRecordExtractIdentifiersTest(InvenioTestCase):
     """ bibrecord - testing for getting identifiers from record """

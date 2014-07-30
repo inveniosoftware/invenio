@@ -153,15 +153,15 @@ extras_require = {
     "sso": [
         "Flask-SSO>=0.1"
     ],
-    # Alternative XML parsers
+    # Alternative XML parser
     #
-    # For pyRXP, the version PyPI many not be the right one.
+    # For pyRXP, the version on PyPI many not be the right one.
     #
     # $ pip install
     # >    https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
-    "xml.parsers": [
-        "pyRXP==1.16-daily-unix",
-        "4suite"
+    #
+    "pyrxp": [
+        "pyRXP==1.16-daily-unix"
     ]
 }
 
