@@ -68,22 +68,6 @@ class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    # WebServices are disabled in OPS
-    # def test_websearch_search_services_report(self):
-    #     """websearchadmin - availability of WebSearch "Search Services" Admin pages"""
-    #
-    #     url = CFG_SITE_URL + '/admin/websearch/websearchadmin.py?colID=1&mtype=perform_checksearchservices&ln=en'
-    #     error_messages = test_web_page_content(url,
-    #                                            username='admin',
-    #                                            password='',
-    #                                            expected_text=['CollectionNameSearchService',
-    #                                                           'collections of interest',
-    #                                                           'OK',
-    #                                                           'SubmissionNameSearchService',
-    #                                                           'submissions of interest'])
-    #     if error_messages:
-    #         self.fail(merge_error_messages(error_messages))
-    #     return
 
 TEST_SUITE = make_test_suite(WebSearchAdminWebPagesAvailabilityTest)
 

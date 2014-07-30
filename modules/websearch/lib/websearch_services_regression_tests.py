@@ -22,12 +22,8 @@
 
 """WebSearch services regression tests."""
 
-__revision__ = "$Id$"
+from invenio.testutils import make_test_suite, run_test_suite
 
-from invenio.testutils import InvenioTestCase
-import time
-import os
-import traceback
 
 from invenio.testutils import make_test_suite, \
     run_test_suite, \
