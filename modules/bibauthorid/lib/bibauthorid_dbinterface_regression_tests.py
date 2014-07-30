@@ -10,12 +10,14 @@ from invenio.bibauthorid_dbinterface import _get_grouped_records_using_marc_cach
 from invenio.bibauthorid_dbinterface import _get_grouped_records_from_db
 from invenio.bibauthorid_rabbit_regression_tests import BibAuthorIDRabbitTestCase
 from invenio.bibauthorid_webapi import get_bibrefs_from_bibrecs
-from invenio.bibauthorid_testutils import get_modified_marc_for_test
 from invenio.bibauthorid_testutils import get_new_marc_for_test
 from invenio.bibauthorid_testutils import get_bibrec_for_record
 
-from invenio.testutils import make_test_suite
-from invenio.testutils import run_test_suite
+from invenio.testutils import (make_test_suite,
+                               run_test_suite,
+                               nottest)
+
+get_new_marc_for_test = nottest(get_new_marc_for_test)
 
 
 class Marc100700CacheTestCase(BibAuthorIDRabbitTestCase):  # TODO Refactor, create test utils.
