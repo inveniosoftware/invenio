@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-
-"""
+"""Deposit workflow tasks."""
 
 from __future__ import print_function
 
@@ -33,6 +31,7 @@ from flask import current_app, abort, request
 from flask.ext.login import current_user
 
 from invenio.modules.records.api import get_record
+from invenio.modules.editor.models import HstRECORD
 from invenio.modules.deposit.models import Deposition, Agent, \
     DepositionDraftCacheManager
 from invenio.ext.logging import register_exception
@@ -326,8 +325,11 @@ def merge_record(draft_id='_default', pre_process_load=None,
 
         # Ensure we are based on latest version_id to prevent being rejected in
         # the bibupload queue.
-        sip.metadata['modification_date'] = \
-            current_full_json['modification_date']
+        hst_record = HstRECORD.query.filter_by(
+            id_bibrec=sip.metadata.get('recid')
+        ).order_by(HstRECORD.job_date.desc()).first()
+
+        sip.metadata['modification_date'] = hst_record.job_date.isoformat()
 
         d.update()
     return _merge_record
