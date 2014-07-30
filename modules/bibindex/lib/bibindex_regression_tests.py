@@ -1448,25 +1448,22 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
     new_index_name = ""
 
     @classmethod
-    def setUp(self):
-        self.counter += 1
-        if self.counter == 1:
-            self.new_index_name = create_virtual_index(self._id, self.indexes)
-            for index_name in self.indexes:
-                wordTable = WordTable(index_name=index_name,
-                                      table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      wash_index_terms=50)
-                wordTable.add_recIDs([[1, 113]], 1000)
-            vit = VirtualIndexTable(self.new_index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-            vit.run_update()
-            #removal part
-            vit.remove_dependent_index("authorcount")
+    def setUpClass(cls):
+        cls.new_index_name = create_virtual_index(cls._id, cls.indexes)
+        for index_name in cls.indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 113]], 1000)
+        vit = VirtualIndexTable(cls.new_index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        vit.run_update()
+        #removal part
+        vit.remove_dependent_index("authorcount")
 
     @classmethod
-    def tearDown(self):
-        remove_virtual_index(self._id)
-
+    def tearDownClass(cls):
+        remove_virtual_index(cls._id)
 
     def test_authorcount_removal_number_of_items(self):
         """bibindex - checks virtual index after authorcount index removal - number of items"""
