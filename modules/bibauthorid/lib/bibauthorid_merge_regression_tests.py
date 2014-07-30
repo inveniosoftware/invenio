@@ -9,7 +9,8 @@ from invenio.bibauthorid_testutils import reject_test_paper
 
 from invenio.testutils import (InvenioTestCase,
                                make_test_suite,
-                               run_test_suite)
+                               run_test_suite,
+                               nottest)
 
 from invenio.bibauthorid_merge import merge_dynamic
 from invenio.bibauthorid_merge import merge_static
