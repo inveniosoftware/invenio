@@ -1550,7 +1550,7 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         res = run_sql(query % self._id)
         terms = deserialize_via_marshal(res[0][0])
         terms = [re.sub(re_prefix, '', term) for term in terms]
-        self.assertEqual(sorted(['151', '1985', '1985', '357', '357-362',
+        self.assertEqual(sorted(['151', '1985', '357', '357-362',
                          'Phys. Lett., B',
                          'Phys. Lett., B 151',
                          'Phys. Lett., B 151 (1985) 357',
