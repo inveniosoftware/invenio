@@ -64,7 +64,7 @@ install_requires = [
     "feedparser==5.1.3",
     "fixture==1.5",
     "Flask==0.10.1",
-    "Flask-Admin==1.0.7",
+    "Flask-Admin>=1.0.8,<1.1",
     "Flask-Assets==0.10",
     "Flask-Babel==0.9",
     "Flask-Breadcrumbs==0.1",

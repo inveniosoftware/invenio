@@ -93,7 +93,8 @@ def setup_app(app):
     admin = Admin(
         name=app.config['ADMIN_NAME'],
         index_view=AdminIndexView(),
-        base_template="admin_base.html"
+        base_template="admin_base.html",
+        template_mode='bootstrap3'
     )
     admin.init_app(app)
 
