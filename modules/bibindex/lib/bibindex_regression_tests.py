@@ -1440,9 +1440,8 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
                          deserialize_via_marshal(run_sql(query)[0][0]))
 
 
-class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
+class BibIndexVirtualIndexTest(InvenioTestCase):
 
-    counter = 0
     indexes = ["authorcount", "journal", "year"]
     _id = 40
     new_index_name = ""
@@ -1511,19 +1510,40 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         terms = [re.sub(re_prefix, '', term) for term in terms]
         self.assertEqual(sorted(['2002', 'Eur. Phys. J., C']), sorted(terms))
 
+
+class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
+
+    _id = 40
+    indexes = ["authorcount", "journal", "year"]
+    new_index_name = ""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.new_index_name = create_virtual_index(cls._id, cls.indexes)
+        for index_name in cls.indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 113]], 1000)
+        vit = VirtualIndexTable(cls.new_index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        vit.run_update()
+        #removal part
+        vit.remove_dependent_index("authorcount")
+        vit.remove_dependent_index("year")
+
+    @classmethod
+    def tearDownClass(cls):
+        remove_virtual_index(cls._id)
+
     def test_year_removal_number_of_items(self):
         """bibindex - checks virtual index after year removal - number of items"""
-        #must be run after: tearDown
-        vit = VirtualIndexTable(self.new_index_name,
-                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-        vit.remove_dependent_index("year")
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
         self.assertEqual(197, res[0][0])
 
     def test_year_removal_record_18_hitlist(self):
         """bibindex - checks virtual index after year removal - termlist for record 18"""
-        #must be run after: tearDown, test_year_removal_number_of_items
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=18"""
         res = run_sql(query % self._id)
         terms = deserialize_via_marshal(res[0][0])
@@ -1534,6 +1554,7 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
                          'Phys. Lett., B 151 (1985) 357',
                          'Phys. Lett., B 151 (1985) 357-362']),
                          sorted(terms))
+
 
 class BibIndexCLICallTest(InvenioTestCase):
     """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
