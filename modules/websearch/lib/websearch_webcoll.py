@@ -489,6 +489,11 @@ class Collection:
                     recIDs = sort_records(None, recIDs, 'reportnumber')
                 elif self.name in ['CERN Yellow Reports']:
                     recIDs = sort_records(None, recIDs, '084__a')
+                elif self.name in ['CERN Courier Issues',
+                                   'CERN Courier Articles',
+                                   'CERN Bulletin Issues',
+                                   'CERN Bulletin Articles']:
+                    recIDs = sort_records(None, recIDs, '773__y')
             # CERN hack ends.
 
             total = len(recIDs)
