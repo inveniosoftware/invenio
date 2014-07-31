@@ -70,7 +70,6 @@ def get_translations():
         locale = get_locale()
         translations = TRANSLATIONS.get(locale)
         ctx.babel_translations = translations
-    current_app.logger.info(translations)
     return translations
 
 
