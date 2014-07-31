@@ -74,7 +74,7 @@ install_requires = [
     "Flask-Gravatar==0.4.0",
     "Flask-Login==0.2.7",
     "Flask-Menu==0.1",
-    "Flask-OAuthlib==0.4.3",
+    "Flask-OAuthlib>=0.6.0,<0.7",
     "Flask-Principal==0.4.0",
     "Flask-Registry>0.1",
     "Flask-RESTful==0.2.12",
