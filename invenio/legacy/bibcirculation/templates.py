@@ -12239,7 +12239,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                           <th width="100" valign="top">%s</th>
                           <td>
                             <table class="bibcircnotes">
-                    """ % (_("Barcode"), barcode or 'No barcode asociated',
+                    """ % (_("Barcode"), barcode or 'No barcode associated',
                            _("Previous notes"))
 
             out += notes
