@@ -17,20 +17,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
+"""TODO."""
 
-"""
-
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import os
-import dictdiffer
 import dateutil.parser
 
 from tempfile import mkstemp
 from functools import partial
 from flask import current_app, abort, request
 from flask.ext.login import current_user
+
+# FIXME this package has been copied locally as the public version is
+#       waiting to be updated with some patches.
+#import dictdiffer
+from .vendors import dictdiffer
 
 from invenio.modules.records.api import get_record
 from invenio.modules.deposit.models import Deposition, Agent, \
