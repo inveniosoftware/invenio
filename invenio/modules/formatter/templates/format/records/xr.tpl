@@ -1,6 +1,6 @@
 {#-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,6 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
+{%- set is_root_collection = collection and collection.name == config.CFG_SITE_NAME -%}
 <rss version="2.0"
     xmlns:media="http://search.yahoo.com/mrss/"
     xmlns:atom="http://www.w3.org/2005/Atom"
@@ -24,15 +25,15 @@
     xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
   <channel>
 {#- FIXME add i18n support -#}
-    <title>{{ config.CFG_SITE_NAME }}
-      {%- if collection and collection.name != config.CFG_SITE_NAME -%}
-      : {{ collection.name }}
+    <title>{{ config.CFG_SITE_NAME|e }}
+      {%- if not is_root_collection -%}
+      : {{ collection.name|e }}
       {%- endif -%}
     </title>
-    <link>{{ config.CFG_SITE_URL }}</link>
-    <description>{{ config.CFG_SITE_NAME }} latest documents
-      {%- if collection and collection.name != config.CFG_SITE_NAME -%}
-      {{ ' ' }}in {{ collection.name }}
+    <link>{{ config.CFG_SITE_URL if is_root_collection else url_for('search.collection', name=collection.name, _external=True) }}</link>
+    <description>{{ config.CFG_SITE_NAME|e }}{{ _('latest documents') }}
+      {%- if not is_root_collection -%}
+      {{ ' ' }}in {{ collection.name|e }}
       {%- endif -%}
     </description>
     <language>{{ config.CFG_SITE_LANG }}</language>
