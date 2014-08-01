@@ -85,6 +85,7 @@ class RnkCITATIONDICT(db.Model):
     __tablename__ = 'rnkCITATIONDICT'
     citee = db.Column(db.Integer(10, unsigned=True), primary_key=True)
     citer = db.Column(db.Integer(10, unsigned=True), primary_key=True)
+    last_updated = db.Column(db.DateTime, nullable=False)
     __table_args__ = (db.Index('rnkCITATIONDICT_reverse', citer, citee),
                       db.Model.__table_args__)
 
