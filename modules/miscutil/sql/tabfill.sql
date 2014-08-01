@@ -67,7 +67,7 @@ INSERT INTO field VALUES (44,'country','country');
 INSERT INTO field VALUES (45,'note','note');
 INSERT INTO field VALUES (46,'address','address');
 INSERT INTO field VALUES (47,'data source','datasource');
-INSERT INTO field VALUES (50,'journal page','journalpage');
+INSERT INTO field VALUES (48,'journal page','journalpage');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -300,7 +300,7 @@ INSERT INTO field_tag VALUES (46,234,10);
 INSERT INTO field_tag VALUES (46,149,10);
 --
 INSERT INTO field_tag VALUES (47,235,10);
-INSERT INTO field_tag VALUES (50,236,10);
+INSERT INTO field_tag VALUES (48,236,10);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
