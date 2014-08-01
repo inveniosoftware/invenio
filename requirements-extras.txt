@@ -11,7 +11,7 @@ selenium
 winpdb
 mock
 ipython
-cython
+cython==0.20.2
 nose
 nosexcover
 flake8
