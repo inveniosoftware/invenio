@@ -32,7 +32,8 @@ class BibARXIVPDF(db.Model):
 
     __tablename__ = 'bibARXIVPDF'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True)
-    status = db.Column(db.Enum('ok', 'missing'), nullable=False, index=True)
+    status = db.Column(db.Enum('ok', 'missing', name='bibarxivpdf_status'),
+                       nullable=False, index=True)
     date_harvested = db.Column(db.DateTime, nullable=False)
     version = db.Column(db.TinyInteger(2), nullable=False)
 

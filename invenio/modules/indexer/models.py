@@ -120,7 +120,7 @@ class IdxPAIR01R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -166,7 +166,7 @@ class IdxPAIR02R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -192,7 +192,7 @@ class IdxPAIR03R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -218,7 +218,7 @@ class IdxPAIR04R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -244,7 +244,7 @@ class IdxPAIR05R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -270,7 +270,7 @@ class IdxPAIR06R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -296,7 +296,7 @@ class IdxPAIR07R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -322,7 +322,7 @@ class IdxPAIR08R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -348,7 +348,7 @@ class IdxPAIR09R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -374,7 +374,7 @@ class IdxPAIR10R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -400,7 +400,7 @@ class IdxPAIR11R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -426,7 +426,7 @@ class IdxPAIR12R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -452,7 +452,7 @@ class IdxPAIR13R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -478,7 +478,7 @@ class IdxPAIR14R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -504,7 +504,7 @@ class IdxPAIR15R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -530,7 +530,7 @@ class IdxPAIR16R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -556,7 +556,7 @@ class IdxPAIR17R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -582,7 +582,7 @@ class IdxPAIR18R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -608,7 +608,7 @@ class IdxPAIR19R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -634,7 +634,7 @@ class IdxPAIR20R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -660,7 +660,7 @@ class IdxPAIR21R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -686,7 +686,7 @@ class IdxPAIR22R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -712,7 +712,7 @@ class IdxPAIR23R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -738,7 +738,7 @@ class IdxPAIR24R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -764,7 +764,7 @@ class IdxPAIR25R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -790,7 +790,7 @@ class IdxPAIR26R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -816,7 +816,7 @@ class IdxPAIR27R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -842,7 +842,7 @@ class IdxPAIR28R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -867,7 +867,7 @@ class IdxPHRASE01R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -912,7 +912,7 @@ class IdxPHRASE02R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -937,7 +937,7 @@ class IdxPHRASE03R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -962,7 +962,7 @@ class IdxPHRASE04R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -987,7 +987,7 @@ class IdxPHRASE05R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1012,7 +1012,7 @@ class IdxPHRASE06R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1037,7 +1037,7 @@ class IdxPHRASE07R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1062,7 +1062,7 @@ class IdxPHRASE08R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1087,7 +1087,7 @@ class IdxPHRASE09R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1112,7 +1112,7 @@ class IdxPHRASE10R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1137,7 +1137,7 @@ class IdxPHRASE11R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1162,7 +1162,7 @@ class IdxPHRASE12R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1187,7 +1187,7 @@ class IdxPHRASE13R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1212,7 +1212,7 @@ class IdxPHRASE14R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1237,7 +1237,7 @@ class IdxPHRASE15R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1262,7 +1262,7 @@ class IdxPHRASE16R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1287,7 +1287,7 @@ class IdxPHRASE17R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1312,7 +1312,7 @@ class IdxPHRASE18R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1337,7 +1337,7 @@ class IdxPHRASE19R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1362,7 +1362,7 @@ class IdxPHRASE20R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1387,7 +1387,7 @@ class IdxPHRASE21R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1412,7 +1412,7 @@ class IdxPHRASE22R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1437,7 +1437,7 @@ class IdxPHRASE23R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1462,7 +1462,7 @@ class IdxPHRASE24R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1487,7 +1487,7 @@ class IdxPHRASE25R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1512,7 +1512,7 @@ class IdxPHRASE26R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1537,7 +1537,7 @@ class IdxPHRASE27R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1562,7 +1562,7 @@ class IdxPHRASE28R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1588,7 +1588,7 @@ class IdxWORD01R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1634,7 +1634,7 @@ class IdxWORD02R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1660,7 +1660,7 @@ class IdxWORD03R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1686,7 +1686,7 @@ class IdxWORD04R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1712,7 +1712,7 @@ class IdxWORD05R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1738,7 +1738,7 @@ class IdxWORD06R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1764,7 +1764,7 @@ class IdxWORD07R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1790,7 +1790,7 @@ class IdxWORD08R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1816,7 +1816,7 @@ class IdxWORD09R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1842,7 +1842,7 @@ class IdxWORD10R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1868,7 +1868,7 @@ class IdxWORD11R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1894,7 +1894,7 @@ class IdxWORD12R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1920,7 +1920,7 @@ class IdxWORD13R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1946,7 +1946,7 @@ class IdxWORD14R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1972,7 +1972,7 @@ class IdxWORD15R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -1998,7 +1998,7 @@ class IdxWORD16R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2024,7 +2024,7 @@ class IdxWORD17R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2050,7 +2050,7 @@ class IdxWORD18R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2076,7 +2076,7 @@ class IdxWORD19R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2102,7 +2102,7 @@ class IdxWORD20R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2128,7 +2128,7 @@ class IdxWORD21R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2154,7 +2154,7 @@ class IdxWORD22R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2180,7 +2180,7 @@ class IdxWORD23R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2206,7 +2206,7 @@ class IdxWORD24R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2232,7 +2232,7 @@ class IdxWORD25R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2258,7 +2258,7 @@ class IdxWORD26R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2284,7 +2284,7 @@ class IdxWORD27R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)
@@ -2310,7 +2310,7 @@ class IdxWORD28R(db.Model):
                 db.ForeignKey(Bibrec.id),
                 primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
-    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
+    type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY', name=__tablename__+'_type'),
                 nullable=False,
                 server_default='CURRENT',
                 primary_key=True)

@@ -40,7 +40,7 @@ class AulPAPERS(db.Model):
     experiment_number = db.Column(db.String(255), nullable=False)
     last_modified = db.Column(db.Integer(10, unsigned=True),
                               nullable=False)
-    __table_args__ = (db.Index('id_user', id_user), db.Model.__table_args__)
+    __table_args__ = (db.Index(__tablename__+'_id_user', id_user), db.Model.__table_args__)
 
 
 class AulREFERENCES(db.Model):
@@ -54,7 +54,7 @@ class AulREFERENCES(db.Model):
     paper_id = db.Column(db.Integer(15, unsigned=True),
                          db.ForeignKey(AulPAPERS.id), primary_key=True,
                          nullable=False)
-    __table_args__ = (db.Index('paper_id', paper_id), db.Index('item', item),
+    __table_args__ = (db.Index(__tablename__+'_paper_id', paper_id), db.Index(__tablename__+'_item', item),
                       db.Model.__table_args__)
 
 
@@ -74,8 +74,8 @@ class AulAFFILIATIONS(db.Model):
     paper_id = db.Column(db.Integer(15, unsigned=True),
                          db.ForeignKey(AulPAPERS.id), primary_key=True,
                          nullable=False)
-    __table_args__ = (db.Index('acronym', acronym), db.Index('item', item),
-                      db.Index('paper_id', paper_id), db.Model.__table_args__)
+    __table_args__ = (db.Index(__tablename__+'_acronym', acronym), db.Index(__tablename__+'_item', item),
+                      db.Index(__tablename__+'_paper_id', paper_id), db.Model.__table_args__)
 
 
 class AulAUTHORS(db.Model):
@@ -92,7 +92,7 @@ class AulAUTHORS(db.Model):
     paper_id = db.Column(db.Integer(15, unsigned=True),
                          db.ForeignKey(AulPAPERS.id), primary_key=True,
                          nullable=False)
-    __table_args__ = (db.Index('item', item), db.Index('paper_id', paper_id),
+    __table_args__ = (db.Index(__tablename__+'_item', item), db.Index(__tablename__+'_paper_id', paper_id),
                       db.Model.__table_args__)
 
 
@@ -110,9 +110,9 @@ class AulAUTHORAFFILIATIONS(db.Model):
     paper_id = db.Column(db.Integer(15, unsigned=True),
                          db.ForeignKey(AulPAPERS.id), primary_key=True,
                          nullable=False)
-    __table_args__ = (db.Index('author_item', author_item),
-                      db.Index('item', item),
-                      db.Index('paper_id', paper_id), db.Model.__table_args__)
+    __table_args__ = (db.Index(__tablename__+'_author_item', author_item),
+                      db.Index(__tablename__+'_item', item),
+                      db.Index(__tablename__+'_paper_id', paper_id), db.Model.__table_args__)
 
 
 class AulAUTHORIDENTIFIERS(db.Model):
@@ -129,8 +129,8 @@ class AulAUTHORIDENTIFIERS(db.Model):
     paper_id = db.Column(db.Integer(15, unsigned=True),
                          db.ForeignKey(AulPAPERS.id), primary_key=True,
                          nullable=False)
-    __table_args__ = (db.Index('item', item), db.Index('paper_id', paper_id),
-                      db.Index('author_item', author_item),
+    __table_args__ = (db.Index(__tablename__+'_item', item), db.Index(__tablename__+'_paper_id', paper_id),
+                      db.Index(__tablename__+'_author_item', author_item),
                       db.Model.__table_args__)
 
 __all__ = ['AulPAPERS',

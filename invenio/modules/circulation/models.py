@@ -175,8 +175,7 @@ class CrcLOAN(db.Model):
                 server_default='')
     loaned_on = db.Column(db.DateTime, nullable=False,
         server_default='1900-01-01 00:00:00')
-    returned_on = db.Column(db.Date, nullable=False,
-                server_default='0000-00-00')
+    returned_on = db.Column(db.Date, nullable=True)
     due_date = db.Column(db.DateTime, nullable=False,
                 server_default='1900-01-01 00:00:00')
     number_of_renewals = db.Column(db.Integer(3, unsigned=True), nullable=False,
