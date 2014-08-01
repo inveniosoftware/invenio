@@ -23,8 +23,10 @@ notifications:
 python:
   - "2.6"
 
-install:
+before_install:
   - sudo apt-get -qqy update
+
+install:
   - sudo pip install devpi-client
   - devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
   - git clone https://github.com/inspirehep/invenio-devscripts /tmp/invenio-devscripts
