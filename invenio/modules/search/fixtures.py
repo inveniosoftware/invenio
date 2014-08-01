@@ -1832,6 +1832,14 @@ class FormatData(DataSet):
         visibility = 0
         name = u'Text MARC'
 
+    class Format_30:
+        code = u'recjson'
+        last_updated = None
+        description = u'Recjson format.'
+        content_type = u'application/json'
+        visibility = 0
+        name = u'Recjson Format'
+
 
 class FieldTagData(DataSet):
 
