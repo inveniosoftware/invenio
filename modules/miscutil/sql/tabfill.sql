@@ -63,6 +63,7 @@ INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcluding
 INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
 INSERT INTO field VALUES (43,'file name','filename');
+INSERT INTO field VALUES (47,'data source','datasource');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -280,6 +281,8 @@ INSERT INTO field_tag VALUES (39,223,10);
 INSERT INTO field_tag VALUES (39,224,10);
 INSERT INTO field_tag VALUES (39,225,10);
 INSERT INTO field_tag VALUES (39,226,10);
+--
+INSERT INTO field_tag VALUES (47,235,10);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -540,7 +543,8 @@ INSERT INTO tag VALUES (223,'FIXME_ALEPH_base_number','909C0b','FIXME_ALEPH_base
 INSERT INTO tag VALUES (224,'FIXME_accelerator','909C0a','FIXME_accelerator');
 INSERT INTO tag VALUES (225,'FIXME_code','909C0o','FIXME_code');
 INSERT INTO tag VALUES (226,'FIXME_909C2','909C2%','FIXME_909C2');
-
+--
+INSERT INTO tag VALUES (235,'data source','786__w','');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
