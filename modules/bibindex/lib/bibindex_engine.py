@@ -1907,7 +1907,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
     if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
-        rec_list_author = intbitset(get_recids_affected_since(dates[0]))
+        rec_list_author = get_recids_affected_since(dates[0], dates[1])
         res = res | rec_list_author
     return set(res)
 
