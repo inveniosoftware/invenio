@@ -64,6 +64,7 @@ from invenio.bibauthorid_general_utils import memoized
 from invenio.bibauthorid_general_utils import monitored
 from invenio.bibauthorid_logutils import Logger
 import time
+from intbitset import intbitset
 
 
 # run_sql = monitored(run_sql)
@@ -2782,34 +2783,33 @@ def back_up_author_paper_associations():  # copy_personids
 # ********** getters **********#
 
 
-def get_papers_affected_since(since):  # personid_get_recids_affected_since
-    '''
-    Gets the set of papers which were manually changed after the specified
-    timestamp.
+def get_papers_affected_since(date_from, date_to=None):  # personid_get_recids_affected_since
+    """
+    Gets the records whose bibauthorid informations changed between
+    date_from and date_to (inclusive).
+    
+    If date_to is None, gets the records whose bibauthorid informations
+    changed after date_to (inclusive).
+    
+    @param date_from: the date after which this function will look for
+        affected records.
+    @type date_from: datetime.datetime
+    
+    @param date_to: the date before which this function will look for
+        affected records. Currently this is not supported and is
+        ignored. Should be supported in the future.
+    @type date_to: datetime.datetime or None
+    
+    @return: affected record ids
+    @return type: intbitset
+    """
+    recs = run_sql("""select bibrec from aidPERSONIDPAPERS where
+                      last_updated >= %s or personid in
+                      (select personid from aidPERSONIDDATA where
+                      last_updated >= %s)""", (date_from, date_from))
 
-    @param since: consider changes after the specified timestamp
-    @type since: datetime.datetime
+    return intbitset([rec[0] for rec in recs])
 
-    @return: paper identifiers
-    @rtype: list [int,]
-    '''
-    recs = set(_split_signature_string(sig[0])[2] for sig in run_sql("""select distinct value
-                                                                       from aidUSERINPUTLOG
-                                                                       where timestamp >= %s""",
-              (since,)) if ',' in sig[0] and ':' in sig[0])
-
-    pids = set(int(pid[0]) for pid in run_sql("""select distinct personid
-                                                 from aidUSERINPUTLOG
-                                                 where timestamp >= %s""",
-              (since,)) if pid[0] > 0)
-
-    if pids:
-        pids_sqlstr = _get_sqlstr_from_set(pids)
-        recs |= set(rec[0] for rec in run_sql("""select bibrec from aidPERSONIDPAPERS
-                                                 where personid in %s"""
-                                              % pids_sqlstr))
-
-    return list(recs)
 
 
 def get_papers_info_of_author(pid, flag,  # get_person_papers
