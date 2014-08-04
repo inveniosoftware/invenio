@@ -64,6 +64,8 @@ INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingse
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
 INSERT INTO field VALUES (43,'file name','filename');
 INSERT INTO field VALUES (44,'country','country');
+INSERT INTO field VALUES (45,'note','note');
+INSERT INTO field VALUES (46,'address','address');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -288,6 +290,13 @@ INSERT INTO field_tag VALUES (44,227,10);
 INSERT INTO field_tag VALUES (44,228,10);
 INSERT INTO field_tag VALUES (44,229,10);
 INSERT INTO field_tag VALUES (44,230,10);
+-- address fields
+INSERT INTO field_tag VALUES (45,231,10);
+INSERT INTO field_tag VALUES (46,232,10);
+INSERT INTO field_tag VALUES (46,233,10);
+INSERT INTO field_tag VALUES (46,234,10);
+INSERT INTO field_tag VALUES (46,149,10);
+
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -553,6 +562,12 @@ INSERT INTO tag VALUES (227,'SPIRES name','110__u','');
 INSERT INTO tag VALUES (228,'country name','371__d','');
 INSERT INTO tag VALUES (229,'country code','371__g','');
 INSERT INTO tag VALUES (230,'extra','371__x','');
+--
+INSERT INTO tag VALUES (231,'note', '500__a','');
+INSERT INTO tag VALUES (232,'address', '371__%','');
+INSERT INTO tag VALUES (233,'110__(any)', '110__%','');
+INSERT INTO tag VALUES (234,'410__g', '410__g','');
+
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
