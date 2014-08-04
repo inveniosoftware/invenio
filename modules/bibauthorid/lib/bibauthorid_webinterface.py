@@ -1373,7 +1373,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         uid = getUid(req)
         tid = int(tid)
 
-        rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        try:
+            rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        except IndexError:
+            msg = """This ticket with the tid: %s has already been
+                     removed.""" % tid
+            return self._error_page(req, message=msg)
 
         for action, bibrefrec in rt_ticket['operations']:
             operation_parts = {'pid': pid,
