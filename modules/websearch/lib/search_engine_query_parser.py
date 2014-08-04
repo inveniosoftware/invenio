@@ -465,8 +465,8 @@ class SpiresToInvenioSyntaxConverter:
         'collab-name' : 'collaboration:',
         'cn' : 'collaboration:',
         # conference number
-        'conf-number' : '111__g:',
-        'cnum' : '773__w:',
+        'conf-number' : 'confnumber:',
+        'cnum' : 'confnumber:',
         # country
         'cc' : 'country:',
         'country' : 'country:',
@@ -523,7 +523,7 @@ class SpiresToInvenioSyntaxConverter:
         'keywords' : 'keyword:',
         'kw' : 'keyword:',
         # note
-        'note' : '500__a:',
+        'note' : 'note:',
         # old title
         'old-title' : '246__a:',
         'old-t' : '246__a:',
@@ -572,7 +572,7 @@ class SpiresToInvenioSyntaxConverter:
         'parx' : '037__c:',
         'primarch' : '037__c:',
         # texkey
-        'texkey' : '035__%:',
+        'texkey' : 'texkey:',
         # type code
         'tc' : 'collection:',
         'ty' : 'collection:',
@@ -614,8 +614,8 @@ class SpiresToInvenioSyntaxConverter:
         'exact-exp' : '',
         'exact-expno' : '',
         # hidden note
-        'hidden-note' : '',
-        'hn' : '',
+        'hidden-note' : '595:',
+        'hn' : '595:',
         # ppf
         'ppf' : '',
         'ppflist' : '',
@@ -641,11 +641,11 @@ class SpiresToInvenioSyntaxConverter:
         #'cited:', # topcite is technically a phrase index - this isn't necessary
         '773__y:', # journal-year
         '773__c:', # journal-page
-        '773__w:', # cnum
-        'country:', # country code
+        'confnumber:', # cnum
+        'country:', # country code and country name
         'subject:', # field code
         'collection:', # type code
-        '035__z:', # texkey
+        'texkey:', # texkey
         # also exact expno, corp-auth, url, abstract, doi, mycite, citing
         # but we have no invenio equivalents for these ATM
     ]
