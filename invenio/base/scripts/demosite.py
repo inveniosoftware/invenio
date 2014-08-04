@@ -105,57 +105,6 @@ def populate(packages=[], default_data=True, files=None,
     print(">>> Demo records loaded successfully.")
 
 
-@option_packages
-def create(packages=[]):
-    """Populate database with demo site data."""
-    from invenio.ext.sqlalchemy import db
-    from invenio.config import CFG_PREFIX
-    from invenio.modules.accounts.models import User
-    from invenio.base.scripts.config import get_conf
-
-    if not packages:
-        packages = ['invenio_demosite.base']
-
-    print(">>> Going to create demo site...")
-    db.session.execute("TRUNCATE schTASK")
-    try:
-        db.session.execute("TRUNCATE session")
-    except:
-        pass
-    User.query.filter(User.email == '').delete()
-    db.session.commit()
-
-    from werkzeug.utils import import_string
-    map(import_string, packages)
-
-    from invenio.base.scripts.database import load_fixtures
-    load_fixtures(packages=packages, truncate_tables_first=True)
-
-    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name "
-                       "IN ('global','abstract','keyword','title','fulltext'"
-                       ",'miscellaneous')")
-    db.session.commit()
-
-    conf = get_conf()
-
-    from invenio.legacy.inveniocfg import cli_cmd_reset_sitename, \
-        cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
-
-    cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_siteadminemail(conf)
-    cli_cmd_reset_fieldnames(conf)  # needed for I18N demo ranking method names
-
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
-                "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 1" % CFG_PREFIX,
-                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
-                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
-        if os.system(cmd):
-            print("ERROR: failed execution of", cmd)
-            sys.exit(1)
-    print(">>> Demo site created successfully.")
-
-
 def main():
     """Start the commandline manager."""
     from invenio.base.factory import create_app

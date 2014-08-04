@@ -19,7 +19,7 @@
 
 
 """
-Usage (via ``inveniomanage``):
+Usage (via ``inveniomanage``).
 
 .. code-block:: console
 
@@ -73,3 +73,15 @@ will be run respecting the dependency graph). The engine will detect cycles in
 the graph and will refuse to run any upgrades until the cycles have been
 broken.
 """
+
+
+def populate_existing_upgrades(sender, yes_i_know=False, drop=True, **kwargs):
+    """Populate existing upgrades."""
+    from .engine import InvenioUpgrader
+    iu = InvenioUpgrader()
+    map(iu.register_success, iu.get_upgrades())
+
+from invenio.base import signals
+from invenio.base.scripts.database import create, recreate
+signals.post_command.connect(populate_existing_upgrades, sender=create)
+signals.post_command.connect(populate_existing_upgrades, sender=recreate)

@@ -30,11 +30,37 @@ import warnings
 
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
-
 from flask import (request, g, current_app, render_template, abort,
                    send_from_directory)
 
+from invenio.base import signals
+from invenio.base.scripts.database import create, recreate
+
 from .request_class import LegacyRequest
+
+def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
+    """Reset legacy values."""
+    from invenio.config import CFG_PREFIX
+    from invenio.base.scripts.config import get_conf
+    from invenio.legacy.inveniocfg import cli_cmd_reset_sitename, \
+        cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
+
+    conf = get_conf()
+    #cli_cmd_reset_sitename(conf)
+    cli_cmd_reset_siteadminemail(conf)
+    cli_cmd_reset_fieldnames(conf)
+
+    for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
+                "%s/bin/webcoll -u admin" % CFG_PREFIX,
+                "%s/bin/webcoll 1" % CFG_PREFIX,
+                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
+                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
+        if os.system(cmd):
+            print("ERROR: failed execution of", cmd)
+            sys.exit(1)
+
+signals.post_command.connect(cli_cmd_reset, sender=create)
+signals.post_command.connect(cli_cmd_reset, sender=recreate)
 
 
 def setup_app(app):

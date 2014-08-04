@@ -345,7 +345,6 @@ with demo records.
 
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
-    (invenio)$ inveniomanage demosite create --packages=invenio_demosite.base
 
 Now you should be able to run the development server. Invenio uses
 `Celery <http://www.celeryproject.org/>`_ and `Redis <http://redis.io/>`_
