@@ -48,74 +48,81 @@ class _install_lib(install_lib):
     """Custom install_lib command."""
 
     def run(self):
-        """Compile catalog before runing installation command."""
+        """Compile catalog before running installation command."""
         self.run_command('compile_catalog')
         install_lib.run(self)
 
 
 install_requires = [
-    "alembic==0.6.2",
-    "Babel==1.3",
-    "BeautifulSoup==3.2.1",
-    "BeautifulSoup4==4.3.2",
-    "celery==3.1.12",
-    "Cerberus==0.7",
-    "dictdiffer==0.0.3",
-    "feedparser==5.1.3",
-    "fixture==1.5",
-    "Flask==0.10.1",
-    "Flask-Admin>1.0.8,<1.1",
-    "Flask-Assets==0.10",
-    "Flask-Babel==0.9",
-    "Flask-Breadcrumbs==0.1",
-    "Flask-Cache==0.12",
+    "alembic>=0.6",
+    "Babel>=1.3",
+    "BeautifulSoup>=3.2.1",
+    "BeautifulSoup4>=4.3.2",
+    "celery>=3.1",
+    # Cerberus>=0.7.1 api changes and is not yet supported
+    "Cerberus>=0.7,<0.7.1",
+    "dictdiffer>=0.0.3",
+    "feedparser>=5.1",
+    "fixture>=1.5",
+    "Flask>=0.10",
+    # Development version is used, will switch to >=1.0.9 once released.
+    "Flask-Admin>1.0.8",
+    "Flask-Assets>=0.10",
+    "Flask-Babel>=0.9",
+    "Flask-Breadcrumbs>=0.1",
+    "Flask-Cache>=0.12",
     "Flask-Collect>=0.2.3",
-    "Flask-Email==1.4.4",
-    "Flask-Gravatar==0.4.0",
-    "Flask-Login==0.2.7",
-    "Flask-Menu==0.1",
-    "Flask-OAuthlib==0.4.3",
-    "Flask-Principal==0.4.0",
-    "Flask-Registry>0.1",
-    "Flask-RESTful==0.2.12",
+    "Flask-Email>=1.4.4",
+    "Flask-Gravatar>=0.4",
+    "Flask-Login>=0.2.7",
+    "Flask-Menu>=0.1",
+    # Flask-OAuthlib>=0.5 api changed and is not supported yet
+    "Flask-OAuthlib>=0.4.3,<0.5",
+    "Flask-Principal>=0.4",
+    "Flask-Registry>=0.2",
+    "Flask-RESTful>=0.2.12",
     "Flask-Script>=2.0.5",
+    # Development version is used, will switch to >=2.0 once released.
     "Flask-SQLAlchemy>1.9",
-    "Flask-WTF==0.9.5",
-    "fs==0.4.0",
-    "intbitset==2.0",
-    "jellyfish>=0.3.1",
-    "Jinja2==2.7.3",
-    "libmagic==1.0",
+    "Flask-WTF>=0.9.5",
+    "fs>=0.4",
+    "intbitset>=2.0",
+    "jellyfish>=0.3",
+    "Jinja2>=2.7",
+    "libmagic>=1.0",
     "lxml>=3.3",
-    "mechanize==0.2.5",
-    "msgpack-python==0.3.0",
-    "MySQL-python==1.2.5",
-    "numpy==1.7.0",
-    "pyparsing==2.0.1",
-    "python-twitter==0.8.7",
-    "pyPDF==1.13",
+    "mechanize>=0.2.5",
+    "msgpack-python>=0.3",
+    "MySQL-python>=1.2.5",
+    "numpy>=1.7",
+    # pyparsing>=2.0.2 has a new api and is not compatible yet
+    "pyparsing>=2.0.1,<2.0.2",
+    "python-twitter>=0.8.7",
+    "pyPDF>=1.13",
     "pyPDF2",
     "PyLD>=0.5.2",
-    "pyStemmer==1.3.0",
+    "pyStemmer>=1.3",
     # python-dateutil>=2.0 is only for Python3
     "python-dateutil>=1.5,<2.0",
-    "python-magic==0.4.6",
+    "python-magic>=0.4.6",
     "pytz",
     "rauth",
-    "raven==4.2.1",
-    "rdflib==2.4.2",
+    "raven>=4.2.1",
+    "rdflib>=4.1.2",
     "redis==2.8.0",  # Is it explicitly required?
-    "reportlab==2.5",
-    "requests==1.2.3",
+    "reportlab>=3.1,<3.2",
+    "requests>=2.3,<2.4",
     "six>=1.7.2",
     "Sphinx",
-    "SQLAlchemy==0.8.3",
+    # SQLAlchemy 0.9 is not compatible yet
+    "SQLAlchemy>=0.8.3,<0.9",
+    # SQLAlchemy-Utils>0.24 depends on SQLAlchemy>=0.9.3
     "SQLAlchemy-Utils>=0.23.5,<0.24",
     "unidecode",
-    "workflow==1.1.0",
+    "workflow>=1.1.0",
     # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
     "WTForms>=1.0.5,<2.0",
-    "wtforms-alchemy==0.12.6"
+    "wtforms-alchemy>=0.12.6"
 ]
 
 
@@ -161,6 +168,7 @@ extras_require = {
     # >    https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
     #
     "pyrxp": [
+        # Any other versions are not supported.
         "pyRXP==1.16-daily-unix"
     ]
 }
@@ -171,12 +179,12 @@ extras_require["docs"] += extras_require["mongo"]
 extras_require["docs"] += extras_require["sso"]
 
 tests_require = [
-    "httpretty==0.8.0",
-    "Flask-Testing==0.4.1",
+    "httpretty>=0.8",
+    "Flask-Testing>=0.4.1",
     "mock",
     "nose",
     "selenium",
-    "unittest2==0.5.1",
+    "unittest2>=0.5",
 ]
 
 
