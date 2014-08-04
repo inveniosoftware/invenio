@@ -34,7 +34,7 @@ class TableUpdateTimesTest(InvenioTestCase):
         # detect MySQL version number:
         res = dbquery.run_sql("SELECT VERSION()")
         mysql_server_version = res[0][0]
-        if mysql_server_version.startswith("5."):
+        if mysql_server_version.startswith("5.") or mysql_server_version.startswith("10."):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
                         WHERE table_name='%s' AND table_schema='%s'""" \
