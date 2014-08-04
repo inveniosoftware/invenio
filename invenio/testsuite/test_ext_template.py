@@ -21,8 +21,11 @@
 Unit test for the template extensions.
 """
 
+from flask import url_for
+
 from invenio.ext.template import render_template_to_string
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import unittest
 
 
 class TemplateTest(InvenioTestCase):
@@ -66,7 +69,56 @@ class TemplateLoaderCase(InvenioTestCase):
         self.assertEqual(response.data.strip(), 'First')
         self.assertNotEqual(response.data.strip(), 'Last')
 
-TEST_SUITE = make_test_suite(TemplateTest, TemplateLoaderCase)
+
+class TemplateArgsTest(InvenioTestCase):
+
+    """Test ``template_args`` decorator."""
+
+    @classmethod
+    def setup_app(cls, app):
+        """Custom setup function."""
+        from invenio.ext.template.context_processor import template_args
+        from invenio.modules.search.views.search import index
+
+        @template_args(index)
+        def foo():
+            return {'foo': 'foo', 'baz': 'baz'}
+
+        @template_args('search.index', app=app)
+        def bar():
+            return {'bar': 'bar', 'baz': 'BAZ'}
+
+    @property
+    def config(self):
+        from invenio.base.config import EXTENSIONS
+        cfg = super(TemplateArgsTest, self).config
+        cfg['EXTENSIONS'] = EXTENSIONS + [
+            'invenio.testsuite.test_ext_template.TemplateArgsTest']
+        return cfg
+
+    def test_template_args_loading(self):
+        self.client.get(url_for('search.index'))
+        self.assertEqual(self.get_context_variable('foo'), 'foo')
+        self.assertEqual(self.get_context_variable('bar'), 'bar')
+        self.assertEqual(self.get_context_variable('baz'), 'BAZ')
+
+
+class TemplateArgsLoadingTest(unittest.TestCase):
+
+    """Test ``template_args`` decorator outside app context."""
+
+    def test_broken_loading(self):
+        from invenio.ext.template.context_processor import template_args
+
+        def foo():
+            return {'foo': 'foo'}
+
+        self.assertRaises(Exception,
+                          lambda: template_args('search.index')(foo))
+
+
+TEST_SUITE = make_test_suite(TemplateTest, TemplateLoaderCase,
+                             TemplateArgsTest, TemplateArgsLoadingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
