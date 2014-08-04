@@ -5094,4 +5094,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_09_09_tag_recjsonva
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_03_03_tag_value',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_2_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_05_26_new_index_country',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_06_new_field_note',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_10_new_field_address',NOW());
 -- end of file
