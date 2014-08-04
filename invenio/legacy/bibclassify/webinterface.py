@@ -15,10 +15,12 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BibClassify's web interface.
+"""
+BibClassify's web interface.
 
 This module is NOT standalone safe - this component is never expected
-to run in a standalone mode, but always inside invenio."""
+to run in a standalone mode, but always inside invenio.
+"""
 
 import os
 import six
