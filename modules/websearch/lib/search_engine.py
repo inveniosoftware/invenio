@@ -4510,6 +4510,9 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
         #req.write("%s:%d-%d" % (recIDs, irec_min, irec_max))
 
+        if len(recIDs) > rg and rg != -9999:
+            recIDs = slice_records(recIDs, jrec, rg)
+
         if format.startswith('x'):
 
             # print header if needed
