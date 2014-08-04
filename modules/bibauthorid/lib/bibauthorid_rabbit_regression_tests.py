@@ -48,11 +48,11 @@ from invenio.testutils import (InvenioTestCase,
                                run_test_suite,
                                make_test_suite,
                                nottest)
-from invenio.testutils import unittest
 import invenio.config as config
 
 from copy import deepcopy
 from mock import patch
+import unittest
 
 
 is_test_paper_claimed = nottest(is_test_paper_claimed)
@@ -106,10 +106,10 @@ class BibAuthorIDRabbitTestCase(InvenioTestCase):
             clean_authors_tables(bibrec)
 
 
-class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
+class AuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
 
     def setUp(self):
-        super(OneAuthorRabbitTestCase, self).setUp()
+        super(AuthorRabbitTestCase, self).setUp()
         self.main_marcxml_record = get_new_marc_for_test('Rabbit Test Paper', author_name=self.author_name,
                                                          ext_id=self.ext_id)
         self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record, opt_mode='insert')
@@ -139,6 +139,7 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             '''
             number_of_personids_before = get_count_of_pids()
             self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record)
+            print self.main_marcxml_record
             self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record,
                                                      opt_mode='replace')
             rabbit([self.main_bibrec], verbose=True)
@@ -636,7 +637,7 @@ class MnamesFunctionsTest(BibAuthorIDRabbitTestCase):
         self.assertTrue(m_name_func_2.has_been_called)
 
 TEST_SUITE = make_test_suite(BibAuthorIDRabbitTestCase,
-                             OneAuthorRabbitTestCase,
+                             AuthorRabbitTestCase,
                              CoauthorsRabbitTestCase,
                              MatchableNameRabbitTestCase,
                              MnamesCacheConsistencyTestCase,
