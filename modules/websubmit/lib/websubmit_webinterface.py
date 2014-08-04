@@ -27,7 +27,9 @@ import sys
 import shutil
 
 from urllib import urlencode
+from collections import defaultdict
 
+from invenio.bibrecord import create_record
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
@@ -37,6 +39,7 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX, \
      CFG_CERN_SITE
+from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 from invenio import webinterface_handler_config as apache
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
@@ -66,7 +69,8 @@ from invenio.websubmit_engine import home, action, interface, endaction, makeCat
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', \
-                'getuploadedfile', 'upload_video', ('continue', 'continue_')]
+                'getuploadedfile', 'upload_video', ('continue', 'continue_'), \
+                'doilookup']
 
     def uploadfile(self, req, form):
         """
@@ -805,7 +809,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urlencode(params, doseq=True))
         redirect_to_url(req, url)
 
-
     def summary(self, req, form):
         args = wash_urlargd(form, {
             'doctype': (str, ''),
@@ -857,6 +860,38 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                  ln = args['ln'],
                  values = values,
                )
+
+    def doilookup(self, req, form):
+        """
+        Returns the metadata from the crossref website based on the DOI.
+        """
+        args = wash_urlargd(form, {
+            'doi': (str, '')})
+        response = defaultdict(list)
+        if args['doi']:
+            doi = args['doi']
+            try:
+                marcxml_template = get_marcxml_for_doi(doi)
+            except CrossrefError:
+                # Just ignore Crossref errors
+                pass
+            else:
+                record = create_record(marcxml_template)[0]
+                if record:
+                    # We need to convert this record structure to a simple dictionary
+                    for key, value in record.items():  # key, value = (773, [([('0', 'PER:64142'), ...], ' ', ' ', '', 47)])
+                        for val in value:  # val = ([('0', 'PER:64142'), ...], ' ', ' ', '', 47)
+                            ind1 = val[1].replace(" ", "_")
+                            ind2 = val[2].replace(" ", "_")
+                            for (k, v) in val[0]:  # k, v = ('0', 'PER:5409')
+                                response[key+ind1+ind2+k].append(v)
+            # The output dictionary is something like:
+            # {"100__a": ['Smith, J.'],
+            #  "700__a": ['Anderson, J.', 'Someoneelse, E.'],
+            #  "700__u": ['University1', 'University2']}
+
+        # return dictionary as JSON
+        return json.dumps(response)
 
     def index(self, req, form):
 
