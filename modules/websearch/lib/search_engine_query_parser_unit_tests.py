@@ -1115,6 +1115,72 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             spi_search = 'find country Italy'
             self._compare_searches(inv_search, spi_search)
 
+        def test_find_conf_number_123(self):
+            """SPIRES and invenio search syntax - find conf-number 123"""
+            combo_search = 'find conf-number 123'
+            inv_search = 'confnumber:123'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_cnum_123(self):
+            """SPIRES and invenio search syntax - find cnum 123"""
+            combo_search = 'find cnum 123'
+            inv_search = 'confnumber:123'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_conf_number_123_456(self):
+            """SPIRES and invenio search syntax - find conf-number 123 456"""
+            combo_search = 'find conf-number 123 456'
+            inv_search = 'confnumber:"123 456"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_country_Switzerland(self):
+            """SPIRES and invenio search syntax - find country Switzerland"""
+            combo_search = 'find country Switzerland'
+            inv_search = 'country:Switzerland'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_cc_Switzerland(self):
+            """SPIRES and invenio search syntax - find cc Switzerland"""
+            combo_search = 'find cc Switzerland'
+            inv_search = 'country:Switzerland'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_country_United_States(self):
+            """SPIRES and invenio search syntax - find country United States"""
+            combo_search = 'find country United States'
+            inv_search = 'country:"United States"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_note_blabla(self):
+            """SPIRES and invenio search syntax - find note blabla"""
+            combo_search = 'find note blabla'
+            inv_search = 'note:blabla'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_texkey_blabla(self):
+            """SPIRES and invenio search syntax - find texkey blabla"""
+            combo_search = 'find texkey blabla'
+            inv_search = 'texkey:blabla'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_texkey_bla_space_bla(self):
+            """SPIRES and invenio search syntax - find texkey bla space bla"""
+            combo_search = 'find texkey bla space bla'
+            inv_search = 'texkey:"bla space bla"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_address_Geneva(self):
+            """SPIRES and invenio search syntax - find address Geneva"""
+            combo_search = 'find address Geneva'
+            inv_search = 'address:Geneva'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_hidden_note_bla(self):
+            """SPIRES and invenio search syntax - find hidden-note bla"""
+            combo_search = 'find hidden-note bla'
+            inv_search = '595:bla'
+            self._compare_searches(inv_search, combo_search)
+
     if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
         def test_absorbs_naked_a_search(self):
             """SPIRES search syntax - a ellis"""

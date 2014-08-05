@@ -5102,4 +5102,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_11_28_bibauthorid_s
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_01_new_aidAFFILIATIONS',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_23_bibauthorid_rabbit_matchable_name_column', NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_05_26_new_index_country',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_06_new_field_note',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_10_new_field_address',NOW());
 -- end of file
