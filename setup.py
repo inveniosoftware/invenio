@@ -164,6 +164,9 @@ extras_require = {
     "sso": [
         "Flask-SSO>=0.1"
     ],
+    "postgresql": [
+        "psycopg2>=2.5",
+    ],
     # Alternative XML parser
     #
     # For pyRXP, the version on PyPI many not be the right one.
