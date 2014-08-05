@@ -136,7 +136,6 @@ class AuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             '''
             number_of_personids_before = get_count_of_pids()
             self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record)
-            print self.main_marcxml_record
             self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record,
                                                      opt_mode='replace')
 
