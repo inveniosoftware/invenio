@@ -5104,4 +5104,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_23_bibauthorid_r
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_05_26_new_index_country',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_06_new_field_note',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_10_new_field_address',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_11_new_field_datasource',NOW());
 -- end of file
