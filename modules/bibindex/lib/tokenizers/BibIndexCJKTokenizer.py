@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,8 @@ import re
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 is_character_from_CJK_set = re.compile(u'[\u3400-\u4DBF\u4E00-\u9FFF]')
-special_CJK_punctuation = re.compile(u'[\uff1a,\uff0c,\u3001,\u3002,\u201c,\u201d]')
+special_CJK_punctuation = re.compile(
+    u'[\uff1a,\uff0c,\u3001,\u3002,\u201c,\u201d]')
 
 
 def is_from_CJK_set_single_character_match(char):
@@ -61,23 +62,22 @@ def is_non_CJK_expression(word):
 
 
 class BibIndexCJKTokenizer(BibIndexDefaultTokenizer):
+
     """A phrase is split into CJK characters.
        CJK is Chinese, Japanese and Korean unified character set.
        It means that for example, phrase: '据信，新手机更轻'
        will be split into: ['据', '信', '新', '手', '机', '更', '轻']"""
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         """Initialisation"""
         BibIndexDefaultTokenizer.__init__(self, stemming_language,
-                                                remove_stopwords,
-                                                remove_html_markup,
-                                                remove_latex_markup)
-
+                                          remove_stopwords,
+                                          remove_html_markup,
+                                          remove_latex_markup)
 
     def tokenize_for_words_default(self, phrase):
         """Default tokenize_for_words inherited from default tokenizer"""
         return super(BibIndexCJKTokenizer, self).tokenize_for_words(phrase)
-
 
     def tokenize_for_words(self, phrase):
         """
@@ -93,15 +93,16 @@ class BibIndexCJKTokenizer(BibIndexDefaultTokenizer):
         @rtype: list of string
         """
         if is_there_any_CJK_character_in_text(phrase):
-            #remove special CJK punctuation
+            # remove special CJK punctuation
             phrase = special_CJK_punctuation.sub("", phrase)
-            #first, we split our phrase with default word tokenizer to make it easier later
+            # first, we split our phrase with default word tokenizer to make it
+            # easier later
             pre_tokenized = self.tokenize_for_words_default(phrase)
-            #list for keeping CJK chars and non-CJK words
+            # list for keeping CJK chars and non-CJK words
             chars = []
-            #every CJK word splits into a set of single characters
-            #for example: "春眠暁覚" into ['春','眠','暁','覚']
-            words = [ word.decode("utf8") for word in pre_tokenized]
+            # every CJK word splits into a set of single characters
+            # for example: "春眠暁覚" into ['春','眠','暁','覚']
+            words = [word.decode("utf8") for word in pre_tokenized]
             for word in words:
                 if is_from_CJK_set_full_match(word):
                     chars.extend(word)
@@ -124,7 +125,6 @@ class BibIndexCJKTokenizer(BibIndexDefaultTokenizer):
             return chars
         else:
             return self.tokenize_for_words_default(phrase)
-
 
     def tokenize_for_pairs(self, phrase):
         return []

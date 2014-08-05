@@ -18,9 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 import unittest
 
-from invenio.dbquery import run_sql, \
-    deserialize_via_marshal
-from invenio.testutils import make_test_suite, run_test_suite, nottest
+from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibindex_termcollectors import TermCollector, \
     NonmarcTermCollector
 from invenio.bibindex_engine import detect_tokenizer_type
@@ -60,15 +58,15 @@ def initialise_term_collector(index_name,
 
 class BibIndexTermCollectorTest(unittest.TestCase):
 
-
     def test_correct_terms_for_title_index_rec_10(self):
         """bibindex - checks correct terms for title index, record 10"""
         mtc = initialise_term_collector("title")
         terms = mtc.collect([10], {})
-        self.assertEqual(terms[10], ['r-pariti', 'pariti', 'at', 'in', 'sneutrino',
-                                     '$\\sqrt{s}$', 'for', 'violat', 'sqrt', 'collis',
-                                     '189', '=', 'singl', 'product', 'gev', '209', 'search',
-                                     'e', 'of', '189-209', 's', 'r', '$e^{+}e^{-}$'])
+        self.assertEqual(
+            terms[10], ['r-pariti', 'pariti', 'at', 'in', 'sneutrino',
+                        '$\\sqrt{s}$', 'for', 'violat', 'sqrt', 'collis',
+                        '189', '=', 'singl', 'product', 'gev', '209', 'search',
+                        'e', 'of', '189-209', 's', 'r', '$e^{+}e^{-}$'])
 
     def test_correct_terms_for_year_index_rec_9(self):
         """bibindex - checks correct terms for year index, record 9"""
@@ -110,15 +108,15 @@ class BibIndexTermCollectorTest(unittest.TestCase):
 
 class BibIndexNonmarcTermCollectorTest(unittest.TestCase):
 
-
     def test_correct_terms_for_title_index_rec_10_non_marc(self):
         """bibindex - checks correct terms for title index, record 10 - non MarcTermCollector"""
         mtc = initialise_term_collector("title", NonmarcTermCollector)
         terms = mtc.collect([10], {})
-        self.assertEqual(terms[10], ['r-pariti', 'pariti', 'at', 'in', 'sneutrino',
-                                     '$\\sqrt{s}$', 'for', 'violat', 'sqrt', 'collis',
-                                     '189', '=', 'singl', 'product', 'gev', '209', 'search',
-                                     'e', 'of', '189-209', 's', 'r', '$e^{+}e^{-}$'])
+        self.assertEqual(
+            terms[10], ['r-pariti', 'pariti', 'at', 'in', 'sneutrino',
+                        '$\\sqrt{s}$', 'for', 'violat', 'sqrt', 'collis',
+                        '189', '=', 'singl', 'product', 'gev', '209', 'search',
+                        'e', 'of', '189-209', 's', 'r', '$e^{+}e^{-}$'])
 
     def test_correct_terms_for_year_index_rec_9_non_marc(self):
         """bibindex - checks correct terms for year index, record 9 - non marc"""

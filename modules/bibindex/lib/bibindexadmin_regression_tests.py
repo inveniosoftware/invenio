@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,11 +26,12 @@ import re
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages, \
+    test_web_page_content, merge_error_messages, \
                               get_authenticated_mechanize_browser, make_url
 
 
 class BibIndexAdminWebPagesAvailabilityTest(InvenioTestCase):
+
     """Check BibIndex Admin web pages whether they are up or not."""
 
     def test_bibindex_admin_interface_pages_availability(self):
@@ -54,16 +55,14 @@ class BibIndexAdminWebPagesAvailabilityTest(InvenioTestCase):
                     'editindex?idxID=1&mtype=perform_modifystopwords',
                     'editindex?idxID=1&mtype=perform_modifyremovehtml',
                     'editindex?idxID=1&mtype=perform_modifyremovelatex',
-                    'editindex?idxID=1&mtype=perform_modifytokenizer'
-                    ]
+                    'editindex?idxID=1&mtype=perform_modifytokenizer']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
             error_messages.extend(test_web_page_content(url,
                                                         username='guest',
-                                                        expected_text=
-                                                        'Authorization failure'))
+                                                        expected_text='Authorization failure'))
             # then try as admin:
             error_messages.extend(test_web_page_content(url,
                                                         username='admin'))
@@ -90,17 +89,18 @@ def check_admin_forms_with_dropdown_list(url, fields):
        @param fields: a dict of the form fields and their values (only dropdown lists)
        @return: html body
     """
-    browser = get_authenticated_mechanize_browser("admin","")
+    browser = get_authenticated_mechanize_browser("admin", "")
     browser.open(url)
     browser.select_form(nr=0)
     form = browser.form
     for key in fields:
         form[key] = [fields[key]]
     resp = browser.submit()
-    #second page - confirmation
+    # second page - confirmation
     browser.select_form(nr=1)
     resp = browser.submit()
     return resp.read()
+
 
 def check_admin_forms_with_input_text(url, fields):
     """Logs in as 'admin' and checks given url for
@@ -110,33 +110,38 @@ def check_admin_forms_with_input_text(url, fields):
        @param fields: a dict of the form fields and their values
        @return: html body
     """
-    browser = get_authenticated_mechanize_browser("admin","")
+    browser = get_authenticated_mechanize_browser("admin", "")
     browser.open(url)
     browser.select_form(nr=0)
     form = browser.form
     for key in fields:
         form[key] = fields[key]
     resp = browser.submit()
-    #second page - confirmation
+    # second page - confirmation
     browser.select_form(nr=1)
     resp = browser.submit()
     return resp.read()
 
+
 class BibIndexAdminSynonymKnowledgeBaseTest(InvenioTestCase):
+
     """Tests BibIndexAdmin's ability to change knowledge base details for indexes"""
 
     def setUp(self):
-        self.re_operation_successfull = re.compile(r"Operation successfully completed")
+        self.re_operation_successfull = re.compile(
+            r"Operation successfully completed")
 
     def test_change_title_index_knowledge_base(self):
         """tests if information about title index's knowledge base can be changed properly"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifysynonymkb'}
-        url = make_url(base,**parameters)
+        parameters = {
+            'idxID': '8', 'ln': 'en', 'mtype': 'perform_modifysynonymkb'}
+        url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxKB":"INDEX-SYNONYM-TITLE",
-                                                                   "idxMATCH":"leading_to_comma"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxKB": "INDEX-SYNONYM-TITLE",
+                  "idxMATCH": "leading_to_comma"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
@@ -146,11 +151,13 @@ class BibIndexAdminSynonymKnowledgeBaseTest(InvenioTestCase):
         """tests if information about title index's knowledge base can be changed back"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifysynonymkb'}
+        parameters = {
+            'idxID': '8', 'ln': 'en', 'mtype': 'perform_modifysynonymkb'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxKB":"INDEX-SYNONYM-TITLE",
-                                                                   "idxMATCH":"exact"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxKB": "INDEX-SYNONYM-TITLE",
+                  "idxMATCH": "exact"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed." in html response."""
@@ -158,37 +165,43 @@ class BibIndexAdminSynonymKnowledgeBaseTest(InvenioTestCase):
 
 
 class BibIndexAdminRemoveStopwordsTest(InvenioTestCase):
+
     """Tests BibIndexAdmin's ability to change stopwords configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
 
     def setUp(self):
-        self.re_operation_successfull = re.compile(r"Operation successfully completed")
-        self.re_stopwords_not_changed = re.compile(r"Stopwords have not been changed")
+        self.re_operation_successfull = re.compile(
+            r"Operation successfully completed")
+        self.re_stopwords_not_changed = re.compile(
+            r"Stopwords have not been changed")
 
     def test_change_title_index_remove_stopword_configuration(self):
         """tests if index's remove stopwords configuration can be changed"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_input_text(url, {"idxSTOPWORDS":"stopwords.kb"})
+        html_response = check_admin_forms_with_input_text(
+            url, {"idxSTOPWORDS": "stopwords.kb"})
 
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
 
-
     def test_change_title_index_remove_stopword_configuration_back(self):
         """tests if index's remove stopwords configuration can be changed back"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_input_text(url, {"idxSTOPWORDS":"No"})
+        html_response = check_admin_forms_with_input_text(
+            url, {"idxSTOPWORDS": "No"})
 
         success = self.re_operation_successfull.search(html_response)
         if not success:
@@ -197,74 +210,85 @@ class BibIndexAdminRemoveStopwordsTest(InvenioTestCase):
 
 
 class BibIndexAdminRemoveHTMLTest(InvenioTestCase):
+
     """Tests BibIndexAdmin's ability to change 'remove html' configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
 
     def setUp(self):
-        self.re_operation_successfull = re.compile(r"Operation successfully completed")
-        self.re_removehtml_not_changed = re.compile(r"Remove HTML markup parameter has not been changed")
+        self.re_operation_successfull = re.compile(
+            r"Operation successfully completed")
+        self.re_removehtml_not_changed = re.compile(
+            r"Remove HTML markup parameter has not been changed")
 
     def test_change_title_index_remove_html_configuration(self):
         """tests if index's 'remove html' configuration can be changed"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifyremovehtml'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxHTML":"Yes"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxHTML": "Yes"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
-
 
     def test_change_title_index_remove_html_configuration_back(self):
         """tests if index's 'remove html' configuration can be changed back"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifyremovehtml'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxHTML":"No"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxHTML": "No"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
 
 
-
 class BibIndexAdminRemoveLatexTest(InvenioTestCase):
+
     """Tests BibIndexAdmin's ability to change 'remove latex' configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
 
     def setUp(self):
-        self.re_operation_successfull = re.compile(r"Operation successfully completed")
-        self.re_removehtml_not_changed = re.compile(r"Remove latex markup parameter has not been changed")
+        self.re_operation_successfull = re.compile(
+            r"Operation successfully completed")
+        self.re_removehtml_not_changed = re.compile(
+            r"Remove latex markup parameter has not been changed")
 
     def test_change_title_index_remove_html_configuration(self):
         """tests if index's 'remove latex' configuration can be changed"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifyremovelatex'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxLATEX":"Yes"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxLATEX": "Yes"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
 
-
     def test_change_title_index_remove_html_configuration_back(self):
         """tests if index's 'remove latex' configuration can be changed back"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifyremovelatex'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxLATEX":"No"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxLATEX": "No"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
@@ -272,41 +296,44 @@ class BibIndexAdminRemoveLatexTest(InvenioTestCase):
 
 
 class BibIndexAdminTokenizerTest(InvenioTestCase):
+
     """Tests BibIndexAdmin's ability to change tokenizer configuration details for indexes.
        Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
     """
 
     def setUp(self):
-        self.re_operation_successfull = re.compile(r"Operation successfully completed")
-
+        self.re_operation_successfull = re.compile(
+            r"Operation successfully completed")
 
     def test_change_title_index_tokenizer_configuration(self):
         """tests if index's tokenizer configuration can be changed"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifytokenizer'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifytokenizer'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxTOK":"BibIndexEmptyTokenizer"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxTOK": "BibIndexEmptyTokenizer"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
-
 
     def test_change_title_index_tokenizer_configuration_back(self):
         """tests if index's tokenizer configuration can be changed back"""
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
-        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifytokenizer'}
+        parameters = {'idxID': '8', 'ln': 'en',
+                      'mtype': 'perform_modifytokenizer'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxTOK":"BibIndexDefaultTokenizer"})
+        html_response = check_admin_forms_with_dropdown_list(
+            url, {"idxTOK": "BibIndexDefaultTokenizer"})
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
-
 
 
 TEST_SUITE = make_test_suite(BibIndexAdminWebPagesAvailabilityTest,

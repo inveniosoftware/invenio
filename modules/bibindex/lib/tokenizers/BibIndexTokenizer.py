@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,6 +46,7 @@
 
 
 class BibIndexTokenizer(object):
+
     """
         Base class for the tokenizers.
 
@@ -60,7 +61,8 @@ class BibIndexTokenizer(object):
         - tokenizers that use bibfield module and their functions
           which precomputes terms to index
     """
-    #words part
+    # words part
+
     def scan_string_for_words(self, s):
         """Return an intermediate representation of the tokens in s.
 
@@ -117,7 +119,7 @@ class BibIndexTokenizer(object):
         """
         raise NotImplementedError
 
-    #pairs part
+    # pairs part
     def scan_string_for_pairs(self, s):
         """ See: scan_string_for_words """
         raise NotImplementedError
@@ -130,7 +132,7 @@ class BibIndexTokenizer(object):
         """ See: tokenize_for_words """
         raise NotImplementedError
 
-    #phrases part
+    # phrases part
     def scan_string_for_phrases(self, s):
         """ See: scan_string_for_words """
         raise NotImplementedError

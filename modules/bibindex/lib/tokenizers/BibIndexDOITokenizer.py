@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,20 +16,23 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from invenio.bibindex_tokenizers.BibIndexFilteringTokenizer import BibIndexFilteringTokenizer
+from invenio.bibindex_tokenizers.BibIndexFilteringTokenizer import (
+    BibIndexFilteringTokenizer,
+)
+from invenio.bibfield import get_record
 
 
 class BibIndexDOITokenizer(BibIndexFilteringTokenizer):
+
     """
         Filtering tokenizer which tokenizes DOI tag (0247_a)
         only if "0247_2" tag is present and its value equals "DOI"
         and 909C4a tag without any constraints.
     """
 
-
-    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
+    def __init__(self, stemming_language=None, remove_stopwords=False,
+                 remove_html_markup=False, remove_latex_markup=False):
         self.rules = (('0247_a', '2', 'DOI'), ('909C4a', '', ''))
-
 
     def get_tokenizing_function(self, wordtable_type):
         """Returns proper tokenizing function"""

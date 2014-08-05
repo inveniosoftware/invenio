@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,9 @@ from invenio.testutils import InvenioTestCase
 from invenio import bibindex_engine_stemmer
 from invenio.testutils import make_test_suite, run_test_suite
 
+
 class TestStemmer(InvenioTestCase):
+
     """Test stemmer."""
 
     def test_stemmer_none(self):

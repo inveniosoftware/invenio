@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ import re
 
 
 from invenio.config import \
-     CFG_SOLR_URL, \
+    CFG_SOLR_URL, \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_SPLASH_PAGES
@@ -37,7 +37,7 @@ from invenio.websubmit_file_converter import convert_file, get_file_converter_lo
 from invenio.solrutils_bibindex_indexer import solr_add_fulltext
 from invenio.xapianutils_bibindex_indexer import xapian_add
 from invenio.bibdocfile import bibdocfile_url_p, \
-     bibdocfile_url_to_bibdoc, download_url, \
+    bibdocfile_url_to_bibdoc, download_url, \
      BibRecDocs, InvenioBibDocFileError
 from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
@@ -46,22 +46,23 @@ from invenio.intbitset import intbitset
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
-fulltext_added = intbitset() # stores ids of records whose fulltexts have been added
-
-
+fulltext_added = intbitset()
+                           # stores ids of records whose fulltexts have been
+                           # added
 
 
 class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
+
     """
         Exctracts all the words contained in document specified by url.
     """
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         self.verbose = 3
         BibIndexDefaultTokenizer.__init__(self, stemming_language,
-                                                remove_stopwords,
-                                                remove_html_markup,
-                                                remove_latex_markup)
+                                          remove_stopwords,
+                                          remove_html_markup,
+                                          remove_latex_markup)
 
     def set_verbose(self, verbose):
         """Allows to change verbosity level during indexing"""
@@ -70,7 +71,6 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
     def tokenize_for_words_default(self, phrase):
         """Default tokenize_for_words inherited from default tokenizer"""
         return super(BibIndexFulltextTokenizer, self).tokenize_for_words(phrase)
-
 
     def get_words_from_fulltext(self, url_direct_or_indirect):
         """Returns all the words contained in the document specified by
@@ -85,10 +85,12 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
            to fulltext documents, for all knows file extensions as
            specified by global CONV_PROGRAMS config variable.
         """
-        write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
+        write_message("... reading fulltext files from %s started" %
+                      url_direct_or_indirect, verbose=2)
         try:
             if bibdocfile_url_p(url_direct_or_indirect):
-                write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
+                write_message("... %s is an internal document" %
+                              url_direct_or_indirect, verbose=2)
                 try:
                     bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
                 except InvenioBibDocFileError:
@@ -124,53 +126,66 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                     return self.tokenize_for_words_default(text)
             else:
                 if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
-                    write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
+                    write_message("... %s is external URL but indexing only local files" %
+                                  url_direct_or_indirect, verbose=2)
                     return []
-                write_message("... %s is an external URL" % url_direct_or_indirect, verbose=2)
+                write_message("... %s is an external URL" %
+                              url_direct_or_indirect, verbose=2)
                 urls_to_index = set()
                 for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
                     if re.match(splash_re, url_direct_or_indirect):
-                        write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
+                        write_message("... %s is a splash page (%s)" %
+                                      (url_direct_or_indirect, splash_re), verbose=2)
                         html = urllib2.urlopen(url_direct_or_indirect).read()
                         urls = get_links_in_html_page(html)
-                        write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
+                        write_message("... found these URLs in %s splash page: %s" %
+                                      (url_direct_or_indirect, ", ".join(urls)), verbose=3)
                         for url in urls:
                             if re.match(url_re, url):
-                                write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
+                                write_message(
+                                    "... will index %s (matched by %s)" % (url, url_re), verbose=2)
                                 urls_to_index.add(url)
                 if not urls_to_index:
                     urls_to_index.add(url_direct_or_indirect)
-                write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
+                write_message("... will extract words from %s" %
+                              ', '.join(urls_to_index), verbose=2)
                 words = {}
                 for url in urls_to_index:
                     tmpdoc = download_url(url)
                     file_converter_logger = get_file_converter_logger()
-                    old_logging_level = file_converter_logger.getEffectiveLevel()
+                    old_logging_level = file_converter_logger.getEffectiveLevel(
+                    )
                     if self.verbose > 3:
                         file_converter_logger.setLevel(logging.DEBUG)
                     try:
                         try:
-                            tmptext = convert_file(tmpdoc, output_format='.txt')
+                            tmptext = convert_file(
+                                tmpdoc, output_format='.txt')
                             text = open(tmptext).read()
                             os.remove(tmptext)
 
                             indexer = get_idx_indexer('fulltext')
                             if indexer != 'native':
                                 if indexer == 'SOLR' and CFG_SOLR_URL:
-                                    solr_add_fulltext(None, text) # FIXME: use real record ID
+                                    solr_add_fulltext(
+                                        None, text)  # FIXME: use real record ID
                                 if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
-                                    #xapian_add(None, 'fulltext', text) # FIXME: use real record ID
+                                    # xapian_add(None, 'fulltext', text) #
+                                    # FIXME: use real record ID
                                     pass
                                 # we are relying on an external information retrieval system
                                 # to provide full-text indexing, so dispatch text to it and
                                 # return nothing here:
                                 tmpwords = []
                             else:
-                                tmpwords = self.tokenize_for_words_default(text)
+                                tmpwords = self.tokenize_for_words_default(
+                                    text)
                             words.update(dict(map(lambda x: (x, 1), tmpwords)))
                         except Exception, e:
-                            message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
-                            register_exception(prefix=message, alert_admin=True)
+                            message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (
+                                url, url_direct_or_indirect, e)
+                            register_exception(
+                                prefix=message, alert_admin=True)
                             write_message(message, stream=sys.stderr)
                     finally:
                         os.remove(tmpdoc)
@@ -178,19 +193,17 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                             file_converter_logger.setLevel(old_logging_level)
                 return words.keys()
         except Exception, e:
-            message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (url_direct_or_indirect, e)
+            message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (
+                url_direct_or_indirect, e)
             register_exception(prefix=message, alert_admin=True)
             write_message(message, stream=sys.stderr)
             return []
 
-
     def tokenize_for_words(self, phrase):
         return self.get_words_from_fulltext(phrase)
-
 
     def tokenize_for_pairs(self, phrase):
         return []
 
     def tokenize_for_phrases(self, phrase):
         return []
-
