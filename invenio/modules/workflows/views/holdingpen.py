@@ -27,10 +27,6 @@ submissions/depositions.
 Note: Currently work-in-progress.
 """
 
-import msgpack
-import calendar
-
-from redis import Redis
 from six import iteritems, text_type
 
 from flask import (render_template, Blueprint, request, jsonify,
@@ -44,10 +40,10 @@ from invenio.base.i18n import _
 from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
-from ..registry import actions, workflows
+from ..registry import actions
 from ..utils import (sort_bwolist, extract_data, get_action_list,
-                     get_pretty_date, get_type, WorkflowBase,
-                     check_ssearch_over_data, get_holdingpen_objects)
+                     get_formatted_holdingpen_object,
+                     get_holdingpen_objects)
 from ..api import continue_oid_delayed, start_delayed
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -84,16 +80,13 @@ def maintable():
     """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
-    my_tags = []
-
-    if 'holdingpen_tags' in session:
-        my_tags = session["holdingpen_tags"]
+    tags = session.get("holdingpen_tags", list())
 
     if 'version' in request.args:
-        if ObjectVersion.MAPPING[int(request.args.get('version'))] not in my_tags:
-            my_tags += ObjectVersion.MAPPING[[int(request.args.get('version'))]]
+        if ObjectVersion.MAPPING[int(request.args.get('version'))] not in tags:
+            tags += ObjectVersion.MAPPING[[int(request.args.get('version'))]]
     tags_to_print = ""
-    for tag in my_tags:
+    for tag in tags:
         if tag:
             tags_to_print += tag + ','
     return dict(bwolist=bwolist,
@@ -284,30 +277,22 @@ def get_context():
 def load_table():
     """Get JSON data for the Holdingpen table.
 
-    Function used for the passing of JSON data to the DataTable
-    1] First checks for what record version to show
-    2] then sorting direction,
-    3] then if the user searched for something
-    and finally it builds the JSON to send.
+    Function used for the passing of JSON data to DataTables:
+
+    1. First checks for what record version to show
+    2. Then the sorting direction.
+    3. Then if the user searched for something.
+
+    :return: JSON formatted str from dict of DataTables args.
     """
+    tags = session.setdefault("holdingpen_tags", list())
     if request.method == "POST":
-        if "holdingpen_tags" not in session:
-            session["holdingpen_tags"] = []
         if request.json and "tags" in request.json:
             tags = request.json["tags"]
             session["holdingpen_tags"] = tags
-        elif "holdingpen_tags" in session:
-            tags = session["holdingpen_tags"]
-        else:
-            tags = []
-            session["holdingpen_tags"] = []
+        # This POST came from tags-input.
+        # We return here as DataTables will call a GET here after.
         return None
-    else:
-        if "holdingpen_tags" in session:
-            tags = session["holdingpen_tags"]
-        else:
-            tags = []
-            session["holdingpen_tags"] = []
 
     i_sortcol_0 = request.args.get('iSortCol_0', session.get('iSortCol_0', 0))
     s_sortdir_0 = request.args.get('sSortDir_0', session.get('sSortDir_0', None))
@@ -316,80 +301,7 @@ def load_table():
     session["holdingpen_iDisplayLength"] = int(request.args.get('iDisplayLength', session.get('iDisplayLength', 0)))
     session["holdingpen_sEcho"] = int(request.args.get('sEcho', session.get('sEcho', 0))) + 1
 
-    workflows_cache = {}
-    tags_copy = tags[:]
-    version_showing = []
-    for i in range(len(tags_copy) - 1, -1, -1):
-        if tags_copy[i] in ObjectVersion.MAPPING.values():
-            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
-            del tags_copy[i]
-
-    if version_showing is None:
-        version_showing = ObjectVersion.MAPPING.keys()
-    ssearch = tags_copy
-    bwobject_list = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_parent == None  # noqa E711
-    ).filter(not version_showing or BibWorkflowObject.version.in_(
-        version_showing)).all()
-    workflows_name = ""
-
-    R_SERVER = Redis()
-
-    for bwo in bwobject_list:
-        try:
-            if not R_SERVER.get(bwo.id):
-                if bwo.id_workflow:
-                    workflows_name = Workflow.query.get(bwo.id_workflow).name
-
-                if workflows_name and workflows_name not in workflows_cache and hasattr(workflows[workflows_name],'get_description'):
-                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
-                                                         "description": workflows[workflows_name].get_description(bwo),
-                                                         "title": workflows[workflows_name].get_title(bwo),
-                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
-                else:
-                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
-                                                         "description": WorkflowBase.get_description(bwo),
-                                                         "title": WorkflowBase.get_title(bwo),
-                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
-
-        except AttributeError:
-            # No name
-            pass
-    if ssearch and not ssearch == [u""]:
-        if not isinstance(ssearch, list):
-            if "," in ssearch:
-                ssearch = ssearch.split(",")
-            else:
-                ssearch = [ssearch]
-
-        bwobject_list_tmp = []
-        for bwo in bwobject_list:
-            results = {"created": get_pretty_date(bwo), "type": get_type(bwo),
-                  "title": None, "description": None }
-            redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id))
-
-            if redis_cache_object["date"] == calendar.timegm(bwo.modified.timetuple()):
-                results["description"] = redis_cache_object["description"]
-                results["title"] = redis_cache_object["title"]
-            else:
-                if bwo.id_workflow:
-                    workflows_name = Workflow.query.get(bwo.id).name
-
-                if workflows_name and workflows_name not in workflows_cache and hasattr(workflows[workflows_name],'get_description'):
-                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
-                                                         "description": workflows[workflows_name].get_description(bwo),
-                                                         "title": workflows[workflows_name].get_title(bwo),
-                                                         "date": calendar.timegm(bwo.modified.timetuple())}))
-                else:
-                    R_SERVER.set(bwo.id, msgpack.dumps({"name": workflows_name,
-                                                        "description": WorkflowBase.get_description(bwo),
-                                                        "title": WorkflowBase.get_title(bwo),
-                                                        "date": calendar.timegm(bwo.modified.timetuple())}))
-
-            if check_ssearch_over_data(ssearch, results):
-                bwobject_list_tmp.append(bwo)
-            # executed if the loop ended normally (no break)
-        bwobject_list = bwobject_list_tmp
+    bwobject_list = get_holdingpen_objects(tags)
 
     if (i_sortcol_0 and s_sortdir_0) or ("holdingpen_iSortCol_0" in session and "holdingpen_sSortDir_0" in session):
         if i_sortcol_0:
@@ -409,30 +321,23 @@ def load_table():
                   'iTotalRecords': len(bwobject_list),
                   'iTotalDisplayRecords': len(bwobject_list),
                   'sEcho': session["holdingpen_sEcho"]}
-    # This will be simplified once Redis is utilized.
+
     records_showing = 0
-    for bwo in bwobject_list[session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"] + session["holdingpen_iDisplayLength"]]:
-        redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id))
+    for bwo in bwobject_list[
+            session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"]
+            + session["holdingpen_iDisplayLength"]]:
         records_showing += 1
         action_name = bwo.get_action()
         action_message = bwo.get_action_message()
         if not action_message:
             action_message = ""
 
+        preformatted = get_formatted_holdingpen_object(bwo)
+
         action = actions.get(action_name, None)
         mini_action = None
         if action:
             mini_action = getattr(action, "render_mini", None)
-        try:
-            title = workflows[redis_cache_object["name"]].get_title(bwo)
-            description = workflows[redis_cache_object["name"]].get_description(bwo)
-        except (AttributeError, TypeError):
-            # Somehow the workflow does not exist (.name)
-            from invenio.ext.logging import register_exception
-            register_exception(alert_admin=True)
-            title = "No title"
-            description = "No description"
-
         extra_data = bwo.get_extra_data()
         record = bwo.get_data()
 
@@ -443,11 +348,11 @@ def load_table():
                 record = {}
 
         row = render_template('workflows/row_formatter.html',
-                              title=title,
+                              title=preformatted["title"],
                               object=bwo,
                               record=record,
                               extra_data=extra_data,
-                              description=description,
+                              description=preformatted["description"],
                               action=action,
                               mini_action=mini_action,
                               action_message=action_message,

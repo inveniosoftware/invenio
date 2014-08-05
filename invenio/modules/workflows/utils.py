@@ -18,8 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import msgpack
-from redis import Redis
 import calendar
+
+from invenio.ext.cache import cache
+from .registry import workflows
 
 
 def session_manager(orig_func):
@@ -215,8 +217,6 @@ class dictproperty(object):
 
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     """Sort a list of BibWorkflowObjects for DataTables."""
-    R_SERVER = Redis()
-
     should_we_reverse = False
     if sSortDir_0 == 'desc':
         should_we_reverse = True
@@ -225,9 +225,9 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 2:
-        bwolist.sort(key=lambda x: msgpack.loads(R_SERVER.get(x.id))["title"], reverse=should_we_reverse)
+        bwolist.sort(key=lambda x: msgpack.loads(cache.get(x.id))["title"], reverse=should_we_reverse)
     elif iSortCol_0 == 3:
-        bwolist.sort(key=lambda x: msgpack.loads(R_SERVER.get(x.id))["description"], reverse=should_we_reverse)
+        bwolist.sort(key=lambda x: msgpack.loads(cache.get(x.id))["description"], reverse=should_we_reverse)
     elif iSortCol_0 == 4:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
     elif iSortCol_0 == 5:
@@ -290,64 +290,91 @@ def get_holdingpen_objects(ptags=[]):
     """
     from .models import (BibWorkflowObject,
                          ObjectVersion)
-    from .registry import workflows
-    tags = ptags[:]
+
+    tags_copy = ptags[:]
     version_showing = []
-    for i in range(len(tags) - 1, -1, -1):
-        if tags[i] in ObjectVersion.MAPPING.values():
-            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags[i]])
-            del tags[i]
+    for i in range(len(tags_copy) - 1, -1, -1):
+        if tags_copy[i] in ObjectVersion.MAPPING.values():
+            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
+            del tags_copy[i]
 
     if version_showing is None:
         version_showing = ObjectVersion.MAPPING.keys()
-    ssearch = tags
+    ssearch = tags_copy
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent == None  # noqa E711
     ).filter(not version_showing or BibWorkflowObject.version.in_(
         version_showing)).all()
 
-    if ssearch and not ssearch == [u""]:
+    if ssearch and ssearch[0]:
         if not isinstance(ssearch, list):
             if "," in ssearch:
                 ssearch = ssearch.split(",")
             else:
                 ssearch = [ssearch]
-        R_SERVER = Redis()
+
         bwobject_list_tmp = []
         for bwo in bwobject_list:
-            results = {"created": get_pretty_date(bwo), "type": get_type(bwo),
-                       "title": None, "description": None}
-            redis_cache_object = msgpack.loads(R_SERVER.get(bwo.id_workflow))
-            if redis_cache_object:
-                if not ("title" and "description" in redis_cache_object):
-                    results["description"] = workflows[redis_cache_object["name"]].get_description(bwo)
-                    results["title"] = workflows[redis_cache_object["name"]].get_title(bwo)
-                    redis_cache_object["title"] = results["title"]
-                    redis_cache_object["description"] = results["description"]
-
-                    redis_cache_object["date"] = calendar.timegm(bwo.modified.timetuple())
-                    R_SERVER.set(bwo.id_workflow, msgpack.dumps(redis_cache_object))
-                else:
-                    if redis_cache_object["date"] == calendar.timegm(bwo.modified.timetuple()):
-                        results["description"] = redis_cache_object["description"]
-                        results["title"] = redis_cache_object["title"]
-                    else:
-                        results["description"] = workflows[redis_cache_object["name"]].get_description(bwo)
-                        results["title"] = workflows[redis_cache_object["name"]].get_title(bwo)
-                        redis_cache_object["title"] = results["title"]
-                        redis_cache_object["description"] = results["description"]
-                        redis_cache_object["date"] = calendar.timegm(bwo.modified.timetuple())
-                        R_SERVER.set(bwo.id_workflow, msgpack.dumps(redis_cache_object))
-            else:
-                results["title"] = WorkflowBase.get_title(bwo)
-                results["description"] = WorkflowBase.get_description(bwo)
+            results = {
+                "created": get_pretty_date(bwo),
+                "type": get_type(bwo),
+                "title": None,
+                "description": None
+            }
+            results.update(get_formatted_holdingpen_object(bwo))
 
             if check_ssearch_over_data(ssearch, results):
                 bwobject_list_tmp.append(bwo)
-            # executed if the loop ended normally (no break)
 
         bwobject_list = bwobject_list_tmp
     return bwobject_list
+
+
+def get_versions_from_tags(tags):
+    """Return a tuple with versions from tags.
+
+    :param tags: list of tags
+    :return: tuple of (versions to show, cleaned tags list)
+    """
+    from .models import ObjectVersion
+
+    tags_copy = tags[:]
+    version_showing = []
+    for i in range(len(tags_copy) - 1, -1, -1):
+        if tags_copy[i] in ObjectVersion.MAPPING.values():
+            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
+            del tags_copy[i]
+    return version_showing, tags_copy
+
+
+def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
+    """Return the formatted output, from cache if available."""
+    results = cache.get(str(bwo.id))
+    if results:
+        results = msgpack.loads(cache.get(str((bwo.id))))
+        if results["date"] == bwo.modified.strftime(date_format):
+            return results
+    results = generate_formatted_holdingpen_object(bwo)
+    cache.set(str(bwo.id), msgpack.dumps(results))
+    return results
+
+
+def generate_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
+    """Generate a dict with formatted column data from Holding Pen object."""
+    workflows_name = bwo.get_workflow_name()
+
+    if workflows_name and hasattr(workflows[workflows_name], 'get_description'):
+        workflow_definition = workflows[workflows_name]
+    else:
+        workflow_definition = WorkflowBase
+
+    results = {
+        "name": workflows_name,
+        "description": workflow_definition.get_description(bwo),
+        "title": workflow_definition.get_title(bwo),
+        "date": bwo.modified.strftime(date_format)
+    }
+    return results
 
 
 def check_ssearch_over_data(ssearch, data):
@@ -363,7 +390,7 @@ def check_ssearch_over_data(ssearch, data):
     total = 0
     for terms in ssearch:
         for datum in data:
-            if terms.lower() in data[datum].lower():
+            if data[datum] and terms.lower() in data[datum].lower():
                 total += 1
                 break
     return total == len(ssearch)

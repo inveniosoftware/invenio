@@ -343,13 +343,23 @@ class BibWorkflowObject(db.Model):
         """
         self._extra_data = base64.b64encode(cPickle.dumps(value))
 
+    def get_workflow_name(self):
+        """Return the workflow name for this object."""
+        try:
+            if self.id_workflow:
+                return Workflow.query.get(self.id_workflow).name
+        except AttributeError:
+            # Workflow non-existent
+            pass
+        return
+
     def get_formatted_data(self, of="hd"):
         """Get the formatted representation for this object."""
         from .registry import workflows
         try:
-            workflow_definition = workflows[Workflow.query.get(self.id_workflow).name]
+            workflow_definition = workflows[self.get_workflow_name()]
             formatted_data = workflow_definition().formatter(self, formatter=None, format=of)
-        except AttributeError:
+        except (KeyError, AttributeError):
             # Somehow the workflow does not exist (.name)
             from invenio.ext.logging import register_exception
             register_exception(alert_admin=True)
@@ -389,16 +399,18 @@ class BibWorkflowObject(db.Model):
         Adds given task results to extra_data in order to be accessed
         and displayed later on by Holding Pen templates.
         """
-        task_name = self.extra_data["_last_task_name"]
+        extra_data = self.get_extra_data()
+        task_name = extra_data["_last_task_name"]
         res_obj = WorkflowsTaskResult(task_name, name, result)
-        if isinstance(self.extra_data["_tasks_results"], list):
-            if not self.extra_data["_tasks_results"]:
-                self.extra_data["_tasks_results"] = {task_name: result}
+        if isinstance(extra_data["_tasks_results"], list):
+            if not extra_data["_tasks_results"]:
+                extra_data["_tasks_results"] = {task_name: result}
         else:
-            if task_name in self.extra_data["_tasks_results"]:
-                self.extra_data["_tasks_results"][task_name].append(res_obj)
+            if task_name in extra_data["_tasks_results"]:
+                extra_data["_tasks_results"][task_name].append(res_obj)
             else:
-                self.extra_data["_tasks_results"][task_name] = [res_obj]
+                extra_data["_tasks_results"][task_name] = [res_obj]
+        self.set_extra_data(extra_data)
 
     def get_tasks_results(self):
         """Return the complete set of tasks results."""
@@ -798,5 +810,5 @@ class BibWorkflowEngineLog(db.Model):
         db.session.commit()
 
 
-__all__ = ['Workflow', 'BibWorkflowObject',
-           'BibWorkflowObjectLog', 'BibWorkflowEngineLog']
+__all__ = ('Workflow', 'BibWorkflowObject',
+           'BibWorkflowObjectLog', 'BibWorkflowEngineLog')

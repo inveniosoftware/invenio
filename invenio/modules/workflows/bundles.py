@@ -65,10 +65,8 @@ vendors_css = Bundle(
 )
 
 dataTables_css = Bundle(
-    'vendors/datatables-colvis/css/dataTables.colVis.css',
     'vendors/datatables-plugins/integration/bootstrap/3'
     '/dataTables.bootstrap.css',
-    'vendors/bootstrap-tagsinput/dist/bootstrap-tagsinput.less',
     filters="less,cleancss",
     output='datatables.css',
     weight=30
@@ -76,14 +74,12 @@ dataTables_css = Bundle(
 
 dataTables_js = Bundle(
     'vendors/datatables/media/js/jquery.dataTables.js',
-    'vendors/datatables-colvis/js/dataTables.colVis.js',
     'vendors/datatables-plugins/integration/bootstrap/3'
     '/dataTables.bootstrap.js',
     filters="uglifyjs",
     output='datatables.js',
     weight=30,
     bower={
-        "datatables-colvis": "latest",
         "datatables": "~1.10",
         "datatables-plugins": "https://github.com/greut/Plugins.git#amdify"
     }

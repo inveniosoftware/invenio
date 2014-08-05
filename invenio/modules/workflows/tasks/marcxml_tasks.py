@@ -15,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Set of function for harvesting."""
 
 import os
@@ -97,8 +98,8 @@ def filtering_oai_pmh_identifier(obj, eng):
         delimiter_start = "<identifier>"
         delimiter_end = "</identifier>"
         identifier = record[
-                     record.index(delimiter_start) +
-                     len(delimiter_start):record.index(delimiter_end)
+            record.index(delimiter_start) +
+            len(delimiter_start):record.index(delimiter_end)
         ]
         if identifier in eng.extra_data["oaiharvest"]["identifiers"]:
             return False
@@ -337,12 +338,12 @@ def get_data(obj, eng):
 
 
 def convert_record(stylesheet="oaidc2marcxml.xsl"):
-    """Will convert the object data, if XML, using the given stylesheet.
+    """Convert the object data, if XML, using the given stylesheet.
 
-    :param stylesheet:
-    :return: :raise workflows_error.WorkflowError:
+    :param stylesheet: which stylesheet to use
+    :return: function to convert record
+    :raise workflows_error.WorkflowError:
     """
-
     def _convert_record(obj, eng):
 
         from invenio.legacy.bibconvert.xslt_engine import convert
@@ -364,10 +365,10 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
 
 
 def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
-    """Convert a marc record to another one thanks to the stylesheet.
+    """Convert a MARC record to another one thanks to the stylesheet.
 
     This function converts a record to a marcxml representation by using a
-    style sheet which should be in parameter or which sould have been stored
+    style sheet which should be in parameter or which should have been stored
     into extra data of the object.
 
     The priority is given to the stylesheet into the extra data of the object.
@@ -378,7 +379,6 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
     to convert a oai record to a marcxml one
     :type stylesheet: str
     """
-
     def _convert_record(obj, eng):
         eng.log.info("my type: %s" % (obj.data_type,))
         try:
@@ -448,12 +448,13 @@ def fulltext_download(obj, eng):
             doctype = 'arXiv'
         if pdf:
             obj.extra_data["_result"]["pdf"] = pdf
-            fulltext_xml = ("  <datafield tag=\"FFT\" ind1=\" \" ind2=\" \">\n"
-                            "    <subfield code=\"a\">%(url)s</subfield>\n"
-                            "    <subfield code=\"t\">%(doctype)s</subfield>\n"
-                            "    </datafield>"
-                           ) % {'url': obj.extra_data["_result"]["pdf"],
-                                'doctype': doctype}
+            fulltext_xml = (
+                "  <datafield tag=\"FFT\" ind1=\" \" ind2=\" \">\n"
+                "    <subfield code=\"a\">%(url)s</subfield>\n"
+                "    <subfield code=\"t\">%(doctype)s</subfield>\n"
+                "    </datafield>"
+            ) % {'url': obj.extra_data["_result"]["pdf"],
+                 'doctype': doctype}
             updated_xml = '<?xml version="1.0"?>\n' \
                           '<collection>\n<record>\n' + fulltext_xml + \
                           '</record>\n</collection>'
@@ -544,7 +545,6 @@ def quick_match_record(obj, eng):
 
 def upload_record(mode="ir"):
     """Perform the upload step."""
-
     def _upload_record(obj, eng):
         eng.log_info("Saving data to temporary file for upload")
         filename = obj.save_to_file()
