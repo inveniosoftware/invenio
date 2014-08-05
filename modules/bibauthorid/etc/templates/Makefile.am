@@ -22,6 +22,7 @@ etc_DATA    = head.html \
             debug_block.html \
             profile_menu.html \
             profile_page.html \
+            profile_page_template.html \
             generic_wrapper.html \
             citations_summary.html \
             publications_box.html \

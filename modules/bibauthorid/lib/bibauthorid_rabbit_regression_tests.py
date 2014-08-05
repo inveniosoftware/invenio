@@ -48,12 +48,10 @@ from invenio.testutils import (InvenioTestCase,
                                run_test_suite,
                                make_test_suite,
                                nottest)
-from invenio.testutils import unittest
 import invenio.config as config
 
 from copy import deepcopy
 from mock import patch
-
 
 is_test_paper_claimed = nottest(is_test_paper_claimed)
 get_modified_marc_for_test = nottest(get_modified_marc_for_test)
@@ -106,17 +104,16 @@ class BibAuthorIDRabbitTestCase(InvenioTestCase):
             clean_authors_tables(bibrec)
 
 
-class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
+class AuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
 
     def setUp(self):
-        super(OneAuthorRabbitTestCase, self).setUp()
+        super(AuthorRabbitTestCase, self).setUp()
         self.main_marcxml_record = get_new_marc_for_test('Rabbit Test Paper', author_name=self.author_name,
                                                          ext_id=self.ext_id)
         self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record, opt_mode='insert')
         self.main_marcxml_record = add_001_field(self.main_marcxml_record, self.main_bibrec)
         self.bibrecs_to_clean = [self.main_bibrec]
 
-    @unittest.skip("fails")
     def test_rabbit_one_author_only(self):
         '''
         Rabbit tests for one author cases.
@@ -141,6 +138,7 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record)
             self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record,
                                                      opt_mode='replace')
+
             rabbit([self.main_bibrec], verbose=True)
             number_of_personids_after = get_count_of_pids()
             self.assertEquals(number_of_personids_before,
@@ -293,9 +291,9 @@ class OneAuthorRabbitTestCase(BibAuthorIDRabbitTestCase):
             A record is deleted. Rabbit should understand that and remove the author from the aidPERSON* tables.
             '''
             number_of_personids_before = get_count_of_pids()
-            if config.CFG_BIBAUTHORID_ENABLED:
+            if config.CFG_INSPIRE_SITE:
                 self.main_marcxml_record = get_modified_marc_for_test(self.main_marcxml_record,
-                                                                      author_name=self.heavily_modified_author_name,
+                                                                      author_name=self.heavily_modified_name,
                                                                       ext_id=self.ext_id)
             self.main_bibrec = get_bibrec_for_record(self.main_marcxml_record,
                                                      opt_mode='delete')
@@ -332,7 +330,6 @@ class CoauthorsRabbitTestCase(BibAuthorIDRabbitTestCase):
         self.bibrecs_to_clean = list()
         self.bibrecs_to_clean.append(self.main_bibrec)
 
-    @unittest.skip("fails")
     def test_rabbit_with_coauthors(self):
 
         def test_rabbit_add_new_paper_with_four_coauthors():
@@ -636,7 +633,7 @@ class MnamesFunctionsTest(BibAuthorIDRabbitTestCase):
         self.assertTrue(m_name_func_2.has_been_called)
 
 TEST_SUITE = make_test_suite(BibAuthorIDRabbitTestCase,
-                             OneAuthorRabbitTestCase,
+                             AuthorRabbitTestCase,
                              CoauthorsRabbitTestCase,
                              MatchableNameRabbitTestCase,
                              MnamesCacheConsistencyTestCase,

@@ -21,7 +21,6 @@
 aidPersonID maintenance algorithms.
 """
 from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_normalized_name
 from invenio.bibauthorid_backinterface import get_name_by_bibref
 from invenio.bibauthorid_backinterface import back_up_author_paper_associations  # emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_backinterface import compare_personid_tables  # emitting #pylint: disable-msg=W0611
@@ -73,8 +72,6 @@ def convert_personid():
                 name = get_name_by_bibref((int(tab), int(ref), int(rec)))
             except:
                 continue
-            name = split_name_parts(name)
-            name = create_normalized_name(name)
             paper_args += [row[0], tab, ref, rec, name, row[3], row[4]]
             if len(paper_args) > chunk:
                 flush_papers(paper_args)

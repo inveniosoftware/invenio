@@ -77,7 +77,7 @@ def get_bibrec_for_record(marcxml, opt_mode):
     A record is uploaded to the system using mainly functionality
     of the bibupload module. Then a bibrec is returned for the record.
     '''
-    recs = create_record(marcxml)
+    recs = create_record(marcxml, parser='lxml')
     _, recid, _ = bibupload(recs[0], opt_mode=opt_mode)
     return recid
 
@@ -93,29 +93,32 @@ def get_modified_marc_for_test(marcxml_string, author_name=None,
         co_authors_names = list(co_authors_names)
     coauthor_index = 0
     for field in fields:
-        if field.items()[0][1] == '100':
-            author_exists = True
-            if author_name:
-                author_subfields = field.findall('subfield')
-                for subfield in author_subfields:
-                    if 'i' in subfield.attrib.values():
-                        extids_exist = True
-                        subfield.text = ext_id
+        field_items = field.items()
+        for inner_field in field_items:
+            if inner_field[0] == 'tag':
+                if inner_field[1] == '100':
+                    author_exists = True
+                    if author_name:
+                        author_subfields = field.findall('subfield')
+                        for subfield in author_subfields:
+                            if 'i' in subfield.attrib.values():
+                                extids_exist = True
+                                subfield.text = ext_id
+                            else:
+                                subfield.text = author_name
+                        if ext_id and not extids_exist:
+                            ext_field = SubElement(field, 'subfield', {'code': 'i'})
+                            ext_field.text = ext_id
                     else:
-                        subfield.text = author_name
-                if ext_id and not extids_exist:
-                    ext_field = SubElement(field, 'subfield', {'code': 'i'})
-                    ext_field.text = ext_id
-            else:
-                marcxml.remove(field)
-        if field.items()[0][1] == '700':
-            coauthors_exist = True
-            if co_authors_names:
-                coauthor_subfield = field.find('subfield')
-                coauthor_subfield.text = co_authors_names[coauthor_index]
-                coauthor_index += 1
-            else:
-                marcxml.remove(field)
+                        marcxml.remove(field)
+                if inner_field[1] == '700':
+                    coauthors_exist = True
+                    if co_authors_names:
+                        coauthor_subfield = field.find('subfield')
+                        coauthor_subfield.text = co_authors_names[coauthor_index]
+                        coauthor_index += 1
+                    else:
+                        marcxml.remove(field)
 
     if author_name and not author_exists:
         build_test_marcxml_field(marcxml, 100, author_name)

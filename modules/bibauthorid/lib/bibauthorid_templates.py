@@ -231,7 +231,7 @@ class WebProfilePage():
     def _load_named_template(template):
         environment = WebProfilePage.environment
         if template is not "generic":
-            loaded_template = WebProfilePage.environment.get_template("%s.html" % str(template))
+            loaded_template = environment.get_template("%s.html" % str(template))
         else:
             loaded_template = environment.get_template("generic_wrapper.html")
         return loaded_template
@@ -248,7 +248,6 @@ class WebProfilePage():
 
     def get_wrapped_body(self, template, content):
         parameters = self._get_standard_author_page_parameters()
-
         try:
             loaded_template = self._load_named_template(template)
             parameters.update(content)
@@ -271,18 +270,27 @@ class WebProfilePage():
 
     @staticmethod
     def render_citations_summary_content(citations, canonical_name):
+        
+        def _get_breakdown_categories_bounds(pid):
+            """
+            An example of a category string would be 'Famous papers (250-499')
+            This returns (250, 499) which are the lower and upper bound.
+            """
+            
+            bounds_str = category.split(')')[0].split('(')[1]
+            
+            try:
+                return (int(bounds_str), 0)
+            except ValueError:
+                if '+' in bounds_str:
+                    return (int(bounds_str.strip('+')), 1000000)
+                else:
+                    return map(int, bounds_str.split('-'))
 
         citeable_breakdown_queries = dict()
         published_breakdown_queries = dict()
         for category in citations['breakdown_categories']:
-            limits = category.split(')')[0].split('(')[1].strip('+').split('-')
-            low = int(limits[0])
-            if len(limits) > 1 and int(limits[0]) != 0:
-                high = int(limits[1])
-            elif int(limits[0]) == 0:
-                high = 0
-            else:
-                high = 1000000
+            low, high = _get_breakdown_categories_bounds(category)
             citeable_breakdown_queries[
                 category] = tmpl_citesummary_get_link_for_rep_breakdown(
                 canonical_name,
@@ -300,27 +308,32 @@ class WebProfilePage():
                 low,
                 high)
 
-        return WebProfilePage.environment.get_template("citations_summary.html").render({
-            'papers_num': citations['papers_num'],
-            'citeable': {'avg_cites': citations['data']['Citeable papers']['avg_cites'],
-                         'num': len(citations['papers']['Citeable papers']),
-                         'citations_num': citations['data']['Citeable papers']['total_cites'],
-                         'h_index': citations['data']['Citeable papers']['h-index'],
-                         'breakdown': citations['data']['Citeable papers']['breakdown'],
-                         'breakdown_queries': citeable_breakdown_queries},
-            'published': {'avg_cites': citations['data']['Published only']['avg_cites'],
-                          'num': len(citations['papers']['Published only']),
-                          'citations_num': citations['data']['Published only']['total_cites'],
-                          'h_index': citations['data']['Published only']['h-index'],
-                          'breakdown': citations['data']['Published only']['breakdown'],
-                          'breakdown_queries': published_breakdown_queries},
-            'breakdown_categories': citations['breakdown_categories'],
-            'hindex_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
-            'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
-            'citeable_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:citeable'),
-            'selfcite_link': '%s/search?ln=en&p=author:%s&of=hcs2' % (CFG_BASE_URL, canonical_name),
-            'published_only_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:published'),
-        })
+        try:
+            result = WebProfilePage.environment.get_template("citations_summary.html").render({
+                'papers_num': citations['papers_num'],
+                'citeable': {'avg_cites': citations['data']['Citeable papers']['avg_cites'],
+                             'num': len(citations['papers']['Citeable papers']),
+                             'citations_num': citations['data']['Citeable papers']['total_cites'],
+                             'h_index': citations['data']['Citeable papers']['h-index'],
+                             'breakdown': citations['data']['Citeable papers']['breakdown'],
+                             'breakdown_queries': citeable_breakdown_queries},
+                'published': {'avg_cites': citations['data']['Published only']['avg_cites'],
+                              'num': len(citations['papers']['Published only']),
+                              'citations_num': citations['data']['Published only']['total_cites'],
+                              'h_index': citations['data']['Published only']['h-index'],
+                              'breakdown': citations['data']['Published only']['breakdown'],
+                              'breakdown_queries': published_breakdown_queries},
+                'breakdown_categories': citations['breakdown_categories'],
+                'hindex_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
+                'citation_fine_print_link': "%s/help/citation-metrics" % CFG_BASE_URL,
+                'citeable_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:citeable'),
+                'selfcite_link': '%s/search?ln=en&p=author:%s&of=hcs2' % (CFG_BASE_URL, canonical_name),
+                'published_only_papers_link': tmpl_citesummary_get_link(canonical_name, 'author', 'collection:published'),
+            })
+        except:
+            result = "No citations data."
+
+        return result
 
     @staticmethod
     def render_publications_box_content(template_vars):

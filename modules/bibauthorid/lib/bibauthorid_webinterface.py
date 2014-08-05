@@ -82,7 +82,6 @@ from invenio.bibauthorid_general_utils import get_inspire_record_url
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
     record_get_field_instances, field_get_subfield_values
-from invenio.bibauthorid_name_utils import create_normalized_name
 from invenio.bibauthorid_name_utils import split_name_parts
 
 TEMPLATE = load('bibauthorid')
@@ -1374,7 +1373,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         uid = getUid(req)
         tid = int(tid)
 
-        rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        try:
+            rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
+        except IndexError:
+            msg = """This ticket with the tid: %s has already been
+                     removed.""" % tid
+            return self._error_page(req, message=msg)
 
         for action, bibrefrec in rt_ticket['operations']:
             operation_parts = {'pid': pid,
@@ -2251,10 +2255,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         mr_name = most_relevant_name(name_variants)
         if mr_name:
-            relevant_name = create_normalized_name(split_name_parts(mr_name))
-
-            if relevant_name:
-                search_param = relevant_name.split(",")[0]
+            search_param = mr_name.split(",")[0]
 
         merge_data['search_param'] = search_param
         merge_data['canonical_id'] = webapi.get_canonical_id_from_person_id(person_id)
@@ -2760,13 +2761,16 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             "base_url": CFG_BASE_URL
         }
 
-
         # Inspire specific endpoints.
         if CFG_INSPIRE_SITE:
             template_parameters["hepnames"] = html_hepnames
             template_parameters["arxiv"] = html_arxiv
             template_parameters["orcid"] = html_orcid
             template_parameters["contact"] = html_support
+
+        template_parameters["inspire"] = CFG_INSPIRE_SITE
+
+        template_parameters["inspire"] = CFG_INSPIRE_SITE
 
         body = profile_page.get_wrapped_body("manage_profile", template_parameters)
         # body = profile_page.get_wrapped_body("generic", {'html': content})
@@ -3600,6 +3604,7 @@ class WebInterfacePerson(WebInterfaceDirectory):
                                              status, research_field_list,
                                              institution_list, phd_advisor_list,
                                              experiment_list, web_page)
+
         title = "HEPNames"
         return page(title=title,
                     metaheaderadd=TEMPLATE.tmpl_update_hep_name_headers(),

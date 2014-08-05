@@ -40,7 +40,6 @@ from invenio.config import CFG_SITE_URL
 
 from invenio.bibauthorid_name_utils import split_name_parts
 from invenio.bibauthorid_name_utils import create_canonical_name
-from invenio.bibauthorid_name_utils import create_normalized_name
 
 from invenio.dbquery import run_sql
 from invenio import bibtask
@@ -65,6 +64,7 @@ from invenio.bibauthorid_general_utils import memoized
 from invenio.bibauthorid_general_utils import monitored
 from invenio.bibauthorid_logutils import Logger
 import time
+from intbitset import intbitset
 
 
 # run_sql = monitored(run_sql)
@@ -1246,10 +1246,7 @@ def get_author_to_papers_mapping(recs, limit_by_name=None):  # get_personids_and
 
     surname = None
     if limit_by_name:
-        try:
-            surname = create_normalized_name(split_name_parts(limit_by_name))
-        except IndexError:
-            pass
+        surname = limit_by_name
 
     if surname:
         pids_papers = run_sql('select personid, bibrec '
@@ -2786,34 +2783,33 @@ def back_up_author_paper_associations():  # copy_personids
 # ********** getters **********#
 
 
-def get_papers_affected_since(since):  # personid_get_recids_affected_since
-    '''
-    Gets the set of papers which were manually changed after the specified
-    timestamp.
+def get_papers_affected_since(date_from, date_to=None):  # personid_get_recids_affected_since
+    """
+    Gets the records whose bibauthorid informations changed between
+    date_from and date_to (inclusive).
+    
+    If date_to is None, gets the records whose bibauthorid informations
+    changed after date_to (inclusive).
+    
+    @param date_from: the date after which this function will look for
+        affected records.
+    @type date_from: datetime.datetime
+    
+    @param date_to: the date before which this function will look for
+        affected records. Currently this is not supported and is
+        ignored. Should be supported in the future.
+    @type date_to: datetime.datetime or None
+    
+    @return: affected record ids
+    @return type: intbitset
+    """
+    recs = run_sql("""select bibrec from aidPERSONIDPAPERS where
+                      last_updated >= %s or personid in
+                      (select personid from aidPERSONIDDATA where
+                      last_updated >= %s)""", (date_from, date_from))
 
-    @param since: consider changes after the specified timestamp
-    @type since: datetime.datetime
+    return intbitset([rec[0] for rec in recs])
 
-    @return: paper identifiers
-    @rtype: list [int,]
-    '''
-    recs = set(_split_signature_string(sig[0])[2] for sig in run_sql("""select distinct value
-                                                                       from aidUSERINPUTLOG
-                                                                       where timestamp >= %s""",
-              (since,)) if ',' in sig[0] and ':' in sig[0])
-
-    pids = set(int(pid[0]) for pid in run_sql("""select distinct personid
-                                                 from aidUSERINPUTLOG
-                                                 where timestamp >= %s""",
-              (since,)) if pid[0] > 0)
-
-    if pids:
-        pids_sqlstr = _get_sqlstr_from_set(pids)
-        recs |= set(rec[0] for rec in run_sql("""select bibrec from aidPERSONIDPAPERS
-                                                 where personid in %s"""
-                                              % pids_sqlstr))
-
-    return list(recs)
 
 
 def get_papers_info_of_author(pid, flag,  # get_person_papers
@@ -4650,7 +4646,7 @@ def remove_all_signatures_from_authors(pids):  # remove_personid_papers
                 % pids_sqlstr)
 
 
-def get_authors_by_surname(surname):  # find_pids_by_name
+def get_authors_by_surname(surname, limit_to_recid=False):  # find_pids_by_name
     '''
     Gets all authors who carry records with the specified surname.
 
@@ -4660,10 +4656,16 @@ def get_authors_by_surname(surname):  # find_pids_by_name
     @return: author identifier and name set((pid, name),)
     @rtype: set set((int, str),)
     '''
-    return set(run_sql("""select personid, name
-                          from aidPERSONIDPAPERS
+
+    if not limit_to_recid:
+        select_query = "select personid, name "
+    else:
+        select_query = "select personid "
+
+    return set(run_sql(select_query +
+                       """from aidPERSONIDPAPERS
                           where name like %s""",
-              (surname + ',%',)))
+                       (surname + ',%',)))
 
 
 # could be useful to optimize rabbit. Still unused and untested, Watch out!
