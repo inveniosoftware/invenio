@@ -40,7 +40,13 @@ class Logger(object):
             self._file_only = False
         self._pidfiles = dict()
 
-        self._verbose = verbose
+        try:
+            import mod_wsgi
+            Logger._update_status = False
+            self._verbose = False
+        except ImportError:
+            self._verbose = verbose
+
 
     def _generate_msg(self, *args):
         message = '[%s][%s][%s]: ' % (datetime.today(), Logger._pid(),
@@ -90,7 +96,8 @@ class Logger(object):
 
     def update_status_final(self, comment=""):
         self.update_status(1., comment)
-        self._bai_print("", to_file=False)
+        if Logger._update_status:
+            self._bai_print("", to_file=False)
 
     @property
     def verbose(self):
