@@ -42,7 +42,6 @@ invenio = Bundle(
 styles = Bundle(
     "vendors/jquery-tokeninput/styles/token-input.css",
     "vendors/jquery-tokeninput/styles/token-input-facebook.css",
-    "vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css",
     "vendors/typeahead.js-bootstrap3.less/typeahead.css",
     "less/base.less",
     output="invenio.css",
@@ -56,7 +55,6 @@ styles = Bundle(
         "bootstrap": "3.2.0",
         "font-awesome": "4.1.0",
         "typeahead.js-bootstrap3.less": "0.2.3",
-        "jqueryui-timepicker-addon": "latest"
     }
 )
 
@@ -71,6 +69,8 @@ jquery = Bundle(
     "vendors/jquery.caret/dist/jquery.caret-1.5.2.js",
     "vendors/typeahead.js/dist/typeahead.bundle.js",
     "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
+    "vendors/bootstrap/dist/js/bootstrap.js",
+    "js/bootstrap-select.js",
     "js/translate.js",
     "js/init.js",
     output="jquery.js",
@@ -100,33 +100,16 @@ jquery = Bundle(
         "swfobject": "latest",  # orphan
         "typeahead.js": "latest",
         "uploadify": "latest"  # orphan
+        #"bootstrap": "*", is set by invenio.css already.
     }
 )
 
-# jQuery UI
+# TO BE REMOVED AND LOADED INDIVIDUALLY.
 jqueryui = Bundle(
     "js/jquery-ui.js",
     filters="requirejs",
     output="jquery-ui.js",
-    weight=11,
-    bower={
-        "jquery-ui": "~1.11.0",
-        #"jqueryui-timepicker-addon": "latest" is set by styles already
-    }
-)
-
-# must be loaded after jQuery UI to avoid conflicts
-# use noConflict() from bootstrap.js to get the functions of jQuery UI covered
-# by bootstrap.js
-bootstrap = Bundle(
-    "vendors/bootstrap/dist/js/bootstrap.js",
-    "js/bootstrap-select.js",
-    output="bootstrap.js",
-    filters="uglifyjs",
-    weight=jqueryui.weight + 1,
-    bower={
-        #"bootstrap": "*", is set by invenio.css already.
-    }
+    weight="11"
 )
 
 # less.js is only used when the following configuration is set:

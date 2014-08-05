@@ -17,6 +17,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(['jquery', 'jquery-ui', 'jqueryui-timepicker'], function ($) {
-    // loading the jQuery UI modules globally.
-})
+require(
+    ['jquery',
+     'jqueryui-timepicker/jquery-ui-sliderAccess',
+     'jqueryui-timepicker/jquery-ui-timepicker-addon'],
+    function ($) {
+        // loading parts of the jQuery UI module globally.
+    }
+)

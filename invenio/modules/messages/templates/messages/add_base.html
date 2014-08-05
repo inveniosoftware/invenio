@@ -22,8 +22,9 @@
 
 {% block global_bundles %}
   {{ super() }}
-  {% bundles "jquery-ui.js" %}
+  {% bundle "messages.js" %}
 {% endblock %}
+
 
 {% block header %}
   {{ super() }}
@@ -33,75 +34,16 @@
 
 {% block javascript %}
     <script type="text/javascript">
-    $(document).ready(function(){
-        function split( val ) {
-            return val.split(/,\s*/);
-        }
-        function extractLast( term ) {
-          return split(term).pop();
-        }
-        var selectLast = function( event, ui ) {
-            var terms = split(this.value);
-            terms.pop();
-            terms.push(ui.item.value);
-            terms.push("");
-            this.value = terms.join(", ");
-            return false;
-        }
-
-        $("#sent_to_user_nicks").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                $.ajax({
-                    url: "{{ url_for('webgroup.search')|safe }}",
-                    data: {
-                        query: "users",
-                        term: extractLast(request.term)
-                    },
-                    focus: function() {
-                        return false;
-                    },
-                    success: function(data, textStatus, jqXHR){
-                        response(data["nicknames"]);
-                    }
-                })},
-            select: selectLast });
-        $("#sent_to_group_names").autocomplete({
-            minLength: 3,
-            source: function(request, response) {
-                $.ajax({
-                    url: "{{ url_for('webgroup.search')|safe }}",
-                    data: {
-                        query: "groups",
-                        term: extractLast(request.term)
-                    },
-                    focus: function() {
-                        return false;
-                    },
-                    success: function(data, textStatus, jqXHR){
-                        response(data["groups"]);
-                    }
-                });
-            },
-            select: selectLast
-        });
-
-        $('input.datepicker').datepicker({
-          dateFormat: 'yy-mm-dd'
-        });
-
-        $('input.datetimepicker').datetimepicker({
-          showSecond: true,
-          dateFormat: 'yy-mm-dd',
-          timeFormat: 'hh:mm:ss'
-        });
-
-        $('input.timepicker').timepicker({
-          timeFormat: 'hh:mm:ss',
-          showSecond: true
-        });
-
-    });
+      require(['jquery', 'js/messages/add'], function($, add) {
+        $(function(){
+          add({
+            url: {
+              search: "{{ url_for('webgroup.search')|safe }}",
+              {#lang: 'fr' // match the plugin language #}
+            }
+          })
+        })
+      })
     </script>
 {% endblock javascript %}
 {% block body %}
