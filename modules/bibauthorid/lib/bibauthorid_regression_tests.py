@@ -86,7 +86,7 @@ class BibAuthorIdDisplayedPages(InvenioTestCase):
             if self.canonical_name:
                 url = '%s/author/profile/%s' % (CFG_SITE_URL,
                                                 self.canonical_name)
-                text_to_check = 'Personal Details'
+                text_to_check = 'Personal Information'
                 response = test_web_page_content(url, 'guest',
                                                  expected_text=text_to_check)
                 self.assertEqual(list(), response)
@@ -109,7 +109,7 @@ class BibAuthorIdDisplayedPages(InvenioTestCase):
                 if self.canonical_name:
                     url = '%s/author/%s' % (CFG_SITE_URL,
                                             self.canonical_name)
-                    text_to_check = 'Personal Details'
+                    text_to_check = 'Personal Information'
                     response = test_web_page_content(url, 'guest',
                                                      expected_text=text_to_check)
                     self.assertEqual(list(), response)
@@ -128,7 +128,7 @@ class BibAuthorIdDisplayedPages(InvenioTestCase):
             text_not_there = ['View Profile', 'Manage Profile']
 
             url = '%s/author/profile/Ellis,%%20J' % CFG_SITE_URL
-            text_to_check = ['Ellis, J', 'Personal Details']
+            text_to_check = ['Ellis, J', 'Personal Information']
             response = test_web_page_content(url, 'guest',
                                              expected_text=text_to_check,
                                              unexpected_text=text_not_there)
@@ -145,7 +145,7 @@ class BibAuthorIdDisplayedPages(InvenioTestCase):
             if self._test_web_page_existence_no_robots('%s/author/Ellis, J'
                                                        % CFG_SITE_URL):
                 url = '%s/author/Ellis,%%20J' % CFG_SITE_URL
-                text_to_check = ['Ellis, J', 'Personal Details']
+                text_to_check = ['Ellis, J', 'Personal Information']
                 response = test_web_page_content(url, 'guest',
                                                  expected_text=text_to_check,
                                                  unexpected_text=text_not_there)
