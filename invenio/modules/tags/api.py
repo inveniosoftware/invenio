@@ -269,6 +269,7 @@ def attach_tag_to_record(uid, tag_name, record_id):
 def attach_tags_to_record(list_of_tags, record_id):
     """Attach a list of tags to a record.
 
+    :param uid: a user id
     :param list_of_tags: a list of tags to be attached to a record
     :param record_id: record identifier
     """
