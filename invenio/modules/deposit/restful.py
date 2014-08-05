@@ -240,7 +240,7 @@ class DepositionListResource(Resource, InputProcessorMixin):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth):
+    def get(self):
         """
         List depositions
 
@@ -254,7 +254,7 @@ class DepositionListResource(Resource, InputProcessorMixin):
 
     @require_header('Content-Type', 'application/json')
     @require_oauth_scopes('deposit:write')
-    def post(self, oauth):
+    def post(self):
         """
         Create a new deposition
         """
@@ -268,19 +268,19 @@ class DepositionListResource(Resource, InputProcessorMixin):
         d.save()
         return d.marshal(), 201
 
-    def put(self, oauth):
+    def put(self):
         abort(405)
 
-    def delete(self, oauth):
+    def delete(self):
         abort(405)
 
-    def head(self, oauth):
+    def head(self):
         abort(405)
 
-    def options(self, oauth):
+    def options(self):
         abort(405)
 
-    def patch(self, oauth):
+    def patch(self):
         abort(405)
 
 
@@ -290,16 +290,16 @@ class DepositionResource(Resource, InputProcessorMixin):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth, resource_id):
+    def get(self, resource_id):
         """ Get a deposition """
         return Deposition.get(resource_id, user=current_user).marshal()
 
-    def post(self, oauth, resource_id):
+    def post(self, resource_id):
         abort(405)
 
     @require_header('Content-Type', 'application/json')
     @require_oauth_scopes('deposit:write')
-    def put(self, oauth, resource_id):
+    def put(self, resource_id):
         """ Update a deposition """
         d = Deposition.get(resource_id, user=current_user)
         self.validate_input(d)
@@ -308,19 +308,19 @@ class DepositionResource(Resource, InputProcessorMixin):
         return d.marshal()
 
     @require_oauth_scopes('deposit:write')
-    def delete(self, oauth, resource_id):
+    def delete(self, resource_id):
         """ Delete existing deposition """
         d = Deposition.get(resource_id, user=current_user)
         d.delete()
         return "", 204
 
-    def head(self, oauth, resource_id):
+    def head(self, resource_id):
         abort(405)
 
-    def options(self, oauth, resource_id):
+    def options(self, resource_id):
         abort(405)
 
-    def patch(self, oauth, resource_id):
+    def patch(self, resource_id):
         abort(405)
 
 
@@ -330,27 +330,27 @@ class DepositionDraftListResource(Resource):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth, resource_id):
+    def get(self, resource_id):
         """ List all drafts """
         d = Deposition.get(resource_id, user=current_user)
         return map(lambda x: d.type.marshal_draft(x), d.drafts_list)
 
-    def post(self, oauth, resource_id):
+    def post(self, resource_id):
         abort(405)
 
-    def put(self, oauth, resource_id):
+    def put(self, resource_id):
         abort(405)
 
-    def delete(self, oauth, resource_id):
+    def delete(self, resource_id):
         abort(405)
 
-    def head(self, oauth, resource_id):
+    def head(self, resource_id):
         abort(405)
 
-    def options(self, oauth, resource_id):
+    def options(self, resource_id):
         abort(405)
 
-    def patch(self, oauth, resource_id):
+    def patch(self, resource_id):
         abort(405)
 
 
@@ -366,28 +366,28 @@ class DepositionDraftResource(Resource, InputProcessorMixin):
         d = Deposition.get(resource_id, user=current_user)
         return d.type.marshal_draft(d.get_draft(draft_id))
 
-    def post(self, oauth, resource_id, draft_id):
+    def post(self, resource_id, draft_id):
         abort(405)
 
     @require_header('Content-Type', 'application/json')
     @require_oauth_scopes('deposit:write')
-    def put(self, oauth, resource_id, draft_id):
+    def put(self, resource_id, draft_id):
         """ Update a deposition draft """
         d = Deposition.get(resource_id, user=current_user)
         self.validate_input(d, draft_id)
         self.process_input(d, draft_id)
         d.save()
 
-    def delete(self, oauth, resource_id, draft_id):
+    def delete(self, resource_id, draft_id):
         abort(405)
 
-    def head(self, oauth, resource_id, draft_id):
+    def head(self, resource_id, draft_id):
         abort(405)
 
-    def options(self, oauth, resource_id, draft_id):
+    def options(self, resource_id, draft_id):
         abort(405)
 
-    def patch(self, oauth, resource_id, draft_id):
+    def patch(self, resource_id, draft_id):
         abort(405)
 
 
@@ -397,28 +397,28 @@ class DepositionActionResource(Resource):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth, resource_id, action_id):
+    def get(self, resource_id, action_id):
         abort(405)
 
     @require_oauth_scopes('deposit:actions')
-    def post(self, oauth, resource_id, action_id):
+    def post(self, resource_id, action_id):
         """ Run an action """
         d = Deposition.get(resource_id, user=current_user)
         return d.type.api_action(d, action_id)
 
-    def put(self, oauth, resource_id, action_id):
+    def put(self, resource_id, action_id):
         abort(405)
 
-    def delete(self, oauth, resource_id, action_id):
+    def delete(self, resource_id, action_id):
         abort(405)
 
-    def head(self, oauth, resource_id, action_id):
+    def head(self, resource_id, action_id):
         abort(405)
 
-    def options(self, oauth, resource_id, action_id):
+    def options(self, resource_id, action_id):
         abort(405)
 
-    def patch(self, oauth, resource_id, action_id):
+    def patch(self, resource_id, action_id):
         abort(405)
 
 
@@ -428,14 +428,14 @@ class DepositionFileListResource(Resource):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth, resource_id):
+    def get(self, resource_id):
         """ Get deposition list of files """
         d = Deposition.get(resource_id, user=current_user)
         return map(lambda f: d.type.marshal_file(f), d.files)
 
     @require_header('Content-Type', 'multipart/form-data')
     @require_oauth_scopes('deposit:write')
-    def post(self, oauth, resource_id):
+    def post(self, resource_id):
         """ Upload a file """
         d = Deposition.get(resource_id, user=current_user)
 
@@ -463,7 +463,7 @@ class DepositionFileListResource(Resource):
 
     @require_header('Content-Type', 'application/json')
     @require_oauth_scopes('deposit:write')
-    def put(self, oauth, resource_id):
+    def put(self, resource_id):
         """ Sort files in collection """
         if not isinstance(request.json, list):
             abort(
@@ -500,16 +500,16 @@ class DepositionFileListResource(Resource):
         d.save()
         return map(lambda f: d.type.marshal_file(f), d.files)
 
-    def delete(self, oauth, resource_id):
+    def delete(self, resource_id):
         abort(405)
 
-    def head(self, oauth, resource_id):
+    def head(self, resource_id):
         abort(405)
 
-    def options(self, oauth, resource_id):
+    def options(self, resource_id):
         abort(405)
 
-    def patch(self, oauth, resource_id):
+    def patch(self, resource_id):
         abort(405)
 
 
@@ -519,7 +519,7 @@ class DepositionFileResource(Resource):
     """
     method_decorators = deposition_decorators
 
-    def get(self, oauth, resource_id, file_id):
+    def get(self, resource_id, file_id):
         """ Get a deposition file """
         d = Deposition.get(resource_id, user=current_user)
         df = d.get_file(file_id)
@@ -528,7 +528,7 @@ class DepositionFileResource(Resource):
         return d.type.marshal_file(df)
 
     @require_oauth_scopes('deposit:write')
-    def delete(self, oauth, resource_id, file_id):
+    def delete(self, resource_id, file_id):
         """ Delete existing deposition file """
         d = Deposition.get(resource_id, user=current_user)
 
@@ -545,7 +545,7 @@ class DepositionFileResource(Resource):
 
     @require_header('Content-Type', 'application/json')
     @require_oauth_scopes('deposit:write')
-    def put(self, oauth, resource_id, file_id):
+    def put(self, resource_id, file_id):
         """ Update a deposition file - i.e. rename it"""
         v = APIValidator()
         if not v.validate(request.json, file_schema):
@@ -582,13 +582,13 @@ class DepositionFileResource(Resource):
 
         return d.type.marshal_file(df)
 
-    def head(self, oauth, resource_id, file_id):
+    def head(self, resource_id, file_id):
         abort(405)
 
-    def options(self, oauth, resource_id, file_id):
+    def options(self, resource_id, file_id):
         abort(405)
 
-    def patch(self, oauth, resource_id, file_id):
+    def patch(self, resource_id, file_id):
         abort(405)
 
 
