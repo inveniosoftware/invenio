@@ -77,7 +77,7 @@ def get_bibrec_for_record(marcxml, opt_mode):
     A record is uploaded to the system using mainly functionality
     of the bibupload module. Then a bibrec is returned for the record.
     '''
-    recs = create_record(marcxml)
+    recs = create_record(marcxml, parser='lxml')
     _, recid, _ = bibupload(recs[0], opt_mode=opt_mode)
     return recid
 
