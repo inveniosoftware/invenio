@@ -47,6 +47,8 @@ def format_element(bfo, var=''):
         out = bfo.user_info['nickname']
     elif var == 'email':
         out = bfo.user_info['email']
+    elif var == 'revision':
+        out = bfo.revision or ''
     else:
         out = 'Unknown variable: %s' % (var)
 

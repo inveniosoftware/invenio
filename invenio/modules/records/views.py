@@ -22,7 +22,7 @@
 from functools import wraps
 from six import iteritems
 from flask import g, render_template, request, flash, redirect, url_for, \
-    current_app, abort, Blueprint, send_file
+    current_app, abort, Blueprint, send_file, escape
 from flask.ext.login import current_user
 
 from invenio.base.decorators import wash_arguments
@@ -89,8 +89,32 @@ def request_record(f):
         elif record_status == -1:
             abort(apache.HTTP_GONE)  # The record is gone!
 
+        # check if revision specified is valid and exists
+        # if revision is valid but doesn't exist, redirect to the closest one
+        revision_parameter = \
+            cfg.get('CFG_RECORD_REVISION_URL_PARAMETER')
+        revision = request.args.get(revision_parameter)
+
+        # FIXME:
+        # revisions only work if marcxml is base format. see #1990
+        if revision is not None:
+            from invenio.legacy.bibedit.utils import \
+                revision_format_valid_p, record_revision_exists
+            from .utils import format_revid
+
+            revid = format_revid(recid, revision)
+            if revision_format_valid_p(revid):
+                if not record_revision_exists(recid, revision):
+                    flash(_('Revision does not exist: {}').format(
+                        escape(revision)), 'error')
+                    return redirect(url_for('record.metadata', recid=recid))
+            else:
+                flash(_('Invalid revision: {}').format(escape(revision)),
+                    'error')
+                return redirect(url_for('record.metadata', recid=recid))
+
         g.bibrec = Bibrec.query.get(recid)
-        record = get_record(recid)
+        record = get_record(recid, revision)
 
         if record is None:
             return render_template('404.html')
@@ -129,9 +153,11 @@ def request_record(f):
                 from invenio.legacy.weblinkback.templates import get_trackback_auto_discovery_tag
                 return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
-        def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):
+        def _format_record(recid, of='hd', record=record, user_info=current_user,
+                           *args, **kwargs):
             from invenio.modules.formatter import format_record
-            return format_record(recid, of, user_info=user_info, *args, **kwargs)
+            return format_record(recid, of, record=record,
+                user_info=user_info, *args, **kwargs)
 
         @register_template_context_processor
         def record_context():

@@ -57,12 +57,15 @@ class Record(SmartJson):
         raise NotImplementedError()
 
     @classmethod
-    def get_record(cls, recid, reset_cache=False):
+    def get_record(cls, recid, revision=None, reset_cache=False):
         """Get one record from the DB.
 
+        :param revision: If not None and revision exists creates a Record from
+                         MARC. Otherwise returns the latest revision.
+                         If base format is not MARC, won't work
         :param reset_cache: If set to `True` it creates the JSON again.
         """
-        if not reset_cache:
+        if not reset_cache and not revision:
             try:
                 json = cls.storage_engine.get_one(recid)
                 if json is None:
@@ -70,6 +73,33 @@ class Record(SmartJson):
                 return Record(json)
             except (NoResultFound, AttributeError):
                 pass
+
+        # checks if revision is valid and exists
+        # retrieves requested Record revision
+        # warning: use of legacy code (invenio.legacy.bibedit.utils)
+        if revision is not None:
+
+            # import revision utilities
+            from utils import format_revid
+            from invenio.legacy.bibedit.utils import \
+                get_marcxml_of_revision_id, revision_format_valid_p, \
+                record_revision_exists, timestamp_to_revision, \
+                latest_record_revision
+
+            # check if revision is the latest revision
+            revision_timetuple = timestamp_to_revision(revision)
+            if latest_record_revision(recid, revision_timetuple):
+                revision = None
+            else:
+                revid = format_revid(recid, revision)
+                if revision_format_valid_p(revid) and \
+                        record_revision_exists(recid, revision):
+                    # generate record from MARCXML if revision exists
+                    marcxml = get_marcxml_of_revision_id(revid)
+                    record = Record.create(marcxml, master_format='marc')
+                    record['revision'] = revision
+                    return record
+
         # try to retrieve the record from the master format if any
         # this might be deprecated in the near future as soon as json will
         # become the master format, until then ...

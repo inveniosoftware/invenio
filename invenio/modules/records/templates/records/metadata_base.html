@@ -22,7 +22,7 @@
 {%- endif -%}
 
 {% block record_content %}
-  {{ format_record(recid, of=of, ln=g.ln)|safe }}
+  {{ format_record(recid, record=record, of=of, ln=g.ln)|safe }}
 
   <hr/>
 

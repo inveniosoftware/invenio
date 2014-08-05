@@ -32,6 +32,10 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
 Record = lazy_import('invenio.modules.records.api:Record')
 Document = lazy_import('invenio.modules.documents.api:Document')
 
+format_revid = lazy_import('invenio.modules.records.utils:format_revid')
+sorted_revision_timestamps = lazy_import('invenio.modules.records.utils:'
+                                         'sorted_revision_timestamps')
+
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
 
@@ -611,12 +615,29 @@ class TestRecordDocuments(InvenioTestCase):
         self.assertEquals(d.is_authorized(user_info)[0], 0)
 
 
+class TestRecordUtils(InvenioTestCase):
 
+    """"Test record module utils"""
+
+    def test_format_revid(self):
+        """Test format_revid"""
+        revid = format_revid(15, '20140722083303')
+        self.assertEquals(revid, '15.20140722083303')
+
+    def test_sorted_record_revisions(self):
+        """Test test_sorted_record_revisions"""
+        rev_timestamps = ['20140722083303', '20140730083444', '20140730083444',
+                          '20140730083443']
+        sorted_timestamps = sorted_revision_timestamps(rev_timestamps)
+        self.assertEquals(sorted_timestamps,
+                         ['20140722083303', '20140730083443', '20140730083444',
+                          '20140730083444'])
 
 
 TEST_SUITE = make_test_suite(TestRecord,
                              TestMarcRecordCreation,
-                             TestRecordDocuments)
+                             TestRecordDocuments,
+                             TestRecordUtils)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

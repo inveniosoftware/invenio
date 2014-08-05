@@ -48,7 +48,8 @@ from invenio.base.globals import cfg
 ##
 def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False,
-                  save_missing=True, force_2nd_pass=False, **kwargs):
+                  save_missing=True, force_2nd_pass=False, record=None,
+                  **kwargs):
     """
     Format a record in given output format.
 
@@ -57,10 +58,12 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     The function will define which format template must be applied.
 
     The record to be formatted can be specified with its ID (with
-    'recID' parameter) or given as XML representation (with
-    'xml_record' parameter). If 'xml_record' is specified 'recID' is
-    ignored (but should still be given for reference. A dummy recid 0
-    or -1 could be used).
+    'recID' parameter), given as XML representation (with
+    'xml_record' parameter) or Record representation (with 'record'
+    parameter). If 'xml_record' or 'record' is specified,
+    'recID' is ignored (but should still be given for reference.
+    A dummy recid 0 or -1 could be used). If both 'xml_record' and 'record'
+    are specified, 'record' has priority.
 
     'user_info' allows to grant access to some functionalities on a
     page depending on the user's priviledges. The 'user_info' object
@@ -91,6 +94,8 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     :param on_the_fly: if False, try to return an already preformatted version
                        of the record in the database
     :type on_the_fly: boolean
+    :param record: Record object representation
+    :type record: Record object or None
     :return: formatted record
     :rtype: string
     """
@@ -104,6 +109,7 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                                         verbose=verbose,
                                         search_pattern=search_pattern,
                                         xml_record=xml_record,
+                                        record=record,
                                         user_info=user_info,
                                         on_the_fly=on_the_fly,
                                         save_missing=save_missing,
@@ -117,6 +123,7 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                                     verbose=verbose,
                                     search_pattern=search_pattern,
                                     xml_record=xml_record,
+                                    record=record,
                                     user_info=user_info,
                                     **kwargs)
 
@@ -155,9 +162,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 # that relies on format_records to do the formatting.
 ##
 def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
-                   xml_records=None, user_info=None, record_prefix=None,
-                   record_separator=None, record_suffix=None, prologue="",
-                   epilogue="", req=None, on_the_fly=False):
+                   xml_records=None, records=None, user_info=None,
+                   record_prefix=None, record_separator=None,
+                   record_suffix=None, prologue="", epilogue="", req=None,
+                   on_the_fly=False):
     """
     Format records given by a list of record IDs or a list of records as xml.
 
