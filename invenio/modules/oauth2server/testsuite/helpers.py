@@ -22,9 +22,7 @@ from flask_oauthlib.client import OAuth
 
 
 def create_client(app, name, **kwargs):
-    """
-    Helper function to create a OAuth2 client to test an OAuth2 provider.
-    """
+    """Helper function to create a OAuth2 client to test an OAuth2 provider."""
     default = dict(
         consumer_key='dev',
         consumer_secret='dev',
@@ -76,12 +74,18 @@ def create_client(app, name, **kwargs):
 
     @app.route('/oauth2test/test-info')
     def test_info():
+<<<<<<< HEAD
         #use url_for instead of hard coded url
+=======
+>>>>>>> abe99bc... restful: decorator improvement
         return get_test(url_for('oauth2server.info'))
 
     @app.route('/oauth2test/test-invalid')
     def test_invalid():
+<<<<<<< HEAD
         #use url_for instead of hard coded url
+=======
+>>>>>>> abe99bc... restful: decorator improvement
         return get_test(url_for('oauth2server.invalid'))
 
     @remote.tokengetter

@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
@@ -141,7 +142,7 @@ def update_tag_of_user(uid, tag_name, dictionary_to_update):
     if not tag_retrieved:
         raise tags_errors.TagNotFoundError(
             "Tag '{0}' could not be found".format(tag_name))
-    if current_user.get_id() != tag_retrieved.id_user:
+    if uid != tag_retrieved.id_user:
         raise tags_errors.TagOwnerError(
             "The tag's owner id does not match the given id")
     # initialize variables to default values
@@ -266,7 +267,7 @@ def attach_tag_to_record(uid, tag_name, record_id):
             return None
 
 
-def attach_tags_to_record(list_of_tags, record_id):
+def attach_tags_to_record(uid, list_of_tags, record_id):
     """Attach a list of tags to a record.
 
     :param uid: a user id
@@ -279,13 +280,13 @@ def attach_tags_to_record(list_of_tags, record_id):
         raise tags_errors.RecordNotFoundError(
             "Tag error: Record with id={0} does not exist".
             format(record_id))
+    if not uid:
+        uid = current_user.get_id()
     # sort the list of tags
     list_of_tags.sort()
     tags_to_return = []
     for tag_name in list_of_tags:
-        tag = attach_tag_to_record(current_user.get_id(),
-                                   tag_name,
-                                   record_id)
+        tag = attach_tag_to_record(uid, tag_name, record_id)
         # if tag is not None
         if tag:
             # append tag to the list that will be returned to user
@@ -357,3 +358,13 @@ def get_attached_tags_on_record(record_id):
             tag = WtgTAG.query.filter(WtgTAG.id == association.id_tag).first()
             attached_tags.append(tag)
     return sorted(attached_tags, key=lambda t: t.name, reverse=False)
+
+
+def get_user_id_from_access_token(access_token):
+    """Get a user id from an access token.
+
+    :param access_token: access token
+    """
+    from invenio.modules.oauth2server.models import Token
+    token = Token.query.filter(Token.access_token == access_token).first()
+    return token.user_id

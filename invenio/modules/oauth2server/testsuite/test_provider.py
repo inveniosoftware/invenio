@@ -275,9 +275,6 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         assert r.data == "Access denied: error=access_denied"
 
     def test_personal_access_token(self):
-        # import ipdb
-        # ipdb.set_trace()
-
         r = self.client.get(
             '/oauth/ping',
             query_string="access_token=%s" % self.personal_token.access_token
@@ -285,7 +282,11 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         self.assert200(r)
         self.assertEqual(r.json, dict(ping='pong'))
 
+<<<<<<< HEAD
         # Access token is not valid for this scope
+=======
+        # Access token is not valid for this scope.
+>>>>>>> abe99bc... restful: decorator improvement
         r = self.client.get(
             '/oauth/info/',
             base_url=cfg['CFG_SITE_SECURE_URL']
@@ -324,7 +325,6 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         )
 
         self.assertStatus(res, 302)
-
 
 
 TEST_SUITE = make_test_suite(OAuth2ProviderTestCase)
