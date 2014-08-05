@@ -104,6 +104,22 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MutableDict = MutableDict
 
 
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy import types
+import sqlalchemy.dialects.postgresql
+
+
+@compiles(types.Text, 'postgresql')
+@compiles(sqlalchemy.dialects.postgresql.TEXT, 'postgresql')
+def compile_text(element, compiler, **kw):
+    return 'TEXT'
+
+
+@compiles(types.VARBINARY, 'postgresql')
+def compile_text(element, compiler, **kw):
+    return 'BYTEA'
+
+
 class PasswordComparator(Comparator):
     def __eq__(self, other):
         return self.__clause_element__() == self.hash(other)
