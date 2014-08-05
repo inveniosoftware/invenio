@@ -72,9 +72,9 @@ jquery = Bundle(
     "vendors/typeahead.js/dist/typeahead.bundle.js",
     "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
     "js/translate.js",
-    "js/legacy.js",
+    "js/init.js",
     output="jquery.js",
-    filters="uglifyjs",
+    filters="requirejs",
     weight=10,
     bower={
         # The dependencies marked as *orphan* are not part of any bundles
