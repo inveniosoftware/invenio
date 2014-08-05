@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,6 +23,7 @@
 # pylint: disable=W0613
 
 from cgi import escape
+from collections import defaultdict
 
 from pprint import pformat
 from operator import itemgetter
@@ -73,7 +74,7 @@ import invenio.legacy.webauthorprofile.interface as webauthorapi
 from invenio.legacy.bibauthorid.general_utils import is_valid_orcid
 from invenio.legacy.bibauthorid.backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
             get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
-from invenio.legacy.bibauthorid.dbinterface import defaultdict, remove_arxiv_papers_of_author
+from invenio.legacy.bibauthorid.dbinterface import remove_arxiv_papers_of_author
 from invenio.legacy.webauthorprofile.orcidutils import get_dois_from_orcid
 
 from invenio.legacy.bibauthorid.webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \

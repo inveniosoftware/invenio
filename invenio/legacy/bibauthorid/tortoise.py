@@ -28,11 +28,7 @@ import gzip as filehandler
 import sys
 sys.setcheckinterval(1000000)
 
-try:
-    from collections import defaultdict
-except:
-    from invenio.utils.container import defaultdict
-
+from collections import defaultdict
 from invenio.legacy.bibauthorid.general_utils import update_status, update_status_final, override_stdout_config
 
 override_stdout_config(fileout=True, stdout=False)
