@@ -183,9 +183,10 @@ def _eval_bibformat(ctx, recID, template_code):
             recID_int = int(recID.text)
 
         bfo = BibFormatObject(recID_int)
-        return format_with_format_template(None, bfo,
-                                           verbose=0,
-                                           format_template_code=template_code)
+        out = format_with_format_template(None, bfo,
+                                          verbose=0,
+                                          format_template_code=template_code)
+        return out[0]
     except Exception as err:
         print("Error during formatting function evaluation: {0}".format(err),
               file=sys.stderr)
