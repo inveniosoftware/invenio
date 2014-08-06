@@ -731,9 +731,18 @@ class WebAuthorPages(WebInterfaceDirectory):
                 else:
                     datasets_pubs_to_display = list()
 
-                arxiv_pubs = [(title, get_arxiv_url(arxiv_id), 'arxiv') for arxiv_id, title
-                              in external_pubs['arxiv'].iteritems()]
-                doi_pubs = [(title, get_doi_url(doi_id), 'doi') for doi_id, title in external_pubs['doi'].iteritems()]
+                arxiv_pubs = list()
+                doi_pubs = list()
+                if external_pubs is not None and external_pubsStatus is True:
+                    if 'arxiv' in external_pubs:
+                        arxiv_pubs = [(title, get_arxiv_url(arxiv_id), 'arxiv')
+                                      for arxiv_id, title
+                                      in external_pubs['arxiv'].iteritems()]
+
+                    if 'doi' in external_pubs:
+                        doi_pubs = [(title, get_doi_url(doi_id), 'doi')
+                        for doi_id, title
+                        in external_pubs['doi'].iteritems()]
 
                 external_pubs = arxiv_pubs + doi_pubs
 
