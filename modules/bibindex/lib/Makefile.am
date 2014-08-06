@@ -22,6 +22,7 @@ pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_unit_t
              bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
              bibindex_engine_stemmer_unit_tests.py bibindex_engine_stemmer_greek.py \
              bibindex_engine_tokenizer_unit_tests.py \
+             bibindex_engine_tokenizer_regression_tests.py \
              bibindexadmin_regression_tests.py bibindex_engine_washer.py \
              bibindex_regression_tests.py bibindex_engine_utils.py \
              bibindex_termcollectors.py bibindex_termcollectors_regression_tests.py

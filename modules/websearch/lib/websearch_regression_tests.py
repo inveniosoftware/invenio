@@ -26,8 +26,7 @@ __revision__ = "$Id$"
 
 from invenio.testutils import InvenioTestCase, InvenioXmlTestCase
 import re
-import urlparse
-import cgi
+import urlparse, cgi
 import sys
 import cStringIO
 
@@ -964,7 +963,7 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
             test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
-                                  expected_text="[96, 92, 88, 81, 74, 72, 67, 54, 53, 52, 51, 50, 48, 46, 17, 11, 10, 9]"))
+                                  expected_text="[142, 96, 92, 81, 74, 72, 67, 54, 53, 52, 51, 50, 48, 17, 11, 10, 9]"))
 
     def test_wildcard_limit_correctly_not_active(self):
         """websearch - wildcard limit is not active when there is no wildcard query"""
@@ -4809,15 +4808,15 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
     def test_queries(self):
         """websearch - testing p_r_s standard arguments and their combinations"""
 
-        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 142])
 
-        self._run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 142, 13])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 142, 13])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;so=a', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=a', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 142, 13])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;so=d', [13, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=d', [13, 142, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
 
         self._run_test('p=ell*;sf=title;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
@@ -4854,15 +4853,15 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 142])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 142])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 10, 11, 13, 16, 17, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 10, 11, 13, 16, 17, 47, 142])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 10, 11, 13, 16, 17, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 10, 11, 13, 16, 17, 47, 142])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
 

@@ -3152,7 +3152,7 @@ def create_similarly_named_authors_link_box(author_name, ln=CFG_SITE_LANG):
     # secondly search for similar name forms:
     similar_author_names = {}
     for name in author_name_to_search, strip_accents(author_name_to_search):
-        for tag in get_field_tags("author"):
+        for tag in get_field_tags("simpleauthor"):
             # deduce into which bibxxx table we will search:
             digit1, digit2 = int(tag[0]), int(tag[1])
             bx = "bib%d%dx" % (digit1, digit2)
@@ -3180,7 +3180,7 @@ def create_similarly_named_authors_link_box(author_name, ln=CFG_SITE_LANG):
 
         tmp_authors = []
         for out_author in out_authors:
-            nbhits = get_nbhits_in_bibxxx(out_author, "author")
+            nbhits = get_nbhits_in_bibxxx(out_author, "simpleauthor")
             if nbhits:
                 tmp_authors.append((out_author, nbhits))
         out += websearch_templates.tmpl_similar_author_names(

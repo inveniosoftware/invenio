@@ -82,7 +82,7 @@ class BibIndexTermCollectorTest(unittest.TestCase):
 
     def test_correct_terms_for_author_index_rec_14_with_authority_rec(self):
         """bibindex - checks if terms from authority record are also found"""
-        mtc = initialise_term_collector("author", table_type="PHRASE")
+        mtc = initialise_term_collector("simpleauthor", table_type="PHRASE")
         terms = mtc.collect([14], {})
         self.assertEqual('Ellis, John' in terms[14], True)
         self.assertEqual('CERN Geneva' in terms[14], True)

@@ -531,6 +531,313 @@ class BibIndexYearIndexTest(InvenioTestCase):
         self.assertEqual(num_orig, num_test)
 
 
+class BibIndexSimpleAuthorIndexTest(InvenioTestCase):
+
+    """
+       Checks simple author index.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('simpleauthor')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 2:
+            remove_reindexed_word_testtables('simpleauthor')
+
+    def test_occurrences_of_Ellis_in_word_index(self):
+        """checks content of simpleauthor word index for Ellis"""
+        word = 'Ellis'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('simpleauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual(
+            [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118],
+            ilist
+        )
+
+    def test_occurrences_of_Adamo_in_word_index(self):
+        """checks content of simpleauthor word index for Adamo"""
+        word = 'Adamo'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('simpleauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([127], ilist)
+
+
+class BibIndexCanonicalAuthorIndexTest(InvenioTestCase):
+
+    """
+       Checks canonical author index.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('canonicalauthor')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 2:
+            remove_reindexed_word_testtables('canonicalauthor')
+
+    def test_occurrences_of_j_ellis_1_in_word_index(self):
+        """checks content of canonicalauthor word index for j.ellis.1"""
+        word = 'j.ellis.1'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('canonicalauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([9, 12, 14, 18], ilist)
+
+    def test_occurrences_of_j_ellis_2_in_word_index(self):
+        """checks content of canonicalauthor word index for j.ellis.2"""
+        word = 'j.ellis.2'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('canonicalauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([], ilist)
+
+
+class BibIndexAuthorIndexTest(InvenioTestCase):
+
+    """
+       Checks author index.
+    """
+
+    def test_occurrences_of_Ellis_in_word_index(self):
+        """checks content of author word index for Ellis"""
+        word = 'Ellis'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('author'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        # The 142 is from parentauthor index
+        self.assertEqual(
+            [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118, 142],
+            ilist
+        )
+
+    def test_occurrences_of_Adamo_in_word_index(self):
+        """checks content of author word index for Adamo"""
+        word = 'Adamo'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('author'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([127], ilist)
+
+    def test_occurrences_of_j_ellis_1_in_word_index(self):
+        """checks content of author word index for j.ellis.1"""
+        word = 'j.ellis.1'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('author'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([9, 12, 14, 18], ilist)
+
+    def test_occurrences_of_j_ellis_2_in_word_index(self):
+        """checks content of author word index for j.ellis.2"""
+        word = 'j.ellis.2'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('author'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([], ilist)
+
+
+class BibIndexExactSimpleAuthorIndexTest(InvenioTestCase):
+
+    """
+       Checks exact simple author index.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('exactsimpleauthor')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 1:
+            remove_reindexed_word_testtables('exactsimpleauthor')
+
+    def test_occurrences_of_Adamo_in_word_index(self):
+        """checks content of exactsimpleauthor word index for Adamo"""
+        word = 'Adamo'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactsimpleauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([127], ilist)
+
+
+class BibIndexExactAuthorIndexTest(InvenioTestCase):
+
+    """
+       Checks exact author index.
+    """
+
+    def test_occurrences_of_Ellis_in_word_index(self):
+        """checks content of exactauthor word index for Ellis"""
+        word = 'Ellis'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        # The 142 is from parentauthor index
+        self.assertEqual(
+            [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118, 142],
+            ilist
+        )
+
+    def test_occurrences_of_j_ellis_1_in_word_index(self):
+        """checks content of exactauthor word index for j.ellis.1"""
+        word = 'j.ellis.1'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([9, 12, 14, 18], ilist)
+
+    def test_occurrences_of_j_ellis_2_in_word_index(self):
+        """checks content of exactauthor word index for j.ellis.2"""
+        word = 'j.ellis.2'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([], ilist)
+
+    def test_occurrences_of_Adamo_in_word_index(self):
+        """checks content of exactauthor word index for Adamo"""
+        word = 'Adamo'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            word
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([127], ilist)
+
+    def test_occurrences_of_Ellis_J_in_phrase_index(self):
+        """checks content of exactauthor phrase index for Ellis, J"""
+        phrase = 'Ellis, J'
+        query = "SELECT hitlist FROM idxPHRASE%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            phrase
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([9, 12, 14, 18], ilist)
+
+    def test_occurrences_of_Adamo_C_in_phrase_index(self):
+        """checks content of exactauthor phrase index for Adamo, C"""
+        phrase = 'Adamo, C'
+        query = "SELECT hitlist FROM idxPHRASE%02dF WHERE term='%s'" % (
+            get_index_id_from_index_name('exactauthor'),
+            phrase
+        )
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([127], ilist)
+
+
 class BibIndexAuthorCountIndexTest(InvenioTestCase):
 
     """
@@ -828,7 +1135,7 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         """bibindex - reindexing after recently changed authority record"""
 
         authRecID = 118
-        index_name = 'author'
+        index_name = 'simpleauthor'
         table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
         reindex_for_type_with_bibsched(index_name)
         simulate_record_modification(authRecID)
@@ -852,7 +1159,7 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         contains words from referenced authority records"""
         bibRecID = 9
         authority_string = 'jonathan'
-        index_name = 'author'
+        index_name = 'simpleauthor'
         table = "idxWORD%02dR" % get_index_id_from_index_name(index_name)
 
         reindex_for_type_with_bibsched(index_name, "-R")
@@ -1205,8 +1512,8 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
         self.assertEqual(['of', 'cours', 'collis'], affiliation_rec2)
 
     def test_proper_content_in_author_index(self):
-        """bibindex - checks reindexation of author index for test records.."""
-        index_id = get_index_id_from_index_name('author')
+        """bibindex - checks reindexation of simpleauthor index for test records.."""
+        index_id = get_index_id_from_index_name('simpleauthor')
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec IN (""" \
             % (index_id,)
         query += ", ".join(map(str, self.records)) + ")"
@@ -1259,9 +1566,9 @@ class BibIndexFindingIndexesForTags(InvenioTestCase):
             sorted([
                 'author', 'affiliation', 'exactauthor',
                 'firstauthor', 'exactfirstauthor',
-                'authorcount',
+                'exactsimpleauthor', 'authorcount',
                 'authorityauthor', 'miscellaneous',
-                'global'
+                'global', 'simpleauthor'
             ]),
             sorted(zip(*get_marc_tag_indexes('100'))[1])
         )
@@ -1270,10 +1577,10 @@ class BibIndexFindingIndexesForTags(InvenioTestCase):
         """bibindex - checks 'get_marc_tag_indexes' for tag '100__a', without virtual indexes"""
         self.assertEqual(
             sorted([
-                'author', 'exactauthor',
                 'firstauthor', 'exactfirstauthor',
-                'authorcount',
-                'authorityauthor', 'miscellaneous'
+                'exactsimpleauthor', 'authorcount',
+                'authorityauthor', 'miscellaneous',
+                'simpleauthor'
             ]),
             sorted(zip(*get_marc_tag_indexes('100__a', virtual=False))[1])
         )
@@ -1328,7 +1635,7 @@ class BibIndexFindingTagsForIndexes(InvenioTestCase):
     def test_tags_for_author_index(self):
         """bibindex - checks if 'get_index_tags' find proper marc tags values for 'author' index """
         self.assertEqual(
-            sorted(get_index_tags('author')), sorted(['100__a', '700__a']))
+            sorted(get_index_tags('author')), sorted(['100__a', '700__a', '786__w']))
 
     def test_tags_for_global_index_virtual_indexes_off(self):
         """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
@@ -1995,6 +2302,11 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
                              BibIndexYearIndexTest,
+                             BibIndexSimpleAuthorIndexTest,
+                             BibIndexCanonicalAuthorIndexTest,
+                             BibIndexExactSimpleAuthorIndexTest,
+                             BibIndexAuthorIndexTest,
+                             BibIndexExactAuthorIndexTest,
                              BibIndexAuthorCountIndexTest,
                              BibIndexItemCountIndexTest,
                              BibIndexFiletypeIndexTest,

@@ -206,14 +206,7 @@ class BibIndexTokenizer(object):
         @return: the modified records
         @type return: intbitset
         """
-        modified_recids = get_modified_recids_bibliographic(
-            date_range,
-            index_name
-        )
-        if index_name in ('author', 'firstauthor',
-                          'exactauthor', 'exactfirstauthor'):
-            modified_recids |= get_modified_recids_bibauthorid(date_range)
-        return modified_recids
+        return get_modified_recids_bibliographic(date_range, index_name)
 
     @classmethod
     def get_dependent_recids(cls, modified_recids, index_name):
@@ -283,22 +276,6 @@ def get_modified_recids_bibliographic(dates, index_name):
                 modified_recids.add(recid)
 
     return modified_recids
-
-
-def get_modified_recids_bibauthorid(dates):
-    """ Finds records that were modified between dates due to bibauthorid.
-
-    @param dates: the dates between whom this function will look for
-        modified records. If the end_date is None this function will look
-        for modified records after start_date
-    @type dates: tuple (start_date, end_date)
-    @return: the modified recids
-    @type return: intbitset
-    """
-    from invenio.bibauthorid_personid_maintenance import (
-        get_recids_affected_since
-    )
-    return get_recids_affected_since(dates[0], dates[1])
 
 
 def get_dependent_recids_from_authority(modified_recids, index_name):

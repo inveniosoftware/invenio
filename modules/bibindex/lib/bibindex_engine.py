@@ -1440,7 +1440,7 @@ class WordTable(AbstractIndexTable):
         # special case of author indexes where we also add author
         # canonical IDs:
         # TODO: move this in tokenizers
-        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+        if self.index_name in ('firstauthor', 'exactfirstauthor'):
             for recID in range(recID1, recID2 + 1):
                 if recID not in wlist:
                     wlist[recID] = []
