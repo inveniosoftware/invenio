@@ -28,34 +28,10 @@
 @fa-font-path: "/vendors/font-awesome/fonts";
 //@fa-font-path: "//netdna.bootstrapcdn.com/font-awesome/4.1.0/fonts";
 
-body {
-	padding-top: 70px;
-}
-
-#footer a, #footer a:hover {
-  color: #666;
-}
-#footer, #footer p {
-  font-size: 11px;
-  color: #333;
-}
-
-#footer .langs {
-  text-align: right;
-}
+@footer-height: 150px;
 
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
 	font-weight: bold;
-}
-
-/* Lastly, apply responsive CSS fixes as necessary */
-@media (max-width: @screen-sm-min) {
-  #footer {
-    margin-left: -20px;
-    margin-right: -20px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
 }
 
 .navbar-brand img {
@@ -115,74 +91,3 @@ a.label, a.label:hover, .label a, .label a:hover { color: white;}
     margin-bottom: 10px;
 }
 
-/*
------------------------ Stick footer ----------------------- */
-/* Reference: http://getbootstrap.com/examples/sticky-footer/sticky-footer.css */
-html,
-body {
-  height: 100%;
-  /* The html and body elements cannot have any padding or margin. */
-}
-
-/* Wrapper for page content to push down footer */
-#wrap {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -150px;
-  /* Pad bottom by footer height */
-  padding: 0 0 150px;
-}
-
-/* Set the fixed height of the footer here */
-#footer {
-  height: 150px;
-}
-
-/* Special class on .container surrounding .navbar, used for positioning it into place. */
-
-.navbar-wrapper {
-  position:absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  margin-top: 20px;
-  .container {
-    padding-left:0;
-    padding-right: 0;
-  }
-  .navbar {
-    padding-left: 15px;
-    padding-right: 15px;
-  }
-}
-
-.navbar-content {
-   width: 300px;
-   padding: 15px;
-   padding-bottom: 0;
-
-   &:before, &:after {
-       display: table;
-       content: "";
-       line-height: 0;
-   }
-}
-
-.navbar-nav.navbar-right:last-child {
-  margin-right: 15px !important;
-}
-
-.navbar-footer {
-  background-color:#DDD;
-}
-
-.navbar-footer-content {
-  padding:15px;
-}
-
-.dropdown-menu {
-  padding: 0px;
-  overflow: hidden;
-}

@@ -80,6 +80,9 @@ styles = Bundle(
     "vendors/jquery-tokeninput/styles/token-input-facebook.css",
     "vendors/typeahead.js-bootstrap3.less/typeahead.css",
     "less/base.less",
+    "less/user-menu.less",
+    "less/sticky-footer.less",
+    "less/footer.less",
     output="invenio.css",
     depends=[
         "less/base.less",
