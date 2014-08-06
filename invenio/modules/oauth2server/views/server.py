@@ -106,7 +106,7 @@ def access_token():
     return None
 
 
-@blueprint.route('/errors')
+@blueprint.route('/errors/')
 def errors():
     """
     Error view in case of invalid oauth requests
@@ -116,7 +116,7 @@ def errors():
 
 @blueprint.route('/ping/')
 @oauth2.require_oauth()
-def ping(oauth_request):
+def ping():
     """
     Test to verify that you have been authenticated.
     """
@@ -125,15 +125,15 @@ def ping(oauth_request):
 
 @blueprint.route('/info/')
 @oauth2.require_oauth('user')
-def info(oauth_request):
+def info():
     """
     Test to verify that you have been authenticated.
     """
     if current_app.testing or current_app.debug:
         return jsonify(dict(
-            user=oauth_request.user.id,
-            client=oauth_request.client.client_id,
-            scopes=list(oauth_request.scopes),
+            user=request.oauth.user.id,
+            client=request.oauth.client.client_id,
+            scopes=list(request.oauth.scopes)
         ))
     else:
         abort(404)
@@ -141,7 +141,7 @@ def info(oauth_request):
 
 @blueprint.route('/invalid/')
 @oauth2.require_oauth('invalid_scope')
-def invalid(oauth_request):
+def invalid():
     """
     Test to verify that you have been authenticated.
     """
