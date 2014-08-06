@@ -29,7 +29,7 @@
 
 {% block global_bundles %}
   {{ super() }}
-  {% bundle "jquery-ui.js" %}
+  {% bundle "admin/search.js" %}
 {% endblock -%}
 
 {% block body %}
@@ -62,3 +62,15 @@
 </div>
 
 {% endblock body %}
+
+{% block javascript %}
+<script type="text/javascript">
+require(["jquery", "js/admin/search/portalboxes"], function($, portalboxes) {
+  $(function() {
+    portalboxes({
+      url: "{{url_for('.manage_portalboxes_order')}}"
+    })
+  })
+})
+</script>
+{% endblock javascript %}

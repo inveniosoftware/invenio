@@ -39,3 +39,13 @@ styles = Bundle(
     output="search.css",
     weight=60
 )
+
+adminjs = Bundle(
+    'js/admin/search/init.js',
+    filters="requirejs",
+    output="admin/search.js",
+    weight=50,
+    bower={
+        "jquery-ui": "~1.11",
+    }
+)

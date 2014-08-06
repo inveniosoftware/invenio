@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -81,38 +81,4 @@
         {% endfor %}
     {% endfor %}
     </ul>
-
-{# FIXME #}
-<script>
-
-    $(function() {
-        $( "#sortable" ).sortable(
-        {
-            cursor: "'move",
-            stop: function(event, ui) {
-                $.ajax( '{{url_for('.manage_portalboxes_order')}}', {
-                    type: 'GET',
-                    data: 'id='+ $(ui.item).attr("data-id") +
-                    "&id_collection="+$(ui.item).parent().attr("data-id") + "&score=" +
-                    ui.item.index()
-                }
-                ).done(function(data) {});
-            }
-        });
-
-        /*$("a.modalloader").each(
-        $(this).click(function(){
-            $.ajax( '{{url_for('.edit_portalbox')}}', {
-                type: 'GET',
-                data: 'id='+ $(ui.item).attr("data-id")
-              }
-            ).done(function(data) {});
-          });
-        );*/
-    });
-</script>
-
 {% endmacro %}
-
-
-
