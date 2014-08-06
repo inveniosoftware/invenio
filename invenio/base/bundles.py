@@ -19,9 +19,45 @@
 
 """Base bundles.
 
-.. note:: `bootstrap.js` bundle must be loaded after jQuery UI to avoid conflicts.
-    You can use `noConflict()` if you need to access functions
-    of jQuery UI covered by `bootstrap.js`.
+.. py:data:: invenio
+
+    Invenio JavaScript scripts
+
+.. py:data:: styles
+
+    Stylesheets such as Twitter Bootstrap, Font-Awesome, Invenio, ...
+
+.. py:data:: jquery
+
+    JavaScript libraries such as jQuery, Type Ahead, Bootstrap, Hogan, ...
+
+    .. note::
+        ``bootstrap.js`` provides ``$.fn.button`` which will be overwritten by
+        jQueryUI button when loaded globally. Use require.js to load only the
+        jQueryUI modules of your needs.
+
+        .. code-block:: javascript
+
+            require(['jquery', 'ui/accordion'], function($) {
+                $(function(){
+                    $('#accordion').accordion()
+                })
+            })
+
+.. py:data:: lessjs
+
+    LessCSS JavaScript library that is used in debug mode to render the less
+    stylesheets
+
+.. py:data:: requirejs
+
+    Require.js JavaScript library used in debug mode to load asynchronously the
+    Javascript modules (defined using AMD).
+
+.. py:data:: almondjs
+
+    Require.js JavaScript library used in production mode. It cannot load
+    asynchronously the module that must be bundles using ``r.js``.
 """
 
 import mimetypes
