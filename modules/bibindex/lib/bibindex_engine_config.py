@@ -57,6 +57,8 @@ CFG_BIBINDEX_TOKENIZERS_PATH = os.path.join(
 
 CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR = "%s adding records #%d-#%d started"
 
+CFG_BIBINDEX_OPTIONS_ERROR_MESSAGE = "There is an error in the command line options."
+
 CFG_BIBINDEX_UPDATE_MESSAGE = "Searching for records which should be reindexed..."
 
 CFG_BIBINDEX_UPDATE_MODE = {'Update': 'update',

@@ -44,6 +44,17 @@
                             (...)
 """
 
+from invenio.bibindex_engine_utils import (
+    get_index_tags,
+    get_field_indexes_memoised
+)
+from invenio.intbitset import intbitset
+from invenio.dbquery import run_sql
+import fnmatch
+from invenio.bibauthority_config import (
+    CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
+)
+
 
 class BibIndexTokenizer(object):
 
@@ -176,3 +187,160 @@ class BibIndexTokenizer(object):
         except AttributeError:
             return False
         return True
+
+    @classmethod
+    def get_modified_recids(cls, date_range, index_name):
+        """ Returns all the records that need to be reindexed using this
+        tokenizer **due to an action happened in the specified date range**.
+        Assumes that the tokenizer is used for the index index_name.
+
+        If a record needs to be updated due to a modification happened to
+        another record, use get_dependent_recids() insthead of this method.
+
+        @param date_range: the dates between whom this function will look for
+            modified records. If the end_date is None this function will look
+            for modified records after start_date
+        @type date_range: tuple (start_date, end_date)
+        @param index_name: the name of the index
+        @type index_name: string
+        @return: the modified records
+        @type return: intbitset
+        """
+        modified_recids = get_modified_recids_bibliographic(
+            date_range,
+            index_name
+        )
+        if index_name in ('author', 'firstauthor',
+                          'exactauthor', 'exactfirstauthor'):
+            modified_recids |= get_modified_recids_bibauthorid(date_range)
+        return modified_recids
+
+    @classmethod
+    def get_dependent_recids(cls, modified_recids, index_name):
+        """ Returns all the records that need to be reindexed using this
+        tokenizer **due to a modification happened to the records in
+        modified_recids**.
+        Assumes that the tokenizer is used for the index index_name.
+
+        If a record needs to be updated due to an action that did not affect
+        another record, use get_modified_recids() insthead of this method.
+
+        @param modified_recids: the ids of the modified records
+        @type modified_recids: intbitset
+        @param index_name: the name of the index
+        @type index_name: string
+        @return: the dependent records
+        @type return: intbitset
+        """
+        recids = modified_recids
+        recids |= get_dependent_recids_from_authority(
+            modified_recids,
+            index_name
+        )
+        return recids
+
+
+def get_modified_recids_bibliographic(dates, index_name):
+    """ Finds bibliographic records that were modified between dates.
+    Makes use of hstRECORD table where different revisions of record are kept.
+
+    @param dates: the dates between whom this function will look for
+        modified records. If the end_date is None this function will look
+        for modified records after start_date
+    @type dates: tuple (start_date, end_date)
+    @param indexe_name: name of the index for reindexation
+    @return: the modified recids
+    @type return: intbitset
+    """
+    modified_recids = intbitset()
+
+    # Get from the history all the updates happened in the specified date range
+    if dates[1] is None:
+        recids_info = run_sql(
+            """SELECT id_bibrec, job_date, affected_fields FROM hstRECORD
+               WHERE job_date >= %s""",
+            (dates[0],)
+        )
+    else:
+        recids_info = run_sql(
+            """SELECT id_bibrec, job_date, affected_fields FROM hstRECORD
+               WHERE job_date BETWEEN %s AND %s""",
+            (dates[0], dates[1])
+        )
+
+    # Filter only records whose modified tags are associated to index_name
+    for (recid, _, raw_affected_fields) in recids_info:
+        affected_fields = raw_affected_fields.split(",")
+        for field in affected_fields:
+            if field:
+                field_indexes = get_field_indexes_memoised(field) or []
+                field_indexe_names = [idx[1] for idx in field_indexes]
+                if index_name in field_indexe_names:
+                    modified_recids.add(recid)
+            else:
+                # record was inserted, all fields were changed,
+                # no specific affected fields
+                modified_recids.add(recid)
+
+    return modified_recids
+
+
+def get_modified_recids_bibauthorid(dates):
+    """ Finds records that were modified between dates due to bibauthorid.
+
+    @param dates: the dates between whom this function will look for
+        modified records. If the end_date is None this function will look
+        for modified records after start_date
+    @type dates: tuple (start_date, end_date)
+    @return: the modified recids
+    @type return: intbitset
+    """
+    from invenio.bibauthorid_personid_maintenance import (
+        get_recids_affected_since
+    )
+    return get_recids_affected_since(dates[0], dates[1])
+
+
+def get_dependent_recids_from_authority(modified_recids, index_name):
+    """ Searches for bibliographic records connected to authority records
+    that have been changed.
+
+    @param modified_recids: the ids of the modified records
+    @type modified_recids: intbitset
+    @return: the dependent records
+    @type return: intbitset
+    """
+    from invenio.search_engine import search_unit
+    from invenio.bibauthority_engine import get_control_nos_from_recID
+    index_tags = get_index_tags(index_name)
+    dependent_recids = intbitset()
+    for tag in index_tags:
+        pattern = tag.replace('%', '*')
+        matches = fnmatch.filter(
+            CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(),
+            pattern
+        )
+
+        for tag_match in matches:
+            # get the type of authority record associated with this field
+            auth_type = CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.get(
+                tag_match
+            )
+            # find updated authority records of this type
+            modified_auth_recIDs = search_unit(p=str(auth_type), f='980__a') \
+                & modified_recids
+            # now find dependent bibliographic records
+            for auth_recID in modified_auth_recIDs:
+                # get the fix authority identifier of this authority record
+                control_nos = get_control_nos_from_recID(auth_recID)
+                # there may be multiple control number entries!
+                # (the '035' field is repeatable!)
+                for control_no in control_nos:
+                    # get the bibrec IDs that refer to AUTHORITY_ID in TAG
+                    # possibly do the same for '4' subfields ?
+                    tag_0 = tag_match[:5] + '0'
+                    dependent_recids |= search_unit(
+                        p=str(tag_0),
+                        f=str(control_no)
+                    )
+    return dependent_recids

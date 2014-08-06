@@ -32,11 +32,12 @@ from invenio.bibtask import write_message
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import \
     CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
+    CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.pluginutils import PluginContainer
 from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZERS_PATH, \
     CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 
+from invenio.memoiseutils import Memoise
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
 phrase_delimiter_re = re.compile(r'[\.:;\?\!]')
@@ -442,6 +443,28 @@ def get_index_tags(indexname, virtual=True, tagtype="marc"):
     return out
 
 
+def get_field_indexes(field):
+    """Returns indexes names and ids corresponding to the given field"""
+    if recognize_marc_tag(field):
+        # field is actually a tag
+        return get_marc_tag_indexes(field, virtual=False)
+    else:
+        return get_nonmarc_tag_indexes(field, virtual=False)
+
+
+get_field_indexes_memoised = Memoise(get_field_indexes)
+
+
+def get_last_updated(index_name):
+    """Returns min modification date for 'indexes':
+       min(last_updated)
+       @param indexes: list of indexes
+    """
+    query = """SELECT last_updated FROM idxINDEX WHERE name = %s"""
+    res = run_sql(query, (index_name,))
+    return res[0][0]
+
+
 def get_min_last_updated(indexes):
     """Returns min modification date for 'indexes':
        min(last_updated)
@@ -560,3 +583,51 @@ def get_values_recursively(subfield, phrases):
             get_values_recursively(s, phrases)
     elif subfield is not None:
         phrases.append(str(subfield))
+
+
+def get_author_canonical_ids_for_recid(recID):
+    """
+    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
+    given record.  Done by consulting BibAuthorID module.
+    """
+    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
+        tag='canonical_name' AND flag>-2""", (recID, ))]
+
+
+def create_range_list(int_list):
+    """Converts an ordered list of integers to a range list.
+    If the input list is not ordered, the resulting range list can be
+    unordered and non maximal.
+
+    @param int_list: an **ordered** list of positive integers (not zero)
+    @return: an ordered, maximal, non overlapping list of ranges [start, end]
+        edge inclusive
+    """
+    if not int_list:
+        return []
+    row = int_list[0]
+    if not row:
+        return []
+    else:
+        range_list = [[row, row]]
+    for row in int_list[1:]:
+        row_id = row
+        if row_id == range_list[-1][1] + 1:
+            range_list[-1][1] = row_id
+        else:
+            range_list.append([row_id, row_id])
+    return range_list
+
+
+def unroll_range_list(range_list):
+    """Converts a **non overlapping** range list to a list of integers.
+
+    @param range_list: unordered list of non overlapping ranges [start, end],
+        edge inclusive. e.g. [[1,3], [123, 125], [20, 22]]
+    @return: unordered list of unique integers
+    """
+    int_list = []
+    for single_range in range_list:
+        int_list.extend(range(single_range[0], single_range[1] + 1))
+    return int_list

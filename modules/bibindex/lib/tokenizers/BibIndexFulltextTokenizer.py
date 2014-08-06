@@ -44,7 +44,7 @@ from invenio.bibtask import write_message
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
-
+from invenio.dbquery import run_sql
 
 fulltext_added = intbitset()
                            # stores ids of records whose fulltexts have been
@@ -207,3 +207,64 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
 
     def tokenize_for_phrases(self, phrase):
         return []
+
+    @classmethod
+    def get_modified_recids(cls, date_range, index_name):
+        """ Returns all the records that need to be reindexed using this
+        tokenizer **due to an action happened in the specified date range**.
+        Assumes that the tokenizer is used for the index index_name.
+
+        If a record needs to be updated due to a modification happened to
+        another record, use get_dependent_recids() insthead of this method.
+
+        @param date_range: the dates between whom this function will look for
+            modified records. If the end_date is None this function will look
+            for modified records after start_date
+        @type date_range: tuple (start_date, end_date)
+        @param index_name: the name of the index
+        @type index_name: string
+        @return: the modified records
+        @type return: intbitset
+        """
+        recids = intbitset()
+        # Modified records coming from the super class
+        recids |= BibIndexDefaultTokenizer.get_modified_recids(
+            date_range,
+            index_name
+        )
+        # Records modified due to fulltext extraction.
+        recids |= get_modified_recids_fulltext(date_range)
+        return recids
+
+
+def get_modified_recids_fulltext(dates):
+    """ Finds records that were modified between dates due to fulltext
+    extraction.
+
+    @param dates: the dates between whom this function will look for
+        modified records. If the end_date is None this function will look
+        for modified records after start_date
+    @type dates: tuple (start_date, end_date)
+    @return: the modified recids
+    @type return: intbitset
+    """
+    if dates[0] is None:
+        recids = intbitset(run_sql(
+            """SELECT id_bibrec FROM bibrec_bibdoc
+               JOIN bibdoc ON id_bibdoc = id
+               WHERE text_extraction_date <= modification_date
+               AND modification_date <= %s
+               AND status<>'DELETED'""",
+            (dates[1],)
+        ))
+    else:
+        # Search for bibliographic records modified between the two dates
+        recids = intbitset(run_sql(
+            """SELECT id_bibrec FROM bibrec_bibdoc
+               JOIN bibdoc ON id_bibdoc = id
+               WHERE text_extraction_date <= modification_date
+               AND modification_date BETWEEN %s AND %s
+               AND status<>'DELETED'""",
+            (dates[0], dates[1],)
+        ))
+    return recids

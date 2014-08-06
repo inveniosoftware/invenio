@@ -25,15 +25,12 @@ import os
 import re
 from datetime import timedelta
 from time import sleep
+import subprocess
 
 from invenio.bibindex_engine import WordTable, \
     VirtualIndexTable, \
     get_word_tables, \
     find_affected_records_for_index, \
-    get_recIDs_by_date_authority, \
-    get_recIDs_by_date_bibliographic, \
-    create_range_list, \
-    beautify_range_list, \
     get_last_updated_all_indexes, \
     re_prefix
 from invenio.bibindex_engine_utils import get_index_id_from_index_name, \
@@ -41,12 +38,12 @@ from invenio.bibindex_engine_utils import get_index_id_from_index_name, \
     get_all_indexes, \
     make_prefix, \
     get_marc_tag_indexes, \
-    get_nonmarc_tag_indexes, \
-    get_all_indexes
+    get_nonmarc_tag_indexes
 from invenio.bibindex_engine_config import \
     CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
-    CFG_BIBINDEX_UPDATE_MESSAGE
+    CFG_BIBINDEX_UPDATE_MESSAGE, \
+    CFG_BIBINDEX_OPTIONS_ERROR_MESSAGE
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR
 from invenio.testutils import make_test_suite, run_test_suite, nottest
@@ -65,18 +62,30 @@ from invenio.bibsort_engine import get_max_recid
 from invenio.bibtask import task_log_path
 
 
-def reindex_for_type_with_bibsched(index_name, force_all=False, *other_options):
+def call_bibindex_cli(options=[]):
+    """Runs bibindex with the specified options.
+       @param arguments: string of options to pass to bibindex
+       @return: tuple of strings (stdout, stderr)
+    """
+    program = os.path.join(CFG_BINDIR, 'bibindex')
+    proc = subprocess.Popen(
+        [program] + options,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    return proc.communicate()
+
+
+def reindex_for_type_with_bibsched(index_name, *options):
     """Runs bibindex for the specified index and returns the task_id.
        @param index_name: name of the index to reindex
-       @param force_all: if it's True function will reindex all records
-       not just affected ones
+       @param options: list of options to pass to bibindex
+       @return: the task_id
     """
     program = os.path.join(CFG_BINDIR, 'bibindex')
     args = ['bibindex', 'bibindex_regression_tests',
-            '-w', index_name, '-u', 'admin']
-    args.extend(other_options)
-    if force_all:
-        args.append("--force")
+            '-u', 'admin', '-w', index_name]
+    args.extend(options)
     task_id = task_low_level_submission(*args)
     COMMAND = "%s %s > /dev/null 2> /dev/null" % (program, str(task_id))
     os.system(COMMAND)
@@ -166,17 +175,7 @@ def reindex_word_tables_into_testtables(index_name, recids=None, prefix='test_',
     if recids:
         wordTable.add_recIDs(recids, 10000)
     else:
-        recIDs_for_index = find_affected_records_for_index([index_name],
-                                                           [[1, get_max_recid(
-                                                           )]],
-                                                           True)
-        bib_recIDs = get_recIDs_by_date_bibliographic([], index_name)
-        auth_recIDs = get_recIDs_by_date_authority([], index_name)
-        final_recIDs = bib_recIDs | auth_recIDs
-        final_recIDs = set(final_recIDs) & set(recIDs_for_index[index_name])
-        final_recIDs = beautify_range_list(
-            create_range_list(list(final_recIDs)))
-        wordTable.add_recIDs(final_recIDs, 10000)
+        wordTable.add_recIDs([[1, get_max_recid()]], 10000)
     return last_updated
 
 
@@ -200,6 +199,28 @@ def is_part_of(container, content):
     ctr = set(container)
     cont = set(content)
     return cont.issubset(ctr)
+
+
+@nottest
+def simulate_record_modification(recid):
+    run_sql(
+        """
+        INSERT INTO hstRECORD
+            (id_bibrec, marcxml, job_id, job_name, job_person, job_date,
+                job_details, affected_fields)
+        VALUES
+            (%s,'',1,'__bibindex_regression_tests__','UNKNOWN',now(),'','')
+        """,
+        (recid,)
+    )
+
+
+@nottest
+def delete_simulated_record_modifications():
+    run_sql("""
+        DELETE FROM hstRECORD
+        WHERE job_name = '__bibindex_regression_tests__'
+    """)
 
 
 class BibIndexRemoveStopwordsTest(InvenioTestCase):
@@ -810,10 +831,10 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         index_name = 'author'
         table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
         reindex_for_type_with_bibsched(index_name)
-        run_sql(
-            "UPDATE bibrec SET modification_date = now() WHERE id = %s", (authRecID,))
+        simulate_record_modification(authRecID)
         # run bibindex again
-        task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
+        task_id = reindex_for_type_with_bibsched(index_name)
+        delete_simulated_record_modifications()
         filename = task_log_path(task_id, 'log')
         _file = open(filename)
         text = _file.read()  # small file
@@ -821,7 +842,10 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         self.assertTrue(text.find(CFG_BIBINDEX_UPDATE_MESSAGE) >= 0)
         adding_records_text = CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR[
             :CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR.find("#")] % table
-        self.assertTrue(text.find(adding_records_text) >= 0)
+        self.assertTrue(
+            adding_records_text in text,
+            "String '%s' is not in '%s'" % (adding_records_text, text)
+        )
 
     def test_authority_record_enriched_index(self):
         """bibindex - test whether reverse index for bibliographic record
@@ -831,12 +855,14 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         index_name = 'author'
         table = "idxWORD%02dR" % get_index_id_from_index_name(index_name)
 
-        reindex_for_type_with_bibsched(index_name, force_all=True)
+        reindex_for_type_with_bibsched(index_name, "-R")
+        termlist = deserialize_via_marshal(
+            run_sql("SELECT termlist FROM %s WHERE id_bibrec = %s" %
+                    (table, bibRecID))[0][0]
+        )
         self.assertTrue(
-            authority_string in deserialize_via_marshal(
-                run_sql("SELECT termlist FROM %s WHERE id_bibrec = %s" %
-                        (table, bibRecID))[0][0]
-            )
+            authority_string in termlist,
+            "The string '%s' is not in %s" % (authority_string, termlist)
         )
 
     def test_subject_authority_record_content(self):
@@ -1069,7 +1095,7 @@ class BibIndexFindingAffectedIndexes(InvenioTestCase):
             sorted(records_for_indexes.keys())
         )
 
-    def test_find_proper_recrods_for_miscellaneous_index(self):
+    def test_find_proper_records_for_miscellaneous_index(self):
         """bibindex - checks if affected recids are found correctly for miscellaneous index"""
         records_for_indexes = find_affected_records_for_index(
             get_all_indexes(virtual=False),
@@ -1183,7 +1209,7 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
         index_id = get_index_id_from_index_name('author')
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec IN (""" \
             % (index_id,)
-        query = query + ", ".join([str(x) for x in self.records]) + ")"
+        query += ", ".join(map(str, self.records)) + ")"
         resp = run_sql(query)
         author_rec1 = deserialize_via_marshal(resp[0][0])
         author_rec2 = deserialize_via_marshal(resp[1][0])
@@ -1230,18 +1256,27 @@ class BibIndexFindingIndexesForTags(InvenioTestCase):
     def test_author_tag_virtual_indexes_on(self):
         """bibindex - checks 'get_marc_tag_indexes' for tag '100'"""
         self.assertEqual(
-            ('author', 'affiliation', 'exactauthor', 'firstauthor',
-             'exactfirstauthor', 'authorcount', 'authorityauthor',
-             'miscellaneous', 'global'),
-            zip(*get_marc_tag_indexes('100'))[1]
+            sorted([
+                'author', 'affiliation', 'exactauthor',
+                'firstauthor', 'exactfirstauthor',
+                'authorcount',
+                'authorityauthor', 'miscellaneous',
+                'global'
+            ]),
+            sorted(zip(*get_marc_tag_indexes('100'))[1])
         )
 
     def test_author_exact_tag_virtual_indexes_off(self):
-        """bibindex - checks 'get_marc_tag_indexes' for tag '100__a'"""
-        self.assertEqual(('author', 'exactauthor', 'firstauthor',
-                          'exactfirstauthor', 'authorcount',
-                          'authorityauthor', 'miscellaneous'),
-                         zip(*get_marc_tag_indexes('100__a', virtual=False))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag '100__a', without virtual indexes"""
+        self.assertEqual(
+            sorted([
+                'author', 'exactauthor',
+                'firstauthor', 'exactfirstauthor',
+                'authorcount',
+                'authorityauthor', 'miscellaneous'
+            ]),
+            sorted(zip(*get_marc_tag_indexes('100__a', virtual=False))[1])
+        )
 
     def test_wide_tag_virtual_indexes_off(self):
         """bibindex - checks 'get_marc_tag_indexes' for tag like '86%'"""
@@ -1291,8 +1326,9 @@ class BibIndexFindingTagsForIndexes(InvenioTestCase):
     """ Tests function 'get_index_tags' """
 
     def test_tags_for_author_index(self):
-        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'author' index """
-        self.assertEqual(get_index_tags('author'), ['100__a', '700__a'])
+        """bibindex - checks if 'get_index_tags' find proper marc tags values for 'author' index """
+        self.assertEqual(
+            sorted(get_index_tags('author')), sorted(['100__a', '700__a']))
 
     def test_tags_for_global_index_virtual_indexes_off(self):
         """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
@@ -1636,17 +1672,18 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
 
 class BibIndexCLICallTest(InvenioTestCase):
 
-    """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
+    """Tests if calls to bibindex from CLI (bibsched deamon) are run
+    correctly"""
 
     def test_correct_message_for_wrong_index_names(self):
         """bibindex - checks if correct message for wrong index appears"""
         index_name = "titlexrg"
-        task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
+        task_id = reindex_for_type_with_bibsched(index_name)
         filename = task_log_path(task_id, 'log')
         fl = open(filename)
         text = fl.read()  # small file
         fl.close()
-        self.assertTrue(text.find("Specified indexes can't be found.") >= 0)
+        self.assertIn("Specified indexes can't be found.", text)
 
     def test_correct_message_for_up_to_date_indexes(self):
         """bibindex - checks if correct message for index up to date appears"""
@@ -1656,8 +1693,28 @@ class BibIndexCLICallTest(InvenioTestCase):
         fl = open(filename)
         text = fl.read()  # small file
         fl.close()
-        self.assertTrue(
-            text.find("Selected indexes/recIDs are up to date.") >= 0)
+        self.assertIn(
+            "Selected recIDs are up to date in index %s." % (index_name,),
+            text
+        )
+
+    def test_correct_message_for_wrong_cli_arguments(self):
+        """bibindex - checks if correct message for wrong cli arguments appears"""
+        wrong_cli_arguments = [
+            ['--add', '--del'],
+            ['--reindex', '--force'],
+            ['--del', '--modified', '2000-01-01 00:00:00'],
+            ['--remove-dependent-index', '__fake_indexname__', '--add'],
+        ]
+
+        for args in wrong_cli_arguments:
+            _, output = call_bibindex_cli(['-u', 'admin'] + args)
+            self.assertIn(
+                CFG_BIBINDEX_OPTIONS_ERROR_MESSAGE,
+                output,
+                "The execution of bibindex cli with arguments '%s' does not prints the error message: '%s' in %s"
+                % (args, CFG_BIBINDEX_OPTIONS_ERROR_MESSAGE, output)
+            )
 
 
 class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):

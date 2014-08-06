@@ -27,7 +27,11 @@ from invenio.testutils import InvenioTestCase
 from invenio import bibindex_engine
 from invenio.bibindex_engine_utils import load_tokenizers, list_union
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibindex_engine_utils import get_values_recursively
+from invenio.bibindex_engine_utils import (
+    get_values_recursively,
+    create_range_list,
+    unroll_range_list
+)
 
 _TOKENIZERS = load_tokenizers()
 
@@ -216,8 +220,12 @@ class TestGetAuthorFamilyNameWords(InvenioTestCase):
     def test_authornames_campbell_wilson(self):
         """bibindex engine - get author family name words for Campbell-Wilson, D"""
         tokenizer = _TOKENIZERS["BibIndexAuthorTokenizer"]()
-        self.assertEqual(['campbell', 'wilson', 'campbell-wilson'],
-                         tokenizer.get_author_family_name_words_from_phrase('Campbell-Wilson, D'))
+        self.assertEqual(
+            ['campbell', 'wilson', 'campbell-wilson'],
+            tokenizer.get_author_family_name_words_from_phrase(
+                'Campbell-Wilson, D'
+            )
+        )
 
 
 class TestGetValuesFromRecjson(InvenioTestCase):
@@ -271,13 +279,160 @@ class TestGetValuesFromRecjson(InvenioTestCase):
         self.assertEqual(phrases, ['name1', 'name2', 'name4'])
 
 
+class TestCreateRangeList(InvenioTestCase):
+
+    """Tests for create_range_list"""
+
+    def test_empty(self):
+        """bibindex engine utils - create range list from empty input"""
+        output = create_range_list([])
+        self.assertEqual(output, [])
+
+    def test_one_range(self):
+        """bibindex engine utils - create range list from one-range input
+        """
+        test_pairs = [
+            ([1], [[1, 1]]),
+            ([2], [[2, 2]]),
+            ([3], [[3, 3]]),
+            ([100], [[100, 100]]),
+            ([7864], [[7864, 7864]]),
+            ([30256854], [[30256854, 30256854]]),
+            ([1, 2, 3], [[1, 3]]),
+            ([5, 6, 7, 8, 9, 10], [[5, 10]]),
+            ([10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], [[10, 20]]),
+        ]
+
+        for test_input, expected_output in test_pairs:
+            output = create_range_list(test_input)
+            self.assertEqual(
+                output,
+                expected_output,
+                "create_range_list(%s): received %s instead of %s"
+                % (test_input, output, expected_output)
+            )
+
+    def test_multiple_ranges(self):
+        """bibindex engine utils - create range list from multiple-range input
+        """
+        test_pairs = [
+            ([1, 2, 3, 5, 6, 7], [[1, 3], [5, 7]]),
+            ([5, 7, 8, 9, 10, 12], [[5, 5], [7, 10], [12, 12]]),
+            ([13, 14, 15, 16, 18, 20], [[13, 16], [18, 18], [20, 20]]),
+            ([22, 23, 25, 26, 28, 29], [[22, 23], [25, 26], [28, 29]]),
+            ([33, 35, 38, 40], [[33, 33], [35, 35], [38, 38], [40, 40]]),
+        ]
+
+        for test_input, expected_output in test_pairs:
+            output = create_range_list(test_input)
+            self.assertEqual(
+                output,
+                expected_output,
+                "create_range_list(%s): received %s instead of %s"
+                % (test_input, output, expected_output)
+            )
+
+    def test_unordered_input(self):
+        """bibindex engine utils - create range list from unordered input
+        """
+        tests = [
+            [2, 1],
+            [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
+            [2, 1, 8, 6, 4, 3, 5, 99, 65, 21],
+            [7, 6, 3, 5, 1, 2],
+            [9, 10, 12, 5, 7, 8]
+        ]
+
+        for test_input in tests:
+            output = create_range_list(test_input)
+            self.assertNotEqual(0, len(output))
+
+            resulting_input = []
+            for single_range in output:
+                self.assertEqual(2, len(single_range))
+                self.assertLessEqual(single_range[0], single_range[1])
+                resulting_input.extend(
+                    range(single_range[0], single_range[1] + 1)
+                )
+
+            self.assertEqual(sorted(resulting_input), sorted(test_input))
+
+
+class TestUnrollRangeList(InvenioTestCase):
+
+    """Tests for unroll_range_list"""
+
+    def test_empty(self):
+        """bibindex engine utils - unroll empty range list"""
+        output = unroll_range_list([])
+        self.assertEqual(output, [])
+
+    def test_one_range(self):
+        """bibindex engine utils - unroll short range list"""
+        test_pairs = [
+            ([[0, 0]], [0]),
+            ([[1, 1]], [1]),
+            ([[2, 2]], [2]),
+            ([[1, 3]], [1, 2, 3]),
+            ([[0, 3]], [0, 1, 2, 3]),
+            ([[5, 10]], [5, 6, 7, 8, 9, 10]),
+            ([[10, 20]], [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]),
+        ]
+
+        for test_input, expected_output in test_pairs:
+            output = unroll_range_list(test_input)
+            self.assertEqual(
+                output,
+                expected_output,
+                "unroll_range_list(%s): received %s instead of %s"
+                % (test_input, output, expected_output)
+            )
+
+    def test_multiple_ranges(self):
+        """bibindex engine utils - unroll long range list
+        """
+        test_pairs = [
+            ([[1, 3], [5, 7]], [1, 2, 3, 5, 6, 7]),
+            ([[5, 5], [7, 10], [12, 12]], [5, 7, 8, 9, 10, 12]),
+            ([[13, 16], [18, 18], [20, 20]], [13, 14, 15, 16, 18, 20]),
+            ([[22, 23], [25, 26], [28, 29]], [22, 23, 25, 26, 28, 29]),
+            ([[33, 33], [35, 35], [38, 38], [40, 40]], [33, 35, 38, 40]),
+        ]
+
+        for test_input, expected_output in test_pairs:
+            output = unroll_range_list(test_input)
+            self.assertEqual(
+                output,
+                expected_output,
+                "unroll_range_list(%s): received %s instead of %s"
+                % (test_input, output, expected_output)
+            )
+
+    def test_unordered_input(self):
+        """bibindex engine utils - unroll unordered, non overlapping range list
+        """
+        tests = [
+            ([[5, 7], [1, 3]], [1, 2, 3, 5, 6, 7]),
+            ([[7, 10], [5, 5]], [5, 7, 8, 9, 10]),
+            ([[18, 18], [13, 16], [20, 20]], [13, 14, 15, 16, 18, 20]),
+            ([[28, 29], [25, 26], [22, 23]], [22, 23, 25, 26, 28, 29]),
+            ([[38, 38], [33, 33], [40, 40], [35, 35]], [33, 35, 38, 40]),
+        ]
+
+        for test_input, expected_output in tests:
+            output = unroll_range_list(test_input)
+            self.assertEqual(sorted(output), expected_output)
+
+
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
                              TestGetWordsFromPhrase,
                              TestGetPairsFromPhrase,
                              TestGetWordsFromDateTag,
                              TestGetAuthorFamilyNameWords,
-                             TestGetValuesFromRecjson,)
+                             TestGetValuesFromRecjson,
+                             TestCreateRangeList,
+                             TestUnrollRangeList,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

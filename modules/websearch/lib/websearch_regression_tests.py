@@ -4799,9 +4799,12 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
         #    print params
         #    print recs
 
-        self.assertEqual(recs, expected_results, "Error, we expect: %s, and we received: %s" % (expected_results, recs))
-
-
+        self.assertEqual(
+            sorted(recs),
+            sorted(expected_results),
+            "Error, we expect: %s, and we received: %s"
+            % (sorted(expected_results), sorted(recs))
+        )
 
     def test_queries(self):
         """websearch - testing p_r_s standard arguments and their combinations"""
