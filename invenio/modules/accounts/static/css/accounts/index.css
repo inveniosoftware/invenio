@@ -17,37 +17,51 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-.form-signin {
-  max-width: 330px;
-  padding: 15px;
-  margin: 0 auto;
+#widgets li .thumbnail {
+  background: white;
 }
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
+
+.widget {
   margin-bottom: 10px;
+  margin-left: -20px;
 }
-.form-signin .checkbox {
-  font-weight: normal;
+
+.widget h4 {
+  display: inline;
+  font-size: inherit;
 }
-.form-signin .form-control {
-  position: relative;
-  font-size: 16px;
-  height: auto;
-  padding: 10px;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+
+.thumbnail {
+  cursor: move;
 }
-.form-signin .form-control:focus {
-  z-index: 2;
+
+.thumbnails li {
+  list-style-type: none;
 }
-.form-signin input[type="text"] {
-  margin-bottom: -1px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+
+.connectedWidgets {
+  min-height: 100px;
 }
-.form-signin input[type="password"] {
+
+.placeholder {
+  border: 2px dashed #999;
+  margin-left: -20px;
   margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  border-radius: 5px;
+  display: block;
+  visibility: visible!important;
+  float: left;
+}
+
+.widgetColumn {
+  visibility: visible!important;
+  display: block!important;
+}
+
+#closed-list {
+  margin: 0px;
+}
+
+#closed-list li {
+  margin-right: 10px;
 }
