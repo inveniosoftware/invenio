@@ -68,8 +68,8 @@
       {%- block index_results -%}
         <div class="row">
           {%- block facets %}
-            <div class="col-md-3 col-lg-2 visible-md visible-lg">
-              <div class="facet" id="facet_list"></div>
+            <div class="col-md-3 col-lg-2 visible-md visible-lg" id="facetparent">
+              <div class="facet" id="facet_list" data-clampedwidth="#facetparent"></div>
             </div>
           {%- endblock facets %}
           {%- block index_right -%}
