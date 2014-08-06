@@ -58,7 +58,6 @@
                       <li><a id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button"><i class="icon-trash"></i>{{ _('Delete this record') }}</a></li>
                   </ul>
               </li>
-
               <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                   <div class="modal-content">
@@ -77,6 +76,24 @@
                 </div>
               </div>
           </ul>
+{% block previous_next %}
+<div class="navbar-form navbar-right">
+  <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
+     class="btn btn-default"
+     {% if previous_object == None %}disabled="disabled"{% endif %}>
+      <span class="glyphicon glyphicon-circle-arrow-left"></span>
+      <strong>Previous</strong>
+  </a>
+
+  <a href="{{ url_for('holdingpen.details', objectid=next_object)}}"
+     class="btn btn-default"
+     {% if next_object == None %}disabled="disabled"{% endif %}>
+        <span class="glyphicon glyphicon-circle-arrow-right"></span>
+        <strong>Next</strong>
+  </a>
+
+</div>
+{% endblock %}
         </div>
       </nav>
   {% endblock %}
@@ -230,7 +247,7 @@
 
         {% if 'message' in bwobject.get_extra_data() and
             bwobject.get_action() != None %}
-            <div id="usermessage" class="alert alert-warning alert-dismissable">
+            <div id="usermessage" class="alert alert-warning alert-dismissible">
                 {{bwobject.get_extra_data()['_message']}}
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
             </div>
@@ -270,6 +287,5 @@
         {% endblock %}
         </div>
     </div>
-
 </div>
 {% endblock %}

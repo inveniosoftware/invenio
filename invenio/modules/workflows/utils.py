@@ -262,7 +262,8 @@ def generate_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'
 
     workflows_name = bwo.get_workflow_name()
 
-    if workflows_name and hasattr(workflows[workflows_name], 'get_description'):
+    if workflows_name and workflows_name in workflows and \
+       hasattr(workflows[workflows_name], 'get_description'):
         workflow_definition = workflows[workflows_name]
     else:
         workflow_definition = WorkflowBase
@@ -355,7 +356,7 @@ def extract_data(bwobject):
         workflow_def = get_workflow_definition(extracted_data['w_metadata'].name)
         extracted_data['workflow_func'] = workflow_def
     else:
-        extracted_data['workflow_func'] = [None]
+        extracted_data['workflow_func'] = []
     return extracted_data
 
 
@@ -401,3 +402,24 @@ def get_rendered_task_results(obj):
                 obj=obj
             ))
     return results
+
+
+def get_previous_next_objects(object_list, current_object_id):
+    """Return tuple of (previous, next) object for given Holding Pen object."""
+    try:
+        current_index = object_list.index(current_object_id)
+        try:
+            next_object_id = object_list[current_index + 1]
+        except IndexError:
+            next_object_id = None
+        try:
+            if current_index == 0:
+                previous_object_id = None
+            else:
+                previous_object_id = object_list[current_index - 1]
+        except IndexError:
+            previous_object_id = None
+    except ValueError:
+        next_object_id = object_list[0]
+        previous_object_id = None
+    return previous_object_id, next_object_id

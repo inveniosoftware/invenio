@@ -16,14 +16,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""Holding Pen overlay blueprint.
+"""
+Holding Pen is a web interface overlay for all BibWorkflowObject's.
 
-Holding Pen is an overlay over all objects (BibWorkflowObject) that
-have run through a workflow (BibWorkflowEngine). This area is targeted
-to catalogers and super users for inspecting ingestion workflows and
-submissions/depositions.
+This area is targeted to catalogers and administrators for inspecting
+and reacting to workflows executions. More importantly, allowing users to deal
+with halted workflows.
 
-Note: Currently work-in-progress.
+For example, accepting submissions or other tasks.
 """
 import os
 
@@ -44,7 +44,9 @@ from ..registry import actions
 from ..utils import (sort_bwolist, extract_data, get_action_list,
                      get_formatted_holdingpen_object,
                      get_holdingpen_objects,
-                     get_rendered_task_results)
+                     get_rendered_task_results,
+                     get_previous_next_objects)
+from ..engine import WorkflowStatus
 from ..api import continue_oid_delayed, start_delayed
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -103,7 +105,17 @@ def details(objectid):
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
     from invenio.ext.sqlalchemy import db
+    if 'holdingpen_current_ids' in session:
+        objects = session['holdingpen_current_ids']
+    else:
+        bwobject_list = get_holdingpen_objects([str(ObjectVersion.HALTED)])
+        objects = []
+        for obj in bwobject_list:
+            version = extract_data(obj)['w_metadata'].status
+            if version == WorkflowStatus.HALTED:
+                objects.append(obj.id)
 
+    previous_object, next_object = get_previous_next_objects(objects, objectid)
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
 
@@ -155,13 +167,15 @@ def details(objectid):
                            data_preview=formatted_data,
                            workflow_func=extracted_data['workflow_func'],
                            workflow=extracted_data['w_metadata'],
-                           task_results=results)
+                           task_results=results,
+                           previous_object=previous_object,
+                           next_object=next_object)
 
 
 @blueprint.route('/files/<int:objectid>/<path:filename>', methods=['POST', 'GET'])
 @login_required
 def get_file(objectid=None, filename=None):
-    """Send the fulltext file to user."""
+    """Send the requested file to user."""
     bwobject = BibWorkflowObject.query.get(objectid)
     task_results = bwobject.get_tasks_results()
     if filename in task_results and task_results[filename]:
@@ -331,6 +345,10 @@ def load_table():
                   'iTotalRecords': len(bwobject_list),
                   'iTotalDisplayRecords': len(bwobject_list),
                   'sEcho': session["holdingpen_sEcho"]}
+
+    # Add current ids in table for use by previous/next
+    record_ids = [o.id for o in bwobject_list]
+    session['holdingpen_current_ids'] = record_ids
 
     records_showing = 0
     for bwo in bwobject_list[
