@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012 CERN.
+ * Copyright (C) 2012, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
  */
 
 
-/* A file contatining fuctions treating the faceting functionality. */
+/* A file containing functions treating the faceting functionality. */
 
 !function( $ ){
 
@@ -393,4 +393,29 @@
     })
   })
 
+  /* AFFIX WIDTH FIX
+   * ===============
+   * Fixes issue with affix loosing it's width once removed from the DOM
+   * See https://github.com/twbs/bootstrap/issues/6350
+   *
+   * Example:
+   * --------
+   * <div data-clampedwidth=".myParent">This long content will force clamped width</div>
+   */
+  $('[data-clampedwidth]').each(function () {
+      var elem = $(this);
+      var parentPanel = elem.data('clampedwidth');
+      var resizeFn = function () {
+          var sideBarNavWidth = $(parentPanel).width() -
+            parseInt(elem.css('paddingLeft')) -
+            parseInt(elem.css('paddingRight')) -
+            parseInt(elem.css('marginLeft')) -
+            parseInt(elem.css('marginRight')) -
+            parseInt(elem.css('borderLeftWidth')) -
+            parseInt(elem.css('borderRightWidth'));
+          elem.css('width', sideBarNavWidth);
+      };
+      resizeFn();
+      $(window).resize(resizeFn);
+  });
 }( window.jQuery )
