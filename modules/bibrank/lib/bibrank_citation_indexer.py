@@ -1042,15 +1042,18 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         done += 1
 
         for reportcode in (r for r in reportcodes if r):
+            field = tags['refs_report_number']
             if reportcode.startswith('arXiv'):
-                std_reportcode = standardize_report_number(reportcode)
-                recids = get_recids_matching_query(p='%s*' % std_reportcode,
-                                                   f=tags['refs_report_number'],
-                                                   config=config)
+                pattern = '%s*' % standardize_report_number(reportcode)
             else:
-                recids = get_recids_matching_query(p=reportcode,
-                                                   f=tags['refs_report_number'],
-                                                   config=config)
+                pattern = reportcode
+
+            recids = get_recids_matching_query(p=pattern,
+                                               f=field,
+                                               config=config)
+            write_message("These match searching %s in %s: %s"
+                             % (pattern, field, list(recids)), verbose=9)
+
             for recid in recids:
                 add_to_cites(recid, thisrecid)
 
