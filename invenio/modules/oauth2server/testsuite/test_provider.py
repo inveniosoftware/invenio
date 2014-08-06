@@ -282,11 +282,7 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         self.assert200(r)
         self.assertEqual(r.json, dict(ping='pong'))
 
-<<<<<<< HEAD
         # Access token is not valid for this scope
-=======
-        # Access token is not valid for this scope.
->>>>>>> abe99bc... restful: decorator improvement
         r = self.client.get(
             '/oauth/info/',
             base_url=cfg['CFG_SITE_SECURE_URL']
