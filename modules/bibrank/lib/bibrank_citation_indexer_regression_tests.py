@@ -160,7 +160,6 @@ class TestCitationIndexerWarnings(InvenioTestCase):
         self.cleanup()
 
 
-
 class TestCitationLosses(InvenioTestCase):
     def test_abort_cites(self):
         from invenio.bibrank_citation_indexer import check_citations_losses
@@ -200,6 +199,31 @@ class TestCitationLosses(InvenioTestCase):
         from invenio.bibrank_citation_indexer import check_citations_losses
         check_citations_losses(CONFIG, [1, 2, 81], {1: set([]), 2: set([]), 81: set([])}, {1: set([]), 2: set([]), 81: set([])})
 
+    def test_disable_abort(self):
+        from invenio.bibrank_citation_indexer import process_and_store
+
+        # Insert fake citations
+        for recid in range(2000, 2500):
+            run_sql("""INSERT IGNORE INTO rnkCITATIONDICT (citer, citee, last_updated)
+                       VALUES (%s, 1, NOW())""", [recid])
+
+        # Let the drop be detected
+        # this will want to remove all the fake citations
+        try:
+            process_and_store(recids=[1],
+                              config=CONFIG,
+                              chunk_size=10)
+        except Exception as e:  # pylint: disable=W0703
+            if 'Lost too many references' not in str(e):
+                raise
+        else:
+            self.fail()
+        # Check that we can remove citations by switching
+        # a flag on
+        process_and_store(recids=[1],
+                          config=CONFIG,
+                          chunk_size=10,
+                          loss_checks=False)
 
 TEST_SUITE = make_test_suite(TestCitationIndexer,
                              TestCitationIndexerWarnings,

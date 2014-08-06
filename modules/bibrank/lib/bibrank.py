@@ -202,6 +202,9 @@ def main():
                            external papers manually.
 
  -A --author-citations     Calculate author citations.
+ --disable-citation-losses-check  Disable checks that prevent more than n
+                           citations to be removed in one single run
+                           (n is defined in citation.cfg)
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -225,6 +228,7 @@ def main():
                 "check",
                 "modified=",
                 "update",
+                "disable-citation-losses-check",
                 "run="]),
             task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,
@@ -277,6 +281,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
         task_set_option("last_updated", "")
     elif key in ("-l", "--lastupdate"):
         task_set_option("last_updated", "last_updated")
+    elif key in ("disable-citation-losses-check", ):
+        task_set_option("disable_citation_losses_check", True)
     else:
         return False
     return True
