@@ -358,13 +358,3 @@ def get_attached_tags_on_record(record_id):
             tag = WtgTAG.query.filter(WtgTAG.id == association.id_tag).first()
             attached_tags.append(tag)
     return sorted(attached_tags, key=lambda t: t.name, reverse=False)
-
-
-def get_user_id_from_access_token(access_token):
-    """Get a user id from an access token.
-
-    :param access_token: access token
-    """
-    from invenio.modules.oauth2server.models import Token
-    token = Token.query.filter(Token.access_token == access_token).first()
-    return token.user_id

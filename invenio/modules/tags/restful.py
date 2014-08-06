@@ -144,11 +144,7 @@ class TagResource(Resource):
 
         :param tag_name: the name of the tag to retrieve
         """
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tag_retrieved = tags_api.get_tag_of_user(uid, tag_name)
         tag = TagRepresenation(tag_retrieved)
         return tag.marshal()
@@ -161,11 +157,7 @@ class TagResource(Resource):
 
         :param tag_name: the name of the tag to delete
         """
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tags_api.delete_tag_from_user(uid, tag_name)
         return "", 204
 
@@ -186,11 +178,7 @@ class TagResource(Resource):
                 error_msg="Validation for tag update failed",
                 status_code=400,
                 error_list=v.get_errors())
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tag_retrieved = tags_api.update_tag_of_user(uid, tag_name, json_data)
         tag = TagRepresenation(tag_retrieved)
         return tag.marshal(), 201
@@ -226,11 +214,7 @@ class TagListResource(Resource):
 
         Get the list of tags a user owns.
         """
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tags_retrieved = tags_api.get_all_tags_of_user(uid)
         tags = [TagRepresenation(t) for t in tags_retrieved]
         return map(lambda t: t.marshal(), tags)
@@ -240,11 +224,7 @@ class TagListResource(Resource):
 
         Delete all the tags a user owns.
         """
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tags_api.delete_all_tags_from_user(uid)
         return "", 204
 
@@ -261,11 +241,7 @@ class TagListResource(Resource):
                 error_msg="Validation error for tag creation",
                 status_code=400,
                 error_list=v.get_errors())
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tag_to_create = tags_api.create_tag_for_user(uid, json_data['name'])
         tag_to_return = TagRepresenation(tag_to_create)
         return tag_to_return.marshal(), 201
@@ -307,11 +283,7 @@ class RecordTagResource(Resource):
         :param record_id: the identifier of the record
         :param tag_name: the name of the tag
         """
-        if 'access_token=' not in request.url:
-            raise TagOwnerError(error_msg="Unauthorized", status_code=401)
-        access_token = request.url[request.url.find('=')+1:len(request.url)]
-        uid = tags_api.get_user_id_from_access_token(access_token)
-        # uid = current_user.get_id()
+        uid = current_user.get_id()
         tags_api.detach_tag_from_record(uid, tag_name, record_id)
         return "", 204
 
