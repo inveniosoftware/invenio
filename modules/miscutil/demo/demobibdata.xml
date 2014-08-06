@@ -26282,4 +26282,56 @@ Only the mountain and I.
     </datafield>
   </record>
 
+  <!----------------------------
+    ARTICLES records used to test 786__w tag
+  ----------------------------->
+
+  <record>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Additional data from: Probing color coherence effects in pp collisions at $\sqrt{s}=7\,\text {TeV}$</subfield>
+    </datafield>
+    <datafield tag="786" ind1=" " ind2=" ">
+      <subfield code="w">10</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Additional data from: Inclusive Deep Inelastic Scattering at High $Q^2$ with Longitudinally Polarised Lepton Beams at HERA</subfield>
+    </datafield>
+    <datafield tag="786" ind1=" " ind2=" ">
+      <subfield code="w">20</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Additional data from: Search for $W' \rightarrow tb \rightarrow qqbb$ Decays in pp Collisions at $\sqrt{s}$ = 8 TeV with the ATLAS Detector</subfield>
+    </datafield>
+    <datafield tag="786" ind1=" " ind2=" ">
+      <subfield code="w">30</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Additional data from: Deep inelastic cross-section measurements at large y with the ZEUS detector at HERA</subfield>
+    </datafield>
+    <datafield tag="786" ind1=" " ind2=" ">
+      <subfield code="w">40</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
 </collection>
