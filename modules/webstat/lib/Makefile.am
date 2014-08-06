@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -36,7 +36,7 @@ CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.
 webstat.clisp.mem: $(FILESLISP)
 	if [ -x "${CLISP}" ]; then \
              (cwd=`pwd`; cd $(srcdir) && \
-             ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))"); \
+             ${CLISP} -q -x "(progn (load \"load.lisp\")(saveinitmem \"$${cwd}/webstat.clisp.mem\"))") 2>&1 >/dev/null; \
         else \
             echo "Warning: cannot find CLISP, hoping you have CMUCL or SBCL instead."; \
             touch webstat.clisp.mem; \
@@ -45,7 +45,7 @@ webstat.clisp.mem: $(FILESLISP)
 webstat.cmucl.core: $(FILESLISP)
 	if [ -x "${CMUCL}" ]; then \
             (cwd=`pwd`; cd $(srcdir) && \
-             ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))"); \
+             ${CMUCL} -quiet -batch -eval "(progn (load \"load.lisp\")(ext:save-lisp \"$${cwd}/webstat.cmucl.core\"))") 2>&1 >/dev/null; \
         else \
             echo "Warning: cannot find CMUCL, hoping you have CLISP or SBCL instead."; \
             touch webstat.cmucl.core; \
@@ -54,7 +54,7 @@ webstat.cmucl.core: $(FILESLISP)
 webstat.sbcl.core: $(FILESLISP)
 	if [ -x "${SBCL}" ]; then \
            (cwd=`pwd`; cd $(srcdir) && \
-            ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))"); \
+            ${SBCL} --noinform --eval "(progn (load \"load.lisp\")(sb-ext:save-lisp-and-die \"$${cwd}/webstat.sbcl.core\"))") 2>&1 >/dev/null; \
         else \
             echo "Warning: cannot find SBCL, hoping you have CLISP or CMUCL instead."; \
             touch webstat.sbcl.core; \
