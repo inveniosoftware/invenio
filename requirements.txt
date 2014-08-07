@@ -1,4 +1,3 @@
--e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
 -e git+https://github.com/mrjoes/flask-admin#egg=Flask-Admin
 -e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
 # requires numpy before it can be installed
