@@ -188,8 +188,6 @@ def check_citations_losses(config, recids, refs, cites):
             except AssertionError:
                 prefix = "Record %s lost too many references: %s refs" \
                          % (recid, record_refs_diff)
-                register_exception(prefix=prefix,
-                                   alert_admin=True)
                 report_loss(recid, prefix, True)
                 if recid not in records_to_ignore:
                     records_to_ignore.append(recid)
