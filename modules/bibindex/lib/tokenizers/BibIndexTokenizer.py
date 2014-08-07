@@ -143,16 +143,32 @@ class BibIndexTokenizer(object):
         """ See: tokenize_for_words """
         raise NotImplementedError
 
-
     def get_tokenizing_function(self, wordtable_type):
         """Chooses tokenize_for_words, tokenize_for_phrases or tokenize_for_pairs
            depending on type of tokenization we want to perform."""
+        raise NotImplementedError
+
+    def get_nonmarc_tokenizing_function(self, table_type):
+        """Chooses best tokenizing function
+           depending on type of tokenization we want to perform.
+           Non-marc version.
+        """
         raise NotImplementedError
 
     @property
     def implemented(self):
         try:
             self.get_tokenizing_function("")
+        except NotImplementedError:
+            return False
+        except AttributeError:
+            return False
+        return True
+
+    @property
+    def implemented_nonmarc(self):
+        try:
+            self.get_nonmarc_tokenizing_function("")
         except NotImplementedError:
             return False
         except AttributeError:

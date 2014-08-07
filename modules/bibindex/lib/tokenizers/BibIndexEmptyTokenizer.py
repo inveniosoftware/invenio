@@ -56,6 +56,13 @@ class BibIndexEmptyTokenizer(BibIndexStringTokenizer):
         elif wordtable_type == CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"]:
             return self.tokenize_for_phrases
 
+    def get_nonmarc_tokenizing_function(self, table_type):
+        """
+        Picks correct tokenize_for_xxx function
+        depending on the type of tokenization
+        for non-marc standards.
+        """
+        return self.get_tokenizing_function(table_type)
 
     def tokenize_for_words(self, phrase):
         return []

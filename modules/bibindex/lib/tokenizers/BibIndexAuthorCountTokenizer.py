@@ -24,7 +24,7 @@
 
 from invenio.bibindex_engine_utils import get_field_count
 from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
-
+from invenio.bibfield import get_record
 
 
 class BibIndexAuthorCountTokenizer(BibIndexMultiFieldTokenizer):
@@ -40,6 +40,7 @@ class BibIndexAuthorCountTokenizer(BibIndexMultiFieldTokenizer):
 
     def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
         self.tags = ['100__a', '700__a']
+        self.nonmarc_tag = 'number_of_authors'
 
 
     def tokenize(self, recID):
@@ -47,6 +48,16 @@ class BibIndexAuthorCountTokenizer(BibIndexMultiFieldTokenizer):
            for finding a number of authors of a publication and pass it in the list"""
         return [str(get_field_count(recID, self.tags)),]
 
+    def tokenize_via_recjson(self, recID):
+        """
+        Will tokenize with use of bibfield.
+        @param recID: id of the record
+        """
+        rec = get_record(recID)
+        return [str(rec.get(self.nonmarc_tag) or 0)]
 
     def get_tokenizing_function(self, wordtable_type):
         return self.tokenize
+
+    def get_nonmarc_tokenizing_function(self, table_type):
+        return self.tokenize_via_recjson

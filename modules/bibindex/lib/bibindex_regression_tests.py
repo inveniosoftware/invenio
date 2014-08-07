@@ -38,10 +38,13 @@ from invenio.bibindex_engine import WordTable, \
     re_prefix
 from invenio.bibindex_engine_utils import get_index_id_from_index_name, \
     get_index_tags, \
-    get_tag_indexes, \
     get_all_indexes, \
-    make_prefix
-from invenio.bibindex_engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
+    make_prefix, \
+    get_marc_tag_indexes, \
+    get_nonmarc_tag_indexes, \
+    get_all_indexes
+from invenio.bibindex_engine_config import \
+    CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
     CFG_BIBINDEX_UPDATE_MESSAGE
 from invenio.bibtask import task_low_level_submission
@@ -51,8 +54,8 @@ from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibauthority_engine import (get_index_strings_by_control_no,
-                                         get_control_nos_from_recID)
+from invenio.bibauthority_engine import get_index_strings_by_control_no, \
+    get_control_nos_from_recID
 from invenio.bibindex_engine_utils import run_sql_drop_silently
 
 from invenio.bibupload import bibupload, xml_marc_to_records
@@ -118,7 +121,7 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
        Reindexes only idxWORDxxx tables.
        @param index_name: name of the index we want to reindex
        @param recids: None means reindexing all records, set ids of the records to update only part of them
-       @param prefix: prefix for the new tabels, if it's set to boolean False function will reindex to original table
+       @param prefix: prefix for the new tabels, empty prefix means indexing original tables
        @param parameters: dict with parameters and their new values; for more specific
        description take a look at  'prepare_for_index_update' function.
        @param turn_off_virtual_indexes: if True only specific index will be reindexed
@@ -145,6 +148,7 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                                            type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                                            PRIMARY KEY (id_bibrec,type)
                                            ) ENGINE=MyISAM""" % test_tablename
+
     if not prefix == "":
         run_sql_drop_silently(query_drop_forward_index_table)
         run_sql_drop_silently(query_drop_reversed_index_table)
@@ -154,7 +158,6 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
         run_sql(query_update)
 
     wordTable = WordTable(index_name=index_name,
-                          fields_to_index=get_index_tags(index_name),
                           table_prefix=prefix,
                           table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                           wash_index_terms=50)
@@ -178,7 +181,7 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
 @nottest
 def remove_reindexed_word_testtables(index_name, prefix = 'test_'):
     """
-        Removes prefix_idxWORDxxx tables created during tests.
+        Removes <<prefix>>idxWORDxxx tables created during tests.
         @param index_name: name of the index
         @param prefix: prefix for the tables
     """
@@ -188,6 +191,13 @@ def remove_reindexed_word_testtables(index_name, prefix = 'test_'):
     query_drop_reversed_index_table = """DROP TABLE IF EXISTS %sR""" % test_tablename
     run_sql(query_drop_forward_index_table)
     run_sql(query_drop_reversed_index_table)
+
+
+def is_part_of(container, content):
+    """checks if content is a part of container"""
+    ctr = set(container)
+    cont = set(content)
+    return cont.issubset(ctr)
 
 
 class BibIndexRemoveStopwordsTest(InvenioTestCase):
@@ -802,6 +812,18 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
             )
         )
 
+    def test_subject_authority_record_content(self):
+        """bibindex - test content of auth. record"""
+        bibRecID = 125
+        t1 = 'colorature'
+        t2 = 'embellishment'
+        table = "idxWORD%02dR" % get_index_id_from_index_name("authoritysubject")
+        res = deserialize_via_marshal(run_sql("""SELECT termlist
+                                                 FROM %s WHERE id_bibrec=%s
+                                              """ % (table, bibRecID))[0][0])
+        self.assertTrue(t1 in res)
+        self.assertTrue(t2 in res)
+
     def test_indexing_of_deleted_authority_record(self):
         """bibindex - no info for indexing from deleted authority record"""
         recID = 119 # deleted record
@@ -851,10 +873,8 @@ def insert_record_one_and_second_revision():
 
     #need to index for the first time
     indexes = get_all_indexes(virtual=False)
-    wtabs = get_word_tables(indexes)
-    for index_id, index_name, index_tags in wtabs:
+    for index_name in indexes:
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               wash_index_terms=50)
         wordTable.add_recIDs([[_id, _id]], 10000)
@@ -895,10 +915,8 @@ def insert_record_two_and_second_revision():
 
     #need to index for the first time
     indexes = get_all_indexes(virtual=False)
-    wtabs = get_word_tables(indexes)
-    for index_id, index_name, index_tags in wtabs:
+    for index_name in indexes:
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               wash_index_terms=50)
         wordTable.add_recIDs([[id_bibrec, id_bibrec]], 10000)
@@ -1065,10 +1083,8 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
             self.records.append(insert_record_two_and_second_revision())
             records_for_indexes = find_affected_records_for_index(get_all_indexes(virtual=False),
                                                                   [self.records])
-            wtabs = get_word_tables(records_for_indexes.keys())
-            for index_id, index_name, index_tags in wtabs:
+            for index_name in records_for_indexes.keys():
                 wordTable = WordTable(index_name=index_name,
-                                      fields_to_index=index_tags,
                                       table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       wash_index_terms=50)
                 wordTable.add_recIDs([self.records], 10000)
@@ -1083,10 +1099,8 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
             for rec in self.records:
                 wipe_out_record_from_all_tables(rec)
             indexes = get_all_indexes(virtual=False)
-            wtabs = get_word_tables(indexes)
-            for index_id, index_name, index_tags in wtabs:
+            for index_name in indexes:
                 wordTable = WordTable(index_name=index_name,
-                                      fields_to_index=index_tags,
                                       table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       wash_index_terms=50)
                 wordTable.del_recIDs([self.records])
@@ -1137,50 +1151,70 @@ class BibIndexIndexingAffectedIndexes(InvenioTestCase):
 
 
 class BibIndexFindingIndexesForTags(InvenioTestCase):
-    """ Tests function 'get_tag_indexes' """
+    """ Tests function 'get_marc_tag_indexes' """
 
     def test_fulltext_tag_virtual_indexes_on(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 8564_u will find only 'fulltext' index"""
-        self.assertEqual(('fulltext',), zip(*get_tag_indexes('8564_u'))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 8564_u will find only 'fulltext' index"""
+        self.assertEqual(('fulltext',), zip(*get_marc_tag_indexes('8564_u'))[1])
 
     def test_title_tag_virtual_indexes_on(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 245__% will find also 'global' index"""
-        self.assertEqual(('title', 'exacttitle', 'global'), zip(*get_tag_indexes('245__%'))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 245__% will find also 'global' index"""
+        self.assertEqual(('title', 'exacttitle', 'global'), zip(*get_marc_tag_indexes('245__%'))[1])
 
     def test_title_tag_virtual_indexes_off(self):
-        """bibindex - checks if 'get_tag_indexes' for tag 245__% wont find 'global' index (with virtual=False)"""
-        self.assertEqual(('title', 'exacttitle'), zip(*get_tag_indexes('245__%', virtual=False))[1])
+        """bibindex - checks if 'get_marc_tag_indexes' for tag 245__% wont find 'global' index (with virtual=False)"""
+        self.assertEqual(('title', 'exacttitle'), zip(*get_marc_tag_indexes('245__%', virtual=False))[1])
 
     def test_author_tag_virtual_indexes_on(self):
-        """bibindex - checks 'get_tag_indexes' for tag '100'"""
+        """bibindex - checks 'get_marc_tag_indexes' for tag '100'"""
         self.assertEqual(('author', 'affiliation', 'exactauthor', 'firstauthor',
                           'exactfirstauthor', 'authorcount', 'authorityauthor',
                           'miscellaneous', 'global'),
-                         zip(*get_tag_indexes('100'))[1])
+                         zip(*get_marc_tag_indexes('100'))[1])
 
     def test_author_exact_tag_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag '100__a'"""
+        """bibindex - checks 'get_marc_tag_indexes' for tag '100__a'"""
         self.assertEqual(('author', 'exactauthor', 'firstauthor',
                           'exactfirstauthor', 'authorcount',
                           'authorityauthor', 'miscellaneous'),
-                         zip(*get_tag_indexes('100__a', virtual=False))[1])
+                         zip(*get_marc_tag_indexes('100__a', virtual=False))[1])
 
     def test_wide_tag_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag like '86%'"""
-        self.assertEqual(('miscellaneous',), zip(*get_tag_indexes('86%', virtual=False))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag like '86%'"""
+        self.assertEqual(('miscellaneous',), zip(*get_marc_tag_indexes('86%', virtual=False))[1])
 
     def test_909_tags_in_misc_index(self):
         """bibindex - checks connection between misc index and tags: 909C1%, 909C4%"""
-        self.assertEqual(('miscellaneous',), zip(*get_tag_indexes('909C1%', virtual=False))[1])
-        self.assertEqual('miscellaneous' in zip(*get_tag_indexes('909C4%', virtual=False))[1], False)
+        self.assertEqual(('miscellaneous',), zip(*get_marc_tag_indexes('909C1%', virtual=False))[1])
+        self.assertEqual('miscellaneous' in zip(*get_marc_tag_indexes('909C4%', virtual=False))[1], False)
 
     def test_year_tag_virtual_indexes_on(self):
-        """bibindex - checks 'get_tag_indexes' for tag 909C0y"""
-        self.assertEqual(('year', 'global'), zip(*get_tag_indexes('909C0y'))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag 909C0y"""
+        self.assertEqual(('year', 'global'), zip(*get_marc_tag_indexes('909C0y'))[1])
 
     def test_wide_tag_authority_index_virtual_indexes_off(self):
-        """bibindex - checks 'get_tag_indexes' for tag like '15%'"""
-        self.assertEqual(('authoritysubject', 'miscellaneous'), zip(*get_tag_indexes('15%',virtual=False))[1])
+        """bibindex - checks 'get_marc_tag_indexes' for tag like '15%'"""
+        self.assertEqual(('authoritysubject', 'miscellaneous'), zip(*get_marc_tag_indexes('15%',virtual=False))[1])
+
+    def test_nonmarc_tag_title_additional_virtual_indexes_on(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'title_additional'"""
+        self.assertEqual(('title', 'exacttitle', 'global'),
+                         zip(*get_nonmarc_tag_indexes('title_additional'))[1])
+
+    def test_nonmarc_tag_isbn_virtual_indexes_off(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'isbn'"""
+        self.assertEqual(('miscellaneous', ),
+                        zip(*get_nonmarc_tag_indexes('isbn', virtual=False))[1])
+
+    def test_nonmarc_tag_report_number_virtual_indexes_on(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for tag 'report_number.report_number'"""
+        self.assertEqual(('reportnumber', 'global' ),
+                        zip(*get_nonmarc_tag_indexes('report_number.report_number'))[1])
+
+    def test_nonmarc_tag_that_doesnt_exist(self):
+        """bibindex - checks 'get_nonmarc_tag_indexes' for MARC tag"""
+        self.assertEqual(tuple(),
+                         get_nonmarc_tag_indexes('8564_u'))
 
 
 class BibIndexFindingTagsForIndexes(InvenioTestCase):
@@ -1188,29 +1222,60 @@ class BibIndexFindingTagsForIndexes(InvenioTestCase):
 
 
     def test_tags_for_author_index(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'author' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'author' index """
         self.assertEqual(get_index_tags('author'), ['100__a', '700__a'])
 
     def test_tags_for_global_index_virtual_indexes_off(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'global' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
         self.assertEqual(get_index_tags('global', virtual=False),[])
 
     def test_tags_for_global_index_virtual_indexes_on(self):
-        """bibindex - checks if 'get_index_tags' find proper tags for 'global' index """
+        """bibindex - checks if 'get_index_tags' finds proper marc tag values for 'global' index """
         tags = get_index_tags('global')
         self.assertEqual('86%' in tags, True)
         self.assertEqual('100__a' in tags, True)
         self.assertEqual('245__%' in tags, True)
 
+    def test_tags_for_authority_author(self):
+        """bibindex - checks if 'get_index_tags' finds marc tag values for authority author"""
+        tags = get_index_tags('authorityauthor')
+        self.assertEqual(tags, ['100__a', '500__a', '400__a'])
+
+    def test_nonmarc_tag_values_for_title(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for title index"""
+        tags = get_index_tags('title', tagtype='nonmarc')
+        self.assertEqual(tags , ['title', 'title_additional'])
+
+    def test_nonmarc_tag_values_for_authorcount(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for authorcount index"""
+        tags = get_index_tags('authorcount', tagtype='nonmarc')
+        self.assertEqual(tags, ['authors[0].full_name', 'contributor.full_name'])
+
+    def test_nonmarc_tag_values_for_keyword(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for keyword index"""
+        tags = get_index_tags('keyword', tagtype='nonmarc')
+        self.assertEqual(tags, ['keywords.term'])
+
+    def test_nonmarc_tag_values_for_year(self):
+        """bibindex - checks if 'get_index_tags' finds proper nonmarc/recjson tag values for year index"""
+        tags = get_index_tags('year', tagtype='nonmarc')
+        self.assertEqual(tags, ['year'])
+
+    def test_nonmarc_tag_values_for_misc_inside_global(self):
+        """bibindex - checks if nonmarc/recjson tag values from misc index are also inside global index"""
+        tags_misc = get_index_tags('miscellaneous', tagtype='nonmarc')
+        tags_global = get_index_tags('global', tagtype='nonmarc')
+        self.assertEqual(is_part_of(tags_global, tags_misc), True)
+
+    def test_nonmarc_tag_values_for_title_inside_global(self):
+        """bibindex - checks if nonmarc/recjson tag values from title index are also inside global index"""
+        tags_title = get_index_tags('title', tagtype='nonmarc')
+        tags_global = get_index_tags('global', tagtype='nonmarc')
+        self.assertEqual(is_part_of(tags_global, tags_title), True)
+
 
 class BibIndexGlobalIndexContentTest(InvenioTestCase):
     """ Tests if virtual global index is correctly indexed"""
-
-    def is_part_of(self, container, content):
-        """checks if content is a part of container"""
-        ctr = set(container)
-        cont = set(content)
-        return cont.issubset(ctr)
 
     def test_title_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in title and global index, reversed table"""
@@ -1225,7 +1290,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_title), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_title), True)
 
     def test_abstract_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in abstract and global index, reversed table"""
@@ -1240,7 +1305,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_abstract), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_abstract), True)
 
     def test_misc_index_compatibility_reversed_table(self):
         """bibindex - checks if the same words are in misc and global index, reversed table"""
@@ -1255,7 +1320,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
             query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=%s""" % (global_id, rec)
             glob = run_sql(query)
             termlist_global = deserialize_via_marshal(glob[0][0])
-            self.assertEqual(self.is_part_of(termlist_global, termlist_misc), True)
+            self.assertEqual(is_part_of(termlist_global, termlist_misc), True)
 
     def test_journal_index_compatibility_forward_table(self):
         """bibindex - checks if the same words are in journal and global index, forward table"""
@@ -1265,7 +1330,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxWORD%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
     def test_keyword_index_compatibility_forward_table(self):
         """bibindex - checks if the same pairs are in keyword and global index, forward table"""
@@ -1275,7 +1340,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxPAIR%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
     def test_affiliation_index_compatibility_forward_table(self):
         """bibindex - checks if the same phrases are in affiliation and global index, forward table"""
@@ -1285,7 +1350,7 @@ class BibIndexGlobalIndexContentTest(InvenioTestCase):
         res = zip(*run_sql(query))[0]
         query = """SELECT term FROM idxPHRASE%02dF""" % global_id
         glob = zip(*run_sql(query))[0]
-        self.assertEqual(self.is_part_of(glob, res), True)
+        self.assertEqual(is_part_of(glob, res), True)
 
 
 class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
@@ -1300,10 +1365,8 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
     def prepare_virtual_index(self):
         """creates new virtual index and binds it to specific normal index"""
         self.new_index_name = create_virtual_index(self._id, self.indexes)
-        wtabs = get_word_tables(self.indexes)
-        for index_id, index_name, index_tags in wtabs:
+        for index_name in self.indexes:
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 10]], 1000)
@@ -1320,14 +1383,12 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
         def tokenize_for_words(phrase):
             return phrase.split(" ")
 
-        wtabs = get_word_tables(self.indexes)
-        for index_id, index_name, index_tags in wtabs:
+        for index_name in self.indexes:
             wordTable = WordTable(index_name=index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             if special_tokenizer == True:
-                wordTable.default_tokenizer_function = tokenize_for_words
+                wordTable.tokenizer.tokenize_for_words = tokenize_for_words
             wordTable.add_recIDs([[1, 10]], 1000)
         vit = VirtualIndexTable(self.new_index_name,
                                 CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
@@ -1393,9 +1454,8 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         if self.counter == 1:
             self.new_index_name = create_virtual_index(self._id, self.indexes)
             wtabs = get_word_tables(self.indexes)
-            for index_id, index_name, index_tags in wtabs:
+            for index_name in self.indexes:
                 wordTable = WordTable(index_name=index_name,
-                                      fields_to_index=index_tags,
                                       table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                       wash_index_terms=50)
                 wordTable.add_recIDs([[1, 113]], 1000)
@@ -1462,7 +1522,7 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         """bibindex - checks virtual index after year removal - number of items"""
         #must be run after: tearDown
         vit = VirtualIndexTable(self.new_index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
         vit.remove_dependent_index("year")
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
@@ -1516,14 +1576,12 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
         self.counter += 1
         if self.counter == 3:
             index_id = get_index_id_from_index_name(self.index_name)
-            index_tags = get_index_tags(self.index_name)
             # tests are too fast for DataCacher timestamp_verifier to notice the difference
             sleep(1)
             query = """UPDATE idxINDEX SET stemming_language='' WHERE id=8"""
             run_sql(query)
 
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
@@ -1531,7 +1589,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             vit.run_update()
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
@@ -1542,14 +1599,12 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
     def tearDown(self):
         if self.counter == 8:
             index_id = get_index_id_from_index_name(self.index_name)
-            index_tags = get_index_tags(self.index_name)
             # tests are too fast for DataCacher timestamp_verifier to notice the difference
             sleep(1)
             query = """UPDATE idxINDEX SET stemming_language='en' WHERE id=8"""
             run_sql(query)
 
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   wash_index_terms=50)
             wordTable.add_recIDs([[1, 9]], 1000)
@@ -1557,7 +1612,6 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
                                     CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
             vit.run_update()
             wordTable = WordTable(index_name=self.index_name,
-                                  fields_to_index=index_tags,
                                   table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   wash_index_terms=50)
             wordTable.add_recIDs([[6, 9]], 1000)
@@ -1647,9 +1701,7 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
     def index_dependent_index(self, index_name, records_range, table_type):
         """indexes a dependent index for given record range"""
         index_id = get_index_id_from_index_name(index_name)
-        index_tags = get_index_tags(index_name)
         wordTable = WordTable(index_name=index_name,
-                              fields_to_index=index_tags,
                               table_type=table_type,
                               wash_index_terms=50)
         wordTable.add_recIDs(records_range, 10000)
@@ -1717,14 +1769,18 @@ class BibIndexSpecialTagsTest(InvenioTestCase):
     def test_special_tags_for_title(self):
         """bibindex - special tags for title"""
         index_name = 'title'
-        wt = WordTable(index_name, ['8564_u'], CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        wt = WordTable(index_name, CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        wt.tags = ['8564_u']
+        wt.special_tags = wt._handle_special_tags()
         self.assertNotEqual(wt.default_tokenizer_function.__self__.__class__.__name__,
                             wt.special_tags['8564_u'].__self__.__class__.__name__)
 
     def test_special_tags_for_fulltext(self):
         """bibindex - special tags for fulltext"""
         index_name = 'fulltext'
-        wt = WordTable(index_name, ['8564_u'], CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        wt = WordTable(index_name, CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        wt.fields_to_index = ['8564_u']
+        wt.special_tags = wt._handle_special_tags()
         self.assertEqual(wt.default_tokenizer_function.__self__.__class__.__name__,
                             wt.special_tags['8564_u'].__self__.__class__.__name__)
 

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1741,13 +1741,17 @@ class BibDoc(object):
 
         # retreiving all available formats
         fprefix = container["storagename"] or "content"
-        if CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE:
-            ## We take all extensions from the existing formats in the DB.
-            container["extensions"] = set([ext[0] for ext in run_sql("SELECT format FROM bibdocfsinfo WHERE id_bibdoc=%s", (docid, ))])
-        else:
-            ## We take all the extensions by listing the directory content, stripping name
-            ## and version.
-            container["extensions"] = set([fname[len(fprefix):].rsplit(";", 1)[0] for fname in filter(lambda x: x.startswith(fprefix), os.listdir(container["basedir"]))])
+        try:
+            if CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE:
+                ## We take all extensions from the existing formats in the DB.
+                container["extensions"] = set([ext[0] for ext in run_sql("SELECT format FROM bibdocfsinfo WHERE id_bibdoc=%s", (docid, ))])
+            else:
+                ## We take all the extensions by listing the directory content, stripping name
+                ## and version.
+                container["extensions"] = set([fname[len(fprefix):].rsplit(";", 1)[0] for fname in filter(lambda x: x.startswith(fprefix), os.listdir(container["basedir"]))])
+        except OSError:
+            container["extensions"] = []
+            register_exception()
         return container
 
     @staticmethod

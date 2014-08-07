@@ -187,3 +187,10 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
     def tokenize_for_words(self, phrase):
         return self.get_words_from_fulltext(phrase)
 
+
+    def tokenize_for_pairs(self, phrase):
+        return []
+
+    def tokenize_for_phrases(self, phrase):
+        return []
+

@@ -25,9 +25,14 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_BINDIR
-from invenio.bibrankadminlib import write_outcome, modify_translations, \
-        get_def_name, get_name, get_languages, addadminbox, tupletotable, \
-        createhiddenform
+from invenio.bibrankadminlib import write_outcome, \
+    modify_translations, \
+    get_def_name, \
+    get_name, \
+    get_languages, \
+    addadminbox, \
+    tupletotable, \
+    createhiddenform
 from invenio.access_control_engine import acc_authorize_action
 from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_name
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
@@ -43,7 +48,8 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_index_name_from_index_id, \
     get_all_index_names_and_column_values, \
     is_index_virtual, \
-    get_index_virtual_indexes
+    get_index_virtual_indexes, \
+    get_index_fields
 
 
 _TOKENIZERS = load_tokenizers()
@@ -172,7 +178,7 @@ def perform_editfield(fldID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>0.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfield">Modify field code</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtranslations">Modify translations</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtags">Modify MARC tags</a></small></td>
+    <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_modifyfieldtags">Modify tags</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_deletefield">Delete field</a></small></td>
     </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
@@ -1151,25 +1157,42 @@ def find_dependent_indexes_to_change(idxID, new_indexes):
 def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Logical fields overview"""
     output = """<table cellpadding="3" border="1">"""
-    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
+    output += """<tr><td><strong>%s</strong></td>
+                     <td><strong>%s</strong></td>
+                     <td><strong>%s</strong></td>
+                     <td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "RecJson Fields", "Translations")
     query = "SELECT id,name FROM field"
     res = run_sql(query)
     col_dict = dict(get_def_name('', "collection"))
     fld_dict = dict(get_def_name('', "field"))
 
     for field_id,field_name in res:
-        query = "SELECT tag.value FROM tag, field_tag WHERE tag.id=field_tag.id_tag AND field_tag.id_field=%s ORDER BY field_tag.score DESC,tag.value ASC"
-        res = run_sql(query, (field_id, ))
-        field_tags = ""
-        for row in res:
-            field_tags = field_tags + row[0] + ", "
-        if field_tags.endswith(", "):
-            field_tags = field_tags[:-2]
-        if not field_tags:
-            field_tags = """<b><span class="info">None</span></b>"""
+        query = """SELECT tag.value, tag.recjson_value FROM tag,
+                                                            field_tag
+                   WHERE tag.id=field_tag.id_tag AND
+                         field_tag.id_field=%s
+                   ORDER BY field_tag.score DESC,tag.value ASC"""
+        tag_values = run_sql(query, (field_id, ) )
+        marc_tags = recjson_fields = """<b><span class="info">None</span></b>"""
+        if tag_values:
+            try:
+                marc_tags_l = [tag for tag in zip(*tag_values)[0] if tag]
+                marc_tags = marc_tags_l and ", ".join(marc_tags_l) or marc_tags
+                recjson = []
+                [recjson.extend(f.split(",")) for f in zip(*tag_values)[1] if f]
+                recjson_fields =  recjson and ", ".join(recjson) or recjson_fields
+            except IndexError:
+                pass
 
         lang = get_lang_list("fieldname", "id_field", field_id)
-        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>""" % (CFG_SITE_URL, field_id, ln, fld_dict[field_id]), field_tags, lang)
+        output += """<tr><td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>
+                                                """ % (CFG_SITE_URL, field_id, ln, fld_dict[field_id]),
+                                                marc_tags,
+                                                recjson_fields,
+                                                lang)
     output += "</table>"
 
     body = [output]
@@ -1763,11 +1786,39 @@ def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confir
 
 def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """Modify which logical fields to use in this index.."""
+    fields = get_index_fields(idxID)
 
     output = ''
     subtitle = """<a name="3"></a>3. Modify index fields.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+    output += """<table cellpadding="3" border="1">"""
+    output += """<tr><td><strong>%s</strong></td>
+                     <td><strong>%s</strong></td>
+                     <td><strong>%s</strong></td>
+              """ % ("Field", "MARC Tags", "RecJson Fields")
+    for field_id, field_name in fields:
+        query = """SELECT tag.value, tag.recjson_value FROM tag,
+                                                            field_tag
+                   WHERE tag.id=field_tag.id_tag AND
+                         field_tag.id_field=%s
+                   ORDER BY field_tag.score DESC,tag.value ASC"""
+        tag_values = run_sql(query, (field_id, ) )
+        marc_tags = tag_values and ", ".join(zip(*tag_values)[0]) or """<b><span class="info">None</span></b>"""
+        recjson_fields = """<b><span class="info">None</span></b>"""
+        if tag_values:
+            recjson = []
+            [recjson.extend(f.split(",")) for f in zip(*tag_values)[1] if f]
+            recjson_fields =  recjson and ", ".join(recjson) or recjson_fields
+        output += """<tr><td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td></tr>
+                  """ % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>
+                         """ % (CFG_SITE_URL, field_id, ln, field_name),
+                         marc_tags,
+                         recjson_fields)
+    output += "</table>"
 
-    output = """<dl>
+
+    output += """<dl>
      <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addindexfield?idxID=%s&amp;ln=%s#3.1">Add field to index</a></dd>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s">Manage fields</a></dd>
@@ -1783,8 +1834,8 @@ def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='
             actions.append([fldNAME])
             for col in [(('Remove','removeindexfield'),)]:
                 actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?idxID=%s&amp;fldID=%s&amp;ln=%s#3.1">%s</a>' % (CFG_SITE_URL, col[0][1], idxID, fldID, ln, col[0][0]))
-                for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;flID=%s&amp;ln=%s#4.1">%s</a>' % (CFG_SITE_URL, function, idxID, fldID, ln, str)
+                for (_str, function) in col[1:]:
+                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;flID=%s&amp;ln=%s#4.1">%s</a>' % (CFG_SITE_URL, function, idxID, fldID, ln, _str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No index fields exists"""
@@ -1807,11 +1858,11 @@ def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='',
     fld_type = get_fld_nametypes()
     fldID = int(fldID)
 
-    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
+    subtitle = """<a name="4"></a>3. Modify tags for the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
     output = """<dl>
      <dt>Menu</dt>
-     <dd><a href="%s/admin/bibindex/bibindexadmin.py/addtag?fldID=%s&amp;ln=%s#4.1">Add MARC tag</a></dd>
-     <dd><a href="%s/admin/bibindex/bibindexadmin.py/deletetag?fldID=%s&amp;ln=%s#4.1">Delete unused MARC tags</a></dd>
+     <dd><a href="%s/admin/bibindex/bibindexadmin.py/addtag?fldID=%s&amp;ln=%s#4.1">Add a new tag</a></dd>
+     <dd><a href="%s/admin/bibindex/bibindexadmin.py/deletetag?fldID=%s&amp;ln=%s#4.1">Delete unused tags</a></dd>
     </dl>
     """  % (CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln)
 
@@ -1850,33 +1901,41 @@ def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='',
         return addadminbox(subtitle, body)
 
 
-def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="yes", confirm=-1):
-    """form to add a new field.
-    fldNAME - the name of the new field
-    code - the field code"""
-
-    output = ""
-    subtitle = """<a name="4.1"></a>Add MARC tag to logical field"""
-    text = """
-    Add new tag:<br />
-    <span class="adminlabel">Tag value</span>
-    <input class="admin_w200" maxlength="6" type="text" name="value" value="%s" /><br />
-    <span class="adminlabel">Tag comment</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br />
-    """ % ((name=='' and value[0] or name), value[0])
-    text += """Or existing tag:<br />
-    <span class="adminlabel">Tag</span>
-    <select name="value" class="admin_w200">
-    <option value="-1">- Select a tag -</option>
+def perform_addtag(fldID, ln=CFG_SITE_LANG, name='', value='', recjson_value='', existing_tag=-1, callback="yes", confirm=-1):
+    """Form to add a new tag to the field specified by fldID.
+       @param fldID: the name of the field which we want to extend with a new tag
+       @param existing_tag: id of the existing tag we want to add to given field or -1
+            if we want to add completely new tag
+       @param value: MARC value for new tag, can be empty string
+       @param recjson_value: non-MARC value for new tag, can be empty string
+       @param name: name of the new tag to add to field and to the list of tags
+       @param confirm: state of the confirmation: -1 not started, 0 waiting for confirmation, 1 confirmed
     """
+    output = ""
+    subtitle = """<a name="4.1"></a>Add a tag to logical field"""
+    text = """Add new tag:<br />
+           <span class="adminlabel">MARC value</span>
+           <input class="admin_w200" maxlength="6" type="text" name="value" value="%s" /><br />
+           <span class="adminlabel">RecJson value</span>
+           <input class="admin_w200" type="text" name="recjson_value" value="%s" /><br />
+           <span class="adminlabel">Name</span>
+           <input class="admin_w200" type="text" name="name" value="%s" /><br />
+           """ % (value, recjson_value, name)
+    text += """Or existing tag:<br />
+            <span class="adminlabel">Tag</span>
+            <select name="existing_tag" class="admin_w200">
+            <option value="-1">- Select a tag -</option>
+            """
 
     fld_tags = get_fld_tags(fldID)
     tags = get_tags()
     fld_tags = dict(map(lambda x: (x[1], x[0]), fld_tags))
 
-    for (id_tag, tname, tvalue) in tags:
-        if not fld_tags.has_key(id_tag):
-            text += """<option value="%s" %s>%s</option>""" % (tvalue, (tvalue==value[1] and 'selected="selected"' or ''), "%s - %s" % (tvalue, tname))
+    for (_id_tag, _name, _value, _recjson_value) in tags:
+        if not fld_tags.has_key(_id_tag):
+            text += """<option value="%s" %s>%s</option>""" % (_id_tag,
+                                                               (_id_tag==existing_tag and 'selected="selected"' or ''),
+                                                               "%s - %s" % (_name, _value))
     text += """</select>"""
 
     output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addtag" % CFG_SITE_URL,
@@ -1886,13 +1945,17 @@ def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="ye
                               button="Add tag",
                               confirm=1)
 
-    if (value[0] and value[1] in [-1, "-1"]) or (not value[0] and value[1] not in [-1, "-1"]):
-        if confirm in ["1", 1]:
-            res = add_fld_tag(fldID, name, (value[0] !='' and value[0] or value[1]))
+    if confirm in ["1", 1]:
+        if ((value or recjson_value) and existing_tag in [-1, "-1"]) or \
+           (not value and not recjson_value and existing_tag not in [-1, "-1"]):
+            res = add_fld_tag(fldID, name, value, recjson_value, existing_tag)
             output += write_outcome(res)
-    elif confirm not in ["-1", -1]:
-        output += """<b><span class="info">Please choose to add either a new or an existing MARC tag, but not both.</span></b>
-        """
+        elif not value and not recjson_value and existing_tag in [-1, "-1"]:
+            output += """<b><span class="info">Please choose to add either a new or an existing MARC tag.</span></b>
+                      """
+        else:
+            output += """<b><span class="info">Please choose to add either a new or an existing MARC tag, but not both.</span></b>
+                      """
 
     body = [output]
 
@@ -1901,14 +1964,12 @@ def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="ye
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='yes', confirm=-1):
+def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', recjson_value='', callback='yes', confirm=-1):
     """form to modify a field.
     fldID - the field to change."""
 
-    subtitle  = ""
+    subtitle = """<a name="3.1"></a>Modify a tag"""
     output  = ""
-
-    fld_dict = dict(get_def_name('', "field"))
 
     fldID = int(fldID)
     tagID = int(tagID)
@@ -1916,16 +1977,17 @@ def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callbac
     if confirm in [-1, "-1"] and not value and not name:
         name = tag[0][1]
         value = tag[0][2]
-
-    subtitle = """<a name="3.1"></a>Modify MARC tag"""
+        recjson_value = tag[0][3]
 
     text = """
-    Any modifications will apply to all logical fields using this tag.<br />
-    <span class="adminlabel">Tag value</span>
-    <input class="admin_w200" type="text" name="value" value="%s" /><br />
-    <span class="adminlabel">Comment</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br />
-    """ % (value, name)
+           Any modifications will apply to all logical fields using this tag.<br />
+           <span class="adminlabel">Name</span>
+           <input class="admin_w200" type="text" name="name" value="%s" /><br />
+           <span class="adminlabel">MARC value</span>
+           <input class="admin_w200" type="text" name="value" value="%s" /><br />
+           <span class="adminlabel">RecJson value</span>
+           <input class="admin_w200" type="text" name="recjson_value" value="%s" /><br />
+           """ % (name, value, recjson_value)
 
     output += createhiddenform(action="modifytag#4.1",
                                text=text,
@@ -1935,8 +1997,8 @@ def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callbac
                                ln=ln,
                                confirm=1)
 
-    if name and value and confirm in [1, "1"]:
-        res = modify_tag(tagID, name, value)
+    if name and (value or recjson_value) and confirm in [1, "1"]:
+        res = modify_tag(tagID, name, value, recjson_value)
         output += write_outcome(res)
 
     body = [output]
@@ -2068,10 +2130,10 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
     fldID - the collection id of the current collection.
     fmtID - the format id to delete."""
 
-    subtitle = """<a name="10.3"></a>Delete an unused MARC tag"""
+    subtitle = """<a name="10.3"></a>Delete an unused tag"""
     output  = """
     <dl>
-     <dd>Deleting an MARC tag will also delete the translations associated.</dd>
+     <dd>Deleting an tag will also delete the translations associated.</dd>
     </dl>
     """
 
@@ -2084,20 +2146,22 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
 
     tags = get_tags()
     text  = """
-    <span class="adminlabel">MARC tag</span>
-    <select name="tagID" class="admin_w200">
-    """
-    text += """<option value="-1">- Select MARC tag -"""
+            <span class="adminlabel">Tag</span>
+            <select name="tagID" class="admin_w200">
+            """
+    text += """<option value="-1">- Select a tag -"""
     i = 0
-    for (id, name, value) in tags:
+    for (id, name, value, value_recjson) in tags:
         if not fld_tag.has_key(id):
-            text += """<option value="%s" %s>%s</option>""" % (id, id  == int(tagID) and 'selected="selected"' or '', "%s - %s" % (value, name))
+            text += """<option value="%s" %s>%s</option>""" % (id,
+                                                               id  == int(tagID) and 'selected="selected"' or '',
+                                                               "%s - %s" % (name, value))
             i += 1
 
     text += """</select><br />"""
 
     if i == 0:
-        output += """<b><span class="info">No unused MARC tags</span></b><br />"""
+        output += """<b><span class="info">No unused tags</span></b><br />"""
     else:
         output += createhiddenform(action="deletetag#4.1",
                                    text=text,
@@ -2110,7 +2174,7 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
         tagID = int(tagID)
         tags = get_tags(tagID)
         if confirm in [0, "0"]:
-            text = """<b>Do you want to delete the MARC tag '%s'.</b>""" % tags[0][2]
+            text = """<b>Do you want to delete the tag '%s'.</b>""" % tags[0][2]
             output += createhiddenform(action="deletetag#4.1",
                                        text=text,
                                        button="Confirm",
@@ -2122,7 +2186,7 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
         elif confirm in [1, "1"]:
             output += write_outcome(ares)
     elif confirm not in [-1, "-1"]:
-        output  += """<b><span class="info">Choose a MARC tag to delete.</span></b>"""
+        output  += """<b><span class="info">Choose a tag to delete.</span></b>"""
 
     body = [output]
 
@@ -2215,7 +2279,7 @@ def get_fld_tags(fldID='', tagID=''):
     fldID - field id
     tagID - tag id"""
 
-    sql = "SELECT id_field,id_tag, tag.name, tag.value, score FROM field_tag,tag  WHERE tag.id=field_tag.id_tag"
+    sql = "SELECT id_field, id_tag, tag.name, tag.value, score FROM field_tag,tag  WHERE tag.id=field_tag.id_tag"
     params = []
 
     try:
@@ -2236,7 +2300,7 @@ def get_tags(tagID=''):
     tagID - tag id
     ln - language id"""
 
-    sql = "SELECT id, name, value FROM tag"
+    sql = "SELECT id, name, value, recjson_value FROM tag"
     params = []
 
     try:
@@ -2609,29 +2673,36 @@ def add_fld(name, code):
     except StandardError, e:
         return (0, e)
 
-def add_fld_tag(fldID, name, value):
-    """Add a sort/search/field to the collection.
-    colID - the id of the collection involved
-    fmtID - the id of the format.
-    score - the score of the format, decides sorting, if not given, place the format on top"""
-
+def add_fld_tag(fldID, name='', value='', recjson_value='', existing_tag=-1, score=0):
+    """Add a completly new tag (with MARC value, RecJson value or both) or existing one
+       to specific field.
+       @param fldID:  the id of the field
+       @param name:   name of the new tag
+       @param value:  MARC value of the new tag
+       @param recjson_value: RecJson value of the new tag
+       @param existing_tag: id of the existing tag to add or -1 if we want to add a new tag
+       @param score: score assigned to tag
+    """
     try:
-        res = run_sql("SELECT score FROM field_tag WHERE id_field=%s ORDER BY score desc", (fldID, ))
-        if res:
-            score = int(res[0][0]) + 1
-        else:
-            score = 0
-        res = run_sql("SELECT id FROM tag WHERE value=%s", (value,))
-        if not res:
-            if name == '':
-                name = value
-            res = run_sql("INSERT INTO tag (name, value) VALUES (%s,%s)", (name,  value))
-            res = run_sql("SELECT id FROM tag WHERE value=%s", (value,))
+        existing_tag = int(existing_tag)
+        if not score:
+            res = run_sql("SELECT score FROM field_tag WHERE id_field=%s ORDER BY score desc", (fldID, ))
+            if res:
+                score = int(res[0][0]) + 1
 
-        res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)",  (fldID, res[0][0], score))
-        return (1, "")
+        if existing_tag > -1:
+            res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)",  (fldID, existing_tag, score))
+            return (1, "")
+        elif name != '' and (value != '' or recjson_value != ''):
+            res = run_sql("INSERT INTO tag (name, value, recjson_value) VALUES (%s,%s,%s)", (name, value, recjson_value))
+            res = run_sql("SELECT id FROM tag WHERE name=%s AND value=%s AND recjson_value=%s", (name, value, recjson_value))
+            res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)",  (fldID, res[0][0], score))
+            return (1, "")
+        else:
+            return (0, "Not all necessary values specified")
     except StandardError, e:
         return (0, e)
+
 
 def add_idx_fld(idxID, fldID):
     """Add a field to an index"""
@@ -2772,17 +2843,17 @@ def modify_fld(fldID, code):
     except StandardError, e:
         return (0, e)
 
-def modify_tag(tagID, name, value):
+def modify_tag(tagID, name, value, recjson_value):
     """Modify the name and value of a tag.
-    tagID - the id of the tag to modify
-    name - the new name of the tag
-    value - the new value of the tag"""
+       @param tagID: the id of the tag to modify
+       @param name: the new name of the tag
+       @param value: the new MARC value of the tag
+       @param recjson_value: the new RecJson value of the tag
+    """
 
     try:
-        sql = "UPDATE tag SET name=%s WHERE id=%s"
-        res = run_sql(sql, (name, tagID))
-        sql = "UPDATE tag SET value=%s WHERE id=%s"
-        res = run_sql(sql, (value, tagID))
+        sql = "UPDATE tag SET name=%s, value=%s, recjson_value=%s WHERE id=%s"
+        res = run_sql(sql, (name, value, recjson_value, tagID))
         return (1, "")
     except StandardError, e:
         return (0, e)
