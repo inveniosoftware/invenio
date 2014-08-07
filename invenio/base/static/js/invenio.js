@@ -197,4 +197,6 @@ require(['jquery'], function ($) {
       $('.modal').remove();
       $('.modal-backdrop').remove();
   });
+
+  $('[rel=tooltip]').tooltip();
 });
