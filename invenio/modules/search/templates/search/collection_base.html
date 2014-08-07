@@ -171,12 +171,3 @@ search_also, with context -%}
     {# endcache #}
   {% endif %}
 {% endblock %}
-
-{% block javascript %}
-  {{ super() }}
-  <script>
-  (function($) {
-    $('[rel=tooltip]').tooltip();
-  })(jQuery);
-  </script>
-{% endblock %}
