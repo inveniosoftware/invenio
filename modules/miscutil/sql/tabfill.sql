@@ -67,6 +67,7 @@ INSERT INTO field VALUES (44,'country','country');
 INSERT INTO field VALUES (45,'note','note');
 INSERT INTO field VALUES (46,'address','address');
 INSERT INTO field VALUES (47,'data source','datasource');
+INSERT INTO field VALUES (50,'journal page','journalpage');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -299,6 +300,7 @@ INSERT INTO field_tag VALUES (46,234,10);
 INSERT INTO field_tag VALUES (46,149,10);
 --
 INSERT INTO field_tag VALUES (47,235,10);
+INSERT INTO field_tag VALUES (50,236,10);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -571,6 +573,7 @@ INSERT INTO tag VALUES (233,'110__(any)', '110__%','');
 INSERT INTO tag VALUES (234,'410__g', '410__g','');
 --
 INSERT INTO tag VALUES (235,'data source','786__w','');
+INSERT INTO tag VALUES (236,'journal page','773__c','');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
@@ -601,6 +604,7 @@ INSERT INTO idxINDEX VALUES (26,'miscellaneous','This index contains words/phras
 INSERT INTO idxINDEX VALUES (27,'doi','This index contains words/phrases from doi fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDOITokenizer');
 INSERT INTO idxINDEX VALUES (28,'filename','This index contains file names of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFilenameTokenizer');
 INSERT INTO idxINDEX VALUES (29,'country','This index contains country names of the affiliated institutes of the authors.','1970-01-01 00:00:00', '', 'native', '','No','No','No', 'BibIndexCountryTokenizer');
+INSERT INTO idxINDEX VALUES (30,'journalpage','This index contains words/phrases from the journal page field.','1970-01-01 00:00:00', '', 'native', '','No','No','No', 'BibIndexJournalPageTokenizer');
 
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
@@ -632,6 +636,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (26,39);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (27,18);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (28,43);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (29,44);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (30,50);
 
 
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 2);

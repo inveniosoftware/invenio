@@ -2026,6 +2026,58 @@ class BibIndexFilenameIndexTest(InvenioTestCase):
         self.assertTrue(len(res) == 2)
 
 
+class BibIndexJournalPageIndexTest(InvenioTestCase):
+    index_name = "journalpage"
+
+    @classmethod
+    def setUpClass(self):
+        """reindexation to new table"""
+        self.last_updated = reindex_word_tables_into_testtables(
+            self.index_name,
+            parameters={'last_updated': '0000-00-00 00:00:00'}
+        )
+
+    @classmethod
+    def tearDownClass(self):
+        """cleaning up"""
+        remove_reindexed_word_testtables(self.index_name)
+        reverse_changes = prepare_for_index_update(
+            get_index_id_from_index_name(self.index_name),
+            parameters={'last_updated': self.last_updated}
+        )
+        run_sql(reverse_changes)
+
+    def test_word_index_1(self):
+        """Journal Page Tokenizer - searching for '1' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("1",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [101, 102, 103, 112])
+
+    def test_word_index_173(self):
+        """Journal Page Tokenizer - searching for '173' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("173",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [108])
+
+    def test_word_index_173_180(self):
+        """Journal Page Tokenizer - searching for '173-180' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("173-180",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [108])
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
@@ -2051,9 +2103,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexCommonWordsInVirtualIndexTest,
                              BibIndexVirtualIndexQueueTableTest,
                              BibIndexSpecialTagsTest,
-                             BibIndexFilenameIndexTest)
+                             BibIndexFilenameIndexTest,
+                             BibIndexJournalPageIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
-
