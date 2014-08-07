@@ -21,7 +21,6 @@ require.config({
     baseUrl: '/',
     paths: {
         jquery: 'vendors/jquery/dist/jquery',
-        'jquery-ui': 'vendors/jquery-ui/jquery-ui',  // to be removed
         'ui': 'vendors/jquery-ui/ui',
         'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/dist',
         'jquery-form': 'vendors/jquery-form/jquery.form',

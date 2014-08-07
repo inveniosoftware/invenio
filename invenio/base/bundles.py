@@ -143,14 +143,6 @@ jquery = Bundle(
     }
 )
 
-# TO BE REMOVED AND LOADED INDIVIDUALLY.
-jqueryui = Bundle(
-    "js/jquery-ui.js",
-    filters="requirejs",
-    output="jquery-ui.js",
-    weight="11"
-)
-
 # less.js is only used when the following configuration is set:
 #
 #  - ASSETS_DEBUG is True
