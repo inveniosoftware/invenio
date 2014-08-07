@@ -483,39 +483,6 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('authorlistusers', 'Users who can user Authorlist tools', 'deny all'),
              )
 
-# Demo site roles
-DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
-                  ('thesesviewer', 'Theses and Drafts viewer', 'allow group "Theses and Drafts viewers"'),
-                  ('ALEPHviewer', 'ALEPH viewer', 'allow group "ALEPH viewers"'),
-                  ('ISOLDEnotesviewer', 'ISOLDE Internal Notes viewer', 'allow group "ISOLDE Internal Notes viewers"'),                  ('thesescurator', 'Theses collection curator', 'deny any'),
-                  ('swordcurator', 'BibSword client curator', 'deny any'),
-                  ('referee_DEMOBOO_*', 'Book collection curator', 'deny any'),
-                  ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
-                  ('curator', 'Curator', 'deny any'),
-                  ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
-                  ('claimpaperusers', 'Users who can perform changes to their own paper attributions without the need for an operator\'s approval', 'deny email "hyde@cds.cern.ch"\nallow any'),
-                  ('submit_DEMOJRN_*', 'Users who can submit (and modify) "Atlantis Times" articles', 'deny all'),
-                  ('atlantiseditor', 'Users who can configure "Atlantis Times" journal', 'deny all'),
-                  ('commentmoderator', 'Users who can moderate comments', 'deny all'),
-                  ('poetrycommentreader', 'Users who can view comments in Poetry collection', 'deny all'))
-
-DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
-                       ('balthasar.montague@cds.cern.ch', 'ALEPHviewer'),
-                       ('dorian.gray@cds.cern.ch', 'ISOLDEnotesviewer'),
-                       ('jekyll@cds.cern.ch', 'swordcurator'),
-                       ('jekyll@cds.cern.ch', 'claimpaperusers'),
-                       ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
-                       ('balthasar.montague@cds.cern.ch', 'curator'),
-                       ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
-                       ('romeo.montague@cds.cern.ch', 'swordcurator'),
-                       ('romeo.montague@cds.cern.ch', 'thesescurator'),
-                       ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'),
-                       ('juliet.capulet@cds.cern.ch', 'photocurator'),
-                       ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
-                       ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'),
-                       ('balthasar.montague@cds.cern.ch', 'atlantiseditor'),
-                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'),
-                       ('jekyll@cds.cern.ch', 'authorlistusers'),)
 
 # users
 # list of e-mail addresses
@@ -612,35 +579,6 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('claimpaperoperators', 'claimpaper_change_others_data', {}),
              )
 
-# Demo site authorizations
-#    role          action        arguments
-DEF_DEMO_AUTHS = (
-    ('photocurator', 'runwebcoll', {'collection': 'Pictures'}),
-    ('restrictedpicturesviewer', 'viewrestrdoc', {'status': 'restricted_picture'}),
-    ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Theses'}),
-    ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Drafts'}),
-    ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Theses'}),
-    ('ALEPHviewer', VIEWRESTRCOLL, {'collection': 'ALEPH Internal Notes'}),
-    ('ISOLDEnotesviewer', VIEWRESTRCOLL, {'collection': 'ISOLDE Internal Notes'}),
-    ('referee_DEMOBOO_*', 'referee', {'doctype': 'DEMOBOO', 'categ': '*'}),
-    ('curator', 'cfgbibknowledge', {}),
-    ('curator', 'runbibedit', {}),
-    ('curator', 'runbibeditmulti', {}),
-    ('curator', 'runbibmerge', {}),
-    ('swordcurator', 'runbibswordclient', {}),
-    ('thesescurator', 'runbibedit', {'collection': 'Theses'}),
-    ('thesescurator', VIEWRESTRCOLL, {'collection': 'Theses'}),
-    ('photocurator', 'runbibedit', {'collection': 'Pictures'}),
-    ('referee_DEMOBOO_*', 'runbibedit', {'collection': 'Books'}),
-    ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI', 'categ': '*'}),
-    ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'}),
-    ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
-    ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
-    ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
-    ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'}),
-    ('atlantiseditor', VIEWRESTRCOLL, {'collection': 'Atlantis Times Drafts'}),
-    ('anyuser', 'submit', {'doctype': 'DEMOART', 'act': 'SBI', 'categ': 'ARTICLE'}),
-)
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {

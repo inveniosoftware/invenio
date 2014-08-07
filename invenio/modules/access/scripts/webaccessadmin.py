@@ -58,12 +58,10 @@ def main():
                                                 acc_reset_default_settings)
     from invenio.base.globals import cfg
     from invenio.legacy.bibsched.bibtask import authenticate
-    from invenio.modules.access.local_config import DEF_DEMO_USER_ROLES, \
-        DEF_DEMO_ROLES, DEF_DEMO_AUTHS
 
-    DEF_DEMO_USER_ROLES = cfg.get('DEF_DEMO_USER_ROLES', DEF_DEMO_USER_ROLES)
-    DEF_DEMO_ROLES = cfg.get('DEF_DEMO_ROLES', DEF_DEMO_ROLES)
-    DEF_DEMO_AUTHS = cfg.get('DEF_DEMO_AUTHS', DEF_DEMO_AUTHS)
+    DEF_DEMO_USER_ROLES = cfg.get('DEF_DEMO_USER_ROLES', tuple())
+    DEF_DEMO_ROLES = cfg.get('DEF_DEMO_ROLES', tuple())
+    DEF_DEMO_AUTHS = cfg.get('DEF_DEMO_AUTHS', tuple())
 
     ## parse command line:
     # set user-defined options:
@@ -100,13 +98,17 @@ def main():
             #        authorization_msg="WebAccess Administration",
             #        authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
-                acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acc_reset_default_settings(
+                    [cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES,
+                    DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print("Reset default demo site settings.")
             elif options['reset']:
                 acc_reset_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
                 print("Reset default settings.")
             elif options['add'] and options['demo']:
-                acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acc_add_default_settings(
+                    [cfg['CFG_SITE_ADMIN_EMAIL']], DEF_DEMO_USER_ROLES,
+                    DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print("Added default demo site settings.")
             elif options['add']:
                 acc_add_default_settings([cfg['CFG_SITE_ADMIN_EMAIL']])
