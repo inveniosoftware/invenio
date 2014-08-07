@@ -17,14 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Helper module to create an oauthclient for testing purposes."""
+
 from flask import url_for, request, session, jsonify, abort
 from flask_oauthlib.client import OAuth
 
 
 def create_client(app, name, **kwargs):
-    """
-    Helper function to create a OAuth2 client to test an OAuth2 provider.
-    """
+    """Helper function to create a OAuth2 client to test an OAuth2 provider."""
     default = dict(
         consumer_key='dev',
         consumer_secret='dev',
@@ -76,11 +76,11 @@ def create_client(app, name, **kwargs):
 
     @app.route('/oauth2test/test-info')
     def test_info():
-        return get_test("/oauth/info")
+        return get_test(url_for('oauth2server.info'))
 
     @app.route('/oauth2test/test-invalid')
     def test_invalid():
-        return get_test("/oauth/invalid")
+        return get_test(url_for('oauth2server.invalid'))
 
     @remote.tokengetter
     def get_oauth_token():
