@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 from functools import wraps
 
+from flask import request
 from flask.ext.restful import Resource, abort
 from invenio.ext.restful import require_api_auth, require_oauth_scopes
 from .models import Receiver, ReceiverDoesNotExists, InvalidPayload, \
@@ -28,9 +29,7 @@ from .models import Receiver, ReceiverDoesNotExists, InvalidPayload, \
 
 
 def error_handler(f):
-    """
-    Decorator to handle exceptions
-    """
+    """Decorator to handle exceptions."""
     @wraps(f)
     def inner(*args, **kwargs):
         try:
@@ -63,9 +62,9 @@ api_decorators = [
 # REST Resources
 #
 class ReceiverEventListResource(Resource):
-    """
-    Receiver event hook
-    """
+
+    """Receiver event hook."""
+
     method_decorators = api_decorators
 
     def get(self, receiver_id=None):
@@ -73,9 +72,9 @@ class ReceiverEventListResource(Resource):
 
     @require_api_auth()
     @require_oauth_scopes('webhooks:event')
-    def post(self, oauth, receiver_id=None):
+    def post(self, receiver_id=None):
         receiver = Receiver.get(receiver_id)
-        receiver.consume_event(oauth.access_token.user_id)
+        receiver.consume_event(request.oauth.access_token.user_id)
         return {'status': 202, 'message': 'Accepted'}, 202
 
     def put(self, receiver_id=None):
