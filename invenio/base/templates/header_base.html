@@ -94,6 +94,10 @@
                   </div>
                 </div>
               </li>
+              {%- for item in current_menu.submenu('settings').children if item.visible %}
+              {% if loop.first %}<li class="divider"></li>{% endif -%}
+              <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+              {%- endfor %}
               <li class="divider"></li>
               <li>
                 <a href="{{ url_for('webaccount.logout') }}">
