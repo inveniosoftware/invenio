@@ -48,6 +48,9 @@ TERMINATOR = '\r'
 if NEWLINE or FO:
     TERMINATOR = '\n'
 
+import socket
+from urllib2 import URLError
+
 import os
 PID = os.getpid
 
@@ -247,8 +250,14 @@ def is_arxiv_id_or_doi(identifier):
 def get_title_of_doi(doi):
     try:
         xml = get_marcxml_for_doi(doi)
-    except CrossrefError:
+    except (CrossrefError, socket.timeout):
         return doi
+    except URLError, e:
+    # For python 2.6 socket.timeout cannot be caught directly    
+        if isinstance(e.reason, socket.timeout):
+            return doi
+        else:  # We make sure we don't cut out other URLErrors.
+            raise
 
     root = ET.fromstring(xml)
 
