@@ -301,7 +301,7 @@ def require_oauth_scopes(*scopes):
         def decorated(*args, **kwargs):
             # Variable requests.oauth is only defined for oauth requests (see
             # require_api_auth() above).
-            if request.oauth is not None:
+            if hasattr(request, 'oauth') and request.oauth is not None:
                 token_scopes = set(request.oauth.access_token.scopes)
                 if not required_scopes.issubset(token_scopes):
                     restful.abort(403)
