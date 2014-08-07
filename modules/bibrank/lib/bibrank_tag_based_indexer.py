@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods.
 
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,40 +23,43 @@ import time
 import traceback
 import ConfigParser
 
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_ETCDIR
+from invenio.config import CFG_SITE_LANG, CFG_ETCDIR
 from invenio.search_engine import perform_request_search
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing
 from invenio.bibrank_downloads_indexer import *
-from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
-     wash_table_column_name, get_table_update_time
-from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
+from invenio.dbquery import (run_sql,
+                             serialize_via_marshal,
+                             deserialize_via_marshal,
+                             wash_table_column_name,
+                             get_table_update_time)
+from invenio.bibtask import (task_get_option,
+                             write_message,
+                             task_sleep_now_if_required)
 from invenio.bibindex_engine import create_range_list
 from invenio.intbitset import intbitset
 
 options = {}
 
 
-def download_weight_filtering_user_repair_exec ():
+def download_weight_filtering_user_repair_exec():
     """Repair download weight filtering user ranking method"""
     write_message("Repairing for this ranking method is not defined. Skipping.")
-    return
+
 
 def download_weight_total_repair_exec():
     """Repair download weight total ranking method"""
     write_message("Repairing for this ranking method is not defined. Skipping.")
-    return
+
 
 def file_similarity_by_times_downloaded_repair_exec():
     """Repair file similarity by times downloaded ranking method"""
     write_message("Repairing for this ranking method is not defined. Skipping.")
-    return
+
 
 def single_tag_rank_method_repair_exec():
     """Repair single tag ranking method"""
     write_message("Repairing for this ranking method is not defined. Skipping.")
-    return
+
 
 def citation_exec(rank_method_code, name, config):
     """Rank method for citation analysis"""
@@ -77,16 +80,20 @@ def citation_exec(rank_method_code, name, config):
         else:
             write_message("No need to update the indexes for citations.")
 
+
 def download_weight_filtering_user(run):
     return bibrank_engine(run)
+
 
 def download_weight_total(run):
     return bibrank_engine(run)
 
+
 def file_similarity_by_times_downloaded(run):
     return bibrank_engine(run)
 
-def download_weight_filtering_user_exec (rank_method_code, name, config):
+
+def download_weight_filtering_user_exec(rank_method_code, name, config):
     """Ranking by number of downloads per User.
     Only one full Text Download is taken in account for one
     specific userIP address"""
@@ -99,7 +106,8 @@ def download_weight_filtering_user_exec (rank_method_code, name, config):
     dic = get_download_weight_filtering_user(dic, keys)
     intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
-    return {"time":time2-time1}
+    return {"time": time2-time1}
+
 
 def download_weight_total_exec(rank_method_code, name, config):
     """rankink by total number of downloads without check the user ip
@@ -113,7 +121,8 @@ def download_weight_total_exec(rank_method_code, name, config):
     dic = get_download_weight_total(dic, keys)
     intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
-    return {"time":time2-time1}
+    return {"time": time2-time1}
+
 
 def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
     """update dictionnary {recid:[(recid, nb page similarity), ()..]}"""
@@ -126,7 +135,8 @@ def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
     dic = get_file_similarity_by_times_downloaded(dic, keys)
     intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
-    return {"time":time2-time1}
+    return {"time": time2-time1}
+
 
 def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
@@ -137,47 +147,47 @@ def single_tag_rank_method_exec(rank_method_code, name, config):
     rnkset = union_dicts(rnkset_old, rnkset_new)
     intoDB(rnkset, begin_date, rank_method_code)
 
+
 def single_tag_rank(config):
     """Connect the given tag with the data from the kb file given"""
     write_message("Loading knowledgebase file", verbose=9)
     kb_data = {}
     records = []
 
-    write_message("Reading knowledgebase file: %s" % \
+    write_message("Reading knowledgebase file: %s" %
                    config.get(config.get("rank_method", "function"), "kb_src"))
-    input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
-    data = input.readlines()
-    for line in data:
-        if not line[0:1] == "#":
-            kb_data[string.strip((string.split(string.strip(line), "---"))[0])] = (string.split(string.strip(line), "---"))[1]
+    with open(config.get(config.get("rank_method", "function"), "kb_src"), 'r') as f:
+        for line in f:
+            if not line[0:1] == "#":
+                key, value = line.strip().split("---")
+                kb_data[key.strip()] = value.strip()
     write_message("Number of lines read from knowledgebase file: %s" % len(kb_data))
 
     tag = config.get(config.get("rank_method", "function"), "tag")
-    tags = config.get(config.get("rank_method", "function"), "check_mandatory_tags").split(", ")
+    tags = config.get(config.get("rank_method", "function"), "check_mandatory_tags").split(",")
     if tags == ['']:
         tags = ""
 
     records = []
-    for (recids, recide) in options["recid_range"]:
+    for recids, recide in options["recid_range"]:
         task_sleep_now_if_required(can_stop_too=True)
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
         valid = intbitset(trailing_bits=1)
         valid.discard(0)
         for key in tags:
-            newset = intbitset()
-            newset += [recid[0] for recid in (run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))]
-            valid.intersection_update(newset)
+            newset = intbitset(run_sql("SELECT id_bibrec FROM bib%sx, bibrec_bib%sx WHERE id_bibxxx=id AND tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (key, recids, recide)))
+            valid &= newset
         if tags:
-            recs = filter(lambda x: x[0] in valid, recs)
-        records = records + list(recs)
+            recs = [(rec, value) for recid, value in recs if recid in valid]
+        records += list(recs)
         write_message("Number of records found with the necessary tags: %s" % len(records))
 
-    records = filter(lambda x: x[0] in options["validset"], records)
+    records = [(recid, value) for recid, value in records if recid in options["validset"]]
     rnkset = {}
     for key, value in records:
-        if kb_data.has_key(value):
-            if not rnkset.has_key(key):
+        if value in kb_data:
+            if key not in rnkset:
                 rnkset[key] = float(kb_data[value])
             else:
                 if kb_data.has_key(rnkset[key]) and float(kb_data[value]) > float((rnkset[key])[1]):
@@ -188,13 +198,16 @@ def single_tag_rank(config):
     write_message("Number of records available in rank method: %s" % len(rnkset))
     return rnkset
 
+
 def get_lastupdated(rank_method_code):
     """Get the last time the rank method was updated"""
     res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name=%s", (rank_method_code, ))
     if res:
         return res[0][0]
     else:
-        raise Exception("Is this the first run? Please do a complete update.")
+        # Is this the first run? Please do a complete update.
+        return None
+
 
 def intoDB(dic, date, rank_method_code):
     """Insert the rank method data into the database"""
@@ -202,34 +215,37 @@ def intoDB(dic, date, rank_method_code):
     del_rank_method_codeDATA(rank_method_code)
     serdata = serialize_via_marshal(dic)
     midstr = str(mid[0][0])
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
+    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata))
     if date:
         run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
+
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    _id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (_id[0][0], ))
     if res:
         return deserialize_via_marshal(res[0][0])
     else:
         return {}
 
+
 def del_rank_method_codeDATA(rank_method_code):
     """Delete the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    _id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (_id[0][0], ))
+
 
 def del_recids(rank_method_code, range_rec):
     """Delete some records from the rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    _id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (_id[0][0], ))
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
         write_message("Old size: %s" % len(rec_dict))
-        for (recids, recide) in range_rec:
+        for recids, recide in range_rec:
             for i in range(int(recids), int(recide)):
-                if rec_dict.has_key(i):
+                if i in rec_dict:
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
         begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -237,34 +253,36 @@ def del_recids(rank_method_code, range_rec):
     else:
         write_message("Create before deleting!")
 
+
 def union_dicts(dict1, dict2):
     "Returns union of the two dicts."
     union_dict = {}
-    for (key, value) in dict1.iteritems():
+    for key, value in dict1.iteritems():
         union_dict[key] = value
-    for (key, value) in dict2.iteritems():
+    for key, value in dict2.iteritems():
         union_dict[key] = value
     return union_dict
+
 
 def rank_method_code_statistics(rank_method_code):
     """Print statistics"""
 
     method = fromDB(rank_method_code)
-    max = ('', -999999)
+    _max = ('', -999999)
     maxcount = 0
-    min = ('', 999999)
+    _min = ('', 999999)
     mincount = 0
 
-    for (recID, value) in method.iteritems():
-        if value < min and value > 0:
-            min = value
-        if value > max:
-            max = value
+    for recID, value in method.iteritems():
+        if value < _min and value > 0:
+            _min = value
+        if value > _max:
+            _max = value
 
-    for (recID, value) in method.iteritems():
-        if value == min:
+    for recID, value in method.iteritems():
+        if value == _min:
             mincount += 1
-        if value == max:
+        if value == _max:
             maxcount += 1
 
     write_message("Showing statistic for selected method")
@@ -272,41 +290,44 @@ def rank_method_code_statistics(rank_method_code):
     write_message("Short name: %s" % rank_method_code)
     write_message("Last run: %s" % get_lastupdated(rank_method_code))
     write_message("Number of records: %s" % len(method))
-    write_message("Lowest value: %s - Number of records: %s" % (min, mincount))
-    write_message("Highest value: %s - Number of records: %s" % (max, maxcount))
+    write_message("Lowest value: %s - Number of records: %s" % (_min, mincount))
+    write_message("Highest value: %s - Number of records: %s" % (_max, maxcount))
     write_message("Divided into 10 sets:")
     for i in range(1, 11):
         setcount = 0
         distinct_values = {}
-        lower = -1.0 + ((float(max + 1) / 10)) * (i - 1)
-        upper = -1.0 + ((float(max + 1) / 10)) * i
-        for (recID, value) in method.iteritems():
+        lower = -1.0 + ((float(_max + 1) / 10)) * (i - 1)
+        upper = -1.0 + ((float(_max + 1) / 10)) * i
+        for recID, value in method.iteritems():
             if value >= lower and value <= upper:
                 setcount += 1
                 distinct_values[value] = 1
         write_message("Set %s (%s-%s) %s Distinct values: %s" % (i, lower, upper, len(distinct_values), setcount))
 
+
 def check_method(rank_method_code):
     write_message("Checking rank method...")
-    if len(fromDB(rank_method_code)) == 0:
+    if not fromDB(rank_method_code):
         write_message("Rank method not yet executed, please run it to create the necessary data.")
     else:
-        if len(add_recIDs_by_date(rank_method_code)) > 0:
+        if add_recIDs_by_date(rank_method_code):
             write_message("Records modified, update recommended")
         else:
             write_message("No records modified, update not necessary")
 
 
 def load_config(method):
-    filename = CFG_ETCDIR + "/bibrank/" + method + ".cfg"
+    filename = "%s/bibrank/%s.cfg" % (CFG_ETCDIR, method)
     config = ConfigParser.ConfigParser()
     try:
-        config.readfp(open(filename))
+        with open(filename) as f:
+            config.readfp(f)
     except StandardError:
         write_message("Cannot find configuration file: %s" % filename,
                       sys.stderr)
         raise
     return config
+
 
 def bibrank_engine(run):
     """Run the indexing task.
@@ -322,18 +343,15 @@ def bibrank_engine(run):
         write_message("Running rank method: %s." % cfg_name)
         config = load_config(rank_method_code)
         cfg_short = rank_method_code
-        cfg_function = config.get("rank_method", "function") + "_exec"
-        cfg_repair_function = config.get("rank_method", "function") + "_repair_exec"
+        cfg_function = "%s_exec" % config.get("rank_method", "function")
+        cfg_repair_function = "%s_repair_exec" % config.get("rank_method", "function")
         cfg_name = getName(cfg_short)
         options["validset"] = get_valid_range(rank_method_code)
 
         if task_get_option("collection"):
-            l_of_colls = string.split(task_get_option("collection"), ", ")
+            l_of_colls = task_get_option("collection").split(",")
             recIDs = perform_request_search(c=l_of_colls)
-            recIDs_range = []
-            for recID in recIDs:
-                recIDs_range.append([recID, recID])
-            options["recid_range"] = recIDs_range
+            options["recid_range"] = [(recID, recID) for recID in recIDs]
         elif task_get_option("id"):
             options["recid_range"] = task_get_option("id")
         elif task_get_option("modified"):
@@ -344,10 +362,10 @@ def bibrank_engine(run):
             write_message("No records specified, updating all", verbose=2)
             min_id = run_sql("SELECT min(id) from bibrec")[0][0]
             max_id = run_sql("SELECT max(id) from bibrec")[0][0]
-            options["recid_range"] = [[min_id, max_id]]
+            options["recid_range"] = [(min_id, max_id)]
 
-        if task_get_option("quick") == "no":
-            write_message("Recalculate parameter not used, parameter ignored.", verbose=9)
+        if task_get_option("quick") == "yes":
+            write_message("Recalculate parameter used", verbose=9)
 
         if task_get_option("cmd") == "del":
             del_recids(cfg_short, options["recid_range"])
@@ -365,39 +383,36 @@ def bibrank_engine(run):
             func_object = globals().get(cfg_repair_function)
             func_object()
         else:
-            write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
-            raise StandardError
+            msg = "Invalid command found processing %s" % rank_method_code
+            write_message(msg, sys.stderr)
+            raise StandardError(msg)
 
     if task_get_option("verbose"):
         showtime((time.time() - startCreate))
+
     return 1
+
 
 def get_valid_range(rank_method_code):
     """Return a range of records"""
     write_message("Getting records from collections enabled for rank method.", verbose=9)
 
     res = run_sql("SELECT collection.name FROM collection, collection_rnkMETHOD, rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s",  (rank_method_code, ))
-    l_of_colls = []
-    for coll in res:
-        l_of_colls.append(coll[0])
-    if len(l_of_colls) > 0:
+    l_of_colls = [coll[0] for coll in res]
+    if l_of_colls:
         recIDs = perform_request_search(c=l_of_colls)
     else:
         recIDs = []
-    valid = intbitset()
-    valid += recIDs
-    return valid
+    return intbitset(recIDs)
 
-def add_recIDs_by_date(rank_method_code, dates=""):
+
+def add_recIDs_by_date(rank_method_code, dates=None):
     """Return recID range from records modified between DATES[0] and DATES[1].
        If DATES is not set, then add records modified since the last run of
        the ranking method RANK_METHOD_CODE.
     """
     if not dates:
-        try:
-            dates = (get_lastupdated(rank_method_code), '')
-        except Exception:
-            dates = ("0000-00-00 00:00:00", '')
+        dates = (get_lastupdated(rank_method_code), '')
     if dates[0] is None:
         dates = ("0000-00-00 00:00:00", '')
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s"""
@@ -413,31 +428,35 @@ def add_recIDs_by_date(rank_method_code, dates=""):
         write_message("No new records added since last time method was run")
     return alist
 
-def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
+
+def getName(rank_method_code, ln=CFG_SITE_LANG, _type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
         rnkid = run_sql("SELECT id FROM rnkMETHOD where name=%s", (rank_method_code, ))
         if rnkid:
             rnkid = str(rnkid[0][0])
-            res = run_sql("SELECT value FROM rnkMETHODNAME where type=%s and ln=%s and id_rnkMETHOD=%s", (type, ln, rnkid))
+            res = run_sql("SELECT value FROM rnkMETHODNAME where type=%s and ln=%s and id_rnkMETHOD=%s", (_type, ln, rnkid))
             if not res:
-                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (CFG_SITE_LANG, rnkid, type))
+                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (CFG_SITE_LANG, rnkid, _type))
             if not res:
                 return rank_method_code
             return res[0][0]
         else:
-            raise Exception
+            raise Exception("Missing method id")
     except Exception:
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
-        raise Exception
+        raise
+
 
 def single_tag_rank_method(run):
     return bibrank_engine(run)
 
+
 def showtime(timeused):
     """Show time used for method"""
     write_message("Time used: %d second(s)." % timeused, verbose=9)
+
 
 def citation(run):
     return bibrank_engine(run)
@@ -458,6 +477,7 @@ def index_term_count_exec(rank_method_code, name, config):
 
     rnkset = calculate_index_term_count(config)
     intoDB(rnkset, begin_date, rank_method_code)
+
 
 def calculate_index_term_count(config):
     """Calculate the weight of a record set based on number of enries of a
