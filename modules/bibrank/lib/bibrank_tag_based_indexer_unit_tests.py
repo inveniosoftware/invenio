@@ -36,7 +36,7 @@ class TestListSetOperations(InvenioTestCase):
 
     def test_split_ranges(self):
         """bibrank tag based indexer - split ranges"""
-        self.assertEqual([[0, 500], [600, 1000]], split_ranges("0-500,600-1000"))
+        self.assertEqual([(0, 500), (600, 1000)], split_ranges("0-500,600-1000"))
 
 TEST_SUITE = make_test_suite(TestListSetOperations,)
 

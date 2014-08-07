@@ -67,31 +67,32 @@ Usage: bibrank [options]
  -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1)
 """
 
-__revision__ = "$Id$"
-
-
 import sys
 import ConfigParser
 
-from invenio.config import CFG_ETCDIR
+from invenio.config import CFG_ETCDIR, CFG_VERSION
 from invenio.dbquery import run_sql
-from invenio.bibtask import task_init, write_message, task_get_option, \
-    task_set_option, get_datetime, task_sleep_now_if_required
+from invenio.bibtask import (task_init,
+                             write_message,
+                             task_get_option,
+                             task_set_option,
+                             get_datetime,
+                             task_sleep_now_if_required)
 
 # pylint: disable=W0611
 # Disabling unused import pylint check, since these are needed to get
 # imported here, and are called later dynamically.
-from invenio.bibrank_tag_based_indexer import \
-     single_tag_rank_method, \
-     citation, \
-     download_weight_filtering_user, \
-     download_weight_total, \
-     file_similarity_by_times_downloaded, \
-     index_term_count
-from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
-from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
-from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport
-from invenio.xapianutils_bibrank_indexer import word_similarity_xapian #@UnusedImport
+from invenio.bibrank_tag_based_indexer import (
+                                           single_tag_rank_method,
+                                           citation,
+                                           download_weight_filtering_user,
+                                           download_weight_total,
+                                           file_similarity_by_times_downloaded,
+                                           index_term_count)
+from invenio.bibrank_word_indexer import word_similarity
+from invenio.bibrank_citerank_indexer import citerank
+from invenio.solrutils_bibrank_indexer import word_similarity_solr
+from invenio.xapianutils_bibrank_indexer import word_similarity_xapian
 from invenio.bibrank_selfcites_task import process_updates as selfcites
 # pylint: enable=W0611
 
@@ -102,31 +103,31 @@ base_process_size = 4500 # process base size
 
 def split_ranges(parse_string):
     """Split ranges of numbers"""
-    recIDs = []
-    ranges = parse_string.split(",")
-    for rang in ranges:
-        tmp_recIDs = rang.split("-")
 
-        if len(tmp_recIDs)==1:
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[0])])
+    def parse_range(r):
+        if '-' in r:
+            start, end = r.split("-")
+            start = int(start)
+            end = int(end)
+            if start > end: # sanity check
+                raise StandardError("Invalid range: %s" % rang)
+            return start, end
         else:
-            if int(tmp_recIDs[0]) > int(tmp_recIDs[1]): # sanity check
-                tmp = tmp_recIDs[0]
-                tmp_recIDs[0] = tmp_recIDs[1]
-                tmp_recIDs[1] = tmp
-            recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[1])])
+            return int(r), int(r)
+
+    ranges = parse_string.split(",")
+    recIDs = [parse_range(r) for r in ranges]
     return recIDs
+
 
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
-    limits = var.split(",")
-    if len(limits)==1:
-        low = get_datetime(limits[0])
-        return low, None
-    if len(limits)==2:
-        low = get_datetime(limits[0])
-        high = get_datetime(limits[1])
-        return low, high
+    if ',' in var:
+        low, high = var.split(",")
+    else:
+        low, high = var, None
+
+    return get_datetime(low), get_datetime(high)
 
 def task_run_core():
     """Run the indexing task. The row argument is the BibSched task
@@ -139,13 +140,14 @@ def task_run_core():
     for key in task_get_option("run"):
         task_sleep_now_if_required(can_stop_too=True)
         write_message("")
-        filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
+        filename = "%s/bibrank/%s.cfg" % (CFG_ETCDIR, key)
         write_message("Getting configuration from file: %s" % filename,
-            verbose=9)
+                      verbose=9)
         config = ConfigParser.ConfigParser()
         try:
-            config.readfp(open(filename))
-        except StandardError:
+            with open(filename) as f:
+                config.readfp(f)
+        except OSError:
             write_message("Cannot find configuration file: %s. "
                 "The rankmethod may also not be registered using "
                 "the BibRank Admin Interface." % filename, sys.stderr)
@@ -158,16 +160,15 @@ def task_run_core():
         if func_object:
             func_object(key)
         else:
-            write_message("Cannot run method '%s', no function to call"
-                % key)
+            write_message("Cannot run method '%s', no function to call" % key)
 
     return True
 
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibrank',
-            authorization_msg="BibRank Task Submission",
-            description="""Ranking examples:
+              authorization_msg="BibRank Task Submission",
+              description="""Ranking examples:
        bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
        bibrank -wjif -d --modified='2002-10-27 13:57:26'
        bibrank -wjif --rebalance --collection=Articles
@@ -181,8 +182,9 @@ def main():
  -c, --collection=c1[,c2]  select according to collection
  -i, --id=low[-high]       select according to doc recID
  -m, --modified=from[,to]  select according to modification date
+                           (ignored by citation or selfcites methods)
  -l, --lastupdate          select according to last update
-
+                           (ignored by citation or selfcites methods)
  -a, --add                 add or update words for selected records
  -d, --del                 delete words for selected records
  -S, --stat                show statistics for a method
@@ -201,7 +203,6 @@ def main():
                            system.  Useful for cataloguers to input
                            external papers manually.
 
- -A --author-citations     Calculate author citations.
  --disable-citation-losses-check  Disable checks that prevent more than n
                            citations to be removed in one single run
                            (n is defined in citation.cfg)
@@ -211,7 +212,7 @@ def main():
                            check if update of ranking data is necessary
  -r, --repair              try to repair all records in the table(s)
 """,
-            version=__revision__,
+            version=CFG_VERSION,
             specific_params=("AE:ladSi:m:c:kUrRM:f:w:", [
                 "author-citations",
                 "print-extcites=",
@@ -239,19 +240,17 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
     """Elaborate a specific parameter of CLI bibrank."""
     if key in ("-a", "--add"):
         task_set_option("cmd", "add")
-        if ("-x","") in opts or ("--del","") in opts:
+        if ("-x", "") in opts or ("--del", "") in opts:
             raise StandardError, "--add incompatible with --del"
     elif key in ("--run", "-w"):
-        task_set_option("run", [])
         run = value.split(",")
-        for run_key in range(0, len(run)):
-            task_get_option('run').append(run[run_key])
+        task_set_option("run", [run[run_key] for run_key in range(len(run))])
     elif key in ("-r", "--repair"):
         task_set_option("cmd", "repair")
     elif key in ("-E", "--print-extcites"):
         try:
             task_set_option("print-extcites", int(value))
-        except:
+        except ValueError:
             task_set_option("print-extcites", 10) # default fallback value
         task_set_option("cmd", "print-missing")
     elif key in ("-A", "--author-citations"):
@@ -274,18 +273,19 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
     elif key in ("-M", "--maxmem"):
         task_set_option("maxmem", int(value))
         if task_get_option("maxmem") < base_process_size + 1000:
-            raise StandardError, "Memory usage should be higher than %d kB" % \
-                (base_process_size + 1000)
+            raise StandardError("Memory usage should be higher than %d kB" %
+                                                    (base_process_size + 1000))
     elif key in ("-m", "--modified"):
-        task_set_option("modified", get_date_range(value))#2002-10-27 13:57:26)
+        task_set_option("modified", get_date_range(value)) #2002-10-27 13:57:26
         task_set_option("last_updated", "")
     elif key in ("-l", "--lastupdate"):
         task_set_option("last_updated", "last_updated")
-    elif key in ("disable-citation-losses-check", ):
+    elif key in ("--disable-citation-losses-check", ):
         task_set_option("disable_citation_losses_check", True)
     else:
         return False
     return True
+
 
 if __name__ == "__main__":
     main()
