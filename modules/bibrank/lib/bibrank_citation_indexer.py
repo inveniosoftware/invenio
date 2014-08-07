@@ -102,6 +102,7 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
     the index of sorted research results by citation information
     """
     quick = task_get_option("quick") != "no"
+    loss_checks = not bool(task_get_option("disable_citation_losses_check"))
 
     # id option forces re-indexing a certain range
     # even if there are no new recs
@@ -141,7 +142,10 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
         except ConfigParser.NoOptionError:
             config.set(function, 'collections', None)
         # Process fully the updated records
-        weights = process_and_store(updated_recids, config, chunk_size)
+        weights = process_and_store(recids=updated_recids,
+                                    config=config,
+                                    chunk_size=chunk_size,
+                                    loss_checks=loss_checks)
         end_time = time.time()
         write_message("Total time of get_citation_weight(): %.2f sec" %
                                                       (end_time - begin_time))
@@ -246,7 +250,7 @@ def report_loss(recid, prefix, is_refs):
     ticket.submit()
 
 
-def process_and_store(recids, config, chunk_size):
+def process_and_store(recids, config, chunk_size, loss_checks=True):
     # If we have nothing to process
     # Do not update the weights dictionary
     modified = False
@@ -269,7 +273,8 @@ def process_and_store(recids, config, chunk_size):
         cites, refs = process_chunk(chunk, config)
         # Check that we haven't lost too many citations
         # (raises an exception if needed)
-        check_citations_losses(config, chunk, refs, cites)
+        if loss_checks:
+            check_citations_losses(config, chunk, refs, cites)
         # Store processed citations/references
         store_dicts(chunk, refs, cites)
         modified = True
