@@ -21,6 +21,7 @@
 
 from __future__ import absolute_import
 
+import errno
 import os
 import six
 
@@ -53,14 +54,27 @@ def get_unique_record_json(param):
 def default_name_generator(document):
     """Return default name of record document with storage path.
 
-    :document:
+    The path is generated from the uuid using two folder level, being the first
+    two characters the name of the first folder and the second two the name of
+    the second folder.
+
+    It avoids creating the directories twice but if any of them is not a
+    directory it will raise an OSError exception.
+
+    :param document: The document to be stored.
     :returns: Path based on the `_id` of the document.
 
     """
     uuid = document['_id']
     directory = os.path.join(cfg.get('CFG_BIBDOCFILE_FILEDIR'),
                              uuid[0:2], uuid[2:4])
-    os.makedirs(directory)
+    try:
+        os.makedirs(directory)
+    except OSError as e:
+        if e.errno == errno.EEXIST and os.path.isdir(directory):
+            pass
+        else:
+            raise
     return os.path.join(directory, uuid[4:])
 
 
