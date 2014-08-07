@@ -109,7 +109,7 @@ class DocumentListResource(Resource):
     """
     method_decorators = document_decorators
 
-    def get(self, oauth):
+    def get(self):
         """
         List all files.
         """
@@ -117,14 +117,14 @@ class DocumentListResource(Resource):
             {'creator': current_user.get_id()})
 
     @require_header('Content-Type', 'application/json')
-    def post(self, oauth):
+    def post(self):
         """
         Create a new document
         """
         abort(405)
 
     @require_header('Content-Length', check_content_length)
-    def put(self, oauth):
+    def put(self):
         filename = parse_options_header(
             request.headers.get('Content-Disposition', ''))[1].get('filename')
 
@@ -137,16 +137,16 @@ class DocumentListResource(Resource):
         )
         return d.dumps()
 
-    def delete(self, oauth):
+    def delete(self):
         abort(405)
 
-    def head(self, oauth):
+    def head(self):
         abort(405)
 
-    def options(self, oauth):
+    def options(self):
         abort(405)
 
-    def patch(self, oauth):
+    def patch(self):
         abort(405)
 
 

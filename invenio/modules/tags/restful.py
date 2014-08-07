@@ -139,7 +139,7 @@ class TagResource(Resource):
         error_handler
     ]
 
-    def get(self, oauth, tag_name):
+    def get(self, tag_name):
         """Get a tag.
 
         :param tag_name: the name of the tag to retrieve
@@ -149,7 +149,7 @@ class TagResource(Resource):
         tag = TagRepresenation(tag_retrieved)
         return tag.marshal()
 
-    def delete(self, oauth, tag_name):
+    def delete(self, tag_name):
         """Delete a tag.
 
         Checks if the tag is attached to records. If True,
@@ -162,7 +162,7 @@ class TagResource(Resource):
         return "", 204
 
     @require_header('Content-Type', 'application/json')
-    def patch(self, oauth, tag_name):
+    def patch(self, tag_name):
         """Update a tag.
 
         The attributes that can be updated are:
@@ -183,19 +183,19 @@ class TagResource(Resource):
         tag = TagRepresenation(tag_retrieved)
         return tag.marshal(), 201
 
-    def post(self, oauth, tag_name):
+    def post(self, tag_name):
         """post."""
         abort(405)
 
-    def options(self, oauth, tag_name):
+    def options(self, tag_name):
         """options."""
         abort(405)
 
-    def put(self, oauth, tag_name):
+    def put(self, tag_name):
         """put."""
         abort(405)
 
-    def head(self, oauth, tag_name):
+    def head(self, tag_name):
         """head."""
         abort(405)
 
@@ -209,7 +209,7 @@ class TagListResource(Resource):
         error_handler
     ]
 
-    def get(self, oauth):
+    def get(self):
         """ Get a list of tags.
 
         Get the list of tags a user owns.
@@ -219,7 +219,7 @@ class TagListResource(Resource):
         tags = [TagRepresenation(t) for t in tags_retrieved]
         return map(lambda t: t.marshal(), tags)
 
-    def delete(self, oauth):
+    def delete(self):
         """Delete all tags.
 
         Delete all the tags a user owns.
@@ -229,7 +229,7 @@ class TagListResource(Resource):
         return "", 204
 
     @require_header('Content-Type', 'application/json')
-    def post(self, oauth):
+    def post(self):
         """Create a new tag.
 
         Creates a new tag and sets as owner the current user.
@@ -246,19 +246,19 @@ class TagListResource(Resource):
         tag_to_return = TagRepresenation(tag_to_create)
         return tag_to_return.marshal(), 201
 
-    def patch(self, oauth):
+    def patch(self):
         """PATCH."""
         abort(405)
 
-    def options(self, oauth):
+    def options(self):
         """OPTIONS."""
         abort(405)
 
-    def put(self, oauth):
+    def put(self):
         """PUT."""
         abort(405)
 
-    def head(self, oauth):
+    def head(self):
         """HEAD."""
         abort(405)
 
@@ -277,7 +277,7 @@ class RecordTagResource(Resource):
         error_handler
     ]
 
-    def delete(self, oauth, record_id, tag_name):
+    def delete(self, record_id, tag_name):
         """Detach a tag from a record.
 
         :param record_id: the identifier of the record
@@ -287,7 +287,7 @@ class RecordTagResource(Resource):
         tags_api.detach_tag_from_record(uid, tag_name, record_id)
         return "", 204
 
-    def post(self, oauth, record_id, tag_name):
+    def post(self, record_id, tag_name):
         """A POST request.
 
         :param record_id: the identifier of the record
@@ -295,7 +295,7 @@ class RecordTagResource(Resource):
         """
         abort(405)
 
-    def put(self, oauth, record_id, tag_name):
+    def put(self, record_id, tag_name):
         """A PUT request.
 
         :param record_id: the identifier of the record
@@ -303,7 +303,7 @@ class RecordTagResource(Resource):
         """
         abort(405)
 
-    def patch(self, oauth, record_id, tag_name):
+    def patch(self, record_id, tag_name):
         """A PATCH request.
 
         :param record_id: the identifier of the record
@@ -311,7 +311,7 @@ class RecordTagResource(Resource):
         """
         abort(405)
 
-    def options(self, oauth, record_id, tag_name):
+    def options(self, record_id, tag_name):
         """A OPTIONS request.
 
         :param record_id: the identifier of the record
@@ -319,7 +319,7 @@ class RecordTagResource(Resource):
         """
         abort(405)
 
-    def head(self, oauth, record_id, tag_name):
+    def head(self, record_id, tag_name):
         """A HEAD request.
 
         :param record_id: the identifier of the record
@@ -327,7 +327,7 @@ class RecordTagResource(Resource):
         """
         abort(405)
 
-    def get(self, oauth, record_id, tag_name):
+    def get(self, record_id, tag_name):
         """A GET request.
 
         :param record_id: the identifier of the record
@@ -346,7 +346,7 @@ class RecordListTagResource(Resource):
     ]
 
     @require_header('Content-Type', 'application/json')
-    def post(self, oauth, record_id):
+    def post(self, record_id):
         """Attach a list of tags to a record.
 
         If a tag in the list exists in database then it is attached
@@ -361,7 +361,9 @@ class RecordListTagResource(Resource):
                 error_msg="Validation error in attaching tags on record",
                 status_code=400,
                 error_list=attachTagsValidator.get_errors())
-        tags_just_attached = tags_api.attach_tags_to_record(json_data['tags'],
+        uid = current_user.get_id()
+        tags_just_attached = tags_api.attach_tags_to_record(uid,
+                                                            json_data['tags'],
                                                             record_id)
         if len(tags_just_attached) == 0:
             return []
@@ -370,7 +372,7 @@ class RecordListTagResource(Resource):
                 lambda t: TagRepresenation(t).marshal(), tags_just_attached
             )
 
-    def get(self, oauth, record_id):
+    def get(self, record_id):
         """Retrieve all the attached on a record tags.
 
         :param record_id: the identifier of the record
@@ -381,29 +383,29 @@ class RecordListTagResource(Resource):
         else:
             return map(lambda t: TagRepresenation(t).marshal(), attached_tags)
 
-    def delete(self, oauth, record_id):
+    def delete(self, record_id):
         """Detach all the tags from a record.
 
         :param record_id: the identifier of the record
         """
         pass
 
-    def put(self, oauth, record_id):
+    def put(self, record_id):
         """Replace all tags for a record.
 
         :param record_id: the identifier of the record
         """
         pass
 
-    def head(self, oauth, record_id):
+    def head(self, record_id):
         """A HEAD request."""
         abort(405)
 
-    def patch(self, oauth, record_id):
+    def patch(self, record_id):
         """A PATCH request."""
         abort(405)
 
-    def options(self, oauth, record_id):
+    def options(self, record_id):
         """A OPTIONS request."""
         abort(405)
 

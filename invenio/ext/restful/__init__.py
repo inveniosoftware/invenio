@@ -250,8 +250,8 @@ def require_api_auth(*scopes):
     """
     def wrapper(f):
         # Wrap function with oauth require decorator
-        from flask_oauthlib.utils import extract_params
         from invenio.modules.oauth2server.provider import oauth2
+        f_oauth_required = oauth2.require_oauth()(f)
 
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -272,33 +272,12 @@ def require_api_auth(*scopes):
 
                 login_user(user_id)
                 resp = f(None, *args, **kwargs)
-                session.clear()
-                return resp
             else:
                 # OAuth 2.0 Authentication
-                for func in oauth2._before_request_funcs:
-                    func()
-
-                server = oauth2.server
-                uri, http_method, body, headers = extract_params()
-                valid, req = server.verify_request(
-                    uri, http_method, body, headers, scopes
-                )
-
-                for func in oauth2._after_request_funcs:
-                    valid, req = func(valid, req)
-
-                if not valid:
-                    return restful.abort(
-                        401,
-                        message="Unauthorized",
-                        status=401,
-                    )
-
-                resp = f(req, *args, **kwargs)
-                session.clear()
-                return resp
-            restful.abort(401)
+                resp = f_oauth_required(*args, **kwargs)
+            # clear the session and return the response
+            session.clear()
+            return resp
         return decorated
     return wrapper
 
@@ -308,24 +287,26 @@ def require_oauth_scopes(*scopes):
 
     Note, if API key authentication is bypassing this check.
     """
+
     required_scopes = set(scopes)
 
     def wrapper(f):
         @wraps(f)
-        def decorated(oauth, bound_instance_, *args, **kwargs):
+        def decorated(*args, **kwargs):
             # Variable oauth is only defined for oauth requests (see
             # require_api_auth() above).
-            if oauth is not None:
-                token_scopes = set(oauth.access_token.scopes)
+            if request.oauth is not None:
+                token_scopes = set(request.oauth.access_token.scopes)
                 if not required_scopes.issubset(token_scopes):
                     restful.abort(403)
-            return f(bound_instance_, oauth, *args, **kwargs)
+            return f(*args, **kwargs)
         return decorated
     return wrapper
 
 
 def require_header(header, value):
     """Decorator to test if proper content-type is provided."""
+
     def decorator(f):
         @wraps(f)
         def inner(*args, **kwargs):

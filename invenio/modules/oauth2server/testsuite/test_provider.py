@@ -72,7 +72,8 @@ class OAuth2ProviderTestCase(InvenioTestCase):
             parsed = urlparse(uri)
             uri = '%s?%s' % (parsed.path, parsed.query)
             resp = test_client.open(
-                uri, headers=headers, data=data, method=method
+                uri, headers=headers, data=data, method=method,
+                base_url=cfg['CFG_SITE_SECURE_URL']
             )
             # for compatible
             resp.code = resp.status_code
@@ -230,8 +231,11 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         assert r.json.get('scopes') == [u'user']
 
         # Access token doesn't provide access to this URL.
-        r = self.client.get('/oauth2test/test-invalid')
-        self.assertStatus(r, 403)
+        r = self.client.get(
+            '/oauth2test/test-invalid',
+            base_url=cfg['CFG_SITE_SECURE_URL']
+        )
+        self.assertStatus(r, 401)
 
         # # Now logout
         r = self.client.get('/oauth2test/logout')
@@ -278,9 +282,12 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         self.assert200(r)
         self.assertEqual(r.json, dict(ping='pong'))
 
-        # Access token is not valid for this scope.
-        r = self.client.get('/oauth/info')
-        self.assertStatus(r, 403)
+        # Access token is not valid for this scope
+        r = self.client.get(
+            '/oauth/info/',
+            base_url=cfg['CFG_SITE_SECURE_URL']
+        )
+        self.assertStatus(r, 401)
 
     def test_settings_index(self):
         # Create a remote account (linked account)
