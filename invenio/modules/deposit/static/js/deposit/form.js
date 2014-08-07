@@ -30,7 +30,9 @@ define(function(require, exports, module) {
     // provides $.fn.dynamicFieldList
     require('./dynamic_field_list')
     // provides $.fn.sortable
-    require('jquery-ui')
+    require('ui/sortable')
+    // provides $.fn.datepicker
+    require('ui/datepicker')
 
     var messages = {
         errors: 'The form was saved, but there were errors. Please see below.',
@@ -1110,8 +1112,6 @@ define(function(require, exports, module) {
           }, false);
   }
 
-
-
   /**
    * Split paste text into multiple fields and elements.
    */
@@ -1125,36 +1125,25 @@ define(function(require, exports, module) {
       });
   }
 
-    // Return public methods
-    module.exports = exports.DEPOSIT_FORM = window.DEPOSIT_FORM = {
-        check_status: check_status,
-        clear_error: clear_error,
-        create_deposition: create_deposition,
-        flash_message: _flash_message,
-        getBytesWithUnit: getBytesWithUnit,
-        handle_field_msg: handle_field_msg,
-        handle_field_values: handle_field_values,
-        handle_response: handle_response,
-        init_autocomplete: init_autocomplete,
-        init_buttons: init_buttons,
-        init_ckeditor: init_ckeditor,
-        init_field_lists: init_field_lists,
-        init_inputs: init_inputs,
-        init_plupload: init_plupload,
-        init_save: init_save,
-        init_submit: init_submit,
-        init_typeaheadjs: init_typeaheadjs,
-        json_options: json_options,
-        paste_newline_splitter: paste_newline_splitter,
-        save_data: save_data,
-        save_field: save_field,
-        serialize_files: serialize_files,
-        serialize_form: serialize_form,
-        serialize_object: serialize_object,
-        set_loader: set_loader,
-        set_status: set_status,
-        submit: submit,
-        typeahead_selection: typeahead_selection,
-        unique_id: unique_id,
-    }
+  module.exports = function(config){
+    init_plupload(config.plupload);
+    init_save(config.urls.save_all_url, '.form-save', '#submitForm');
+    init_submit(config.urls.complete_url, '.form-submit', '#submitForm', '#form-submit-dialog');
+    init_inputs('#submitForm input, #submitForm textarea, #submitForm select', config.urls.save_url);
+    init_buttons('#submitForm .form-button', config.urls.save_url);
+    init_autocomplete('[data-autocomplete="1"]', config.urls.save_url, config.urls.autocomplete_url);
+    init_field_lists('#submitForm .dynamic-field-list', config.urls.save_url, '[data-autocomplete="1"]', config.urls.autocomplete_url);
+    init_ckeditor('#submitForm textarea[data-ckeditor="1"]', config.urls.save_url);
+    // Initialize rest of jquery plugins
+    // Fix issue with typeahead.js drop-down partly cut-off due to overflow ???
+    $('#webdeposit_form_accordion').on('hide', function (e) {
+      $(e.target).css("overflow","hidden");
+    })
+    $('#webdeposit_form_accordion').on('shown', function (e) {
+      $(e.target).css("overflow", "visible");
+    })
+    $('#webdeposit_form_accordion .panel-collapse.in.collapse').css("overflow", "visible");
+    // Initialize jquery_plugins
+    $(config.datepicker.element).datepicker({dateFormat: config.datepicker.format});
+  }
 })

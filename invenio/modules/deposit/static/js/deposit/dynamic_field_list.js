@@ -25,7 +25,7 @@ define(function(require, exports, module) {
         Hogan = require('hogan')
 
     // provides $.fn.sortable
-    require('jquery-ui')
+    require('ui/sortable')
 
   /**
    * Constructor.
