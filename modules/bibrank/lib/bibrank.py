@@ -281,7 +281,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
         task_set_option("last_updated", "")
     elif key in ("-l", "--lastupdate"):
         task_set_option("last_updated", "last_updated")
-    elif key in ("disable-citation-losses-check", ):
+    elif key in ("--disable-citation-losses-check", ):
         task_set_option("disable_citation_losses_check", True)
     else:
         return False
