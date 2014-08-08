@@ -158,12 +158,13 @@ class BibIndexCountryTokenizer(BibIndexMultiFieldTokenizer):
         # Search for the institution name and get a list of institution ids
         institution_ids = intbitset([])
         for name in institution_names:
-            result_hitset = search_pattern(
-                p=name,
-                f=self.institution_name_field
-            )
-            institution_hitset = result_hitset & institution_collection_hitset
-            institution_ids += list(institution_hitset)
+            if name.strip():
+                result_hitset = search_pattern(
+                    p=name,
+                    f=self.institution_name_field
+                )
+                institution_hitset = result_hitset & institution_collection_hitset
+                institution_ids += list(institution_hitset)
 
         # Get the country tokens
         tokens = []
