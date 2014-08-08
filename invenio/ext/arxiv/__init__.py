@@ -158,7 +158,8 @@ class Arxiv(object):
         from invenio.modules.records.utils import get_unique_record_json
 
         # query the database
-        result = get_unique_record_json(arxiv)
+        result = get_unique_record_json(
+            self.app.config.get("ARXIV_SEARCH_PREFIX", "") + arxiv)
         if result["status"] == "notfound":
             # query arxiv
             result = self.get_json(arxiv)
