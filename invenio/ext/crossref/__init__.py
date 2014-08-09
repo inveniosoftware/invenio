@@ -31,17 +31,18 @@ Configuration Settings
 The details of the CrossRef URL and endpoint can be customized in the application
 settings.
 
-=================== ============================================================
-`CROSSREF_API_URL`  The URL of CrossRef query API.
-                    **Default:** `http://api.crossref.org/works`
-`CROSSREF_ENDPOINT` The name of Flask endpoint for new application route.
-                    If the value is `False` (or `None`) the url rule is not
-                    registered.  **Default:** `_crossref.search`
-`CROSSREF_URL_RULE` The URL for `CROSSREF_ENPOINT` (i.e.
-                    `url_for(current_app.config['CROSSREF_ENDPOINT'])` is equal
-                    TO `current_app.config['CROSSREF_ENDPOINT']`).
-                    **Default:** `/crossref/search`
-=================== ============================================================
+========================= =====================================================
+`CROSSREF_API_URL`        The URL of CrossRef query API.
+                          **Default:** `http://api.crossref.org/works`
+`CROSSREF_ENDPOINT`       The name of Flask endpoint for new application route.
+                          If the value is `False` (or `None`) the url rule is
+                          not registered.  **Default:** `_crossref.search`
+`CROSSREF_URL_RULE`       The URL for `CROSSREF_ENPOINT` (i.e.
+                          `url_for(current_app.config['CROSSREF_ENDPOINT'])`
+                          is equal TO `current_app.config['CROSSREF_ENDPOINT']`
+                          ). **Default:** `/crossref/search`
+`CROSSREF_SEARCH_PREFIX`  The prefix used to perform the database search.
+========================= =====================================================
 
 """
 
@@ -133,7 +134,8 @@ class CrossRef(object):
 
     def search(self, doi=None):
         """Search for given DOI."""
-        doi = doi or request.args.get("doi")
+        doi = (self.app.config.get("CROSSREF_SEARCH_PREFIX", "") + doi if doi
+               else request.args.get("doi"))
 
         from invenio.modules.records.utils import get_unique_record_json
 
