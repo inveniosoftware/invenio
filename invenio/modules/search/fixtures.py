@@ -1605,7 +1605,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML brief output format, used for search results pages.'
         content_type = u'text/html'
-        id = 1
         visibility = 1
         name = u'HTML brief'
 
@@ -1614,7 +1613,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML detailed output format, used for Detailed record pages.'
         content_type = u'text/html'
-        id = 2
         visibility = 1
         name = u'HTML detailed'
 
@@ -1623,7 +1621,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML MARC.'
         content_type = u'text/html'
-        id = 3
         visibility = 1
         name = u'MARC'
 
@@ -1632,7 +1629,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML Dublin Core.'
         content_type = u'text/xml'
-        id = 4
         visibility = 1
         name = u'Dublin Core'
 
@@ -1641,7 +1637,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML MARC.'
         content_type = u'text/xml'
-        id = 5
         visibility = 1
         name = u'MARCXML'
 
@@ -1650,7 +1645,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML portfolio-style output format for photos.'
         content_type = u'text/html'
-        id = 6
         visibility = 1
         name = u'portfolio'
 
@@ -1659,7 +1653,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML caption-only output format for photos.'
         content_type = u'text/html'
-        id = 7
         visibility = 1
         name = u'photo captions only'
 
@@ -1668,7 +1661,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'BibTeX.'
         content_type = u'text/html'
-        id = 8
         visibility = 1
         name = u'BibTeX'
 
@@ -1677,7 +1669,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML EndNote.'
         content_type = u'text/xml'
-        id = 9
         visibility = 1
         name = u'EndNote'
 
@@ -1686,7 +1677,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML NLM.'
         content_type = u'text/xml'
-        id = 10
         visibility = 1
         name = u'NLM'
 
@@ -1695,7 +1685,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Excel csv output'
         content_type = u'application/ms-excel'
-        id = 11
         visibility = 0
         name = u'Excel'
 
@@ -1704,7 +1693,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Very short HTML output for similarity box (<i>people also viewed..</i>).'
         content_type = u'text/html'
-        id = 12
         visibility = 0
         name = u'HTML similarity'
 
@@ -1713,7 +1701,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'RSS.'
         content_type = u'text/xml'
-        id = 13
         visibility = 0
         name = u'RSS'
 
@@ -1722,7 +1709,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'OAI DC.'
         content_type = u'text/xml'
-        id = 14
         visibility = 0
         name = u'OAI DC'
 
@@ -1731,7 +1717,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Used to show fulltext files in mini-panel of detailed record pages.'
         content_type = u'text/html'
-        id = 15
         visibility = 0
         name = u'File mini-panel'
 
@@ -1740,7 +1725,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Used to display actions in mini-panel of detailed record pages.'
         content_type = u'text/html'
-        id = 16
         visibility = 0
         name = u'Actions mini-panel'
 
@@ -1749,7 +1733,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Display record references in References tab.'
         content_type = u'text/html'
-        id = 17
         visibility = 0
         name = u'References tab'
 
@@ -1758,7 +1741,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML cite summary format, used for search results pages.'
         content_type = u'text/html'
-        id = 18
         visibility = 1
         name = u'HTML citesummary'
 
@@ -1767,7 +1749,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'RefWorks.'
         content_type = u'text/xml'
-        id = 19
         visibility = 1
         name = u'RefWorks'
 
@@ -1776,7 +1757,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Metadata Object Description Schema'
         content_type = u'application/xml'
-        id = 20
         visibility = 1
         name = u'MODS'
 
@@ -1785,7 +1765,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Very brief HTML output format for author/paper claiming facility.'
         content_type = u'text/html'
-        id = 21
         visibility = 0
         name = u'HTML author claiming'
 
@@ -1794,7 +1773,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Sample format suitable for multimedia feeds, such as podcasts'
         content_type = u'application/rss+xml'
-        id = 22
         visibility = 0
         name = u'Podcast'
 
@@ -1803,7 +1781,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'cPickled dicts'
         content_type = u'text'
-        id = 23
         visibility = 0
         name = u'WebAuthorProfile affiliations helper'
 
@@ -1812,7 +1789,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML EndNote (8-X).'
         content_type = u'text/xml'
-        id = 24
         visibility = 1
         name = u'EndNote (8-X)'
 
@@ -1821,7 +1797,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML cite summary format, including self-citations counts.'
         content_type = u'text/html'
-        id = 25
         visibility = 0
         name = u'HTML citesummary extended'
 
@@ -1830,7 +1805,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'DataCite XML format.'
         content_type = u'text/xml'
-        id = 26
         visibility = 0
         name = u'DataCite'
 
@@ -1839,7 +1813,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Mobile brief format.'
         content_type = u'text/html'
-        id = 27
         visibility = 0
         name = u'Mobile brief'
 
@@ -1848,7 +1821,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Mobile detailed format.'
         content_type = u'text/html'
-        id = 28
         visibility = 0
         name = u'Mobile detailed'
 
@@ -1857,7 +1829,6 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Text MARC.'
         content_type = u'text/plain'
-        id = 29
         visibility = 0
         name = u'Text MARC'
 
