@@ -918,6 +918,19 @@ class FormatTest(InvenioTestCase):
                                                       ln=ln)
         self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="%s"/>' % _('Record'))
 
+    def test_engine_xslt_format(self):
+        from ..engines import xslt
+        template = pkg_resources.resource_filename(
+            'invenio.modules.formatter', 'format_templates/RSS.xsl')
+        self.assertEqual(
+            xslt.format(self.xml_text_1, template_filename=template),
+            '<item>\n  <title>On the foo and bar1On the foo and bar2</title>\n'
+            '  <link/>\n  <description/>\n  '
+            '<dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">'
+            'Doe2, John</dc:creator>\n  <pubDate/>\n  <guid/>\n</item>\n'
+        )
+
+
 class MarcFilteringTest(InvenioTestCase):
     """ bibformat - MARC tag filtering tests"""
 
