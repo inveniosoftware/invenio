@@ -201,8 +201,8 @@ distances from it.
         from invenio.modules.workflows.engine import WorkflowStatus
 
         test_object = BibWorkflowObject()
-        test_object.save()
         test_object.set_data(2)
+        test_object.save()
 
         self.assertEqual(ObjectVersion.INITIAL, test_object.version)
         self.assertEqual(None, test_object.id_parent)
@@ -664,6 +664,7 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
 
         test_object = BibWorkflowObject()
         test_object.set_data(0)
+        test_object.save()
 
         workflow = start('test_workflow_logic', [test_object], module_name="unit_tests")
 
@@ -671,6 +672,26 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
         start_by_wid(workflow.uuid)
         test_object.delete(test_object.id)
+
+    def test_workflow_task_results(self):
+        """Test the setting and getting of task results."""
+        from invenio.modules.workflows.models import BibWorkflowObject
+
+        test_object = BibWorkflowObject()
+        test_object.save()  # Saving is needed to instantiate default values
+
+        test_object.add_task_result("test", {"data": "testing"})
+        results = test_object.get_tasks_results()
+        self.assertEqual(len(results.get("test")), 1)
+
+        result_item = results.get("test")[0]
+        self.assertEqual({"data": "testing"},
+                         result_item.get("result"))
+        self.assertEqual("workflows/results/default.html",
+                         result_item.get("template"))
+        self.assertEqual("test",
+                         result_item.get("name"))
+
 
 TEST_SUITE = make_test_suite(WorkflowTasksTestAPI,
                              TestWorkflowTasks)

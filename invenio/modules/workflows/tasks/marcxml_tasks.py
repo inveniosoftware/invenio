@@ -429,8 +429,12 @@ def fulltext_download(obj, eng):
         obj.extra_data["_result"] = {}
     bibtask.task_sleep_now_if_required()
     if "pdf" not in obj.extra_data["_result"]:
-        extract_path = plotextractor_getter.make_single_directory(
-            cfg['CFG_TMPSHAREDDIR'], str(eng.uuid))
+        extract_path = os.path.join(
+            cfg['CFG_TMPSHAREDDIR'],
+            str(eng.uuid)
+        )
+        if not os.path.exists(extract_path):
+            os.makedirs(extract_path)
         tarball, pdf = plotextractor_getter.harvest_single(
             obj.data["system_number_external"]["value"],
             extract_path, ["pdf"])
@@ -469,9 +473,18 @@ def fulltext_download(obj, eng):
             except (KeyError, TypeError):
                 obj.data['fft'] = [new_dict_representation['fft']]
 
-            obj.add_task_result("Fulltext",
-                                new_dict_representation["fft"],
-                                "workflows/results/fulltext_download.html")
+            filename = os.path.basename(pdf)
+            fileinfo = {
+                "type": "Fulltext",
+                "filename": filename,
+                "full_path": pdf,
+            }
+
+            obj.add_task_result(filename,
+                                fileinfo,
+                                "workflows/results/files.html")
+        else:
+            obj.log.error("No PDF found.")
     else:
         eng.log.info("There was already a pdf register for this record,"
                      "perhaps a duplicate task in you workflow.")

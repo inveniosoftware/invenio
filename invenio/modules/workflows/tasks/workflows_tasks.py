@@ -221,13 +221,16 @@ def wait_for_a_workflow_to_complete(scanning_time=0.5):
             eng.extra_data["_nb_workflow_failed"] = 0
             eng.extra_data["_nb_workflow_finish"] = 0
 
-        if '_tasks_results' in obj.extra_data and '_wait_for_a_workflow_to_complete' in obj.extra_data['_tasks_results']:
-            del obj.extra_data['_tasks_results']['_wait_for_a_workflow_to_complete']
-
-        obj.add_task_result("review_workflow",
-                            {"finished": eng.extra_data["_nb_workflow_finish"],
-                             "failed": eng.extra_data["_nb_workflow_failed"],
-                             "total": eng.extra_data["_nb_workflow"]})
+        obj.update_task_results(
+            "wait_for_a_workflow_to_complete",
+            [
+                {"name": "wait_for_a_workflow_to_complete",
+                 "template": "workflows/results/default.html",
+                 "result": {"finished": eng.extra_data["_nb_workflow_finish"],
+                            "failed": eng.extra_data["_nb_workflow_failed"],
+                            "total": eng.extra_data["_nb_workflow"]}}
+            ]
+        )
 
     return _wait_for_a_workflow_to_complete
 
@@ -379,10 +382,16 @@ def workflows_reviews(stop_if_error=False, clean=True):
             raise WorkflowError(
                 "%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]),
                 eng.uuid, obj.id, payload=eng.extra_data["_uuid_workflow_crashed"])
-        obj.add_task_result("review_workflow",
-                            {"finished": eng.extra_data["_nb_workflow_finish"],
-                             "failed": eng.extra_data["_nb_workflow_failed"],
-                             "total": eng.extra_data["_nb_workflow"]})
+        obj.update_task_results(
+            "review_workflow",
+            [
+                {"name": "wait_for_a_workflow_to_complete",
+                 "template": "workflows/results/default.html",
+                 "result": {"finished": eng.extra_data["_nb_workflow_finish"],
+                            "failed": eng.extra_data["_nb_workflow_failed"],
+                            "total": eng.extra_data["_nb_workflow"]}}
+            ]
+        )
         if clean:
             eng.extra_data["_nb_workflow_failed"] = 0
             eng.extra_data["_nb_workflow"] = 0
@@ -392,7 +401,7 @@ def workflows_reviews(stop_if_error=False, clean=True):
 
 
 def log_info(message):
-    """ A simple function to log a simple thing.
+    """A simple function to log a simple thing.
 
     If you want more sophisticated way, thanks to see
     the function write_something_generic.

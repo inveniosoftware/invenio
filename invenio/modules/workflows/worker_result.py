@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Contain the AsynchronousResultWrapper class for asynchronous execution."""
+
 from abc import abstractmethod, ABCMeta
 from six import add_metaclass
 
@@ -35,7 +37,6 @@ class AsynchronousResultWrapper(object):
 
     For example the get method now allow a post processing
     on the result.
-
     """
 
     def __init__(self, asynchronousresult):
@@ -57,7 +58,7 @@ class AsynchronousResultWrapper(object):
 
 
 def uuid_to_workflow(uuid):
-    """Return the workflow associate to a specify uuid."""
+    """Return the workflow associated to an uuid."""
     from invenio.modules.workflows.models import Workflow
 
     return Workflow.query.filter(Workflow.uuid == uuid).first()

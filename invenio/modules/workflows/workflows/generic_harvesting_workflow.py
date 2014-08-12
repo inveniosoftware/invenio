@@ -16,7 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
 
-"""Implements an example of a typical ingestion workflow for MARCXML records"""
+"""Implements an example of a typical ingestion workflow for MARCXML records."""
 
 from ..tasks.marcxml_tasks import (get_repositories_list, harvest_records,
                                    get_records_from_file, update_last_update,
@@ -36,10 +36,13 @@ from invenio.modules.workflows.utils import WorkflowBase
 
 class generic_harvesting_workflow(WorkflowBase):
 
-    object_type = "Supervising Workflow"
+    """A generic harvesting workflow for use with OAI harvesting."""
+
+    object_type = "workflow"
 
     @staticmethod
     def get_description(bwo):
+        """Return a human readable description for data in workflow."""
         from flask import render_template
 
         identifiers = None
@@ -48,19 +51,12 @@ class generic_harvesting_workflow(WorkflowBase):
         if 'options' in extra_data and 'identifiers' in extra_data["options"]:
             identifiers = extra_data["options"]["identifiers"]
 
-        if '_task_results' in extra_data and '_workflows_reviews' in extra_data['_task_results']:
-            result_temp = bwo.get_tasks_results()
-            result_temp = result_temp['_workflows_reviews'][0]['result']
-            result_progress = {
-                'success': (result_temp['total'] - result_temp['failed']),
-                'failed': result_temp['failed'],
-                'success_per': ((result_temp['total'] - result_temp['failed'])
-                                * 100 / result_temp['total']),
-                'failed_per': result_temp['failed'] * 100 / result_temp[
-                    'total'],
-                'total': result_temp['total']}
+        results = bwo.get_tasks_results()
+
+        if 'review_workflow' in results:
+            result_progress = results['review_workflow'][0]['result']
         else:
-            result_progress = {'success_per': 0, 'failed_per': 0, 'success': 0, 'failed': 0, 'total': 0}
+            result_progress = {}
 
         current_task = extra_data['_last_task_name']
 
@@ -71,12 +67,14 @@ class generic_harvesting_workflow(WorkflowBase):
 
     @staticmethod
     def get_title(bwo):
+        """Return a human readable title for data in workflow."""
         return "Supervising harvesting of {0}".format(
             bwo.get_extra_data()["_repository"]["name"])
 
     @staticmethod
-    def formatter(bwo, **kwargs):
-        return ""
+    def formatter(bwo, **dummy):
+        """Return a human readable representation of data in workflow."""
+        return generic_harvesting_workflow.get_description(bwo)
 
     workflow = [
         init_harvesting,

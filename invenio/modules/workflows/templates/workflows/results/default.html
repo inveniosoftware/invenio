@@ -16,13 +16,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+
+{% extends "workflows/results/results_base.html" %}
+
+{% block results_body %}
 <div class="panel panel-default">
     <div class="panel-heading">
-        {{ results["name"] }}
+        {{ results.name }}
     </div>
     <div class="panel-body">
         <div class="list-group">
-            {% for key, value in results.iteritems() %}
+            {% for key, value in results.items() %}
                 <li class="list-group-item">
                     <h4 class="list-group-item-heading">{{ key }}</h4>
                     <p class="list-group-item-text">{{ value }}</p>
@@ -31,3 +35,4 @@
         </div>
     </div>
 </div>
+{% endblock %}

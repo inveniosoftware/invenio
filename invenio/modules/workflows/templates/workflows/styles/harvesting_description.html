@@ -1,25 +1,49 @@
-<h4><b>Harvesting process summary:</b></h4><br>
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
 
+{% if result_progress %}
+  <p><strong>{{ _('Progress') }}</strong></b>:
 
-<p><b>Progress</b>:
-
-<div class="progress">
-  <div class="progress-bar progress-bar-success" style="width: {{result_progress['success_per']}}%">
-    <span class="sr-only">Succeed</span>
+  <div class="progress">
+    <div class="progress-bar progress-bar-success" style="width: {{(result_progress.total - result_progress.failed)* 100 / result_progress.total}}%">
+      <span class="sr-only">{{ _('Succeeded') }}</span>
+    </div>
+    <div class="progress-bar progress-bar-danger" style="width: {{result_progress.failed * 100 / result_progress.total}}%">
+      <span class="sr-only">{{ _('Failed') }}</span>
+    </div>
   </div>
-  <div class="progress-bar progress-bar-danger" style="width: {{result_progress['failed_per']}}%">
-    <span class="sr-only">Failed</span>
-  </div>
-</div>
-Success:{{result_progress['success']}} Failed:{{result_progress['failed']}} Total:{{result_progress['total']}}</p>
 
-<p><b>Current task</b>: {{current_task}}</p>
+  <p>
+    <strong>{{result_progress.total - result_progress.failed}}</strong> out of <strong>{{result_progress.total}}</strong> record(s) done.
+  </p>
+  {% if result_progress.failed %}
+    <p class="text-warning">
+      {{ result_progress.failed }} {{ _('failed') }}.
+    </p>
+  {% endif %}
 
+{% endif %}
 
 {% if identifiers %}
-    <p><b>Identifiers</b> :
-        {% for identifier in identifiers %}
-            {{identifier}}
-        {% endfor %}
-    </p>
+  <p><b>{{ _('Identifiers:') }}</b> :
+      {% for identifier in identifiers %}
+          {{identifier}}
+      {% endfor %}
+  </p>
 {% endif %}

@@ -16,10 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+
+{% extends "workflows/results/results_base.html" %}
+
+{% block results_body %}
 <div class="panel-body">
-    <a href="{{ url_for('holdingpen.fulltext', filename=results['result']['url']) }}">
+    <a href="{{ url_for('holdingpen.get_file', objectid=obj.id, filename=results.result.filename) }}">
         <button type="button" class="btn btn-default btn-lg">
-          <span class="glyphicon glyphicon-book"></span> Fulltext
+          <span class="glyphicon glyphicon-book"></span> {{results.result.type}}
         </button>
     </a>
 </div>
+{% endblock %}

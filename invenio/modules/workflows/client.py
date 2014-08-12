@@ -15,7 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""Client side of workflows."""
+
+"""Low-level functions to run workflows."""
 
 import traceback
 from .errors import WorkflowHalt, WorkflowError
@@ -56,7 +57,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
             current_obj = wfe.get_current_object()
             if current_obj:
                 if workflowhalt_triggered.action:
-                    current_obj.add_action(workflowhalt_triggered.action,
+                    current_obj.set_action(workflowhalt_triggered.action,
                                            workflowhalt_triggered.message)
                 current_obj.version = ObjectVersion.HALTED
                 current_obj.save(version=ObjectVersion.HALTED,

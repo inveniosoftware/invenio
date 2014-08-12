@@ -16,8 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-Holding Pen
+"""Holding Pen overlay blueprint.
 
 Holding Pen is an overlay over all objects (BibWorkflowObject) that
 have run through a workflow (BibWorkflowEngine). This area is targeted
@@ -26,11 +25,12 @@ submissions/depositions.
 
 Note: Currently work-in-progress.
 """
+import os
 
-from six import iteritems, text_type
+from six import text_type
 
 from flask import (render_template, Blueprint, request, jsonify,
-                   url_for, flash, session, send_file)
+                   url_for, flash, session, send_from_directory)
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.menu import register_menu
@@ -43,7 +43,8 @@ from ..models import BibWorkflowObject, Workflow, ObjectVersion
 from ..registry import actions
 from ..utils import (sort_bwolist, extract_data, get_action_list,
                      get_formatted_holdingpen_object,
-                     get_holdingpen_objects)
+                     get_holdingpen_objects,
+                     get_rendered_task_results)
 from ..api import continue_oid_delayed, start_delayed
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -142,14 +143,7 @@ def details(objectid):
         hbwobject[ObjectVersion.FINAL]
     )
 
-    results = []
-    for task, res in iteritems(bwobject.get_tasks_results()):
-        for result in res:
-            template = render_template(result["template"], results=result)
-            if task == "fulltext_download":
-                results.insert(0, (result, template))
-            else:
-                results.append((result, template))
+    results = get_rendered_task_results(bwobject)
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
@@ -164,12 +158,16 @@ def details(objectid):
                            task_results=results)
 
 
-@blueprint.route('/fulltext', methods=['GET', 'POST'])
+@blueprint.route('/files/<int:objectid>/<path:filename>', methods=['POST', 'GET'])
 @login_required
-def fulltext():
-    """ Sends the fulltext file to user. """
-    filename = request.args.get('filename')
-    return send_file(filename)
+def get_file(objectid=None, filename=None):
+    """Send the fulltext file to user."""
+    bwobject = BibWorkflowObject.query.get(objectid)
+    task_results = bwobject.get_tasks_results()
+    if filename in task_results and task_results[filename]:
+        fileinfo = task_results[filename][0].get("result", dict())
+        directory = os.path.split(fileinfo.get("full_path", ""))[0]
+        return send_from_directory(directory, filename)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])

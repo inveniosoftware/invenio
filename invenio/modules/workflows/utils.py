@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Various utility functions for use across the workflows module."""
+
 import msgpack
 
 from invenio.ext.cache import cache
@@ -82,10 +84,12 @@ class BibWorkflowObjectIdContainer(object):
 
     def get_object(self):
         """Get the BibWorkflowObject from self.id."""
-        from ..workflows.models import BibWorkflowObject as bwlObject
+        from .models import BibWorkflowObject
 
         if self.id is not None:
-            return bwlObject.query.filter(bwlObject.id == self.id).one()
+            return BibWorkflowObject.query.filter(
+                BibWorkflowObject.id == self.id
+            ).one()
         else:
             return None
 
@@ -105,29 +109,8 @@ class BibWorkflowObjectIdContainer(object):
         return {str(self.__class__): self.__dict__}
 
 
-class WorkflowsTaskResult(object):
-
-    """The class to contain the current task results."""
-
-    def __init__(self, task_name, name, result):
-        """Create a task result passing task_name, name and result."""
-        self.task_name = task_name
-        self.name = name
-        self.result = result
-
-    def to_dict(self):
-        """Return a dictionary representing a full task result."""
-        return {
-            'name': self.name,
-            'task_name': self.task_name,
-            'result': self.result
-        }
-
-
 def get_workflow_definition(name):
     """Try to load the given workflow from the system."""
-    from .registry import workflows
-
     if name in workflows:
         return getattr(workflows[name], "workflow", None)
     else:
@@ -453,3 +436,18 @@ def get_action_list(object_list):
             action_nicename = getattr(action, "name", action_name)
         action_dict[action_nicename] = found_actions.count(action_name)
     return action_dict
+
+
+def get_rendered_task_results(obj):
+    """Return a list of rendered results from BibWorkflowObject task results."""
+    from flask import render_template
+
+    results = []
+    for res in obj.get_tasks_results().values():
+        for result in res:
+            results.append(render_template(
+                result.get("template", "workflows/results/default.html"),
+                results=result,
+                obj=obj
+            ))
+    return results

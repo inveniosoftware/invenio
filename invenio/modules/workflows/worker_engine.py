@@ -15,7 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""API for workflow manipulation in the worker."""
+
+"""Mediator between API and workers responsible for running the workflows."""
 
 from .client import run_workflow, continue_execution
 from .engine import BibWorkflowEngine, WorkflowStatus
@@ -24,19 +25,19 @@ from .errors import WorkflowObjectVersionError
 
 
 def run_worker(wname, data, **kwargs):
-    """
-    Run workflow with given name and given data.
+    """Run a workflow by name with list of data objects.
 
-    Data can be specified as list of objects or
-    single id of WfeObject/BibWorkflowObjects.
+    The list of data can also contain BibWorkflowObjects.
 
-    :param wname: the name of the workflow which will be run.
-    :type wname: String
-    :param data: And Array of value and variable which will
-    be processed by the workflow specified by wname
-    :type data: Array
-    :param kwargs: This parameter allow to pass some
-    special arguments for the different steps.
+    ``**kwargs`` can be used to pass custom arguments to the engine/object.
+
+    :param wname: name of workflow to run.
+    :type wname: str
+
+    :param data: objects to run through the workflow.
+    :type data: list
+
+    :return: BibWorkflowEngine instance
     """
     engine = BibWorkflowEngine(wname, **kwargs)
     engine.save()
@@ -46,19 +47,19 @@ def run_worker(wname, data, **kwargs):
 
 
 def restart_worker(wid, **kwargs):
-    """
-    Restart workflow with given id (wid) and given data.
+    """Restart workflow from beginning with given id (wid) and any data.
 
-    If data are not specified then it will load all initial data for workflow.
-
-    The workflow will restart from scratch.
+    ``**kwargs`` can be used to pass custom arguments to the engine/object such
+    as ``data``. If ``data`` is not specified then it will load all
+    initial data for the data objects.
 
     Data can be specified as list of objects or single id of
     BibWorkflowObjects.
 
     :param wid: workflow id (uuid) of the workflow to be restarted
-    :param kwargs: This parameter allow to pass some
-    special arguments for the different steps.
+    :type wid: str
+
+    :return: BibWorkflowEngine instance
     """
     if "data" not in kwargs:
         data = []
@@ -93,18 +94,24 @@ def restart_worker(wid, **kwargs):
 
 def continue_worker(oid, restart_point="continue_next",
                     task_offset=1, **kwargs):
-    """
-    Restart workflow with given id (wid) at given point.
+    """Restart workflow with given id (wid) at given point.
 
-    :param oid: object id of the object to process
-    :param restart_point: can be one of:
+    By providing the ``restart_point`` you can change the
+    point of which the workflow will continue from.
 
     * restart_prev: will restart from the previous task
-    * continue_next: will continue to the next task
+    * continue_next: will continue to the next task (default)
     * restart_task: will restart the current task
 
-    :param kwargs: This parameter allow to pass some
-    special arguments for the different steps.
+    ``**kwargs`` can be used to pass custom arguments to the engine/object.
+
+    :param oid: object id of the object to process
+    :type oid: int
+
+    :param restart_point: point to continue from
+    :type restart_point: str
+
+    :return: BibWorkflowEngine instance
     """
     workflow_object = BibWorkflowObject.query.get(oid)
     workflow = Workflow.query.get(workflow_object.id_workflow)
@@ -120,8 +127,7 @@ def continue_worker(oid, restart_point="continue_next",
 
 
 def get_workflow_object_instances(data, engine):
-    """
-    Analyse data and create corresponding BibWorkflowObjects.
+    """Analyze data and create corresponding BibWorkflowObjects.
 
     Wrap each item in the given list of data objects into BibWorkflowObject
     instances - creating appropriate versions of objects in the database and
@@ -134,9 +140,12 @@ def get_workflow_object_instances(data, engine):
     BibWorkflowObject instances.
 
     :param data: list of data objects to wrap
-    :param engine: instance of BibWorkflowEngine
+    :type data: list
 
-    :returns: list -- BibWorkflowObject's list
+    :param engine: instance of BibWorkflowEngine
+    :type engine: py:class:`.engine.BibWorkflowEngine`
+
+    :return: list of BibWorkflowObject
     """
     workflow_objects = []
     data_type = None
@@ -161,7 +170,7 @@ def get_workflow_object_instances(data, engine):
             # Data is not already a BibWorkflowObject, we then
             # create initial + running object pairs for each data object.
             # Then we add the running object to run through the workflow.
-            current_obj = create_object_pairs_from_data(
+            current_obj = create_data_object_from_data(
                 data_object,
                 engine,
                 data_type
@@ -172,8 +181,7 @@ def get_workflow_object_instances(data, engine):
 
 
 def generate_snapshot(workflow_object, engine):
-    """
-    Save a version of the BibWorkflowObject passed in parameter.
+    """Save a version of the BibWorkflowObject passed in parameter.
 
     Given a workflow object, generate a snapshot of it's current state
     and return the given instance to work on.
@@ -181,11 +189,13 @@ def generate_snapshot(workflow_object, engine):
     Also checks if the given workflow instance has a valid version and
     is not in RUNNING state.
 
-    :param workflow_object: Instance of BibWorkflowObject to create
-                            snapshot from.
-    :param engine: Instance of Workflow that is currently running.
+    :param workflow_object: BibWorkflowObject to create snapshot from.
+    :type workflow_object: py:class:`.models.BibWorkflowObject`
 
-    :returns: BibWorkflowObject -- the given object instance
+    :param engine: Instance of Workflow that is currently running.
+    :type engine: py:class:`.engine.BibWorkflowEngine`
+
+    :returns: BibWorkflowObject -- workflow_object instance
     :raises: WorkflowObjectVersionError
     """
     if workflow_object.version in (ObjectVersion.INITIAL,
@@ -221,15 +231,22 @@ def generate_snapshot(workflow_object, engine):
     return workflow_object
 
 
-def create_object_pairs_from_data(data_object, engine, data_type):
-    """
-    Create a new workflow object pair (INITIAL + RUNNING) and return them.
+def create_data_object_from_data(data_object, engine, data_type):
+    """Create a new BibWorkflowObject from given data and return it.
+
+    Returns a data object wrapped around data_object given. In addition
+    it creates an initial snapshot.
 
     :param data_object: object containing the data
-    :param engine: Instance of Workflow that is currently running.
-    :param data_type: the determined type of the data given.
+    :type data_object: object
 
-    :returns: tuple -- pair of BibWorkflowObject instances (initial, running)
+    :param engine: Instance of Workflow that is currently running.
+    :type engine: py:class:`.engine.BibWorkflowEngine`
+
+    :param data_type: type of the data given as taken from workflow definition.
+    :type data_type: str
+
+    :returns: new BibWorkflowObject
     """
     # Data is not already a BibWorkflowObject, we first
     # create an initial object for each data object.
