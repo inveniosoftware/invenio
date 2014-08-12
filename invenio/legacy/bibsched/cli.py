@@ -44,6 +44,7 @@ from invenio.config import \
     CFG_BIBSCHED_REFRESHTIME, \
     CFG_BINDIR, \
     CFG_LOGDIR, \
+    CFG_RUNDIR, \
     CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
     CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
     CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE, \
@@ -1028,7 +1029,7 @@ Purge options:
 
     sys.exit(exitcode)
 
-pidfile = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched.pid')
+pidfile = os.path.join(CFG_RUNDIR, 'bibsched.pid')
 
 
 def error(msg):
