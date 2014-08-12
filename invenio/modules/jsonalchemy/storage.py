@@ -99,3 +99,11 @@ class Storage(object):
         :param query: dictionary specifying the search prototype document
         """
         raise NotImplemented
+
+    def create(self):
+        """Create underlying empty storage."""
+        raise NotImplemented
+
+    def drop(self):
+        """Drop data from underlying storage."""
+        raise NotImplemented

@@ -37,6 +37,14 @@ class StorageEngine(type):
 
     """Storage metaclass for parsing application config."""
 
+    __storage_engine_registry__ = []
+
+    def __init__(cls, name, bases, dct):
+        """Register cls to type registry."""
+        if hasattr(cls, '__storagename__'):
+            cls.__storage_engine_registry__.append(cls)
+        super(StorageEngine, cls).__init__(name, bases, dct)
+
     @property
     def storage_engine(cls):
         """Return an instance of storage engine defined in application config.
