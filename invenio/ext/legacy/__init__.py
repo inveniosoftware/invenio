@@ -168,10 +168,12 @@ def setup_app(app):
         # ---------------------------------
         # Apache normally serve all static files, but if we are using the
         # devserver we need to serve static files here.
-        if not app.config.get('CFG_FLASK_SERVE_STATIC_FILES'):
+        filename = kwargs.get("filename")
+        if not app.config.get('CFG_FLASK_SERVE_STATIC_FILES') \
+                or filename is None:
             abort(404)
         else:
-            return send_from_directory(app.static_folder, kwargs["filename"])
+            return send_from_directory(app.static_folder, filename)
 
     try:
         # pylint: disable=E0611
