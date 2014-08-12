@@ -1,0 +1,60 @@
+image: inspirehep/invenio-drone:latest
+script:
+    # Autotools
+    - aclocal
+    - automake -a
+    - autoconf
+    - ./configure
+
+    # Create destination
+    - sudo mkdir -p /opt/invenio
+    - sudo chown drone:drone /opt/invenio
+    - mkdir -p /opt/invenio/lib/python/invenio
+    - sudo ln -s /opt/invenio/lib/python/invenio /usr/local/lib/python2.7/dist-packages/invenio
+
+    # Install
+    - make
+    - make install
+
+    # Config
+    - sed -i 's/www-data/drone/g' ~/invenio-local.conf
+    - mv ~/invenio-local.conf /opt/invenio/etc/invenio-local.conf
+    - /opt/invenio/bin/inveniocfg --update-all
+    - /opt/invenio/bin/inveniocfg --load-bibfield-conf
+
+    # Mails
+    - sudo service postfix start
+
+    # Apache
+    - /opt/invenio/bin/inveniocfg --create-apache-conf
+    - sed -i 's/WSGIDaemonProcess invenio/WSGIDaemonProcess invenio user=drone/g' /opt/invenio/etc/apache/invenio-apache-vhost.conf
+    - sed -i 's/WSGIDaemonProcess invenio/WSGIDaemonProcess invenio user=drone/g' /opt/invenio/etc/apache/invenio-apache-vhost-ssl.conf
+    - sudo ln -fs /opt/invenio/etc/apache/invenio-apache-vhost.conf /etc/apache2/sites-available/invenio.conf
+    - sudo ln -fs /opt/invenio/etc/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-available/invenio-ssl.conf
+    - sudo /usr/sbin/a2ensite invenio
+    - sudo /usr/sbin/a2ensite invenio-ssl
+    - touch /opt/invenio/var/log/apache.err
+    - sudo chown www-data:www-data /opt/invenio/var/log/apache.err
+
+    # Redis
+    - sudo service redis-server start
+
+    # Database
+    - sudo mv /var/lib/mysql /dev/shm/mysql
+    - sudo ln -s /dev/shm/mysql /var/lib/mysql
+    - sudo service mysql start
+    - mysql -e "CREATE DATABASE invenio DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci" -u root
+    - mysql -e "GRANT ALL PRIVILEGES ON invenio.* TO invenio@localhost IDENTIFIED BY 'my123p\$ss'" -u root
+
+    # Load records
+    - /opt/invenio/bin/inveniocfg --create-tables --yes-i-know
+    - /opt/invenio/bin/inveniocfg --create-demo-site --yes-i-know
+    - /opt/invenio/bin/inveniocfg --load-demo-records --yes-i-know
+
+    # Start apache after creating the demo site
+    # to be able to populate startup caches properly
+    - sudo service apache2 start
+
+    # Tests
+    - nosetests -v /opt/invenio/lib/python/invenio/*_unit_tests.py
+    - nosetests -v /opt/invenio/lib/python/invenio/*_regression_tests.py
