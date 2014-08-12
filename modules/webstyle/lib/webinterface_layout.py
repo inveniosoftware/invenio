@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,10 @@ from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio import webinterface_handler_config as apache
-from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import CFG_DEVEL_SITE, \
+                           CFG_OPENAIRE_SITE, \
+                           CFG_ACCESS_CONTROL_LEVEL_SITE, \
+                           CFG_CERN_SITE
 
 
 class WebInterfaceDisabledPages(WebInterfaceDirectory):
@@ -301,6 +304,47 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceAuthorlistPages = WebInterfaceDumbPages
 
+if CFG_CERN_SITE:
+    try:
+        from invenio.aleph_webinterface import WebInterfaceAlephPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceAlephPages = WebInterfaceDumbPages
+
+    try:
+        from invenio.setlink_webinterface import WebInterfaceSetLinkPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceSetLinkPages = WebInterfaceDumbPages
+
+    try:
+        from invenio.yellowreports_webinterface import WebInterfaceYellowReportsPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceYellowReportsPages = WebInterfaceDumbPages
+
+    try:
+        from invenio.webimages_webinterface import WebInterfaceImagesPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceImagesPages = WebInterfaceDumbPages
+
+    try:
+        from invenio.embedvideo_webinterface import WebInterfaceEmbedVideo
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCE')
+        WebInterfaceEmbedVideo = WebInterfaceDumbPages
+
+    try:
+        from invenio.webapi_webinterface import WebInterfaceAPIPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCE')
+        WebInterfaceAPIPages = WebInterfaceDumbPages
+
+    cds_exports = ['cdslib', 'setlink', 'images', 'video', 'api', 'yellowrep']
+else:
+    cds_exports = []
+
 if CFG_OPENAIRE_SITE:
     try:
         from invenio.openaire_deposit_webinterface import \
@@ -369,7 +413,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'goto',
                    'info',
                    'authorlist',
-               ] + test_exports + openaire_exports
+               ] + test_exports + openaire_exports + cds_exports
 
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
@@ -410,6 +454,14 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         yourcomments = WebInterfaceDisabledPages()
         goto = WebInterfaceDisabledPages()
         authorlist = WebInterfaceDisabledPages()
+        if CFG_CERN_SITE:
+            cdslib = WebInterfaceDisabledPages()
+            setlink = WebInterfaceDisabledPages()
+            yellowrep = WebInterfaceYellowReportsPages()
+            images = WebInterfaceImagesPages()
+            video = WebInterfaceEmbedVideo()
+            api = WebInterfaceAPIPages()
+
     else:
         submit = WebInterfaceSubmitPages()
         youraccount = WebInterfaceYourAccountPages()
@@ -442,6 +494,13 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         yourcomments = WebInterfaceYourCommentsPages()
         goto = WebInterfaceGotoPages()
         authorlist = WebInterfaceAuthorlistPages()
+        if CFG_CERN_SITE:
+            cdslib = WebInterfaceAlephPages()
+            setlink = WebInterfaceSetLinkPages()
+            yellowrep = WebInterfaceYellowReportsPages()
+            images = WebInterfaceImagesPages()
+            video = WebInterfaceEmbedVideo()
+            api = WebInterfaceAPIPages()
 
 
 # This creates the 'handler' function, which will be invoked directly
