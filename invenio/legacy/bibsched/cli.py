@@ -861,8 +861,8 @@ class BibSched(object):
                 pass
             else:
                 if date_string:
-                    resume_after = datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))
-                    if datetime.now() > resume_after:
+                    resume_after = datetime.datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))
+                    if datetime.datetime.now() > resume_after:
                         run_sql('UPDATE schSTATUS SET value = "" WHERE name = "resume_after"')
                         run_sql('UPDATE schSTATUS SET value = "1" WHERE name = "auto_mode"')
                         status = 1
@@ -943,7 +943,7 @@ class BibSched(object):
                 else:
                     # If nothing has changed we can go on to run tasks.
                     for task in self.node_relevant_waiting_tasks:
-                        if task[1] == 'bibupload' and self.node_relevant_bibupload_tasks:
+                        if task.proc == 'bibupload' and self.node_relevant_bibupload_tasks:
                             ## We switch in bibupload serial mode!
                             ## which means we execute the first next bibupload.
                             if self.handle_task(*self.node_relevant_bibupload_tasks[0]):
@@ -958,7 +958,7 @@ class BibSched(object):
             register_exception(alert_admin=True)
             try:
                 register_emergency('Emergency from %s: BibSched halted: %s'
-                                                         % (CFG_SITE_URL, err))
+                                   % (CFG_SITE_URL, err))
             except NotImplementedError:
                 pass
             raise
