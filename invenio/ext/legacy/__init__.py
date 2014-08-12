@@ -84,6 +84,7 @@ def setup_app(app):
                     'CFG_LOCALEDIR',
                     'CFG_LOGDIR',
                     'CFG_PYLIBDIR',
+                    'CFG_RUNDIR',
                     'CFG_TMPDIR',
                     'CFG_TMPSHAREDDIR',
                     'CFG_BIBEDIT_CACHEDIR',
