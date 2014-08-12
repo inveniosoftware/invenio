@@ -2297,15 +2297,18 @@ class BibDoc(object):
         @param newname: the new name.
         @type newname: string
         @raise InvenioBibDocFileError: if the new name corresponds to
-            a document already attached to the record owning this document.
+            a document already attached to the record owning this document or
+            if the name was not changed.
         """
         newname = normalize_docname(newname)
 
         res = run_sql("SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s AND docname=%s", (recid, newname))
         if res:
-            raise InvenioBibDocFileError, "A bibdoc called %s already exists for recid %s" % (newname, recid)
+            raise InvenioBibDocFileError("A bibdoc called %s already exists for recid %s" % (newname, recid))
 
-        run_sql("update bibrec_bibdoc set docname=%s where id_bibdoc=%s and id_bibrec=%s", (newname, self.id, recid))
+        updated = run_sql("update bibrec_bibdoc set docname=%s where id_bibdoc=%s and id_bibrec=%s", (newname, self.id, recid))
+        if not updated:
+            raise InvenioBibDocFileError("Docname for bibdoc %s in record %s was not changed" % (self.id, recid))
         # docid is known, the document already exists
         res2 = run_sql("SELECT id_bibrec, type, docname FROM bibrec_bibdoc WHERE id_bibdoc=%s", (self.id,))
         ## Refreshing names and types.
