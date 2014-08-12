@@ -734,13 +734,13 @@ def _get_cache(cache_file, source_file=None):
 
     filestream = open(cache_file, "rb")
     try:
-        #bibclassify_ontology_reader = sys.modules['bibclassify_ontology_reader']
         cached_data = cPickle.load(filestream)
 
         if cached_data['version_info']['rdflib'] != (rdflib and rdflib.__version__) or \
-                        cached_data['version_info']['bibclassify'] != bconfig.VERSION:
+                cached_data['version_info']['bibclassify'] != bconfig.VERSION:
             raise KeyError
-    except (cPickle.UnpicklingError, AttributeError, DeprecationWarning, EOFError) as e:
+    except (cPickle.UnpicklingError, ImportError,
+            AttributeError, DeprecationWarning, EOFError):
         log.warning("The existing cache in %s is not readable. "
                     "Removing and rebuilding it." % cache_file)
         filestream.close()

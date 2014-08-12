@@ -299,7 +299,7 @@ def get_keywords_output(single_keywords, composite_keywords, taxonomy_name,
                                        author_keywords, acronyms, spires,
                                        only_core_tags, limit=output_limit)
     functions = {"text": _output_text, "marcxml": _output_marc, "html":
-                 _output_html, "dict": lambda x: x}
+                 _output_html, "dict": _output_dict}
     my_styles = {}
 
     for s in style:
@@ -409,6 +409,13 @@ def _output_complete(skw_matches=None, ckw_matches=None, author_keywords=None,
         results["Acronyms"] = _get_acronyms(acronyms)
 
     return results
+
+
+def _output_dict(complete_output, categories):
+    return {
+        "complete_output": complete_output,
+        "categories": categories
+    }
 
 
 def _output_text(complete_output, categories):
