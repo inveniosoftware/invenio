@@ -163,3 +163,11 @@ class BibIndexDefaultTokenizer(BibIndexStringTokenizer):
         """
         phrase = wash_for_utf8(phrase)
         return [phrase]
+
+    def get_nonmarc_tokenizing_function(self, table_type):
+        """
+        Picks correct tokenize_for_xxx function
+        depending on the type of tokenization
+        for non-marc standards.
+        """
+        return self.get_tokenizing_function(table_type)
