@@ -171,7 +171,7 @@ def setup_app(app):
         # devserver we need to serve static files here.
         filename = kwargs.get("filename")
         if not app.config.get('CFG_FLASK_SERVE_STATIC_FILES') \
-                or filename is None:
+                or filename is None or app.static_folder is None:
             abort(404)
         else:
             return send_from_directory(app.static_folder, filename)

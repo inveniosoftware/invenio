@@ -24,11 +24,12 @@ from __future__ import print_function
 import re
 import functools
 
-from flask import flash
+from flask import flash, current_app
 from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
 from flask.ext.script import Manager as FlaskExtManager
-from functools import wraps
+from flask.ext.script.commands import Shell, Server, ShowUrls, Clean
 from six.moves import urllib
+from types import FunctionType
 from werkzeug.utils import import_string, find_modules
 
 from invenio.base.signals import pre_command, post_command
@@ -129,22 +130,38 @@ class Manager(FlaskExtManager):
 
     def add_command(self, name, command):
         """Wrap default ``add_command`` method."""
-        f = command.run
+        sender = command.run if type(command.run) is FunctionType \
+            else command.__class__
 
-        @wraps(f)
-        def wrapper(*args, **kwargs):
-            pre_command.send(f, args=args, **kwargs)
-            result = f(*args, **kwargs)
-            post_command.send(f, args=args, **kwargs)
-            return result
-        command.run = wrapper
+        class SignalingCommand(command.__class__):
+            def __call__(self, *args, **kwargs):
+                app = self.app if not len(args) else args[0]
+                with app.test_request_context():
+                    pre_command.send(sender, args=args, **kwargs)
+                res = super(SignalingCommand, self).__call__(*args, **kwargs)
+                with app.test_request_context():
+                    post_command.send(sender, args=args, **kwargs)
+                return res
+
+        command.__class__ = SignalingCommand
         return super(Manager, self).add_command(name, command)
+
+
+def set_serve_static_files(sender, *args, **kwargs):
+    """Enable serving of static files for `runserver` command.
+
+    Normally Apache serves static files, but during development and if you are
+    using the Werkzeug standalone development server, you can set this flag to
+    `True`, to enable static file serving.
+    """
+    current_app.config.setdefault('CFG_FLASK_SERVE_STATIC_FILES', True)
+
+pre_command.connect(set_serve_static_files, sender=Server)
 
 
 def register_manager(manager):
     """Register all manager plugins and default commands with the manager."""
     from six.moves.urllib.parse import urlparse
-    from flask.ext.script.commands import Shell, Server, ShowUrls, Clean
     managers = RegistryProxy('managers', ModuleAutoDiscoveryRegistry, 'manage')
 
     with manager.app.app_context():
@@ -163,7 +180,8 @@ def register_manager(manager):
     parsed_url = urlparse(manager.app.config.get('CFG_SITE_URL'))
     port = parsed_url.port or 80
     host = parsed_url.hostname or '127.0.0.1'
-    manager.add_command("runserver", Server(host=host, port=port))
+    runserver = Server(host=host, port=port)
+    manager.add_command("runserver", runserver)
 
     # FIXME separation of concerns is violated here.
     from invenio.ext.collect import collect
