@@ -507,8 +507,9 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
         all_recIDs = []
         for recIDs_range in recIDs:
             all_recIDs.extend(range(recIDs_range[0], recIDs_range[1]+1))
-        for index in indexes:
-            records_for_indexes[index] = all_recIDs
+        if all_recIDs:
+            for index in indexes:
+                records_for_indexes[index] = all_recIDs
         return records_for_indexes
 
     min_last_updated = get_min_last_updated(indexes)[0][0] or \
@@ -2135,11 +2136,16 @@ def task_run_core():
 
     # regular index: initialization for Words,Pairs,Phrases
     recIDs_range = get_recIDs_from_cli(regular_indexes)
+    # FIXME: restore when the hstRECORD table race condition between
+    #        bibupload and bibindex is solved
+    # recIDs_for_index = find_affected_records_for_index(regular_indexes,
+    #                                                    recIDs_range,
+    #                                                    (task_get_option("force") or \
+    #                                                    task_get_option("reindex") or \
+    #                                                    task_get_option("cmd") == "del"))
     recIDs_for_index = find_affected_records_for_index(regular_indexes,
                                                        recIDs_range,
-                                                       (task_get_option("force") or \
-                                                       task_get_option("reindex") or \
-                                                       task_get_option("cmd") == "del"))
+                                                       True)
 
     if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")

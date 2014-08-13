@@ -1778,6 +1778,7 @@ class BibIndexCLICallTest(InvenioTestCase):
     def test_correct_message_for_up_to_date_indexes(self):
         """bibindex - checks if correct message for index up to date appears"""
         index_name = "abstract"
+        reindex_for_type_with_bibsched(index_name)
         task_id = reindex_for_type_with_bibsched(index_name)
         filename = task_log_path(task_id, 'log')
         fl = open(filename)
@@ -1919,6 +1920,15 @@ class BibIndexCommonWordsInVirtualIndexTest(InvenioTestCase):
 class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
     """Tests communication through Queue tables between virtual index and
        dependent indexes"""
+
+    @classmethod
+    def setUpClass(cls):
+        # Clean the queue table, because some test did not it before
+        # FIXME: remove when restoring hstRECORD table utilization in bibindex
+        for table_type in ["Words", "Pairs", "Phrases"]:
+            cls.run_update_for_virtual_index(
+                CFG_BIBINDEX_INDEX_TABLE_TYPE[table_type]
+            )
 
     @classmethod
     def index_dependent_index(self, index_name, records_range, table_type):
