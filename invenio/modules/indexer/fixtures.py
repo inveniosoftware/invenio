@@ -566,3 +566,5 @@ class IdxINDEXIdxINDEXData(DataSet):
     class IdxINDEXIdxINDEX_1_26:
         id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
         id_normal = IdxINDEXData.IdxINDEX_26.ref('id')
+
+__all__ = ('IdxINDEXData', 'IdxINDEXFieldData', 'IdxINDEXIdxINDEXData')

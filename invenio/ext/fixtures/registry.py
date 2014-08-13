@@ -33,7 +33,7 @@ def fixtures_loader():
     """Load fixtures datasets."""
     out = {}
     for fixture in fixtures_proxy:
-        for data in dir(fixture):
+        for data in getattr(fixture, '__all__', dir(fixture)):
             if data[-4:] != 'Data' or data in out:
                 continue
             out[data] = getattr(fixture, data)

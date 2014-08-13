@@ -34,4 +34,6 @@ class CollectionRnkMETHODData(DataSet):
     class CollectionRnkMETHOD_1_1:
         score = 100
         id_rnkMETHOD = RnkMETHODData.RnkMETHOD_1.ref('id')
-        id_collection = 1 #CollectionData.siteCollection.ref('id')
+        id_collection = CollectionData.siteCollection.ref('id')
+
+__all__ = ('RnkMETHODData', 'CollectionRnkMETHODData')

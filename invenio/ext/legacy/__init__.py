@@ -46,9 +46,10 @@ def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
         cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
 
     conf = get_conf()
-    #cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_siteadminemail(conf)
-    cli_cmd_reset_fieldnames(conf)
+    # FIXME refactor fixtures so these calls are not needed
+    # cli_cmd_reset_sitename(conf)
+    # cli_cmd_reset_siteadminemail(conf)
+    # cli_cmd_reset_fieldnames(conf)
 
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,

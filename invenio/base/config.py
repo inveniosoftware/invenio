@@ -39,6 +39,7 @@ EXTENSIONS = [
     'invenio.ext.login',
     'invenio.ext.principal',
     'invenio.ext.email',
+    'invenio.ext.fixtures',  # before legacy
     'invenio.ext.legacy',
     'invenio.ext.assets',
     'invenio.ext.template',
@@ -53,7 +54,6 @@ EXTENSIONS = [
     'invenio.ext.menu',
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
-    'invenio.ext.fixtures',
 ]
 
 PACKAGES = [
