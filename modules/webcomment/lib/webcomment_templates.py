@@ -26,17 +26,22 @@ import re
 import html2text
 import markdown2
 import json
+from datetime import datetime, date
 
-# Invenio imports
 from invenio.webcomment_config import \
     CFG_WEBCOMMENT_BODY_FORMATS, \
     CFG_WEBCOMMENT_OUTPUT_FORMATS
 from invenio.urlutils import create_html_link, create_url
-from invenio.webuser import get_user_info, \
-                            collect_user_info, \
-                            isGuestUser, \
-                            get_email
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.webuser import (
+    get_user_info,
+    collect_user_info,
+    isGuestUser,
+    get_email
+)
+from invenio.dateutils import (
+    convert_datetext_to_dategui,
+    convert_datestruct_to_dategui
+)
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import \
     CFG_SITE_URL, \
@@ -64,6 +69,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_user_roles_from_user_info, acc_get_role_id
 from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.webcomment_config import CFG_WEBCOMMENT_DEADLINE_CONFIGURATION
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -1177,10 +1183,39 @@ class Template:
                     ' from this discussion. You will no longer receive emails about new comments.' + \
                     '</p>'
 
+        deadline_text = ""
+        for (matching_value, (matching_key, deadline_key, deadline_value_format)) in CFG_WEBCOMMENT_DEADLINE_CONFIGURATION.items():
+            if matching_value in get_fieldvalues(recID, matching_key):
+                deadline_value = get_fieldvalues(recID, deadline_key)
+                if deadline_value:
+                    try:
+                        deadline_object = datetime.strptime(deadline_value[0], deadline_value_format)
+                    except ValueError:
+                        break
+                    datetime_left = deadline_object - datetime.now()
+                    # People can still submit comments on the day of the
+                    # deadline, so make sure to add a day here.
+                    days_left = datetime_left.days + 1
+                    deadline_struct_time = date.timetuple(deadline_object)
+                    deadline_dategui = convert_datestruct_to_dategui(deadline_struct_time, ln).split(",")[0]
+                    if days_left > 0:
+                        deadline_text = _("Please submit your comments within %i days, by %s." % (days_left, deadline_dategui))
+                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
+                    elif days_left == 0:
+                        deadline_text = _("Please submit your comments by today.")
+                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
+                    else:
+                        deadline_text = _("The deadline to submit comments expired %i days ago, on %s." % (abs(days_left), deadline_dategui))
+                        deadline_text = "<span class=\"warningred\">" + deadline_text + "</span><br />"
+                # If at least one matching value is found, then there is no
+                # need to look for more.
+                break
+
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
 %(comments_and_review_tabs)s
 %(subscription_link_before)s
+%(deadline_text)s
 %(filtering_script)s
 <div style="clear:both"></div>
 <br />
@@ -1230,7 +1265,8 @@ class Template:
                 filter_file=filter_for_file,
                 page=page,
                 nb_per_page=nb_per_page,
-                nb_pages=nb_pages)
+                nb_pages=nb_pages),
+            'deadline_text': deadline_text,
         }
 
         # form is not currently used. reserved for an eventual purpose
