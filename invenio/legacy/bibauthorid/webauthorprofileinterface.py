@@ -25,6 +25,8 @@ from invenio.legacy.bibauthorid.config import CLAIMPAPER_USER_ROLE #emitting #py
 
 from invenio.legacy.bibauthorid.frontinterface import get_bibrefrec_name_string #emitting #pylint: disable-msg=W0611
 
+from invenio.legacy.bibauthorid.webapi import author_has_papers #emitting #pylint: disable-msg=W0611
+from invenio.legacy.bibauthorid.webapi import is_valid_bibref #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import search_person_ids_by_name #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.webapi import get_papers_by_person_id #emitting #pylint: disable-msg=W0611
 from invenio.legacy.bibauthorid.dbinterface import get_names_of_author #emitting #pylint: disable-msg=W0611
