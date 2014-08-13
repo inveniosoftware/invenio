@@ -23,12 +23,37 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_CERN_SITE
+
 CFG_WEBCOMMENT_ACTION_CODE = {
     'ADD_COMMENT': 'C',
     'ADD_REVIEW': 'R',
     'VOTE': 'V',
     'REPORT_ABUSE': 'A'
 }
+
+# Based on CFG_WEBCOMMENT_DEADLINE_CONFIGURATION we can display, but not
+# enforce comment submission deadlines. The configuration is composed of rules
+# (dictionary items). For a rule to be applied in the currently displayed
+# record, the dictionary key has to be in the list of values of the MARC field
+# that is the first element of the tuple in that dictionary key's value. If that
+# is the case, then the dealine is retrieved as the first value of the MARC
+# field that is the second element of the tuple in that dictionary key's value.
+# In order to programmatically check if the deadline has passed or not we need
+# to know the format of the given deadline, using standard strftime conversion
+# specifications <http://linux.die.net/man/3/strftime>. The deadline format is
+# the third element of the tuple in that dictionary key's value.
+if CFG_CERN_SITE:
+    CFG_WEBCOMMENT_DEADLINE_CONFIGURATION = {
+        "ATLASPUBDRAFT": (
+            "980__a",
+            "925__b",
+            "%d %b %Y",
+        )
+    }
+else:
+    CFG_WEBCOMMENT_DEADLINE_CONFIGURATION = {
+    }
 
 # Exceptions: errors
 class InvenioWebCommentError(Exception):

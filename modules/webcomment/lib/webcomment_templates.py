@@ -23,11 +23,13 @@
 __revision__ = "$Id$"
 
 import cgi
+from datetime import datetime, date
 
 # Invenio imports
 from invenio.urlutils import create_html_link, create_url
 from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.dateutils import convert_datetext_to_dategui, \
+                              convert_datestruct_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
@@ -51,6 +53,7 @@ from invenio.bibformat import format_record
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_user_roles_from_user_info, acc_get_role_id
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.webcomment_config import CFG_WEBCOMMENT_DEADLINE_CONFIGURATION
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -928,9 +931,38 @@ class Template:
         elif reviews == 1 and total_nb_reviews == 0 and can_send_comments:
             review_or_comment_first = _("Be the first to review this document.") + '<br />'
 
+        deadline_text = ""
+        for (matching_value, (matching_key, deadline_key, deadline_value_format)) in CFG_WEBCOMMENT_DEADLINE_CONFIGURATION.items():
+            if matching_value in get_fieldvalues(recID, matching_key):
+                deadline_value = get_fieldvalues(recID, deadline_key)
+                if deadline_value:
+                    try:
+                        deadline_object = datetime.strptime(deadline_value[0], deadline_value_format)
+                    except ValueError:
+                        break
+                    datetime_left = deadline_object - datetime.now()
+                    # People can still submit comments on the day of the
+                    # deadline, so make sure to add a day here.
+                    days_left = datetime_left.days + 1
+                    deadline_struct_time = date.timetuple(deadline_object)
+                    deadline_dategui = convert_datestruct_to_dategui(deadline_struct_time, ln).split(",")[0]
+                    if days_left > 0:
+                        deadline_text = _("Please submit your comments within %i days, by %s." % (days_left, deadline_dategui))
+                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
+                    elif days_left == 0:
+                        deadline_text = _("Please submit your comments by today.")
+                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
+                    else:
+                        deadline_text = _("The deadline to submit comments expired %i days ago, on %s." % (abs(days_left), deadline_dategui))
+                        deadline_text = "<span class=\"warningred\">" + deadline_text + "</span><br />"
+                # If at least one matching value is found, then there is no
+                # need to look for more.
+                break
+
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
 %(comments_and_review_tabs)s
+%(deadline_text)s
 <!-- start comments table -->
 <div class="webcomment_comment_table">
   %(comments_rows)s
@@ -957,7 +989,8 @@ class Template:
                                        CFG_WEBCOMMENT_ALLOW_COMMENTS and \
                                        '%s | %s <br />' % \
                                        (comments_link, reviews_link) or '',
-            'review_or_comment_first'   : review_or_comment_first
+            'review_or_comment_first'   : review_or_comment_first,
+            'deadline_text'             : deadline_text,
         }
 
         # form is not currently used. reserved for an eventual purpose
