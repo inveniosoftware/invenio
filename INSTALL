@@ -34,7 +34,7 @@ Contents
           $ sudo aptitude install python-dev apache2-mpm-prefork \
               mysql-server mysql-client python-mysqldb \
               python-4suite-xml python-simplejson python-xml \
-              python-libxml2 python-libxslt1 gnuplot poppler-utils \
+              gnuplot poppler-utils \
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib python-pyparsing \
               python-gnuplot python-magic pdftk html2text giflib-tools \
@@ -119,8 +119,6 @@ Contents
              <http://www.reportlab.org/pyrxp.html>
           - (recommended) lxml, for XML/XLST processing:
              <http://lxml.de/>
-          - (recommended) libxml2-python, for XML/XLST processing:
-             <ftp://xmlsoft.org/libxml2/python/>
           - (recommended) Gnuplot.Py, for producing graphs:
              <http://gnuplot-py.sourceforge.net/>
           - (recommended) Snowball Stemmer, for stemming:
@@ -133,6 +131,8 @@ Contents
              <http://www.darwinsys.com/file/>
           - (recommended) cerberus, extensible validation for Python dictionaries.
              <http://cerberus.readthedocs.org/>
+          - (optional) libxml2-python, for XML/XLST processing:
+             <ftp://xmlsoft.org/libxml2/python/>
           - (optional) chardet, for character encoding detection:
              <http://chardet.feedparser.org/>
           - (optional) 4suite, slower alternative to PyRXP and
