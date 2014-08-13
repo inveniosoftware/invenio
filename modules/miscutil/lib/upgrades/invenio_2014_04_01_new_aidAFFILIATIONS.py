@@ -28,7 +28,7 @@ def do_upgrade():
     """ Implement your upgrades here  """
     run_sql("""CREATE TABLE IF NOT EXISTS `aidAFFILIATIONS` (
   `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
-  `affiliation` VARCHAR( 256 ) NOT NULL,
+  `affiliation` VARCHAR( 255 ) NOT NULL,
   `last_recid` MEDIUMINT( 8 ) UNSIGNED NOT NULL,
   `last_occurence` datetime NOT NULL
 ) ENGINE=MyISAM""")

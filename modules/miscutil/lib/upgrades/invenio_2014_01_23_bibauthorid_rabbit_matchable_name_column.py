@@ -35,7 +35,7 @@ def do_upgrade():
     logger = Logger("Rabbit m_name upgrade script")
 
     warnings.filterwarnings('ignore')
-    run_sql("alter table aidPERSONIDPAPERS add `m_name` VARCHAR(256) not null after name")
+    run_sql("alter table aidPERSONIDPAPERS add `m_name` VARCHAR(255) not null after name")
 
     run_sql("alter table aidPERSONIDPAPERS add INDEX `m_name-b` (`m_name`)")
 
@@ -61,7 +61,7 @@ def do_upgrade():
         rabbit(records_for_rabbit)
     logger.update_status(1., 'Finished')
 
-    run_sql("alter table aidPERSONIDDATA modify  data varchar(256) not null default '' ")
+    run_sql("alter table aidPERSONIDDATA modify  data varchar(255) not null default '' ")
 
 def estimate():
     """

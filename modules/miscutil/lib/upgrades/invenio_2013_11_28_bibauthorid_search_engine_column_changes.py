@@ -31,10 +31,10 @@ def do_upgrade():
     run_sql("""DROP TABLE aidDENSEINDEX""")
     run_sql("""CREATE TABLE IF NOT EXISTS `aidDENSEINDEX` (
                  `id` BIGINT( 16 ) NULL DEFAULT NULL,
-                 `indexable_string` VARCHAR( 256 ) NULL DEFAULT NULL,
+                 `indexable_string` VARCHAR( 255 ) NULL DEFAULT NULL,
                  `personids` LONGBLOB NULL DEFAULT NULL,
                  `flag` SMALLINT( 2 ) NOT NULL,
-                 `indexable_surname` VARCHAR( 256 ) NULL DEFAULT NULL,
+                 `indexable_surname` VARCHAR( 255 ) NULL DEFAULT NULL,
                   PRIMARY KEY  (`id`, `flag`),
                   INDEX `nameid-b` (`id`)
                ) ENGINE=MyISAM""")
