@@ -73,7 +73,7 @@ before_script:
   - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
   - "inveniomanage database init --yes-i-know || echo ':('"
-  - "inveniomanage database create || echo ':('"
+  - "inveniomanage database create --quiet || echo ':('"
 #  - "inveniomanage demosite populate"
 
 script:

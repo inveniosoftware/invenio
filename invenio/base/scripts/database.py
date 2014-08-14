@@ -36,6 +36,8 @@ manager = Manager(usage="Perform database operations")
 # Shortcuts for manager options to keep code DRY.
 option_yes_i_know = manager.option('--yes-i-know', action='store_true',
                                    dest='yes_i_know', help='use with care!')
+option_quiet = manager.option('--quiet', action='store_true',
+                              dest='quiet', help='show less output')
 option_default_data = manager.option(
     '--no-data', action='store_false',
     dest='default_data',
@@ -92,7 +94,8 @@ def init(user='root', password='', yes_i_know=False):
 
 
 @option_yes_i_know
-def drop(yes_i_know=False):
+@option_quiet
+def drop(yes_i_know=False, quiet=False):
     """Drop database tables."""
     print(">>> Going to drop tables and related data on filesystem ...")
 
@@ -102,6 +105,7 @@ def drop(yes_i_know=False):
     from invenio.legacy.inveniocfg import test_db_connection
     from invenio.ext.sqlalchemy import db, models
     from invenio.legacy.bibdocfile.api import _make_base_dir
+    from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
     ## Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -141,32 +145,44 @@ def drop(yes_i_know=False):
     event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
     tables = list(reversed(db.metadata.sorted_tables))
-    N = len(tables)
 
-    prefix = '>>> Dropping %d tables ...' % N
+    def _dropper(items, prefix, dropper):
+        N = len(items)
+        prefix = prefix.format(N)
+        e = get_time_estimator(N)
+        dropped = 0
+        if quiet:
+            print(prefix)
 
-    e = get_time_estimator(N)
-    dropped = 0
+        for i, table in enumerate(items):
+            try:
+                if not quiet:
+                    print_progress(
+                        1.0 * (i+1) / N, prefix=prefix,
+                        suffix=str(datetime.timedelta(seconds=e()[0])))
+                dropper(table)
+                dropped += 1
+            except:
+                print('\r', '>>> problem with dropping ', table)
+                current_app.logger.exception(table)
 
-    for i, table in enumerate(tables):
-        try:
-            print_progress(1.0 * i / N, prefix=prefix,
-                           suffix=str(datetime.timedelta(seconds=e()[0])))
-            table.drop(bind=db.engine)
-            dropped += 1
-        except:
-            print('\r', '>>> problem with dropping table', table)
+        if dropped == N:
+            print(">>> Everything has been dropped successfully.")
+        else:
+            print("ERROR: not all items were properly dropped.")
+            print(">>> Dropped", dropped, 'out of', N)
 
-    print
-    if dropped == N:
-        print(">>> Tables dropped successfully.")
-    else:
-        print("ERROR: not all tables were properly dropped.")
-        print(">>> Dropped", dropped, 'out of', N)
+    _dropper(tables, '>>> Dropping {0} tables ...',
+             lambda table: table.drop(bind=db.engine))
+
+    _dropper(StorageEngine.__storage_engine_registry__,
+             '>>> Dropping {0} storage engines ...',
+             lambda api: api.storage_engine.drop())
 
 
 @option_default_data
-def create(default_data=True):
+@option_quiet
+def create(default_data=True, quiet=False):
     """Create database tables from sqlalchemy models."""
     print(">>> Going to create tables...")
 
@@ -174,6 +190,8 @@ def create(default_data=True):
     from invenio.utils.date import get_time_estimator
     from invenio.legacy.inveniocfg import test_db_connection
     from invenio.ext.sqlalchemy import db, models
+    from invenio.modules.jsonalchemy.wrappers import StorageEngine
+
     try:
         test_db_connection()
     except Exception as e:
@@ -197,29 +215,39 @@ def create(default_data=True):
     event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
 
     tables = db.metadata.sorted_tables
-    N = len(tables)
 
-    prefix = '>>> Creating %d tables ...' % N
+    def _creator(items, prefix, creator):
+        N = len(items)
+        prefix = prefix.format(N)
+        e = get_time_estimator(N)
+        created = 0
+        if quiet:
+            print(prefix)
 
-    e = get_time_estimator(N)
-    created = 0
+        for i, table in enumerate(items):
+            try:
+                if not quiet:
+                    print_progress(
+                        1.0 * (i+1) / N, prefix=prefix,
+                        suffix=str(datetime.timedelta(seconds=e()[0])))
+                creator(table)
+                created += 1
+            except:
+                print('\r', '>>> problem with dropping ', table)
+                current_app.logger.exception(table)
 
-    for i, table in enumerate(tables):
-        try:
-            print_progress(1.0 * i / N, prefix=prefix,
-                           suffix=str(datetime.timedelta(seconds=e()[0])))
-            table.create(bind=db.engine)
-            created += 1
-        except:
-            print('\r', '>>> problem with creating table', table)
+        if created == N:
+            print(">>> Everything has been created successfully.")
+        else:
+            print("ERROR: not all items were properly created.")
+            print(">>> Created", created, 'out of', N)
 
-    print('\n')
+    _creator(tables, '>>> Creating {0} tables ...',
+             lambda table: table.create(bind=db.engine))
 
-    if created == N:
-        print(">>> Tables created successfully.")
-    else:
-        print("ERROR: not all tables were properly created.")
-        print(">>> Created", created, 'out of', N)
+    _creator(StorageEngine.__storage_engine_registry__,
+             '>>> Creating {0} storage engines ...',
+             lambda api: api.storage_engine.create())
 
 
 @manager.command
@@ -239,10 +267,11 @@ def diff():
 
 @option_yes_i_know
 @option_default_data
-def recreate(yes_i_know=False, default_data=True):
+@option_quiet
+def recreate(yes_i_know=False, default_data=True, quiet=False):
     """Recreate database tables (same as issuing 'drop' and then 'create')."""
-    drop()
-    create(default_data)
+    drop(quiet=quiet)
+    create(default_data=default_data, quiet=quiet)
 
 
 @manager.command
