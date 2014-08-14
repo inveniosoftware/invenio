@@ -8692,7 +8692,7 @@ msgstr "fermer"
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:126
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:141
 msgid "No information available"
-msgstr "Aucun information disponible"
+msgstr "Aucune information disponible"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:111
 msgid "No seminars today"
