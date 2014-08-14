@@ -9346,7 +9346,7 @@ msgstr "fermer"
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:125
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:140
 msgid "No information available"
-msgstr "Aucun information disponible"
+msgstr "Aucune information disponible"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:86
 msgid "No seminars today"
