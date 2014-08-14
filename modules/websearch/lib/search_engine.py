@@ -321,6 +321,10 @@ def is_user_owner_of_record(user_info, recid):
         email = email_or_group.strip().lower()
         if user_info['email'].strip().lower() == email:
             return True
+        if CFG_CERN_SITE:
+            #the egroup might be in the form egroup@cern.ch
+            if email_or_group.replace('@cern.ch', ' [CERN]') in user_info['group']:
+                return True
     return False
 
 ###FIXME: This method needs to be refactorized
@@ -1775,8 +1779,6 @@ def is_hosted_collection(coll):
     Returns True if it is, False if it's not or if the result is empty or if the query failed"""
 
     res = run_sql("SELECT dbquery FROM collection WHERE name=%s", (coll, ))
-    if not res[0][0]:
-        return False
     try:
         return res[0][0].startswith("hostedcollection:")
     except IndexError:
@@ -4567,6 +4569,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
             elif format.startswith("hd"):
                 # HTML detailed format:
+                referer = user_info.get('referer', '')
                 for recid in recIDs:
                     if record_exists(recid) == -1:
                         write_warning(_("The record has been deleted."), req=req)
@@ -4574,7 +4577,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         if merged_recid:
                             write_warning(_("The record %d replaces it." % merged_recid), req=req)
                         continue
-                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recid)),
+                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_collection_of_a_record(recid, referer, False)),
                                                             recid, ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
