@@ -1251,8 +1251,6 @@ class BibIndexFindingAffectedIndexes(InvenioTestCase):
         self.assertRaises(KeyError, lambda :records_for_indexes["title"])
 
 
-
-
 class BibIndexIndexingAffectedIndexes(InvenioTestCase):
 
     started = False

@@ -230,6 +230,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
     now = datetime.now()  # will hold record creation/modification date
     record_had_altered_bit = False
     is_opt_mode_delete = False
+    job_id = task_get_task_param('task_id', 0)
 
     # Extraction of the Record Id from 001, SYSNO or OAIID or DOI tags:
     rec_id = retrieve_rec_id(record, opt_mode, pretend=pretend)
@@ -569,9 +570,15 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
                 # archive MARCXML format of this record for version history purposes:
                 if insert_mode_p:
-                    error = archive_marcxml_for_history(rec_id, affected_fields={}, pretend=pretend)
+                    error = archive_marcxml_for_history(rec_id=rec_id,
+                                                        affected_fields={},
+                                                        job_id=job_id,
+                                                        pretend=pretend)
                 else:
-                    error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
+                    error = archive_marcxml_for_history(rec_id=rec_id,
+                                                        affected_fields=affected_tags,
+                                                        job_id=job_id,
+                                                        pretend=pretend)
                 if error == 1:
                     msg = "   ERROR: Failed to archive MARCXML for history"
                     write_message(msg, verbose=1, stream=sys.stderr)
@@ -620,8 +627,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                     verbose=2)
         if opt_notimechange == 0 and (updates_exist or record_had_FFT):
             bibrec_now = convert_datestruct_to_datetext(time.localtime())
+            update_job_end_dates(bibrec_now=bibrec_now,
+                                 rec_id=rec_id,
+                                 insert_mode_p=insert_mode_p,
+                                 pretend=pretend)
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -633,7 +643,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             stat['nb_records_updated'] += 1
 
         # Upload of this record finish
-        write_message("Record "+str(rec_id)+" DONE", verbose=1)
+        write_message("Record %s DONE" % rec_id, verbose=1)
         return (0, int(rec_id), "")
     finally:
         if record_deleted_p:
@@ -641,6 +651,12 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             ## back the original record then.
             update_database_with_metadata(original_record, rec_id, oai_rec_id, pretend=pretend)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
+
+
+def update_job_end_dates(bibrec_now, rec_id, insert_mode_p, pretend):
+    # update_history_date(bibrec_now, recid)
+    update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
+
 
 def record_is_valid(record):
     """
@@ -2305,15 +2321,15 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
     return 0
 
 
-def archive_marcxml_for_history(recID, affected_fields, pretend=False):
+def archive_marcxml_for_history(rec_id, affected_fields, job_id, pretend=False):
     """
     Archive current MARCXML format of record RECID from BIBFMT table
     into hstRECORD table.  Useful to keep MARCXML history of records.
 
     Return 0 if everything went fine.  Return 1 otherwise.
     """
-    res = run_sql("SELECT id_bibrec, value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
-                    (recID,))
+    res = run_sql("SELECT value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
+                    (rec_id,))
 
     db_affected_fields = ""
     if affected_fields:
@@ -2328,9 +2344,10 @@ def archive_marcxml_for_history(recID, affected_fields, pretend=False):
         tmp_affected_fields.sort()
         db_affected_fields = ",".join(tmp_affected_fields)
     if res and not pretend:
+        marcxml, job_date = res[0]
         run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details, affected_fields)
                                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user', 'UNKNOWN'), res[0][2],
+                (rec_id, marcxml, job_id, 'bibupload', task_get_task_param('user', 'UNKNOWN'), job_date,
                     'mode: ' + task_get_option('mode', 'UNKNOWN') + '; file: ' + task_get_option('file_path', 'UNKNOWN') + '.',
                 db_affected_fields))
     return 0
