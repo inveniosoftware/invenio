@@ -265,8 +265,8 @@ class FormatElementTest(InvenioTestCase):
         """bibformat - identification of tag usage inside element"""
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
-        tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
-        self.failUnless(len(tags) == 4,
+        tags = bibformatadminlib.get_tags_used_by_element('bfe_additional_report_numbers.py')
+        self.failUnless(tags == ['088__a'],
                         'Could not correctly identify tags used in bfe_abstract.py')
 
 class OutputFormatTest(InvenioTestCase):

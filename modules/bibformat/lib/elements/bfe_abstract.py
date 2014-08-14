@@ -22,17 +22,101 @@
 __revision__ = "$Id$"
 
 #import cgi
-from invenio import bibformat_utils
+import re
 
-def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
-           extension_en="[...] ",extension_fr="[...] ", contextual="no",
-           highlight='no', print_lang='en,fr', escape="3",
-           separator_en="<br/>", separator_fr="<br/>", latex_to_html='no'):
+from functools import partial
+from invenio.bibformat_utils import (get_contextual_content,
+                                     highlight as _highlight,
+                                     latex_to_html as _latex_to_html)
+
+
+class AbstractWrapper:
+    """Just there to make the loop in format_element work."""
+    def __init__(self, bfo, field1, field2, escape_mode, separator):
+        self.abstract = bfo.fields(field1, escape=escape_mode)
+        self.abstract.extend(bfo.fields(field2, escape=escape_mode))
+        self.abstract = separator.join(self.abstract)
+
+
+def get_languages_to_display(bfo, print_lang):
+    if print_lang == 'auto':
+        print_lang = bfo.lang
+    langs = print_lang.split(',')
+    possible_languages = ['en', 'fr']
+
+    return map(lambda x: x in langs, possible_languages)
+
+
+def get_escape_mode(escape):
+    try:
+        return int(escape)
+    except ValueError:
+        return 0
+
+
+def convert_to_int(val):
+    try:
+        return int(val)
+    except:
+        return None
+
+
+def find_all_occurrences(text, substring):
+    return [m.start() for m in re.finditer(re.escape(substring), text)]
+
+
+def find_substring_positions(text, regex_pattern):
+    results = set(re.findall(regex_pattern, text))
+    return map(lambda x: (find_all_occurrences(text, x), len(x)), results)
+
+
+def split_regarding_substrings(s, separator, *searches):
+    """Splits a string except for those positions, which are found by the
+    searches."""
+
+    def make_split_is_valid(*invalid_positions_list):
+        """Checks if a position in a string is valid for a split"""
+        def split_is_valid(position):
+            for invalid_positions in invalid_positions_list:
+                for pos in invalid_positions:
+                    eq_length = pos[1]
+                    for p in pos[0]:
+                        if p <= position <= p + eq_length:
+                            return False
+            return True
+        return split_is_valid
+
+    split_positions = find_all_occurrences(s, separator)
+
+    invalid_splits = map(partial(find_substring_positions, s), searches)
+
+    splits = filter(make_split_is_valid(*invalid_splits),
+                    split_positions)
+
+    return map(lambda x: s[x[0]+len(separator):x[1]],
+               zip([-len(separator)]+splits, splits+[len(s)]))
+
+
+def extend_max_chars(max_chars, positions):
+    for positions, length in positions:
+        for position in positions:
+            if position < max_chars:
+                max_chars += length
+
+    return max_chars
+
+
+def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit,
+                   max_chars, extension_en="[...] ", extension_fr="[...] ",
+                   contextual="no", highlight='no', print_lang='en,fr',
+                   escape="3", separator_en="<br/>", separator_fr="<br/>",
+                   latex_to_html='no'):
     """ Prints the abstract of a record in HTML. By default prints
     English and French versions.
 
     Printed languages can be chosen with the 'print_lang' parameter.
 
+    @param bfo: BibFormatObject from invenio.bibformat_engine
     @param prefix_en: a prefix for english abstract (printed only if english abstract exists)
     @param prefix_fr: a prefix for french abstract (printed only if french abstract exists)
     @param limit: the maximum number of sentences of the abstract to display (for each language)
@@ -51,119 +135,84 @@ def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_c
     """
     out = ''
 
-    if print_lang == 'auto':
-        print_lang = bfo.lang
-    languages = print_lang.split(',')
+    languages = get_languages_to_display(bfo, print_lang)
+    escape_mode = get_escape_mode(escape)
 
-    try:
-        escape_mode_int = int(escape)
-    except ValueError, e:
-        escape_mode_int = 0
+    abstracts = [AbstractWrapper(bfo, '520__a', '520__b',
+                                 escape_mode, separator_en),   # EN ABSTRACT
+                 AbstractWrapper(bfo, '590__a', '590__b',
+                                 escape_mode, separator_fr)]   # FR ABSTRACT
+    prefixes = [prefix_en, prefix_fr]
+    suffixes = [suffix_en, suffix_fr]
 
-    abstract_en = bfo.fields('520__a', escape=escape_mode_int)
-    abstract_en.extend(bfo.fields('520__b', escape=escape_mode_int))
-    abstract_en = separator_en.join(abstract_en)
+    max_chars = convert_to_int(max_chars)
+    limit = convert_to_int(limit)
 
-    abstract_fr = bfo.fields('590__a', escape=escape_mode_int)
-    abstract_fr.extend(bfo.fields('590__b', escape=escape_mode_int))
-    abstract_fr = separator_fr.join(abstract_fr)
+    if contextual == 'yes' and limit and limit > 0:
+        for abstract in abstracts:
+            context = get_contextual_content(abstract,
+                                             bfo.search_pattern,
+                                             max_lines=limit)
+            abstract.abstract = "<br/>".join(context)
 
-    if contextual == 'yes' and limit != "" and \
-           limit.isdigit() and int(limit) > 0:
-        context_en = bibformat_utils.get_contextual_content(abstract_en,
-                                                            bfo.search_pattern,
-                                                            max_lines=int(limit))
-        #FIXME add something like [...] before and after
-        #contextual sentences when not at beginning/end of abstract
-        #if not abstract_en.strip().startswith(context_en[0].strip()):
-        #    out += '[...]'
-        abstract_en = "<br/>".join(context_en)
+    for abstract, language, prefix, suffix in zip(abstracts, languages,
+                                                  prefixes, suffixes):
 
-        context_fr = bibformat_utils.get_contextual_content(abstract_fr,
-                                                            bfo.search_pattern,
-                                                            max_lines=int(limit))
-        abstract_fr = "<br/>".join(context_fr)
+        if len(abstract.abstract) > 0 and language:
 
-    if len(abstract_en) > 0 and 'en' in languages:
+            out += prefix
+            print_extension = False
 
-        out += prefix_en
-        print_extension = False
+            if max_chars and max_chars < len(abstract.abstract):
+                latex_eqs = find_substring_positions(abstract.abstract,
+                                                     '\$.*?\$')
+                mathml_eqs = find_substring_positions(abstract.abstract,
+                                                      '<math.*?</math>')
+                max_chars = extend_max_chars(max_chars, latex_eqs)
+                max_chars = extend_max_chars(max_chars, mathml_eqs)
 
-        if max_chars != "" and max_chars.isdigit() and \
-               int(max_chars) < len(abstract_en):
-            print_extension = True
-            abstract_en = abstract_en[:int(max_chars)]
+                abstract.abstract = abstract.abstract[:max_chars]
 
-        if limit != "" and limit.isdigit():
-            s_abstract = abstract_en.split(". ") # Split around
-                                                 # DOTSPACE so that we
-                                                 # don't split html
-                                                 # links
+                if max_chars < len(abstract.abstract):
+                    print_extension = True
 
-            if int(limit) < len(s_abstract):
-                print_extension = True
-                s_abstract = s_abstract[:int(limit)]
+            if limit:
+                # Split around DOTSPACE so that we don't split html links.
+                # Also check to not split in formulas, eventhough it might
+                # never happen
+                s_abstract = split_regarding_substrings(abstract.abstract,
+                                                        ". ",
+                                                        '\$.*?\$',
+                                                        '<math.*?</math>')
 
-            #for sentence in s_abstract:
-            #    out += sentence + "."
-            out = '. '.join(s_abstract)
+                if limit < len(s_abstract):
+                    print_extension = True
+                    s_abstract = s_abstract[:limit]
 
-            # Add final dot if needed
-            if abstract_en.endswith('.'):
-                out += '.'
+                #for sentence in s_abstract:
+                #    out += sentence + "."
+                out += '. '.join(s_abstract)
 
-            if print_extension:
-                out += " " + extension_en
+                # Add final dot if needed
+                if abstract.abstract.endswith('.'):
+                    out += '.'
 
-        else:
-            out += abstract_en
+                if print_extension:
+                    out += " " + extension_en
 
-        out += suffix_en
+            else:
+                out += abstract.abstract
 
-    if len(abstract_fr) > 0 and 'fr' in languages:
-
-        out += prefix_fr
-
-        print_extension = False
-
-        if max_chars != "" and max_chars.isdigit() and \
-               int(max_chars) < len(abstract_fr):
-            print_extension = True
-            abstract_fr = abstract_fr[:int(max_chars)]
-
-        if limit != "" and limit.isdigit():
-            s_abstract = abstract_fr.split(". ") # Split around
-                                                 # DOTSPACE so that we
-                                                 # don't split html
-                                                 # links
-
-            if int(limit) < len(s_abstract):
-                print_extension = True
-                s_abstract = s_abstract[:int(limit)]
-
-            #for sentence in s_abstract:
-            #    out += sentence + "."
-            out += '. '.join(s_abstract)
-
-            # Add final dot if needed
-            if abstract_fr.endswith('.'):
-                out += '.'
-
-            if print_extension:
-                out += " "+extension_fr
-
-        else:
-            out += abstract_fr
-
-        out += suffix_fr
+            out += suffix
 
     if highlight == 'yes':
-        out = bibformat_utils.highlight(out, bfo.search_pattern)
+        out = _highlight(out, bfo.search_pattern)
 
     if latex_to_html == 'yes':
-        out = bibformat_utils.latex_to_html(out)
+        out = _latex_to_html(out)
 
     return out
+
 
 def escape_values(bfo):
     """
