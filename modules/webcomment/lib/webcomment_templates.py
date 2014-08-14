@@ -660,7 +660,7 @@ class Template:
             c_visibility = 14
             discussion = 'reviews'
             comments_link = '<a href="%s/%s/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Comments'), total_nb_comments)
-            reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
+            reviews_link = '<strong>%s (%i)</strong>' % (_('Reviews'), total_nb_reviews)
             add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, current_user_fullname or nickname, ln, '', score, note, warnings, show_title_p=True, can_attach_files=can_attach_files)
         else:
             c_nickname = 0
@@ -675,7 +675,7 @@ class Template:
             reply_to = 9
             c_visibility = 10
             discussion = 'comments'
-            comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
+            comments_link = '<strong>%s (%i)</strong>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/%s/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Reviews'), total_nb_reviews)
             add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings, can_attach_files=can_attach_files, user_is_subscribed_to_discussion=user_is_subscribed_to_discussion)
 
@@ -911,10 +911,12 @@ class Template:
 
         write_button_link = '''%s/%s/%s/%s/add''' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, discussion)
         write_button_form = '<input type="hidden" name="ln" value="%s"/>'
-        write_button_form = self.createhiddenform(action=write_button_link,
-                                                  method="get",
-                                                  text=write_button_form,
-                                                  button = reviews and _('Write a review') or _('Write a comment'))
+        write_button_form = self.createhiddenform(
+            action=write_button_link,
+            method="get",
+            text=write_button_form,
+            button=reviews and _('Write a review') or _('Write a comment')
+        )
 
         if reviews:
             total_label = _("There is a total of %s reviews")
@@ -922,42 +924,101 @@ class Template:
             total_label = _("There is a total of %s comments")
         total_label %= total_nb_comments
 
-        review_or_comment_first = ''
-        if reviews == 0 and total_nb_comments == 0 and can_send_comments:
-            review_or_comment_first = _("Start a discussion about any aspect of this document.") + '<br />'
-        elif reviews == 1 and total_nb_reviews == 0 and can_send_comments:
-            review_or_comment_first = _("Be the first to review this document.") + '<br />'
+        review_or_comment_first = ""
+        if not reviews and total_nb_comments == 0 and can_send_comments:
+            review_or_comment_first = \
+                "<p>" + \
+                _("Start a discussion about any aspect of this document.") + \
+                "</p>"
+        elif reviews and total_nb_reviews == 0 and can_send_comments:
+            review_or_comment_first = \
+                "<p>" + \
+                _("Be the first to review this document.") + \
+                "</p>"
+
+        subscription_link = ""
+        if not reviews:
+            if not user_is_subscribed_to_discussion:
+                subscription_link = \
+                    '<p class="comment-subscribe">' + \
+                    '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
+                    '&nbsp;' + \
+                    '<strong>' + \
+                    create_html_link(
+                        urlbase=CFG_SITE_URL +
+                        '/' +
+                        CFG_SITE_RECORD +
+                        '/' +
+                        str(recID) +
+                        '/comments/subscribe',
+                        urlargd={},
+                        link_label=_('Subscribe')) + \
+                    '</strong>' + \
+                    ' to this discussion. You will then receive all new comments by email.' + \
+                    '</p>'
+            elif user_can_unsubscribe_from_discussion:
+                subscription_link = \
+                    '<p class="comment-subscribe">' + \
+                    '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
+                    '&nbsp;' + \
+                    '<strong>' + \
+                    create_html_link(
+                        urlbase=CFG_SITE_URL +
+                        '/' +
+                        CFG_SITE_RECORD +
+                        '/' +
+                        str(recID) +
+                        '/comments/unsubscribe',
+                        urlargd={},
+                        link_label=_('Unsubscribe')) + \
+                    '</strong>' + \
+                    ' from this discussion. You will no longer receive emails about new comments.' + \
+                    '</p>'
 
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
 %(comments_and_review_tabs)s
+%(subscription_link_before)s
 <!-- start comments table -->
 <div class="webcomment_comment_table">
   %(comments_rows)s
 </div>
 <!-- end comments table -->
 %(review_or_comment_first)s
-<br />''' % \
-        {   'record_label': _("Record"),
+%(subscription_link_after)s
+''' % {
+            'record_label': _("Record"),
             'back_label': _("Back to search results"),
             'total_label': total_label,
-            'write_button_form' : write_button_form,
-            'write_button_form_again' : total_nb_comments>3 and write_button_form or "",
-            'comments_rows'             : comments_rows,
-            'total_nb_comments'         : total_nb_comments,
-            'comments_or_reviews'       : reviews and _('review') or _('comment'),
-            'comments_or_reviews_title' : reviews and _('Review') or _('Comment'),
-            'siteurl'                    : CFG_SITE_URL,
-            'module'                    : "comments",
-            'recid'                     : recID,
-            'ln'                        : ln,
-            #'border'                    : border,
-            'ranking_avg'               : ranking_average,
-            'comments_and_review_tabs'  : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
-                                       CFG_WEBCOMMENT_ALLOW_COMMENTS and \
-                                       '%s | %s <br />' % \
-                                       (comments_link, reviews_link) or '',
-            'review_or_comment_first'   : review_or_comment_first
+            'write_button_form': write_button_form,
+            'write_button_form_again':
+                total_nb_comments > 3 and
+                write_button_form or
+                "",
+            'comments_rows': comments_rows,
+            'total_nb_comments': total_nb_comments,
+            'comments_or_reviews': reviews and _('review') or _('comment'),
+            'comments_or_reviews_title':
+                reviews and
+                _('Review') or
+                _('Comment'),
+            'siteurl': CFG_SITE_URL,
+            'module': "comments",
+            'recid': recID,
+            'ln': ln,
+            # 'border': border,
+            'ranking_avg': ranking_average,
+            'comments_and_review_tabs':
+                CFG_WEBCOMMENT_ALLOW_REVIEWS and
+                CFG_WEBCOMMENT_ALLOW_COMMENTS and
+                '<p>%s&nbsp;|&nbsp;%s</p>' % (comments_link, reviews_link) or
+                "",
+            'review_or_comment_first': review_or_comment_first,
+            'subscription_link_before':
+                not reviews and
+                total_nb_comments != 0 and
+                subscription_link or "",
+            'subscription_link_after': subscription_link
         }
 
         # form is not currently used. reserved for an eventual purpose
@@ -1013,24 +1074,6 @@ class Template:
             body = warnings + body + pages
         else:
             body = warnings + body
-
-        if reviews == 0:
-            if not user_is_subscribed_to_discussion:
-                body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
-                        '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
-                                                            str(recID) + '/comments/subscribe',
-                                                            urlargd={},
-                                                            link_label=_('Subscribe')) + \
-                        '</b>' + ' to this discussion. You will then receive all new comments by email.' + '</div>'
-                body += '<br />'
-            elif user_can_unsubscribe_from_discussion:
-                body += '<div class="comment-subscribe">' + '<img src="%s/img/mail-icon-12x8.gif" border="0" alt="" />' % CFG_SITE_URL + \
-                        '&nbsp;' + '<b>' + create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
-                                                            str(recID) + '/comments/unsubscribe',
-                                                            urlargd={},
-                                                            link_label=_('Unsubscribe')) + \
-                        '</b>' + ' from this discussion. You will no longer receive emails about new comments.' + '</div>'
-                body += '<br />'
 
         if can_send_comments:
             body += add_comment_or_review
