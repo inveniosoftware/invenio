@@ -29,7 +29,6 @@ from invenio.bibindex_engine_utils import load_tokenizers
 _TOKENIZERS = load_tokenizers()
 
 
-
 class TestAuthorTokenizerScanning(InvenioTestCase):
     """Test BibIndex name tokenization"""
 
@@ -279,7 +278,6 @@ class TestAuthorTokenizerTokens(InvenioTestCase):
         self.assertEqual(output, anticipated)
 
 
-
 class TestExactAuthorTokenizer(InvenioTestCase):
     """Test exact author name tokenizer."""
 
@@ -313,7 +311,6 @@ class TestExactAuthorTokenizer(InvenioTestCase):
         """BibIndexExactNameTokenizer - name with hyphens"""
         self.assertEqual(self.tokenize('Doe, Jean-Pierre'),
                          ['Doe, Jean Pierre'])
-
 
 
 class TestCJKTokenizer(InvenioTestCase):
@@ -357,10 +354,76 @@ class TestCJKTokenizer(InvenioTestCase):
         self.assertEqual(sorted(self.tokenizer.tokenize_for_words(phrase)), sorted(['春','眠','暁']))
 
 
+class TestJournalPageTokenizer(InvenioTestCase):
+    """Tests for JournalPage Tokenizer"""
+
+    @classmethod
+    def setUp(self):
+        self.tokenizer = _TOKENIZERS["BibIndexJournalPageTokenizer"]()
+
+    def test_tokenize_for_single_page(self):
+        """tokenizing for single page"""
+        test_pairs = [
+            # simple number
+            ('1',       ['1']),
+            ('23',      ['23']),
+            ('12312',   ['12312']),
+            # letter + number
+            ('C85',     ['C85']),
+            ('L45',     ['L45']),
+            # roman numbers
+            ('VII',     ['VII']),
+            ('X',       ['X']),
+            # prefix + simple number
+            ('p.321',   ['p.321', '321']),
+            ('pp.321',  ['pp.321', '321']),
+            ('cpp.321', ['cpp.321', '321']),
+            ('pag.321', ['pag.321', '321']),
+            # prefix + non-simple page
+            ('p.A45',   ['p.A45', 'A45']),
+            ('pp.C83',  ['pp.C83', 'C83']),
+            ('p.V',     ['p.V', 'V']),
+            ('pp.IV',   ['pp.IV', 'IV']),
+        ]
+        for phrase, expected_tokens in test_pairs:
+            result = self.tokenizer.tokenize(phrase)
+            self.assertEqual(sorted(expected_tokens), sorted(result))
+
+    def test_tokenize_for_page_range(self):
+        """tokenizing for page range"""
+        test_pairs = [
+            # simple number
+            ('1-12',       ['1', '1-12']),
+            ('22-22',      ['22', '22-22']),
+            ('95-12312',   ['95', '95-12312']),
+            # letter + number
+            ('C85-D55',    ['C85', 'C85-D55']),
+            ('L45-L88',    ['L45', 'L45-L88']),
+            # roman numbers
+            ('I-VII',      ['I', 'I-VII']),
+            ('VIII-X',     ['VIII', 'VIII-X']),
+            # mixed range
+            ('III-12',     ['III', 'III-12']),
+            ('343-A10',    ['343', '343-A10']),
+            ('IX-B5',      ['IX', 'IX-B5']),
+            # prefix + simple number
+            ('p.56-123',   ['p.56-123', '56-123', '56']),
+            ('pp.56-123',  ['pp.56-123', '56-123', '56']),
+            ('cpp.56-123', ['cpp.56-123', '56-123', '56']),
+            ('pag.56-123', ['pag.56-123', '56-123', '56']),
+            # prefix + non-simple page
+            ('pp.VII-123',   ['pp.VII-123', 'VII-123', 'VII']),
+        ]
+        for phrase, expected_tokens in test_pairs:
+            result = self.tokenizer.tokenize(phrase)
+            self.assertEqual(sorted(expected_tokens), sorted(result))
+
+
 TEST_SUITE = make_test_suite(TestAuthorTokenizerScanning,
                              TestAuthorTokenizerTokens,
                              TestExactAuthorTokenizer,
-                             TestCJKTokenizer)
+                             TestCJKTokenizer,
+                             TestJournalPageTokenizer)
 
 
 if __name__ == '__main__':
