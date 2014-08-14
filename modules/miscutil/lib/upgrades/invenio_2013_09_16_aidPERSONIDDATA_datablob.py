@@ -33,7 +33,7 @@ def do_upgrade():
         run_sql("""ALTER TABLE aidPERSONIDDATA
                    ADD COLUMN datablob LONGBLOB NULL DEFAULT NULL""")
 
-    run_sql("""ALTER TABLE aidPERSONIDDATA MODIFY data VARCHAR( 256 ) NULL DEFAULT NULL""")
+    run_sql("""ALTER TABLE aidPERSONIDDATA MODIFY data VARCHAR( 255 ) NULL DEFAULT NULL""")
 
     pids_with_tickets = set(run_sql("""select personid
                                        from aidPERSONIDDATA
