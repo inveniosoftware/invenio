@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 from invenio.testutils import InvenioTestCase
 import os
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 from time import sleep
 
 from invenio.bibindex_engine import WordTable, \
@@ -1249,6 +1249,29 @@ class BibIndexFindingAffectedIndexes(InvenioTestCase):
         """bibindex - checks if nothing was found for title index in range of records: 1 - 20"""
         records_for_indexes = find_affected_records_for_index(["title"], [[1, 20]])
         self.assertRaises(KeyError, lambda :records_for_indexes["title"])
+
+    def test_concurrent_bibupload(self):
+        """bibindex - checks if bibupload and bibindex can run concurrently"""
+        from invenio.bibupload import update_job_end_dates
+        bibnow = run_sql("""SELECT last_updated FROM bibfmt
+                            WHERE format = 'xm' AND id_bibrec = 1""")[0][0]
+        now = datetime.now()
+        update_job_end_dates(bibrec_now=now.strftime("%Y-%m-%d %H:%M:%S"),
+                             rec_id=1,
+                             insert_mode_p=False,
+                             pretend=False)
+
+        index_name = "abstract"
+        task_id = reindex_for_type_with_bibsched(index_name)
+        filename = task_log_path(task_id, 'log')
+        with open(filename) as fl:
+            text = fl.read()  # small file
+        self.assertTrue("Selected indexes/recIDs are up to date." not in text)
+
+        update_job_end_dates(bibrec_now=bibnow.strftime("%Y-%m-%d %H:%M:%S"),
+                             rec_id=1,
+                             insert_mode_p=False,
+                             pretend=False)
 
 
 class BibIndexIndexingAffectedIndexes(InvenioTestCase):
