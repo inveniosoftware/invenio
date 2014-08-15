@@ -456,8 +456,18 @@ define(function(require, exports, module) {
   /**
    * Initialize PLUpload
    */
-  function init_plupload(max_size, selector, save_url, url, delete_url, get_file_url, db_files, dropbox_url, uuid, newdep_url, continue_url) {
-      if($(selector).length === 0){
+  function init_plupload(config) {
+      var uuid = config.uuid,
+          db_files = config.db_files,
+          url = config.url,
+          save_url = config.save_url,
+          delete_url = config.delete_url,
+          get_file_url = config.get_file_url,
+          dropbox_url = config.dropbox_url,
+          newdep_url = config.newdep_url,
+          continue_url = config.continue_url;
+
+      if($(config.selector).length === 0){
           uploader = null;
           return;
       }
@@ -468,7 +478,7 @@ define(function(require, exports, module) {
           // General settings
           runtimes : 'html5',
           url : url,
-          max_file_size : max_size,
+          max_file_size : config.max_size,
           chunk_size : '10mb',
           //unique_names : true,
           browse_button : 'pickfiles',
@@ -689,7 +699,7 @@ define(function(require, exports, module) {
 
           });
 
-          $(selector).removeClass("hide");
+          $(selector.config).removeClass("hide");
           $('#uploadfiles').removeClass("disabled");
           $('#file-table').show('slow');
           up.total.reset();
