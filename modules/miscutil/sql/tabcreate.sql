@@ -3916,6 +3916,16 @@ CREATE TABLE IF NOT EXISTS cmtCOLLAPSED (
   PRIMARY KEY (id_user, id_bibrec, id_cmtRECORDCOMMENT)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `cmtRECORDCOMMENT_bibdoc` (
+  `id_bibrec` mediumint(8) unsigned NOT NULL,
+  `id_cmtRECORDCOMMENT` int(15) unsigned NOT NULL,
+  `id_bibdoc` mediumint(9) unsigned NOT NULL,
+  `version` tinyint(4) unsigned NOT NULL,
+  PRIMARY KEY (`id_bibrec`,`id_cmtRECORDCOMMENT`),
+  KEY `id_cmtRECORDCOMMENT` (`id_cmtRECORDCOMMENT`),
+  KEY `id_bibdoc` (`id_bibdoc`)
+) ENGINE=MyISAM;
+
 -- tables for BibKnowledge:
 
 CREATE TABLE IF NOT EXISTS knwKB (
