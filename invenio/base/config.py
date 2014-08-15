@@ -65,6 +65,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
     'invenio.modules.communities',
     'invenio.modules.pages',
+    'invenio.modules.multimedia',
 ]
 
 CFG_PREFIX = distutils.sysconfig.get_config_var("prefix")
