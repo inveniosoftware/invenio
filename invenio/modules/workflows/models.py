@@ -399,18 +399,16 @@ class BibWorkflowObject(db.Model):
         Adds given task results to extra_data in order to be accessed
         and displayed later on by Holding Pen templates.
         """
-        extra_data = self.get_extra_data()
-        task_name = extra_data["_last_task_name"]
+        task_name = self.extra_data["_last_task_name"]
         res_obj = WorkflowsTaskResult(task_name, name, result)
-        if isinstance(extra_data["_tasks_results"], list):
-            if not extra_data["_tasks_results"]:
-                extra_data["_tasks_results"] = {task_name: result}
+        if isinstance(self.extra_data["_tasks_results"], list):
+            if not self.extra_data["_tasks_results"]:
+                self.extra_data["_tasks_results"] = {task_name: result}
         else:
-            if task_name in extra_data["_tasks_results"]:
-                extra_data["_tasks_results"][task_name].append(res_obj)
+            if task_name in self.extra_data["_tasks_results"]:
+                self.extra_data["_tasks_results"][task_name].append(res_obj)
             else:
-                extra_data["_tasks_results"][task_name] = [res_obj]
-        self.set_extra_data(extra_data)
+                self.extra_data["_tasks_results"][task_name] = [res_obj]
 
     def get_tasks_results(self):
         """Return the complete set of tasks results."""
