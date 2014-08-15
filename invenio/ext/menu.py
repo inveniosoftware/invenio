@@ -20,6 +20,7 @@
 """Administration menu."""
 
 from flask.ext.menu import Menu
+from flask.ext.login import current_user
 from invenio.base.i18n import _
 
 menu = Menu()
@@ -32,4 +33,5 @@ def setup_app(app):
     @app.before_first_request
     def register_item():
         item = app.extensions['menu'].submenu('main.admin')
-        item.register('admin.index', _('Admin'), order=3)
+        item.register('admin.index', _('Admin'), order=10,
+                      visible_when=lambda: current_user.is_admin)
