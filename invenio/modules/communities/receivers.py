@@ -17,24 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Communities Module recivers"""
+"""Post database creation listener."""
+
 from invenio.ext.sqlalchemy import db
 from invenio.base.factory import with_app_context
 
+
 @with_app_context(new_context=True)
 def post_handler_database_create(sender, default_data='', *args, **kwargs):
-    """
-        Fills in the Format table with new format
-        for Communities module.
-    """
+    """Fill format table with new format for Communities module."""
     from invenio.modules.formatter.models import Format
-    data = {'code':'hbpro',
+    data = {'code': 'hbpro',
             'last_updated': None,
             'description': u'Provisional HTML brief',
             'content_type': u'text/html',
-            'visibility': 1,
+            'visibility': 0,
             'name': u'hbpro'}
-    format = Format.query.filter_by(name='hbpro').first()
+    format = Format.query.filter_by(code='hbpro').first()
     if not format:
         c = Format(**data)
         db.session.add(c)
