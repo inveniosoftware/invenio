@@ -57,7 +57,7 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         raise NotImplementedError
 
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="", priority="", owner="", requestor=""):
-        """creates a ticket. return true on success, otherwise false"""
+        """creates a ticket. Returns ticket_id on success, otherwise None"""
 
         if not EMAIL_SUBMIT_CONFIGURED:
             register_exception(stream='warning',
