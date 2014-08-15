@@ -474,8 +474,8 @@ class TestTagsRestfulAPI(APITestCase):
         from invenio.modules.records.models import Record
         # first create a record
         test_record = Record(
-            creation_date=datetime.now(tzutc()).isoformat(),
-            modification_date=datetime.now(tzutc()).isoformat()
+            creation_date=datetime.now(),
+            modification_date=datetime.now()
         )
         test_record_info = dict(
             name="test_record"
@@ -528,8 +528,8 @@ class TestTagsRestfulAPI(APITestCase):
         from invenio.modules.records.models import Record
         # first create a record
         test_record = Record(
-            creation_date=datetime.now(tzutc()).isoformat(),
-            modification_date=datetime.now(tzutc()).isoformat()
+            creation_date=datetime.now(),
+            modification_date=datetime.now()
         )
         db.session.add(test_record)
         db.session.commit()
@@ -581,8 +581,8 @@ class TestTagsRestfulAPI(APITestCase):
         from invenio.modules.records.models import Record
         # first create a record
         test_record = Record(
-            creation_date=datetime.now(tzutc()).isoformat(),
-            modification_date=datetime.now(tzutc()).isoformat()
+            creation_date=datetime.now(),
+            modification_date=datetime.now()
         )
         db.session.add(test_record)
         db.session.commit()
