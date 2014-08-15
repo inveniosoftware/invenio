@@ -105,8 +105,8 @@ distances from it.
 
     def tearDown(self):
         """ Clean up created objects."""
-        from invenio.modules.workflows.utils import test_teardown
-        test_teardown(self)
+        from invenio.modules.workflows.models import Workflow
+        Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
 
     def test_halt(self):
@@ -615,9 +615,9 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
 
     def tearDown(self):
         """Clean up tests."""
-        from invenio.modules.workflows.utils import test_teardown
+        from invenio.modules.workflows.models import Workflow
+        Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
-        test_teardown(self)
 
     def test_logic_tasks(self):
         """Test that the logic tasks work correctly."""

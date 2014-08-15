@@ -18,7 +18,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import msgpack
-import calendar
 
 from invenio.ext.cache import cache
 from .registry import workflows
@@ -60,39 +59,6 @@ def convert_marcxml_to_bibfield(marcxml):
                             SmartJson,
                             master_format='marc',
                             namespace='recordext')
-
-
-def test_teardown(self):
-    """Clean up created objects in tests."""
-    from invenio.modules.workflows.models import (BibWorkflowObject,
-                                                  Workflow,
-                                                  BibWorkflowEngineLog,
-                                                  BibWorkflowObjectLog)
-    from invenio.ext.sqlalchemy import db
-
-    workflows = Workflow.get(Workflow.module_name == "unit_tests").all()
-    for workflow in workflows:
-        BibWorkflowObject.query.filter(
-            BibWorkflowObject.id_workflow == workflow.uuid
-        ).delete()
-
-        objects = BibWorkflowObjectLog.query.filter(
-            BibWorkflowObject.id_workflow == workflow.uuid
-        ).all()
-        for obj in objects:
-            db.session.delete(obj)
-        db.session.delete(workflow)
-
-        objects = BibWorkflowObjectLog.query.filter(
-            BibWorkflowObject.id_workflow == workflow.uuid
-        ).all()
-        for obj in objects:
-            BibWorkflowObjectLog.delete(id=obj.id)
-        BibWorkflowEngineLog.delete(uuid=workflow.uuid)
-
-    # Deleting dummy object created in tests
-    Workflow.query.filter(Workflow.module_name == "unit_tests").delete()
-    db.session.commit()
 
 
 class BibWorkflowObjectIdContainer(object):

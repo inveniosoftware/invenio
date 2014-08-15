@@ -30,20 +30,16 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
     def setUp(self):
         """Setup tests."""
         self.create_registries()
-        self.objects_to_delete = []
 
     def tearDown(self):
-        """ Clean up created objects."""
-        from invenio.modules.workflows.utils import test_teardown
-        from invenio.modules.workflows.models import BibWorkflowObject
-
-        test_teardown(self)
+        """Clean up created objects."""
+        from invenio.modules.workflows.models import Workflow
+        Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
-        for obj in self.objects_to_delete:
-            BibWorkflowObject.delete(obj.id)
 
     def test_filtering(self):
-        """ Test filtering functionnality."""
+        """Test filtering functionality."""
+        from invenio.ext.sqlalchemy import db
         from ..tasks.marcxml_tasks import filtering_oai_pmh_identifier
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject
@@ -77,8 +73,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
         self.assertFalse(filtering_oai_pmh_identifier(my_test_obj, engine))
-        self.objects_to_delete.append(my_test_obj_b)
-        self.objects_to_delete.append(my_test_obj)
+        db.session.delete(my_test_obj_b)
 
     def test_init_harvesting(self):
         """Test harvesting."""
@@ -98,7 +93,6 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         engine.extra_data = engine.get_extra_data()
         init_harvesting(my_test_obj, engine)
         self.assertTrue(engine.get_extra_data()["options"]["test"])
-        self.objects_to_delete.append(my_test_obj)
 
 TEST_SUITE = make_test_suite(WorkflowMarcXML)
 

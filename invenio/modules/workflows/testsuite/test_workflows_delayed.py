@@ -35,8 +35,8 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
 
     def tearDown(self):
         """ Clean up created objects."""
-        from invenio.modules.workflows.utils import test_teardown
-        test_teardown(self)
+        from invenio.modules.workflows.models import Workflow
+        Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
 
     def test_workflow_delay(self):

@@ -91,14 +91,18 @@ class Workflow(db.Model):
                             default=get_default_extra_data())
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
-    objects = db.relationship("BibWorkflowObject", backref="bwlWORKFLOW")
+    objects = db.relationship("BibWorkflowObject",
+                              backref='bwlWORKFLOW',
+                              cascade="all, delete, delete-orphan")
     counter_initial = db.Column(db.Integer, default=0, nullable=False)
     counter_halted = db.Column(db.Integer, default=0, nullable=False)
     counter_error = db.Column(db.Integer, default=0, nullable=False)
     counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
 
-    child_logs = db.relationship("BibWorkflowEngineLog")
+    child_logs = db.relationship("BibWorkflowEngineLog",
+                                 backref='bwlWORKFLOW',
+                                 cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         """Represent a workflow object."""
@@ -304,9 +308,13 @@ class BibWorkflowObject(db.Model):
                           nullable=True)
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
-    child_logs = db.relationship("BibWorkflowObjectLog")
+
+    child_logs = db.relationship("BibWorkflowObjectLog",
+                                 backref='bibworkflowobject',
+                                 cascade="all, delete, delete-orphan")
+
     workflow = db.relationship(
-        Workflow, foreign_keys=[id_workflow], remote_side=Workflow.uuid
+        Workflow, foreign_keys=[id_workflow], remote_side=Workflow.uuid,
     )
 
     _log = None

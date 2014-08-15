@@ -31,20 +31,16 @@ class WorkflowOthers(WorkflowTasksTestCase):
     def setUp(self):
         """Setup tests."""
         self.create_registries()
-        self.objects_to_delete = []
 
     def tearDown(self):
         """ Clean up created objects."""
-        from invenio.modules.workflows.utils import test_teardown
-        from ..models import BibWorkflowObject
-
-        test_teardown(self)
+        from invenio.modules.workflows.models import Workflow
+        Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
-        for obj in self.objects_to_delete:
-            BibWorkflowObject.delete(obj.id)
 
     def test_result_abstraction(self):
         """Test abastraction layer for celery worker."""
+        from invenio.ext.sqlalchemy import db
         from ..utils import BibWorkflowObjectIdContainer
         from ..models import BibWorkflowObject
         from ..worker_result import AsynchronousResultWrapper
@@ -58,7 +54,7 @@ class WorkflowOthers(WorkflowTasksTestCase):
         self.assertEqual(bwoic2.get_object().id, test_object.id)
         result = bwoic2.to_dict()
         self.assertEqual(bwoic2.from_dict(result).id, test_object.id)
-        self.objects_to_delete.append(test_object)
+        db.session.delete(test_object)
         try:
             AsynchronousResultWrapper(None)
         except Exception as e:
