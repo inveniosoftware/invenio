@@ -458,6 +458,8 @@ define(function(require, exports, module) {
    */
   function init_plupload(config) {
       var uuid = config.uuid,
+          selector = config.selector,
+          max_size = config.max_size,
           db_files = config.db_files,
           url = config.url,
           save_url = config.save_url,
@@ -467,7 +469,7 @@ define(function(require, exports, module) {
           newdep_url = config.newdep_url,
           continue_url = config.continue_url;
 
-      if($(config.selector).length === 0){
+      if($(selector).length === 0){
           uploader = null;
           return;
       }
@@ -478,7 +480,7 @@ define(function(require, exports, module) {
           // General settings
           runtimes : 'html5',
           url : url,
-          max_file_size : config.max_size,
+          max_file_size : max_size,
           chunk_size : '10mb',
           //unique_names : true,
           browse_button : 'pickfiles',
@@ -699,7 +701,7 @@ define(function(require, exports, module) {
 
           });
 
-          $(selector.config).removeClass("hide");
+          $(selector).removeClass("hide");
           $('#uploadfiles').removeClass("disabled");
           $('#file-table').show('slow');
           up.total.reset();
