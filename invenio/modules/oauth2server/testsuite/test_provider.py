@@ -523,6 +523,34 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         )
         self.assertStatus(r, 401)
 
+    def test_resource_auth_methods(self):
+        # Query string
+        r = self.client.get(
+            '/oauth/ping',
+            query_string="access_token=%s" % self.personal_token.access_token
+        )
+        self.assert200(r)
+        self.assertEqual(r.json, dict(ping='pong'))
+
+        # POST request body
+        r = self.client.post(
+            '/oauth/ping',
+            data=dict(access_token=self.personal_token.access_token),
+        )
+        self.assert200(r)
+        self.assertEqual(r.json, dict(ping='pong'))
+
+        # Authorization Header
+        r = self.client.get(
+            '/oauth/ping',
+            headers=[
+                ("Authorization",
+                 "Bearer %s" % self.personal_token.access_token),
+            ]
+        )
+        self.assert200(r)
+        self.assertEqual(r.json, dict(ping='pong'))
+
     def test_settings_index(self):
         # Create a remote account (linked account)
         r = self.client.get(

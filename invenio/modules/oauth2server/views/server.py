@@ -153,7 +153,7 @@ def errors():
         return render_template('oauth2server/errors.html', error=e)
 
 
-@blueprint.route('/ping/')
+@blueprint.route('/ping/', methods=['GET', 'POST'])
 @oauth2.require_oauth()
 def ping():
     """Test to verify that you have been authenticated."""
