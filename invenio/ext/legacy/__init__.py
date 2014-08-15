@@ -18,8 +18,10 @@
 
 """Tools for working with legacy application."""
 
+from __future__ import print_function
+
 import os
-import warnings
+import sys
 
 ## Import the remote debugger as a first thing, if allowed
 #FIXME enable remote_debugger when invenio.config is ready
@@ -38,17 +40,19 @@ from invenio.base.scripts.database import create, recreate
 
 from .request_class import LegacyRequest
 
+
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
     from invenio.config import CFG_PREFIX
     from invenio.base.scripts.config import get_conf
-    from invenio.legacy.inveniocfg import cli_cmd_reset_sitename, \
-        cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
+    # from invenio.legacy.inveniocfg import cli_cmd_reset_sitename
+    from invenio.legacy.inveniocfg import cli_cmd_reset_siteadminemail
+    # from invenio.legacy.inveniocfg import cli_cmd_reset_fieldnames
 
     conf = get_conf()
     # FIXME refactor fixtures so these calls are not needed
     # cli_cmd_reset_sitename(conf)
-    # cli_cmd_reset_siteadminemail(conf)
+    cli_cmd_reset_siteadminemail(conf)
     # cli_cmd_reset_fieldnames(conf)
 
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
@@ -175,18 +179,5 @@ def setup_app(app):
             abort(404)
         else:
             return send_from_directory(app.static_folder, filename)
-
-    try:
-        # pylint: disable=E0611
-        from invenio.webinterface_handler_local import customize_app
-        # pylint: enable=E0611
-        warnings.warn("Do not use 'invenio.webinterface_handler_local:"
-                      "customize_app' directly. Please, adapt your function "
-                      "into package and use configuration option "
-                      "EXTENSIONS = ['mypackage.customize_app'] instead.",
-                      DeprecationWarning)
-    except ImportError:
-        ## No customization needed.
-        pass
 
     return app
