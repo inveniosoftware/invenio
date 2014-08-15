@@ -1246,7 +1246,7 @@ form input[disabled], form input[disabled="true"]{
 }
 
 #comment-write .submit-area {
-   margin:20px 0 0 -5px;
+   margin: 0px 0 0 -5px;
 }
 
 /* Subscribe to comment*/
@@ -1965,7 +1965,6 @@ dd{
 }
 .cmtsubround {
    margin: 5px 15px 5px;
-   border-bottom: 1px dashed #bbb;
 }
 .cmtfilesblock{
    background-color:#f5f5f5;
@@ -4036,5 +4035,99 @@ img.login_button_big {
 
 img.login_button_small {
     border-radius: 2px;
+}
+
+#filter_area{
+    float: right;
+    margin-top: -5px;
+    height: 20px;
+    display: inline-table;
+    text-align: right;
+}
+
+#filter_area input{
+    padding: 4px;
+    margin: 0;
+    width: 240px;
+    font-size: 12px;
+}
+
+#filter_area p{
+    display: inline;
+    padding: 0;
+    margin: 0;
+}
+
+#filter_area #matching_comments_number.filter-no-matches {
+    color: #b85757;
+}
+
+#filter_area p.filter-area-count {
+    color: #777;
+    font-size: 13px;
+    padding-right: 10px;
+}
+
+#filter_area #selectize_input {
+    width: 252px;
+}
+
+#filter_area .filter-area-advance {
+    margin-top: 5px;
+}
+
+#filter_area .filter-area-advance a.toggle-advance-search {
+    font-size: 12px;
+    line-height: 20px;
+    vertical-align: top;
+    background-image: url('/img/filter_filled.png');
+    background-position: 0 2px;
+    background-repeat: no-repeat;
+    padding-left: 12px;
+}
+
+#cmtRound.cmtround {
+    margin-top: 80px;
+}
+
+#cmtSubRound .cmt_file_relation {
+    font-size: 11px;
+    color: #777;
+    padding-right: 5px;
+}
+
+#related_file {
+    margin-bottom: 20px;
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+#related_file small{
+    line-height: 25px;
+}
+
+#related_file select{
+    min-width: 255px;
+}
+
+#search_all_authors_anchor{
+   font-size: 12px;
+}
+
+.webcomments-matches-alert {
+    text-align: center;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #8a6d3b;
+    background: #fcf8e3;
+    border: 1px solid #ded18a;
+    padding: 10px 5px;
+}
+
+#search_next_page {
+    text-align: right!important;
+    margin-top: 20px;
 }
 /* end of invenio.css */
