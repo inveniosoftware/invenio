@@ -135,7 +135,7 @@ def main():
     Main body of bibtasklet.
     """
     task_init(
-        authorization_action='runbibtaslet',
+        authorization_action='runbibtasklet',
         authorization_msg="BibTaskLet Task Submission",
         help_specific_usage="""\
   -T, --tasklet         Execute the specific tasklet
