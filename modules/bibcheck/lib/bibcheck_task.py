@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -376,15 +376,15 @@ Edit this record: %s
 
     subject = "Bibcheck rule failed in record %s" % record_id
 
-    res = BIBCATALOG_SYSTEM.ticket_submit(
+    ticket_id = BIBCATALOG_SYSTEM.ticket_submit(
         subject=subject,
         recordid=record_id,
         text=subject,
         queue=task_get_option("queue", "Bibcheck")
     )
-    write_message("Bibcatalog returned %s" % res)
-    if res > 0:
-        BIBCATALOG_SYSTEM.ticket_comment(None, res, msg)
+    write_message("Bibcatalog returned %s" % ticket_id)
+    if ticket_id:
+        BIBCATALOG_SYSTEM.ticket_comment(None, ticket_id, msg)
 
 
 def upload_amendments(records, holdingpen):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -68,7 +68,7 @@ class BibCatalogSystem(object):
         raise NotImplementedError("This class cannot be instantiated")
 
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="", priority="", owner="",requestor=""):
-        """submit a ticket. Return ticket number on success, otherwise None
+        """submit a ticket. Return ticket_id on success, otherwise None
            @param uid: invenio user id. optional
            @type uid: number
            @param subject: set this as the ticket's subject.
@@ -85,7 +85,7 @@ class BibCatalogSystem(object):
            @type owner: number
            @param requestor: set ticket requestor to this email.
            @type requestor: string
-           @return: new ticket id or None
+           @return: new ticket_id or None
         """
         raise NotImplementedError("This class cannot be instantiated")
 
