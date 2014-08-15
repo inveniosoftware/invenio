@@ -19,6 +19,7 @@
 
 """ Comments and reviews for records """
 
+
 __revision__ = "$Id$"
 
 # non Invenio imports:
@@ -83,13 +84,35 @@ from invenio.search_engine import \
      get_collection_reclist, \
      get_colID
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.webcomment_dblayer import \
+    set_comment_to_bibdoc_relation,\
+    get_comment_to_bibdoc_relations
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')
 except:
     pass
 
-def perform_request_display_comments_or_remarks(req, recID, display_order='od', display_since='all', nb_per_page=100, page=1, ln=CFG_SITE_LANG, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False, display_comment_rounds=None):
+
+def perform_request_display_comments_or_remarks(req,
+                                                recID,
+                                                display_order='od',
+                                                display_since='all',
+                                                nb_per_page=100,
+                                                page=1,
+                                                ln=CFG_SITE_LANG,
+                                                voted=-1,
+                                                reported=-1,
+                                                subscribed=0,
+                                                reviews=0,
+                                                uid=-1,
+                                                can_send_comments=False,
+                                                can_attach_files=False,
+                                                user_is_subscribed_to_discussion=False,
+                                                user_can_unsubscribe_from_discussion=False,
+                                                display_comment_rounds=None,
+                                                filter_for_text=None,
+                                                filter_for_file=None):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -165,6 +188,11 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
 
     nb_reviews = get_nb_reviews(recID, count_deleted=False)
     nb_comments = get_nb_comments(recID, count_deleted=False)
+    res_related_files = get_comment_to_bibdoc_relations(recID)
+    related_files = {}
+    if res_related_files:
+        for related_file in res_related_files:
+            related_files[related_file['id_comment']] = related_file
 
     # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
@@ -311,25 +339,33 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
             display_comment_rounds.append(grouped_comments[-1][0])
         display_comment_rounds.remove('latest')
 
-    body = webcomment_templates.tmpl_get_comments(req,
-                                                  recID,
-                                                  ln,
-                                                  nb_per_page, page, last_page,
-                                                  display_order, display_since,
-                                                  CFG_WEBCOMMENT_ALLOW_REVIEWS,
-                                                  grouped_comments, nb_comments, avg_score,
-                                                  warnings,
-                                                  border=0,
-                                                  reviews=reviews,
-                                                  total_nb_reviews=nb_reviews,
-                                                  uid=uid,
-                                                  can_send_comments=can_send_comments,
-                                                  can_attach_files=can_attach_files,
-                                                  user_is_subscribed_to_discussion=\
-                                                  user_is_subscribed_to_discussion,
-                                                  user_can_unsubscribe_from_discussion=\
-                                                  user_can_unsubscribe_from_discussion,
-                                                  display_comment_rounds=display_comment_rounds)
+    body = webcomment_templates.tmpl_get_comments(
+        req,
+        recID,
+        ln,
+        nb_per_page,
+        page,
+        last_page,
+        display_order,
+        display_since,
+        CFG_WEBCOMMENT_ALLOW_REVIEWS,
+        grouped_comments,
+        nb_comments,
+        avg_score,
+        warnings,
+        border=0,
+        reviews=reviews,
+        total_nb_reviews=nb_reviews,
+        uid=uid,
+        can_send_comments=can_send_comments,
+        can_attach_files=can_attach_files,
+        user_is_subscribed_to_discussion=user_is_subscribed_to_discussion,
+        user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion,
+        display_comment_rounds=display_comment_rounds,
+        filter_for_text=filter_for_text,
+        filter_for_file=filter_for_file,
+        related_files=related_files
+    )
     return body
 
 def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
@@ -929,7 +965,8 @@ def get_reply_order_cache_data(comid):
 def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                 note="", score=0, priority=0,
                                 client_ip_address='', editor_type='textarea',
-                                req=None, reply_to=None, attached_files=None):
+                                req=None, reply_to=None, attached_files=None,
+                                related_file=None):
     """
     Private function
     Insert a comment/review or remarkinto the database
@@ -942,6 +979,9 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param editor_type: the kind of editor used to submit the comment: 'textarea', 'ckeditor'
     @param req: request object. If provided, email notification are sent after we reply to user request.
     @param reply_to: the id of the comment we are replying to with this inserted comment.
+    @param related_file: dictionary containing all the information about the
+        relation of the comment being submitted to the bibdocfile that was
+        chosen. ("id_bibdoc:version:mime")
     @return: integer >0 representing id if successful, integer 0 if not
     """
 
@@ -1009,6 +1049,12 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     if res:
         new_comid = int(res)
         move_attached_files_to_storage(attached_files, recID, new_comid)
+
+        # Relate comment with a bibdocfile if one was chosen
+        if related_file and len(related_file.split(":")) >= 2:
+            id_bibdoc, doc_version = related_file.split(":")[:2]
+            set_comment_to_bibdoc_relation(recID, new_comid, id_bibdoc, doc_version)
+
         parent_reply_order = run_sql("""SELECT reply_order_cached_data from cmtRECORDCOMMENT where id=%s""", (reply_to,))
         if not parent_reply_order or parent_reply_order[0][0] is None:
             # This is not a reply, but a first 0-level comment
@@ -1633,7 +1679,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                           subscribe=False,
                                           req=None,
                                           attached_files=None,
-                                          warnings=None):
+                                          warnings=None,
+                                          related_file=None):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -1811,7 +1858,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type,
                                                           req=req,
-                                                          reply_to=comID)
+                                                          reply_to=comID,
+                                                          related_file=related_file)
                 else:
                     try:
                         raise InvenioWebCommentWarning(_('You already wrote a review for this record.'))
@@ -1827,8 +1875,9 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type,
                                                           req=req,
-
-                                                          reply_to=comID, attached_files=attached_files)
+                                                          reply_to=comID,
+                                                          attached_files=attached_files,
+                                                          related_file=related_file)
                     if success > 0 and subscribe:
                         subscribe_user_to_discussion(recID, uid)
                 else:

@@ -313,6 +313,29 @@ uninstall-pdfa-helper-files:
 	@echo "** The PDF/A helper files were successfully uninstalled. **"
 	@echo "***********************************************************"
 
+install-webcomment:
+	@echo "***********************************************************"
+	@echo "** Installing Webcomment plugin dependencies.            **"
+	@echo "***********************************************************"
+	rm -rf /tmp/webcomment
+	mkdir /tmp/webcomment
+	wget 'https://github.com/cowboy/jquery-throttle-debounce/archive/master.zip' -O '/tmp/webcomment/webcomment.zip' --no-check-certificate
+	unzip -u -d '/tmp/webcomment' '/tmp/webcomment/webcomment.zip'
+	mv /tmp/webcomment/jquery-throttle-debounce-master/jquery.ba-throttle-debounce.min.js ${prefix}/var/www/js
+	wget 'https://raw.githubusercontent.com/bartaz/sandbox.js/master/jquery.highlight.js' -O '/tmp/webcomment/jquery.highlight.min.js' --no-check-certificate
+	mv /tmp/webcomment/jquery.highlight.min.js ${prefix}/var/www/js
+	rm -rf /tmp/webcomment
+	@echo "***********************************************************"
+	@echo "** Webcomment plugins were successfully installed.       **"
+	@echo "***********************************************************"
+
+uninstall-webcomment:
+	rm -f ${prefix}/var/www/js/jquery.ba-throttle-debounce.min.js
+	rm -f ${prefix}/var/www/js/jquery.highlight.min.js
+	@echo "***********************************************************"
+	@echo "** The Webcomment plugins were successfully uninstalled. **"
+	@echo "***********************************************************"
+
 #Solrutils allows automatic installation, running and searching of an external Solr index.
 install-solrutils:
 	@echo "***********************************************************"
