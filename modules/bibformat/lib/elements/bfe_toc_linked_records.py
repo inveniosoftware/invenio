@@ -20,23 +20,26 @@ def format_element(bfo, display_search_link_to_contributions='yes', volume_label
     records = []
     for record_id in record_ids:
         records.append(BibFormatObject(record_id))
-	
-    if(len(records)<1):
-	return output
 
-    output += '<table cellspacing="2" width="100%">'
-    last_volume_header = ''
+    if len(records) < 1:
+        return output
+
+    # Sort linked records alphabetically
+    records = sorted(records, key=lambda record: record.field("245__a"))
+
+    output += '<table class="toc_linked_records" cellspacing="2" width="100%">'
+    # last_volume_header = ''
     for record in records:
         recid = "%s" % record.recID
         title = "%s" % record.field("245__a")
         if title == '':
             title = "%s" % record.field("24500a")
-	
-	contributers = record.field("720__a")
-	if contributers == '':
-	    contributers = record.field("7200a")
-	if contributers == '':
-	    contributers = record.field("100__a")
+
+    contributers = record.field("720__a")
+    if contributers == '':
+         contributers = record.field("7200a")
+    if contributers == '':
+        contributers = record.field("100__a")
 
         link = '%s/record/%s?ln=%s' % (CFG_SITE_URL, recid, bfo.lang)
         output += '''<tr><td><a href="%s">%s</a> by %s </td></tr>''' % (link, title, contributers)
@@ -44,6 +47,7 @@ def format_element(bfo, display_search_link_to_contributions='yes', volume_label
     output += '</table>'
 
     return output
+
 
 def escape_values(bfo):
     """
