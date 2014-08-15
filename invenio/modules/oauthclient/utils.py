@@ -17,6 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+""" Utility methods to help find, authenticate or register a remote user. """
 
 from flask.ext.login import logout_user
 from invenio.ext.login import authenticate, UserInfo
@@ -29,10 +30,10 @@ from .models import RemoteToken, RemoteAccount
 
 def oauth_get_user(client_id, account_info=None, access_token=None):
     """
-    Retrieve user exists for the given request.
+    Retrieve user object for the given request.
 
-    Uses either the access token or extracted account information to trieve the
-    user object.
+    Uses either the access token or extracted account information to retrieve
+    the user object.
     """
     if access_token:
         token = RemoteToken.get_by_token(client_id, access_token)

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+""" Forms for module. """
+
 from wtforms import TextField
 from wtforms import validators
 
@@ -28,6 +30,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 
 class EmailSignUpForm(InvenioBaseForm):
+
+    """ Form for requesting email address during sign up process. """
+
     email = TextField(
         label=_("Email address"),
         description=_("Required."),
@@ -35,17 +40,22 @@ class EmailSignUpForm(InvenioBaseForm):
     )
 
     def validate_email(self, field):
+        """ Validate email address.
+
+        Ensures that the email address is not already registered.
+        """
         field.data = field.data.lower()
         validate_email(field.data.lower())
 
         try:
             User.query.filter(User.email == field.data).one()
             raise validators.ValidationError(
-                _("Email address %(addr)s already exists in the"
-                  " database. If this is your address, please sign-in and go"
-                  " to Profile > Linked Accounts to link your account.",
-                  addr=field.data
-                  )
+                _(
+                    "Email address %(addr)s already exists in the"
+                    " database. If this is your address, please sign-in and go"
+                    " to Profile > Linked Accounts to link your account.",
+                    addr=field.data
+                )
             )
         except SQLAlchemyError:
             pass

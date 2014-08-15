@@ -17,14 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""OAuth Client Exceptions."""
+""" Module level errors. """
 
 
 class OAuthError(Exception):
 
-    """Define general OAuth exception."""
+    """Base class for OAuth exceptions."""
 
     def __init__(self, message, remote):
+        """ Initialize exception.
+
+        :param message: Error message.
+        :param message: Remote application.
+        """
         self.message = message
         self.remote = remote
 
@@ -34,6 +39,12 @@ class OAuthResponseError(OAuthError):
     """Define response exception during OAuth process."""
 
     def __init__(self, message, remote, response):
+        """ Initialize exception.
+
+        :param message: Error message.
+        :param remote: Remote application.
+        :param response: OAuth response object.
+        """
         super(OAuthResponseError, self).__init__(message, remote)
         self.response = response
 
@@ -45,9 +56,20 @@ class OAuthRejectedRequestError(OAuthResponseError):
 
 class OAuthClientError(OAuthResponseError):
 
-    """Define OAuth client exception."""
+    """Define OAuth client exception.
+
+    Client errors happens when the client (i.e. Invenio) creates an invalid
+    request.
+    """
 
     def __init__(self, message, remote, response):
+        """ Initialize exception.
+
+        :param message: Error message.
+        :param remote: Remote application.
+        :param response: OAuth response object. Used to extract ``error``,
+                         ``error_uri`` and ``error_description``.
+        """
         # Only OAuth2 specifies how to send error messages
         self.code = response['error']
         self.uri = response.get('error_uri', None)

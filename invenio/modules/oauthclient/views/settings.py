@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-OAuth Client Settings Blueprint
-"""
+""" Account settings blueprint for oauthclient. """
 
 from __future__ import absolute_import
 
@@ -61,6 +59,7 @@ blueprint = Blueprint(
     blueprint, 'breadcrumbs.settings.oauthclient', _('Linked accounts')
 )
 def index():
+    """ List linked accounts. """
     services = []
     service_map = {}
     i = 0

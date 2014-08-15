@@ -169,13 +169,17 @@ extras_require = {
     "pyrxp": [
         # Any other versions are not supported.
         "pyRXP==1.16-daily-unix"
-    ]
+    ],
+    "github": [
+        "github3.py>=0.9"
+    ],
 }
 
 extras_require["docs"] += extras_require["elasticsearch"]
 extras_require["docs"] += extras_require["img"]
 extras_require["docs"] += extras_require["mongo"]
 extras_require["docs"] += extras_require["sso"]
+extras_require["docs"] += extras_require["github"]
 
 tests_require = [
     "httpretty>=0.8",

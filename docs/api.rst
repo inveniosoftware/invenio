@@ -34,6 +34,7 @@ Modules
    modules/formatter
    modules/jsonalchemy
    modules/multimedia
+   modules/oauthclient
    modules/tags
    modules/upgrader
    modules/uploader

@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+""" Handlers for customizing oauthclient endpoints. """
+
 import six
 from functools import wraps, partial
 from werkzeug.utils import import_string
@@ -166,7 +168,7 @@ def oauth_error_handler(f):
 #
 @oauth_error_handler
 def authorized_default_handler(resp, remote, *args, **kwargs):
-    """ Stores access token in session.
+    """ Store access token in session.
 
     Default authorized handler.
     """
@@ -236,6 +238,12 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
 @oauth_error_handler
 def disconnect_handler(remote, *args, **kwargs):
+    """ Handle unlinking of remote account.
+
+    This default handler will just delete the remote account link. You may
+    wish to extend this module to perform clean-up in the remote service
+    before removing the link (e.g. removing install webhooks).
+    """
     if not current_user.is_authenticated():
         return current_app.login_manager.unauthorized()
 
@@ -342,8 +350,6 @@ def make_token_getter(remote):
 
 def oauth2_handle_error(remote, resp, error_code, error_uri,
                         error_description):
-    """ Default handling of OAuth2 errors when exchanging one-time
-    code for an access token fails.
-    """
+    """Handle errors during exchange of one-time code for an access tokens."""
     flash("Authorization with remote service failed.")
     return redirect('/')
