@@ -3389,16 +3389,18 @@ class Template:
          </td>
          </tr>
          <tr>
-          <td><table>
+          <td>
         ''' % { 'title': cgi.escape(title) }
-        for recid, score in recID_score_list_to_be_printed:
-            out += '''
-            <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
-                'score': score,
-                'info' : print_record(recid, format="hs", ln=ln),
+        if len(recID_score_list_to_be_printed) > 0:
+            out += '<table>'
+            for recid, score in recID_score_list_to_be_printed:
+                out += '''
+                <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
+                    'score': score,
+                    'info' : print_record(recid, format="hs", ln=ln),
                 }
-
-        out += """</table></td></tr></table> """
+            out += '</table>'
+        out += "</td></tr></table> "
         return out
 
     def tmpl_print_record_brief(self, ln, recID):
@@ -4277,8 +4279,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = []
+        out.append('<tr><td>')
         if log_entries:
-            out.append('<style>td.citationlogdate { width: 5.4em; }</style>')
             out.append('<table><tr><td class="blocknote">Citation Log: </td></tr><tr><td><a id="citationlogshow" class="moreinfo" style="text-decoration: underline; " onclick="$(\'#citationlog\').show(); $(\'#citationlogshow\').hide();">show</a></td></tr></table>')
             out.append('<table id="citationlog" style="display: none;">')
             for recid, action_type, action_date in log_entries:
@@ -4288,10 +4290,11 @@ class Template:
                     record_str = 'The record with id %s was deleted' % recid
                 out.append("""<tr>
   <td>%s</td>
-  <td class="citationlogdate">%s</td>
+  <td class="citationlogdate" style="width: 5.4em;">%s</td>
   <td>%s</td>
 </tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), record_str))
             out.append('</table>')
+            out.append('</td></tr>')
 
         return '\n'.join(out)
 

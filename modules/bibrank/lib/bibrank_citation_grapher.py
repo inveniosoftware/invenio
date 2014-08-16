@@ -113,7 +113,7 @@ def html_command(filename):
     """
     t = ''
     if CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1:
-        t = '<img src="%s/%s/%s" align="center" alt="Citation Graph">' \
+        t = '<img src="%s/%s/%s" align="middle" alt="Citation Graph" />' \
                                            % (CFG_SITE_URL, REL_PATH, filename)
     elif CFG_BIBRANK_SHOW_CITATION_GRAPHS == 2:
         t = open(os.path.join(BASE_DIR, filename)).read()
