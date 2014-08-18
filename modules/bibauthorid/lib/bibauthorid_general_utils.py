@@ -33,7 +33,6 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ET
 from urllib import urlopen
-from urllib2 import HTTPError
 from collections import deque
 
 import multiprocessing as mp
@@ -331,7 +330,7 @@ def get_title_of_doi(doi):
         return doi
     except URLError, e:
     # For python 2.6 socket.timeout cannot be caught directly    
-        if isinstance(e.reason, socket.timeout):
+        if hasattr(e, "reason") and isinstance(e.reason, socket.timeout):
             return doi
         else:  # We make sure we don't cut out other URLErrors.
             raise
@@ -388,7 +387,14 @@ def get_title_of_arxiv_pubid(arxiv_pubid):
         xml = fxml.read()
         fxml.close()
         root = ET.fromstring(xml)
-    except HTTPError:
+    except URLError, e:
+    # For python 2.6 socket.timeout cannot be caught directly
+        if hasattr(e, "reason") and isinstance(e.reason, socket.timeout):
+            return arxiv_pubid
+        else:  # We make sure we don't cut out other URLErrors.
+            raise
+    except socket.timeout:
+        # Python 2.7
         return arxiv_pubid
 
     title = get_title_from_arxiv_xml(root, deque(['GetRecord', 'record', 'metadata', 'dc', 'title']))
