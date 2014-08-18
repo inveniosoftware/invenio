@@ -1,0 +1,149 @@
+{
+  "query": {
+    "DOI": "10.1088/0067-0049/192/2/18",
+    "ISSN": [
+      "0067-0049",
+      "1538-4365"
+    ],
+    "URL": "http://dx.doi.org/10.1088/0067-0049/192/2/18",
+    "author": [
+      {
+        "family": "Komatsu",
+        "given": "E."
+      },
+      {
+        "family": "Smith",
+        "given": "K. M."
+      },
+      {
+        "family": "Dunkley",
+        "given": "J."
+      },
+      {
+        "family": "Bennett",
+        "given": "C. L."
+      },
+      {
+        "family": "Gold",
+        "given": "B."
+      },
+      {
+        "family": "Hinshaw",
+        "given": "G."
+      },
+      {
+        "family": "Jarosik",
+        "given": "N."
+      },
+      {
+        "family": "Larson",
+        "given": "D."
+      },
+      {
+        "family": "Nolta",
+        "given": "M. R."
+      },
+      {
+        "family": "Page",
+        "given": "L."
+      },
+      {
+        "family": "Spergel",
+        "given": "D. N."
+      },
+      {
+        "family": "Halpern",
+        "given": "M."
+      },
+      {
+        "family": "Hill",
+        "given": "R. S."
+      },
+      {
+        "family": "Kogut",
+        "given": "A."
+      },
+      {
+        "family": "Limon",
+        "given": "M."
+      },
+      {
+        "family": "Meyer",
+        "given": "S. S."
+      },
+      {
+        "family": "Odegard",
+        "given": "N."
+      },
+      {
+        "family": "Tucker",
+        "given": "G. S."
+      },
+      {
+        "family": "Weiland",
+        "given": "J. L."
+      },
+      {
+        "family": "Wollack",
+        "given": "E."
+      },
+      {
+        "family": "Wright",
+        "given": "E. L."
+      }
+    ],
+    "container-title": [
+      "ApJS",
+      "The Astrophysical Journal Supplement Series"
+    ],
+    "deposited": {
+      "date-parts": [
+        [
+          2011,
+          8,
+          22
+        ]
+      ],
+      "timestamp": 1313971200000
+    },
+    "indexed": {
+      "date-parts": [
+        [
+          2014,
+          7,
+          25
+        ]
+      ],
+      "timestamp": 1406274623737
+    },
+    "issue": "2",
+    "issued": {
+      "date-parts": [
+        [
+          2011,
+          1,
+          11
+        ]
+      ]
+    },
+    "member": "http://id.crossref.org/member/266",
+    "page": "18",
+    "prefix": "http://id.crossref.org/prefix/10.1088",
+    "publisher": "IOP Publishing",
+    "reference-count": 416,
+    "score": 1.0,
+    "source": "CrossRef",
+    "status": "success",
+    "subject": [
+      "Space and Planetary Science",
+      "Astronomy and Astrophysics"
+    ],
+    "subtitle": [],
+    "title": [
+      " SEVEN-YEAR WILKINSON MICROWAVE ANISOTROPY PROBE ( WMAP ) OBSERVATIONS: COSMOLOGICAL INTERPRETATION "
+    ],
+    "type": "journal-article",
+    "volume": "192"
+  },
+  "source": "crossref"
+}
