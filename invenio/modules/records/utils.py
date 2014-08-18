@@ -78,6 +78,24 @@ def default_name_generator(document):
     return os.path.join(directory, uuid[4:])
 
 
+def format_revid(recid, revision):
+    """Format revision id from url input"""
+    template = '{recid}.{revision}'
+    return template.format(recid=recid, revision=revision)
+
+
+def sorted_revision_timestamps(rev_timestamps):
+    """Return chronologically sorted list of revisions"""
+    from invenio.legacy.bibedit.utils import get_record_revision_timestamps, \
+                                             timestamp_to_revision, \
+                                             revision_to_timestamp
+
+    timetuples = [timestamp_to_revision(timestamp) for timestamp \
+        in rev_timestamps]
+    return [revision_to_timestamp(timetuple) for timetuple \
+        in sorted(timetuples)]
+
+
 class NameGenerator(object):
 
     """Record documents name generator."""
