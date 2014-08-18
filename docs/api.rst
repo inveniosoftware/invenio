@@ -38,6 +38,14 @@ Modules
    modules/workflows
 
 
+Utilities
+---------
+
+.. toctree::
+   :maxdepth: 1
+
+   utils/washers
+
 Legacy
 ------
 

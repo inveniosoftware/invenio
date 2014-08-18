@@ -17,9 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #
 
-"""
-Invenio -> Flask adapter utilities
-"""
+"""Washing utilities."""
 
 import types
 
@@ -30,23 +28,23 @@ def wash_urlargd(form, content):
     Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, unicode, invenio.legacy.wsgi.utils.StringField, int, tuple, or
-    invenio.legacy.wsgi.utils.Field (for
-    file uploads).
+    'type' can be list, unicode, invenio.legacy.wsgi.utils.StringField, int,
+    tuple, or invenio.legacy.wsgi.utils.Field (for file uploads).
 
     The specification automatically includes the 'ln' field, which is
     common to all queries.
 
     Arguments that are not defined in 'content' are discarded.
 
-    Note that in case {list,tuple} were asked for, we assume that
-    {list,tuple} of strings is to be returned.  Therefore beware when
-    you want to use wash_urlargd() for multiple file upload forms.
+    .. note::
 
-    @Return: argd dictionary that can be used for passing function
-    parameters by keywords.
+        In case `list` or `tuple` were asked for, we assume that
+        `list` or `tuple` of strings is to be returned.  Therefore beware when
+        you want to use ``wash_urlargd()`` for multiple file upload forms.
+
+    :returns: argd dictionary that can be used for passing function
+        parameters by keywords.
     """
-
     result = {}
 
     for k, (dst_type, default) in content.items():
@@ -100,8 +98,9 @@ def wash_urlargd(form, content):
             result[k] = [value]
 
         else:
-            raise ValueError('cannot cast form value %s of type %r into type %r' % (
-                value, src_type, dst_type))
+            raise ValueError(
+                'cannot cast form value %s of type %r into type %r' % (
+                    value, src_type, dst_type))
 
     return result
 
@@ -111,10 +110,8 @@ def wash_html_id(dirty):
 
     It can be used as a HTML element ID (also with jQuery and in all browsers).
 
-    Args:
-        dirty - the string to wash
-    Returns:
-        the HTML ID ready string
+    :param dirty: the string to wash
+    :returns: the HTML ID ready string
     """
     import re
     if not dirty[0].isalpha():
@@ -122,12 +119,3 @@ def wash_html_id(dirty):
         dirty = 'i' + dirty
     non_word = re.compile(r'[^\w]+')
     return non_word.sub('', dirty)
-
-
-def remove_underscore_keys(dictionary):
-    """Remove underscore keys from a dictionary."""
-    for key in dictionary.keys():
-        if key.startswith('_'):
-            dictionary.pop(key)
-
-    return dictionary
