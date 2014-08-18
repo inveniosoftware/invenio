@@ -533,7 +533,7 @@ class DepositionFileResource(Resource):
         d.save()
         return "", 204
 
-    def post(self, oauth, resource_id, file_id):
+    def post(self, resource_id, file_id):
         abort(405)
 
     @require_header('Content-Type', 'application/json')
