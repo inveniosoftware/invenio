@@ -34,16 +34,15 @@ from invenio.legacy.search_engine import perform_request_search
 
 def get_unique_record_json(param):
     """API to query records from the database."""
-    data = {}
-    query = {}
-    query['status'] = 'notfound'
+    data, query = {}, {}
+    data['status'] = 'notfound'
 
     recid = perform_request_search(p=param)
     if len(recid) == 1:
         query = get_record(recid).dumps(clean=True)
-        query['status'] = 'success'
+        data['status'] = 'success'
     elif len(recid) > 1:
-        query['status'] = 'multiplefound'
+        data['status'] = 'multiplefound'
 
     data['source'] = 'database'
     data['query'] = query
