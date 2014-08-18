@@ -36,7 +36,6 @@ base class.
 
 __revision__ = "$Id"
 
-import subprocess
 import re
 from invenio import search_engine
 from invenio import bibrecord
@@ -219,7 +218,7 @@ class ReplaceTextInSubfieldCommand(BaseSubfieldCommand):
             for field in record[tag]:
                 if field[4] == field_number:
                     subfields = field[0]
-                    (field_code, field_value) = subfields[subfield_index]
+                    (dummy_field_code, field_value) = subfields[subfield_index]
             replace_string = re.escape(self._value)
             for val in self._additional_values:
                 replace_string += "|" + re.escape(val)
@@ -609,7 +608,7 @@ def _create_marc(records_xml):
     aleph_marc_output = ""
 
     records = bibrecord.create_records(records_xml)
-    for (record, status_code, list_of_errors) in records:
+    for (record, dummy_status_code, dummy_list_of_errors) in records:
 
         sysno = ""
 

@@ -352,7 +352,6 @@ div .boxleft_2 {
 
         """% {"language" : language,
              "text_test_search" : _("Search"),
-             "text_next_step" : _("Next Step"),
              "text_search_criteria" : _("Search criteria"),
              "text_output_tags" : _("Output tags"),
              "text_filter_collection": _("Filter collection"),
@@ -816,7 +815,6 @@ div .boxleft_2 {
             <div class="divRecordCheckbox">
             <input type="checkbox" name="recordCheckbox" class="recordCheckbox" value="%(record_id)s"
             """ % {"record_id": record_id,
-                  "record": record
                   }
             if record_id in checked_records:
                 result += ' checked="checked"'

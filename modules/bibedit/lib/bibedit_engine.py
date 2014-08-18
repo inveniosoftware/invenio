@@ -55,8 +55,9 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS, CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
 
 from invenio.config import (CFG_SITE_LANG,
-    CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
-    CFG_BIBCATALOG_SYSTEM, CFG_BIBEDIT_AUTOCOMPLETE)
+                            CFG_BIBCATALOG_SYSTEM_RT_URL,
+                            CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
+                            CFG_BIBCATALOG_SYSTEM, CFG_BIBEDIT_AUTOCOMPLETE)
 
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
@@ -89,8 +90,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
     record_strip_controlfields, record_order_subfields, \
-    field_add_subfield, field_get_subfield_values, field_xml_output, \
-    record_extract_dois
+    field_add_subfield, field_get_subfield_values, record_extract_dois
 
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
@@ -1846,7 +1846,7 @@ def perform_request_submit(recid, uid, data, response):
         response['resultCode'] = 105
     else:
         dummy_cache_dirty, record_revision, record, dummy_pending_changes, \
-            disabled_hp_changes, dummy_undo_list, dummy_redo_list \
+            dummy_disabled_hp_changes, dummy_undo_list, dummy_redo_list \
                                             = get_cache_contents(recid, uid)
 
         xml_record = wash_for_xml(print_rec(record))

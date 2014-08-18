@@ -115,7 +115,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                auth_code, auth_message = acc_authorize_action(req,
+                dummy_auth_code, auth_message = acc_authorize_action(req,
                                                                'runbibedit')
                 referer = '/edit/'
                 if self.recid:

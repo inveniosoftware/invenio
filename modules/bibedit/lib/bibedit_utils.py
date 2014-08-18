@@ -44,7 +44,6 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-from invenio.jsonutils import json
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
     CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_CACHEDIR
@@ -76,7 +75,7 @@ from invenio.search_engine import record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info, getUid, get_email, \
+from invenio.webuser import get_user_info, get_email, \
      collect_user_info, get_user_preferences, list_registered_users
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
@@ -90,7 +89,6 @@ from invenio.bibauthorid_name_utils import split_name_parts, \
 from invenio.bibknowledge import get_kbr_values
 from invenio.webauthorprofile_config import deserialize
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
-from invenio.bibcatalog_system import get_bibcat_from_prefs
 from invenio.pluginutils import PluginContainer
 
 # Precompile regexp:
@@ -1105,7 +1103,7 @@ def get_new_ticket_RT_info(uid, recId):
     response = {}
     response['resultCode'] = 0
     if BIBCATALOG_SYSTEM is None:
-            response['description'] = "<!--No ticket system configured-->"
+        response['description'] = "<!--No ticket system configured-->"
     elif BIBCATALOG_SYSTEM and uid:
         bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
         if bibcat_resp == "":

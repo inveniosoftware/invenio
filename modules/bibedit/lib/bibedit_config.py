@@ -94,11 +94,11 @@ CFG_BIBEDIT_REQUESTS_UNTIL_SAVE = 3
 ## by the Ajax engine.
 
 CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
-#TODO: all the result codes should be accessible through the constants rather than
-#      a direct number ! some parts of the bibedit_engine.py are not readable because
-#      of using the numbers
-#      The dictionary is convenient at this place because it can be imported with one command
-#      unlike a number of constants
+    #TODO: all the result codes should be accessible through the constants rather than
+    #      a direct number ! some parts of the bibedit_engine.py are not readable because
+    #      of using the numbers
+    #      The dictionary is convenient at this place because it can be imported with one command
+    #      unlike a number of constants
     'record_submitted': 4,
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
