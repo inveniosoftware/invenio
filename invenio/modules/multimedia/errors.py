@@ -77,3 +77,8 @@ class MultimediaImageQualityError(MultimediaError):
 class MultimediaImageFormatError(MultimediaError):
 
     """Image format error."""
+
+
+class IIIFValidatorError(MultimediaError):
+
+    """IIIF API validator error."""

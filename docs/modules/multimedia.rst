@@ -28,3 +28,9 @@ Image API
 
 .. automodule:: invenio.modules.multimedia.api
    :members:
+
+IIIF Image API
+--------------
+
+.. automodule:: invenio.modules.multimedia.restful
+   :members:

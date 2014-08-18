@@ -22,6 +22,7 @@
 import itertools
 import math
 import os
+import re
 from decimal import Decimal
 from six import StringIO
 from PIL import Image
@@ -29,12 +30,14 @@ from invenio.modules.documents.api import Document
 from invenio.modules.documents.errors import DocumentNotFound
 from .config import (
     MULTIMEDIA_IMAGE_API_SUPPORTED_FORMATS, MULTIMEDIA_IMAGE_CACHE_TIME,
-    MULTIMEDIA_IMAGE_API_QUALITIES, MULTIMEDIA_IMAGE_API_COVERTERS
+    MULTIMEDIA_IMAGE_API_QUALITIES, MULTIMEDIA_IMAGE_API_COVERTERS,
+    IIIF_API_VALIDATIONS
 )
 from .errors import (
     MultmediaImageCropError, MultmediaImageResizeError,
     MultimediaImageFormatError, MultimediaImageRotateError,
     MultimediaImageQualityError, MultimediaImageNotFound,
+    IIIFValidatorError
 )
 from .utils import initialize_redis
 
@@ -444,6 +447,70 @@ class MultimediaImage(MultimediaObject):
     def sanitize_format_name(value):
         """Lowercase formats and make sure that jpg is written as jpeg."""
         return value.lower().replace("jpg", "jpeg")
+
+
+class IIIFImageAPIWrapper(MultimediaImage):
+
+    """IIIF Image API Wrapper."""
+
+    @staticmethod
+    def validate_api(**kwargs):
+        """Validate IIIF Image API."""
+        # Get the api version
+        version = kwargs.get('version', 'v2')
+        # Get the validations and ignore cases
+        cases = IIIF_API_VALIDATIONS.get(version)
+        for key in cases.keys():
+            # If the parameter don't match with iiif casess
+            if not re.search(
+                cases.get(key, {}).get('validate', ''), kwargs.get(key)
+            ):
+                raise IIIFValidatorError(
+                    ("value: `{0}` for parameter: `{1}` is not supported").
+                    format(kwargs.get(key), key)
+                )
+
+    def apply_api(self, **kwargs):
+        """Apply the IIIF API to the image."""
+        # Get the api version
+        version = kwargs.get('version', 'v2')
+        # Get the validations and ignore cases
+        cases = IIIF_API_VALIDATIONS.get(version)
+        # Set the apply order
+        order = 'region', 'size', 'rotate', 'quality'
+        # Set the functions to be applied
+        tools = {
+            "region": self.apply_region,
+            "size": self.apply_size,
+            "rotate": self.apply_rotate,
+            "quality": self.apply_quality
+        }
+
+        for key in order:
+            # Ignore if has the ignore value for the specific key
+            if kwargs.get(key) != cases.get(key, {}).get('ignore'):
+                tools.get(key)(kwargs.get(key))
+
+    def apply_region(self, value):
+        """IIIF apply crop."""
+        self.crop(value)
+
+    def apply_size(self, value):
+        """IIIF apply resize."""
+        self.resize(value)
+
+    def apply_rotate(self, value):
+        """IIIF apply rotate."""
+        mirror = False
+        degrees = value
+        if value.startswith('!'):
+            mirror = True
+            degrees = value[1:]
+        self.rotate(degrees, mirror=mirror)
+
+    def apply_quality(self, value):
+        """IIIF apply quality."""
+        self.quality(value)
 
 
 class MultimediaImageCache(MultimediaObject):

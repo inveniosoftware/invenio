@@ -39,6 +39,56 @@ MULTIMEDIA_IMAGE_API_SUPPORTED_FORMATS = {
     'png': 'image/png',
 }
 
+# Regular expressions to validate each parameter of iiif API v2.0
+IIIF_API_VALIDATIONS = {
+    "v1": {
+        "region": {
+            "ignore": "full",
+            "validate": "(^full|(pct:)?([\d.]+,){3}([\d.]+))",
+        },
+        "size": {
+            "ignore": "full",
+            "validate": ("(^full|[\d.]+,|,[\d.]+|pct:[\d.]+|[\d.]+,"
+                         "[\d.]+|![\d.]+,[\d.]+)")
+        },
+        "rotate": {
+            "ignore": "0",
+            "validate": "^[\d.]+$"
+        },
+        "quality": {
+            "ignore": "default",
+            "validate": "(native|color|grey|bitonal)"
+        },
+        "image_format": {
+            "ignore": "",
+            "validate": "(jpg|png|gif|jp2|jpeg|pdf)"
+        }
+    },
+    "v2": {
+        "region": {
+            "ignore": "full",
+            "validate": "(^full|(pct:)?([\d.]+,){3}([\d.]+))",
+        },
+        "size": {
+            "ignore": "full",
+            "validate": ("(^full|[\d.]+,|,[\d.]+|pct:[\d.]+|[\d.]+,"
+                         "[\d.]+|![\d.]+,[\d.]+)")
+        },
+        "rotate": {
+            "ignore": "0",
+            "validate": "^!?[\d.]+$"
+        },
+        "quality": {
+            "ignore": "default",
+            "validate": "(default|color|grey|bitonal)"
+        },
+        "image_format": {
+            "ignore": "",
+            "validate": "(jpg|png|gif|jp2|jpeg|pdf)"
+        }
+    }
+}
+
 # Qualities per image mode
 IIIF_QUALITIES_PER_IMAGE_MODE = {
     '1': ['default', 'bitonal'],
