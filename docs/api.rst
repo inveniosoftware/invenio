@@ -16,6 +16,7 @@ Extensions
 
    ext/assets
    ext/arxiv
+   ext/crossref
    ext/elasticsearch
    ext/login
    ext/sqlalchemy
