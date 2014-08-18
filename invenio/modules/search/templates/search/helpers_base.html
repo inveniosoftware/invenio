@@ -246,7 +246,7 @@
             </option>
             {% endfor %}
           </select>
-          <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
+          <span data-target="p" data-source="{{ soo[0].field.code }}" class="input-group-addon appender">
             <i class="glyphicon glyphicon-ok"></i>
           </span>
         </div>
@@ -446,9 +446,9 @@ require(['jquery', 'js/search/form'], function($, searchForm) {
     keywords: {{ collection.search_within[1:] | tojson | safe }},
     hintsUrl: '/list/%TYPE?q=%QUERY',
     defaultSet: 'invenio'
-  }
-{%- for id, soo in collection.search_options | groupby('id_field') -%}
-  args.keywords.push('{{ soo[0].field.code }}:')
+  };
+{%- for id, soo in collection.search_options | groupby('id_field') %}
+  args.keywords.push(['{{ soo[0].field.code }}', '{{ soo[0].field.code }}']);
 {%- endfor %}
 
   $(function() {
