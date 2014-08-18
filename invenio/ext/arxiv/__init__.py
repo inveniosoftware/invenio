@@ -156,11 +156,9 @@ class Arxiv(object):
         arxiv = arxiv or request.args.get("arxiv")
 
         from invenio.modules.records.utils import get_unique_record_json
-        from invenio.utils.washers import remove_underscore_keys
 
         # query the database
         result = get_unique_record_json(arxiv)
-        result["query"] = remove_underscore_keys(result["query"])
         if result["query"]["status"] == "notfound":
             # query arxiv
             result = self.get_json(arxiv)

@@ -40,7 +40,7 @@ def get_unique_record_json(param):
 
     recid = perform_request_search(p=param)
     if len(recid) == 1:
-        query = dict(get_record(recid))
+        query = get_record(recid).dumps(clean=True)
         query['status'] = 'success'
     elif len(recid) > 1:
         query['status'] = 'multiplefound'
