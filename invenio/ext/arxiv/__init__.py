@@ -131,20 +131,20 @@ class Arxiv(object):
             # Check if the ArXiv ID is malformed:
             if query["error"].startswith("Malformed"):
                 query = {}
-                query["status"] = "malformed"
+                data["status"] = "malformed"
             # Check if the ArXiv ID has version specified:
             elif 'versions' in query["error"]:
                 query = {}
-                query["status"] = "unsupported_versioning"
+                data["status"] = "unsupported_versioning"
             # Otherwise, ArXiv ID was not found:
             else:
                 query = {}
-                query["status"] = "notfound"
+                data["status"] = "notfound"
         else:
             for d in query['GetRecord'][0]['record'][1]['metadata'][0]['arXiv']:
                 query.update(dict(d.items()))
             del query['GetRecord']
-            query["status"] = "success"
+            data["status"] = "success"
 
         data["source"] = "arxiv"
         data["query"] = query
@@ -159,13 +159,13 @@ class Arxiv(object):
 
         # query the database
         result = get_unique_record_json(arxiv)
-        if result["query"]["status"] == "notfound":
+        if result["status"] == "notfound":
             # query arxiv
             result = self.get_json(arxiv)
 
         resp = jsonify(result)
-        resp.status_code = response_code.get(result['query']['status'],
-                                             result['query']['status'])
+        resp.status_code = response_code.get(result['status'],
+                                             result['status'])
         return resp
 
 __all__ = ("Arxiv", )
