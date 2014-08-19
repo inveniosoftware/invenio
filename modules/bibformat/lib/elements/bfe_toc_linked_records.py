@@ -25,7 +25,9 @@ def format_element(bfo, display_search_link_to_contributions='yes', volume_label
         return output
 
     # Sort linked records alphabetically
-    records = sorted(records, key=lambda record: record.field("245__a"))
+    records = sorted(records, key=lambda rec:
+                     rec.field("245__a") if rec.field("245__a") != ''
+                     else rec.field("24500a"))
 
     output += '<table class="toc_linked_records" cellspacing="2" width="100%">'
     # last_volume_header = ''
