@@ -68,7 +68,7 @@ var PLUPLOAD_HELPER = (function($) {
             max_file_size : '10mb',
             chunk_size : '10mb',
             browse_button : 'pickfiles',
-            drop_element : 'filebox'
+            drop_element : 'filebox' //FIXME filebox id was removed from Invenio
         });
 
         // var queue_progress = new plupload.QueueProgress();

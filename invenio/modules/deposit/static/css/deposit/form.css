@@ -67,3 +67,11 @@ span.ui-icon.ui-icon-circle-triangle-e {
 .tag {
   cursor: move;
 }
+
+.upload-speed {
+  margin-right: 10px;
+}
+
+.upload-stop {
+  display:none;
+}
