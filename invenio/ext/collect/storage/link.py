@@ -46,6 +46,9 @@ class Storage(BaseStorage):
                 os.makedirs(destination_dir)
 
             if not os.path.exists(destination):
+                # the path is a link, but points to invalid location
+                if os.path.islink(destination):
+                    os.remove(destination)
                 os.symlink(f, destination)
                 self.log("{0}:{1} symbolink link created".format(bp.name, o))
             else:
