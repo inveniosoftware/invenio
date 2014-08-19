@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 from invenio.testutils import InvenioTestCase
 import os
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 from time import sleep
 
 from invenio.bibindex_engine import WordTable, \
@@ -1250,7 +1250,28 @@ class BibIndexFindingAffectedIndexes(InvenioTestCase):
         records_for_indexes = find_affected_records_for_index(["title"], [[1, 20]])
         self.assertRaises(KeyError, lambda :records_for_indexes["title"])
 
+    def test_concurrent_bibupload(self):
+        """bibindex - checks if bibupload and bibindex can run concurrently"""
+        from invenio.bibupload import update_job_end_dates
+        bibnow = run_sql("""SELECT last_updated FROM bibfmt
+                            WHERE format = 'xm' AND id_bibrec = 1""")[0][0]
+        now = datetime.now()
+        update_job_end_dates(bibrec_now=now.strftime("%Y-%m-%d %H:%M:%S"),
+                             rec_id=1,
+                             insert_mode_p=False,
+                             pretend=False)
 
+        index_name = "abstract"
+        task_id = reindex_for_type_with_bibsched(index_name)
+        filename = task_log_path(task_id, 'log')
+        with open(filename) as fl:
+            text = fl.read()  # small file
+        self.assertTrue("Selected indexes/recIDs are up to date." not in text)
+
+        update_job_end_dates(bibrec_now=bibnow.strftime("%Y-%m-%d %H:%M:%S"),
+                             rec_id=1,
+                             insert_mode_p=False,
+                             pretend=False)
 
 
 class BibIndexIndexingAffectedIndexes(InvenioTestCase):
@@ -1757,6 +1778,7 @@ class BibIndexCLICallTest(InvenioTestCase):
     def test_correct_message_for_up_to_date_indexes(self):
         """bibindex - checks if correct message for index up to date appears"""
         index_name = "abstract"
+        reindex_for_type_with_bibsched(index_name)
         task_id = reindex_for_type_with_bibsched(index_name)
         filename = task_log_path(task_id, 'log')
         fl = open(filename)
@@ -1899,11 +1921,18 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
     """Tests communication through Queue tables between virtual index and
        dependent indexes"""
 
+    @classmethod
+    def setUpClass(cls):
+        # Clean the queue table, because some test did not it before
+        # FIXME: remove when restoring hstRECORD table utilization in bibindex
+        for table_type in ["Words", "Pairs", "Phrases"]:
+            cls.run_update_for_virtual_index(
+                CFG_BIBINDEX_INDEX_TABLE_TYPE[table_type]
+            )
 
     @classmethod
     def index_dependent_index(self, index_name, records_range, table_type):
         """indexes a dependent index for given record range"""
-        index_id = get_index_id_from_index_name(index_name)
         wordTable = WordTable(index_name=index_name,
                               table_type=table_type,
                               wash_index_terms=50)
@@ -1917,54 +1946,91 @@ class BibIndexVirtualIndexQueueTableTest(InvenioTestCase):
 
     def test_1_correct_entry_in_queue_for_word_table(self):
         """bibindex - checks correct entry in queue table for words"""
-        self.index_dependent_index('title', [[10,14]], CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-        query = "SELECT * FROM idxWORD01Q"
-        res = run_sql(query)
-        self.assertEqual((10, 14), (res[0][2], res[0][3]))
-        self.run_update_for_virtual_index(CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        index_name = 'title'
+        table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"]
+        # Add records to queue
+        self.index_dependent_index(index_name, [[10, 14]], table_type)
+        # Get content of queue
+        queue = run_sql(
+            """SELECT id_bibrec_low, id_bibrec_high, index_name, mode
+            FROM idx%s01Q""" % table_type
+        )
+        # Clean the queue
+        self.run_update_for_virtual_index(table_type)
+        # Check queue content
+        self.assertEqual(((10, 14, index_name, 'update'),), queue)
 
     def test_2_correct_entry_in_queue_for_pair_table(self):
         """bibindex - checks correct entry in queue table for pairs"""
-        self.index_dependent_index('collection', [[1,5],[20,21]], CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"])
-        query = "SELECT * FROM idxPAIR01Q ORDER BY runtime,id DESC"
-        res = run_sql(query)
-        self.assertEqual(2, len(res))
-        self.assertEqual((20, 21), (res[0][2], res[0][3]))
-        self.assertEqual('update', res[0][5])
-        self.run_update_for_virtual_index(CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"])
+        index_name = 'collection'
+        table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"]
+        # Add records to queue
+        self.index_dependent_index(index_name, [[1, 5], [20, 21]], table_type)
+        # Get content of queue
+        queue = run_sql(
+            """SELECT id_bibrec_low, id_bibrec_high, index_name, mode
+            FROM idx%s01Q""" % table_type
+        )
+        # Clean the queue
+        self.run_update_for_virtual_index(table_type)
+        # Check queue content
+        expected = [
+            (1, 5, index_name, 'update'),
+            (20, 21, index_name, 'update')
+        ]
+        self.assertEqual(expected, sorted(queue))
 
     def test_3_correct_entry_in_queue_for_phrase_table(self):
         """bibindex - checks correct entry in queue table for phrases"""
-        self.index_dependent_index('keyword', [[19,19]], CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"])
-        query = "SELECT * FROM idxPHRASE01Q"
-        res = run_sql(query)
-        self.assertEqual((19, 19), (res[0][2], res[0][3]))
-        self.assertEqual('keyword', res[0][4])
-        self.run_update_for_virtual_index(CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"])
+        index_name = 'keyword'
+        table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"]
+        # Add records to queue
+        self.index_dependent_index(index_name, [[19, 19]], table_type)
+        # Get content of queue
+        queue = run_sql(
+            """SELECT id_bibrec_low, id_bibrec_high, index_name, mode
+            FROM idx%s01Q""" % table_type
+        )
+        # Clean the queue
+        self.run_update_for_virtual_index(table_type)
+        # Check queue content
+        self.assertEqual(((19, 19, index_name, 'update'),), queue)
 
     def test_4_no_entries_in_queue_table(self):
         """bibindex - checks if virtual index removes entries from queue table after update"""
-        query = "SELECT * FROM idxWORD01Q"
-        res = run_sql(query)
-        empty = tuple()
-        self.assertEqual(empty, res)
+        table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"]
+        # Add records to queue
+        self.index_dependent_index('title',      [[10, 14]], table_type)
+        self.index_dependent_index('collection', [[20, 21]], table_type)
+        self.index_dependent_index('keyword',    [[14, 23]], table_type)
+        # Update the virtual index and flush queue table for words
+        self.run_update_for_virtual_index(table_type)
+        # After running the update the queue table for words MUST be empty
+        res = run_sql("SELECT * FROM idx%s01Q" % table_type)
+        self.assertEqual(tuple(), res)
 
     def test_5_remove_duplicates_in_queue_table(self):
         """bibindex - checks if duplicates are removed"""
         index_name = 'title'
         table_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"]
-        self.index_dependent_index(index_name, [[10,14]], table_type)
-        self.index_dependent_index(index_name, [[20,23]], table_type)
-        self.index_dependent_index(index_name, [[10,14]], table_type)
-        query = """SELECT id_bibrec_low, id_bibrec_high, mode FROM idx%s01Q
-                   WHERE index_name='%s' ORDER BY runtime ASC""" % (table_type, index_name)
-        entries_before = run_sql(query)
+        # Add records to queue
+        self.index_dependent_index(index_name, [[10, 14]], table_type)
+        self.index_dependent_index(index_name, [[20, 23]], table_type)
+        self.index_dependent_index(index_name, [[10, 14]], table_type)
+        # Get queue
+        entries_before = run_sql(
+            """SELECT id_bibrec_low, id_bibrec_high, mode FROM idx%s01Q
+            ORDER BY runtime ASC""" % table_type
+        )
+        # Remove duplicates
         vit = VirtualIndexTable('global', table_type)
         entries_after = vit.remove_duplicates(entries_before)
+        # Update the virtual index and flush queue table for words
+        self.run_update_for_virtual_index(table_type)
+        # Check queue content
         self.assertEqual(len(entries_before), 3)
         self.assertEqual(len(entries_after), 2)
-        self.assertTrue(entries_before[1] == entries_after[1])
-        self.run_update_for_virtual_index(table_type)
+        self.assertEqual(entries_before[1], entries_after[1])
 
 
 class BibIndexSpecialTagsTest(InvenioTestCase):
