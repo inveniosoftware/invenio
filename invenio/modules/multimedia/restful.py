@@ -62,19 +62,18 @@ class IiifImageAPI(Resource):
 
     .. note::
 
-        ## IIF IMAGE API 1.0
-        ** For more infos please visit <http://iiif.io/api/image/>. **
+        * IIF IMAGE API v1.0
+            * For more infos please visit <http://iiif.io/api/image/>.
+        * IIIF Image API v2.0
+            * For more infos please visit <http://iiif.io/api/image/2.0/>.
+        * The API works only for GET requests
+        * The image process must follow strictly the following workflow:
 
-        ## IIIF Image API 2.0
-        ** For more infos please visit <http://iiif.io/api/image/2.0/>. **
-
-        1. The API works only for GET requests
-        2. The image process must follow strictly the following workflow
-           a) Region
-           b) Size
-           c) Rotation
-           d) Quality
-           e) Format
+           * Region
+           * Size
+           * Rotation
+           * Quality
+           * Format
 
     """
 
@@ -84,7 +83,7 @@ class IiifImageAPI(Resource):
 
     def get(self, version, uuid, region, size, rotation, quality,
             image_format):
-        """Run IIIF Image API v2.0 workflow."""
+        """Run IIIF Image API workflow."""
         # Validate IIIF parameters
         IIIFImageAPIWrapper.validate_api(
             version=version,
@@ -132,23 +131,23 @@ class IiifImageAPI(Resource):
         )
         return send_file(to_serve, mimetype=mimetype)
 
-    def post(self, oauth, tag_name):
+    def post(self):
         """post."""
         abort(405)
 
-    def delete(self, oauth, tag_name):
-        """post."""
+    def delete(self):
+        """delete."""
         abort(405)
 
-    def options(self, oauth, tag_name):
+    def options(self):
         """options."""
         abort(405)
 
-    def put(self, oauth, tag_name):
+    def put(self):
         """put."""
         abort(405)
 
-    def head(self, oauth, tag_name):
+    def head(self):
         """head."""
         abort(405)
 

@@ -51,45 +51,50 @@ class MultimediaImage(MultimediaObject):
 
     """Multimedia Image API.
 
-    Initializes an image api with iiif v2.0 standards. You can:
-    * Resize :func: `resize`
-    * Crop :func: `crop`
-    * Rotate :func: `rotate`
-    * Change image quality :func: `quality`
+    Initializes an image api with IIIF standards. You can:
 
-    Example of editing and image and save it to disk
+    * Resize :func:`resize`.
+    * Crop :func:`crop`.
+    * Rotate :func:`rotate`.
+    * Change image quality :func:`quality`.
 
-    ..code-block:: python
+    Example of editing and image and save it to disk:
+
+    .. code-block:: python
 
         from invenio.modules.MultimediaImage import MultimediaImage
 
         image = MultimediaImage.get_image(uuid)
-        # Rotate image 90 degrees
+        # Rotate the image
         image.rotate(90)
-
-        # Resize image
+        # Resize the image
         image.resize('300,200')
-
-        # Crop image
+        # Crop the image
         image.crop('20,20,400,300')
-
-        # Change image quality
+        # Make the image black and white
         image.quality('grey')
-
-        # Save image
+        # Finaly save it to /tmp
         image.save('/tmp')
 
-    Example of serving the modified image over http
+    Example of serving the modified image over http:
 
-    ..code-block:: python
+    .. code-block:: python
 
+        from flask import Blueprint
         from invenio.modules.MultimediaImage import MultimediaImage
 
-        @blueprint.route('/serve')
+        @blueprint.route('/serve/<string:uuid>/<string:size>')
+        def serve_thumbnail(uuid, size):
+            \"\"\"Serve the image thumbnail.
 
-        def serve():
+            :param uuid: The document uuid.
+            :param size: The desired image size.
+            \"\"\"
+            # Initialize the image with the uuid
             image = MultimediaImage.get_image(uuid)
-            # .... more image editing ...........
+            # Resize it
+            image.resize(size)
+            # Serve it
             return send_file(image.serve(), mimetype='image/jpeg')
     """
 
@@ -101,9 +106,9 @@ class MultimediaImage(MultimediaObject):
     def get_image(cls, uuid):
         """Return the image object.
 
-        :param uuid: The document uuid.
+        :param str uuid: The document uuid
         :returns: a :class:`~invenio.modules.multimedia.api.MultimediaImage`
-                  instance.
+                  instance
         """
         try:
             document = Document.get_document(uuid)
@@ -122,9 +127,9 @@ class MultimediaImage(MultimediaObject):
     def from_file(cls, path):
         """Return the image object from the given path.
 
-        :param path: The absolute path of the file.
+        :param str path: The absolute path of the file
         :returns: a :class:`~invenio.modules.multimedia.api.MultimediaImage`
-                  instance.
+                  instance
         """
         if not os.path.exists(path):
             raise MultimediaImageNotFound(
@@ -137,9 +142,10 @@ class MultimediaImage(MultimediaObject):
     def from_string(cls, source):
         """Create an :class:`MultimediaImage` instance from string.
 
-        :param: source: :class:`StringIO.StringIO` object
+        :param source: The image image string
+        :type source: :class:`StringIO.StringIO` object
         :returns: a :class:`~invenio.modules.multimedia.api.MultimediaImage`
-                  instance.
+                  instance
         """
         image = Image.open(source)
         return cls(image)
@@ -147,15 +153,20 @@ class MultimediaImage(MultimediaObject):
     def resize(self, dimensions, resample=Image.NEAREST):
         """Resize the image.
 
-        :param dimensions: The dimensions to resize the image. Should be a
-                           comma separated string with the following patterns:
-                           `full`: The full image size.
-                           `w,`: The exact width, height will be calculated.
-                           `,h`: The exact height, width will be calculated.
-                           `pct:n`: Image percentance scale.
-                           `w,h`: The extact width and height.
-                           `!w,h`: Best fit for the given width and height.
-        :param resample: The algorithm to be used from PIL.
+        :param str dimensions: The dimensions to resize the image
+        :param resample: The algorithm to be used
+        :type resample: `PIL.Image` algorithm
+
+        .. note::
+
+            * `dimensions` must be one of the following:
+
+                * 'w,': The exact width, height will be calculated.
+                * ',h': The exact height, width will be calculated.
+                * 'pct:n': Image percentance scale.
+                * 'w,h': The extact width and height.
+                * '!w,h': Best fit for the given width and height.
+
         """
         real_width, real_height = self.image.size
 
@@ -230,19 +241,15 @@ class MultimediaImage(MultimediaObject):
     def crop(self, coordinates):
         """Crop the image.
 
-        :param coordinates: comma separated string with the following patterns:
-                            `full`: The full image size. Nothing will happen.
-                            `x,y,w,h`: The region of the full image to be
-                            returned. The value of x represents the number of
-                            pixels from the 0 position on the horizontal axis.
-                            The value of y represents the number of pixels from
-                            the 0 position on the vertical axis. Thus the x,y
-                            position 0,0 is the upper left-most pixel of the
-                            image. w represents the width of the region and h
-                            represents the height of the region in pixels.
-                            `pct:x,y,w,h`: The same as above but is specified
-                            as a sequence of percentages of the full image's
-                            dimensions.
+        :param str coordinates: The coordinates to crop the image
+
+        .. note::
+
+            * `coordinates` must have the following pattern:
+
+                * 'x,y,w,h': in pixels.
+                * 'pct:x,y,w,h': percentance.
+
         """
         # Get image full dimensions
         real_width, real_height = self.image.size
@@ -305,8 +312,8 @@ class MultimediaImage(MultimediaObject):
     def rotate(self, degrees, mirror=False):
         """Rotate the image by given degress.
 
-        :param degress: The degrees to turn, should be in range of [0, 360].
-        :param mirror: Flip image from left to right.
+        :param float degress: The degrees, should be in range of [0, 360]
+        :param bool mirror: Flip image from left to right
         """
         transforms = {
             '90': Image.ROTATE_90,
@@ -335,8 +342,8 @@ class MultimediaImage(MultimediaObject):
     def quality(self, quality):
         """Change the image format.
 
-        :param quality: The image quality should be in (default, grey,
-                        bitonal, color).
+        :param str quality: The image quality should be in (default, grey,
+                        bitonal, color)
 
         .. note::
 
@@ -367,15 +374,19 @@ class MultimediaImage(MultimediaObject):
             self.image = self.image.convert(code)
 
     def size(self):
-        """Return the current image size."""
+        """Return the current image size.
+
+        :return: the image size
+        :rtype: list
+        """
         return self.image.size
 
     def save(self, path, image_format="jpeg", quality=90):
         """Store the image to the specific path.
 
-        :param path: absolute path.
-        :param image_format: (gif, jpeg, pdf, png).
-        :param quality: The image quality; [1, 100].
+        :param str path: absolute path
+        :param str image_format: (gif, jpeg, pdf, png)
+        :param int quality: The image quality; [1, 100]
 
         .. note::
 
@@ -390,8 +401,8 @@ class MultimediaImage(MultimediaObject):
     def serve(self, image_format="png", quality=90):
         """Return a StringIO object to easily serve it thought HTTTP.
 
-        :param image_format: (gif, jpeg, pdf, png).
-        :param quality: The image quality; [1, 100].
+        :param str image_format: (gif, jpeg, pdf, png)
+        :param int quality: The image quality; [1, 100]
 
         .. note::
 
@@ -410,7 +421,7 @@ class MultimediaImage(MultimediaObject):
     def _prepare_for_output(self, requested_format):
         """Help validate output format.
 
-        :param requested_format: The image output format.
+        :param str requested_format: The image output format
 
         .. note::
 
@@ -455,7 +466,28 @@ class IIIFImageAPIWrapper(MultimediaImage):
 
     @staticmethod
     def validate_api(**kwargs):
-        """Validate IIIF Image API."""
+        """Validate IIIF Image API.
+
+        Example to validate the IIIF API:
+
+        .. code:: python
+
+            from invenio.multimedia.api import IIIFImageAPIWrapper
+
+            IIIFImageAPIWrapper.validate_api(
+                version=version,
+                region=region,
+                size=size,
+                rotate=rotation,
+                quality=quality,
+                image_format=image_format
+            )
+
+        .. note::
+
+            If the version is not specified it will fallback to version 2.0.
+
+        """
         # Get the api version
         version = kwargs.get('version', 'v2')
         # Get the validations and ignore cases
@@ -471,7 +503,31 @@ class IIIFImageAPIWrapper(MultimediaImage):
                 )
 
     def apply_api(self, **kwargs):
-        """Apply the IIIF API to the image."""
+        """Apply the IIIF API to the image.
+
+        Example to apply the IIIF API:
+
+        .. code:: python
+
+            from invenio.multimedia.api import IIIFImageAPIWrapper
+
+            image = IIIFImageAPIWrapper.get_image(uuid)
+
+            image.apply_api(
+                version=version,
+                region=region,
+                size=size,
+                rotate=rotation,
+                quality=quality
+            )
+
+        .. note::
+
+            * If the version is not specified it will fallback to version 2.0.
+            * Please note the :func:`validate_api` should be ran before
+              :func:`apply_api`.
+
+        """
         # Get the api version
         version = kwargs.get('version', 'v2')
         # Get the validations and ignore cases
@@ -492,15 +548,24 @@ class IIIFImageAPIWrapper(MultimediaImage):
                 tools.get(key)(kwargs.get(key))
 
     def apply_region(self, value):
-        """IIIF apply crop."""
+        """IIIF apply crop.
+
+        Apply :func:`~invenio.modules.multimedia.api.MultimediaImage.crop`.
+        """
         self.crop(value)
 
     def apply_size(self, value):
-        """IIIF apply resize."""
+        """IIIF apply resize.
+
+        Apply :func:`~invenio.modules.multimedia.api.MultimediaImage.resize`.
+        """
         self.resize(value)
 
     def apply_rotate(self, value):
-        """IIIF apply rotate."""
+        """IIIF apply rotate.
+
+        Apply :func:`~invenio.modules.multimedia.api.MultimediaImage.rotate`.
+        """
         mirror = False
         degrees = value
         if value.startswith('!'):
@@ -509,7 +574,10 @@ class IIIFImageAPIWrapper(MultimediaImage):
         self.rotate(degrees, mirror=mirror)
 
     def apply_quality(self, value):
-        """IIIF apply quality."""
+        """IIIF apply quality.
+
+        Apply :func:`~invenio.modules.multimedia.api.MultimediaImage.quality`
+        """
         self.quality(value)
 
 
