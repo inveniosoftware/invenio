@@ -30,7 +30,8 @@ Used by: bibformat_engine.py
 from __future__ import print_function
 
 import os
-import sys
+
+from flask import current_app
 from lxml import etree
 
 from invenio.modules.formatter.config import CFG_BIBFORMAT_TEMPLATES_PATH
@@ -85,9 +86,10 @@ def _get_creation_date(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = fmt.text
 
         return get_creation_date(recID_int, fmt_str)
-    except Exception as err:
-        print("Error during formatting function evaluation: {0}".format(err),
-              file=sys.stderr)
+    except Exception:
+        current_app.logger.exception(
+            "Error during formatting function evaluation"
+        )
         return ''
 
 
@@ -136,9 +138,10 @@ def _get_modification_date(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
             fmt_str = fmt.text
 
         return get_modification_date(recID_int, fmt_str)
-    except Exception as err:
-        print("Error during formatting function evaluation: {0}".format(err),
-              file=sys.stderr)
+    except Exception:
+        current_app.logger.exception(
+            "Error during formatting function evaluation."
+        )
         return ''
 
 
@@ -187,9 +190,10 @@ def _eval_bibformat(ctx, recID, template_code):
                                           verbose=0,
                                           format_template_code=template_code)
         return out[0]
-    except Exception as err:
-        print("Error during formatting function evaluation: {0}".format(err),
-              file=sys.stderr)
+    except Exception:
+        current_app.logger.exception(
+            "Error during formatting function evaluation."
+        )
         return ''
 
 
@@ -223,15 +227,17 @@ def format(xmltext, template_filename=None, template_source=None):
             elif os.path.exists(template_filename):
                 template = file(template_filename).read()
             else:
-                print('{0} does not exist'.format(template_filename),
-                      file=sys.stderr)
+                current_app.logger.error(
+                    "{0} does not exist".format(template_filename)
+                )
                 return None
         except IOError:
-            print('{0} could not be read.'.format(template_filename),
-                  file=sys.stderr)
+            current_app.logger.exception(
+                '{0} could not be read.'.format(template_filename),
+            )
             return None
     else:
-        print('No templates were given.', file=sys.stderr)
+        current_app.logger.error('No templates were given.')
         return None
 
     # Some massaging of the input to avoid the default namespace issue
@@ -246,24 +252,20 @@ def format(xmltext, template_filename=None, template_source=None):
 
     try:
         xml = etree.XML(xmltext)
-    except etree.XMLSyntaxError as e:
-        error = 'The XML code given is invalid. [%s]' % (e,)
-        print(error, file=sys.stderr)
+    except etree.XMLSyntaxError:
+        current_app.logger.exception('The XML code given is invalid.')
         return result
     except:
-        error = 'Failed to process the XML code.'
-        print(error, file=sys.stderr)
+        current_app.logger.exception('Failed to process the XML code.')
         return result
 
     try:
         xsl = etree.XML(template)
-    except etree.XMLSyntaxError as e:
-        error = 'The XSL code given is invalid. [%s]' % (e,)
-        print(error, file=sys.stderr)
+    except etree.XMLSyntaxError:
+        current_app.logger.exception('The XSL code given is invalid.')
         return result
     except:
-        error = 'Failed to process the XSL code.'
-        print(error, file=sys.stderr)
+        current_app.logger.exception('Failed to process the XSL code.')
         return result
 
     try:
@@ -271,27 +273,27 @@ def format(xmltext, template_filename=None, template_source=None):
         fns["creation_date"] = _get_creation_date
         fns["modification_date"] = _get_modification_date
         fns["eval_bibformat"] = _eval_bibformat
-    except etree.NamespaceRegistryError as e:
-        error = 'Failed registering the XPath extension function. [%s]' % e
-        print(error, file=sys.stderr)
+    except etree.NamespaceRegistryError:
+        current_app.logger.exception(
+            'Failed registering the XPath extension function.'
+        )
         return result
 
     try:
         xslt = etree.XSLT(xsl)
-    except etree.XSLTParseError as e:
-        error = 'The XSL code given is invalid. [%s]' % e
-        print(error, file=sys.stderr)
+    except etree.XSLTParseError:
+        current_app.logger.exception('The XSL code given is invalid.')
         return result
     except:
-        error = 'Failed to process the XSL code.'
-        print(error, file=sys.stderr)
+        current_app.logger.exception('Failed to process the XSL code.')
         return result
 
     try:
         temporary_result = xslt(xml)
     except:
-        error = 'Failed to perform the XSL transformation.'
-        print(error, file=sys.stderr)
+        current_app.logger.exception(
+            'Failed to perform the XSL transformation.'
+        )
         return result
 
     result = str(temporary_result)
