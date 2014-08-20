@@ -120,7 +120,29 @@ require(["jquery", "js/deposit/form"], function($, form) {
           datepicker: date_options
       }
       // Initialize form
-      form.init(configuration);
+      form.attachTo("#submitForm", {
+        save_url: save_url,
+        save_all_url: save_all_url,
+        complete_url: complete_url,
+        autocomplete_url: autocomplete_url,
+        datepicker_element: '.datepicker',
+        datepicker_options: {dateFormat: "yy-mm-dd"}
+      });
+
+      $('.pluploader').pluploadWidget({
+        max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+        save_url: save_url,
+        url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
+        delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
+        get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
+        dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}',
+        files: {{ form.files|safe }},
+        form_selector: "#submitForm"
+        // Those are missing
+        // uuid:,
+        // newdep_url:,
+        // continue_url
+      });
     });
 });
 </script>

@@ -190,7 +190,7 @@ define(function(require, exports, module) {
                   }));
                   $('#' + file.id).show('fast');
                   $('#' + file.id + ' .rmlink').on("click", function(event){
-                      uploader.removeFile(file);
+                      up.removeFile(file);
                   });
               }
           });
@@ -298,17 +298,21 @@ define(function(require, exports, module) {
               $(ui.placeholder).show();
               $(ui.placeholder).html("<td></td><td></td><td></td><td></td>");
               $(ui.placeholder).css("visibility", "");
-              header_ths = $("#file-table thead th");
-              item_tds = $(ui.helper).find("td");
-              placeholder_tds = $(ui.placeholder).find("td");
+              var header_ths = $("#file-table thead th"),
+                  item_tds = $(ui.helper).find("td"),
+                  placeholder_tds = $(ui.placeholder).find("td");
               for(var i = 0; i < header_ths.length; i++){
                   $(item_tds[i]).width($(header_ths[i]).width());
                   $(placeholder_tds[i]).width($(header_ths[i]).width());
               }
           },
           update: function(event, ui){
-              if(save_url) {
-                  save_field(save_url, 'files', serialize_files("#filelist"));
+              if (save_url) {
+                  $(that.options.form_selector).trigger("dataSaveField", {
+                    save_url: save_url,
+                    name: "files",
+                    value: that.val()
+                  });
               }
           }
       });
@@ -437,6 +441,7 @@ define(function(require, exports, module) {
     unique_names : true,
     browse_button : 'pickfiles',
     drop_element : 'field-plupload_file',
+    form_selector: "#submitForm"
   };
 
   $.fn.pluploadWidget.Constructor = PluploadWidget;

@@ -31,7 +31,8 @@ js = Bundle(
     weight=51,
     bower={
         "plupload": "latest",
-        "ckeditor": "latest"
+        "ckeditor": "latest",
+        "flight": "latest"
     }
 )
 
