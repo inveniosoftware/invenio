@@ -1008,7 +1008,7 @@ define(function(require, exports, module) {
           autocomplete_request = $.ajax({
               type: 'GET',
               url: url,
-              data: $.param({term: query})
+              data: $.param({term: query, limit: $(item).data("autocomplete-limit")})
           }).done(function(data) {
               process(data);
               $(item).removeClass('ui-autocomplete-loading');
