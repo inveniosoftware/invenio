@@ -1,3 +1,20 @@
+..  This file is part of Invenio
+    Copyright (C) 2014 CERN.
+
+    Invenio is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 .. _git-workflow:
 
 Git Workflow
@@ -11,15 +28,15 @@ Introduction
 
 Our collaboration model is basically a pull-on-demand model similar to
 the one used for the Linux kernel.  You may want to read a
-`chapter on this collaboration model in the Mercurial book 
+`chapter on this collaboration model in the Mercurial book
 <http://hgbook.red-bean.com/read/collaborating-with-other-people.html>`_.
 
 In the recipes below you will encounter several personas with
 different roles:
 
 * Joe Bloggs, head developer and system integrator
-* John Doe, developer, maintainer of the *WebFoo* module 
-* Erika Mustermann, developer, maintainer of the *WebBar* module 
+* John Doe, developer, maintainer of the *WebFoo* module
+* Erika Mustermann, developer, maintainer of the *WebBar* module
 
 
 Setting things up
@@ -486,7 +503,7 @@ attached ``0001-WebFoo-fixed-bad-problem.patch`` file.
 W7.c Sending patch-suggestions
 ++++++++++++++++++++++++++++++
 
-As we said in the introduction, John usually maintains the !WebFoo module 
+As we said in the introduction, John usually maintains the !WebFoo module
 while Erika usually maintains the !WebBar module.  What happens if Erika
 spots a problem some !WebFoo feature?
 
@@ -496,7 +513,7 @@ branch or send an email to Joe asking for integration.
 
 If the problem a little bit more complicated or there are several
 possible solutions and it is not clear which one is the best or the
-solution to the problem requires some deep changes inside the structure 
+solution to the problem requires some deep changes inside the structure
 of !WebFoo that may affect other things or the problem requires
 optimizations of several pre-existing functions, then it may be best
 if Erika contacts John as the !WebFoo module maintainer about the

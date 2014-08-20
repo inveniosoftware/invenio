@@ -1,3 +1,20 @@
+..  This file is part of Invenio
+    Copyright (C) 2014 CERN.
+
+    Invenio is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 .. _bibedit-admin-guide:
 
 BibEdit Admin Guide
@@ -186,14 +203,14 @@ You therefore continue as follows:
    ::
 
                 $ wget -O z.xml 'http://your.site/record/1234?of=xm'
-               
+
 
    or download latest 5,000 public documents written by ``Qllis, J``:
 
    ::
 
                 $ wget -O z.xml 'http://your.site/search?p=Qllis%2C+J&f=author&of=xm&rg=5000'
-               
+
 
    Note also that you can access history of records as covered in a
    `access record history <#6>`__ section below.
@@ -203,21 +220,21 @@ You therefore continue as follows:
    ::
 
                 $ emacs z.xml
-               
+
 
 #. Upload changes back:
 
    ::
 
                 $ bibupload -r z.xml
-               
+
 
 #. See the progress of the treatment of the file via BibSched:
 
    ::
 
                 $ bibsched
-               
+
 
    If you do not want to wait for the next wake-up time of indexing and
    formatting daemons, launch them manually now:
@@ -227,7 +244,7 @@ You therefore continue as follows:
                 $ bibindex
                 $ bibreformat
                 $ webcoll
-                
+
 
    and watch the progress via ``bibsched``.
 
@@ -252,7 +269,7 @@ v0.1.x development branch is to download its XML MARC:
 ::
 
            $ wget -O z.xml 'http://your.site/record/1234?of=xm'
-           
+
 
 and to mark it as deleted by adding the indicator \`\`DELETED'' into the
 MARC 980 $$c tag:
@@ -266,14 +283,14 @@ MARC 980 $$c tag:
               <subfield code="c">DELETED</subfield>
             </datafield>
            [...]
-           
+
 
 and upload thusly modified record in the \`replace' mode:
 
 ::
 
            $ bibupload -r z.xml
-           
+
 
 and watch the progress via ``bibsched``, as mentioned in the `section
 3 <#3>`__.
@@ -328,7 +345,7 @@ you can launch:
            $ rm -rf /opt/invenio/var/data/files/*
            $ /opt/invenio/bin/webcoll
            $ /opt/invenio/bin/bibindex --reindex
-         
+
 
 Note that you may also want to delete the fulltext files and the
 submission counters in ``/opt/invenio/var/data`` subdirectories, if you
@@ -349,7 +366,7 @@ To list previous revisions of record ID 1:
          1.20080319193118
          1.20080318172536
          1.20080311020315
-         
+
 
 To get MARCXML of the revision 1.20080318172536 (record ID 1, revision
 date 2008-03-18 17:25:36):
@@ -363,7 +380,7 @@ date 2008-03-18 17:25:36):
              <subfield code="a">CERN-EX-0106015</subfield>
            </datafield>
          [...]
-         
+
 
 To compare the differences between the two last revisions:
 
@@ -390,5 +407,5 @@ To compare the differences between the two last revisions:
             </datafield>
             <datafield tag="653" ind1="1" ind2=" ">
               <subfield code="a">LEP</subfield>
-         
+
 
