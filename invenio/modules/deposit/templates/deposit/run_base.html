@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,4 +16,113 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "deposit/run_base_base.html" -%}
+
+{%- extends "page.html" -%}
+
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "deposit.js", "deposit.css" %}
+{% endblock %}
+
+{%- block header %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for("static", filename="vendors/jquery-ui/themes/base/theme.css") }}"/>
+  <link rel="stylesheet" type="text/css"
+        href="{{ url_for("static", filename="vendors/jquery-ui/themes/base/datepicker.css") }}"/>
+{% endblock header %}
+
+{%- block css %}
+  {{ super() }}
+  <style>
+    .ui-autocomplete-loading {
+      background: white url('{{ url_for('static', filename='img/loading.gif') }}') right top no-repeat;
+    }
+  </style>
+{%- endblock css %}
+
+{% block body %}
+{% block form_submit_dialog %}
+<div id="form-submit-dialog" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div align="center" id="{{id}}Label">{{ _('Submitting') }} <img src="/img/loading.gif" /></div>
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock form_submit_dialog %}
+{% block deposit_page %}
+<div class="row">
+    {% block file_container %}
+        <div id="file_container" class="col-md-8 form-feedback-warning">
+            <div id="flash-message"></div>
+            {% include "deposit/form.html" %}
+        </div>
+    {% endblock %}
+    {% if form._drafting %}
+        <div class="col-md-4">
+            {% include "deposit/myview.html" %}
+        </div>
+    {% endif %}
+    </div>
+</div>
+{% endblock deposit_page %}
+{% endblock %}
+
+
+{% block javascript %}
+  {{ super() }}
+  {# The ckEditor loads dynamically other files and thus cannot be safely
+   # bundled with the others.
+   #}
+  <script type="text/javascript" src="{{ url_for("static", filename="vendors/ckeditor/ckeditor.js" )}}"></script>
+  <script type="text/javascript" src="{{ url_for("static", filename="js/ckeditor/invenio-ckeditor-config.js" )}}"></script>
+
+{%- block form_script_options %}
+<script type="text/javascript">
+var date_options = {dateFormat: 'yy-mm-dd'}
+</script>
+{%- endblock form_script_options %}
+<script type="text/javascript">
+require(["jquery", "js/deposit/form"], function($, form) {
+    $(function(){
+      var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
+      var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
+      var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
+      var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
+
+      var configuration = {
+          plupload: {
+            max_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+            selector:'.pluploader',
+            save_url: save_url,
+            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
+            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
+            get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
+            db_files: {{ form.files|safe }},
+            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
+            // Those are missing
+            // uuid:,
+            // newdep_url:,
+            // continue_url
+          },
+          urls: {
+            save_url: save_url,
+            save_all_url: save_all_url,
+            complete_url: complete_url,
+            autocomplete_url: autocomplete_url,
+          },
+          datepicker: {
+            element: '.datepicker',
+            format: 'yy-mm-dd'
+          }
+      }
+      // Initialize form
+      form(configuration);
+    });
+});
+</script>
+<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
+{% endblock javascript %}

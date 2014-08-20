@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,4 +16,50 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- extends "deposit/index_base_base.html" -%}
+
+{% extends "page.html" %}
+{% block body %}
+
+<div class="page-header">
+  <h3>{{ _('Select a Document Type') }}</h3>
+</div>
+
+<div class="row">
+  <div id="webdeposit_types_accordion" class="col-md-offset-3 col-md-6 panel-group">
+    {% for deptype_group in deposition_types.values()|groupby('group') %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4>
+        <a data-toggle="collapse"
+           data-parent="#webdeposit_types_accordion"
+           href="#collapse{{ loop.index }}">
+          <i class="glyphicon glyphicon-list pull-right"></i> {{ deptype_group.grouper }}
+        </a>
+        </h4>
+      </div>
+      <div id="collapse{{ loop.index }}" class="collapse">
+        <div class="panel-body" style="padding: 0px;">
+          <ul class="nav nav-pills nav-stacked" style="margin-bottom: 0px;">
+          {% for deptype in deptype_group.list|sort(attribute='name') %}
+            <li>
+              <a href="{{ url_for('.deposition_type_index', deposition_type=deptype.get_identifier()) }}">
+                <i class="glyphicon glyphicon-chevron-right pull-right"></i>
+                {{ deptype.name }}
+                {% if deptype.type in drafts %}
+                &nbsp;
+                <span class="badge badge-important">
+                  {{ drafts[dep.dep_type] }}
+                </span>
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
