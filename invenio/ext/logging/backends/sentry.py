@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-invenio.ext.logging.backends.sentry
------------------------------------
+""" Sentry logging backend.
 
 Integration of Sentry for application error logging. Configuration options:
 
@@ -41,12 +39,23 @@ from werkzeug.local import LocalProxy
 from flask import current_app
 from raven.handlers.logging import SentryHandler
 from raven.contrib.flask import Sentry
+from raven.processors import SanitizePasswordsProcessor
 from celery.signals import after_setup_logger, after_setup_task_logger
 
 import invenio
 
 
+class InvenioSanitizeProcessor(SanitizePasswordsProcessor):
+
+    """ Remove additional sensitve configuration from Sentry data. """
+
+    FIELDS = frozenset([
+        'access_token'
+    ])
+
+
 def sentry_include_paths():
+    """ Detect Invenio dependencies and for use with SENTRY_INCLUDE_PATHS. """
     try:
         dist = pkg_resources.get_distribution('invenio')
         return map(lambda req: req.key, dist.requires())
@@ -55,9 +64,7 @@ def sentry_include_paths():
 
 
 def setup_warnings(sentry):
-    """
-    Add sentry to warnings logger
-    """
+    """ Add sentry to warnings logger. """
     warnings = logging.getLogger('py.warnings')
     warnings.addHandler(SentryHandler(sentry.client, level=logging.WARNING))
 
@@ -112,10 +119,13 @@ def add_handler(logger, app):
 
 
 def setup_app(app):
-    """
-    Setup Sentry extension
-    """
+    """ Setup Sentry extension. """
     app.config.setdefault('SENTRY_DSN', None)
+    # Sanitize data more
+    app.config.setdefault('SENTRY_PROCESSORS', (
+        'raven.processors.SanitizePasswordsProcessor',
+        'invenio.ext.logging.backends.sentry.InvenioSanitizeProcessor',
+    ))
     # When a user is logged in, also include the user info in the log message.
     app.config.setdefault('SENTRY_USER_ATTRS', ['info', ])
     # Defaults to only reporting errors and warnings.

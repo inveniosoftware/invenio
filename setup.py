@@ -106,7 +106,7 @@ install_requires = [
     "python-magic>=0.4.6",
     "pytz",
     "rauth",
-    "raven>=4.2.1",
+    "raven>=5.0.0",
     "rdflib>=4.1.2",
     "redis==2.8.0",  # Is it explicitly required?
     "reportlab>=3.1,<3.2",
