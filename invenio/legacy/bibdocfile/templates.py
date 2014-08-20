@@ -366,7 +366,7 @@ class Template:
             CFG_SITE_URL,
             CFG_SITE_RECORD,
             recid,
-            '%s%s' % (cgi.escape(name, True), superformat))
+            '%s%s' % (cgi.escape(urllib.quote(name), True), superformat))
 
         urlargd = {'version' : version}
         if subformat:

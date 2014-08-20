@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,9 @@ import sys
 import shutil
 
 from urllib import urlencode
+from collections import defaultdict
 
+from invenio.bibrecord import create_record
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
@@ -37,6 +39,7 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX, \
      CFG_CERN_SITE
+from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 from invenio.utils import apache
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.access.engine import acc_authorize_action
@@ -44,6 +47,7 @@ from invenio.modules.access.control import acc_is_role
 from invenio.legacy.webpage import warning_page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
+from invenio.legacy.search_engine import is_user_owner_of_record
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
@@ -68,7 +72,8 @@ from invenio.legacy.websubmit.engine import home, action, interface, endaction, 
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', \
-                'getuploadedfile', 'upload_video', ('continue', 'continue_')]
+                'getuploadedfile', 'upload_video', ('continue', 'continue_'), \
+                'doilookup']
 
     def uploadfile(self, req, form):
         """
@@ -122,13 +127,31 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             except:
                 action = ""
 
+        try:
+            recid_fd = file(os.path.join(curdir, 'SN'))
+            recid = recid_fd.read()
+            recid_fd.close()
+        except:
+            recid = ''
+        user_is_owner = False
+        if recid:
+            user_is_owner = is_user_owner_of_record(user_info, recid)
+
+        try:
+            categ_fd = file(os.path.join(curdir, 'combo%s' %argd['doctype']))
+            categ = categ_fd.read()
+            categ_fd.close()
+        except IOError:
+            categ = '*'
+
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
                                                          authorized_if_no_roles=not isGuestUser(uid),
                                                          verbose=0,
                                                          doctype=argd['doctype'],
-                                                         act=action)
-        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
+                                                         act=action,
+                                                         categ=categ)
+        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0 and not user_is_owner:
             # User cannot submit
             raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
         else:
@@ -789,7 +812,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urlencode(params, doseq=True))
         redirect_to_url(req, url)
 
-
     def summary(self, req, form):
         args = wash_urlargd(form, {
             'doctype': (str, ''),
@@ -841,6 +863,38 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                  ln = args['ln'],
                  values = values,
                )
+
+    def doilookup(self, req, form):
+        """
+        Returns the metadata from the crossref website based on the DOI.
+        """
+        args = wash_urlargd(form, {
+            'doi': (str, '')})
+        response = defaultdict(list)
+        if args['doi']:
+            doi = args['doi']
+            try:
+                marcxml_template = get_marcxml_for_doi(doi)
+            except CrossrefError:
+                # Just ignore Crossref errors
+                pass
+            else:
+                record = create_record(marcxml_template)[0]
+                if record:
+                    # We need to convert this record structure to a simple dictionary
+                    for key, value in record.items():  # key, value = (773, [([('0', 'PER:64142'), ...], ' ', ' ', '', 47)])
+                        for val in value:  # val = ([('0', 'PER:64142'), ...], ' ', ' ', '', 47)
+                            ind1 = val[1].replace(" ", "_")
+                            ind2 = val[2].replace(" ", "_")
+                            for (k, v) in val[0]:  # k, v = ('0', 'PER:5409')
+                                response[key+ind1+ind2+k].append(v)
+            # The output dictionary is something like:
+            # {"100__a": ['Smith, J.'],
+            #  "700__a": ['Anderson, J.', 'Someoneelse, E.'],
+            #  "700__u": ['University1', 'University2']}
+
+        # return dictionary as JSON
+        return json.dumps(response)
 
     def index(self, req, form):
 

@@ -29,26 +29,26 @@ import sys
 import datetime
 import time
 import os
-try:
-    from invenio.legacy.dbquery import run_sql, wash_table_column_name
-    from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
-         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
-    from invenio.legacy.bibsched.bibtask import task_init, task_set_option, task_get_option, \
+
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
+        CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
+        CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
+        CFG_INSPIRE_SITE
+from invenio.legacy.bibsched.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
-    from invenio.legacy.bibsched.bibtask_config import CFG_BIBSCHED_LOGDIR
-    from invenio.modules.access.mailcookie import mail_cookie_gc
-    from invenio.legacy.bibdocfile.api import BibDoc
-    from invenio.legacy.bibsched.cli import gc_tasks
-    from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
-    from invenio.utils.date import convert_datestruct_to_datetext
-except ImportError as e:
-    print("Error: %s" % (e,))
-    sys.exit(1)
+from invenio.legacy.bibsched.bibtask_config import CFG_BIBSCHED_LOGDIR
+from invenio.modules.access.mailcookie import mail_cookie_gc
+from invenio.legacy.bibdocfile.api import BibDoc
+from invenio.legacy.bibsched.cli import gc_tasks
+from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+from invenio.utils.date import convert_datestruct_to_datetext
+from intbitset import intbitset
 
 # Add trailing slash to CFG_TMPSHAREDDIR, for find command to work
 # with symlinks
 CFG_TMPSHAREDDIR = CFG_TMPSHAREDDIR + os.sep
+CFG_TMPDIR = CFG_TMPDIR + os.sep
 
 # configure variables
 CFG_MYSQL_ARGUMENTLIST_SIZE = 100
@@ -125,17 +125,6 @@ def clean_tempfiles():
     write_message("- deleting/gzipping temporary empty/old "
             "BibReformat xml files")
     vstr = task_get_option('verbose') > 1 and '-v' or ''
-    gc_exec_command('find %s %s -name "rec_fmt_*"'
-        ' -size 0c -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, vstr))
-    gc_exec_command('find %s %s -name "rec_fmt_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_RM_FMT, vstr))
-    gc_exec_command('find %s %s -name "rec_fmt_*"'
-        ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_ZIP_FMT, vstr))
 
     write_message("- deleting/gzipping temporary old "
             "OAIHarvest xml files")
@@ -154,27 +143,24 @@ def clean_tempfiles():
         ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
-    gc_exec_command('find %s %s -name "oai_archive*"'
-        ' -mtime +%s -exec rm %s -rf {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_RM_OAI, vstr))
 
-    write_message("- deleting/gzipping temporary old "
-            "BibSword files")
-    gc_exec_command('find %s %s -name "bibsword_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_RM_BIBSWORD, vstr))
-    gc_exec_command('find %s %s -name "bibsword_*"'
-        ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
+    if not CFG_INSPIRE_SITE:
+        write_message("- deleting/gzipping temporary old "
+                "BibSword files")
+        gc_exec_command('find %s %s -name "bibsword_*"'
+            ' -atime +%s -exec rm %s -f {} \;' \
+                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+                CFG_MAX_ATIME_RM_BIBSWORD, vstr))
+        gc_exec_command('find %s %s -name "bibsword_*"'
+            ' -atime +%s -exec gzip %s -9 {} \;' \
+                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+                CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
 
-    # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
-    write_message("- deleting old video submissions")
-    gc_exec_command('find %s -name %s* -atime +%s -exec rm %s -f {} \;' \
-                    % (CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_TMP_VIDEO_PREFIX,
-                       CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO, vstr))
+        # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
+        write_message("- deleting old video submissions")
+        gc_exec_command('find %s -name %s* -atime +%s -exec rm %s -f {} \;' \
+                        % (CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_TMP_VIDEO_PREFIX,
+                        CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO, vstr))
 
     write_message("- deleting temporary old "
             "RefExtract files")
@@ -195,28 +181,23 @@ def clean_tempfiles():
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_ICON, vstr))
 
-    write_message("- deleting old temporary WebSubmit stamps")
-    gc_exec_command('find %s %s -name "websubmit_file_stamper_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_RM_STAMP, vstr))
+    if not CFG_INSPIRE_SITE:
+        write_message("- deleting old temporary WebSubmit stamps")
+        gc_exec_command('find %s %s -name "websubmit_file_stamper_*"'
+            ' -atime +%s -exec rm %s -f {} \;' \
+                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+                CFG_MAX_ATIME_RM_STAMP, vstr))
 
-    write_message("- deleting old temporary WebJournal XML files")
-    gc_exec_command('find %s %s -name "webjournal_publish_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-               CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
+        write_message("- deleting old temporary WebJournal XML files")
+        gc_exec_command('find %s %s -name "webjournal_publish_*"'
+            ' -atime +%s -exec rm %s -f {} \;' \
+                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+                CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
 
     write_message("- deleting old temporary files attached with CKEditor")
     gc_exec_command('find %s/var/tmp/attachfile/ '
         ' -atime +%s -exec rm %s -f {} \;' \
             % (CFG_PREFIX, CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE,
-               vstr))
-
-    write_message("- deleting old temporary files attached with BibEdit")
-    gc_exec_command('find %s -name "bibedit*.tmp"'
-        ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPSHAREDDIR + '/bibedit-cache/', CFG_MAX_ATIME_BIBEDIT_TMP,
                vstr))
 
     write_message("- deleting old XML files submitted via BibEdit")
@@ -248,26 +229,27 @@ def clean_cache():
     write_message("""%s rss cache file pruned out of %s.""" % (count, len(filenames)))
     write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
 
-    write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
-    webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
-    filenames = []
-    try:
-        for root, dummy, files in os.walk(webjournal_cache_dir):
-            filenames.extend(os.path.join(root, filename) for filename in files)
-    except OSError:
-        pass
-    count = 0
-    for filename in filenames:
-        filename = os.path.join(webjournal_cache_dir, filename)
-        last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
-        if not (datetime.datetime.now() < last_update_time + datetime.timedelta(days=CFG_WEBJOURNAL_TTL)):
-            try:
-                os.remove(filename)
-                count += 1
-            except OSError as e:
-                write_message("Error: %s" % e)
-    write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
-    write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")
+    if not CFG_INSPIRE_SITE:
+        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
+        webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
+        filenames = []
+        try:
+            for root, dummy, files in os.walk(webjournal_cache_dir):
+                filenames.extend(os.path.join(root, filename) for filename in files)
+        except OSError:
+            pass
+        count = 0
+        for filename in filenames:
+            filename = os.path.join(webjournal_cache_dir, filename)
+            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
+            if not (datetime.datetime.now() < last_update_time + datetime.timedelta(days=CFG_WEBJOURNAL_TTL)):
+                try:
+                    os.remove(filename)
+                    count += 1
+                except OSError, e:
+                    write_message("Error: %s" % e)
+        write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
+        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")
 
 
 def clean_bibxxx():
@@ -348,15 +330,16 @@ def clean_sessions():
     """
     Deletes expired sessions only.
     """
-    deleted_sessions = 0
-    timelimit = convert_datestruct_to_datetext(time.gmtime())
-    write_message("Deleting expired sessions since %s" % (timelimit,))
+    if not CFG_INSPIRE_SITE:
+        deleted_sessions = 0
+        timelimit = convert_datestruct_to_datetext(time.gmtime())
+        write_message("Deleting expired sessions since %s" % (timelimit,))
 
-    query = "DELETE LOW_PRIORITY FROM session WHERE session_expiry < %s"
-    write_message(query % (timelimit,), verbose=9)
-    deleted_sessions += run_sql(query, (timelimit,))
+        query = "DELETE LOW_PRIORITY FROM session WHERE session_expiry < %s"
+        write_message(query % (timelimit,), verbose=9)
+        deleted_sessions += run_sql(query, (timelimit,))
 
-    write_message("Deleted %d sessions" % (deleted_sessions,))
+        write_message("Deleted %d sessions" % (deleted_sessions,))
 
 def clean_bibedit_cache():
     """Deletes experied bibedit cache entries"""
@@ -444,22 +427,24 @@ def guest_user_garbage_collector():
         " non-existent users")
 
     # find user_queries referencing non-existent users
-    write_message("  SELECT DISTINCT uq.id_user\n"
-        "  FROM user_query AS uq LEFT JOIN user AS u\n"
-        "  ON uq.id_user = u.id\n  WHERE u.id IS NULL", verbose=9)
-    result = run_sql("""SELECT DISTINCT uq.id_user
-        FROM user_query AS uq LEFT JOIN user AS u
-        ON uq.id_user = u.id
-        WHERE u.id IS NULL""")
-    write_message(result, verbose=9)
 
+    users_with_queries = intbitset(run_sql("""SELECT DISTINCT id_user
+                                              FROM user_query"""))
+    existing_users = intbitset(run_sql("SELECT id FROM user"))
+    users_with_queries_to_be_deleted = users_with_queries - existing_users
+    write_message("  Users with queries: %s" % len(users_with_queries),
+                  verbose=9)
+    write_message("  Existing users: %s" % len(existing_users),
+                  verbose=9)
+    write_message("  Users with queries to be deleted: %s"
+                  % len(users_with_queries_to_be_deleted), verbose=9)
 
     # delete in user_query one by one
     write_message("  DELETE FROM user_query WHERE"
         " id_user = 'TRAVERSE LAST RESULT' \n", verbose=9)
-    for (id_user,) in result:
-        delcount['user_query'] += run_sql("""DELETE FROM user_query
-            WHERE id_user = %s""" % (id_user,))
+    for id_user in users_with_queries_to_be_deleted:
+        delcount['user_query'] += run_sql("""DELETE FROM user_query WHERE
+                                             id_user=%s""", (id_user, ))
 
     # delete the actual queries
     write_message("- deleting queries not attached to any user")

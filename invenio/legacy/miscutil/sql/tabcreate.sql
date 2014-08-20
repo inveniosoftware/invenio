@@ -3437,7 +3437,7 @@ CREATE TABLE IF NOT EXISTS collection_format (
 CREATE TABLE IF NOT EXISTS format (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
-  code varchar(6) NOT NULL,
+  code varchar(20) NOT NULL,
   description varchar(255) default '',
   content_type varchar(255) default '',
   visibility tinyint NOT NULL default '1',
@@ -5038,5 +5038,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larg
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_queue_table_virtual_index',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_varchar20',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
 
 -- end of file
