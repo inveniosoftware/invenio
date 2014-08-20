@@ -263,6 +263,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
 
     record_deleted_p = False
+    original_005 = None
     if opt_mode == 'insert' or \
     (opt_mode == 'replace_or_insert') and rec_id is None:
         insert_mode_p = True
@@ -290,6 +291,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                 error = None
         else:
             write_message("   Note: 005 already existing upon inserting of new record. Keeping it.", verbose=2)
+        original_005 = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime('20140408151829.0'.split('.')[0], "%Y%m%d%H%M%S"))
 
     elif opt_mode != 'insert':
         insert_mode_p = False
@@ -627,10 +629,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                     verbose=2)
         if opt_notimechange == 0 and (updates_exist or record_had_FFT):
             bibrec_now = convert_datestruct_to_datetext(time.localtime())
-            update_job_end_dates(bibrec_now=bibrec_now,
-                                 rec_id=rec_id,
-                                 insert_mode_p=insert_mode_p,
-                                 pretend=pretend)
+            update_bibrec_date(now=bibrec_now,
+                               bibrec_id=rec_id,
+                               insert_mode_p=insert_mode_p,
+                               original_005=original_005,
+                               pretend=pretend)
             write_message("   -Retrieved current localtime: DONE", verbose=2)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
@@ -651,12 +654,6 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
             ## back the original record then.
             update_database_with_metadata(original_record, rec_id, oai_rec_id, pretend=pretend)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
-
-
-def update_job_end_dates(bibrec_now, rec_id, insert_mode_p, pretend):
-    # update_history_date(bibrec_now, recid)
-    update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
-
 
 def record_is_valid(record):
     """
@@ -1272,9 +1269,9 @@ def create_new_record(rec_id=None, pretend=False):
         else:
             return run_sql("SELECT max(id)+1 FROM bibrec")[0][0]
     if rec_id is not None:
-        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date) VALUES (%s, NOW(), NOW())", (rec_id, ))
+        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date, ingestion_date) VALUES (%s, NOW(), NOW(), NOW())", (rec_id, ))
     else:
-        return run_sql("INSERT INTO bibrec (creation_date, modification_date) VALUES (NOW(), NOW())")
+        return run_sql("INSERT INTO bibrec (creation_date, modification_date, ingestion_date) VALUES (NOW(), NOW(), NOW())")
 
 def insert_bibfmt(id_bibrec, marc, bibformat, modification_date='1970-01-01 00:00:00', pretend=False):
     """Insert the format in the table bibfmt"""
@@ -2259,11 +2256,11 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
 ### Update functions
 
-def update_bibrec_date(now, bibrec_id, insert_mode_p, pretend=False):
+def update_bibrec_date(now, bibrec_id, insert_mode_p, original_005=None, pretend=False):
     """Update the date of the record in bibrec table """
     if insert_mode_p:
-        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s WHERE id=%s"""
-        params = (now, now, bibrec_id)
+        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s, ingestion_date=%s WHERE id=%s"""
+        params = (original_005, now, now, bibrec_id)
     else:
         query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
         params = (now, bibrec_id)
