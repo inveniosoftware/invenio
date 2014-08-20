@@ -18,6 +18,7 @@ Extensions
    ext/arxiv
    ext/crossref
    ext/elasticsearch
+   ext/logging
    ext/login
    ext/sqlalchemy
    ext/template

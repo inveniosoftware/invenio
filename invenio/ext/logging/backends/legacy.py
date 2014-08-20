@@ -18,16 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-"""
-invenio.ext.logging.backends.legacy
------------------------------------
+"""Invenio 1.x style error handling.
 
-Adds a Invenio 1.x style error handling by logging exceptions to the database
-and sending emails. Works in connection with register_exception()
+Logs exceptions to database and sends emails. Works only in connection with
+register_exception().
 
-Configuration::
+**Configuration**
 
-    LOGGING_LEGACY_LEVEL = 'ERROR' # log level (maps to logging.ERROR)
+======================== ======================================================
+`LOGGING_LEGACY_LEVEL`   Log level threshold for handler. **Default:**
+                         ``ERROR``.
+======================== ======================================================
 """
 
 from __future__ import absolute_import
@@ -38,9 +39,7 @@ from ..formatters import InvenioExceptionFormatter
 
 
 def setup_app(app):
-    """
-    Invenio 1.x log handler
-    """
+    """Invenio 1.x log handler."""
     if not app.debug:
         app.config.setdefault('LOGGING_LEGACY_LEVEL', 'ERROR')
 

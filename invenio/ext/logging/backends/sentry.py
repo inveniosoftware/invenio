@@ -17,18 +17,31 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Sentry logging backend.
+"""Sentry logging backend.
 
-Integration of Sentry for application error logging. Configuration options:
+Currently only Python application errors are sent to
+`Sentry <http://getsentry.com>`_. Future extensions may allow for sending
+JavaScript errors to Sentry as well.
 
-SENTRY_DSN = "https://...:...@app.getsentry.com/..."
-SENTRY_INCLUDE_PATHS = [..]  # List all modules you want version information
-                             # for.
-LOGGING_SENTRY_LEVEL = 'ERROR' # log level (maps to logging.ERROR)
-LOGGING_SENTRY_INCLUDE_WARNINGS = True # Include deprecation warnings
+**Configuration**
 
-Note, Sentry also supports logging JavaScript errors. This is however not yet
-supported.
+================================== ============================================
+`SENTRY_DSN`                       Sentry DSN (get it from your Sentry account)
+                                   . **Required**.
+`LOGGING_SENTRY_LEVEL`             Log level threshold for handler.
+                                   **Default:**  ``WARNING``.
+`LOGGING_SENTRY_INCLUDE_WARNINGS`  Include messages from warnings module.
+                                   **Default:**  ``True``.
+`LOGGING_SENTRY_CELERY`            Log Celery messages to Sentry.
+                                   **Default:**  ``True``.
+`LOGGING_SENTRY_CELERY_TRANSPORT`  Transport mechanism for Celery.
+                                   **Default:**  ``sync``.
+================================== ============================================
+
+`Raven <raven.readthedocs.org/en/latest/>`_ (the Python library responsible for
+sending log messages to Sentry), supports some additionally configuration
+variables. See https://github.com/getsentry/raven-python/blob/master/raven/contrib/flask.py
+for further details.
 """
 
 import logging
@@ -47,7 +60,7 @@ import invenio
 
 class InvenioSanitizeProcessor(SanitizePasswordsProcessor):
 
-    """ Remove additional sensitve configuration from Sentry data. """
+    """Remove additional sensitve configuration from Sentry data."""
 
     FIELDS = frozenset([
         'access_token'
@@ -55,7 +68,7 @@ class InvenioSanitizeProcessor(SanitizePasswordsProcessor):
 
 
 def sentry_include_paths():
-    """ Detect Invenio dependencies and for use with SENTRY_INCLUDE_PATHS. """
+    """Detect Invenio dependencies and for use with SENTRY_INCLUDE_PATHS."""
     try:
         dist = pkg_resources.get_distribution('invenio')
         return map(lambda req: req.key, dist.requires())
@@ -64,25 +77,25 @@ def sentry_include_paths():
 
 
 def setup_warnings(sentry):
-    """ Add sentry to warnings logger. """
+    """Add sentry to warnings logger."""
     warnings = logging.getLogger('py.warnings')
     warnings.addHandler(SentryHandler(sentry.client, level=logging.WARNING))
 
 
 def add_sentry_id_header(self, sender, response, *args, **kwargs):
-    """ Fix issue when last_event_id is not defined. """
+    """Fix issue when last_event_id is not defined."""
     if hasattr(self, 'last_event_id'):
         response.headers['X-Sentry-ID'] = self.last_event_id
     return response
 
 
 def celery_logger_setup(app=None, sender=None, logger=None, **kwargs):
-    """ Setup Sentry logging for Celery. """
+    """Setup Sentry logging for Celery."""
     add_handler(logger, app)
 
 
 def celery_dsn_fix(app):
-    """ Fix SENTRY_DSN for Celery.
+    """Fix SENTRY_DSN for Celery.
 
     Celery does not handle threaded transport very well, so allow overriding
     default transport mechanism for Celery.
@@ -105,7 +118,7 @@ def celery_dsn_fix(app):
 
 
 def add_handler(logger, app):
-    """ Add handler to logger if not already added. """
+    """Add handler to logger if not already added."""
     for h in logger.handlers:
         if type(h) == SentryHandler:
             return
@@ -119,7 +132,7 @@ def add_handler(logger, app):
 
 
 def setup_app(app):
-    """ Setup Sentry extension. """
+    """Setup Sentry extension."""
     app.config.setdefault('SENTRY_DSN', None)
     # Sanitize data more
     app.config.setdefault('SENTRY_PROCESSORS', (
@@ -201,6 +214,4 @@ def setup_app(app):
 
 
 sentry = LocalProxy(lambda: current_app.extension['sentry'])
-"""
-Proxy object to sentry instance
-"""
+"""Proxy object to sentry instance."""
