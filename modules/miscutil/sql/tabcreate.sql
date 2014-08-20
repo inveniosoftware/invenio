@@ -21,10 +21,12 @@ CREATE TABLE IF NOT EXISTS bibrec (
   id mediumint(8) unsigned NOT NULL auto_increment,
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
+  earliest_date datetime NOT NULL default '0000-00-00',
   master_format varchar(16) NOT NULL default 'marc',
   PRIMARY KEY  (id),
   KEY creation_date (creation_date),
-  KEY modification_date (modification_date)
+  KEY modification_date (modification_date),
+  KEY earliest_date (earliest_date)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib00x (
@@ -5041,5 +5043,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_varchar20',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_earliest_date',NOW());
 
 -- end of file
