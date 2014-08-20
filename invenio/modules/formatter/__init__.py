@@ -157,7 +157,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                    xml_records=None, user_info=None, record_prefix=None,
                    record_separator=None, record_suffix=None, prologue="",
-                   epilogue="", req=None, on_the_fly=False):
+                   epilogue="", req=None, on_the_fly=False,
+                   extra_context=None):
     """
     Format records given by a list of record IDs or a list of records as xml.
 
@@ -260,7 +261,7 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
         ln = ln or cfg['CFG_SITE_LANG']
         formatted_record = format_record(recIDs[i], of, ln, verbose,
                                          search_pattern, xml_records[i],
-                                         user_info, on_the_fly)
+                                         user_info, on_the_fly, extra_context)
         formatted_records += formatted_record
         if req is not None:
             req.write(formatted_record)

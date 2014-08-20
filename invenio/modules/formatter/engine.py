@@ -297,7 +297,8 @@ def get_format_element_path(filename):
 
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
-                  search_pattern=None, xml_record=None, user_info=None, qid="", extra_context={}):
+                  search_pattern=None, xml_record=None, user_info=None, qid="",
+                  extra_context=None):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -621,7 +622,8 @@ def translate_template(template, ln=CFG_SITE_LANG):
 
 
 def format_with_format_template(format_template_filename, bfo,
-                                verbose=0, format_template_code=None, qid="", extra_context={}):
+                                verbose=0, format_template_code=None, qid="",
+                                extra_context=None):
     """ Format a record given a
     format template.
 
@@ -688,7 +690,8 @@ def format_with_format_template(format_template_filename, bfo,
         record.get = encode_utf8(record.get)
 
         ctx = TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions
-        ctx.update(extra_context)
+        if extra_context is not None:
+            ctx.update(extra_context)
 
         evaluated_format = render_template_to_string(
             'format/record/'+format_template_filename,
