@@ -8,11 +8,11 @@ from invenio.bibformat_engine import BibFormatObject
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL
 
-def format_element(bfo, display_search_link_to_contributions='yes', volume_label="Volume "):
+def format_element(bfo, authors='yes'):
     """
     Prints a table of contents.
 
-    @param display_search_link_to_contributions: display a link searching for corresponding contribution in Invenio, or not.
+    @param authors: Display author(s) below each link or not ('yes' or 'no', default 'yes').
     """
 
     output = ''
@@ -37,15 +37,18 @@ def format_element(bfo, display_search_link_to_contributions='yes', volume_label
         if title == '':
             title = "%s" % record.field("24500a")
 
-    contributers = record.field("720__a")
-    if contributers == '':
-         contributers = record.field("7200a")
-    if contributers == '':
-        contributers = record.field("100__a")
+        contributers = record.field("720__a")
+        if contributers == '':
+             contributers = record.field("7200a")
+        if contributers == '':
+            contributers = record.field("100__a")
 
         link = '%s/record/%s?ln=%s' % (CFG_SITE_URL, recid, bfo.lang)
-        output += '''<tr><td><a href="%s">%s</a> by %s </td></tr>''' % (link, title, contributers)
-        
+        output += '''<tr><td><a href="%s">%s</a>''' % (link, title)
+        if authors == 'yes':
+            output += ' by %s' % contributers
+        output += '</td></tr>'
+
     output += '</table>'
 
     return output
