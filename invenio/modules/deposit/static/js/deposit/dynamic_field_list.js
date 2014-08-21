@@ -53,7 +53,7 @@ define(function(require, exports, module) {
         this.options.index_suffix + "))" + this.options.sep + "(.+)"
     );
     // Get template name from options or the empty elements data attribute
-    this.tag_template = Hogan.compile($(this).data('tagTemplate') || '');
+    this.tag_template = Hogan.compile(this.$element.data('tagTemplate') || '');
 
   }
 
@@ -179,7 +179,7 @@ define(function(require, exports, module) {
       }
 
       //Update field values if data exists
-      if(data !== null){
+      if(data !== null && data !== undefined){
         // Remove prefix from field name
         newdata = {};
         if (typeof data == 'object'){

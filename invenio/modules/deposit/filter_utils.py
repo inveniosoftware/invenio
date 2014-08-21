@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
-#
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+##
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 """WTForm filters implementation.
 
@@ -27,7 +27,8 @@ http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field
 
 import six
 
-from invenio.utils.html import HTMLWasher
+from invenio.utils.html import HTMLWasher, \
+    CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
 
 
 def strip_string(value):
@@ -95,10 +96,13 @@ def strip_prefixes(*prefixes):
     return _inner
 
 
-def sanitize_html(value):
+def sanitize_html(allowed_tag_whitelist=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST):
     """Sanitize HTML."""
-    if isinstance(value, six.string_types):
-        washer = HTMLWasher()
-        return washer.wash(value)
-    else:
-        return value
+    def _inner(value):
+        if isinstance(value, six.string_types):
+            washer = HTMLWasher()
+            return washer.wash(value,
+                               allowed_tag_whitelist=allowed_tag_whitelist)
+        else:
+            return value
+    return _inner

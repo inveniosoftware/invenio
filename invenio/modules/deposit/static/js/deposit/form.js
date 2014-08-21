@@ -39,7 +39,7 @@ define(function(require, exports, module) {
         status_saving: 'Saving <img src="/img/loading.gif" />',
         status_error: '<span class="text-danger">Not saved due to server error. Please try to reload your browser <i class="glyphicon glyphicon-warning-sign"></i></span>',
         status_saved: 'Saved <i class="fa fa-check"></i>',
-        status_saved_with_error: '<span class="text-warning">Saved, but with errors <i class="glyphicon glyphicon-warning-sign"></i></span>',
+        status_saved_with_errors: '<span class="text-warning">Saved, but with errors <i class="glyphicon glyphicon-warning-sign"></i></span>',
         success: 'Successfully saved.',
         loader: '<img src="/img/loading.gif"/>',
         loader_success: '<span class="text-success"> <i class="fa fa-check"></i></span>',
@@ -311,7 +311,7 @@ define(function(require, exports, module) {
           $('#file-table').show('fast');
       } else {
           clear_error(name);
-          has_ckeditor = $('[name=' + name + ']').data('ckeditor');
+          var has_ckeditor = $('[name=' + name + ']').data('ckeditor');
           if( has_ckeditor === 1) {
               if(CKEDITOR.instances[name].getData(value) != value) {
                   CKEDITOR.instances[name].setData(value);
@@ -394,7 +394,9 @@ define(function(require, exports, module) {
    * Save field value value
    */
   function save_field(url, name, value) {
-      save_data(url, {name: value})
+      var request_data = {};
+      request_data[name] = value;
+      save_data(url, request_data);
   }
   /**
    * Save field value value
@@ -681,7 +683,7 @@ define(function(require, exports, module) {
 
       uploader.bind('UploadProgress', function(up, file) {
           $('#' + file.id + " .progress-bar").css('width', file.percent + "%");
-          upload_speed = getBytesWithUnit(up.total.bytesPerSec) + " per sec";
+          var upload_speed = getBytesWithUnit(up.total.bytesPerSec) + " per sec";
           console.log("Progress " + file.name + " - " + file.percent);
           $('#upload_speed').html(upload_speed);
           up.total.reset();
@@ -701,7 +703,7 @@ define(function(require, exports, module) {
 
           });
 
-          $(selector).removeClass("hide");
+          $(selector).show();
           $('#uploadfiles').removeClass("disabled");
           $('#file-table').show('slow');
           up.total.reset();
@@ -1090,10 +1092,8 @@ define(function(require, exports, module) {
               $('.pluploader').show();
               $('#file-table').show('fast');
               $.each(e.files, function(i, file){
-                  id = unique_id();
-
-                  dbfile = {
-                      id: id,
+                  var dbfile = {
+                      id: unique_id(),
                       name: file.name,
                       size: file.bytes,
                       url: file.link
@@ -1105,7 +1105,7 @@ define(function(require, exports, module) {
                       filesize: getBytesWithUnit(file.bytes),
                       removeable: true
                   }));
-                  $('#filelist #' + id).show('fast');
+                  $('#filelist #' + dbfile.id).show('fast');
                   $('#uploadfiles').removeClass("disabled");
                   $('#' + dbfile.id + ' .rmlink').on("click", function(event){
                       $('#' + dbfile.id).hide('fast', function() {
@@ -1137,7 +1137,12 @@ define(function(require, exports, module) {
       });
   }
 
-  module.exports = function(config){
+  /**
+   * Exports
+   */
+  module.exports.submit = submit;
+
+  module.exports.init = function(config){
     init_plupload(config.plupload);
     init_save(config.urls.save_all_url, '.form-save', '#submitForm');
     init_submit(config.urls.complete_url, '.form-submit', '#submitForm', '#form-submit-dialog');
@@ -1156,6 +1161,6 @@ define(function(require, exports, module) {
     })
     $('#webdeposit_form_accordion .panel-collapse.in.collapse').css("overflow", "visible");
     // Initialize jquery_plugins
-    $(config.datepicker.element).datepicker({dateFormat: config.datepicker.format});
+    $(config.datepicker.element).datepicker(config.datepicker.options);
   }
 })

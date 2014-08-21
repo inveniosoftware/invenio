@@ -25,9 +25,9 @@
     <div class="well">
         <span class="pull-right">
             {%- if deposition.type.editable -%}
-            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="fa fa-pencil"></i>{{ _('Edit') }}</a> &nbsp;
+            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="fa fa-pencil"></i> {{ _('Edit') }}</a> &nbsp;
             {%- endif -%}
-            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="fa fa-eye"></i>{{ _('View') }}</a>
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="fa fa-eye"></i> {{ _('View') }}</a>
         </span>
         <span class="clearfix"></span>
     </div>
@@ -42,8 +42,8 @@
              'If you want to remove your upload, please contact %(x_contact)s',
              x_link='<a href="{url}">{url}</a>'.format(
                 url=url_for('record.metadata', recid=sip.metadata['recid'], _external=True)
-             ),
-             x_contact='<a href="mailto:{email}">{email}</a>'.format(email=config.CFG_SITE_SUPPORT_EMAIL)) }}
+             )|safe,
+             x_contact='<a href="mailto:{email}">{email}</a>'.format(email=config.CFG_SITE_SUPPORT_EMAIL)|safe) }}
     </small>
     <hr />
     {{format_record(recID=sip.metadata['recid'], xml_record=sip.package, of='hd')|safe}}

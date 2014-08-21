@@ -77,12 +77,15 @@
   {# The ckEditor loads dynamically other files and thus cannot be safely
    # bundled with the others.
    #}
-  <script type="text/javascript" src="{{ url_for("static", filename="vendors/ckeditor/ckeditor.js" )}}"></script>
-  <script type="text/javascript" src="{{ url_for("static", filename="js/ckeditor/invenio-ckeditor-config.js" )}}"></script>
-
+<script type="text/javascript" src="{{ url_for("static", filename="vendors/ckeditor/ckeditor.js" )}}"></script>
 {%- block form_script_options %}
 <script type="text/javascript">
-var date_options = {dateFormat: 'yy-mm-dd'}
+var date_options = {
+    element: '.datepicker',
+    options: {
+        dateFormat: 'yy-mm-dd',
+    }
+};
 </script>
 {%- endblock form_script_options %}
 <script type="text/javascript">
@@ -114,13 +117,10 @@ require(["jquery", "js/deposit/form"], function($, form) {
             complete_url: complete_url,
             autocomplete_url: autocomplete_url,
           },
-          datepicker: {
-            element: '.datepicker',
-            format: 'yy-mm-dd'
-          }
+          datepicker: date_options
       }
       // Initialize form
-      form(configuration);
+      form.init(configuration);
     });
 });
 </script>

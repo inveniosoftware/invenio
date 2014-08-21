@@ -168,7 +168,7 @@ require(['jquery'], function ($) {
     if (filter) {
       filter = '[data-toggle="modal"]' + filter;
     } else {
-      filter = '[data-toggle="modal"]';
+      filter = '[data-toggle="modal"][href]';
     }
     $(filter).click(function (e) {
         e.preventDefault();
@@ -193,9 +193,12 @@ require(['jquery'], function ($) {
   window.bindModals = bindModals;
 
   $(document).on('hidden.bs.modal', function() {
-      // delete any existing modal elements instead of just hiding them
-      $('.modal').remove();
-      $('.modal-backdrop').remove();
+        // delete any existing modal elements instead of just hiding them
+        var href = $(this).attr('href');
+        if (href !== undefined){
+            $('.modal').remove();
+            $('.modal-backdrop').remove();
+        }
   });
 
   $('[rel=tooltip]').tooltip();

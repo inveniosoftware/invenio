@@ -93,7 +93,6 @@ class CKEditorWidget(object):
         html = [u'<textarea %s >' % html_params(
             id=field.name,
             name=field.name,
-            value=field.data or '',
             **attrs
         )]
         html.append('%s</textarea>' % field.data or '')
