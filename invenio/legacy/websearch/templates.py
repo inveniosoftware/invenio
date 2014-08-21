@@ -3419,9 +3419,11 @@ class Template:
         """Creates XML RSS 2.0 prologue."""
         title = CFG_SITE_NAME
         description = '%s latest documents' % CFG_SITE_NAME
+        link = CFG_SITE_URL
         if cc and cc != CFG_SITE_NAME:
             title += ': ' + cgi.escape(cc)
             description += ' in ' + cgi.escape(cc)
+            link += '/collection/' + quote(cc)
 
         out = """<rss version="2.0"
         xmlns:media="http://search.yahoo.com/mrss/"
@@ -3431,7 +3433,7 @@ class Template:
         xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
       <channel>
         <title>%(rss_title)s</title>
-        <link>%(siteurl)s</link>
+        <link>%(rss_link)s</link>
         <description>%(rss_description)s</description>
         <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
@@ -3477,7 +3479,8 @@ class Template:
                'items_per_page': (rg and \
                              '\n<opensearch:itemsPerPage>%i</opensearch:itemsPerPage>' % rg) or '',
                'rss_title': title,
-               'rss_description': description
+               'rss_description': description,
+               'rss_link': link,
         }
         return out
 

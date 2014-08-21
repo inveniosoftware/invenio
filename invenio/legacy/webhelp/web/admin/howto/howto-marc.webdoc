@@ -699,6 +699,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Terms governing use and reproduction, e.g. CC License
          $b   person or institution imposing the license (author, publisher)
+         $f   OA funder: Institution who pays for OA fees
          $u   URI
          $3   material (currently not used)
 

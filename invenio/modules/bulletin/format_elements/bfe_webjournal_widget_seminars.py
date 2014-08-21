@@ -77,7 +77,9 @@ def get_widget_html(bfo, indico_baseurl, indico_what, indico_loc, indico_id,
     Gets seminars of the day from CERN Indico every 60 minutes and displays
     them in a widget.
     """
+
     _ = gettext_set_language(ln)
+
     try:
         seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, cached_filename))
     except:
@@ -88,6 +90,7 @@ def get_widget_html(bfo, indico_baseurl, indico_what, indico_loc, indico_id,
             seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, cached_filename))
         except:
             return "<ul><li><i>" + _("No information available") + "</i></li></ul>"
+
     try:
         timestamp = seminar_xml.firstChild.getAttribute("time")
     except:
@@ -96,6 +99,7 @@ def get_widget_html(bfo, indico_baseurl, indico_what, indico_loc, indico_id,
     last_update = time.mktime(time.strptime(timestamp,
                                             "%a, %d %b %Y %H:%M:%S %Z"))
     now = time.mktime(time.gmtime())
+
     if last_update + update_frequency < now:
         try:
             _update_seminars(indico_baseurl, indico_what, indico_loc, indico_id,
@@ -104,49 +108,69 @@ def get_widget_html(bfo, indico_baseurl, indico_what, indico_loc, indico_id,
             seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, cached_filename))
         except:
             return "<ul><li><i>" + _("No information available") + "</i></li></ul>"
-    html = ""
+
     seminars = seminar_xml.getElementsByTagName("seminar")
-    if len(seminars) == 0:
+
+    if not seminars:
         return "<ul><li><i>" + _("No seminars today") + "</i></li></ul>"
+
+    html = ""
+
     for seminar in seminars:
+
         html += "<li>"
+
         try:
             seminar_time = seminar.getElementsByTagName("start_time")[0].firstChild.toxml(encoding="utf-8")
         except:
             seminar_time = ""
+
         try:
             category = seminar.getElementsByTagName("category")[0].firstChild.toxml(encoding="utf-8")
         except:
             category = "Seminar"
+
         html += '%s %s<br/>' % (seminar_time, category)
+
         try:
             title = seminar.getElementsByTagName("title")[0].firstChild.toxml(encoding="utf-8")
         except:
             title = ""
+
         try:
             url = seminar.getElementsByTagName("url")[0].firstChild.toxml(encoding="utf-8")
         except:
             url = "#"
+
         try:
-            speaker = seminar.getElementsByTagName("speaker")[0].firstChild.toxml(encoding="utf-8")
+            speaker = seminar.getElementsByTagName("chair")[0].firstChild.toxml(encoding="utf-8")
         except:
-            speaker = ""
-        if (title != ""):
-            html += '<strong><a href="%s">%s</a></strong>, %s<br/>' % (url, title, speaker)
+            try:
+                speaker = seminar.getElementsByTagName("creator")[0].firstChild.toxml(encoding="utf-8")
+            except:
+                speaker = ""
+
+        if title:
+            html += '<strong><a href="%s">%s</a></strong>, %s<br />' % (url, title, speaker)
+
         try:
-            location = seminar.getElementsByTagName("location")[0].firstChild.toxml(encoding="utf-8") + ' '
+            location = seminar.getElementsByTagName("location")[0].firstChild.toxml(encoding="utf-8") + " "
         except:
             location = ""
+
         html += location
+
         try:
             room = seminar.getElementsByTagName("room")[0].firstChild.toxml(encoding="utf-8")
         except:
             room = ""
+
         html += room
 
         html += "</li>"
 
-    html = '<ul>' + html + '</ul>'
+    html = "<ul>" + html + "</ul>"
+
     return html
 
 def _update_seminars(indico_baseurl, indico_what, indico_loc, indico_id,
@@ -182,46 +206,104 @@ def _update_seminars(indico_baseurl, indico_what, indico_loc, indico_id,
     agenda_items = xml_file_handler.getElementsByTagName("conference")
     for item in agenda_items:
         seminar_xml.extend(["<seminar>", ])
-        try:
-            start_date = item.getElementsByTagName("startDate")[0].firstChild.toxml(encoding="utf-8")
-            start_time = start_date[11:16]
-        except:
-            start_time = ""
-        seminar_xml.extend(["<start_time>%s</start_time>" % start_time, ])
-        try:
-            category = item.getElementsByTagName("category")[0].firstChild.toxml(encoding="utf-8")
-            category = category.split("/")[-1]
-            category = category.replace("&amp;", "")
-            category = category.replace("nbsp;", "")
-            category = category.replace("&nbsp;", "")
-        except:
-            category = ""
-        seminar_xml.extend(["<category>%s</category>" % category, ])
-        try:
-            title = item.getElementsByTagName("title")[0].firstChild.toxml(encoding="utf-8")
-        except:
-            title = ""
-        seminar_xml.extend(["<title>%s</title>" % title, ])
-        try:
-            url = item.getElementsByTagName("url")[0].firstChild.toxml(encoding="utf-8")
-        except:
-            url = "#"
-        seminar_xml.extend(["<url>%s</url>" % url, ])
-        try:
-            speaker = item.getElementsByTagName("fullName")[0].firstChild.toxml(encoding="utf-8")
-        except:
-            speaker = ""
-        seminar_xml.extend(["<speaker>%s</speaker>" % speaker, ])
-        try:
-            room = item.getElementsByTagName("room")[0].firstChild.toxml(encoding="utf-8")
-        except:
-            room = ""
-        seminar_xml.extend(["<room>%s</room>" % room, ])
-        try:
-            location = item.getElementsByTagName("location")[0].firstChild.toxml(encoding="utf-8")
-        except:
-            location = ""
-        seminar_xml.extend(["<location>%s</location>" % location, ])
+
+        for childNode in item.childNodes:
+
+            if childNode.tagName == "startDate":
+                key = "start_time"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                value = value and value[11:16] or ""
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
+            #if childNode.tagName == "endDate":
+            #    continue
+
+            if childNode.tagName == "creator":
+                for extraChildNode in childNode.getElementsByTagName("fullName"):
+                    key = "creator"
+                    value = extraChildNode.firstChild.toxml(encoding="utf-8")
+                    seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                    # Only get the first childNode
+                    break
+                continue
+
+            #if childNode.tagName == "hasAnyProtection":
+            #    continue
+
+            #if childNode.tagName == "roomFullname":
+            #    continue
+
+            #if childNode.tagName == "modificationDate":
+            #    continue
+
+            #if childNode.tagName == "timezone":
+            #    continue
+
+            if childNode.tagName == "category":
+                key = "category"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                value = value.split("/")[-1].replace("&amp;", "").replace("nbsp;", "").replace("&nbsp;", "")
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
+            if childNode.tagName == "title":
+                key = "title"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
+            if childNode.tagName == "location":
+                key = "location"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
+            #if childNode.tagName == "type":
+            #    continue
+
+            #if childNode.tagName == "categoryId":
+            #    continue
+
+            #if childNode.tagName == "description":
+            #    continue
+
+            #if childNode.tagName == "roomMapURL":
+            #    continue
+
+            #if childNode.tagName == "material":
+            #    continue
+
+            #if childNode.tagName == "visibility":
+            #    continue
+
+            #if childNode.tagName == "address":
+            #    continue
+
+            #if childNode.tagName == "creationDate":
+            #    continue
+
+            if childNode.tagName == "room":
+                key = "room"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
+            if childNode.tagName == "chairs":
+                for extraChildNode in childNode.getElementsByTagName("fullName"):
+                    key = "chair"
+                    value = extraChildNode.firstChild.toxml(encoding="utf-8")
+                    seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                    # Only get the first childNode
+                    break
+                continue
+
+            if childNode.tagName == "url":
+                key = "url"
+                value = childNode.firstChild.toxml(encoding="utf-8")
+                seminar_xml.extend(["<%s>%s</%s>" % (key, value, key), ])
+                continue
+
         seminar_xml.extend(["</seminar>", ])
     seminar_xml.extend(["</Indico_Seminars>", ])
     # write the created file to cache
