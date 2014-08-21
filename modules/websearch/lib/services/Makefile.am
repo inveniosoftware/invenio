@@ -18,7 +18,11 @@
 pylibdir = $(libdir)/python/invenio/search_services
 
 pylib_DATA = \
-	__init__.py
+	__init__.py \
+	CollectionNameSearchService.py \
+	FAQKBService.py \
+	SubmissionNameSearchService.py \
+	JournalHintService.py
 
 EXTRA_DIST = $(pylib_DATA)
 
