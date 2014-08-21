@@ -5,6 +5,7 @@ import re
 
 from invenio.search_engine import perform_request_search
 from invenio.bibformat_engine import BibFormatObject
+from invenio.config import CFG_SITE_URL
 
 def format_element(bfo, parent_type='Conference', key_class='record-meta-key', value_class='record-meta-value'):
     """
@@ -18,16 +19,16 @@ def format_element(bfo, parent_type='Conference', key_class='record-meta-key', v
     output = ''
     parent_id = bfo.fields("962__r")
     if len(parent_id) == 1:
-        output += '<div class="'+key_class+'">'+parent_type+': </div>'
+        output += '<div class="%s">%s: </div>' % (key_class, parent_type)
         parent_rec = BibFormatObject(parent_id[0])
         parent_title = "%s" % parent_rec.field("111__a")
         if parent_title == '':
             parent_title = "%s" % parent_rec.field("245__a")
         if parent_title == '':
             parent_title = "%s" % parent_rec.field("24500a")
-        output += '<div class="' + value_class + '">' + parent_title + '</div>'
-    else:
-        output += " ".join(parent_id)
+
+        link = '%s/record/%s?ln=%s' % (CFG_SITE_URL, parent_id[0], bfo.lang)
+        output += '<div class="%s"><a href="%s">%s</a></div>' % (value_class, link, parent_title)
     return output
 
 
