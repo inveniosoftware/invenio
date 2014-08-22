@@ -166,7 +166,447 @@ class DecoratorsTestCase(InvenioTestCase):
         self.assertStatus(res, 415)
 
 
-TEST_SUITE = make_test_suite(DecoratorsTestCase)
+class RestfulPaginationTestCase(InvenioTestCase):
+
+    def setUp(self):
+        """Set up some dummy data and a resource."""
+        from invenio.modules.accounts.models import User
+        from invenio.modules.oauth2server.models import Token
+
+        self.data = range(25)
+
+        # setup test api resources
+
+        class TestDataResource(Resource):
+
+            method_decorators = [
+                require_api_auth()
+            ]
+
+            @require_header('Content-Type', 'application/json')
+            def get(self):
+                import json
+                from flask import make_response
+                from invenio.ext.restful.errors import(
+                    RestfulError, InvalidPageError
+                )
+                from invenio.ext.restful import pagination
+                # Test to see that the exceptions are raised correctly
+                # In restful.py it is not needed because the error_hanler
+                # takes care of exceptions
+                response = None
+                try:
+                    # test data
+                    testdata = range(25)
+                    endpoint = request.endpoint
+                    args = request.args
+                    page = int(args.get('page', 1))
+                    per_page = int(args.get('per_page', 10))
+                    # check values arguments and raise exceptions if any errors
+                    if per_page < 0:
+                        raise RestfulError(
+                            error_msg="Invalid per_page: {}".format(per_page),
+                            status_code=400
+                        )
+
+                    p = pagination.RestfulPagination(
+                        page=page, per_page=per_page, total_count=len(testdata)
+                    )
+                    if (page < 0) or (page > p.pages):
+                        raise InvalidPageError(
+                            error_msg="Invalid page: {}".format(page),
+                            status_code=400
+                        )
+                    data_to_return = p.slice(testdata)
+                    kwargs = {}
+                    kwargs['endpoint'] = endpoint
+                    kwargs['args'] = request.args
+                    link_header = p.link_header(**kwargs)
+                    response = make_response(json.dumps(data_to_return))
+                    response.headers[link_header[0]] = link_header[1]
+                    response.headers['Content-Type'] = request.headers['Content-Type']
+                except (RestfulError, InvalidPageError) as e:
+                    exception = {}
+                    exception['message'] = e.error_msg
+                    exception['type'] = "{0}".format(type(e))
+                    response = make_response(json.dumps(exception))
+                return response
+
+        # Register API resources
+        api = self.app.extensions['restful']
+        api.add_resource(
+            TestDataResource,
+            '/api/testdata/'
+        )
+
+        # Create a user
+        self.user = User(
+            email='info@invenio-software.org', nickname='tester'
+        )
+        self.user.password = "tester"
+        db.session.add(self.user)
+        db.session.commit()
+
+        # create token
+        self.token = Token.create_personal(
+            'test-', self.user.id, scopes=[], is_internal=True)
+
+    def tearDown(self):
+        """Delete the dummy data."""
+        del self.data
+        db.session.delete(self.user)
+        db.session.delete(self.token.client)
+        db.session.delete(self.token)
+        db.session.commit()
+
+    def test_paginate_page1(self):
+        endpoint = "/api/testdata/?"
+        link_template = '<{}per_page={}&page={}>; rel="{}"'
+        answer_get = self.client.get(
+            url_for('testdataresource', access_token=self.token.access_token,
+                    per_page=10),
+            headers=[('Content-Type', 'application/json')])
+        data_returned = answer_get.json
+        links_string = answer_get.headers['Link']
+        # expected answers
+        expected_data = self.data[0:10]
+        first_link = link_template.format(endpoint, 10, 1, "first")
+        next_link = link_template.format(endpoint, 10, 2, "next")
+        last_link = link_template.format(endpoint, 10, 3, "last")
+        expected_links_string = "{0},{1},{2}".format(
+            first_link,
+            next_link,
+            last_link
+        )
+        self.assertEqual(data_returned, expected_data)
+        self.assertEqual(links_string, expected_links_string)
+
+    def test_paginate_page2(self):
+        endpoint = "/api/testdata/?"
+        link_template = '<{}per_page={}&page={}>; rel="{}"'
+        answer_get = self.client.get(
+            url_for('testdataresource', access_token=self.token.access_token,
+                    page=2, per_page=10),
+            headers=[('Content-Type', 'application/json')])
+        data_returned = answer_get.json
+        links_string = answer_get.headers['Link']
+        # expected answers
+        expected_data = self.data[10:20]
+        first_link = link_template.format(endpoint, 10, 1, "first")
+        prev_link = link_template.format(endpoint, 10, 1, "prev")
+        next_link = link_template.format(endpoint, 10, 3, "next")
+        last_link = link_template.format(endpoint, 10, 3, "last")
+        expected_links_string = "{0},{1},{2},{3}".format(
+            first_link,
+            prev_link,
+            next_link,
+            last_link
+        )
+        self.assertEqual(data_returned, expected_data)
+        self.assertEqual(links_string, expected_links_string)
+
+    def test_paginate_lastpage(self):
+        endpoint = "/api/testdata/?"
+        link_template = '<{}per_page={}&page={}>; rel="{}"'
+        answer_get = self.client.get(
+            url_for('testdataresource', access_token=self.token.access_token,
+                    page=3, per_page=10),
+            headers=[('Content-Type', 'application/json')])
+        data_returned = answer_get.json
+        links_string = answer_get.headers['Link']
+
+        # expected answers
+        expected_data = self.data[20:25]
+        first_link = link_template.format(endpoint, 10, 1, "first")
+        prev_link = link_template.format(endpoint, 10, 2, "prev")
+        last_link = link_template.format(endpoint, 10, 3, "last")
+        expected_links_string = "{0},{1},{2}".format(
+            first_link,
+            prev_link,
+            last_link
+        )
+        self.assertEqual(data_returned, expected_data)
+        self.assertEqual(links_string, expected_links_string)
+
+    def test_paginate_nonexistentpage(self):
+        from invenio.ext.restful import errors
+        answer_get = self.client.get(
+            url_for('testdataresource',
+                    access_token=self.token.access_token,
+                    page=-2),
+            headers=[('Content-Type', 'application/json')])
+        # Test/assert to see that the exceptions are raised correctly
+        expected = {}
+        expected['message'] = "Invalid page: {0}".format(-2)
+        expected['type'] = "{0}".format(errors.InvalidPageError)
+        self.assertEqual(answer_get.json, expected)
+
+    def test_paginate_per_pageerror(self):
+        from invenio.ext.restful import errors
+        answer_get = self.client.get(
+            url_for('testdataresource',
+                    access_token=self.token.access_token,
+                    per_page=-5),
+            headers=[('Content-Type', 'application/json')])
+        # Test/assert to see that the exceptions are raised correctly
+        expected = {}
+        expected['message'] = "Invalid per_page: {0}".format(-5)
+        expected['type'] = "{0}".format(errors.RestfulError)
+        self.assertEqual(answer_get.json, expected)
+
+
+class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
+
+    def setUp(self):
+        from flask.ext.restful import Resource, fields, marshal
+        from invenio.modules.accounts.models import User
+        from invenio.modules.oauth2server.models import Token
+
+        class TagRepresenation(object):
+
+            """A representation of a tag.
+
+            This class will be only used to return a tag as JSON.
+            """
+
+            marshaling_fields = dict(
+                id=fields.Integer,
+                name=fields.String,
+                id_user=fields.Integer
+            )
+
+            def __init__(self, retrieved_tag):
+                """Initialization.
+
+                Declared the attributes to marshal with a tag.
+                :param retrieved_tag: a tag from the database
+                """
+                #get fields from the given tag
+                self.id = retrieved_tag.id
+                self.name = retrieved_tag.name
+                self.id_user = retrieved_tag.id_user
+
+            def marshal(self):
+                """Marshal the Tag."""
+                return marshal(self, self.marshaling_fields)
+
+        class TestTagsResource(Resource):
+
+            method_decorators = [
+                require_api_auth()
+            ]
+
+            @require_header('Content-Type', 'application/json')
+            def get(self):
+                import json
+                from flask import make_response
+                from invenio.modules.tags.models import WtgTAG
+                from invenio.ext.restful.errors import(
+                    RestfulError, InvalidPageError
+                )
+                from invenio.ext.restful import pagination
+
+                response = None
+                try:
+                    endpoint = request.endpoint
+                    args = request.args
+                    page = int(args.get('page', 1))
+                    per_page = int(args.get('per_page', 2))
+                    # check values arguments and raise exceptions if any errors
+                    if per_page < 0:
+                        raise RestfulError(
+                            error_msg="Invalid per_page: {}".format(per_page),
+                            status_code=400
+                        )
+                    if page < 0:
+                        raise InvalidPageError(
+                            error_msg="Invalid page: {}".format(page),
+                            status_code=400
+                        )
+
+                    # need to sort by id
+                    # also assuming only one user so no need to filter
+                    # user's id
+                    tags_q = WtgTAG.query.order_by(WtgTAG.id)
+                    p = pagination.RestfulSQLAlchemyPagination(
+                        query=tags_q, page=page, per_page=per_page
+                    )
+                    if page > p.pages:
+                        raise InvalidPageError(
+                            error_msg="Invalid page: {}".format(page),
+                            status_code=400
+                        )
+                    tags_to_return = map(
+                        lambda x: TagRepresenation(x).marshal(),
+                        p.items
+                    )
+
+                    kwargs = {}
+                    kwargs['endpoint'] = endpoint
+                    kwargs['args'] = request.args
+                    link_header = p.link_header(**kwargs)
+                    response = make_response(json.dumps(tags_to_return))
+                    response.headers[link_header[0]] = link_header[1]
+                    response.headers['Content-Type'] = request.headers['Content-Type']
+                except (RestfulError, InvalidPageError) as e:
+                    exception = {}
+                    exception['message'] = e.error_msg
+                    exception['type'] = "{0}".format(type(e))
+                    response = make_response(json.dumps(exception))
+                return response
+
+        # Register API resources
+        api = self.app.extensions['restful']
+        api.add_resource(
+            TestTagsResource,
+            '/api/testtags/'
+        )
+
+        # Create a user
+        self.user = User(
+            email='info@invenio-software.org', nickname='tester'
+        )
+        self.user.password = "tester"
+        db.session.add(self.user)
+        db.session.commit()
+
+        # create token
+        self.token = Token.create_personal(
+            'test-', self.user.id, scopes=[], is_internal=True)
+
+    def tearDown(self):
+        db.session.delete(self.user)
+        db.session.delete(self.token.client)
+        db.session.delete(self.token)
+        db.session.commit()
+
+    def test_pagination_flow(self):
+        from invenio.modules.tags import api as tags_api
+        # template of tags names
+        tag_name_template = "tag{}"
+        # endpoint
+        endpoint = "/api/testtags/?"
+        # links template
+        link_template = '<{}per_page={}&page={}>; rel="{}"'
+        # create tags
+        for i in range(1, 7):
+            tag_name = tag_name_template.format(i)
+            tags_api.create_tag_for_user(self.user.id, tag_name)
+
+        # request first page
+        answer_get = self.client.get(
+            url_for('testtagsresource', access_token=self.token.access_token,
+                    page=1, per_page=2),
+            headers=[('Content-Type', 'application/json')])
+        # check to ensure correct results
+        tags_names_from_request = [x['name'] for x in answer_get.json]
+        links_string = answer_get.headers['Link']
+        expected_names = []
+        for i in range(1, 3):
+            expected_name = tag_name_template.format(i)
+            expected_names.append(expected_name)
+
+        first_link = link_template.format(endpoint, 2, 1, "first")
+        next_link = link_template.format(endpoint, 2, 2, "next")
+        last_link = link_template.format(endpoint, 2, 3, "last")
+        expected_links_string = "{0},{1},{2}".format(
+            first_link,
+            next_link,
+            last_link
+        )
+        self.assertEqual(set(tags_names_from_request), set(expected_names))
+        self.assertEqual(links_string, expected_links_string)
+
+        tags_names_from_request = []
+        expected_names = []
+        # request second page
+        answer_get = self.client.get(
+            url_for('testtagsresource', access_token=self.token.access_token,
+                    page=2, per_page=2),
+            headers=[('Content-Type', 'application/json')])
+        # check to ensure correct results
+        tags_names_from_request = [x['name'] for x in answer_get.json]
+        links_string = answer_get.headers['Link']
+        # check if names of tags are the expected ones
+        expected_names = []
+        for i in range(3, 5):
+            expected_name = tag_name_template.format(i)
+            expected_names.append(expected_name)
+
+        first_link = link_template.format(endpoint, 2, 1, "first")
+        prev_link = link_template.format(endpoint, 2, 1, "prev")
+        next_link = link_template.format(endpoint, 2, 3, "next")
+        last_link = link_template.format(endpoint, 2, 3, "last")
+        expected_links_string = "{0},{1},{2},{3}".format(
+            first_link,
+            prev_link,
+            next_link,
+            last_link
+        )
+
+        self.assertEqual(set(tags_names_from_request), set(expected_names))
+        self.assertEqual(links_string, expected_links_string)
+
+        tags_names_from_request = []
+        expected_names = []
+        # request third(last) page
+        answer_get = self.client.get(
+            url_for('testtagsresource', access_token=self.token.access_token,
+                    page=3, per_page=2),
+            headers=[('Content-Type', 'application/json')])
+        # check to ensure correct results
+        tags_names_from_request = [x['name'] for x in answer_get.json]
+        links_string = answer_get.headers['Link']
+        # check if names of tags are the expected ones
+        expected_names = []
+        for i in range(5, 7):
+            expected_name = tag_name_template.format(i)
+            expected_names.append(expected_name)
+
+        first_link = link_template.format(endpoint, 2, 1, "first")
+        prev_link = link_template.format(endpoint, 2, 2, "prev")
+        last_link = link_template.format(endpoint, 2, 3, "last")
+        expected_links_string = "{0},{1},{2}".format(
+            first_link,
+            prev_link,
+            last_link
+        )
+
+        self.assertEqual(set(tags_names_from_request), set(expected_names))
+        self.assertEqual(links_string, expected_links_string)
+
+        # delete created tags
+        tags_api.delete_all_tags_from_user(self.user.id)
+
+    def test_paginate_nonexistentpage(self):
+        from invenio.ext.restful import errors
+        answer_get = self.client.get(
+            url_for('testtagsresource',
+                    access_token=self.token.access_token,
+                    page=-2),
+            headers=[('Content-Type', 'application/json')])
+        # Test/assert to see that the exceptions are raised correctly
+        expected = {}
+        expected['message'] = "Invalid page: {0}".format(-2)
+        expected['type'] = "{0}".format(errors.InvalidPageError)
+        self.assertEqual(answer_get.json, expected)
+
+    def test_paginate_per_pageerror(self):
+        from invenio.ext.restful import errors
+        answer_get = self.client.get(
+            url_for('testtagsresource',
+                    access_token=self.token.access_token,
+                    per_page=-5),
+            headers=[('Content-Type', 'application/json')])
+        # Test/assert to see that the exceptions are raised correctly
+        expected = {}
+        expected['message'] = "Invalid per_page: {0}".format(-5)
+        expected['type'] = "{0}".format(errors.RestfulError)
+        self.assertEqual(answer_get.json, expected)
+
+
+TEST_SUITE = make_test_suite(DecoratorsTestCase, RestfulPaginationTestCase,
+                             RestfulSQLAlchemyPaginationTestCase)
 
 
 if __name__ == "__main__":
