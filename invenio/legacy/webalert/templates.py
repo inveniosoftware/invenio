@@ -166,7 +166,7 @@ class Template:
                     <tr>
                       <td></td>
                       <td style="text-align: left; vertical-align: top; width: 10px; font-weight: bold;">%(query_text)s:</td>
-                      <td style="text-align: left; vertical-align: top; width: 500px">%(query)s</td>
+                      <td class="label label-info" style="text-align: left; vertical-align: top; max-width: 500px">%(query)s</td>
                     </tr>
                   </table>""" % {
                  'notify_cond' : _("This alert will notify you each time/only if a new item satisfies the following query:"),
@@ -174,8 +174,8 @@ class Template:
                  'query' : query,
                }
 
-        out += """<form name="setalert" action="../youralerts/%(action)s" method="get">
-        <table style="background-color:F1F1F1; border:thin groove grey; padding: 0px;">
+        out += """<form name="setalert" action="../youralerts/%(action)s" method="get"><br /><br />
+        <table padding: 0px;">
           <tr>
             <td>
               <table style="border: 0px; padding:10px;">
@@ -234,8 +234,8 @@ class Template:
                     <td colspan="2" style="text-align:center">
                       <input type="hidden" name="idq" value="%(idq)s" />
                       <input type="hidden" name="ln" value="%(ln)s" />
-                      <input class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" />&nbsp;
-                      <input class="formbutton" type="reset" value="%(clear_data)s" />
+                      <input class="btn btn-small btn-primary" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" />&nbsp;
+                      <input class="btn btn-small btn-primary" type="reset" value="%(clear_data)s" />
                      </td>
                     </tr>
                    </table>
@@ -306,7 +306,7 @@ class Template:
             })
         out += '</p>'
         if len(alerts):
-            out += """<table class="alrtTable">
+            out += """<table class="table table-hover">
                           <tr class="pageboxlefttop" style="text-align: center;">
                             <td style="font-weight: bold">%(no)s</td>
                             <td style="font-weight: bold">%(name)s</td>
@@ -355,12 +355,12 @@ class Template:
                               <td style="text-wrap:none;">%(basketname)s</td>
                               <td style="text-wrap:none;">%(lastrun)s</td>
                               <td style="text-wrap:none;">%(created)s</td>
-                              <td>%(textargs)s</td>
+                              <td><span class="label label-info">%(textargs)s</span></td>
                               <td>
-                                 %(remove_link)s<br />
-                                 %(modify_link)s<br />
-                                 <a href="%(siteurl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
-                             </td>
+                                %(remove_link)s<br />
+                                %(modify_link)s<br />
+                                <a href="%(siteurl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
+                              </td>
                             </tr>""" % {
                     'index' : i,
                     'alertname' : cgi.escape(alert['alertname']),
@@ -454,7 +454,7 @@ class Template:
             out += '<p>' + msg + '</p>'
 
         # display the list of searches
-        out += """<table class="alrtTable">
+        out += """<table class="table table-hover">
                     <tr class="pageboxlefttop">
                       <td style="font-weight: bold">%(no)s</td>
                       <td style="font-weight: bold">%(question)s</td>
@@ -472,9 +472,9 @@ class Template:
             # id, pattern, base, search url and search set alert, date
             out += """<tr>
                         <td style="font-style: italic;">#%(index)d</td>
-                        <td>%(textargs)s</td>
-                        <td><a href="%(siteurl)s/search?%(args)s">%(execute_query)s</a><br />
-                            <a href="%(siteurl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d">%(set_alert)s</a></td>""" % {
+                        <td><span class="label label-info">%(textargs)s</td></span>
+                        <td><a href="%(siteurl)s/search?%(args)s&amp" class=" btn btn-mini btn-primary">%(execute_query)s</a>
+                            <a href="%(siteurl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d "class="btn btn-mini btn-primary">%(set_alert)s</a></td>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
                      'siteurl' : CFG_SITE_URL,
