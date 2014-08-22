@@ -19,10 +19,10 @@
 <div class="well"{% if margin %}style="margin-top: {{margin}}"{% endif %}>
     <a class="btn btn-warning pull-left" data-toggle="tooltip" title="{{_('Discard changes.')}}" href="{{ url_for('webdeposit.discard', deposition_type=deposition_type, uuid=uuid) }}"><i class="fa fa-times icon-white"></i> {{ _('Discard') }}</a>
     <span class="pull-right">
-        <span class="loader" style="display:none;"><img src="{{ url_for('static', filename='img/loading.gif' ) }}" /></span>
-        <span class="status-indicator muted"></span>&nbsp;
-        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="fa fa-file-o"></i>{{ _('Save') }}</button>
-        <button title="{{_('Press "Submit" to persist your changes.')}}" class="btn btn-primary form-submit"><i class="fa fa-check"></i>{{ _('Submit') }}</button>
+        <span class="loader hide"><img src="{{ url_for('static', filename='img/loading.gif' ) }}" /></span>
+        <small><span class="status-indicator text-muted"></span></small>&nbsp;
+        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="fa fa-file-o"></i> {{ _('Save') }}</button>
+        <button title="{{_('Press "Submit" to persist your changes.')}}" class="btn btn-primary form-submit"><i class="fa fa-check"></i> {{ _('Submit') }}</button>
     </span>
     <span class="clearfix"></span>
 </div>
