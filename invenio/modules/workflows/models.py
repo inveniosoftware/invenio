@@ -366,7 +366,9 @@ class BibWorkflowObject(db.Model):
         from .registry import workflows
         try:
             workflow_definition = workflows[self.get_workflow_name()]
-            formatted_data = workflow_definition().formatter(self, formatter=None, format=of)
+            formatted_data = workflow_definition().formatter(self,
+                                                             formatter=None,
+                                                             format=of)
         except (KeyError, AttributeError):
             # Somehow the workflow does not exist (.name)
             from invenio.ext.logging import register_exception

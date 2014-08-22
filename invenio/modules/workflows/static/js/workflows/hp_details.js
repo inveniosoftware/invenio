@@ -1,4 +1,4 @@
-/*
+ /*
  * This file is part of Invenio.
  * Copyright (C) 2013, 2014 CERN.
  *
@@ -28,7 +28,7 @@ var WORKFLOWS_HP_DETAILS = (function ($) {
             data: {'objectid': bwoid,
                    'of': format},
             success: function (json) {
-                if (format === "xm" || format === "marcxml") {
+                if (format === "xm" || format === "xo") {
                     if (json.data === "") {
                         json.data = "Preview not available";
                     }

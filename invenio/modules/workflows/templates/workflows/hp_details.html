@@ -262,16 +262,15 @@
         {% block hp_preview %}
             {{ _('Display:') }}
             <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
-
                 <button class="preview btn btn-xs btn-primary active"
                         data-id="{{ bwobject.id }}"
                         name="hd">HTML</button>
                 <button class="preview btn btn-xs btn-primary"
                         data-id="{{ bwobject.id }}"
-                        name="xm">RAW</button>
+                        name="xo">RAW</button>
                 <button class="preview btn btn-xs btn-primary"
                         data-id="{{ bwobject.id }}"
-                        name="tm">MARC</button>
+                        name="xm">MARC</button>
             </div>
             <div id="object_preview_container{{bwobject.id}}" class="object_preview_container">
                 {{ data_preview|safe }}

@@ -263,16 +263,16 @@ def entry_data_preview(objectid, of):
     from pprint import pformat
 
     bwobject = BibWorkflowObject.query.get(int(objectid))
-
     if not bwobject:
         flash("No object found for %s" % (objectid,))
         return jsonify(data={})
-
-    formatted_data = bwobject.get_formatted_data()
+    formatted_data = bwobject.get_formatted_data(of)
     if isinstance(formatted_data, dict):
         formatted_data = pformat(formatted_data)
-    if of and of in ("xm", "xml", "marcxml"):
+    if of == "xm":
         data = Markup.escape(formatted_data)
+    elif of == 'xo':
+        data = Markup.escape(formatted_data[0])
     else:
         data = formatted_data
     return jsonify(data=data)
