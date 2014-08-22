@@ -79,6 +79,8 @@ except ImportError:
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
+from weakref import ref
+
 
 from invenio import webinterface_handler_config as apache
 
@@ -2924,7 +2926,9 @@ class BibDocFile(object):
     """This class represents a physical file in the Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, recid_doctypes, version, docformat, docid, status, checksum, more_info=None, human_readable=False, cd=None, md=None, size=None, bibdoc = None):
+    def __init__(self, fullpath, recid_doctypes, version, docformat, docid,
+                 status, checksum, more_info=None, human_readable=False,
+                 cd=None, md=None, size=None, bibdoc=None):
         self.fullpath = os.path.abspath(fullpath)
 
         self.docid = docid
@@ -2936,7 +2940,10 @@ class BibDocFile(object):
         self.checksum = checksum
         self.human_readable = human_readable
         self.name = recid_doctypes[0][2]
-        self.bibdoc = bibdoc
+        if bibdoc is not None:
+            self.__bibdoc = ref(bibdoc)
+        else:
+            self.__bibdoc = None
 
         if more_info:
             self.description = more_info.get_description(docformat, version)
@@ -2974,6 +2981,17 @@ class BibDocFile(object):
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         self.magic = None
 
+    @property
+    def bibdoc(self):
+        """
+        Wrapper around the referenced bibdoc necesseary to avoid memory leaks.
+        """
+        if self.__bibdoc is None or self.__bibdoc() is None:
+            bibdoc = BibDoc(self.docid)
+            self.__bibdoc = ref(bibdoc)
+            return bibdoc
+        return self.__bibdoc()
+
     def __repr__(self):
         return ('BibDocFile(%s,  %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), self.version, repr(self.name), repr(self.format), self.recids_doctypes[0][0], self.docid, repr(self.status), repr(self.checksum), repr(self.more_info), repr(self.human_readable)))
 
@@ -2981,6 +2999,7 @@ class BibDocFile(object):
         if self.bibdoc:
             return self.bibdoc.format_recids()
         return "0"
+
     def __str__(self):
         recids = self.format_recids()
         out = '%s:%s:%s:%s:fullpath=%s\n' % (recids, self.docid, self.version, self.format, self.fullpath)
