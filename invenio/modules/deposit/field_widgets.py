@@ -212,8 +212,9 @@ class WrappedInput(Input):
     def __init__(self, widget=None, wrapper=None, **kwargs):
         """Initialize wrapped input with widget and wrapper."""
         self.wrapped_widget = widget or self.wrapped_widget
-        self.wrapper = wrapper or self.wrapper
         self.wrapper_args = kwargs
+        if wrapper is not None:
+            self.wrapper = wrapper
 
     def __call__(self, field, **kwargs):
         """Render wrapped input."""
@@ -227,7 +228,14 @@ class ColumnInput(WrappedInput):
 
     """Specialized column wrapped input."""
 
-    wrapper = '<div class="%(class_)s">%(field)s</div>'
+    @property
+    def wrapper(self):
+        """Wrapper template with description support."""
+        if 'description' in self.wrapper_args:
+            return ('<div class="%(class_)s">%(field)s'
+                    '<p class="text-muted field-desc">'
+                    '<small>%(description)s</small></p></div>')
+        return '<div class="%(class_)s">%(field)s</div>'
 
 
 #
