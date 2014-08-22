@@ -19,6 +19,8 @@
 
 from invenio.modules.upgrader.api import op
 from sqlalchemy.dialects import mysql
+from sqlalchemy.exc import OperationalError
+import sqlalchemy as sa
 
 depends_on = []
 
@@ -28,12 +30,18 @@ def info():
 
 
 def do_upgrade():
-    op.alter_column(
-        u'bibrec', 'additional_info',
-        existing_type=mysql.TEXT(),
-        type_=mysql.LONGTEXT(),
-        nullable=True
-    )
+    try:
+        op.alter_column(
+            u'bibrec', 'additional_info',
+            existing_type=mysql.TEXT(),
+            type_=mysql.LONGTEXT(),
+            nullable=True
+        )
+    except OperationalError:
+        op.add_column('bibrec',
+                      sa.Column('additional_info',
+                      mysql.LONGTEXT(),
+                      nullable=True))
 
 
 def estimate():
