@@ -178,10 +178,11 @@ class RESTValidator(Validator):
                             code=(validation_errors
                                   ['INCORRECT_ELEMENT_TYPE_IN_DATASTRUCTURE']
                                   ['error_code']),
-                            message=(validation_errors
-                                     ['INCORRECT_ELEMENT_TYPE_IN_DATASTRUCTURE']
-                                     ['error_mesg'] +
-                                     " : "+error_dict[entry]),
+                            message=(
+                                validation_errors
+                                ['INCORRECT_ELEMENT_TYPE_IN_DATASTRUCTURE']
+                                ['error_mesg'] +
+                                " : " + error_dict[entry]),
                             field=key
                         )
                         found_errors.append(error_to_append)
@@ -210,10 +211,16 @@ class ISODate(fields.Raw):
 
 class UTCISODateTime(fields.DateTime):
 
-    """Format a datetime object in ISO format and convert to UTC if necessary."""
+    """Format a datetime object in ISO format.
+
+    Convert to UTC if necessary.
+    """
 
     def format(self, dt):
-        """Format a datetime object in ISO format and convert to UTC if necessary."""
+        """Format a datetime object in ISO format.
+
+        Convert to UTC if necessary.
+        """
         try:
             if not dt.tzinfo:
                 dt = dt.replace(tzinfo=tzlocal())
@@ -224,10 +231,16 @@ class UTCISODateTime(fields.DateTime):
 
 class UTCISODateTimeString(fields.DateTime):
 
-    """Format a string which represents a datetime in ISO format and convert to UTC if necessary."""
+    """Format a string which represents a datetime in ISO format.
+
+    Convert to UTC if necessary.
+    """
 
     def format(self, value):
-        """Format a string which represents a datetime in ISO format and convert to UTC if necessary."""
+        """Format a string which represents a datetime in ISO format.
+
+        Convert to UTC if necessary.
+        """
         try:
             dt = parser.parse(value)
             if not dt.tzinfo:
