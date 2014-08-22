@@ -223,7 +223,7 @@ def _get_ontology(ontology):
     onto_name = onto_path = onto_url = None
 
     # first assume we got the path to the file
-    if os.access(ontology, os.R_OK):
+    if os.path.exists(ontology):
         onto_name = os.path.split(os.path.abspath(ontology))[1]
         onto_path = os.path.abspath(ontology)
         onto_url = ""
@@ -260,7 +260,7 @@ def _discover_ontology(ontology_name):
     @var ontology: string, name or path name or url
     @return: absolute path of a file if found, or None
     """
-    last_part = os.path.split(os.path.abspath(ontology_name))[1].lower()
+    last_part = os.path.split(os.path.abspath(ontology_name))[1]
 
     if last_part in taxonomies:
         return taxonomies.get(last_part)
@@ -270,7 +270,7 @@ def _discover_ontology(ontology_name):
         log.debug("No taxonomy with pattern '%s' found" % ontology_name)
 
     # LEGACY
-    possible_patterns = [last_part]
+    possible_patterns = [last_part, last_part.lower()]
     if not last_part.endswith('.rdf'):
         possible_patterns.append(last_part + '.rdf')
     places = [config.CFG_CACHEDIR,
