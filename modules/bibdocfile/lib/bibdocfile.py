@@ -79,6 +79,8 @@ except ImportError:
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
+from weakref import ref
+
 
 from invenio import webinterface_handler_config as apache
 
@@ -2920,7 +2922,7 @@ class BibDocFile(object):
         self.checksum = checksum
         self.human_readable = human_readable
         self.name = recid_doctypes[0][2]
-        self.bibdoc = bibdoc
+        self.__bibdoc = ref(bibdoc)
 
         if more_info:
             self.description = more_info.get_description(docformat, version)
@@ -2957,6 +2959,17 @@ class BibDocFile(object):
             self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recids_doctypes[0][0], self.name, self.superformat), {'version' : self.version})
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         self.magic = None
+
+    @property
+    def bibdoc(self):
+        """
+        Wrapper around the referenced bibdoc necesseary to avoid memory leaks.
+        """
+        if self.__bibdoc() is None:
+            bibdoc = BibDoc(self.docid)
+            self.__bibdoc = ref(bibdoc)
+            return bibdoc
+        return self.__bibdoc()
 
     def __repr__(self):
         return ('BibDocFile(%s,  %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), self.version, repr(self.name), repr(self.format), self.recids_doctypes[0][0], self.docid, repr(self.status), repr(self.checksum), repr(self.more_info), repr(self.human_readable)))

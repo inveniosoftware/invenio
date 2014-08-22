@@ -27,7 +27,7 @@ from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo, \
     check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC, \
-    Md5Folder, calculate_md5, calculate_md5_external
+    Md5Folder, calculate_md5, calculate_md5_external, BibDoc
 from invenio.dbquery import run_sql
 
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
@@ -597,6 +597,24 @@ class BibDocFileMd5FolderTests(InvenioTestCase):
             open(filepath, "w").write("test")
             self.assertEqual(calculate_md5(filepath, force_internal=True), calculate_md5_external(filepath))
 
+
+class BibDocFileMemoryLeak(InvenioTestCase):
+    def test_for_memory_leaks(self):
+        """bibdocfile - test for memory leaks"""
+        import gc
+
+        def foo(id):
+            bd = BibDoc(id)
+            bf = bd.list_all_files()
+
+        gc.collect()
+        self.assertEqual(gc.garbage, [])
+        for id in range(1,11):
+            foo(id)
+        gc.collect()
+        self.assertEqual(gc.garbage, [])
+
+
 TEST_SUITE = make_test_suite(BibDocFileMd5FolderTests,
                              BibRecDocsTest,
                              BibDocsTest,
@@ -606,6 +624,7 @@ TEST_SUITE = make_test_suite(BibDocFileMd5FolderTests,
                              BibDocFileURLTest,
                              CheckBibDocAuthorizationTest,
                              BibDocFsInfoTest,
-                             BibDocFileGuessFormat)
+                             BibDocFileGuessFormat,
+                             BibDocFileMemoryLeak)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
