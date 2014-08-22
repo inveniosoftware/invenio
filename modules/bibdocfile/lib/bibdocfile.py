@@ -2910,7 +2910,9 @@ class BibDocFile(object):
     """This class represents a physical file in the Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, recid_doctypes, version, docformat, docid, status, checksum, more_info=None, human_readable=False, cd=None, md=None, size=None, bibdoc = None):
+    def __init__(self, fullpath, recid_doctypes, version, docformat, docid,
+                 status, checksum, more_info=None, human_readable=False,
+                 cd=None, md=None, size=None, bibdoc=None):
         self.fullpath = os.path.abspath(fullpath)
 
         self.docid = docid
@@ -2922,7 +2924,10 @@ class BibDocFile(object):
         self.checksum = checksum
         self.human_readable = human_readable
         self.name = recid_doctypes[0][2]
-        self.__bibdoc = ref(bibdoc)
+        if bibdoc is not None:
+            self.__bibdoc = ref(bibdoc)
+        else:
+            self.__bibdoc = None
 
         if more_info:
             self.description = more_info.get_description(docformat, version)
@@ -2965,7 +2970,7 @@ class BibDocFile(object):
         """
         Wrapper around the referenced bibdoc necesseary to avoid memory leaks.
         """
-        if self.__bibdoc() is None:
+        if self.__bibdoc is None or self.__bibdoc() is None:
             bibdoc = BibDoc(self.docid)
             self.__bibdoc = ref(bibdoc)
             return bibdoc
@@ -2978,6 +2983,7 @@ class BibDocFile(object):
         if self.bibdoc:
             return self.bibdoc.format_recids()
         return "0"
+
     def __str__(self):
         recids = self.format_recids()
         out = '%s:%s:%s:%s:fullpath=%s\n' % (recids, self.docid, self.version, self.format, self.fullpath)

@@ -603,14 +603,14 @@ class BibDocFileMemoryLeak(InvenioTestCase):
         """bibdocfile - test for memory leaks"""
         import gc
 
-        def foo(id):
-            bd = BibDoc(id)
-            bf = bd.list_all_files()
+        def foo(docid):
+            bd = BibDoc(docid)
+            dummy_bf = bd.list_all_files()
 
         gc.collect()
         self.assertEqual(gc.garbage, [])
-        for id in range(1,11):
-            foo(id)
+        for docid in range(1,11):
+            foo(docid)
         gc.collect()
         self.assertEqual(gc.garbage, [])
 
