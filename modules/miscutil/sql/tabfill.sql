@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+-- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -815,6 +815,7 @@ INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canRestrictDocty
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canRenameDoctypes');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canNameNewFiles');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','createRelatedFormats');
+INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','deferRelatedFormatsCreation');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','keepDefault');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','showLinks');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','fileLabel');
