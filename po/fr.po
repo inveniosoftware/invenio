@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-02-25 14:17+0100\n"
-"PO-Revision-Date: 2012-02-16 14:04+0100\n"
+"PO-Revision-Date: 2014-08-23 23:27+0200\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <info@invenio-software.org>\n"
 "Language: \n"
@@ -7836,7 +7836,7 @@ msgstr "Citations:"
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:634
 #: modules/websearch/lib/websearch_templates.py:4366
 msgid "No Citation Information available"
-msgstr "Aucun information de citation disponible"
+msgstr "Aucune information de citation disponible"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:706
 #: modules/websearch/lib/websearch_templates.py:4323
@@ -9944,7 +9944,7 @@ msgstr "Veuillez choisir un numéro"
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:125
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:140
 msgid "No information available"
-msgstr "Aucun information disponible"
+msgstr "Aucune information disponible"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:110
 msgid "No seminars today"
