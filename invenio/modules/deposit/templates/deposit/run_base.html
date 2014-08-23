@@ -79,46 +79,15 @@
    #}
 <script type="text/javascript" src="{{ url_for("static", filename="vendors/ckeditor/ckeditor.js" )}}"></script>
 {%- block form_script_options %}
-<script type="text/javascript">
-var date_options = {
-    element: '.datepicker',
-    options: {
-        dateFormat: 'yy-mm-dd',
-    }
-};
-</script>
 {%- endblock form_script_options %}
 <script type="text/javascript">
-require(["jquery", "js/deposit/form"], function($, form) {
+require(["jquery", "js/deposit/form", "js/deposit/plupload"], function($, form) {
     $(function(){
       var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
       var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
       var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
       var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
 
-      var configuration = {
-          plupload: {
-            max_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
-            selector:'.pluploader',
-            save_url: save_url,
-            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
-            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
-            get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
-            db_files: {{ form.files|safe }},
-            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
-            // Those are missing
-            // uuid:,
-            // newdep_url:,
-            // continue_url
-          },
-          urls: {
-            save_url: save_url,
-            save_all_url: save_all_url,
-            complete_url: complete_url,
-            autocomplete_url: autocomplete_url,
-          },
-          datepicker: date_options
-      }
       // Initialize form
       form.attachTo("#submitForm", {
         save_url: save_url,
