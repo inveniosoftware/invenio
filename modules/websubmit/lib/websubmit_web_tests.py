@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -289,7 +289,7 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
         self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
         time.sleep(1)
-        self.wait_element_displayed_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.wait_element_hidden_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
         self.find_element_by_xpath_with_timeout("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']")
         self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']").click()
         self.choose_selectbox_option_by_value(selectbox_id='fileDoctype', value='Additional')
