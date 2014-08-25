@@ -57,7 +57,7 @@ class JournalHintService(SearchService):
         if re_keyword_at_beginning.match(p):
             return (0, "")
 
-        (field, pattern) = search_from_reference(p)
+        (field, pattern) = search_from_reference(p.decode('utf-8'))
 
         if field is not "journal":
             return (0, "")
