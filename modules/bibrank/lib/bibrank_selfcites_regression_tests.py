@@ -109,7 +109,7 @@ class SelfCitesIndexerTests(InvenioTestCase):
         from invenio.bibrank_selfcites_indexer import update_self_cites_tables
         from invenio.bibrank_selfcites_indexer import get_authors_tags
         tags = get_authors_tags()
-        config = {}
+        config = {'friends_threshold': 3}
         update_self_cites_tables(1, config, tags)
 
     def test_store_record(self):
