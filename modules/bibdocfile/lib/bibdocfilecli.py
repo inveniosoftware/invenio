@@ -826,7 +826,7 @@ def cli_check_format(options):
         tot += 1
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():
-            print >> sys.stderr, "recid %s has duplicate docnames!"
+            print >> sys.stderr, "recid %s has duplicate docnames!" % recid
             broken = True
             duplicate = True
         else:
@@ -853,9 +853,9 @@ def cli_check_duplicate_docnames(options):
     for recid in cli_recids_iterator(options):
         tot += 1
         bibrecdocs = BibRecDocs(recid)
-        if bibrecdocs.check_duplicate_docnames():
+        if not bibrecdocs.check_duplicate_docnames():
             count += 1
-            print >> sys.stderr, "recid %s has duplicate docnames!"
+            print >> sys.stderr, "recid %s has duplicate docnames!" % recid
     if count:
         print "%d out of %d records have duplicate docnames." % (count, tot)
         return False
@@ -900,7 +900,7 @@ def cli_fix_duplicate_docnames(options):
     if fixed:
         print "Now we need to synchronize MARC to reflect current changes."
         cli_fix_marc(options, explicit_recid_set=fixed)
-    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion")
+    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(fixed), tot), style="conclusion")
     return not fixed
 
 def cli_delete(options):
