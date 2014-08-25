@@ -240,75 +240,42 @@ def upload_record(mode="ir"):
 
 
 def bibclassify(taxonomy, rebuild_cache=False, no_cache=False,
-                output_mode='text',
-                output_limit=20, spires=False, match_mode='full',
-                with_author_keywords=False,
-                extract_acronyms=False, only_core_tags=False):
+                output_mode='text', output_limit=20, spires=False,
+                match_mode='full', with_author_keywords=False,
+                extract_acronyms=False, only_core_tags=False,
+                fast_mode=False):
     """Extract keywords and core ones from pdf file if it exists."""
     def _bibclassify(obj, eng):
-        import os.path
+        from invenio.legacy.bibclassify.api import (
+            bibclassify_exhaustive_call,
+            bibclassify_exhaustive_call_text
+        )
+        from invenio.modules.classifier.errors import TaxonomyError
 
-        if not os.path.isfile(taxonomy):
-            eng.log.error("No RDF found, no bibclassify can run")
-            return None
-
-        from invenio.legacy.bibclassify.api import bibclassify_exhaustive_call
-
-        if "_result" not in obj.extra_data:
-            obj.extra_data["_result"] = {}
-
-        if "pdf" in obj.extra_data["_result"]:
-            obj.extra_data["_result"][
-                "bibclassify"] = bibclassify_exhaustive_call(
-                obj.extra_data["_result"]["pdf"],
-                taxonomy, rebuild_cache,
-                no_cache,
-                output_mode, output_limit,
-                spires,
-                match_mode, with_author_keywords,
-                extract_acronyms, only_core_tags
-            )
-            obj.add_task_result("bibclassify",
-                                obj.extra_data["_result"]["bibclassify"])
+        data = None
+        if fast_mode:
+            data = [obj.data.get("title", {}).get("title", ""),
+                    obj.data.get("abstract", {}).get("summary", "")]
+            callback = bibclassify_exhaustive_call_text
         else:
-            obj.log.error("No classification done due to missing fulltext."
-                          "\n You need to get it before! see fulltext task")
-
-    return _bibclassify
-
-
-def bibclassify_fast(taxonomy, rebuild_cache=False, no_cache=False,
-                     output_mode='text',
-                     output_limit=20, spires=False, match_mode='full',
-                     with_author_keywords=False,
-                     extract_acronyms=False, only_core_tags=False):
-    """Extract keywords and core ones from title and abstract."""
-    def _bibclassify(obj, eng):
-        import os.path
-
-        if not os.path.isfile(taxonomy):
-            eng.log.error("No RDF found, no bibclassify can run")
-            return None
-
-        from invenio.legacy.bibclassify.api import bibclassify_exhaustive_call_text
-
-        if "_result" not in obj.extra_data:
-            obj.extra_data["_result"] = {}
-
-        if "title" in obj.data:
-            obj.extra_data["_result"]["bibclassify"] = \
-                bibclassify_exhaustive_call_text(
-                    [obj.data["title"], obj.data["abstract"]],
-                    taxonomy, rebuild_cache,
-                    no_cache,
-                    output_mode, output_limit,
-                    spires,
-                    match_mode, with_author_keywords,
-                    extract_acronyms, only_core_tags
-                )
-            obj.add_task_result("bibclassify",
-                                obj.extra_data["_result"]["bibclassify"])
+            if "_result" not in obj.extra_data:
+                obj.extra_data["_result"] = {}
+            if "pdf" in obj.extra_data["_result"]:
+                data = obj.extra_data["_result"]["pdf"]
+                callback = bibclassify_exhaustive_call
+        if not data:
+            obj.log.error("No classification done due to missing data.")
+            return
+        try:
+            result = callback(data, taxonomy, rebuild_cache,
+                              no_cache, output_mode, output_limit,
+                              spires, match_mode, with_author_keywords,
+                              extract_acronyms, only_core_tags)
+        except TaxonomyError as e:
+            obj.log.error(e)
         else:
-            obj.log.error("No classification done due to missing fulltext."
-                          "\n You need to get it before! see fulltext task")
+            result["fast_mode"] = fast_mode
+            obj.add_task_result("bibclassify", result,
+                                template="workflows/results/classifier.html")
+
     return _bibclassify
