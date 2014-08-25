@@ -30,23 +30,38 @@ from cgi import escape
 
 __plugin_version__ = "Search Service Plugin API 1.0"
 
-re_keyword_at_beginning = re.compile(
-    '^((f|fin|find)\s+)|([a-zA-Z0-9_-]+\:)',
-    re.IGNORECASE
-)
-
 
 class JournalHintService(SearchService):
 
+    """Give hints on how to search the journal reference."""
+
+    re_dot_comma_year = re.compile(r',|\([0-9]{4}\)')
+    re_keyword = re.compile(
+        r'^((f|fin|find)\s+)|^([a-zA-Z0-9_-]+\:)',
+        re.IGNORECASE
+    )
+
+    @classmethod
+    def seems_a_journal_reference(cls, reference):
+        """Quickly check if `name` seems to be a journal reference."""
+        # It must not be empty
+        if not reference.strip():
+            return False
+        # There must be a comma or a year in parentesis
+        if not cls.re_dot_comma_year.search(reference):
+            return False
+        # It must not start with a keyword
+        if cls.re_keyword.search(reference):
+            return False
+        return True
+
     def get_description(self, ln=CFG_SITE_LANG):
-        "Return service description"
+        """Return service description."""
         return "Give hints on how to search the journal reference"
 
     def answer(self, req, user_info, of, cc,
                colls_to_search, p, f, search_units, ln):
-        """
-        Answer question given by context.
-
+        """Answer question given by context.
         Return (relevance, html_string) where relevance is integer
         from 0 to 100 indicating how relevant to the question the
         answer is (see C{CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE}
@@ -54,7 +69,7 @@ class JournalHintService(SearchService):
         """
         from invenio.refextract_api import search_from_reference
 
-        if re_keyword_at_beginning.match(p):
+        if not self.seems_a_journal_reference(p):
             return (0, "")
 
         (field, pattern) = search_from_reference(p.decode('utf-8'))

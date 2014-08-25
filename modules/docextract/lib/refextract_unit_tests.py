@@ -258,6 +258,7 @@ class SearchTest(InvenioTestCase):
         self.assertEqual(field, '')
         self.assertEqual(pattern, '')
 
+
 class RebuildReferencesTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
