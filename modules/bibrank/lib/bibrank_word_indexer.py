@@ -26,7 +26,8 @@ import ConfigParser
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR
+     CFG_ETCDIR, \
+     CFG_SITE_URL
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
@@ -973,6 +974,13 @@ def update_rnkWORD(table, terms):
     table - name of forward index to update
     terms - modified terms"""
 
+    zero_division_msg = """\
+ERROR: %s captured. This might be caused by not enough balanced indexes.
+Please, schedule a regular, e.g. weekly, rebalancing of the word similarity
+ranking indexes, by using e.g.
+"bibrank -f50000 -R -wwrd -s14d -LSunday"
+as recommended in %s/help/admin/howto-run"""
+
     stime = time.time()
     Gi = {}
     Nj = {}
@@ -1110,7 +1118,8 @@ def update_rnkWORD(table, terms):
                         (serialize_via_marshal(doc_terms), j))
             except (ZeroDivisionError, OverflowError), e:
                 ## This is to try to isolate division by zero errors.
-                register_exception(prefix="Error when analysing the record %s (%s): %s\n" % (j, repr(docs_terms), e), alert_admin=True)
+                write_message(zero_division_msg % (e, CFG_SITE_URL), stream=sys.stderr)
+                register_exception(prefix=zero_division_msg % (e, CFG_SITE_URL), alert_admin=True)
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
         i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
@@ -1135,7 +1144,8 @@ def update_rnkWORD(table, terms):
                 run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
                         (serialize_via_marshal(term_docs), t))
             except (ZeroDivisionError, OverflowError), e:
-                register_exception(prefix="Error when analysing the term %s (%s): %s\n" % (t, repr(terms_docs), e), alert_admin=True)
+                write_message(zero_division_msg % (e, CFG_SITE_URL), stream=sys.stderr)
+                register_exception(prefix=zero_division_msg % (e, CFG_SITE_URL), alert_admin=True)
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)
