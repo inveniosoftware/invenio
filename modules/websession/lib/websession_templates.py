@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -99,7 +99,7 @@ class Template:
         }
         return out
 
-    def tmpl_user_preferences(self, ln, email, email_disabled, password_disabled, nickname):
+    def tmpl_user_preferences(self, ln, email, email_disabled, password_disabled, nickname, csrf_token=''):
         """
         Displays a form for the user to change his email/password.
 
@@ -115,6 +115,7 @@ class Template:
 
           - 'nickname' *string* - The nickname of the user (empty string if user does not have it)
 
+          - 'csrf_token' *string* - The CSRF token to verify the form origin.
         """
 
         # load the right message language
@@ -150,12 +151,14 @@ class Template:
                   </td></tr>
                 </table>
                 <input type="hidden" name="action" value="edit" />
+                <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
                 </form>
             """ % {
                 'change_user' : _("If you want to change your email or set for the first time your nickname, please set new values in the form below."),
                 'edit_params' : _("Edit login credentials"),
                 'nickname_label' : _("Nickname"),
                 'nickname' : nickname,
+                'csrf_token': cgi.escape(csrf_token, True),
                 'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" id="nickname" value=""' or '',
                 'nickname_suffix' : nickname=='' and '" /><br /><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
                 'new_email' : _("New email address"),
@@ -203,12 +206,14 @@ class Template:
                   </td></tr>
                 </table>
                 <input type="hidden" name="action" value="edit" />
+                <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
                 </form>
                 """ % {
                     'change_pass' : _("If you want to change your password, please enter the old one and set the new value in the form below."),
                     'mandatory' : _("mandatory"),
                     'old_password' : _("Old password"),
                     'new_password' : _("New password"),
+                    'csrf_token': cgi.escape(csrf_token, True),
                     'optional' : _("optional"),
                     'note' : _("Note"),
                     'password_note' : _("The password phrase may contain punctuation, spaces, etc."),
@@ -230,7 +235,7 @@ class Template:
         return out
 
 
-    def tmpl_user_bibcatalog_auth(self, bibcatalog_username="", bibcatalog_password="", ln=CFG_SITE_LANG):
+    def tmpl_user_bibcatalog_auth(self, bibcatalog_username="", bibcatalog_password="", ln=CFG_SITE_LANG, csrf_token=''):
         """template for setting username and pw for bibcatalog backend"""
         _ = gettext_set_language(ln)
         out = """
@@ -245,6 +250,8 @@ class Template:
                   <td><input class="formbutton" type="submit" value="%(update_settings)s" /></td>
                 </tr>
               </table>
+              <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
+            </form>
         """ % {
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'bibcatalog_username' : bibcatalog_username,
@@ -252,12 +259,13 @@ class Template:
           'edit_bibcatalog_settings' : _("Edit cataloging interface settings"),
           'username' :  _("Username"),
           'password' :  _("Password"),
-          'update_settings' : _('Update settings')
+          'update_settings' : _('Update settings'),
+          'csrf_token': cgi.escape(csrf_token, True),
         }
         return out
 
 
-    def tmpl_user_lang_edit(self, ln, preferred_lang):
+    def tmpl_user_lang_edit(self, ln, preferred_lang, csrf_token=''):
         _ = gettext_set_language(ln)
         out = """
             <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_lang_settings">
@@ -276,13 +284,14 @@ class Template:
             }
         out += """</select></td><td valign="top"><strong><label for="lang">%(select_lang)s</label></strong></td></tr>
             <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
-        </table></form>""" % {
+        </table><input type="hidden" name="csrf_token" value="%(csrf_token)s" /></form>""" % {
             'select_lang' : _('Select desired language of the web interface.'),
-            'update_settings' : _('Update settings')
+            'update_settings' : _('Update settings'),
+            'csrf_token': cgi.escape(csrf_token, True),
         }
         return out
 
-    def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
+    def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True, csrf_token=''):
         _ = gettext_set_language(ln)
         out = """
             <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_websearch_settings">
@@ -311,14 +320,16 @@ class Template:
         out += """</select></td><td valign="top"><strong><label for="group_records">%(select_group_records)s</label></strong></td></tr>
               <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
               </table>
+              <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
             </form>""" % {
                 'update_settings' : _("Update settings"),
                 'select_group_records' : _("Number of search results per page"),
+                'csrf_token': cgi.escape(csrf_token, True),
             }
         return out
 
 
-    def tmpl_user_external_auth(self, ln, methods, current, method_disabled):
+    def tmpl_user_external_auth(self, ln, methods, current, method_disabled, csrf_token=''):
         """
         Displays a form for the user to change his authentication method.
 
@@ -331,6 +342,8 @@ class Template:
           - 'method_disabled' *boolean* - If the user has the right to change this
 
           - 'current' *string* - The currently selected method
+
+          - 'csrf_token' *string* - The CSRF token to verify the form origin.
         """
 
         # load the right message language
@@ -358,8 +371,10 @@ class Template:
         out += """  </td></tr>
                    <tr><td>&nbsp;</td>
                      <td><input class="formbutton" type="submit" value="%(select_method)s" /></td></tr></table>
+                    <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
                     </form>""" % {
                      'select_method' : _("Select method"),
+                     'csrf_token': cgi.escape(csrf_token, True),
                    }
 
         return out
