@@ -709,6 +709,29 @@ class WebSearchServicesJournalHintService(InvenioTestCase):
                          (0, ''))
 
 
+    def test_search_Capella_Pere_utf8(self):
+        """websearch - search 'Capellà Pere' utf8, with JournalHintService"""
+        user_info = collect_user_info(0)
+        pattern = u'Capellà Pere'.encode('utf8')
+        search_units = create_basic_search_units(None, pattern, '')
+        response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
+                                      cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
+                                      f='', search_units=search_units, ln='en')
+        self.assertEqual(response,
+                         (0, ''))
+
+    def test_search_Pais_Valencia_utf8(self):
+        """websearch - search 'País Valencià' utf8, with JournalHintService"""
+        user_info = collect_user_info(0)
+        pattern = u'País Valencià'.encode('utf8')
+        search_units = create_basic_search_units(None, pattern, '')
+        response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
+                                      cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
+                                      f='', search_units=search_units, ln='en')
+        self.assertEqual(response,
+                         (0, ''))
+
+
 TEST_SUITE = make_test_suite(WebSearchServicesLoading,
                              WebSearchServicesCollectionNameSearch,
                              WebSearchServicesSubmissionNameSearch,
