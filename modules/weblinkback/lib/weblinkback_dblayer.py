@@ -187,7 +187,7 @@ def get_approved_latest_added_linkbacks(count):
                              insert_time
                       FROM lnkENTRY
                       WHERE status=%s
-                      ORDER BY insert_time DESC
+                      ORDER BY insert_time DESC, id DESC
                       LIMIT %s
                    """, (CFG_WEBLINKBACK_STATUS['APPROVED'], count))
 
