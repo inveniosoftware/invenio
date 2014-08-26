@@ -184,16 +184,30 @@ function init_ckeditor(selector, type) {
             toolbar: [
                 ['PasteText','PasteFromWord'],
                 ['Bold','Italic','Strike','-','Subscript','Superscript',],
-                ['NumberedList','BulletedList'],
+                ['NumberedList','BulletedList', 'Blockquote'],
                 ['Undo','Redo','-','Find','Replace','-', 'RemoveFormat'],
+                ['Mathjax', 'SpecialChar', 'ScientificChar'],
                 ['Source'], ['Maximize'],
             ],
-            disableNativeSpellChecker: false
+            extraPlugins: 'scientificchar,mathjax,blockquote',
+            disableNativeSpellChecker: false,
+            removePlugins: 'elementspath',
+            removeButtons: ''
         });
     } else {
         CKEDITOR.replace( selector, {
-            toolbar: 'Basic',
-            disableNativeSpellChecker: false
+            toolbar: [
+                ['PasteText','PasteFromWord'],
+                ['Bold','Italic','Strike','-','Subscript','Superscript',],
+                ['NumberedList','BulletedList', 'Blockquote', 'Table', '-', 'Link', 'Anchor'],
+                ['Undo','Redo','-','Find','Replace','-', 'RemoveFormat'],
+                ['Mathjax', 'SpecialChar', 'ScientificChar'],
+                ['Styles', 'Format'], ['Source'], ['Maximize'],
+            ],
+            extraPlugins: 'scientificchar,mathjax,blockquote',
+            disableNativeSpellChecker: false,
+            removePlugins: 'elementspath',
+            removeButtons: ''
         });
     }
 }
