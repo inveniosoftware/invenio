@@ -174,6 +174,7 @@ branch.
 
 .. code-block:: console
 
+    $ mkdir -p $HOME/src
     $ cd $HOME/src/
     $ export BRANCH=pu
     $ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio.git
