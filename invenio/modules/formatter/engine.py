@@ -298,7 +298,7 @@ def get_format_element_path(filename):
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                   search_pattern=None, xml_record=None, user_info=None, qid="",
-                  extra_context=None):
+                  **kwargs):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -385,7 +385,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         return out, False
 
     # Format with template
-    out_, needs_2nd_pass = format_with_format_template(template, bfo, verbose)
+    out_, needs_2nd_pass = format_with_format_template(
+        template, bfo, verbose=verbose, extra_context=kwargs)
 
     out += out_
 
