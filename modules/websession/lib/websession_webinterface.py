@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,6 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from datetime import timedelta
-import os
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -49,7 +48,7 @@ from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio import webinterface_handler_config as apache
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
@@ -306,12 +305,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             for key in keys:
                 body += "<b>%s</b>:%s<br />" % (key, user_info[key])
 
+        # set CSRF token:
+        csrf_token, dummy_csrf_token_time = webuser.regenerate_csrf_token_if_needed(req)
+
         #check if the user should see bibcatalog user name / passwd in the settings
         can_config_bibcatalog = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
                                                      args['ln'], can_config_bibcatalog,
-                                                     verbose=args['verbose']),
+                                                     verbose=args['verbose'],
+                                                     csrf_token=csrf_token),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
@@ -336,7 +339,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'lang' : (str, None),
             'bibcatalog_username' : (str, None),
             'bibcatalog_password' : (str, None),
+            'csrf_token' : (str, None),
             })
+
+        # do not allow non-POST methods in here:
+        if req.method != 'POST':
+            raise apache.SERVER_RETURN(apache.HTTP_METHOD_NOT_ALLOWED)
+
+        # check CSRF token:
+        if not webuser.is_csrf_token_valid(req, args['csrf_token']):
+            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
         ## Wash arguments:
         args['login_method'] = wash_login_method(args['login_method'])
