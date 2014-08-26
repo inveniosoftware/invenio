@@ -728,6 +728,20 @@ define([
 
       this._reinterpretFragment(update_end);
       if (DEBUG) this._printCharRoles();
+    },
+
+    /**
+    * Reparses the whole string. Use only when the whole string was changed.
+    *
+    * Don't use this function on key-press event as the query while typing may
+    * have temporary invalid syntax until a user finishes typing. In such
+    * a situation use updateSource() with a proper caret position.
+    *
+    * @param str the new string
+    * @returns {*} updateSource() result
+    */
+    reparseSource: function(str) {
+      return this.updateSource(str, str.length);
     }
   };
 

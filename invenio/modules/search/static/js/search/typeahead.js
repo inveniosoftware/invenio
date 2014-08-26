@@ -193,6 +193,10 @@ define([
     // disable grey hint in input field background - not compatible yet
     // with this kind of typeahead
     this.ttTypeahead.input.setHintValue = function(value) {};
+
+    // sets initial query_range
+    this.parser.reparseSource(this.$element.val());
+    this.query_range = this.parser.getQueryRangeIdx(this.$element.val().length);
   }
 
   var PluginClass = SearchTypeahead;
