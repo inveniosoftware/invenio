@@ -438,11 +438,11 @@ class WebLinkbackDatabaseTest(InvenioTestCase):
 
         approved_linkbacks = get_approved_latest_added_linkbacks(6)
         self.assertEqual(5, len(approved_linkbacks))
-        self.assertEqual(1 + self._max_id_lnkENTRY, approved_linkbacks[0][0])
-        self.assertEqual(2 + self._max_id_lnkENTRY, approved_linkbacks[1][0])
+        self.assertEqual(1 + self._max_id_lnkENTRY, approved_linkbacks[4][0])
+        self.assertEqual(2 + self._max_id_lnkENTRY, approved_linkbacks[3][0])
         self.assertEqual(5 + self._max_id_lnkENTRY, approved_linkbacks[2][0])
-        self.assertEqual(6 + self._max_id_lnkENTRY, approved_linkbacks[3][0])
-        self.assertEqual(7 + self._max_id_lnkENTRY, approved_linkbacks[4][0])
+        self.assertEqual(6 + self._max_id_lnkENTRY, approved_linkbacks[1][0])
+        self.assertEqual(7 + self._max_id_lnkENTRY, approved_linkbacks[0][0])
 
         url = CFG_SITE_URL + '/linkbacks/'
         expected_texts = ('URL1', 'URL2', 'URL5', 'URL6', 'URL7')
