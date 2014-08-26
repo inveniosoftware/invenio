@@ -398,7 +398,7 @@ class Template:
         return out
 
 
-    def tmpl_user_profiling_settings(self, ln, enable_profiling):
+    def tmpl_user_profiling_settings(self, ln, enable_profiling, csrf_token=''):
         _ = gettext_set_language(ln)
         out = """
             <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_profiling_settings">
@@ -419,8 +419,9 @@ class Template:
         }
         out += """</select></td><td valign="top"></td></tr>
             <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
-        </table></form>""" % {
-            'update_settings' : _('Update settings')
+        </table><input type="hidden" name="csrf_token" value="%(csrf_token)s" /></form>""" % {
+            'update_settings' : _('Update settings'),
+            'csrf_token': cgi.escape(csrf_token, True),
         }
         return out
 

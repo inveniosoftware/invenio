@@ -370,7 +370,8 @@ def perform_set(email, ln, can_config_bibcatalog=False,
 
     if can_config_profiling:
         out += websession_templates.tmpl_user_profiling_settings(ln=ln,
-                                                                 enable_profiling=prefs.get('enable_profiling'))
+                                                                 enable_profiling=prefs.get('enable_profiling'),
+                                                                 csrf_token=csrf_token)
 
     if verbose >= 9:
         for key, value in prefs.items():
