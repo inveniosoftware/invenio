@@ -20,6 +20,7 @@
 """Record API."""
 
 import six
+from speaklater import is_lazy_string
 
 from flask import current_app
 from sqlalchemy import or_
@@ -180,8 +181,9 @@ class Record(SmartJson):
             ind1 = ''
             ind2 = ''
             for key, value in six.iteritems(marc_dict):
-                if isinstance(value, six.string_types) or \
-                        not isinstance(value, Iterable):
+                if (isinstance(value, six.string_types)
+                     or not isinstance(value, Iterable)
+                     or is_lazy_string(value)):
                     value = [value]
                 for v in value:
                     if v is None:
