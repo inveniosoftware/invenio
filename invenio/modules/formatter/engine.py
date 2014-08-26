@@ -2343,7 +2343,27 @@ def escape_field(value, mode=0):
         return value
 
 
-def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
+def make_filter_line(hide_tag):
+    """Generate a line used for filtering MARCXML."""
+    hide_tag = str(hide_tag)
+    tag = hide_tag[:3]
+    ind1 = hide_tag[3:4]
+    ind2 = hide_tag[4:5]
+
+    if ind1 == "_":
+        ind1 = " "
+    if ind2 == "_":
+        ind2 = " "
+
+    if not ind1 and not ind2:
+        return 'datafield tag="%s"' % tag
+    if not ind2 and ind1:
+        return 'datafield tag="%s" ind1="%s"' % (tag, ind1)
+    return 'datafield tag="%s" ind1="%s"  ind2="%s"' % (tag, ind1, ind2)
+
+
+def filter_hidden_fields(recxml, user_info=None,
+                         filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
                          force_filtering=False):
     """
     Filter out tags specified by filter_tags from MARCXML. If the user
@@ -2369,10 +2389,11 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
     #filter..
     out = ""
     omit = False
+    filter_lines = map(make_filter_line, filter_tags)
     for line in recxml.splitlines(True):
         #check if this block needs to be omitted
-        for htag in filter_tags:
-            if 'datafield tag="'+str(htag)+'"' in line:
+        for htag in filter_lines:
+            if htag in line:
                 omit = True
         if not omit:
             out += line
