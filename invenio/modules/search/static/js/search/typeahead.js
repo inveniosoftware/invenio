@@ -364,6 +364,10 @@ define([
       var query = this.parser.getAutocompleteQuery(
         this.query_range.start, caretIdx);
 
+      // saves the current query inside typeahead to prevent improper text
+      // merging on blur
+      this.ttTypeahead.input.setQuery(query.value);
+
       var options_set = this.options.options_sets[
         this.parser.getOptionsSetName()
       ];
@@ -454,8 +458,6 @@ define([
 
       var merged = this.mergeWithCurrentInputFieldValue(
         bracketedValue, this.query_range);
-      if (this.ttTypeahead.input.getQuery() == value)
-        this.ttTypeahead.input.setQuery(merged);
 
       // run original setInputValue with merged value
       var result = this.orgTypeahead.setInputValue.call(
