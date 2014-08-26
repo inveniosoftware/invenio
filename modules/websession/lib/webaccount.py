@@ -344,7 +344,8 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0, csrf_toke
     keys_info = web_api_key.show_web_api_keys(uid=uid)
     out+=websession_templates.tmpl_user_api_key(
                 ln = ln,
-                keys_info = keys_info
+                keys_info = keys_info,
+                csrf_token = csrf_token,
                 )
 
     #show this dialog only if the system has been configured to use a ticket system

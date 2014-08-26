@@ -101,7 +101,7 @@ class Template:
         return out
 
 
-    def tmpl_user_api_key(self, ln=CFG_SITE_LANG, keys_info=None):
+    def tmpl_user_api_key(self, ln=CFG_SITE_LANG, keys_info=None, csrf_token=''):
         """
         Displays all the API key that the user owns the user
 
@@ -109,6 +109,7 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
           - 'key_info' *tuples* - Contains the tuples with the key data (id, desciption, status)
+          - 'csrf_token' *string* - The CSRF token to verify the form origin.
 
         """
 
@@ -154,6 +155,7 @@ class Template:
                             <form method="post" action="%(sitesecureurl)s/youraccount/apikey" name="api_key_remove">
                                  <input type="hidden" name="key_id" value="%(key_id)s" />
                                 <code class="blocknote"><input class="formbutton" type="%(input_type)s" value="%(remove_key)s" /></code>
+                                <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
                             </form>
                         </td>
                         </tr>
@@ -164,6 +166,7 @@ class Template:
                               'index':  keys_info.index(key_info),
                               'key_label': _("API key"),
                               'remove_key' : _("Delete key"),
+                              'csrf_token': cgi.escape(csrf_token, True),
                               'sitesecureurl': CFG_SITE_SECURE_URL,
                               'input_type': ("submit", "hidden")[key_info[2] == CFG_WEB_API_KEY_STATUS['REVOKED']]
                               }
@@ -187,6 +190,7 @@ class Template:
                     <code class="blocknote"><input class="formbutton" type="submit" value="%(create_new_key_button)s" /></code>
                   </td></tr>
                 </table>
+                <input type="hidden" name="csrf_token" value="%(csrf_token)s" />
                 </form>
         """ % {
                'create_new_key' : _("If you want to create a new API key, please enter a description for it"),
@@ -195,6 +199,7 @@ class Template:
                'note' : _("Note"),
                'new_key_description_note': _("The description should be something meaningful for you to recognize the API key"),
                'create_new_key_button' : _("Create new key"),
+               'csrf_token': cgi.escape(csrf_token, True),
                'sitesecureurl': CFG_SITE_SECURE_URL
                }
 

@@ -256,8 +256,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         args = wash_urlargd(form, {
                                    'key_description' : (str, None),
                                    'key_id' : (str, None),
-                                   'referer': (str, '')
+                                   'referer': (str, ''),
+                                   'csrf_token' : (str, None),
                                    })
+
+        # do not allow non-POST methods in here:
+        if req.method != 'POST':
+            raise apache.SERVER_RETURN(apache.HTTP_METHOD_NOT_ALLOWED)
+
+        # check CSRF token:
+        if not webuser.is_csrf_token_valid(req, args['csrf_token']):
+            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+
         uid = webuser.getUid(req)
         # load the right message language
         _ = gettext_set_language(args['ln'])
