@@ -141,13 +141,17 @@ def details(objectid):
                  ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
 
     for hbobject in hbwobject_db_request:
-        hbwobject[hbobject.version].append({"id": hbobject.id,
-                                            "version": hbobject.version,
-                                            "date": pretty_date(hbobject.created),
-                                            "true_date": hbobject.modified})
+        hbwobject[hbobject.version].append(
+            {"id": hbobject.id,
+             "version": hbobject.version,
+             "date": pretty_date(hbobject.created),
+             "true_date": hbobject.modified}
+        )
 
     for list_of_object in hbwobject:
-        hbwobject[list_of_object].sort(key=lambda x: x["true_date"], reverse=True)
+        hbwobject[list_of_object].sort(
+            key=lambda x: x["true_date"], reverse=True
+        )
 
     hbwobject_final = (
         hbwobject[ObjectVersion.INITIAL] +
@@ -172,7 +176,8 @@ def details(objectid):
                            next_object=next_object)
 
 
-@blueprint.route('/files/<int:objectid>/<path:filename>', methods=['POST', 'GET'])
+@blueprint.route('/files/<int:objectid>/<path:filename>',
+                 methods=['POST', 'GET'])
 @login_required
 def get_file(objectid=None, filename=None):
     """Send the requested file to user."""
@@ -318,25 +323,41 @@ def load_table():
         # We return here as DataTables will call a GET here after.
         return None
 
-    i_sortcol_0 = request.args.get('iSortCol_0', session.get('iSortCol_0', 0))
-    s_sortdir_0 = request.args.get('sSortDir_0', session.get('sSortDir_0', None))
+    i_sortcol_0 = request.args.get('iSortCol_0',
+                                   session.get('iSortCol_0', 0))
+    s_sortdir_0 = request.args.get('sSortDir_0',
+                                   session.get('sSortDir_0', None))
 
-    session["holdingpen_iDisplayStart"] = int(request.args.get('iDisplayStart', session.get('iDisplayLength', 10)))
-    session["holdingpen_iDisplayLength"] = int(request.args.get('iDisplayLength', session.get('iDisplayLength', 0)))
-    session["holdingpen_sEcho"] = int(request.args.get('sEcho', session.get('sEcho', 0))) + 1
+    session["holdingpen_iDisplayStart"] = int(request.args.get(
+        'iDisplayStart', session.get('iDisplayLength', 10))
+    )
+    session["holdingpen_iDisplayLength"] = int(
+        request.args.get('iDisplayLength', session.get('iDisplayLength', 0))
+    )
+    session["holdingpen_sEcho"] = int(
+        request.args.get('sEcho', session.get('sEcho', 0))
+    ) + 1
 
     bwobject_list = get_holdingpen_objects(tags)
 
-    if (i_sortcol_0 and s_sortdir_0) or ("holdingpen_iSortCol_0" in session and "holdingpen_sSortDir_0" in session):
+    if (i_sortcol_0 and s_sortdir_0)\
+            or ("holdingpen_iSortCol_0" in session
+                and "holdingpen_sSortDir_0" in session):
         if i_sortcol_0:
             i_sortcol = int(str(i_sortcol_0))
         else:
             i_sortcol = session["holdingpen_iSortCol_0"]
 
-        if not ('holdingpen_iSortCol_0' in session and "holdingpen_sSortDir_0" in session) or i_sortcol != session['holdingpen_iSortCol_0'] or s_sortdir_0 != session['holdingpen_sSortDir_0']:
+        if not ('holdingpen_iSortCol_0' in session
+                and "holdingpen_sSortDir_0" in session):
+            bwobject_list = sort_bwolist(bwobject_list, i_sortcol, s_sortdir_0)
+        elif i_sortcol != session['holdingpen_iSortCol_0']\
+                or s_sortdir_0 != session['holdingpen_sSortDir_0']:
             bwobject_list = sort_bwolist(bwobject_list, i_sortcol, s_sortdir_0)
         else:
-            bwobject_list = sort_bwolist(bwobject_list, session["holdingpen_iSortCol_0"], session["holdingpen_sSortDir_0"])
+            bwobject_list = sort_bwolist(bwobject_list,
+                                         session["holdingpen_iSortCol_0"],
+                                         session["holdingpen_sSortDir_0"])
 
     session["holdingpen_iSortCol_0"] = i_sortcol_0
     session["holdingpen_sSortDir_0"] = s_sortdir_0
@@ -351,9 +372,9 @@ def load_table():
     session['holdingpen_current_ids'] = record_ids
 
     records_showing = 0
-    for bwo in bwobject_list[
-            session["holdingpen_iDisplayStart"]:session["holdingpen_iDisplayStart"]
-            + session["holdingpen_iDisplayLength"]]:
+    display_start = session["holdingpen_iDisplayStart"]
+    display_end = display_start + session["holdingpen_iDisplayLength"]
+    for bwo in bwobject_list[display_start:display_end]:
         records_showing += 1
         action_name = bwo.get_action()
         action_message = bwo.get_action_message()

@@ -270,8 +270,10 @@ BibWorkflowEngine
         """Return True if workflow is fully completed."""
         res = db.session.query(db.func.count(BibWorkflowObject.id)).\
             filter(BibWorkflowObject.id_workflow == self.uuid).\
-            filter(BibWorkflowObject.version.in_([ObjectVersion.INITIAL, ObjectVersion.FINAL])).\
-            group_by(BibWorkflowObject.version).all()
+            filter(BibWorkflowObject.version.in_(
+                [ObjectVersion.INITIAL,
+                 ObjectVersion.FINAL]
+            )).group_by(BibWorkflowObject.version).all()
         return len(res) == 2 and res[0] == res[1]
 
     def save(self, status=None):

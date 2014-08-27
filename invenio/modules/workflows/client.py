@@ -126,4 +126,4 @@ def continue_execution(wfe, workflow_object, restart_point="restart_task",
     wfe.reset()
     wfe.set_task_position(pos)
     run_workflow(wfe, wfe._objects, stop_on_halt,
-                 initial_run=True, stop_on_error=True,  **kwargs)
+                 initial_run=True, stop_on_error=True, **kwargs)
