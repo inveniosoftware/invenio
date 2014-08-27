@@ -142,9 +142,10 @@ def get_keywords_from_local_file(local_file, taxonomy_name, output_mode="text",
 
 
 def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
-                           output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
-                           match_mode="full", no_cache=False, with_author_keywords=False,
-                           rebuild_cache=False, only_core_tags=False, extract_acronyms=False,
+                           output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
+                           spires=False, match_mode="full", no_cache=False,
+                           with_author_keywords=False, rebuild_cache=False,
+                           only_core_tags=False, extract_acronyms=False,
                            **kwargs):
     """Extract keywords from the list of strings
 
@@ -167,8 +168,10 @@ def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
 
     cache = reader.get_cache(taxonomy_name)
     if not cache:
-        reader.set_cache(taxonomy_name, reader.get_regular_expressions(taxonomy_name,
-                                                                       rebuild=rebuild_cache, no_cache=no_cache))
+        reader.set_cache(taxonomy_name,
+                         reader.get_regular_expressions(taxonomy_name,
+                                                        rebuild=rebuild_cache,
+                                                        no_cache=no_cache))
         cache = reader.get_cache(taxonomy_name)
     _skw = cache[0]
     _ckw = cache[1]
