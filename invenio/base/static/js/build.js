@@ -39,7 +39,8 @@
 	'jquery-ui': 'vendors/jquery-ui/jquery-ui.min',
         hgn: 'vendors/requirejs-hogan-plugin/hgn',
         hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
-        text: 'vendors/requirejs-hogan-plugin/text'
+        text: 'vendors/requirejs-hogan-plugin/text',
+        flight: 'vendors/flight/lib'
     },
     shim: {
         jquery: { exports: '$' },
