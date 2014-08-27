@@ -54,19 +54,19 @@ class _install_lib(install_lib):
 
 
 install_requires = [
-    "alembic>=0.6",
+    "alembic>=0.6.6",
     "Babel>=1.3",
     "BeautifulSoup>=3.2.1",
     "BeautifulSoup4>=4.3.2",
-    "celery>=3.1",
+    "celery>=3.1.8",
     # Cerberus>=0.7.1 api changes and is not yet supported
     "Cerberus>=0.7,<0.7.1",
     "dictdiffer>=0.0.3",
     "feedparser>=5.1",
     "fixture>=1.5",
-    "Flask>=0.10",
+    "Flask>=0.10.1",
     # Development version is used, will switch to >=1.0.9 once released.
-    "Flask-Admin>1.0.8",
+    "Flask-Admin>=1.0.9.dev0",
     "Flask-Assets>=0.10",
     "Flask-Babel>=0.9",
     "Flask-Breadcrumbs>=0.1",
@@ -76,7 +76,7 @@ install_requires = [
     "Flask-Gravatar>=0.4",
     "Flask-Login>=0.2.7",
     "Flask-Menu>=0.1",
-    "Flask-OAuthlib>=0.6.0,<0.7", # quick fix for issue #2158
+    "Flask-OAuthlib>=0.6.0,<0.7",  # quick fix for issue #2158
     "Flask-Principal>=0.4",
     "Flask-Registry>=0.2",
     "Flask-RESTful>=0.2.12",
@@ -86,7 +86,7 @@ install_requires = [
     "Flask-WTF>=0.9.5",
     "fs>=0.4",
     "intbitset>=2.0",
-    "jellyfish>=0.3",
+    "jellyfish>=0.3.2",
     "Jinja2>=2.7",
     "libmagic>=1.0",
     "lxml>=3.3",
@@ -109,7 +109,7 @@ install_requires = [
     "raven>=5.0.0",
     "rdflib>=4.1.2",
     "redis==2.8.0",  # Is it explicitly required?
-    "reportlab>=3.1,<3.2",
+    "reportlab>=3.1.8,<3.2",
     "requests>=2.3,<2.4",
     "six>=1.7.2",
     "Sphinx",
