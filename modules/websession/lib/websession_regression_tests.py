@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,7 +40,9 @@ class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
 
         baseurl = CFG_SITE_SECURE_URL + '/youraccount/'
 
-        _exports = ['', 'edit', 'change', 'lost', 'display',
+        # not testing 'change' endpoint here, since it is accepting
+        # only POST requests
+        _exports = ['', 'edit', 'lost', 'display',
                     'send_email', 'youradminactivities',
                     'delete', 'logout', 'login', 'register']
 
