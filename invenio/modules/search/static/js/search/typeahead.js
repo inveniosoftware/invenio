@@ -441,8 +441,21 @@ define([
     },
 
     /**
+     * Checks if the input field is focused.
+     *
+     * @returns {boolean}
+     * @private
+     */
+    _isFocused: function() {
+      return !!this.$element.filter($(document.activeElement)).length;
+    },
+
+    /**
      * Does all the tricks which need to be done at setting
-     * value of the input field.
+     * a value of the input field.
+     *
+     * It is run also by resetInputValue from twitter's typeahead.js on blur
+     * event.
      *
      * @param {String} value typeahead suggestion
      * @param silent corresponding twitter's typeahead parameter - see
@@ -460,6 +473,8 @@ define([
         bracketedValue, this.query_range);
 
       // run original setInputValue with merged value
+      // must be run before setting the caret position as the caret position
+      // should be updated after updating the value of the input field
       var result = this.orgTypeahead.setInputValue.call(
         this.ttTypeahead.input, merged, silent);
 
@@ -467,12 +482,21 @@ define([
       this.query_range.end =
         this.query_range.start + bracketedValue.length;
 
-      // set caret position
-      var new_caret_pos = this.query_range.end;
-      this.$element.caret(new_caret_pos);
+      // update the parser until the end of the typed and autocompleted part of
+      // the query
+      this.parser.updateSource(merged, this.query_range.end);
 
-      // update parser
-      this.parser.updateSource(merged, new_caret_pos);
+      // To set the caret position the element must be focused, otherwise
+      // $.fn.caret focuses it which is not the desired result on blur event.
+      // When the element is not focused we don't care about the caret position
+      // update. In this situation a focus event by pressing Tab button selects
+      // the whole text, whereas focus by clicking moves the caret to the click
+      // position, so the caret position is not stored anyway.
+      if (this._isFocused())
+        // if a user types and just autocompleted, move the caret to the end of
+        // the autocompleted part
+        this.$element.caret(this.query_range.end);
+
       return result;
 
       function bracketStr(str) {
