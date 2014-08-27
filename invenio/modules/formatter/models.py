@@ -39,7 +39,7 @@ class Format(db.Model):
 
     name = db.Column(db.String(255), nullable=False)
 
-    code = db.Column(db.String(6), nullable=False, unique=True)
+    code = db.Column(db.String(20), nullable=False, unique=True)
 
     description = db.Column(db.String(255), server_default='')
 
