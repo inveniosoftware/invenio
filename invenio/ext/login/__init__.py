@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,8 @@
     module.
 """
 
+import urllib
+
 from .legacy_user import UserInfo
 from flask import request, flash, g, url_for, redirect
 from flask.ext.login import LoginManager, current_user, \
@@ -32,7 +34,7 @@ from flask.ext.login import LoginManager, current_user, \
 
 
 def login_user(user, *args, **kwargs):
-    """Allows login user by its id."""
+    """Allow login user by its id."""
     if type(user) in [int, long]:
         user = UserInfo(user)
     return flask_login_user(user, *args, **kwargs)
@@ -40,6 +42,7 @@ def login_user(user, *args, **kwargs):
 
 #FIXME move to account module
 def reset_password(email, ln=None):
+    """Reset user password."""
     from datetime import timedelta
     from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, \
         CFG_SITE_NAME_INTL, CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
@@ -47,7 +50,8 @@ def reset_password(email, ln=None):
     if ln is None:
         ln = g.ln
     from invenio.modules.access.mailcookie import mail_cookie_create_pw_reset
-    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(
+        days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
     if reset_key is None:
         return False  # reset key could not be created
 
@@ -72,6 +76,7 @@ def reset_password(email, ln=None):
 
 
 def login_redirect(referer=None):
+    """Redirect to url after login."""
     if referer is None:
         referer = request.values.get('referer')
     if referer:
@@ -92,14 +97,13 @@ def login_redirect(referer=None):
 def authenticate(nickname_or_email=None, password=None,
                  login_method='Local'):
     """
-    Finds user identified by given information and login method.
+    Find user identified by given information and login method.
 
     :param nickname_or_email: User nickname or email address
     :param password: Password used only in login methods that need it
     :param login_method: Login method (default: 'Local')
     :return: UserInfo
     """
-
     from invenio.base.i18n import _
     from invenio.ext.sqlalchemy import db
     from invenio.modules.accounts.models import User
@@ -126,25 +130,25 @@ def authenticate(nickname_or_email=None, password=None,
         logout_user()
         flash(_("You have not yet confirmed the email address for the \
             '%(login_method)s' authentication method.",
-            login_method=login_method), 'warning')
+              login_method=login_method), 'warning')
 
     return login_user(user.id)
 
 
 def setup_app(app):
     """Setup login extension."""
-
     app.config.setdefault('CFG_OPENID_AUTHENTICATION', False)
     app.config.setdefault('CFG_OAUTH1_AUTHENTICATION', False)
     app.config.setdefault('CFG_OAUTH2_AUTHENTICATION', False)
 
     @app.errorhandler(401)
     def do_login_first(error=401):
-        """Displays login page when user is not authorised."""
+        """Display login page when user is not authorised."""
         if request.is_xhr:
             return g._("Authorization failure"), 401
-        secure_url = url_for(request.endpoint, _external=True, _scheme='https')
-        if not request.base_url == secure_url:
+        secure_url = url_for(request.endpoint, _external=True, _scheme='https',
+                             **request.view_args)
+        if not urllib.unquote(secure_url).startswith(request.base_url):
             return redirect(secure_url)
         if current_user.is_guest:
             flash(g._("Please sign in to continue."), 'info')
