@@ -32,17 +32,18 @@ function SearchParser(options, default_set_name) {
 
   // stores the role to which every character belongs
   // as one of 'char_roles_enum' values
-  this.char_roles = []; // indices of word stack
-  this.words_stack = [];
+  this.char_roles = [];
 
+  // stores the analysed string
   this.str = '';
 
+  // there can be a couple of parsing schemas switched even by keywords
   this.options_sets = options;
   this.default_options_set = default_set_name;
 
   this._setOptions(this.default_options_set);
 
-  // here you can add other search methods
+  // here you can add other parsing methods
   this.methods = {
     SEARCH: this._findBySearch
   }
@@ -143,9 +144,7 @@ SearchParser.prototype = {
         var conf = method[word_type];
         options.word_types[word_type] = word_type;
         if (method_key == 'SEARCH') {
-          conf.sorted_values = conf.values.slice(0).sort(function (a, b) {
-            return b.length - a.length;
-          });
+          conf.sorted_values = conf.values.slice(0).sort(sortByLength);
         }
       }
     }
@@ -160,6 +159,10 @@ SearchParser.prototype = {
     options.initialized = true;
 
     return options;
+
+    function sortByLength(a, b) {
+      return b.length - a.length;
+    }
   },
 
   /**
@@ -202,21 +205,22 @@ SearchParser.prototype = {
   },
 
   /**
-   * Checks if the character under the index is a pard
-   * of an autocomplete word
+   * Checks if the character under the index is a part
+   * of an autocomplete word. 
+   *
+   * Returns false also when the word has not been analysed by the parser yet.
    *
    * @param idx index of the checked character
    * @returns {boolean}
    * @private
    */
   _isWordPart: function(idx) {
-    return !!this.char_roles[idx]
-      && !this._isSeparator(idx);
+    return !!this.char_roles[idx] && !this._isSeparator(idx);
   },
 
   /**
    * Finds the indices range in string which is going
-   * to be substituted uses the curren caret index to
+   * to be substituted uses the current caret index to
    * as reference point of the place the query is written
    * The returned range includes quotation marks if they
    * exist at the beginning or end of the query value
@@ -228,8 +232,10 @@ SearchParser.prototype = {
   getQueryRangeIdx: function(caretIdx) {
     var idx = caretIdx - 1;
     var start, end;
-    var model = undefined;
+    // by default model type is undefined
+    var model;
 
+    // if the character at idx was not analysed yet model type stays undefined
     if (this._isWordPart(idx))
       model = this.char_roles[idx];
 
@@ -281,8 +287,8 @@ SearchParser.prototype = {
     var idx = query_beginning - 1;
 
     // check if before the query there is a separator
-    if (idx >= 0 && this.char_roles[idx] != this.char_roles[query_beginning]
-      && !this._isSeparator(idx)) {
+    if (idx >= 0 && this.char_roles[idx] != this.char_roles[query_beginning] &&
+      !this._isSeparator(idx)) {
       return  {
         value: query,
         type: undefined
@@ -292,9 +298,9 @@ SearchParser.prototype = {
     }
 
     // jump over more separators
-    while (!this._isWordPart(idx) && idx >= 0
-      || this.str[idx] == '"')
+    while (!this._isWordPart(idx) && idx >= 0 || this.str[idx] == '"') {
       idx--;
+    }
 
     var previous_word_type = this.char_roles[idx];
     // the word is currently autocompleted - cannot be full
@@ -306,7 +312,7 @@ SearchParser.prototype = {
     var result = {
       value: query,
       type: autocomplete_type
-    }
+    };
 
     if (autocomplete_type == this.word_types.QUERY_VALUE) {
       // find what kind of value label stands in before
@@ -321,14 +327,22 @@ SearchParser.prototype = {
 
     return result;
 
-    function removeQuotationMarks(query) {
-      if (query[0] == '"')
-        query = query.slice(1, query.length);
+    /**
+     * Gets the string without quotation marks at the beginning and the end
+     *
+     * @param {String} str input string with eventual quotation marks
+     * @returns {String} the string with the quotation marks removed
+     */
+    function removeQuotationMarks(str) {
+      if (str[0] == '"') {
+        str = str.slice(1, str.length);
+      }
 
-      if (query[query.length - 1] == '"')
-        query = query.slice(0, query.length - 1);
+      if (str[str.length - 1] == '"') {
+        str = str.slice(0, str.length - 1);
+      }
 
-      return query;
+      return str;
     }
   },
 
@@ -358,7 +372,7 @@ SearchParser.prototype = {
    * @param nev new string
    * @param caret_pos caret position after the operation
    * @returns {Object} the result consists of an object with
-   *  following proerties:
+   *  following properties:
    *    start: start index of the inconsistency between the strings,
    *    end: end index of the inconsistency
    *    operation: operation done on the string, can have values:
@@ -380,11 +394,11 @@ SearchParser.prototype = {
 
     var diff_start, diff_end;
 
-    // hipothesis:
+    // hypothesis:
     // 1. the inserted/deleted string
     // is as long as the new and old strings length
     // difference
-    // 2. the changed part is continious and it has
+    // 2. the changed part is continuous and it has
     // one end at the current cursor position
     if (!inserted) {
       // deleted
@@ -401,7 +415,7 @@ SearchParser.prototype = {
         start: diff_start,
         end: longer.length,
         operation: inserted ? 'INSERTED' : 'DELETED'
-      }
+      };
     }
 
     if (checkHypothesis(diff_start, diff_end)) {
@@ -409,30 +423,32 @@ SearchParser.prototype = {
         start: diff_start,
         end: diff_end,
         operation: inserted ? 'INSERTED' : 'DELETED'
-      }
+      };
     }
 
     // the string was totally changed
     return {
       operation: 'SUBSTITUTED'
-    }
+    };
 
     function checkHypothesis(diff_start, diff_end) {
-      // check hipothesis
+      // check hypothesis
       var i_lon = diff_end;
       var i_sh = diff_start;
       var i = 0;
 
-      while (i < shorter.length && shorter[i] == longer[i])
+      while (i < shorter.length && shorter[i] == longer[i]) {
         i++;
+      }
 
-      if (i < diff_start)
+      if (i < diff_start) {
         return false;
+      }
 
       while (i_sh < shorter.length && shorter[i_sh] == longer[i_lon]) {
         i_lon++;
         i_sh++;
-        // hipothesis is true
+        // hypothesis is true
         if (i_sh == shorter.length) {
           return true;
         }
@@ -474,13 +490,13 @@ SearchParser.prototype = {
           continue;
 
         // the keyword doesn't begin or end with separator
-        if (found_start_idx > 0 && !this._isSeparator(found_start_idx - 1)
-          || (found_end_idx < limit && !this._isSeparator(found_end_idx)))
+        if (found_start_idx > 0 && !this._isSeparator(found_start_idx - 1) ||
+          (found_end_idx < limit && !this._isSeparator(found_end_idx)))
           continue;
 
         // detection_condition not passed
-        if (conf.detection_condition
-          && !conf.detection_condition(str, this.char_roles, found_start_idx, keyword))
+        if (conf.detection_condition && !conf.detection_condition(
+          str, this.char_roles, found_start_idx, keyword))
           continue;
 
         // mark fields belonging to it
@@ -530,7 +546,9 @@ SearchParser.prototype = {
     var separator_indices = this._findSeparators();
     var parser = this;
 
-    var previous_word_type = undefined;
+    // by default undefined what means that the currently analysed word is
+    // the first one
+    var previous_word_type;
 
     separator_indices.push(limit_idx);
     // to return by pop from the first index
@@ -543,7 +561,7 @@ SearchParser.prototype = {
         // omit separators
         word_begin = omitSeparators(word_begin);
         // omit marked words
-        while (this.char_roles[word_begin] != undefined) {
+        while (this.char_roles[word_begin] !== undefined) {
           previous_word_type = this.char_roles[word_begin];
           word_begin = separator_indices.pop() + 1;
           word_begin = omitSeparators(word_begin);
@@ -559,9 +577,11 @@ SearchParser.prototype = {
       }
       word_end = separator_indices.pop();
       // otherwise it's QUERY_VALUE without type - general search
-      if (!(is_word_last
-        || checkDetectionCondition(word_begin, word_end, word_type)))
+      if (!(is_word_last ||
+        checkDetectionCondition(word_begin, word_end, word_type))
+      ) {
         word_type = this.char_roles_enum.QUERY_VALUE;
+      }
 
       this._markAs(word_type, word_begin, word_end);
       previous_word_type = word_type;
@@ -599,7 +619,7 @@ SearchParser.prototype = {
    * Debug function to print the parsing result on the console
    * @private
    */
-  _print_char_roles: function() {
+  _printCharRoles: function() {
     var translation_key = {
       QUERY_VALUE: 'V',
       QUERY_TYPE: 'T',
@@ -607,7 +627,7 @@ SearchParser.prototype = {
       NOT: 'N',
       LOGICAL_EXP: 'L',
       SPIRES: 'R'
-    }
+    };
 
     var translated = [];
     for (var i in this.char_roles) {
@@ -651,7 +671,8 @@ SearchParser.prototype = {
 
       // iterate over word types
       for (var type in this.keywords[method]) {
-        this.methods[method].call(this, type, this.keywords[method][type], limit_idx);
+        this.methods[method].call(this, type, this.keywords[method][type],
+          limit_idx);
       }
     }
 
@@ -683,7 +704,7 @@ SearchParser.prototype = {
     if (comparison.operation == 'DELETED') {
       this.char_roles.splice(
         comparison.start, comparison.end - comparison.start);
-      if (DEBUG) this._print_char_roles();
+      if (DEBUG) this._printCharRoles();
       return;
     }
 
@@ -702,6 +723,6 @@ SearchParser.prototype = {
     }
 
     this._reinterpretFragment(update_end);
-    if (DEBUG) this._print_char_roles();
+    if (DEBUG) this._printCharRoles();
   }
 };

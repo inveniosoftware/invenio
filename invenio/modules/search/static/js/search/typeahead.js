@@ -38,7 +38,8 @@
   }
 
   searchField - jQuery selector
-  value_hints_url - url for getting remote queries - other than keywords e.g. authors
+  value_hints_url - url for getting remote queries - other than keywords
+    e.g. authors
   options_sets - syntax schema, there can be many of them switched with custom keywords
   default_set - default options set, used when the typeahead field is empty
 
@@ -147,7 +148,7 @@
 
 !function( $ ){
 
-  "use strict"
+  "use strict";
 
   function SearchTypeahead(element, options) {
 
@@ -166,7 +167,7 @@
 
     this.parser = new SearchParser(this.options.options_sets, this.options.default_set);
 
-    this.init();
+    this.initTypeahead();
 
     this.ttTypeahead = this.$element.data("ttTypeahead");
 
@@ -178,7 +179,7 @@
 
     this.ttTypeahead.input.setInputValue = function(value, silent) {
       return that.setInputFieldValue.apply(that, [value, silent]);
-    }
+    };
 
     // update parser state on input event
     this.$element.on('input', function(event) {
@@ -188,18 +189,18 @@
 
     // disable grey hint in input field background - not compatible yet
     // with this kind of typeahead
-    this.ttTypeahead.input.setHintValue = function(value) {}
+    this.ttTypeahead.input.setHintValue = function(value) {};
   }
 
-  var plugin_object_class = SearchTypeahead;
-  var data_key = 'search_typeahead';
+  var PluginClass = SearchTypeahead;
+  var dataLabel = 'search_typeahead';
 
   SearchTypeahead.prototype = {
 
     /**
      * Setups the typeahead element
      */
-    init: function() {
+    initTypeahead: function() {
 
       var that = this;
 
@@ -223,7 +224,6 @@
         options.indices = this.createIndices(engine, options.keywords);
       }
 
-      var that = this;
       engine.get = function(field_value, cb) {
         return that.getHints(field_value, cb, this);
       };
@@ -232,7 +232,7 @@
 
       this.$element.typeahead({
         // min length is controlled in getHints function
-        // this setting is to pass by everything
+        // this setting is to pass everything
         minLength: 1
       },
       {
@@ -277,7 +277,7 @@
         var method = keywords[method_key];
         for (var word_type in method) {
           var conf = method[word_type];
-          if (conf.values == undefined)
+          if (conf.values === undefined)
             continue;
 
           var index = deepCopy(engine.index);
@@ -350,8 +350,6 @@
     getHints: function(field_value, cb, bloodhound) {
       var matches = [];
 
-      this.i = 1;
-
       var caretIdx = this.$element.caret();
 
       this.parser.updateSource(field_value, caretIdx);
@@ -359,7 +357,9 @@
       var query = this.parser.getAutocompleteQuery(
         this.query_range.start, caretIdx);
 
-      var options_set = this.options.options_sets[this.parser.getOptionsSetName()];
+      var options_set = this.options.options_sets[
+        this.parser.getOptionsSetName()
+      ];
 
       if (!query.type) {
         cb && cb([]);
@@ -410,9 +410,10 @@
      * from typeahead
      *
      * @param {String} to_merge the value to be merged
+     * @param {*} query_range
      * @returns {string} merged string
      */
-    mergeWithCurrentValue: function(to_merge, query_range) {
+    mergeWithCurrentInputFieldValue: function(to_merge, query_range) {
       var input_field_value = this.$element.val();
 
       var precedingStr = input_field_value.slice(
@@ -420,19 +421,21 @@
       var followingStr = input_field_value.slice(
         query_range.end, input_field_value.length);
 
-      if (precedingStr[precedingStr.length - 1] == '"'
-        && to_merge[0] == '"')
-          precedingStr = precedingStr.slice(0, precedingStr.length - 1);
+      if (precedingStr[precedingStr.length - 1] == '"' && 
+          to_merge[0] == '"') {
+        precedingStr = precedingStr.slice(0, precedingStr.length - 1);
+      }
 
       return precedingStr + to_merge + followingStr;
     },
 
     /**
      * Does all the tricks which need to be done at setting
-     * value of the input field
+     * value of the input field.
      *
      * @param {String} value typeahead suggestion
-     * @param silent corresponding Typeahead JS parameter
+     * @param silent corresponding twitter's typeahead parameter - see
+     *   twitter typeahead documentation
      * @returns {*}
      */
     setInputFieldValue: function(value, silent) {
@@ -442,7 +445,8 @@
         bracketedValue = bracketStr(value);
       }
 
-      var merged = this.mergeWithCurrentValue(bracketedValue, this.query_range);
+      var merged = this.mergeWithCurrentInputFieldValue(
+        bracketedValue, this.query_range);
       if (this.ttTypeahead.input.getQuery() == value)
         this.ttTypeahead.input.setQuery(merged);
 
@@ -479,23 +483,28 @@
      * @param {String} new_value new value to set
      */
     setFieldValue: function(new_value) {
-      this.$element.val(new_value)
+      this.$element.val(new_value);
       this.ttTypeahead.input.setQuery(new_value);
     }
-  }
+  };
 
-  $.fn.searchTypeahead = function ( option ) {
-    return this.each(function () {
-      var $this = $(this)
-        , data = $this.data(data_key)
-        , options = typeof option == 'object' && option
-      if (!data) $this.data(data_key, (data = new plugin_object_class(this, options)))
-      if (typeof option == 'string') data[option]()
-    })
-  }
+  $.fn.searchTypeahead = function (option) {
 
-  $.fn.searchTypeahead.defaults = {}
+    var $elements = this;
 
-  $.fn.searchTypeahead.Constructor = plugin_object_class;
+    return $elements.map(function (idx, element) {
+      var $element = $(element);
+      var object = $element.data(dataLabel)
+      var options = typeof option == 'object' && option;
+      // attach jQuery plugin
+      if (!object) {
+        object = new PluginClass($element, options)
+        $element.data(dataLabel, object)
+      }
+      return object;
+    });
+  };
 
-}( window.jQuery )
+  $.fn.searchTypeahead.defaults = {};
+
+}(window.jQuery);
