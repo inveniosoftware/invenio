@@ -519,6 +519,7 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         # Access token is not valid for this scope
         r = self.client.get(
             '/oauth/info/',
+            query_string="access_token=%s" % self.personal_token.access_token,
             base_url=cfg['CFG_SITE_SECURE_URL']
         )
         self.assertStatus(r, 401)
