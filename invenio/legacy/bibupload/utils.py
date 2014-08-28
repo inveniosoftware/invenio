@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,8 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Helper module to bibupload a record."""
+
 import os
 import uuid
+import six
 from tempfile import mkstemp
 
 from invenio.legacy.bibrecord import record_xml_output
@@ -28,9 +31,7 @@ CFG_MAX_RECORDS = 500
 
 
 def open_temp_file(prefix):
-    """
-    Create a temporary file to write MARC XML in
-    """
+    """Create a temporary file to write MARC XML in."""
     # Prepare to save results in a tmp file
     (fd, filename) = mkstemp(
         dir=CFG_TMPSHAREDDIR,
@@ -42,17 +43,26 @@ def open_temp_file(prefix):
 
 
 def close_temp_file(file_out, filename):
-    """ Close temporary file again """
+    """Close temporary file again."""
     file_out.close()
     os.chmod(filename, 0o644)
 
 
-def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils", mode="-c",
+def create_marcxml(record):
+    """Create MARCXML based on type of input variable."""
+    from invenio.modules.records.api import Record
+    if isinstance(record, six.string_types):
+        return record
+    elif isinstance(record, Record):
+        return record.legacy_export_as_marc()
+    else:
+        return record_xml_output(record)
+
+
+def bibupload_record(record=None, collection=None,
+                     file_prefix="bibuploadutils", mode="-c",
                      alias='bibuploadutils', opts=[]):
-    """
-    General purpose function that will write a MARCXML file and call bibupload
-    on it.
-    """
+    """Write a MARCXML file and bibupload it."""
     if collection is None and record is None:
         return
 
@@ -62,7 +72,7 @@ def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils",
         file_out.write("<collection>")
         tot = 0
         for rec in collection:
-            file_out.write(record_xml_output(rec))
+            file_out.write(create_marcxml(record))
             tot += 1
             if tot == CFG_MAX_RECORDS:
                 file_out.write("</collection>")
@@ -77,7 +87,7 @@ def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils",
         file_out.write("</collection>")
     elif record is not None:
         tot = 1
-        file_out.write(record_xml_output(record))
+        file_out.write(create_marcxml(record))
 
     close_temp_file(file_out, filename)
     if tot > 0:
