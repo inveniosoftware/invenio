@@ -1439,7 +1439,7 @@ def detect_apache_version():
     """
     from invenio.shellutils import run_shell_command
     out = []
-    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
+    dummy1, cmd_out, dummy2 = run_shell_command("which httpd || which apache2")
     for apache in cmd_out.split("\n"):
         apache_version = _grep_version_from_executable(apache, '^Apache\/')
         if apache_version:
