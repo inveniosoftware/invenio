@@ -246,13 +246,21 @@ define(function(require, exports, module) {
           var $state_name = $("#state-" + name);
           var $state_group_name = $("#state-group-" + name);
 
-          $state_name.html(
-              tpl_field_message({
-                  name: name,
-                  state: state,
-                  messages: data.messages
-              })
-          );
+          var msgs = $.map(data.messages, function(value, top_index) {
+            if (typeof value !== "string") {
+              return $.map(value, function(msg, index) {
+                return msg;
+              });
+            } else {
+              return [value];
+            }
+          });
+
+          $state_name.html(tpl_field_message({
+            name: name,
+            state: state,
+            messages: msgs
+          }));
 
           var error_state = 'danger';
 
