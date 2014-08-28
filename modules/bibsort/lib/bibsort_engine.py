@@ -315,7 +315,7 @@ def write_to_methoddata_table(id_method, data_dict, data_dict_ordered, data_list
     date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
-            date = run_sql('SELECT last_update from bsrMETHODDATA WHERE id_bsrMETHOD = %s', (id_method, ))[0][0]
+            date = run_sql('SELECT last_updated from bsrMETHODDATA WHERE id_bsrMETHOD = %s', (id_method, ))[0][0]
         except IndexError:
             pass # keep the generated date
     write_message("Starting writing the data for method_id=%s " \
@@ -348,7 +348,7 @@ def write_to_buckets_table(id_method, bucket_no, bucket_data, bucket_last_value,
     date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
-            date = run_sql('SELECT last_update from bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s and bucket_no = %s', \
+            date = run_sql('SELECT last_updated from bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s and bucket_no = %s', \
                            (id_method, bucket_no))[0][0]
         except IndexError:
             pass # keep the generated date
