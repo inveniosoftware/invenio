@@ -35,10 +35,16 @@ op = LocalProxy(lambda: create_operations())
 """ Alembic operations object used to modify the database structure. """
 
 
+def has_table(table_name):
+    """Return True if table exists, False otherwise."""
+    return db.engine.dialect.has_table(
+        db.engine.connect(),
+        table_name
+    )
+
+
 def create_migration_ctx(**kwargs):
-    """
-    Create an alembic migration context.
-    """
+    """Create an alembic migration context."""
     env = EnvironmentContext(Config(), None)
     env.configure(
         connection=db.engine.connect(),
@@ -49,20 +55,18 @@ def create_migration_ctx(**kwargs):
 
 
 def create_operations(ctx=None, **kwargs):
-    """
-    Create an alembic operations object.
-    """
+    """Create an alembic operations object."""
     if ctx is None:
         ctx = create_migration_ctx(**kwargs)
-    return Operations(ctx)
+    operations = Operations(ctx)
+    operations.has_table = has_table
+    return operations
 
 
 def produce_upgrade_operations(
         ctx=None, metadata=None, include_symbol=None, include_object=None,
         **kwargs):
-    """
-    Produce a list of upgrade statements
-    """
+    """Produce a list of upgrade statements."""
     if metadata is None:
         # Note, all SQLAlchemy models must have been loaded to produce
         # accurate results.
