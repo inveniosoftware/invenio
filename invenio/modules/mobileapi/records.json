@@ -1,0 +1,110 @@
+[
+	{
+		"id": "55",
+		"authors": [
+			{"name": "Aglietti, U", "inst": "CERN"},
+			{"name": "Ciuchini, M"},
+			{"name": "Gambino, P"} ],
+		"title": "A new model-independent way of extracting |V_ub/V_cb|",
+		"journal": "CERN",
+		"date": "2002-04-12",
+		"reportNumbers": ["hep-ph/0204140", "CERN-TH-2002-069", "RM3-TH-02-4"],
+		"abstract": "The ratio between the photon spectrum in B -> X_s gamma and the differential semileptonic rate wrt the hadronic variable M_X/E_X is a short-distance quantity calculable in perturbation theory and independent of the Fermi motion of the b quark in the B meson. We present a NLO analysis of this ratio and show how it can be used to determine |V_ub/V_cb| independently of any model for the shape function. We also discuss how this relation can be used to test the validity of the shape-function theory on the data.",
+		"keywords": ["photon spectrum", "peturbation", "semileptonic rate"],
+		"files": [
+				{"label": "PDF", "name": "0204140.pdf", "type": "application/pdf"},
+				{"label": "PS.GZ", "name": "0204140.ps.gz", "type": "application/gzip"},
+				{"label": "doesn't exist", "name": "crazy-name.txt", "type": "text/plain"}
+			]
+	},
+	{
+		"id": "54",
+		"authors": [
+			{"name": "Van Beveren, E"},
+			{"name": "Kleefeld, F"},
+			{"name": "Rupp, G"},
+			{"name": "Scadron, M D"} ],
+		"title": "Remarks on the f_0(400-1200) scalar meson as the dynamically generated chiral partner of the pion",
+		"date": "2002-04-12",
+		"reportNumbers": ["hep-ph/0204139"],
+		"abstract": "The quark-level linear sigma model is revisited, in particular concerning the identification of the f_0(400-1200) (or \\sigma(600)) scalar meson as the chiral partner of the pion. We demonstrate the predictive power of the linearsigma model through the pi-pi and pi-N s-wave scattering lengths, as well as several electromagnetic, weak, and strong decays of pseudoscalar and vector mesons. The ease with which the data for these observables are reproduced in thelinear sigma model lends credit to the necessity to include the sigma as a fundamental q\bar{q} degree of freedom, to be contrasted with approaches like chiral perturbation theory or the confining NJL model of Shakin and Wang."
+	},
+	{
+		"id": "51",
+		"authors": [
+			{"name": "Branco, G C"},
+			{"name": "Gomez, M E"},
+			{"name": "Khalil, S"},
+			{"name": "Teixeira, A M"} ],
+		"title": "Supersymmetry and a rationale for small CP violating phases",
+		"date": "2002-04-12",
+		"reportNumbers": ["hep-ph/0204136", "FISIST-14-2001-CFIF", "IPPP-01-58", "DCPT-01-114"],
+		"abstract": "We analyse the CP problem in the context of a supersymmetric extension of the standard model with universal strength of Yukawa couplings. A salient feature of these models is that the CP phases are constrained to be very small by the hierarchy of the quark masses, and the pattern of CKM mixing angles. This leads to a small amount of CP violation from the usual KM mechanism and a significant contribution from supersymmetry is required. Due to the large generationmixing in some of the supersymmetric interactions, the electric dipole moments impose severe constraints on the parameter space, forcing the trilinear couplings to be factorizable in matrix form. We find that the LL mass insertionsgive the dominant gluino contribution to saturate epsilon_K. The chargino contributions to epsilon'/epsilon are significant and can accommodate the experimental results. In this framework, the standard model gives a negligible contribution to the CP asymmetry in B-meson decay, a_{J/\\psi K_s}. However, due to supersymmetric contributions to B_d-\\bar{B}_d mixing, the recent large value of a_{J/\\psi K_s} can be accommodated."
+	},
+	{
+		"id": "47",
+		"authors": [
+			{"name": "Shovkovy, I A"},
+			{"name": "Ellis, P J"} ],
+		"title": "Thermal conductivity of dense quark matter and cooling of stars",
+		"date": "2002-04-12",
+		"reportNumbers": ["hep-ph/0204132", "NUC-MINN-02-3-T"],
+		"abstract": "The thermal conductivity of the color-flavor locked phase of dense quark matter is calculated. The dominant contribution to the conductivity comes from photons and Nambu-Goldstone bosons associated with breaking of baryon numberwhich are trapped in the quark core. Because of their very large mean free path the conductivity is also very large. The cooling of the quark core arises mostly from the heat flux across the surface of direct contact with the nuclearmatter. As the thermal conductivity of the neighboring layer is also high, the whole interior of the star should be nearly isothermal. Our results imply that the cooling time of compact stars with color-flavor locked quark cores issimilar to that of ordinary neutron stars."
+	},
+	{
+		"id": "13",
+		"authors": [
+			{"name": "Nason, P"},
+			{"name": "Dawson, S"},
+			{"name": "Ellis, R K"} ],
+		"title": "The total cross section for the production of heavy quarks in hadronic collisions",
+		"date": "2002-04-12",
+		"reportNumbers": ["BNL-40718", "FERMILAB-Pub-87-222-T"]
+	},
+	{
+		"id": "12",
+		"authors": [
+			{"name": "Mangano, M L"},
+			{"name": "Alekhin, S I"},
+			{"name": "Anselmino, M"},
+			{"name": "Ball, R D"},
+			{"name": "Boglione, M"},
+			{"name": "D'Alesio, U"},
+			{"name": "Davidson, S"},
+			{"name": "De Lellis, G"},
+			{"name": "Ellis, J"},
+			{"name": "Forte, S"},
+			{"name": "Gambino, P"},
+			{"name": "Gehrmann, T"},
+			{"name": "Kataev, A L"},
+			{"name": "Kotzinian, A"},
+			{"name": "Kulagin, S A"},
+			{"name": "Lehmann-Dronke, B"},
+			{"name": "Migliozzi, P"},
+			{"name": "Murgia, F"},
+			{"name": "Ridolfi, G"}
+		],
+		"title": "Physics at the front-end of a neutrino factory : a quantitative appraisal",
+		"date": "2001-05-16",
+		"reportNumbers": ["hep-ph/0105155", "CERN-TH-2001-131"],
+		"abstract": "We present a quantitative appraisal of the physics potential for neutrino experiments at the front-end of a muon storage ring. We estimate the forseeable accuracy in the determination of several interesting observables, and explorethe consequences of these measurements. We discuss the extraction of individual quark and antiquark densities from polarized and unpolarized deep-inelastic scattering. In particular we study the implications for the undertanding ofthe nucleon spin structure. We assess the determination of alpha_s from scaling violation of structure functions, and from sum rules, and the determination of sin^2(theta_W) from elastic nu-e and deep-inelastic nu-p scattering. Wethen consider the production of charmed hadrons, and the measurement of their absolute branching ratios. We study the polarization of Lambda baryons produced in the current and target fragmentation regions. Finally, we discuss thesensitivity to physics beyond the Standard Model."
+	},
+	{
+		"id": "1",
+		"authors": [ {"name": "Photolab"} ],
+		"title": "ALEPH experiment: Candidate of Higgs boson production",
+		"keywords": ["LEP"],
+		"date": "2002-04-12",
+		"reportNumbers": ["CERN-EX-0106015"],
+		"abstract": "Candidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: \"World map\" showing the spatial distribution of the jets in the event."
+	},
+	{
+		"id": "42",
+		"authors": [ {"name": "Adams, D N"} ],
+		"title": "(sample) The answer we've all been waiting for",
+		"keywords": ["Artificial Intelligence"],
+		"date": "2001-01-01",
+		"reportNumbers": ["hep-ph/0000042"],
+		"abstract": "(Filler sample data for testing paging.)"
+	}
+]

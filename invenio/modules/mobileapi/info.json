@@ -1,0 +1,8 @@
+{
+	"id": "ch.cern.pcuds47.invenio",
+	"invenio_api_version": "0.0.0",
+	"authentication_url": "http://pcuds47.cern.ch:4000/oauth/authorize?scope=deposit%3Awrite+deposit%3Aactions&state={STATE}&redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fapi%2Fstatic%2Fhash_to_message.html&response_type=token&client_id=dhJ7f5F21r9JcKyIWY4WgREh7RbLMJdHDt88sKth",
+
+	"name": "(pcuds47) Atlantis Institute",
+	"description": "All of the latest, cutting-edge sample data."
+}
