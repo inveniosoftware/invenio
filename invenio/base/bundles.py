@@ -106,7 +106,6 @@ jquery = Bundle(
     "vendors/jquery.jeditable/index.js",
     "vendors/jquery-tokeninput/src/jquery.tokeninput.js",
     "vendors/jquery.caret/dist/jquery.caret-1.5.2.js",
-    "vendors/typeahead.js/dist/typeahead.bundle.js",
     "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
     "vendors/bootstrap/dist/js/bootstrap.js",
     "js/bootstrap-select.js",
