@@ -379,13 +379,11 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
     if to_upload:
         args = ['bibupload', user_name, '-P', '5', '-r',
                 file_path, '-u', user_name]
-        user_email = get_email(uid) or None
-        if user_email:
-            args.extend(['--email-logs-to', user_email])
         if task_name == "bibedit":
             args.extend(['--name', 'bibedit'])
         if sequence_id:
             args.extend(["-I", sequence_id])
+        args.extend(['--email-logs-on-error'])
         task_low_level_submission(*args)
     return True
 
