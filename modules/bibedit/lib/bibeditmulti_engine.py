@@ -682,9 +682,7 @@ def _upload_file_with_bibupload(file_path, upload_mode, num_records, req):
     user_name = user_info.get('nickname') or 'multiedit'
     user_email = user_info.get('email') or None
     task_options = ['bibupload', user_name, '-N', 'multiedit', '-P', '4', upload_mode]
-
-    if user_email:
-        task_options.extend(["--email-logs-to", user_email])
+    task_options.extend(["--email-logs-on-error"])
 
     if num_records < CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING:
         task_options.append('%s' % file_path)
