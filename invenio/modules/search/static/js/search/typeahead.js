@@ -146,8 +146,11 @@
  *
  */
 
-!function( $ ){
-
+define([
+  'jquery',
+  'js/search/search_parser',
+  'typeahead', // $.fn.typeahead()
+], function($, SearchParser) {
   "use strict";
 
   function SearchTypeahead(element, options) {
@@ -507,4 +510,4 @@
 
   $.fn.searchTypeahead.defaults = {};
 
-}(window.jQuery);
+});

@@ -20,7 +20,9 @@
 require(
     [
         "js/search/search",
-        "js/search/form"
+        "js/search/form",
+        "js/search/search_parser",
+        "js/search/typeahead",
     ],
     function() {
         // This file is simply here to make sure the above dependencies are

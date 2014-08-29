@@ -40,12 +40,14 @@
         hgn: 'vendors/requirejs-hogan-plugin/hgn',
         hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
         text: 'vendors/requirejs-hogan-plugin/text',
-        flight: 'vendors/flight/lib'
+        flight: 'vendors/flight/lib',
+        typeahead: 'vendors/typeahead.js/dist/typeahead.bundle',
     },
     shim: {
         jquery: { exports: '$' },
         'jqueryui-timepicker/jqueryui-sliderAccess': {deps: ['jquery']},
         'jqueryui-timepicker/jqueryui-timepicker-addon': {deps: ['jquery', 'ui/slider']},
-        'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']}
+        'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']},
+        typeahead: {deps: ['jquery']},
     }
 })

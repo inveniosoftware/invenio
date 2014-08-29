@@ -22,8 +22,6 @@
 from invenio.ext.assets import Bundle
 
 js = Bundle(
-    'js/search/search_parser.js',
-    'js/search/typeahead.js',
     'js/search/default_typeahead_configuration.js',
     'js/search/facet.js',
     'js/search/init.js',

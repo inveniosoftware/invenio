@@ -18,7 +18,7 @@
  */
 
 
-define(['jquery'], function($) {
+define(['jquery', 'js/search/typeahead'], function($) {
     "use strict";
 
     $("form[name=search]").submit(function() {
