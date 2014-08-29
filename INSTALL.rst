@@ -216,7 +216,7 @@ Installing Invenio.
 .. code-block:: console
 
     (invenio)$ cdvirtualenv src/invenio
-    (invenio)$ pip install -r requirements.txt
+    (invenio)$ pip install --process-dependency-links -e .[development]
 
 Some modules may require specific dependencies listed as ``extras``. Pick the
 ones you need. E.g. to add `images` support, we can do as follow:

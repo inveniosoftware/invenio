@@ -52,6 +52,11 @@ class _install_lib(install_lib):
         self.run_command('compile_catalog')
         install_lib.run(self)
 
+dependency_links = [
+    "git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer",
+    "git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0",
+    "git+git://github.com/inveniosoftware/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow",
+]
 
 install_requires = [
     "alembic>=0.6.6",
@@ -82,7 +87,7 @@ install_requires = [
     "Flask-RESTful>=0.2.12",
     "Flask-Script>=2.0.5",
     # Development version is used, will switch to >=2.0 once released.
-    "Flask-SQLAlchemy>1.9",
+    "Flask-SQLAlchemy>=2.0",
     "Flask-WTF>=0.9.5",
     "fs>=0.4",
     "intbitset>=2.0",
@@ -274,6 +279,7 @@ setup(
         ]
     },
     install_requires=install_requires,
+    dependency_links=dependency_links,
     extras_require=extras_require,
     classifiers=[
         'Development Status :: 4 - Beta',
