@@ -43,6 +43,8 @@ define(function(require, exports, module) {
     require('ui/sortable')
     // provides $.fn.datepicker
     require('ui/datepicker')
+    // provides $.fn.typeahead
+    require('typeahead')
 
   var empty_cssclass = "empty-element";
 
