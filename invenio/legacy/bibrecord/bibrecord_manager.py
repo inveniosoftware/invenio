@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,9 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Perform BibRecord operations."""
+
 from invenio.ext.script import Manager
 
-manager = Manager(usage="Perform BibRecord operations")
+manager = Manager(usage=__doc__)
 
 # Define sub-manager
 bibrecord_cache = Manager(usage="Manipulates BibRecord cache.")
@@ -31,9 +33,9 @@ manager.add_command("cache", bibrecord_cache)
 @bibrecord_cache.command
 def reset(split_by=1000):
     """Reset bibrecord structure cache."""
-    from invenio.modules.editor.models import Bibfmt
+    from invenio.modules.formatter.models import Bibfmt
     from invenio.base.scripts.cache import reset_rec_cache
-    from invenio.legacy.dbquery import run_sql, serialize_via_marshal
+    from invenio.legacy.dbquery import serialize_via_marshal
     from invenio.legacy.search_engine import get_record
     from invenio.ext.sqlalchemy import db
 
@@ -48,6 +50,7 @@ def reset(split_by=1000):
 
 
 def main():
+    """Run manager command."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app
