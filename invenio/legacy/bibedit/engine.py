@@ -270,7 +270,6 @@ def perform_request_init(uid, ln, req, lastupdated):
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
     scripts = [
-        'vendors/jquery-ui/jquery-ui.min.js',
         'vendors/jquery.jeditable/index.js',
         'vendors/jquery.hotkeys/jquery.hotkeys.js',
         'vendors/json2/json2.js'
@@ -1747,7 +1746,6 @@ def perform_request_init_template_interface():
 
     # Add scripts (the ordering is NOT irrelevant).
     scripts = [
-        'vendors/jquery-ui/jquery-ui.min.js',
         'vendors/json2/json2.js'
     ]
     bibedit_scripts = ['display.js', 'template_interface.js']

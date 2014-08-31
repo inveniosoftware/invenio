@@ -36,10 +36,10 @@
   {% endif %}
 {%- endblock title %}
 
-{%- block _top_assets %}
-  {{- super() }}
+{%- block header %}
   {%- include "base/scripts.html" %}
-{%- endblock %}
+  {{- super() }}
+{%- endblock header %}
 {%- block _bottom_assets %}
   {# The legacy page requires that the scripts are loaded from the <head>
    # rather than at the bottom of the page.
