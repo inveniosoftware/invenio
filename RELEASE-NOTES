@@ -1,46 +1,35 @@
 --------------------------------------------------------------------
-Invenio v1.0.6 is released
-January 31, 2014
+Invenio v1.0.7 is released
+August 31, 2014
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.6 was released on January 31, 2014.
+Invenio v1.0.7 was released on August 31, 2014.
 
 This is a bugfix release update for Invenio v1.0 release series.  It
-is recommended to all Invenio sites using v1.0.5 or previous releases.
+is recommended to all Invenio sites using v1.0.6 or previous releases.
 
 What's new:
 -----------
 
- *) BatchUploader: avoid tempfile.tempdir redefinition (#1594)
+ *) BibDocFile: FFT comment/description documentation (#635);
+    duplicate docname fix (#1930)
 
- *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
+ *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
 
- *) BibUpload: FFT replace warning in guide
+ *) WebSession: CSRF tokens in account settings forms (#1855)
 
- *) dbquery: closes redundant connection
+ *) installation: GnuPG key server location update; location of
+    jquery.treeview
 
- *) global: language value always in link URLs
-
- *) installation: fix autotools rsync instructions; pip requirements;
-    pip requirement version updates
-
- *) intbitset: no crash when intbitset is on rhs (#1287)
-
- *) WebSearch: asciification of `oe` grapheme (#1582); correct record
-    sums from hosted colls (#1651); nonexisting record API test case
-    fix (#1692); space between records in MARC HTML
-
- *) WebSession: fix mail cookie expiration (#1596)
-
- *) WebSubmit: fix for typo in Shared_Functions
+ *) I18N: fix gender problem in a French translation (#2089)
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.6.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.6.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.6.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.7.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.7.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.7.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -50,34 +39,34 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.5, then:
+If you are upgrading from Invenio v1.0.6, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.6.tar.gz
-     $ cd invenio-1.0.6
+     $ tar xvfz invenio-1.0.7.tar.gz
+     $ cd invenio-1.0.7
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ make check-custom-templates
-     $ make update-v1.0.5-tables
+     $ make check-custom-templates # (1)
+     $ make update-v1.0.6-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
          /opt/invenio/etc/
 
+    Notes:
+
+    (1) If you have customised your session templates
+        (`websession_templates.py`) in your site-specific overlay,
+        then you will need to add a new `csrf_token` parameter to
+        several of your templates (e.g. `tmpl_user_preferences()`).
+        Running `make check-custom-templates` will warn you about this
+        necessity, should it be applicable.
+
  c) Restart your Apache server and your bibsched queue.
-
- d) If your records may contain `oe` UTF-8 graphemes, please schedule
-    reindexing of concerned indexes at a convenient time, for example:
-
-     $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
-
-If you are upgrading from a previous Invenio release (notably from
-v0.99 release series), then please see a dedicated Invenio Upgrade
-wiki page at <http://invenio-software.org/wiki/Installation/Upgrade>.
 
 - end of file -

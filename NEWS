@@ -6,6 +6,21 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.7 -- released 2014-08-31
+-------------------------------------
+
+ *) BibDocFile: FFT comment/description documentation (#635);
+    duplicate docname fix (#1930)
+
+ *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
+
+ *) WebSession: CSRF tokens in account settings forms (#1855)
+
+ *) installation: GnuPG key server location update; location of
+    jquery.treeview
+
+ *) I18N: fix gender problem in a French translation (#2089)
+
 Invenio v1.0.6 -- released 2014-01-31
 -------------------------------------
 
