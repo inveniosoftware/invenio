@@ -1,80 +1,63 @@
 --------------------------------------------------------------------
-Invenio v1.1.3 is released
-February 25, 2014
+Invenio v1.1.4 is released
+August 31, 2014
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.1.3 was released on February 25, 2014.
+Invenio v1.1.4 was released on August 31, 2014.
 
-This stable release contains a number of minor fixes and improvements.
-It is recommended to all Invenio sites using v1.1.2 or previous stable
+This stable release contains a number of bugfixes and improvements.
+It is recommended to all Invenio sites using v1.1.3 or previous stable
 release series (v0.99, v1.0).
 
 What's new:
 -----------
 
- *) BatchUploader: rights to ::1 for robot upload; avoid
-    tempfile.tempdir redefinition (#1594)
+ *) BibDocFile: FFT comment/description documentation (#635);
+    duplicate docname fix (#1930); convert files and icons
+    asynchronously (#1428)
 
- *) BibCatalog: no newlines in subject for RT plugin
+ *) BibEncode: fix video-encoded files synchro to DB (#1647)
 
- *) BibDocFile: RHEL6 magic bindings support (#1466)
+ *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
 
- *) BibFormat: fix for BibTeX regression tests; better BibTeX title
-    and collaboration
+ *) BibSched: authorization typo fix in BibTasklet (#1746); more
+    customizable icon creation tasklet; icons creation tasklet
 
- *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
+ *) BibSort: `last_updated` column name typo fix (#1408 #1742)
 
- *) BibSword: author MARC tag definition fix
+ *) OAIRepository: OAI-PMH handler URL documented (#1027 #2152)
 
- *) BibUpload: FFT replace warning in guide
+ *) WebComment: attachments in multi-node setup
 
- *) I18N: PO file update for the release of v1.1.3; PO file update for
-    the release of v1.0.6; PO file update for the release of v0.99.9;
-    collection demo names for new translations
+ *) WebJournal: update demo "Article Header" style
 
- *) OAIHarvest: for for bad exception handling
+ *) WebSearch: disable meta tags for deleted records (#1680)
 
- *) OAIRepository: optional support for --notimechange
+ *) WebSession: CSRF token in API key settings form (#1855); CSRF
+    tokens in account settings forms (#1855); Python-2.4 combatibility
+    issue fix
 
- *) Travis CI: initial release of configuration
+ *) WebSubmit: file stamper option to copy metadata (#1569); new
+    Create_Modify_Interface parameters; value escaping for
+    modifications (#1578); better value escaping (#1578); more
+    customizable Link_Records function; no double-submit (#1020)
 
- *) WebSearch: nonexisting record API test case fix (#1692); correct
-    record sums from hosted colls (#1651); space between records in
-    MARC HTML; fix for BibTeX regression tests; field-filtered MARCXML
-    API output (#1591); more complete API regression test suite;
-    get_fieldvalues_alephseq_like() utils; asciification of `oe`
-    grapheme (#1582); bug fix for SPIRES date math search
+ *) installation: GnuPG key server location update; location of
+    jquery.treeview
 
- *) WebSession: fix mail cookie expiration (#1596)
+ *) jQuery: fix for DataTables dependency URL location (#2078)
 
- *) WebSubmit: fix for typo in Shared_Functions; optional pdftk
-    regression tests
+ *) sequtils: more robust cnum generation (#2119)
 
- *) dbquery: closes redundant connection
-
- *) git: addition of compile to gitignore; new entry in gitignore
-
- *) global: language value always in link URLs
-
- *) installation: pip requirement version updates; pip requirements;
-    no user prompt for warnings; empty Travis configuration; location
-    of jquery-1.7.1.min.js; location of flot; information about
-    unidecode; fix autotools rsync instructions
-
- *) intbitset: no crash when intbitset is on rhs (#1287)
-
- *) inveniocfg: fix for mod_headers
-
- *) kwalitee: list comprehensions instead of lambdas; compatibility
-    with pylint 1.0.0
+ *) I18N: fix gender problem in a French translation (#2089)
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.1.3.tar.gz>
-  <http://invenio-software.org/download/invenio-1.1.3.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.1.3.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.1.4.tar.gz>
+  <http://invenio-software.org/download/invenio-1.1.4.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.1.4.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -90,28 +73,33 @@ Please proceed as follows:
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.1.3.tar.gz
-     $ cd invenio-1.1.3
+     $ tar xvfz invenio-1.1.4.tar.gz
+     $ cd invenio-1.1.4
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ make check-upgrade
+     $ make check-upgrade # (1)
      $ sudo -u www-data make install
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
-         /opt/invenio/etc/
-       # Note: if you are upgrading from previous stable release
-       # series (v0.99 or v1.0), please don't rsync but diff, in order
-       # to inspect changes and adapt your old configuration to the
-       # new v1.1 release series.
+         /opt/invenio/etc/ # (2)
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
+    Notes:
+
+    (1) If you have customised your session templates
+        (`websession_templates.py`) in your site-specific overlay,
+        then you will need to add a new `csrf_token` parameter to
+        several of your templates (e.g. `tmpl_user_preferences()`).
+        Running `make check-upgrade` will warn you about this
+        necessity, should it be applicable.
+
+    (2) If you are upgrading from previous stable release series
+        (v0.99 or v1.0), please don't run this rsync command but diff,
+        in order to inspect changes and adapt your old configuration
+        to the new v1.1 release series.
+
  c) Restart your Apache server and your bibsched queue.
-
- d) If your records may contain `oe` UTF-8 graphemes, please schedule
-    reindexing of concerned indexes at a convenient time, for example:
-
-     $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
 
 - end of file -
