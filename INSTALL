@@ -5,7 +5,7 @@ About
 =====
 
 This document specifies how to build, customize, and install Invenio
-v1.1.3 for the first time.  See RELEASE-NOTES if you are upgrading
+v1.1.4 for the first time.  See RELEASE-NOTES if you are upgrading
 from a previous Invenio release.
 
 Contents
@@ -304,13 +304,13 @@ Contents
 ----------------
 
       $ cd $HOME/src/
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz.sig
-      $ md5sum -c invenio-1.1.3.tar.gz.md5
-      $ gpg --verify invenio-1.1.3.tar.gz.sig invenio-1.1.3.tar.gz
-      $ tar xvfz invenio-1.1.3.tar.gz
-      $ cd invenio-1.1.3
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz.sig
+      $ md5sum -c invenio-1.1.4.tar.gz.md5
+      $ gpg --verify invenio-1.1.4.tar.gz.sig invenio-1.1.4.tar.gz
+      $ tar xvfz invenio-1.1.4.tar.gz
+      $ cd invenio-1.1.4
       $ ./configure
       $ make
       $ make install
@@ -358,19 +358,19 @@ Contents
           sources.  (The built files will be installed into different
           "target" directories later.)
 
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz.md5
-      $ wget http://invenio-software.org/download/invenio-1.1.3.tar.gz.sig
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz.md5
+      $ wget http://invenio-software.org/download/invenio-1.1.4.tar.gz.sig
 
           Fetch Invenio source tarball from the distribution server,
           together with MD5 checksum and GnuPG cryptographic signature
           files useful for verifying the integrity of the tarball.
 
-      $ md5sum -c invenio-1.1.3.tar.gz.md5
+      $ md5sum -c invenio-1.1.4.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify invenio-1.1.3.tar.gz.sig invenio-1.1.3.tar.gz
+      $ gpg --verify invenio-1.1.4.tar.gz.sig invenio-1.1.4.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -382,11 +382,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz invenio-1.1.3.tar.gz
+      $ tar xvfz invenio-1.1.4.tar.gz
 
           Untar the distribution tarball.
 
-      $ cd invenio-1.1.3
+      $ cd invenio-1.1.4
 
           Go to the source directory.
 

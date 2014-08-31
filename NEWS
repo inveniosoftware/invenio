@@ -6,6 +6,48 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.1.4 -- released 2014-08-31
+-------------------------------------
+
+ *) BibDocFile: FFT comment/description documentation (#635);
+    duplicate docname fix (#1930); convert files and icons
+    asynchronously (#1428)
+
+ *) BibEncode: fix video-encoded files synchro to DB (#1647)
+
+ *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
+
+ *) BibSched: authorization typo fix in BibTasklet (#1746); more
+    customizable icon creation tasklet; icons creation tasklet
+
+ *) BibSort: `last_updated` column name typo fix (#1408 #1742)
+
+ *) OAIRepository: OAI-PMH handler URL documented (#1027 #2152)
+
+ *) WebComment: attachments in multi-node setup
+
+ *) WebJournal: update demo "Article Header" style
+
+ *) WebSearch: disable meta tags for deleted records (#1680)
+
+ *) WebSession: CSRF token in API key settings form (#1855); CSRF
+    tokens in account settings forms (#1855); Python-2.4 combatibility
+    issue fix
+
+ *) WebSubmit: file stamper option to copy metadata (#1569); new
+    Create_Modify_Interface parameters; value escaping for
+    modifications (#1578); better value escaping (#1578); more
+    customizable Link_Records function; no double-submit (#1020)
+
+ *) installation: GnuPG key server location update; location of
+    jquery.treeview
+
+ *) jQuery: fix for DataTables dependency URL location (#2078)
+
+ *) sequtils: more robust cnum generation (#2119)
+
+ *) I18N: fix gender problem in a French translation (#2089)
+
 Invenio v1.0.7 -- released 2014-08-31
 -------------------------------------
 
