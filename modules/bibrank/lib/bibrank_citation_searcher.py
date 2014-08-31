@@ -190,47 +190,71 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([]),
     return matches
 
 
-def get_cited_by_list(recids):
-    """Return a tuple of ([recid,list_of_citing_records],...) for all the
-       records in recordlist.
+def get_cited_by_list(recids, input_limit=None):
+    """
+    Return a tuple of ([recid,list_of_citing_records],...) for all the records
+    in recordlist.
+
+    The parameter 'input_limit' is the maximum number of records of 'recids' to
+    consider. If it is None (the default value) all the records will be used.
     """
     if not recids:
         return []
 
-    in_sql = ','.join('%s' for dummy in recids)
+    # We don't want to overwrite the input parameter
+    if input_limit is not None:
+        limited_recids = recids[:input_limit]
+    else:
+        limited_recids = recids
+
+    in_sql = ','.join('%s' for dummy in limited_recids)
     rows = run_sql("""SELECT citer, citee FROM rnkCITATIONDICT
-                       WHERE citee IN (%s)""" % in_sql, recids)
+                       WHERE citee IN (%s)""" % in_sql, limited_recids)
 
     cites = {}
     for citer, citee in rows:
         cites.setdefault(citee, set()).add(citer)
 
-    return [(recid, cites.get(recid, set())) for recid in recids]
+    return [(recid, cites.get(recid, set())) for recid in limited_recids]
 
 
-def get_refers_to_list(recids):
-    """Return a tuple of ([recid,list_of_citing_records],...) for all the
-       records in recordlist.
+def get_refers_to_list(recids, input_limit=None):
+    """
+    Return a tuple of ([recid,list_of_citing_records],...) for all the records
+    in recordlist.
+
+    The parameter 'input_limit' is the maximum number of records of 'recids' to
+    consider. If it is None (the default value) all the records will be used.
     """
     if not recids:
         return []
 
-    in_sql = ','.join('%s' for dummy in recids)
+    # We don't want to overwrite the input parameter
+    if input_limit is not None:
+        limited_recids = recids[:input_limit]
+    else:
+        limited_recids = recids
+
+    in_sql = ','.join('%s' for dummy in limited_recids)
     rows = run_sql("""SELECT citee, citer FROM rnkCITATIONDICT
-                       WHERE citer IN (%s)""" % in_sql, recids)
+                       WHERE citer IN (%s)""" % in_sql, limited_recids)
 
     refs = {}
     for citee, citer in rows:
         refs.setdefault(citer, set()).add(citee)
 
-    return [(recid, refs.get(recid, set())) for recid in recids]
+    return [(recid, refs.get(recid, set())) for recid in limited_recids]
 
 
-def get_refersto_hitset(ahitset):
+def get_refersto_hitset(ahitset, input_limit=None):
     """
     Return a hitset of records that refers to (cite) some records from
     the given ahitset.  Useful for search engine's
     refersto:author:ellis feature.
+
+    The parameter 'input_limit' is the maximum number of records of 'ahitset'
+    to consider. If it is None (the default value) all the records will be
+    used.
     """
     out = intbitset()
     if ahitset:
@@ -240,11 +264,18 @@ def get_refersto_hitset(ahitset):
             # ignore attempt to iterate over infinite ahitset
             pass
         else:
-            in_sql = ','.join('%s' for dummy in ahitset)
+            # We don't want to overwrite the input parameter
+            if input_limit is not None:
+                limited_ahitset = ahitset[:input_limit]
+            else:
+                limited_ahitset = ahitset
+
+            in_sql = ','.join('%s' for dummy in limited_ahitset)
             rows = run_sql("""SELECT citer FROM rnkCITATIONDICT
-                              WHERE citee IN (%s)""" % in_sql, ahitset)
+                              WHERE citee IN (%s)""" % in_sql, limited_ahitset)
             out = intbitset(rows)
     return out
+
 
 def get_one_cited_by_weight(recID):
     """Returns a number_of_citing_records for one record
@@ -252,6 +283,7 @@ def get_one_cited_by_weight(recID):
     weight = get_citation_dict("citations_weights")
 
     return weight.get(recID, 0)
+
 
 def get_cited_by_weight(recordlist):
     """Return a tuple of ([recid,number_of_citing_records],...) for all the
@@ -266,10 +298,14 @@ def get_cited_by_weight(recordlist):
     return result
 
 
-def get_citedby_hitset(ahitset):
+def get_citedby_hitset(ahitset, input_limit=None):
     """
     Return a hitset of records that are cited by records in the given
-    ahitset.  Useful for search engine's citedby:author:ellis feature.
+    ahitset. Useful for search engine's citedby:author:ellis feature.
+
+    The parameter 'input_limit' is the maximum number of records of 'ahitset'
+    to consider. If it is None (the default value) all the records will be
+    used.
     """
     out = intbitset()
     if ahitset:
@@ -279,9 +315,15 @@ def get_citedby_hitset(ahitset):
             # ignore attempt to iterate over infinite ahitset
             pass
         else:
-            in_sql = ','.join('%s' for dummy in ahitset)
+            # We don't want to overwrite the input parameter
+            if input_limit is not None:
+                limited_ahitset = ahitset[:input_limit]
+            else:
+                limited_ahitset = ahitset
+
+            in_sql = ','.join('%s' for dummy in limited_ahitset)
             rows = run_sql("""SELECT citee FROM rnkCITATIONDICT
-                              WHERE citer IN (%s)""" % in_sql, ahitset)
+                              WHERE citer IN (%s)""" % in_sql, limited_ahitset)
             out = intbitset(rows)
     return out
 
