@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.6\n"
+"Project-Id-Version: Invenio 1.0.7\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2014-01-31 15:12+0100\n"
+"POT-Creation-Date: 2014-08-31 21:44+0200\n"
 "PO-Revision-Date: 2012-02-16 14:04+0100\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <info@invenio-software.org>\n"
@@ -1530,9 +1530,9 @@ msgstr "Nom"
 #: modules/bibformat/lib/bibformat_templates.py:930
 #: modules/bibformat/lib/bibformat_templates.py:1055
 #: modules/webbasket/lib/webbasket_templates.py:1247
-#: modules/websession/lib/websession_templates.py:1510
-#: modules/websession/lib/websession_templates.py:1584
-#: modules/websession/lib/websession_templates.py:1647
+#: modules/websession/lib/websession_templates.py:1525
+#: modules/websession/lib/websession_templates.py:1599
+#: modules/websession/lib/websession_templates.py:1662
 #: modules/websubmit/lib/websubmit_managedocfiles.py:372
 #: modules/bibcirculation/lib/bibcirculation_templates.py:291
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2868
@@ -1861,10 +1861,10 @@ msgstr "Supprimer le format de sortie"
 #: modules/webbasket/lib/webbasket_templates.py:1733
 #: modules/webbasket/lib/webbasket_templates.py:2803
 #: modules/webbasket/lib/webbasket_templates.py:3607
-#: modules/websession/lib/websession_templates.py:1787
-#: modules/websession/lib/websession_templates.py:1895
-#: modules/websession/lib/websession_templates.py:2097
-#: modules/websession/lib/websession_templates.py:2180
+#: modules/websession/lib/websession_templates.py:1802
+#: modules/websession/lib/websession_templates.py:1910
+#: modules/websession/lib/websession_templates.py:2112
+#: modules/websession/lib/websession_templates.py:2195
 #: modules/websubmit/lib/websubmit_managedocfiles.py:846
 #: modules/websubmit/lib/websubmit_templates.py:2526
 #: modules/websubmit/lib/websubmit_templates.py:2589
@@ -2087,9 +2087,9 @@ msgstr "Heure"
 #: modules/bibupload/lib/batchuploader_templates.py:173
 #: modules/bibupload/lib/batchuploader_templates.py:355
 #: modules/bibupload/lib/batchuploader_templates.py:361
-#: modules/websession/lib/websession_templates.py:160
 #: modules/websession/lib/websession_templates.py:163
-#: modules/websession/lib/websession_templates.py:1035
+#: modules/websession/lib/websession_templates.py:166
+#: modules/websession/lib/websession_templates.py:1050
 msgid "Example"
 msgstr "Exemple"
 
@@ -2258,7 +2258,7 @@ msgstr "Batch Uploader: moniteur de processus"
 #: modules/webbasket/lib/webbasket.py:181
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
-#: modules/websession/lib/webuser.py:304
+#: modules/websession/lib/webuser.py:306
 #: modules/webstyle/lib/webstyle_templates.py:577
 msgid "N/A"
 msgstr "N/A"
@@ -2566,24 +2566,24 @@ msgid "Need human intervention?  Contact"
 msgstr "Besoin d'une intervention humaine? Veuillez contacter"
 
 #: modules/webaccess/lib/access_control_config.py:262
-#: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:889 modules/websession/lib/webuser.py:898
-#: modules/websession/lib/webuser.py:899
+#: modules/websession/lib/websession_templates.py:1102
+#: modules/websession/lib/webuser.py:891 modules/websession/lib/webuser.py:900
+#: modules/websession/lib/webuser.py:901
 msgid "Run Record Editor"
 msgstr "Lancer éditeur de notices"
 
 #: modules/webaccess/lib/access_control_config.py:263
-#: modules/websession/lib/websession_templates.py:1089
+#: modules/websession/lib/websession_templates.py:1104
 msgid "Run Multi-Record Editor"
 msgstr "Lancer éditeur de notices multiples"
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:890
+#: modules/websession/lib/webuser.py:892
 msgid "Run Document File Manager"
 msgstr "Lancer gestionnaire de fichiers"
 
 #: modules/webaccess/lib/access_control_config.py:265
-#: modules/websession/lib/websession_templates.py:1093
+#: modules/websession/lib/websession_templates.py:1108
 msgid "Run Record Merger"
 msgstr "Lancer fusionneur de notices"
 
@@ -2592,67 +2592,67 @@ msgid "Run BibSword client"
 msgstr "Lancer client BibSword"
 
 #: modules/webaccess/lib/access_control_config.py:267
-#: modules/websession/lib/websession_templates.py:1101
+#: modules/websession/lib/websession_templates.py:1116
 msgid "Configure BibKnowledge"
 msgstr "Configurer BibKnowledge"
 
 #: modules/webaccess/lib/access_control_config.py:268
-#: modules/websession/lib/websession_templates.py:1099
+#: modules/websession/lib/websession_templates.py:1114
 msgid "Configure BibFormat"
 msgstr "Configurer BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:269
-#: modules/websession/lib/websession_templates.py:1103
+#: modules/websession/lib/websession_templates.py:1118
 msgid "Configure OAI Harvest"
 msgstr "Configurer l'Import OAI"
 
 #: modules/webaccess/lib/access_control_config.py:270
-#: modules/websession/lib/websession_templates.py:1105
+#: modules/websession/lib/websession_templates.py:1120
 msgid "Configure OAI Repository"
 msgstr "Configurer l'Archive OAI"
 
 #: modules/webaccess/lib/access_control_config.py:271
-#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1122
 msgid "Configure BibIndex"
 msgstr "Configurer BibIndex"
 
 #: modules/webaccess/lib/access_control_config.py:272
-#: modules/websession/lib/websession_templates.py:1109
+#: modules/websession/lib/websession_templates.py:1124
 msgid "Configure BibRank"
 msgstr "Configurer BibRank"
 
 #: modules/webaccess/lib/access_control_config.py:273
-#: modules/websession/lib/websession_templates.py:1111
+#: modules/websession/lib/websession_templates.py:1126
 msgid "Configure WebAccess"
 msgstr "Configurer WebAccess"
 
 #: modules/webaccess/lib/access_control_config.py:274
-#: modules/websession/lib/websession_templates.py:1113
+#: modules/websession/lib/websession_templates.py:1128
 msgid "Configure WebComment"
 msgstr "Configurer WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:275
-#: modules/websession/lib/websession_templates.py:1117
+#: modules/websession/lib/websession_templates.py:1132
 msgid "Configure WebSearch"
 msgstr "Configurer WebSearch"
 
 #: modules/webaccess/lib/access_control_config.py:276
-#: modules/websession/lib/websession_templates.py:1119
+#: modules/websession/lib/websession_templates.py:1134
 msgid "Configure WebSubmit"
 msgstr "Configurer WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:277
-#: modules/websession/lib/websession_templates.py:1115
+#: modules/websession/lib/websession_templates.py:1130
 msgid "Configure WebJournal"
 msgstr "Configurer WebJournal"
 
 #: modules/webaccess/lib/access_control_config.py:278
-#: modules/websession/lib/websession_templates.py:1091
+#: modules/websession/lib/websession_templates.py:1106
 msgid "Run BibCirculation"
 msgstr "Lancer BibCirculation"
 
 #: modules/webaccess/lib/access_control_config.py:279
-#: modules/websession/lib/websession_templates.py:1097
+#: modules/websession/lib/websession_templates.py:1112
 msgid "Run Batch Uploader"
 msgstr "Lancer Batch Uploader"
 
@@ -2932,8 +2932,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:509
-#: modules/websession/lib/websession_templates.py:2221
-#: modules/websession/lib/websession_templates.py:2261
+#: modules/websession/lib/websession_templates.py:2236
+#: modules/websession/lib/websession_templates.py:2276
 msgid "No"
 msgstr "Non"
 
@@ -3040,8 +3040,8 @@ msgid "Popular Searches"
 msgstr "Recherches Populaires"
 
 #: modules/webalert/lib/webalert_webinterface.py:81
-#: modules/websession/lib/websession_templates.py:456
-#: modules/websession/lib/websession_templates.py:616
+#: modules/websession/lib/websession_templates.py:471
+#: modules/websession/lib/websession_templates.py:631
 msgid "Your Searches"
 msgstr "Vos Recherches"
 
@@ -3064,24 +3064,24 @@ msgstr "Vos Recherches"
 #: modules/webbasket/lib/webbasket_webinterface.py:1123
 #: modules/webbasket/lib/webbasket_webinterface.py:1220
 #: modules/webmessage/lib/webmessage_templates.py:466
-#: modules/websession/lib/websession_templates.py:602
-#: modules/websession/lib/websession_templates.py:2334
-#: modules/websession/lib/websession_webinterface.py:215
-#: modules/websession/lib/websession_webinterface.py:237
-#: modules/websession/lib/websession_webinterface.py:279
-#: modules/websession/lib/websession_webinterface.py:521
-#: modules/websession/lib/websession_webinterface.py:544
-#: modules/websession/lib/websession_webinterface.py:572
-#: modules/websession/lib/websession_webinterface.py:588
-#: modules/websession/lib/websession_webinterface.py:640
-#: modules/websession/lib/websession_webinterface.py:663
-#: modules/websession/lib/websession_webinterface.py:689
-#: modules/websession/lib/websession_webinterface.py:755
-#: modules/websession/lib/websession_webinterface.py:804
-#: modules/websession/lib/websession_webinterface.py:839
-#: modules/websession/lib/websession_webinterface.py:870
-#: modules/websession/lib/websession_webinterface.py:942
-#: modules/websession/lib/websession_webinterface.py:980
+#: modules/websession/lib/websession_templates.py:617
+#: modules/websession/lib/websession_templates.py:2349
+#: modules/websession/lib/websession_webinterface.py:214
+#: modules/websession/lib/websession_webinterface.py:236
+#: modules/websession/lib/websession_webinterface.py:282
+#: modules/websession/lib/websession_webinterface.py:533
+#: modules/websession/lib/websession_webinterface.py:556
+#: modules/websession/lib/websession_webinterface.py:584
+#: modules/websession/lib/websession_webinterface.py:600
+#: modules/websession/lib/websession_webinterface.py:652
+#: modules/websession/lib/websession_webinterface.py:675
+#: modules/websession/lib/websession_webinterface.py:701
+#: modules/websession/lib/websession_webinterface.py:767
+#: modules/websession/lib/websession_webinterface.py:816
+#: modules/websession/lib/websession_webinterface.py:851
+#: modules/websession/lib/websession_webinterface.py:882
+#: modules/websession/lib/websession_webinterface.py:954
+#: modules/websession/lib/websession_webinterface.py:992
 #: modules/websubmit/web/publiline.py:133
 #: modules/websubmit/web/publiline.py:154
 #: modules/websubmit/web/yourapprovals.py:91
@@ -3106,18 +3106,18 @@ msgstr "%s Personnaliser, Afficher requêtes"
 #: modules/webalert/lib/webalert_webinterface.py:475
 #: modules/webalert/lib/webalert_webinterface.py:523
 #: modules/webalert/lib/webalert_webinterface.py:551
-#: modules/websession/lib/websession_webinterface.py:218
-#: modules/websession/lib/websession_webinterface.py:240
-#: modules/websession/lib/websession_webinterface.py:281
-#: modules/websession/lib/websession_webinterface.py:523
-#: modules/websession/lib/websession_webinterface.py:546
-#: modules/websession/lib/websession_webinterface.py:575
-#: modules/websession/lib/websession_webinterface.py:591
-#: modules/websession/lib/websession_webinterface.py:609
-#: modules/websession/lib/websession_webinterface.py:619
-#: modules/websession/lib/websession_webinterface.py:642
-#: modules/websession/lib/websession_webinterface.py:665
-#: modules/websession/lib/websession_webinterface.py:691
+#: modules/websession/lib/websession_webinterface.py:217
+#: modules/websession/lib/websession_webinterface.py:239
+#: modules/websession/lib/websession_webinterface.py:284
+#: modules/websession/lib/websession_webinterface.py:535
+#: modules/websession/lib/websession_webinterface.py:558
+#: modules/websession/lib/websession_webinterface.py:587
+#: modules/websession/lib/websession_webinterface.py:603
+#: modules/websession/lib/websession_webinterface.py:621
+#: modules/websession/lib/websession_webinterface.py:631
+#: modules/websession/lib/websession_webinterface.py:654
+#: modules/websession/lib/websession_webinterface.py:677
+#: modules/websession/lib/websession_webinterface.py:703
 #, python-format
 msgid "%s, personalize"
 msgstr "%s, personnaliser"
@@ -3164,7 +3164,7 @@ msgid "%s Personalize, Modify alert settings"
 msgstr "%s Personnaliser, Modifier les propriétés des alertes"
 
 #: modules/webalert/lib/webalert_webinterface.py:314
-#: modules/websession/lib/websession_templates.py:473
+#: modules/websession/lib/websession_templates.py:488
 msgid "Your Alerts"
 msgstr "Vos Alertes"
 
@@ -3207,8 +3207,8 @@ msgid "Others' baskets"
 msgstr "Paniers des autres"
 
 #: modules/webbasket/lib/webbasket.py:2100
-#: modules/websession/lib/websession_templates.py:464
-#: modules/websession/lib/websession_templates.py:610
+#: modules/websession/lib/websession_templates.py:479
+#: modules/websession/lib/websession_templates.py:625
 msgid "Your Baskets"
 msgstr "Vos Paniers"
 
@@ -3513,8 +3513,8 @@ msgstr "Vous avez défini %i alertes sur ce panier."
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:508
-#: modules/websession/lib/websession_templates.py:2220
-#: modules/websession/lib/websession_templates.py:2260
+#: modules/websession/lib/websession_templates.py:2235
+#: modules/websession/lib/websession_templates.py:2275
 msgid "Yes"
 msgstr "Oui"
 
@@ -3625,7 +3625,7 @@ msgid "Sharing basket to a new group"
 msgstr "Partager le panier avec un nouveau groupe"
 
 #: modules/webbasket/lib/webbasket_templates.py:1756
-#: modules/websession/lib/websession_templates.py:507
+#: modules/websession/lib/websession_templates.py:522
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
@@ -3635,7 +3635,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1757
 #: modules/webbasket/lib/webbasket_templates.py:1772
-#: modules/websession/lib/websession_templates.py:510
+#: modules/websession/lib/websession_templates.py:525
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
@@ -3644,7 +3644,7 @@ msgstr ""
 "enregistrer ici%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1771
-#: modules/websession/lib/websession_webinterface.py:262
+#: modules/websession/lib/websession_webinterface.py:261
 msgid "This functionality is forbidden to guest users."
 msgstr "Cette fonctionnalité est indisponible pour les invités."
 
@@ -3849,10 +3849,10 @@ msgstr "%(x_title)s, par %(x_name)s le %(x_date)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:2885
 #: modules/webbasket/lib/webbasket_templates.py:3684
-#: modules/websession/lib/websession_templates.py:164
-#: modules/websession/lib/websession_templates.py:213
-#: modules/websession/lib/websession_templates.py:912
-#: modules/websession/lib/websession_templates.py:1036
+#: modules/websession/lib/websession_templates.py:167
+#: modules/websession/lib/websession_templates.py:218
+#: modules/websession/lib/websession_templates.py:927
+#: modules/websession/lib/websession_templates.py:1051
 msgid "Note"
 msgstr "Note"
 
@@ -4379,8 +4379,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1533
 #: modules/webcomment/lib/webcomment_templates.py:1562
-#: modules/websession/lib/websession_templates.py:157
-#: modules/websession/lib/websession_templates.py:1031
+#: modules/websession/lib/websession_templates.py:159
+#: modules/websession/lib/websession_templates.py:1046
 msgid "Nickname"
 msgstr "Pseudonyme"
 
@@ -4686,7 +4686,7 @@ msgstr "Administration de WebComment"
 #: modules/webcomment/web/admin/webcommentadmin.py:273
 #: modules/websearch/lib/websearch_webinterface.py:969
 #: modules/websearch/web/admin/websearchadmin.py:1040
-#: modules/websession/lib/websession_webinterface.py:936
+#: modules/websession/lib/websession_webinterface.py:948
 #: modules/webstyle/lib/webstyle_templates.py:583
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
@@ -4784,7 +4784,7 @@ msgstr "Votre message a été envoyé."
 #: modules/webmessage/lib/webmessage_webinterface.py:87
 #: modules/webmessage/lib/webmessage_webinterface.py:318
 #: modules/webmessage/lib/webmessage_webinterface.py:366
-#: modules/websession/lib/websession_templates.py:604
+#: modules/websession/lib/websession_templates.py:619
 msgid "Your Messages"
 msgstr "Vos Messages"
 
@@ -4905,7 +4905,7 @@ msgid "No matching user"
 msgstr "Pas d'utilisateur correspondant"
 
 #: modules/webmessage/lib/webmessage_templates.py:624
-#: modules/websession/lib/websession_templates.py:1825
+#: modules/websession/lib/websession_templates.py:1840
 msgid "No matching group"
 msgstr "Pas de groupe correspondant"
 
@@ -5667,14 +5667,14 @@ msgstr ""
 msgid "No queries found"
 msgstr "Pas de requête trouvée"
 
-#: modules/websession/lib/webaccount.py:366
+#: modules/websession/lib/webaccount.py:371
 msgid ""
 "This collection is restricted.  If you think you have right to access it, "
 "please authenticate yourself."
 msgstr ""
 "Cette collection est restreinte d'accès. Identifiez-vous pour y accéder."
 
-#: modules/websession/lib/webaccount.py:367
+#: modules/websession/lib/webaccount.py:372
 msgid ""
 "This file is restricted.  If you think you have right to access it, please "
 "authenticate yourself."
@@ -5697,7 +5697,7 @@ msgstr ""
 msgid "External user groups"
 msgstr "Groupes utilisateurs externes"
 
-#: modules/websession/lib/websession_templates.py:155
+#: modules/websession/lib/websession_templates.py:157
 msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
@@ -5706,25 +5706,25 @@ msgstr ""
 "fois,\n"
 "utilisez les champs ci-dessous."
 
-#: modules/websession/lib/websession_templates.py:156
+#: modules/websession/lib/websession_templates.py:158
 msgid "Edit login credentials"
 msgstr "Modifier les données d'identification"
 
-#: modules/websession/lib/websession_templates.py:161
+#: modules/websession/lib/websession_templates.py:164
 msgid "New email address"
 msgstr "Nouvelle adresse email"
 
-#: modules/websession/lib/websession_templates.py:162
-#: modules/websession/lib/websession_templates.py:209
-#: modules/websession/lib/websession_templates.py:1033
+#: modules/websession/lib/websession_templates.py:165
+#: modules/websession/lib/websession_templates.py:213
+#: modules/websession/lib/websession_templates.py:1048
 msgid "mandatory"
 msgstr "obligatoire"
 
-#: modules/websession/lib/websession_templates.py:165
+#: modules/websession/lib/websession_templates.py:168
 msgid "Set new values"
 msgstr "Enregistrer les nouvelles valeurs"
 
-#: modules/websession/lib/websession_templates.py:169
+#: modules/websession/lib/websession_templates.py:172
 msgid ""
 "Since this is considered as a signature for comments and reviews, once set "
 "it can not be changed."
@@ -5733,7 +5733,7 @@ msgstr ""
 "les évaluations, il n'est pas possible\n"
 "de le changer une fois choisi."
 
-#: modules/websession/lib/websession_templates.py:208
+#: modules/websession/lib/websession_templates.py:212
 msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
@@ -5741,37 +5741,37 @@ msgstr ""
 "Pour changer votre adresse email ou votre mot de passe, utilisez le\n"
 "formulaire ci-dessous."
 
-#: modules/websession/lib/websession_templates.py:210
+#: modules/websession/lib/websession_templates.py:214
 msgid "Old password"
 msgstr "Ancien mot de passe"
 
-#: modules/websession/lib/websession_templates.py:211
+#: modules/websession/lib/websession_templates.py:215
 msgid "New password"
 msgstr "Nouveau mot de passe"
 
-#: modules/websession/lib/websession_templates.py:212
-#: modules/websession/lib/websession_templates.py:1034
+#: modules/websession/lib/websession_templates.py:217
+#: modules/websession/lib/websession_templates.py:1049
 msgid "optional"
 msgstr "optionnel"
 
-#: modules/websession/lib/websession_templates.py:214
-#: modules/websession/lib/websession_templates.py:1037
+#: modules/websession/lib/websession_templates.py:219
+#: modules/websession/lib/websession_templates.py:1052
 msgid "The password phrase may contain punctuation, spaces, etc."
 msgstr "Le mot de passe peut contenir de la ponctuation, des espaces, etc."
 
-#: modules/websession/lib/websession_templates.py:215
+#: modules/websession/lib/websession_templates.py:220
 msgid "You must fill the old password in order to set a new one."
 msgstr "Vous devez entrer l'ancien mot de passe pour en choisir un nouveau."
 
-#: modules/websession/lib/websession_templates.py:216
+#: modules/websession/lib/websession_templates.py:221
 msgid "Retype password"
 msgstr "Inscrivez à nouveau votre mot de passe"
 
-#: modules/websession/lib/websession_templates.py:217
+#: modules/websession/lib/websession_templates.py:222
 msgid "Set new password"
 msgstr "Enregistrer nouveau mot de passe"
 
-#: modules/websession/lib/websession_templates.py:222
+#: modules/websession/lib/websession_templates.py:227
 #, python-format
 msgid ""
 "If you are using a lightweight CERN account you can\n"
@@ -5780,7 +5780,7 @@ msgstr ""
 "Si vous utilisez un compte CERN \"lightweight\", vous pouvez\n"
 "%(x_url_open)sréinitialiser le mot de passe%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:228
+#: modules/websession/lib/websession_templates.py:233
 #, python-format
 msgid ""
 "You can change or reset your CERN account password by means of the "
@@ -5790,67 +5790,67 @@ msgstr ""
 "directement sur la %(x_url_open)spage de gestion des comptes\n"
 "CERN%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:252
+#: modules/websession/lib/websession_templates.py:259
 msgid "Edit cataloging interface settings"
 msgstr "Modifier les préférences de l'interface de cataloguage"
 
-#: modules/websession/lib/websession_templates.py:253
-#: modules/websession/lib/websession_templates.py:897
+#: modules/websession/lib/websession_templates.py:260
+#: modules/websession/lib/websession_templates.py:912
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: modules/websession/lib/websession_templates.py:254
-#: modules/websession/lib/websession_templates.py:898
-#: modules/websession/lib/websession_templates.py:1032
+#: modules/websession/lib/websession_templates.py:261
+#: modules/websession/lib/websession_templates.py:913
+#: modules/websession/lib/websession_templates.py:1047
 msgid "Password"
 msgstr "Mot de passe"
 
-#: modules/websession/lib/websession_templates.py:255
-#: modules/websession/lib/websession_templates.py:281
-#: modules/websession/lib/websession_templates.py:315
+#: modules/websession/lib/websession_templates.py:262
+#: modules/websession/lib/websession_templates.py:289
+#: modules/websession/lib/websession_templates.py:325
 msgid "Update settings"
 msgstr "Modifier les préférences"
 
-#: modules/websession/lib/websession_templates.py:269
+#: modules/websession/lib/websession_templates.py:277
 msgid "Edit language-related settings"
 msgstr "Modifier les préférences de langue"
 
-#: modules/websession/lib/websession_templates.py:280
+#: modules/websession/lib/websession_templates.py:288
 msgid "Select desired language of the web interface."
 msgstr "Choisir la langue de l'interface."
 
-#: modules/websession/lib/websession_templates.py:298
+#: modules/websession/lib/websession_templates.py:307
 msgid "Edit search-related settings"
 msgstr "Modifier les préférences de recherche"
 
-#: modules/websession/lib/websession_templates.py:299
+#: modules/websession/lib/websession_templates.py:308
 msgid "Show the latest additions box"
 msgstr "Afficher les listes des derniers ajouts"
 
-#: modules/websession/lib/websession_templates.py:301
+#: modules/websession/lib/websession_templates.py:310
 msgid "Show collection help boxes"
 msgstr "Afficher les boites d'aide des collections"
 
-#: modules/websession/lib/websession_templates.py:316
+#: modules/websession/lib/websession_templates.py:326
 msgid "Number of search results per page"
 msgstr "Nombre de résultats par page"
 
-#: modules/websession/lib/websession_templates.py:346
+#: modules/websession/lib/websession_templates.py:359
 msgid "Edit login method"
 msgstr "Éditer la méthode d'identification"
 
-#: modules/websession/lib/websession_templates.py:347
+#: modules/websession/lib/websession_templates.py:360
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr "Veuillez sélectionner la méthode utilisée pour vous identifier."
 
-#: modules/websession/lib/websession_templates.py:348
-#: modules/websession/lib/websession_templates.py:362
+#: modules/websession/lib/websession_templates.py:361
+#: modules/websession/lib/websession_templates.py:376
 msgid "Select method"
 msgstr "Choisir la méthode"
 
-#: modules/websession/lib/websession_templates.py:380
+#: modules/websession/lib/websession_templates.py:395
 #, python-format
 msgid ""
 "If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
@@ -5862,16 +5862,16 @@ msgstr ""
 "ci-dessous pour recevoir un lien permettant de réinitialiser votre mot\n"
 "de passe."
 
-#: modules/websession/lib/websession_templates.py:402
-#: modules/websession/lib/websession_templates.py:1030
+#: modules/websession/lib/websession_templates.py:417
+#: modules/websession/lib/websession_templates.py:1045
 msgid "Email address"
 msgstr "Adresse email"
 
-#: modules/websession/lib/websession_templates.py:403
+#: modules/websession/lib/websession_templates.py:418
 msgid "Send password reset link"
 msgstr "Envoyer le lien de réinitialisation"
 
-#: modules/websession/lib/websession_templates.py:407
+#: modules/websession/lib/websession_templates.py:422
 #, python-format
 msgid ""
 "If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
@@ -5882,7 +5882,7 @@ msgstr ""
 "%(x_fmt_close)s, vous pouvez retrouver votre mot de passe sur la "
 "%(x_url_open)spage de gestion des comptes CERN%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:410
+#: modules/websession/lib/websession_templates.py:425
 msgid ""
 "Note that if you have been using an external login system, then we cannot do "
 "anything and you have to ask there."
@@ -5890,7 +5890,7 @@ msgstr ""
 "Si vous utilisez un système d'identification externe, vous devez vous "
 "adresser directement aux responsables de ce système."
 
-#: modules/websession/lib/websession_templates.py:411
+#: modules/websession/lib/websession_templates.py:426
 #, python-format
 msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
@@ -5899,7 +5899,7 @@ msgstr ""
 "Autrement vous pouvez demander à %s de changer le système d'enregistrement "
 "de externe à interne."
 
-#: modules/websession/lib/websession_templates.py:438
+#: modules/websession/lib/websession_templates.py:453
 #, python-format
 msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
@@ -5911,12 +5911,12 @@ msgstr ""
 "tournant périodiquement et vous avertissant lorsque de nouveaux résultats de "
 "recherche sont disponibles."
 
-#: modules/websession/lib/websession_templates.py:448
-#: modules/websession/lib/websession_webinterface.py:275
+#: modules/websession/lib/websession_templates.py:463
+#: modules/websession/lib/websession_webinterface.py:277
 msgid "Your Settings"
 msgstr "Vos Paramètres"
 
-#: modules/websession/lib/websession_templates.py:449
+#: modules/websession/lib/websession_templates.py:464
 msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
@@ -5924,13 +5924,13 @@ msgstr ""
 "Inscrivez ou modifiez l'adresse email ou le mot de passe de votre compte. "
 "Indiquez vos préférences pour l'affichage de l'interface."
 
-#: modules/websession/lib/websession_templates.py:457
+#: modules/websession/lib/websession_templates.py:472
 msgid "View all the searches you performed during the last 30 days."
 msgstr ""
 "Afficher les recherches que vous avez effectuées durant les 30 derniers "
 "jours."
 
-#: modules/websession/lib/websession_templates.py:465
+#: modules/websession/lib/websession_templates.py:480
 msgid ""
 "With baskets you can define specific collections of items, store interesting "
 "records you want to access later or share with others."
@@ -5939,7 +5939,7 @@ msgstr ""
 "notices, d'enregistrer des notices que vous souhaiteriez revoir plus tard ou "
 "partager avec d'autres."
 
-#: modules/websession/lib/websession_templates.py:474
+#: modules/websession/lib/websession_templates.py:489
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
@@ -5948,13 +5948,13 @@ msgstr ""
 "services. Les résultats peuvent vous être communiqués par email ou être "
 "directement enregistrés dans l'un de vos paniers."
 
-#: modules/websession/lib/websession_templates.py:483
-#: modules/websession/lib/websession_templates.py:607
+#: modules/websession/lib/websession_templates.py:498
+#: modules/websession/lib/websession_templates.py:622
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:116
 msgid "Your Loans"
 msgstr "Vos Prêts"
 
-#: modules/websession/lib/websession_templates.py:484
+#: modules/websession/lib/websession_templates.py:499
 msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
@@ -5962,7 +5962,7 @@ msgstr ""
 "Vérifiez la liste des ouvrages que vous avez en prêt, soumettez des demandes "
 "d'emprunt, etc. Nécessite un CERN ID."
 
-#: modules/websession/lib/websession_templates.py:509
+#: modules/websession/lib/websession_templates.py:524
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
@@ -5970,7 +5970,7 @@ msgstr ""
 "Vous êtes actuellement enregistré en tant qu'invité. Vos alertes "
 "disparaîtront à la fin de la session."
 
-#: modules/websession/lib/websession_templates.py:532
+#: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
@@ -5981,11 +5981,11 @@ msgstr ""
 "déconnecter%(x_url1_close)s; b) modifier vos %(x_url2_open)spréférences de "
 "compte%(x_url2_close)s."
 
-#: modules/websession/lib/websession_templates.py:613
+#: modules/websession/lib/websession_templates.py:628
 msgid "Your Alert Searches"
 msgstr "Vos Alertes"
 
-#: modules/websession/lib/websession_templates.py:619
+#: modules/websession/lib/websession_templates.py:634
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
@@ -5994,13 +5994,13 @@ msgstr ""
 "Vous pouvez consulter la liste de %(x_url_open)svos groupes%(x_url_close)s "
 "pour lesquels vous êtes administrateur ou membre."
 
-#: modules/websession/lib/websession_templates.py:622
-#: modules/websession/lib/websession_templates.py:2332
-#: modules/websession/lib/websession_webinterface.py:1019
+#: modules/websession/lib/websession_templates.py:637
+#: modules/websession/lib/websession_templates.py:2347
+#: modules/websession/lib/websession_webinterface.py:1031
 msgid "Your Groups"
 msgstr "Vos Groupes"
 
-#: modules/websession/lib/websession_templates.py:625
+#: modules/websession/lib/websession_templates.py:640
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
@@ -6009,12 +6009,12 @@ msgstr ""
 "Vous pouvez consulter la liste de %(x_url_open)svos soumissions"
 "%(x_url_close)s et vous informer sur leur statut."
 
-#: modules/websession/lib/websession_templates.py:628
+#: modules/websession/lib/websession_templates.py:643
 #: modules/websubmit/web/yoursubmissions.py:160
 msgid "Your Submissions"
 msgstr "Vos Soumissions"
 
-#: modules/websession/lib/websession_templates.py:631
+#: modules/websession/lib/websession_templates.py:646
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
@@ -6024,33 +6024,33 @@ msgstr ""
 "%(x_url_close)s contenant les références des documents que vous avez "
 "approuvés ou relus."
 
-#: modules/websession/lib/websession_templates.py:634
+#: modules/websession/lib/websession_templates.py:649
 #: modules/websubmit/web/yourapprovals.py:88
 msgid "Your Approvals"
 msgstr "Vos Approbations"
 
-#: modules/websession/lib/websession_templates.py:638
+#: modules/websession/lib/websession_templates.py:653
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
 msgstr ""
 "Vous pouvez consulter la liste de %(x_url_open)svos tickets%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:641
+#: modules/websession/lib/websession_templates.py:656
 msgid "Your Tickets"
 msgstr "Vos Tickets"
 
-#: modules/websession/lib/websession_templates.py:643
-#: modules/websession/lib/websession_webinterface.py:638
+#: modules/websession/lib/websession_templates.py:658
+#: modules/websession/lib/websession_webinterface.py:650
 msgid "Your Administrative Activities"
 msgstr "Vos Activités Administratives"
 
-#: modules/websession/lib/websession_templates.py:670
+#: modules/websession/lib/websession_templates.py:685
 #: modules/bibharvest/lib/oai_harvest_admin.py:429
 #: modules/bibharvest/lib/oai_harvest_admin.py:444
 msgid "Try again"
 msgstr "Réessayer"
 
-#: modules/websession/lib/websession_templates.py:692
+#: modules/websession/lib/websession_templates.py:707
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -6060,23 +6060,23 @@ msgstr ""
 "Quelqu'un (vous-même?) provenant de %(x_ip_address)s a demandé de "
 "réinitialiser le mot de passe %(x_sitename)s pour le compte \"%(x_email)s\"."
 
-#: modules/websession/lib/websession_templates.py:700
+#: modules/websession/lib/websession_templates.py:715
 msgid "If you want to reset the password for this account, please go to:"
 msgstr "Pour réinitialiser le mot de passe de ce compte, allez ici:"
 
-#: modules/websession/lib/websession_templates.py:706
-#: modules/websession/lib/websession_templates.py:743
+#: modules/websession/lib/websession_templates.py:721
+#: modules/websession/lib/websession_templates.py:758
 msgid "in order to confirm the validity of this request."
 msgstr "afin de confirmer la validité de cette demande."
 
-#: modules/websession/lib/websession_templates.py:707
-#: modules/websession/lib/websession_templates.py:744
+#: modules/websession/lib/websession_templates.py:722
+#: modules/websession/lib/websession_templates.py:759
 #, python-format
 msgid ""
 "Please note that this URL will remain valid for about %(days)s days only."
 msgstr "Notez que ce lien restera valide seulement %(days)s jours."
 
-#: modules/websession/lib/websession_templates.py:729
+#: modules/websession/lib/websession_templates.py:744
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -6087,24 +6087,24 @@ msgstr ""
 "l'enregistrement d'un nouveau compte %(x_sitename)s pour l'adresse "
 "\"%(x_email)s\"."
 
-#: modules/websession/lib/websession_templates.py:737
+#: modules/websession/lib/websession_templates.py:752
 msgid "If you want to complete this account registration, please go to:"
 msgstr "Pour procéder à l'enregistrement de ce compte, allez ici:"
 
-#: modules/websession/lib/websession_templates.py:763
+#: modules/websession/lib/websession_templates.py:778
 #, python-format
 msgid "Okay, a password reset link has been emailed to %s."
 msgstr "Le lien de réinitialisation du mot de passe a été envoyé à %s."
 
-#: modules/websession/lib/websession_templates.py:778
+#: modules/websession/lib/websession_templates.py:793
 msgid "Deleting your account"
 msgstr "Effacement de votre compte"
 
-#: modules/websession/lib/websession_templates.py:792
+#: modules/websession/lib/websession_templates.py:807
 msgid "You are no longer recognized by our system."
 msgstr "Vous n'êtes plus connecté sur notre système."
 
-#: modules/websession/lib/websession_templates.py:794
+#: modules/websession/lib/websession_templates.py:809
 #, python-format
 msgid ""
 "You are still recognized by the centralized\n"
@@ -6115,20 +6115,20 @@ msgstr ""
 "centralisé SSO%(x_fmt_close)s. Vous pouvez également vous "
 "%(x_url_open)sdéconnecter de SSO%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:801
+#: modules/websession/lib/websession_templates.py:816
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr ""
 "Si vous le souhaitez, vous pouvez vous %(x_url_open)sidentifier"
 "%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:832
+#: modules/websession/lib/websession_templates.py:847
 msgid "If you already have an account, please login using the form below."
 msgstr ""
 "Si vous possédez déjà un compte, veuillez utiliser le formulaire ci-dessous "
 "pour vous identifier."
 
-#: modules/websession/lib/websession_templates.py:836
+#: modules/websession/lib/websession_templates.py:851
 #, python-format
 msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
@@ -6137,7 +6137,7 @@ msgstr ""
 "Si vous ne possédez pas encore de compte CERN, vous pouvez "
 "%(x_url_open)scréer un compte CERN \"lightweight\"%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:839
+#: modules/websession/lib/websession_templates.py:854
 #, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister"
@@ -6146,40 +6146,40 @@ msgstr ""
 "Si vous ne possédez pas encore de compte, vous pouvez vous "
 "%(x_url_open)senregistrer%(x_url_close)s pour créer un compte interne."
 
-#: modules/websession/lib/websession_templates.py:847
+#: modules/websession/lib/websession_templates.py:862
 #, python-format
 msgid "If you don't own an account yet, please contact %s."
 msgstr "Si vous ne possédez pas encore de compte, veuillez contacter %s."
 
-#: modules/websession/lib/websession_templates.py:870
+#: modules/websession/lib/websession_templates.py:885
 msgid "Login method:"
 msgstr "Méthode d'identification:"
 
-#: modules/websession/lib/websession_templates.py:899
+#: modules/websession/lib/websession_templates.py:914
 msgid "Remember login on this computer."
 msgstr "Mémoriser ma session sur cet ordinateur."
 
-#: modules/websession/lib/websession_templates.py:900
-#: modules/websession/lib/websession_templates.py:1178
-#: modules/websession/lib/websession_webinterface.py:102
-#: modules/websession/lib/websession_webinterface.py:197
-#: modules/websession/lib/websession_webinterface.py:754
-#: modules/websession/lib/websession_webinterface.py:838
+#: modules/websession/lib/websession_templates.py:915
+#: modules/websession/lib/websession_templates.py:1193
+#: modules/websession/lib/websession_webinterface.py:101
+#: modules/websession/lib/websession_webinterface.py:196
+#: modules/websession/lib/websession_webinterface.py:766
+#: modules/websession/lib/websession_webinterface.py:850
 msgid "login"
 msgstr "identification"
 
-#: modules/websession/lib/websession_templates.py:905
-#: modules/websession/lib/websession_webinterface.py:542
+#: modules/websession/lib/websession_templates.py:920
+#: modules/websession/lib/websession_webinterface.py:554
 msgid "Lost your password?"
 msgstr "Vous avez perdu votre mot de passe?"
 
-#: modules/websession/lib/websession_templates.py:913
+#: modules/websession/lib/websession_templates.py:928
 msgid "You can use your nickname or your email address to login."
 msgstr ""
 "Vous pouvez utiliser votre pseudonyme ou votre adresse email pour vous "
 "identifier."
 
-#: modules/websession/lib/websession_templates.py:937
+#: modules/websession/lib/websession_templates.py:952
 msgid ""
 "Your request is valid. Please set the new desired password in the following "
 "form."
@@ -6187,29 +6187,29 @@ msgstr ""
 "Votre demande a été vérifiée. Veuillez entrer le nouveau mot de passe désiré "
 "dans le formulaire ci-dessous."
 
-#: modules/websession/lib/websession_templates.py:960
+#: modules/websession/lib/websession_templates.py:975
 msgid "Set a new password for"
 msgstr "Enregistrer un nouveau mot de passe pour"
 
-#: modules/websession/lib/websession_templates.py:961
+#: modules/websession/lib/websession_templates.py:976
 msgid "Type the new password"
 msgstr "Indiquez le nouveau mot de passe"
 
-#: modules/websession/lib/websession_templates.py:962
+#: modules/websession/lib/websession_templates.py:977
 msgid "Type again the new password"
 msgstr "Retapez le nouveau mot de passe"
 
-#: modules/websession/lib/websession_templates.py:963
+#: modules/websession/lib/websession_templates.py:978
 msgid "Set the new password"
 msgstr "Appliquer le nouveau mot de passe"
 
-#: modules/websession/lib/websession_templates.py:985
+#: modules/websession/lib/websession_templates.py:1000
 msgid "Please enter your email address and desired nickname and password:"
 msgstr ""
 "Veuillez entrer votre adresse email, ainsi que le nom d'utilisateur souhaité "
 "et le mot de passe:"
 
-#: modules/websession/lib/websession_templates.py:987
+#: modules/websession/lib/websession_templates.py:1002
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
@@ -6217,16 +6217,16 @@ msgstr ""
 "Le compte ne pourra pas être utilisé avant qu'il ait été vérifié et activé "
 "par nos services."
 
-#: modules/websession/lib/websession_templates.py:1038
+#: modules/websession/lib/websession_templates.py:1053
 msgid "Retype Password"
 msgstr "Réinscrivez votre mot de passe"
 
-#: modules/websession/lib/websession_templates.py:1039
-#: modules/websession/lib/websession_webinterface.py:941
+#: modules/websession/lib/websession_templates.py:1054
+#: modules/websession/lib/websession_webinterface.py:953
 msgid "register"
 msgstr "s'enregistrer"
 
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1055
 #, python-format
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
@@ -6244,7 +6244,7 @@ msgstr ""
 "preprints et vous informe quotidiennement par email des nouveautés "
 "disponibles."
 
-#: modules/websession/lib/websession_templates.py:1044
+#: modules/websession/lib/websession_templates.py:1059
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
@@ -6253,7 +6253,7 @@ msgstr ""
 "Il n'est pas possible de créer un compte vous-même. Veuillez contacter %s si "
 "vous désirez un compte."
 
-#: modules/websession/lib/websession_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1085
 #, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
@@ -6262,24 +6262,24 @@ msgstr ""
 "Vous n'êtes pas identifé. Vous devez d'abord vous %(x_url_open)sidentifier"
 "%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1076
+#: modules/websession/lib/websession_templates.py:1091
 msgid "You are not authorized to access administrative functions."
 msgstr "Vous n'êtes pas autorisé à accéder aux fonctions administratives."
 
-#: modules/websession/lib/websession_templates.py:1079
+#: modules/websession/lib/websession_templates.py:1094
 #, python-format
 msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "Vous avez accès aux rôles suivants: %(x_role)s."
 
-#: modules/websession/lib/websession_templates.py:1095
+#: modules/websession/lib/websession_templates.py:1110
 msgid "Run BibSword Client"
 msgstr "Lancer client BibSword"
 
-#: modules/websession/lib/websession_templates.py:1121
+#: modules/websession/lib/websession_templates.py:1136
 msgid "Here are some interesting web admin links for you:"
 msgstr "Voici quelques liens administratifs intéressants pour vous:"
 
-#: modules/websession/lib/websession_templates.py:1123
+#: modules/websession/lib/websession_templates.py:1138
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
@@ -6288,213 +6288,213 @@ msgstr ""
 "Pour plus d'activités administratives, affichez la %(x_url_open)szone "
 "d'administration%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1176
+#: modules/websession/lib/websession_templates.py:1191
 msgid "guest"
 msgstr "visiteur"
 
-#: modules/websession/lib/websession_templates.py:1190
+#: modules/websession/lib/websession_templates.py:1205
 msgid "logout"
 msgstr "déconnexion"
 
-#: modules/websession/lib/websession_templates.py:1238
+#: modules/websession/lib/websession_templates.py:1253
 #: modules/webstyle/lib/webstyle_templates.py:433
 #: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "Personnaliser"
 
-#: modules/websession/lib/websession_templates.py:1246
+#: modules/websession/lib/websession_templates.py:1261
 msgid "Your account"
 msgstr "Votre compte"
 
-#: modules/websession/lib/websession_templates.py:1252
+#: modules/websession/lib/websession_templates.py:1267
 msgid "Your alerts"
 msgstr "Vos alertes"
 
-#: modules/websession/lib/websession_templates.py:1258
+#: modules/websession/lib/websession_templates.py:1273
 msgid "Your approvals"
 msgstr "Vos approbations"
 
-#: modules/websession/lib/websession_templates.py:1264
+#: modules/websession/lib/websession_templates.py:1279
 msgid "Your baskets"
 msgstr "Vos paniers"
 
-#: modules/websession/lib/websession_templates.py:1270
+#: modules/websession/lib/websession_templates.py:1285
 msgid "Your groups"
 msgstr "Vos groupes"
 
-#: modules/websession/lib/websession_templates.py:1276
+#: modules/websession/lib/websession_templates.py:1291
 msgid "Your loans"
 msgstr "Vos emprunts"
 
-#: modules/websession/lib/websession_templates.py:1282
+#: modules/websession/lib/websession_templates.py:1297
 msgid "Your messages"
 msgstr "Vos messages"
 
-#: modules/websession/lib/websession_templates.py:1288
+#: modules/websession/lib/websession_templates.py:1303
 msgid "Your submissions"
 msgstr "Vos soumissions"
 
-#: modules/websession/lib/websession_templates.py:1294
+#: modules/websession/lib/websession_templates.py:1309
 msgid "Your searches"
 msgstr "Vos recherches"
 
-#: modules/websession/lib/websession_templates.py:1347
+#: modules/websession/lib/websession_templates.py:1362
 msgid "Administration"
 msgstr "Administration"
 
-#: modules/websession/lib/websession_templates.py:1363
+#: modules/websession/lib/websession_templates.py:1378
 msgid "Statistics"
 msgstr "Statistiques"
 
-#: modules/websession/lib/websession_templates.py:1490
+#: modules/websession/lib/websession_templates.py:1505
 msgid "You are an administrator of the following groups:"
 msgstr "Vous êtes administrateur des groupes suivants:"
 
-#: modules/websession/lib/websession_templates.py:1510
-#: modules/websession/lib/websession_templates.py:1584
-#: modules/websession/lib/websession_templates.py:1647
+#: modules/websession/lib/websession_templates.py:1525
+#: modules/websession/lib/websession_templates.py:1599
+#: modules/websession/lib/websession_templates.py:1662
 #: modules/websubmit/lib/websubmit_templates.py:3003
 #: modules/websubmit/lib/websubmit_templates.py:3009
 msgid "Group"
 msgstr "Groupe"
 
-#: modules/websession/lib/websession_templates.py:1517
+#: modules/websession/lib/websession_templates.py:1532
 msgid "You are not an administrator of any groups."
 msgstr "Vous n'êtes administrateur d'aucun groupe."
 
-#: modules/websession/lib/websession_templates.py:1524
+#: modules/websession/lib/websession_templates.py:1539
 msgid "Edit group"
 msgstr "Éditer le groupe"
 
-#: modules/websession/lib/websession_templates.py:1531
+#: modules/websession/lib/websession_templates.py:1546
 #, python-format
 msgid "Edit %s members"
 msgstr "Éditer les %s membres du groupe"
 
-#: modules/websession/lib/websession_templates.py:1554
-#: modules/websession/lib/websession_templates.py:1694
-#: modules/websession/lib/websession_templates.py:1696
-#: modules/websession/lib/websession_webinterface.py:1079
+#: modules/websession/lib/websession_templates.py:1569
+#: modules/websession/lib/websession_templates.py:1709
+#: modules/websession/lib/websession_templates.py:1711
+#: modules/websession/lib/websession_webinterface.py:1091
 msgid "Create new group"
 msgstr "Créer un nouveau groupe"
 
-#: modules/websession/lib/websession_templates.py:1568
+#: modules/websession/lib/websession_templates.py:1583
 msgid "You are a member of the following groups:"
 msgstr "Vous êtes membre des groupes suivants:"
 
-#: modules/websession/lib/websession_templates.py:1591
+#: modules/websession/lib/websession_templates.py:1606
 msgid "You are not a member of any groups."
 msgstr "Vous n'êtes membre d'aucun groupe."
 
-#: modules/websession/lib/websession_templates.py:1615
+#: modules/websession/lib/websession_templates.py:1630
 msgid "Join new group"
 msgstr "Adhérer à un nouveau groupe"
 
-#: modules/websession/lib/websession_templates.py:1616
-#: modules/websession/lib/websession_templates.py:2168
-#: modules/websession/lib/websession_templates.py:2179
+#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:2183
+#: modules/websession/lib/websession_templates.py:2194
 msgid "Leave group"
 msgstr "Quitter un groupe"
 
-#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:1646
 msgid "You are a member of the following external groups:"
 msgstr "Vous êtes membre des groupes externes suivants:"
 
-#: modules/websession/lib/websession_templates.py:1654
+#: modules/websession/lib/websession_templates.py:1669
 msgid "You are not a member of any external groups."
 msgstr "Vous n'êtes membre d'aucun groupe externe."
 
-#: modules/websession/lib/websession_templates.py:1702
+#: modules/websession/lib/websession_templates.py:1717
 msgid "Update group"
 msgstr "Mettre à jour le groupe"
 
-#: modules/websession/lib/websession_templates.py:1704
+#: modules/websession/lib/websession_templates.py:1719
 #, python-format
 msgid "Edit group %s"
 msgstr "Éditer le groupe %s"
 
-#: modules/websession/lib/websession_templates.py:1706
+#: modules/websession/lib/websession_templates.py:1721
 msgid "Delete group"
 msgstr "Effacer le groupe"
 
-#: modules/websession/lib/websession_templates.py:1779
+#: modules/websession/lib/websession_templates.py:1794
 msgid "Group name:"
 msgstr "Nom du groupe:"
 
-#: modules/websession/lib/websession_templates.py:1781
+#: modules/websession/lib/websession_templates.py:1796
 msgid "Group description:"
 msgstr "Description du groupe:"
 
-#: modules/websession/lib/websession_templates.py:1782
+#: modules/websession/lib/websession_templates.py:1797
 msgid "Group join policy:"
 msgstr "Règle adhésion au groupe:"
 
-#: modules/websession/lib/websession_templates.py:1823
-#: modules/websession/lib/websession_templates.py:1896
-#: modules/websession/lib/websession_templates.py:2037
-#: modules/websession/lib/websession_templates.py:2046
-#: modules/websession/lib/websession_templates.py:2166
-#: modules/websession/lib/websession_templates.py:2278
+#: modules/websession/lib/websession_templates.py:1838
+#: modules/websession/lib/websession_templates.py:1911
+#: modules/websession/lib/websession_templates.py:2052
+#: modules/websession/lib/websession_templates.py:2061
+#: modules/websession/lib/websession_templates.py:2181
+#: modules/websession/lib/websession_templates.py:2293
 msgid "Please select:"
 msgstr "Veuillez choisir:"
 
-#: modules/websession/lib/websession_templates.py:1889
+#: modules/websession/lib/websession_templates.py:1904
 msgid "Join group"
 msgstr "Adhérer au groupe"
 
-#: modules/websession/lib/websession_templates.py:1891
+#: modules/websession/lib/websession_templates.py:1906
 msgid "or find it"
 msgstr "ou en trouver un"
 
-#: modules/websession/lib/websession_templates.py:1892
+#: modules/websession/lib/websession_templates.py:1907
 msgid "Choose group:"
 msgstr "Choisissez un groupe:"
 
-#: modules/websession/lib/websession_templates.py:1894
+#: modules/websession/lib/websession_templates.py:1909
 msgid "Find group"
 msgstr "Chercher un groupe"
 
-#: modules/websession/lib/websession_templates.py:2042
+#: modules/websession/lib/websession_templates.py:2057
 msgid "Remove member"
 msgstr "Supprimer un membre"
 
-#: modules/websession/lib/websession_templates.py:2044
+#: modules/websession/lib/websession_templates.py:2059
 msgid "No members."
 msgstr "Aucun membre."
 
-#: modules/websession/lib/websession_templates.py:2054
+#: modules/websession/lib/websession_templates.py:2069
 msgid "Accept member"
 msgstr "Accepter un nouveau membre"
 
-#: modules/websession/lib/websession_templates.py:2054
+#: modules/websession/lib/websession_templates.py:2069
 msgid "Reject member"
 msgstr "Rejeter l'adhésion du membre"
 
-#: modules/websession/lib/websession_templates.py:2056
+#: modules/websession/lib/websession_templates.py:2071
 msgid "No members awaiting approval."
 msgstr "Aucun membre en attente d'approbation"
 
-#: modules/websession/lib/websession_templates.py:2058
-#: modules/websession/lib/websession_templates.py:2092
+#: modules/websession/lib/websession_templates.py:2073
+#: modules/websession/lib/websession_templates.py:2107
 msgid "Current members"
 msgstr "Membres actuels"
 
-#: modules/websession/lib/websession_templates.py:2059
-#: modules/websession/lib/websession_templates.py:2093
+#: modules/websession/lib/websession_templates.py:2074
+#: modules/websession/lib/websession_templates.py:2108
 msgid "Members awaiting approval"
 msgstr "Membres en attente d'approbation"
 
-#: modules/websession/lib/websession_templates.py:2060
-#: modules/websession/lib/websession_templates.py:2094
+#: modules/websession/lib/websession_templates.py:2075
+#: modules/websession/lib/websession_templates.py:2109
 msgid "Invite new members"
 msgstr "Inviter de nouveaux membres"
 
-#: modules/websession/lib/websession_templates.py:2065
+#: modules/websession/lib/websession_templates.py:2080
 #, python-format
 msgid "Invitation to join \"%s\" group"
 msgstr "Invitation à rejoindre le groupe \"%s\""
 
-#: modules/websession/lib/websession_templates.py:2066
+#: modules/websession/lib/websession_templates.py:2081
 #, python-format
 msgid ""
 "Hello:\n"
@@ -6512,7 +6512,7 @@ msgstr ""
 "\n"
 "Meilleures salutations.\n"
 
-#: modules/websession/lib/websession_templates.py:2080
+#: modules/websession/lib/websession_templates.py:2095
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the "
@@ -6522,46 +6522,46 @@ msgstr ""
 "veuillez utiliser le %(x_url_open)ssystème de messagerie interne"
 "%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:2084
+#: modules/websession/lib/websession_templates.py:2099
 #, python-format
 msgid "Group: %s"
 msgstr "Groupe: %s"
 
-#: modules/websession/lib/websession_templates.py:2167
+#: modules/websession/lib/websession_templates.py:2182
 msgid "Group list"
 msgstr "Liste des groupes"
 
-#: modules/websession/lib/websession_templates.py:2170
+#: modules/websession/lib/websession_templates.py:2185
 msgid "You are not member of any group."
 msgstr "Vous n'êtes pas membre de groupe."
 
-#: modules/websession/lib/websession_templates.py:2218
+#: modules/websession/lib/websession_templates.py:2233
 msgid "Are you sure you want to delete this group?"
 msgstr "Êtes-vous sûr de vouloir supprimer ce groupe?"
 
-#: modules/websession/lib/websession_templates.py:2258
+#: modules/websession/lib/websession_templates.py:2273
 msgid "Are you sure you want to leave this group?"
 msgstr "Êtes-vous sûr de vouloir quitter ce groupe?"
 
-#: modules/websession/lib/websession_templates.py:2274
+#: modules/websession/lib/websession_templates.py:2289
 msgid "Visible and open for new members"
 msgstr "Visible et ouvert aux nouveaux membres"
 
-#: modules/websession/lib/websession_templates.py:2276
+#: modules/websession/lib/websession_templates.py:2291
 msgid "Visible but new members need approval"
 msgstr "Visible mais nécessitant une approbation pour les nouveaux membres"
 
-#: modules/websession/lib/websession_templates.py:2361
+#: modules/websession/lib/websession_templates.py:2376
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "Groupe %s: Nouvelle demande d'adhésion"
 
-#: modules/websession/lib/websession_templates.py:2365
+#: modules/websession/lib/websession_templates.py:2380
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "Un utilisateur désire adhérer au groupe %s."
 
-#: modules/websession/lib/websession_templates.py:2366
+#: modules/websession/lib/websession_templates.py:2381
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
@@ -6569,44 +6569,44 @@ msgstr ""
 "Veuillez %(x_url_open)saccepter ou rejeter%(x_url_close)s la demande de cet "
 "utilisateur."
 
-#: modules/websession/lib/websession_templates.py:2383
+#: modules/websession/lib/websession_templates.py:2398
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "Groupe %s: la demande d'adhésion a été acceptée"
 
-#: modules/websession/lib/websession_templates.py:2384
+#: modules/websession/lib/websession_templates.py:2399
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "Votre demande d'adhésion au groupe %s a été acceptée."
 
-#: modules/websession/lib/websession_templates.py:2386
+#: modules/websession/lib/websession_templates.py:2401
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "Groupe %s: la demande d'adhésion a été rejetée"
 
-#: modules/websession/lib/websession_templates.py:2387
+#: modules/websession/lib/websession_templates.py:2402
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "Votre demande d'adhésion au groupe %s a été rejetée."
 
-#: modules/websession/lib/websession_templates.py:2390
-#: modules/websession/lib/websession_templates.py:2408
+#: modules/websession/lib/websession_templates.py:2405
+#: modules/websession/lib/websession_templates.py:2423
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
 "Vous pouvez consulter la liste de %(x_url_open)svos groupes%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:2404
+#: modules/websession/lib/websession_templates.py:2419
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "Le groupe %s a été supprimé"
 
-#: modules/websession/lib/websession_templates.py:2406
+#: modules/websession/lib/websession_templates.py:2421
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "Le groupe %s a été supprimé par son administrateur."
 
-#: modules/websession/lib/websession_templates.py:2423
+#: modules/websession/lib/websession_templates.py:2438
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
@@ -6617,7 +6617,7 @@ msgstr ""
 "%(x_url_close)s dont vous êtes membre (%(x_nb_member)i) ou "
 "administrateur(%(x_nb_admin)i)."
 
-#: modules/websession/lib/websession_templates.py:2442
+#: modules/websession/lib/websession_templates.py:2457
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
 "Invenio password. For security purposes, you may want to change the password."
@@ -6626,7 +6626,7 @@ msgstr ""
 "de passe que celui de l'utilisateur d'Invenio sur MySQL. Pour des raisons de "
 "sécurité veuillez changer ce mot de passe."
 
-#: modules/websession/lib/websession_templates.py:2448
+#: modules/websession/lib/websession_templates.py:2463
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
@@ -6635,7 +6635,7 @@ msgstr ""
 "celui par défaut d'Invenio. Pour des raisons de sécurité veuillez changer ce "
 "mot de passe."
 
-#: modules/websession/lib/websession_templates.py:2454
+#: modules/websession/lib/websession_templates.py:2469
 msgid ""
 "Warning: The password set for the Invenio admin user is currently empty. For "
 "security purposes, it is strongly recommended that you add a password."
@@ -6643,7 +6643,7 @@ msgstr ""
 "Attention: le mot de passe de l'utilisateur admin est resté vide. Pour des "
 "raisons de sécurité veuillez changer ce mot de passe."
 
-#: modules/websession/lib/websession_templates.py:2460
+#: modules/websession/lib/websession_templates.py:2475
 msgid ""
 "Warning: The email address set for support email is currently set to "
 "info@invenio-software.org. It is recommended that you change this to your "
@@ -6653,12 +6653,12 @@ msgstr ""
 "\"info@invenio-software.org\". Il est recommandé de saisir votre propre "
 "adresse de support."
 
-#: modules/websession/lib/websession_templates.py:2466
+#: modules/websession/lib/websession_templates.py:2481
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr "Une nouvelle version d'Invenio est disponible à "
 
-#: modules/websession/lib/websession_templates.py:2473
+#: modules/websession/lib/websession_templates.py:2488
 msgid ""
 "Cannot download or parse release notes from http://invenio-software.org/repo/"
 "invenio/tree/RELEASE-NOTES"
@@ -6666,61 +6666,61 @@ msgstr ""
 "Impossible de charger ou lire les notes de version de http://invenio-"
 "software.org/repo/invenio/tree/RELEASE-NOTES"
 
-#: modules/websession/lib/webuser.py:154
+#: modules/websession/lib/webuser.py:156
 msgid "Database problem"
 msgstr "Problème de base de données"
 
-#: modules/websession/lib/webuser.py:302
+#: modules/websession/lib/webuser.py:304
 #: modules/websession/lib/webgroup_dblayer.py:314
 msgid "user"
 msgstr "utilisateur"
 
-#: modules/websession/lib/webuser.py:477
+#: modules/websession/lib/webuser.py:479
 #, python-format
 msgid "Account registration at %s"
 msgstr "Enregistrement d'un compte sur %s"
 
-#: modules/websession/lib/webuser.py:710
+#: modules/websession/lib/webuser.py:712
 msgid "New account on"
 msgstr "Nouveau compte sur"
 
-#: modules/websession/lib/webuser.py:712
+#: modules/websession/lib/webuser.py:714
 msgid "PLEASE ACTIVATE"
 msgstr "VEUILLEZ ACTIVER"
 
-#: modules/websession/lib/webuser.py:713
+#: modules/websession/lib/webuser.py:715
 msgid "A new account has been created on"
 msgstr "Un nouveau compte a été créé sur"
 
-#: modules/websession/lib/webuser.py:715
+#: modules/websession/lib/webuser.py:717
 msgid " and is awaiting activation"
 msgstr "et est en attente d'activation"
 
-#: modules/websession/lib/webuser.py:717
+#: modules/websession/lib/webuser.py:719
 msgid "   Username/Email"
 msgstr "Nom d'utilisateur/Email"
 
-#: modules/websession/lib/webuser.py:718
+#: modules/websession/lib/webuser.py:720
 msgid "You can approve or reject this account request at"
 msgstr "Vous pouvez approuver ou rejeter cette demande de compte sur"
 
-#: modules/websession/lib/webuser.py:900 modules/websession/lib/webuser.py:901
+#: modules/websession/lib/webuser.py:902 modules/websession/lib/webuser.py:903
 msgid "Run File Manager"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:84
+#: modules/websession/lib/websession_webinterface.py:83
 msgid "Mail Cookie Service"
 msgstr "Service d'activation par email"
 
-#: modules/websession/lib/websession_webinterface.py:94
+#: modules/websession/lib/websession_webinterface.py:93
 msgid "Role authorization request"
 msgstr "Demande d'autorisation de rôles"
 
-#: modules/websession/lib/websession_webinterface.py:94
+#: modules/websession/lib/websession_webinterface.py:93
 msgid "This request for an authorization has already been authorized."
 msgstr "La demande d'autorisation a déjà été acceptée."
 
-#: modules/websession/lib/websession_webinterface.py:97
+#: modules/websession/lib/websession_webinterface.py:96
 #, python-format
 msgid ""
 "You have successfully obtained an authorization as %(x_role)s! This "
@@ -6731,100 +6731,100 @@ msgstr ""
 "autorisation durera jusqu'au %(x_expiration)s, ou jusqu'à la fermeture de "
 "votre navigateur si vous êtes connecté en tant qu'invité."
 
-#: modules/websession/lib/websession_webinterface.py:115
+#: modules/websession/lib/websession_webinterface.py:114
 msgid "You have confirmed the validity of your email address!"
 msgstr "Vous avez confirmé la validité de votre adresse email!"
 
-#: modules/websession/lib/websession_webinterface.py:118
-#: modules/websession/lib/websession_webinterface.py:128
+#: modules/websession/lib/websession_webinterface.py:117
+#: modules/websession/lib/websession_webinterface.py:127
 msgid "Please, wait for the administrator to enable your account."
 msgstr "Veuillez patienter le temps que l'administrateur active votre compte."
 
-#: modules/websession/lib/websession_webinterface.py:122
-#: modules/websession/lib/websession_webinterface.py:131
+#: modules/websession/lib/websession_webinterface.py:121
+#: modules/websession/lib/websession_webinterface.py:130
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
 msgstr ""
 "Vous pouvez désormais accéder à %(x_url_open)svotre compte%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:123
-#: modules/websession/lib/websession_webinterface.py:132
+#: modules/websession/lib/websession_webinterface.py:122
+#: modules/websession/lib/websession_webinterface.py:131
 msgid "Email address successfully activated"
 msgstr "Adresse email activée avec succès"
 
-#: modules/websession/lib/websession_webinterface.py:126
+#: modules/websession/lib/websession_webinterface.py:125
 msgid "You have already confirmed the validity of your email address!"
 msgstr "Vous avez déjà confirmé la validité de votre adresse email!"
 
-#: modules/websession/lib/websession_webinterface.py:135
+#: modules/websession/lib/websession_webinterface.py:134
 msgid ""
 "This request for confirmation of an email address is not valid or is expired."
 msgstr ""
 "Cette demande de confirmation d'adresse email est invalide ou a expiré."
 
-#: modules/websession/lib/websession_webinterface.py:140
+#: modules/websession/lib/websession_webinterface.py:139
 msgid "This request for an authorization is not valid or is expired."
 msgstr "Cette demande d'autorisation est invalide ou a expiré."
 
-#: modules/websession/lib/websession_webinterface.py:153
+#: modules/websession/lib/websession_webinterface.py:152
 msgid "Reset password"
 msgstr "Réinitaliser le mot de passe"
 
-#: modules/websession/lib/websession_webinterface.py:159
+#: modules/websession/lib/websession_webinterface.py:158
 msgid "This request for resetting a password has already been used."
 msgstr "Cette demande de réinitialisation de mot de passe a déjà été utilisée."
 
-#: modules/websession/lib/websession_webinterface.py:162
+#: modules/websession/lib/websession_webinterface.py:161
 msgid "This request for resetting a password is not valid or is expired."
 msgstr ""
 "Cette demande de réinitialisation de mot de passe est invalide ou a expiré."
 
-#: modules/websession/lib/websession_webinterface.py:167
+#: modules/websession/lib/websession_webinterface.py:166
 msgid "This request for resetting the password is not valid or is expired."
 msgstr ""
 "Cette demande de réinitialisation de mot de passe est invalide ou a expiré."
 
-#: modules/websession/lib/websession_webinterface.py:180
+#: modules/websession/lib/websession_webinterface.py:179
 msgid "The two provided passwords aren't equal."
 msgstr "Les mots de passe entrés ne correspondent pas."
 
-#: modules/websession/lib/websession_webinterface.py:195
+#: modules/websession/lib/websession_webinterface.py:194
 msgid "The password was successfully set! You can now proceed with the login."
 msgstr ""
 "Le mot de passe a été appliqué avec succès! Vous pouvez à présent vous "
 "identifier."
 
-#: modules/websession/lib/websession_webinterface.py:280
+#: modules/websession/lib/websession_webinterface.py:283
 #, python-format
 msgid "%s Personalize, Your Settings"
 msgstr "%s Personnaliser, Vos Paramètres"
 
-#: modules/websession/lib/websession_webinterface.py:339
-#: modules/websession/lib/websession_webinterface.py:415
-#: modules/websession/lib/websession_webinterface.py:477
-#: modules/websession/lib/websession_webinterface.py:490
-#: modules/websession/lib/websession_webinterface.py:503
+#: modules/websession/lib/websession_webinterface.py:351
+#: modules/websession/lib/websession_webinterface.py:427
+#: modules/websession/lib/websession_webinterface.py:489
+#: modules/websession/lib/websession_webinterface.py:502
+#: modules/websession/lib/websession_webinterface.py:515
 msgid "Settings edited"
 msgstr "Préférences modifiées"
 
-#: modules/websession/lib/websession_webinterface.py:341
-#: modules/websession/lib/websession_webinterface.py:414
-#: modules/websession/lib/websession_webinterface.py:455
-#: modules/websession/lib/websession_webinterface.py:479
-#: modules/websession/lib/websession_webinterface.py:492
-#: modules/websession/lib/websession_webinterface.py:498
+#: modules/websession/lib/websession_webinterface.py:353
+#: modules/websession/lib/websession_webinterface.py:426
+#: modules/websession/lib/websession_webinterface.py:467
+#: modules/websession/lib/websession_webinterface.py:491
+#: modules/websession/lib/websession_webinterface.py:504
+#: modules/websession/lib/websession_webinterface.py:510
 msgid "Show account"
 msgstr "Afficher le compte"
 
-#: modules/websession/lib/websession_webinterface.py:345
+#: modules/websession/lib/websession_webinterface.py:357
 msgid "Unable to change login method."
 msgstr "Impossible de changer la méthode d'authentification."
 
-#: modules/websession/lib/websession_webinterface.py:353
+#: modules/websession/lib/websession_webinterface.py:365
 msgid "Switched to internal login method."
 msgstr "Méthode d'identification interne activée."
 
-#: modules/websession/lib/websession_webinterface.py:354
+#: modules/websession/lib/websession_webinterface.py:366
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -6836,11 +6836,11 @@ msgstr ""
 "par défaut. Cliquez sur le bouton ci-dessous pour recevoir un email vous "
 "permettant de changer ce mot de passe:"
 
-#: modules/websession/lib/websession_webinterface.py:362
+#: modules/websession/lib/websession_webinterface.py:374
 msgid "Send Password"
 msgstr "Envoyer le mot de passe"
 
-#: modules/websession/lib/websession_webinterface.py:372
+#: modules/websession/lib/websession_webinterface.py:384
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6849,7 +6849,7 @@ msgstr ""
 "Impossible d'activer la méthode d'identification externe %s, car l'adresse "
 "email n'est pas connue."
 
-#: modules/websession/lib/websession_webinterface.py:376
+#: modules/websession/lib/websession_webinterface.py:388
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6858,11 +6858,11 @@ msgstr ""
 "Impossible d'activer la méthode d'identification externe %s, car votre "
 "adresse email est inconnue du système d'identification externe."
 
-#: modules/websession/lib/websession_webinterface.py:380
+#: modules/websession/lib/websession_webinterface.py:392
 msgid "Login method successfully selected."
 msgstr "Méthode d'identification modifiée."
 
-#: modules/websession/lib/websession_webinterface.py:382
+#: modules/websession/lib/websession_webinterface.py:394
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
@@ -6872,16 +6872,16 @@ msgstr ""
 "basée sur les adresses emails.\n"
 "Veuillez contacter les administrateurs du site."
 
-#: modules/websession/lib/websession_webinterface.py:394
+#: modules/websession/lib/websession_webinterface.py:406
 #, fuzzy
 msgid "Your nickname has not been updated"
 msgstr "Cet exemplaire a été mise à jour."
 
-#: modules/websession/lib/websession_webinterface.py:408
+#: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
 msgstr "Préférences modifiées."
 
-#: modules/websession/lib/websession_webinterface.py:409
+#: modules/websession/lib/websession_webinterface.py:421
 #, python-format
 msgid ""
 "Note that if you have changed your email address, you will have to "
@@ -6890,109 +6890,109 @@ msgstr ""
 "Notez que si vous avez changé votre adresse email, vous devrez "
 "%(x_url_open)sréinitialiser votre mot de passe%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:417
-#: modules/websession/lib/websession_webinterface.py:911
+#: modules/websession/lib/websession_webinterface.py:429
+#: modules/websession/lib/websession_webinterface.py:923
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Le pseudonyme %s est invalide."
 
-#: modules/websession/lib/websession_webinterface.py:418
-#: modules/websession/lib/websession_webinterface.py:424
-#: modules/websession/lib/websession_webinterface.py:437
-#: modules/websession/lib/websession_webinterface.py:459
-#: modules/websession/lib/websession_webinterface.py:465
-#: modules/websession/lib/websession_webinterface.py:902
-#: modules/websession/lib/websession_webinterface.py:907
-#: modules/websession/lib/websession_webinterface.py:912
-#: modules/websession/lib/websession_webinterface.py:923
+#: modules/websession/lib/websession_webinterface.py:430
+#: modules/websession/lib/websession_webinterface.py:436
+#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:471
+#: modules/websession/lib/websession_webinterface.py:477
+#: modules/websession/lib/websession_webinterface.py:914
+#: modules/websession/lib/websession_webinterface.py:919
+#: modules/websession/lib/websession_webinterface.py:924
+#: modules/websession/lib/websession_webinterface.py:935
 msgid "Please try again."
 msgstr "Veuillez réessayer."
 
-#: modules/websession/lib/websession_webinterface.py:420
-#: modules/websession/lib/websession_webinterface.py:426
-#: modules/websession/lib/websession_webinterface.py:433
-#: modules/websession/lib/websession_webinterface.py:439
-#: modules/websession/lib/websession_webinterface.py:461
-#: modules/websession/lib/websession_webinterface.py:467
-#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:432
+#: modules/websession/lib/websession_webinterface.py:438
+#: modules/websession/lib/websession_webinterface.py:445
+#: modules/websession/lib/websession_webinterface.py:451
+#: modules/websession/lib/websession_webinterface.py:473
+#: modules/websession/lib/websession_webinterface.py:479
+#: modules/websession/lib/websession_webinterface.py:526
 msgid "Edit settings"
 msgstr "Modifier les préférences"
 
-#: modules/websession/lib/websession_webinterface.py:421
-#: modules/websession/lib/websession_webinterface.py:427
-#: modules/websession/lib/websession_webinterface.py:434
-#: modules/websession/lib/websession_webinterface.py:440
-#: modules/websession/lib/websession_webinterface.py:516
+#: modules/websession/lib/websession_webinterface.py:433
+#: modules/websession/lib/websession_webinterface.py:439
+#: modules/websession/lib/websession_webinterface.py:446
+#: modules/websession/lib/websession_webinterface.py:452
+#: modules/websession/lib/websession_webinterface.py:528
 msgid "Editing settings failed"
 msgstr "Échec lors de la modification des préférences"
 
-#: modules/websession/lib/websession_webinterface.py:423
-#: modules/websession/lib/websession_webinterface.py:906
+#: modules/websession/lib/websession_webinterface.py:435
+#: modules/websession/lib/websession_webinterface.py:918
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "L'adresse email %s n'est pas valide."
 
-#: modules/websession/lib/websession_webinterface.py:429
-#: modules/websession/lib/websession_webinterface.py:916
+#: modules/websession/lib/websession_webinterface.py:441
+#: modules/websession/lib/websession_webinterface.py:928
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "L'adresse email %s existe déjà dans la base de données."
 
-#: modules/websession/lib/websession_webinterface.py:431
-#: modules/websession/lib/websession_webinterface.py:918
+#: modules/websession/lib/websession_webinterface.py:443
+#: modules/websession/lib/websession_webinterface.py:930
 msgid "Or please try again."
 msgstr "Ou réessayez."
 
-#: modules/websession/lib/websession_webinterface.py:436
+#: modules/websession/lib/websession_webinterface.py:448
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "Le pseudonyme %s est déjà utilisé."
 
-#: modules/websession/lib/websession_webinterface.py:445
+#: modules/websession/lib/websession_webinterface.py:457
 msgid "Users cannot edit passwords on this site."
 msgstr "Les utilisateurs ne peuvent pas éditer leur mots de passe sur ce site."
 
-#: modules/websession/lib/websession_webinterface.py:453
+#: modules/websession/lib/websession_webinterface.py:465
 msgid "Password successfully edited."
 msgstr "Mot de passe modifié."
 
-#: modules/websession/lib/websession_webinterface.py:456
+#: modules/websession/lib/websession_webinterface.py:468
 msgid "Password edited"
 msgstr "Mot de passe modifié"
 
-#: modules/websession/lib/websession_webinterface.py:458
-#: modules/websession/lib/websession_webinterface.py:901
+#: modules/websession/lib/websession_webinterface.py:470
+#: modules/websession/lib/websession_webinterface.py:913
 msgid "Both passwords must match."
 msgstr "Les deux mots de passe doivent être identiques."
 
-#: modules/websession/lib/websession_webinterface.py:462
-#: modules/websession/lib/websession_webinterface.py:468
+#: modules/websession/lib/websession_webinterface.py:474
+#: modules/websession/lib/websession_webinterface.py:480
 msgid "Editing password failed"
 msgstr "Échec lors de la modification du mot de passe"
 
-#: modules/websession/lib/websession_webinterface.py:464
+#: modules/websession/lib/websession_webinterface.py:476
 msgid "Wrong old password inserted."
 msgstr "L'ancien mot de passe entré est faux."
 
-#: modules/websession/lib/websession_webinterface.py:480
-#: modules/websession/lib/websession_webinterface.py:493
-#: modules/websession/lib/websession_webinterface.py:507
+#: modules/websession/lib/websession_webinterface.py:492
+#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:519
 msgid "User settings saved correctly."
 msgstr "Préférences sauvegardées."
 
-#: modules/websession/lib/websession_webinterface.py:500
+#: modules/websession/lib/websession_webinterface.py:512
 msgid "Editing bibcatalog authorization failed"
 msgstr "Échec lors de la modification des préférences de BibCatalog"
 
-#: modules/websession/lib/websession_webinterface.py:501
+#: modules/websession/lib/websession_webinterface.py:513
 msgid "Empty username or password"
 msgstr "Nom d'utilisateur ou mot de passe vide"
 
-#: modules/websession/lib/websession_webinterface.py:510
+#: modules/websession/lib/websession_webinterface.py:522
 msgid "Unable to update settings."
 msgstr "Impossible de modifier les préférences."
 
-#: modules/websession/lib/websession_webinterface.py:571
+#: modules/websession/lib/websession_webinterface.py:583
 msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
@@ -7000,15 +7000,15 @@ msgstr ""
 "Impossible d'envoyer un lien de réinitialisation de mot de passe car vous "
 "utilisez un système d'authentification externe."
 
-#: modules/websession/lib/websession_webinterface.py:587
+#: modules/websession/lib/websession_webinterface.py:599
 msgid "The entered email address does not exist in the database."
 msgstr "L'adresse email fournie n'existe pas dans la base de données."
 
-#: modules/websession/lib/websession_webinterface.py:601
+#: modules/websession/lib/websession_webinterface.py:613
 msgid "Password reset request for"
 msgstr "Demande de réinitialisation du mot de passe sur %s"
 
-#: modules/websession/lib/websession_webinterface.py:605
+#: modules/websession/lib/websession_webinterface.py:617
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -7016,47 +7016,47 @@ msgstr ""
 "L'adresse email est incorrecte. Veuillez vérifier qu'elle soit correctement "
 "écrite (par ex. jean.dupont@exemple.fr)"
 
-#: modules/websession/lib/websession_webinterface.py:606
+#: modules/websession/lib/websession_webinterface.py:618
 msgid "Incorrect email address"
 msgstr "Adresse email incorrecte"
 
-#: modules/websession/lib/websession_webinterface.py:616
+#: modules/websession/lib/websession_webinterface.py:628
 msgid "Reset password link sent"
 msgstr "Lien de réinitialisation de mot de passe envoyé"
 
-#: modules/websession/lib/websession_webinterface.py:661
+#: modules/websession/lib/websession_webinterface.py:673
 msgid "Delete Account"
 msgstr "Effacer compte"
 
-#: modules/websession/lib/websession_webinterface.py:687
+#: modules/websession/lib/websession_webinterface.py:699
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: modules/websession/lib/websession_webinterface.py:753
-#: modules/websession/lib/websession_webinterface.py:802
-#: modules/websession/lib/websession_webinterface.py:837
+#: modules/websession/lib/websession_webinterface.py:765
+#: modules/websession/lib/websession_webinterface.py:814
+#: modules/websession/lib/websession_webinterface.py:849
 msgid "Login"
 msgstr "Identification"
 
-#: modules/websession/lib/websession_webinterface.py:868
+#: modules/websession/lib/websession_webinterface.py:880
 msgid "Register"
 msgstr "Enregistrement"
 
-#: modules/websession/lib/websession_webinterface.py:871
-#: modules/websession/lib/websession_webinterface.py:943
+#: modules/websession/lib/websession_webinterface.py:883
+#: modules/websession/lib/websession_webinterface.py:955
 #, python-format
 msgid "%s  Personalize, Main page"
 msgstr "%s Personnaliser, Page principale"
 
-#: modules/websession/lib/websession_webinterface.py:888
+#: modules/websession/lib/websession_webinterface.py:900
 msgid "Your account has been successfully created."
 msgstr "Votre compte a été créé."
 
-#: modules/websession/lib/websession_webinterface.py:889
+#: modules/websession/lib/websession_webinterface.py:901
 msgid "Account created"
 msgstr "Compte créé"
 
-#: modules/websession/lib/websession_webinterface.py:891
+#: modules/websession/lib/websession_webinterface.py:903
 msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
@@ -7064,7 +7064,7 @@ msgstr ""
 "Afin de confirmer sa validité, un email contenant une clé d'activation a été "
 "envoyée à l'adresse donnée."
 
-#: modules/websession/lib/websession_webinterface.py:892
+#: modules/websession/lib/websession_webinterface.py:904
 msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
@@ -7072,7 +7072,7 @@ msgstr ""
 "Veuillez y suivre les instructions précisées afin de terminer le processus "
 "de création du compte."
 
-#: modules/websession/lib/websession_webinterface.py:894
+#: modules/websession/lib/websession_webinterface.py:906
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -7080,42 +7080,42 @@ msgstr ""
 "Un deuxième email sera envoyé dès que le compte sera activé et pourra être "
 "utilisé."
 
-#: modules/websession/lib/websession_webinterface.py:897
+#: modules/websession/lib/websession_webinterface.py:909
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr ""
 "Vous pouvez désormais accéder à %(x_url_open)svotre compte%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:904
-#: modules/websession/lib/websession_webinterface.py:909
-#: modules/websession/lib/websession_webinterface.py:914
-#: modules/websession/lib/websession_webinterface.py:920
-#: modules/websession/lib/websession_webinterface.py:925
-#: modules/websession/lib/websession_webinterface.py:929
-#: modules/websession/lib/websession_webinterface.py:933
-#: modules/websession/lib/websession_webinterface.py:938
+#: modules/websession/lib/websession_webinterface.py:916
+#: modules/websession/lib/websession_webinterface.py:921
+#: modules/websession/lib/websession_webinterface.py:926
+#: modules/websession/lib/websession_webinterface.py:932
+#: modules/websession/lib/websession_webinterface.py:937
+#: modules/websession/lib/websession_webinterface.py:941
+#: modules/websession/lib/websession_webinterface.py:945
+#: modules/websession/lib/websession_webinterface.py:950
 msgid "Registration failure"
 msgstr "Échec lors de l'enregistrement"
 
-#: modules/websession/lib/websession_webinterface.py:922
+#: modules/websession/lib/websession_webinterface.py:934
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Le pseudonyme %s existe déjà dans la base de données."
 
-#: modules/websession/lib/websession_webinterface.py:927
+#: modules/websession/lib/websession_webinterface.py:939
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "Les utilisateurs ne peuvent pas s'enregistrer eux-mêmes; seul "
 "l'administrateur peut le faire."
 
-#: modules/websession/lib/websession_webinterface.py:931
+#: modules/websession/lib/websession_webinterface.py:943
 msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
 "Le site n'arrive pas à vous envoyer l'email de vérification de votre adresse."
 
-#: modules/websession/lib/websession_webinterface.py:931
+#: modules/websession/lib/websession_webinterface.py:943
 #: modules/websubmit/lib/websubmit_webinterface.py:141
 msgid ""
 "The error has been logged and will be taken in consideration as soon as "
@@ -7123,32 +7123,32 @@ msgid ""
 msgstr ""
 "L'erreur a été enregistrée et sera prise en considération dès que possible."
 
-#: modules/websession/lib/websession_webinterface.py:978
+#: modules/websession/lib/websession_webinterface.py:990
 msgid "Your tickets"
 msgstr "Vos tickets"
 
-#: modules/websession/lib/websession_webinterface.py:1014
-#: modules/websession/lib/websession_webinterface.py:1059
-#: modules/websession/lib/websession_webinterface.py:1120
-#: modules/websession/lib/websession_webinterface.py:1184
-#: modules/websession/lib/websession_webinterface.py:1243
-#: modules/websession/lib/websession_webinterface.py:1316
+#: modules/websession/lib/websession_webinterface.py:1026
+#: modules/websession/lib/websession_webinterface.py:1071
+#: modules/websession/lib/websession_webinterface.py:1132
+#: modules/websession/lib/websession_webinterface.py:1196
+#: modules/websession/lib/websession_webinterface.py:1255
+#: modules/websession/lib/websession_webinterface.py:1328
 msgid "You are not authorized to use groups."
 msgstr "Vous n'êtes pas autorisé à utiliser les groupes."
 
-#: modules/websession/lib/websession_webinterface.py:1145
+#: modules/websession/lib/websession_webinterface.py:1157
 msgid "Join New Group"
 msgstr "Adhérer à un groupe"
 
-#: modules/websession/lib/websession_webinterface.py:1199
+#: modules/websession/lib/websession_webinterface.py:1211
 msgid "Leave Group"
 msgstr "Quitter le groupe"
 
-#: modules/websession/lib/websession_webinterface.py:1271
+#: modules/websession/lib/websession_webinterface.py:1283
 msgid "Edit Group"
 msgstr "Éditer un groupe"
 
-#: modules/websession/lib/websession_webinterface.py:1345
+#: modules/websession/lib/websession_webinterface.py:1357
 msgid "Edit group members"
 msgstr "Éditer les membres du groupe"
 

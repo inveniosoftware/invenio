@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.6\n"
+"Project-Id-Version: Invenio 1.0.7\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2014-01-31 15:12+0100\n"
+"POT-Creation-Date: 2014-08-31 21:44+0200\n"
 "PO-Revision-Date: 2010-07-27 15:13+0100\n"
 "Last-Translator: Nino Jejelava <nino.jejelava@gmail.com>\n"
 "Language-Team: KA <info@invenio-software.org>\n"
@@ -1533,9 +1533,9 @@ msgstr "სახელი"
 #: modules/bibformat/lib/bibformat_templates.py:930
 #: modules/bibformat/lib/bibformat_templates.py:1055
 #: modules/webbasket/lib/webbasket_templates.py:1247
-#: modules/websession/lib/websession_templates.py:1510
-#: modules/websession/lib/websession_templates.py:1584
-#: modules/websession/lib/websession_templates.py:1647
+#: modules/websession/lib/websession_templates.py:1525
+#: modules/websession/lib/websession_templates.py:1599
+#: modules/websession/lib/websession_templates.py:1662
 #: modules/websubmit/lib/websubmit_managedocfiles.py:372
 #: modules/bibcirculation/lib/bibcirculation_templates.py:291
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2868
@@ -1864,10 +1864,10 @@ msgstr "გამავლი ფორმატის წაშლა"
 #: modules/webbasket/lib/webbasket_templates.py:1733
 #: modules/webbasket/lib/webbasket_templates.py:2803
 #: modules/webbasket/lib/webbasket_templates.py:3607
-#: modules/websession/lib/websession_templates.py:1787
-#: modules/websession/lib/websession_templates.py:1895
-#: modules/websession/lib/websession_templates.py:2097
-#: modules/websession/lib/websession_templates.py:2180
+#: modules/websession/lib/websession_templates.py:1802
+#: modules/websession/lib/websession_templates.py:1910
+#: modules/websession/lib/websession_templates.py:2112
+#: modules/websession/lib/websession_templates.py:2195
 #: modules/websubmit/lib/websubmit_managedocfiles.py:846
 #: modules/websubmit/lib/websubmit_templates.py:2526
 #: modules/websubmit/lib/websubmit_templates.py:2589
@@ -2093,9 +2093,9 @@ msgstr "დრო"
 #: modules/bibupload/lib/batchuploader_templates.py:173
 #: modules/bibupload/lib/batchuploader_templates.py:355
 #: modules/bibupload/lib/batchuploader_templates.py:361
-#: modules/websession/lib/websession_templates.py:160
 #: modules/websession/lib/websession_templates.py:163
-#: modules/websession/lib/websession_templates.py:1035
+#: modules/websession/lib/websession_templates.py:166
+#: modules/websession/lib/websession_templates.py:1050
 msgid "Example"
 msgstr "მაგალითი"
 
@@ -2265,7 +2265,7 @@ msgstr "ჯგუფური ამტვირთავი: სერვის
 #: modules/webbasket/lib/webbasket.py:181
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
-#: modules/websession/lib/webuser.py:304
+#: modules/websession/lib/webuser.py:306
 #: modules/webstyle/lib/webstyle_templates.py:577
 msgid "N/A"
 msgstr "არ არის ხელმისაწვდომი"
@@ -2573,24 +2573,24 @@ msgid "Need human intervention?  Contact"
 msgstr "გჭირდებათ ადამიანთან დაკავშირება? დაგვიკავშირდით"
 
 #: modules/webaccess/lib/access_control_config.py:262
-#: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:889 modules/websession/lib/webuser.py:898
-#: modules/websession/lib/webuser.py:899
+#: modules/websession/lib/websession_templates.py:1102
+#: modules/websession/lib/webuser.py:891 modules/websession/lib/webuser.py:900
+#: modules/websession/lib/webuser.py:901
 msgid "Run Record Editor"
 msgstr "ჩანაწერის ედიტორის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:263
-#: modules/websession/lib/websession_templates.py:1089
+#: modules/websession/lib/websession_templates.py:1104
 msgid "Run Multi-Record Editor"
 msgstr "მულტი-ჩანაწერის ედიტორის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:890
+#: modules/websession/lib/webuser.py:892
 msgid "Run Document File Manager"
 msgstr "დოკუმენტის ფაილ მენეჯერის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:265
-#: modules/websession/lib/websession_templates.py:1093
+#: modules/websession/lib/websession_templates.py:1108
 msgid "Run Record Merger"
 msgstr "ჩანაწერის შემაერთებლის გაშვება"
 
@@ -2600,67 +2600,67 @@ msgid "Run BibSword client"
 msgstr "BibCirculation -ის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:267
-#: modules/websession/lib/websession_templates.py:1101
+#: modules/websession/lib/websession_templates.py:1116
 msgid "Configure BibKnowledge"
 msgstr "BibKnowledge -ის კონფიგურაცია"
 
 #: modules/webaccess/lib/access_control_config.py:268
-#: modules/websession/lib/websession_templates.py:1099
+#: modules/websession/lib/websession_templates.py:1114
 msgid "Configure BibFormat"
 msgstr "BibFormat -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:269
-#: modules/websession/lib/websession_templates.py:1103
+#: modules/websession/lib/websession_templates.py:1118
 msgid "Configure OAI Harvest"
 msgstr "OAI მოგროვების კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:270
-#: modules/websession/lib/websession_templates.py:1105
+#: modules/websession/lib/websession_templates.py:1120
 msgid "Configure OAI Repository"
 msgstr "OAI რეპოსიტორის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:271
-#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1122
 msgid "Configure BibIndex"
 msgstr "BibIndex -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:272
-#: modules/websession/lib/websession_templates.py:1109
+#: modules/websession/lib/websession_templates.py:1124
 msgid "Configure BibRank"
 msgstr "BibRank -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:273
-#: modules/websession/lib/websession_templates.py:1111
+#: modules/websession/lib/websession_templates.py:1126
 msgid "Configure WebAccess"
 msgstr "WebAccess -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:274
-#: modules/websession/lib/websession_templates.py:1113
+#: modules/websession/lib/websession_templates.py:1128
 msgid "Configure WebComment"
 msgstr "WebComment -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:275
-#: modules/websession/lib/websession_templates.py:1117
+#: modules/websession/lib/websession_templates.py:1132
 msgid "Configure WebSearch"
 msgstr "WebSearch -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:276
-#: modules/websession/lib/websession_templates.py:1119
+#: modules/websession/lib/websession_templates.py:1134
 msgid "Configure WebSubmit"
 msgstr "WebSubmit -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:277
-#: modules/websession/lib/websession_templates.py:1115
+#: modules/websession/lib/websession_templates.py:1130
 msgid "Configure WebJournal"
 msgstr "WebJournal -ის კონფიგურება"
 
 #: modules/webaccess/lib/access_control_config.py:278
-#: modules/websession/lib/websession_templates.py:1091
+#: modules/websession/lib/websession_templates.py:1106
 msgid "Run BibCirculation"
 msgstr "BibCirculation -ის გაშვება"
 
 #: modules/webaccess/lib/access_control_config.py:279
-#: modules/websession/lib/websession_templates.py:1097
+#: modules/websession/lib/websession_templates.py:1112
 msgid "Run Batch Uploader"
 msgstr "ჯგუფური ამტვირთავის გაშვება"
 
@@ -2940,8 +2940,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:509
-#: modules/websession/lib/websession_templates.py:2221
-#: modules/websession/lib/websession_templates.py:2261
+#: modules/websession/lib/websession_templates.py:2236
+#: modules/websession/lib/websession_templates.py:2276
 msgid "No"
 msgstr "არა"
 
@@ -3048,8 +3048,8 @@ msgid "Popular Searches"
 msgstr "პოპულარული ძიებები"
 
 #: modules/webalert/lib/webalert_webinterface.py:81
-#: modules/websession/lib/websession_templates.py:456
-#: modules/websession/lib/websession_templates.py:616
+#: modules/websession/lib/websession_templates.py:471
+#: modules/websession/lib/websession_templates.py:631
 msgid "Your Searches"
 msgstr "თქვენი ძებნა"
 
@@ -3072,24 +3072,24 @@ msgstr "თქვენი ძებნა"
 #: modules/webbasket/lib/webbasket_webinterface.py:1123
 #: modules/webbasket/lib/webbasket_webinterface.py:1220
 #: modules/webmessage/lib/webmessage_templates.py:466
-#: modules/websession/lib/websession_templates.py:602
-#: modules/websession/lib/websession_templates.py:2334
-#: modules/websession/lib/websession_webinterface.py:215
-#: modules/websession/lib/websession_webinterface.py:237
-#: modules/websession/lib/websession_webinterface.py:279
-#: modules/websession/lib/websession_webinterface.py:521
-#: modules/websession/lib/websession_webinterface.py:544
-#: modules/websession/lib/websession_webinterface.py:572
-#: modules/websession/lib/websession_webinterface.py:588
-#: modules/websession/lib/websession_webinterface.py:640
-#: modules/websession/lib/websession_webinterface.py:663
-#: modules/websession/lib/websession_webinterface.py:689
-#: modules/websession/lib/websession_webinterface.py:755
-#: modules/websession/lib/websession_webinterface.py:804
-#: modules/websession/lib/websession_webinterface.py:839
-#: modules/websession/lib/websession_webinterface.py:870
-#: modules/websession/lib/websession_webinterface.py:942
-#: modules/websession/lib/websession_webinterface.py:980
+#: modules/websession/lib/websession_templates.py:617
+#: modules/websession/lib/websession_templates.py:2349
+#: modules/websession/lib/websession_webinterface.py:214
+#: modules/websession/lib/websession_webinterface.py:236
+#: modules/websession/lib/websession_webinterface.py:282
+#: modules/websession/lib/websession_webinterface.py:533
+#: modules/websession/lib/websession_webinterface.py:556
+#: modules/websession/lib/websession_webinterface.py:584
+#: modules/websession/lib/websession_webinterface.py:600
+#: modules/websession/lib/websession_webinterface.py:652
+#: modules/websession/lib/websession_webinterface.py:675
+#: modules/websession/lib/websession_webinterface.py:701
+#: modules/websession/lib/websession_webinterface.py:767
+#: modules/websession/lib/websession_webinterface.py:816
+#: modules/websession/lib/websession_webinterface.py:851
+#: modules/websession/lib/websession_webinterface.py:882
+#: modules/websession/lib/websession_webinterface.py:954
+#: modules/websession/lib/websession_webinterface.py:992
 #: modules/websubmit/web/publiline.py:133
 #: modules/websubmit/web/publiline.py:154
 #: modules/websubmit/web/yourapprovals.py:91
@@ -3114,18 +3114,18 @@ msgstr "%s პერსონალიზაცია, ნაჩვენებ�
 #: modules/webalert/lib/webalert_webinterface.py:475
 #: modules/webalert/lib/webalert_webinterface.py:523
 #: modules/webalert/lib/webalert_webinterface.py:551
-#: modules/websession/lib/websession_webinterface.py:218
-#: modules/websession/lib/websession_webinterface.py:240
-#: modules/websession/lib/websession_webinterface.py:281
-#: modules/websession/lib/websession_webinterface.py:523
-#: modules/websession/lib/websession_webinterface.py:546
-#: modules/websession/lib/websession_webinterface.py:575
-#: modules/websession/lib/websession_webinterface.py:591
-#: modules/websession/lib/websession_webinterface.py:609
-#: modules/websession/lib/websession_webinterface.py:619
-#: modules/websession/lib/websession_webinterface.py:642
-#: modules/websession/lib/websession_webinterface.py:665
-#: modules/websession/lib/websession_webinterface.py:691
+#: modules/websession/lib/websession_webinterface.py:217
+#: modules/websession/lib/websession_webinterface.py:239
+#: modules/websession/lib/websession_webinterface.py:284
+#: modules/websession/lib/websession_webinterface.py:535
+#: modules/websession/lib/websession_webinterface.py:558
+#: modules/websession/lib/websession_webinterface.py:587
+#: modules/websession/lib/websession_webinterface.py:603
+#: modules/websession/lib/websession_webinterface.py:621
+#: modules/websession/lib/websession_webinterface.py:631
+#: modules/websession/lib/websession_webinterface.py:654
+#: modules/websession/lib/websession_webinterface.py:677
+#: modules/websession/lib/websession_webinterface.py:703
 #, python-format
 msgid "%s, personalize"
 msgstr "%s, პერსონოლიზაცია"
@@ -3172,7 +3172,7 @@ msgid "%s Personalize, Modify alert settings"
 msgstr "%s პერსონალიზაცია, შეტყობინების პარამეტრების შეცვლა"
 
 #: modules/webalert/lib/webalert_webinterface.py:314
-#: modules/websession/lib/websession_templates.py:473
+#: modules/websession/lib/websession_templates.py:488
 msgid "Your Alerts"
 msgstr "თქვენი შეტყობინებები"
 
@@ -3215,8 +3215,8 @@ msgid "Others' baskets"
 msgstr "სხვისი კალათები"
 
 #: modules/webbasket/lib/webbasket.py:2100
-#: modules/websession/lib/websession_templates.py:464
-#: modules/websession/lib/websession_templates.py:610
+#: modules/websession/lib/websession_templates.py:479
+#: modules/websession/lib/websession_templates.py:625
 msgid "Your Baskets"
 msgstr "თქვენი კალათები"
 
@@ -3521,8 +3521,8 @@ msgstr "თქვენ გაქვთ %i შეტყობინება ა
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:508
-#: modules/websession/lib/websession_templates.py:2220
-#: modules/websession/lib/websession_templates.py:2260
+#: modules/websession/lib/websession_templates.py:2235
+#: modules/websession/lib/websession_templates.py:2275
 msgid "Yes"
 msgstr "დიახ"
 
@@ -3634,7 +3634,7 @@ msgid "Sharing basket to a new group"
 msgstr "კალათის გაზიარება ახალ ჯგუფთან."
 
 #: modules/webbasket/lib/webbasket_templates.py:1756
-#: modules/websession/lib/websession_templates.py:507
+#: modules/websession/lib/websession_templates.py:522
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
@@ -3644,7 +3644,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1757
 #: modules/webbasket/lib/webbasket_templates.py:1772
-#: modules/websession/lib/websession_templates.py:510
+#: modules/websession/lib/websession_templates.py:525
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
@@ -3653,7 +3653,7 @@ msgstr ""
 "%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1771
-#: modules/websession/lib/websession_webinterface.py:262
+#: modules/websession/lib/websession_webinterface.py:261
 msgid "This functionality is forbidden to guest users."
 msgstr "ეს ფუნქციები აკრძალულია უცხო მომხმარებლებისათვის."
 
@@ -3859,10 +3859,10 @@ msgstr "განხილულია %(x_nickname)s ის მიერ %(x_da
 
 #: modules/webbasket/lib/webbasket_templates.py:2885
 #: modules/webbasket/lib/webbasket_templates.py:3684
-#: modules/websession/lib/websession_templates.py:164
-#: modules/websession/lib/websession_templates.py:213
-#: modules/websession/lib/websession_templates.py:912
-#: modules/websession/lib/websession_templates.py:1036
+#: modules/websession/lib/websession_templates.py:167
+#: modules/websession/lib/websession_templates.py:218
+#: modules/websession/lib/websession_templates.py:927
+#: modules/websession/lib/websession_templates.py:1051
 msgid "Note"
 msgstr "შენიშვნა"
 
@@ -4391,8 +4391,8 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1533
 #: modules/webcomment/lib/webcomment_templates.py:1562
-#: modules/websession/lib/websession_templates.py:157
-#: modules/websession/lib/websession_templates.py:1031
+#: modules/websession/lib/websession_templates.py:159
+#: modules/websession/lib/websession_templates.py:1046
 msgid "Nickname"
 msgstr "მეტსახელი"
 
@@ -4702,7 +4702,7 @@ msgstr "ვებკომენტირების ადმინისტ�
 #: modules/webcomment/web/admin/webcommentadmin.py:273
 #: modules/websearch/lib/websearch_webinterface.py:969
 #: modules/websearch/web/admin/websearchadmin.py:1040
-#: modules/websession/lib/websession_webinterface.py:936
+#: modules/websession/lib/websession_webinterface.py:948
 #: modules/webstyle/lib/webstyle_templates.py:583
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
@@ -4798,7 +4798,7 @@ msgstr "თქვენი წერილი გაგზავნილია.
 #: modules/webmessage/lib/webmessage_webinterface.py:87
 #: modules/webmessage/lib/webmessage_webinterface.py:318
 #: modules/webmessage/lib/webmessage_webinterface.py:366
-#: modules/websession/lib/websession_templates.py:604
+#: modules/websession/lib/websession_templates.py:619
 msgid "Your Messages"
 msgstr "თქვენი წერილები"
 
@@ -4918,7 +4918,7 @@ msgid "No matching user"
 msgstr "მომხმარებელი არ ემთხვევა"
 
 #: modules/webmessage/lib/webmessage_templates.py:624
-#: modules/websession/lib/websession_templates.py:1825
+#: modules/websession/lib/websession_templates.py:1840
 msgid "No matching group"
 msgstr "ჯგუფი არ ემთხვევა"
 
@@ -5663,7 +5663,7 @@ msgstr ""
 msgid "No queries found"
 msgstr "მოთხოვნები ვერ მოიძებნა"
 
-#: modules/websession/lib/webaccount.py:366
+#: modules/websession/lib/webaccount.py:371
 msgid ""
 "This collection is restricted.  If you think you have right to access it, "
 "please authenticate yourself."
@@ -5671,7 +5671,7 @@ msgstr ""
 "ეს აკრძალული კოლექციაა. თუ თვლით რომ გაქვთ უფლებები მისი ნახვის გთხოვთ "
 "გაიაროთ ავტორიზაცია."
 
-#: modules/websession/lib/webaccount.py:367
+#: modules/websession/lib/webaccount.py:372
 msgid ""
 "This file is restricted.  If you think you have right to access it, please "
 "authenticate yourself."
@@ -5696,7 +5696,7 @@ msgstr ""
 msgid "External user groups"
 msgstr "გარე მომხმარებელთა ჯგუფი."
 
-#: modules/websession/lib/websession_templates.py:155
+#: modules/websession/lib/websession_templates.py:157
 msgid ""
 "If you want to change your email or set for the first time your nickname, "
 "please set new values in the form below."
@@ -5704,25 +5704,25 @@ msgstr ""
 "თუ გნებავთ თქვენი ელფოსტის შეცვლა ან მეტსახელის პირველად არცჰევა, გთხოვთ "
 "შეიყვანოთ ახალი მნიშვნელობები ქვემოთ."
 
-#: modules/websession/lib/websession_templates.py:156
+#: modules/websession/lib/websession_templates.py:158
 msgid "Edit login credentials"
 msgstr "შესვლის პარამეტრების შეცვლა"
 
-#: modules/websession/lib/websession_templates.py:161
+#: modules/websession/lib/websession_templates.py:164
 msgid "New email address"
 msgstr "ახალი ელფოსტა"
 
-#: modules/websession/lib/websession_templates.py:162
-#: modules/websession/lib/websession_templates.py:209
-#: modules/websession/lib/websession_templates.py:1033
+#: modules/websession/lib/websession_templates.py:165
+#: modules/websession/lib/websession_templates.py:213
+#: modules/websession/lib/websession_templates.py:1048
 msgid "mandatory"
 msgstr "აუცილებელი"
 
-#: modules/websession/lib/websession_templates.py:165
+#: modules/websession/lib/websession_templates.py:168
 msgid "Set new values"
 msgstr "ახალი მნიშვნელობების მინიჭება"
 
-#: modules/websession/lib/websession_templates.py:169
+#: modules/websession/lib/websession_templates.py:172
 msgid ""
 "Since this is considered as a signature for comments and reviews, once set "
 "it can not be changed."
@@ -5730,7 +5730,7 @@ msgstr ""
 "რადგან ეს წარმოადგენს კომენტარების და მიმოხილვების იდენტიფიკატორს, მისი "
 "შემდგომი შეცვლა შეუძლებელია."
 
-#: modules/websession/lib/websession_templates.py:208
+#: modules/websession/lib/websession_templates.py:212
 msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
@@ -5738,37 +5738,37 @@ msgstr ""
 "თუ გსურთ პაროლის შეცვლა, გთხოვთ ჩაწეროთ ძველი და მიუთითოთ ახალი "
 "მნიშვნელობები ფორმას ქვემოთ."
 
-#: modules/websession/lib/websession_templates.py:210
+#: modules/websession/lib/websession_templates.py:214
 msgid "Old password"
 msgstr "ძველი პაროლი"
 
-#: modules/websession/lib/websession_templates.py:211
+#: modules/websession/lib/websession_templates.py:215
 msgid "New password"
 msgstr "ახალი პაროლი"
 
-#: modules/websession/lib/websession_templates.py:212
-#: modules/websession/lib/websession_templates.py:1034
+#: modules/websession/lib/websession_templates.py:217
+#: modules/websession/lib/websession_templates.py:1049
 msgid "optional"
 msgstr "არასავალდებულო"
 
-#: modules/websession/lib/websession_templates.py:214
-#: modules/websession/lib/websession_templates.py:1037
+#: modules/websession/lib/websession_templates.py:219
+#: modules/websession/lib/websession_templates.py:1052
 msgid "The password phrase may contain punctuation, spaces, etc."
 msgstr "პაროლი შეიძლება შეიცავდეს პუნქტუაციას, ცარიელ სივრცეს და ა.შ."
 
-#: modules/websession/lib/websession_templates.py:215
+#: modules/websession/lib/websession_templates.py:220
 msgid "You must fill the old password in order to set a new one."
 msgstr "თქვენ ჯერ უნდა ჩაწეროთ ძველი პაროლი, რომ დააყენოთ ახალი."
 
-#: modules/websession/lib/websession_templates.py:216
+#: modules/websession/lib/websession_templates.py:221
 msgid "Retype password"
 msgstr "ხელახლა ჩაწერეთ პაროლი"
 
-#: modules/websession/lib/websession_templates.py:217
+#: modules/websession/lib/websession_templates.py:222
 msgid "Set new password"
 msgstr "ახალი პაროლის დაყენება"
 
-#: modules/websession/lib/websession_templates.py:222
+#: modules/websession/lib/websession_templates.py:227
 #, python-format
 msgid ""
 "If you are using a lightweight CERN account you can\n"
@@ -5777,7 +5777,7 @@ msgstr ""
 "თუ თქვენ იყენებთ ცერნის მსუბუქ ანგარიშს\n"
 "                %(x_url_open)sგადატვირთეთ პაროლი%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:228
+#: modules/websession/lib/websession_templates.py:233
 #, python-format
 msgid ""
 "You can change or reset your CERN account password by means of the "
@@ -5786,67 +5786,67 @@ msgstr ""
 "თქვენ შეგიძიათ გადატვირთოთ თქვენი ცერნის პაროლი  %(x_url_open)s ცერნის "
 "ანგარიშების სისტემის გამოყენებით %(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:252
+#: modules/websession/lib/websession_templates.py:259
 msgid "Edit cataloging interface settings"
 msgstr "შეასწორეთ კატალოგირების ინტერფეისის თვისებები"
 
-#: modules/websession/lib/websession_templates.py:253
-#: modules/websession/lib/websession_templates.py:897
+#: modules/websession/lib/websession_templates.py:260
+#: modules/websession/lib/websession_templates.py:912
 msgid "Username"
 msgstr "მომხმარებლის სახელი"
 
-#: modules/websession/lib/websession_templates.py:254
-#: modules/websession/lib/websession_templates.py:898
-#: modules/websession/lib/websession_templates.py:1032
+#: modules/websession/lib/websession_templates.py:261
+#: modules/websession/lib/websession_templates.py:913
+#: modules/websession/lib/websession_templates.py:1047
 msgid "Password"
 msgstr "პაროლი"
 
-#: modules/websession/lib/websession_templates.py:255
-#: modules/websession/lib/websession_templates.py:281
-#: modules/websession/lib/websession_templates.py:315
+#: modules/websession/lib/websession_templates.py:262
+#: modules/websession/lib/websession_templates.py:289
+#: modules/websession/lib/websession_templates.py:325
 msgid "Update settings"
 msgstr "პარამეტრების განახლება"
 
-#: modules/websession/lib/websession_templates.py:269
+#: modules/websession/lib/websession_templates.py:277
 msgid "Edit language-related settings"
 msgstr "შეასწორეთ ენასთან დაკავშირებული პარამეტრები"
 
-#: modules/websession/lib/websession_templates.py:280
+#: modules/websession/lib/websession_templates.py:288
 msgid "Select desired language of the web interface."
 msgstr "აირჩიეთ ვებ ინტერფეისისთვის სასურველი ენა."
 
-#: modules/websession/lib/websession_templates.py:298
+#: modules/websession/lib/websession_templates.py:307
 msgid "Edit search-related settings"
 msgstr "შეასწორეთ ძიებასთან დაკავშირებული პარამეტრები"
 
-#: modules/websession/lib/websession_templates.py:299
+#: modules/websession/lib/websession_templates.py:308
 msgid "Show the latest additions box"
 msgstr "მაჩვენე უკანასკნელი დამატების ველი"
 
-#: modules/websession/lib/websession_templates.py:301
+#: modules/websession/lib/websession_templates.py:310
 msgid "Show collection help boxes"
 msgstr "მაჩვენე კოლექციების დამხმარე ველი"
 
-#: modules/websession/lib/websession_templates.py:316
+#: modules/websession/lib/websession_templates.py:326
 msgid "Number of search results per page"
 msgstr "შედეგების რაოდენობა თვითოეული გვერდისათვის"
 
-#: modules/websession/lib/websession_templates.py:346
+#: modules/websession/lib/websession_templates.py:359
 msgid "Edit login method"
 msgstr "შესვლის მეთოდის შესწორება"
 
-#: modules/websession/lib/websession_templates.py:347
+#: modules/websession/lib/websession_templates.py:360
 msgid ""
 "Please select which login method you would like to use to authenticate "
 "yourself"
 msgstr "გთხოვთ აირჩიოთ შესვლის მეთოდი რომელიც მოგწონთ თქვენი ავტორიზებისათვის"
 
-#: modules/websession/lib/websession_templates.py:348
-#: modules/websession/lib/websession_templates.py:362
+#: modules/websession/lib/websession_templates.py:361
+#: modules/websession/lib/websession_templates.py:376
 msgid "Select method"
 msgstr "აირჩიეთ მეთოდი"
 
-#: modules/websession/lib/websession_templates.py:380
+#: modules/websession/lib/websession_templates.py:395
 #, python-format
 msgid ""
 "If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
@@ -5857,16 +5857,16 @@ msgstr ""
 "%(x_fmt_close)s, მაშინ გთხოვთ შეიყვანოთ თქვენი ელფოსტის მისამართი ქვემოთ "
 "მოცემულ ფორმაში, რომ გამოგიგზავნოთ წერილი პაროლის გადასატვირთად."
 
-#: modules/websession/lib/websession_templates.py:402
-#: modules/websession/lib/websession_templates.py:1030
+#: modules/websession/lib/websession_templates.py:417
+#: modules/websession/lib/websession_templates.py:1045
 msgid "Email address"
 msgstr "ელფოსტის მისამართი"
 
-#: modules/websession/lib/websession_templates.py:403
+#: modules/websession/lib/websession_templates.py:418
 msgid "Send password reset link"
 msgstr "გაგზავნე პაროლის გადასატვირთი ბმული"
 
-#: modules/websession/lib/websession_templates.py:407
+#: modules/websession/lib/websession_templates.py:422
 #, python-format
 msgid ""
 "If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
@@ -5877,7 +5877,7 @@ msgstr ""
 "%(x_fmt_close)s, თქვენ შეგიძლიათ აღადგინოთ თქვენი პაროლი "
 "%(x_url_open)sცერნის ავტორიზაციის სისტემით%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:410
+#: modules/websession/lib/websession_templates.py:425
 msgid ""
 "Note that if you have been using an external login system, then we cannot do "
 "anything and you have to ask there."
@@ -5885,7 +5885,7 @@ msgstr ""
 "გთხოვთ გაითვალისწინოთ რომ, თუ თქვენ იყენებდით გარე სისტემას, თქვენ უნდა "
 "მიმართოთ მის ადმინისტრატორს."
 
-#: modules/websession/lib/websession_templates.py:411
+#: modules/websession/lib/websession_templates.py:426
 #, python-format
 msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
@@ -5894,7 +5894,7 @@ msgstr ""
 "ან თქვენ შეგიძლიათ თხოვოთ %s -ს რომ შეცვალოს თქვენი ავტორიზაციის სისტემა "
 "გარედან შიდაზე."
 
-#: modules/websession/lib/websession_templates.py:438
+#: modules/websession/lib/websession_templates.py:453
 #, python-format
 msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
@@ -5905,12 +5905,12 @@ msgstr ""
 "დოკუმენტები, ან დააყენოთ ავტომატური შეტყობინება რომელიც გაუწყებთ ძიების "
 "შედეგებში ცვლილებებს."
 
-#: modules/websession/lib/websession_templates.py:448
-#: modules/websession/lib/websession_webinterface.py:275
+#: modules/websession/lib/websession_templates.py:463
+#: modules/websession/lib/websession_webinterface.py:277
 msgid "Your Settings"
 msgstr "თქვენი პარამეტრები"
 
-#: modules/websession/lib/websession_templates.py:449
+#: modules/websession/lib/websession_templates.py:464
 msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
@@ -5918,11 +5918,11 @@ msgstr ""
 "დააყენეთ ან შეცვალეთ თქვენი ანგარიშის ელფოსტის მისამართი ან პაროლი. მიუთითეთ "
 "თქვენი პარამეტრები ინტერფეისის შესაცვლელად."
 
-#: modules/websession/lib/websession_templates.py:457
+#: modules/websession/lib/websession_templates.py:472
 msgid "View all the searches you performed during the last 30 days."
 msgstr "იხილეთ ყველა ძიება რომელიც განახორციელეთ ბოლო 30 დღის განმავლობაში."
 
-#: modules/websession/lib/websession_templates.py:465
+#: modules/websession/lib/websession_templates.py:480
 msgid ""
 "With baskets you can define specific collections of items, store interesting "
 "records you want to access later or share with others."
@@ -5931,7 +5931,7 @@ msgstr ""
 "შეინახოთ საინტერესო ჩანაწერები რომელიც გნებავთ რომ მომავალში იხილოთ ან "
 "გაუზიაროთ მეგობარს."
 
-#: modules/websession/lib/websession_templates.py:474
+#: modules/websession/lib/websession_templates.py:489
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
@@ -5940,13 +5940,13 @@ msgstr ""
 "შედეგები შეიძლება გამოგზავნილი იყოს თქვენს ელფოსტაზე ან შენახული იყოს თქვენ "
 "კალათებში."
 
-#: modules/websession/lib/websession_templates.py:483
-#: modules/websession/lib/websession_templates.py:607
+#: modules/websession/lib/websession_templates.py:498
+#: modules/websession/lib/websession_templates.py:622
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:116
 msgid "Your Loans"
 msgstr "თქვენი სესხები"
 
-#: modules/websession/lib/websession_templates.py:484
+#: modules/websession/lib/websession_templates.py:499
 msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
@@ -5954,7 +5954,7 @@ msgstr ""
 "შეამოწმეთ წიგნები რომელიც გამოტანილი გაქვთ, დაამატეთ წიგნის გამოტანის "
 "მოთხოვნა, და ა.შ. მოითხოვება თქვენი ცერნის საიდენტიფიკაციო."
 
-#: modules/websession/lib/websession_templates.py:509
+#: modules/websession/lib/websession_templates.py:524
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
@@ -5962,7 +5962,7 @@ msgstr ""
 "თქვენ შემოსული ხართ როგორც სტუმარი, ამიტომ თქვენი შეტყობინებები წაიშლება ამ "
 "სესიის დამთავრების შემდეგ."
 
-#: modules/websession/lib/websession_templates.py:532
+#: modules/websession/lib/websession_templates.py:547
 #, python-format
 msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
@@ -5973,11 +5973,11 @@ msgstr ""
 "%(x_url1_open)sგამოსვლა%(x_url1_close)s; ბ) შეასწოროთ თქვენი "
 "%(x_url2_open)sანგარიშის პარამეტრები%(x_url2_close)s."
 
-#: modules/websession/lib/websession_templates.py:613
+#: modules/websession/lib/websession_templates.py:628
 msgid "Your Alert Searches"
 msgstr "თქვენი ძიების შეტყობინებანი"
 
-#: modules/websession/lib/websession_templates.py:619
+#: modules/websession/lib/websession_templates.py:634
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
@@ -5986,13 +5986,13 @@ msgstr ""
 "თქვენ შეგიძლიათ იხილოთ სია %(x_url_open)sთქვენი ჯგუფების%(x_url_close)s "
 "რომლებსაც თქვენ განაგებთ ან გაწევრიანებული ხართ."
 
-#: modules/websession/lib/websession_templates.py:622
-#: modules/websession/lib/websession_templates.py:2332
-#: modules/websession/lib/websession_webinterface.py:1019
+#: modules/websession/lib/websession_templates.py:637
+#: modules/websession/lib/websession_templates.py:2347
+#: modules/websession/lib/websession_webinterface.py:1031
 msgid "Your Groups"
 msgstr "თქვენი ჯგუფი "
 
-#: modules/websession/lib/websession_templates.py:625
+#: modules/websession/lib/websession_templates.py:640
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
@@ -6001,12 +6001,12 @@ msgstr ""
 "თქვენ შეგიძლიათ იხილოთ თქვენი%(x_url_open)sწარდგინებების სია%(x_url_close)s "
 "და შეამოწმოთ მათი სტატუსი."
 
-#: modules/websession/lib/websession_templates.py:628
+#: modules/websession/lib/websession_templates.py:643
 #: modules/websubmit/web/yoursubmissions.py:160
 msgid "Your Submissions"
 msgstr "თქვენი  წარდგენები"
 
-#: modules/websession/lib/websession_templates.py:631
+#: modules/websession/lib/websession_templates.py:646
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
@@ -6015,33 +6015,33 @@ msgstr ""
 "თქვენ შეგიძლიათ იხილოთ%(x_url_open)sთქვენი დასტურების სია%(x_url_close)s "
 "დოკუმენტებზე რომლებიც დაადასტურეთ ან მიმართეთ."
 
-#: modules/websession/lib/websession_templates.py:634
+#: modules/websession/lib/websession_templates.py:649
 #: modules/websubmit/web/yourapprovals.py:88
 msgid "Your Approvals"
 msgstr "თქვენი დასტური"
 
-#: modules/websession/lib/websession_templates.py:638
+#: modules/websession/lib/websession_templates.py:653
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
 msgstr ""
 "თქვენ შეგიძლიათ იხილოთ %(x_url_open)sთქვენი ბილეთების სია%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:641
+#: modules/websession/lib/websession_templates.py:656
 msgid "Your Tickets"
 msgstr "თქვენი ბილეთები"
 
-#: modules/websession/lib/websession_templates.py:643
-#: modules/websession/lib/websession_webinterface.py:638
+#: modules/websession/lib/websession_templates.py:658
+#: modules/websession/lib/websession_webinterface.py:650
 msgid "Your Administrative Activities"
 msgstr "თქვენი ადმინისტრაციული აქტივობა"
 
-#: modules/websession/lib/websession_templates.py:670
+#: modules/websession/lib/websession_templates.py:685
 #: modules/bibharvest/lib/oai_harvest_admin.py:429
 #: modules/bibharvest/lib/oai_harvest_admin.py:444
 msgid "Try again"
 msgstr "სცადეთ კიდევ ერთხელ "
 
-#: modules/websession/lib/websession_templates.py:692
+#: modules/websession/lib/websession_templates.py:707
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -6052,26 +6052,26 @@ msgstr ""
 "პაროლის აღსადგენად %(x_sitename)s\n"
 "შემდეგი ანგარიშისთვის \"%(x_email)s\"."
 
-#: modules/websession/lib/websession_templates.py:700
+#: modules/websession/lib/websession_templates.py:715
 msgid "If you want to reset the password for this account, please go to:"
 msgstr ""
 "თუ თქვენ გსურთ გადატვირთოთ ამ ანგარიშთან დაკავშირებული თქვენი პაროლი გთხოვთ "
 "მიმართოთ:"
 
-#: modules/websession/lib/websession_templates.py:706
-#: modules/websession/lib/websession_templates.py:743
+#: modules/websession/lib/websession_templates.py:721
+#: modules/websession/lib/websession_templates.py:758
 msgid "in order to confirm the validity of this request."
 msgstr "იმისათვის რომ დაადასტუროთ ეს მოთხოვნა"
 
-#: modules/websession/lib/websession_templates.py:707
-#: modules/websession/lib/websession_templates.py:744
+#: modules/websession/lib/websession_templates.py:722
+#: modules/websession/lib/websession_templates.py:759
 #, python-format
 msgid ""
 "Please note that this URL will remain valid for about %(days)s days only."
 msgstr ""
 "გთხოვთ გაითვალისწინოთ რომ ეს მისამართი ძალაში იქნება დაახლოებით %(days)s დღე."
 
-#: modules/websession/lib/websession_templates.py:729
+#: modules/websession/lib/websession_templates.py:744
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -6082,25 +6082,25 @@ msgstr ""
 "რეგისტრაცია %(x_sitename)s -ზე \n"
 "შემდეგი ელფოსტებისათვის \"%(x_email)s\"."
 
-#: modules/websession/lib/websession_templates.py:737
+#: modules/websession/lib/websession_templates.py:752
 msgid "If you want to complete this account registration, please go to:"
 msgstr ""
 "თუ თქვენ გსურთ საბოლოო რეგისტრაცია თქვენი ანგარიშის, გთხოვთ გადახვიდეთ:"
 
-#: modules/websession/lib/websession_templates.py:763
+#: modules/websession/lib/websession_templates.py:778
 #, python-format
 msgid "Okay, a password reset link has been emailed to %s."
 msgstr "კარგი, თქვენი პაროლის გადასატვირთი ბმული გამოგზავნილი %s -ზე."
 
-#: modules/websession/lib/websession_templates.py:778
+#: modules/websession/lib/websession_templates.py:793
 msgid "Deleting your account"
 msgstr "თქვენი ანგარიშის წაშლა"
 
-#: modules/websession/lib/websession_templates.py:792
+#: modules/websession/lib/websession_templates.py:807
 msgid "You are no longer recognized by our system."
 msgstr "თქვენ აღარ ხართ აღიარებული ჩვენი სისტემის მიერ."
 
-#: modules/websession/lib/websession_templates.py:794
+#: modules/websession/lib/websession_templates.py:809
 #, python-format
 msgid ""
 "You are still recognized by the centralized\n"
@@ -6111,19 +6111,19 @@ msgstr ""
 "                %(x_fmt_open)sSSO%(x_fmt_close)s სისტემბა. თქვენ შეგიძლიათ\n"
 "                %(x_url_open)sგამოხვიდეთ SSO%(x_url_close)s -დან."
 
-#: modules/websession/lib/websession_templates.py:801
+#: modules/websession/lib/websession_templates.py:816
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr ""
 "თუ თქვენ გნებავთ, თქვენ შეგიძლიათ %(x_url_open)sშემოხვიდეთ აქ%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:832
+#: modules/websession/lib/websession_templates.py:847
 msgid "If you already have an account, please login using the form below."
 msgstr ""
 "თუ თქვენ უკვე გაქვთ ანგარიში, გთხოვთ შეხვიდეთ ქვემოთ მოყვანილი ფორმის "
 "გამოყენებით."
 
-#: modules/websession/lib/websession_templates.py:836
+#: modules/websession/lib/websession_templates.py:851
 #, python-format
 msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
@@ -6132,7 +6132,7 @@ msgstr ""
 "თუ თქვენ ჯერ არ გაქვთ ცერნის ანგარიში, თქვენ შეგიძლიათ დაარეგისტრიროთ "
 "%(x_url_open)sცერნის ახალი მსუბუქი ანგარიში%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:839
+#: modules/websession/lib/websession_templates.py:854
 #, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister"
@@ -6141,40 +6141,40 @@ msgstr ""
 "თუ თქვენ ჯერ არ გაქვთ ანგარიში, გთხოვთ %(x_url_open)sდაარეგისტრიროთ"
 "%(x_url_close)s ინტერნეტ ანგარიში."
 
-#: modules/websession/lib/websession_templates.py:847
+#: modules/websession/lib/websession_templates.py:862
 #, python-format
 msgid "If you don't own an account yet, please contact %s."
 msgstr "თუ თქვენ ჯერ არ გაქვთ ანგარიშ, გთხოვთ დაუკავშირდეთ %s."
 
-#: modules/websession/lib/websession_templates.py:870
+#: modules/websession/lib/websession_templates.py:885
 msgid "Login method:"
 msgstr "შესვლის მეთოდი"
 
-#: modules/websession/lib/websession_templates.py:899
+#: modules/websession/lib/websession_templates.py:914
 msgid "Remember login on this computer."
 msgstr "დაიმახსოვრე შესვლის პარამეტრები ამ კომპიუტერზე."
 
-#: modules/websession/lib/websession_templates.py:900
-#: modules/websession/lib/websession_templates.py:1178
-#: modules/websession/lib/websession_webinterface.py:102
-#: modules/websession/lib/websession_webinterface.py:197
-#: modules/websession/lib/websession_webinterface.py:754
-#: modules/websession/lib/websession_webinterface.py:838
+#: modules/websession/lib/websession_templates.py:915
+#: modules/websession/lib/websession_templates.py:1193
+#: modules/websession/lib/websession_webinterface.py:101
+#: modules/websession/lib/websession_webinterface.py:196
+#: modules/websession/lib/websession_webinterface.py:766
+#: modules/websession/lib/websession_webinterface.py:850
 msgid "login"
 msgstr "შესვლა"
 
-#: modules/websession/lib/websession_templates.py:905
-#: modules/websession/lib/websession_webinterface.py:542
+#: modules/websession/lib/websession_templates.py:920
+#: modules/websession/lib/websession_webinterface.py:554
 msgid "Lost your password?"
 msgstr "დაკარგეთ თქვენი პაროლი?"
 
-#: modules/websession/lib/websession_templates.py:913
+#: modules/websession/lib/websession_templates.py:928
 msgid "You can use your nickname or your email address to login."
 msgstr ""
 "თქვენ შეგიძლიათ გამოიყენოთ თქვენი მეტსახლი ან ელ-ფოსტის მისამართი "
 "შესასვლელად."
 
-#: modules/websession/lib/websession_templates.py:937
+#: modules/websession/lib/websession_templates.py:952
 msgid ""
 "Your request is valid. Please set the new desired password in the following "
 "form."
@@ -6182,28 +6182,28 @@ msgstr ""
 "თქვენი მოთხოვნა სწორია. გთხოვთ აირჩიოთ ახალი თქვენთვის სასურველი პაროლი "
 "აღნიშნულ ფორაში."
 
-#: modules/websession/lib/websession_templates.py:960
+#: modules/websession/lib/websession_templates.py:975
 msgid "Set a new password for"
 msgstr "ახალი პაროლის დაყენება"
 
-#: modules/websession/lib/websession_templates.py:961
+#: modules/websession/lib/websession_templates.py:976
 msgid "Type the new password"
 msgstr "აკრიფეთ ახალი პაროლი"
 
-#: modules/websession/lib/websession_templates.py:962
+#: modules/websession/lib/websession_templates.py:977
 msgid "Type again the new password"
 msgstr "ხელახლა აკრიპეთ ახალი პაროლი "
 
-#: modules/websession/lib/websession_templates.py:963
+#: modules/websession/lib/websession_templates.py:978
 msgid "Set the new password"
 msgstr "ახალი პაროლის დაყენება"
 
-#: modules/websession/lib/websession_templates.py:985
+#: modules/websession/lib/websession_templates.py:1000
 msgid "Please enter your email address and desired nickname and password:"
 msgstr ""
 "გთზოვთ შეიყვანოთ თქვენი ელ-ფოსტის მისამართი და სასურველი მეტსახელი და პაროლი:"
 
-#: modules/websession/lib/websession_templates.py:987
+#: modules/websession/lib/websession_templates.py:1002
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
@@ -6211,16 +6211,16 @@ msgstr ""
 "ანგარიშის გამოყენება არ იქნება შესაძლებელი , ვიდრე ის არ იქნება "
 "დადასტურებული და გააქტიურებული."
 
-#: modules/websession/lib/websession_templates.py:1038
+#: modules/websession/lib/websession_templates.py:1053
 msgid "Retype Password"
 msgstr "ხელახლა ჩაწერეთ პაროლი"
 
-#: modules/websession/lib/websession_templates.py:1039
-#: modules/websession/lib/websession_webinterface.py:941
+#: modules/websession/lib/websession_templates.py:1054
+#: modules/websession/lib/websession_webinterface.py:953
 msgid "register"
 msgstr "რეგისტრაცია"
 
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1055
 #, python-format
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
@@ -6236,7 +6236,7 @@ msgstr ""
 "იდენტიფიცირებისათვის %s -ზე. მაგალითად, თქვენ შეგეძლებათ დააყენოთ ავტომატური "
 "შეტყობინებები ძიების შედეგებზე და შეგატყობინოთ ელფოსტის მეშვეობით."
 
-#: modules/websession/lib/websession_templates.py:1044
+#: modules/websession/lib/websession_templates.py:1059
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
@@ -6244,7 +6244,7 @@ msgid ""
 msgstr ""
 "ანგარიშს თავად ვერ შექმნით. დაუკავშრდით %s თუ თქვენ გსურთ ანგარიშის შექმნა."
 
-#: modules/websession/lib/websession_templates.py:1070
+#: modules/websession/lib/websession_templates.py:1085
 #, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
@@ -6253,24 +6253,24 @@ msgstr ""
 "თქვენ ხართ შემოსული როგორც სტუმარი. გთხოვთ ჯერ %(x_url_open)sშემოხვიდეთ"
 "%(x_url_close)s სისტემაში."
 
-#: modules/websession/lib/websession_templates.py:1076
+#: modules/websession/lib/websession_templates.py:1091
 msgid "You are not authorized to access administrative functions."
 msgstr "თქვენ არ გაქვთ უფლებები რომ შეასწოროთ ადმინისტრაციული ფუნქციები."
 
-#: modules/websession/lib/websession_templates.py:1079
+#: modules/websession/lib/websession_templates.py:1094
 #, python-format
 msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "თქვენ გააქტიურეთ შემდეგი როლები: %(x_role)s."
 
-#: modules/websession/lib/websession_templates.py:1095
+#: modules/websession/lib/websession_templates.py:1110
 msgid "Run BibSword Client"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1121
+#: modules/websession/lib/websession_templates.py:1136
 msgid "Here are some interesting web admin links for you:"
 msgstr "იხილეთ რამდენიმე საინტერესო ვებ ადმინისტრატორის ლინკები თქვენთვის:"
 
-#: modules/websession/lib/websession_templates.py:1123
+#: modules/websession/lib/websession_templates.py:1138
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
@@ -6279,213 +6279,213 @@ msgstr ""
 "მეტი ადმინისტრატორის ფუნქციებისათვის, იხილეთ სრული %(x_url_open)sადმინის "
 "სივრცე%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1176
+#: modules/websession/lib/websession_templates.py:1191
 msgid "guest"
 msgstr "სტუმარი"
 
-#: modules/websession/lib/websession_templates.py:1190
+#: modules/websession/lib/websession_templates.py:1205
 msgid "logout"
 msgstr "გამოსვლა"
 
-#: modules/websession/lib/websession_templates.py:1238
+#: modules/websession/lib/websession_templates.py:1253
 #: modules/webstyle/lib/webstyle_templates.py:433
 #: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "პერს"
 
-#: modules/websession/lib/websession_templates.py:1246
+#: modules/websession/lib/websession_templates.py:1261
 msgid "Your account"
 msgstr "თქვენი ანგარიში"
 
-#: modules/websession/lib/websession_templates.py:1252
+#: modules/websession/lib/websession_templates.py:1267
 msgid "Your alerts"
 msgstr "თქვენი ცვლილებები"
 
-#: modules/websession/lib/websession_templates.py:1258
+#: modules/websession/lib/websession_templates.py:1273
 msgid "Your approvals"
 msgstr "თქვენი დასტური"
 
-#: modules/websession/lib/websession_templates.py:1264
+#: modules/websession/lib/websession_templates.py:1279
 msgid "Your baskets"
 msgstr "თქვენი კალათები"
 
-#: modules/websession/lib/websession_templates.py:1270
+#: modules/websession/lib/websession_templates.py:1285
 msgid "Your groups"
 msgstr "თქვენი ჯგუფები"
 
-#: modules/websession/lib/websession_templates.py:1276
+#: modules/websession/lib/websession_templates.py:1291
 msgid "Your loans"
 msgstr "თქვენი კრედითები"
 
-#: modules/websession/lib/websession_templates.py:1282
+#: modules/websession/lib/websession_templates.py:1297
 msgid "Your messages"
 msgstr "თქვენი შეტყობინებები"
 
-#: modules/websession/lib/websession_templates.py:1288
+#: modules/websession/lib/websession_templates.py:1303
 msgid "Your submissions"
 msgstr "თქვენი დანართი"
 
-#: modules/websession/lib/websession_templates.py:1294
+#: modules/websession/lib/websession_templates.py:1309
 msgid "Your searches"
 msgstr "თქვენი ძებნა"
 
-#: modules/websession/lib/websession_templates.py:1347
+#: modules/websession/lib/websession_templates.py:1362
 msgid "Administration"
 msgstr "ადმინისტრაცია"
 
-#: modules/websession/lib/websession_templates.py:1363
+#: modules/websession/lib/websession_templates.py:1378
 msgid "Statistics"
 msgstr "სტატისტიკა"
 
-#: modules/websession/lib/websession_templates.py:1490
+#: modules/websession/lib/websession_templates.py:1505
 msgid "You are an administrator of the following groups:"
 msgstr "თქვენ მომდებნო ჯგუფების ადმინისტრატორი ბრძანდებით:"
 
-#: modules/websession/lib/websession_templates.py:1510
-#: modules/websession/lib/websession_templates.py:1584
-#: modules/websession/lib/websession_templates.py:1647
+#: modules/websession/lib/websession_templates.py:1525
+#: modules/websession/lib/websession_templates.py:1599
+#: modules/websession/lib/websession_templates.py:1662
 #: modules/websubmit/lib/websubmit_templates.py:3003
 #: modules/websubmit/lib/websubmit_templates.py:3009
 msgid "Group"
 msgstr "ჯგუფი"
 
-#: modules/websession/lib/websession_templates.py:1517
+#: modules/websession/lib/websession_templates.py:1532
 msgid "You are not an administrator of any groups."
 msgstr "თქვენ არ ბრძანდებით არცერთი ჯგუფის ადმინისტრატორი"
 
-#: modules/websession/lib/websession_templates.py:1524
+#: modules/websession/lib/websession_templates.py:1539
 msgid "Edit group"
 msgstr "ჯგუფის ჩასწორება"
 
-#: modules/websession/lib/websession_templates.py:1531
+#: modules/websession/lib/websession_templates.py:1546
 #, python-format
 msgid "Edit %s members"
 msgstr " %s წევრების ჩასწორება"
 
-#: modules/websession/lib/websession_templates.py:1554
-#: modules/websession/lib/websession_templates.py:1694
-#: modules/websession/lib/websession_templates.py:1696
-#: modules/websession/lib/websession_webinterface.py:1079
+#: modules/websession/lib/websession_templates.py:1569
+#: modules/websession/lib/websession_templates.py:1709
+#: modules/websession/lib/websession_templates.py:1711
+#: modules/websession/lib/websession_webinterface.py:1091
 msgid "Create new group"
 msgstr "ახალი ჯგუფის შექმნა"
 
-#: modules/websession/lib/websession_templates.py:1568
+#: modules/websession/lib/websession_templates.py:1583
 msgid "You are a member of the following groups:"
 msgstr "თქვენ მომდებნო ჯგუფების წევრი ბრძანდებით:"
 
-#: modules/websession/lib/websession_templates.py:1591
+#: modules/websession/lib/websession_templates.py:1606
 msgid "You are not a member of any groups."
 msgstr "თქვენ არ ბრძანდებით არცერთი ჯგუფის წევრი."
 
-#: modules/websession/lib/websession_templates.py:1615
+#: modules/websession/lib/websession_templates.py:1630
 msgid "Join new group"
 msgstr "ახალ ჯგუფთან შეერთება"
 
-#: modules/websession/lib/websession_templates.py:1616
-#: modules/websession/lib/websession_templates.py:2168
-#: modules/websession/lib/websession_templates.py:2179
+#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:2183
+#: modules/websession/lib/websession_templates.py:2194
 msgid "Leave group"
 msgstr "ჯგუფის დატოვება"
 
-#: modules/websession/lib/websession_templates.py:1631
+#: modules/websession/lib/websession_templates.py:1646
 msgid "You are a member of the following external groups:"
 msgstr "თქვენ მომდებნო გარე ჯგუფების წევრი ბრძანდებით:"
 
-#: modules/websession/lib/websession_templates.py:1654
+#: modules/websession/lib/websession_templates.py:1669
 msgid "You are not a member of any external groups."
 msgstr "თქვენ არ ბრძანდებით არცერთი გარე ჯგუფის წევრი."
 
-#: modules/websession/lib/websession_templates.py:1702
+#: modules/websession/lib/websession_templates.py:1717
 msgid "Update group"
 msgstr "ჯგუფის განახლება"
 
-#: modules/websession/lib/websession_templates.py:1704
+#: modules/websession/lib/websession_templates.py:1719
 #, python-format
 msgid "Edit group %s"
 msgstr "ჯგუფის ჩასწორება %s"
 
-#: modules/websession/lib/websession_templates.py:1706
+#: modules/websession/lib/websession_templates.py:1721
 msgid "Delete group"
 msgstr "ჯგუფის წაშლა"
 
-#: modules/websession/lib/websession_templates.py:1779
+#: modules/websession/lib/websession_templates.py:1794
 msgid "Group name:"
 msgstr "ჯგუფის სახელი: "
 
-#: modules/websession/lib/websession_templates.py:1781
+#: modules/websession/lib/websession_templates.py:1796
 msgid "Group description:"
 msgstr "ჯგუფის აღწერა:"
 
-#: modules/websession/lib/websession_templates.py:1782
+#: modules/websession/lib/websession_templates.py:1797
 msgid "Group join policy:"
 msgstr "ჯგუფში გაწევრიანების პრინციპი: "
 
-#: modules/websession/lib/websession_templates.py:1823
-#: modules/websession/lib/websession_templates.py:1896
-#: modules/websession/lib/websession_templates.py:2037
-#: modules/websession/lib/websession_templates.py:2046
-#: modules/websession/lib/websession_templates.py:2166
-#: modules/websession/lib/websession_templates.py:2278
+#: modules/websession/lib/websession_templates.py:1838
+#: modules/websession/lib/websession_templates.py:1911
+#: modules/websession/lib/websession_templates.py:2052
+#: modules/websession/lib/websession_templates.py:2061
+#: modules/websession/lib/websession_templates.py:2181
+#: modules/websession/lib/websession_templates.py:2293
 msgid "Please select:"
 msgstr "გთხოვთ ამოირჩიოთ:"
 
-#: modules/websession/lib/websession_templates.py:1889
+#: modules/websession/lib/websession_templates.py:1904
 msgid "Join group"
 msgstr "ჯგუფთან შეერთება"
 
-#: modules/websession/lib/websession_templates.py:1891
+#: modules/websession/lib/websession_templates.py:1906
 msgid "or find it"
 msgstr "ან იპოვეთ "
 
-#: modules/websession/lib/websession_templates.py:1892
+#: modules/websession/lib/websession_templates.py:1907
 msgid "Choose group:"
 msgstr "აირჩიეთ ჯგუფი: "
 
-#: modules/websession/lib/websession_templates.py:1894
+#: modules/websession/lib/websession_templates.py:1909
 msgid "Find group"
 msgstr "იპოვეთ ჯგუფი "
 
-#: modules/websession/lib/websession_templates.py:2042
+#: modules/websession/lib/websession_templates.py:2057
 msgid "Remove member"
 msgstr "ამოშალეთ წევრი "
 
-#: modules/websession/lib/websession_templates.py:2044
+#: modules/websession/lib/websession_templates.py:2059
 msgid "No members."
 msgstr "წევრები არ არიან."
 
-#: modules/websession/lib/websession_templates.py:2054
+#: modules/websession/lib/websession_templates.py:2069
 msgid "Accept member"
 msgstr "წევრის მიღება"
 
-#: modules/websession/lib/websession_templates.py:2054
+#: modules/websession/lib/websession_templates.py:2069
 msgid "Reject member"
 msgstr "წევრის უარყოფა"
 
-#: modules/websession/lib/websession_templates.py:2056
+#: modules/websession/lib/websession_templates.py:2071
 msgid "No members awaiting approval."
 msgstr "არცერთი წევრი არ ელის დასტურს."
 
-#: modules/websession/lib/websession_templates.py:2058
-#: modules/websession/lib/websession_templates.py:2092
+#: modules/websession/lib/websession_templates.py:2073
+#: modules/websession/lib/websession_templates.py:2107
 msgid "Current members"
 msgstr "წევრები ამჟამად"
 
-#: modules/websession/lib/websession_templates.py:2059
-#: modules/websession/lib/websession_templates.py:2093
+#: modules/websession/lib/websession_templates.py:2074
+#: modules/websession/lib/websession_templates.py:2108
 msgid "Members awaiting approval"
 msgstr "წევრები დასტურის მოლოდინში"
 
-#: modules/websession/lib/websession_templates.py:2060
-#: modules/websession/lib/websession_templates.py:2094
+#: modules/websession/lib/websession_templates.py:2075
+#: modules/websession/lib/websession_templates.py:2109
 msgid "Invite new members"
 msgstr "ახალი წევრების მოწვევა"
 
-#: modules/websession/lib/websession_templates.py:2065
+#: modules/websession/lib/websession_templates.py:2080
 #, python-format
 msgid "Invitation to join \"%s\" group"
 msgstr "მოიწვიეთ ჯგუფში \"%s\" გასაწევრიანებლად"
 
-#: modules/websession/lib/websession_templates.py:2066
+#: modules/websession/lib/websession_templates.py:2081
 #, fuzzy, python-format
 msgid ""
 "Hello:\n"
@@ -6502,7 +6502,7 @@ msgstr ""
 "\n"
 "საუკეთესო სურვილებით.\n"
 
-#: modules/websession/lib/websession_templates.py:2080
+#: modules/websession/lib/websession_templates.py:2095
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the "
@@ -6511,90 +6511,90 @@ msgstr ""
 "თუ თქვენ გსურთ მოიწვიოთ ახალი წევრი ჯგუფში გასაწევრიანებლად, გთხოვთ "
 "გამოიყენოთ %(x_url_open)s ვებ გზავნილის%(x_url_close)s სისტემა."
 
-#: modules/websession/lib/websession_templates.py:2084
+#: modules/websession/lib/websession_templates.py:2099
 #, python-format
 msgid "Group: %s"
 msgstr "ჯგუფი: %s"
 
-#: modules/websession/lib/websession_templates.py:2167
+#: modules/websession/lib/websession_templates.py:2182
 msgid "Group list"
 msgstr "ჯგუფების სია"
 
-#: modules/websession/lib/websession_templates.py:2170
+#: modules/websession/lib/websession_templates.py:2185
 msgid "You are not member of any group."
 msgstr "თქვენ არ ბრძანდებით არცერთი ჯგუფის წევრი"
 
-#: modules/websession/lib/websession_templates.py:2218
+#: modules/websession/lib/websession_templates.py:2233
 msgid "Are you sure you want to delete this group?"
 msgstr "დარწმუნებული ბრძანდებით რომ გნებავთ ამ ჯგუფის წაშლა?"
 
-#: modules/websession/lib/websession_templates.py:2258
+#: modules/websession/lib/websession_templates.py:2273
 msgid "Are you sure you want to leave this group?"
 msgstr "დარწმუნებული ბრძანდებით რომ გნებავთ ამ ჯგუფის დატოვება?"
 
-#: modules/websession/lib/websession_templates.py:2274
+#: modules/websession/lib/websession_templates.py:2289
 msgid "Visible and open for new members"
 msgstr "ჩანს და გახსნილია ახალი წევრებისთვის"
 
-#: modules/websession/lib/websession_templates.py:2276
+#: modules/websession/lib/websession_templates.py:2291
 msgid "Visible but new members need approval"
 msgstr "ჩანს მაგრამ ახალ წევრებს ესაჭიროებათ დასტური"
 
-#: modules/websession/lib/websession_templates.py:2361
+#: modules/websession/lib/websession_templates.py:2376
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "ჯგუფი %s: ახალი წევრობის თხოვნა"
 
-#: modules/websession/lib/websession_templates.py:2365
+#: modules/websession/lib/websession_templates.py:2380
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "წევრს სურს ჯგუფში გაწევრიანდება %s."
 
-#: modules/websession/lib/websession_templates.py:2366
+#: modules/websession/lib/websession_templates.py:2381
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
 "გთხოვთ %(x_url_open)sმიიღოთ ან უარყოთ%(x_url_close)s ამ მომხმარებლის თხოვნა."
 
-#: modules/websession/lib/websession_templates.py:2383
+#: modules/websession/lib/websession_templates.py:2398
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "ჯგუფი %s: გაწევრიანების თხოვნა დაკმაყოფილებულია"
 
-#: modules/websession/lib/websession_templates.py:2384
+#: modules/websession/lib/websession_templates.py:2399
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "თქვენი თხოვნა %s ჯგუფში გასაწევრიანებლად დაკმაყოფილეულია."
 
-#: modules/websession/lib/websession_templates.py:2386
+#: modules/websession/lib/websession_templates.py:2401
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "ჯგუფი %s: გაწევრიანების თხოვნა უარყოფილია"
 
-#: modules/websession/lib/websession_templates.py:2387
+#: modules/websession/lib/websession_templates.py:2402
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "თქვენი თხოვნა %s ჯგუფში გასაწევრიანებლად უარყოფილია."
 
-#: modules/websession/lib/websession_templates.py:2390
-#: modules/websession/lib/websession_templates.py:2408
+#: modules/websession/lib/websession_templates.py:2405
+#: modules/websession/lib/websession_templates.py:2423
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
 "თქვენ შეგიძლიათ იხილოთ თქვენი %(x_url_open)sჯგუფების სია%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:2404
+#: modules/websession/lib/websession_templates.py:2419
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "ჯგუფი %s წაშლილია"
 
-#: modules/websession/lib/websession_templates.py:2406
+#: modules/websession/lib/websession_templates.py:2421
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "ჯგუფი %s წაშლილია ადმინისტრატორის მიერ."
 
-#: modules/websession/lib/websession_templates.py:2423
+#: modules/websession/lib/websession_templates.py:2438
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
@@ -6605,7 +6605,7 @@ msgstr ""
 "%(x_url_close)s რომელზეც ჩაწერილი ხართ (%(x_nb_member)i) ან მართავთ "
 "(%(x_nb_admin)i)."
 
-#: modules/websession/lib/websession_templates.py:2442
+#: modules/websession/lib/websession_templates.py:2457
 #, fuzzy
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
@@ -6614,7 +6614,7 @@ msgstr ""
 "გაფრთხილება :  პაროლი რომელიც დააყენეთ MySQL -ზე იგივეა რაც სტანდარტული "
 "Invenio -ს პაროლი. თქვენი უსაფრთხოებისათივს, თქვენ უნდა შეცვალოთ პაროლი."
 
-#: modules/websession/lib/websession_templates.py:2448
+#: modules/websession/lib/websession_templates.py:2463
 #, fuzzy
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
@@ -6624,7 +6624,7 @@ msgstr ""
 "სტანდარტული პაროლი Invenio -ს პაროლი. უსაფრთხოებისათვის გირჩევთ შეცვალოთ "
 "პაროლი."
 
-#: modules/websession/lib/websession_templates.py:2454
+#: modules/websession/lib/websession_templates.py:2469
 #, fuzzy
 msgid ""
 "Warning: The password set for the Invenio admin user is currently empty. For "
@@ -6633,7 +6633,7 @@ msgstr ""
 "გაფრთხილება : პაროლი Invenio admin მომხმარებლისათვის ამჟამად ცარიელია. "
 "უსაფრთხოებისათვის რეკომენდირებულია რომ დაადოთ პაროლი."
 
-#: modules/websession/lib/websession_templates.py:2460
+#: modules/websession/lib/websession_templates.py:2475
 #, fuzzy
 msgid ""
 "Warning: The email address set for support email is currently set to "
@@ -6643,73 +6643,73 @@ msgstr ""
 "გაფრთხილება: მხარდაჭერის პაროლი ამჟამად არის info@invenio-software.org . "
 "რეკომენდირებულია რომ თქვენ შეცვალოთ ის თქვენს ელფოსტის მისამართზე."
 
-#: modules/websession/lib/websession_templates.py:2466
+#: modules/websession/lib/websession_templates.py:2481
 #, fuzzy
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr "Invenio -ს ახალი ვერსია შეიძლება იყოს გადმოწერილი. გთხოვთ გვეახლეთ"
 
-#: modules/websession/lib/websession_templates.py:2473
+#: modules/websession/lib/websession_templates.py:2488
 msgid ""
 "Cannot download or parse release notes from http://invenio-software.org/repo/"
 "invenio/tree/RELEASE-NOTES"
 msgstr ""
 
-#: modules/websession/lib/webuser.py:154
+#: modules/websession/lib/webuser.py:156
 msgid "Database problem"
 msgstr "მონაცემთა ბაზასთან დაკავშირებული პრობლემა"
 
-#: modules/websession/lib/webuser.py:302
+#: modules/websession/lib/webuser.py:304
 #: modules/websession/lib/webgroup_dblayer.py:314
 msgid "user"
 msgstr "მომხმარებელი"
 
-#: modules/websession/lib/webuser.py:477
+#: modules/websession/lib/webuser.py:479
 #, python-format
 msgid "Account registration at %s"
 msgstr "ანგარიშის რეგისტრაცია %s"
 
-#: modules/websession/lib/webuser.py:710
+#: modules/websession/lib/webuser.py:712
 msgid "New account on"
 msgstr "ახალი ანგარიში ჩართულია"
 
-#: modules/websession/lib/webuser.py:712
+#: modules/websession/lib/webuser.py:714
 msgid "PLEASE ACTIVATE"
 msgstr "გთხოვთ გაააქტიუროთ"
 
-#: modules/websession/lib/webuser.py:713
+#: modules/websession/lib/webuser.py:715
 msgid "A new account has been created on"
 msgstr "შექმნილია ახალი ანგარიში "
 
-#: modules/websession/lib/webuser.py:715
+#: modules/websession/lib/webuser.py:717
 msgid " and is awaiting activation"
 msgstr "და ელოდება გააქტიურებას"
 
-#: modules/websession/lib/webuser.py:717
+#: modules/websession/lib/webuser.py:719
 msgid "   Username/Email"
 msgstr "მომხმარებლის სახელი/ე-მეილი:"
 
-#: modules/websession/lib/webuser.py:718
+#: modules/websession/lib/webuser.py:720
 msgid "You can approve or reject this account request at"
 msgstr "თქვენ შეგიძლიათ ან დაადასტუროთ ან უარყოთ ამ ანგარიშის მოთხოვნა "
 
-#: modules/websession/lib/webuser.py:900 modules/websession/lib/webuser.py:901
+#: modules/websession/lib/webuser.py:902 modules/websession/lib/webuser.py:903
 msgid "Run File Manager"
 msgstr "ფაილების მენეჯერის გაშვება"
 
-#: modules/websession/lib/websession_webinterface.py:84
+#: modules/websession/lib/websession_webinterface.py:83
 msgid "Mail Cookie Service"
 msgstr "ფოსტის ქუქიების სერვისი"
 
-#: modules/websession/lib/websession_webinterface.py:94
+#: modules/websession/lib/websession_webinterface.py:93
 msgid "Role authorization request"
 msgstr "როლის ავტორიზაციაზე მოთხოვნა"
 
-#: modules/websession/lib/websession_webinterface.py:94
+#: modules/websession/lib/websession_webinterface.py:93
 msgid "This request for an authorization has already been authorized."
 msgstr "ეს მოთხოვნა ავტორიზაციის თაობაზე უკვე იქნა ავტორიზებული."
 
-#: modules/websession/lib/websession_webinterface.py:97
+#: modules/websession/lib/websession_webinterface.py:96
 #, python-format
 msgid ""
 "You have successfully obtained an authorization as %(x_role)s! This "
@@ -6720,102 +6720,102 @@ msgstr ""
 "გაგრძელდება  %(x_expiration)s -მდე და სანამ დახურავთ ბრაუზერს თუ შემოსული "
 "ხართ როგორც სტუმარი."
 
-#: modules/websession/lib/websession_webinterface.py:115
+#: modules/websession/lib/websession_webinterface.py:114
 msgid "You have confirmed the validity of your email address!"
 msgstr "თქვენ დაადასტურეთ თქვენი ელ-ფოსტის მისამართის სისწორე!"
 
-#: modules/websession/lib/websession_webinterface.py:118
-#: modules/websession/lib/websession_webinterface.py:128
+#: modules/websession/lib/websession_webinterface.py:117
+#: modules/websession/lib/websession_webinterface.py:127
 msgid "Please, wait for the administrator to enable your account."
 msgstr "თქვენი ანგარიშის ჩასართავად,  გთხოვთ დაუცადოთ ადინისტრატორს.  "
 
-#: modules/websession/lib/websession_webinterface.py:122
-#: modules/websession/lib/websession_webinterface.py:131
+#: modules/websession/lib/websession_webinterface.py:121
+#: modules/websession/lib/websession_webinterface.py:130
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
 msgstr ""
 "თქვენ უკვე შეგიძლიათ გადახვიდეთ %(x_url_open)sთქვენ ანგარისის გვერდზე"
 "%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:123
-#: modules/websession/lib/websession_webinterface.py:132
+#: modules/websession/lib/websession_webinterface.py:122
+#: modules/websession/lib/websession_webinterface.py:131
 msgid "Email address successfully activated"
 msgstr "ელ-ფოსტის მისამართი წარმატებით არის გააქტიურებული"
 
-#: modules/websession/lib/websession_webinterface.py:126
+#: modules/websession/lib/websession_webinterface.py:125
 msgid "You have already confirmed the validity of your email address!"
 msgstr "თქვენ უკვე დაადასტურეთ თქვენი ელ-ფოსტის მისამართის სისწორე!"
 
-#: modules/websession/lib/websession_webinterface.py:135
+#: modules/websession/lib/websession_webinterface.py:134
 msgid ""
 "This request for confirmation of an email address is not valid or is expired."
 msgstr ""
 "ეს მოთხოვნა ელ-ფოსტის მისამართის დასადასტურებლად არ არის სწორი ან უკვე "
 "ამოიწურა."
 
-#: modules/websession/lib/websession_webinterface.py:140
+#: modules/websession/lib/websession_webinterface.py:139
 msgid "This request for an authorization is not valid or is expired."
 msgstr "ეს ავტორიზაციის მოთხოვნა არ არის სწორი ან უკვე ამოიწურა."
 
-#: modules/websession/lib/websession_webinterface.py:153
+#: modules/websession/lib/websession_webinterface.py:152
 msgid "Reset password"
 msgstr "პაროლის გადატვირთვა"
 
-#: modules/websession/lib/websession_webinterface.py:159
+#: modules/websession/lib/websession_webinterface.py:158
 msgid "This request for resetting a password has already been used."
 msgstr "ეს მოთხოვნა პაროლის გადასატვირთად უკვე იყო გაგზავნილი."
 
-#: modules/websession/lib/websession_webinterface.py:162
+#: modules/websession/lib/websession_webinterface.py:161
 msgid "This request for resetting a password is not valid or is expired."
 msgstr ""
 "ეს მოთხოვნა პაროლის გადათვირთვის თაობაზე არ არის ძალაში ან უკვე ამოიწურა."
 
-#: modules/websession/lib/websession_webinterface.py:167
+#: modules/websession/lib/websession_webinterface.py:166
 msgid "This request for resetting the password is not valid or is expired."
 msgstr ""
 "ეს მოთხოვნა პაროლის გადათვირთვის თაობაზე არ არის ძალაში ან უკვე ამოიწურა."
 
-#: modules/websession/lib/websession_webinterface.py:180
+#: modules/websession/lib/websession_webinterface.py:179
 msgid "The two provided passwords aren't equal."
 msgstr "მოწოდებული ორი პაროლი არ ემთხვევა."
 
-#: modules/websession/lib/websession_webinterface.py:195
+#: modules/websession/lib/websession_webinterface.py:194
 msgid "The password was successfully set! You can now proceed with the login."
 msgstr ""
 "პაროლი წარმატებულად იქნა დადასწურებული! თქვენ შეგიძლიათ აწი განაგრძოთ და "
 "შეხვიდეთ."
 
-#: modules/websession/lib/websession_webinterface.py:280
+#: modules/websession/lib/websession_webinterface.py:283
 #, python-format
 msgid "%s Personalize, Your Settings"
 msgstr "%s თქვენი პარამეტრების პერსონალიზაცია"
 
-#: modules/websession/lib/websession_webinterface.py:339
-#: modules/websession/lib/websession_webinterface.py:415
-#: modules/websession/lib/websession_webinterface.py:477
-#: modules/websession/lib/websession_webinterface.py:490
-#: modules/websession/lib/websession_webinterface.py:503
+#: modules/websession/lib/websession_webinterface.py:351
+#: modules/websession/lib/websession_webinterface.py:427
+#: modules/websession/lib/websession_webinterface.py:489
+#: modules/websession/lib/websession_webinterface.py:502
+#: modules/websession/lib/websession_webinterface.py:515
 msgid "Settings edited"
 msgstr "პარამეტრების შეცვლილია"
 
-#: modules/websession/lib/websession_webinterface.py:341
-#: modules/websession/lib/websession_webinterface.py:414
-#: modules/websession/lib/websession_webinterface.py:455
-#: modules/websession/lib/websession_webinterface.py:479
-#: modules/websession/lib/websession_webinterface.py:492
-#: modules/websession/lib/websession_webinterface.py:498
+#: modules/websession/lib/websession_webinterface.py:353
+#: modules/websession/lib/websession_webinterface.py:426
+#: modules/websession/lib/websession_webinterface.py:467
+#: modules/websession/lib/websession_webinterface.py:491
+#: modules/websession/lib/websession_webinterface.py:504
+#: modules/websession/lib/websession_webinterface.py:510
 msgid "Show account"
 msgstr "ანგარიშის ჩვენება"
 
-#: modules/websession/lib/websession_webinterface.py:345
+#: modules/websession/lib/websession_webinterface.py:357
 msgid "Unable to change login method."
 msgstr "შესვლის მეთოდის შეცვლა ვერ ხერხდება."
 
-#: modules/websession/lib/websession_webinterface.py:353
+#: modules/websession/lib/websession_webinterface.py:365
 msgid "Switched to internal login method."
 msgstr "გადავერთე შიდა შესვლის მეთოდზე."
 
-#: modules/websession/lib/websession_webinterface.py:354
+#: modules/websession/lib/websession_webinterface.py:366
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -6826,11 +6826,11 @@ msgstr ""
 "მეთოდით, სისტემამ დააყენა შემთხვევით დაგენერირებული პაროლი. გთხოვთ დააჭიროთ "
 "შემდეგ ღილაკს, პაროლის გადასატვირთი ლინკის გამოსაგზავნად ელფოსტაზე:"
 
-#: modules/websession/lib/websession_webinterface.py:362
+#: modules/websession/lib/websession_webinterface.py:374
 msgid "Send Password"
 msgstr "პაროლის გაგზავნა"
 
-#: modules/websession/lib/websession_webinterface.py:372
+#: modules/websession/lib/websession_webinterface.py:384
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6839,7 +6839,7 @@ msgstr ""
 "ვერ ვახერხებ გარე შესვლის მეთოდზე გადასვლას %s, რადგან თქვენი ელფოსტა "
 "უცნობია."
 
-#: modules/websession/lib/websession_webinterface.py:376
+#: modules/websession/lib/websession_webinterface.py:388
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6848,11 +6848,11 @@ msgstr ""
 "ვერ ვახერხებ გარე შესვლის მეთოდზე გადასვლას %s, რადგან თქვენი ელფოსტა "
 "უცნობია გარე შესვლის სისტემისათვის."
 
-#: modules/websession/lib/websession_webinterface.py:380
+#: modules/websession/lib/websession_webinterface.py:392
 msgid "Login method successfully selected."
 msgstr "შესვლის მეთოდი წარმატებულად იქნა არჩეული."
 
-#: modules/websession/lib/websession_webinterface.py:382
+#: modules/websession/lib/websession_webinterface.py:394
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
@@ -6861,16 +6861,16 @@ msgstr ""
 "გარე შესვლის მეთოდს %s არ აქვს ელფოსტაზე დაფუძვნებული შესვლის მხარდაჭერა. "
 "გთხოვთ დაუკავშირდეთ საიტის ადმინისტრატორს."
 
-#: modules/websession/lib/websession_webinterface.py:394
+#: modules/websession/lib/websession_webinterface.py:406
 #, fuzzy
 msgid "Your nickname has not been updated"
 msgstr "ეს ჩანაწერი განახლებულია"
 
-#: modules/websession/lib/websession_webinterface.py:408
+#: modules/websession/lib/websession_webinterface.py:420
 msgid "Settings successfully edited."
 msgstr "პარამეტრები წარმატებით შეიცვალა."
 
-#: modules/websession/lib/websession_webinterface.py:409
+#: modules/websession/lib/websession_webinterface.py:421
 #, python-format
 msgid ""
 "Note that if you have changed your email address, you will have to "
@@ -6879,109 +6879,109 @@ msgstr ""
 "გთხოვთ შენიშნოთ, რომ თუ თქვენ შეცვალეთ ელფოსტის მისამართი, თქვენ უნდა "
 "გადატვირთოთ %(x_url_open)sთქვენი პაროლი%(x_url_close)s ახალზე."
 
-#: modules/websession/lib/websession_webinterface.py:417
-#: modules/websession/lib/websession_webinterface.py:911
+#: modules/websession/lib/websession_webinterface.py:429
+#: modules/websession/lib/websession_webinterface.py:923
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "სასურველი მეტსახელი %s  არასწორია."
 
-#: modules/websession/lib/websession_webinterface.py:418
-#: modules/websession/lib/websession_webinterface.py:424
-#: modules/websession/lib/websession_webinterface.py:437
-#: modules/websession/lib/websession_webinterface.py:459
-#: modules/websession/lib/websession_webinterface.py:465
-#: modules/websession/lib/websession_webinterface.py:902
-#: modules/websession/lib/websession_webinterface.py:907
-#: modules/websession/lib/websession_webinterface.py:912
-#: modules/websession/lib/websession_webinterface.py:923
+#: modules/websession/lib/websession_webinterface.py:430
+#: modules/websession/lib/websession_webinterface.py:436
+#: modules/websession/lib/websession_webinterface.py:449
+#: modules/websession/lib/websession_webinterface.py:471
+#: modules/websession/lib/websession_webinterface.py:477
+#: modules/websession/lib/websession_webinterface.py:914
+#: modules/websession/lib/websession_webinterface.py:919
+#: modules/websession/lib/websession_webinterface.py:924
+#: modules/websession/lib/websession_webinterface.py:935
 msgid "Please try again."
 msgstr "გთხოვთ სცადოთ კიდევ ერთხელ."
 
-#: modules/websession/lib/websession_webinterface.py:420
-#: modules/websession/lib/websession_webinterface.py:426
-#: modules/websession/lib/websession_webinterface.py:433
-#: modules/websession/lib/websession_webinterface.py:439
-#: modules/websession/lib/websession_webinterface.py:461
-#: modules/websession/lib/websession_webinterface.py:467
-#: modules/websession/lib/websession_webinterface.py:514
+#: modules/websession/lib/websession_webinterface.py:432
+#: modules/websession/lib/websession_webinterface.py:438
+#: modules/websession/lib/websession_webinterface.py:445
+#: modules/websession/lib/websession_webinterface.py:451
+#: modules/websession/lib/websession_webinterface.py:473
+#: modules/websession/lib/websession_webinterface.py:479
+#: modules/websession/lib/websession_webinterface.py:526
 msgid "Edit settings"
 msgstr "პარამეტრების შეცვლა"
 
-#: modules/websession/lib/websession_webinterface.py:421
-#: modules/websession/lib/websession_webinterface.py:427
-#: modules/websession/lib/websession_webinterface.py:434
-#: modules/websession/lib/websession_webinterface.py:440
-#: modules/websession/lib/websession_webinterface.py:516
+#: modules/websession/lib/websession_webinterface.py:433
+#: modules/websession/lib/websession_webinterface.py:439
+#: modules/websession/lib/websession_webinterface.py:446
+#: modules/websession/lib/websession_webinterface.py:452
+#: modules/websession/lib/websession_webinterface.py:528
 msgid "Editing settings failed"
 msgstr "პარამეტრების შეცვლა წარუმატებელია"
 
-#: modules/websession/lib/websession_webinterface.py:423
-#: modules/websession/lib/websession_webinterface.py:906
+#: modules/websession/lib/websession_webinterface.py:435
+#: modules/websession/lib/websession_webinterface.py:918
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "მოწოდებული ელ-ფოსტის მისამართი %s  არასწორია. "
 
-#: modules/websession/lib/websession_webinterface.py:429
-#: modules/websession/lib/websession_webinterface.py:916
+#: modules/websession/lib/websession_webinterface.py:441
+#: modules/websession/lib/websession_webinterface.py:928
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "მოწოდებული ელფოსტის მისამართი %s უკვე არსებობს მონაცემთა ბაზაში."
 
-#: modules/websession/lib/websession_webinterface.py:431
-#: modules/websession/lib/websession_webinterface.py:918
+#: modules/websession/lib/websession_webinterface.py:443
+#: modules/websession/lib/websession_webinterface.py:930
 msgid "Or please try again."
 msgstr "ან გთხოვთ სცადოთ კიდევ ერთხელ."
 
-#: modules/websession/lib/websession_webinterface.py:436
+#: modules/websession/lib/websession_webinterface.py:448
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "სასურველი მეტსახელი %s უკვე გამოყენებლია."
 
-#: modules/websession/lib/websession_webinterface.py:445
+#: modules/websession/lib/websession_webinterface.py:457
 msgid "Users cannot edit passwords on this site."
 msgstr "მომხმარებელს არ შეუძლია პაროლის რედაქტირება ამ საიტზე."
 
-#: modules/websession/lib/websession_webinterface.py:453
+#: modules/websession/lib/websession_webinterface.py:465
 msgid "Password successfully edited."
 msgstr "პაროლი რედაქტირებულია წარმატებით."
 
-#: modules/websession/lib/websession_webinterface.py:456
+#: modules/websession/lib/websession_webinterface.py:468
 msgid "Password edited"
 msgstr "პაროლის რედაქტირება"
 
-#: modules/websession/lib/websession_webinterface.py:458
-#: modules/websession/lib/websession_webinterface.py:901
+#: modules/websession/lib/websession_webinterface.py:470
+#: modules/websession/lib/websession_webinterface.py:913
 msgid "Both passwords must match."
 msgstr "ორივე პაროლი უნდა ემთხვეოდეს ერთმანეთს."
 
-#: modules/websession/lib/websession_webinterface.py:462
-#: modules/websession/lib/websession_webinterface.py:468
+#: modules/websession/lib/websession_webinterface.py:474
+#: modules/websession/lib/websession_webinterface.py:480
 msgid "Editing password failed"
 msgstr "პაროლის რედაქტირება ვერ განხორციელდა"
 
-#: modules/websession/lib/websession_webinterface.py:464
+#: modules/websession/lib/websession_webinterface.py:476
 msgid "Wrong old password inserted."
 msgstr "ძველი პაროლი არასწორარ არის შეყვანილი."
 
-#: modules/websession/lib/websession_webinterface.py:480
-#: modules/websession/lib/websession_webinterface.py:493
-#: modules/websession/lib/websession_webinterface.py:507
+#: modules/websession/lib/websession_webinterface.py:492
+#: modules/websession/lib/websession_webinterface.py:505
+#: modules/websession/lib/websession_webinterface.py:519
 msgid "User settings saved correctly."
 msgstr "მომხმარების შეყვანილი პარამეტრები დამახსოვრებულ იქნა. "
 
-#: modules/websession/lib/websession_webinterface.py:500
+#: modules/websession/lib/websession_webinterface.py:512
 msgid "Editing bibcatalog authorization failed"
 msgstr "ბიბკატალოგის რედაქტირების აუტორიზაცია ვერ ხორციელდება "
 
-#: modules/websession/lib/websession_webinterface.py:501
+#: modules/websession/lib/websession_webinterface.py:513
 msgid "Empty username or password"
 msgstr "ცარიელია ან მომხმარებლის სახელი ან პაროლი"
 
-#: modules/websession/lib/websession_webinterface.py:510
+#: modules/websession/lib/websession_webinterface.py:522
 msgid "Unable to update settings."
 msgstr "ვერ ხორციელდება პარამეტრების  განახლება."
 
-#: modules/websession/lib/websession_webinterface.py:571
+#: modules/websession/lib/websession_webinterface.py:583
 msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
@@ -6989,15 +6989,15 @@ msgstr ""
 "ვერ იგზავნება პაროლის შეცვლის მოთხოვნა, ვინაიდან თქვენ იყენებთ გარე "
 "აუტორიზირებულ სისტემას."
 
-#: modules/websession/lib/websession_webinterface.py:587
+#: modules/websession/lib/websession_webinterface.py:599
 msgid "The entered email address does not exist in the database."
 msgstr "შეყვანილი ელ-ფოსტის მისამართი არ არსებობს მონაემთაბაზაში."
 
-#: modules/websession/lib/websession_webinterface.py:601
+#: modules/websession/lib/websession_webinterface.py:613
 msgid "Password reset request for"
 msgstr "პაროლის გადატვირთვის მოთხოვნა"
 
-#: modules/websession/lib/websession_webinterface.py:605
+#: modules/websession/lib/websession_webinterface.py:617
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -7005,47 +7005,47 @@ msgstr ""
 "შეყვანილი ელ-ფოსტის მისამართი არ არის სწორი, გთხოვთ შეამოწმოთ რომ ის სწორედ "
 "ჩაჭერეთ  (მაგალიტად:  johndoe@example.com)."
 
-#: modules/websession/lib/websession_webinterface.py:606
+#: modules/websession/lib/websession_webinterface.py:618
 msgid "Incorrect email address"
 msgstr "არასწორი ელ-ფოსტის მისამართი"
 
-#: modules/websession/lib/websession_webinterface.py:616
+#: modules/websession/lib/websession_webinterface.py:628
 msgid "Reset password link sent"
 msgstr "პაროლის გადატვირთვის ლინკი გამოგზავნილია"
 
-#: modules/websession/lib/websession_webinterface.py:661
+#: modules/websession/lib/websession_webinterface.py:673
 msgid "Delete Account"
 msgstr "ანგარიშის წაშლა"
 
-#: modules/websession/lib/websession_webinterface.py:687
+#: modules/websession/lib/websession_webinterface.py:699
 msgid "Logout"
 msgstr "გამოსვლა"
 
-#: modules/websession/lib/websession_webinterface.py:753
-#: modules/websession/lib/websession_webinterface.py:802
-#: modules/websession/lib/websession_webinterface.py:837
+#: modules/websession/lib/websession_webinterface.py:765
+#: modules/websession/lib/websession_webinterface.py:814
+#: modules/websession/lib/websession_webinterface.py:849
 msgid "Login"
 msgstr "შესვლა"
 
-#: modules/websession/lib/websession_webinterface.py:868
+#: modules/websession/lib/websession_webinterface.py:880
 msgid "Register"
 msgstr "რეგისტრაცია"
 
-#: modules/websession/lib/websession_webinterface.py:871
-#: modules/websession/lib/websession_webinterface.py:943
+#: modules/websession/lib/websession_webinterface.py:883
+#: modules/websession/lib/websession_webinterface.py:955
 #, python-format
 msgid "%s  Personalize, Main page"
 msgstr "%s  მთავარი გვერდის პერსონალიზაცია"
 
-#: modules/websession/lib/websession_webinterface.py:888
+#: modules/websession/lib/websession_webinterface.py:900
 msgid "Your account has been successfully created."
 msgstr "თქვენი ანგარიშის შექმნა დასრულდა წარმატებით.  "
 
-#: modules/websession/lib/websession_webinterface.py:889
+#: modules/websession/lib/websession_webinterface.py:901
 msgid "Account created"
 msgstr "ანგარიში შექმნილია"
 
-#: modules/websession/lib/websession_webinterface.py:891
+#: modules/websession/lib/websession_webinterface.py:903
 msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
@@ -7053,13 +7053,13 @@ msgstr ""
 "ელფოსტის დასადასტურებლად, წერილია გამოგზავნილი თქვენს მისამართზე აქტივაციის "
 "გასაღებით შემდეგ ელფოსტის მისამართზე."
 
-#: modules/websession/lib/websession_webinterface.py:892
+#: modules/websession/lib/websession_webinterface.py:904
 msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr "გთხოვთ მიყვეთ ინსტრუქციას ანგარიშის რეგისტრაციის დასამთავრებლად."
 
-#: modules/websession/lib/websession_webinterface.py:894
+#: modules/websession/lib/websession_webinterface.py:906
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -7067,74 +7067,74 @@ msgstr ""
 "მეორე ელ-ფოსტა გამოგზავნილი იქნება მაშინ, როდესაც თქვენი ანგარიშ იქნება "
 "გააქტიურებული და შესაძლებელი იქნება მისის გამოყენება."
 
-#: modules/websession/lib/websession_webinterface.py:897
+#: modules/websession/lib/websession_webinterface.py:909
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr ""
 "თქვენ შეგიძლიათ შეხვიდეთ თქვენს %(x_url_open)sანგარიშზე%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:904
-#: modules/websession/lib/websession_webinterface.py:909
-#: modules/websession/lib/websession_webinterface.py:914
-#: modules/websession/lib/websession_webinterface.py:920
-#: modules/websession/lib/websession_webinterface.py:925
-#: modules/websession/lib/websession_webinterface.py:929
-#: modules/websession/lib/websession_webinterface.py:933
-#: modules/websession/lib/websession_webinterface.py:938
+#: modules/websession/lib/websession_webinterface.py:916
+#: modules/websession/lib/websession_webinterface.py:921
+#: modules/websession/lib/websession_webinterface.py:926
+#: modules/websession/lib/websession_webinterface.py:932
+#: modules/websession/lib/websession_webinterface.py:937
+#: modules/websession/lib/websession_webinterface.py:941
+#: modules/websession/lib/websession_webinterface.py:945
+#: modules/websession/lib/websession_webinterface.py:950
 msgid "Registration failure"
 msgstr "რეგისტრაცია ვერ განხორციელდა"
 
-#: modules/websession/lib/websession_webinterface.py:922
+#: modules/websession/lib/websession_webinterface.py:934
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "არჩეული მეტსახელი %s უკვე არსებობს მონაცემთაბაზაში."
 
-#: modules/websession/lib/websession_webinterface.py:927
+#: modules/websession/lib/websession_webinterface.py:939
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "მომხმარებელს არ შეუძია საკუთარი თავის დარეგისტრირება ეს ადმინისტრატორის "
 "პრეროგატივაა."
 
-#: modules/websession/lib/websession_webinterface.py:931
+#: modules/websession/lib/websession_webinterface.py:943
 msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
 "სისტემა ვერ ახერხებს თქვნთან ელფოსტის გაგზავნას, მისამართის დასადასტურებლად."
 
-#: modules/websession/lib/websession_webinterface.py:931
+#: modules/websession/lib/websession_webinterface.py:943
 #: modules/websubmit/lib/websubmit_webinterface.py:141
 msgid ""
 "The error has been logged and will be taken in consideration as soon as "
 "possible."
 msgstr "შეცდომა შენახულია და შესწორდება რაც შეიძლება მალე."
 
-#: modules/websession/lib/websession_webinterface.py:978
+#: modules/websession/lib/websession_webinterface.py:990
 msgid "Your tickets"
 msgstr "თქვენი ბილეთები"
 
-#: modules/websession/lib/websession_webinterface.py:1014
-#: modules/websession/lib/websession_webinterface.py:1059
-#: modules/websession/lib/websession_webinterface.py:1120
-#: modules/websession/lib/websession_webinterface.py:1184
-#: modules/websession/lib/websession_webinterface.py:1243
-#: modules/websession/lib/websession_webinterface.py:1316
+#: modules/websession/lib/websession_webinterface.py:1026
+#: modules/websession/lib/websession_webinterface.py:1071
+#: modules/websession/lib/websession_webinterface.py:1132
+#: modules/websession/lib/websession_webinterface.py:1196
+#: modules/websession/lib/websession_webinterface.py:1255
+#: modules/websession/lib/websession_webinterface.py:1328
 msgid "You are not authorized to use groups."
 msgstr "თქვენ არ გაქვთ ავტორიზაცია ჯგუფების გამოყენებისთვის."
 
-#: modules/websession/lib/websession_webinterface.py:1145
+#: modules/websession/lib/websession_webinterface.py:1157
 msgid "Join New Group"
 msgstr "შეუერთდით ახალ ჯგუფს "
 
-#: modules/websession/lib/websession_webinterface.py:1199
+#: modules/websession/lib/websession_webinterface.py:1211
 msgid "Leave Group"
 msgstr "ჯგუფის დატოვება"
 
-#: modules/websession/lib/websession_webinterface.py:1271
+#: modules/websession/lib/websession_webinterface.py:1283
 msgid "Edit Group"
 msgstr "ჯგუფის რედაქრტიება"
 
-#: modules/websession/lib/websession_webinterface.py:1345
+#: modules/websession/lib/websession_webinterface.py:1357
 msgid "Edit group members"
 msgstr "ჯგუფის წევრების რედაქრირება"
 
