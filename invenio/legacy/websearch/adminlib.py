@@ -44,6 +44,7 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
+     CFG_WEBLINKBACK_TRACKBACK_ENABLED, \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE
@@ -3427,6 +3428,8 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         for key in tabs.keys():
             tabs[key]['visible'] = True
 
+    if not CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+        tabs['linkbacks']['visible'] = False
 
     if not CFG_WEBCOMMENT_ALLOW_COMMENTS:
         tabs['comments']['visible'] = False

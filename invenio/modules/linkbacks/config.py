@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-##
+#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,13 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implement *Linkback* methods."""
+"""Linkback configuration."""
 
-import warnings
-
-warnings.warn(
-    "The linkbacks module has been deprecated. If you would like to use it, "
-    "please join Invenio development on GitHub "
-    "<https://github.com/inveniosoftware/invenio/>.",
-    PendingDeprecationWarning
-)
+# Enable legacy weblinkback code.
+CFG_WEBLINKBACK_TRACKBACK_ENABLED = 1

@@ -65,6 +65,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
     'invenio.modules.communities',
     'invenio.modules.pages',
+    'invenio.modules.linkbacks',
     'invenio.modules.multimedia',
 ]
 
