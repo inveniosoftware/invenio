@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Forms for generating access tokens and clients. """
+"""Forms for generating access tokens and clients."""
 
 from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
     InvalidRedirectURIError
@@ -26,6 +26,7 @@ from wtforms import fields, validators, widgets
 from invenio.utils.forms import InvenioBaseForm
 
 from .models import Client
+from .validators import validate_redirect_uri
 
 
 #
@@ -90,7 +91,7 @@ class RedirectURIValidator(object):
         errors = []
         for v in field.data.splitlines():
             try:
-                Client.validate_redirect_uri(v)
+                validate_redirect_uri(v)
             except InsecureTransportError:
                 errors.append(v)
             except InvalidRedirectURIError:

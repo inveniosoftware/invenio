@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""OAuth2Server configuration variables."""
+
 OAUTH2_CACHE_TYPE = 'redis'
 """ Type of cache to use for storing the temporary grant token """
 

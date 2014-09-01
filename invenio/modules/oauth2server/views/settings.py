@@ -1,29 +1,24 @@
 # -*- coding: utf-8 -*-
-#
-## This file is part of ZENODO.
+##
+## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
-## ZENODO is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
 ##
-## ZENODO is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-"""
-OAuth Server Settings Blueprint
-"""
+"""OAuth Server Settings Blueprint."""
 
 from __future__ import absolute_import
 from functools import wraps
@@ -56,9 +51,7 @@ blueprint = Blueprint(
 # Decorator
 #
 def client_getter():
-    """
-    Decorator to retrieve Client object and check user permission
-    """
+    """Decorator to retrieve Client object and check user permission."""
     def wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):
@@ -79,9 +72,7 @@ def client_getter():
 
 
 def token_getter(is_personal=True, is_internal=False):
-    """
-    Decorator to retrieve Token object and check user permission
-    """
+    """Decorator to retrieve Token object and check user permission."""
     def wrapper(f):
         @wraps(f)
         def decorated(*args, **kwargs):

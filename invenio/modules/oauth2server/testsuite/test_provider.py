@@ -222,10 +222,21 @@ class OAuth2ProviderTestCase(InvenioTestCase):
             self.assertEqual(data['error'], 'unauthorized_client')
             assert next_url == redirect_uri
 
-            # Missing arguments
+            # Missing response_type
             r = self.client.get(url_for(
-                'oauth2server.authorize', client_id=client_id,
+                'oauth2server.authorize', redirect_uri=redirect_uri,
+                scope=scope, client_id=client_id,
             ))
+            self.assertStatus(r, 302)
+            next_url, data = self.parse_redirect(r.location)
+            self.assertEqual(data['error'], 'invalid_request')
+            assert next_url == redirect_uri
+
+            # Duplicate parameter
+            r = self.client.get(url_for(
+                'oauth2server.authorize', redirect_uri=redirect_uri,
+                scope=scope, response_type='invalid', client_id=client_id,
+            ) + "&client_id=%s" % client_id)
             self.assertStatus(r, 302)
             next_url, data = self.parse_redirect(r.location)
             self.assertEqual(data['error'], 'invalid_request')
@@ -243,6 +254,16 @@ class OAuth2ProviderTestCase(InvenioTestCase):
 
             r = self.client.get(next_url, query_string=data)
             assert 'invalid_client_id' in r.data
+
+            # Invalid redirect uri
+            r = self.client.get(url_for(
+                'oauth2server.authorize', redirect_uri='http://localhost/',
+                scope=scope, response_type=response_type, client_id=client_id,
+            ))
+            self.assertStatus(r, 302)
+            next_url, data = self.parse_redirect(r.location)
+            self.assertEqual(data['error'], 'mismatching_redirect_uri')
+            assert error_url in next_url
 
     def test_refresh_flow(self):
         # First login on provider site

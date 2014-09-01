@@ -17,33 +17,35 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Database models for OAuth2 server."""
+
 from __future__ import absolute_import
 
 
 from flask import current_app
 from flask.ext.login import current_user
-from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
-    InvalidRedirectURIError
+
 from werkzeug.security import gen_salt
 from wtforms import validators
 from sqlalchemy_utils import URLType
 import six
-from six.moves.urllib_parse import urlparse
-
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login.legacy_user import UserInfo
 
+from .validators import validate_redirect_uri, validate_scopes
+from .errors import ScopeDoesNotExists
+
 
 class OAuthUserProxy(object):
 
-    """ Proxy object to an Invenio User. """
+    """Proxy object to an Invenio User."""
 
     def __init__(self, user):
         self._user = user
 
     def __getattr__(self, name):
-        """ Pass any undefined attribute to the underlying object. """
+        """Pass any undefined attribute to the underlying object."""
         return getattr(self._user, name)
 
     def __getstate__(self):
@@ -105,7 +107,7 @@ class Client(db.Model):
             validators=[validators.Required()]
         )
     )
-    """ Human readable name of the application. """
+    """Human readable name of the application."""
 
     description = db.Column(
         db.Text(),
@@ -116,7 +118,7 @@ class Client(db.Model):
                         ' (displayed to users).',
         )
     )
-    """ Human readable description. """
+    """Human readable description."""
 
     website = db.Column(
         URLType(),
@@ -128,21 +130,21 @@ class Client(db.Model):
     )
 
     user_id = db.Column(db.ForeignKey('user.id'))
-    """ Creator of the client application. """
+    """Creator of the client application."""
 
     client_id = db.Column(db.String(255), primary_key=True)
-    """ Client application ID. """
+    """Client application ID."""
 
     client_secret = db.Column(
         db.String(255), unique=True, index=True, nullable=False
     )
-    """ Client application secret. """
+    """Client application secret."""
 
     is_confidential = db.Column(db.Boolean, default=True)
-    """ Determine if client application is public or not.  """
+    """Determine if client application is public or not."""
 
     is_internal = db.Column(db.Boolean, default=False)
-    """ Determins if client application is an internal application. """
+    """Determins if client application is an internal application."""
 
     _redirect_uris = db.Column(db.Text)
     """A newline-separated list of redirect URIs. First is the default URI."""
@@ -155,7 +157,7 @@ class Client(db.Model):
     """
 
     user = db.relationship('User')
-    """ Relationship to user. """
+    """Relationship to user."""
 
     @property
     def allowed_grant_types(self):
@@ -182,35 +184,16 @@ class Client(db.Model):
 
     @redirect_uris.setter
     def redirect_uris(self, value):
-        """ Validate and store redirect URIs for client. """
+        """Validate and store redirect URIs for client."""
         if isinstance(value, six.text_type):
             value = value.split("\n")
 
         value = [v.strip() for v in value]
 
         for v in value:
-            self.validate_redirect_uri(v)
+            validate_redirect_uri(v)
 
         self._redirect_uris = "\n".join(value) or ""
-
-    @staticmethod
-    def validate_redirect_uri(value):
-        """ Validate a redirect URI.
-
-        A redirect URL must utilize https or redirect to localhost.
-
-        :param value: Value to validate.
-        :raises: InvalidRedirectURIError, InsecureTransportError
-        """
-        sch, netloc, path, par, query, fra = urlparse(value)
-        if not (sch and netloc):
-            raise InvalidRedirectURIError()
-        if sch != 'https':
-            if ':' in netloc:
-                netloc, port = netloc.split(':', 1)
-            if not (netloc in ('localhost', '127.0.0.1') and sch == 'http'):
-                raise InsecureTransportError()
-        return True
 
     @property
     def default_redirect_uri(self):
@@ -221,19 +204,24 @@ class Client(db.Model):
 
     @property
     def default_scopes(self):
-        """ List of default scopes for client. """
+        """List of default scopes for client."""
         if self._default_scopes:
             return self._default_scopes.split(" ")
         return []
 
-    def validate_scopes(self, scopes):
-        """ Validate if client is allowed to access scopes. """
-        from .registry import scopes as scopes_registry
+    @default_scopes.setter
+    def default_scopes(self, scopes):
+        """Set default scopes for client."""
+        validate_scopes(scopes)
+        self._default_scopes = " ".join(set(scopes)) if scopes else ""
 
-        for s in set(scopes):
-            if s not in scopes_registry:
-                return False
-        return True
+    def validate_scopes(self, scopes):
+        """Validate if client is allowed to access scopes."""
+        try:
+            validate_scopes(scopes)
+            return True
+        except ScopeDoesNotExists:
+            return False
 
     def gen_salt(self):
         self.reset_client_id()
@@ -257,27 +245,27 @@ class Token(db.Model):
     __tablename__ = 'oauth2TOKEN'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    """ Object ID """
+    """Object ID."""
 
     client_id = db.Column(
         db.String(40), db.ForeignKey('oauth2CLIENT.client_id'),
         nullable=False,
     )
-    """ Foreign key to client application """
+    """Foreign key to client application."""
 
     client = db.relationship('Client')
-    """ SQLAlchemy relationship to client application """
+    """SQLAlchemy relationship to client application."""
 
     user_id = db.Column(
         db.Integer, db.ForeignKey('user.id')
     )
-    """ Foreign key to user """
+    """Foreign key to user."""
 
     user = db.relationship('User')
-    """ SQLAlchemy relationship to user """
+    """SQLAlchemy relationship to user."""
 
     token_type = db.Column(db.String(255), default='bearer')
-    """ Token type - only bearer is supported at the moment """
+    """Token type - only bearer is supported at the moment."""
 
     access_token = db.Column(db.String(255), unique=True)
 
@@ -288,10 +276,10 @@ class Token(db.Model):
     _scopes = db.Column(db.Text)
 
     is_personal = db.Column(db.Boolean, default=False)
-    """ Personal accesss token """
+    """Personal accesss token."""
 
     is_internal = db.Column(db.Boolean, default=False)
-    """ Determines if token is an internally generated token. """
+    """Determines if token is an internally generated token."""
 
     @property
     def scopes(self):
@@ -301,13 +289,11 @@ class Token(db.Model):
 
     @scopes.setter
     def scopes(self, scopes):
-        self._scopes = " ".join(scopes) if scopes else ""
-
-    def scopes_ordered(self, scopes):
-        self._scopes = " ".join(scopes) if scopes else ""
+        validate_scopes(scopes)
+        self._scopes = " ".join(set(scopes)) if scopes else ""
 
     def get_visible_scopes(self):
-        """ Get list of non-internal scopes for token. """
+        """Get list of non-internal scopes for token."""
         from .registry import scopes as scopes_registry
         return [k for k, s in scopes_registry.choices() if k in self.scopes]
 
