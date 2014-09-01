@@ -93,7 +93,8 @@ def start(workflow_name, data, **kwargs):
     :return: BibWorkflowEngine that ran the workflow.
     """
     from .worker_engine import run_worker
-
+    if not isinstance(data, list):
+        data = [data]
     return run_worker(workflow_name, data, **kwargs)
 
 
@@ -121,11 +122,12 @@ def start_delayed(workflow_name, data, **kwargs):
     if not CFG_BIBWORKFLOW_WORKER:
         raise WorkflowWorkerError('No worker configured')
 
-    #The goal of this part is to avoid a SQLalchemy decoherence in case
-    #some one try to send a Bibworkflow object. To avoid to send the
-    #complete object and get SQLAlchemy error of mapping, we save the id
-    #into our Id container, In the celery process the object is reloaded
-    #from the database !
+    # The goal of this part is to avoid a SQLalchemy decoherence in case
+    # some one try to send a Bibworkflow object. To avoid to send the
+    # complete object and get SQLAlchemy error of mapping, we save the id
+    # into our Id container, In the celery process the object is reloaded
+    # from the database !
+
     if isinstance(data, list):
         for i in range(0, len(data)):
             if isinstance(data[i], BibWorkflowObject):

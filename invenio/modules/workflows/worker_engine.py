@@ -140,6 +140,9 @@ def get_workflow_object_instances(data, engine):
     """
     workflow_objects = []
     data_type = None
+    if isinstance(data, BibWorkflowObject):
+        # A BibWorkflowObject was passed directly, put it in a list.
+        data = [data]
     for data_object in data:
         if isinstance(data_object, BibWorkflowObject):
             data_object.data_type = data_type = data_type or engine.get_default_data_type()
