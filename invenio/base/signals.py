@@ -111,6 +111,11 @@ Example subscriber::
     )
 """
 
+fixtures_loaded = _signals.signal('fixtures-loaded')
+"""
+This signal is sent right after fixtures are loaded.
+"""
+
 # Record related signals
 record_before_create = _signals.signal(
     'record-before-create')

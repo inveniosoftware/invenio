@@ -35,6 +35,7 @@ def load_fixtures(sender, yes_i_know=False, drop=True, **kwargs):
         the fixtures
     """
     from invenio.ext.sqlalchemy import db, models
+    from invenio.base.signals import fixtures_loaded
     from fixture import SQLAlchemyFixture
 
     # Load SQLAlchemy models.
@@ -52,6 +53,7 @@ def load_fixtures(sender, yes_i_know=False, drop=True, **kwargs):
         env=models, engine=db.metadata.bind, session=db.session
     ).data(*fixtures.values()).setup()
     db.session.commit()
+    fixtures_loaded.send(load_fixtures)
 
 
 def setup_app(app):
