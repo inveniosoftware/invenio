@@ -30,8 +30,6 @@ from invenio.modules.search.models import Collection
 
 class KnwKB(db.Model):
     """Represents a KnwKB record."""
-    def __init__(self):
-        pass
     __tablename__ = 'knwKB'
     id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
                 primary_key=True, autoincrement=True)
@@ -41,8 +39,6 @@ class KnwKB(db.Model):
 
 class KnwKBDDEF(db.Model):
     """Represents a KnwKBDDEF record."""
-    def __init__(self):
-        pass
     __tablename__ = 'knwKBDDEF'
     id_knwKB = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(KnwKB.id), nullable=False, primary_key=True)
@@ -55,8 +51,6 @@ class KnwKBDDEF(db.Model):
 
 class KnwKBRVAL(db.Model):
     """Represents a KnwKBRVAL record."""
-    def __init__(self):
-        pass
     __tablename__ = 'knwKBRVAL'
     id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
                 primary_key=True,
