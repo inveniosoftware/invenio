@@ -29,7 +29,7 @@ import shutil
 from urllib import urlencode
 from collections import defaultdict
 
-from invenio.bibrecord import create_record
+from invenio.legacy.bibrecord import create_record
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
