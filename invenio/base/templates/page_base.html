@@ -81,16 +81,15 @@
   {%- endblock head_apple_icons %}
   {%- endblock head_links %}
 
-  {%- block header %}
-    {{- metaheaderadd | safe }}
-    {%- block metaheader %}{% endblock metaheader %}
-  {%- endblock header %}
-
   {%- block _top_assets %}
     {%- block global_stylesheets %}
       {%- include "base/stylesheets.html" %}
     {%- endblock %}
   {%- endblock %}
+  {%- block header %}
+    {{- metaheaderadd | safe }}
+    {%- block metaheader %}{% endblock metaheader %}
+  {%- endblock header %}
   {%- block css %}{% endblock %}
   {%- endblock head %}
 </head>
