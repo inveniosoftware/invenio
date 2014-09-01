@@ -67,7 +67,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
 
             # Save workflow progress
             wfe.save(status=WorkflowStatus.HALTED)
-            wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            wfe.setPosition(wfe.getCurrObjId() + 1, [0])
 
             message = "Workflow '%s' halted at task %s with message: %s" % \
                       (wfe.name,
@@ -95,7 +95,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
             # together with default exception handling
             wfe.increase_counter_error()
             wfe.save(status=WorkflowStatus.ERROR)
-            wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            wfe.setPosition(wfe.getCurrObjId() + 1, [0])
             if stop_on_error:
                 if isinstance(exception_triggered, WorkflowError):
                     raise exception_triggered

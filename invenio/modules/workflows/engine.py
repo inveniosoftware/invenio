@@ -451,8 +451,10 @@ BibWorkflowEngine
         """Get name of current task/step in the workflow (if applicable)."""
         callback_list = self.getCallbacks()
         if callback_list:
+            import collections
             for i in self.getCurrTaskId():
-                callback_list = callback_list[i]
+                if not isinstance(callback_list, collections.Callable):
+                    callback_list = callback_list[i]
             if isinstance(callback_list, list):
                 # With operator functions such as IF_ELSE
                 # The final value is not a function, but a list.value
