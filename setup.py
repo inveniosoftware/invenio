@@ -114,7 +114,7 @@ install_requires = [
     "raven>=5.0.0",
     "rdflib>=4.1.2",
     "redis==2.8.0",  # Is it explicitly required?
-    "reportlab>=3.1.8,<3.2",
+    "reportlab>=2.7,<3.2",
     "requests>=2.3,<2.4",
     "six>=1.7.2",
     "Sphinx",
