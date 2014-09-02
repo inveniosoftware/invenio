@@ -1,4 +1,3 @@
-## Administrator interface for BibIndex
 ## This file is part of Invenio.
 ## Copyright (C) 2009, 2010, 2011, 2012, 2014 CERN.
 ##
@@ -23,7 +22,6 @@ __revision__ = "$Id$"
 import re
 import os
 import cgi
-import time
 import urllib
 import tempfile
 import datetime
@@ -32,9 +30,7 @@ from httplib import InvalidURL
 from invenio.config import (CFG_SITE_LANG,
                             CFG_TMPDIR,
                             CFG_SITE_URL,
-                            CFG_ETCDIR,
                             CFG_BINDIR,
-                            CFG_LOGDIR,
                             CFG_SITE_RECORD)
 
 from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
@@ -44,20 +40,21 @@ from invenio.legacy.bibrank.adminlib import (write_outcome,
                                              createhiddenform)
 from invenio.legacy.dbquery import deserialize_via_marshal
 
-from invenio.legacy.oaiharvest.dblayer import get_month_logs_size, \
-     get_history_entries_for_day, get_day_logs_size, get_entry_history, \
-     get_entry_logs_size, get_holdingpen_entries, delete_holdingpen_entry, \
-     get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
-     get_holdingpen_day_fragment, get_holdingpen_entry_details, \
-     add_oai_src, modify_oai_src, delete_oai_src, \
-     get_next_schedule, get_oai_src_by_id, get_all_oai_src
+from invenio.legacy.oaiharvest.dblayer import (
+    get_month_logs_size, get_history_entries_for_day, get_day_logs_size,
+    get_entry_history, get_entry_logs_size, delete_holdingpen_entry,
+    get_holdingpen_years, get_holdingpen_month, get_holdingpen_year,
+    get_holdingpen_day_fragment, get_holdingpen_entry_details)
+
 from invenio.legacy.search_engine import get_record
 
 import invenio.legacy.template
-from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import (
+    create_marc_record)
 from invenio.legacy.bibrecord import create_record
 from invenio.utils.url import create_html_link
-from invenio.legacy.bibsched.bibtask import task_low_level_submission, task_log_path
+from invenio.legacy.bibsched.bibtask import (
+    task_low_level_submission, task_log_path)
 from invenio.legacy.webuser import get_user_info, get_email
 
 webstyle_templates = invenio.legacy.template.load('webstyle')
@@ -78,18 +75,18 @@ dates = [[0, "from beginning"],
 
 
 def getnavtrail(previous='', ln=CFG_SITE_LANG):
-    """Get the navtrail"""
+    """Get the navtrail."""
     return oaiharvest_templates.tmpl_getnavtrail(previous=previous,
                                                  ln=ln)
 
+
 def getheader():
-    """Get the standard meta header"""
+    """Get the standard meta header."""
     return oaiharvest_templates.tmpl_meta_headers()
 
+
 def generate_sources_actions_menu(oai_src_id, ln=CFG_SITE_LANG):
-    """
-    Create the links/actions to administrate the given OAI source.
-    """
+    """Create the links/actions to administrate the given OAI source."""
     _ = gettext_set_language(ln)
     default_link_argd = {'ln': ln,
                          'oai_src_id': str(oai_src_id)}
@@ -103,26 +100,31 @@ def generate_sources_actions_menu(oai_src_id, ln=CFG_SITE_LANG):
     test_link = create_html_link(urlbase=oai_harvest_admin_url + "/testsource",
                                  urlargd=default_link_argd,
                                  link_label=_("test"))
-    hist_link = create_html_link(urlbase=oai_harvest_admin_url + "/viewhistory",
+    hist_link = create_html_link(urlbase=oai_harvest_admin_url +
+                                 "/viewhistory",
                                  urlargd=default_link_argd,
                                  link_label=_("history"))
     harvest_link = create_html_link(urlbase=oai_harvest_admin_url + "/harvest",
                                     urlargd=default_link_argd,
                                     link_label=_("harvest"))
 
-    return edit_link + " / " + del_link + " / " + test_link + \
-           " / " + hist_link + " / " + harvest_link
+    return (edit_link + " / " + del_link + " / " + test_link +
+            " / " + hist_link + " / " + harvest_link)
 
 
 def perform_request_index(ln=CFG_SITE_LANG):
-    """start area for administering harvesting from OAI repositories"""
+    """Start area for administering harvesting from OAI repositories."""
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import get_next_schedule, \
+        get_all_oai_src
     _ = gettext_set_language(ln)
 
-    titlebar = oaiharvest_templates.tmpl_draw_titlebar(ln=ln, title=_("Overview of sources"), guideurl=guideurl,
-                                                       extraname="add new OAI source",
-                                                       extraurl="admin/oaiharvest/oaiharvestadmin.py/addsource?ln="
-                                                                + ln)
-    titlebar2 = oaiharvest_templates.tmpl_draw_titlebar(ln=ln, title=_("Harvesting status"), guideurl=guideurl)
+    titlebar = oaiharvest_templates.tmpl_draw_titlebar(
+        ln=ln, title=_("Overview of sources"), guideurl=guideurl,
+        extraname="add new OAI source",
+        extraurl="admin/oaiharvest/oaiharvestadmin.py/addsource?ln=" + ln)
+    titlebar2 = oaiharvest_templates.tmpl_draw_titlebar(
+        ln=ln, title=_("Harvesting status"), guideurl=guideurl)
     header = ['name', 'base URL', 'metadata prefix', 'frequency',
               'last run', 'post-processes', 'actions', 'comments']
     oai_sources = get_all_oai_src()
@@ -132,33 +134,37 @@ def perform_request_index(ln=CFG_SITE_LANG):
     for repository in oai_sources:
         default_link_argd = {'ln': ln,
                              'oai_src_id': str(repository['id'])}
-        namelinked = create_html_link(urlbase=oai_harvest_admin_url + \
-                                      "/editsource",
-                                      urlargd=default_link_argd,
-                                      link_label=cgi.escape(repository['name']))
+        namelinked = create_html_link(
+            urlbase=oai_harvest_admin_url + "/editsource",
+            urlargd=default_link_argd,
+            link_label=cgi.escape(repository['name']))
         freq = _("Not Set")
-        if repository['frequency'] == 0: freq = _("never")
-        elif repository['frequency'] == 24: freq = _("daily")
-        elif repository['frequency'] == 168: freq = _("weekly")
-        elif repository['frequency'] == 720: freq = _("monthly")
+        if repository['frequency'] == 0:
+            freq = _("never")
+        elif repository['frequency'] == 24:
+            freq = _("daily")
+        elif repository['frequency'] == 168:
+            freq = _("weekly")
+        elif repository['frequency'] == 720:
+            freq = _("monthly")
 
         if not repository['lastrun']:
-            repository['lastrun'] = oaiharvest_templates.tmpl_print_warning(ln, \
-                                                                      _("Never harvested"), \
-                                                                      prefix="")
+            repository['lastrun'] = oaiharvest_templates.tmpl_print_warning(
+                ln, _("Never harvested"), prefix="")
         else:
-            #cut away leading zeros
-            repository['lastrun'] = re.sub(r'\.[0-9]+$', '', str(repository['lastrun']))
+            # cut away leading zeros
+            repository['lastrun'] = re.sub(
+                r'\.[0-9]+$', '', str(repository['lastrun']))
         if not repository['comment']:
             repository['comment'] = ""
         action = generate_sources_actions_menu(repository['id'], ln)
-        sources.append([namelinked, \
-                        repository['baseurl'], \
-                        repository['metadataprefix'], \
-                        freq, \
-                        repository['lastrun'], \
-                        repository['postprocess'], \
-                        action, \
+        sources.append([namelinked,
+                        repository['baseurl'],
+                        repository['metadataprefix'],
+                        freq,
+                        repository['lastrun'],
+                        repository['postprocess'],
+                        action,
                         repository['comment']])
 
     (schtime, schstatus) = get_next_schedule()
@@ -166,15 +172,17 @@ def perform_request_index(ln=CFG_SITE_LANG):
         schtime = re.sub(r'\.[0-9]+$', '', str(schtime))
 
     holdingpen_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                               "/viewholdingpen",
+                                       "/viewholdingpen",
                                        urlargd={'ln': ln},
                                        link_label=_("View Holding Pen"))
     output = titlebar
-    output += oaiharvest_templates.tmpl_output_numbersources(ln, len(oai_sources))
+    output += oaiharvest_templates.tmpl_output_numbersources(
+        ln, len(oai_sources))
     output += tupletotable(header=header, tuple=sources)
     output += oaiharvest_templates.tmpl_print_brs(ln, 2)
     output += titlebar2
-    output += oaiharvest_templates.tmpl_output_schedule(ln, schtime, str(schstatus))
+    output += oaiharvest_templates.tmpl_output_schedule(
+        ln, schtime, str(schstatus))
     output += holdingpen_link
 
     return output
@@ -184,10 +192,16 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                oai_src_baseurl='', oai_src_prefix='',
                                oai_src_frequency='', oai_src_post='',
                                oai_src_comment='', ln=CFG_SITE_LANG,
-                               confirm=-1, oai_src_sets=None, oai_src_args=None):
-    """creates html form to edit a OAI source. this method is calling other methods
-    which again is calling this and sending back the output of the method.
-    confirm - determines the validation status of the data input into the form"""
+                               confirm=-1, oai_src_sets=None,
+                               oai_src_args=None):
+    """Create html form to edit a OAI source.
+
+    This method is calling other methods which again is calling this and
+    sending back the output of the method.  confirm - determines the validation
+    status of the data input into the form.
+    """
+    from invenio.legacy.oaiharvest.dblayer import modify_oai_src, \
+        get_oai_source_form
     _ = gettext_set_language(ln)
 
     if oai_src_id is None:
@@ -199,19 +213,21 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
     confirm = int(confirm)
     show_form = True
 
-    subtitle = oaiharvest_templates.tmpl_draw_subtitle(ln=ln, \
-                                                       title="edit source", \
-                                                       subtitle="Edit OAI source", \
-                                                       guideurl=guideurl)
+    subtitle = oaiharvest_templates.tmpl_draw_subtitle(
+        ln=ln, title="edit source", subtitle="Edit OAI source",
+        guideurl=guideurl)
 
     if confirm == -1:
         oai_src = get_oai_src_by_id(oai_src_id)
         if not oai_src:
-            return oaiharvest_templates.tmpl_print_info(ln, "Source specified does not exist.")
-        # A list is returned, we care only of the first item (which should be the only one..)
+            return oaiharvest_templates.tmpl_print_info(
+                ln, "Source specified does not exist.")
+        # A list is returned, we care only of the first item (which should be
+        # the only one..)
         oai_src = oai_src[0]
         if oai_src['arguments']:
-            oai_src['arguments'] = deserialize_via_marshal(oai_src['arguments'])
+            oai_src['arguments'] = deserialize_via_marshal(
+                oai_src['arguments'])
 
         oai_src['setspecs'] = oai_src['setspecs'].split()
 
@@ -227,11 +243,14 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
     elif confirm == 1:
         warnings = []
         if not oai_src_name:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source."))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please enter a name for the source."))
         if not oai_src_prefix:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please enter a meta-data prefix."))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please enter a meta-data prefix."))
         if not oai_src_frequency:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting"))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please choose a frequency of harvesting"))
 
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
@@ -241,14 +260,14 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
             if not oai_src_post:
                 oai_src_post = []
 
-            res = modify_oai_src(oai_src_id, \
-                                 oai_src_name, \
-                                 oai_src_baseurl, \
-                                 oai_src_prefix, \
-                                 oai_src_frequency, \
-                                 oai_src_post, \
-                                 oai_src_comment, \
-                                 oai_src_sets, \
+            res = modify_oai_src(oai_src_id,
+                                 oai_src_name,
+                                 oai_src_baseurl,
+                                 oai_src_prefix,
+                                 oai_src_frequency,
+                                 oai_src_post,
+                                 oai_src_comment,
+                                 oai_src_sets,
                                  oai_src_args)
             if res[0] == 1:
                 # OAI source modified!
@@ -268,17 +287,19 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                    oai_src_args=oai_src_args,
                                    oai_src_comment=oai_src_comment,
                                    editing_mode=True)
-        output += oaiharvest_templates.tmpl_form_vertical(action="editsource#1",
-                                                          text=text,
-                                                          button="Modify",
-                                                          oai_src_id=oai_src_id,
-                                                          ln=ln,
-                                                          confirm=1)
+        output += oaiharvest_templates.tmpl_form_vertical(
+            action="editsource#1",
+            text=text,
+            button="Modify",
+            oai_src_id=oai_src_id,
+            ln=ln,
+            confirm=1)
 
     output += oaiharvest_templates.tmpl_print_brs(ln, 2)
-    output += create_html_link(urlbase=oai_harvest_admin_url + "/index",
-                               urlargd={'ln': ln},
-                               link_label=_("Go back to the OAI sources overview"))
+    output += create_html_link(
+        urlbase=oai_harvest_admin_url + "/index",
+        urlargd={'ln': ln},
+        link_label=_("Go back to the OAI sources overview"))
 
     body = [output]
 
@@ -291,7 +312,9 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                               oai_src_post=[], oai_src_args={},
                               ln=CFG_SITE_LANG, confirm=-1,
                               oai_src_sets=None):
-    """creates html form to add a new source"""
+    """Create html form to add a new source."""
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import add_oai_src
     _ = gettext_set_language(ln)
 
     if oai_src_name is None:
@@ -299,10 +322,11 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
     if oai_src_sets is None:
         oai_src_sets = []
 
-    subtitle = oaiharvest_templates.tmpl_draw_subtitle(ln=ln,
-                                                       title="add source",
-                                                       subtitle="Add new OAI source",
-                                                       guideurl=guideurl)
+    subtitle = oaiharvest_templates.tmpl_draw_subtitle(
+        ln=ln,
+        title="add source",
+        subtitle="Add new OAI source",
+        guideurl=guideurl)
     output = ""
 
     confirm = int(confirm)
@@ -311,10 +335,11 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
     # Step one - user enters source URL
     if confirm <= -1:
         text = oaiharvest_templates.tmpl_print_brs(ln, 1)
-        text += oaiharvest_templates.tmpl_admin_w200_text_placeholder(ln=ln,
-                                                          placeholder="Enter the base URL for source...",
-                                                          name="oai_src_baseurl",
-                                                          value=oai_src_baseurl)
+        text += oaiharvest_templates.tmpl_admin_w200_text_placeholder(
+            ln=ln,
+            placeholder="Enter the base URL for source...",
+            name="oai_src_baseurl",
+            value=oai_src_baseurl)
         output = createhiddenform(action="addsource",
                                   text=text,
                                   ln=ln,
@@ -326,13 +351,17 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
         # User is trying to add a new source
         warnings = []
         if not oai_src_name:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please enter a name for the source."))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please enter a name for the source."))
         if not oai_src_prefix:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please enter a metadata prefix."))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please enter a metadata prefix."))
         if not oai_src_frequency:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please choose a frequency of harvesting"))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please choose a frequency of harvesting"))
         if not oai_src_lastrun:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(ln, "Please choose the harvesting starting date"))
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please choose the harvesting starting date"))
 
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
@@ -357,14 +386,16 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
     elif confirm == 0 and validate(oai_src_baseurl)[0] > 0:
         # Could not perform first url validation
-        output += oaiharvest_templates.tmpl_output_validate_info(ln, 1, str(oai_src_baseurl))
+        output += oaiharvest_templates.tmpl_output_validate_info(
+            ln, 1, str(oai_src_baseurl))
         output += oaiharvest_templates.tmpl_print_brs(ln, 2)
-        output += create_html_link(urlbase=oai_harvest_admin_url + "/addsource",
-        urlargd = {'ln': ln},
-                  link_label = _("Try again with another url"))
+        output += create_html_link(
+            urlbase=oai_harvest_admin_url + "/addsource",
+            urlargd={'ln': ln},
+            link_label=_("Try again with another url"))
         output += " " + _("or") + " "
         output += create_html_link(urlbase=oai_harvest_admin_url +
-                                           "/addsource",
+                                   "/addsource",
                                    urlargd={'ln': ln,
                                             'oai_src_baseurl': oai_src_baseurl,
                                             'confirm': '2'},
@@ -373,11 +404,13 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
     elif confirm == 0 and validate(oai_src_baseurl)[0] == 0:
         # URL validated - user can add source
-        output += oaiharvest_templates.tmpl_output_validate_info(ln, 0, str(oai_src_baseurl))
+        output += oaiharvest_templates.tmpl_output_validate_info(
+            ln, 0, str(oai_src_baseurl))
 
     elif confirm == 2 and validate(oai_src_baseurl)[0] > 0:
         # URL not validated - user can still add a source
-        output += oaiharvest_templates.tmpl_output_validate_info(ln, 1, str(oai_src_baseurl))
+        output += oaiharvest_templates.tmpl_output_validate_info(
+            ln, 1, str(oai_src_baseurl))
 
     if show_form:
         text = get_oai_source_form(ln=ln,
@@ -400,7 +433,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
     output += oaiharvest_templates.tmpl_print_brs(ln, 2)
     output += create_html_link(urlbase=oai_harvest_admin_url +
-                                       "/index",
+                               "/index",
                                urlargd={'ln': ln},
                                link_label=_("Go back to the OAI sources overview"))
 
@@ -412,6 +445,9 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
     """creates html form to delete a source
     """
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import delete_oai_src, \
+        get_oai_src_by_id
     _ = gettext_set_language(ln)
     output = ""
     subtitle = ""
@@ -420,7 +456,8 @@ def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
         oai_src = get_oai_src_by_id(oai_src_id)
         if not oai_src:
             return oaiharvest_templates.tmpl_print_info(ln, "Source specified does not exist.")
-        # A list is returned, we care only of the first item (which should be the only one..)
+        # A list is returned, we care only of the first item (which should be
+        # the only one..)
         oai_src = oai_src[0]
 
         namesrc = (oai_src['name'])
@@ -430,26 +467,28 @@ def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
         output = ""
 
         if confirm in ["0", 0]:
-            question = """Do you want to delete the OAI source '%s' and all its definitions?""" % cgi.escape(namesrc)
+            question = """Do you want to delete the OAI source '%s' and all its definitions?""" % cgi.escape(
+                namesrc)
             text = oaiharvest_templates.tmpl_print_info(ln, question)
             text += oaiharvest_templates.tmpl_print_brs(ln, 3)
             output += createhiddenform(action="delsource#5",
-                                   text=text,
-                                   button="Confirm",
-                                   oai_src_id=oai_src_id,
-                                   confirm=1)
+                                       text=text,
+                                       button="Confirm",
+                                       oai_src_id=oai_src_id,
+                                       confirm=1)
         elif confirm in ["1", 1]:
             res = delete_oai_src(oai_src_id)
             if res[0] == 1:
-                output += oaiharvest_templates.tmpl_print_info(ln, "Source removed.")
+                output += oaiharvest_templates.tmpl_print_info(
+                    ln, "Source removed.")
                 output += oaiharvest_templates.tmpl_print_brs(ln, 1)
                 output += write_outcome(res)
             else:
                 output += write_outcome(res)
 
     output += oaiharvest_templates.tmpl_print_brs(ln, 2)
-    output += create_html_link(urlbase=oai_harvest_admin_url + \
-                                       "/index",
+    output += create_html_link(urlbase=oai_harvest_admin_url +
+                               "/index",
                                urlargd={'ln': ln},
                                link_label=_("Go back to the OAI sources overview"))
 
@@ -466,30 +505,30 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, record_id=None
     result = ""
 
     result += oaiharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
-    result += oaiharvest_templates.tmpl_draw_titlebar(ln=ln, title= \
-        "Record ID ( Recognized by the data source )", guideurl=guideurl)
+    result += oaiharvest_templates.tmpl_draw_titlebar(
+        ln=ln, title="Record ID ( Recognized by the data source )", guideurl=guideurl)
     record_str = ""
     if record_id:
         record_str = str(record_id)
-    form_text = oaiharvest_templates.tmpl_admin_w200_text(ln=ln, title= \
-        "Record identifier", name="record_id", value=record_str)
+    form_text = oaiharvest_templates.tmpl_admin_w200_text(
+        ln=ln, title="Record identifier", name="record_id", value=record_str)
     result += createhiddenform(action="testsource",
                                text=form_text,
                                button="Test",
                                oai_src_id=oai_src_id,
                                ln=ln)
     if record_id:
-        result += oaiharvest_templates.tmpl_draw_titlebar(ln=ln, title= \
-            "OAI XML downloaded from the source", guideurl=guideurl)
+        result += oaiharvest_templates.tmpl_draw_titlebar(
+            ln=ln, title="OAI XML downloaded from the source", guideurl=guideurl)
         result += oaiharvest_templates.tmpl_embed_document(
-            "/admin/oaiharvest/oaiharvestadmin.py/preview_original_xml?oai_src_id=" \
-            + str(oai_src_id) + "&record_id=" \
+            "/admin/oaiharvest/oaiharvestadmin.py/preview_original_xml?oai_src_id="
+            + str(oai_src_id) + "&record_id="
             + str(record_id))
-        result += oaiharvest_templates.tmpl_draw_titlebar(ln=ln, title= \
-            "MARC XML after all the transformations", guideurl=guideurl)
+        result += oaiharvest_templates.tmpl_draw_titlebar(
+            ln=ln, title="MARC XML after all the transformations", guideurl=guideurl)
         result += oaiharvest_templates.tmpl_embed_document(
-            "/admin/oaiharvest/oaiharvestadmin.py/preview_harvested_xml?oai_src_id=" \
-            + str(oai_src_id) + "&record_id=" \
+            "/admin/oaiharvest/oaiharvestadmin.py/preview_harvested_xml?oai_src_id="
+            + str(oai_src_id) + "&record_id="
             + str(record_id))
     return result
 
@@ -506,10 +545,10 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
     ## First column
     table_first_col = "<h3>OAI harvesting job options</h3>"
     table_first_col += oaiharvest_templates.tmpl_admin_w200_text(ln=ln,
-                                                     title="Source name",
-                                                     name="oai_src_name",
-                                                     value=oai_src_name,
-                                                     suffix=" e.g. arxiv<br />")
+                                                                 title="Source name",
+                                                                 name="oai_src_name",
+                                                                 value=oai_src_name,
+                                                                 suffix=" e.g. arxiv<br />")
 
     if editing_mode:
         table_first_col += oaiharvest_templates.tmpl_admin_w200_text(ln=ln,
@@ -524,29 +563,29 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
         for value in metadatas:
             prefixes.append([value, str(value)])
         table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
-                                                            title="Meta-data prefix",
-                                                            name="oai_src_prefix",
-                                                            valuenil="- select meta-data prefix -" ,
-                                                            values=prefixes,
-                                                            lastval=oai_src_prefix,
-                                                            suffix=" e.g. oai_dc<br />")
+                                                                       title="Meta-data prefix",
+                                                                       name="oai_src_prefix",
+                                                                       valuenil="- select meta-data prefix -",
+                                                                       values=prefixes,
+                                                                       lastval=oai_src_prefix,
+                                                                       suffix=" e.g. oai_dc<br />")
     else:
         # Let user specify prefix in free textbox
         table_first_col += oaiharvest_templates.tmpl_admin_w200_text(ln=ln,
-                                                          title="Meta-data prefix",
-                                                          name="oai_src_prefix",
-                                                          value=oai_src_prefix,
-                                                          suffix=" e.g. oai_dc<br />")
+                                                                     title="Meta-data prefix",
+                                                                     name="oai_src_prefix",
+                                                                     value=oai_src_prefix,
+                                                                     suffix=" e.g. oai_dc<br />")
 
-    table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln, \
-                    title="Harvesting frequency", name="oai_src_frequency", \
-                    valuenil="- select harvest frequency -" , values=freqs, \
-                    lastval=oai_src_frequency)
+    table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
+                                                                   title="Harvesting frequency", name="oai_src_frequency",
+                                                                   valuenil="- select harvest frequency -", values=freqs,
+                                                                   lastval=oai_src_frequency)
     if not editing_mode:
-        table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln, \
-                        title="Harvest from", name="oai_src_lastrun", \
-                        valuenil="- select a time to harvest from -" , values=dates, \
-                        lastval=oai_src_lastrun)
+        table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
+                                                                       title="Harvest from", name="oai_src_lastrun",
+                                                                       valuenil="- select a time to harvest from -", values=dates,
+                                                                       lastval=oai_src_lastrun)
     table_first_col += oaiharvest_templates.tmpl_admin_w200_textarea(ln=ln,
                                                                      title="Comments (optional)",
                                                                      name="oai_src_comment",
@@ -569,7 +608,8 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
                 arg_dict['value'] = oai_src_args.get(name, "")
             elif arg_dict['input'] == 'checkbox':
                 for i in range(len(arg_dict['value'])):
-                    arg_dict['states'][i] = arg_dict['value'][i] in oai_src_args.get(name,[])
+                    arg_dict['states'][i] = arg_dict['value'][
+                        i] in oai_src_args.get(name, [])
             updated_mode_arguments.append(arg_dict)
         post_arguments.append(updated_mode_arguments)
 
@@ -589,33 +629,35 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
         # Show available sets to users
         sets_specs = [aset[0] for aset in sets]
         sets_names = [aset[1] for aset in sets]
-        sets_labels = [((aset[1] and aset[0] + ' (' + aset[1] + ')') or aset[0]) \
+        sets_labels = [((aset[1] and aset[0] + ' (' + aset[1] + ')') or aset[0])
                        for aset in sets]
-        sets_states = [((aset[0] in oai_src_sets and 1) or 0) \
-                        for aset in sets]
+        sets_states = [((aset[0] in oai_src_sets and 1) or 0)
+                       for aset in sets]
         table_second_col += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln,
-                                                           title="",
-                                                           name="oai_src_sets",
-                                                           values=sets_specs,
-                                                           labels=sets_labels,
-                                                           states=sets_states)
+                                                                       title="",
+                                                                       name="oai_src_sets",
+                                                                       values=sets_specs,
+                                                                       labels=sets_labels,
+                                                                       states=sets_states)
     else:
         # Let user specify sets in free textbox
         table_second_col += oaiharvest_templates.tmpl_admin_w200_text(ln=ln,
-                                                          title="Sets",
-                                                          name='oai_src_sets',
-                                                          value=' '.join(oai_src_sets),
-                                                          suffix=" e.g. physics<br />")
+                                                                      title="Sets",
+                                                                      name='oai_src_sets',
+                                                                      value=' '.join(
+                                                                          oai_src_sets),
+                                                                      suffix=" e.g. physics<br />")
 
-    output += oaiharvest_templates.tmpl_output_table(data=([table_first_col, "_SEPARATOR_", table_second_col],), \
-                                                  td_class="admin_source_td", \
-                                                  separator_class="admin_source_separator")
+    output += oaiharvest_templates.tmpl_output_table(data=([table_first_col, "_SEPARATOR_", table_second_col],),
+                                                     td_class="admin_source_td",
+                                                     separator_class="admin_source_separator")
     return output
 
 
 ######################################
-###  Displaying bibsched task logs ###
+#    Displaying bibsched task logs   #
 ######################################
+
 def does_logfile_exist(task_id):
     """
        returns logfile name if exists. None otherwise
@@ -653,7 +695,7 @@ def perform_request_viewtasklogs(ln, task_id):
         file_fd = open(log_name)
         content = file_fd.read(-1)
         file_fd.close()
-        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Log file : " + \
+        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Log file : " +
                                                               log_name, guideurl)
         result += oaiharvest_templates.tmpl_output_scrollable_frame(
             oaiharvest_templates.tmpl_output_preformatted(content))
@@ -663,18 +705,19 @@ def perform_request_viewtasklogs(ln, task_id):
         content = file_fd.read(-1)
         file_fd.close()
         result += oaiharvest_templates.tmpl_print_brs(ln, 2)
-        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Error-log file : " + \
+        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Error-log file : " +
                                                               err_name, guideurl)
         result += oaiharvest_templates.tmpl_output_scrollable_frame(
             oaiharvest_templates.tmpl_output_preformatted(content))
 
     if err_name is None and log_name is None:
-        result = oaiharvest_templates.tmpl_print_warning(ln, "Task log currently not available. " \
-                                                             "Probably the task has not started yet. " \
+        result = oaiharvest_templates.tmpl_print_warning(ln, "Task log currently not available. "
+                                                             "Probably the task has not started yet. "
                                                              "Try to refresh in a little while.")
     return result
 
 ### Probably should be moved to some other data-connection file
+
 
 def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids, identifier=""):
     def get_cssclass(cssclass):
@@ -704,7 +747,8 @@ def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids
                                                               cssclass=cssclass)
 
         record_details_link = create_html_link(CFG_SITE_URL +
-                                               "/" + CFG_SITE_RECORD + "/" + str(item.record_id),
+                                               "/" + CFG_SITE_RECORD +
+                                               "/" + str(item.record_id),
                                                urlargd={'ln': ln},
                                                link_label=str(item.record_id))
         cssclass = get_cssclass(cssclass)
@@ -722,10 +766,12 @@ def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids
                                    urlargd={'ln': ln,
                                             'task_id': str(item.bibupload_task_id)},
                                    link_label=str(item.bibupload_task_id))
-    result += oaiharvest_templates.tmpl_table_output_cell(task_id, cssclass=cssclass)
+    result += oaiharvest_templates.tmpl_table_output_cell(
+        task_id, cssclass=cssclass)
 
     if show_selection:
-        chkbox = oaiharvest_templates.tmpl_output_checkbox(item.oai_id, identifier, "1")
+        chkbox = oaiharvest_templates.tmpl_output_checkbox(
+            item.oai_id, identifier, "1")
         cssclass = get_cssclass(cssclass)
         result += oaiharvest_templates.tmpl_table_output_cell(chkbox,
                                                               cssclass=cssclass)
@@ -754,9 +800,9 @@ def build_history_table_header(show_selection=True, show_oai_source=False,
 
 def build_month_history_table(oai_src_id, date, ln):
     """ Function formats the historical data
-     @param oai_src_id: identifier of the harvesting source
-     @param date: date designing the month of interest
-     @return: String containing the history table
+     :param oai_src_id: identifier of the harvesting source
+     :param date: date designing the month of interest
+     :return: String containing the history table
     """
     day_limit = 10
     stats = get_month_logs_size(oai_src_id, date)
@@ -767,17 +813,20 @@ def build_month_history_table(oai_src_id, date, ln):
         result += oaiharvest_templates.tmpl_table_row_begin()
         d_date = datetime.datetime(date.year, date.month, day)
         result += oaiharvest_templates.tmpl_history_table_output_day_cell(d_date,
-                                                                          stats[day], oai_src_id, ln,
+                                                                          stats[
+                                                                              day], oai_src_id, ln,
                                                                           stats[day] > day_limit)
         btn = oaiharvest_templates.tmpl_output_select_day_button(day)
         result += oaiharvest_templates.tmpl_table_output_cell(btn)
         result += oaiharvest_templates.tmpl_table_row_end()
-        day_data = get_history_entries_for_day(oai_src_id, d_date, limit=day_limit)
+        day_data = get_history_entries_for_day(
+            oai_src_id, d_date, limit=day_limit)
         for item in day_data:
             identifier = oaiharvest_templates.format_date(item.date_harvested) + \
-                         oaiharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
-            result += build_history_row(item, ln, show_selection=True, show_oai_source=
-            False, show_record_ids=True, identifier=identifier)
+                oaiharvest_templates.format_time(
+                    item.date_harvested) + "_" + item.oai_id
+            result += build_history_row(item, ln, show_selection=True,
+                                        show_oai_source=False, show_record_ids=True, identifier=identifier)
             if item.date_harvested.day not in identifiers:
                 identifiers[item.date_harvested.day] = []
             identifiers[item.date_harvested.day].append(identifier)
@@ -798,7 +847,8 @@ def build_history_table(data, ln=CFG_SITE_LANG, show_selection=True,
     identifiers = {}
     for item in data:
         identifier = oaiharvest_templates.format_date(item.date_harvested) + \
-                     oaiharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
+            oaiharvest_templates.format_time(
+                item.date_harvested) + "_" + item.oai_id
         result += build_history_row(item, ln, show_selection=show_selection,
                                     show_oai_source=show_oai_source, show_record_ids=show_record_ids,
                                     identifier=identifier)
@@ -813,7 +863,7 @@ def build_history_table(data, ln=CFG_SITE_LANG, show_selection=True,
 
 
 def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, month=None, year=None):
-    """ Creates html to view the harvesting history """
+    """Create html to view the harvesting history."""
     date = datetime.datetime.now()
     if year and month:
         year = int(year)
@@ -836,9 +886,7 @@ def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, month=None, y
 def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
                                    month=None, year=None, day=None,
                                    start=0):
-    """
-    Records history page
-    """
+    """Record history page."""
     _ = gettext_set_language(ln)
     page_length = 50
     result = ""
@@ -849,7 +897,7 @@ def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
     number_of_records = get_day_logs_size(oai_src_id, considered_date)
     return_to_month_link = create_html_link(
         urlbase=oai_harvest_admin_url +
-                "/viewhistory",
+        "/viewhistory",
         urlargd={'ln': ln,
                  'oai_src_id': str(oai_src_id),
                  'year': str(considered_date.year),
@@ -860,7 +908,7 @@ def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
     if number_of_records > start + page_length:
         next_page_link = create_html_link(
             urlbase=oai_harvest_admin_url +
-                    "/viewhistoryday",
+            "/viewhistoryday",
             urlargd={'ln': ln,
                      'oai_src_id': str(oai_src_id),
                      'year': str(considered_date.year),
@@ -875,7 +923,7 @@ def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
             new_start = 0
         prev_page_link = create_html_link(
             urlbase=oai_harvest_admin_url +
-                    "/viewhistoryday",
+            "/viewhistoryday",
             urlargd={'ln': ln,
                      'oai_src_id': str(oai_src_id),
                      'year': str(considered_date.year),
@@ -886,15 +934,15 @@ def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
     last_shown = start + page_length
     if last_shown > number_of_records:
         last_shown = number_of_records
-    current_day_records = get_history_entries_for_day(oai_src_id, considered_date, limit=
-    page_length, start=start)
+    current_day_records = get_history_entries_for_day(
+        oai_src_id, considered_date, limit=page_length, start=start)
     current_range = "&nbsp;&nbsp;&nbsp;&nbsp;Viewing entries : " + str(start + 1) + "-" + \
                     str(last_shown) + "&nbsp;&nbsp;&nbsp;&nbsp;"
     # Building the interface
-    result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " + str(year) \
+    result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " + str(year)
                                                           + "-" + str(month) + "-" + str(day), guideurl)
     result += prev_page_link + current_range + next_page_link + \
-              oaiharvest_templates.tmpl_print_brs(ln, 1)
+        oaiharvest_templates.tmpl_print_brs(ln, 1)
     result += oaiharvest_templates.tmpl_output_history_javascript_functions()
     inner_text = oaiharvest_templates.tmpl_output_scrollable_frame(build_history_table(
         current_day_records, ln=ln))
@@ -918,7 +966,7 @@ def perform_request_viewentryhistory(oai_id, ln, start):
     if number_of_records > start + page_length:
         prev_page_link = create_html_link(
             urlbase=oai_harvest_admin_url +
-                    "/viewhistoryday",
+            "/viewhistoryday",
             urlargd={'ln': ln,
                      'oai_id': str(oai_id),
                      'start': str(start + page_length)},
@@ -930,7 +978,7 @@ def perform_request_viewentryhistory(oai_id, ln, start):
             new_start = 0
         prev_page_link = create_html_link(
             urlbase=oai_harvest_admin_url +
-                    "/viewhistoryday",
+            "/viewhistoryday",
             urlargd={'ln': ln,
                      'oai_id': str(oai_id),
                      'start': str(new_start)},
@@ -938,14 +986,15 @@ def perform_request_viewentryhistory(oai_id, ln, start):
     last_shown = start + page_length
     if last_shown > number_of_records:
         last_shown = number_of_records
-    current_entry_records = get_entry_history(oai_id, limit=page_length, start=start)
+    current_entry_records = get_entry_history(
+        oai_id, limit=page_length, start=start)
     current_range = "&nbsp;&nbsp;&nbsp;&nbsp;Viewing entries : " + str(start + 1) \
                     + "-" + str(last_shown) + "&nbsp;&nbsp;&nbsp;&nbsp;"
     # Building the interface
-    result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " + \
+    result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " +
                                                           str(oai_id), guideurl)
     result += prev_page_link + current_range + next_page_link + \
-              oaiharvest_templates.tmpl_print_brs(ln, 1)
+        oaiharvest_templates.tmpl_print_brs(ln, 1)
     result += oaiharvest_templates.tmpl_output_history_javascript_functions()
     inner_text = oaiharvest_templates.tmpl_output_scrollable_frame(
         build_history_table(current_entry_records, ln, show_selection=False,
@@ -958,12 +1007,13 @@ def perform_request_viewentryhistory(oai_id, ln, start):
 ###  The functions allowing to preview the harvested XML ###
 ############################################################
 
+
 def harvest_record(record_id, oai_src_baseurl, oai_src_prefix):
     """
        Harvests given record and returns it's string as a result
     """
     command = CFG_BINDIR + "/oaiharvest -vGetRecord -i" + record_id \
-              + " -p" + oai_src_prefix + " " + oai_src_baseurl
+        + " -p" + oai_src_prefix + " " + oai_src_baseurl
     program_output = os.popen(command)
     result = program_output.read(-1)
     program_output.close()
@@ -1011,11 +1061,14 @@ def format_record(oai_src_bibfilter, record_to_convert, treat_new=False):
 
 def harvest_postprocess_record(oai_src_id, record_id, treat_new=False):
     """Harvest the record and postprocess it"""
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import get_oai_src_by_id
     oai_src = get_oai_src_by_id(oai_src_id)[0]
     if oai_src['arguments']:
         oai_src['arguments'] = deserialize_via_marshal(oai_src['arguments'])
 
-    result = harvest_record(record_id, oai_src['baseurl'], oai_src['metadataprefix'])
+    result = harvest_record(
+        record_id, oai_src['baseurl'], oai_src['metadataprefix'])
     if result == None:
         return (False, "Error during harvesting")
     if oai_src['postprocess'].find("c") != -1:
@@ -1023,7 +1076,8 @@ def harvest_postprocess_record(oai_src_id, record_id, treat_new=False):
         if result == None:
             return (False, "Error during converting")
     if oai_src['postprocess'].find("f") != -1:
-        fres = format_record(oai_src['arguments']['f_filter-file'], result, treat_new=treat_new)
+        fres = format_record(
+            oai_src['arguments']['f_filter-file'], result, treat_new=treat_new)
         fname = fres[0]
         if fname:
             f = open(fname, "r")
@@ -1034,10 +1088,13 @@ def harvest_postprocess_record(oai_src_id, record_id, treat_new=False):
             return (False, "Error during formatting: " + fres[1] + "\n\n" + fres[2])
     return (True, result)
 
+
 def launch_harvesting_task_for_id(oai_src_id, record_id, uid=None, send_email=False):
     """
     Launches a oaiharvest BibTask to download (and post-process) given id.
     """
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import get_oai_src_by_id
     oai_src = get_oai_src_by_id(oai_src_id)[0]
     params = ["-r", oai_src['name'], "-i", record_id, "-P", "4"]
     if uid:
@@ -1051,6 +1108,7 @@ def launch_harvesting_task_for_id(oai_src_id, record_id, uid=None, send_email=Fa
     # launch task
     taskid = task_low_level_submission("oaiharvest", user, *tuple(params))
     return taskid
+
 
 def upload_record(record=None, uploader_paremeters=None, oai_source_id=None):
     """Upload the given record"""
@@ -1074,8 +1132,11 @@ def upload_record(record=None, uploader_paremeters=None, oai_source_id=None):
 
 def perform_request_preview_original_xml(oai_src_id=None, record_id=None):
     """Harvest a record and return it. No side effect, useful for preview"""
+    #FIXME: This import could not be solved, probably the function has change
+    from invenio.legacy.oaiharvest.dblayer import get_oai_src_by_id
     oai_src = get_oai_src_by_id(oai_src_id)[0]
-    record = harvest_record(record_id, oai_src['baseurl'], oai_src['metadataprefix'])
+    record = harvest_record(
+        record_id, oai_src['baseurl'], oai_src['metadataprefix'])
     return record
 
 
@@ -1086,6 +1147,7 @@ def perform_request_preview_harvested_xml(oai_src_id=None, record_id=None):
 ### Reharvesting of already existing records             ###
 ############################################################
 
+
 def perform_request_reharvest_records(oai_src_id=None, ln=CFG_SITE_LANG, record_ids=None, uid=None):
     if oai_src_id is None:
         return "No OAI source ID selected."
@@ -1095,14 +1157,17 @@ def perform_request_reharvest_records(oai_src_id=None, ln=CFG_SITE_LANG, record_
     result = oaiharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
     if oai_ids:
         # there was a harvest-request - lets launch a task
-        launched_taskid = launch_harvesting_task_for_id(oai_src_id, oai_ids, uid)
+        launched_taskid = launch_harvesting_task_for_id(
+            oai_src_id, oai_ids, uid)
         if launched_taskid:
-            result += oaiharvest_templates.tmpl_print_info(ln, "Harvesting task %d submitted. " \
+            result += oaiharvest_templates.tmpl_print_info(ln, "Harvesting task %d submitted. "
                                                                % (launched_taskid,))
         else:
-            result += oaiharvest_templates.tmpl_print_warning(ln, "Error while submitting harvesting task. Contact administrators.")
+            result += oaiharvest_templates.tmpl_print_warning(
+                ln, "Error while submitting harvesting task. Contact administrators.")
     else:
-        result += oaiharvest_templates.tmpl_print_warning(ln, "No OAI IDs defined.")
+        result += oaiharvest_templates.tmpl_print_warning(
+            ln, "No OAI IDs defined.")
     return result
 
 
@@ -1115,7 +1180,8 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
     guideurl = "help/admin/oaiharvest-admin-guide"
     result += oaiharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
     result += oaiharvest_templates.tmpl_draw_titlebar(ln=ln,
-                                                      title=_("Record OAI IDs ( as recognized by the data source )"),
+                                                      title=_(
+                                                          "Record OAI IDs ( as recognized by the data source )"),
                                                       guideurl=guideurl)
     record_str = ""
     if record_id:
@@ -1128,13 +1194,14 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
         enable_reporting = True
 
     form_text = "<p><small>Enter one OAI ID per line. Ex: oai:arXiv.org:hep-th/9901001 or arXiv:1308.1234 or hep-th/9901001</small></p>"
-    form_text += oaiharvest_templates.tmpl_admin_w200_textarea(ln=ln, title="", \
-                                                              name="record_id", value=record_str)
-    form_text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln, \
-                                                            title="", \
-                                                            name="enable_reporting", \
-                                                            values=["enable"], \
-                                                            labels=["Send e-mail (%s) when completed?" % (get_email(uid),)], \
+    form_text += oaiharvest_templates.tmpl_admin_w200_textarea(ln=ln, title="",
+                                                               name="record_id", value=record_str)
+    form_text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln,
+                                                            title="",
+                                                            name="enable_reporting",
+                                                            values=["enable"],
+                                                            labels=[
+                                                                "Send e-mail (%s) when completed?" % (get_email(uid),)],
                                                             states=[enable_reporting])
     result += oaiharvest_templates.tmpl_form_vertical(action="harvest",
                                                       text=form_text,
@@ -1145,12 +1212,13 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
     if record_id:
         # there was a harvest-request - lets launch a task
         record_id = ",".join(record_id.split())
-        launched_taskid = launch_harvesting_task_for_id(oai_src_id, record_id, uid, send_email=enable_reporting)
+        launched_taskid = launch_harvesting_task_for_id(
+            oai_src_id, record_id, uid, send_email=enable_reporting)
         user_message = "Harvesting task %d submitted." % (launched_taskid,)
         if enable_reporting:
             user_message += " You will receive a mail when it finishes."
         user_message += "<br />Follow task progress %s." % \
-                        (create_html_link(urlbase=oai_harvest_admin_url + \
+                        (create_html_link(urlbase=oai_harvest_admin_url +
                                           "/viewtasklogs",
                                           urlargd={'ln': ln,
                                                    'task_id': str(launched_taskid)},
@@ -1158,9 +1226,11 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
         if launched_taskid:
             result += oaiharvest_templates.tmpl_print_info(ln, _(user_message))
         else:
-            result += oaiharvest_templates.tmpl_print_warning(ln, _("Error while submitting harvesting task. Contact administrators."))
+            result += oaiharvest_templates.tmpl_print_warning(
+                ln, _("Error while submitting harvesting task. Contact administrators."))
     elif confirm in (1, "1"):
-        result += oaiharvest_templates.tmpl_print_warning(ln, _("No OAI IDs defined. Provide at least one ID."))
+        result += oaiharvest_templates.tmpl_print_warning(
+            ln, _("No OAI IDs defined. Provide at least one ID."))
     return result
 
 
@@ -1179,64 +1249,74 @@ def build_holdingpen_table(data, ln=CFG_SITE_LANG):
         # getting the modyfied record's ID
         rec_id = get_holdingpen_entry_details(hpupdate_id)[1]
         result += oaiharvest_templates.tmpl_table_row_begin()
-        result += oaiharvest_templates.tmpl_table_output_cell(str(oai_id), cssclass="oddtablecolumn")
-        result += oaiharvest_templates.tmpl_table_output_cell(str(date_inserted), cssclass="pairtablecolumn")
+        result += oaiharvest_templates.tmpl_table_output_cell(
+            str(oai_id), cssclass="oddtablecolumn")
+        result += oaiharvest_templates.tmpl_table_output_cell(
+            str(date_inserted), cssclass="pairtablecolumn")
         details_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                                "/viewhprecord",
+                                        "/viewhprecord",
                                         urlargd={'ln': ln,
                                                  'hpupdate_id': str(hpupdate_id)},
                                         link_label=_("Compare with original"))
-        result += oaiharvest_templates.tmpl_table_output_cell(details_link, cssclass="oddtablecolumn")
+        result += oaiharvest_templates.tmpl_table_output_cell(
+            details_link, cssclass="oddtablecolumn")
         # creating link to bibedit to apply changes
         apply_link = create_html_link(urlbase=CFG_SITE_URL + '/record/edit/#' +
-                                              'state=hpapply&recid=' + str(rec_id) +
-                                              '&hpid=' + str(hpupdate_id),
+                                      'state=hpapply&recid=' + str(rec_id) +
+                                      '&hpid=' + str(hpupdate_id),
                                       urlargd={},
                                       link_label=_("Apply changes"),
                                       escape_urlargd=False)
-        result += oaiharvest_templates.tmpl_table_output_cell(apply_link, cssclass="pairtablecolumn")
+        result += oaiharvest_templates.tmpl_table_output_cell(
+            apply_link, cssclass="pairtablecolumn")
         delete_hp_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                                  "/delhprecord",
+                                          "/delhprecord",
                                           urlargd={'ln': ln,
                                                    'hpupdate_id': str(hpupdate_id)},
                                           link_label=_("Delete from holding pen"))
-        result += oaiharvest_templates.tmpl_table_output_cell(delete_hp_link, cssclass="oddtablecolumn")
+        result += oaiharvest_templates.tmpl_table_output_cell(
+            delete_hp_link, cssclass="oddtablecolumn")
         result += oaiharvest_templates.tmpl_table_row_end()
     result += oaiharvest_templates.tmpl_table_end()
     return result
+
 
 def perform_request_viewhprecord(hpupdate_id, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
     result = ""
     try:
-        (oai_id, record_id, date_inserted, hprecord_content) = get_holdingpen_entry_details(hpupdate_id)
+        (oai_id, record_id, date_inserted,
+         hprecord_content) = get_holdingpen_entry_details(hpupdate_id)
     except:
         return _("Error when retrieving the Holding Pen entry")
     try:
         db_rec = get_record(record_id)
-        db_MARC = create_marc_record(db_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
+        db_MARC = create_marc_record(
+            db_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
         #import rpdb2; rpdb2.start_embedded_debugger('password', fAllowRemote=True)
         db_content = oaiharvest_templates.tmpl_output_preformatted(
-            db_MARC) # originally .encode("utf-8") ... does ot work
-        db_label = "Database version of record" + oaiharvest_templates.tmpl_print_brs(ln, 1)
+            db_MARC)  # originally .encode("utf-8") ... does ot work
+        db_label = "Database version of record" + \
+            oaiharvest_templates.tmpl_print_brs(ln, 1)
     except:
         return _("Error when retrieving the record")
     try:
         hp_rec = create_record(hprecord_content)[0]
-        hp_MARC = create_marc_record(hp_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
+        hp_MARC = create_marc_record(
+            hp_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
         hp_content = oaiharvest_templates.tmpl_output_preformatted(
-            hp_MARC) # originally .encode("utf-8") ... does ot work
+            hp_MARC)  # originally .encode("utf-8") ... does ot work
         hp_label = oaiharvest_templates.tmpl_print_brs(ln, 2) + "Holdingpen version of record" \
-                   + oaiharvest_templates.tmpl_print_brs(ln, 1)
+            + oaiharvest_templates.tmpl_print_brs(ln, 1)
     except:
         return _("Error when formatting the Holding Pen entry. Probably its content is broken")
     submit_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                           "/accepthprecord",
+                                   "/accepthprecord",
                                    urlargd={'ln': ln,
                                             'hpupdate_id': hpupdate_id},
                                    link_label=_("Accept Holding Pen version"))
     delete_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                           "/delhprecord",
+                                   "/delhprecord",
                                    urlargd={'ln': ln,
                                             'oai_id': str(oai_id),
                                             'date_inserted': str(date_inserted)},
@@ -1300,7 +1380,8 @@ def perform_request_gethpyear(prefix, year, filter_key):
     result = ""
     for month in months:
         result += "<li id=\"%s_%s_%s_%s\"><span>%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_ul\"></ul></li>" % (
-            prefix, year, str(month[0]), filter_key, year, str(month[0]), str(month[1]), prefix, year, str(month[0]),
+            prefix, year, str(month[0]), filter_key, year, str(
+                month[0]), str(month[1]), prefix, year, str(month[0]),
             filter_key)
     return result
 
@@ -1310,13 +1391,16 @@ def perform_request_gethpmonth(prefix, year, month, filter_key):
     result = ""
     for day in days:
         result += "<li id=\"%s_%s_%s_%s_%s\"><span>%s-%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_%s_ul\"></ul></li>" % (
-            prefix, year, month, str(day[0]), filter_key, year, month, str(day[0]), str(day[1]), prefix, year, month,
+            prefix, year, month, str(day[0]), filter_key, year, month, str(
+                day[0]), str(day[1]), prefix, year, month,
             str(day[0]), filter_key)
     return result
 
 
-def perform_request_gethpdayfragment(year, month, day, limit, start, filter_key):
-    data = get_holdingpen_day_fragment(year, month, day, limit, start, filter_key)
+def perform_request_gethpdayfragment(year, month, day, limit, start,
+                                     filter_key):
+    data = get_holdingpen_day_fragment(
+        year, month, day, limit, start, filter_key)
     return build_holdingpen_table(data, "en")
 
 
@@ -1326,10 +1410,14 @@ def view_holdingpen_headers():
 
 def perform_request_view_holdingpen_tree(filter_key):
     return oaiharvest_templates.tmpl_view_holdingpen_body(
-        filter_key, perform_request_gethpall("holdingpencontainer", filter_key))
+        filter_key, perform_request_gethpall("holdingpencontainer",
+                                             filter_key))
+
 
 def validate(oai_src_baseurl):
-    """This function validates a baseURL by opening its URL and 'greping' for the <OAI-PMH> and <Identify> tags:
+    """Validate a baseURL by opening its URL.
+
+    'Grep' for the <OAI-PMH> and <Identify> tags:
 
     Codes:
      0 = okay
@@ -1354,36 +1442,37 @@ def validate(oai_src_baseurl):
 
         grepOUT2 = os.popen('grep -iwc "<identify>" ' + tmppath).read()
         if int(grepOUT2) > 0:
-            #print "Valid!"
             return (0, '')
         else:
-            #print "Not valid!"
             return (1, '')
-    except IOError, (errno, strerror):
+    except IOError as (errno, strerror):
         # Quick error handling for frequent error codes.
         if errno == 13:
             return (3, "Please check permission on %s and retry" % CFG_TMPDIR)
         elif errno == 2 or errno == 'socket error':
-            return (2, "Could not connect with URL %s. Check URL or retry when server is available." % url)
+            return (2, "Could not connect with URL %s. "
+                    "Check URL or retry when server is available." % url)
         return (4, strerror)
     except StandardError as e:
         return (4, "An unknown error has occured: %s" % e)
     except InvalidURL as e:
-        return (2, "Could not connect with URL %s. Check URL or retry when server is available: %s" % (url, e))
+        return (2, "Could not connect with URL %s. Check URL or retry when "
+                "server is available: %s" % (url, e))
+
 
 def validate_file(path):
-    """
-    This function checks whether the given path to text file exists or not.
-    I checks first in config directory, in case the path given is relative.
+    """Check whether the given path to text file exists or not.
+
+    Check first in config directory, in case the path given is relative.
 
     If path is not found it will try the path given from /. It then
     returns True if path is valid, otherwise False.
 
-    @param path: path to a file
-    @type path: string
+    :param path: path to a file
+    :type path: string
 
-    @return: True if path is valid, otherwise False
-    @rtype: bool
+    :return: True if path is valid, otherwise False
+    :rtype: bool
     """
 
     from invenio.legacy.bibconvert.registry import templates
@@ -1396,9 +1485,8 @@ def validate_file(path):
             cfgstr = ftmp.read()
             ftmp.close()
             if cfgstr != "":
-                #print "Valid!"
                 return True
-        except StandardError, e:
+        except StandardError:
             pass
 
     path_to_program = CFG_BINDIR + os.sep + path
@@ -1409,9 +1497,8 @@ def validate_file(path):
             cfgstr = ftmp.read()
             ftmp.close()
             if cfgstr != "":
-                #print "Valid!"
                 return True
-        except StandardError, e:
+        except StandardError:
             pass
 
     # Try to read as complete path
@@ -1420,19 +1507,20 @@ def validate_file(path):
         cfgstr = ftmp.read()
         ftmp.close()
         if cfgstr != "":
-            #print "Valid!"
             return True
         else:
-            #print "Not valid!"
             return False
-    except StandardError, e:
+    except StandardError:
         return False
 
     return False
 
 
 def findMetadataFormats(oai_src_baseurl):
-    """This function finds the Metadata formats offered by a OAI repository by analysing the output of verb=ListMetadataFormats"""
+    """Find the Metadata formats offered by a OAI repository.
+
+    Analyse the output of verb=ListMetadataFormats.
+    """
     formats = []
     url = oai_src_baseurl + "?verb=ListMetadataFormats"
     try:
@@ -1443,7 +1531,7 @@ def findMetadataFormats(oai_src_baseurl):
     xmlstr = ftmp.read()
     ftmp.close()
     chunks = xmlstr.split('<metadataPrefix>')
-    count = 0 # first chunk is invalid
+    count = 0  # first chunk is invalid
     for chunk in chunks:
         if count != 0:
             formats.append(chunk.split('</metadataPrefix>')[0])
@@ -1452,9 +1540,11 @@ def findMetadataFormats(oai_src_baseurl):
 
 
 def findSets(oai_src_baseurl):
-    """This function finds the sets offered by a OAI repository
-    by analysing the output of verb=ListSets.
-    Returns list of tuples(SetSpec, SetName)"""
+    """Finds the sets offered by a OAI repository.
+
+    Analyse the output of verb=ListSets and return list of
+    tuples(SetSpec, SetName).
+    """
     url = oai_src_baseurl + "?verb=ListSets"
     sets = {}
     try:
@@ -1465,12 +1555,12 @@ def findSets(oai_src_baseurl):
     xmlstr = ftmp.read()
     ftmp.close()
     chunks = xmlstr.split('<set>')
-    count = 0 # first chunk is invalid
+    count = 0  # first chunk is invalid
     for chunk in chunks:
         if count != 0:
             chunks_set = chunk.split('<setSpec>')[1].split("</setSpec>")
             set_spec = chunks_set[0]
-            #chunks_set[1].split('<setName>')
+            # chunks_set[1].split('<setName>')
             check_set_2 = chunks_set[1].split("<setName>")
             set_name = None
             if len(check_set_2) > 1:
@@ -1479,16 +1569,17 @@ def findSets(oai_src_baseurl):
         count = count + 1
     return sets.values()
 
+
 def validate_int(value):
-    """
-    Checks if the given value is really an integer. Returns True if
-    valid, otherwise False.
+    """Check if the given value is really an integer.
 
-    @param value: value to check
-    @type value: anything
+    Return True if valid, otherwise False.
 
-    @return: True if valid integer, otherwise False.
-    @rtype: bool
+    :param value: value to check
+    :type value: anything
+
+    :return: True if valid integer, otherwise False.
+    :rtype: bool
     """
     try:
         int(value)
@@ -1496,27 +1587,29 @@ def validate_int(value):
         return False
     return True
 
+
 def validate_arguments(ln, oai_src_post, oai_src_args, warning_list):
-    """
-    The function will check the arguments that are given for
-    each post-process to see if they are valid. The given list of
-    warnings will be changed according to invalid values found.
+    """Check the validity of arguments for each post-process.
 
-    @param ln: current language code
-    @type ln: string
+    The given list of warnings will be changed according to invalid values
+    found.
 
-    @param oai_src_post: string of post-processes chosen
-    @type oai_src_post: string
+    :param ln: current language code
+    :type ln: string
 
-    @param oai_src_args: dict of post-process argument values
-    @type oai_src_args: dict
+    :param oai_src_post: string of post-processes chosen
+    :type oai_src_post: string
 
-    @param warning_list: list warning messages given to the user
-    @type warning_list: list
+    :param oai_src_args: dict of post-process argument values
+    :type oai_src_args: dict
+
+    :param warning_list: list warning messages given to the user
+    :type warning_list: list
     """
     if oai_src_post is None:
         return
-    modes = [mode for mode in CFG_OAI_POSSIBLE_POSTMODES if mode[0] in oai_src_post]
+    modes = [
+        mode for mode in CFG_OAI_POSSIBLE_POSTMODES if mode[0] in oai_src_post]
     for mode_value, mode_label, mode_arguments in modes:
         for arg_dict in mode_arguments:
             name = "%s_%s" % (mode_value, arg_dict['name'])
@@ -1524,18 +1617,25 @@ def validate_arguments(ln, oai_src_post, oai_src_args, warning_list):
                 # Empty is allowed if not required
                 continue
             if arg_dict['required'] and not oai_src_args[name]:
-                warning_list.append(oaiharvest_templates.tmpl_print_warning(ln, \
-                    "The field '%s' is an required argument when choosing '%s' post-process." % \
-                    (arg_dict['name'], mode_label)))
+                warning_list.append(oaiharvest_templates.tmpl_print_warning(
+                    ln, "The field '%s' is an required argument "
+                    "when choosing '%s' post-process." % (
+                        arg_dict['name'], mode_label)))
                 continue
             # Check if there is any validation step.
             if arg_dict['validation']:
                 for validation_type in arg_dict['validation']:
-                    if validation_type == "file" and not validate_file(oai_src_args[name]):
-                        warning_list.append(oaiharvest_templates.tmpl_print_warning(ln, \
-                        "The file path given in argument '%s' for post-process '%s' is not valid." % \
-                        (arg_dict['name'], mode_label)))
-                    elif validation_type == "int" and not validate_int(oai_src_args[name]):
-                        warning_list.append(oaiharvest_templates.tmpl_print_warning(ln, \
-                        "The value given in argument '%s' for post-process '%s' is not a valid number." % \
-                        (arg_dict['name'], mode_label)))
+                    if validation_type == "file" \
+                            and not validate_file(oai_src_args[name]):
+                        warning_list.append(
+                            oaiharvest_templates.tmpl_print_warning(
+                                ln, "The file path given in argument '%s' for "
+                                "post-process '%s' is not valid." % (
+                                    arg_dict['name'], mode_label)))
+                    elif validation_type == "int" \
+                            and not validate_int(oai_src_args[name]):
+                        warning_list.append(
+                            oaiharvest_templates.tmpl_print_warning(
+                                ln, "The value given in argument '%s' for "
+                                "post-process '%s' is not a valid number." % (
+                                    arg_dict['name'], mode_label)))
