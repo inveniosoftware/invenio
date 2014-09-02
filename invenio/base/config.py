@@ -385,6 +385,7 @@ CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', 'oairepositoryupdater', ]
 CFG_BIBSCHED_GC_TASKS_TO_REMOVE = [
     'bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
 CFG_BIBSCHED_LOG_PAGER = which("less")
+CFG_BIBSCHED_LOGDIR = join(CFG_PREFIX, "var", "log", "bibsched")
 CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY = 500
 CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS = 1
 CFG_BIBSCHED_NODE_TASKS = {}

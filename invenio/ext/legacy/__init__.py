@@ -33,7 +33,8 @@ import sys
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
 from flask import (request, g, current_app, render_template, abort,
-                   send_from_directory)
+                   send_from_directory, url_for)
+from flask.ext.admin.menu import MenuLink
 
 from invenio.base import signals
 from invenio.base.scripts.database import create, recreate
@@ -179,5 +180,17 @@ def setup_app(app):
             abort(404)
         else:
             return send_from_directory(app.static_folder, filename)
+
+    @app.before_first_request
+    def _setup_legacy_admin_menu():
+        """Add legacy menu admin to *Flask-Admin* interface."""
+        from invenio.legacy.registry import webadmin
+        for admin in app.extensions['admin']:
+            for legacy_admin_link in webadmin.keys():
+                module, action = legacy_admin_link.split('/')
+                admin.add_link(MenuLink(
+                    name=module,
+                    category='Legacy Admin',
+                    url=url_for('web_admin', module=module, action=action)))
 
     return app
