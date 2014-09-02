@@ -571,7 +571,8 @@ distances from it.
         restarted_workflow = start_by_wid(wid=init_workflow.uuid,
                                           module_name="unit_tests")
 
-        self.assertFalse(init_workflow.uuid == restarted_workflow.uuid)
+        # We expect the same workflow to be re-started
+        self.assertTrue(init_workflow.uuid == restarted_workflow.uuid)
 
         restarted_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == restarted_workflow.uuid
@@ -619,11 +620,37 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         Workflow.get(Workflow.module_name == "unit_tests").delete()
         self.cleanup_registries()
 
-    def test_logic_tasks(self):
-        """Test that the logic tasks work correctly."""
+    def test_logic_tasks_restart(self):
+        """Test that the logic tasks work correctly when restarted."""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.modules.workflows.api import (start, continue_oid,
+        from invenio.modules.workflows.api import (start,
                                                    start_by_wid)
+
+        test_object = BibWorkflowObject()
+        test_object.set_data(0)
+        test_object.save()
+
+        # Initial run
+        workflow = start('test_workflow_logic', [test_object],
+                         module_name="unit_tests")
+
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
+
+        # Reset before re-starting (reset Iterator data)
+        workflow.reset_extra_data()
+
+        workflow = start_by_wid(workflow.uuid)
+        self.assertEqual(5, test_object.get_data())
+        self.assertEqual("lt9", test_object.get_extra_data()["test"])
+
+    def test_logic_tasks_continue(self):
+        """Test that the logic tasks work correctly when continuing."""
+        from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                      ObjectVersion)
+        from invenio.modules.workflows.api import (start,
+                                                   continue_oid)
+        from invenio.modules.workflows.engine import WorkflowStatus
 
         test_object = BibWorkflowObject()
         test_object.set_data(0)
@@ -634,28 +661,21 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         self.assertEqual(5, test_object.get_data())
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
 
-        start_by_wid(workflow.uuid)
-
-        self.assertEqual(5, test_object.get_data())
-        self.assertEqual("lt9", test_object.get_extra_data()["test"])
-        continue_oid(test_object.id)
-
+        workflow = continue_oid(test_object.id)
         self.assertEqual(6, test_object.get_data())
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
-        continue_oid(test_object.id)
 
+        workflow = continue_oid(test_object.id)
         self.assertEqual(9, test_object.get_data())
         self.assertEqual("gte9", test_object.get_extra_data()["test"])
-        continue_oid(test_object.id)
 
+        workflow = continue_oid(test_object.id)
         self.assertEqual(15, test_object.get_data())
         self.assertEqual("gte9", test_object.get_extra_data()["test"])
-        engine = continue_oid(test_object.id)
 
-        from invenio.modules.workflows.engine import WorkflowStatus
-        from invenio.modules.workflows.models import ObjectVersion
+        workflow = continue_oid(test_object.id)
         self.assertEqual(ObjectVersion.FINAL, test_object.version)
-        self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
+        self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
 
     def test_workflow_without_workflow_object_saved(self):
         """Test that the logic tasks work correctly."""

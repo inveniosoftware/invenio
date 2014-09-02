@@ -43,17 +43,11 @@ def run_workflow(wfe, data, stop_on_halt=False,
             if initial_run:
                 initial_run = False
                 wfe.process(data)
-                # We processed the workflow. We're done.
                 break
             else:
-                wfe._unpickled = True
-                wfe.restart('current', 'current')
-                # We processed the restarted workflow. We're done.
+                wfe.restart('next', 'first')
                 break
         except WorkflowHalt as workflowhalt_triggered:
-            # Processing was halted. Lets save current object and continue.
-
-            # Save current object progress
             current_obj = wfe.get_current_object()
             if current_obj:
                 if workflowhalt_triggered.action:
@@ -66,10 +60,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
             else:
                 wfe.log.warning("No active object found!")
 
-            # Save workflow progress
             wfe.save(status=WorkflowStatus.HALTED)
-            wfe.setPosition(wfe.getCurrObjId() + 1, [0])
-
             message = "Workflow '%s' halted at task %s with message: %s" % \
                       (wfe.name,
                        wfe.get_current_taskname() or "Unknown",
@@ -78,8 +69,6 @@ def run_workflow(wfe, data, stop_on_halt=False,
             if stop_on_halt:
                 break
         except Exception as exception_triggered:
-            # We print the stacktrace, save the object and continue
-            # unless instructed otherwise.
             msg = "Error: %r\n%s" % \
                   (exception_triggered, traceback.format_exc())
             wfe.log.error(msg)
@@ -92,11 +81,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                     wfe.getCurrTaskId(),
                     id_workflow=wfe.uuid
                 )
-            #TODO: Changing counter should be moved to wfe object
-            # together with default exception handling
-            wfe.increase_counter_error()
             wfe.save(status=WorkflowStatus.ERROR)
-            wfe.setPosition(wfe.getCurrObjId() + 1, [0])
             if stop_on_error:
                 if isinstance(exception_triggered, WorkflowError):
                     raise exception_triggered
@@ -138,9 +123,7 @@ def continue_execution(wfe, workflow_object, restart_point="restart_task",
     elif restart_point == "continue_next":
         pos[-1] += task_offset
 
-    # Set (object index, position index) in the workflow. Only one object so
-    # object selection is 0. Position is the index of the task to run.
-
-    wfe.setPosition(0, pos)
+    wfe.reset()
+    wfe.set_task_position(pos)
     run_workflow(wfe, wfe._objects, stop_on_halt,
-                 initial_run=False, stop_on_error=True,  **kwargs)
+                 initial_run=True, stop_on_error=True,  **kwargs)

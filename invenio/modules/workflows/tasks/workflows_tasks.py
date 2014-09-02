@@ -371,8 +371,6 @@ def workflows_reviews(stop_if_error=False, clean=True):
     if a child workflow has crashed.
     :type stop_if_error: bool
     """
-    from invenio.modules.workflows.errors import WorkflowError
-
     def _workflows_reviews(obj, eng):
         if eng.extra_data["_nb_workflow"] == 0:
             raise WorkflowError("Nothing has been harvested ! Look into logs for errors !", eng.uuid, obj.id)

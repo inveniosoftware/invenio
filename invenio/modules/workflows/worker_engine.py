@@ -19,7 +19,7 @@
 """Mediator between API and workers responsible for running the workflows."""
 
 from .client import run_workflow, continue_execution
-from .engine import BibWorkflowEngine, WorkflowStatus
+from .engine import BibWorkflowEngine
 from .models import BibWorkflowObject, Workflow, ObjectVersion
 from .errors import WorkflowObjectVersionError
 
@@ -61,8 +61,12 @@ def restart_worker(wid, **kwargs):
 
     :return: BibWorkflowEngine instance
     """
+    workflow = Workflow.query.get(wid)
+    engine = BibWorkflowEngine(workflow_object=workflow,
+                               **kwargs)
+
     if "data" not in kwargs:
-        data = []
+        objects = []
         # First we get all initial objects
         initials = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == wid,
@@ -74,20 +78,14 @@ def restart_worker(wid, **kwargs):
             running_object = BibWorkflowObject.query.filter(
                 BibWorkflowObject.id == initial_object.id_parent
             ).one()
+            old_id_parent = running_object.id_parent
             running_object.copy(initial_object)
-            running_object.id_parent = initial_object.id
+            running_object.id_parent = old_id_parent
             running_object.save()
 
-            data.append(running_object)
+            objects.append(running_object)
     else:
-        data = kwargs["data"]
-
-    workflow = Workflow.query.get(wid)
-    engine = BibWorkflowEngine(workflow.name,
-                               **kwargs)
-    engine.reset_extra_data()
-    engine.save(WorkflowStatus.NEW)
-    objects = get_workflow_object_instances(data, engine)
+        objects = get_workflow_object_instances(kwargs["data"], engine)
     run_workflow(wfe=engine, data=objects, **kwargs)
     return engine
 
@@ -120,7 +118,6 @@ def continue_worker(oid, restart_point="continue_next",
                                workflow_object=workflow,
                                **kwargs)
     engine.save()
-    generate_snapshot(workflow_object, engine)
     continue_execution(engine, workflow_object, restart_point,
                        task_offset, **kwargs)
     return engine

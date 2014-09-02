@@ -281,6 +281,10 @@ BibWorkflowEngine
             self.db_obj.current_object = 0
         self.db_obj.save(status)
 
+    def set_task_position(self, new_position):
+        """Set current task position."""
+        self._i[1] = new_position
+
     def process(self, objects):
         """Process objects.
 
@@ -294,10 +298,30 @@ BibWorkflowEngine
         Will restart the workflow engine instance at given object and task
         relative to current state.
 
-        :param obj: the object which should be restarted ("prev","current","next")
+        `obj` must be either:
+
+        * "prev": previous object
+        * "current": current object
+        * "next": next object
+        * "first": first object
+
+        `task` must be either:
+
+        * "prev": previous object
+        * "current": current object
+        * "next": next object
+        * "first": first object
+
+        To continue with next object from the first task:
+
+        .. code-block:: python
+
+                wfe.restart("next", "first")
+
+        :param obj: the object which should be restarted
         :type obj: str
 
-        :param task: the task which should be restarted ("prev","current","next")
+        :param task: the task which should be restarted
         :type task: str
         """
         self.log.debug("Restarting workflow from %s object and %s task" %
@@ -307,12 +331,13 @@ BibWorkflowEngine
         if obj == 'prev':
             # start with the previous object
             self._i[0] -= 2
-            #TODO: check if there is any object there
         elif obj == 'current':
             # continue with the current object
             self._i[0] -= 1
         elif obj == 'next':
             pass
+        elif obj == 'first':
+            self._i[0] = 0
         else:
             raise Exception('Unknown start point for object: %s' % obj)
 
@@ -326,6 +351,8 @@ BibWorkflowEngine
         elif task == 'next':
             # continue with the next task
             self._i[1][-1] += 1
+        elif task == 'first':
+            self._i[1] = [0]
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
         self.process(self._objects)
@@ -417,8 +444,7 @@ BibWorkflowEngine
                     msg = "Error: %r\n%s" % (e, traceback.format_exc())
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
-                    # Changing counter should be moved to wfe object
-                    # together with default exception handling
+                    self.increase_counter_error()
                     if isinstance(e, WorkflowErrorClient):
                         reraise(*sys.exc_info())
                     else:

@@ -30,7 +30,6 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.utils.shell import run_shell_command, Timeout
-from invenio.utils.plotextractor.converter import untar
 from invenio.modules.workflows.utils import convert_marcxml_to_bibfield
 
 bibtask = lazy_import("invenio.legacy.bibsched.bibtask")
@@ -584,6 +583,7 @@ def plot_extract(plotextractor_types):
     from invenio.utils.plotextractor.cli import (get_defaults, extract_captions,
                                                  extract_context)
     from invenio.utils.plotextractor.converter import convert_images
+    from invenio.utils.plotextractor.converter import untar
 
     def _plot_extract(obj, eng):
         """Perform the plotextraction step."""
@@ -755,6 +755,7 @@ def author_list(obj, eng):
     from invenio.legacy.bibrecord import create_records, record_xml_output
     from invenio.legacy.bibconvert.xslt_engine import convert
     from invenio.utils.plotextractor.cli import get_defaults
+    from invenio.utils.plotextractor.converter import untar
 
     identifiers = obj.data["system_number_external"]["value"]
     bibtask.task_sleep_now_if_required()

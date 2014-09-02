@@ -96,7 +96,8 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         from ..workers.worker_celery import (celery_run, celery_restart,
                                              celery_continue)
         from invenio.modules.workflows.utils import BibWorkflowObjectIdContainer
-        from invenio.modules.workflows.models import BibWorkflowObject
+        from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                      get_default_extra_data)
 
         test_objectb = BibWorkflowObject()
         test_objectb.set_data(22)
@@ -128,15 +129,20 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
                        module_name="unit_tests"))
         self.assertEqual(5, test_object.get_data())
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
+
+        engine._extra_data = get_default_extra_data()  # reset iterators
         celery_restart(engine.uuid)
         self.assertEqual(5, test_object.get_data())
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
+
         celery_continue(test_object.id, "continue_next")
         self.assertEqual(6, test_object.get_data())
         self.assertEqual("lt9", test_object.get_extra_data()["test"])
+
         celery_continue(test_object.id, "continue_next")
         self.assertEqual(9, test_object.get_data())
         self.assertEqual("gte9", test_object.get_extra_data()["test"])
+
         celery_continue(test_object.id, "continue_next")
         self.assertEqual(15, test_object.get_data())
         self.assertEqual("gte9", test_object.get_extra_data()["test"])
