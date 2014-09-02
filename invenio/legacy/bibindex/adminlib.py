@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -330,7 +330,7 @@ def perform_editvirtualindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', call
 
 def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of all indexes"""
-    output = """<table cellpadding="3" border="1">"""
+    output = """<table class="table table-bordered">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords", "Remove HTML markup", "Remove Latex markup", "Tokenizer", "Indexer type")
 
     idx = get_idx()
@@ -454,7 +454,7 @@ def perform_showvirtualindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     </tr>
     </table>
     """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln)
-    output += """<table cellpadding="3" border="1">"""
+    output += """<table class="table table-bordered">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Virtual index", "Dependent indexes")
     idx = get_all_virtual_indexes()
     for idxID, idxNAME in idx:
@@ -483,7 +483,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
     if len(idx) > 0:
         text = """
         <span class="adminlabel">Index name</span>
-        <select name="idxID" class="admin_w200">
+        <select name="idxID" class="form-control">
         <option value="-1">- Select a index -</option>
         """
         for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS, idxHTML, idxLATEX, idxTOK) in idx:
@@ -517,7 +517,7 @@ def perform_editvirtualindexes(ln=CFG_SITE_LANG, callback='yes', content='', con
     if len(idx) > 0:
         text = """
         <span class="adminlabel">Virtual index name</span>
-        <select name="idxID" class="admin_w200">
+        <select name="idxID" class="form-control">
         <option value="-1">- Select a index -</option>
         """
         for (idxID, idxNAME) in idx:
@@ -552,7 +552,7 @@ def perform_editfields(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1)
     if len(res) > 0:
         text = """
         <span class="adminlabel">Field name</span>
-        <select name="fldID" class="admin_w200">
+        <select name="fldID" class="form-control">
         <option value="-1">- Select a field -</option>
         """
         for (fldID, name, code) in res:
@@ -583,7 +583,7 @@ def perform_addindex(ln=CFG_SITE_LANG, idxNAME='', callback="yes", confirm=-1):
     subtitle = """<a name="3"></a>3. Add new index"""
     text = """
     <span class="adminlabel">Index name</span>
-    <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br />
+    <input class="form-control" type="text" name="idxNAME" value="%s" /><br />
     """ % idxNAME
     output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindex" % CFG_SITE_URL,
                               text=text,
@@ -616,7 +616,7 @@ def perform_addvirtualindex(ln=CFG_SITE_LANG, idxNEWVID='', idxNEWPID='', callba
     if len(idx) > 0:
         text = """
         <span class="adminlabel">Choose new virtual index</span>
-        <select name="idxNEWVID" class="admin_w200">
+        <select name="idxNEWVID" class="form-control">
         <option value="-1">- Select an index -</option>
         """
 
@@ -628,7 +628,7 @@ def perform_addvirtualindex(ln=CFG_SITE_LANG, idxNEWVID='', idxNEWPID='', callba
 
         text += """&nbsp;&nbsp;
         <span class="adminlabel">Add physical index</span>
-        <select name="idxNEWPID" class="admin_w200">
+        <select name="idxNEWPID" class="form-control">
         <option value="-1">- Select an index -</option>
         """
         for (idxID, idxNAME) in idx:
@@ -686,7 +686,7 @@ def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=
         if len(types) > 1:
             text  = """
             <span class="adminlabel">Name type</span>
-            <select name="sel_type" class="admin_w200">
+            <select name="sel_type" class="form-control">
             """
 
             for (key, value) in types:
@@ -765,7 +765,7 @@ def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=
         if len(types) > 1:
             text  = """
             <span class="adminlabel">Name type</span>
-            <select name="sel_type" class="admin_w200">
+            <select name="sel_type" class="form-control">
             """
             for (key, value) in types:
                 text += """<option value="%s" %s>%s""" % (key, key == sel_type and 'selected="selected"' or '', value)
@@ -904,9 +904,9 @@ def perform_addfield(ln=CFG_SITE_LANG, fldNAME='', code='', callback="yes", conf
     code = str.replace(code,' ', '')
     text = """
     <span class="adminlabel">Field name</span>
-    <input class="admin_w200" type="text" name="fldNAME" value="%s" /><br />
+    <input class="form-control" type="text" name="fldNAME" value="%s" /><br />
     <span class="adminlabel">Field code</span>
-    <input class="admin_w200" type="text" name="code" value="%s" /><br />
+    <input class="form-control" type="text" name="code" value="%s" /><br />
     """ % (fldNAME, code)
     output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addfield" % CFG_SITE_URL,
                               text=text,
@@ -1013,7 +1013,7 @@ def perform_deletevirtualindex(ln=CFG_SITE_LANG, idxID='',  callback='yes', conf
     idx = get_all_virtual_indexes()
     if len(idx) > 0:
         text = """<span class="adminlabel">Choose a virtual index</span>
-                  <select name="idxID" class="admin_w200">
+                  <select name="idxID" class="form-control">
                   <option value="-1">- Select an index -</option>
                """
         for idx_id, idx_name in idx:
@@ -1158,7 +1158,7 @@ def find_dependent_indexes_to_change(idxID, new_indexes):
 
 def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Logical fields overview"""
-    output = """<table cellpadding="3" border="1">"""
+    output = """<table class="table table-bordered">"""
     output += """<tr><td><strong>%s</strong></td>
                      <td><strong>%s</strong></td>
                      <td><strong>%s</strong></td>
@@ -1222,9 +1222,9 @@ def perform_modifyindex(idxID, ln=CFG_SITE_LANG, idxNAME='', idxDESC='', callbac
             idxDESC = idx[0][2]
         text = """
         <span class="adminlabel">Index name</span>
-        <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br />
+        <input class="form-control" type="text" name="idxNAME" value="%s" /><br />
         <span class="adminlabel">Index description</span>
-        <textarea class="admin_w200" name="idxDESC">%s</textarea><br />
+        <textarea class="form-control" name="idxDESC">%s</textarea><br />
         """ % (idxNAME, idxDESC)
 
         output += createhiddenform(action="modifyindex#1",
@@ -1270,7 +1270,7 @@ def perform_modifyindexstemming(idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='y
         if not idxSTEM:
             idxSTEM = ''
 
-        language_html_element = """<select name="idxSTEM" class="admin_w200">"""
+        language_html_element = """<select name="idxSTEM" class="form-control">"""
         languages = stemming_language_map.keys()
         languages.sort()
         for language in languages:
@@ -1345,7 +1345,7 @@ def perform_modifyindexer(idxID, ln=CFG_SITE_LANG, indexer='', callback='yes', c
         else:
             items.extend(["virtual"])
 
-        html_element = """<select name="indexer" class="admin_w200">"""
+        html_element = """<select name="indexer" class="form-control">"""
         for item in items:
             selected = indexer==item and 'selected="selected"' or ''
             html_element += """<option value="%s" %s>%s</option>""" % (item, selected, item)
@@ -1405,7 +1405,7 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
             idxKB = ''
             idxMATCH = ''
 
-        kb_html_element = """<select name="idxKB" class="admin_w200">"""
+        kb_html_element = """<select name="idxKB" class="form-control">"""
         knowledge_base_names = get_all_kb_names()
         knowledge_base_names.append(CFG_BIBINDEX_SYNONYM_MATCH_TYPE["None"])
         knowledge_base_names.sort()
@@ -1417,7 +1417,7 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
             kb_html_element += """<option value="%s" %s>%s</option>""" % (knowledge_base_name, selected, knowledge_base_name)
         kb_html_element += """</select>"""
 
-        match_html_element = """<select name="idxMATCH" class="admin_w200">"""
+        match_html_element = """<select name="idxMATCH" class="form-control">"""
         match_names = CFG_BIBINDEX_SYNONYM_MATCH_TYPE.values()
         match_names.sort()
         for match_name in match_names:
@@ -1491,7 +1491,7 @@ def perform_modifystopwords(idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='
         if isinstance(idxSTOPWORDS, tuple):
             idxSTOPWORDS = ''
 
-        stopwords_html_element = """<input class="admin_w200" type="text" name="idxSTOPWORDS" value="%s" /><br />""" % idxSTOPWORDS
+        stopwords_html_element = """<input class="form-control" type="text" name="idxSTOPWORDS" value="%s" /><br />""" % idxSTOPWORDS
 
         text = """<span class="adminlabel">Remove stopwords</span><br />"""  + stopwords_html_element
 
@@ -1552,7 +1552,7 @@ def perform_modifyremovehtml(idxID, ln=CFG_SITE_LANG, idxHTML='', callback='yes'
         if not idxHTML:
             idxHTML = ''
 
-        remove_html_element = """<select name="idxHTML" class="admin_w200">"""
+        remove_html_element = """<select name="idxHTML" class="form-control">"""
         if idxHTML == 'Yes':
             remove_html_element += """<option value="Yes" selected ="selected">Yes</option>"""
             remove_html_element += """<option value="No">No</option>"""
@@ -1621,7 +1621,7 @@ def perform_modifyremovelatex(idxID, ln=CFG_SITE_LANG, idxLATEX='', callback='ye
         if not idxLATEX:
             idxLATEX = ''
 
-        remove_latex_element = """<select name="idxLATEX" class="admin_w200">"""
+        remove_latex_element = """<select name="idxLATEX" class="form-control">"""
         if idxLATEX == 'Yes':
             remove_latex_element += """<option value="Yes" selected ="selected">Yes</option>"""
             remove_latex_element += """<option value="No">No</option>"""
@@ -1691,7 +1691,7 @@ def perform_modifytokenizer(idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', 
             idxTOK = ''
 
 
-        tokenizer_element = """<select name="idxTOK" class="admin_w200">"""
+        tokenizer_element = """<select name="idxTOK" class="form-control">"""
         tokenizers = [tokenizer for tokenizer in _TOKENIZERS if _TOKENIZERS[tokenizer]().implemented]
         for key in tokenizers:
             if key == idxTOK:
@@ -1761,7 +1761,7 @@ def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confir
 
         text = """
         <span class="adminlabel">Field code</span>
-        <input class="admin_w200" type="text" name="code" value="%s" /><br />
+        <input class="form-control" type="text" name="code" value="%s" /><br />
         """ % code
 
         output += createhiddenform(action="modifyfield#2",
@@ -1792,7 +1792,7 @@ def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='
 
     output = ''
     subtitle = """<a name="3"></a>3. Modify index fields.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
-    output += """<table cellpadding="3" border="1">"""
+    output += """<table class="table table-bordered">"""
     output += """<tr><td><strong>%s</strong></td>
                      <td><strong>%s</strong></td>
                      <td><strong>%s</strong></td>
@@ -1917,15 +1917,15 @@ def perform_addtag(fldID, ln=CFG_SITE_LANG, name='', value='', recjson_value='',
     subtitle = """<a name="4.1"></a>Add a tag to logical field"""
     text = """Add new tag:<br />
            <span class="adminlabel">MARC value</span>
-           <input class="admin_w200" maxlength="6" type="text" name="value" value="%s" /><br />
+           <input class="form-control" maxlength="6" type="text" name="value" value="%s" /><br />
            <span class="adminlabel">RecJson value</span>
-           <input class="admin_w200" type="text" name="recjson_value" value="%s" /><br />
+           <input class="form-control" type="text" name="recjson_value" value="%s" /><br />
            <span class="adminlabel">Name</span>
-           <input class="admin_w200" type="text" name="name" value="%s" /><br />
+           <input class="form-control" type="text" name="name" value="%s" /><br />
            """ % (value, recjson_value, name)
     text += """Or existing tag:<br />
             <span class="adminlabel">Tag</span>
-            <select name="existing_tag" class="admin_w200">
+            <select name="existing_tag" class="form-control">
             <option value="-1">- Select a tag -</option>
             """
 
@@ -1984,11 +1984,11 @@ def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', recjson
     text = """
            Any modifications will apply to all logical fields using this tag.<br />
            <span class="adminlabel">Name</span>
-           <input class="admin_w200" type="text" name="name" value="%s" /><br />
+           <input class="form-control" type="text" name="name" value="%s" /><br />
            <span class="adminlabel">MARC value</span>
-           <input class="admin_w200" type="text" name="value" value="%s" /><br />
+           <input class="form-control" type="text" name="value" value="%s" /><br />
            <span class="adminlabel">RecJson value</span>
-           <input class="admin_w200" type="text" name="recjson_value" value="%s" /><br />
+           <input class="form-control" type="text" name="recjson_value" value="%s" /><br />
            """ % (name, value, recjson_value)
 
     output += createhiddenform(action="modifytag#4.1",
@@ -2052,7 +2052,7 @@ def perform_addindexfield(idxID, ln=CFG_SITE_LANG, fldID='', callback="yes", con
     subtitle = """<a name="4.1"></a>Add logical field to index"""
     text = """
     <span class="adminlabel">Field name</span>
-    <select name="fldID" class="admin_w200">
+    <select name="fldID" class="form-control">
     <option value="-1">- Select a field -</option>
     """
 
@@ -2149,7 +2149,7 @@ def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm
     tags = get_tags()
     text  = """
             <span class="adminlabel">Tag</span>
-            <select name="tagID" class="admin_w200">
+            <select name="tagID" class="form-control">
             """
     text += """<option value="-1">- Select a tag -"""
     i = 0
