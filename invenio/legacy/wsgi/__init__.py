@@ -141,7 +141,9 @@ class SimulatedModPythonRequest(object):
         form = flatten_multidict(request.values)
 
         if request.files:
-            form.update(request.files.to_dict())
+            for name, file_ in iteritems(request.files):
+                setattr(file_, 'file', file_.stream)
+                form[name] = file_
         return form
 
     def get_response_sent_p(self):
