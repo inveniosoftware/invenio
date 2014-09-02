@@ -35,6 +35,9 @@ from .models import (Workflow, BibWorkflowObject, BibWorkflowEngineLog,
 from .utils import dictproperty
 from .logger import get_logger, BibWorkflowLogHandler
 from .errors import WorkflowHalt
+from .signals import (workflow_finished,
+                      workflow_halted,
+                      workflow_started)
 from invenio.ext.sqlalchemy import db
 from invenio.config import CFG_DEVEL_SITE
 DEBUG = CFG_DEVEL_SITE > 0
@@ -255,6 +258,7 @@ BibWorkflowEngine
         """Executed before processing the workflow."""
         self.save(status=WorkflowStatus.RUNNING)
         self.set_counter_initial(len(objects))
+        workflow_started.send(self)
         GenericWorkflowEngine.before_processing(objects, self)
 
     @staticmethod
@@ -263,6 +267,7 @@ BibWorkflowEngine
         self._i = [-1, [0]]
         if self.has_completed():
             self.save(WorkflowStatus.COMPLETED)
+            workflow_finished.send(self)
         else:
             self.save(WorkflowStatus.HALTED)
 
@@ -357,6 +362,7 @@ BibWorkflowEngine
             self._i[1] = [0]
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
+
         self.process(self._objects)
         self._unpickled = False
 
@@ -382,7 +388,6 @@ BibWorkflowEngine
         updated after the task finished running.
         """
         self.before_processing(objects, self)
-
         i = self._i
         # negative index not allowed, -1 is special
         while len(objects) - 1 > i[0] >= -1:
@@ -428,6 +433,7 @@ BibWorkflowEngine
                     self.increase_counter_halted()
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
+                    workflow_halted.send(obj)
 
                     if DEBUG:
                         msg = 'Processing was halted at step: %s' % (i,)

@@ -95,6 +95,7 @@ def start(workflow_name, data, **kwargs):
     from .worker_engine import run_worker
     if not isinstance(data, list):
         data = [data]
+
     return run_worker(workflow_name, data, **kwargs)
 
 
@@ -135,7 +136,6 @@ def start_delayed(workflow_name, data, **kwargs):
     else:
         if isinstance(data, BibWorkflowObject):
             data = [BibWorkflowObjectIdContainer(data).to_dict()]
-
     return WORKER().run_worker(workflow_name, data, **kwargs)
 
 
@@ -235,7 +235,6 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     objects = BibWorkflowObject.query.filter(
         BibWorkflowObject.id.in_(list(oids))
     ).all()
-
     return start_delayed(workflow_name, objects, **kwargs)
 
 
@@ -261,7 +260,6 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     :return: BibWorkflowEngine that ran the workflow
     """
     from .worker_engine import continue_worker
-
     return continue_worker(oid, start_point, **kwargs)
 
 
