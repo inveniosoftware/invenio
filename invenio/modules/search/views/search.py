@@ -80,9 +80,16 @@ blueprint = Blueprint('search', __name__, url_prefix="",
 
 default_breadcrumb_root(blueprint, '.')
 
-collection_of = LocalProxy(
-    lambda: g.collection.formatoptions[0]['code']
-)
+
+def _collection_of():
+    """Get output format from user settings."""
+    of = current_user['settings'].get('of')
+    if of is not None and of != '':
+        return of
+    return g.collection.formatoptions[0]['code']
+
+collection_of = LocalProxy(_collection_of)
+
 """Collection output format."""
 
 FACETS = FacetLoader()
@@ -435,7 +442,7 @@ def search(collection, p, of, so, rm):
 
     # update search arguments with the search user preferences
     if 'rg' not in request.values and current_user.get('rg'):
-        argd['rg'] = current_user.get('rg')
+        argd['rg'] = int(current_user.get('rg'))
     rg = int(argd['rg'])
 
     collection_breadcrumbs(collection)

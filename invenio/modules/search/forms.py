@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebMessage Forms"""
+"""WebMessage Forms."""
 
 from flask import url_for
 from invenio.base.i18n import _
@@ -31,35 +31,50 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 
 class JournalForm(WTFormDefault):
+
+    """Journal Form."""
+
     name = QuerySelectField(
         '',
         get_pk=lambda i: i['key'],
         get_label=lambda i: i['value'],
         query_factory=lambda: [{'key': '', 'value': _('Any journal')}] +
-                              get_kb_mappings('EJOURNALS'))
+        get_kb_mappings('EJOURNALS'))
     vol = TextField(_('Vol'))
     page = TextField(_('Pg'))
 
 
 class EasySearchForm(InvenioBaseForm):
+
     """Defines form for easy seach popup."""
+
     author = AutocompleteField(_('Author'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='exactauthor'))
+                               data_source=lambda:
+                               url_for('search.autocomplete',
+                                       field='exactauthor'))
     title = TextField(_('Title'))
     rn = AutocompleteField(_('Report number'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='reportnumber'))
+                           data_source=lambda: url_for('search.autocomplete',
+                                                       field='reportnumber'))
     aff = AutocompleteField(_('Affiliation'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='affiliation'))
+                            data_source=lambda: url_for('search.autocomplete',
+                                                        field='affiliation'))
     cn = AutocompleteField(_('Collaboration'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='collaboration'))
+                           data_source=lambda: url_for('search.autocomplete',
+                                                       field='collaboration'))
     k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
-        data_source=lambda: url_for('search.autocomplete', field='keyword'))
+                          data_source=lambda: url_for('search.autocomplete',
+                                                      field='keyword'))
     journal = FormField(JournalForm, widget=RowWidget(
-        classes={0:'col-xs-6', 1:'col-xs-3', 2: 'col-xs-3'}))
+        classes={0: 'col-xs-6', 1: 'col-xs-3', 2: 'col-xs-3'}))
 
 
 class GetCollections(object):
+
+    """Get all collections."""
+
     def __iter__(self):
+        """Get all the collections."""
         from invenio.modules.search.models import Collection
         collections = Collection.query.all()
 
@@ -68,10 +83,29 @@ class GetCollections(object):
                 yield (coll.name, coll.name_ln)
 
 
+class GetOutputFormats(object):
+
+    """Collection output formats."""
+
+    def __iter__(self):
+        """Get all the output formats."""
+        from invenio.modules.formatter.models import Format
+
+        formats = Format.query.filter_by(visibility=True).all()
+        yield ('', _('Default'))
+        for format_ in formats:
+            yield (format_.code, format_.name)
+
+
 class WebSearchUserSettingsForm(InvenioBaseForm):
+
+    """User settings for search."""
+
     rg = SelectField(_('Results per page'),
-                    choices=[('10', '10'), ('25', '25'), ('50', '50'), ('100', '100')])
+                     choices=[('10', '10'), ('25', '25'), ('50', '50'),
+                              ('100', '100')])
     websearch_hotkeys = SelectField(_('Hotkeys'), choices=[('0', _('Disable')),
                                                            ('1', _('Enable'))])
 
     c = SelectMultipleField(_('Collections'), choices=GetCollections())
+    of = SelectField(_('Personal output format'), choices=GetOutputFormats())
