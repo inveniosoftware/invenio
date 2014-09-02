@@ -91,7 +91,6 @@ from invenio.legacy.websearch_external_collections.utils import get_collection_i
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.modules.formatter import format_record
-from invenio.legacy.search_engine.utils import record_exists
 
 from invenio.utils.hepdata import display as hepdatadisplayutils
 
@@ -4141,6 +4140,7 @@ class Template:
           - citationhistory *string* - citationhistory box
 
         """
+        from invenio.legacy.search_engine.utils import record_exists
         # load the right message language
         _ = gettext_set_language(ln)
 
