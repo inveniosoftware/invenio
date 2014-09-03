@@ -65,11 +65,15 @@ define(function(require, exports, module) {
      */
     init: function () {
 
+      var that = this;
+
       // Make list sortable
       if (this.options.sortable) {
         var sortable_options = {
           items: "." + this.options.element_css_class,
-          update: this.sort_element,
+          update: function(e, ui) {
+            that.sort_element(e, ui);
+          }
         };
 
         if (this.$element.find("." + this.options.sort_cssclass).length !== 0) {
