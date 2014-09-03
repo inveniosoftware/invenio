@@ -57,6 +57,7 @@ from invenio.dbquery import run_sql, real_escape_string
 from invenio.errorlib import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
 
+#If you change this variable, please check bibsched_task_finished, etc.
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
                     '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED',
                     'SLEEPING', 'KILLED', 'NOW STOP', 'ERRORS REPORTED')
@@ -214,6 +215,37 @@ def bibsched_set_host(task_id, host=""):
     """Update the progress of task_id."""
     return run_sql("UPDATE schTASK SET host=%s WHERE id=%s", (host, task_id))
 
+def bibsched_task_finished_successfully(task_id):
+    """Check if the task has finished and no errors occurred."""
+    status = bibsched_get_status(task_id)
+    return status in ('ACK DONE', 'DONE')
+
+def bibsched_task_finished(task_id):
+    """Check if the task has finished."""
+    return bibsched_task_finished_successfully(task_id) or \
+        bibsched_task_finished_with_error(task_id)
+
+def bibsched_task_deleted(task_id):
+    """Check if the task has been deleted."""
+    status = bibsched_get_status(task_id)
+    return status.endswith('DELETED')
+
+def bibsched_task_waiting(task_id):
+    """Check if the task is waiting to be executed."""
+    status = bibsched_get_status(task_id)
+    return status == 'WAITING'
+
+def bibsched_task_running(task_id):
+    """Check if the task is currently running."""
+    status = bibsched_get_status(task_id)
+    return status in ('NOW STOP', 'SLEEPING') or status in ACTIVE_STATUS
+
+def bibsched_task_finished_with_error(task_id):
+    """Check if the tash has finished and errors occurred."""
+    status = bibsched_get_status(task_id)
+    return status in ('ACK DONE WITH ERRORS', 'ACK ERROR', 'CERROR',
+                      'ACK ERRORS REPORTED', 'ERRORS REPORTED', 'ERROR',
+                      'STOPPED', 'KILLED', 'ACK STOPPED', 'ACK KILLED')
 
 def bibsched_get_status(task_id):
     """Retrieve the task status."""
@@ -1163,6 +1195,9 @@ def stop(verbose=True, debug=False):
     if verbose:
         print "\nStopped"
     Log("BibSched and all BibTasks stopped")
+
+class UnknownBibschedStatus(Exception):
+    pass
 
 
 def main():
