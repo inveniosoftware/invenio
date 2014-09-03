@@ -1,0 +1,15 @@
+-e git+git://github.com/mitsuhiko/werkzeug.git#egg=Werkzeug
+-e git+git://github.com/mitsuhiko/jinja2.git#egg=Jinja2
+-e git+git://github.com/mitsuhiko/itsdangerous.git#egg=itsdangerous
+-e git+git://github.com/jek/blinker.git#egg=blinker
+-e git+git://github.com/mitsuhiko/flask.git#egg=flask
+
+-e git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0",
+
+-e git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer
+-e git+git://github.com/inveniosoftware/intbitset.git#egg=intbitset
+-e git+git://github.com/inveniosoftware/workflow.git#egg=workflow
+-e git+git://github.com/inveniosoftware/flask-sso.git#egg=flask-sso
+-e git+git://github.com/inveniosoftware/flask-menu.git#egg=flask-menu
+-e git+git://github.com/inveniosoftware/flask-breadcrumbs.git#egg=flask-breadcrumbs
+-e git+git://github.com/inveniosoftware/flask-registry.git#egg=flask-registry

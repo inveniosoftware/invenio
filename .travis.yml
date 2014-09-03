@@ -29,6 +29,7 @@ language: python
 
 env:
   - REQUIREMENTS=lowest
+  - REQUIREMENTS=release
   - REQUIREMENTS=devel
 
 python:
@@ -40,7 +41,7 @@ before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
   - "python requirements.py > .travis-lowest-requirements.txt"
-  - "touch .travis-devel-requirements.txt"
+  - "touch .travis-release-requirements.txt"
 
 install:
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
@@ -58,11 +59,12 @@ install:
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
   - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
   - "inveniomanage config set CFG_TMPDIR /tmp"
+  - "sudo su -c \"npm update\""
   - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
   # All the step below this points are solely for test purposes, don't use them
   # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
   - "inveniomanage bower -i bower-base.json > bower.json"
-  - "bower install"
+  - "bower install --silent"
   - "inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link"
   - "inveniomanage collect > /dev/null"
   - "inveniomanage assets build"

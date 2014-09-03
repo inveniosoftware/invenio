@@ -53,7 +53,6 @@ class _install_lib(install_lib):
         install_lib.run(self)
 
 dependency_links = [
-    "git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer",
     "git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0",
     "git+git://github.com/inveniosoftware/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow",
 ]
