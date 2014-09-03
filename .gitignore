@@ -75,6 +75,7 @@ modules/miscutil/bin/inveniocfg
 modules/miscutil/bin/plotextractor
 modules/miscutil/bin/bibtex
 modules/miscutil/bin/hepdataharvest
+modules/miscutil/bin/orcidpush
 modules/miscutil/etc/bash_completion.d/inveniocfg
 modules/miscutil/lib/build
 modules/webaccess/bin/authaction

@@ -532,6 +532,19 @@
   display: none;
 }
 
+@media screen{
+    /* Hides additional modal scrollbar when not using mobile version */
+    .modal {
+     overflow-y: auto;
+    }
+
+    /* Leaves the old scrollbar when modal is on, so that the view is not moving */
+    /* Probably will be fixed in new version of Bootstrap */
+    .modal-open {
+     overflow: auto;
+    }
+}
+
 .login-btns {
     padding: 0;
     margin: 0;
@@ -711,6 +724,7 @@
 .bai-box-content {
     padding-left: 5px;
     min-height: 32px;
+    overflow: hidden;
 }
 
 #pubs_list {
