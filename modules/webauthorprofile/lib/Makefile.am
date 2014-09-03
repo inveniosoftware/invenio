@@ -28,8 +28,7 @@ pylib_DATA = webauthorprofile_corefunctions.py \
              webauthorprofile_cli.py \
              webauthorprofile_daemon.py \
              webauthorprofile_regression_tests.py \
-             webauthorprofile_unit_tests.py \
-             webauthorprofile_orcidutils.py
+             webauthorprofile_unit_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

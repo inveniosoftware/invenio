@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orcid-message xmlns="http://www.orcid.org/ns/orcid"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://raw.github.com/ORCID/ORCID-Source/master/orcid-model/src/main/resources/orcid-message-1.1.xsd">
+  <message-version>1.1</message-version>
+  <orcid-profile>
+    <orcid-activities>
+      <orcid-works>
+        {% for record in records %}
+          <orcid-work {% if record.visibility %}visibility="{{ record.visibility }}"{% endif %}{% if record.put_code %} put-code="{{ record.put_code }}"{% endif %}>
+          {% if record.work_title %}
+          <work-title>
+            {% if record.work_title.title %}
+            <title>{{ record.work_title.title }}</title>
+            {% if record.work_title.subtitle %}
+            <subtitle>{{ record.work_title.subtitle }}</subtitle>
+            {% endif %}
+            {% if record.work_title.translated_titles %}
+            {% for translation in record.work_title.translated_titles %}
+            <translated-title language-code="{{ translation.0 }}">{{ translation.1 }}</translated-title>
+            {% endfor %}
+            {% endif %}
+            {% endif %}
+          </work-title>
+          {% endif %}
+          {% if record.journal_title %}
+          <journal-title>
+            {{ record.journal_title }}
+          </journal-title>
+          {% endif %}
+          {% if record.short_description %}
+          <short-description>
+            {{ record.short_description }}
+          </short-description>
+          {% endif %}
+          {% if record.work_citation %}
+          <work-citation>
+            <work-citation-type>{{ record.work_citation.0 }}</work-citation-type>
+            <citation>{{ record.work_citation.1 }}</citation>
+          </work-citation>
+          {% endif %}
+          {% if record.work_type %}
+          <work-type>{{ record.work_type }}</work-type>
+          {% endif %}
+          {% if record.publication_date %}
+          <publication-date>
+              <year>{{ record.publication_date.year }}</year>
+              {%- if record.publication_date.month %}
+              <month>{{ record.publication_date.month }}</month>
+              {%- if record.publication_date.day %}
+              <day>{{ record.publication_date.day }}</day>
+              {%- endif %}
+              {%- endif %}
+          </publication-date>
+          {% endif %}
+          {% if record.work_external_identifiers %}
+          <work-external-identifiers>
+            {% for external_id in record.work_external_identifiers %}
+            <work-external-identifier>
+            <work-external-identifier-type>{{ external_id.0 }}</work-external-identifier-type>
+            <work-external-identifier-id>{{ external_id.1 }}</work-external-identifier-id>
+            </work-external-identifier>
+            {% endfor %}
+          </work-external-identifiers>
+          {% endif %}
+          {% if record.url %}
+          <url>{{ record.url }}</url>
+          {% endif %}
+          {% if record.work_contributors %}
+          <work-contributors>
+            {% for contributor in record.work_contributors %}
+            <contributor>
+              {% if contributor.orcid %}
+              <contributor-orcid><uri>http://orcid.org/{{ contributor.orcid }}</uri></contributor-orcid>
+              {% endif %}
+              {% if contributor.name %}
+              <credit-name>{{ contributor.name }}</credit-name>
+              {% endif %}
+              {% if contributor.email %}
+              <contributor-email>{{ contributor.email }}</contributor-email>
+              {% endif %}
+              {% if contributor.attributes %}
+              <contributor-attributes>
+                {% if contributor.attributes.role %}
+                <contributor-role>{{ contributor.attributes.role }}</contributor-role>
+                {% endif %}
+                {% if contributor.attributes.sequence %}
+                <contributor-sequence>{{ contributor.attributes.sequence }}</contributor-sequence>
+                {% endif %}
+              </contributor-attributes>
+              {% endif %}
+            </contributor>  
+            {% endfor %}
+          </work-contributors>
+          {% endif %}
+          {% if record.work_source %}
+          <work-source>{{ record.work_source }}</work-source>
+          {% endif %}
+          {% if record.language_code %}
+          <language-code>{{ record.language_code }}</language-code>
+          {% endif %}
+          {% if record.country %}
+          <country visibility="{{ record.country.1 }}">{{ record.country.0 }}</country>
+          {% endif %}
+        </orcid-work>
+        {%- endfor %}
+      </orcid-works>
+    </orcid-activities>
+  </orcid-profile>
+</orcid-message>

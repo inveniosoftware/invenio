@@ -119,7 +119,10 @@ class ExternalOAuth2(ExternalAuth):
                     # Construct redirect uri without having '/' character at the
                     # left most of SITE_SECURE_URL
                     redirect_uri =  CFG_SITE_URL + '/youraccount/login?' +
-                        urlencode({'login_method': 'oauth2', 'provider': req.g['oauth2_provider_name']}))
+                        urlencode({'login_method': 'oauth2',
+                                   'provider': req.g['oauth2_provider_name'],
+                                  })
+                   )
         headers = dict(Accept = "application/json")
         kwargs = dict(data = data, headers = headers)
         # Get the access token
@@ -283,3 +286,4 @@ class ExternalOAuth2(ExternalAuth):
             return req.g.get('orcid_record', {})
         else:
             raise NotImplementedError()
+

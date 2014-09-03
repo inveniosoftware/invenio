@@ -1,5 +1,7 @@
 {% extends "index.html" %}
+
 {% block content %}
+
 <div class="row">
     <!-- left -->
     <div class="col-md-6">
@@ -51,7 +53,7 @@
             <div class="bai-box-title">
                 <span>ORCiD</span>
             </div>
-            <div class="bai-box-content">{{ orcid }}</div>
+            <div class="bai-box-content">{{ orcid_message }}{{ orcid }}</div>
         </div>
 
         <!-- hepnames -->
@@ -74,4 +76,7 @@
     </div>
 
 </div>
+
+{{ modal }}
+
 {% endblock %}

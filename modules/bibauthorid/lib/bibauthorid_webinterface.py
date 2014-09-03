@@ -63,6 +63,9 @@ from invenio.access_control_admin import acc_get_user_roles
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_config import CREATE_NEW_PERSON
+from invenio.bibsched import bibsched_task_finished_successfully, \
+    bibsched_task_finished_with_error, bibsched_task_running, bibsched_task_waiting, \
+    UnknownBibschedStatus
 import invenio.webinterface_handler_config as apache
 import invenio.webauthorprofile_interface as webauthorapi
 import invenio.bibauthorid_webapi as webapi
@@ -70,7 +73,7 @@ from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arx
 from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
     get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
 from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
-from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
+from invenio.orcidutils import get_dois_from_orcid, get_dois_from_orcid_using_pid
 
 from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \
     get_person_redirect_link, author_has_papers
@@ -83,6 +86,7 @@ from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
     record_get_field_instances, field_get_subfield_values
 from invenio.bibauthorid_name_utils import split_name_parts
+from invenio.orcidutils import push_orcid_papers
 
 TEMPLATE = load('bibauthorid')
 
@@ -2488,6 +2492,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
     _exports = ['',
                 'import_orcid_pubs',
+                'push_orcid_pubs',
                 'connect_author_with_hepname',
                 'connect_author_with_hepname_ajax',
                 'suggest_orcid',
@@ -2553,6 +2558,17 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             if pid >= 0:
                 self.person_id = pid
                 return
+
+    def _get_orcid_token(self, session, pinfo):
+        if 'user_info' not in session or \
+                'oauth2_access_token' not in session['user_info']:
+            return False
+        token = session['user_info']['oauth2_access_token']
+        if pinfo['pid'] == self.person_id and token != '':
+            #logged user is browsing his own management page
+            return token
+        else:
+            return None
 
     def __call__(self, req, form):
         '''
@@ -2638,9 +2654,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         user_pid = webapi.get_user_pid(login_info['uid'])
         person_data = webapi.get_person_info_by_pid(person_id)
 
-        # proccess and collect data for every box [LEGACY]
         arxiv_data = WebInterfaceBibAuthorIDClaimPages._arxiv_box(req, login_info, person_id, user_pid)
         orcid_data = WebInterfaceBibAuthorIDClaimPages._orcid_box(arxiv_data['login'], person_id, user_pid, ulevel)
+        orcid_data['token'] = self._get_orcid_token(session, pinfo)
         claim_paper_data = WebInterfaceBibAuthorIDClaimPages._claim_paper_box(person_id)
         support_data = WebInterfaceBibAuthorIDClaimPages._support_box()
         ids_box_html = None
@@ -2668,9 +2684,17 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
             session.dirty = True
 
+        modal = ''
+
+        if 'orcid_info' in pinfo:
+            self._update_orcid_info(session, pinfo)
+            orcid_info = pinfo['orcid_info']['status']
+        else:
+            orcid_info = ''
+
         if CFG_INSPIRE_SITE:
             html_arxiv = TEMPLATE.tmpl_arxiv_box(arxiv_data, ln, add_box=False, loading=False)
-            html_orcid = TEMPLATE.tmpl_orcid_box(orcid_data, ln, add_box=False, loading=False)
+            html_orcid, modal = TEMPLATE.tmpl_orcid_box(orcid_data, ln, orcid_info, add_box=False, loading=False)
             if hepnames_data is not None:
                 hepnames_data.update({
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
@@ -2758,8 +2782,15 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             "merge": TEMPLATE.tmpl_merge_box(merge_data, ln, add_box=False, loading=False),
             "external_ids_box_html": ids_box_html,
             "user_level": ulevel,
-            "base_url": CFG_BASE_URL
+            "base_url": CFG_BASE_URL,
+            "inspire" : CFG_INSPIRE_SITE,
+            "orcid_message" : self._generate_orcid_message(req, ln)
         }
+
+        if 'orcid_info' in pinfo:
+            if pinfo['orcid_info']['status'] not in ('running',):
+                pinfo.pop('orcid_info', None)
+                session.dirty = True
 
         # Inspire specific endpoints.
         if CFG_INSPIRE_SITE:
@@ -2767,10 +2798,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             template_parameters["arxiv"] = html_arxiv
             template_parameters["orcid"] = html_orcid
             template_parameters["contact"] = html_support
+            template_parameters["modal"] = modal
 
-        template_parameters["inspire"] = CFG_INSPIRE_SITE
-
-        template_parameters["inspire"] = CFG_INSPIRE_SITE
 
         body = profile_page.get_wrapped_body("manage_profile", template_parameters)
         # body = profile_page.get_wrapped_body("generic", {'html': content})
@@ -2782,19 +2811,55 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     language=ln,
                     show_title_p=False)
 
+    def _update_orcid_info(self, session, pinfo):
+
+        '''Changes pinfo['orcid_info']['status'] if needed.'''
+
+        if pinfo['orcid_info']['status'] == 'wrong_account':
+            return
+
+        sched_id = pinfo['orcid_info']['sched_id']
+
+        if bibsched_task_finished_successfully(sched_id):
+            pinfo['orcid_info']['status'] = 'finished'
+        elif bibsched_task_running(sched_id) or bibsched_task_waiting(sched_id):
+            #the status doesn't need to be updated
+            pass
+        elif bibsched_task_finished_with_error(sched_id):
+            pinfo['orcid_info']['status'] = 'error'
+        else:
+            #probably deleted by hand
+            pinfo['orcid_info']['status'] = 'error'
+            #raise UnknownBibschedStatus
+        session.dirty = True
+
+
+    def _generate_orcid_message(self, req, ln):
+        '''
+        Generate the box which informs the user about running ORCID push.
+
+        @param req: Apache request object
+        @type req: Apache request object
+        '''
+        session = get_session(req)
+        pinfo = session["personinfo"]
+        orcid_info = None
+
+        if 'orcid_info' in pinfo:
+            orcid_info = pinfo['orcid_info']['status']
+        if not orcid_info:
+            return ''
+        else:
+            return TEMPLATE.tmpl_orcid_message(orcid_info, ln)
+
+
     def import_orcid_pubs(self, req, form):
         webapi.session_bareinit(req)
         session = get_session(req)
         pinfo = session['personinfo']
         orcid_info = pinfo['orcid']
 
-        # author should have already an orcid if this method was triggered
-        try:
-            orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
-        except IndexError:
-            # weird, no orcid id in the database? Let's not do anything...
-            orcid_id = None
-        orcid_dois = get_dois_from_orcid(orcid_id)
+        orcid_id, orcid_dois = get_dois_from_orcid_using_pid(pinfo['pid'])
 
         # TODO: what to do in case some ORCID server error occurs?
         if orcid_id is None or orcid_dois is None:
@@ -2810,6 +2875,54 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session.dirty = True
 
         redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
+
+    def push_orcid_pubs(self, req, form):
+
+        '''Pushes all claimed papers to ORCID database.
+
+        Doesn't push papers which were there earlier. Needs user authentication.
+        When a user requests a push, this method will be run twice. Firstly,
+        user should authenticate himself. Then, in the second run, after
+        receiving the token from ORCID, the push is done.
+        '''
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        uinfo = session['user_info']
+        orcid_info = pinfo['orcid']
+        pid = pinfo['pid']
+
+        if 'oauth2_access_token' not in uinfo:
+            uinfo['oauth2_access_token'] = ''
+
+        if  uinfo['oauth2_access_token'] == '':
+            # Authenticate
+            uinfo['pushorcid'] = True
+            session.dirty = True
+            redirect_to_url(req, "%s/youraccount/oauth2?provider=%s&scope=/orcid-works/create" % (CFG_SITE_SECURE_URL, 'orcid'))
+
+        #We expect user to have only one ORCID
+        assert(len(webapi.get_orcids_by_pid(pid)) == 1)
+
+        if uinfo['oauth2_orcid'] != webapi.get_orcids_by_pid(pid)[0]:
+            # User has authenticated, but he is using different account
+            uinfo['oauth2_access_token'] = ''
+            pinfo['orcid_info'] = {'status' : 'wrong_account', 'sched_id': -1 }
+            session.dirty = True
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pid))
+
+        sched_id = push_orcid_papers(pid, uinfo['oauth2_access_token'])
+
+        pinfo['orcid_info'] = {'status' : 'running', 'sched_id' : sched_id }
+
+        #Token may expire. It is better to get rid of it.
+        uinfo['oauth2_access_token'] = ''
+
+        session.dirty = True
+
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pid))
+
 
     def connect_author_with_hepname(self, req, form):
         argd = wash_urlargd(form, {'cname': (str, None),
