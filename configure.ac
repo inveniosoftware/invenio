@@ -804,6 +804,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/plotextractor \
      modules/miscutil/bin/hepdataharvest \
      modules/miscutil/bin/bibtex \
+     modules/miscutil/bin/orcidpush \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \
      modules/miscutil/doc/hacking/Makefile \
@@ -813,6 +814,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/etc/ckeditor_scientificchar/Makefile \
      modules/miscutil/etc/ckeditor_scientificchar/dialogs/Makefile \
      modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
+     modules/miscutil/etc/templates/Makefile \
      modules/miscutil/lib/Makefile \
      modules/miscutil/lib/upgrades/Makefile \
      modules/miscutil/sql/Makefile \

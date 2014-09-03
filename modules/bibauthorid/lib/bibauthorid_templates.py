@@ -2065,55 +2065,6 @@ class Template:
     def loading_html(self):
         return '<img src=/img/ui-anim_basic_16x16.gif> Loading...'
 
-    def tmpl_profile_management(self, ln, person_data, arxiv_data, orcid_data, claim_paper_data,
-                                int_ids_data, ext_ids_data, autoclaim_data, support_data,
-                                merge_data, hepnames_data):
-        '''
-        SSO landing/manage profile page.
-        '''
-
-        html = list()
-        if CFG_INSPIRE_SITE:
-            html_arxiv = self.tmpl_arxiv_box(arxiv_data, ln, loading=False)
-            html_orcid = self.tmpl_orcid_box(orcid_data, ln, loading=False)
-            html_hepnames = self.tmpl_hepnames_box(hepnames_data, ln, loading=False)
-            html_support = self.tmpl_support_box(support_data, ln, loading=False)
-        html_claim_paper = self.tmpl_claim_paper_box(claim_paper_data, ln, loading=False)
-        if ext_ids_data:
-            html_ext_ids = self.tmpl_ext_ids_box(person_data['pid'], int_ids_data, ext_ids_data, ln, loading=False)
-        html_autoclaim = self.tmpl_autoclaim_box(autoclaim_data, ln, loading=True)
-        html_merge = self.tmpl_merge_box(merge_data, ln, loading=False)
-        g = self._grid
-        left_side_elements = list()
-        if CFG_INSPIRE_SITE:
-            left_side_elements.append(g(1, 1, cell_padding=5)(html_arxiv))
-        left_side_elements.append(g(1, 1, cell_padding=5)(html_claim_paper))
-        if not autoclaim_data['hidden']:
-            left_side_elements.append(g(1, 1, cell_padding=5)(html_autoclaim))
-
-        left_len = len(left_side_elements)
-        left_side = g(left_len, 1)(*left_side_elements)
-
-        right_side_elements = list()
-        if CFG_INSPIRE_SITE:
-            right_side_elements.append(g(1, 1, cell_padding=5)(html_orcid))
-        if ext_ids_data:
-            right_side_elements.append(g(1, 1, cell_padding=5)(html_ext_ids))
-        if CFG_INSPIRE_SITE:
-            right_side_elements.append(g(1, 1, cell_padding=5)(html_hepnames))
-        right_side_elements.append(g(1, 1, cell_padding=5)(html_merge))
-        if CFG_INSPIRE_SITE:
-            right_side_elements.append(g(1, 1, cell_padding=5)(html_support))
-
-        right_len = len(right_side_elements)
-        right_side = g(right_len, 1)(*right_side_elements)
-
-        page = g(1, 2)(left_side, right_side)
-
-        html.append(page)
-
-        return ' '.join(html)
-
     def tmpl_print_searchresultbox(self, bid, header, body):
         """ Print a nicely formatted box for search results. """
 
@@ -2158,7 +2109,7 @@ You may also continue as a guest. In this case your input will be processed by o
         else:
             return html_arxiv
 
-    def tmpl_orcid_box(self, orcid_data, ln, add_box=True, loading=True):
+    def tmpl_orcid_box(self, orcid_data, ln, orcid_info, add_box=True, loading=True):
         _ = gettext_set_language(ln)
 
         html_head = _(""" <span title="ORCiD (Open Researcher and Contributor ID) is a unique researcher identifier that distinguishes you from other researchers.
@@ -2166,16 +2117,46 @@ It holds a record of all your research activities. You can add your ORCiD to all
         <strong> Connect this profile to an ORCiD </strong> <span>""")
         html_orcid = ""
 
+        modal = ""
+
         if orcid_data['orcids']:
             html_orcid += _(
                 'This profile is already connected to the following ORCiD: <strong>%s</strong></br>' %
                 (",".join(['<a rel="nofollow" href="http://www.orcid.org/' + orcidid + '"">' + orcidid + '</a>' for orcidid in orcid_data['orcids']]),))
             if orcid_data['arxiv_login'] and orcid_data['own_profile']:
-                html_orcid += '<br><a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (
+                html_orcid += '<br><div class="btn-group"><a rel="nofollow" href="%s" class="btn btn-default ' % (
+                    "%s/author/manage_profile/push_orcid_pubs" % CFG_SITE_SECURE_URL )
+                if orcid_info == 'running':
+                    html_orcid += 'disabled'
+                html_orcid +='">%s</a>' % (
+                    _("Push my claimed publications to ORCiD"))
+                html_orcid += '<button class="btn btn-primary btn-default '
+                if orcid_info == 'running' :
+                    html_orcid += 'disabled'
+                html_orcid += '" data-toggle="modal" data-target="#orcidPushHelp"><b>?</b></button></div>'
+                html_orcid += '<br><br><a rel="nofollow" href="%s" class="btn btn-default">%s</a>' % (
                     "%s/author/manage_profile/import_orcid_pubs" % CFG_SITE_SECURE_URL,
-                    _("Import your publications from ORCID"))
-                html_orcid += '<br><br><a rel="nofollow" href="http://orcid.org/%s" class="btn btn-default">%s</a>' % (
-                    orcid_data['orcids'][0], _("Visit your profile in ORCID"))
+                    _("Import my publications from ORCiD"))
+                modal += '<div class="modal fade" id="orcidPushHelp"> \
+                          <div class="modal-dialog"><div class="modal-content"> \
+                          <div class="modal-header"> \
+                          <h4 class="modal-title">%s</h4> \
+                          </div> \
+                          <div class="modal-body"> \
+                          <p>%s</p></div> \
+                          <div class="modal-footer"> \
+                          <button type="button" class="btn btn-default" data-dismiss="modal">%s</button> \
+                          <a rel="nofollow" href="%s" class="btn btn-primary">%s</a> \
+                          </div></div></div></div>' % (
+                            _("Pushing your claimed publication list to ORCiD"),
+                            _("By pushing your publications list to ORCiD, \
+                               we will send the details of all the papers and \
+                               datasets you have claimed as yours in INSPIRE. \
+                               Every time you perform this operation, only the \
+                               new additions will be submitted to ORCiD."),
+                            _("Go back"),
+                            "%s/author/manage_profile/push_orcid_pubs" % CFG_SITE_SECURE_URL,
+                            _("Push to ORCiD"))
         else:
             html_orcid += "This profile has not been connected to an ORCiD account yet. "
             if orcid_data['arxiv_login'] and (orcid_data['own_profile'] or orcid_data['add_power']):
@@ -2192,22 +2173,13 @@ It holds a record of all your research activities. You can add your ORCiD to all
                 html_orcid += '<span class="pid hidden">%s</span>%s</a></div></form>' % (
                     orcid_data['pid'], 'Submit Suggestion')
 
-                # html_orcid += '<form method="GET" action="%s/author/manage_profile/suggest_orcid" rel="nofollow">' % CFG_SITE_URL
-                # html_orcid += '<input name="orcid" id="orcid" type="text" style="border:1px solid #333; width:300px;"/>'
-                # html_orcid += '<input type="hidden" name="pid" value="%s">' % orcid_data['pid']
-                # html_orcid += '<input type="submit" class="btn btn-default" value="%s">
-                # </form>' % ('Submit suggestion',)
-
-                # html_orcid += '<a rel="nofollow" href="%s" class="btn
-                # btn-default">%s</a>' % (suggest_link, suggest_text)
-
         if loading:
             html_orcid = self.loading_html()
         if add_box:
             orcid_box = self.tmpl_print_searchresultbox('orcid', html_head, html_orcid)
-            return orcid_box
+            return orcid_box, modal
         else:
-            return html_orcid
+            return html_orcid, modal
 
     def tmpl_claim_paper_box(self, claim_paper_data, ln, add_box=True, loading=True):
         _ = gettext_set_language(ln)
@@ -2228,6 +2200,35 @@ You can also assign publications to other authors. This will help %s provide mor
             return claim_paper_box
         else:
             return html_claim_paper
+
+    def tmpl_orcid_message(self, orcid_info, ln):
+
+        _ = gettext_set_language(ln)
+
+        html = ''
+
+        if orcid_info == 'running':
+            html = ('<div class="alert alert-info" role="alert">%s</div>' % _('Request \
+                    for pushing ORCID data is being processed. \
+                    Your works will be available in ORCID database soon.'))
+        elif orcid_info == 'finished':
+            html = ('<div class="alert alert-success" role="alert">%s</div>' % _('Your \
+                    request for pushing ORCID data was processed succesfully. \
+                    Your works are available in ORCID database.'))
+        elif orcid_info == 'error':
+            html = ('<div class="alert alert-danger" role="alert">%s</div>' % _('An \
+                    error occurred when INSPIRE was processing your ORCID data push \
+                    request. Our developers were informed of the issue and \
+                    will fix it.'))
+        elif orcid_info == 'wrong_account':
+            html = ('<div class="alert alert-danger" role="alert">%s</div>' % _('You \
+                    authenticated correctly to ORCID, but you are using a different \
+                    account than the one that is connected to your profile on INSPIRE. \
+                    We will not allow you push your works to a different account. \
+                    If you want to change your ORCID on your INSPIRE profile, \
+                    please contact our staff.'))
+
+        return html
 
     def tmpl_ext_ids_box(self, personid, int_ids_data, ext_ids_data, ln, add_box=True, loading=True):
         _ = gettext_set_language(ln)
