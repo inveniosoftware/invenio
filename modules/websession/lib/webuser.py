@@ -1234,6 +1234,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_usepaperattribution' : False,
         'precached_canseehiddenmarctags' : False,
         'precached_sendcomments' : False,
+        'oauth2_access_token' : ''
     }
 
     try:

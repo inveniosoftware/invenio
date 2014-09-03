@@ -65,7 +65,7 @@ from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.intbitset import intbitset
 from invenio.bibformat import format_record, format_records
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
-from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
+from invenio.orcidutils import get_dois_from_orcid
 
 
 # After this delay, we assume that a process computing an empty claimed cache is dead

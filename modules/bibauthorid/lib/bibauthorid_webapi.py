@@ -2608,7 +2608,7 @@ def get_orcids_by_pid(pid):
 
 
 def add_orcid_to_pid(pid, orcid):
-    if orcid in get_orcids_by_pid(pid):
+    if len(get_orcids_by_pid(pid)) > 0:
         return
 
     dbapi.add_orcid_id_to_author(pid, orcid)
