@@ -98,6 +98,7 @@ install_requires = [
     "msgpack-python>=0.3",
     "MySQL-python>=1.2.5",
     "numpy>=1.7",
+    "nydus>=0.10.8",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
     "pycrypto>=2.0.1",
     "pyparsing>=2.0.1,<2.0.2",
