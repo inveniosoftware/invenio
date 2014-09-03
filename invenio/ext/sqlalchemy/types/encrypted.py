@@ -25,7 +25,7 @@ from sqlalchemy.types import TypeDecorator, String
 from Crypto.Cipher import AES
 
 
-class EncryptDecprytModule(object):
+class EncryptDecryptModule(object):
 
     """Provide encryption and decryption methods."""
 
@@ -43,7 +43,8 @@ class EncryptDecprytModule(object):
     @classmethod
     def encrypt(cls, key, value):
         """Encrypt a message."""
-        encrypted = base64.b64encode(key.encrypt(cls.pad(value)))
+        pad_func = cls.pad
+        encrypted = base64.b64encode(key.encrypt(pad_func(value)))
         return encrypted
 
     @classmethod
@@ -55,7 +56,7 @@ class EncryptDecprytModule(object):
         return decrypted
 
 
-class AESEngine(EncryptDecprytModule):
+class AESEngine(EncryptDecryptModule):
 
     """Wrap AES symmetric cipher engine."""
 
