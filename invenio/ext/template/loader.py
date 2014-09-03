@@ -23,7 +23,13 @@ By default the Flask Jinja2 template loader is not aware of the order of
 Blueprints as defined by the PACKAGES configuration variable.
 """
 
-from flask.templating import DispatchingJinjaLoader, blueprint_is_module
+from flask.templating import DispatchingJinjaLoader
+
+try:
+    # Deprecated in Flask commit 817b72d484d353800d907b3580c899314bf7f3c6
+    from flask.templating import blueprint_is_module
+except ImportError:
+    blueprint_is_module = lambda blueprint: False
 
 
 class OrderAwareDispatchingJinjaLoader(DispatchingJinjaLoader):
