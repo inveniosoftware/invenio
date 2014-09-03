@@ -406,9 +406,11 @@ CFG_OAUTH2_CONFIGURATIONS =  {
     'orcid': {
         'consumer_key': '',
         'consumer_secret': '',
-        'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
-        'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
-        'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
+        'authorize_url': 'http://sandbox.orcid.org/oauth/authorize',
+        'public_url': 'http://sandbox.orcid.org/',
+        'member_url': 'http://api.sandbox.orcid.org/',
+        'access_token_url': 'http://api.sandbox.orcid.org/oauth/token',
+        'request_url': 'http://api.sandbox.orcid.org/{id}/orcid-profile',
         'authorize_parameters': {
             'scope': '/orcid-profile/read-limited',
             'response_type': 'code',
@@ -550,6 +552,7 @@ DEF_ACTIONS = (
                ('runbibrank', 'run BibRank', '', 'no'),
                ('runoaiharvest', 'run oaiharvest task', '', 'no'),
                ('runoairepository', 'run oairepositoryupdater task', '', 'no'),
+               ('runorcidpush', 'run orcidpush task', '', 'no'),
                ('runbibedit', 'run Record Editor', 'collection', 'yes'),
                ('runbibeditmulti', 'run Multi-Record Editor', '', 'no'),
                ('runbibdocfile', 'run Document File Manager', '', 'no'),
