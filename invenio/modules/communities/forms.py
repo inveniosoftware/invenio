@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Community Module Forms"""
+"""Community forms."""
 
 from __future__ import absolute_import
 
@@ -30,23 +30,19 @@ from wtforms import TextField, \
 from .models import Community
 
 
-#
-# Form
-#
-
 class SearchForm(Form):
-    """
-    Search Form
-    """
+
+    """Search Form."""
+
     p = TextField(
         validators=[validators.required()]
     )
 
 
 class CommunityForm(Form):
-    """
-    Community form.
-    """
+
+    """Community form."""
+
     field_sets = [
         ('Information', [
             'identifier', 'title', 'description', 'curation_policy',
@@ -131,14 +127,17 @@ class CommunityForm(Form):
 
 
 class EditCommunityForm(CommunityForm):
-    """
+
+    """Edit community form.
+
     Same as collection form, except identifier is removed.
     """
+
     identifier = None
 
 
 class DeleteCommunityForm(InvenioBaseForm):
-    """
-    Form to confirm deletion of a collection:
-    """
+
+    """Confirm deletion of a collection."""
+
     delete = HiddenField(default='yes', validators=[validators.required()])

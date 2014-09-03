@@ -26,43 +26,57 @@
 {% endblock %}
 
 {% block body %}
-<div class="row" id="file_container">
-  <div class="col-sm-12 col-md-12">
-    <h1><i class="icon-group"></i> Community Collections</h1>
-    <p class="text-muted">Communities created and curated by {{config.CFG_SITE_NAME}} users</p>
+<div class="row">
+  <div class="col-xs-12 col-sm-12 col-md-12">
+      <nav class="navbar navbar-default" role="navigation">
+        <div class="collapse navbar-collapse">
+            <form action="." method="GET" id="search_form" class="navbar-form" role="form">
+            <div class="input-group">
+                {{ form.p(class_="form-control " + form.p.short_name, ) }}
+                <span class="input-group-btn"  style="width: 1%;">
+                    <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-search glyphicon-white"></i> {{ _("Search") }}</button>
+                </span>
+            </div>
+            </form>
+        </div>
+      </nav>
+
+    <h1><i class="fa fa-group"></i> Communities <small>created and curated by {{config.CFG_SITE_NAME}} users</small></h1>
   </div>
 
   <div class="col-sm-8 col-md-8">
-    {%- set args = request.args.copy().to_dict() -%}
+  {%- set args = request.args.copy().to_dict() -%}
 
-    <div class="form-group">
-      <div class="btn-group">
-        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-          <i class="glyphicon glyphicon-th"></i> {{ _('Sort by') }}
-          <span class="caret"></span>
-        </a>
-        <ul class="dropdown-menu">
-          {%- for opt in ['title', 'ranking'] -%}
-            {%- set new_args = args.copy() -%}
-            {%- do new_args.update({'so': opt}) -%}
-            <li><a
-               href="{{ url_for('communities.index', **new_args) }}"
-               class="active">
-              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if args.get('so', 'ranking')==opt }}"></i>
-              {{ opt }}
-            </a></li>
-          {%- endfor -%}
-          <!-- dropdown menu links -->
-        </ul>
-      </div>
 
-      <form action="." method="GET" id="search_form" class="form-horizontal" role="form" style="display:inline-block;">
-        <div class="controls col-md-9">
-          {{ form.p(class_="form-control col-md-5 " + form.p.short_name) }}
+
+    {% if communities %}
+    <p>
+    <div class="form-inline">
+        <div class="form-group">
+            <p class="help-block hidden-xs">{{ _('Showing communties %(x_from)d to %(x_to)d out of %(x_total)d results.', x_from=r_from, x_to=r_to, x_total=r_total) }}</p>
         </div>
-        <button type="submit" class="btn btn-primary"><i class="icon-ok  icon-white"></i> {{ _("Search") }}</button>
-      </form>
+        <div class="form-group pull-right">
+          <div class="btn-group">
+            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="glyphicon glyphicon-random"></i> {{ _('Sort by') }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              {%- for opt in ['title', 'ranking'] -%}
+                {%- set new_args = args.copy() -%}
+                {%- do new_args.update({'so': opt}) -%}
+                <li><a
+                   href="{{ url_for('communities.index', **new_args) }}"
+                   class="active">
+                  <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if args.get('so', 'ranking')==opt }}"></i>
+                  {{ opt }}
+                </a></li>
+              {%- endfor -%}
+            </ul>
+            </div>
+        </div>
     </div>
+    <p>
 
     {%- for row in communities|batch(2) %}
     <div class="row">
@@ -86,6 +100,8 @@
     </div>
     {%- endfor %}
 
+    {% if pagination.total_count > pagination.per_page %}
+    <div align="center">
     <ul class="pagination">
       <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
         {%- set new_args = args.copy() -%}
@@ -118,6 +134,13 @@
         <a title="last" href="{{ url_for('communities.index', **new_args) }}">»</a>
       </li>
     </ul>
+    </div>
+    {% endif %}
+    {% else %}
+    <p class="text-muted text-center"><strong>
+    {{ _('Your search did not match any communities. Please try again.')}}
+    </strong></p>
+    {% endif %}
 
   </div>
 

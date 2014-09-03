@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Community Module Blueprint"""
+"""Community Module Blueprint."""
 
 from __future__ import absolute_import
 
@@ -52,8 +52,7 @@ blueprint = Blueprint(
 
 @blueprint.app_template_filter('community_id')
 def community_id(coll):
-    """
-    Determine if current user is owner of a given record
+    """Determine if current user is owner of a given record.
 
     :param coll: Collection object
     """
@@ -71,17 +70,14 @@ def community_id(coll):
 
 @blueprint.app_template_filter('curation_action')
 def curation_action(recid, ucoll_id=None):
-    """
-    Determine if curation action is underway
-    """
+    """Determine if curation action is underway."""
     return cache.get("community_curate:%s_%s" % (ucoll_id, recid))
 
 
 @blueprint.app_template_filter('communities')
 def communities(bfo, is_owner=False, provisional=False, public=True,
                 exclude=None):
-    """
-    Maps collection identifiers to community collection objects
+    """Map collection identifiers to community collection objects.
 
     :param bfo: BibFormat Object
     :param is_owner: Set to true to only return user collections which the
@@ -111,8 +107,7 @@ def communities(bfo, is_owner=False, provisional=False, public=True,
 
 @blueprint.app_template_filter('community_state')
 def community_state(bfo, ucoll_id=None):
-    """
-    Determine if current user is owner of a given record
+    """Determine if current user is owner of a given record.
 
     :param coll: Collection object
     """
@@ -125,11 +120,10 @@ def community_state(bfo, ucoll_id=None):
             return "provisional"
     return "rejected"
 
+
 @blueprint.app_template_filter('mycommunities_ctx')
 def mycommunities_ctx():
-    """
-    Helper method for return ctx used by many views
-    """
+    """Helper method for return ctx used by many views."""
     return {
         'mycommunities': Community.query.filter_by(
             id_user=current_user.get_id()).order_by(db.asc(Community.title)).all()
@@ -144,21 +138,23 @@ def mycommunities_ctx():
                  'page': (int, 1),
                  })
 def index(p, so, page):
-    """
-    Index page with uploader and list of existing depositions
-    """
+    """Index page with uploader and list of existing depositions."""
     ctx = mycommunities_ctx()
 
     if not so:
         so = cfg.get('COMMUNITIES_DEFAULT_SORTING_OPTION')
 
     communities = Community.filter_communities(p, so)
-    form = SearchForm()
+    form = SearchForm(p=p)
     per_page = cfg.get('COMMUNITIES_DISPLAYED_PER_PAGE', 10)
     page = max(page, 1)
+    p = Pagination(page, per_page, communities.count())
 
     ctx.update({
-        'pagination': Pagination(page, per_page, communities.count()),
+        'r_from': max(p.per_page*(p.page-1), 0),
+        'r_to': min(p.per_page*p.page, p.total_count),
+        'r_total': p.total_count,
+        'pagination': p,
         'form': form,
         'title': _('Community Collections'),
         'communities': communities.slice(
@@ -173,9 +169,7 @@ def index(p, so, page):
 
 @blueprint.route('/about/<string:community_id>/', methods=['GET'])
 def detail(community_id=None):
-    """
-    Index page with uploader and list of existing depositions
-    """
+    """Index page with uploader and list of existing depositions."""
     # Check existence of community
     u = Community.query.filter_by(id=community_id).first_or_404()
     uid = current_user.get_id()
@@ -198,9 +192,7 @@ def detail(community_id=None):
 @login_required
 @permission_required('submit')
 def curate():
-    """
-    Index page with uploader and list of existing depositions
-    """
+    """Index page with uploader and list of existing depositions."""
     from invenio.legacy.search_engine import get_fieldvalues
     action = request.values.get('action')
     community_id = request.values.get('collection')
@@ -261,9 +253,7 @@ def curate():
 @permission_required('submit')
 @register_breadcrumb(blueprint, '.new', _('Create new'))
 def new():
-    """
-    Create or edit a community.
-    """
+    """Create or edit a community."""
     uid = current_user.get_id()
     form = CommunityForm(request.values, crsf_enabled=False)
 
@@ -298,9 +288,7 @@ def new():
 @permission_required('submit')
 @register_breadcrumb(blueprint, '.edit', _('Edit'))
 def edit(community_id):
-    """
-    Create or edit a community.
-    """
+    """Create or edit a community."""
     # Check existence of community
     u = Community.query.filter_by(id=community_id).first_or_404()
     uid = current_user.get_id()
@@ -339,9 +327,7 @@ def edit(community_id):
 @permission_required('submit')
 @register_breadcrumb(blueprint, '.delete', _('Delete'))
 def delete(community_id):
-    """
-    Delete a community
-    """
+    """Delete a community."""
     # Check existence of community
     u = Community.query.filter_by(id=community_id).first_or_404()
     uid = current_user.get_id()
