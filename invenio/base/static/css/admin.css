@@ -2,10 +2,6 @@
 
    Copied over from flask_admin.
 */
-body
-{
-    padding-top: 60px;
-}
 
 /* Form customizations */
 form.icon {
