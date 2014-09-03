@@ -17,50 +17,80 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implement an Encrypted column type."""
+"""Implement Encrypted type."""
 
 import base64
-from Crypto.Cipher import AES
 import hashlib
-from sqlalchemy.types import TypeDecorator, VARCHAR
+from sqlalchemy.types import TypeDecorator, String
+from Crypto.Cipher import AES
+
+
+class EncryptDecprytModule(object):
+
+    """Provide encryption and decryption methods."""
+
+    BLOCK_SIZE = 16
+    PADDING = '*'
+
+    @classmethod
+    def pad(cls, value):
+        """Pad the message to be encrypted, if needed."""
+        BS = cls.BLOCK_SIZE
+        P = cls.PADDING
+        padded = (value + (BS - len(value) % BS) * P)
+        return padded
+
+    @classmethod
+    def encrypt(cls, key, value):
+        """Encrypt a message."""
+        encrypted = base64.b64encode(key.encrypt(cls.pad(value)))
+        return encrypted
+
+    @classmethod
+    def decrypt(cls, key, value):
+        """Decrypt a message."""
+        P = cls.PADDING
+        decrypted = (key.decrypt(base64.b64decode(value)).
+                     decode('utf-8').rstrip(P))
+        return decrypted
+
+
+class AESEngine(EncryptDecprytModule):
+
+    """Wrap AES symmetric cipher engine."""
+
+    @staticmethod
+    def cipher(key):
+        """Create a new AES cipher."""
+        return AES.new(hashlib.sha256(key).digest())
 
 
 class Encrypted(TypeDecorator):
 
     """Implement an Encrypted column type."""
 
-    impl = VARCHAR
-    BLOCK_SIZE = 16
-    PADDING = '*'
+    impl = String
+    encr_decr_engine = AESEngine
 
-    def __init__(self, key, *args, **kwargs):
-        """Initialization."""
-        super(Encrypted, self).__init__(*args, **kwargs)
+    def __init__(self, key, **kwargs):
+        """Initialization.
+
+        :param key: [String] a given key for encryption/decryption
+        """
+        super(Encrypted, self).__init__(**kwargs)
         # produce a 32-bytes key
-        secret_key = hashlib.sha256(key).digest()
-        self.cipher = AES.new(secret_key)
-
-    def _pad(self, value):
-        """Pad the message to be encrypted, if needed."""
-        padded = (value + (self.BLOCK_SIZE - len(value) % self.BLOCK_SIZE) *
-                  self.PADDING)
-        return padded
-
-    def _aes_encrypt(self, value):
-        """Encrypt a message."""
-        encrypted = base64.b64encode(self.cipher.encrypt(self._pad(value)))
-        return encrypted
-
-    def _aes_decrypt(self, value):
-        """Decrypt a message."""
-        decrypted = (self.cipher.decrypt(base64.b64decode(value)).
-                     decode('utf-8').rstrip(self.PADDING))
-        return decrypted
+        self.cipher = self.encr_decr_engine.cipher(key)
 
     def process_bind_param(self, value, dialect):
-        """Encrypt a value on the way in."""
-        return self._aes_enrypt(value)
+        """Encrypt a value on the way in.
+
+        :param value: [String] the value to be encrypted
+        """
+        return self.encr_decr_engine.encrypt(self.cipher, value)
 
     def process_result_value(self, value, dialect):
-        """Decrypt value on the way out."""
-        return self._aes_decrypt(value)
+        """Decrypt value on the way out.
+
+        :param value: the value to be decrypted
+        """
+        return self.encr_decr_engine.decrypt(self.cipher, value)
