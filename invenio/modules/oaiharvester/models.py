@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,20 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Oai harvest database models.
-"""
+"""OAI harvest database models."""
 
-# General imports.
 from sqlalchemy import event
-from invenio.ext.sqlalchemy import db
 
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.scheduler.models import SchTASK
 
 
 def get_default_arguments():
-    """ Returns the base64 representation of the extra_data default value """
+    """Return default values for arguments."""
     arguments_default = {'c_stylesheet': '',
                          'r_kb-rep-no-file': '',
                          'r_format': '',
@@ -46,6 +44,7 @@ def get_default_arguments():
 
 
 class OaiHARVEST(db.Model):
+
     """Represents a OaiHARVEST record."""
 
     __tablename__ = 'oaiHARVEST'
@@ -66,22 +65,32 @@ class OaiHARVEST(db.Model):
     setspecs = db.Column(db.Text, nullable=False)
 
     def to_dict(self):
+        """Get model as dict."""
         dict_representation = self.__dict__
         del dict_representation["_sa_instance_state"]
         return dict_representation
 
     @classmethod
     def get(cls, *criteria, **filters):
-        """ A wrapper for the filter and filter_by functions of sqlalchemy.
-        Define a dict with which columns should be filtered by which values.
+        """Wrapper for filter and filter_by functions of SQLAlchemy.
 
-        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        .. code-block: python
+
+            OaiHARVEST.get(OaiHARVEST.id == 1)
+            OaiHARVEST.get(id=1)
         """
         return cls.query.filter(*criteria).filter_by(**filters)
 
+    @session_manager
+    def save(self):
+        """Save object to persistent storage."""
+        db.session.add(self)
+
 
 class OaiREPOSITORY(db.Model):
+
     """Represents a OaiREPOSITORY record."""
+
     __tablename__ = 'oaiREPOSITORY'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
                    primary_key=True, autoincrement=True)
@@ -108,10 +117,7 @@ class OaiREPOSITORY(db.Model):
 
     @classmethod
     def update_setdefinition_listener(cls, mapper, connection, target):
-        """
-        Update the setDefinition attribute on before_insert/before_update
-        events.
-        """
+        """Update setDefinition attribute on before_insert/before_update events."""
         # FIXME: Next two lines
         op1 = ''
         op2 = ''
@@ -146,7 +152,9 @@ event.listen(
 
 
 class OaiHARVESTLOG(db.Model):
+
     """Represents a OaiHARVESTLOG record."""
+
     __tablename__ = 'oaiHARVESTLOG'
     id_oaiHARVEST = db.Column(
         db.MediumInteger(9, unsigned=True),
@@ -172,6 +180,6 @@ class OaiHARVESTLOG(db.Model):
     schtask = db.relationship(SchTASK)
 
 
-__all__ = ['OaiHARVEST',
+__all__ = ('OaiHARVEST',
            'OaiREPOSITORY',
-           'OaiHARVESTLOG']
+           'OaiHARVESTLOG')
