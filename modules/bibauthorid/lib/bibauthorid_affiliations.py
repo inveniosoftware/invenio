@@ -34,7 +34,6 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import write_message, task_update_progress as bibtask_update_progress, task_sleep_now_if_required
 from invenio.docextract_task import fetch_last_updated, store_last_updated
 from invenio.docextract_record import get_record
-from invenio.textutils import translate_to_ascii
 
 CHUNK_SIZE = 10000
 
@@ -52,10 +51,6 @@ def recompute_affiliation(pid):
                                ON aidPERSONIDPAPERS.bibref_value = bib70x.id
                                WHERE personid = %s and bibref_table = '700'""", [pid])
 
-
-
-    author_recids = run_sql("""SELECT bibrec, name FROM aidPERSONIDPAPERS
-                               WHERE personid = %s ORDER BY bibrec DESC""", [pid])
     for recid, name in chain(pid_100_rows, pid_700_rows):
         record = get_record(recid)
         for field in chain(record['100'], record['700']):
@@ -175,12 +170,9 @@ def process_chunk(recids):
                 try:
                     pid = pids[field_author]
                 except KeyError:
-                    # Name stored by an older version of bibauthorid
-                    try:
-                        pid = pids[unidecode(field_author)]
-                    except KeyError:
-                        # There is some corruption somewhere...
-                        continue
+                    # This happens when bibupload runs while
+                    # bibauthorid (rabbit) is sleeping
+                    continue
                 record_date = get_creation_date(recid)
                 if pid not in aff or aff[pid]['last_occurence'] <= record_date:
                     aff[pid] = {'aff': field_aff,
