@@ -49,7 +49,7 @@ class BibRecordSuccessTest(InvenioTestCase):
 
     def test_records_created(self):
         """ bibrecord - demo file how many records are created """
-        self.assertEqual(141, len(self.recs))
+        self.assertEqual(142, len(self.recs))
 
     def test_tags_created(self):
         """ bibrecord - demo file which tags are created """
@@ -88,7 +88,7 @@ class BibRecordSuccessTest(InvenioTestCase):
                   26, 24, 26, 26, 25, 28, 24, 23, 27, 25, 25, 26, 26,
                   25, 20, 26, 25, 22, 9, 8, 9, 9, 8, 7, 19, 21, 27, 23,
                   23, 22, 9, 8, 16, 7, 7, 9, 5, 5, 3, 9, 12, 6,
-                  8, 8, 8, 13, 20, 20, 5, 8, 7, 7, 7, 7, 7, 8, 7, 8, 7, 7, 8]
+                  8, 8, 8, 13, 20, 20, 5, 8, 7, 7, 7, 7, 7, 8, 7, 8, 7, 7, 8, 6]
         cr = []
         ret = []
         for rec in self.recs:
