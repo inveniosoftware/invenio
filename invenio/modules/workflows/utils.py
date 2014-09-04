@@ -25,23 +25,6 @@ from invenio.ext.cache import cache
 from .registry import workflows
 
 
-def session_manager(orig_func):
-    """Decorator to wrap function with the session."""
-    from invenio.ext.sqlalchemy import db
-
-    def new_func(self, *a, **k):
-        """Wrappen function to manage DB session."""
-        try:
-            resp = orig_func(self, *a, **k)
-            db.session.commit()
-            return resp
-        except:
-            db.session.rollback()
-            raise
-
-    return new_func
-
-
 def convert_marcxml_to_bibfield(marcxml):
     """Return a SmartJson representation of MARC XML string.
 

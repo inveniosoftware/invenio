@@ -28,9 +28,9 @@ from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.base.globals import cfg
 
-from .utils import session_manager
 from .logger import get_logger, BibWorkflowLogHandler
 
 
