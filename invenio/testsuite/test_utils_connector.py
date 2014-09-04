@@ -18,9 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-"""
-Test unit for the utils/connector
-"""
+"""Unit tests for the utils/connector."""
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.base.wrappers import lazy_import
@@ -35,7 +33,6 @@ class ConnectorTest(InvenioTestCase):
     def test_url_errors(self):
         """InvenioConnector - URL errors"""
         from invenio.utils.connector import InvenioConnectorServerError
-        InvenioConnector('http://cds.cern.ch')
         invalid_urls = [
             'htp://cds.cern.ch',
             'cds.cern.ch',
