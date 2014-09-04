@@ -74,7 +74,7 @@ class OaiHARVEST(db.Model):
     def get(cls, *criteria, **filters):
         """Wrapper for filter and filter_by functions of SQLAlchemy.
 
-        .. code-block: python
+        .. code-block:: python
 
             OaiHARVEST.get(OaiHARVEST.id == 1)
             OaiHARVEST.get(id=1)

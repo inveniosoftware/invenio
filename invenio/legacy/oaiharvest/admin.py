@@ -35,9 +35,7 @@ from invenio.config import (CFG_SITE_LANG,
 
 from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.legacy.bibrank.adminlib import (write_outcome,
-                                             addadminbox,
-                                             tupletotable,
-                                             createhiddenform)
+                                             addadminbox)
 from invenio.legacy.dbquery import deserialize_via_marshal
 
 from invenio.legacy.oaiharvest.dblayer import (
@@ -115,70 +113,62 @@ def generate_sources_actions_menu(oai_src_id, ln=CFG_SITE_LANG):
 def perform_request_index(ln=CFG_SITE_LANG):
     """Start area for administering harvesting from OAI repositories."""
     #FIXME: This import could not be solved, probably the function has change
-    from invenio.legacy.oaiharvest.dblayer import get_next_schedule, \
-        get_all_oai_src
+    from invenio.modules.oaiharvester.models import OaiHARVEST
+    from invenio.legacy.oaiharvest.dblayer import get_next_schedule
+    from flask import url_for
     _ = gettext_set_language(ln)
 
     titlebar = oaiharvest_templates.tmpl_draw_titlebar(
-        ln=ln, title=_("Overview of sources"), guideurl=guideurl,
-        extraname="add new OAI source",
-        extraurl="admin/oaiharvest/oaiharvestadmin.py/addsource?ln=" + ln)
+        ln=ln, title=_("Overview of sources"), guideurl=guideurl
+    )
     titlebar2 = oaiharvest_templates.tmpl_draw_titlebar(
         ln=ln, title=_("Harvesting status"), guideurl=guideurl)
-    header = ['name', 'base URL', 'metadata prefix', 'frequency',
+    header = ['name', 'base URL', 'metadata prefix',
               'last run', 'post-processes', 'actions', 'comments']
-    oai_sources = get_all_oai_src()
+    oai_sources = OaiHARVEST.query.all()
 
     sources = []
 
     for repository in oai_sources:
         default_link_argd = {'ln': ln,
-                             'oai_src_id': str(repository['id'])}
+                             'oai_src_id': str(repository.id)}
         namelinked = create_html_link(
             urlbase=oai_harvest_admin_url + "/editsource",
             urlargd=default_link_argd,
-            link_label=cgi.escape(repository['name']))
-        freq = _("Not Set")
-        if repository['frequency'] == 0:
-            freq = _("never")
-        elif repository['frequency'] == 24:
-            freq = _("daily")
-        elif repository['frequency'] == 168:
-            freq = _("weekly")
-        elif repository['frequency'] == 720:
-            freq = _("monthly")
+            link_label=cgi.escape(repository.name))
 
-        if not repository['lastrun']:
-            repository['lastrun'] = oaiharvest_templates.tmpl_print_warning(
-                ln, _("Never harvested"), prefix="")
+        if not repository.lastrun:
+            repository.lastrun = _("Never harvested")
         else:
             # cut away leading zeros
-            repository['lastrun'] = re.sub(
-                r'\.[0-9]+$', '', str(repository['lastrun']))
-        if not repository['comment']:
-            repository['comment'] = ""
-        action = generate_sources_actions_menu(repository['id'], ln)
+            repository.lastrun = re.sub(
+                r'\.[0-9]+$', '', str(repository.lastrun))
+        if not repository.comment:
+            repository.comment = ""
+        action = generate_sources_actions_menu(repository.id, ln)
         sources.append([namelinked,
-                        repository['baseurl'],
-                        repository['metadataprefix'],
-                        freq,
-                        repository['lastrun'],
-                        repository['postprocess'],
+                        repository.baseurl,
+                        repository.metadataprefix,
+                        repository.lastrun,
+                        repository.postprocess,
                         action,
-                        repository['comment']])
+                        repository.comment])
 
     (schtime, schstatus) = get_next_schedule()
     if schtime:
         schtime = re.sub(r'\.[0-9]+$', '', str(schtime))
 
-    holdingpen_link = create_html_link(urlbase=oai_harvest_admin_url +
-                                       "/viewholdingpen",
-                                       urlargd={'ln': ln},
+    holdingpen_link = create_html_link(urlbase=url_for("holdingpen.index"),
+                                       urlargd={},
                                        link_label=_("View Holding Pen"))
     output = titlebar
     output += oaiharvest_templates.tmpl_output_numbersources(
         ln, len(oai_sources))
-    output += tupletotable(header=header, tuple=sources)
+    output += oaiharvest_templates.tmpl_output_table(title_row=header, data=sources)
+    output += oaiharvest_templates.tmpl_button_link(
+        title="Add new OAI source",
+        url="/admin/oaiharvest/oaiharvestadmin.py/addsource?ln=" + ln
+    )
     output += oaiharvest_templates.tmpl_print_brs(ln, 2)
     output += titlebar2
     output += oaiharvest_templates.tmpl_output_schedule(
@@ -190,7 +180,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
 def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                oai_src_baseurl='', oai_src_prefix='',
-                               oai_src_frequency='', oai_src_post='',
+                               oai_src_post='',
                                oai_src_comment='', ln=CFG_SITE_LANG,
                                confirm=-1, oai_src_sets=None,
                                oai_src_args=None):
@@ -200,8 +190,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
     sending back the output of the method.  confirm - determines the validation
     status of the data input into the form.
     """
-    from invenio.legacy.oaiharvest.dblayer import modify_oai_src, \
-        get_oai_source_form
+    from invenio.modules.oaiharvester.models import OaiHARVEST
     _ = gettext_set_language(ln)
 
     if oai_src_id is None:
@@ -218,27 +207,18 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
         guideurl=guideurl)
 
     if confirm == -1:
-        oai_src = get_oai_src_by_id(oai_src_id)
+        oai_src = OaiHARVEST.query.get(oai_src_id)
         if not oai_src:
             return oaiharvest_templates.tmpl_print_info(
                 ln, "Source specified does not exist.")
-        # A list is returned, we care only of the first item (which should be
-        # the only one..)
-        oai_src = oai_src[0]
-        if oai_src['arguments']:
-            oai_src['arguments'] = deserialize_via_marshal(
-                oai_src['arguments'])
 
-        oai_src['setspecs'] = oai_src['setspecs'].split()
-
-        oai_src_baseurl = oai_src['baseurl']
-        oai_src_name = oai_src['name']
-        oai_src_prefix = oai_src['metadataprefix']
-        oai_src_frequency = oai_src['frequency']
-        oai_src_sets = oai_src['setspecs']
-        oai_src_post = oai_src['postprocess']
-        oai_src_args = oai_src['arguments']
-        oai_src_comment = oai_src['comment']
+        oai_src_baseurl = oai_src.baseurl
+        oai_src_name = oai_src.name
+        oai_src_prefix = oai_src.metadataprefix
+        oai_src_sets = oai_src.setspecs.split(" ")
+        oai_src_post = oai_src.postprocess.split("-")
+        oai_src_args = oai_src.arguments
+        oai_src_comment = oai_src.comment
 
     elif confirm == 1:
         warnings = []
@@ -248,40 +228,35 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
         if not oai_src_prefix:
             warnings.append(oaiharvest_templates.tmpl_print_warning(
                 ln, "Please enter a meta-data prefix."))
-        if not oai_src_frequency:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(
-                ln, "Please choose a frequency of harvesting"))
 
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
         if len(warnings) == 0:
-            if not oai_src_frequency:
-                oai_src_frequency = 0
             if not oai_src_post:
                 oai_src_post = []
 
-            res = modify_oai_src(oai_src_id,
-                                 oai_src_name,
-                                 oai_src_baseurl,
-                                 oai_src_prefix,
-                                 oai_src_frequency,
-                                 oai_src_post,
-                                 oai_src_comment,
-                                 oai_src_sets,
-                                 oai_src_args)
-            if res[0] == 1:
-                # OAI source modified!
-                show_form = False
-            output += write_outcome(res)
+            oai_src = OaiHARVEST.query.get(oai_src_id)
+            oai_src.setspecs = " ".join(oai_src_sets)
+            oai_src.baseurl = oai_src_baseurl
+            oai_src.name = oai_src_name
+            oai_src.metadataprefix = oai_src_prefix
+            oai_src.postprocess = "-".join(oai_src_post)
+            oai_src.arguments = oai_src_args
+            oai_src.comment = oai_src_comment
+            oai_src.save()
+            # OAI source modified!
+            show_form = False
+            output += oaiharvest_templates.tmpl_print_info(
+                ln, _("OAI source successfully modified!"))
         else:
-            output += "".join(warnings)
+            output += oaiharvest_templates.tmpl_print_warning(
+                ln, "<br />".join(warnings), prefix="")
 
     if show_form:
         text = get_oai_source_form(ln=ln,
                                    oai_src_baseurl=oai_src_baseurl,
                                    oai_src_name=oai_src_name,
                                    oai_src_prefix=oai_src_prefix,
-                                   oai_src_frequency=oai_src_frequency,
                                    oai_src_sets=oai_src_sets,
                                    oai_src_post=oai_src_post,
                                    oai_src_args=oai_src_args,
@@ -307,14 +282,14 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
 
 
 def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
-                              oai_src_prefix='', oai_src_frequency='',
-                              oai_src_lastrun='', oai_src_comment='',
+                              oai_src_prefix='', oai_src_lastrun='',
+                              oai_src_comment='',
                               oai_src_post=[], oai_src_args={},
                               ln=CFG_SITE_LANG, confirm=-1,
                               oai_src_sets=None):
     """Create html form to add a new source."""
-    #FIXME: This import could not be solved, probably the function has change
-    from invenio.legacy.oaiharvest.dblayer import add_oai_src
+    #FIXME: This import could not be solved, probably the function has changeF
+    from invenio.modules.oaiharvester.models import OaiHARVEST
     _ = gettext_set_language(ln)
 
     if oai_src_name is None:
@@ -322,11 +297,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
     if oai_src_sets is None:
         oai_src_sets = []
 
-    subtitle = oaiharvest_templates.tmpl_draw_subtitle(
-        ln=ln,
-        title="add source",
-        subtitle="Add new OAI source",
-        guideurl=guideurl)
+    subtitle = ""
     output = ""
 
     confirm = int(confirm)
@@ -334,17 +305,19 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
     # Step one - user enters source URL
     if confirm <= -1:
-        text = oaiharvest_templates.tmpl_print_brs(ln, 1)
-        text += oaiharvest_templates.tmpl_admin_w200_text_placeholder(
+        text = oaiharvest_templates.tmpl_admin_w200_text_placeholder(
             ln=ln,
             placeholder="Enter the base URL for source...",
             name="oai_src_baseurl",
-            value=oai_src_baseurl)
-        output = createhiddenform(action="addsource",
-                                  text=text,
-                                  ln=ln,
-                                  button="Validate",
-                                  confirm=0)
+            value=oai_src_baseurl,
+            suffix="")
+        output = oaiharvest_templates.tmpl_createhiddenform(
+            action="addsource",
+            text=text,
+            ln=ln,
+            button="Validate",
+            confirm=0
+        )
         show_form = False
     elif confirm == 1:
         # Step two - evaluate new OAI source
@@ -356,9 +329,6 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
         if not oai_src_prefix:
             warnings.append(oaiharvest_templates.tmpl_print_warning(
                 ln, "Please enter a metadata prefix."))
-        if not oai_src_frequency:
-            warnings.append(oaiharvest_templates.tmpl_print_warning(
-                ln, "Please choose a frequency of harvesting"))
         if not oai_src_lastrun:
             warnings.append(oaiharvest_templates.tmpl_print_warning(
                 ln, "Please choose the harvesting starting date"))
@@ -366,21 +336,29 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
         if len(warnings) == 0:
-            if not oai_src_frequency:
-                oai_src_frequency = 0
             if not oai_src_lastrun:
                 oai_src_lastrun = 1
             if not oai_src_post:
                 oai_src_post = []
 
-            res = add_oai_src(oai_src_name, oai_src_baseurl,
-                              oai_src_prefix, oai_src_frequency,
-                              oai_src_lastrun, oai_src_post, oai_src_comment,
-                              oai_src_sets, oai_src_args)
-            if res[0] == 1:
-                # OAI source added!
-                show_form = False
-            output += write_outcome(res)
+            if oai_src_lastrun in [0, "0"]:
+                oai_src_lastrun = None
+            else:
+                oai_src_lastrun = datetime.datetime.now()
+
+            res = OaiHARVEST(name=oai_src_name,
+                             baseurl=oai_src_baseurl,
+                             metadataprefix=oai_src_prefix,
+                             lastrun=oai_src_lastrun,
+                             postprocess="-".join(oai_src_post),
+                             comment=oai_src_comment,
+                             setspecs=" ".join(oai_src_sets),
+                             arguments=oai_src_args)
+            res.save()
+            # OAI source added!
+            show_form = False
+            output += oaiharvest_templates.tmpl_print_info(
+                ln, _("OAI source successfully added!"))
         else:
             output += "".join(warnings)
 
@@ -417,7 +395,6 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                                    oai_src_baseurl=oai_src_baseurl,
                                    oai_src_name=oai_src_name,
                                    oai_src_prefix=oai_src_prefix,
-                                   oai_src_frequency=oai_src_frequency,
                                    oai_src_sets=oai_src_sets,
                                    oai_src_post=oai_src_post,
                                    oai_src_args=oai_src_args,
@@ -471,11 +448,13 @@ def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
                 namesrc)
             text = oaiharvest_templates.tmpl_print_info(ln, question)
             text += oaiharvest_templates.tmpl_print_brs(ln, 3)
-            output += createhiddenform(action="delsource#5",
-                                       text=text,
-                                       button="Confirm",
-                                       oai_src_id=oai_src_id,
-                                       confirm=1)
+            output += oaiharvest_templates.tmpl_createhiddenform(
+                action="delsource#5",
+                text=text,
+                button="Confirm",
+                oai_src_id=oai_src_id,
+                confirm=1
+            )
         elif confirm in ["1", 1]:
             res = delete_oai_src(oai_src_id)
             if res[0] == 1:
@@ -512,11 +491,13 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, record_id=None
         record_str = str(record_id)
     form_text = oaiharvest_templates.tmpl_admin_w200_text(
         ln=ln, title="Record identifier", name="record_id", value=record_str)
-    result += createhiddenform(action="testsource",
-                               text=form_text,
-                               button="Test",
-                               oai_src_id=oai_src_id,
-                               ln=ln)
+    result += oaiharvest_templates.tmpl_createhiddenform(
+        action="testsource",
+        text=form_text,
+        button="Test",
+        oai_src_id=oai_src_id,
+        ln=ln
+    )
     if record_id:
         result += oaiharvest_templates.tmpl_draw_titlebar(
             ln=ln, title="OAI XML downloaded from the source", guideurl=guideurl)
@@ -534,7 +515,7 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, record_id=None
 
 
 def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
-                        oai_src_frequency, oai_src_sets, oai_src_post,
+                        oai_src_sets, oai_src_post,
                         oai_src_args, oai_src_comment, oai_src_lastrun=0, editing_mode=False):
     """
     Returns the main layout table for adding and editing OAI harvest sources.
@@ -577,10 +558,6 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
                                                                      value=oai_src_prefix,
                                                                      suffix=" e.g. oai_dc<br />")
 
-    table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
-                                                                   title="Harvesting frequency", name="oai_src_frequency",
-                                                                   valuenil="- select harvest frequency -", values=freqs,
-                                                                   lastval=oai_src_frequency)
     if not editing_mode:
         table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
                                                                        title="Harvest from", name="oai_src_lastrun",
@@ -878,8 +855,11 @@ def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, month=None, y
     inner_text += oaiharvest_templates.tmpl_print_brs(ln, 1)
     inner_text = oaiharvest_templates.tmpl_output_scrollable_frame(inner_text)
     inner_text += oaiharvest_templates.tmpl_output_selection_bar()
-    result += createhiddenform(action="/admin/oaiharvest/oaiharvestadmin.py/reharvest",
-                               text=inner_text, button="Reharvest selected records", oai_src_id=oai_src_id, ln=ln)
+    result += oaiharvest_templates.tmpl_createhiddenform(
+        action="/admin/oaiharvest/oaiharvestadmin.py/reharvest",
+        text=inner_text, button="Reharvest selected records",
+        oai_src_id=oai_src_id, ln=ln
+    )
     return result
 
 
@@ -947,8 +927,12 @@ def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
     inner_text = oaiharvest_templates.tmpl_output_scrollable_frame(build_history_table(
         current_day_records, ln=ln))
     inner_text += oaiharvest_templates.tmpl_output_selection_bar()
-    result += createhiddenform(action="/admin/oaiharvest/oaiharvestadmin.py/reharvest",
-                               text=inner_text, button="Reharvest selected records", oai_src_id=oai_src_id, ln=ln)
+    result += oaiharvest_templates.tmpl_createhiddenform(
+        action="/admin/oaiharvest/oaiharvestadmin.py/reharvest",
+        text=inner_text,
+        button="Reharvest selected records",
+        oai_src_id=oai_src_id, ln=ln
+    )
     result += return_to_month_link + oaiharvest_templates.tmpl_print_brs(ln, 1)
     return result
 

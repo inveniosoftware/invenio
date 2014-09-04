@@ -68,7 +68,6 @@ def editsource(req, **kwargs):
                'oai_src_name': (str, ""),
                'oai_src_baseurl': (str, ""),
                'oai_src_prefix': (str, ""),
-               'oai_src_frequency': (str, ""),
                'oai_src_comment': (str, ""),
                'oai_src_post': (list, None),
                'ln': (str, CFG_SITE_LANG),
@@ -89,7 +88,6 @@ def editsource(req, **kwargs):
     oai_src_name = argd['oai_src_name']
     oai_src_baseurl = argd['oai_src_baseurl']
     oai_src_prefix = argd['oai_src_prefix']
-    oai_src_frequency = argd['oai_src_frequency']
     oai_src_comment = argd['oai_src_comment']
     oai_src_post = argd['oai_src_post']
     ln = argd['ln']
@@ -125,7 +123,6 @@ def editsource(req, **kwargs):
                                                         oai_src_name=oai_src_name,
                                                         oai_src_baseurl=oai_src_baseurl,
                                                         oai_src_prefix=oai_src_prefix,
-                                                        oai_src_frequency=oai_src_frequency,
                                                         oai_src_post=oai_src_post,
                                                         oai_src_sets=oai_src_sets,
                                                         oai_src_comment=oai_src_comment,
@@ -149,7 +146,6 @@ def addsource(req, **kwargs):
                'oai_src_name': (str, ""),
                'oai_src_baseurl': (str, ""),
                'oai_src_prefix': (str, ""),
-               'oai_src_frequency': (str, ""),
                'oai_src_lastrun': (str, ""),
                'oai_src_comment': (str, ""),
                'oai_src_post': (list, None),
@@ -166,7 +162,6 @@ def addsource(req, **kwargs):
     oai_src_name = argd['oai_src_name']
     oai_src_baseurl = argd['oai_src_baseurl']
     oai_src_prefix = argd['oai_src_prefix']
-    oai_src_frequency = argd['oai_src_frequency']
     oai_src_lastrun = argd['oai_src_lastrun']
     oai_src_comment = argd['oai_src_comment']
     oai_src_post = argd['oai_src_post']

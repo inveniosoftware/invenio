@@ -308,3 +308,18 @@ def get_holdingpen_entry_details(hpupdate_id):
     """
     query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
     return run_sql(query, (hpupdate_id,))[0]
+
+
+def get_next_schedule():
+    """Return the next scheduled oaiharvest tasks."""
+    from sqlalchemy.orm.exc import NoResultFound
+    from invenio.modules.scheduler.models import SchTASK
+    try:
+        res = SchTASK.query.filter(
+            SchTASK.proc == "oaiharvest",
+            SchTASK.runtime > datetime.now()
+        ).order_by(SchTASK.runtime).one()
+    except NoResultFound:
+        return ("", "")
+    else:
+        return (res.runtime, res.status)
