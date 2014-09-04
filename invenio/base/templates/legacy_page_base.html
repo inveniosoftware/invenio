@@ -20,7 +20,15 @@
 {%- extends "page.html" -%}
 
 {%- block title %}
-<h1>Legacy</h1>
+<div class="alert alert-warning">
+  <strong>{{ _("Note") }}</strong>
+    {% autoescape false %}
+    {{ _("This module is running via Invenio 1 compatibility mode. If you find any troubles, please %(x_url_open)ssubmit an issue%(x_url_close)s.",
+      x_url_open='<a href="https://github.com/inveniosoftware/invenio/issues?q=is%3Aopen+is%3Alabel%3Anext" target="_blank">',
+      x_url_close='</a>') }}
+    {% endautoescape %}
+</div>
+
   {%- if title and show_title_p %}
 <div class="row">
   <div class="col-md-12">
