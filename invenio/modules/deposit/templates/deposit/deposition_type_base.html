@@ -24,10 +24,10 @@
   <h3>
     {{ _(deposition_type.name_plural) }}
     <small>
-      {{ _('select or create deposition') }}
+      {{ _('select or create deposit') }}
       <a class="btn btn-info pull-right"
          href="{{ url_for('webdeposit.create', deposition_type=deposition_type.get_identifier()) }}">
-        <i class="glyphicon glyphicon-edit"></i> {{ _('New Deposition') }}
+        <i class="glyphicon glyphicon-edit"></i> {{ _('New Deposit') }}
       </a>
     </small>
   </h3>
@@ -47,7 +47,7 @@
   </ul>
   {% else %}
   <div class="col-md-12">
-    <strong>{{ _('There is no ongoing deposition.') }}</strong>
+    <strong>{{ _('There is no ongoing deposit.') }}</strong>
   </div>
   {% endif %}
 </div>
