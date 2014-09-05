@@ -90,11 +90,50 @@ connect = DBConnect()
 _DB_CONN = LazyDict(_db_conn)
 
 
+def _get_password_from_database_password_file(user):
+    """
+    Parse CFG_DATABASE_PASSWORD_FILE and return password
+    corresponding to user.
+    """
+    pwfile = cfg.get("CFG_DATABASE_PASSWORD_FILE", None)
+    if pwfile and os.path.exists(pwfile):
+        for row in open(pwfile):
+            if row.strip():
+                a_user, pwd = row.strip().split(" // ")
+                if user == a_user:
+                    return pwd
+        raise ValueError("user '%s' not found in database password file '%s'"
+                         % (user, pwfile))
+    raise IOError("No password defined for user '%s' but database password "
+                  "file is not available" % user)
+
+
+def get_connection_for_dump_on_slave():
+    """
+    Return a valid connection, suitable to perform dump operation
+    on a slave node of choice.
+    """
+    su_user = cfg.get("CFG_DATABASE_SLAVE_SU_USER", "")
+    if "CFG_DATABASE_SLAVE_SU_PASS" not in cfg:
+        cfg["CFG_DATABASE_SLAVE_SU_PASS"] = \
+            _get_password_from_database_password_file(su_user)
+
+    connection = connect(host=cfg.get("CFG_DATABASE_SLAVE", ""),
+                         port=int(cfg.get("CFG_DATABASE_PORT"), 3306),
+                         db=cfg.get("CFG_DATABASE_NAME", ""),
+                         user=su_user,
+                         passwd=cfg.get("CFG_DATABASE_SLAVE_SU_PASS", ""),
+                         use_unicode=False, charset='utf8')
+    connection.autocommit(True)
+    return connection
+
+
 class InvenioDbQueryWildcardLimitError(Exception):
     """Exception raised when query limit reached."""
     def __init__(self, res):
         """Initialization."""
         self.res = res
+
 
 def _db_login(dbhost=None, relogin=0):
     """Login to the database."""
