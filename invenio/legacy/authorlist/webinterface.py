@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,8 +29,8 @@ from invenio.utils.url import redirect_to_url
 
 import invenio.legacy.template
 authorlist_templates = invenio.legacy.template.load('authorlist')
-import invenio.authorlist_engine as authorlist_engine
-import invenio.authorlist_dblayer as authorlist_db
+from invenio.legacy.authorlist import engine as authorlist_engine
+from invenio.legacy.authorlist import dblayer as authorlist_db
 
 navtrail = (' <a class="navtrail" href=\"%s/youraccount/display\">Admin Area</a> '
             ) % CFG_SITE_SECURE_URL
@@ -124,15 +124,15 @@ class WebInterfaceAuthorlistPages(WebInterfaceDirectory):
             except:
                 # redirect to the main page if weird stuff happens
                 redirect_to_url(req, '%s/authorlist/' % (CFG_SITE_URL))
-                        
-        # On load state we will answer with the JSON encoded data of the passed 
+
+        # On load state we will answer with the JSON encoded data of the passed
         # paper id. Should usually not be directly surfed by the user.
         elif state == 'load':
             try:
                 received = wash_urlargd(form, {'id': (str, None)})
                 paper_id = received['id']
                 data = authorlist_db.load(paper_id)
-                
+
                 req.content_type = 'application/json'
                 req.write(json.dumps(data))
             except:
