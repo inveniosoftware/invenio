@@ -23,7 +23,7 @@ import sys
 from invenio.legacy.docextract.record import create_records, print_records
 from invenio.refextract_kbs import get_kbs
 
-from invenio.docextract_text import re_group_captured_multiple_space
+from invenio.legacy.docextract.text import re_group_captured_multiple_space
 from invenio.refextract_re import re_punctuation
 
 
