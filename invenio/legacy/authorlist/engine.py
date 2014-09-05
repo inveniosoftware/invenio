@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,12 +30,12 @@ except ImportError:
 
 from invenio.legacy.webuser import page_not_authorized
 from invenio.modules.access.engine import acc_authorize_action
-import invenio.authorlist_config as cfg
+from invenio.legacy.authorlist import config as cfg
 from invenio.legacy.search_engine import perform_request_search, record_exists
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibedit.utils import get_record
 # from lxml import etree
-from invenio.authorlist_dblayer import get_owner
+from invenio.legacy.authorlist.dblayer import get_owner
 from invenio.utils.text import escape_latex
 
 # default name that will be used, when affiliation name is missing

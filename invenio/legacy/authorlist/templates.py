@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
 
-import invenio.authorlist_config as cfg
+from invenio.legacy.authorlist import config as cfg
 
 
 class Template:
