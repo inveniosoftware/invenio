@@ -89,6 +89,7 @@ def cleanup_legacy_configuration(app):
     app.config.update(unicodifier(dict(app.config)))
     # ... and map certain common parameters
     app.config['CFG_LANGUAGE_LIST_LONG'] = LocalProxy(language_list_long)
+    app.config['CFG_WEBDIR'] = app.static_folder
 
 
 def register_legacy_blueprints(app):
