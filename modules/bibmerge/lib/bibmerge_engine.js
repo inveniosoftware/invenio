@@ -882,7 +882,7 @@ function onclickSubmitButton(confirm_p, additional_data) {
       var _data = {
         requestType: 'submit',
         record2Mode: gRecord2Mode,
-        recID1: gRecID1
+        recID1: gRecID1,
         recID2: gRecID2
       };
       if (checkbox == true)
