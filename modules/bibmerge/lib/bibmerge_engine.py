@@ -25,7 +25,7 @@ import re
 
 from invenio.config import \
      CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN, \
-     CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL
+     CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL, CFG_SITE_RECORD
 from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
@@ -55,6 +55,15 @@ def perform_request_init():
     errors   = []
     warnings = []
     body = ''
+
+    # Add script data.
+
+    data = {'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"'}
+
+    body += '<script type="text/javascript">\n'
+    for key in data:
+        body += '    var %s = %s;\n' % (key, data[key])
+    body += '    </script>\n'
 
     # Build page structure and control panel.
     body += bibmerge_templates.controlpanel()
