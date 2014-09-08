@@ -16,14 +16,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Customization of default Flask Jinja2 template loader.
+"""Customization of default Flask Jinja2 template loader.
 
 By default the Flask Jinja2 template loader is not aware of the order of
 Blueprints as defined by the PACKAGES configuration variable.
 """
 
 from flask.templating import DispatchingJinjaLoader
+from flask import __version__ as flask_version
+from distutils.version import LooseVersion
+
+# Flask 1.0 changes return value of _iter_loaders so for compatibility with
+# both Flask 0.10 and 1.0 we here check the version.
+# See Flask commit bafc13981002dee4610234c7c97ac176766181c1
+IS_FLASK_1_0 = LooseVersion(flask_version) >= LooseVersion("0.11-dev")
 
 try:
     # Deprecated in Flask commit 817b72d484d353800d907b3580c899314bf7f3c6
@@ -34,7 +40,7 @@ except ImportError:
 
 class OrderAwareDispatchingJinjaLoader(DispatchingJinjaLoader):
 
-    """TODO."""
+    """Order aware dispatching Jinja loader."""
 
     def _iter_loaders(self, template):
         for blueprint in self.app.extensions['registry']['blueprints']:
@@ -42,4 +48,7 @@ class OrderAwareDispatchingJinjaLoader(DispatchingJinjaLoader):
                 continue
             loader = blueprint.jinja_loader
             if loader is not None:
-                yield loader, template
+                if IS_FLASK_1_0:
+                    yield blueprint, loader
+                else:
+                    yield loader, template
