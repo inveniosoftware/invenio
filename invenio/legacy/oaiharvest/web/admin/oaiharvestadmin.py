@@ -62,6 +62,7 @@ def index(req, ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+
 def editsource(req, **kwargs):
     form = dict(req.form)
     content = {'oai_src_id': (str, None),
@@ -72,10 +73,11 @@ def editsource(req, **kwargs):
                'oai_src_post': (list, None),
                'ln': (str, CFG_SITE_LANG),
                'confirm': (int, -1),
-               'oai_src_sets': (list, None)}
+               'oai_src_sets': (list, None),
+               'oai_src_workflow': (str, "")}
     # Grab list of defined post-process arguments to select from POST-data. e.g. ('c_cfg-file', str)
-    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value'])) \
-                      for mode in CFG_OAI_POSSIBLE_POSTMODES \
+    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value']))
+                      for mode in CFG_OAI_POSSIBLE_POSTMODES
                       for arg in mode[2]]
     for argument_name, argument_type in post_arguments:
         if argument_type == str:
@@ -89,11 +91,12 @@ def editsource(req, **kwargs):
     oai_src_baseurl = argd['oai_src_baseurl']
     oai_src_prefix = argd['oai_src_prefix']
     oai_src_comment = argd['oai_src_comment']
+    oai_src_workflow = argd['oai_src_workflow']
     oai_src_post = argd['oai_src_post']
     ln = argd['ln']
     confirm = argd['confirm']
     oai_src_sets = argd['oai_src_sets']
-    if oai_src_sets == None:
+    if oai_src_sets is None:
         oai_src_sets = []
 
     oai_src_args = {}
@@ -127,6 +130,7 @@ def editsource(req, **kwargs):
                                                         oai_src_sets=oai_src_sets,
                                                         oai_src_comment=oai_src_comment,
                                                         oai_src_args=oai_src_args,
+                                                        oai_src_workflow=oai_src_workflow,
                                                         ln=ln,
                                                         confirm=confirm),
                     uid=uid,
@@ -150,7 +154,8 @@ def addsource(req, **kwargs):
                'oai_src_comment': (str, ""),
                'oai_src_post': (list, None),
                'confirm': (int, -1),
-               'oai_src_sets': (list, None)}
+               'oai_src_sets': (list, None),
+               'oai_src_workflow': (str, "")}
     for argument_name, argument_type in post_arguments:
         if argument_type == str:
             content[argument_name] = (str, "")
@@ -167,6 +172,7 @@ def addsource(req, **kwargs):
     oai_src_post = argd['oai_src_post']
     confirm = argd['confirm']
     oai_src_sets = argd['oai_src_sets']
+    oai_src_workflow = argd['oai_src_workflow']
     if oai_src_sets == None:
         oai_src_sets = []
     if oai_src_post == None:
@@ -202,6 +208,7 @@ def addsource(req, **kwargs):
                                                        oai_src_post=oai_src_post,
                                                        oai_src_sets=oai_src_sets,
                                                        oai_src_args=oai_src_args,
+                                                       oai_src_workflow=oai_src_workflow,
                                                        oai_src_comment=oai_src_comment,
                                                        ln=ln,
                                                        confirm=confirm),

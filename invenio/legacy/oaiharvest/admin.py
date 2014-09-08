@@ -180,7 +180,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
 def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                oai_src_baseurl='', oai_src_prefix='',
-                               oai_src_post='',
+                               oai_src_post='', oai_src_workflow='',
                                oai_src_comment='', ln=CFG_SITE_LANG,
                                confirm=-1, oai_src_sets=None,
                                oai_src_args=None):
@@ -219,6 +219,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
         oai_src_post = oai_src.postprocess.split("-")
         oai_src_args = oai_src.arguments
         oai_src_comment = oai_src.comment
+        oai_src_workflow = oai_src.workflows
 
     elif confirm == 1:
         warnings = []
@@ -228,6 +229,9 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
         if not oai_src_prefix:
             warnings.append(oaiharvest_templates.tmpl_print_warning(
                 ln, "Please enter a meta-data prefix."))
+        if not oai_src_workflow:
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please select a workflow for the source."))
 
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
@@ -243,6 +247,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
             oai_src.postprocess = "-".join(oai_src_post)
             oai_src.arguments = oai_src_args
             oai_src.comment = oai_src_comment
+            oai_src.workflows = oai_src_workflow
             oai_src.save()
             # OAI source modified!
             show_form = False
@@ -260,6 +265,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                    oai_src_sets=oai_src_sets,
                                    oai_src_post=oai_src_post,
                                    oai_src_args=oai_src_args,
+                                   oai_src_workflow=oai_src_workflow,
                                    oai_src_comment=oai_src_comment,
                                    editing_mode=True)
         output += oaiharvest_templates.tmpl_form_vertical(
@@ -283,6 +289,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
 
 def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                               oai_src_prefix='', oai_src_lastrun='',
+                              oai_src_workflow='',
                               oai_src_comment='',
                               oai_src_post=[], oai_src_args={},
                               ln=CFG_SITE_LANG, confirm=-1,
@@ -332,6 +339,9 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
         if not oai_src_lastrun:
             warnings.append(oaiharvest_templates.tmpl_print_warning(
                 ln, "Please choose the harvesting starting date"))
+        if not oai_src_workflow:
+            warnings.append(oaiharvest_templates.tmpl_print_warning(
+                ln, "Please select a workflow for the source."))
 
         validate_arguments(ln, oai_src_post, oai_src_args, warnings)
 
@@ -353,7 +363,8 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                              postprocess="-".join(oai_src_post),
                              comment=oai_src_comment,
                              setspecs=" ".join(oai_src_sets),
-                             arguments=oai_src_args)
+                             arguments=oai_src_args,
+                             workflows=oai_src_workflow)
             res.save()
             # OAI source added!
             show_form = False
@@ -398,6 +409,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                                    oai_src_sets=oai_src_sets,
                                    oai_src_post=oai_src_post,
                                    oai_src_args=oai_src_args,
+                                   oai_src_workflow=oai_src_workflow,
                                    oai_src_comment=oai_src_comment,
                                    oai_src_lastrun=oai_src_lastrun,
                                    editing_mode=False)
@@ -515,11 +527,11 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, record_id=None
 
 
 def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
-                        oai_src_sets, oai_src_post,
-                        oai_src_args, oai_src_comment, oai_src_lastrun=0, editing_mode=False):
-    """
-    Returns the main layout table for adding and editing OAI harvest sources.
-    """
+                        oai_src_sets, oai_src_post, oai_src_args,
+                        oai_src_workflow, oai_src_comment, oai_src_lastrun=0, editing_mode=False):
+    """Return the main layout table for adding and editing OAI harvest sources."""
+    from invenio.modules.workflows.registry import workflows
+
     # Build table layout in two columns
     output = ""
 
@@ -557,6 +569,15 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
                                                                      name="oai_src_prefix",
                                                                      value=oai_src_prefix,
                                                                      suffix=" e.g. oai_dc<br />")
+    # Show available metadata to user
+    workflow_names = [(name, name) for name in workflows if name]
+    table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
+                                                                   title="Workflow",
+                                                                   name="oai_src_workflow",
+                                                                   valuenil="- select workflow -",
+                                                                   values=workflow_names,
+                                                                   lastval=oai_src_workflow,
+                                                                   suffix=" select a workflow from workflows module.<br />")
 
     if not editing_mode:
         table_first_col += oaiharvest_templates.tmpl_admin_w200_select(ln=ln,
