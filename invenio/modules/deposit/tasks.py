@@ -29,6 +29,7 @@ from tempfile import mkstemp
 from functools import partial
 from flask import current_app, abort, request
 from flask.ext.login import current_user
+from functools import wraps
 
 from invenio.modules.records.api import get_record
 from invenio.modules.editor.models import HstRECORD
@@ -48,6 +49,7 @@ from invenio.modules.pidstore.models import PersistentIdentifier
 #
 def filter_empty_helper(keys=None):
     """Remove empty elements from a list."""
+    @wraps(filter_empty_helper)
     def _inner(elem):
         if isinstance(elem, dict):
             for k, v in elem.items():
@@ -97,6 +99,7 @@ def is_sip_uploaded(sip, record=None):
 
 def authorize_user(action, **params):
     """Check if current user is authorized to perform the action."""
+    @wraps(authorize_user)
     def _authorize_user(obj, dummy_eng):
         from invenio.modules.access.engine import acc_authorize_action
 
@@ -114,6 +117,7 @@ def authorize_user(action, **params):
 
 def prefill_draft(draft_id='_default', clear=True):
     """Fill draft values with values from pre-filled cache."""
+    @wraps(prefill_draft)
     def _prefill_draft(obj, eng):
         if not getattr(request, 'is_api_request', False):
             draft_cache = DepositionDraftCacheManager.get()
@@ -130,6 +134,7 @@ def render_form(draft_id='_default'):
     :param draft_id: The name of the draft to create. Must be specified if you
         put more than two ``render_form'''s in your deposition workflow.
     """
+    @wraps(render_form)
     def _render_form(obj, eng):
         d = Deposition(obj)
         draft = d.get_or_create_draft(draft_id)
@@ -184,6 +189,7 @@ def render_form(draft_id='_default'):
 def load_record(draft_id='_default', producer='json_for_form',
                 pre_process=None, post_process=None):
     """Load a record and map to draft data."""
+    @wraps(load_record)
     def _load_record(obj, eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=True)
@@ -281,6 +287,7 @@ def merge_record(draft_id='_default', pre_process_load=None,
     if not merge_func or not callable(merge_func):
         raise RuntimeError("No merge function given.")
 
+    @wraps(merge_record)
     def _merge_record(obj, eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
@@ -337,6 +344,7 @@ def merge_record(draft_id='_default', pre_process_load=None,
 
 def create_recid():
     """Create a new record id."""
+    @wraps(create_recid)
     def _create_recid(obj, dummy_eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
@@ -363,6 +371,7 @@ def mint_pid(pid_field='doi', pid_creator=None, pid_store_type='doi',
         (pid_str, recjson) that will check if an pid found using ``pid_field''
         should be registered or not.
     """
+    @wraps(mint_pid)
     def _mint_pid(obj, dummy_eng):
         d = Deposition(obj)
         recjson = d.get_latest_sip(sealed=False).metadata
@@ -400,6 +409,7 @@ def mint_pid(pid_field='doi', pid_creator=None, pid_store_type='doi',
 
 def process_bibdocfile(process=None):
     """Process bibdocfiles with custom processor."""
+    @wraps(process_bibdocfile)
     def _bibdocfile_update(obj, eng):
         if process:
             d = Deposition(obj)
@@ -414,6 +424,7 @@ def process_bibdocfile(process=None):
 
 def prepare_sip():
     """Prepare a submission information package."""
+    @wraps(prepare_sip)
     def _prepare_sip(obj, dummy_eng):
         d = Deposition(obj)
 
@@ -434,6 +445,7 @@ def prepare_sip():
 
 def process_sip_metadata(processor=None):
     """Process metadata in submission information package using a custom processor."""
+    @wraps(process_sip_metadata)
     def _process_sip(obj, dummy_eng):
         d = Deposition(obj)
         metadata = d.get_latest_sip(sealed=False).metadata
@@ -449,6 +461,7 @@ def process_sip_metadata(processor=None):
 
 def finalize_record_sip(is_dump=True):
     """Finalize the SIP by generating the MARC and storing it in the SIP."""
+    @wraps(finalize_record_sip)
     def _finalize_sip(obj, dummy_eng):
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=False)
@@ -461,6 +474,7 @@ def finalize_record_sip(is_dump=True):
 
 def hold_for_approval():
     """Hold deposition on the Holding Pen for admin approval."""
+    @wraps(hold_for_approval)
     def _hold_for_approval(obj, dummy_eng):
         from invenio.modules.workflows.tasks.marcxml_tasks import approve_record
         d = Deposition(obj)
@@ -476,6 +490,7 @@ def upload_record_sip():
     so the function export_marc_from_json must have been called successfully
     before
     """
+    @wraps(upload_record_sip)
     def create(obj, dummy_eng):
         #FIXME change share tmp directory
         from invenio.config import CFG_TMPSHAREDDIR
