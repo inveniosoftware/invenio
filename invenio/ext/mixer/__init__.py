@@ -21,22 +21,22 @@
 
 from __future__ import absolute_import, print_function
 
+import errno
 import json
 import logging
 import os
-import six
 import sys
 
-from flask import current_app
 from mixer.backend.flask import Mixer as _Mixer
 
 from invenio.ext.sqlalchemy import db
 
 from .registry import mixers
 
+
 class InvalidMixerRequest(Exception):
 
-    """Default Mixer exception. """
+    """Default Mixer exception."""
 
     pass
 
@@ -69,7 +69,8 @@ class JSONBlender(object):
             return self.dump
 
         def __exit__(self, type, value, traceback):
-            json.dump(self.__fixtures, self.__source, indent=4, sort_keys=True)
+            json.dump(self.__fixtures, self.__source,
+                      indent=4, sort_keys=True, separators=(',', ': '))
             self.__source.close()
 
         def dump(self, obj):
@@ -133,7 +134,7 @@ class MixerMeta(type):
 
 class Mixer(_Mixer):
 
-    """ Custom mixer to use external files as fixtures and not only random. """
+    """Custom mixer to use external files as fixtures and not only random."""
 
     def __init__(self, fake=True, factory=None, loglevel=logging.WARN,
                  silence=False, **params):
@@ -190,8 +191,7 @@ def blend_all(sender, yes_i_know=False, drop=True, **kwargs):
 
     :param drop: If `True` delete the previous data.
     """
-    print(kwargs)
-    print('>>> Blending DB')
+    print('>>> Mixer: Blending DB')
     for table in db.metadata.sorted_tables:
         if table.name in mixers:
             mixer.blend(mixers[table.name], drop)
@@ -199,6 +199,7 @@ def blend_all(sender, yes_i_know=False, drop=True, **kwargs):
 
 def unblend_all(sender, **kwargs):
     """Unblend all the possible models found in the package."""
+    print('>>> Mixer: Unblending DB')
     for table in db.metadata.sorted_tables:
         if table.name in mixers:
             mixer.unblend(mixers[table.name])
@@ -209,6 +210,7 @@ def setup_app(app):
     mixer.init_app(app)
     # Subscribe to database post create and recreate command
     from invenio.base import signals
-    from invenio.base.scripts.database import create, recreate
+    from invenio.base.scripts.database import create, recreate, dump
     signals.post_command.connect(blend_all, sender=create)
     signals.post_command.connect(blend_all, sender=recreate)
+    signals.post_command.connect(unblend_all, sender=dump)

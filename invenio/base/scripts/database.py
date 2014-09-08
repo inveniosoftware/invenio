@@ -251,6 +251,12 @@ def create(default_data=True, quiet=False):
 
 
 @manager.command
+def dump():
+    """Export all the tables, similar to `dbdump`."""
+    print('>>> Dumping the DataBase.')
+
+
+@manager.command
 def diff():
     """Diff database against SQLAlchemy models."""
     try:

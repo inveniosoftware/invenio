@@ -54,10 +54,16 @@ def load_fixtures(sender, yes_i_know=False, drop=True, **kwargs):
     db.session.commit()
 
 
+def fixture_dump(sender, **kwargs):
+    """Dump fixtures."""
+    print('ERROR: This feature is not implemented inside fixtures.')
+
+
 def setup_app(app):
     """Set up the extension for the given app."""
     # Subscribe to database post create command
     from invenio.base import signals
-    from invenio.base.scripts.database import create, recreate
+    from invenio.base.scripts.database import create, recreate, dump
     signals.post_command.connect(load_fixtures, sender=create)
     signals.post_command.connect(load_fixtures, sender=recreate)
+    signals.post_command.connect(fixture_dump, sender=dump)
