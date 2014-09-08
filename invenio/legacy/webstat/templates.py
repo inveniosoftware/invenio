@@ -142,7 +142,7 @@ class Template:
         Generates a list of available custom statistics.
         """
         out = """<h3>Custom events</h3>
-                 <p>The Webstat module supplies a mean for the administrators of Invenio
+                 <p>The Webstat module supplies the means for the administrators of Invenio
                  to define their own custom events, more abstract than the Key Statistics above.
                  A technical walk-through how to create these, is available <a href="%s/stats/customevent_help">here</a>.
                  When a custom event has been made available, it is displayed below.</p>
@@ -340,11 +340,11 @@ class Template:
                   <p>A custom event is a measure indicating the frequency of some kind of
                   "action", such as e.g. the number of advanced searches carried out using
                   the Swedish language interface. The custom event functionality is intended
-                  to give administrators a mean to log abstract activity, as opposed to
+                  to give administrators the means to log abstract activity, as opposed to
                   trivial measurements like "collection population" and "search frequency".
                   Thus, a custom event is fully customizable and defined by an administrator
                   but it is important to understand that the Webstat module merely supplies
-                  the mean to register an action and associate it with a predefined custom event,
+                  the means to register an action and associate it with a predefined custom event,
                   while the actual use case leading up to the very registration of the action
                   is left to the user.</p>
 
