@@ -340,11 +340,11 @@ class Template:
                   <p>A custom event is a measure indicating the frequency of some kind of
                   "action", such as e.g. the number of advanced searches carried out using
                   the Swedish language interface. The custom event functionality is intended
-                  to give administrators a mean to log abstract activity, as opposed to
+                  to give administrators the means to log abstract activity, as opposed to
                   trivial measurements like "collection population" and "search frequency".
                   Thus, a custom event is fully customizable and defined by an administrator
                   but it is important to understand that the Webstat module merely supplies
-                  the mean to register an action and associate it with a predefined custom event,
+                  the means to register an action and associate it with a predefined custom event,
                   while the actual use case leading up to the very registration of the action
                   is left to the user.</p>
 
