@@ -32,7 +32,6 @@ pylib_DATA = access_control_engine.py \
              external_authentication_sso.py \
              external_authentication_robot.py \
              webaccess_regression_tests.py \
-             external_authentication_oauth1.py \
              external_authentication_oauth2.py \
              external_authentication_openid.py
 
