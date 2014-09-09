@@ -190,13 +190,25 @@ def details(objectid):
                            )
 
 
-@blueprint.route('/files/<int:objectid>/<path:filename>',
+@blueprint.route('/files/<int:object_id>/<path:filename>',
                  methods=['POST', 'GET'])
 @login_required
 @permission_required(viewholdingpen.name)
-def get_file(objectid=None, filename=None):
-    """Send the requested file to user."""
-    bwobject = BibWorkflowObject.query.get(objectid)
+def get_file_from_task_result(object_id=None, filename=None):
+    """Send the requested file to user from a workflow task result.
+
+    Expects a certain file meta-data structure in task result:
+
+    .. code-block:: python
+
+        {
+            "type": "Fulltext",
+            "filename": "file.pdf",
+            "full_path": "/path/to/file",
+        }
+
+    """
+    bwobject = BibWorkflowObject.query.get(object_id)
     task_results = bwobject.get_tasks_results()
     if filename in task_results and task_results[filename]:
         fileinfo = task_results[filename][0].get("result", dict())

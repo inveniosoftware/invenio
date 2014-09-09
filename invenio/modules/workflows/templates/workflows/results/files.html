@@ -21,9 +21,9 @@
 
 {% block results_body %}
 <div class="panel-body">
-    <a href="{{ url_for('holdingpen.get_file', objectid=obj.id, filename=results.result.filename) }}">
+    <a href="{{ url_for('holdingpen.get_file_from_task_result', object_id=obj.id, filename=results.result.filename) }}">
         <button type="button" class="btn btn-default btn-lg">
-          <span class="glyphicon glyphicon-book"></span> {{results.result.type}}
+          <span class="glyphicon glyphicon-file"></span> {{results.name}}
         </button>
     </a>
 </div>
