@@ -3510,7 +3510,7 @@ CREATE TABLE IF NOT EXISTS tag (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(255) NOT NULL,
   value varchar(6) default '',
-  recjson_value text,
+  recjson_value text NOT NULL,
   PRIMARY KEY  (id)
 ) ENGINE=MyISAM;
 
@@ -5045,5 +5045,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjso
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_31_next_collection_tree',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_13_hide_holdings',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_arguments_cfg_namechange',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_09_09_tag_recjsonvalue_not_null',NOW());
 
 -- end of file
