@@ -161,7 +161,9 @@ def perform_request_index(ln=CFG_SITE_LANG):
     holdingpen_link = create_html_link(urlbase=url_for("holdingpen.index"),
                                        urlargd={},
                                        link_label=_("View Holding Pen"))
-    output = titlebar
+    output = ("""<div class="alert alert-info" role="alert"><strong>NOTE:</strong>"""
+              """To run OAI harvests you need an active <a href="http://invenio.readthedocs.org/en/latest/getting-started/first-steps.html?highlight=celery#development">Celery</a> instance</div>""")
+    output += titlebar
     output += oaiharvest_templates.tmpl_output_numbersources(
         ln, len(oai_sources))
     output += oaiharvest_templates.tmpl_output_table(title_row=header, data=sources)
@@ -589,8 +591,10 @@ def get_oai_source_form(ln, oai_src_baseurl, oai_src_name, oai_src_prefix,
                                                                      name="oai_src_comment",
                                                                      value=oai_src_comment)
 
-    table_first_col += "<h3>Automatic post-harvest processes</h3>"
-
+    table_first_col += "<h3>Automatic post-harvest processes <small>soon to be deprecated</small></h3>"
+    table_first_col += ("""<p class="lead">These arguments are being deprecated. """
+                        """Create workflows using <a href="http://invenio.readthedocs.org/en/latest/modules/workflows.html">workflows module</a> instead.</p>
+                        <p>The arguments will only work with 'oaiharvest_harvest_repositores' workflow (or derivatives)</p>""")
     post_values = []
     post_labels = []
     post_states = []

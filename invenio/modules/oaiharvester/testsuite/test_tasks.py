@@ -17,13 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Test for marcxml tasks."""
+"""Test for workflow tasks used by OAI harvester."""
 
 from invenio.testsuite import make_test_suite, run_test_suite
-from .test_workflows import WorkflowTasksTestCase
+from invenio.modules.workflows.testsuite.test_workflows import WorkflowTasksTestCase
 
 
-class WorkflowMarcXML(WorkflowTasksTestCase):
+class OAIHarvesterTasks(WorkflowTasksTestCase):
 
     """Class to test the marcxml tasks."""
 
@@ -40,7 +40,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
     def test_filtering(self):
         """Test filtering functionality."""
         from invenio.ext.sqlalchemy import db
-        from ..tasks.marcxml_tasks import filtering_oai_pmh_identifier
+        from ..tasks.harvesting import filtering_oai_pmh_identifier
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject
 
@@ -77,7 +77,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
 
     def test_init_harvesting(self):
         """Test harvesting."""
-        from ..tasks.marcxml_tasks import init_harvesting
+        from ..tasks.harvesting import init_harvesting
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject
 
@@ -94,7 +94,7 @@ class WorkflowMarcXML(WorkflowTasksTestCase):
         init_harvesting(my_test_obj, engine)
         self.assertTrue(engine.get_extra_data()["options"]["test"])
 
-TEST_SUITE = make_test_suite(WorkflowMarcXML)
+TEST_SUITE = make_test_suite(OAIHarvesterTasks)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

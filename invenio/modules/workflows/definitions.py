@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -9,27 +10,57 @@
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111 1307, USA.
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Generic record process in harvesting."""
+
+"""Contains basic workflow types for use in workflow definitions."""
+
+
 import collections
 from six import string_types
 
-from ..tasks.marcxml_tasks import (convert_record_with_repository,
-                                   convert_record_to_bibfield,
-                                   quick_match_record, upload_step,
-                                   approve_record)
-from ..tasks.workflows_tasks import log_info
-from ..tasks.logic_tasks import workflow_if, workflow_else
-from invenio.modules.workflows.utils import WorkflowBase
+
+class WorkflowMissing(object):
+
+    """Placeholder workflow definition."""
+
+    workflow = [lambda obj, eng: None]
 
 
-class full_doc_process(WorkflowBase):
+class WorkflowBase(object):
+
+    """Base class for workflow definition.
+
+    Interface to define which functions should be imperatively implemented.
+    All workflows should inherit from this class.
+    """
+
+    @staticmethod
+    def get_title(bwo, **kwargs):
+        """Return the value to put in the title column of HoldingPen."""
+        return "No title"
+
+    @staticmethod
+    def get_description(bwo, **kwargs):
+        """Return the value to put in the title  column of HoldingPen."""
+        return "No description"
+
+    @staticmethod
+    def formatter(obj, **kwargs):
+        """Format the object."""
+        return "No data"
+
+
+class RecordWorkflow(WorkflowBase):
+
+    """Workflow to be used where BibWorkflowObject is a Record instance."""
+
+    workflow = []
 
     @staticmethod
     def get_title(bwo):
@@ -113,7 +144,7 @@ class full_doc_process(WorkflowBase):
 
     @staticmethod
     def formatter(bwo, **kwargs):
-
+        """Nicely format the record."""
         from invenio.modules.formatter.engine import format_record
 
         data = bwo.get_data()
@@ -167,19 +198,3 @@ class full_doc_process(WorkflowBase):
             return list(data)
         # Not any of the above types. How juicy!
         return data
-
-    object_type = "harvesting process"
-
-    workflow = [
-        convert_record_with_repository("oaiarxiv2marcxml.xsl"),
-        convert_record_to_bibfield,
-        workflow_if(quick_match_record, True),
-        [
-            approve_record,
-            upload_step,
-        ],
-        workflow_else,
-        [
-            log_info("Record already into database"),
-        ],
-    ]

@@ -97,6 +97,7 @@ def get_workflow_definition(name):
     if name in workflows:
         return getattr(workflows[name], "workflow", None)
     else:
+        from .definitions import WorkflowMissing
         return WorkflowMissing.workflow
 
 
@@ -179,42 +180,6 @@ def parse_bwids(bwolist):
     return list(ast.literal_eval(bwolist))
 
 
-def dummy_function(obj, eng):
-    """Workflow function not found for workflow."""
-    pass
-
-
-class WorkflowMissing(object):
-
-    """Workflow is missing."""
-
-    workflow = [dummy_function]
-
-
-class WorkflowBase(object):
-
-    """Base class for workflow.
-
-    Interface to define which functions should be imperatively implemented.
-    All workflows should inherit from this class.
-    """
-
-    @staticmethod
-    def get_title(bwo, **kwargs):
-        """Return the value to put in the title column of HoldingPen."""
-        return "No title"
-
-    @staticmethod
-    def get_description(bwo, **kwargs):
-        """Return the value to put in the title  column of HoldingPen."""
-        return "No description"
-
-    @staticmethod
-    def formatter(obj, **kwargs):
-        """Format the object. Not implemented."""
-        raise NotImplementedError
-
-
 def get_holdingpen_objects(ptags=[]):
     """Get BibWorkflowObject's for display in Holding Pen.
 
@@ -293,6 +258,8 @@ def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
 
 def generate_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
     """Generate a dict with formatted column data from Holding Pen object."""
+    from .definitions import WorkflowBase
+
     workflows_name = bwo.get_workflow_name()
 
     if workflows_name and hasattr(workflows[workflows_name], 'get_description'):

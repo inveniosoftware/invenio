@@ -257,9 +257,9 @@ class Template:
           - 'name' *string* - The name of the value in the dd box
           - 'value' *list* - The values in the textbox"""
         _ = gettext_set_language(ln)
-        text = ""
+        text = """<div class="form-group">"""
         if title:
-            text += """<span class="admin_label">%s</span>""" % (title,)
+            text += """<label for="{0}">{1}</label>""".format(name, title)
         text += """<select name="%s" class="form-control">""" % (name,)
         text += """<option value="">%s</option>""" % (valuenil,)
         try:
@@ -275,7 +275,7 @@ class Template:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
-        return """%s</select>%s""" % (text, suffix)
+        return """%s</select><p class="help-block">%s</p></div>""" % (text, suffix)
 
     def tmpl_admin_w200_textarea(self, ln, title, name, value, suffix="<br/>"):
         """
