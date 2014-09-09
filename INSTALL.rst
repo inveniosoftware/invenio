@@ -89,7 +89,7 @@ user. You will need the root password later on and we will refer to it as
 .. code-block:: console
 
     $ sudo yum install mysql-server
-    $ sudo service msyqld status
+    $ sudo service mysqld status
     mysqld is stopped
     $ sudo service mysqld start
     $ sudo mysql_secure_installation
@@ -339,7 +339,7 @@ the original files. As a developer you may want to have symbolic links instead.
 3.3. Development
 ~~~~~~~~~~~~~~~~
 
-Once you have everything installed you can create database and populate it
+Once you have everything installed, you can create the database and populate it
 with demo records.
 
 .. code-block:: console
