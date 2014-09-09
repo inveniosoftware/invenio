@@ -18,7 +18,7 @@
 #}
 
 {% if result_progress %}
-  <p><strong>{{ _('Progress') }}</strong></b>:
+  <p><strong>{{ _('Progress') }}</strong></p>:
 
   <div class="progress">
     <div class="progress-bar progress-bar-success" style="width: {{(result_progress.total - result_progress.failed)* 100 / result_progress.total}}%">
@@ -41,9 +41,17 @@
 {% endif %}
 
 {% if identifiers %}
-  <p><b>{{ _('Identifiers:') }}</b> :
-      {% for identifier in identifiers %}
-          {{identifier}}
-      {% endfor %}
-  </p>
+  <h6>{{ _('Identifiers') }}</h6>:
+  <ul class="list-unstyled">
+  {% for identifier in identifiers %}
+      <li>
+      {% if 'arxiv' in identifier.lower() %}
+        {% set identifier = identifier.split(':')[-1] %}
+        <a href="http://arxiv.org/abs/{{identifier}}">{{identifier}}</a>
+      {% else %}
+        {{ identifier }}
+      {% endif %}
+      </li>
+  {% endfor %}
+  </ul>
 {% endif %}
