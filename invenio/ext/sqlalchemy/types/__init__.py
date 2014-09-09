@@ -19,10 +19,17 @@
 
 """Implement various custom column types."""
 
-from .encrypted import Encrypted
+from .encrypted import Encrypted, AESEngine
 from .guid import GUID
 from .marshal_binary import MarshalBinary
 from .pickle_binary import PickleBinary
+from .legacyinteger import LegacyInteger
+from .legacymediuminteger import LegacyMediumInteger
+from .legacysmallinteger import LegacySmallInteger
+from .legacytinyinteger import LegacyTinyInteger
+from .legacybiginteger import LegacyBigInteger
 
 
-__all__ = ('Encrypted', 'GUID', 'MarshalBinary', 'PickleBinary')
+__all__ = ('Encrypted', 'GUID', 'MarshalBinary', 'PickleBinary',
+           'LegacyInteger', 'LegacyMediumInteger', 'LegacySmallInteger',
+           'LegacyTinyInteger', 'LegacyBigInteger', 'AESEngine')

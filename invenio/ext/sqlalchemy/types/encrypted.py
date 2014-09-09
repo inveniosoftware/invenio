@@ -76,7 +76,8 @@ class Encrypted(TypeDecorator):
     def __init__(self, key, **kwargs):
         """Initialization.
 
-        :param key: [String] a given key for encryption/decryption
+        :param key: :class:`~sqlalchemy.types.String`
+            a given key for encryption/decryption
         """
         super(Encrypted, self).__init__(**kwargs)
         # produce a 32-bytes key
@@ -85,7 +86,8 @@ class Encrypted(TypeDecorator):
     def process_bind_param(self, value, dialect):
         """Encrypt a value on the way in.
 
-        :param value: [String] the value to be encrypted
+        :param value: :class:`~sqlalchemy.types.String`
+            the value to be encrypted
         """
         return self.encr_decr_engine.encrypt(self.cipher, value)
 

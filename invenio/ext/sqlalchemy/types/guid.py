@@ -28,8 +28,9 @@ class GUID(TypeDecorator):
 
     """Platform-independent GUID type.
 
-    Uses Postgresql's `UUID` type, otherwise uses
-    `CHAR(32)`, storing as stringified hex values.
+    Uses Postgresql's :class:`~sqlalchemy.dialects.postgresql.UUID`
+    type, otherwise uses :class:`~sqlalchemy.types.CHAR` (32),
+    storing as stringified hex values.
     """
 
     impl = CHAR

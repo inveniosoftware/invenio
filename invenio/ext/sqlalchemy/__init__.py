@@ -37,6 +37,10 @@ from invenio.utils.hash import md5
 from .expressions import AsBINARY
 from .types import MarshalBinary, PickleBinary, GUID
 from .utils import get_model_type
+from invenio.ext.sqlalchemy.types import (LegacyInteger, LegacyMediumInteger,
+                                          LegacySmallInteger,
+                                          LegacyTinyInteger,
+                                          LegacyBigInteger)
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -54,7 +58,7 @@ def _include_sqlalchemy(obj, engine=None):
     # Length is provided to JSONType to ensure MySQL uses LONGTEXT instead
     # of TEXT which only provides for 64kb storage compared to 4gb for
     # LONGTEXT.
-    setattr(obj, 'JSON', JSONType(length=2**32-2))
+    setattr(obj, 'JSON', JSONType(length=2 ** 32 - 2))
     setattr(obj, 'Char', engine_types.CHAR)
     try:
         setattr(obj, 'TinyText', engine_types.TINYTEXT)
@@ -65,22 +69,16 @@ def _include_sqlalchemy(obj, engine=None):
         setattr(obj, 'Double', engine_types.DOUBLE)
     except:
         setattr(obj, 'Double', engine_types.FLOAT)
-    setattr(obj, 'Integer', engine_types.INTEGER)
-    setattr(obj, 'SmallInteger', engine_types.SMALLINT)
-    try:
-        setattr(obj, 'MediumInteger', engine_types.MEDIUMINT)
-    except:
-        setattr(obj, 'MediumInteger', engine_types.INT)
-    setattr(obj, 'BigInteger', engine_types.BIGINT)
-    try:
-        setattr(obj, 'TinyInteger', engine_types.TINYINT)
-    except:
-        setattr(obj, 'TinyInteger', engine_types.INT)
     setattr(obj, 'Binary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iMediumBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'UUID', GUID)
+    setattr(obj, 'Integer', LegacyInteger)
+    setattr(obj, 'MediumInteger', LegacyMediumInteger)
+    setattr(obj, 'SmallInteger', LegacySmallInteger)
+    setattr(obj, 'TinyInteger', LegacyTinyInteger)
+    setattr(obj, 'BigInteger', LegacyBigInteger)
 
     if engine == 'mysql':
         from .engines import mysql as dummy_mysql  # noqa
@@ -183,10 +181,12 @@ class SQLAlchemy(FlaskSQLAlchemy):
         # Don't forget to apply hacks defined on parent object.
         super(self.__class__, self).apply_driver_hacks(app, info, options)
         if info.drivername == 'mysql':
-            options.setdefault('execution_options', {'autocommit': True,
-                                                     'use_unicode': False,
-                                                     'charset': 'utf8mb4',
-                                                     })
+            options.setdefault('execution_options', {  # Autocommit cause Exception in SQLAlchemy >= 0.9.
+                # @see http://docs.sqlalchemy.org/en/rel_0_9/core/connections.html#understanding-autocommit
+                # 'autocommit': True,
+                'use_unicode': False,
+                'charset': 'utf8mb4',
+            })
             event.listen(Pool, 'checkin', autocommit_on_checkin)
 
 

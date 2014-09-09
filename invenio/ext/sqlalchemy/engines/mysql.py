@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ import base64
 # SQLAlchemy
 import sqlalchemy
 from sqlalchemy import Table, Index, Column,  MetaData, ForeignKey,\
-        Date, DateTime, Enum,  DateTime, Float
+        Date, DateTime, Enum, Float
 from sqlalchemy.dialects.mysql import DOUBLE as Double
 from sqlalchemy.dialects.mysql import INTEGER as Integer
 from sqlalchemy.dialects.mysql import TEXT as Text
@@ -59,7 +59,10 @@ def visit_create_index(element, compiler, **kw):
     index = element.element
     preparer = compiler.preparer
     table = preparer.format_table(index.table)
+    # @deprecated [object].quote in SQLAlchemy >= 0.9.*
     name = preparer.quote(index.name, index.quote)
+    # use this:
+    # name = preparer.quote(index.name, index.name.quote)
 
     text = "ALTER TABLE %s ADD " % (table, )
     if index.unique:
@@ -70,7 +73,10 @@ def visit_create_index(element, compiler, **kw):
 
     columns = []
     for i,c in enumerate(index.columns):
+        # FIXME with SQLAlchemy >= 0.9.*
         cname = preparer.quote(c.name, c.quote)
+        # use this:
+        # cname = c.name
         suffix = ''
         if isinstance(lst, (list, tuple)) and len(lst)>i \
             and lst[i] is not None:
@@ -83,7 +89,8 @@ def visit_create_index(element, compiler, **kw):
 
     if 'mysql_using' in index.kwargs:
         using = index.kwargs['mysql_using']
-        text += " USING %s" % (preparer.quote(using, index.quote))
+        if using is not None:
+            text += " USING %s" % (preparer.quote(using, index.quote))
 
     return text
 
@@ -100,7 +107,10 @@ def visit_primary_key_constraint(*element):
         text += "CONSTRAINT %s " % \
                 compiler.preparer.format_constraint(constraint)
     text += "PRIMARY KEY "
+    # FIXME with SQLAlchemy >= 0.9.*
     text += "(%s)" % ', '.join(compiler.preparer.quote(c.name, c.quote) +
+    # use this:
+    # text += "(%s)" % ', '.join(c.name +
             ((str(c.type).startswith('TEXT') and (c.type.length != None))
                 and '(%d)' % c.type.length
                 or ''
