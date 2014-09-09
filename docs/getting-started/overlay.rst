@@ -299,8 +299,8 @@ Translations
 ============
 
 Invenio comes with full internationalization and localization support
-based on `Babel <http://babel.pocoo.org/` library and `Flask-Babel
-<https://pythonhosted.org/Flask-Babel/>`.  All strings you want to
+based on `Babel <http://babel.pocoo.org/>`_ library and `Flask-Babel
+<https://pythonhosted.org/Flask-Babel/>`_.  All strings you want to
 translate in your overlay have to be marked with ``_()``.
 
 When you have all strings properly marked, it is time to prepare
