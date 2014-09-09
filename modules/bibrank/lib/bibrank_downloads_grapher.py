@@ -70,11 +70,12 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
         if history_analysis_results and history_analysis_results[0]:
+            graph_path = history_analysis_results[0][history_analysis_results[0].rfind('/')+1:]
             if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
-                graph_file_history = CFG_WEBDIR + "/img/" + history_analysis_results[0]
+                graph_file_history = CFG_WEBDIR + "/img/" + graph_path
                 html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_history).read()
             else:  # gnuplot
-                graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
+                graph_file_history = CFG_SITE_URL + "/img/" + graph_path
                 html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             file_to_close_history = history_analysis_results[1]
             if file_to_close_history :
