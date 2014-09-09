@@ -57,7 +57,8 @@ define(function(require, exports, module) {
           $upload_stop = this.$element.find('.upload-stop'),
           $upload_speed = this.$element.find('.upload-speed'),
           $upload_filetable = this.$element.find('.upload-filetable'),
-          $upload_filelist = this.$element.find('.upload-filelist');
+          $upload_filelist = this.$element.find('.upload-filelist'),
+          $upload_errors = this.$element.find('.upload-errors');
 
       var had_error = false;
 
