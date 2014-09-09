@@ -50,7 +50,7 @@ class Storage(SessionStorage):
         if not self.db.engine.dialect.has_table(self.db.engine,
                                                 self.model.__tablename__):
             self.model.__table__.create(bind=self.db.engine)
-            self.db.commit()
+            self.db.session.commit()
 
     @locked_cached_property
     def db(self):
