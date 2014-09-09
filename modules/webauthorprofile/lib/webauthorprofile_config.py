@@ -59,17 +59,18 @@ marc_tag_uncontrol_keyword = get_tag_from_name('uncontrolled keyword')
 if marc_tag_uncontrol_keyword:
     CFG_WEBAUTHORPROFILE_FKEYWORD_TAG = marc_tag_uncontrol_keyword
 else:
-    CFG_WEBAUTHORPROFILE_FKEYWORD_TAG = '65017a'
+    CFG_WEBAUTHORPROFILE_FKEYWORD_TAG = '6531_a'
 
 # collaboration:
 marc_tag_collaboration = get_tag_from_name('collaboration')
 if marc_tag_collaboration:
     CFG_WEBAUTHORPROFILE_COLLABORATION_TAG = marc_tag_collaboration
 else:
-    CFG_WEBAUTHORPROFILE_COLLABORATION_TAG = '65017a'
+    CFG_WEBAUTHORPROFILE_COLLABORATION_TAG = '710__g'
+
+CFG_WEBAUTHORPROFILE_CATEGORIES_TAG = '65017a'
 
 CFG_WEBAUTHORPROFILE_GENERATED_TIMESTAMP_BOTTOM_POSITION = True
-
 
 try:
     from cPickle import loads

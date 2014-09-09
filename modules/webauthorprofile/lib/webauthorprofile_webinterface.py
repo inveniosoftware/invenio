@@ -502,6 +502,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                 if not selfpubs:
                     selfpubs = list()
 
+
                 person_link, person_linkStatus = get_veryfy_my_pubs_list_link(person_id)
                 bibauthorid_data = {'is_baid': True, 'pid': person_id, 'cid': None}
                 if person_link and person_linkStatus:
@@ -749,7 +750,8 @@ class WebAuthorPages(WebInterfaceDirectory):
                 try:
                     canonical_name = get_canonical_name_of_author(person_id)[0][0]
                 except IndexError:
-                    canonical_name = None
+                    canonical_name = person_id
+
                 all_pubs_search_link = "%s/search?p=exactauthor%%3A%s" % (CFG_BASE_URL, canonical_name)
 
                 if datasets_pubs:

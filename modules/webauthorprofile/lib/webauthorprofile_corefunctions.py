@@ -45,7 +45,7 @@ from invenio.webauthorprofile_config import CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
     CFG_WEBAUTHORPROFILE_USE_ALLOWED_FIELDCODES, \
     CFG_WEBAUTHORPROFILE_ALLOWED_FIELDCODES, CFG_WEBAUTHORPROFILE_KEYWORD_TAG, \
     CFG_WEBAUTHORPROFILE_FKEYWORD_TAG, CFG_WEBAUTHORPROFILE_COLLABORATION_TAG, \
-    CFG_WEBAUTHORPROFILE_FIELDCODE_TAG
+    CFG_WEBAUTHORPROFILE_FIELDCODE_TAG, CFG_WEBAUTHORPROFILE_CATEGORIES_TAG
 from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_id, \
     get_names_of_author, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
@@ -319,7 +319,9 @@ def _get_summarize_records(pubs, rec_query):
     @param person_id: int person id
     @param tag: str kind of output
     @param ln: str language
+
     '''
+
     citation_summary = generate_citation_summary(intbitset(pubs))
 
     # the serialization function (msgpack.packb) cannot serialize an intbitset
@@ -336,7 +338,7 @@ def get_internal_publications(person_id):
     '''
     return retrieve_update_cache('internal_pubs', 'pid:' + str(person_id), _get_internal_publications, person_id)
 
-def _get_internal_publications(person_id):
+def _get_internal_publications_bai(person_id):
     '''
     Returns internal pubs for given personid.
     @param person_id: int, person id
@@ -358,7 +360,7 @@ def get_datasets(person_id):
     '''
     return retrieve_update_cache('datasets_pubs', 'pid:' + str(person_id), _get_datasets, person_id)
 
-def _get_datasets(person_id):
+def _get_datasets_bai(person_id):
     recs =  get_confirmed_papers_of_author(person_id)
     data_recs = set()
 
@@ -380,7 +382,7 @@ def get_external_publications(person_id):
     '''
     return retrieve_update_cache('external_pubs', 'pid:' + str(person_id), _get_external_publications, person_id)
 
-def _get_external_publications(person_id):
+def _get_external_publications_bai(person_id):
     '''
     Returns external pubs for given personid.
     @param person_id: int, person id
@@ -842,7 +844,10 @@ def _get_kwtuples_fallback(pubs, person_id):
     return tup
 
 def _get_fieldtuples_fallback(pubs, person_id):
-    return _get_fieldtuples_bai_tup(pubs, person_id)
+
+    tup = get_most_popular_field_values(pubs,
+                            (CFG_WEBAUTHORPROFILE_KEYWORD_TAG, CFG_WEBAUTHORPROFILE_CATEGORIES_TAG), count_repetitive_values=True)
+    return tup
 
 def _get_collabtuples_fallback(pubs, person_id):
     '''
@@ -911,6 +916,42 @@ def  _get_rec_query_fallback(bibauthorid_data, authorname, db_names_dict, person
             rec_query = extended_author_search_str
     return rec_query
 
+def _get_internal_publications_fallback(person_id):
+    '''
+    Returns internal pubs for given personid.
+    @param person_id: int, person id
+    @return
+    '''
+    internal_pubs = dict()
+
+    recs = perform_request_search(rg=0, p='exactauthor:"%s"' % str(person_id))
+    for rec in recs:
+        print rec
+        internal_pubs[rec] = get_title_of_paper(rec)
+
+    return internal_pubs
+
+
+def _get_external_publications_fallback(person_id):
+    '''
+    Returns empty dictionary for default Invenio site.
+    The default site should not use it.
+    '''
+    return {}
+
+def _get_datasets_fallback(person_id):
+
+    data_recs = set()
+
+    data_recs_tmp = perform_request_search(p="exactauthor:%s" % str(person_id), f='786__w', cc='Data', rg=0)
+    data_recs.update(set(data_recs_tmp))
+
+    datasets_pubs = dict()
+    for rec in data_recs:
+        datasets_pubs[rec] = get_title_of_paper(rec)
+
+    return datasets_pubs
+
 
 if CFG_BIBAUTHORID_ENABLED:
     _get_pubs = _get_pubs_bai
@@ -925,6 +966,9 @@ if CFG_BIBAUTHORID_ENABLED:
     _get_collabtuples = _get_collabtuples_bai
     _get_coauthors = _get_coauthors_bai
     _get_rec_query = _get_rec_query_bai
+    _get_internal_publications = _get_internal_publications_bai
+    _get_external_publications = _get_external_publications_bai
+    _get_datasets = _get_datasets_bai
 else:
     _get_pubs = _get_pubs_fallback
     _get_self_pubs = _get_self_pubs_fallback
@@ -938,3 +982,6 @@ else:
     _get_collabtuples = _get_collabtuples_fallback
     _get_coauthors = _get_coauthors_fallback
     _get_rec_query = _get_rec_query_fallback
+    _get_internal_publications = _get_internal_publications_fallback
+    _get_external_publications = _get_external_publications_fallback
+    _get_datasets = _get_datasets_fallback
