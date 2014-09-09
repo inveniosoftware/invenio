@@ -308,6 +308,10 @@ class WebProfilePage():
                 low,
                 high)
 
+        if not CFG_INSPIRE_SITE:
+            citations['data']['Citeable papers'] = citations['data']['All papers']
+            citations['papers']['Citeable papers'] = citations['papers']['All papers']
+
         try:
             result = WebProfilePage.environment.get_template("citations_summary.html").render({
                 'papers_num': citations['papers_num'],

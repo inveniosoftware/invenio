@@ -26,7 +26,8 @@
 '''
 
 from invenio.config import CFG_SITE_URL, \
-    CFG_BIBAUTHORID_SEARCH_ENGINE_MAX_DATACHUNK_PER_INSERT_DB_QUERY
+    CFG_BIBAUTHORID_SEARCH_ENGINE_MAX_DATACHUNK_PER_INSERT_DB_QUERY, \
+    CFG_INSPIRE_SITE
 import invenio.bibauthorid_config as bconfig
 
 import gc
@@ -1977,6 +1978,9 @@ def get_canonical_name_of_author(pid):  # get_canonical_id_from_personid - get_c
     @return: canonical name
     @rtype: tuple ((str),)
     '''
+    if not CFG_INSPIRE_SITE:
+        return ((pid,),)
+
     return _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='canonical_name')
 
 
