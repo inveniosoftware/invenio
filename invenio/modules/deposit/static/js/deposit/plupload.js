@@ -70,6 +70,7 @@ define(function(require, exports, module) {
           unique_names : this.options.unique_names,
           browse_button : this.options.browse_button,
           drop_element : this.options.drop_element,
+          filters : this.options.filters,
       });
 
       new plupload.QueueProgress();
@@ -441,7 +442,8 @@ define(function(require, exports, module) {
     unique_names : true,
     browse_button : 'pickfiles',
     drop_element : 'field-plupload_file',
-    form_selector: "#submitForm"
+    form_selector: "#submitForm",
+    filters : {}
   };
 
   $.fn.pluploadWidget.Constructor = PluploadWidget;
