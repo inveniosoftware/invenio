@@ -76,13 +76,18 @@ def populate(packages=[], default_data=True, files=None,
             'invenio',
             os.path.join('testsuite', 'data', 'demo_record_marc_data.xml'))]
 
+    # upload demo site files:
+    bibupload_flags = '-i'
+    if 'force-recids' in extra_info:
+        bibupload_flags = '-i -r --force'
     for f in files:
         job_id += 1
-        for cmd in ["%s/bin/bibupload -u admin -i %s" % (CFG_PREFIX, f),
+        for cmd in ["%s/bin/bibupload -u admin %s %s" % (CFG_PREFIX, bibupload_flags, f),
                     "%s/bin/bibupload %d" % (CFG_PREFIX, job_id)]:
             if os.system(cmd):
                 print("ERROR: failed execution of", cmd)
                 sys.exit(1)
+
     for cmd in ["bin/bibdocfile --textify --with-ocr --recid 97",
                 "bin/bibdocfile --textify --all",
                 "bin/bibindex -u admin",
