@@ -30,7 +30,7 @@ except ImportError:
 
 from invenio.legacy.webuser import page_not_authorized
 from invenio.modules.access.engine import acc_authorize_action
-import invenio.authorlist_config as cfg
+import .config as cfg
 from invenio.legacy.search_engine import perform_request_search, record_exists
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibedit.utils import get_record
