@@ -61,7 +61,9 @@ class OaiHARVEST(db.Model):
     lastrun = db.Column(db.DateTime, nullable=True)
     postprocess = db.Column(db.String(20), nullable=False,
                             server_default='h')
-    workflows = db.Column(db.String(255), nullable=True)
+    workflows = db.Column(db.String(255),
+                          nullable=False,
+                          server_default='')
     setspecs = db.Column(db.Text, nullable=False)
 
     def to_dict(self):
