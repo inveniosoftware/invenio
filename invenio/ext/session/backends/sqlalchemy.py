@@ -87,16 +87,6 @@ class Storage(SessionStorage):
         self.db.session.merge(s)
         self.db.session.commit()
 
-        session_expiry = datetime.utcnow() + timeout
-        s = Session()
-        s.uid = current_user.get_id()
-        s.session_key = name
-        s.session_object = value
-        s.session_expiry = session_expiry
-        #FIXME REPLACE OR UPDATE
-        self.db.session.merge(s)
-        self.db.session.commit()
-
     def get(self, name):
         return getattr(self.getter(name), self.value)
 
