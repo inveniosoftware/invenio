@@ -18,7 +18,7 @@
 #}
 <div class="panel panel-default">
     <div class="panel-heading">
-        <a data-toggle="collapse" class="panel-toggle{{ ' collapsed' if group.meta.classes is not none else '' }}" href="#collapse-{{ idx }}"> {{ group.name }} <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span> <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></a>
+        <a data-toggle="collapse" class="panel-toggle{{ ' collapsed' if group.meta.classes is not none else '' }}" href="#collapse-{{ idx }}"> {{ group.name }} <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span> <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></a>
         {% if group.meta.indication %}
             <span class="text-muted pull-right" style="padding-right: 10px;">{{ group.meta.indication }}</span>
         {% endif %}
