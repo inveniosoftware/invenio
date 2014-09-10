@@ -29,8 +29,10 @@ css = Bundle(
     weight=60,
     filters="cleancss",
     bower={
-        # /!\ 1.4.0 is from 2011 /!\
-        # --------------------------
+        # Used by Video_HTML_detailed.
+        "mediaelement": "latest",
+        # 1.4.0 is from 2011 !!!
+        # ----------------------
         # http://www.keith-wood.name/bookmark.html
         "jquery.bookmark": "http://invenio-software.org/download/jquery/"
                            "jquery.bookmark.package-1.4.0.zip"  # orphan

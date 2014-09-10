@@ -31,6 +31,16 @@
   {% endif %}
 {% endblock metaheader %}
 
+{%- block header %}
+  {%- include "base/scripts.html" %}
+  {{- super() }}
+{%- endblock header %}
+{%- block _bottom_assets %}
+  {# The legacy page requires that the scripts are loaded from the <head>
+   # rather than at the bottom of the page.
+   #}
+{%- endblock %}
+
 {% block global_bundles %}
   {{ super() }}
   {% bundles "records.js", "formatter.css" %}
