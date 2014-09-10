@@ -1244,7 +1244,7 @@ def field_xml_output(field, tag):
                        (tag, field[1], field[2]))
         marcxml += [_subfield_xml_output(subfield) for subfield in field[0]]
         marcxml.append('  </datafield>')
-    return '\n'.join(map(str, marcxml))
+    return '\n'.join(marcxml)
 
 
 def record_extract_oai_id(record):
