@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
@@ -17,49 +17,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.session.interface
-    -----------------------------
-
-    Implements Flask `SessionInterface`.
-"""
+"""Flask :class:`~flask.sessions.SessionInterface` implementation."""
 
 import six
-from six.moves import cPickle
-import zlib
 
 from datetime import timedelta, datetime
 from flask import current_app, request
 from flask.helpers import locked_cached_property
 from flask.sessions import SessionInterface as FlaskSessionInterface
 from uuid import uuid4
-from werkzeug.utils import import_string
 from werkzeug.exceptions import BadRequest
+from werkzeug.utils import import_string
 
-
-class Serializer(object):
-    @staticmethod
-    def loads(string):
-        return cPickle.loads(zlib.decompress(string))
-
-    @staticmethod
-    def dumps(data):
-        return zlib.compress(cPickle.dumps(data, -1))
+from invenio.utils.serializers import ZlibPickle as Serializer
 
 
 class SessionInterface(FlaskSessionInterface):
-    """
-    The session interface replaces standard Flask session
-    implementation.
-    """
+
+    """Extend :class:`~flask.sessions.SessionInterface` class."""
 
     @locked_cached_property
     def has_secure_url(self):
+        """Return ``True`` if secure url is configured."""
         return current_app.config.get('CFG_SITE_SECURE_URL', '').\
             startswith("https://")
 
     @locked_cached_property
     def serializer(self):
+        """Return serializer class."""
         serializer_string = current_app.config.get('SESSION_SERIALIZER',
                                                    Serializer)
         return import_string(serializer_string)() \
@@ -68,6 +53,7 @@ class SessionInterface(FlaskSessionInterface):
 
     @locked_cached_property
     def session_class(self):
+        """Return session class."""
         session_class_string = current_app.config.get(
             'SESSION_CLASS', 'invenio.ext.session.legacy_session:Session')
         return import_string(session_class_string) \
@@ -76,6 +62,7 @@ class SessionInterface(FlaskSessionInterface):
 
     @locked_cached_property
     def backend(self):
+        """Return session backend."""
         storage_string = current_app.config.get(
             'SESSION_BACKEND', 'invenio.ext.session.backends.cache:Storage')
         return import_string(storage_string)() \
@@ -83,16 +70,18 @@ class SessionInterface(FlaskSessionInterface):
             else storage_string()
 
     def generate_sid(self):
-        """Generates unique session identifier."""
+        """Generate unique session identifier."""
         sid = uuid4().hex
         return sid
 
     def get_session_expiration_time(self, app, session):
+        """Return session expiration time."""
         if session.permanent:
             return app.permanent_session_lifetime
         return timedelta(days=1)
 
     def open_session(self, app, request):
+        """Return session instance."""
         sid = request.cookies.get(app.session_cookie_name) or \
             request.args.get('session_id')
         if not sid:
@@ -112,6 +101,7 @@ class SessionInterface(FlaskSessionInterface):
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
+        """Save current session."""
         domain = self.get_cookie_domain(app)
         if not session:
             current_app.logger.debug("Empty session: " + str(request.url))
@@ -130,20 +120,20 @@ class SessionInterface(FlaskSessionInterface):
             cookie_expiry = session_expiry
         sid = session.sid
         if session.logging_in:
-            #FIXME Do we really need to delete the session after login?
-            ## The user just logged in, better change the session ID
-            #sid = self.generate_sid()
-            #flashes = get_flashed_messages(with_categories=True)
-            ## And remove the cookie that has been set
-            #self.backend.delete(session.sid)
-            #session.clear()
-            #response.delete_cookie(app.session_cookie_name, domain=domain)
-            #response.delete_cookie(app.session_cookie_name + 'stub',
-            #                       domain=domain)
-            #session.sid = sid
-            #session.uid = uid
-            # Fixes problem with lost flashes after login.
-            #map(lambda (cat, msg): flash(msg, cat), flashes)
+            # # FIXME Do we really need to delete the session after login?
+            # # The user just logged in, better change the session ID
+            # sid = self.generate_sid()
+            # flashes = get_flashed_messages(with_categories=True)
+            # # And remove the cookie that has been set
+            # self.backend.delete(session.sid)
+            # session.clear()
+            # response.delete_cookie(app.session_cookie_name, domain=domain)
+            # response.delete_cookie(app.session_cookie_name + 'stub',
+            #                        domain=domain)
+            # session.sid = sid
+            # session.uid = uid
+            # # Fixes problem with lost flashes after login.
+            # map(lambda (cat, msg): flash(msg, cat), flashes)
             pass
         # Set all user id keys for compatibility.
         session.uid = uid
@@ -156,7 +146,7 @@ class SessionInterface(FlaskSessionInterface):
                                 expires=cookie_expiry, httponly=True,
                                 domain=domain, max_age=max_age)
         elif session.uid > 0:
-            ## User is authenticated, we shall use HTTPS then
+            # User is authenticated, we shall use HTTPS then
             if request.scheme == 'https':
                 response.set_cookie(app.session_cookie_name, sid,
                                     expires=cookie_expiry, httponly=True,

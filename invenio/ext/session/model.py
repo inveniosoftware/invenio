@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,12 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.session.model
-    -------------------------
-
-    Implements example of SQLAlchemy session model backend.
-"""
+"""Example implementation of SQLAlchemy session model backend."""
 
 from datetime import datetime
 from flask.ext.login import current_user
@@ -30,7 +25,9 @@ from invenio.ext.sqlalchemy import db
 
 
 class Session(db.Model):
-    """Represents a Session record."""
+
+    """Represent Session record."""
+
     __tablename__ = 'session'
     session_key = db.Column(db.String(32), nullable=False,
                             server_default='', primary_key=True)
@@ -39,6 +36,7 @@ class Session(db.Model):
     uid = db.Column(db.Integer(15, unsigned=True), nullable=False, index=True)
 
     def get_session(self, name, expired=False):
+        """Return an instance of :class:`Session`."""
         where = Session.session_key == name
         if expired:
             where = db.and_(
@@ -46,6 +44,7 @@ class Session(db.Model):
         return self.query.filter(where).one()
 
     def set_session(self, name, value, timeout=None):
+        """Store value in database."""
         uid = current_user.get_id()
         session_expiry = datetime.utcnow() + timeout
         return Session(session_key=name,

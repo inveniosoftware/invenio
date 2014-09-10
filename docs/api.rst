@@ -37,6 +37,7 @@ Extensions
    ext/elasticsearch
    ext/logging
    ext/login
+   ext/session
    ext/sqlalchemy
    ext/template
 

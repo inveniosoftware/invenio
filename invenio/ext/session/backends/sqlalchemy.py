@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,36 +17,38 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""SQLAlchemy backend for session.
+
+Configuration variables for SQLAlchemy backend.
+
+=================================== ===========================================
+`SESSION_BACKEND_SQLALCHEMY`        Configured *Flask-SQLAlchemy* object.
+                                    **Default:** ``invenio.ext.sqlalchemy:db``
+`SESSION_BACKEND_SQLALCHEMY_MODEL`  SQLAlchemy ORM model. **Default:**
+                                    ``invenio.ext.session.model:Session'``
+`SESSION_BACKEND_SQLALCHEMY_GETTER` Name of method on model to retrieve session
+                                    data. **Default:** ``get_session``
+`SESSION_BACKEND_SQLALCHEMY_SETTER` Name of method on medel to set session
+                                    data. **Default:** ``set_session``
+`SESSION_BACKEND_SQLALCHEMY_VALUE`  Name of model attribute where to store
+                                    session data. **Default:**
+                                    ``session_object``
+=================================== ===========================================
 """
-    invenio.ext.session.backends.sqlalchemy
-    ---------------------------------------
-
-    Configuration:
-
-    - SESSION_BACKEND_SQLALCHEMY = 'invenio.ext.sqlalchemy:db'
-    - SESSION_BACKEND_SQLALCHEMY_MODEL = 'invenio.ext.session.model:Session'
-    - SESSION_BACKEND_SQLALCHEMY_GETTER = 'get_session'
-    - SESSION_BACKEND_SQLALCHEMY_SETTER = 'set_session'
-    - SESSION_BACKEND_SQLALCHEMY_VALUE = 'session_object'
-"""
-
-from datetime import datetime
 
 from flask import current_app
-from flask.ext.login import current_user
 from flask.helpers import locked_cached_property
 from werkzeug import import_string
 
 from ..storage import SessionStorage
-from ..model import Session
 
 
 class Storage(SessionStorage):
-    """
-    Implements database backend for SQLAlchemy model storage.
-    """
+
+    """Implement database backend for SQLAlchemy model storage."""
 
     def __init__(self, *args, **kwargs):
+        """Initialize database backend and create table if necessary."""
         if not self.db.engine.dialect.has_table(self.db.engine,
                                                 self.model.__tablename__):
             self.model.__table__.create(bind=self.db.engine)
@@ -54,42 +56,48 @@ class Storage(SessionStorage):
 
     @locked_cached_property
     def db(self):
-        """Returns SQLAlchemy database object."""
+        """Return SQLAlchemy database object."""
         return import_string(current_app.config.get(
             'SESSION_BACKEND_SQLALCHEMY', 'invenio.ext.sqlalchemy:db'))
 
     @locked_cached_property
     def model(self):
-        """Returns SQLAlchemy model."""
+        """Return SQLAlchemy model."""
         return import_string(current_app.config.get(
             'SESSION_BACKEND_SQLALCHEMY_MODEL',
             'invenio.ext.session.model:Session'))()
 
     @locked_cached_property
     def getter(self):
+        """Return method to get session value."""
         return getattr(self.model, current_app.config.get(
             'SESSION_BACKEND_SQLALCHEMY_GETTER', 'get_session'
-            ))
+        ))
 
     @locked_cached_property
     def setter(self):
+        """Return method to set session value."""
         return getattr(self.model, current_app.config.get(
             'SESSION_BACKEND_SQLALCHEMY_SETTER', 'set_session'
-            ))
+        ))
 
     @locked_cached_property
     def value(self):
+        """Return model property for storing session value."""
         return current_app.config.get('SESSION_BACKEND_SQLALCHEMY_VALUE',
                                       'session_object')
 
     def set(self, name, value, timeout=None):
+        """Store value in database table."""
         s = self.setter(name, value, timeout=timeout)
         self.db.session.merge(s)
         self.db.session.commit()
 
     def get(self, name):
+        """Return value from database table."""
         return getattr(self.getter(name), self.value)
 
     def delete(self, name):
+        """Delete key from database table."""
         self.getter(name).delete()
         self.db.session.commit()
