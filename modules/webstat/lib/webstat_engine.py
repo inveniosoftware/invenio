@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1886,15 +1886,18 @@ def create_custom_summary_graph(data, path, title):
     """
     # If no input, we don't bother about anything
     if len(data) == 0:
-        return
+        return False
     os.environ['HOME'] = CFG_TMPDIR
 
     try:
         import matplotlib
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
-    except ImportError:
-        return
+    except:
+        from invenio.errorlib import register_exception
+        register_exception()
+        return False
+
     # make a square figure and axes
     matplotlib.rcParams['font.size'] = 8
     labels = [x[0] for x in data]
@@ -1940,7 +1943,7 @@ def create_custom_summary_graph(data, path, title):
     plt.figlegend(patches, labels, 'lower right', **legend_keywords)
     plt.savefig(path)
     plt.close(gfile)
-
+    return True
 # GRAPHER
 
 def create_graph_trend(trend, path, settings):
