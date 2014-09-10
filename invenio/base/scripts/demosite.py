@@ -78,7 +78,7 @@ def populate(packages=[], default_data=True, files=None,
 
     # upload demo site files:
     bibupload_flags = '-i'
-    if 'force-recids' in extra_info:
+    if extra_info is not None and 'force-recids' in extra_info:
         bibupload_flags = '-i -r --force'
     for f in files:
         job_id += 1
