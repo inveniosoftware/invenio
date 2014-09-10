@@ -233,7 +233,7 @@ def create(default_data=True, quiet=False):
                 creator(table)
                 created += 1
             except:
-                print('\r', '>>> problem with dropping ', table)
+                print('\r', '>>> problem with creating ', table)
                 current_app.logger.exception(table)
 
         if created == N:
