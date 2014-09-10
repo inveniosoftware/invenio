@@ -1886,15 +1886,14 @@ def create_custom_summary_graph(data, path, title):
     """
     # If no input, we don't bother about anything
     if len(data) == 0:
-        return
+        return False
     os.environ['HOME'] = CFG_TMPDIR
 
-    try:
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-    except ImportError:
-        return
+
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+
     # make a square figure and axes
     matplotlib.rcParams['font.size'] = 8
     labels = [x[0] for x in data]
@@ -1940,7 +1939,7 @@ def create_custom_summary_graph(data, path, title):
     plt.figlegend(patches, labels, 'lower right', **legend_keywords)
     plt.savefig(path)
     plt.close(gfile)
-
+    return True
 # GRAPHER
 
 def create_graph_trend(trend, path, settings):

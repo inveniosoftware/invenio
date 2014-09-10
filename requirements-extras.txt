@@ -17,3 +17,4 @@ nose
 nosexcover
 flake8
 raven==4.2.1
+matplotlib
