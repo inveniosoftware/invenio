@@ -1823,6 +1823,6 @@ def websubmit_engine_write_file(file_path, data_to_write):
         f.write(data_to_write)
 
 def websubmit_engine_read_file(file_path):
-    with open(file_path, "w") as f:
+    with open(file_path) as f:
         content = f.read()
     return content
