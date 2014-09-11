@@ -411,8 +411,10 @@ def function_step_is_last(doctype, action, step):
            """WHERE action=%s AND doctype=%s AND step > %s"""
     qres = run_sql(qstr, (action, doctype, step))
     if len(qres) > 0:
-        ## Rows were returned. This means that this is not the last-step:
-        last_step = 0
+        max_value = max(qres)
+        if max_value[0] - int(step) > 1:
+            ## Rows were returned. This means that this is not the last-step:
+            last_step = 0
     return last_step
 
 
