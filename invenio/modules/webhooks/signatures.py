@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-import re
+
 import hmac
 from hashlib import sha1
 
@@ -24,8 +24,9 @@ from invenio.base.globals import cfg
 
 
 def get_hmac(message):
-    """
-    Helper function which calculates HMAC value.
+    """Calculate HMAC value of message using ``WEBHOOKS_SECRET_KEY``.
+
+    :param message: String to calculate HMAC for.
     """
     key = str(cfg["WEBHOOKS_SECRET_KEY"])
     hmac_value = hmac.new(key, message, sha1).hexdigest()
@@ -33,13 +34,14 @@ def get_hmac(message):
 
 
 def check_x_hub_signature(signature, message):
-    """
-    Checks X-Hub-Signature. Secret key to compare
-    signature: WEBHOOKS_SECRET_KEY.
+    """Check X-Hub-Signature used by GitHub to sign requests.
+
+    :param signature: HMAC signature extracted from request.
+    :param message: Request message.
     """
     hmac_value = get_hmac(message)
     if hmac_value == signature or \
-       (signature.find('=') > -1 and \
+       (signature.find('=') > -1 and
             hmac_value == signature[signature.find('=') + 1:]):
         return True
     return False

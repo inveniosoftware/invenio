@@ -18,10 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 WEBHOOKS_DEBUG_RECEIVER_URLS = {}
-"""
-Mapping of receiver id to URL pattern. This allows generating URLs to an
+"""Mapping of receiver id to URL pattern. This allows generating URLs to an
 intermediate webhook proxy service like Ultrahook for testing on development
-machines::
+machines:
+
+.. code-block:: python
 
     WEBHOOKS_DEBUG_RECEIVER_URLS = {
         'github': 'https://hook.user.ultrahook.com/?access_token=%%(token)s'
