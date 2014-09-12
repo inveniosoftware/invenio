@@ -51,8 +51,6 @@
     {{ bfe_appears_in_collections(bfo, prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />", suffix="</p>") }}
 
     {# WebTags #}
-    {{ tfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}
-    {% if record.get('recid') is not None %}
-        {{ tfn_get_back_to_search_links(record['recid'])|wrap(prefix='<div class="pull-right linksbox">', suffix='</div>') }}
-    {% endif %}
+    {{ tfn_webtag_record_tags(record.get('recid'), current_user.get_id())|prefix('<hr />') }}
+    {{ tfn_get_back_to_search_links(record.get('recid'))|wrap(prefix='<div class="pull-right linksbox">', suffix='</div>') }}
 {% endblock %}

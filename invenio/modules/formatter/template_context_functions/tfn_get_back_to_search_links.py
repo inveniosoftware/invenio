@@ -36,7 +36,8 @@ def template_context_function(recID):
     :type recID: string
     :return: html output
     """
-
+    if recID is None:
+        return ""
     # this variable is set to zero so nothing is displayed
     if not cfg['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']:
         return ""
