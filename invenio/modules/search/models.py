@@ -212,8 +212,6 @@ class Collection(db.Model):
 
     _examples_example = association_proxy('_examples', 'example')
 
-    facets = db.relationship('FacetCollection', backref='collection')
-
     @property
     #@cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def examples(self):
@@ -850,6 +848,8 @@ class FacetCollection(db.Model):
     id_collection = db.Column(db.Integer, db.ForeignKey(Collection.id))
     order = db.Column(db.Integer)
     facet_name = db.Column(db.String(80))
+
+    collection = db.relationship(Collection, backref='facets')
 
     def __repr__(self):
         return ('FacetCollection <id: {0.id}, id_collection: {0.id_collection},'
