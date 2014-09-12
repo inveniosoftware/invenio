@@ -150,7 +150,7 @@ define([
   'jquery',
   'js/search/search_parser',
   'typeahead', // $.fn.typeahead()
-], function($, SearchParser) {
+], function($, SearchParser, Bloodhound) {
   "use strict";
 
   function SearchTypeahead(element, options) {

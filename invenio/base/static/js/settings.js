@@ -36,6 +36,6 @@ require.config({
         'jqueryui-timepicker/jquery-ui-sliderAccess': {deps: ['jquery']},
         'jqueryui-timepicker/jquery-ui-timepicker-addon': {deps: ['jquery', 'ui/slider']},
         'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']},
-        typeahead: {deps: ['jquery']},
+        typeahead: {deps: ['jquery'], exports: 'Bloodhound'},
     }
 })
