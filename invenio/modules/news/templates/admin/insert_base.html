@@ -1,0 +1,145 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "layout.html" %}
+
+{% block header %}
+  <title>Edit News</title>
+{% endblock header -%}
+
+{% block page_body %}{% block body %}
+{{ super() }}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+	<ul class='flashes {{alert}}'>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+                     <div class="col-lg-12"  style="display:{{display_forms[2]}}">
+                        <h1 class="page-header">
+                            Tag
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i>  <a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}/?id={{Encode(Arr=id)}}">Parent</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-edit"></i> Tag
+                            </li>
+                        </ol>
+                     </div>
+                     <div class="col-lg-12"  style="display:{{display_forms[1]}}">
+                        <h1 class="page-header">
+                            ToolsTip
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i>  <a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}/?id={{Encode(Arr=id)}}">Parent</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-edit"></i> ToolsTip
+                            </li>
+                        </ol>
+                     </div>
+
+                     <div class="col-lg-12"  style="display:{{display_forms[0]}}">
+                        <h1 class="page-header">
+                            News Stories
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li class="active">
+                                <i class="fa fa-dashboard"></i> News Stories
+                            </li>
+                        </ol>
+                    </div>
+
+
+                    <!-- News form  -->
+                    <div class="col-lg-12" style="display:{{display_forms[0]}}">
+                        <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_INSERT[1:]) }}" method=post   >
+
+                            <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Title</label>
+                                <input type="text" class="form-control" name="txtTitle" required>
+                            </div>
+
+                            <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Body</label>
+                               <textarea class="form-control" rows="3" name="txtBody_news"   required></textarea>
+                            </div>
+                            
+                           <div class="form-group has-success">
+                                 <label class="control-label" for="inputSuccess">Document Status</label>
+                                <select class="form-control" name="st_document_status">
+                                    <option>SHOW</option>
+                                    <option>HIDE</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="remote_ip" value='{{current_user.remote_ip}}' >
+                            <input type="hidden" name="email" value='{{current_user.email}}' >
+                            <input type="hidden" name="nickname" value='{{current_user.nickname}}' >
+                            <input type="hidden" name="uid" value='{{current_user.uid}}' >
+                            <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_NEWS}}' >
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </form>
+                    </div>
+                    <!-- Tooltip form  -->
+
+                    <div class="col-lg-12" style="display:{{display_forms[1]}}">
+                        <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_INSERT[1:]) }}" method=post   >
+                            <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Body</label>
+                               <textarea class="form-control" rows="3" name="txtBody_tooltip"  required></textarea>
+                            </div>
+                            <input type="hidden" name="_newsID" value="{{Encode(Arr=id)}}" >
+                            <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_TOOLTIP}}' >
+                            <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Target Element</label>
+                                <input type="text" class="form-control" name="txttarget_element"  required>
+                            </div>
+                             <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Target Page</label>
+                                <input type="text" class="form-control" name="txttarget_page"    required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </form>
+                    </div>
+                    <!-- Tag form  -->
+                    <div class="col-lg-12" style="display:{{display_forms[2]}}">
+                        <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_INSERT[1:]) }}" method=post   >
+                            <div class="form-group has-success">
+                                <label class="control-label" for="inputSuccess">Tag</label>
+                                <input type="text" class="form-control" name="txttag"   required>
+                            </div>
+                           <input type="hidden" name="_newsID" value="{{Encode(Arr=id)}}" >
+                            <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_TAG}}' >
+                            <button type="submit" class="btn btn-primary">Continue</button>
+                        </form>
+                    </div>
+
+
+{% endblock %}
+{% endblock %}
+
+{% block title %}{% endblock %}

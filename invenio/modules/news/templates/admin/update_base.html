@@ -1,0 +1,163 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "layout.html" %}
+
+{% block header %}
+  <title>Update News</title>
+{% endblock header -%}
+
+{% block page_body %}{% block body %}
+{{ super() }}
+
+<div id="page-wrapper">
+	<div class="container-fluid">
+		<div class="row" >
+			<div class="col-lg-12" style="display:{{display_forms[0]}}">
+
+
+                <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}" method=post   >
+					<input type="hidden" name="_newsID" value="{{searchResult.id}}" />
+					<div class="row">
+						<div class="col-lg-12">
+							<h1>News Stories  {{Environment}}</h1>
+							<div class="form-group">
+								<label>Title</label>
+								<input class="form-control" name="story_txtTitle" value='{{searchResult.title}}' required />
+							</div>
+							<div class="form-group">
+								<label>Body</label>
+								<textarea class="form-control" rows="3" name="story_txtBody"   required>{{searchResult.body}}</textarea>
+							</div>
+							<div class="form-group">
+								<label>Document Status</label>
+								<input class="form-control" name="story_docStatus" pattern='SHOW|HIDE' value='{{searchResult.document_status}}'  required />
+								<p class=" label label-warning">This field only accept SHOW or HIDE</p>
+							</div>
+						</div>
+
+					</div>
+                    <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_NEWS}}' >
+					<button type="submit" class="btn btn-primary">Update</button>
+				</form>
+                <!-- FOR TOOLTIP-->
+                <h2>ToolTips<small style="float:right"> <a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_INSERT[1:]) }}/?formAct={{Encode(Arr='1')}}&id={{Encode(Arr=searchResult.id)}}" a>Add New<span title="Add New" class="glyphicon glyphicon-plus" /></a></small></h2>
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover table-striped">
+						<thead>
+							<tr>
+								<th>Body</th>
+								<th>Target Element</th>
+								<th>Target Page</th>
+								<th>Edit</th>
+								<th>Delete</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for result in searchResult.nwsToolTip %}
+							<tr class="active">
+								<td rel="tooltip" title data-placement="bottom" >{{ result.body }}</td>
+								<td rel="tooltip" title data-placement="bottom" >{{ result.target_element }}</td>
+								<td rel="tooltip" title data-placement="bottom" >{{ result.target_page }}</td>
+								<td><a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}/?formAct={{Encode(Arr='1')}}&id={{Encode(Arr=result.id)}}" data-toggle="confirmation" data-placement="right" data-original-title="" title="" ><span class="glyphicon glyphicon-edit"></span></a></td>
+								<td><a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_DELETE[1:]) }}/?formAct={{Encode(Arr='1')}}&id={{Encode(Arr=result.id)}}"  onclick="return confirm('Are you sure you want to delete?')"><span class="glyphicon glyphicon-trash"></span></a></td>
+
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+
+
+                <!-- FOR tag-->
+
+                <h2>Tag <small style="float:right"> <a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_INSERT[1:]) }}/?formAct={{Encode(Arr='2')}}&id={{Encode(Arr=searchResult.id)}}" a>Add New<span title="Add New" class="glyphicon glyphicon-plus" /></a></small></h2>
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover table-striped">
+						<thead>
+							<tr>
+								<th>TAG</th>
+								<th>Edit</th>
+								<th>Delete</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for result in searchResult.nwsTAG %}
+							<tr class="active">
+								<td rel="tooltip" title data-placement="bottom" >{{ result.tag }}</td>
+								<td><a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}/?formAct={{Encode(Arr='2')}}&id={{Encode(Arr=result.id)}}" data-toggle="confirmation" data-placement="right" data-original-title="" title="" ><span class="glyphicon glyphicon-edit"></span></a></td>
+								<td><a href="{{ url_for(config.CFG_WEBNEWS_ADMIN_DELETE[1:]) }}/?formAct={{Encode(Arr='2')}}&id={{Encode(Arr=result.id)}}"  onclick="return confirm('Are you sure you want to delete?')" ><span class="glyphicon glyphicon-trash"></span></a></td>
+
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+
+
+
+
+			</div>
+
+            <div class="col-lg-12" style="display:{{display_forms[2]}}">
+                <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}" method=post   >
+                    <div class="form-group has-success">
+                        <label class="control-label" for="inputSuccess">Tag</label>
+                        <input type="text" class="form-control" name="txttag" value="{{searchResult.tag}}"  required>
+                    </div>
+                   <input type="hidden" name="_tagID" value="{{Encode(Arr=searchResult.id)}}" >
+                    <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_TAG}}' >
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </form>
+            </div>
+
+
+
+
+            <div class="col-lg-12" style="display:{{display_forms[1]}}">
+                <form action="{{ url_for(config.CFG_WEBNEWS_ADMIN_UPDATE[1:]) }}" method=post   >
+                    <div class="form-group has-success">
+                        <label class="control-label" for="inputSuccess">Body</label>
+                       <textarea class="form-control" rows="3" name="txtBody_tooltip"  required>{{searchResult.body}}</textarea>
+                    </div>
+                    <input type="hidden" name="_tooltipID" value="{{Encode(Arr=searchResult.id)}}" >
+                    <input type="hidden" name="_action" value='{{config.CFG_WEBNEWS_ADMIN_ACTION_TOOLTIP}}' >
+                    <div class="form-group has-success">
+                        <label class="control-label" for="inputSuccess">Target Element</label>
+                        <input type="text" class="form-control" name="txttarget_element" value="{{searchResult.target_element}}"  required>
+                    </div>
+                     <div class="form-group has-success">
+                        <label class="control-label" for="inputSuccess">Target Page</label>
+                        <input type="text" class="form-control" name="txttarget_page" value="{{searchResult.target_page}}"    required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </form>
+            </div>
+        </div>
+	</div>
+</div>
+
+
+
+
+
+{% endblock %}
+{% endblock %}
+
+{% block title %}{% endblock %}
