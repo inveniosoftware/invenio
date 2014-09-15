@@ -87,8 +87,8 @@ def get_record_last_modification_date(recid):
 
 def reserve_record_id():
     """Reserve a new record ID in the bibrec table."""
-    return run_sql("""INSERT INTO bibrec (creation_date, modification_date)
-                       VALUES (NOW(), NOW())""")
+    return run_sql("""INSERT INTO bibrec (creation_date, modification_date,
+                      ingestion_date) VALUES (NOW(), NOW(), NOW())""")
 
 def get_related_hp_changesets(recId):
     """
