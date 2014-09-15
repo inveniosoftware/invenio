@@ -864,7 +864,7 @@ class WebSearchTestSearch(InvenioTestCase):
         """ websearch - check different values of em return different parts of the search page"""
         for combi in string_combinations(["K", "A", "I", "O"]):
             url = '/search?ln=en&cc=Articles+%%26+Preprints&sc=1&c=Articles&c=Preprints&em=%s' % ','.join(combi)
-            expected_text = ["<strong>Development of photon beam diagnostics for VUV radiation from a SASE FEL</strong>"]
+            expected_text = ["<strong>Quasi-normal Modes of Electromagnetic Perturbations of Four-Dimensional Topological Black Holes with Scalar Hair</strong>"]
             unexpected_text = []
             if "H" in combi:
                 expected_text.append(">Atlantis Institute of Fictive Science</a>")
@@ -963,8 +963,7 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
             test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
-                                  expected_text=[],
-                                  unexpected_text="[96, 92, 88, 81, 74, 72, 71, 67, 55, 54, 53, 52, 51, 50, 48, 47, 46, 44, 18, 17, 16, 14, 13, 12, 11, 10, 9, 8]"))
+                                  expected_text="[92, 88, 54, 53, 52, 51, 50, 48, 46, 81, 10, 11, 96, 74, 72, 17, 67, 9]"))
 
     def test_wildcard_limit_correctly_not_active(self):
         """websearch - wildcard limit is not active when there is no wildcard query"""
@@ -1217,7 +1216,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
-        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+        self.assertEqual([14, 9, 18, 16, 13, 17, 8, 11, 15, 12, 10, 47],
                          perform_request_search(p='ellis'))
 
     def test_search_engine_python_api_for_successful_query_format_intbitset(self):
@@ -1227,12 +1226,12 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 
     def test_search_engine_web_api_jrec_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
-        self.assertEqual([11, 12, 13, 14, 15, 16, 17, 18, 47],
+        self.assertEqual([16, 13, 17, 8, 11, 15, 12, 10, 47],
                          perform_request_search(p='ellis', jrec=3))
 
     def test_search_engine_web_api_paging_parameters(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
-        self.assertEqual([11, 12, 13, 14, 15],
+        self.assertEqual([16, 13, 17, 8, 11],
                          perform_request_search(p='ellis', rg=5, jrec=3))
 
     def test_search_engine_python_api_respect_sorting_parameter(self):
@@ -1287,7 +1286,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     def test_search_engine_python_api_textmarc_full(self):
         """websearch - search engine Python API for Text MARC output, full"""
         req = make_fake_request()
-        perform_request_search(req=req, p='higgs', of='tm', so='d')
+        perform_request_search(req=req, p='higgs', of='tm', so='d', sf='dateingested')
         out = req.test_output_buffer.getvalue()
         self.assertMultiLineEqual(out, """\
 000000107 001__ 107
@@ -1470,7 +1469,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     def test_search_engine_python_api_xmlmarc_full(self):
         """websearch - search engine Python API for XMLMARC output, full"""
         req = make_fake_request(admin_user=False)
-        perform_request_search(req=req, p='higgs', of='xm', so='d')
+        perform_request_search(req=req, p='higgs', of='xm', so='d', sf='dateingested')
         out = req.test_output_buffer.getvalue()
         # print out
         self.assertXmlEqual(out, """<?xml version="1.0" encoding="UTF-8"?>
@@ -1914,7 +1913,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         """websearch - search engine Python API for XMLMARC output, field-filtered"""
         # we are testing example from /help/hacking/search-engine-api
         req = make_fake_request()
-        perform_request_search(req=req, p='higgs', of='xm', ot=['100', '700'], so='d')
+        perform_request_search(req=req, p='higgs', of='xm', ot=['100', '700'], so='d', sf='dateingested')
         out = req.test_output_buffer.getvalue()
         self.assertXmlEqual(out, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
@@ -1949,7 +1948,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         """websearch - search engine Python API for XMLMARC output, field-filtered, hidden field, no guest access"""
         # we are testing example from /help/hacking/search-engine-api
         req = make_fake_request()
-        perform_request_search(req=req, p='higgs', of='xm', ot=['100', '595'], so='d')
+        perform_request_search(req=req, p='higgs', of='xm', ot=['100', '595'], so='d', sf='dateingested')
         out = req.test_output_buffer.getvalue()
         self.assertXmlEqual(out, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
@@ -2002,24 +2001,24 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0',
-                                               expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8]"))
+                                               expected_text="[47, 10, 12, 15, 11, 8, 17, 13, 16, 18, 9, 14]"))
 
     def test_search_engine_web_api_no_paging_parameter(self):
         """websearch - search engine Web API for successful query, ignore paging parameters"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0',
-                                               expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8]"))
+                                               expected_text="[47, 10, 12, 15, 11, 8, 17, 13, 16, 18, 9, 14]"))
 
     def test_search_engine_web_api_jrec_parameter(self):
         """websearch - search engine Web API for successful query, ignore paging parameters"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0&jrec=3',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=0&jrec=3&sf=dateingested',
                                                expected_text="[16, 15, 14, 13, 12, 11, 10, 9, 8]"))
 
     def test_search_engine_web_api_paging_parameters(self):
         """websearch - search engine Web API for successful query, ignore paging parameters"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3&sf=dateingested',
                                                expected_text="[16, 15, 14, 13, 12]"))
 
     def test_search_engine_web_api_respect_sorting_parameter(self):
@@ -2097,7 +2096,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     def test_search_engine_web_api_textmarc_full(self):
         """websearch - search engine Web API for Text MARC output, full"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&sf=dateingested',
                                                expected_text="""\
 000000107 001__ 107
 000000107 003__ SzGeCERN
@@ -2240,7 +2239,7 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     def test_search_engine_web_api_textmarc_field_filtered_hidden_admin(self):
         """websearch - search engine Web API for Text MARC output, field-filtered, hidden field, admin access"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595&sf=dateingested',
                                                username='admin',
                                                expected_text="""\
 000000107 595__ $$aNo authors
@@ -2267,7 +2266,7 @@ Zaffaroni, A
     def test_search_engine_web_api_xmlmarc_full(self):
         """websearch - search engine Web API for XMLMARC output, full"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&sf=dateingested',
                                                expected_text="""\
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
@@ -2709,7 +2708,7 @@ Zaffaroni, A
     def test_search_engine_web_api_xmlmarc_field_filtered(self):
         """websearch - search engine Web API for XMLMARC output, field-filtered"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,700',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,700&sf=dateingested',
                                                expected_text="""\
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
@@ -2743,7 +2742,7 @@ Zaffaroni, A
     def test_search_engine_web_api_xmlmarc_field_filtered_hidden_guest(self):
         """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, no guest access"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595&sf=dateingested',
                                                expected_text="""\
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
@@ -2771,7 +2770,7 @@ Zaffaroni, A
     def test_search_engine_web_api_xmlmarc_field_filtered_hidden_admin(self):
         """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, admin access"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595&sf=dateingested',
                                                username='admin',
                                                expected_text="""\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2834,13 +2833,13 @@ class WebSearchSearchEngineJSONAPITest(InvenioTestCase):
     def test_search_engine_json_api_for_ellis_query(self):
         """websearch - search engine JSON API for Ellis"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid&sf=dateingested',
                                                expected_text='[{"recid": 47},{"recid": 18},{"recid": 17},{"recid": 16},{"recid": 15},{"recid": 14},{"recid": 13},{"recid": 12},{"recid": 11},{"recid": 10}]'))
 
     def test_search_engine_json_api_for_ellis_query_paginated(self):
         """websearch - search engine JSON API for Ellis, output fields and pagination"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid,title&jrec=4&rg=2',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=recjson&ot=recid,title&jrec=4&rg=2&sf=dateingested',
                                                expected_text='[{"recid": 16, "title": {"title": "Cosmological perturbations in Kaluza-Klein models"}},{"recid": 15, "title": {"title": "Cosmic equation of state, Gravitational Lensing Statistics and Merging of Galaxies"}}]'))
 
 
@@ -3715,11 +3714,11 @@ class WebSearchRestrictedCollectionHandlingTest(InvenioTestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=of&f=&action_search=Search&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
                                                username='admin',
                                                password='',
-                                               expected_text=['Articles &amp; Preprints', '61', 'records found',
-                                                              'Books &amp; Reports', '6', 'records found',
-                                                              'Multimedia &amp; Arts', '14', 'records found',
-                                                              'ALEPH Theses', '1', 'records found',
-                                                              'ALEPH Internal Notes', '1', 'records found'])
+                                               expected_text=['Articles &amp; Preprints', '63</strong> records found',
+                                                              'Books &amp; Reports', '2</strong> records found',
+                                                              'Multimedia &amp; Arts', '14</strong> records found',
+                                                              'ALEPH Theses', '1</strong> records found',
+                                                              'ALEPH Internal Notes', '1</strong> records found'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -4107,7 +4106,7 @@ class WebSearchMARCQueryTest(InvenioTestCase):
         """websearch - single MARC tag, exact phrase query (100__a)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=100__a%3A%22Ellis%2C+J%22&so=a',
-                                               expected_text="[9, 14, 18]"))
+                                               expected_text="[14, 9, 18]"))
 
     def test_single_marc_tag_partial_phrase_query(self):
         """websearch - single MARC tag, partial phrase query (245__b)"""
@@ -4119,13 +4118,13 @@ class WebSearchMARCQueryTest(InvenioTestCase):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27&rg=100&so=a',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
+                                               expected_text="[28, 22, 33, 24, 14, 9, 20, 69, 71, 8, 96, 1, 15, 82, 47, 48, 49, 51, 53, 64, 79, 83, 85, 91, 108]"))
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100&so=a',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
+                                               expected_text="[28, 22, 33, 24, 14, 9, 20, 69, 71, 8, 96, 1, 15, 82, 47, 48, 49, 51, 53, 64, 79, 83, 85, 91, 108]"))
 
 class WebSearchExtSysnoQueryTest(InvenioTestCase):
     """Test of queries using external system numbers."""
@@ -4179,7 +4178,7 @@ class WebSearchSpecialTermsQueryTest(InvenioTestCase):
         """websearch - query for special terms, U(1)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29',
-                                               expected_text="[88, 80, 79, 57]"))
+                                               expected_text="[88, 79, 57, 80]"))
 
     def test_special_terms_u1_and_sl(self):
         """websearch - query for special terms, U(1) SL(2,Z)"""
@@ -4191,7 +4190,7 @@ class WebSearchSpecialTermsQueryTest(InvenioTestCase):
         """websearch - query for special terms, U(1) OR SL(2,Z)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29+OR+SL%282%2CZ%29',
-                                               expected_text="[88, 80, 79, 57]"))
+                                               expected_text="[88, 79, 57, 80]"))
 
     @nottest
     def FIXME_TICKET_453_test_special_terms_u1_and_sl_or_parens(self):
@@ -4204,7 +4203,7 @@ class WebSearchSpecialTermsQueryTest(InvenioTestCase):
         """websearch - query for special terms, ('SL(2,Z)' OR 'U(1)')"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + "/search?of=id&p=%28%27SL%282%2CZ%29%27+OR+%27U%281%29%27%29",
-                                               expected_text="[96, 88, 80, 79, 57]"))
+                                               expected_text="[88, 79, 57, 80, 96]"))
 
 
 class WebSearchJournalQueryTest(InvenioTestCase):
@@ -4471,7 +4470,7 @@ class WebSearchSpanQueryTest(InvenioTestCase):
         """websearch - span query in special author index"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis,%20K%22-%3E%22Ellis,%20RZ%22&of=id&ap=0',
-                                               expected_text='[47, 18, 17, 14, 13, 12, 11, 9, 8]'))
+                                               expected_text='[47, 12, 11, 8, 17, 13, 18, 9, 14]'))
 
 
 class WebSearchReferstoCitedbyTest(InvenioTestCase):
@@ -4546,15 +4545,15 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
             'websearch - find a ellis, j and not a enqvist'
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0&so=a',
-                                                   expected_text='[9, 12, 14, 47]'))
+                                                   expected_text='[14, 9, 12, 47]'))
 
     if DATEUTIL_AVAILABLE:
         def test_dadd_search(self):
-            'websearch - find da > today - 3650'
+            'websearch - find di > today - 3650'
             # XXX: assumes we've reinstalled our site in the last 10 years
             # should return every document in the system
             self.assertEqual([],
-                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a&rg=0',
+                             test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+di+%3E+today+-+3650&f=&of=id&so=a&rg=0&sf=dateingested',
                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
 
 
@@ -4653,13 +4652,13 @@ class WebSearchAuthorCountQueryTest(InvenioTestCase):
         """websearch - author count, word query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=4&f=authorcount&of=id&so=a',
-                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+                                               expected_text="[66, 96, 51, 54, 59, 92]"))
 
     def test_journal_authorcount_phrase(self):
         """websearch - author count, phrase query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%224%22&f=authorcount&of=id&so=a',
-                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+                                               expected_text="[66, 96, 51, 54, 59, 92]"))
 
     def test_journal_authorcount_span(self):
         """websearch - author count, span query"""
@@ -4671,7 +4670,7 @@ class WebSearchAuthorCountQueryTest(InvenioTestCase):
         """websearch - author count, plus query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id&so=a',
-                                               expected_text="[10, 17]"))
+                                               expected_text="[17, 10]"))
 
 
 class WebSearchItemCountQueryTest(InvenioTestCase):
@@ -4755,7 +4754,7 @@ class WebSearchFilenameQueryTest(InvenioTestCase):
         """websearch - file name, query with span"""
         self.assertEqual([],
                   test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filename:6->7&of=id&so=a',
-                                        expected_text="[3, 6]"))
+                                        expected_text="[6, 3]"))
 
 
 def make_fake_request(admin_user=True):
@@ -4807,7 +4806,7 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
     def test_queries(self):
         """websearch - testing p_r_s standard arguments and their combinations"""
 
-        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p=ellis;f=author;action=Search', [14, 9, 18, 16, 13, 17, 8, 11, 12, 10, 47])
 
         self._run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
@@ -4846,27 +4845,27 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
         if not get_external_word_similarity_ranker():
             self._run_test('p=boson;rm=wrd', [47, 50, 77, 95, 108, 1, 107])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [9, 12, 14, 18])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [14, 9, 18, 12])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [9, 12, 14, 18])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [14, 9, 18, 12])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [14, 9, 18, 16, 13, 17, 8, 11, 12, 10, 47])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [14, 9, 18, 16, 13, 17, 8, 11, 12, 10, 47])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 10, 11, 13, 16, 17, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [16, 13, 17, 8, 11, 10, 47])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 10, 11, 13, 16, 17, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [16, 13, 17, 8, 11, 10, 47])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=1', [14, 9, 18, 17, 11, 12, 10, 47])
 
-        self._run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=0', [14, 9, 18, 17, 11, 12, 10, 47])
 
         self._run_test('p=recid:148x', [])
 
