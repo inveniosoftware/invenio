@@ -480,10 +480,9 @@ def save_preformatted_record(recID, of, res, needs_2nd_pass=False,
                              low_priority=False, compress=zlib.compress):
     start_date = time.strftime('%Y-%m-%d %H:%M:%S')
     formatted_record = compress(res)
+    sql_str = ""
     if low_priority:
         sql_str = " LOW_PRIORITY"
-    else:
-        sql_str = " DELAYED"
     run_sql("""INSERT%s INTO bibfmt
                (id_bibrec, format, last_updated, value, needs_2nd_pass)
                VALUES (%%s, %%s, %%s, %%s, %%s)
