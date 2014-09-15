@@ -32,16 +32,24 @@ class CacheStorage(Storage):
     def __init__(self, **kwargs):
         """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.__init__`."""
         self._prefix = kwargs.get('model', '')
-        self._keys = set()
 
     def _set(self, data):
-        self._keys.add(data['_id'])
+        self._keys = self._keys | set([data['_id']])
         cache.set(self._prefix + data['_id'], data, timeout=99999)
 
     def _get(self, id):
         value = cache.get(self._prefix + id)
         if value is None:
             raise KeyError()
+        return value
+
+    @property
+    def _keys(self):
+        return cache.get(self._prefix + '::keys') or set()
+
+    @_keys.setter
+    def _keys(self, value):
+        cache.set(self._prefix + '::keys', value)
 
     def save_one(self, data, id=None):
         """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.save_one`."""
@@ -90,6 +98,8 @@ class CacheStorage(Storage):
         """See :meth:`~invenio.modules.jsonalchemy.storage.Storage.search`."""
         def _find(item):
             for k, v in six.iteritems(query):
+                if item is None:
+                    return False
                 test_v = item.get(k)
                 if test_v is None and v is not None:
                     return False
