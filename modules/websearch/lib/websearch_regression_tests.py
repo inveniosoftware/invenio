@@ -3937,6 +3937,21 @@ class WebSearchResultsOverview(InvenioTestCase):
             self.fail("Oops, when split by collection is on, "
                       "a link to Multimedia & Arts should be found.")
 
+class WebSearchResultsNumberingTest(InvenioTestCase):
+    """Test the numbering of the search results."""
+
+    def test_results_numbering(self):
+        """websearch - results number after the 1st page"""
+        rg = 10
+        jrec = 11
+        browser = Browser()
+        browser.open("%s/search?rg=%i&jrec=%i" % (CFG_SITE_URL, rg, jrec))
+        body = browser.response().read()
+        self.assertEqual(
+            range(jrec, jrec+rg),
+            map(int, re.findall(r"</abbr>\s*(\d+)\.\s*</td>", body, re.I+re.M))
+        )
+
 class WebSearchSortResultsTest(InvenioTestCase):
     """Test of the search results page's sorting capability."""
 
