@@ -157,6 +157,16 @@ define(['jquery', 'js/search/typeahead'], function($) {
         }
 
         /**
+         * Removes query values from all fields in 'simple' tab
+         *
+         * @method cleanSimpleQueryForm
+         */
+        function cleanSimpleQueryForm() {
+            $(':focus').blur()
+            $('#simple-search input').val('')
+        }
+
+        /**
          * Creates search query from 'simple' tab in 'Add to search' form
          *
          * @method getSimpleQuery
@@ -220,6 +230,10 @@ define(['jquery', 'js/search/typeahead'], function($) {
          * @param {String} new_part a string which user is going to merge
          */
         function mergeQuery(current_query, new_part) {
+            if (new_part === "") {
+                return current_query;
+            }
+
             var op1 = $('#add_type-btn-group .active').children(':first').val(),
                 op = '';
 
@@ -246,6 +260,7 @@ define(['jquery', 'js/search/typeahead'], function($) {
                 var current_query = $.trim(searchQueryField.val())
                 var new_part = getSimpleQuery()
                 setSearchFieldValue(mergeQuery(current_query, new_part))
+                cleanSimpleQueryForm()
             } else {
                 addAdvancedQueryToSearch()
                 $('.add_to_search-form .appender').trigger('click')
@@ -271,10 +286,10 @@ define(['jquery', 'js/search/typeahead'], function($) {
             return false
         })
 
-        $('.add_to_search-form #advanced-search [name=p1]').keypress(function(event) {
+        $('.add_to_search-form #advanced-search input, .add_to_search-form #simple-search input').keypress(function(event) {
             // on 'return' key
             if ( event.which == 13 ) {
-                addAdvancedQueryToSearch()
+                makeSearchQuery()
                 return false
             }
         })
