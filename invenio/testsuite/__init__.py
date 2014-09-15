@@ -1232,25 +1232,38 @@ def build_and_run_flask_test_suite():
     run_test_suite(complete_suite)
 
 
-from invenio.base.utils import import_submodules_from_packages
-
-
 def iter_suites(packages=None):
     """Yield all testsuites."""
+    from werkzeug.utils import import_string, find_modules
+    from flask.ext.registry import ModuleAutoDiscoveryRegistry, \
+        ImportPathRegistry
+
     app = create_app()
 
     if packages is None:
-        packages = ['invenio', 'invenio.base', 'invenio.celery']
-        packages += app.config.get('PACKAGES', [])
+        testsuite = ModuleAutoDiscoveryRegistry('testsuite', app=app)
+        from invenio import testsuite as testsuite_invenio
+        from invenio.base import testsuite as testsuite_base
+        from invenio.celery import testsuite as testsuite_celery
+        testsuite.register(testsuite_invenio)
+        testsuite.register(testsuite_base)
+        testsuite.register(testsuite_celery)
+    else:
+        exclude = map(lambda x: x + '.testsuite',
+                      app.config('EXCLUDE_PACKAGES', []))
+        testsuite = ImportPathRegistry(initial=packages, exclude=exclude,
+                                       load_modules=True)
 
-    for module in import_submodules_from_packages('testsuite', app=app,
-                                                  packages=packages):
-        if not module.__name__.split('.')[-1].startswith('test_'):
-            continue
-        if hasattr(module, 'TEST_SUITE'):
-            yield module.TEST_SUITE
-        else:
-            app.logger.warning("%s: No test suite defined." % module.__name__)
+    for package in testsuite:
+        for name in find_modules(package.__name__):
+            module = import_string(name)
+            if not module.__name__.split('.')[-1].startswith('test_'):
+                continue
+            if hasattr(module, 'TEST_SUITE'):
+                yield module.TEST_SUITE
+            else:
+                app.logger.warning(
+                    "%s: No test suite defined." % module.__name__)
 
 
 def suite():
