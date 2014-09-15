@@ -4896,7 +4896,7 @@ class WebSearchDOIQueryTest(InvenioTestCase):
 
 class WebSearchGetRecordTests(InvenioTestCase):
     def setUp(self):
-        self.recid = run_sql("INSERT INTO bibrec(creation_date, modification_date) VALUES(NOW(), NOW())")
+        self.recid = run_sql("INSERT INTO bibrec(creation_date, modification_date, ingestion_date) VALUES(NOW(), NOW(), NOW())")
 
     def tearDown(self):
         run_sql("DELETE FROM bibrec WHERE id=%s", (self.recid,))
