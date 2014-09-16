@@ -15,64 +15,25 @@
     along with Invenio; if not, write to the Free Software Foundation, Inc.,
     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _api:
+.. _modules-documentation:
 
-API
-===
+Documentation
+=============
 
-.. toctree::
-   :maxdepth: 1
+.. automodule:: invenio.modules.documentation
+   :members:
 
-   base
+..
 
-Extensions
-----------
+Configuration
+-------------
 
-.. toctree::
-   :maxdepth: 1
-
-   ext/assets
-   ext/arxiv
-   ext/crossref
-   ext/elasticsearch
-   ext/logging
-   ext/login
-   ext/session
-   ext/sqlalchemy
-   ext/template
-
-Modules
--------
-
-.. toctree::
-   :maxdepth: 1
-
-   modules/annotations
-   modules/apikeys
-   modules/documentation
-   modules/documents
-   modules/formatter
-   modules/jsonalchemy
-   modules/multimedia
-   modules/oauthclient
-   modules/tags
-   modules/upgrader
-   modules/uploader
-   modules/workflows
+.. automodule:: invenio.modules.documentation.config
+   :members:
 
 
-Utilities
----------
+Views
+-----
 
-.. toctree::
-   :maxdepth: 1
-
-   utils/washers
-
-Legacy
-------
-
-.. toctree::
-   :maxdepth: 1
-
-   legacy/bibrecord
+.. automodule:: invenio.modules.documentation.views
+   :members:

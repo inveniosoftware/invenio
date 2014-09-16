@@ -17,4 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Integrate Sphinx documentation pages."""
+"""Configuration of documentation module.
+
+**Configuration**
+
+======================= ======================================================
+`DOCUMENTATION_PACKAGE` Define documentation package name.
+                        **Default:** ``invenio_docs``
+`DOCUMENTATION_INDEX`   Define default page.  **Default:** ``index``
+======================= ======================================================
+"""
+
+DOCUMENTATION_PACKAGE = "invenio_docs"
+
+DOCUMENTATION_INDEX = "index"
