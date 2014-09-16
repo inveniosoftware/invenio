@@ -89,8 +89,11 @@ def maintable():
     tags = session.get("holdingpen_tags", list())
 
     if 'version' in request.args:
-        if ObjectVersion.MAPPING[int(request.args.get('version'))] not in tags:
-            tags += ObjectVersion.MAPPING[[int(request.args.get('version'))]]
+        for key, value in ObjectVersion.MAPPING.items():
+            if value == int(request.args.get('version')):
+                if key not in tags:
+                    tags += key
+
     tags_to_print = ""
     for tag in tags:
         if tag:
@@ -409,6 +412,7 @@ def load_table():
                               mini_action=mini_action,
                               action_message=action_message,
                               pretty_date=pretty_date,
+                              version=ObjectVersion
                               )
 
         row = row.split("<!--sep-->")

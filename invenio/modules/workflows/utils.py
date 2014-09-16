@@ -190,13 +190,11 @@ def get_holdingpen_objects(ptags=[]):
 
     tags_copy = ptags[:]
     version_showing = []
-    for i in range(len(tags_copy) - 1, -1, -1):
-        if tags_copy[i] in ObjectVersion.MAPPING.values():
-            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
-            del tags_copy[i]
+    for tag in ptags:
+        if tag in ObjectVersion.MAPPING:
+            version_showing.append(ObjectVersion.MAPPING[tag])
+            tags_copy.remove(tag)
 
-    if version_showing is None:
-        version_showing = ObjectVersion.MAPPING.keys()
     ssearch = tags_copy
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent == None  # noqa E711
@@ -238,8 +236,8 @@ def get_versions_from_tags(tags):
     tags_copy = tags[:]
     version_showing = []
     for i in range(len(tags_copy) - 1, -1, -1):
-        if tags_copy[i] in ObjectVersion.MAPPING.values():
-            version_showing.append(ObjectVersion.REVERSE_MAPPING[tags_copy[i]])
+        if tags_copy[i] in ObjectVersion.MAPPING:
+            version_showing.append(ObjectVersion.MAPPING[tags_copy[i]])
             del tags_copy[i]
     return version_showing, tags_copy
 

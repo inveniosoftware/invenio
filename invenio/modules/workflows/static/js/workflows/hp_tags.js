@@ -30,6 +30,8 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
                 return 'label label-warning';
             case 'Need action':
                 return 'label label-danger';
+            case 'Waiting':
+                return 'label label-warning';
             case 'Done':
                 return 'label label-success';
             case 'New':

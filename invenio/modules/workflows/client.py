@@ -53,10 +53,15 @@ def run_workflow(wfe, data, stop_on_halt=False,
                 if workflowhalt_triggered.action:
                     current_obj.set_action(workflowhalt_triggered.action,
                                            workflowhalt_triggered.message)
-                current_obj.version = ObjectVersion.HALTED
-                current_obj.save(version=ObjectVersion.HALTED,
-                                 task_counter=wfe.getCurrTaskId(),
-                                 id_workflow=wfe.uuid)
+                    current_obj.version = ObjectVersion.HALTED
+                    current_obj.save(version=ObjectVersion.HALTED,
+                                     task_counter=wfe.getCurrTaskId(),
+                                     id_workflow=wfe.uuid)
+                else:
+                    current_obj.version = ObjectVersion.WAITING
+                    current_obj.save(version=ObjectVersion.WAITING,
+                                     task_counter=wfe.getCurrTaskId(),
+                                     id_workflow=wfe.uuid)
             else:
                 wfe.log.warning("No active object found!")
 
