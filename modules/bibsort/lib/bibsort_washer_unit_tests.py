@@ -56,6 +56,14 @@ class TestBibSortWasherWashers(InvenioTestCase):
         self.assertEqual('2010-01-01', bsm.get_transformed_value('2010'))
         self.assertEqual('2010-11-08', bsm.get_transformed_value('8 nov 2010'))
 
+    def test_sort_nosymbols_case_insensitive_strip_accents(self):
+        """Test the sort_nosymbols_case_insensitive_strip_accents method"""
+        method = "sort_nosymbols_case_insensitive_strip_accents"
+        bsm = BibSortWasher(method)
+        self.assertEqual("thooftgerardus", bsm.get_transformed_value("'t Hooft, Gerardus"))
+        self.assertEqual("ahearnmichaelf", bsm.get_transformed_value("A'Hearn, Michael F."))
+        self.assertEqual("zvolskymilan", bsm.get_transformed_value("Zvolský, Milan"))
+
 
 TEST_SUITE = make_test_suite(TestBibSortWasherWashers,
                              TestBibSortWasherCreation)

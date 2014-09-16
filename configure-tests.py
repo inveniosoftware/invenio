@@ -114,6 +114,7 @@ try:
     import urllib
     import zlib
     import wsgiref
+    import unidecode
 except ImportError, msg:
     error_messages.append("""
     *************************************************
@@ -357,26 +358,6 @@ except ImportError, msg:
     ** Note that pyPdf or pyPdf2 module is not really  **
     ** required, but we recommend it you want to       **
     ** enrich PDF with OCR information.                **
-    **                                                 **
-    ** You can safely continue installing Invenio      **
-    ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put     **
-    ** into production.)                               **
-    *****************************************************
-    """ % msg
-    )
-
-try:
-    import unidecode
-except ImportError, msg:
-    warning_messages.append(
-    """
-    *****************************************************
-    ** IMPORT WARNING %s
-    *****************************************************
-    ** Note that unidecode module is not really        **
-    ** required, but we recommend it you want to       **
-    ** introduce smarter author names matching.        **
     **                                                 **
     ** You can safely continue installing Invenio      **
     ** now, and add this module anytime later.  (I.e.  **
