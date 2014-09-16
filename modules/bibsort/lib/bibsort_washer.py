@@ -19,11 +19,13 @@
 
 """Applies a transformation function to a value"""
 
+import re
 from invenio.dateutils import strftime, strptime
 from invenio.textutils import decode_to_unicode, translate_to_ascii
 
 LEADING_ARTICLES = ['the', 'a', 'an', 'at', 'on', 'of']
 
+_RE_NOSYMBOLS = re.compile("\w+")
 
 class InvenioBibSortWasherNotImplementedError(Exception):
     """Exception raised when a washer method
@@ -85,6 +87,12 @@ class BibSortWasher(object):
         if not val:
             return ''
         return translate_to_ascii(val).pop().lower()
+
+    def _sort_nosymbols_case_insensitive_strip_accents(self, val):
+        """Remove accents, remove symbols, and convert to lower case"""
+        if not val:
+            return ''
+        return ''.join(_RE_NOSYMBOLS.findall(translate_to_ascii(val).pop().lower()))
 
     def _sort_case_insensitive(self, val):
         """Conversion to lower case"""
