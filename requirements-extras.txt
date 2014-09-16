@@ -11,7 +11,7 @@ pep8
 selenium
 winpdb
 mock
-ipython
+ipython==1.21
 cython
 nose
 nosexcover
