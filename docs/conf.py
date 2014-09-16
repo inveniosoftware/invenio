@@ -37,21 +37,22 @@ import os
 import sys
 
 
-_html_theme = "sphinx_rtd_theme"
+_html_theme = "default"
 _html_theme_path = []
 try:
     import sphinx_rtd_theme
+    _html_theme = "sphinx_rtd_theme"
     _html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 except ImportError:
-    print("Template {0} not found, pip install it", file=sys.stderr)
-    _html_theme = "default"
+    print("Template `sphinx_rtd_theme` not found, pip install it",
+          file=sys.stderr)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('_ext'))
-sys.path.append(os.path.abspath('_themes'))
+#sys.path.append(os.path.abspath('_themes'))
 #sys.path.append(os.path.abspath('.'))
 sys.path.append(os.path.abspath('../invenio'))
 
