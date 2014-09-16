@@ -19,11 +19,7 @@
 
 import re
 
-try:
-    from unidecode import unidecode
-    UNIDECODE_AVAILABLE = True
-except ImportError:
-    UNIDECODE_AVAILABLE = False
+from unidecode import unidecode
 
 from invenio.refextract_config import \
     CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
@@ -886,13 +882,12 @@ def identify_and_tag_authors(line, authors_kb):
     line = strip_tags(output_line)
     matched_authors = list(re_auth.finditer(line))
     # We try to have better results by unidecoding
-    if UNIDECODE_AVAILABLE:
-        unidecoded_line = strip_tags(unidecode(output_line))
-        matched_authors_unidecode = list(re_auth.finditer(unidecoded_line))
+    unidecoded_line = strip_tags(unidecode(output_line))
+    matched_authors_unidecode = list(re_auth.finditer(unidecoded_line))
 
-        if len(matched_authors_unidecode) > len(matched_authors):
-            output_line = unidecode(output_line)
-            matched_authors = matched_authors_unidecode
+    if len(matched_authors_unidecode) > len(matched_authors):
+        output_line = unidecode(output_line)
+        matched_authors = matched_authors_unidecode
 
     # If there is at least one matched author group
     if matched_authors:

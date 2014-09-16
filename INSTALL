@@ -47,7 +47,7 @@ Contents
           $ sudo aptitude install sbcl cmucl pylint pychecker pyflakes \
               python-profiler python-epydoc libapache2-mod-xsendfile \
               openoffice.org python-utidylib python-beautifulsoup \
-              python-unidecode libhdf5-dev
+              libhdf5-dev
 
         (Note that if you use pip to manage your Python dependencies
         instead of operating system packages, please see the section
@@ -107,6 +107,8 @@ Contents
              <http://sourceforge.net/projects/mysql-python>
           - (mandatory) Pyparsing, for document parsing
              <http://pyparsing.wikispaces.com/>
+          - (mandatory) unidecode, for ASCII representation of Unicode text:
+             <https://pypi.python.org/pypi/Unidecode>
           - (recommended) Redis connector:
              <https://pypi.python.org/pypi/redis/>
           - (recommended) Nydus, Redis consistent hashing connector:
@@ -159,9 +161,6 @@ Contents
           - (optional) Python Rauth if you want to enable OAuth 1.0/2.0
              support for authentication (depends on Python-2.6 or later):
              <http://packages.python.org/rauth/>
-          - (optional) unidecode, for ASCII representation of Unicode
-             text:
-             <https://pypi.python.org/pypi/Unidecode>
           - (optional) libhdf5-7, libhdf5-dev, python-h5py, in order to
              run author disambiguation.
              <https://code.google.com/p/h5py/>

@@ -29,11 +29,7 @@ try:
 except ImportError:
     CHARDET_AVAILABLE = False
 
-try:
-    from unidecode import unidecode
-    UNIDECODE_AVAILABLE = True
-except ImportError:
-    UNIDECODE_AVAILABLE = False
+from unidecode import unidecode
 
 from invenio.textutils import \
      wrap_text_in_a_box, \
@@ -442,22 +438,19 @@ class Latex2UnicodeTest(InvenioTestCase):
 
 class TestStripping(InvenioTestCase):
     """Test for stripping functions like accents and control characters."""
-    if UNIDECODE_AVAILABLE:
-        def test_text_to_ascii(self):
-            """textutils - transliterate to ascii using unidecode"""
-            self.assert_(translate_to_ascii(
-                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]) in
-                (["a i U", "Hohne", "Age Ost Vaer", "normal"],  ## unidecode < 0.04.13
-                 ['a i U', 'Hoehne', 'Age Ost Vaer', 'normal']) ## unidecode >= 0.04.13
-            )
-            self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
-            self.assertEqual(translate_to_ascii("ß"), ["ss"])
-            self.assertEqual(translate_to_ascii(None), None)
-            self.assertEqual(translate_to_ascii([]), [])
-            self.assertEqual(translate_to_ascii([None]), [None])
-            self.assertEqual(translate_to_ascii("√"), [""])
-    else:
-        pass
+    def test_text_to_ascii(self):
+        """textutils - transliterate to ascii using unidecode"""
+        self.assert_(translate_to_ascii(
+            ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]) in
+            (["a i U", "Hohne", "Age Ost Vaer", "normal"],  ## unidecode < 0.04.13
+                ['a i U', 'Hoehne', 'Age Ost Vaer', 'normal']) ## unidecode >= 0.04.13
+        )
+        self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
+        self.assertEqual(translate_to_ascii("ß"), ["ss"])
+        self.assertEqual(translate_to_ascii(None), None)
+        self.assertEqual(translate_to_ascii([]), [])
+        self.assertEqual(translate_to_ascii([None]), [None])
+        self.assertEqual(translate_to_ascii("√"), [""])
 
     def test_strip_accents(self):
         """textutils - transliterate to ascii (basic)"""
@@ -560,13 +553,12 @@ Aenean ultrices condimentum quam vitae pharetra.
 class TestALALC(InvenioTestCase):
     """Test for handling ALA-LC transliteration."""
 
-    if UNIDECODE_AVAILABLE:
-        def test_alalc(self):
-            msg = "眾鳥高飛盡"
-            encoded_text, encoding = guess_minimum_encoding(msg)
-            unicode_text = unicode(encoded_text.decode(encoding))
-            self.assertEqual("Zhong Niao Gao Fei Jin ",
-                             transliterate_ala_lc(unicode_text))
+    def test_alalc(self):
+        msg = "眾鳥高飛盡"
+        encoded_text, encoding = guess_minimum_encoding(msg)
+        unicode_text = unicode(encoded_text.decode(encoding))
+        self.assertEqual("Zhong Niao Gao Fei Jin ",
+                            transliterate_ala_lc(unicode_text))
 
 
 class LatexEscape(InvenioTestCase):
