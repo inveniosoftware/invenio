@@ -52,7 +52,7 @@ from invenio.legacy.webuser import collect_user_info, isUserSuperAdmin
 
 from invenio.legacy.dbquery import run_sql
 
-from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
+from invenio.legacy.bibrecord import xmlmarc2textmarc as xmlmarc2textmarc
 
 from invenio.legacy.bibedit.utils import record_locked_by_queue
 

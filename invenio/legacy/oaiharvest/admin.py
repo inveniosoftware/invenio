@@ -47,7 +47,7 @@ from invenio.legacy.oaiharvest.dblayer import (
 from invenio.legacy.search_engine import get_record
 
 import invenio.legacy.template
-from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import (
+from invenio.legacy.bibrecord.xmlmarc2textmarc import (
     create_marc_record)
 from invenio.legacy.bibrecord import create_record
 from invenio.utils.url import create_html_link

@@ -58,7 +58,7 @@ from invenio.legacy.search_engine import get_fieldcodes, \
     re_pattern_spaces_after_colon
 from invenio.legacy.search_engine.query_parser import SearchQueryParenthesisedParser
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
+from invenio.legacy.bibrecord.textmarc2xmlmarc import transform_file
 from invenio.legacy.bibmatch.validator import validate_matches, transform_record_to_marc, \
                                        validate_tag, BibMatchValidationError
 from invenio.utils.text import translate_to_ascii, xml_entities_to_utf8

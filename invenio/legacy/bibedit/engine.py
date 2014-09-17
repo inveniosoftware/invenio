@@ -36,7 +36,7 @@ from invenio.modules import formatter as bibformat
 from invenio.ext.logging import register_exception
 from invenio.utils.json import CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url
-from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
+from invenio.legacy.bibrecord.xmlmarc2textmarc import create_marc_record
 
 from invenio.config import (CFG_SITE_LANG, CFG_DEVEL_SITE,
     CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
@@ -99,7 +99,7 @@ from invenio.legacy.refextract.api import FullTextNotAvailable, \
                                    get_pdf_doc, \
                                    record_has_fulltext
 
-from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
+from invenio.legacy.bibrecord import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 
 from invenio.base.globals import cfg
