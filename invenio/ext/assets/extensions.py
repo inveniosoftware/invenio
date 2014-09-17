@@ -20,7 +20,7 @@
 
 import os
 import six
-from flask import current_app
+from flask import current_app, _request_ctx_stack
 from flask.ext.assets import Environment, FlaskResolver
 from jinja2 import nodes
 from jinja2.ext import Extension
@@ -56,6 +56,15 @@ class BundleExtension(Extension):
     """
 
     tags = set(('bundle', 'bundles'))
+
+    @classmethod
+    def storage(cls):
+        """Store used bundles on request context stack."""
+        ctx = _request_ctx_stack.top
+        if ctx is not None:
+            if not hasattr(ctx, "_bundles"):
+                setattr(ctx, "_bundles", set())
+            return ctx._bundles
 
     @classmethod
     def install(cls, app):
@@ -110,7 +119,7 @@ class BundleExtension(Extension):
 
             static_url_path = current_app.static_url_path + "/"
             bundles = []
-            for bundle_name in current_app.jinja_env.bundles:
+            for bundle_name in cls.storage():
                 if bundle_name.endswith(suffix):
                     bundle = _bundles[bundle_name]
                     if suffix == "css":
@@ -142,20 +151,13 @@ class BundleExtension(Extension):
         """Initialize the extension."""
         super(BundleExtension, self).__init__(environment)
 
-        def get_bundle(suffix):
-            for bundle in environment.bundles:
-                if bundle.endswith(suffix):
-                    yield bundle
-
-        environment.extend(bundles=set())
-
     def _update(self, filename, bundles, caller):
         """Update the environment bundles.
 
         :return: empty html or html comment in debug mode.
         :rtype: str
         """
-        self.environment.bundles.update(bundles)
+        self.storage().update(bundles)
         if current_app.debug:
             return "<!-- {0}: {1} -->\n".format(filename, ", ".join(bundles))
         else:
