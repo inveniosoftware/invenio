@@ -5691,8 +5691,8 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl, pl_in_url = "", "" # no limits by default
-    if action != "browse" and req and not isinstance(req, cStringIO.OutputType) \
-           and req.args: # we do not want to add options while browsing or while calling via command-line
+    if action != "browse" and req and not isinstance(req, (cStringIO.OutputType, dict)) \
+           and getattr(req, 'args', None): # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldcode in fieldargs:

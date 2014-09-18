@@ -24,6 +24,9 @@ when the request is a journal reference
 from invenio.websearch_services import SearchService
 from invenio.config import (CFG_SITE_URL,
                             CFG_SITE_LANG)
+from invenio.messages import gettext_set_language
+from invenio.search_engine import perform_request_search, print_record
+from invenio.webuser import collect_user_info
 from urllib import urlencode
 import re
 from cgi import escape
@@ -70,7 +73,9 @@ class JournalHintService(SearchService):
         """
         from invenio.refextract_api import search_from_reference
 
-        if not self.seems_a_journal_reference(p):
+        _ = gettext_set_language(ln)
+
+        if f or not self.seems_a_journal_reference(p):
             return (0, "")
 
         (field, pattern) = search_from_reference(p.decode('utf-8'))
@@ -78,11 +83,25 @@ class JournalHintService(SearchService):
         if field is not "journal":
             return (0, "")
 
-        query = "journal:\"" + pattern + "\""
+        recids = perform_request_search(
+            req=req, p=pattern, f=field, cc=cc, c=colls_to_search)
+
+        if not recids:
+            return (0, "")
+
+        if len(recids) == 1:
+            recid = recids.pop()
+            user_info = collect_user_info(req)
+            return (100, """\
+<p><span class="journalhint">%s</span></p>
+<table style="padding: 5px; border: 2px solid #ccc; margin: 20px"><tr><td>
+%s
+</td></tr></table>""" % (escape(_("Were you looking for this paper?")),
+             print_record(recid, ln=ln, user_info=user_info)))
+
+        query = "find rawref \"" + p + "\""
         query_link = CFG_SITE_URL + '/search?' + urlencode({'p': query})
-        return (
-            80,
-            'Were you looking for a journal reference? '
-            'Try: <a href="{0}">{1}</a>'
-            .format(query_link, escape(query))
-        )
+        return (80, '<span class="journalhint">%s</span>' % (
+                _("Were you looking for a journal reference? Try: %(x_href)s") %
+                {"x_href": '<a href="{0}">{1}</a>'.format(
+                 escape(query_link, True), escape(query))}, ))
