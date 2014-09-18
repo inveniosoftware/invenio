@@ -438,7 +438,7 @@ define(function(require, exports, module) {
 
   $.fn.pluploadWidget.defaults = {
     files: null,
-    runtimes: 'html5',
+    runtimes: 'html5,html4',
     chunksize: '10mb',
     unique_names : true,
     browse_button : 'pickfiles',
