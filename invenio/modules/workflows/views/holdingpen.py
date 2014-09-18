@@ -264,23 +264,12 @@ def resolve_action(objectid):
                  'of': (text_type, None)})
 def entry_data_preview(objectid, of):
     """Present the data in a human readble form or in xml code."""
-    from flask import Markup
-    from pprint import pformat
-
     bwobject = BibWorkflowObject.query.get(int(objectid))
     if not bwobject:
         flash("No object found for %s" % (objectid,))
         return jsonify(data={})
     formatted_data = bwobject.get_formatted_data(of)
-    if isinstance(formatted_data, dict):
-        formatted_data = pformat(formatted_data)
-    if of == "xm":
-        data = Markup.escape(formatted_data)
-    elif of == 'xo':
-        data = Markup.escape(formatted_data[0])
-    else:
-        data = formatted_data
-    return jsonify(data=data)
+    return jsonify(data=formatted_data)
 
 
 @blueprint.route('/get_context', methods=['GET', 'POST'])

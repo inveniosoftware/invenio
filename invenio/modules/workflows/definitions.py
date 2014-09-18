@@ -145,56 +145,61 @@ class RecordWorkflow(WorkflowBase):
     @staticmethod
     def formatter(bwo, **kwargs):
         """Nicely format the record."""
-        from invenio.modules.formatter.engine import format_record
+        from flask import Markup
+        from pprint import pformat
 
         data = bwo.get_data()
         if not data:
             return ''
-        print kwargs
+
         formatter = kwargs.get("formatter", None)
-        format = kwargs.get("format", None)
+        of = kwargs.get("of", None)
         if formatter:
-            # A seperate formatter is supplied
+            # A separate formatter is supplied
             return formatter(data)
+
         from invenio.modules.records.api import Record
         if isinstance(data, collections.Mapping):
             # Dicts are cool on its own, but maybe its SmartJson (record)
             try:
                 data = Record(data.dumps()).legacy_export_as_marc()
             except (TypeError, KeyError):
-                # Maybe not, submission?
-                return data
+                pass
 
         if isinstance(data, string_types):
-            # Its a string type, lets try to convert
-            if format:
-                # We can try formatter!
-                # If already XML, format_record does not like it.
-                if format != 'xm':
-                    try:
-                        return format_record(recID=None,
-                                             of=format,
-                                             xml_record=data)
-                    except TypeError:
-                        # Wrong kind of type
-                        pass
-                else:
-                    # So, XML then
-                    from xml.dom.minidom import parseString
+            # We can try formatter!
+            # If already XML, format_record does not like it.
+            if of != 'xm':
+                try:
+                    from invenio.modules.formatter.engine import format_record
+                    formatted_data = format_record(
+                        recID=None,
+                        of=of,
+                        xml_record=data
+                    )
+                except TypeError:
+                    # Wrong kind of type
+                    pass
+            else:
+                # So, XML then
+                from xml.dom.minidom import parseString
 
-                    try:
-                        pretty_data = parseString(data)
-                        return pretty_data.toprettyxml()
-                    except TypeError:
-                        # Probably not proper XML string then
-                        return "Data cannot be parsed: %s" % (data,)
-                    except Exception:
-                        # Some other parsing error
-                        pass
+                try:
+                    unpretty_data = parseString(data)
+                    formatted_data = unpretty_data.toprettyxml()
+                except TypeError:
+                    # Probably not proper XML string then
+                    return "Data cannot be parsed: %s" % (data,)
+                except Exception:
+                    # Just return raw string
+                    pass
 
-            # Just return raw string
-            return data
-        if isinstance(data, set):
-            return list(data)
-        # Not any of the above types. How juicy!
-        return data
+        if not formatted_data:
+            formatted_data = data
+
+        if isinstance(formatted_data, dict):
+            formatted_data = pformat(formatted_data)
+        elif of == "xm":
+            formatted_data = Markup.escape(formatted_data)
+        elif of == 'xo':
+            formatted_data = Markup.escape(formatted_data[0])
