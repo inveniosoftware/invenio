@@ -190,23 +190,47 @@ define(['jquery', 'js/search/typeahead'], function($) {
                 //eprintnumber = $('#eprint-number').val(),
                 j = $('#journal-name').val(),
                 jvol = $('#journal-vol').val(),
-                jpage = $('#journal-page').val()
+                jpage = $('#journal-page').val(),
+                //match every word or the whole sentence in the quotes
+                matcher = /("(?:[^"\\]|\\.)*")|('(?:[^'\\]|\\.)*')|(\S+)/g
 
-            if (author !== '') { query.push('author:' + author) }
-            if (title !== '') { query.push('title:' + title) }
-            if (rn !== '') { query.push('reportnumber:' + rn) }
-            if (aff !== '') { query.push('affiliation:' + aff) }
-            if (cn !== '') { query.push('collaboration:' + cn) }
-            if (k !== '') { query.push('keyword:' + k) }
-            if (j !== '') { query.push('journal:' + j) }
-            if (jvol !== '') { query.push('909C4v:' + jvol) }
-            if (jpage !== '') { query.push('909C4c:' + jpage) }
+            function buildQueryElement(fieldName, input, reg) {
+                reg = reg ? reg : matcher;
+                var matches = input.match(reg);
 
-            if (query.length > 0) {
-                query_str = query.join(' ' + operators[op1])
+                return $.map(matches, function(item) {
+                    return fieldName + item;
+                }).join(" " + operators[op1] + " ");
             }
 
-            return query_str
+            if (author !== '') {
+                query.push('author:' + '\"' + author + '\"');
+            }
+            if (title !== '') {
+                query.push('title:' + '\"' + title + '\"');
+            }
+            if (rn !== '') {
+                query.push(buildQueryElement("reportnumber:", rn));
+            }
+            if (aff !== '') {
+                query.push(buildQueryElement("affiliation:", aff));
+            }
+            if (cn !== '') {
+                query.push(buildQueryElement('collaboration:', cn));
+            }
+            if (k !== '') {
+                query.push(buildQueryElement('keyword:', k));
+            }
+
+            if (j !== '') { query.push('journal:' + j); }
+            if (jvol !== '') { query.push('909C4v:' + jvol); }
+            if (jpage !== '') { query.push('909C4c:' + jpage); }
+
+            if (query.length > 0) {
+                query_str = query.join(' ' + operators[op1]);
+            }
+
+            return query_str;
         }
 
         /**
