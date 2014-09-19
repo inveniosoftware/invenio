@@ -1214,10 +1214,10 @@ class Template:
 
         return "\n".join(html)
 
-    def tmpl_choose_profile_search_new_person_generator(self):
+    def tmpl_choose_profile_search_new_person_generator(self, free_id):
         def stub():
             text = self._("Create new profile")
-            link = "%s/author/claim/action?associate_profile=True&pid=%s" % (CFG_SITE_URL, str(-1))
+            link = "%s/author/claim/action?associate_profile=True&pid=%s" % (CFG_SITE_URL, free_id)
             return text, link
 
         return stub

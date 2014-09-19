@@ -68,7 +68,8 @@ import invenio.webauthorprofile_interface as webauthorapi
 import invenio.bibauthorid_webapi as webapi
 from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid, is_valid_orcid
 from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
-    get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
+    get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author, \
+    get_free_author_id
 from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
 from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
 
@@ -2046,9 +2047,11 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 last_viewed_profile_suggestion_info,
                 search_param)
 
+            free_id = get_free_author_id()
+
             shown_element_functions = dict()
             shown_element_functions['button_gen'] = TEMPLATE.tmpl_choose_profile_search_button_generator()
-            shown_element_functions['new_person_gen'] = TEMPLATE.tmpl_choose_profile_search_new_person_generator()
+            shown_element_functions['new_person_gen'] = TEMPLATE.tmpl_choose_profile_search_new_person_generator(free_id)
             shown_element_functions['show_search_bar'] = TEMPLATE.tmpl_choose_profile_search_bar()
             # show in the templates the column status (if profile is bound to a user or not)
             shown_element_functions['show_status'] = True
