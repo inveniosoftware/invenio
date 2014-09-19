@@ -192,9 +192,13 @@ define(['jquery', 'js/search/typeahead'], function($) {
                 jvol = $('#journal-vol').val(),
                 jpage = $('#journal-page').val()
 
-            if (author !== '') { query.push('author:' + author) }
+            if (author !== '') { query.push('author:' + '\"' + author + '\"') }
             if (title !== '') { query.push('title:' + title) }
-            if (rn !== '') { query.push('reportnumber:' + rn) }
+            if (rn !== '') { 
+                var rnArray = rn.match(/(\S+)/g);
+                var rnQueryString = "reportnumber:" + rnArray.join(' reportnumber:');
+                query.push(rnQueryString); 
+            }
             if (aff !== '') { query.push('affiliation:' + aff) }
             if (cn !== '') { query.push('collaboration:' + cn) }
             if (k !== '') { query.push('keyword:' + k) }
