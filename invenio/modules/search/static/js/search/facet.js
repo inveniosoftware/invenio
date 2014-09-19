@@ -138,8 +138,8 @@
           var $row = $(row_builder(this, name))
           if (data.parent) {
             $row.on('click', function() {
-              context.that.delete('+', name, data.parent)
-              context.that.delete('-', name, data.parent)
+              context.that._delete('+', name, data.parent)
+              context.that._delete('-', name, data.parent)
               el.trigger($.Event('deleted', {op: '', key: name, value: data.parent}));
             })
           }
