@@ -64,7 +64,7 @@ class full_doc_process(WorkflowBase):
                     final_identifiers.append(i['value'])
             except Exception as e:
                 if hasattr(record, "get"):
-                    final_identifiers = [record.get("system_number_external", {}).get("value", 'No ids')]
+                    final_identifiers = [record.get("system_control_number", {}).get("value", 'No ids')]
                 else:
                     final_identifiers = [' No ids']
 

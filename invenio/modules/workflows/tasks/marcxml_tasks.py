@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2013, 2014 CERN.
 ##
@@ -510,7 +511,7 @@ def quick_match_record(obj, eng):
     identifier_function_to_check = {'recid': find_record_from_recid,
                                     'system_number': find_record_from_sysno,
                                     'oaiid': find_record_from_oaiid,
-                                    'system_number_external': find_records_from_extoaiid,
+                                    'system_control_number': find_records_from_extoaiid,
                                     'doi': find_record_from_doi}
 
     record = Record(obj.data.dumps())
