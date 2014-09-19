@@ -21,24 +21,33 @@
 
 {% block styles_body %}
 
-    {% if message %}
-        {{message}}
-    {% endif %}
+  {% if message %}
+    {{message}}
+  {% endif %}
 
-    {% if identifiers %}
-    <p><b>identifiers</b>:
-    {% for i in identifiers %}
-        {{i}}
+  {% if identifiers %}
+  <h5>{{ _('Identifiers') }}:</h5>
+  <ul class="list-unstyled">
+    {% for identifier in identifiers %}
+      <li>
+        {% if 'arxiv' in identifier.lower() %}
+          {% set identifier = identifier.split(':')[-1] %}
+          <a href="http://arxiv.org/abs/{{identifier}}">{{identifier}}</a>
+        {% else %}
+          {{ identifier }}
+        {% endif %}
+      </li>
     {% endfor %}
-    </p>
-    {% endif %}
+  </ul>
+  {% endif %}
 
-    {% if categories %}
-    <p><b>categories</b>:
-    {% for i in categories %}
-        {{i}}
-    {% endfor %}
-    </p>
-    {% endif %}
+  {% if categories %}
+    <h5>{{ _('Categories') }}:</h5>
+    <ul class="list-unstyled">
+      {% for category in categories %}
+        <li>{{ category }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
 {% endblock %}
