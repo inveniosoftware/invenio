@@ -533,11 +533,20 @@ def results(qid, p, of, so, rm):
         recids = faceted_results_filter(recIDsHitSet,
                                         filter_data,
                                         facets)
+        jrec = request.values.get('jrec', 1, type=int)
+        rg = request.values.get('rg', 10, type=int)
         recids = sort_and_rank_records(recids, so=so, rm=rm, p=p)
+        records = len(recids)
+
+        if records > 0 and records < jrec:
+            args = request.values.to_dict()
+            args["jrec"] = 1
+            return redirect(url_for(request.endpoint, qid=qid, **args))
 
         return response_formated_records(
-            recids, collection, of,
-            create_nearest_terms_box=_create_neareset_term_box, qid=qid)
+            recids[jrec-1:jrec-1+rg], collection, of,
+            create_nearest_terms_box=_create_neareset_term_box, qid=qid,
+            records=records)
 
     return make_results()
 
