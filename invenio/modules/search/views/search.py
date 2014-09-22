@@ -421,10 +421,11 @@ def rss(collection, p, jrec, so, rm):
 @register_breadcrumb(blueprint, '.browse', _('Search results'))
 @wash_arguments({'p': (unicode, ''),
                  'of': (unicode, collection_of),
+                 'ot': (unicode, None),
                  'so': (unicode, None),
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
-def search(collection, p, of, so, rm):
+def search(collection, p, of, ot, so, rm):
     """Render search page."""
     from invenio.legacy.search_engine import perform_request_search
 
@@ -478,7 +479,8 @@ def search(collection, p, of, so, rm):
         records=len(get_current_user_records_that_can_be_displayed(qid)),
         qid=qid, rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
-        easy_search_form=EasySearchForm(csrf_enabled=False)
+        easy_search_form=EasySearchForm(csrf_enabled=False),
+        ot=ot
     )
 
     return response_formated_records(recids, collection, of, **ctx)
@@ -609,9 +611,9 @@ def dispatch():
 
 
 @blueprint.route('/export', methods=['GET', 'POST'])
-@wash_arguments({'of': (unicode, 'xm')})
+@wash_arguments({'of': (unicode, 'xm'), 'ot': (unicode, None)})
 @check_collection(default_collection=True)
-def export(collection, of):
+def export(collection, of, ot):
     """
     Export requested records to defined output format.
 
@@ -622,4 +624,4 @@ def export(collection, of):
     """
     # Get list of integers with record IDs.
     recids = request.values.getlist('recid', type=int)
-    return response_formated_records(recids, collection, of)
+    return response_formated_records(recids, collection, of, ot=ot)

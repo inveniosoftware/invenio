@@ -19,7 +19,6 @@
 {%- set sep = joiner(", ") -%}
 [
 {%- for recid in recids -%}
-  {#- FIXME add fields filtering -#}
-  {{ sep() }}{{- get_record(recid).dumps(clean=True)|tojson() -}}
+    {{ sep() }}{{- get_record(recid).dumps(clean=True, keywords=ot)|tojson() -}}
 {%- endfor -%}
 ]

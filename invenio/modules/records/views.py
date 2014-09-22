@@ -157,9 +157,9 @@ def request_record(f):
 @blueprint.route('/<int:recid>/', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>/export/<of>', methods=['GET', 'POST'])
-@wash_arguments({'of': (unicode, 'hd')})
+@wash_arguments({'of': (unicode, 'hd'), 'ot': (unicode, None)})
 @request_record
-def metadata(recid, of='hd'):
+def metadata(recid, of='hd', ot=None):
     from invenio.legacy.bibrank.downloads_similarity import register_page_view_event
     from invenio.modules.formatter import get_output_format_content_type
     register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
@@ -174,7 +174,7 @@ def metadata(recid, of='hd'):
         id_user=current_user.get_id(),
         request=request)
 
-    return render_template('records/metadata.html', of=of)
+    return render_template('records/metadata.html', of=of, ot=ot)
 
 
 @blueprint.route('/<int:recid>/references', methods=['GET', 'POST'])

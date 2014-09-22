@@ -92,7 +92,8 @@ from invenio.config import \
      CFG_BIBSORT_ENABLED, \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BASE_URL
+     CFG_BASE_URL, \
+     CFG_BIBFORMAT_HIDDEN_TAGS
 
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
@@ -4954,7 +4955,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         from invenio.modules.records.api import get_record as get_recjson
         if ot:
             ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
-            return json.dumps(dict(get_recjson(recID, fields=ot)))
+            return json.dumps(get_recjson(recID).dumps(keywords=ot))
         else:
             return json.dumps(get_recjson(recID).dumps())
 

@@ -508,6 +508,7 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
     ln = ln or wash_language(request.values.get('ln', cfg['CFG_SITE_LANG']))
+    ot = (request.values.get('ot', ctx.get('ot')) or '').split(',')
     records = ctx.get('records', len(recIDs))
 
     if jrec > records:
@@ -516,7 +517,7 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     pages = int(ceil(jrec / float(rg))) if rg > 0 else 1
 
     context = dict(
-        of=of, jrec=jrec, rg=rg, ln=ln,
+        of=of, jrec=jrec, rg=rg, ln=ln, ot=ot,
         facets={},
         time=time,
         recids=recIDs,
