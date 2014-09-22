@@ -1236,7 +1236,8 @@ def institution_history(record):
             'a': 'name',
             'r': 'rank',
             's': 'start',
-            't': 'end'
+            't': 'end',
+            'z': 'current'
         }
         institution = map_subfields(sub_fields, mapping)
         if 'start' not in institution:
@@ -1247,7 +1248,7 @@ def institution_history(record):
         return institution or None
 
     if (not record_has_field(record, '371')):
-        return None
+        return []
 
     field_instances = record_get_field_instances(record, '371', '', '')
     institutions = [extract_institution(x[0]) for x in field_instances if extract_institution(x[0]) is not None]
@@ -1399,6 +1400,9 @@ def hepnames_context(record):
         'institution_history': institution_history(record)
 
     }
+    for institution in context['institution_history']:
+        if institution['current'] == 'Current':
+            context['current_institution'] = institution['name']
 
     return context
 
