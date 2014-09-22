@@ -82,7 +82,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                 # Sets an error message as a tuple (title, details)
                 current_obj.set_error_message((str(exception_triggered), msg))
                 current_obj.save(
-                    ObjectVersion.HALTED,
+                    ObjectVersion.ERROR,
                     wfe.getCurrTaskId(),
                     id_workflow=wfe.uuid
                 )

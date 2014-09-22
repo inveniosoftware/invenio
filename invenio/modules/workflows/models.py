@@ -42,10 +42,10 @@ class ObjectVersion(object):
     FINAL = 1
     HALTED = 2
     RUNNING = 3
-    MAPPING = {0: "New", 1: "Done", 2: "Need action",
-               3: "In process"}
-    REVERSE_MAPPING = {"New": 0, "Done": 1, "Need action": 2,
-                       "In process": 3}
+    WAITING = 4
+    ERROR = 5
+    MAPPING = {"New": 0, "Done": 1, "Need action": 2,
+               "In process": 3, "Waiting": 4, "Error": 5}
 
 
 def get_default_data():

@@ -145,7 +145,8 @@ def details(objectid):
                    BibWorkflowObject.id == bwobject.id)).all()
 
     hbwobject = {ObjectVersion.FINAL: [], ObjectVersion.HALTED: [],
-                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: []}
+                 ObjectVersion.INITIAL: [], ObjectVersion.RUNNING: [],
+                 ObjectVersion.WAITING: [], ObjectVersion.ERROR: []}
 
     for hbobject in hbwobject_db_request:
         hbwobject[hbobject.version].append(

@@ -30,10 +30,12 @@
 <!--sep-->
 {{ pretty_date(object.created)}}
 <!--sep-->
-{% if object.version == 1 %}<span class="label label-success">Done</span>
-{% elif object.version == 2 %}<span class="label label-danger">Need action</span>
-{% elif object.version == 3 %}<span class="label label-warning">In process</span>
-{% elif object.version == 0 %}<span class="label label-info">New</span>
+{% if object.version == version.FINAL %}<span class="label label-success">Done</span>
+{% elif object.version == version.HALTED %}<span class="label label-danger">Need action</span>
+{% elif object.version == version.WAITING %}<span class="label label-warning">Waiting</span>
+{% elif object.version == version.RUNNING %}<span class="label label-warning">In process</span>
+{% elif object.version == version.INITIAL %}<span class="label label-info">New</span>
+{% elif object.version == version.ERROR %}<span class="label label-danger">Error</span>
 {% endif %}
 <!--sep-->
 {{object.data_type}}

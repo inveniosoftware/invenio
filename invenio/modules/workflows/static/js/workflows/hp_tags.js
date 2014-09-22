@@ -36,6 +36,8 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
                 return 'label label-success';
             case 'New':
                 return 'label label-info';
+            case 'Error':
+                return 'label label-danger';
             default:
                 return 'badge badge-warning';
             }
