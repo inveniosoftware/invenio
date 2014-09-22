@@ -152,10 +152,12 @@ def setup_app(app):
             return redirect(secure_url)
         if current_user.is_guest:
             flash(g._("Please sign in to continue."), 'info')
+            from invenio.modules.accounts.views.accounts import login
+            return login(referer=request.url), 401
         else:
             flash(g._("Authorization failure."), 'danger')
-        from invenio.modules.accounts.views.accounts import login
-        return login(referer=request.url), 401
+            from flask import render_template
+            return render_template("401.html"), 401
 
     # Let's create login manager.
     _login_manager = LoginManager(app)
