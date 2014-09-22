@@ -439,6 +439,10 @@ def search(collection, p, of, so, rm):
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
+    # fix for queries like `/search?p=+ellis`
+    if 'p' in argd:
+        argd['p'] = argd['p'].strip()
+
     # update search arguments with the search user preferences
     if 'rg' not in request.values and current_user.get('rg'):
         argd['rg'] = int(current_user.get('rg'))
