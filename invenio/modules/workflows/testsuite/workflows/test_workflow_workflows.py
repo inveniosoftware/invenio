@@ -18,11 +18,15 @@
 
 """ Implements a workflow for testing. """
 
-from ...tasks.workflows_tasks import (start_workflow, workflows_reviews,
-                                      wait_for_a_workflow_to_complete, log_info,
-                                      get_nb_workflow_running,
-                                      num_workflow_running_greater,
-                                      wait_for_workflows_to_complete)
+from ...tasks.workflows_tasks import (
+    start_async_workflow,
+    workflows_reviews,
+    wait_for_a_workflow_to_complete,
+    log_info,
+    get_nb_workflow_running,
+    num_workflow_running_greater,
+    wait_for_workflows_to_complete
+)
 
 from ...tasks.logic_tasks import simple_for, end_for, workflow_if, workflow_else
 
@@ -37,7 +41,7 @@ class test_workflow_workflows(object):
         log_info("starting"),
         simple_for(0, 20, 1, "X"),
         [
-            start_workflow("test_workflow", 22),
+            start_async_workflow("test_workflow"),
         ],
         end_for,
 
@@ -52,12 +56,12 @@ class test_workflow_workflows(object):
         [
             workflow_if(num_workflow_running_greater(3), neg=True),
             [
-                start_workflow("test_workflow", 22),
+                start_async_workflow("test_workflow"),
             ],
             workflow_else,
             [
                 wait_for_a_workflow_to_complete(0.1),
-                start_workflow("test_workflow", 22),
+                start_async_workflow("test_workflow"),
             ],
             set_obj_extra_data_key("nbworkflowrunning",
                                    get_nb_workflow_running),

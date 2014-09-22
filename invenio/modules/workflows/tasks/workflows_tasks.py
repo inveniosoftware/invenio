@@ -90,45 +90,50 @@ def get_nb_workflow_running(obj, eng):
         return "0"
 
 
-def start_workflow(workflow_to_run="default", data=None, copy=True, **kwargs):
-    """Run a new asynchronous workflow.
+def start_async_workflow(workflow_to_run,
+                         preserve_data=True,
+                         preserve_extra_data_keys=None, **kwargs):
+    """Run a new asynchronous workflow on new objects.
 
-    This function allow you to run a new asynchronous workflow, this
-    will be run on the celery node configurer into invenio
-    configuration.
+    This function allows you to run a new asynchronous workflow. This
+    will be run asynchronously.
 
-    :param workflow_to_run: The first argument is the name of the workflow to run.
+    The current object data will be preserved in the new object by default.
 
-    :param data: The second one is the data to use for this workflow.
+    Any extra data you with to transfer over from the current object to the
+    new object should be specified via extra_data keys.
 
-    :param copy: The copy parameter allow you to pass to the workflow  a copy
-    of the obj at the moment of the call .
+    :param workflow_to_run: name of the workflow to run.
+    :type workflow_to_run: str
 
-    :param kwargs: **kargs allow you to add some key:value into the extra data of
-    the object.
+    :param preserve_data: should current object data be passed to new object?
+    :type preserve_data: bool
+
+    :param preserve_extra_data_keys: extra data from current object to preserve.
+    :type preserve_extra_data_keys: list
     """
-    from ...workflows.models import BibWorkflowObject, ObjectVersion
+    from ...workflows.models import BibWorkflowObject
     from invenio.modules.workflows.api import start_delayed
 
     def _start_workflow(obj, eng):
+        record_object = BibWorkflowObject.create_object()
+        record_object.save()  # Saving to set default extra_data and data
 
-        if copy:
-            myobject = BibWorkflowObject.create_object_revision(obj,
-                                                                version=ObjectVersion.INITIAL)
-        else:
-            myobject = BibWorkflowObject()
+        if preserve_extra_data_keys:
+            record_object.extra_data = record_object.get_extra_data()
+            for extra_data_key in preserve_extra_data_keys:
+                record_object.extra_data[extra_data_key] = obj.extra_data[extra_data_key]
+            record_object.set_extra_data(record_object.extra_data)
 
-        if data:
-            myobject.set_data(data)
-            myobject.save()
-
+        if preserve_data:
+            record_object.set_data(obj.data)
         workflow_id = start_delayed(workflow_to_run,
-                                    data=[myobject],
+                                    data=[record_object],
                                     stop_on_error=True,
                                     module_name=eng.module_name,
                                     **kwargs)
 
-        eng.log.debug("Workflow launched")
+        eng.log.debug("New workflow '{0}' launched".format(workflow_to_run))
         try:
             eng.extra_data["_workflow_ids"].append(workflow_id)
         except KeyError:
@@ -187,7 +192,7 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
     workflow_result_management(obj.data, eng)
 
 
-def wait_for_a_workflow_to_complete(scanning_time=0.5):
+def wait_for_a_workflow_to_complete(scanning_time=5.0):
     """Wait for a children workflow finished processing.
 
     This function wait for the asynchronous workflow specified in obj.data

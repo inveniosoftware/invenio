@@ -80,7 +80,7 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         from invenio.modules.workflows.worker_result import uuid_to_workflow
 
         test_object = BibWorkflowObject()
-        test_object.set_data(10)
+        test_object.set_data(22)
         test_object.save()
         async = start_delayed("test_workflow_workflows", [test_object],
                               module_name="unit_tests")
@@ -160,7 +160,7 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
 
         test_object = BibWorkflowObject()
         test_object.save()
-        test_object.set_data(10)
+        test_object.set_data(22)
         engine = start("test_workflow_workflows", [test_object],
                        module_name="unit_tests")
         from invenio.modules.workflows.engine import WorkflowStatus
