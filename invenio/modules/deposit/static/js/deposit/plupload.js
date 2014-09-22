@@ -62,6 +62,11 @@ define(function(require, exports, module) {
 
       var had_error = false;
 
+      // Set prevent_duplicates to true if not specified
+      if ( this.options.filters.prevent_duplicates === undefined ) {
+        this.options.filters.prevent_duplicates = true;
+      }
+
       this.uploader = new plupload.Uploader({
           // General settings
           runtimes : this.options.runtimes,
@@ -72,6 +77,7 @@ define(function(require, exports, module) {
           browse_button : this.options.browse_button,
           drop_element : this.options.drop_element,
           filters : this.options.filters,
+          autoupload : this.options.autoupload,
       });
 
       new plupload.QueueProgress();
@@ -139,7 +145,7 @@ define(function(require, exports, module) {
                       type: "POST",
                       url: delete_url,
                       data: $.param({
-                          file_id: file.id
+                          file_id: file.server_id
                       })
                   });
               }
@@ -161,45 +167,26 @@ define(function(require, exports, module) {
       });
 
       this.uploader.bind('FilesAdded', function(up, files) {
-          var remove_files = [];
-          $.each(up.files, function(i, file) {
-
-          });
-
           that.$element.show();
           $upload_start.removeClass("disabled");
           $upload_filetable.show('slow');
           up.total.reset();
-          var filename_already_exists = [];
-          $.each(files, function(i, file) {
-              // Check for existing file
-              var removed = false;
-              for(var j = 0; j<up.files.length; j++){
-                  var existing_file = up.files[j];
-                  if(existing_file.id != file.id && file.name == existing_file.name){
-                      filename_already_exists.push(file.name);
-                      up.removeFile(file);
-                      removed = true;
-                  }
-              }
-              if(!removed){
-                  $upload_filelist.append(tpl_file_entry({
-                          id: file.id,
-                          filename: file.name,
-                          filesize: that.getBytesWithUnit(file.size),
-                          removeable: true,
-                          progress: 0
-                  }));
-                  $('#' + file.id).show('fast');
-                  $('#' + file.id + ' .rmlink').on("click", function(event){
-                      up.removeFile(file);
-                  });
-              }
+          $.each(files, function(index, file) {
+            $upload_filelist.append(tpl_file_entry({
+                  id: file.id,
+                  filename: file.name,
+                  filesize: that.getBytesWithUnit(file.size),
+                  removeable: true,
+                  progress: 0
+            }));
+            $('#' + file.id).show('fast');
+            $('#' + file.id + ' .rmlink').on("click", function(event){
+                up.removeFile(file);
+            });
           });
-          if(filename_already_exists.length > 0) {
-              $upload_errors.hide();
-              $upload_errors.append('<div class="alert alert-warning"><a class="close" data-dismiss="alert" href="#">&times;</a><strong>Warning:</strong>' + filename_already_exists.join(", ") + " already exist.</div>");
-              $upload_errors.show('fast');
+          // auto start upload
+          if ( that.options.autoupload ) {
+            up.start();
           }
       });
 
@@ -238,6 +225,7 @@ define(function(require, exports, module) {
           error_messages[plupload.GENERIC_ERROR] = "an unknown error.";
           error_messages[plupload.IO_ERROR] = "problems reading the file on disk.";
           error_messages[plupload.SECURITY_ERROR] = "problems reading the file on disk.";
+          error_messages[plupload.FILE_DUPLICATE_ERROR] = "duplicated file.";
 
           message = error_messages[err.code];
 
@@ -268,12 +256,12 @@ define(function(require, exports, module) {
           $upload_errors.hide();
           if (err.file){
               $('#' + err.file.id + " .progress").removeClass("progress-striped").addClass("progress-danger");
-              $upload_errors.append(
-                '<div class="alert alert-danger"><strong>Error:</strong> Could not upload ' + err.file.name +" due to " + message + "</div>"
+              $upload_errors.append(tpl_flash_message({state:"danger",
+                message:'<strong>Error:</strong> Could not upload ' + err.file.name +" due to " + message})
               );
           } else {
-              $upload_errors.append(
-                '<div class="alert alert-danger"><strong>Error:</strong> ' + message + "</div>"
+              $upload_errors.append(tpl_flash_message({state:"danger",
+                message:'<strong>Error:</strong> ' + message})
               );
           }
           $upload_errors.show('fast');
@@ -444,7 +432,8 @@ define(function(require, exports, module) {
     browse_button : 'pickfiles',
     drop_element : 'field-plupload_file',
     form_selector: "#submitForm",
-    filters : {}
+    filters : {},
+    autoupload: false,
   };
 
   $.fn.pluploadWidget.Constructor = PluploadWidget;

@@ -348,8 +348,8 @@ def status(deposition_type=None, uuid=None, draft_id=None):
     return jsonify({"status": 1 if completed else 0})
 
 
-#@blueprint.route('/%s/<int:uuid>/file/url/' % deptypes, methods=['POST'])
 @blueprint.route('/<int:uuid>/file/url/', methods=['POST'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/url/', methods=['POST'])
 @login_required
 @deposition_error_handler()
 def upload_url(deposition_type=None, uuid=None):
@@ -381,6 +381,7 @@ def upload_url(deposition_type=None, uuid=None):
 
 
 @blueprint.route('/<int:uuid>/file/', methods=['POST'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/', methods=['POST'])
 @login_required
 @deposition_error_handler()
 def upload_file(deposition_type=None, uuid=None):
@@ -418,9 +419,8 @@ def upload_file(deposition_type=None, uuid=None):
     return jsonify(dict(filename=df.name, id=df.uuid, checksum=None))
 
 
-#@blueprint.route('/%s/<int:uuid>/file/delete/' % deptypes,
-#                 methods=['POST'])
 @blueprint.route('/<int:uuid>/file/delete/', methods=['POST'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/delete/', methods=['POST'])
 @login_required
 @deposition_error_handler()
 def delete_file(deposition_type=None, uuid=None):
@@ -439,8 +439,8 @@ def delete_file(deposition_type=None, uuid=None):
         return ('', 400)
 
 
-#@blueprint.route('/%s/<int:uuid>/file/' % deptypes, methods=['GET'])
 @blueprint.route('/<int:uuid>/file/', methods=['GET'])
+@blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/', methods=['GET'])
 @login_required
 @deposition_error_handler()
 def get_file(deposition_type=None, uuid=None):
