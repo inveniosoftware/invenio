@@ -327,7 +327,7 @@ class SmartJson(SmartDict):
         raise NotImplementedError()
 
     def dumps(self, without_meta_metadata=False, with_calculated_fields=False,
-              clean=False):
+              clean=False, keywords=None):
         """Create the JSON friendly representation of the current object.
 
         :param without_meta_metadata: by default ``False``, if set to ``True``
@@ -351,6 +351,11 @@ class SmartJson(SmartDict):
             for key in list(dict_.keys()):
                 if key.startswith('_'):
                     del dict_[key]
+
+        # Filter keywords
+        if keywords is not None and any(keywords):
+            dict_ = dict(((k, v) for (k, v) in six.iteritems(dict_) if k in keywords))
+
         return dict_
 
     def loads(self, without_meta_metadata=False, with_calculated_fields=True,
