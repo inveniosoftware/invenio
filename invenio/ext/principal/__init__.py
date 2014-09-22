@@ -54,7 +54,7 @@ class AccAuthorizeActionPermission(Permission):
 
 
 def permission_required(action, **kwargs):
-    return AccAuthorizeActionPermission(action, **kwargs).require()
+    return AccAuthorizeActionPermission(action, **kwargs).require(http_exception=401)
 
 
 def setup_app(app):
