@@ -17,20 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.login
-    -----------------
-
-    This module provides initialization and configuration for `flask.ext.login`
-    module.
-"""
+"""Provide initialization and configuration for `flask.ext.login` module."""
 
 import urllib
 
 from .legacy_user import UserInfo
 from flask import request, flash, g, url_for, redirect
-from flask.ext.login import LoginManager, current_user, \
-    login_user as flask_login_user, logout_user, login_required, UserMixin
+from flask.ext.login import (
+    LoginManager,
+    current_user,
+    login_user as flask_login_user,
+    logout_user
+)
 
 
 def login_user(user, *args, **kwargs):
@@ -168,10 +166,7 @@ def setup_app(app):
 
     @_login_manager.user_loader
     def _load_user(uid):
-        """
-        Function should not raise an exception if uid is not valid
-        or User was not found in database.
-        """
+        """Do not raise an exception if uid is not valid or missing."""
         return UserInfo(int(uid))
 
     return app
