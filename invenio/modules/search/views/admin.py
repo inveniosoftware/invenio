@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,16 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
+"""WebSearch Admin Flask Blueprint."""
 
-"""WebSearch Admin Flask Blueprint"""
+from __future__ import print_function
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
     url_for, abort
-from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.sqlalchemy import db
 from ..models import Collection, CollectionCollection, \
-        Collectionname, CollectionPortalbox, Portalbox
+    Collectionname, CollectionPortalbox, Portalbox
 from invenio.base.i18n import _
 from invenio.base.decorators import templated
 from flask.ext.login import current_user, login_required
@@ -51,17 +51,16 @@ blueprint = Blueprint('websearch_admin', __name__,
 @login_required
 @permission_required('cfgwebsearch')
 @templated('search/admin_index.html')
-@register_menu(blueprint, 'main.admin.websearch', _('Configure WebSearch'),
-               order=50)
+@register_breadcrumb(blueprint, 'admin.websearch_admin', _('WebSearch'))
 def index():
-    """
-    WebSearch admin interface with editable collection tree.
-    """
+    """WebSearch admin interface with editable collection tree."""
     collection = Collection.query.get_or_404(1)
     orphans = Collection.query.filter(
         db.not_(db.or_(
-            Collection.id.in_(db.session.query(CollectionCollection.id_son).subquery()),
-            Collection.id.in_(db.session.query(CollectionCollection.id_dad).subquery())
+            Collection.id.in_(db.session.query(
+                              CollectionCollection.id_son).subquery()),
+            Collection.id.in_(db.session.query(
+                              CollectionCollection.id_dad).subquery())
         ))).all()
 
     return dict(collection=collection, orphans=orphans)
@@ -72,9 +71,8 @@ def index():
 @permission_required('cfgwebsearch')
 def modifycollectiontree():
     """
-    Handler of the tree changing operations triggered by the drag and drop operation
+    Handler of the tree changing operations triggered by the drag and drop operation.
     """
-
     # Get the requests parameters
     id_son = request.form.get('id_son', 0, type=int)
     id_dad = request.form.get('id_dad', 0, type=int)
@@ -91,8 +89,8 @@ def modifycollectiontree():
         # Get only one record
         cc = CollectionCollection.query.filter(
             db.and_(
-            CollectionCollection.id_son==id_son,
-            CollectionCollection.id_dad==id_dad
+                CollectionCollection.id_son == id_son,
+                CollectionCollection.id_dad == id_dad
             )).one()
         dad = Collection.query.get_or_404(id_dad)
         dad._collection_children.remove(cc)
@@ -132,14 +130,11 @@ def modifycollectiontree():
 @login_required
 @permission_required('cfgwebsearch')
 def managecollectiontree():
-    """
-    Here is where managing the tree is possible
-    """
-
+    """Here is where managing the tree is possible."""
     collection = Collection.query.get_or_404(1)
     orphans = Collection.query.filter(
-            Collection.id != CollectionCollection.id_dad,
-            id != CollectionCollection.id_son).get_or_404(1)
+        Collection.id != CollectionCollection.id_dad,
+        id != CollectionCollection.id_son).get_or_404(1)
 
     return dict(collection=collection, orphans=orphans)
 
@@ -149,23 +144,24 @@ def managecollectiontree():
 @login_required
 @permission_required('cfgwebsearch')
 def manage_collection(name):
-    collection = Collection.query.filter(Collection.name==name).first_or_404()
-    form = CollectionForm(request.form, obj = collection)
+    collection = Collection.query.filter(Collection.name == name).first_or_404()
+    form = CollectionForm(request.form, obj=collection)
 
     # gets the collections translations
-    translations = dict((x.ln,x.value) for x in  collection.collection_names)
+    translations = dict((x.ln, x.value) for x in collection.collection_names)
 
     # Creating the translations form
-    TranslationsFormFilled = TranslationsForm(language_list_long(), translations)
+    TranslationsFormFilled = TranslationsForm(language_list_long(),
+                                              translations)
     translation_form = TranslationsFormFilled(request.form)
     #for x in  collection.collection_names:
     #    translation_form[x.ln](default = x.value)
 
     #translation_form.populate_obj(translations)
 
-    return render_template('search/admin_collection.html', \
-            collection = collection, form=form, \
-            translation_form=translation_form)
+    return render_template('search/admin_collection.html',
+                           collection=collection, form=form,
+                           translation_form=translation_form)
 
 
 @blueprint.route('/collection/update/<id>', methods=['POST'])
@@ -173,8 +169,8 @@ def manage_collection(name):
 @permission_required('cfgwebsearch')
 def update(id):
     form = CollectionForm(request.form)
-    if  request.method == 'POST':# and form.validate():
-        collection = Collection.query.filter(Collection.id==id).first_or_404()
+    if request.method == 'POST':  # and form.validate():
+        collection = Collection.query.filter(Collection.id == id).first_or_404()
         form.populate_obj(collection)
         db.session.commit()
         flash(_('Collection was updated'), "info")
@@ -190,24 +186,19 @@ def create_collection():
     return dict(form=form)
 
 
-
-
 @blueprint.route('/collection/update_translations<id>', methods=['POST'])
 @login_required
 @permission_required('cfgwebsearch')
 #@login_required
 def update_translations(id):
-    """
-    updates translations if the value is altered or not void
-    """
-
-    collection = Collection.query.filter(Collection.id==id).first_or_404()
+    """Update translations if the value is altered or not void."""
+    collection = Collection.query.filter(Collection.id == id).first_or_404()
 
     for (lang, lang_long) in language_list_long():
 
         collection_name = Collectionname.query.filter(
-                db.and_(Collectionname.id_collection==id,
-            Collectionname.ln == lang, Collectionname.type=='ln')).first()
+            db.and_(Collectionname.id_collection == id,
+                    Collectionname.ln == lang, Collectionname.type == 'ln')).first()
 
         if collection_name:
             if collection_name.value != request.form.get(lang):
@@ -215,28 +206,28 @@ def update_translations(id):
                 db.session.commit()
         else:
             if request.form.get(lang) != '':
-                collection_name = Collectionname(collection, lang, \
-                       'ln', request.form.get(lang))
+                collection_name = Collectionname(collection, lang,
+                                                 'ln', request.form.get(lang))
                 db.session.add(collection_name)
                 db.session.commit()
 
     flash(_('Collection was updated on n languages:'), "info")
-    return redirect(url_for('.manage_collection', name = collection.name))
+    return redirect(url_for('.manage_collection', name=collection.name))
 
 
 @blueprint.route('/collection/manage_portalboxes_order', methods=['GET', 'POST'])
 #@login_required
 def manage_portalboxes_order():
-    id_p = request.args.get('id', 0 , type=int)
-    collection_id = request.args.get('id_collection', 0 , type=int)
-    order = request.args.get('score', 0 , type=int)
+    id_p = request.args.get('id', 0, type=int)
+    collection_id = request.args.get('id_collection', 0, type=int)
+    order = request.args.get('score', 0, type=int)
 
-    collection = Collection.query.filter(Collection.id==collection_id).first_or_404()
+    collection = Collection.query.filter(Collection.id == collection_id).first_or_404()
 
     portalbox = \
-            CollectionPortalbox.query.filter(db.and_(
-                CollectionPortalbox.id_portalbox==id_p,
-                CollectionPortalbox.id_collection==collection_id)).first_or_404()
+        CollectionPortalbox.query.filter(db.and_(
+            CollectionPortalbox.id_portalbox == id_p,
+            CollectionPortalbox.id_collection == collection_id)).first_or_404()
 
     position = portalbox.position
     p_order = portalbox.score
@@ -244,9 +235,10 @@ def manage_portalboxes_order():
     db.session.delete(portalbox)
 
     #p = portalboxes.pop(portalbox)
-    collection.portal_boxes_ln.set(CollectionPortalbox(collection_id, \
-            id_p,\
-            g.ln, position, p_order ), order )
+    collection.portal_boxes_ln.set(CollectionPortalbox(collection_id,
+                                                       id_p,
+                                                       g.ln, position,
+                                                       p_order), order)
     db.session.commit()
 
     return ''
@@ -257,4 +249,4 @@ def manage_portalboxes_order():
 @permission_required('cfgwebsearch')
 def edit_portalbox():
     portalbox = Portalbox.query.get(request.args.get_or_404('id', 0, type=int))
-    return dict(portalbox = portalbox)
+    return dict(portalbox=portalbox)
