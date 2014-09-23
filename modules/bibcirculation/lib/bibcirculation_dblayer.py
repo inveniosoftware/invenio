@@ -580,7 +580,7 @@ def get_pdf_request_data(status):
                             it.id_bibrec=lr.id_bibrec AND
                             lib.id = it.id_crcLIBRARY AND
                             lr.status=%s;
-                  """ , (status))
+                  """, (status,))
     return res
 
 
@@ -1558,13 +1558,21 @@ def get_borrower_details(borrower_id):
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
-    res =  run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
-                        FROM crcBORROWER
-                       WHERE id=%s""", (borrower_id, ))
+    res = run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
+                  FROM crcBORROWER WHERE id=%s""", (borrower_id, ))
     if res:
-        return res[0]
+        return clean_data(res[0])
     else:
         return None
+
+
+def clean_data(data):
+    final_res = list(data)
+    for i in range(0, len(final_res)):
+        if isinstance(final_res[i], str):
+            final_res[i] = final_res[i].replace(",", " ")
+    return final_res
+
 
 def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
     """
@@ -1599,7 +1607,7 @@ def get_borrower_data(borrower_id):
                   (borrower_id, ))
 
     if res:
-        return res[0]
+        return clean_data(res[0])
     else:
         return None
 
@@ -1614,7 +1622,7 @@ def get_borrower_data_by_id(borrower_id):
                       WHERE id=%s""", (borrower_id, ))
 
     if res:
-        return res[0]
+        return clean_data(res[0])
     else:
         return None
 
@@ -1694,7 +1702,7 @@ def get_borrower_address(email):
                      WHERE email=%s""", (email, ))
 
     if len(res[0][0]) > 0:
-        return res[0][0]
+        return res[0][0].replace(",", " ")
     else:
         return 0
 
