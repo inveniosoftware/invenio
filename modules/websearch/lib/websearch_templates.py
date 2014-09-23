@@ -77,7 +77,7 @@ from invenio.search_engine_config import CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import run_sql, CFG_DATABASE_NAME
 from invenio.messages import gettext_set_language
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
-from invenio.htmlutils import nmtoken_from_string
+from invenio.htmlutils import nmtoken_from_string, encode_for_xml
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
 from invenio.webuser import session_param_get
@@ -5122,12 +5122,12 @@ class Template:
                     <databaseInfo>
                       <title>%s</title>
                       <description lang="en" primary="true">%s</description>
-                    </databaseInfo>""" % (self.sru_protocol_version,
-                                        site_sru_url,
-                                        site_port,
-                                        CFG_DATABASE_NAME,
-                                        CFG_SITE_NAME,
-                                        CFG_SITE_NAME)
+                    </databaseInfo>""" % (encode_for_xml(sel.sru_protocol_version),
+                                          encode_for_xml(site_sru_url),
+                                          encode_for_xml(site_port),
+                                          encode_for_xml(CFG_DATABASE_NAME),
+                                          encode_for_xml(CFG_SITE_NAME),
+                                          encode_for_xml(CFG_SITE_NAME))
 
         out += """<indexInfo>
                       <set identifier="info:srw/cql-context-set/1/cql-v1.1" name="cql"/>
@@ -5136,7 +5136,7 @@ class Template:
         res = run_sql("""SELECT id, name, description FROM idxINDEX""")
         if res:
             for id, name, description in res:
-                out += """<index id="%d"><title>%s</title><map><name set="dc">%s</name></map></index>""" % (id, name, description)
+                out += """<index id="%d"><title>%s</title><map><name set="dc">%s</name></map></index>""" % (encode_for_xml(id, quote=True), encode_for_xml(name), encode_for_xml(description))
 
         out += """</indexInfo>
         <schemaInfo>
@@ -5168,7 +5168,7 @@ class Template:
             <zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/">
             <zs:version>%s</zs:version>
             <zs:numberOfRecords>%d</zs:numberOfRecords>""" % \
-            (self.sru_protocol_version, params['number_of_records'])
+            (encode_for_xml(self.sru_protocol_version), params['number_of_records'])
         return out
 
     def tmpl_sru_search_retrieve_epilogue(self):
