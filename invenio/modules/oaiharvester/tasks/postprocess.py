@@ -302,6 +302,8 @@ def refextract(obj, eng):
 
     if "_result" not in obj.extra_data:
         obj.extra_data["_result"] = {}
+
+    pdf = None
     if "pdf" not in obj.extra_data["_result"] or not os.path.isfile(obj.extra_data["_result"]["pdf"]):
         extract_path = os.path.join(
             cfg['CFG_TMPSHAREDDIR'],
@@ -312,11 +314,9 @@ def refextract(obj, eng):
         tarball, pdf = harvest_single(
             obj.data["system_control_number"]["value"], extract_path, ["pdf"]
         )
+        obj.extra_data["_result"]["pdf"] = pdf
 
-        if pdf is not None:
-            obj.extra_data["_result"]["pdf"] = pdf
-
-    if os.path.isfile(obj.extra_data["_result"]["pdf"]):
+    if pdf and os.path.isfile(obj.extra_data["_result"]["pdf"]):
         references_xml = extract_references_from_file_xml(
             obj.extra_data["_result"]["pdf"])
         if references_xml:

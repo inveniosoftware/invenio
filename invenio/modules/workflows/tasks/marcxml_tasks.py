@@ -122,6 +122,12 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
         eng.log.info("Starting conversion using %s stylesheet" %
                      (stylesheet,))
 
+        if not obj.data:
+            obj.log.error("Not valid conversion data!")
+            raise WorkflowError("Error: conversion data missing",
+                                id_workflow=eng.uuid,
+                                id_object=obj.id)
+
         try:
             obj.data = convert(obj.data, stylesheet)
         except Exception as e:
