@@ -1715,13 +1715,13 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     def add_new_library_step3(self, req, form):
         """http://cds.cern.ch/admin2/bibcirculation/add_new_library_step3"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
-            'phone': (str, None), 'address': (str, None), 'type': (str, None),
+            'phone': (str, None), 'address': (str, None), 'lib_type': (str, None),
             'notes': (str, None), 'ln': (str, "en")})
         name = argd['name']
         email = argd['email']
         phone = argd['phone']
         address = argd['address']
-        library_type = argd['type']
+        library_type = argd['lib_type']
         notes = argd['notes']
         ln = argd['ln']
 
