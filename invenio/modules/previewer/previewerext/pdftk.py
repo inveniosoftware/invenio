@@ -17,7 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import current_app, jsonify, request, safe_join
+"""Implemenent PDFTk previewer plugin."""
+
+from flask import abort, current_app, jsonify, request, safe_join
 
 from invenio.base.globals import cfg
 from invenio.utils.shell import run_shell_command  # FIXME: subprocess.Popen
@@ -27,38 +29,41 @@ from ..utils import get_pdf_path
 
 
 def can_preview(f):
-    '''Returns True for PDFs, False for others'''
-    if f.superformat == '.pdf':
+    """Return True for PDFs, False for others."""
+    if f.superformat == ".pdf":
         return True
     return False
 
 
 def preview(f):
+    """Generate preview for a file."""
     generate_preview(f)  # FIXME: call as Celery task at record upload time?
     return send_pdf_image_data(current_app.instance_path + "/previews/" +
                                str(f.get_recid()))
 
 
 def send_pdf_image_data(directory):
+    """Send encoded raw PNG preview of a PDF page."""
     try:
         raw_file = open(safe_join(directory, "pg_" +
-                                  request.args.get('page', default='1',
+                                  request.args.get("page", default="1",
                                                    type=str) +
-                                  ".png"), 'r')
+                                  ".png"), "r")
         # FIXME: use Documents to store previews
         import base64
         return base64.b64encode(raw_file.read())
     except IOError:
-        return '404', 'Not Found'
+        current_app.logger.exception("PDF page not found")
+        abort(404)
 
 
 def maxpage(f):
-    """Returns the number of pages for PDF records via AJAX"""
-    cmd_pdftk = '%s %s dump_data output | grep NumberOfPages'
+    """Return number of pages for PDF records via AJAX."""
+    cmd_pdftk = "%s %s dump_data output | grep NumberOfPages"
     pdf = get_pdf_path(f)
     if pdf is not None:
         (exit_status, output_std, output_err) = \
-            run_shell_command(cmd_pdftk, args=(str(cfg['CFG_PATH_PDFTK']), pdf))
+            run_shell_command(cmd_pdftk, args=(str(cfg["CFG_PATH_PDFTK"]), pdf))
         if int(exit_status) == 0 and len(output_err) == 0:
-            return jsonify(maxpage=int(output_std.strip().split(' ')[1]))
+            return jsonify(maxpage=int(output_std.strip().split(" ")[1]))
     return jsonify(maxpage=-1)

@@ -35,8 +35,6 @@ blueprint = Blueprint('previewer', __name__, url_prefix="/" + CFG_SITE_RECORD,
 
 default_breadcrumb_root(blueprint, '.')
 
-from flask import current_app
-
 
 @blueprint.route('/<int:recid>/preview', methods=['GET', 'POST'])
 @request_record
@@ -58,7 +56,6 @@ def preview(recid):
                     ordered).keys()
 
             for plugin_id in ordered:
-                current_app.logger.info(plugin_id)
                 if previewers[plugin_id]['can_preview'](f):
                     return previewers[plugin_id]['preview'](f)
     return previewers['default']['preview'](None)

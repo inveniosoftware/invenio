@@ -23,7 +23,7 @@
 {%- block global_bundles -%}
   {{ super() }}
   {%- if config.ANNOTATIONS_PREVIEW_ENABLED -%}
-    {%- bundles "previewer.css", "previewer.js"}
+    {%- bundles "previewer/pdf.css", "previewer/pdf.js" -%}
   {%- endif -%}
   {%- bundles "comments.css", "annotations.js" -%}
 {%- endblock -%}

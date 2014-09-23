@@ -17,13 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Implement Celery tasks for generating previews."""
+
 import os
 
 from flask import current_app, safe_join
 
 from invenio.base.globals import cfg
 
-from invenio.base.helpers import with_app_context
 from invenio.celery import celery
 from invenio.utils.shell import run_shell_command  # FIXME: subprocess.Popen
 
@@ -31,15 +32,15 @@ from .utils import get_pdf_path
 
 
 @celery.task
-@with_app_context()
 def generate_preview(f):
-    directory = current_app.instance_path + "/previews/"
+    """Generate PNG previews of PDF pages."""
+    directory = os.path.join(current_app.instance_path, "previews")
     try:
         os.mkdir(directory)
     except OSError:  # directory already exists as per docs
         pass
 
-    directory += str(f.get_recid())
+    directory = os.path.join(directory, str(f.get_recid()))
     try:
         os.mkdir(directory)
     except OSError:  # directory already exists as per docs, preview exists
@@ -56,5 +57,3 @@ def generate_preview(f):
                 run_shell_command(cmd_pdftk, args=(
                     str(cfg["CFG_PATH_CONVERT"]), fn, directory,
                     fn))
-
-    return directory
