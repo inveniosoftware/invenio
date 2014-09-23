@@ -52,6 +52,7 @@ EXTENSIONS = [
     'invenio.ext.collect',
     'invenio.ext.restful',
     'invenio.ext.menu',
+    'invenio.ext.jasmine',  # after assets
     'flask.ext.breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
 ]
