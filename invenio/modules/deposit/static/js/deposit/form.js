@@ -22,7 +22,7 @@ define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery'),
-        defineComponent = require('flight/component'),
+        defineComponent = require('flight/lib/component'),
         tpl_file_entry = require('hgn!./templates/file_entry'),
         tpl_file_link = require('hgn!./templates/file_link'),
         tpl_flash_message = require('hgn!./templates/flash_message'),
@@ -45,7 +45,6 @@ define(function(require, exports, module) {
     require('ui/datepicker')
     // provides $.fn.typeahead
     require('typeahead')
-
   var empty_cssclass = "empty-element";
 
   return defineComponent(depositForm);
@@ -67,7 +66,7 @@ define(function(require, exports, module) {
         formSaveClass: '.form-save',
         formSubmitClass: '.form-submit',
         dynamicFieldListClass : ".dynamic-field-list",
-        pluploaderClass: ".pluploader"
+        uploaderSelector: "#uploader"
       });
 
   //
@@ -99,6 +98,7 @@ define(function(require, exports, module) {
    * Serialize a form
    */
   this.serialize_form = function(selector){
+
       // Sync CKEditor before serializing
       if (typeof CKEDITOR !== 'undefined') {
         $.each(CKEDITOR.instances, function(instance, editor) {
@@ -106,15 +106,15 @@ define(function(require, exports, module) {
         });
       }
       var fields = $(selector).serializeArray(),
-          $pluploader = $(this.attr.pluploaderClass);
+          uploader = this.select('uploaderSelector');
 
-      if ( $pluploader.length ) {
-        // There is a pluploader instance in the form
+      if ( uploader.length ) {
         fields.push({
           name: 'files',
-          value: $pluploader.data('pluploadWidget').val()
+          value: uploader.data('getOrderedFileList')()
         });
       }
+
       return serialize_object(fields);
   }
 
@@ -419,7 +419,7 @@ define(function(require, exports, module) {
    * @param data {Object}
    */
   this.onSaveField = function(ev, data) {
-    save_field(data.save_url, data.name, data.value);
+    save_field(this.attr.save_url, data.name, data.value);
   }
 
 
