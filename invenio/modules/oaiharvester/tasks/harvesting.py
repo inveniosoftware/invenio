@@ -22,6 +22,8 @@
 import os
 import time
 
+from functools import wraps
+
 from invenio.base.globals import cfg
 
 
@@ -41,6 +43,9 @@ def init_harvesting(obj, eng):
                       "that the following task could failed or work not as expected")
         obj.extra_data["options"] = {}
     eng.log.info("end of init_harvesting")
+
+
+init_harvesting.description = 'Start harvesting'
 
 
 def filtering_oai_pmh_identifier(obj, eng):
@@ -82,6 +87,7 @@ def get_repositories_list(repositories=()):
     from invenio.modules.oaiharvester.models import OaiHARVEST
     from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+    @wraps(get_repositories_list)
     def _get_repositories_list(obj, eng):
         repositories_to_harvest = repositories
         reposlist_temp = []
@@ -182,6 +188,7 @@ def get_records_from_file(path=None):
     """Allow to retrieve the records from a file."""
     from invenio.legacy.oaiharvest.utils import record_extraction_from_file
 
+    @wraps(get_records_from_file)
     def _get_records_from_file(obj, eng):
         if "_LoopData" not in eng.extra_data:
             eng.extra_data["_LoopData"] = {}

@@ -23,6 +23,8 @@ import os
 import random
 import re
 
+from functools import wraps
+
 from invenio.base.globals import cfg
 
 
@@ -35,6 +37,7 @@ REGEXP_REFS = re.compile(
 
 def post_process_selected(post_process):
     """Check if post process is selected."""
+    @wraps(post_process_selected)
     def _post_process_selected(obj, eng):
         try:
             post_process_list = obj.extra_data["repository"]["postprocess"]
@@ -64,6 +67,7 @@ def convert_record_with_repository(stylesheet="oaidc2marcxml.xsl"):
     to convert a oai record to a marcxml one
     :type stylesheet: str
     """
+    @wraps(convert_record_with_repository)
     def _convert_record(obj, eng):
         from invenio.modules.workflows.tasks.marcxml_tasks import convert_record
         eng.log.info("my type: %s" % (obj.data_type,))
@@ -163,6 +167,7 @@ def plot_extract(plotextractor_types=("latex",)):
     :param plotextractor_types:
     :return: :raise workflows_error.WorkflowError:
     """
+    @wraps(plot_extract)
     def _plot_extract(obj, eng):
         """Perform the plotextraction step.
 
@@ -435,8 +440,7 @@ def author_list(obj, eng):
 
 
 def upload_step(obj, eng):
-    """
-    Perform the upload step.
+    """Perform the upload step.
 
     :param obj: BibWorkflowObject to process
     :param eng: BibWorkflowEngine processing the object
