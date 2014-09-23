@@ -121,10 +121,8 @@ install_requires = [
     "setuptools>=2.2",
     "six>=1.7.2",
     "Sphinx",
-    # SQLAlchemy 0.9 is not compatible yet
-    "SQLAlchemy>=0.8.3,<0.9",
-    # SQLAlchemy-Utils>0.24 depends on SQLAlchemy>=0.9.3
-    "SQLAlchemy-Utils>=0.23.5,<0.24",
+    "SQLAlchemy>=0.9.8",
+    "SQLAlchemy-Utils>=0.27",
     "unidecode",
     "workflow>=1.1.0",
     # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
