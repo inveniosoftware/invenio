@@ -16,17 +16,27 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
+'use strict';
 
-require(
-  [
-    'jquery',
-    'js/deposit/form',
-    'js/deposit/uploader/uploader',
-    "js/deposit/uploader/uploaders/plUploader",
-    "js/deposit/uploader/uploaders/dropboxUploader",
-  ], function() {
-    /*
-     * It preloads js/deposit/form to give it a name so you're free to use it
-     * from any places.
-     */
+define({
+
+  bytesToSize : function (bytes) {
+    if (bytes === 0) {
+      return '0 Byte';
+    }
+    var k = 1000;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toPrecision(3) + ' ' + sizes[i];
+  },
+
+  guid : (function () {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+    return function () {
+      return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    };
+  })()
+
 });

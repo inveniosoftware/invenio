@@ -24,11 +24,11 @@ require.config({
         'ui': 'vendors/jquery-ui/ui',
         'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/dist',
         'jquery-form': 'vendors/jquery-form/jquery.form',
-	'jquery-ui': 'vendors/jquery-ui/jquery-ui.min',
+        'jquery-ui': 'vendors/jquery-ui/jquery-ui.min',
         hgn: 'vendors/requirejs-hogan-plugin/hgn',
         hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
         text: 'vendors/requirejs-hogan-plugin/text',
-        flight: 'vendors/flight/lib',
+        flight: 'vendors/flight',
         typeahead: 'vendors/typeahead.js/dist/typeahead.bundle',
     },
     shim: {

@@ -1,0 +1,23 @@
+<tr id='{{file.id}}'>
+  <td>
+  {{#downloadable}}
+    <a href="{{get_file_url}}?file_id={{file.server_id}}">
+  {{/downloadable}}
+  {{file.name}}
+  {{#downloadable}}
+    </a>
+  {{/downloadable}}
+  </td>
+  <td>{{file.size}}</td>
+  <td>
+    <div class="progress">
+      <div class="progress-bar progress-bar-default" style="width: {{file.percent}}%;">
+        {{file.percent}}%
+      </div>
+    </div>
+  </td>
+  <td>
+    <a id="sortFile" class='glyphicon glyphicon-align-justify'></a>
+    <a id="removeFile" style='margin-left: 20px' class='glyphicon glyphicon-trash'></a>
+  </td>
+</tr>
