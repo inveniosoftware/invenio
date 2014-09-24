@@ -119,7 +119,7 @@ class LaziestDict(LazyDict):
         # It will give you the JsonReader class
     """
 
-    def __init__(self, function):
+    def __init__(self, function=dict):
         """
         :param function: it must accept one parameter (the key of the
             dictionary)
@@ -158,7 +158,7 @@ import re
 
 class SmartDict(object):
     """
-    This dictionary allows to do some 'smart queries' to its content::
+    This dictionary allows to do some 'smart queries' to its content:
 
         >>> d = SmartDict()
 
@@ -173,6 +173,19 @@ class SmartDict(object):
         [1,2,3]
         >>> d['a[1:]']
         [{'b':2}, {'b':3}]
+
+    note: you can't use the reserved words '.', '[', ']' like key.
+          e.g:
+
+        >>> d['.']
+        >>> d[']']
+        >>> d['.a']
+
+          also is not recommended initialize SmartDict() with a array
+          with inside a reserved words.
+          e.g:
+
+        >>> d = SmartDict({'a': 3, 'b': {'.': 5}})
     """
 
     split_key_pattern = re.compile('\.|\[')
@@ -225,6 +238,11 @@ class SmartDict(object):
         return value
 
     def __setitem__(self, key, value, extend=False, **kwargs):
+        # check if the key is composed only by special chars
+        if key[0] in ['.', ']', '[']:
+            # this kind of key is not supported!
+            raise KeyError
+
         if '.' not in key and ']' not in key and not extend:
             self._dict[key] = value
         else:
@@ -284,7 +302,9 @@ class SmartDict(object):
             else:
                 return value
 
-        if ']' in key:  # list
+        if key in ['.', ']']:
+            chunk[key] = value
+        elif ']' in key:  # list
             key = int(key[:-1].replace('n', '-1'))
             if extend:
                 if chunk is None:
