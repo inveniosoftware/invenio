@@ -1269,9 +1269,9 @@ def create_new_record(rec_id=None, pretend=False):
         else:
             return run_sql("SELECT max(id)+1 FROM bibrec")[0][0]
     if rec_id is not None:
-        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date, ingestion_date) VALUES (%s, NOW(), NOW(), NOW())", (rec_id, ))
+        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date, earliest_date) VALUES (%s, NOW(), NOW(), NOW())", (rec_id, ))
     else:
-        return run_sql("INSERT INTO bibrec (creation_date, modification_date, ingestion_date) VALUES (NOW(), NOW(), NOW())")
+        return run_sql("INSERT INTO bibrec (creation_date, modification_date, earliest_date) VALUES (NOW(), NOW(), NOW())")
 
 def insert_bibfmt(id_bibrec, marc, bibformat, modification_date='1970-01-01 00:00:00', pretend=False):
     """Insert the format in the table bibfmt"""
@@ -2259,7 +2259,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 def update_bibrec_date(now, bibrec_id, insert_mode_p, original_005=None, pretend=False):
     """Update the date of the record in bibrec table """
     if insert_mode_p:
-        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s, ingestion_date=%s WHERE id=%s"""
+        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s, earliest_date=%s WHERE id=%s"""
         params = (original_005, now, now, bibrec_id)
     else:
         query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""

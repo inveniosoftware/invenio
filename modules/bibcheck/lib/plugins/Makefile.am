@@ -32,7 +32,7 @@ pylib_DATA = __init__.py \
     doi.py \
     crossref_checker.py \
     url.py \
-    creation_date.py
+    earliest_date.py
 
 EXTRA_DIST = $(pylib_DATA)
 

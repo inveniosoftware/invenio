@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS bibrec (
   id mediumint(8) unsigned NOT NULL auto_increment,
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
-  ingestion_date datetime NOT NULL default '0000-00-00',
+  earliest_date datetime NOT NULL default '0000-00-00',
   master_format varchar(16) NOT NULL default 'marc',
   PRIMARY KEY  (id),
   KEY creation_date (creation_date),
   KEY modification_date (modification_date),
-  KEY ingestion_date (ingestion_date)
+  KEY earliest_date (earliest_date)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib00x (
@@ -5155,5 +5155,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_06_new_field_not
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_10_new_field_address',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_11_new_field_datasource',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_07_new_journalpage_index',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_ingestion_date',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_earliest_date',NOW());
 -- end of file

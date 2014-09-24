@@ -133,10 +133,10 @@ class WebAlertFilteringRestrictedRecords(InvenioTestCase):
 
     def test_alert_theses_and_poems_for_juliet(self):
         """webalert - Juliet does not get Theses in alert"""
-        self.assertTrue('-> these records have been filtered out, as user id 6 did not have access:\n[105, 39, 38, 37, 36, 35, 42, 41, 40' in self.alerts['Juliet alert 1'], "%s not in %s" % ('-> these records have been filtered out, as user id 6 did not have access:\n[105, 39, 38, 37, 36, 35, 42, 41, 40', repr(self.alerts['Juliet alert 1'])))
-        self.assertTrue(CFG_SITE_RECORD + '/35' not in self.alerts['Juliet alert 1'])
-        self.assertTrue(CFG_SITE_RECORD + '/41' not in self.alerts['Juliet alert 1'])
-        self.assertTrue(CFG_SITE_RECORD + '/75' in self.alerts['Juliet alert 1'])
+        self.assert_('-> these records have been filtered out, as user id 6 did not have access:\n[105, 42, 41, 40, 39, 38, 37, 36, 35' in self.alerts['Juliet alert 1'])
+        self.assert_(CFG_SITE_RECORD + '/35' not in self.alerts['Juliet alert 1'])
+        self.assert_(CFG_SITE_RECORD + '/41' not in self.alerts['Juliet alert 1'])
+        self.assert_(CFG_SITE_RECORD + '/75' in self.alerts['Juliet alert 1'])
 
     def test_alert_theses_and_poems_for_romeo(self):
         """webalert - Romeo gets Theses in alert"""
