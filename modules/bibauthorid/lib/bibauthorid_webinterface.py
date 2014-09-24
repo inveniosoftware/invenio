@@ -1201,9 +1201,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip),
                             'name': name,
                             'email': email,
-                            'merge link': "%s/author/merge_profiles?primary_profile=%s&selection=%s" % (CFG_SITE_URL, primary_cname, selection_str)}
+                            'merge link': "%s/author/merge_profiles?primary_profile=%s&selection=%s" % (CFG_SITE_URL, primary_cname, selection_str),
+                            'uid': uid}
                 # a message is sent to the admin with info regarding the currently attempted merge
-                webapi.create_request_message(userinfo, subj='Merge profiles request')
+                webapi.create_request_message(userinfo, subj=('Merge profiles request: %s' % primary_cname))
 
                 # when redirected back to the manage profile page display a message about the merge
                 pinfo['merge_info_message'] = ("success", "confirm_operation")
@@ -1280,7 +1281,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                         'name_given': name_given,
                         'email_given': email_given,
                         'name_changed': name_changed,
-                        'email_changed': email_changed}
+                        'email_changed': email_changed,
+                        'uid': uid}
 
             webapi.create_request_message(userinfo)
 
@@ -2942,9 +2944,11 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         else:
             return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid hepname.")
 
-        webapi.connect_author_with_hepname(cname, hepname)
         webapi.session_bareinit(req)
         session = get_session(req)
+
+        webapi.connect_author_with_hepname(cname, hepname, session['uid'])
+
         pinfo = session['personinfo']
         last_visited_page = webapi.history_get_last_visited_url(pinfo['visit_diary'], just_page=True)
 
@@ -2981,7 +2985,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session = get_session(req)
         pinfo = session['personinfo']
         if not self._is_admin(pinfo):
-            webapi.connect_author_with_hepname(cname, hepname)
+            webapi.connect_author_with_hepname(cname, hepname, session['uid'])
         else:
             uid = getUid(req)
             add_cname_to_hepname_record(cname, hepname, uid)
@@ -3001,7 +3005,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         else:
             return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid ORCiD.")
 
-        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+        session = get_session(req)
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
         redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, pid))
 
     def suggest_orcid_ajax(self, req, form):
@@ -3034,7 +3040,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         if not is_valid_orcid(orcid):
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
-        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+        session = get_session(req)
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
 
     def _fail(self, req, code):
         req.status = code
@@ -3369,6 +3377,7 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
         @return:
         @rtype: json data
         '''
+
         # Abort if the simplejson module isn't available
         assert CFG_JSON_AVAILABLE, "Json not available"
         # Fail if no json data exists in the Ajax request

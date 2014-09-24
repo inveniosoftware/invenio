@@ -1816,7 +1816,6 @@ def update_request_ticket_for_author(pid, ticket_dict, tid=None):  # update_requ
                values (%s, %s, %s, %s)""",
            (pid, 'request_tickets', request_tickets, request_tickets_num))
 
-
 def remove_request_ticket_for_author(pid, tid=None):  # delete_request_ticket
     '''
     Removes a request ticket from the given author. If ticket identifier is not
@@ -1857,7 +1856,7 @@ def remove_request_ticket_for_author(pid, tid=None):  # delete_request_ticket
     run_sql("""insert into aidPERSONIDDATA
                (personid, tag, datablob, opt1)
                values (%s, %s, %s, %s)""",
-           (pid, 'request_tickets', request_tickets, request_tickets_num))
+            (pid, 'request_tickets', request_tickets, request_tickets_num))
 
 
 def modify_canonical_name_of_authors(pids_newcnames=None):  # change_personID_canonical_names
