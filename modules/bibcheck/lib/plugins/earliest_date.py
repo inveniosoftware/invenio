@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Backdate the creation_date of a record to reflect the earliest date information
+Populates the earliest_date of a record to reflect the earliest date information
 available.
 Note in case of partial dates (e.g. just the year or just year-month), if there
 is another valid date within the
@@ -35,7 +35,7 @@ CFG_POSSIBLE_DATE_FORMATS = ["%Y-%m-%d", "%d %m %Y", "%x", "%d %b %Y", "%d %B %Y
 
 def check_records(records, date_fields=CFG_DEFAULT_DATE_FIELDS):
     """
-    Backdate the creation_date of a record to reflect the earliest date information
+    Backdate the earliest_date of a record to reflect the earliest date information
     available.
     Note in case of partial dates (e.g. just the year or just year-month), if there
     is another valid date within the
@@ -44,11 +44,11 @@ def check_records(records, date_fields=CFG_DEFAULT_DATE_FIELDS):
         dates = []
         recid = int(record["001"][0][3])
 
-        creation_date, modification_date, ingestion_date = run_sql("SELECT creation_date, modification_date, ingestion_date FROM bibrec WHERE id=%s", (recid, ))[0]
+        creation_date, modification_date, earliest_date = run_sql("SELECT creation_date, modification_date, earliest_date FROM bibrec WHERE id=%s", (recid, ))[0]
         creation_date = strftime("%Y-%m-%d %H:%M:%S", creation_date)
         modification_date = strftime("%Y-%m-%d %H:%M:%S", modification_date)
-        ingestion_date = strftime("%Y-%m-%d %H:%M:%S", ingestion_date)
-        dates.append(ingestion_date)
+        earliest_date = strftime("%Y-%m-%d %H:%M:%S", earliest_date)
+        dates.append(creation_date)
         dates.append(modification_date)
 
         if '005' in record:
@@ -80,6 +80,6 @@ def check_records(records, date_fields=CFG_DEFAULT_DATE_FIELDS):
         min_date = min(dates)
         ## Let's restore meaningful first month and day
         min_date = min_date.replace("-99", "-01")
-        if min_date != creation_date:
-            run_sql("UPDATE bibrec SET creation_date=%s WHERE id=%s", (min_date, recid))
-            record.warn("record creation_date amended from %s to %s" % (creation_date, min_date))
+        if min_date != earliest_date:
+            run_sql("UPDATE bibrec SET earliest_date=%s WHERE id=%s", (min_date, recid))
+            record.warn("record earliest_date amended from %s to %s" % (earliest_date, min_date))

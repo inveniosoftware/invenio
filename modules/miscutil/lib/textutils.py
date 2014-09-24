@@ -466,7 +466,7 @@ def decode_to_unicode(text, default_encoding='utf-8'):
     if detected_encoding == None:
         # No chardet detection, try to make a basic guess
         dummy, detected_encoding = guess_minimum_encoding(text)
-    return text.decode(detected_encoding)
+    return text.decode(detected_encoding, errors='ignore')
 
 def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
                             (CFG_ETCDIR,)):

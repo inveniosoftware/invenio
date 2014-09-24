@@ -3828,7 +3828,7 @@ class Template:
                                       content,
                                       creationdate=None,
                                       modificationdate=None,
-                                      ingestiondate=None):
+                                      earliestdate=None):
         """Returns the main detailed page of a record
 
         Parameters:
@@ -3845,7 +3845,7 @@ class Template:
 
           - 'modificationdate' *string* - The last modification date of the printed record
 
-          - 'ingestiondate' *string* - The ingestion date of the printed record
+          - 'earliestdate' *string* - The earliest date of the printed record
         """
         _ = gettext_set_language(ln)
 

@@ -1252,26 +1252,27 @@ class BibIndexFindingAffectedIndexes(InvenioTestCase):
 
     def test_concurrent_bibupload(self):
         """bibindex - checks if bibupload and bibindex can run concurrently"""
-        from invenio.bibupload import update_job_end_dates
+        from invenio.bibupload import update_bibrec_date
         bibnow = run_sql("""SELECT last_updated FROM bibfmt
                             WHERE format = 'xm' AND id_bibrec = 1""")[0][0]
-        now = datetime.now()
-        update_job_end_dates(bibrec_now=now.strftime("%Y-%m-%d %H:%M:%S"),
-                             rec_id=1,
-                             insert_mode_p=False,
-                             pretend=False)
+        try:
+            now = datetime.now()
+            update_bibrec_date(now=now.strftime("%Y-%m-%d %H:%M:%S"),
+                               bibrec_id=1,
+                               insert_mode_p=False,
+                               pretend=False)
 
-        index_name = "abstract"
-        task_id = reindex_for_type_with_bibsched(index_name)
-        filename = task_log_path(task_id, 'log')
-        with open(filename) as fl:
-            text = fl.read()  # small file
-        self.assertTrue("Selected indexes/recIDs are up to date." not in text)
-
-        update_job_end_dates(bibrec_now=bibnow.strftime("%Y-%m-%d %H:%M:%S"),
-                             rec_id=1,
-                             insert_mode_p=False,
-                             pretend=False)
+            index_name = "abstract"
+            task_id = reindex_for_type_with_bibsched(index_name)
+            filename = task_log_path(task_id, 'log')
+            with open(filename) as fl:
+                text = fl.read()  # small file
+            self.assertTrue("Selected indexes/recIDs are up to date." not in text)
+        finally:
+            update_bibrec_date(now=bibnow.strftime("%Y-%m-%d %H:%M:%S"),
+                               bibrec_id=1,
+                               insert_mode_p=False,
+                               pretend=False)
 
 
 class BibIndexIndexingAffectedIndexes(InvenioTestCase):
