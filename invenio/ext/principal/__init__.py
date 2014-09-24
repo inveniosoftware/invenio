@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,31 +17,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.principal
-    ---------------------
-
-    This module provides initialization and configuration for
-    `flask.ext.principal` module.
-"""
+"""Initialize and configure *Flask-Principal* extension."""
 
 from flask import current_app
-from flask.ext.login import current_user, user_logged_in, user_logged_out
+from flask.ext.login import user_logged_in, user_logged_out
 from flask.ext.principal import Principal, Identity, AnonymousIdentity, \
     identity_changed, Permission
 from six import iteritems
+
+from .wrappers import actions, Action
+
+__all__ = ('setup_app', 'principals', 'permission_required', 'actions',
+           'Action')
 
 principals = Principal()
 
 
 class AccAuthorizeActionPermission(Permission):
 
+    """Wrapper for ``acc_authorize_action``."""
+
     def __init__(self, action, **kwargs):
+        """Define action and arguments."""
         self.action = action
         self.params = kwargs
         super(self.__class__, self).__init__()
 
     def allows(self, identity):
+        """Check if given identity can perform defined action."""
         from invenio.modules.access.engine import acc_authorize_action
         auth, message = acc_authorize_action(
             identity.id, self.action, **dict(
@@ -54,11 +57,13 @@ class AccAuthorizeActionPermission(Permission):
 
 
 def permission_required(action, **kwargs):
-    return AccAuthorizeActionPermission(action, **kwargs).require(http_exception=401)
+    """Check if user can perform given action."""
+    return AccAuthorizeActionPermission(action, **kwargs).require(
+        http_exception=401)
 
 
 def setup_app(app):
-
+    """Setup principal extension."""
     principals.init_app(app)
 
     @user_logged_in.connect_via(app)
@@ -69,9 +74,9 @@ def setup_app(app):
     def _logged_out(sender, user):
         identity_changed.send(sender, identity=AnonymousIdentity())
 
-    #@identity_loaded.connect_via(app)
-    #def on_identity_loaded(sender, identity):
-    #    """One can modify idenity object."""
-    #    pass
+    # @identity_loaded.connect_via(app)
+    # def on_identity_loaded(sender, identity):
+    #     """One can modify idenity object."""
+    #     pass
 
     return app

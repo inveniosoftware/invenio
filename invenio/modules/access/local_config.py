@@ -559,6 +559,16 @@ DEF_ACTIONS = (
                ('runinfomanager', 'run Info Space Manager', '', 'no')
               )
 
+
+from invenio.ext.principal.wrappers import Action
+
+for action in DEF_ACTIONS:
+    type(action[0], (Action, ), {
+        '__doc__': action[1],
+        'allowedkeywords': action[2].split(','),
+        'optional': action[3] == "yes"
+    })
+
 # Default authorizations
 #              role          action        arguments
 DEF_AUTHS = (('basketusers', 'usebaskets', {}),

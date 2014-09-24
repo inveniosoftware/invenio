@@ -39,7 +39,8 @@ from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
-    DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
+    DEF_USERS, DEF_ROLES, DEF_AUTHS, CFG_ACC_ACTIVITIES_URLS
+from invenio.ext import principal
 from invenio.legacy.dbquery import run_sql, ProgrammingError
 from invenio.modules.access.firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
@@ -1826,12 +1827,17 @@ def acc_add_default_settings(superusers=(),
 
     # add actions
     insactions = []
-    for (name, description, allkeys, optional) in DEF_ACTIONS:
+    for action in principal.actions:
+        name = action.name
+        description = action.description
+        optional = 'yes' if action.optional else 'no'
+        allkeys = ','.join(action.allowedkeywords) \
+            if action.allowedkeywords is not None else ''
         # try to add action as new
         action_id = acc_add_action(name, description, optional, allkeys)
         # action with the name exist
         if not action_id:
-            action_id = acc_get_action_id(name_action=name)
+            action_id = acc_get_action_id(name_action=action.name)
             # update the action, necessary updates to the database
             # will also be done
             acc_update_action(id_action=action_id, optional=optional,
