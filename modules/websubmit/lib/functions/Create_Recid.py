@@ -27,7 +27,7 @@ def Create_Recid(parameters, curdir, form, user_info=None):
     """
     global sysno
     if not os.path.exists("%s/SN" % curdir):
-        recid = run_sql("insert into bibrec (creation_date,modification_date,ingestion_date) values(NOW(),NOW(),NOW())")
+        recid = run_sql("insert into bibrec (creation_date,modification_date,earliest_date) values(NOW(),NOW(),NOW())")
         fp = open("%s/SN" % curdir,"w")
         fp.write(str(recid))
         sysno = recid

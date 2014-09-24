@@ -774,7 +774,7 @@ URI: http://%(host)s%(page)s
                                       show_similar_rec_p=True,
                                       creationdate=None,
                                       modificationdate=None,
-                                      ingestiondate=None,
+                                      earliestdate=None,
                                       show_short_rec_p=True,
                                       citationnum=-1, referencenum=-1, discussionnum=-1,
                                       include_jquery = False, include_mathjax = False):
@@ -791,7 +791,7 @@ URI: http://%(host)s%(page)s
         @param show_similar_rec_p: *bool* print 'similar records' link in the box
         @param creationdate: *string* - the creation date of the displayed record
         @param modificationdate: *string* - the last modification date of the displayed record
-        @param ingestiondate: *string* - the ingestion date of the displayed record
+        @param earliestdate: *string* - the earliest date of the displayed record
         @param show_short_rec_p: *boolean* - prints a very short version of the record as reminder.
         @param citationnum: show (this) number of citations in the citations tab
         @param referencenum: show (this) number of references in the references tab
@@ -900,7 +900,7 @@ URI: http://%(host)s%(page)s
                                          show_similar_rec_p=True,
                                          creationdate=None,
                                          modificationdate=None,
-                                         ingestiondate=None,
+                                         earliestdate=None,
                                          show_short_rec_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
@@ -915,7 +915,7 @@ URI: http://%(host)s%(page)s
          - show_similar_rec_p *bool* print 'similar records' link in the box
          - creationdate *string* - the creation date of the displayed record
          - modificationdate *string* - the last modification date of the displayed record
-         - ingestiondate *string* - the date of ingestion of the displayed record
+         - earliestdate *string* - the earliest date of the displayed record
          - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
         """
         # If no tabs, returns nothing
@@ -945,8 +945,8 @@ URI: http://%(host)s%(page)s
     <br/>
     """ % {'similar' : similar,
            'dates' : creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
-                'dates': _("Record added %(x_date_ingestion)s, last modified %(x_date_modification)s") % \
-                {'x_date_ingestion': ingestiondate,
+                'dates': _("Record added %(x_date_creation)s, last modified %(x_date_modification)s") % \
+                {'x_date_creation': creationdate,
                  'x_date_modification': modificationdate},
                 } or ''
            }

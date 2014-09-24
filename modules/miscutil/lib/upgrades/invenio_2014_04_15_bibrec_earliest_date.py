@@ -24,15 +24,16 @@ depends_on = ['invenio_release_1_1_0']
 
 
 def info():
-    return "Add new ingestion_date column to bibrec table"
+    return "Add new earliest column to bibrec table"
 
 
 def do_upgrade():
     """ Implement your upgrades here  """
     create_statement = run_sql('SHOW CREATE TABLE bibrec')[0][1]
-    if "`ingestion_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'" not in create_statement:
-        run_sql("ALTER TABLE bibrec ADD COLUMN `ingestion_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'")
-        run_sql("UPDATE bibrec SET ingestion_date=creation_date")
+    if "earliest_date" not in create_statement:
+        run_sql("ALTER TABLE bibrec ADD COLUMN `earliest_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'")
+        run_sql("ALTER TABLE bibrec ADD INDEX earliest_date (earliest_date)")
+        run_sql("UPDATE bibrec SET earliest_date=creation_date")
 
 
 def estimate():
