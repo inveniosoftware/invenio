@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,11 +27,14 @@ Search Engine internals.</p>
 <blockquote>
 <dl>
 
+<dt><a href="record-api">Record API</a> <dd>Explains how to access
+record information via HTTP or from Python programs.
+
+<dt><a href="search-engine-api">Search Engine API</a> <dd>Explains how
+to access search engine results via HTTP or from Python programs.
+
 <dt><a href="search-engine-stages">Search Processing Stages</a> <dd>Explains what
 happens after user hits the SEARCH button.
-
-<dt><a href="search-engine-api">Search Engine API</a> <dd>Explains how to call
-search engine from your Python programs, should a need arize.
 
 <dt><a href="search-services">Search Services</a> <dd>Explains how to
 manage and implement new search services.
