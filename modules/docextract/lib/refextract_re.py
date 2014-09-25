@@ -369,7 +369,7 @@ re_tagged_numeration_near_line_start = \
 
 re_ibid = re.compile(ur'(-|\b)?IBID(EM)?\.?', re.UNICODE)
 
-re_series_from_numeration = re.compile(ur'^([A-Z])\s*[,\s:-]?\s*\d+', re.UNICODE)
+re_series_from_numeration = re.compile(ur'^([A-Za-z])\s*[,\s:-]?\s*\d+', re.UNICODE)
 re_series_from_numeration_after_volume = re.compile(ur'^\d+\s*[,\s:-]?\s*([A-Z])', re.UNICODE)
 
 # Obtain the series character from the standardised title text
