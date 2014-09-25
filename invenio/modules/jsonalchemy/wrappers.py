@@ -336,6 +336,7 @@ class SmartJson(SmartDict):
             dump, if they are needed in the output set it to ``True``
         :param clean: if set to ``True`` all the keys stating with ``_`` will
             be removed from the ouput
+        :param keywords: list of keywords to dump. if None, return all
 
         :return: JSON friendly object
         """
