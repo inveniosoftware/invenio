@@ -187,15 +187,18 @@ def index():
     return dict(collection=collection)
 
 
+@blueprint.route('/collection/', methods=['GET', 'POST'])
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
-def collection(name):
-    """
-    Render the collection page.
+def collection(name=None):
+    """Render the collection page.
 
     It renders it either with a collection specific template (aka
     collection_{collection_name}.html) or with the default collection
     template (collection.html)
     """
+    if name is None:
+        return redirect('.collection',
+                        name=current_app.config['CFG_SITE_NAME'])
     collection = Collection.query.filter(Collection.name == name) \
                                  .first_or_404()
 
