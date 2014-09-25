@@ -26,7 +26,7 @@
   <li class="divider" style="margin-bottom: 0"></li>
   {% for m, um in messages %}
   <li>
-    {% set a_class = "alert-info" if um.status == 'N' else "" %}
+    {% set a_class = "message-highlight" if um.status == 'N' else "" %}
     <a class="navbar-content {{ a_class }}"
        href="{{ url_for('webmessage.view', msgid=m.id) }}">
         <div style="float:left; width: 30px; padding: 4px;">

@@ -43,6 +43,7 @@
 .navbar-content {
    padding: @padding-large-horizontal;
    padding-bottom: @padding-xs-vertical;
+   min-width: 250px;
    .clearfix;
 }
 
@@ -55,12 +56,12 @@
   overflow: hidden;
 }
 
-.alert-info {
+.message-highlight {
   background-color: @dropdown-link-hover-bg;
 }
 
 @media (max-width: 768px) {
-  .alert-info{
+  .message-highlight{
     background-color: @gray-dark !important;
   }
 }
