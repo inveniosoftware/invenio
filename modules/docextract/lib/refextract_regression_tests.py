@@ -2503,6 +2503,24 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    </datafield>
 </record>""")
 
+    def test_dash_dash_report_number(self):
+        ref_line = u"""[6] ATL--PHYS-INT-2009-110"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+   </datafield>
+</record>""")
+
+    def test_dash_dash_num_report_number(self):
+        ref_line = u"""[6] ATL-PHYS-INT-2009--110"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+   </datafield>
+</record>""")
+
     def test_only_journal(self):
         ref_line = u"""[6] Phys. Rev.D, 41 (1990) 83"""
         _reference_test(self, ref_line, u"""<record>
