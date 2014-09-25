@@ -291,7 +291,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
                 error = None
         else:
             write_message("   Note: 005 already existing upon inserting of new record. Keeping it.", verbose=2)
-        original_005 = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime('20140408151829.0'.split('.')[0], "%Y%m%d%H%M%S"))
+        original_005 = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(record['005'][0][3].split('.')[0], "%Y%m%d%H%M%S"))
 
     elif opt_mode != 'insert':
         insert_mode_p = False
