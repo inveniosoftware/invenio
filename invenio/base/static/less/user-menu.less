@@ -41,14 +41,9 @@
 }
 
 .navbar-content {
-   width: @modal-sm;
    padding: @padding-large-horizontal;
    padding-bottom: @padding-xs-vertical;
    .clearfix;
-}
-
-.navbar-nav.navbar-right:last-child {
-  margin-right: @line-height-computed !important;
 }
 
 .navbar-footer {
@@ -58,4 +53,14 @@
 .dropdown-menu {
   padding: @padding-xs-vertical;
   overflow: hidden;
+}
+
+.alert-info {
+  background-color: @dropdown-link-hover-bg;
+}
+
+@media (max-width: 768px) {
+  .alert-info{
+    background-color: @gray-dark !important;
+  }
 }
