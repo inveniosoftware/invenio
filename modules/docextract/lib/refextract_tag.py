@@ -549,7 +549,7 @@ def extract_series_from_volume(volume):
     for p in patterns:
         match = p.search(volume)
         if match:
-            return match.group(1)
+            return match.group(1).upper()
     return None
 
 
