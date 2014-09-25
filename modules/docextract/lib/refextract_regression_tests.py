@@ -2998,6 +2998,16 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    </datafield>
 </record>""")
 
+    def test_journal_lowercase(self):
+        """Checks journal with lower case volume letter"""
+        ref_line = u"""[2] phys.rev. d90 064027"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="s">Phys.Rev.,D90,064027</subfield>
+   </datafield>
+</record>""")
+
 
 class TaskTest(InvenioTestCase):
     def setUp(self):
