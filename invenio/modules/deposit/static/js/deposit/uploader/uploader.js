@@ -20,9 +20,9 @@
 
 define(function (require) {
 
-  var util = require('js/deposit/uploader/util');
+  var withUtil = require('js/deposit/uploader/mixins/util');
 
-  return require('flight/lib/component')(Uploader);
+  return require('flight/lib/component')(Uploader, withUtil);
 
   function Uploader() {
 
@@ -30,15 +30,18 @@ define(function (require) {
         files = {};
 
     this.attributes({
-      formfiles: [],
-
+      form_files: [],
       uploadersSelector: '#uploader-uploaders',
       fileListSelector: '#uploader-filelist',
       errorListSelector: '#uploader-errorlist',
       uploadButtonSelector: '#uploader-upload',
+      stopButtonSelector: '#uploader-stop',
       form_selector: null, 
-      save_url: null,
-      get_file_url: null
+      delete_url: "http://httpbin.org/post",
+      get_file_url: null,
+      resolve_uuid_url: null,
+      resolve_uuid: false,
+      autoupload: false
     });
 
     /**
@@ -46,6 +49,7 @@ define(function (require) {
      */
 
     this.handleFilesAdded = function (ev, data) {
+      Uploader.select('uploadButtonSelector').removeAttr('disabled');
       var newFiles = {};
 
       data.files.forEach(function (file) {
@@ -60,6 +64,7 @@ define(function (require) {
       });
 
       Uploader.trigger(this.select('fileListSelector'), 'filesAddedToFileList', newFiles);
+      if (Uploader.attr.autoupload === true) Uploader.handleUpload();
     }
 
     this.handleFileRemovedByUser = function (ev, data) {
@@ -69,15 +74,43 @@ define(function (require) {
           delete files[i];
         }
       });
-
+      if (Uploader.getObjectSize(files) === 0) this.select('uploadButtonSelector').attr('disabled', true);
       $.each(this.select('uploadersSelector').children(), function (i, uploader) {
         Uploader.trigger(uploader, 'fileRemoved', data);
       });
+
+      if (data.server_id) {
+          $.ajax({
+            type: "POST",
+            url: this.attr.delete_url,
+            data: $.param({
+                file_id: data.server_id
+            })
+          });
+      }
+    }
+
+    this.handleUploadButtonClick = function (ev, data) {
+      Uploader.select('uploadButtonSelector').hide();
+      Uploader.select('stopButtonSelector').show();
+      if (Uploader.attr.resolve_uuid) {
+        Uploader.getUUID();
+      } else {
+        Uploader.handleUpload();
+      }
     }
 
     this.handleUpload = function (ev, data) {
       $.each(this.select('uploadersSelector').children(), function (i, uploader) {
         Uploader.trigger(uploader, 'uploadFiles');
+      });
+    }
+
+    this.resolveURLAndUpload = function (ev, data) {
+      Uploader.attr.get_file_url = Uploader.attr.get_file_url.replace("-1", data.uuid);
+      Uploader.attr.delete_url = Uploader.attr.delete_url.replace("-1", data.uuid);
+      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+        Uploader.trigger(uploader, 'uploadFiles', data);
       });
     }
 
@@ -95,6 +128,19 @@ define(function (require) {
         completedFiles[file.name] = files[file.name];
       });
 
+      var all_done = true;
+      $.each(files, function (key, val) {
+        if (val.status !== 5) {
+          all_done = false;
+        }
+      });
+
+      if (all_done) {
+        Uploader.select('stopButtonSelector').hide();
+        Uploader.select('uploadButtonSelector').show();
+        Uploader.select('uploadButtonSelector').attr('disabled', 'true');
+      }
+
       this.trigger(this.select('fileListSelector'), 'uploadCompleted', completedFiles);
     }
 
@@ -111,27 +157,38 @@ define(function (require) {
     }
 
     this.init_fileList = function (formfiles) {
-      formfiles.forEach(function (file) {
-        files[file.name] = {
-          id: file.id,
-          name: file.name,
-          size: util.bytesToSize(file.size),
-          status: 5,
-          percent: 100,
-          server_id: file.id
-        };
-      });
+      if (formfiles.length){
+        formfiles.forEach(function (file) {
+          files[file.name] = {
+            id: file.id,
+            name: file.name,
+            size: Uploader.bytesToSize(file.size),
+            status: 5,
+            percent: 100,
+            server_id: file.id
+          };
+        });
 
-      Uploader.trigger(this.select('fileListSelector'), 'filesAddedToFileList', files);
+        Uploader.trigger(this.select('fileListSelector'), 'filesAddedToFileList', files); 
+      }
     }
 
     this.handleFileListUpdated = function () {
       Uploader.trigger($(Uploader.attr.form_selector), 'dataSaveField', {
-        save_url: Uploader.attr.save_url,
         name: "files",
         value: Uploader.getOrderedFileList()
       });
     };
+
+    this.handleStopButton = function () {
+      Uploader.select('stopButtonSelector').hide();
+      Uploader.select('uploadButtonSelector').show();
+      if (Uploader.getObjectSize(files) === 0) this.select('uploadButtonSelector').attr('disabled', true);
+      
+      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+        Uploader.trigger(uploader, 'stopUploadFiles');
+      });
+    }
 
     this.getOrderedFileList = function () {
       return $.map(Uploader.$node.find('tbody').children(), function (file) { 
@@ -151,8 +208,8 @@ define(function (require) {
       });
       ErrorList.attachTo(this.select('errorListSelector'));
 
-      this.init_fileList(this.attr.formfiles);
-
+      this.init_fileList(this.attr.form_files);
+      this.on('resolveURLAndUpload', this.resolveURLAndUpload);
       this.on('filesAdded', this.handleFilesAdded);
       this.on('fileRemovedByUser', this.handleFileRemovedByUser);
       this.on('fileProgressUpdated', this.handleFileProgressUpdated);
@@ -161,7 +218,13 @@ define(function (require) {
       this.on('fileRemovedFromUploader', this.handleFileRemovedFromUploader);
       this.on('uploaderError', this.handleUploaderError);
 
-      this.on(this.select('uploadButtonSelector'), 'click', this.handleUpload);
+      this.on(this.select('stopButtonSelector'), 'click', this.handleStopButton);
+
+      if (Uploader.attr.autoupload === false) {
+        this.select('uploadButtonSelector').show();
+        this.on(this.select('uploadButtonSelector'), 'click', this.handleUploadButtonClick);
+      }
+      
       this.on('fileListUpdated', this.handleFileListUpdated);
 
       this.$node.data('getOrderedFileList', this.getOrderedFileList);
@@ -172,6 +235,5 @@ define(function (require) {
 });
 // ## TODO: tiredToAddExistingFile ERRORS in general
 // ## not to all but discover by tag or name
-// ## remove file from server
 // ## autoupload funciton
 // ## TODO: zielone tylko jak sa jakies nowe pliki

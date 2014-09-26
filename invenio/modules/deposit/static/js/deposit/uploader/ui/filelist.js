@@ -63,9 +63,9 @@ define( function (require) {
 
       function handleFileProgressUpdatedOnFileList(ev, data) {
         var selector = "#"+data.file.id;
-        $(this.$node.find('thead tr').children()[2]).html('Progress ' + data.upload_speed);
+        $('#upload-speed').html(data.upload_speed);
         $(this.$node.find(selector).children()[2]).children().children().css('width', data.file.percent.toString() + "%");
-        $(this.$node.find(selector).children()[2]).children().children().html(data.file.percent.toString() + "%");
+        $(this.$node.find(selector).children()[2]).children().children().addClass("progress-bar-striped");
       }
 
       function handleItemClick(ev) {
@@ -75,24 +75,24 @@ define( function (require) {
           this.trigger('fileRemovedByUser', {
             fileId: fileId
           });
-          ev.target.parentNode.parentNode.remove();
+          $(ev.target.parentNode.parentNode).fadeOut(200, function() { 
+            $(this).remove(); 
+          });
         }
       }
 
       function handleUploadCompleted(ev, files) {
         var that = this;
-        $(this.$node.find('thead tr').children()[2]).html('Progress');
         $.each(files, function (key, file) {
           if (file.status === 5) {
             var selector = '#'+file.id;
-            var $elem = $(that.$node.find(selector).children()[2]).children().children();
-            $elem.css('width', file.percent.toString() + "%");
-            $elem.html(file.percent.toString() + "%");
-            $elem.removeClass('active progress-bar-info progress-bar-striped');
-            $elem.addClass('progress-bar-default');
-            $elem.children().css('display','inline');
+            var $elem = $(that.$node.find(selector).children()[2]).children();
+            var $elemName = $(that.$node.find(selector).children()[0]);
+            $elemName.html("<a href='"+that.attr.get_file_url+"?file_id=" + file.server_id +"'>" + file.name + "</a>");
+            $elem.remove();
           }
         });
+        $('#upload-speed').html('');
       };
 
       function handleMouseOver(ev) {

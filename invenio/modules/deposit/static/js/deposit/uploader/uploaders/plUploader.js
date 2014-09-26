@@ -16,39 +16,18 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
-
-'use strict';
-
-/**
- * This component provides PlUpload functionality.  
- * It supposed to be attached to the PlUpload button.
- *
- * @author Adrian Baran adrian.pawel.baran@cern.ch
- * @version 0.0.1 
- *
- * @requires plupload/js/plupload.full.min
- * @requires component/util
- *
- * @fires PlUploader#filesAdded
- * @fires PlUploader#filesRemoved
- * @fires PlUploader#fileProgressUpdated
- * @fires PlUploader#fileUploadCompleted
- * @fires PlUploader#uploaderError
- *
- * @returns {Component} PlUploader
- */
 define(function (require) {
+  'use strict';
 
-  var util = require('js/deposit/uploader/util');
+  var withUtil = require('js/deposit/uploader/mixins/util');
 
-  return require('flight/lib/component')(PlUploader);
+  return require('flight/lib/component')(PlUploader, withUtil);
 
   function PlUploader() {
 
 
     this.attributes({
       url: "http://httpbin.org/post",
-      delete_url: "http://httpbin.org/post",
       drop_element: null,
       max_file_size: null
     });
@@ -75,6 +54,9 @@ define(function (require) {
         */
 
       that.on('uploadFiles', function (ev, data) {
+        if (data && data.uuid) {
+          that.attr.url = that.attr.url.replace("-1", data.uuid);
+        }
         PlUploader.start();
       });
 
@@ -83,16 +65,10 @@ define(function (require) {
         if (file !== undefined) {
           PlUploader.removeFile(file);
         }
+      });
 
-        if (data.server_id) {
-          $.ajax({
-            type: "POST",
-            url: this.attr.delete_url,
-            data: $.param({
-                file_id: data.server_id
-            })
-          });
-        }
+      that.on('stopUploadFiles', function (ev, data) {
+        PlUploader.stop();
       });
 
       /**
@@ -104,7 +80,7 @@ define(function (require) {
           return {
             id: file.id,
             name: file.name,
-            size: util.bytesToSize(file.size),
+            size: that.bytesToSize(file.size),
             percent: file.percent,
             status: file.status
           }
@@ -120,7 +96,7 @@ define(function (require) {
       });
 
         PlUploader.bind('UploadProgress', function (up, file) {
-          var upload_speed = util.bytesToSize(up.total.bytesPerSec)+ "/s";
+          var upload_speed = that.bytesToSize(up.total.bytesPerSec)+ "/s";
           that.trigger('fileProgressUpdated', {
             file: {
               id: file.id,
@@ -154,7 +130,7 @@ define(function (require) {
           return {
             id: file.id,
             name: file.name,
-            size: util.bytesToSize(file.size),
+            size: that.bytesToSize(file.size),
             status: file.status,
             percent: file.percent
           }

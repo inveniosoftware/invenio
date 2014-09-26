@@ -36,10 +36,10 @@ jasmine_js = Bundle(
     # Must be included prior to RequireJS
     weight=-1,
     bower={
-        "jasmine": ">=2",
-        "jasmine-jquery": ">=2",
-        "jasmine-flight": ">=3",
-        "jasmine-ajax": ">=2",
+        "jasmine": ">=2.0.x",
+        "jasmine-jquery": ">=2.0.x",
+        "jasmine-flight": ">=3.0.x",
+        "jasmine-ajax": ">=2.0.x",
     }
 )
 

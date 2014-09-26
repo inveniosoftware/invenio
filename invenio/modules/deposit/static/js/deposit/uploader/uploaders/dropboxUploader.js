@@ -16,28 +16,12 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
-'use strict';
+ define(function (require) {
+  'use strict';
 
-/**
- * This component provides Dropbox functionality.  
- * It supposed to be attached to the Dropbox button.
- *
- * @author Adrian Baran adrian.pawel.baran@cern.ch
- * @version 0.0.1 
- *
- * @requires dropins.js
- * @requires component/util
- *
- * @fires DropboxUploader#filesAdded
- * @fires DropboxUploader#filesRemoved
- *
- * @returns {Component} DropboxUploader
- */
-define(function (require) {
+  var withUtil = require('js/deposit/uploader/mixins/util');
 
-  var util = require('js/deposit/uploader/util');
-
-  return require('flight/lib/component')(DropboxUploader);
+  return require('flight/lib/component')(DropboxUploader, withUtil);
 
   function DropboxUploader() {
 
@@ -47,17 +31,18 @@ define(function (require) {
     });
 
     var self;
+    var pause = false;
 
     var dropboxFiles = {};
 
-        var options = {
+    var options = {
 
-        success: function(files) {
-          var newFiles = {};
+      success: function(files) {
+        var newFiles = {};
         files.forEach(function (file) {
           if (dropboxFiles[file.name] === undefined) {
             dropboxFiles[file.name] = file;
-            dropboxFiles[file.name].id = util.guid();
+            dropboxFiles[file.name].id = self.guid();
             dropboxFiles[file.name].status = 1;
             dropboxFiles[file.name].percent = 0;
 
@@ -72,7 +57,7 @@ define(function (require) {
           return {
             id: file.id,
             name: file.name,
-            size: util.bytesToSize(file.bytes),
+            size: self.bytesToSize(file.bytes),
             percent: file.percent,
             status: file.status
           }
@@ -82,81 +67,96 @@ define(function (require) {
             files: files
           });
         }
-        },
+      },
 
-        cancel: function() {
-          console.log('canceled');
-        },
+      cancel: function() {
+        console.log('canceled');
+      },
 
         linkType: "direct", // "preview" or "direct"
 
         multiselect: true,
 
         // extensions: ['.pdf', '.doc', '.docx'],
-    };
+      };
 
     /**
-         * Evevt Handlers
-         */
+     * Evevt Handlers
+     */
 
-
-
-    this.after('initialize', function () {
+     this.after('initialize', function () {
       self = this;
 
       this.on('click', function () {
         Dropbox.choose(options);
       });
 
-      this.on('uploadFiles', function () {
-
+      this.on('uploadFiles', function (ev, data) {
+        if (data && data.uuid) {
+          self.attr.dropbox_url = self.attr.dropbox_url.replace("-1", data.uuid);
+        }
+        pause = false;
 
         $.each(dropboxFiles, function (key, val) {
+          var filename = val.name;
+          var all_done = true;
           if (val.status !== 5) {
+            if (pause === 5) return false;
             self.trigger('fileProgressUpdated', {
-                file: {
-                  id: val.id,
-                  percent: 50, 
-                  name: val.name
-                }
-              });
+              file: {
+                id: val.id,
+                percent: 80, 
+                name: val.name
+              }
+            });
             $.ajax({
-                    type: 'POST',
-                    url: self.attr.dropbox_url,
-                    data: $.param({
-                        name: val.name,
-                        size: val.bytes,
-                        url: val.link
-                    }),
-                    dataType: "json"
-                }).done(function(data){
-                    dropboxFiles[data.filename].server_id = data.id;
-                    dropboxFiles[data.filename].status = 5;
-                    dropboxFiles[data.filename].percent = 100;
-                    self.trigger('filesUploadCompleted', {
-                      files: [dropboxFiles[data.filename]]
-                    });
-                    self.trigger('fileUploadedCompleted', {
-                      file: dropboxFiles[data.filename]
-                    });
+              type: 'POST',
+              url: self.attr.dropbox_url,
+              data: $.param({
+                name: val.name,
+                size: val.bytes,
+                url: val.link
+              }),
+              dataType: "json"
+            }).done(function(data){
+              dropboxFiles[filename].server_id = data.id;
+              dropboxFiles[filename].status = 5;
+              dropboxFiles[filename].percent = 100;
+              self.trigger('fileUploadedCompleted', {
+                file: dropboxFiles[filename]
+              });
+
+              all_done = true;
+              $.each(dropboxFiles, function (key, val) {
+                if (val.status!==5) all_done=false;
+              });
+              if (all_done) {
+                self.trigger('filesUploadCompleted', {
+                  files: dropboxFiles
                 });
+              }
+            });
           }
         });
 
+});
+
+this.on('stopUploadFiles', function (ev, data) {
+        //
       });
 
-      this.on('fileRemoved', function (ev, data) {
-        var fileName;
-        $.each(dropboxFiles, function (key, val) {
-          if (val.id === data.fileId) {
-            fileName = key;
-          }
-        });
-        delete dropboxFiles[fileName];
-      });
-    });
+this.on('fileRemoved', function (ev, data) {
+  var fileName;
+  $.each(dropboxFiles, function (key, val) {
+    if (val.id === data.fileId) {
+      fileName = key;
+    }
+  });
+  delete dropboxFiles[fileName];
+});
+});
 
 
-  }
+}
 
 });

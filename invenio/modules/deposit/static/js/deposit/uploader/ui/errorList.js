@@ -28,7 +28,7 @@ define( function (require) {
       errorListSelector : "#errorList"
     });
 
-    var erroListRow = require('hgn!../../templates/errorListRow');
+    var erroListRow = require('hgn!../../templates/error');
 
     this.handleErrorOccurred = function (ev, error) {
       var html = "";

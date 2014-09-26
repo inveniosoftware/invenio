@@ -42,18 +42,8 @@ span.ui-icon.ui-icon-circle-triangle-e {
   content:" *";
 }
 
-.rmlink {
-  cursor: pointer;
-}
-.sortlink {
-  cursor: move;
-  margin-left: 10px;
-}
 .empty-element {
   display: none;
-}
-.sortlink:hover {
-  cursor: move;
 }
 .remove-element {
   padding-left: 10px;
@@ -67,11 +57,68 @@ span.ui-icon.ui-icon-circle-triangle-e {
 .tag {
   cursor: move;
 }
-
 .upload-speed {
   margin-right: 10px;
 }
-
 .upload-stop {
   display:none;
 }
+
+/*Uploader*/
+
+#uploader-uploaders {
+  float: right;
+  margin-right: 5px;
+}
+
+#uploader-actions {
+  float: right;
+}
+
+#uploader-upload {
+  display: none;
+}
+
+#uploader-stop {
+  display: none;
+}
+
+#uploader-filelist th {
+    min-width: 60px;
+}
+
+@media (min-width:960px){
+  #uploader-filelist th {
+    min-width: 120px;
+  }
+}
+
+.table-striped > tbody > tr:nth-child(odd) > td {
+background-color: #fff;
+}
+
+#uploader-filelist .progress {
+  margin-bottom: 5px;
+}
+
+.rmlink {
+  cursor: pointer;
+  color: #000;
+}
+.rmlink:hover {
+  text-decoration: none;
+  color: #000;
+}
+.sortlink {
+  cursor: move;
+  color: #000;
+  margin-left: 10px;
+  text-decoration: none;
+}
+.sortlink:hover {
+  text-decoration: none;
+  cursor: move;
+  color: #000;
+}
+
+

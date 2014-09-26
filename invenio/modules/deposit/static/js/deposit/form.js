@@ -66,7 +66,7 @@ define(function(require, exports, module) {
         formSaveClass: '.form-save',
         formSubmitClass: '.form-submit',
         dynamicFieldListClass : ".dynamic-field-list",
-        pluploaderClass: ".pluploader"
+        uploaderSelector: "#uploader"
       });
 
   //
@@ -106,7 +106,7 @@ define(function(require, exports, module) {
         });
       }
       var fields = $(selector).serializeArray(),
-          uploader = $('#uploader');
+          uploader = this.select('uploaderSelector');
 
       if ( uploader.length ) {
         fields.push({
@@ -419,7 +419,7 @@ define(function(require, exports, module) {
    * @param data {Object}
    */
   this.onSaveField = function(ev, data) {
-    save_field(data.save_url, data.name, data.value);
+    save_field(this.attr.save_url, data.name, data.value);
   }
 
 
