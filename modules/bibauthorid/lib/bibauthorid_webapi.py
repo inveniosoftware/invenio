@@ -1401,8 +1401,8 @@ def hepnames_context(record):
 
     }
     for institution in context['institution_history']:
-        if institution['current'] == 'Current':
-            context['current_institution'] = institution['name']
+        if institution.get('current', '') == 'Current':
+            context['current_institution'] = institution.get('name', '')
 
     return context
 
