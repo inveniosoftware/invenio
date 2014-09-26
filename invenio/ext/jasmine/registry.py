@@ -33,7 +33,7 @@ class JasmineSpecsAutoDiscoveryRegistry(DictModuleAutoDiscoverySubRegistry):
     Looks into /testsuite/js/*.spec.js in each module.
     """
 
-    pattern = re.compile(".+\.spec.js")
+    pattern = re.compile("(?:.+\.spec.js$)|(?:.+\.html$)")
     specs_folder = 'js'
 
     def __init__(self, *args, **kwargs):
@@ -51,12 +51,12 @@ class JasmineSpecsAutoDiscoveryRegistry(DictModuleAutoDiscoverySubRegistry):
         for root, dirs, files in os.walk(root):
             for name in files:
                 if JasmineSpecsAutoDiscoveryRegistry.pattern.match(name):
-                    specfilename = os.path.join(root, name)
-                    specpath = "{0}/{1}".format(
+                    filename = os.path.join(root, name)
+                    filepath = "{0}/{1}".format(
                         pkg,
-                        specfilename[len(base)+1:]
+                        filename[len(base)+1:]
                     )
-                    self.register(specfilename, key=specpath)
+                    self.register(filename, key=filepath)
 
     def _discover_module(self, pkg):
         """Load list of files from resource directory."""

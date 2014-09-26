@@ -34,8 +34,8 @@ blueprint = Blueprint(
 @blueprint.route('/specrunner/', methods=['GET'])
 def specrunner():
     """Render Jasmine test runner page."""
-    modules = [url_for('jasmine.spec', specpath=x) for x in specs.keys()]
-    modules.sort()
+    modules = sorted([url_for('jasmine.spec', specpath=x)
+                     for x in specs.keys() if x.endswith(".spec.js")])
     return render_template('jasmine/specrunner.html', modules=modules)
 
 
@@ -45,9 +45,12 @@ def spec(specpath):
     if specpath not in specs:
         abort(404)
 
+    mimetype = "text/html" if specpath.endswith(".html") else \
+               "application/javascript"
+
     return send_file(
         specs[specpath],
-        mimetype="application/javascript",
+        mimetype=mimetype,
         conditional=False,
         add_etags=False,
     )
