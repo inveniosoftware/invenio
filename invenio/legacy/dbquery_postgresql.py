@@ -140,6 +140,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
             return cur.lastrowid
         return cur
 
+
 def run_sql_many(query, params, limit=None, run_on_slave=False):
     """Run SQL on the server with PARAM.
 
@@ -311,3 +312,4 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = db.engine.raw_connection()
     escaped_string = connection_object.escape(unescaped_string)
     return escaped_string
+

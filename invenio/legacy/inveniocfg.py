@@ -94,6 +94,7 @@ import sys
 import zlib
 from six import iteritems
 from warnings import warn
+from sqlalchemy import exc
 
 
 def print_usage():
@@ -123,16 +124,15 @@ def convert_conf_option(option_name, option_value):
 
     ## 1a) adjust renamed variables:
     if option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
-                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
-                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
-                          'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
-                          'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
-                          'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
+                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                       'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
+                       'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                       'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
         new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
         print(("""WARNING: %s has been renamed to %s.
 Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name)), file=sys.stderr)
         option_name = new_option_name
-
 
     ## 2) convert option value to int or string:
     if option_name in ['CFG_BIBUPLOAD_REFERENCE_TAG',
@@ -214,7 +214,7 @@ different document types.  See the corresponding documentation in invenio.conf.
 You may want to customise your invenio-local.conf configuration accordingly.""", file=sys.stderr)
                 option_value = """{'': %s}""" % option_value
             else:
-                print("ERROR: type error in %s value %s." % \
+                print("ERROR: type error in %s value %s." %
                       (option_name, option_value), file=sys.stderr)
                 sys.exit(1)
 
@@ -256,7 +256,7 @@ You may want to customise your invenio-local.conf configuration accordingly.""",
                        'CFG_OAUTH2_PROVIDERS',
                        'CFG_BIBFORMAT_CACHED_FORMATS',
                        'CFG_BIBEDIT_ADD_TICKET_RT_QUEUES',
-                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',]:
+                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS', ]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -366,6 +366,7 @@ def cli_cmd_update_dbquery_py(conf):
     print("You may want to restart Apache now.")
     print(">>> dbquery.py updated successfully.")
 
+
 def cli_cmd_update_dbexec(conf):
     """
     Update bin/dbexec file with DB parameters read from conf file.
@@ -450,6 +451,7 @@ def cli_cmd_update_web_tests(conf):
             fdesc.close()
     print(">>> web tests updated successfully.")
 
+
 def cli_cmd_reset_sitename(conf):
     """
     Reset collection-related tables with new CFG_SITE_NAME and
@@ -476,6 +478,7 @@ def cli_cmd_reset_sitename(conf):
                     (sitename_lang, lang))
     print("You may want to restart Apache now.")
     print(">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully.")
+
 
 def cli_cmd_reset_recstruct_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
@@ -551,6 +554,7 @@ def cli_cmd_reset_siteadminemail(conf):
     print("You may want to restart Apache now.")
     print(">>> CFG_SITE_ADMIN_EMAIL reset successfully.")
 
+
 def cli_cmd_reset_fieldnames(conf):
     """
     Reset I18N field names such as author, title, etc and other I18N
@@ -616,6 +620,7 @@ def cli_cmd_reset_fieldnames(conf):
 
     print(">>> I18N field names reset successfully.")
 
+
 def cli_check_openoffice(conf):
     """
     If OpenOffice.org integration is enabled, checks whether the system is
@@ -633,88 +638,6 @@ def cli_check_openoffice(conf):
         print("ok")
     else:
         sys.exit(1)
-
-def test_db_connection():
-    """
-    Test DB connection, and if fails, advise user how to set it up.
-    Useful to be called during table creation.
-    """
-    print("Testing DB connection...", end=' ')
-    from invenio.utils.text import wrap_text_in_a_box
-    from invenio.legacy.dbquery import run_sql, Error
-
-    ## first, test connection to the DB server:
-    try:
-        run_sql("SHOW TABLES")
-    except Error as err:
-        from invenio.config import CFG_DATABASE_HOST, \
-            CFG_DATABASE_PORT, CFG_DATABASE_NAME, CFG_DATABASE_USER, \
-            CFG_DATABASE_PASS
-        print(wrap_text_in_a_box("""\
-DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.\n
-
-Perhaps you need to set up database and connection rights?
-If yes, then please login as MySQL admin user and run the
-following commands now:
-
-
-$ mysql -h %(dbhost)s -P %(dbport)s -u root -p mysql
-
-mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
-
-mysql> GRANT ALL PRIVILEGES ON %(dbname)s.*
-
-       TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
-
-mysql> QUIT
-
-
-The values printed above were detected from your
-configuration. If they are not right, then please edit your
-invenio-local.conf file and rerun 'inveniocfg --update-all' first.
-
-
-If the problem is of different nature, then please inspect
-the above error message and fix the problem before continuing.""" % \
-                                 {'errno': err.args[0],
-                                  'errmsg': err.args[1],
-                                  'dbname': CFG_DATABASE_NAME,
-                                  'dbhost': CFG_DATABASE_HOST,
-                                  'dbport': CFG_DATABASE_PORT,
-                                  'dbuser': CFG_DATABASE_USER,
-                                  'dbpass': CFG_DATABASE_PASS,
-                                  'webhost': CFG_DATABASE_HOST == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),
-                                  }))
-        sys.exit(1)
-    print("ok")
-
-    ## second, test insert/select of a Unicode string to detect
-    ## possible Python/MySQL/MySQLdb mis-setup:
-    print("Testing Python/MySQL/MySQLdb UTF-8 chain...", end=' ')
-    try:
-        try:
-            beta_in_utf8 = "β" # Greek beta in UTF-8 is 0xCEB2
-            run_sql("CREATE TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8 ENGINE=MyISAM;")
-            run_sql("INSERT INTO test__invenio__utf8 (x, y) VALUES (%s, %s)", (beta_in_utf8, beta_in_utf8))
-            res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
-            assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
-            run_sql("DROP TABLE test__invenio__utf8")
-        except Exception as err:
-            print(wrap_text_in_a_box("""\
-DATABASE RELATED ERROR %s\n
-
-A problem was detected with the UTF-8 treatment in the chain
-between the Python application, the MySQLdb connector, and
-the MySQL database. You may perhaps have installed older
-versions of some prerequisite packages?\n
-
-Please check the INSTALL file and please fix this problem
-before continuing.""" % err))
-
-            sys.exit(1)
-    finally:
-        run_sql("DROP TABLE IF EXISTS test__invenio__utf8")
-    print("ok")
 
 
 def cli_cmd_create_secret_key(conf):
@@ -803,6 +726,7 @@ def cli_cmd_create_demo_site(conf):
             sys.exit(1)
     print(">>> Demo site created successfully.")
 
+
 def cli_cmd_load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
     from invenio.config import CFG_PREFIX
@@ -834,6 +758,7 @@ def cli_cmd_load_demo_records(conf):
             sys.exit(1)
     print(">>> Demo records loaded successfully.")
 
+
 def cli_cmd_remove_demo_records(conf):
     """Remove demo records.  Useful when you are finished testing."""
     print(">>> Going to remove demo records...")
@@ -853,6 +778,7 @@ your records and documents!"""))
             sys.exit(1)
     print(">>> Demo records removed successfully.")
 
+
 def cli_cmd_drop_demo_site(conf):
     """Drop demo site completely.  Useful when you are finished testing."""
     print(">>> Going to drop demo site...")
@@ -864,11 +790,13 @@ your site and documents!"""))
     cli_cmd_remove_demo_records(conf)
     print(">>> Demo site dropped successfully.")
 
+
 def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
     from invenio.testsuite import build_and_run_unit_test_suite
     if not build_and_run_unit_test_suite():
         sys.exit(1)
+
 
 def cli_cmd_run_js_unit_tests(conf):
     """Run JavaScript unit tests, usually on the working demo site."""
@@ -876,11 +804,13 @@ def cli_cmd_run_js_unit_tests(conf):
     if not build_and_run_js_unit_test_suite():
         sys.exit(1)
 
+
 def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
     from invenio.testsuite import build_and_run_regression_test_suite
     if not build_and_run_regression_test_suite():
         sys.exit(1)
+
 
 def cli_cmd_run_web_tests(conf):
     """Run web tests in a browser. Requires Firefox with Selenium."""
@@ -888,10 +818,12 @@ def cli_cmd_run_web_tests(conf):
     if not build_and_run_web_test_suite():
         sys.exit(1)
 
+
 def cli_cmd_run_flask_tests(conf):
     """Run flask tests."""
     from invenio.testsuite import build_and_run_flask_test_suite
     build_and_run_flask_test_suite()
+
 
 def _detect_ip_address():
     """Detect IP address of this computer.  Useful for creating Apache
@@ -908,6 +840,7 @@ def _detect_ip_address():
         return s.getsockname()[0]
     except:
         return '*'
+
 
 def cli_cmd_create_apache_conf(conf):
     """

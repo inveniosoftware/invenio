@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
@@ -37,6 +39,7 @@ import os
 import string
 import time
 import re
+import sys
 
 from thread import get_ident
 from flask import current_app
@@ -531,3 +534,4 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
+

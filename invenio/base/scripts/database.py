@@ -102,7 +102,7 @@ def drop(yes_i_know=False, quiet=False):
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-    from invenio.legacy.inveniocfg import test_db_connection
+    from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
     from invenio.legacy.bibdocfile.api import _make_base_dir
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
@@ -113,7 +113,8 @@ def drop(yes_i_know=False, quiet=False):
         "data on filesystem!"))
 
     ## Step 1: test database connection
-    test_db_connection()
+    test_sqla_connection()
+    test_sqla_utf8_chain()
     list(models)
 
     ## Step 2: disable foreign key checks
@@ -188,17 +189,12 @@ def create(default_data=True, quiet=False):
 
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
-    from invenio.legacy.inveniocfg import test_db_connection
+    from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
-    try:
-        test_db_connection()
-    except Exception as e:
-        from invenio.ext.logging.wrappers import get_traceback
-        print('Cannot connect with the db:', e.message)
-        print(get_traceback())
-        return
+    test_sqla_connection()
+    test_sqla_utf8_chain()
 
     list(models)
 
