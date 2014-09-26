@@ -57,8 +57,6 @@ class JasmineSpecsAutoDiscoveryRegistry(DictModuleAutoDiscoverySubRegistry):
                         specfilename[len(base)+1:]
                     )
                     self.register(specfilename, key=specpath)
-            for name in dirs:
-                self._walk_dir(pkg, base, os.path.join(root, name))
 
     def _discover_module(self, pkg):
         """Load list of files from resource directory."""
