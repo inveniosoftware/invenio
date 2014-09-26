@@ -21,6 +21,7 @@
 
 import base64
 import hashlib
+import six
 from sqlalchemy.types import TypeDecorator, String
 from Crypto.Cipher import AES
 
@@ -63,6 +64,8 @@ class AESEngine(EncryptDecryptModule):
     @staticmethod
     def cipher(key):
         """Create a new AES cipher."""
+        if isinstance(key, six.string_types):
+            key = key.encode('utf8')
         return AES.new(hashlib.sha256(key).digest())
 
 
@@ -71,17 +74,22 @@ class Encrypted(TypeDecorator):
     """Implement an Encrypted column type."""
 
     impl = String
-    encr_decr_engine = AESEngine
 
-    def __init__(self, key, **kwargs):
+    def __init__(self, type_in=None, key=None, engine=AESEngine, **kwargs):
         """Initialization.
 
+        :param type_in: the type of the value to be encrypted
         :param key: :class:`~sqlalchemy.types.String`
             a given key for encryption/decryption
+        :param engine: the engine to be used for encryption/decryption
         """
         super(Encrypted, self).__init__(**kwargs)
-        # produce a 32-bytes key
-        self.cipher = self.encr_decr_engine.cipher(key)
+        if not type_in:
+            type_in = String()
+        self.underlying_type = type_in()
+        self.engine = engine
+        # produce a 32-bytes secret key
+        self.cipher = self.engine.cipher(key)
 
     def process_bind_param(self, value, dialect):
         """Encrypt a value on the way in.
@@ -89,11 +97,14 @@ class Encrypted(TypeDecorator):
         :param value: :class:`~sqlalchemy.types.String`
             the value to be encrypted
         """
-        return self.encr_decr_engine.encrypt(self.cipher, value)
+        if not isinstance(value, six.string_types):
+            value = repr(value)
+        return self.engine.encrypt(self.cipher, value)
 
     def process_result_value(self, value, dialect):
         """Decrypt value on the way out.
 
         :param value: the value to be decrypted
         """
-        return self.encr_decr_engine.decrypt(self.cipher, value)
+        decrypted_value = self.engine.decrypt(self.cipher, value)
+        return self.underlying_type.python_type(decrypted_value)
