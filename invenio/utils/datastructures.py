@@ -18,16 +18,19 @@
 
 """Invenio special data structures."""
 
+import re
+
 from collections import MutableMapping
 from six import iteritems
 
 
 class LazyDict(object):
 
-    """
-    Lazy dictionary that evaluates its content when it is first accessed.
+    """Lazy dictionary that evaluates its content when it is first accessed.
 
-    Example of use::
+    Example:
+
+    .. code-block:: python
 
         def my_dict():
             from werkzeug.utils import import_string
@@ -39,7 +42,8 @@ class LazyDict(object):
     """
 
     def __init__(self, function=dict):
-        """
+        """Initialize lazy dictionary with given function.
+
         :param function: it must return a dictionary like structure
         """
         super(LazyDict, self).__init__()
@@ -50,21 +54,25 @@ class LazyDict(object):
         self._cached_dict = self._function()
 
     def __getitem__(self, key):
+        """Return item from cache if it exists else create it."""
         if self._cached_dict is None:
             self._evaluate_function()
         return self._cached_dict.__getitem__(key)
 
     def __setitem__(self, key, value):
+        """Set item to cache if it exists else create it."""
         if self._cached_dict is None:
             self._evaluate_function()
         return self._cached_dict.__setitem__(key, value)
 
     def __delitem__(self, key):
+        """Delete item from cache if it exists else create it."""
         if self._cached_dict is None:
             self._evaluate_function()
         return self._cached_dict.__delitem__(key)
 
     def __getattr__(self, key):
+        """Get cache attribute if it exists else create it."""
         if self._cached_dict is None:
             self._evaluate_function()
         return getattr(self._cached_dict, key)
@@ -101,11 +109,14 @@ class LazyDict(object):
 
 class LaziestDict(LazyDict):
 
-    """
-    Even lazier dictionary (maybe the laziest), it doesn't have content
-    and when a key is accessed it tries to evaluate only this key.
+    """Even lazier dictionary (maybe the laziest).
 
-    Example of use::
+    It does not have content and when a key is accessed it tries to evaluate
+    only this key.
+
+    Example:
+
+    .. code-block:: python
 
         def reader_discover(key):
             from werkzeug.utils import import_string
@@ -120,16 +131,15 @@ class LaziestDict(LazyDict):
     """
 
     def __init__(self, function=dict):
-        """
+        """Initialize laziest dictionary with given function.
+
         :param function: it must accept one parameter (the key of the
-            dictionary)
-        and returns the element which will be store that key.
+            dictionary) and returns the element which will be store that key.
         """
         super(LaziestDict, self).__init__(function)
 
     def _evaluate_function(self):
-        """It doesn't know how to create the full dictionary, in case
-        is really needed an empty dictionary is created."""
+        """Create empty dict if necessary."""
         if self._cached_dict is None:
             self._cached_dict = {}
 
@@ -153,18 +163,18 @@ class LaziestDict(LazyDict):
                 return False
         return True
 
-import re
-
 
 class SmartDict(object):
-    """
-    This dictionary allows to do some 'smart queries' to its content:
+
+    """This dictionary allows to do some 'smart queries' to its content.
+
+    Example:
+
+    .. code-block:: python
 
         >>> d = SmartDict()
-
         >>> d['foo'] = {'a': 'world', 'b':'hello'}
         >>> d['a'] = [ {'b':1}, {'b':2}, {'b':3} ]
-
         >>> d['a']
         [ {'b':1}, {'b':2}, {'b':3} ]
         >>> d['a[0]']
@@ -174,18 +184,21 @@ class SmartDict(object):
         >>> d['a[1:]']
         [{'b':2}, {'b':3}]
 
-    note: you can't use the reserved words '.', '[', ']' like key.
-          e.g:
+    .. note::
+        You can't use the reserved words '.', '[', ']' like a key.
 
-        >>> d['.']
-        >>> d[']']
-        >>> d['.a']
+        .. code-block:: python
 
-          also is not recommended initialize SmartDict() with a array
-          with inside a reserved words.
-          e.g:
+            >>> d['.']
+            >>> d[']']
+            >>> d['.a']
 
-        >>> d = SmartDict({'a': 3, 'b': {'.': 5}})
+        It is also not recommended initialize `SmartDict` with keys from
+        within the list of reserved words.
+
+        .. code-block:: python
+
+            >>> d = SmartDict({'a': 3, 'b': {'.': 5}})
     """
 
     split_key_pattern = re.compile('\.|\[')
@@ -195,15 +208,18 @@ class SmartDict(object):
         self._dict = d if d is not None else dict()
 
     def __getitem__(self, key):
-        """As in `dict.__getitem__` but using 'smart queries'.
+        """Return item as `dict.__getitem__` but using 'smart queries'.
 
-        Note: accessing one value in a normal way, meaning d['a'], is almost as
-              fast as accessing a regular dictionary. But using the special
-              name convention is a bit slower than using the regular access::
-                %timeit x = dd['a[0].b']
-                100000 loops, best of 3: 3.94 µs per loop
+        .. note::
+            Accessing one value in a normal way, meaning d['a'], is almost as
+            fast as accessing a regular dictionary. But using the special
+            name convention is a bit slower than using the regular access:
 
-                %timeit x = dd['a'][0]['b']
+            .. code-block:: python
+
+                >>> %timeit x = dd['a[0].b']
+                100000 loops, best of 3: 3.94 us per loop
+                >>> %timeit x = dd['a'][0]['b']
                 1000000 loops, best of 3: 598 ns per loop
         """
         def getitem(k, v):
@@ -250,7 +266,7 @@ class SmartDict(object):
             self.__setitem(self._dict, keys[0], keys[1:], value, extend)
 
     def __delitem__(self, key):
-        """Note: It only works with first keys"""
+        """Delete item only from first level dictionary keys."""
         del self._dict[key]
 
     def __contains__(self, key):
@@ -280,22 +296,27 @@ class SmartDict(object):
         return self._dict.items()
 
     def iteritems(self):
+        """Proxy to `dict.iteritems`."""
         return iteritems(self._dict)
 
     def iterkeys(self):
+        """Proxy to `dict.iterkeys`."""
         return self._dict.iterkeys()
 
     def itervalues(self):
+        """Proxy to `dict.itervalues`."""
         return self._dict.itervalues()
 
     def has_key(self, key):
+        """Return ``True`` if ``key`` is in dictionary."""
         return key in self
 
     def __repr__(self):
+        """Proxy to `dict.__repr__`."""
         return repr(self._dict)
 
     def __setitem(self, chunk, key, keys, value, extend=False):
-        """Helper function to fill up the dictionary"""
+        """Helper function to fill up the dictionary."""
         def setitem(chunk):
             if keys:
                 return self.__setitem(chunk, keys[0], keys[1:], value, extend)
@@ -347,15 +368,18 @@ class SmartDict(object):
         return chunk
 
     def get(self, key, default=None):
+        """Return value for given ``key`` or ``default`` value."""
         try:
             return self[key]
-        except:
+        except KeyError:
             return default
 
     def set(self, key, value, extend=False, **kwargs):
+        """Extended standard set function."""
         self.__setitem__(key, value, extend, **kwargs)
 
     def update(self, E, **F):
+        """Proxy `dict` update method."""
         self._dict.update(E, **F)
 
 MutableMapping.register(SmartDict)
@@ -363,23 +387,30 @@ MutableMapping.register(SmartDict)
 
 class DotableDict(dict):
 
-    """
-    DotableDict to make nested python dictionaries (json-like objects)
-    accessable using dot notation.
+    """Make nested python dictionaries accessable using dot notation.
 
-    >>> dotable = DotableDict({'a': [{'b': 3, 'c': 5}]})
-    >>> dotable.a
-    ...  [{'b': 3, 'c': 5}]
+    Example:
+
+    .. code-block:: python
+
+        >>> dotable = DotableDict({'a': [{'b': 3, 'c': 5}]})
+        >>> dotable.a
+        ...  [{'b': 3, 'c': 5}]
     """
 
-    #TODO: allow dotable.a[0].b
     def __getattr__(self, key):
+        """Return value from dictionary.
+
+        .. todo:: allow ``dotable.a[0].b``
+        """
         return self[key]
 
     def __setattr__(self, key, value):
+        """Set value for given key in dictionary."""
         self[key] = value
 
 
 def flatten_multidict(multidict):
+    """Return flattened dictionary from ``MultiDict``."""
     return dict([(key, value if len(value) > 1 else value[0])
                 for (key, value) in multidict.iterlists()])
