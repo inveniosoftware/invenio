@@ -434,7 +434,7 @@ class SmartJson(SmartDict):
             try:
                 schema.update(FieldParser.field_definitions(
                     self.additional_info.namespace)[json_id].get('schema', {}))
-            except TypeError:
+            except (TypeError, KeyError):
                 pass
         _validator = validator(schema=schema)
         _validator.validate(self)
