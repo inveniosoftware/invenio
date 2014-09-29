@@ -17,11 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Uploader celery tasks.
-"""
+"""Uploader celery tasks."""
 
-import six
 from werkzeug.utils import import_string
 from workflow.engine import GenericWorkflowEngine as WorkflowEngine
 
@@ -65,7 +62,7 @@ def run_workflow(records, name, **kwargs):
 
     """
     def _run_pre_post_tasks(tasks):
-        """Helper function to run list of functions"""
+        """Helper function to run list of functions."""
         for task in tasks:
             task(records, **kwargs)
 
@@ -79,7 +76,8 @@ def run_workflow(records, name, **kwargs):
     wfe.setVar('options', kwargs)
     wfe.process(records)
     _run_pre_post_tasks(workflow['post_tasks'])
-    signals.uploader_finished.send(name=name, result=records, **kwargs)
+    signals.uploader_finished.send(uploader_workflow=name,
+                                   result=records, **kwargs)
     return records
 
 
@@ -97,4 +95,4 @@ def run_workflow(records, name, **kwargs):
 #           % (uuid, exc, result.traceback))
 #     return None
 
-__all__ = ['translate', 'run_workflow']
+__all__ = ('translate', 'run_workflow')
