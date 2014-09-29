@@ -429,7 +429,7 @@ BibWorkflowEngine
                                        'continue with next')
                     i[1] = [0]  # reset the callbacks pointer
                     continue
-                except HaltProcessing as e:
+                except (HaltProcessing, WorkflowHalt) as e:
                     self.increase_counter_halted()
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
@@ -447,7 +447,7 @@ BibWorkflowEngine
                         reraise(*sys.exc_info())
                     else:
                         raise WorkflowHalt(e)
-                except Exception as e:
+                except (WorkflowErrorClient, WorkflowError, Exception) as e:
                     # unless instructed otherwise.
                     msg = "Error: %r\n%s" % (e, traceback.format_exc())
                     extra_data = obj.get_extra_data()
