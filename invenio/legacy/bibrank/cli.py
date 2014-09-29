@@ -74,8 +74,8 @@ import sys
 import ConfigParser
 
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.bibsched.bibtask import task_init, write_message, task_get_option, \
-    task_set_option, get_datetime, task_sleep_now_if_required
+from invenio.legacy.bibsched.bibtask import task_init, write_message, \
+    task_get_option, task_set_option, get_datetime, task_sleep_now_if_required
 from invenio.base.factory import with_app_context
 
 # pylint: disable=W0611
@@ -88,13 +88,15 @@ from invenio.legacy.bibrank.tag_based_indexer import \
      download_weight_total, \
      file_similarity_by_times_downloaded, \
      index_term_count
-from invenio.modules.ranker.registry import configuration
-#from invenio.legacy.bibrank.word_indexer import word_similarity #@UnusedImport
-#from invenio.legacy.bibrank.citerank_indexer import citerank #@UnusedImport
-#from invenio.legacy.miscutil.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport
-#from invenio.legacy.miscutil.xapianutils_bibrank_indexer import word_similarity_xapian #@UnusedImport
-#from invenio.legacy.bibrank.selfcites_task import process_updates as selfcites
+from invenio.legacy.bibrank.word_indexer import word_similarity
+from invenio.legacy.bibrank.citerank_indexer import citerank
+from invenio.legacy.miscutil.solrutils_bibrank_indexer import \
+    word_similarity_solr
+from invenio.legacy.miscutil.xapianutils_bibrank_indexer import \
+    word_similarity_xapian
+from invenio.legacy.bibrank.selfcites_task import process_updates as selfcites
 # pylint: enable=W0611
+from invenio.modules.ranker.registry import configuration
 
 
 nb_char_in_line = 50  # for verbose pretty printing
