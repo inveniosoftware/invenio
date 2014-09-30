@@ -38,9 +38,6 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
-from invenio.bibauthorid_name_utils import split_name_parts
-from invenio.bibauthorid_name_utils import create_canonical_name
-
 from invenio.dbquery import run_sql
 from invenio import bibtask
 
@@ -4888,7 +4885,6 @@ def get_existing_papers_and_refs(table, recs, refs):  # get_bibrefrec_subset
 
     # there are duplicates
     return set(ifilter(lambda x: x[0] in recs and x[1] in refs, contents))
-
 
 #
 # BibRDF utilities. To be refactored and ported to bibauthorid_bibrdfinterface                      #
