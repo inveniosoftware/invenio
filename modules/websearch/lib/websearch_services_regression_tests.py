@@ -415,8 +415,7 @@ class WebSearchServicesJournalHintService(InvenioTestCase):
         response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
                                       cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
                                       f='', search_units=search_units, ln='en')
-        self.assert_(response[0] >=50)
-        self.assert_('journal:"Nucl. Phys. B75 (1974) 461"' in response[1])
+        self.assertEqual(response, (0, ''))
 
     def test_search_Nucl_Phys_B75_1974_461_with_spaces(self):
         """websearch - search '  Nucl.  Phys.   B75   (1974)  461   ', with JournalHintService"""
@@ -426,8 +425,18 @@ class WebSearchServicesJournalHintService(InvenioTestCase):
         response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
                                       cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
                                       f='', search_units=search_units, ln='en')
+        self.assertEqual(response, (0, ''))
+
+    def test_search_Nucl_Instrum_Methods_Phys_Res_A_445_2000_456_462(self):
+        """webseach - search 'Nucl. Instrum. Methods Phys. Res., A :445 2000 456-462', with JournalHintService"""
+        user_info = collect_user_info(1)
+        pattern = 'Nucl. Instrum. Methods Phys. Res., A :445 2000 456-462'
+        search_units = create_basic_search_units(None, pattern, '')
+        response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
+                                      cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
+                                      f='', search_units=search_units, ln='en')
         self.assert_(response[0] >=50)
-        self.assert_('journal:"Nucl. Phys. B75 (1974) 461"' in response[1])
+        self.assert_('Development of photon beam diagnostics for VUV radiation from a SASE FEL' in response[1])
 
     def test_search_D_S_Salopek_J_R_Bond_and_J_M_Bardeen_Phys_Rev_D40_1989_1753(self):
         """websearch - search 'D.S. Salopek, J.R.Bond and J.M.Bardeen,Phys.Rev.D40(1989)1753.', with JournalHintService"""
@@ -437,8 +446,7 @@ class WebSearchServicesJournalHintService(InvenioTestCase):
         response = self.plugin.answer(req=user_info, user_info=user_info, of='hb',
                                       cc=CFG_SITE_NAME, colls_to_search='', p=pattern,
                                       f='', search_units=search_units, ln='en')
-        self.assert_(response[0] >=50)
-        self.assert_('journal:"Phys. Rev. D40 (1989) 1753"' in response[1])
+        self.assertEqual(response, (0, ''))
 
     def test_search_Capella_Pere_utf8(self):
         """websearch - search 'Capellà Pere' utf8, with JournalHintService"""
