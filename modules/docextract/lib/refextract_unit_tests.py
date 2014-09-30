@@ -248,6 +248,16 @@ class SearchTest(InvenioTestCase):
         self.assert_('B76' in pattern)
         self.assert_('477' in pattern)
 
+    def test_not_recognized_unicode_1(self):
+        field, pattern = search_from_reference(u'País Valencià')
+        self.assertEqual(field, '')
+        self.assertEqual(pattern, '')
+
+    def test_not_recognized_unicode_2(self):
+        field, pattern = search_from_reference(u'Capellà Pere')
+        self.assertEqual(field, '')
+        self.assertEqual(pattern, '')
+
 
 class RebuildReferencesTest(InvenioTestCase):
     def setUp(self):
