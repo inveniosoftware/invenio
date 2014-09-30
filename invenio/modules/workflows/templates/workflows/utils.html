@@ -20,11 +20,11 @@
 {% macro display_task_history(nicename, doc, parameters, name, id) -%}
 
   <a class="list-group-item list-group-item-success"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
-      <span class="glyphicon glyphicon-ok-sign"></span>
-      {{ nicename }}
+    <span class="glyphicon glyphicon-ok-sign"></span>
+    {{ nicename }}
   </a>
   <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -34,14 +34,14 @@
           {% if doc %}
             {{ doc }}
           {% else %}
-            {{_("Documentation unavailable")}}
+            {{ _("Documentation unavailable") }}
           {% endif %}
 
           {% if parameters %}
-            <h5>{{_("Parameters")}}:</h5>
+            <h5>{{ _("Parameters") }}:</h5>
             <ul class='list-unstyled'>
               {% for name, value in parameters %}
-                <li><strong>{{ name }}:</strong> {{value }}</li>
+                <li><strong>{{ name }}:</strong> {{ value }}</li>
               {% endfor %}
             </ul>
           {% endif %}
@@ -56,49 +56,49 @@
 {%- endmacro %}
 
 {% macro display_workflow_definition(workflow_definition, id) -%}
- <div class="list-group">
+  <div class="list-group">
     {% for item in workflow_definition %}
-        {% if item is mapping %}
-            {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length)  }}
-            {% do id.append(1) %}
-        {% else %}
-        </div>
-        <div class="list-group">
-            {{ display_workflow_definition(item, id) }}
-            {% do id.append(1) %}
-        </div>
-        <div class="list-group">
-        {% endif %}
+      {% if item is mapping %}
+        {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length)  }}
+        {% do id.append(1) %}
+      {% else %}
+      </div>
+      <div class="list-group">
+        {{ display_workflow_definition(item, id) }}
+        {% do id.append(1) %}
+      </div>
+      <div class="list-group">
+      {% endif %}
     {% endfor %}
-    </div>
+  </div>
 {%- endmacro %}
 
 {% macro display_task(nicename, doc, parameters, name, id) -%}
 
   <a class="list-group-item list-group-item-info"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
-        <span class="glyphicon glyphicon-question-sign"></span>
-        {{ nicename }}
+      <span class="glyphicon glyphicon-question-sign"></span>
+      {{ nicename }}
   </a>
 
   <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-   <div class="modal-dialog">
+    <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
           <h4 class="modal-title" id="myModalLabel">{{  name }}</h4>
         </div>
         <div class="modal-body">
-        {{parameteres}}
+          {{ parameteres }}
           {% if doc %}
             {{ doc }}
           {% else %}
-            {{_("Documentation unavailable")}}
+            {{ _("Documentation unavailable") }}
           {% endif %}
           {% if parameters %}
-            <h5>{{_("Parameters")}}:</h5>
+            <h5>{{ _("Parameters") }}:</h5>
             <ul class='list-unstyled'>
               {% for name, value in parameters %}
-                <li><strong>{{ name }}:</strong> {{value }}</li>
+                <li><strong>{{ name }}:</strong> {{ value }}</li>
               {% endfor %}
             </ul>
           {% endif %}
@@ -115,20 +115,20 @@
 {% macro render_field(field) %}
   <div class="form-group">
   {% if field.name != "core" %}
-      {% if field.name != "submit" %}
-        {{field.label}}
-      {% endif %}
-      <div class="col-sm-10">
-        {{ field(**kwargs)|safe }}
-      </div>
+    {% if field.name != "submit" %}
+      {{ field.label }}
+    {% endif %}
+    <div class="col-sm-10">
+      {{ field(**kwargs)|safe }}
+    </div>
   {% else %}
-      <div class="col-sm-10">
-        <div class="checkbox">
-          <label>
-             <strong>{{ _('Core') }}</strong> {{field(**kwargs)|safe}}
-          </label>
-        </div>
+    <div class="col-sm-10">
+      <div class="checkbox">
+        <label>
+          <strong>{{ _('Core') }}</strong> {{ field(**kwargs)|safe }}
+        </label>
       </div>
+    </div>
   {% endif %}
   </div>
   {% if field.errors %}

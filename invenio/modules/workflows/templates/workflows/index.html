@@ -21,23 +21,23 @@
 {% block workflowbody %}
     <div class="alert alert-warning">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <h4>Warning!</h4>
-      Much of the functionality of the BibWorkflow admin pages are placeholder
-      only and are not working as expected.
+      <h4>{{ _('Warning') }}!</h4>
+      {{ _('Much of the functionality of the BibWorkflow admin pages are placeholder
+      only and are not working as expected') }}.
     </div>
 
-    <h1>Workflows list</h1>
-    
+    <h1>{{ _('Workflows list') }}</h1>
+
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Workflow name</th>
-                <th>Started</th>
-                <th>Modified</th>
-                <th>Last task</th>
-                <th>Progress</th>
-                <th>Error msg.</th>
-                <th>View</th>
+                <th>{{ _('Workflow name') }}</th>
+                <th>{{ _('Started') }}</th>
+                <th>{{ _('Modified') }}</th>
+                <th>{{ _('Last task') }}</th>
+                <th>{{ _('Progress') }}</th>
+                <th>{{ _('Error msg.') }}</th>
+                <th>{{ _('View') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -56,7 +56,7 @@ Finished: {{ workflow.counter_finished }}">
                         {% else %}
                             {%- set progress = 0 -%}
                         {% endif %}
-                        Progress: <span class="pull-right strong">{{ progress|int }}%</span>
+                        {{ _('Progress') }}: <span class="pull-right strong">{{ progress|int }}%</span>
                             {% if workflow.status == 0 %}
                                 <div class="progress progress active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
@@ -77,7 +77,7 @@ Finished: {{ workflow.counter_finished }}">
                                 </div>
                     </td>
                     <td>{{ workflow.error_msg }}</td>
-                    <td><a href="{{ url_for('workflows.workflow_details', id_workflow=workflow.uuid) }}/">View</a></td>
+                    <td><a href="{{ url_for('workflows.workflow_details', id_workflow=workflow.uuid) }}/">{{ _('View') }}</a></td>
                 </tr>
                 {%- if workflow.objects -%}
                 <tr>
@@ -85,12 +85,12 @@ Finished: {{ workflow.counter_finished }}">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Id</th>
-                                <th>Created</th>
-                                <th>Modified</th>
-                                <th>Task</th>
-                                <th>Status</th>
-                                <th>View</th>
+                                <th>{{ _('Id') }}</th>
+                                <th>{{ _('Created') }}</th>
+                                <th>{{ _('Modified') }}</th>
+                                <th>{{ _('Task') }}</th>
+                                <th>{{ _('Status') }}</th>
+                                <th>{{ _('View') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -103,14 +103,14 @@ Finished: {{ workflow.counter_finished }}">
                                     <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
                                     <td>
                                         {% if object.version == 0 %}
-                                            <span class="badge alert-info">Initial</span>
+                                            <span class="badge alert-info">>{{ _('Initial') }}</span>
                                         {% elif object.version == 1 %}
-                                            <span class="badge alert-success">Final</span>
+                                            <span class="badge alert-success">>{{ _('Final') }}</span>
                                         {% elif object.version == 2 %}
-                                            <span class="badge alert-danger">Error</span>
+                                            <span class="badge alert-danger">{{ _('Error') }}</span>
                                         {% endif %}
                                     </td>
-                                    <td><a href="{{ url_for('workflows.details', objectid=object.id) }}/">View</a></tr>
+                                    <td><a href="{{ url_for('workflows.details', objectid=object.id) }}/">>{{ _('View') }}</a></tr>
                                 </tr>
 
                         {% endfor %}

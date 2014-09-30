@@ -38,18 +38,18 @@
     <div class="row">
         <div class="col-md-12">
             <h3 id="myModalLabel">{{ entry.id }}</h3>
-            <p>Owner: <strong>{{ entry.id_user }}</strong> | Creation date: <strong>{{ entry.created }}</strong></p>
+            <p>{{ _('Owner') }}: <strong>{{ entry.id_user }}</strong> | {{ _('Creation date') }}: <strong>{{ entry.created }}</strong></p>
         </div>
     </div>
     <div class="row">
          <div class="col-md-5">
-            Preview:
+            {{ _('Preview') }}:
             <div class="well">
                 <div name="object_preview">{{- data_preview|safe -}}</div>
              </div>
          </div>
          <div class="col-md-3">
-            Workflow definition:
+            {{ _('Workflow definition') }}:
             <div class="well">
                 {{ utils.function_display(workflow_tasks, entry.get_extra_data()['_task_counter']) }}
             </div>
@@ -57,7 +57,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            Log:
+            {{ _('Log') }}:
             {% for log_object in log %}
                 <pre>{{ log_object.message }}</pre><br/>
             {% endfor %}
@@ -66,7 +66,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <a class="btn btn-primary" href="{{ url_for('holdingpen.details', objectid=entry.id)}}" >Open in HoldingPen <i class="glyphicon glyphicon-wrench"></i></a>
+            <a class="btn btn-primary" href="{{ url_for('holdingpen.details', objectid=entry.id)}}" >{{ _('Open in HoldingPen') }} <i class="glyphicon glyphicon-wrench"></i></a>
         </div>
     </div>
 

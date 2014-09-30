@@ -17,21 +17,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{{object.id}}
+{{ object.id }}
 <!--sep-->
 <input type="checkbox" class="hp-check">
 <!--sep-->
     <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
-        {{title}}
+        {{ title }}
     </a>
 <!--sep-->
-{{description|safe}}
+{{ description|safe }}
 <!--sep-->
-{{ pretty_date(object.created)}}
+{{ pretty_date(object.created) }}
 <!--sep-->
 <span class="label label-{{object._class}}">{{ object.message }}</span>
 <!--sep-->
-{{object.data_type}}
+{{ object.data_type }}
 <!--sep-->
 {% if mini_action != None %}
     {% set action = action() %}

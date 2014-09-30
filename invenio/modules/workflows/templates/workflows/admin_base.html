@@ -1,4 +1,4 @@
-{#
+s{#
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -26,13 +26,13 @@
                         {% if request.path == url_for('workflows.index') %}
                             class="active"
                         {% endif %}>
-                        Running workflows
+                        {{ _('Running workflows') }}
                     </a></li>
                     <li><a href="{{ url_for('workflows.show_workflows') }}"
                     {% if request.path == url_for('workflows.show_workflows') %}
                         class="active"
                     {% endif %}>
-                        Defined workflows
+                        {{ _('Defined workflows') }}
                     </a></li>
                     <li>Logs</li>
                 </ul>

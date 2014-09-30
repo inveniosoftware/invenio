@@ -50,36 +50,36 @@
       <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
            <!--  <li><a href="#">Assigned to me</a></li> -->
-            <p class="navbar-text" style="margin-right:0px; color:light gray;">Show Records by:</p>
+            <p class="navbar-text" style="margin-right:0px; color:light gray;">{{ _('Show Records by') }}:</p>
             <li class="dropdown">
-                <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">Actions<b class="caret"></b></a>
+                <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Actions') }}<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                     {% if user_list %}
                         {% set i = 0 %}
                         {% for task, object_count in action_list.items() %}
-                            <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{task}}: {{object_count}}</a></li>
+                            <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{ task }}: {{ object_count }}</a></li>
                             {% set i = i + 1 %}
                         {% endfor %}
                     {% else %}
-                            <li><a class="task-btn">No actions left</a></li>
+                            <li><a class="task-btn">{{ _('No actions left') }}</a></li>
                     {% endif %}
                     </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">Status<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a id="version-halted" class="version-selection" name="Need action">Need action</a></li>
-                    <li><a id="version-halted" class="version-selection" name="Waiting">Waiting</a></li>
-                    <li><a id="version-completed" class="version-selection" name="Done">Done</a></li>
-                    <li><a id="version-running" class="version-selection" name="In process">In process</a></li>
-                    <li><a id="version-initial" class="version-selection" name="New">New</a></li>
-                    <li><a id="version-error" class="version-selection" name="Error">Error</a></li>
+                    <li><a id="version-halted" class="version-selection" name="Need action">{{ _('Need action') }}</a></li>
+                    <li><a id="version-halted" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
+                    <li><a id="version-completed" class="version-selection" name="Done">{{ _('Done') }}</a></li>
+                    <li><a id="version-running" class="version-selection" name="In process">{{ _('In process') }}</a></li>
+                    <li><a id="version-initial" class="version-selection" name="New">{{ _('New') }}</a></li>
+                    <li><a id="version-error" class="version-selection" name="Error">{{ _('Error') }}</a></li>
                 </ul>
             </li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">Options<b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Options') }}<b class="caret"></b></a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a id="option-autorefresh" name="autorefresh-option">Auto-refresh</a></li>
+                    <li><a id="option-autorefresh" name="autorefresh-option">{{ _('Auto-refresh') }}</a></li>
                 </ul>
             </li>
         </ul>
@@ -95,14 +95,14 @@
             <table id="maintable" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
                 <thead>
                     <tr>
-                        <th>Id</th>
+                        <th>{{ _('Id') }}</th>
                         <th><input id="select-all" type="checkbox"></th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Created</th>
-                        <th>Status</th>
-                        <th>Type</th>
-                        <th>Actions</th>
+                        <th>{{ _('Title') }}</th>
+                        <th>{{ _('Description') }}</th>
+                        <th>{{ _('Created') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Type') }}</th>
+                        <th>{{ _('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>

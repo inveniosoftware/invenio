@@ -35,25 +35,25 @@
 
     <div class="alert alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <h4>Warning!</h4>
-      This functionality is not fully supported at the moment as you cannot pass
-      any data to the workflows yet.
+      <h4>{{ _('Warning') }}!</h4>
+      {{ _('This functionality is not fully supported at the moment as you cannot pass
+      any data to the workflows yet') }}.
     </div>
 
-    <h1>Available workflows</h1>
+    <h1>{{ _("Available workflows") }}</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Workflow name</th>
-                <th>Options</th>
+                <th>{{ _("Workflow name") }}</th>
+                <th>{{ _("Options") }}</th>
             </tr>
         </thead>
         <tbody>
             {% for workflow in workflows %}
             <tr>
                 <td>{{ workflow }}</td>
-                <td><input id="example_{{ workflow }} 
+                <td><input id="example_{{ workflow }}
                 " class="btn" type="submit" rel="popover" name="{{ workflow }}"/></td>
             </tr>
             {% endfor %}
