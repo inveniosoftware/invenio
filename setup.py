@@ -118,6 +118,7 @@ install_requires = [
     "redis==2.8.0",  # Is it explicitly required?
     "reportlab>=2.7,<3.2",
     "requests>=2.3,<2.4",
+    "setuptools>=2.2",
     "six>=1.7.2",
     "Sphinx",
     # SQLAlchemy 0.9 is not compatible yet
