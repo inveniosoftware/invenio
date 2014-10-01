@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,13 +20,160 @@
 <!-- WebDoc-Page-Title: Search Engine API -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="search-engine-internals">WebSearch Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
-
 <protect>
-<pre>
+<pre>===================
+ Search Engine API
+===================
+
+There are three kind of API interfaces you can use: XML API, JSON API,
+and Python API.
+
+1. XML API
+==========
+
+About:
+
+   Invenio has been having stable search API since its inception.  You
+   can use regular search interface to refine your query until you
+   find what you are looking for, and then amend a few URL parameters
+   to turn the query into an XML API one.
+
+Syntax:
+
+   GET /search?p=...&of=...&ot=...&jrec=...&rg=...
+
+Parameters:
+
+   p = pattern (i.e. your query)
+   of = output format (e.g. `xm` for MARCXML)
+   ot = output tags (e.g. `` to get all fields, `100` to get titles only)
+   jrec = jump to record ID (e.g. 1 for first hit)
+   rg = records-in-groups-of (e.g. 10 hits per page)
+
+   You can use other parameters as well; the list above mentions the
+   most useful one.  For full documentation on these and the other
+   `/search` URL parameters, please see Python API section 3.1 below.
+
+Pros:
+
+   Eesy web search -> API search context switch.  Uses the same
+   parameters as in visible UI.
+
+Cons:
+
+   The XML API output covers only MARC metadata.
+
+Notes:
+
+   The master format of Invenio records is usually MARC.  Hence
+   chances are you would like to use `of=xm` output format parameter
+   in your XML API queries in order to get the richest data.
+
+   Set `jrec` and `rg` appropriately to paginate.  For example:
+
+        /search?p=ellis&of=xm&jrec=1&rg=10
+        /search?p=ellis&of=xm&jrec=11rg=10
+        /search?p=ellis&of=xm&jrec=12rg=10
+        [...]
+
+   Do not set `rg` too high; there is a server-wide safety limit on
+   it.  (CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS)
+
+Example: (returning full XML output)
+
+   GET /search?p=ellis&of=xm
+
+   &lt;!-- Search-Engine-Total-Number-Of-Results: 12 -->
+   &lt;collection>
+     &lt;record>
+       &lt;controlfield tag="001">47&lt;/controlfield>
+       &lt;controlfield tag="005">20140908173007.0&lt;/controlfield>
+       &lt;datafield tag="037" ind1=" " ind2=" ">
+         &lt;subfield code="a">hep-ph/0204132&lt;/subfield>
+       &lt;/datafield>
+       &lt;datafield tag="041" ind1=" " ind2=" ">
+         &lt;subfield code="a">eng&lt;/subfield>
+       &lt;/datafield>
+    ...
+
+Example: (returning XML output, first author (100) and title (245) fields only)
+
+   GET /search?p=ellis&of=xm&ot=100,245
+
+   &lt;!-- Search-Engine-Total-Number-Of-Results: 12 -->
+   &lt;collection>
+     &lt;record>
+       &lt;controlfield tag="001">47&lt;/controlfield>
+       &lt;controlfield tag="005">20140908173007.0&lt;/controlfield>
+       &lt;datafield tag="100" ind1=" " ind2=" ">
+         &lt;subfield code="a">Shovkovy, I A&lt;/subfield>
+         &lt;subfield code="u">Minnesota Univ.&lt;/subfield>
+       &lt;/datafield>
+       &lt;datafield tag="245" ind1=" " ind2=" ">
+         &lt;subfield code="a">Thermal conductivity of dense quark matter and cooling of stars&lt;/subfield>
+       &lt;/datafield>
+     &lt;/record>
+    ...
+
+Example: returning 250th page of a query, with 50 records per page:
+
+   GET /search?p=cern&of=xm&ot=100,245&jrec=12501&rg=50
+
+
+2. JSON API
+===========
+
+About:
+
+   Internally, Invenio records are represented in JSON.  You can ask
+   for JSON output format (`of=recjson`) to obtain it.  Otherwise use
+   the same parameters as in XML API, see section 1.
+
+Pros:
+
+   The JSON API cover field abstraction (support for virtual fields,
+   e.g.  number of citations or book circulation counts) as well as
+   master format abstraction (e.g. UNIMARC, EAD).
+
+Cons:
+
+   May be unusably slow if `recjson` is not cached on the server.
+   (See `CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE`.)
+
+   Not yet REST-ified; just an evolution of HTTP XML API described
+   above.
+
+Example: (who cites me?)
+
+   GET /search?p=refersto:author:maldacena&of=recjson&ot=recid,creation_date,authors[0],number_of_authors,system_control_number
+
+   [{
+       recid: 1290100,
+       creation_date: "2014-04-14T04:44:13"
+       authors: [{
+         first_name: "A.",
+         last_name: "Bernui",
+         full_name: "Bernui, A."
+       }],
+       number_of_authors: 3,
+       system_control_number: [
+         {
+           institute: "arXiv",
+           value: "oai:arXiv.org:1404.2936"
+         }
+       ],
+     },
+     ...]
+
+
+3. Python API
+=============
+
 Invenio Search Engine can be called from within your Python programs
 via both a high-level and low-level API interface.
 
-1. High-level API
+3.1 High-level API
+------------------
 
    Description:
 
@@ -45,10 +192,11 @@ via both a high-level and low-level API interface.
 
    Signature:
 
-       def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
-                                  p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
-                                  recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
-                                  d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None):
+      def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=None, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
+                              p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
+                              recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
+                              d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
+                              wl=0, em=""):
           """Perform search or browse request, without checking for
              authentication.  Return list of recIDs found, if of=id.
              Otherwise create web page.
@@ -63,10 +211,6 @@ via both a high-level and low-level API interface.
                  c - collection list (e.g. ["Theses", "Books"]).  The
                      collections user may have selected/deselected when
                      starting to search from 'cc'.
-
-                ec - external collection list (e.g. ['CiteSeer', 'Google']). The
-                     external collections may have been selected/deselected by the
-                     user.
 
                  p - pattern to search for (e.g. "ellis and muon or kaon").
 
@@ -91,11 +235,15 @@ via both a high-level and low-level API interface.
                      HTML output (and "hb" for HTML brief, "hd" for HTML
                      detailed), "x" means XML output, "t" means plain text
                      output, "id" means no output at all but to return list
-                     of recIDs found.  (Suitable for high-level API.)
+                     of recIDs found, "intbitset" means to return an intbitset
+                     representation of the recIDs found (no sorting or ranking
+                     will be performed).  (Suitable for high-level API.)
 
                 ot - output only these MARC tags (e.g. "100,700,909C0b").
                      Useful if only some fields are to be shown in the
                      output, e.g. for library to control some fields.
+
+                em - output only part of the page.
 
                aas - advanced search ("0" means no, "1" means yes).  Whether
                      search was called from within the advanced search
@@ -222,6 +370,9 @@ via both a high-level and low-level API interface.
 
                 ec - list of external search engines to search as well
                      (e.g. "SPIRES HEP").
+
+                wl - wildcard limit (ex: 100) the wildcard queries will be
+                     limited at 100 results
           """
 
    Examples: (retrieving record IDs)
@@ -265,7 +416,8 @@ via both a high-level and low-level API interface.
       000000085 700__ $$aZaffaroni, A
       000000001 100__ $$aPhotolab
 
-2. Mid-level API
+3.2. Mid-level API
+------------------
 
    Description:
 
@@ -282,7 +434,7 @@ via both a high-level and low-level API interface.
 
    Signature:
 
-      def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0):
+      def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True, wl=0):
           """Search for complex pattern 'p' within field 'f' according to
              matching type 'm'.  Return hitset of recIDs.
 
@@ -296,6 +448,9 @@ via both a high-level and low-level API interface.
              spaces if it would give some hits.  See the Search Internals
              document for detailed description.  (ap=0 forbits the
              alternative pattern usage, ap=1 permits it.)
+             'ap' is also internally used for allowing hidden tag search
+             (for requests coming from webcoll, for example). In this
+             case ap=-9
 
              The 'of' argument governs whether to print or not some
              information to the user in case of no match found.  (Usually it
@@ -325,7 +480,8 @@ via both a high-level and low-level API interface.
       >>> # regexp search for a report number with possible trailing subjects:
       >>> search_pattern(p="^CERN-LHC-PROJECT-REPORT-40(-|$)", f="reportnumber", m="r").tolist()
 
-3. Low-level API
+3.3. Low-level API
+------------------
 
    Description:
 
@@ -338,7 +494,7 @@ via both a high-level and low-level API interface.
 
    Signature:
 
-      def search_unit(p, f=None, m=None):
+      def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
           """Search for basic search unit defined by pattern 'p' and field
              'f' and matching type 'm'.  Return hitset of recIDs.
 
@@ -346,6 +502,19 @@ via both a high-level and low-level API interface.
              'p' is assumed to be already a ``basic search unit'' so that it
              is searched as such and is not broken up in any way.  Only
              wildcard and span queries are being detected inside 'p'.
+
+             If CFG_WEBSEARCH_SYNONYM_KBRS is set and we are searching in
+             one of the indexes that has defined runtime synonym knowledge
+             base, then look up there and automatically enrich search
+             results with results for synonyms.
+
+             In case the wildcard limit (wl) is greater than 0 and this limit
+             is reached an InvenioWebSearchWildcardLimitError will be raised.
+             In case you want to call this function with no limit for the
+             wildcard queries, wl should be 0.
+
+             Parameter 'ignore_synonyms' is a list of terms for which we
+             should not try to further find a synonym.
 
              This function is suitable as a low-level API.
           """
@@ -361,7 +530,5 @@ via both a high-level and low-level API interface.
       >>> # regexp search for a report number with possible trailing subjects:
       >>> search_unit(p="^CERN-PS-99-037(-|$)", f="reportnumber", m="r").tolist()
 
-More entry points may be created, but I think this threesome kind of
-access to the search engine should cover all your needs.
 </pre>
 </protect>

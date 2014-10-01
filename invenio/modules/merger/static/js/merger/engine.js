@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -882,7 +882,7 @@ function onclickSubmitButton(confirm_p, additional_data) {
       var _data = {
         requestType: 'submit',
         record2Mode: gRecord2Mode,
-        recID1: gRecID1
+        recID1: gRecID1,
         recID2: gRecID2
       };
       if (checkbox == true)

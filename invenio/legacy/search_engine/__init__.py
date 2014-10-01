@@ -1056,6 +1056,52 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG, em=""):
             req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     return
 
+def create_add_to_search_pattern(p, p1, f1, m1, op1):
+    """Create the search pattern """
+    if not p1:
+        return p
+    init_search_pattern = p
+    # operation: AND, OR, AND NOT
+    if op1 == 'a' and p: # we don't want '+' at the begining of the query
+        op =  ' +'
+    elif op1 == 'o':
+        op = ' |'
+    elif op1 == 'n':
+        op = ' -'
+    else:
+        op = ''
+
+    # field
+    field = ''
+    if f1:
+        field = f1 + ':'
+
+    # type of search
+    pattern = p1
+    start = '('
+    end = ')'
+    if m1 == 'e':
+        start = end = '"'
+    elif m1 == 'p':
+        start = end = "'"
+    elif m1 == 'r':
+        start = end = '/'
+    else: # m1 == 'o' or m1 =='a'
+        words = p1.strip().split(' ')
+        if len(words) == 1:
+            start = end = ''
+            pattern = field + words[0]
+        elif m1 == 'o':
+            pattern = ' |'.join([field + word for word in words])
+        else:
+            pattern = ' '.join([field + word for word in words])
+        #avoid having field:(word1 word2) since this is not currently correctly working
+        return init_search_pattern + op + start + pattern + end
+    if not pattern:
+        return ''
+    #avoid having field:(word1 word2) since this is not currently correctly working
+    return init_search_pattern + op + field + start + pattern + end
+
 def create_page_title_search_pattern_info(p, p1, p2, p3):
     """Create the search pattern bit for the page <title> web page
     HTML header.  Basically combine p and (p1,p2,p3) together so that
@@ -4454,7 +4500,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                   relevances=[], relevances_prologue="(", relevances_epilogue="%%)",
                   decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True,
                   print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='',
-                  rm='', em=''):
+                  rm='', em='', nb_found=-1):
 
     """
     Prints list of records 'recIDs' formatted according to 'format' in
@@ -4493,8 +4539,10 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
     else:
         user_info = collect_user_info(req)
 
-    if len(recIDs):
+    if nb_found == -1:
         nb_found = len(recIDs)
+
+    if nb_found:
 
         if not rg or rg == -9999: # print all records
             rg = nb_found
@@ -5737,6 +5785,13 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
 
     _ = gettext_set_language(ln)
 
+    if aas == 2: #add-to-search interface
+        p = create_add_to_search_pattern(p, p1, f1, m1, op1)
+        default_addtosearch_args = websearch_templates.restore_search_args_to_default(['p1', 'f1', 'm1', 'op1'])
+        if req:
+            req.argd.update(default_addtosearch_args)
+            req.argd['p'] = p
+
     kwargs = {'req': req, 'cc': cc, 'c': c, 'p': p, 'f': f, 'rg': rg, 'sf': sf,
               'so': so, 'sp': sp, 'rm': rm, 'of': of, 'ot': ot, 'aas': aas,
               'p1': p1, 'f1': f1, 'm1': m1, 'op1': op1, 'p2': p2, 'f2': f2,
@@ -5828,8 +5883,9 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             else:
                 return result
         else:
-            print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose,
-                          tab=tab, sf=sf, so=so, sp=sp, rm=rm, em=em)
+            print_records(req, range(recid, recidb), -1, -9999, of, ot, ln,
+                          search_pattern=p, verbose=verbose, tab=tab, sf=sf,
+                          so=so, sp=sp, rm=rm, em=em, nb_found=len(range(recid, recidb)))
         if req and of.startswith("h"): # register detailed record page view event
             client_ip_address = str(req.remote_ip)
             register_page_view_event(recid, uid, client_ip_address)
@@ -5947,18 +6003,24 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                                             d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
                 write_warning(results_similar_comments, req=req)
                 print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
-                              results_similar_relevances, results_similar_relevances_prologue,
+                              results_similar_relevances,
+                              results_similar_relevances_prologue,
                               results_similar_relevances_epilogue,
-                              search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
+                              search_pattern=p, verbose=verbose, sf=sf, so=so,
+                              sp=sp, rm=rm, em=em,
+                              nb_found=len(results_similar_recIDs))
             elif of == "id":
                 return results_similar_recIDs
             elif of == "intbitset":
                 return intbitset(results_similar_recIDs)
             elif of.startswith("x"):
                 print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
-                              results_similar_relevances, results_similar_relevances_prologue,
-                              results_similar_relevances_epilogue, search_pattern=p, verbose=verbose,
-                              sf=sf, so=so, sp=sp, rm=rm, em=em)
+                              results_similar_relevances,
+                              results_similar_relevances_prologue,
+                              results_similar_relevances_epilogue,
+                              search_pattern=p, verbose=verbose, sf=sf, so=so,
+                              sp=sp, rm=rm, em=em,
+                              nb_found=len(results_similar_recIDs))
             else:
                 # rank_records failed and returned some error message to display:
                 if of.startswith("h"):
@@ -6018,15 +6080,19 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                             sc, pl_in_url,
                                             d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
-                print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose,
-                              sf=sf, so=so, sp=sp, rm=rm, em=em)
+                print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln,
+                              search_pattern=p, verbose=verbose, sf=sf, so=so,
+                              sp=sp, rm=rm, em=em,
+                              nb_found=len(results_cocited_recIDs))
             elif of == "id":
                 return results_cocited_recIDs
             elif of == "intbitset":
                 return intbitset(results_cocited_recIDs)
             elif of.startswith("x"):
-                print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose,
-                              sf=sf, so=so, sp=sp, rm=rm, em=em)
+                print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln,
+                              search_pattern=p, verbose=verbose, sf=sf, so=so,
+                              sp=sp, rm=rm, em=em,
+                              nb_found=len(results_cocited_recIDs))
             else:
                 # cited rank_records failed and returned some error message to display:
                 if of.startswith("h"):
@@ -6426,6 +6492,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                                             sc, pl_in_url,
                                             d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, em=em))
             results_final_recIDs = list(results_final[coll])
+            results_final_nb_found = len(results_final_recIDs)
             results_final_relevances = []
             results_final_relevances_prologue = ""
             results_final_relevances_epilogue = ""
@@ -6463,7 +6530,8 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                           so=so,
                           sp=sp,
                           rm=rm,
-                          em=em)
+                          em=em,
+                          nb_found=results_final_nb_found)
 
             if of.startswith("h"):
                 req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
@@ -6621,14 +6689,20 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
     t1 = os.times()[4]
     results_in_any_collection = intbitset()
-    if aas == 1 or (p1 or p2 or p3):
-        ## 3A - advanced search
+    if aas == 2 and not (p2 or p3):
+        ## 3A add-to-search
+        output = prs_simple_search(results_in_any_collection, kwargs=kwargs, **kwargs)
+        if output is not None:
+            return output
+
+    elif aas == 1 or (p1 or p2 or p3):
+        ## 3B - advanced search
         output = prs_advanced_search(results_in_any_collection, kwargs=kwargs, **kwargs)
         if output is not None:
             return output
 
     else:
-        ## 3B - simple search
+        ## 3C - simple search
         output = prs_simple_search(results_in_any_collection, kwargs=kwargs, **kwargs)
         if output is not None:
             return output

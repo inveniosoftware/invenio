@@ -41,11 +41,11 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_LANGS, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
-     CFG_SCOAP3_SITE
-from invenio.base.i18n import gettext_set_language, language_list_long
+     CFG_SCOAP3_SITE, \
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
+from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
 from invenio.legacy.bibrank.record_sorter import get_bibrank_methods
@@ -729,12 +729,24 @@ class Collection:
 
     def create_searchfor(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
-        if aas == 1:
+        if aas == 2:
+            return self.create_searchfor_addtosearch(ln)
+        elif aas == 1:
             return self.create_searchfor_advanced(ln)
         elif aas == 0:
             return self.create_searchfor_simple(ln)
         else:
             return self.create_searchfor_light(ln)
+
+    def create_searchfor_addtosearch(self, ln=CFG_SITE_LANG):
+        "Produces add-to-search 'Search for' box for the current collection."
+
+        return websearch_templates.tmpl_searchfor_addtosearch(
+          ln=ln,
+          collection_id=self.name,
+          record_count=self.nbrecs,
+          searchwithin= self.create_searchwithin_selection_box(fieldname='f1', ln=ln),
+        )
 
     def create_searchfor_light(self, ln=CFG_SITE_LANG):
         "Produces light 'Search for' box for the current collection."
@@ -1157,12 +1169,15 @@ def task_run_core():
             webcoll_after_reclist_cache_update.send('webcoll', collections=colls)
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
+            # Updates cache only for chosen languages or for all available ones if none was chosen
+            languages = task_get_option("language", CFG_SITE_LANGS)
+            write_message("Cache update for the following languages: %s" % str(languages), verbose=3)
             i = 0
             for coll in colls:
                 i += 1
                 if coll.reclist_updated_since_start or task_has_option("collection") or task_get_option("force") or not task_get_option("quick"):
                     write_message("%s / webpage cache update" % coll.name)
-                    for lang in CFG_SITE_LANGS:
+                    for lang in languages:
                         coll.update_webpage_cache(lang)
                         webcoll_after_webpage_cache_update.send(coll.name, collection=coll, lang=lang)
                 else:

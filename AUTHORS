@@ -15,13 +15,6 @@ The CERN development team currently consists of:
      WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
      WebHelp, and more.
 
- - Jerome Caffaro <jerome.caffaro@cern.ch>
-     BibFormat, redesign and rewrite in Python.  BibConvert
-     XML-oriented mode.  OAI harvester improvements.  Improvements to
-     BibEdit.  WebDoc tool.  WebJournal refactoring and rewrite.
-     WebComment rounds and threads.  WebSubmit asynchronous upload
-     support.  Improvements to numerous modules.
-
  - Samuele Kaplun <samuele.kaplun@cern.ch>
      Authentication and user preferences rewrite and improvements.
      Firewall-like access control RBAC system.  Fulltext file
@@ -119,6 +112,13 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Jerome Caffaro <jerome.caffaro@cern.ch>
+     BibFormat, redesign and rewrite in Python.  BibConvert
+     XML-oriented mode.  OAI harvester improvements.  Improvements to
+     BibEdit.  WebDoc tool.  WebJournal refactoring and rewrite.
+     WebComment rounds and threads.  WebSubmit asynchronous upload
+     support.  Improvements to numerous modules.
 
  - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
      Improvements to the BibCirculation module.

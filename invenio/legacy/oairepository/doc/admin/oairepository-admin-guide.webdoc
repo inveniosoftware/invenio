@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -130,3 +130,13 @@ $ oairepositoryupdater -d
 <p>
 
 Please see also invenio.conf for more fine configurations of the OAI Repository.
+
+<a name="2.2.2"></a><h4>2.2.2 OAI-PMH handler</h4>
+<p>OAI harvester wishing to harvest records exposed by the current instance can access the OAI-PMH handler available at:
+<blockquote>
+<pre>
+<CFG_SITE_URL>/oai2d
+</pre>
+</blockquote>
+E.g. visit <a href="<CFG_SITE_URL>/oai2d?verb=Identify" target="_blank"><CFG_SITE_URL>/oai2d?verb=Identify</a> in order to receive the OAI-PMH identification of this Invenio instance.
+</p>

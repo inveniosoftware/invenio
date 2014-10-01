@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -49,7 +49,7 @@ from invenio.legacy.dbquery import run_sql
 from invenio.legacy.webmessage.api import account_new_mail
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.utils import apache
 from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.legacy.websession import webgroup
 from invenio.legacy.websession import dblayer as webgroup_dblayer
@@ -263,8 +263,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         args = wash_urlargd(form, {
                                    'key_description' : (str, None),
                                    'key_id' : (str, None),
-                                   'referer': (str, '')
+                                   'referer': (str, ''),
+                                   'csrf_token' : (str, None),
                                    })
+
+        # do not allow non-POST methods in here:
+        if req.method != 'POST':
+            raise apache.SERVER_RETURN(apache.HTTP_METHOD_NOT_ALLOWED)
+
+        # check CSRF token:
+        if not webuser.is_csrf_token_valid(req, args['csrf_token']):
+            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
+
         uid = webuser.getUid(req)
         # load the right message language
         _ = gettext_set_language(args['ln'])
@@ -312,6 +322,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             for key in keys:
                 body += "<b>%s</b>:%s<br />" % (key, user_info[key])
 
+        # set CSRF token:
+        csrf_token, dummy_csrf_token_time = webuser.regenerate_csrf_token_if_needed(req)
+
         #check if the user should see bibcatalog user name / passwd in the settings
         can_config_bibcatalog = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
         can_config_profiling = (acc_authorize_action(user_info, 'profiling')[0] == 0)
@@ -320,7 +333,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                      args['ln'],
                                                      can_config_bibcatalog,
                                                      can_config_profiling,
-                                                     verbose=args['verbose']),
+                                                     verbose=args['verbose'],
+                                                     csrf_token=csrf_token),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%(x_name)s Personalize, Your Settings", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                     keywords=_("%(x_name)s, personalize", x_name=CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
@@ -346,7 +360,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'bibcatalog_username' : (str, None),
             'bibcatalog_password' : (str, None),
             'profiling' : (int, 0),
+            'csrf_token' : (str, None),
             })
+
+        # do not allow non-POST methods in here:
+        if req.method != 'POST':
+            raise apache.SERVER_RETURN(apache.HTTP_METHOD_NOT_ALLOWED)
+
+        # check CSRF token:
+        if not webuser.is_csrf_token_valid(req, args['csrf_token']):
+            raise apache.SERVER_RETURN(apache.HTTP_FORBIDDEN)
 
         ## Wash arguments:
         args['login_method'] = wash_login_method(args['login_method'])

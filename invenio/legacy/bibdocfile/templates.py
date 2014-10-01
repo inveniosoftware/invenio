@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -202,7 +202,8 @@ class Template:
                  superformat = bibdocfile.get_superformat(),
                  subformat = bibdocfile.subformat,
                  nice_size_f = nice_size(bibdocfile.get_size()),
-                 description = bibdocfile.description or ''
+                 description = bibdocfile.description or '',
+                 comment = bibdocfile.comment or '',
                )
 
     def tmpl_display_bibdoc(self, bibdoc, version="", ln=CFG_SITE_LANG,
@@ -333,7 +334,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size_f, description):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size_f, description, comment):
         """
         Displays a file in the file list.
 
@@ -356,6 +357,9 @@ class Template:
           - 'nice_size_f' *string* - The nice_size of the file
 
           - 'description' *string* - The description that might have been associated
+          to the particular file
+
+          - 'comment' *string* - The comment that might have been associated
           to the particular file
         """
 
@@ -385,6 +389,7 @@ class Template:
                     <td valign="top">
                       <font size="-2" color="green">[%(nice_size)s]</font>
                       <font size="-2"><em>%(md)s</em>
+                      %(comment)s
                     </td>
                     <td valign="top"><em>%(description)s</em></td>
                     </tr>""" % {
@@ -392,4 +397,5 @@ class Template:
                       'nice_size' : nice_size_f,
                       'md' : convert_datestruct_to_dategui(md.timetuple(), ln),
                       'description' : cgi.escape(description),
+                      'comment' : comment and """<br /><font size="-2"><em>%s</em></font>""" % cgi.escape(comment) or '',
                     }

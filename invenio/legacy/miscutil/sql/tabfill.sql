@@ -816,6 +816,7 @@ INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canRestrictDocty
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canRenameDoctypes');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','canNameNewFiles');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','createRelatedFormats');
+INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','deferRelatedFormatsCreation');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','keepDefault');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','showLinks');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','fileLabel');

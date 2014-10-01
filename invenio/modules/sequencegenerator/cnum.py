@@ -91,12 +91,10 @@ class CnumSeq(SequenceGenerator):
         record_cnums = self._get_record_cnums(base_cnum)
         if not record_cnums:
             new_cnum = base_cnum
-        elif len(record_cnums) == 1:
-            new_cnum = base_cnum + '.' + '1'
         else:
             # Get the max current revision, cnums are in format Cyy-mm-dd,
             # Cyy-mm-dd.1, Cyy-mm-dd.2
-            highest_revision = max([int(rev[0].split('.')[1]) for rev in record_cnums[1:]])
+            highest_revision = max([0] + [int(rev[0].split('.')[1]) for rev in record_cnums if '.' in rev[0]])
             new_cnum = base_cnum + '.' + str(highest_revision + 1)
 
         return new_cnum

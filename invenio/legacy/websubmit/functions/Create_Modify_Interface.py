@@ -232,7 +232,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         t = t + "<FONT color=\"darkblue\">\n"
         res = run_sql("SELECT modifytext FROM sbmFIELDDESC WHERE  name=%s", (field,))
         if len(res)>0:
-            t = t + "<small>%s</small> </FONT>\n" % res[0][0]
+            t = t + "<small>%s</small> </FONT>\n" % (res[0][0] is None and ' ' or res[0][0],)
         # retrieve the marc code associated with the field
         res = run_sql("SELECT marccode FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:

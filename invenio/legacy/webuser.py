@@ -43,6 +43,9 @@ import datetime
 from flask import Request
 from six import iteritems
 from socket import gaierror
+import os
+import binascii
+import time
 
 from invenio.base.wrappers import lazy_import
 from invenio.config import \
@@ -1443,3 +1446,76 @@ def collect_user_info(req, login_time=False, refresh=False):
     except Exception as e:
         register_exception()
     return user_info
+
+
+def generate_csrf_token(req):
+    """Generate a new CSRF token and store it in the user session.
+
+    Generate random CSRF token for the current user and store it in
+    the current session.  Also, store the time stamp when it was
+    generated.
+
+    Return tuple (csrf_token, csrf_token_time).
+
+    """
+    csrf_token = binascii.hexlify(os.urandom(32))
+    csrf_token_time = time.time()
+    session_param_set(req, 'csrf_token', csrf_token)
+    session_param_set(req, 'csrf_token_time', csrf_token_time)
+    return (csrf_token, csrf_token_time)
+
+
+def regenerate_csrf_token_if_needed(req, token_expiry=300):
+    """Regenerate CSRF token, if necessary, and store it in session.
+
+    Check whether user session has stored CSRF token, and whether it
+    is still not expired, i.e. whether not more than `token_expiry`
+    seconds elapsed since current session's CSRF token was created.
+    If not, then create new one.
+
+    Return tuple (csrf_token, csrf_token_time).
+    """
+
+    csrf_token = session_param_get(req, 'csrf_token')
+    csrf_token_time = session_param_get(req, 'csrf_token_time')
+
+    if not csrf_token or not csrf_token_time:
+        csrf_token, csrf_token_time = generate_csrf_token(req)
+
+    if csrf_token_time + token_expiry < time.time():
+        csrf_token, csrf_token_time = generate_csrf_token(req)
+
+    return (csrf_token, csrf_token_time)
+
+
+def is_csrf_token_valid(req, token_value, token_expiry=300):
+    """Check whether CSRF token is still valid.
+
+    Take CSRF token value from current session and check whether it is
+    equal to the passed `token_value`.  Also, check whether it has not
+    expired yet, i.e. whether not more than `token_expiry` seconds
+    elapsed since current session's CSRF token was created.
+
+    Return True if everything is OK, False otherwise.
+    """
+
+    # retrieve CSRF token from session:
+    csrf_token = session_param_get(req, 'csrf_token')
+    if not csrf_token:
+        return False
+
+    # retrieve CSRF token's timestamp from session:
+    csrf_token_time = session_param_get(req, 'csrf_token_time')
+    if not csrf_token_time:
+        return False
+
+    # is session's CSRF token not yet expired?
+    if csrf_token_time + token_expiry < time.time():
+        return False
+
+    # is session's CSRF token equal to given value?
+    if not token_value or token_value != csrf_token:
+        return False
+
+    # OK, every test passed, we are good:
+    return True
