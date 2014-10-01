@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, collect_user_info, page_not_authorized
-from invenio.legacy.webstyle.webdoc import get_webdoc_parts, webdoc_dirs
+from invenio.legacy.webdoc.api import get_webdoc_parts, webdoc_dirs
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.bibdocfile.api import stream_file
 

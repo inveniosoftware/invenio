@@ -39,6 +39,7 @@ import sys
 import re
 import os
 import gc
+import warnings
 
 from flask import session
 from invenio.utils import apache
@@ -246,6 +247,8 @@ class WebInterfaceDirectory(object):
             req.content_type = "text/html; charset=UTF-8"
             raise apache.SERVER_RETURN, apache.DONE
 
+        warnings.warn("Accessed deprecated page {0.uri}".format(req),
+                      PendingDeprecationWarning, stacklevel=2)
         form = req.form
         #if 'ln' not in form and \
         #        req.uri not in CFG_NO_LANG_RECOGNITION_URIS:

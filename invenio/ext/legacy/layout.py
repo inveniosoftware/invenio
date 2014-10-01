@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,6 +29,41 @@ from invenio.ext.logging import register_exception
 from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.utils import apache
 from invenio.config import CFG_DEVEL_SITE, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.legacy.registry import webinterface_proxy, webinterfaces
+
+
+class WebInterfaceDeprecatedPages(WebInterfaceDirectory):
+
+    """Implement dumb interface for deprecated pages."""
+
+    _exports = ['']
+
+    def __call__(self, req, form):
+        """Return deprecation warning."""
+        try:
+            from invenio.legacy.webpage import page
+        except ImportError:
+            register_exception()
+            page = lambda * args: args[1]
+        req.status = apache.HTTP_SERVICE_UNAVAILABLE
+        msg = "<p>This functionality will be soon deprecated.</p>"
+        try:
+            from invenio.config import CFG_SITE_ADMIN_EMAIL
+            msg += """<p>If you would still like to use it, please ask your
+                Invenio administrator <code>%s</code> to consider enabling it.
+                </p>""" % CFG_SITE_ADMIN_EMAIL
+        except ImportError:
+            pass
+        try:
+            return page('Service disabled', msg, req=req)
+        except:
+            return msg
+
+    def _lookup(self, component, path):
+        """Return current interface for given path."""
+        return WebInterfaceDeprecatedPages(), path
+
+    index = __call__
 
 
 class WebInterfaceDisabledPages(WebInterfaceDirectory):
@@ -93,175 +128,16 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
     index = __call__
 
 try:
-    from invenio.legacy.websearch.webinterface import WebInterfaceSearchInterfacePages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.websearch.webinterface import WebInterfaceRSSFeedServicePages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceRSSFeedServicePages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.websearch.webinterface import WebInterfaceUnAPIPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceUnAPIPages = WebInterfaceDumbPages
-
-try:
     from invenio.legacy.bibdocfile.webinterface import bibdocfile_legacy_getfile
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websubmit.webinterface import WebInterfaceSubmitPages
+    from invenio.legacy.websearch.webinterface import WebInterfaceSearchInterfacePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceSubmitPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourAccountPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourAccountPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourTicketsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourTicketsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.websession.webinterface import WebInterfaceYourGroupsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourGroupsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webalert.webinterface import WebInterfaceYourAlertsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourAlertsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webbasket.webinterface import WebInterfaceYourBasketsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourBasketsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webcomment.webinterface import WebInterfaceCommentsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceCommentsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.weblinkback.webinterface import WebInterfaceRecentLinkbacksPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceRecentLinkbacksPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webmessage.webinterface import WebInterfaceYourMessagesPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourMessagesPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.errorlib.webinterface import WebInterfaceErrorPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceErrorPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.oairepository.webinterface import WebInterfaceOAIProviderPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceOAIProviderPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webstat.webinterface import WebInterfaceStatsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceStatsPages = WebInterfaceDumbPages
-try:
-    from invenio.legacy.bibcirculation.webinterface import WebInterfaceYourLoansPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourLoansPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibcirculation.webinterface import WebInterfaceILLPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceILLPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webjournal.webinterface import WebInterfaceJournalPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceJournalPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webstyle.webdoc_webinterface import WebInterfaceDocumentationPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocumentationPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webdoc_info.webinterface import WebInterfaceInfoPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceInfoPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibexport.webinterface import \
-        WebInterfaceFieldExporterPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceFieldExporterPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibknowledge.webinterface import WebInterfaceBibKnowledgePages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.batchuploader.webinterface import \
-         WebInterfaceBatchUploaderPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBatchUploaderPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibsword.webinterface import \
-         WebInterfaceSword
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceSword = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webstyle.ping_webinterface import \
-         WebInterfacePingPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCE')
-    WebInterfacePingPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibauthorid.webinterface import WebInterfaceAuthor
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceAuthor = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.bibauthorid.webinterface import WebInterfacePerson
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfacePerson = WebInterfaceDumbPages
+    WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
 
 try:
     from invenio.legacy.bibcirculation.admin_webinterface import \
@@ -277,36 +153,8 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
 
-try:
-    from invenio.legacy.docextract.webinterface import WebInterfaceDocExtract
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocExtract = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webcomment.webinterface import WebInterfaceYourCommentsPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourCommentsPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.webstyle.goto_webinterface import WebInterfaceGotoPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceGotoPages = WebInterfaceDumbPages
-
-try:
-    from invenio.legacy.authorlist.webinterface import WebInterfaceAuthorlistPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceAuthorlistPages = WebInterfaceDumbPages
 
 if CFG_DEVEL_SITE:
-    try:
-        from invenio.legacy.webstyle.httptest_webinterface import WebInterfaceHTTPTestPages
-    except:
-        register_exception(alert_admin=True, subject='EMERGENCY')
-        WebInterfaceHTTPTestPages = WebInterfaceDumbPages
     test_exports = ['httptest']
 else:
     test_exports = []
@@ -363,72 +211,59 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
         if CFG_DEVEL_SITE:
-            self.httptest = WebInterfaceHTTPTestPages()
+            self.httptest = webinterfaces.get('WebInterfaceHTTPTestPages',
+                                              WebInterfaceDisabledPages)()
 
-    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-        submit = WebInterfaceDisabledPages()
-        youraccount = WebInterfaceDisabledPages()
-        youralerts = WebInterfaceDisabledPages()
-        yourbaskets = WebInterfaceDisabledPages()
-        yourmessages = WebInterfaceDisabledPages()
-        yourloans = WebInterfaceDisabledPages()
-        ill = WebInterfaceDisabledPages()
-        yourgroups = WebInterfaceDisabledPages()
-        yourtickets = WebInterfaceDisabledPages()
-        comments = WebInterfaceDisabledPages()
-        error = WebInterfaceErrorPages()
-        oai2d = WebInterfaceDisabledPages()
-        rss = WebInterfaceRSSFeedServicePages()
-        stats = WebInterfaceDisabledPages()
-        journal = WebInterfaceDisabledPages()
-        help = WebInterfaceDocumentationPages()
-        info = WebInterfaceInfoPages()
-        unapi = WebInterfaceUnAPIPages()
-        exporter = WebInterfaceDisabledPages()
-        kb = WebInterfaceBibKnowledgePages()
-        admin2 = WebInterfaceDisabledPages()
-        batchuploader = WebInterfaceDisabledPages()
-        bibsword = WebInterfaceDisabledPages()
-        ping = WebInterfacePingPages()
-        linkbacks = WebInterfaceDisabledPages()
-        author = WebInterfaceDisabledPages()
-        person = WebInterfaceDisabledPages()
-        textmining = WebInterfaceDocExtract()
-        yourcomments = WebInterfaceDisabledPages()
-        goto = WebInterfaceDisabledPages()
-        authorlist = WebInterfaceDisabledPages()
-    else:
-        submit = WebInterfaceSubmitPages()
-        youraccount = WebInterfaceYourAccountPages()
-        youralerts = WebInterfaceYourAlertsPages()
-        yourbaskets = WebInterfaceYourBasketsPages()
-        yourmessages = WebInterfaceYourMessagesPages()
-        yourloans = WebInterfaceYourLoansPages()
-        ill = WebInterfaceILLPages()
-        yourgroups = WebInterfaceYourGroupsPages()
-        yourtickets = WebInterfaceYourTicketsPages()
-        comments = WebInterfaceCommentsPages()
-        error = WebInterfaceErrorPages()
-        oai2d = WebInterfaceOAIProviderPages()
-        rss = WebInterfaceRSSFeedServicePages()
-        stats = WebInterfaceStatsPages()
-        journal = WebInterfaceJournalPages()
-        help = WebInterfaceDocumentationPages()
-        info = WebInterfaceInfoPages()
-        unapi = WebInterfaceUnAPIPages()
-        exporter = WebInterfaceFieldExporterPages()
-        kb = WebInterfaceBibKnowledgePages()
-        admin2 = WebInterfaceAdminPages()
-        batchuploader = WebInterfaceBatchUploaderPages()
-        bibsword = WebInterfaceSword()
-        ping = WebInterfacePingPages()
-        linkbacks = WebInterfaceRecentLinkbacksPages()
-        author = WebInterfaceAuthor()
-        person = WebInterfacePerson()
-        textmining = WebInterfaceDocExtract()
-        yourcomments = WebInterfaceYourCommentsPages()
-        goto = WebInterfaceGotoPages()
-        authorlist = WebInterfaceAuthorlistPages()
+    _mapping = dict(
+        submit='WebInterfaceSubmitPages',
+        youraccount='WebInterfaceYourAccountPages',
+        youralerts='WebInterfaceYourAlertsPages',
+        yourbaskets='WebInterfaceYourBasketsPages',
+        yourmessages='WebInterfaceYourMessagesPages',
+        yourloans='WebInterfaceYourLoansPages',
+        ill='WebInterfaceILLPages',
+        yourgroups='WebInterfaceYourGroupsPages',
+        yourtickets='WebInterfaceYourTicketsPages',
+        comments='WebInterfaceCommentsPages',
+        error='WebInterfaceErrorPages',
+        oai2d='WebInterfaceOAIProviderPages',
+        rss='WebInterfaceRSSFeedServicePages',
+        stats='WebInterfaceStatsPages',
+        journal='WebInterfaceJournalPages',
+        help='WebInterfaceDocumentationPages',
+        info='WebInterfaceInfoPages',
+        unapi='WebInterfaceUnAPIPages',
+        exporter='WebInterfaceFieldExporterPages',
+        kb='WebInterfaceBibKnowledgePages',
+        admin2='WebInterfaceAdminPages',
+        batchuploader='WebInterfaceBatchUploaderPages',
+        bibsword='WebInterfaceSword',
+        ping='WebInterfacePingPages',
+        linkbacks='WebInterfaceRecentLinkbacksPages',
+        author='WebInterfaceAuthor',
+        person='WebInterfacePerson',
+        textmining='WebInterfaceDocExtract',
+        yourcomments='WebInterfaceYourCommentsPages',
+        goto='WebInterfaceGotoPages',
+        authorlist='WebInterfaceAuthorlistPages',
+    )
+
+    def __new__(cls):
+        from flask import current_app
+        if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+            for key in cls._mapping.keys():
+                setattr(cls, key, WebInterfaceDisabledPages())
+        else:
+            webinterfaces_ = dict(webinterfaces)
+            webinterfaces_['WebInterfaceAdminPages'] = WebInterfaceAdminPages
+            for key, value in cls._mapping.items():
+                if value in webinterfaces_:
+                    setattr(cls, key, webinterfaces_[value]())
+                else:
+                    current_app.logger.error(
+                        "Can not load {name}.".format(name=value))
+                    setattr(cls, key, WebInterfaceDeprecatedPages())
+        return super(WebInterfaceInvenio, cls).__new__(cls)
 
 
 # This creates the 'handler' function, which will be invoked directly
