@@ -481,6 +481,7 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('paperattributionviewers', 'Users who can view "attribute this paper" facilities', 'allow all'),
              ('paperattributionlinkviewers', 'Users who can see attribution links in the search', 'allow all'),
              ('authorlistusers', 'Users who can user Authorlist tools', 'deny all'),
+             ('holdingpenusers', 'Users who can view Holding Pen', {}),
              )
 
 
@@ -587,6 +588,7 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('claimpaperusers', 'claimpaper_change_own_data', {}),
              ('claimpaperoperators', 'claimpaper_change_own_data', {}),
              ('claimpaperoperators', 'claimpaper_change_others_data', {}),
+             ('holdingpenusers', 'viewholdingpen', {}),
              )
 
 
