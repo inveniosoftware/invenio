@@ -31,17 +31,20 @@ define(function (require) {
 
     this.attributes({
       form_files: [],
-      uploadersSelector: '#uploader-uploaders',
+      uploadersSelector: '.pluploader, .dropboxuploader',
       fileListSelector: '#uploader-filelist',
       errorListSelector: '#uploader-errorlist',
       uploadButtonSelector: '#uploader-upload',
       stopButtonSelector: '#uploader-stop',
+      uploadsTableSelector: '#uploads-table',
       form_selector: null, 
       delete_url: "http://httpbin.org/post",
+      continue_url: null,
       get_file_url: null,
       resolve_uuid_url: null,
       resolve_uuid: false,
-      autoupload: false
+      autoupload: false,
+      as_jumbo: false
     });
 
     /**
@@ -50,6 +53,8 @@ define(function (require) {
 
     this.handleFilesAdded = function (ev, data) {
       Uploader.select('uploadButtonSelector').removeAttr('disabled');
+      Uploader.select('uploadsTableSelector').css('visibility', 'visible');
+      Uploader.select('uploadButtonSelector').css('visibility', 'visible');
       var newFiles = {};
 
       data.files.forEach(function (file) {
@@ -75,7 +80,7 @@ define(function (require) {
         }
       });
       if (Uploader.getObjectSize(files) === 0) this.select('uploadButtonSelector').attr('disabled', true);
-      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+      $.each(this.select('uploadersSelector'), function (i, uploader) {
         Uploader.trigger(uploader, 'fileRemoved', data);
       });
 
@@ -101,7 +106,7 @@ define(function (require) {
     }
 
     this.handleUpload = function (ev, data) {
-      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+      $.each(this.select('uploadersSelector'), function (i, uploader) {
         Uploader.trigger(uploader, 'uploadFiles');
       });
     }
@@ -109,7 +114,8 @@ define(function (require) {
     this.resolveURLAndUpload = function (ev, data) {
       Uploader.attr.get_file_url = Uploader.attr.get_file_url.replace("-1", data.uuid);
       Uploader.attr.delete_url = Uploader.attr.delete_url.replace("-1", data.uuid);
-      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+      Uploader.attr.continue_url = Uploader.attr.continue_url.replace("-1", data.uuid);
+      $.each(this.select('uploadersSelector'), function (i, uploader) {
         Uploader.trigger(uploader, 'uploadFiles', data);
       });
     }
@@ -139,6 +145,10 @@ define(function (require) {
         Uploader.select('stopButtonSelector').hide();
         Uploader.select('uploadButtonSelector').show();
         Uploader.select('uploadButtonSelector').attr('disabled', 'true');
+
+        if (Uploader.attr.resolve_uuid) {
+          window.location.href = Uploader.attr.continue_url;
+        }
       }
 
       this.trigger(this.select('fileListSelector'), 'uploadCompleted', completedFiles);
@@ -185,7 +195,7 @@ define(function (require) {
       Uploader.select('uploadButtonSelector').show();
       if (Uploader.getObjectSize(files) === 0) this.select('uploadButtonSelector').attr('disabled', true);
       
-      $.each(this.select('uploadersSelector').children(), function (i, uploader) {
+      $.each(this.select('uploadersSelector'), function (i, uploader) {
         Uploader.trigger(uploader, 'stopUploadFiles');
       });
     }

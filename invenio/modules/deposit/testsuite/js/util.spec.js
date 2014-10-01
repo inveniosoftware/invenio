@@ -84,31 +84,13 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
   });
 
   describe('getUUID', function () {
-
     it ('should trigger uploaderError event if no url is defined', function () {
       this.setupComponent();
       var spy = spyOnEvent(this.component.$node, 'uploaderError');
       this.component.getUUID();
       expect(spy.callCount).toBe(1);
-      expect(spy).toHaveBeenTriggeredOnAndWith(this.component.$node, {
-        message: "Problem while trying to get new uuid."
-      });
+      expect(spy).toHaveBeenTriggeredOn(this.component.$node);
     });
-    it ('should trigger uploaderError event if ajax fails', function () {
-      jasmine.Ajax.install();
-      this.setupComponent({
-        resolve_uuid_url: 'http://some.failing.html'
-      });
-      var spy = spyOnEvent(this.component.$node, 'uploaderError');
-      this.component.getUUID();
-      var request = jasmine.Ajax.requests.mostRecent();
-      console.log(request);
-       expect(1).toBe(1);
-      // expect(spy).toHaveBeenTriggeredOnAndWith(this.component.$node, {
-      //   message: "Cannot find url for resolving uuid."
-      // });
-    });
-
   });
+
 });
-//url: 'http://httpbin.org/post'

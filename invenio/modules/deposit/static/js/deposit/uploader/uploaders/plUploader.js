@@ -56,6 +56,7 @@ define(function (require) {
       that.on('uploadFiles', function (ev, data) {
         if (data && data.uuid) {
           that.attr.url = that.attr.url.replace("-1", data.uuid);
+          PlUploader.settings.url = that.attr.url;
         }
         PlUploader.start();
       });

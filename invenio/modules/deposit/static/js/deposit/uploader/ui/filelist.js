@@ -69,7 +69,7 @@ define( function (require) {
       }
 
       function handleItemClick(ev) {
-        if (ev.target.id==="removeFile") {
+        if ($(ev.target).hasClass("rmlink")) {
           var fileId = ev.target.parentNode.parentNode.id;
 
           this.trigger('fileRemovedByUser', {
@@ -96,13 +96,13 @@ define( function (require) {
       };
 
       function handleMouseOver(ev) {
-        if (ev.target.id==="sortFile") {
+        if ($(ev.target).hasClass("sortlink")) {
           $( "#sortable" ).sortable( "enable" );
         }
       }
 
       function handleItemMouseUp(ev) {
-        if (ev.target.id==="sortFile") {
+        if ($(ev.target).hasClass("sortlink")) {
           $( "#sortable" ).sortable( "disable" );
         }
       }
