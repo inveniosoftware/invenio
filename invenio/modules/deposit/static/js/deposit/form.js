@@ -742,11 +742,22 @@ define(function(require, exports, module) {
     save_data(data.url, this.serialize_form(data.form_selector), data.show);
   }
 
+  /**
+   * Show validation message for a field.
+   *
+   * @param ev {Event}
+   * @param data {Object}
+   */
+  this.handleFieldMessage = function(ev, data) {
+    handle_field_msg(data.name, data.data);
+  };
+
   this.after('initialize', function() {
     // Custom handlers
     this.on('dataFormSave', this.saveForm);
     this.on('dataFormSubmit', this.submitForm);
     this.on('dataSaveField', this.onSaveField);
+    this.on('handleFieldMessage', this.handleFieldMessage);
 
     this.on(document, "click", {
       formSaveClass: this.onSaveClick,
