@@ -33,7 +33,6 @@ define(function (require) {
       if (bytes === 0) {
         return '0 Bytes';
       }
-
       i = Math.floor(Math.log(bytes) / Math.log(k));
       return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + SIZES[i];
     };

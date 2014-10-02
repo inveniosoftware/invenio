@@ -43,8 +43,7 @@ define(function (require) {
       get_file_url: null,
       resolve_uuid_url: null,
       resolve_uuid: false,
-      autoupload: false,
-      as_jumbo: false
+      autoupload: false
     });
 
     /**
@@ -208,17 +207,17 @@ define(function (require) {
       })
     };
 
-    this.after('initialize', function () {
-      Uploader = this;
-      var FileList = require('js/deposit/uploader/ui/filelist');
-      var ErrorList = require('js/deposit/uploader/ui/errorList');
-
-      FileList.attachTo(this.select('fileListSelector'), {
+    this.handleFileListInitialized = function () {
+      this.trigger(Uploader.select('fileListSelector'), 'updateGetFileUrl', {
         get_file_url: Uploader.attr.get_file_url
       });
-      ErrorList.attachTo(this.select('errorListSelector'));
-
       this.init_fileList(this.attr.form_files);
+    };
+
+
+    this.after('initialize', function () {
+      Uploader = this;
+
       this.on('resolveURLAndUpload', this.resolveURLAndUpload);
       this.on('filesAdded', this.handleFilesAdded);
       this.on('fileRemovedByUser', this.handleFileRemovedByUser);
@@ -227,23 +226,19 @@ define(function (require) {
       this.on('filesUploadCompleted', this.handleUploadCompleted);
       this.on('fileRemovedFromUploader', this.handleFileRemovedFromUploader);
       this.on('uploaderError', this.handleUploaderError);
-
       this.on(this.select('stopButtonSelector'), 'click', this.handleStopButton);
+      this.on('fileListUpdated', this.handleFileListUpdated);
+      this.on('fileListInitialized', this.handleFileListInitialized);
 
       if (Uploader.attr.autoupload === false) {
         this.select('uploadButtonSelector').show();
         this.on(this.select('uploadButtonSelector'), 'click', this.handleUploadButtonClick);
       }
-      
-      this.on('fileListUpdated', this.handleFileListUpdated);
 
       this.$node.data('getOrderedFileList', this.getOrderedFileList);
     });
 
+
   }
 
 });
-// ## TODO: tiredToAddExistingFile ERRORS in general
-// ## not to all but discover by tag or name
-// ## autoupload funciton
-// ## TODO: zielone tylko jak sa jakies nowe pliki

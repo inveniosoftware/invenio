@@ -35,7 +35,7 @@ define( function (require) {
 
       this.attributes({
         tableBodySelector: 'tbody',
-        get_file_url: null
+        get_file_url: ''
       });
 
       var fileListRow = require('hgn!../../templates/fileListRow');
@@ -107,6 +107,10 @@ define( function (require) {
         }
       }
 
+      function handleUpdateGetFileUrl(ev, data) {
+        this.attr.get_file_url = data.get_file_url;
+      }
+
       this.after('initialize', function () {
         var that = this;
         $( "#sortable" ).sortable({ 
@@ -136,7 +140,9 @@ define( function (require) {
         this.on('click', handleItemClick);
         this.on('mouseover', handleMouseOver);
         this.on('mouseup', handleItemMouseUp);
+        this.on('updateGetFileUrl', handleUpdateGetFileUrl);
 
+        this.trigger('fileListInitialized');
       });
 
 

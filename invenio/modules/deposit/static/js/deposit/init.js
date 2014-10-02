@@ -24,6 +24,8 @@ require(
     'js/deposit/uploader/uploader',
     "js/deposit/uploader/uploaders/plUploader",
     "js/deposit/uploader/uploaders/dropboxUploader",
+    "js/deposit/uploader/ui/filelist",
+    "js/deposit/uploader/ui/errorList"
   ], function() {
     /*
      * It preloads js/deposit/form to give it a name so you're free to use it

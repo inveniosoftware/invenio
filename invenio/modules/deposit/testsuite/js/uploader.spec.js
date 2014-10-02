@@ -16,6 +16,41 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
-describeComponent('/js/uploader/uploader', function () {
+describeComponent('js/deposit/uploader/uploader', function () {
   'use strict';
+
+  jasmine.getFixtures().fixturesPath = '/jasmine/spec/invenio.modules.deposit/fixtures/';
+  var uploaderFixture = readFixtures('uploader.html');
+
+  describe('basic', function () {
+    var config = {
+      get_file_url: '',
+      delete_url: '',
+      form_selector: "#submitForm",
+      form_files: [],
+      resolve_uuid_url: '',
+      resolve_uuid: true,
+      autoupload: false,
+      continue_url: ''
+    };
+
+    beforeEach(function () {
+      this.setupComponent(uploaderFixture, config);
+    });
+
+    it('', function () {
+
+    });
+  });
+
+  describe('autoupload', function () {
+    it('', function () {
+    });
+  });
+
+  describe('resolve_uuid', function () {
+    it('', function () {
+    });
+  });
+
 });

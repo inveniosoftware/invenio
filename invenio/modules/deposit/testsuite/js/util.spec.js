@@ -20,7 +20,6 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
   'use strict';
 
   describe('bytesToSize', function () {
-
     beforeEach(function () {
       this.setupComponent();
     });
@@ -39,17 +38,19 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
       expect(this.component.bytesToSize(999)).toEqual('999.00 Bytes');
       expect(this.component.bytesToSize(1.1e+3)).toEqual('1.10 KB');
     });
-    it('should works only for numbers', function () {
+    it('should works only for number', function () {
       expect(this.component.bytesToSize('0')).toEqual(NaN);
       expect(this.component.bytesToSize({})).toEqual(NaN);
       expect(this.component.bytesToSize([2])).toEqual(NaN);
       expect(this.component.bytesToSize(true)).toEqual(NaN);
     });
-
+    it('should returns NaN for values other then number', function () {
+      expect(this.component.bytesToSize('0')).toEqual(NaN);
+      expect(this.component.bytesToSize({})).toEqual(NaN);
+    });
   });
 
   describe('guid', function () {
-
     beforeEach(function () {
       this.setupComponent();
     });
@@ -61,6 +62,12 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
       expect(this.component.guid().length).toBe(36);
     });
     it('should returns pseudo-random strings', function () {
+      var unique_array = function (arr) {
+        return arr.reduce(function (p, c) {
+          if (p.indexOf(c) < 0) p.push(c);
+          return p;
+        }, []);
+      };
       var testStrings = [],
           i = 0;
 
@@ -68,19 +75,8 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
         testStrings.push(this.component.guid());
       }
 
-      testStrings.forEach(function (elem) {
-        var index = -1,
-            counter=0;
-
-        while((index = testStrings.indexOf(elem, index+1)) !== -1) {
-          counter++;
-          index++;
-        }
-
-        expect(counter).toBe(1);
-      });
+      expect(unique_array(testStrings).length).toBe(testStrings.length);
     });
-
   });
 
   describe('getUUID', function () {
