@@ -164,6 +164,9 @@ extras_require = {
         "python-openid",  # extra=sso?
         "urllib3",  # extra=cloud?
     ],
+    "mixer": [
+        "mixer",
+    ],
     "sso": [
         "Flask-SSO>=0.1"
     ],
