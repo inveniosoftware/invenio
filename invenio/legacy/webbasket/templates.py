@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1934,8 +1934,8 @@ class Template:
     </tr>
   </table>
 
-</form>""" % {'label': _('Editing basket %(x_basket_name)s') % \
-              {'x_basket_name': cgi.escape(bsk_name, True)},
+</form>""" % {'label': _('Editing basket %(x_basket_name)s',
+                         x_basket_name=cgi.escape(bsk_name, True)),
               'action': CFG_SITE_URL + '/yourbaskets/edit',
               'ln': ln,
               'topic': cgi.escape(topic, True),
@@ -1993,7 +1993,8 @@ class Template:
     </tr>
   </table>
 
-</form>""" % {'label': _('Editing topic: %(x_topic_name)s') % {'x_topic_name': cgi.escape(topic, True)},
+</form>""" % {'label': _('Editing topic: %(x_topic_name)s',
+                         x_topic_name=cgi.escape(topic, True)),
               'action': CFG_SITE_URL + '/yourbaskets/edit_topic',
               'ln': ln,
               'topic': cgi.escape(topic, True),
