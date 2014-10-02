@@ -200,7 +200,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
                 'export', 'citations', 'holdings', 'edit', 'keywords',
-                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
+                'multiedit', 'merge', 'plots', 'linkbacks', 'data']
 
     #_exports.extend(output_formats)
 
@@ -218,7 +218,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.plots = self
-        self.hepdata = self
+        self.data = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -308,7 +308,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
                 'export', 'citations', 'holdings', 'edit', 'keywords',
-                'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
+                'multiedit', 'merge', 'plots', 'linkbacks', 'data']
 
     #_exports.extend(output_formats)
 
@@ -330,7 +330,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
-        self.hepdata = self
+        self.data = self
 
     def __call__(self, req, form):
         argd = wash_search_urlargd(form)
@@ -713,7 +713,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
                                'keywords', 'multiedit', 'merge', 'plots',
-                               'linkbacks', 'hepdata']:
+                               'linkbacks', 'data']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

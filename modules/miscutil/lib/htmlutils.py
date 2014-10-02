@@ -20,7 +20,21 @@
 
 __revision__ = "$Id$"
 
-from HTMLParser import HTMLParser
+## HACK: this is needed to load local HTMLParser from Python 2.7
+## in case Python 2.6 is used.
+import sys
+_tmp_sys_path = sys.path
+_new_sys_path = []
+try:
+    for path in sys.path:
+        if ('dist-packages' in path) or ('site-packages' in path):
+            _new_sys_path.append(path)
+    _new_sys_path.extend(sys.path)
+    sys.path = _new_sys_path
+    from HTMLParser import HTMLParser
+finally:
+    sys.path = _tmp_sys_path
+
 from invenio.config import CFG_SITE_URL, \
      CFG_MATHJAX_HOSTING, \
      CFG_MATHJAX_RENDERS_MATHML, \
@@ -337,16 +351,8 @@ class HTMLWasher(HTMLParser):
     def handle_data(self, data):
         """Function called for text nodes"""
         if not self.silent:
-            possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
-            # validate possible urls
-            # we'll transform them just in case
-            # they are valid.
-            if possible_urls and self.automatic_link_transformation:
-                for url in possible_urls:
-                    if regex_url.search(url):
-                        transformed_url = '<a href="%s">%s</a>' % (url, url)
-                        data = data.replace(url, transformed_url)
-                self.result += data
+            if self.automatic_link_transformation:
+                self.result += transform_links(data)
             else:
                 self.result += cgi.escape(data, True)
 
@@ -947,3 +953,25 @@ def get_links_in_html_page(html):
     parser = _LinkGetter()
     parser.feed(html)
     return parser.urls
+
+
+def transform_links(data):
+    """
+    Create html links from possible_urls in input string
+    @param data: input string where links have to be transformed
+    @type data: str
+    """
+    possible_urls = re.findall(r'(https?://[\w\d:#%/;$()~_?\-=\\\.&]*)', data)
+    # validate possible urls
+    # we'll transform them just in case
+    # they are valid.
+    result = ""
+    if possible_urls:
+        for url in possible_urls:
+            if regex_url.search(url):
+                transformed_url = '<a href="%s">%s</a>' % (url, url)
+                data = data.replace(url, transformed_url)
+        result += data
+    else:
+        result = data
+    return result

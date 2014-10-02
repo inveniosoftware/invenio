@@ -926,8 +926,8 @@ function displayMessage(msgCode, keepContent, args) {
         msg = 'Search term did not match any records.';
         break;
     case 0:
-        msg = 'A server error has occured. Please contact your system ' +
-            'administrator.<br />' + 'Error code: <b>' + msgCode + '</b>';
+        msg = 'A server error has occurred. Please contact your system ' +
+            'administrator.<br />';
         break;
     case 4:
         msg = 'Your modifications have now been submitted. ' +
@@ -997,8 +997,9 @@ function displayMessage(msgCode, keepContent, args) {
             'Errors: <b>' + args[0] + '</b><br /><br />';
         break;
     case 111:
-        msg = 'Internal error. Cache file format is incorrect. ' +
-            'Try to open the record again';
+        msg = 'A server error has occurred. Try reopening the record. ' +
+            'If the problem persists, please contact your system ' +
+            'administrator.<br />';
         break;
     case 113:
         msg = 'An error ocurred during the upload simulation: <br /><br />' +
@@ -1184,6 +1185,11 @@ function displayAlert(msgType, args) {
         msg = 'Field ' + args[0] + ' cannot be deleted.\n' +
         'It contains subfield changed in Holding Pen\'s record and an action should be taken first';
         break;
+    case 'alertSwitchHoldingPenToMarc':
+        msg = '******************** WARNING ********************\n' +
+            '                  You have pending Holding Pen changes.\n\n' +
+            'You must take an action for every Holding Pen change\n';
+        break;
     case 'errorPhysicalCopiesExist':
         msg = "ERROR: Cannot delete record when physical copies exist. " +
             "First remove the copies in the BibCirculation module and then try again";
@@ -1305,6 +1311,14 @@ function getRevisionDate(revisionTs) {
     return result;
 }
 
+function getRevisionAuthor(revisionTs) {
+    var result = "";
+    if ( gRecRevisionAuthors[revisionTs] != undefined ) {
+        result = gRecRevisionAuthors[revisionTs];
+    }
+    return result;
+}
+
 function formatDateTime(dt) {
     return dt.year + '.' + dt.month + '.' + dt.day + ' ' + dt.hour + ':' +
         dt.minute + ':' + dt.second;
@@ -1313,6 +1327,7 @@ function formatDateTime(dt) {
 function displayRevisionHistoryEntry(recId, revisionId) {
     var entryClass = (revisionId == gRecRev) ? "bibEditRevHistorySelectedEntry" : "bibEditRevHistoryEntry";
     var timeString = formatDateTime(getRevisionDate(revisionId));
+    var authorString = getRevisionAuthor(revisionId);
 
     /* Define icons per row */
     var mergeImgId = 'imgMergeWithNewest_' + revisionId;
@@ -1341,12 +1356,12 @@ function displayRevisionHistoryEntry(recId, revisionId) {
         '</a>';
 
     var resultHTML = '<div class="' + entryClass + '">\n' +
-        '<div class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
+        '<table><tr><td rowspan="2" class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
         revisionId + '">' + checkImg + timeString +
-        '</div><div class="bibEditRevHistoryEntryControls">' +
+        '</td><td class="bibEditRevHistoryEntryControls">' +
         '<div>' + mergeWithNewestControl +
         compareWithCurrentControl + revertToRevisionControl +
-        "</div></div></div>\n";
+        '</div></td><tr><td class="bibEditRevHistoryAuthor">' + authorString + '</td></tr></table></div>\n';
 
     return {
         "HTML": resultHTML,
@@ -1401,7 +1416,7 @@ function createTemplateList() {
  * **************************** Functions related to jquery UI dialog ****************************************
  */
 
-function createDialog(title, content, height, width, loading) {
+function createDialog(title, content, height, width, loading, modal) {
     /* Creates a jQuery UI dialog
      *
      * title: string, title displayed on top of the dialog
@@ -1429,12 +1444,16 @@ function createDialog(title, content, height, width, loading) {
     }
     dialogDiv.append(contentParagraph.append(contentSpan));
     dialogDiv.appendTo($('body'));
-    dialogDiv.dialog({
-        title: title,
-        resizable: false,
-        height: height,
-        width: width
-    });
+    dialog_options = {}
+    dialog_options.title = title;
+    dialog_options.resizeable = false;
+    dialog_options.height = height;
+    dialog_options.width = width;
+    if (modal == true) {
+        dialog_options.modal = true;
+    }
+
+    dialogDiv.dialog(dialog_options);
 
     return dialog;
 }
@@ -1451,8 +1470,28 @@ function addContentToDialog(dialog, html_content, alertText) {
     dialog.iconSpan.addClass('ui-icon').addClass('ui-icon-alert').addClass('dialog-icon');
     dialog.contentParagraph.before(dialog.iconSpan);
     dialog.contentParagraph.removeClass('dialog-box-centered');
-    dialog.contentSpan.html("<strong>" + alertText + "</strong>\n\
-                    <br /><br />" + html_content);
+    dialog.contentSpan.html("<strong>" + alertText + "</strong><br /><br />"+
+    html_content);
+}
+
+function makeDialogLoading(dialog, message) {
+    /* Modifies internal content of a jQuery UI dialog,
+     * by removing the content and adding a centered loading bar
+     * and a message above it.
+     *
+     * dialog: object containing different parts of the dialog
+     * (see createDialog())
+     * message: string, text displayed in the center of the dialog
+     */
+    dialog.iconSpan.removeClass('ui-icon').removeClass('ui-icon-alert').removeClass('dialog-icon');
+    dialog.iconSpan.empty();
+    dialog.contentParagraph.addClass('dialog-box-centered');
+    dialog.contentSpan.html(message +
+                         "<br /><br /> <img src='/img/ajax-loader.gif'>");
+    var buttons = dialog.dialogDiv.dialog('option', 'buttons');
+    for ( var button in buttons) {
+        $('#' + buttons[button].id ).hide();
+    }
 }
 
 function openCenteredPopup(pageURL, title, w, h) { /* Opens a centered popup */

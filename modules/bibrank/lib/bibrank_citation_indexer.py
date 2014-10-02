@@ -36,6 +36,7 @@ from invenio.redisutils import get_redis
 from invenio.search_engine import search_pattern, \
                                   search_unit, \
                                   get_collection_reclist
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibknowledge import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \
@@ -44,6 +45,8 @@ from invenio.bibtask import write_message, task_get_option, \
 from invenio.bibindex_engine_utils import get_field_tags
 from invenio.docextract_record import get_record
 from invenio.dbquery import serialize_via_marshal
+from invenio.config import CFG_SITE_URL, CFG_INSPIRE_SITE
+from invenio.errorlib import register_exception
 
 re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK \
                    = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
@@ -99,6 +102,7 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
     the index of sorted research results by citation information
     """
     quick = task_get_option("quick") != "no"
+    loss_checks = not bool(task_get_option("disable_citation_losses_check"))
 
     # id option forces re-indexing a certain range
     # even if there are no new recs
@@ -138,7 +142,10 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
         except ConfigParser.NoOptionError:
             config.set(function, 'collections', None)
         # Process fully the updated records
-        weights = process_and_store(updated_recids, config, chunk_size)
+        weights = process_and_store(recids=updated_recids,
+                                    config=config,
+                                    chunk_size=chunk_size,
+                                    loss_checks=loss_checks)
         end_time = time.time()
         write_message("Total time of get_citation_weight(): %.2f sec" %
                                                       (end_time - begin_time))
@@ -151,10 +158,97 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
     return weights, index_update_time
 
 
-def process_and_store(recids, config, chunk_size):
+def check_citations_losses(config, recids, refs, cites):
+    """Check citations/references losses at the end of computation process
+
+    Raises an exception if needed"""
+
     # Limit of # of citation we can loose in one chunk
     function = config.get("rank_method", "function")
     citation_loss_limit = int(config.get(function, "citation_loss_limit"))
+    citation_loss_per_record_limit = int(config.get(function, "citation_loss_per_record_limit"))
+
+    err_msg = 'Lost too many references, aborting'
+
+    refs_diff, cites_diff = compute_dicts_diff(recids, refs, cites)
+
+    # Overall loss limits
+    write_message("References balance %s" % sum(refs_diff))
+    write_message("Citations balance %s" % sum(cites_diff))
+    if citation_loss_limit and sum(cites_diff) <= -citation_loss_limit or sum(refs_diff) <= -citation_loss_limit:
+        print_cites_diff(recids, refs_diff, cites_diff)
+        raise Exception(err_msg)
+
+    # Per record loss limits
+    records_to_ignore = []
+    if citation_loss_per_record_limit:
+        for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
+            try:
+                assert record_refs_diff > -citation_loss_per_record_limit
+            except AssertionError:
+                prefix = "Record %s lost too many references: %s refs" \
+                         % (recid, record_refs_diff)
+                report_loss(recid, prefix, True)
+                if recid not in records_to_ignore:
+                    records_to_ignore.append(recid)
+
+            try:
+                assert record_cites_diff > -citation_loss_per_record_limit
+            except AssertionError:
+                prefix = "Record %s lost too many citations: %s cites" \
+                         % (recid, record_cites_diff)
+                register_exception(prefix=prefix,
+                                   alert_admin=True)
+                report_loss(recid, prefix, False)
+                if recid not in records_to_ignore:
+                    records_to_ignore.append(recid)
+
+    for recid in records_to_ignore:
+        try:
+            recids.pop(recids.index(recid))
+        except (ValueError, IndexError):
+            # recid not in list. ignore
+            pass
+
+
+def report_loss(recid, prefix, is_refs):
+    """
+    Reports the loss of reference/citation to RT.
+    """
+    if not CFG_INSPIRE_SITE:
+        return
+
+    from invenio.bibcatalog_task import BibCatalogTicket
+
+    if is_refs:
+        type_of_loss = "references"
+    else:
+        type_of_loss = "citations"
+
+    ticket = BibCatalogTicket(recid=int(recid))
+    ticket.subject = prefix
+    ticket.queue = "CitationLoss"
+    ticket.body = """
+        Record lost too many %(type_of_loss)s: %(recordlink)s
+
+        Edit it: %(recordeditlink)s
+
+        After investigation alert admin to run:
+        $ sudo -u apache /opt/cds-invenio/bin/bibrank -i %(recid)s
+
+    """ % {
+        "recordlink": "%s/record/%s/%s" % (CFG_SITE_URL, recid, type_of_loss),
+        "recordeditlink": "%s/record/%s/edit" % (CFG_SITE_URL, recid),
+        "recid": recid,
+        "type_of_loss": type_of_loss,
+    }
+
+    if isinstance(ticket.body, unicode):
+        ticket.body = ticket.body.encode("utf-8")
+    ticket.submit()
+
+
+def process_and_store(recids, config, chunk_size, loss_checks=True):
     # If we have nothing to process
     # Do not update the weights dictionary
     modified = False
@@ -176,11 +270,9 @@ def process_and_store(recids, config, chunk_size):
         # The core work
         cites, refs = process_chunk(chunk, config)
         # Check that we haven't lost too many citations
-        cites_diff = compute_dicts_diff(chunk, refs, cites)
-        write_message("Citations balance %s" % cites_diff)
-        if citation_loss_limit and cites_diff <= -citation_loss_limit:
-            raise Exception('Lost too many references, aborting')
-
+        # (raises an exception if needed)
+        if loss_checks:
+            check_citations_losses(config, chunk, refs, cites)
         # Store processed citations/references
         store_dicts(chunk, refs, cites)
         modified = True
@@ -188,10 +280,9 @@ def process_and_store(recids, config, chunk_size):
     # Compute new weights dictionary
     if modified:
         weights = compute_weights()
+        store_weights_cache(weights)
     else:
         weights = None
-
-    store_weights_cache(weights)
 
     return weights
 
@@ -509,9 +600,6 @@ def get_citation_informations(recid_list, tags, config,
             write_message(mesg)
             task_update_progress(mesg)
 
-        record = get_record(recid)
-        records_info['record_id'][recid] = [unicode(recid)]
-
         function = config.get("rank_method", "function")
         if config.get(function, 'collections'):
             if recid not in recids_cache(config.get(function, 'collections')):
@@ -527,13 +615,19 @@ def get_citation_informations(recid_list, tags, config,
             # get_fieldvalues() below would return old values)
             continue
 
-        if tags['refs_report_number']:
+        record = get_record(recid)
+        records_info['record_id'][recid] = [unicode(recid)]
+
+        # We ignore all the references of superseeded records
+        superseeded = bool(record['78502'])
+
+        if tags['refs_report_number'] and not superseeded:
             references_info['report-numbers'][recid] = [t.value for t in
                              record.find_subfields(tags['refs_report_number'])]
             msg = "references_info['report-numbers'][%s] = %r" \
                         % (recid, references_info['report-numbers'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_journal']:
+        if tags['refs_journal'] and not superseeded:
             references_info['journals'][recid] = []
             for ref in record.find_subfields(tags['refs_journal']):
                 try:
@@ -550,7 +644,8 @@ def get_citation_informations(recid_list, tags, config,
             msg = "references_info['journals'][%s] = %r" \
                               % (recid, references_info['journals'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_doi']:
+
+        if tags['refs_doi'] and not superseeded:
             references = [t.value for t in
                                        record.find_subfields(tags['refs_doi'])]
             dois = []
@@ -570,14 +665,13 @@ def get_citation_informations(recid_list, tags, config,
             msg = "references_info['hdl'][%s] = %r" % (recid, hdls)
             write_message(msg, verbose=9)
 
-
-        if tags['refs_record_id']:
+        if tags['refs_record_id'] and not superseeded:
             references_info['record_id'][recid] = [t.value for t in
                                  record.find_subfields(tags['refs_record_id'])]
             msg = "references_info['record_id'][%s] = %r" \
                                    % (recid, references_info['record_id'][recid])
             write_message(msg, verbose=9)
-        if tags['refs_isbn']:
+        if tags['refs_isbn'] and not superseeded:
             references_info['isbn'][recid] = [t.value for t in
                                       record.find_subfields(tags['refs_isbn'])]
             msg = "references_info['isbn'][%s] = %r" \
@@ -690,6 +784,10 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         # Make sure we don't add ourselves
         # Workaround till we know why we are adding ourselves.
         if citer == citee:
+            return
+
+        # Ignore cites from superseeded records
+        if get_fieldvalues(citer, '78502w'):
             return
 
         citations[citee].add(citer)
@@ -947,18 +1045,18 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         done += 1
 
         for reportcode in (r for r in reportcodes if r):
+            field = tags['refs_report_number']
             if reportcode.startswith('arXiv'):
-                std_reportcode = standardize_report_number(reportcode)
-                report_pattern = r'^%s( *\[[a-zA-Z.-]*\])?' % \
-                                                re.escape(std_reportcode)
-                recids = get_recids_matching_query(p=report_pattern,
-                                                   f=tags['refs_report_number'],
-                                                   m='r',
-                                                   config=config)
+                pattern = '%s*' % standardize_report_number(reportcode)
             else:
-                recids = get_recids_matching_query(p=reportcode,
-                                                   f=tags['refs_report_number'],
-                                                   config=config)
+                pattern = reportcode
+
+            recids = get_recids_matching_query(p=pattern,
+                                               f=field,
+                                               config=config)
+            write_message("These match searching %s in %s: %s"
+                             % (pattern, field, list(recids)), verbose=9)
+
             for recid in recids:
                 add_to_cites(recid, thisrecid)
 
@@ -1128,17 +1226,28 @@ def compute_cites_diff(recid, new_cites):
     return len(cites_to_add) - len(cites_to_delete)
 
 
+def print_cites_diff(recids, refs_diff, cites_diff):
+    """
+    Given the new dictionaries for references and citations, computes how
+    many references were added or removed by comparing them to the current
+    stored in the database.
+    """
+    for recid, record_refs_diff, record_cites_diff in zip(recids, refs_diff, cites_diff):
+        if record_refs_diff:
+            write_message('%s balance %s refs' % (recid, record_refs_diff))
+        if record_cites_diff:
+            write_message('%s balance %s cites' % (recid, record_cites_diff))
+
+
 def compute_dicts_diff(recids, refs, cites):
     """
     Given the new dictionaries for references and citations, computes how
     many references were added or removed by comparing them to the current
     stored in the database.
     """
-    cites_diff = 0
-    for recid in recids:
-        cites_diff += compute_refs_diff(recid, refs[recid])
-        cites_diff += compute_cites_diff(recid, cites[recid])
-    return cites_diff
+    refs_diff = [compute_refs_diff(recid, refs[recid]) for recid in recids]
+    cites_diff = [compute_cites_diff(recid, cites[recid]) for recid in recids]
+    return refs_diff, cites_diff
 
 
 def store_dicts(recids, refs, cites):

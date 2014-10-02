@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,45 +30,48 @@ def format_element(bfo):
     """
 
     publisher = bfo.field("520__9")
-    if publisher == "HEPDATA":
-        out = hepdata_cite_as(bfo)
-    elif publisher == "Dataverse":
-        out = dataverse_cite_as(bfo)
-    elif publisher == "INSPIRE":
-        out = inspire_cite_as(bfo)
+    return cite_as(bfo, publisher)
 
-    return out
 
-def hepdata_cite_as(bfo):
+def cite_as(bfo, publisher):
     """
     HepData format example:
         Cite as: The ATLAS Collaboration (2013) HepData, doi: 10.1234/123456
+    Dataverse format example:
+        Cranmer, Kyle; Allanach, Ben; Lester, Christopher; Weber, Arne, "Replication data for:
+        "Natural Priors, CMSSM Fits and LHC Weather Forecasts"", http://hdl.handle.net/1902.1/21804
+    INSPIRE format example:
+        Cite as: The ATLAS Collaboration (2013) INSPIRE, doi: 10.1234/123456
     """
 
     from invenio.bibformat_engine import BibFormatObject
+
+    if publisher == "Dataverse":
+        return dataverse_cite_as(bfo)
 
     colls = []
     for coll in bfo.fields("710__g"):
         if coll not in colls:
             colls.append(coll)
 
-    parent_recid = bfo.field("786__w")
+    parent_recid = int(bfo.field("786__w"))
     bfo_parent = BibFormatObject(parent_recid)
     year = get_year(bfo_parent)
-    if year == None:
-        year = 0
 
-    publisher = bfo.field("520__9")
     if publisher == 'HEPDATA':
         publisher = 'HepData'
+    elif publisher == "INSPIRE":
+        publisher == "INSPIRE-HEP"
 
     pid_type = bfo.field("0247_2")
     pid = bfo.field("0247_a")
 
     out = ''
-    out += ("<b>Cite as: </b>")
-    out += str(colls[0])
-    out += ' ( '+ str(year) +' ) '
+    out += "<b>Cite as: </b>"
+    if colls:
+        out += str(colls[0])
+    if year:
+        out += ' ( ' + str(year) + ' ) '
     out += publisher + ', '
 
     if pid_type == 'DOI':
@@ -79,6 +82,7 @@ def hepdata_cite_as(bfo):
         out += '[no persistent identifier assigned]'
 
     return out
+
 
 def dataverse_cite_as(bfo):
     """
@@ -92,7 +96,7 @@ def dataverse_cite_as(bfo):
     out = ''
     out += ("<b>Cite as: </b>")
     out += authors[:-2] + ", "
-    
+
     title = bfo.field("245__a")
     out += '"' + title + '", <br /> ' 
 
@@ -106,45 +110,6 @@ def dataverse_cite_as(bfo):
 
     return out
 
-def inspire_cite_as(bfo):
-    """
-    INSPIRE format example:
-        Cite as: The ATLAS Collaboration (2013) INSPIRE, doi: 10.1234/123456
-    """
-    from invenio.bibformat_engine import BibFormatObject
-
-    colls = []
-    for coll in bfo.fields("710__g"):
-        if coll not in colls:
-            colls.append(coll)
-
-    parent_recid = bfo.field("786__w")
-    bfo_parent = BibFormatObject(parent_recid)
-    year = get_year(bfo_parent)
-    if year == None:
-        year = 0
-
-    publisher = bfo.field("520__9")
-    if publisher == "INSPIRE":
-        publisher == "INSPIRE-HEP"
-
-    pid_type = bfo.field("0247_2")
-    pid = bfo.field("0247_a")
-
-    out = ''
-    out += ("<b>Cite as: </b>")
-    out += str(colls[0])
-    out += ' ( '+ str(year) +' ) '
-    out += publisher + ', '
-
-    if pid_type == 'DOI':
-        out += '<a href="http://doi.org/' + pid + '" target="_blank" > http://doi.org/' + pid + '</a>'
-    elif pid_type == 'HDL':
-        out += '<a href="http://hdl.handle.net/' + pid + '" target="_blank" > http://hdl.handle.net/' + pid + '</a>'
-    elif pid_type == '':
-        out += '[no persistent identifier assigned]'
-
-    return out
 
 def get_year(bfo):
     """

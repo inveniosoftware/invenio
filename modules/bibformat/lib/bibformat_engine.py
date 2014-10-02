@@ -1861,12 +1861,24 @@ class BibFormatObject(object):
             # If record is given as parameter
             self.xml_record = xml_record
             self.record = create_record(xml_record)[0]
-            recID = record_get_field_value(self.record, "001")
+            if '001' in self.record:
+                recID = int(record_get_field_value(self.record, "001"))
 
         self.lang = wash_language(ln)
         if search_pattern is None:
             search_pattern = []
         self.search_pattern = search_pattern
+        try:
+            assert isinstance(recID, (int, long, type(None))), 'Argument of wrong type!'
+        except AssertionError:
+            from StringIO import StringIO
+            stream = StringIO()
+            traceback.print_stack(file=stream)
+            prefix = stream.getvalue()
+            prefix += "\nrecid needs to be an integer in BibFormatObject"
+            register_exception(prefix=prefix,
+                               alert_admin=True)
+            recID = int(recID)
         self.recID = recID
         self.output_format = output_format
         self.user_info = user_info
@@ -2083,6 +2095,17 @@ class BibFormatObject(object):
         except IndexError:
             return default
 
+    def __repr__(self):
+        """
+        Representation of the BibFormatObject. Useful for debugging.
+        """
+        return "<BibFormatObject(recid=%r,lang=%r,search_pattern=%r,output_format=%r," \
+               "user_info=%r, record=%r)" % (self.recID,
+                                             self.lang,
+                                             self.search_pattern,
+                                             self.output_format,
+                                             self.user_info,
+                                             self.record)
 
 # Utility functions
 ##

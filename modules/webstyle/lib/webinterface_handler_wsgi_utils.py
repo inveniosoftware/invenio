@@ -229,25 +229,26 @@ def _parse_cookie(str, Class, names=None):
 
     return result
 
-def get_cookies(req, Class=Cookie, **kw):
+
+def get_cookies(req, cls=Cookie, **kw):
     """
     A shorthand for retrieveing and parsing cookies given
     a Cookie class. The class must be one of the classes from
     this module.
     """
-
-    if not req.headers_in.has_key("cookie"):
+    if not "cookie" in getattr(req, "headers_in", {}):
         return {}
 
     cookies = req.headers_in["cookie"]
-    if type(cookies) == type([]):
+    if isinstance(cookies, list):
         cookies = '; '.join(cookies)
 
-    return Class.parse(cookies, **kw)
+    return cls.parse(cookies, **kw)
 
-def get_cookie(req, name, Class=Cookie, **kw):
-    cookies = get_cookies(req, Class, names=[name], **kw)
-    if cookies.has_key(name):
+
+def get_cookie(req, name, cls=Cookie, **kw):
+    cookies = get_cookies(req, cls, names=[name], **kw)
+    if name in cookies:
         return cookies[name]
 
 
@@ -509,8 +510,11 @@ class FieldStorage:
                         end_of_stream = True
                 # we read the headers until we reach an empty line
                 # NOTE : a single \n would mean the entity is malformed, but
-                # we're tolerating it anyway
-                h, v = line.split(":", 1)
+                # we're tolerating it anyway. We just raise an apache exception
+                try:
+                    h, v = line.split(":", 1)
+                except ValueError:
+                    raise SERVER_RETURN(HTTP_BAD_REQUEST)
                 headers.add(h, v)
                 h = h.lower()
                 if h == "content-disposition":
@@ -837,7 +841,7 @@ def handle_file_post(req, allowed_mimetypes=None):
     ## Let's read the file
     while True:
         chunk = req.read(min(10240, clen))
-        if len(chunk) < clen:
+        if len(chunk) < min(10240, clen):
             ## We expected to read at least clen (which is different than 0)
             ## but chunk was shorter! Gosh! Error! Panic!
             the_file.close()

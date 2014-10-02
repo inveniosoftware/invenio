@@ -26,11 +26,15 @@ They are intended to make sure there is no regression in references parsing.
 
 from invenio.testutils import InvenioTestCase
 import re
+from mock import patch
 
+from invenio import bibupload
+from invenio.search_engine_utils import get_fieldvalues
 from invenio.testutils import make_test_suite, run_test_suite, InvenioXmlTestCase
 from invenio.refextract_engine import parse_references
 from invenio.docextract_utils import setup_loggers
 from invenio.refextract_text import wash_and_repair_reference_line
+from invenio.config import CFG_ETCDIR
 from invenio import refextract_kbs
 from invenio import refextract_record
 
@@ -165,12 +169,32 @@ class RefextractInvenioTest(InvenioXmlTestCase):
         _reference_test(self, ref_line, u"""<record>
    <datafield ind1="C" ind2="5" tag="999">
        <subfield code="o">1</subfield>
-       <subfield code="t">Electrical breakdown in gases</subfield>
        <subfield code="y">1973</subfield>
+       <subfield code="t">Electrical breakdown in gases</subfield>
        <subfield code="0">34</subfield>
    </datafield>
 </record>
 """)
+
+    def test_ligo_report_number(self):
+        """Checks that LIGO report numbers are recognized"""
+        ref_line = u"""[2] LIGO-T950132-00-R; LIGO-T940063-00-R; LIGO-T060303-00-D"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T950132-00-R</subfield>
+   </datafield>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T940063-00-R</subfield>
+   </datafield>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="r">LIGO-T060303-00-D</subfield>
+   </datafield>
+</record>
+""")
+
 
 class RefextractTest(InvenioXmlTestCase):
     """Testing output of refextract"""
@@ -181,7 +205,8 @@ class RefextractTest(InvenioXmlTestCase):
 
         self.inspire = True
         self.kb_books = [
-            ('Griffiths, David', 'Introduction to elementary particles', '2008')
+            ('Griffiths, David', 'Introduction to elementary particles', '2008'),
+            ('Kosyakov, B.P.', 'Introduction to the classical theory of particles and fields', '2007'),
         ]
         self.kb_journals = [
             ("PHYSICAL REVIEW SPECIAL TOPICS ACCELERATORS AND BEAMS", "Phys.Rev.ST Accel.Beams"),
@@ -435,8 +460,42 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">10</subfield>
       <subfield code="h">R. Penrose and W. Rindler</subfield>
+      <subfield code="y">1986</subfield>
    </datafield>
 </record>""")
+
+    def test_book2(self):
+        """book with authors and title and year
+
+        This book was not detected, this tests makes sure the bug does not
+        appear again."""
+        ref_line = u"""[6] B. P. Kosyakov, Introduction to the classical theory of particles and fields, (Springer Verlag, 2007)."""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="h">B. P. Kosyakov</subfield>
+      <subfield code="p">Springer</subfield>
+      <subfield code="y">2007</subfield>
+      <subfield code="t">Introduction to the classical theory of particles and fields</subfield>
+   </datafield>
+</record>""")
+
+    def test_book_year_removed(self):
+        """check that the year is removed from the misc field
+
+        This book was not detected, this tests makes sure the bug does not
+        appear again."""
+        ref_line = u"""[6] B. P. Kosyakov, Introduction to the classical theory of particles and fields, (Springer Verlag, 2007)."""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="h">B. P. Kosyakov</subfield>
+      <subfield code="p">Springer</subfield>
+      <subfield code="m">Verlag,)</subfield>
+      <subfield code="y">2007</subfield>
+      <subfield code="t">Introduction to the classical theory of particles and fields</subfield>
+   </datafield>
+</record>""", ignore_misc=False)
 
     def test_hep_combined(self):
         ref_line = u"""[11] R. Britto-Pacumio, A. Strominger and A. Volovich, JHEP 9911:013 (1999); hep-th/9905210; blah hep-th/9905211; blah hep-ph/9711200"""
@@ -575,6 +634,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">20</subfield>
       <subfield code="h">M. Duff, B. Nilsson and C. Pope</subfield>
+      <subfield code="y">1986</subfield>
    </datafield>
 </record>""")
 
@@ -636,6 +696,7 @@ class RefextractTest(InvenioXmlTestCase):
       <subfield code="o">25</subfield>
       <subfield code="h">C. Fefferman and C. Graham</subfield>
       <subfield code="t">Conformal Invariants</subfield>
+      <subfield code="y">1985</subfield>
    </datafield>
 </record>""")
 
@@ -1071,6 +1132,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">46</subfield>
       <subfield code="h">E. Schrodinger</subfield>
+      <subfield code="y">1931</subfield>
    </datafield>
 </record>""")
 
@@ -1097,7 +1159,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">48</subfield>
       <subfield code="h">O.O. Vaneeva, R.O. Popovych and C. Sophocleous</subfield>
-      <subfield code="a">10.1007/s10440-008-9280-9</subfield>
+      <subfield code="a">doi:10.1007/s10440-008-9280-9</subfield>
       <subfield code="r">arXiv:0708.3457</subfield>
    </datafield>
 </record>""")
@@ -1107,7 +1169,7 @@ class RefextractTest(InvenioXmlTestCase):
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">1</subfield>
-      <subfield code="a">10.1175/1520-0442(2000)013&lt;2671:TAORTT&gt;2.0.CO;2</subfield>
+      <subfield code="a">doi:10.1175/1520-0442(2000)013&lt;2671:TAORTT&gt;2.0.CO;2</subfield>
    </datafield>
 </record>""")
 
@@ -1117,7 +1179,8 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">49</subfield>
       <subfield code="h">M. I. Trofimov, N. De Filippis and E. A. Smolenskii</subfield>
-      <subfield code="a">10.1007/s11172-006-0105-6</subfield>
+      <subfield code="a">doi:10.1007/s11172-006-0105-6</subfield>
+      <subfield code="y">2005</subfield>
    </datafield>
 </record>""")
 
@@ -1128,10 +1191,12 @@ class RefextractTest(InvenioXmlTestCase):
       <subfield code="o">50</subfield>
       <subfield code="h">M. Gell-Mann, P. Ramon ans R. Slansky</subfield>
       <subfield code="p">North-Holland</subfield>
+      <subfield code="y">1979</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">50</subfield>
       <subfield code="h">T. Yanagida</subfield>
+      <subfield code="y">1979</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">50</subfield>
@@ -1178,6 +1243,7 @@ class RefextractTest(InvenioXmlTestCase):
       <subfield code="h">Hush, D.R., R.Leighton, and B.G. Horne</subfield>
       <subfield code="t">Progress in supervised Neural Netw. What's new since Lippmann?</subfield>
       <subfield code="p">IEEE</subfield>
+      <subfield code="y">1993</subfield>
    </datafield>
 </record>""")
 
@@ -1301,6 +1367,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">63</subfield>
       <subfield code="h">Z. Guzik and R. Jacobsson</subfield>
+      <subfield code="y">2005</subfield>
    </datafield>
 </record>""")
 
@@ -1540,6 +1607,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="c">ATLAS Collaboration</subfield>
       <subfield code="u">http://cdsweb.cern.ch/record/1266235/files/ATLAS-COM-CONF-2010-031.pdf</subfield>
       <subfield code="r">ATLAS-CONF-2010-031</subfield>
+      <subfield code="y">2010</subfield>
    </datafield>
 </record>""")
 
@@ -1619,6 +1687,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="h">S. Calatroni, H. Neupert, and M. Taborelli</subfield>
       <subfield code="t">Fatigue testing of materials by UV pulsed laser irradiation</subfield>
       <subfield code="r">CERN-CLIC-Note-615</subfield>
+      <subfield code="y">2004</subfield>
    </datafield>
 </record>""")
 
@@ -1630,6 +1699,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="h">H. Braun, R. Corsini, J. P. Delahaye, A. de Roeck, S. Dbert, A. Ferrari, G. Geschonke, A. Grudiev, C. Hauviller, B. Jeanneret, E. Jensen, T. Lefvre, Y. Papaphilippou, G. Riddone, L. Rinolfi, W. D. Schlatter, H. Schmickler, D. Schulte, I. Syratchev, M. Taborelli, F. Tecker, R. Toms, S. Weisz, and W. Wuensch</subfield>
       <subfield code="t">CLIC 2008 parameters</subfield>
       <subfield code="r">CERN-CLIC-Note-764</subfield>
+      <subfield code="y">2008</subfield>
    </datafield>
 </record>""")
 
@@ -1688,6 +1758,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">5</subfield>
       <subfield code="h">I. J. Aitchison and A. J. Hey</subfield>
       <subfield code="p">CRC Pr.</subfield>
+      <subfield code="y">2003</subfield>
    </datafield>
 </record>""")
 
@@ -1698,6 +1769,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">48</subfield>
       <subfield code="h">D. Adams, S. Asai, D. Cavalli, M. D\xfchrssen, K. Edmonds, S. Elles, M. Fehling, U. Felzmann, L. Gladilin, L. Helary, M. Hohlfeld, S. Horvat, K. Jakobs, M. Kaneda, G. Kirsch, S. Kuehn, J. F. Marchand, C. Pizio, X. Portell, D. Rebuzzi, E. Schmidt, A. Shibata, I. Vivarelli, S. Winkelmann, and S. Yamamoto</subfield>
       <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+      <subfield code="y">2009</subfield>
    </datafield>
 </record>""")
 
@@ -1769,6 +1841,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">15</subfield>
       <subfield code="h">(E. Berger (eds.))</subfield>
       <subfield code="p">World Scientific</subfield>
+      <subfield code="y">1992</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">15</subfield>
@@ -1803,7 +1876,8 @@ Rev. D 80 034030 1-25"""
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">15</subfield>
-      <subfield code="m">Proceedings of the 1990 Summer Study on High Energy Physics</subfield>
+      <subfield code="m">Proceedings of theSummer Study on High Energy Physics</subfield>
+      <subfield code="y">1990</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">15</subfield>
@@ -1886,13 +1960,15 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">39</subfield>
       <subfield code="h">M. Sisti</subfield>
       <subfield code="c">CUORE Collaboration</subfield>
-      <subfield code="m">J. Phys. Conf. Ser. 203 (2010)012069</subfield>
+      <subfield code="m">J. Phys. Conf. Ser. 203 012069</subfield>
+      <subfield code="y">2010</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">39</subfield>
       <subfield code="h">F. Bellini, C. Bucci, S. Capelli, O. Cremonesi, L. Gironi, M. Martinez, M. Pavanand C. Tomei et al.</subfield>
-      <subfield code="m">Astropart. Phys. 33 (2010) 169</subfield>
+      <subfield code="m">Astropart. Phys. 33  169</subfield>
       <subfield code="r">arXiv:0912.0452 [physics.ins-det]</subfield>
+      <subfield code="y">2010</subfield>
    </datafield>
 </record>""", ignore_misc=False)
 
@@ -1987,6 +2063,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">20</subfield>
       <subfield code="h">G. Duckeck</subfield>
       <subfield code="t">ATLAS computing: Technical design report</subfield>
+      <subfield code="y">1988</subfield>
    </datafield>
 </record>""")
 
@@ -1997,6 +2074,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">22</subfield>
       <subfield code="h">B. Crowell</subfield>
       <subfield code="i">0-9704670-3-6</subfield>
+      <subfield code="y">2009</subfield>
    </datafield>
 </record>""")
 
@@ -2008,6 +2086,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="h">D. E. Gray</subfield>
       <subfield code="p">McGraw-Hill</subfield>
       <subfield code="i">9780070014855</subfield>
+      <subfield code="y">1972</subfield>
    </datafield>
 </record>""")
 
@@ -2171,7 +2250,6 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    </datafield>
 </record>""")
 
-
     def test_complex_author(self):
         ref_line = u"""[39] Michael E. Peskin, Michael E. Peskin and Michael E. Peskin “An Introduction To Quantum Field Theory,” Westview Press, 1995."""
         _reference_test(self, ref_line, u"""<record>
@@ -2179,6 +2257,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">39</subfield>
       <subfield code="h">Michael E. Peskin, Michael E. Peskin and Michael E. Peskin</subfield>
       <subfield code="t">An Introduction To Quantum Field Theory</subfield>
+      <subfield code="y">1995</subfield>
    </datafield>
 </record>""")
 
@@ -2189,6 +2268,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">39</subfield>
       <subfield code="h">Dan V. Schroeder, Dan V. Schroeder and Dan V. Schroeder</subfield>
       <subfield code="t">An Introduction To Quantum Field Theory</subfield>
+      <subfield code="y">1995</subfield>
    </datafield>
 </record>""")
 
@@ -2199,6 +2279,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">39</subfield>
       <subfield code="h">Michael E. Peskin and Dan V. Schroeder</subfield>
       <subfield code="t">An Introduction To Quantum Field Theory</subfield>
+      <subfield code="y">1995</subfield>
    </datafield>
 </record>""")
 
@@ -2369,6 +2450,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">12</subfield>
       <subfield code="h">C. T. Hill and E. H. Simmons</subfield>
       <subfield code="r">hep-ph/0203079</subfield>
+      <subfield code="y">2003</subfield>
    </datafield>
 </record>""")
 
@@ -2421,6 +2503,24 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    </datafield>
 </record>""")
 
+    def test_dash_dash_report_number(self):
+        ref_line = u"""[6] ATL--PHYS-INT-2009-110"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+   </datafield>
+</record>""")
+
+    def test_dash_dash_num_report_number(self):
+        ref_line = u"""[6] ATL-PHYS-INT-2009--110"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield tag="999" ind1="C" ind2="5">
+      <subfield code="o">6</subfield>
+      <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+   </datafield>
+</record>""")
+
     def test_only_journal(self):
         ref_line = u"""[6] Phys. Rev.D, 41 (1990) 83"""
         _reference_test(self, ref_line, u"""<record>
@@ -2436,7 +2536,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">6</subfield>
-      <subfield code="a">10.1007/s10440-008-9280-9</subfield>
+      <subfield code="a">doi:10.1007/s10440-008-9280-9</subfield>
    </datafield>
 </record>""")
 
@@ -2452,6 +2552,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">1</subfield>
       <subfield code="h">D. Adams, S. Asai, D. Cavalli, K. Edmonds</subfield>
       <subfield code="r">ATL-PHYS-INT-2009-110</subfield>
+      <subfield code="y">2009</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">2</subfield>
@@ -2512,6 +2613,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">21</subfield>
       <subfield code="h">R. Barlow</subfield>
       <subfield code="r">physics/0401042</subfield>
+      <subfield code="y">2003</subfield>
    </datafield>
 </record>""")
 
@@ -2705,7 +2807,8 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">44</subfield>
       <subfield code="h">R. Baier et al.</subfield>
-      <subfield code="m">Invalid. Hello. Lett. B 345 (1995)</subfield>
+      <subfield code="m">Invalid. Hello. Lett. B 345</subfield>
+      <subfield code="y">1995</subfield>
    </datafield>
 </record>""", ignore_misc=False)
 
@@ -2759,6 +2862,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">14</subfield>
+      <subfield code="y">2012</subfield>
    </datafield>
 </record>""")
 
@@ -2789,6 +2893,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">35</subfield>
       <subfield code="h">G. I. Egri, Z. Fodor, C. Hoelbling, S. D. Katz, D. N\xf3gr\xe1di, et al.</subfield>
       <subfield code="r">hep-lat/0611022</subfield>
+      <subfield code="y">2007</subfield>
    </datafield>
 </record>""")
 
@@ -2822,7 +2927,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
         _reference_test(self, ref_line, u"""<record>
    <datafield ind1="C" ind2="5" tag="999">
        <subfield code="o">1</subfield>
-       <subfield code="a">10.1007/s10440-008-9280-9</subfield>
+       <subfield code="a">doi:10.1007/s10440-008-9280-9</subfield>
    </datafield>
 </record>""")
 
@@ -2873,14 +2978,107 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    </datafield>
 </record>""")
 
+    def test_hdl_url(self):
+        """Checks hdl url recognition"""
+        ref_line = u"""[2] http://hdl.handle.net/1201/99999 """
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="a">hdl:1201/99999</subfield>
+   </datafield>
+</record>""")
+
+    def test_hdl(self):
+        """Checks hdl recognition"""
+        ref_line = u"""[2] before hdl:1201/99999 after"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="a">hdl:1201/99999</subfield>
+   </datafield>
+</record>""")
+
+    def test_journal_lowercase(self):
+        """Checks journal with lower case volume letter"""
+        ref_line = u"""[2] phys.rev. d90 064027"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">2</subfield>
+       <subfield code="s">Phys.Rev.,D90,064027</subfield>
+   </datafield>
+</record>""")
+
 
 class TaskTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=0)
+        self.recid = 20
 
     def test_task_run_core(self):
         from invenio.refextract_task import task_run_core
         task_run_core(1, [])
+
+    def test_overwrite(self):
+        from invenio.refextract_task import extract_one
+        def mocked_look_for_fulltext(recid):
+            return "%s/docextract/example.pdf" % CFG_ETCDIR
+        with patch('invenio.refextract_api.look_for_fulltext', mocked_look_for_fulltext):
+            results = []
+            try:
+                extract_one(self.recid, results)
+            except NotSafeForExtraction:
+                pass
+            else:
+                self.assertEqual(len(results), 1)
+                self.assertTrue(results[0]['999C5'])
+
+
+class TaskRecordWithRefsTest(InvenioTestCase):
+    def setUp(self):
+        """Setup record needed for tests
+
+        We setup the record with id=self.recid to have a single dummy
+        reference."""
+        setup_loggers(verbosity=0)
+        self.recid = 20
+        self.bibupload_xml = """<record>
+            <controlfield tag="001">%s</controlfield>
+            <datafield tag="999" ind1="C" ind2="5">
+                <subfield code="m">This is a dummy reference</subfield>
+            </datafield>
+        </record>""" % self.recid
+        recs = bibupload.xml_marc_to_records(self.bibupload_xml)
+        status, dummy, err = bibupload.bibupload(recs[0], opt_mode='correct')
+        assert status == 0, err.strip()
+        assert len(get_fieldvalues(self.recid, '999C5m')) == 1
+
+    def tearDown(self):
+        """Helper function that restores self.recid MARCXML"""
+        recs = bibupload.xml_marc_to_records(self.bibupload_xml)
+        bibupload.bibupload(recs[0], opt_mode='delete')
+
+    def test_no_overwrite(self):
+        from invenio.refextract_task import extract_one, NotSafeForExtraction
+        try:
+            extract_one(self.recid, [])
+        except NotSafeForExtraction:
+            pass
+        else:
+            self.fail()
+
+    def test_overwrite(self):
+        from invenio.refextract_task import extract_one, NotSafeForExtraction
+        def mocked_look_for_fulltext(recid):
+            return "%s/docextract/example.pdf" % CFG_ETCDIR
+        with patch('invenio.refextract_api.look_for_fulltext', mocked_look_for_fulltext):
+            results = []
+            try:
+                extract_one(self.recid, results, overwrite=True)
+            except NotSafeForExtraction:
+                pass
+            else:
+                self.assertEqual(len(results), 1)
+                self.assertTrue(results[0]['999C5'])
 
 TEST_SUITE = make_test_suite(RefextractTest)
 if __name__ == '__main__':

@@ -106,7 +106,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'autosuggestion_scanned' : 36,
     'error_rec_locked_by_user' : 104,
     'error_rec_locked_by_queue' : 105,
-    'error_wrong_cache_file_format' : 111,
+    'server_error' : 111,
     'error_physical_copies_exist': 112,
     'cache_updated_with_references': 114,
     'textmarc_parsing_error' : 115,
@@ -119,7 +119,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_ticket_closed': 122,
     'ticket_opened' : 123,
     'error_ticket_opened': 124,
-    'error_rt_connection': 125
+    'error_rt_connection': 125,
+    'ticket_created' : 126,
+    'error_ticket_created': 127
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {

@@ -38,8 +38,7 @@ from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_LOGGER
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.bibauthorid_name_utils import (soft_compare_names,
-                                            string_partition)
+from invenio.bibauthorid_name_utils import soft_compare_names
 from invenio.textutils import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
@@ -135,13 +134,15 @@ def validate_matches(bibmatch_recid, record, server, result_recids, \
                              (current_index, recid))
         CFG_BIBMATCH_LOGGER.info("Matching of record %d: Comparing to matched record %s" % \
                                  (bibmatch_recid, recid))
-        match_ratio = validate_match(record, matched_record, final_ruleset, \
-                                     verbose, ascii_mode)
-        if match_ratio == 1.0:
+
+        match_ratio, fuzzy = validate_match(record, matched_record, final_ruleset,
+                                            verbose, ascii_mode)
+
+        if match_ratio == 1.0 and not fuzzy:
             # All matches were a success, this is an exact match
             CFG_BIBMATCH_LOGGER.info("Matching of record %d: Exact match found -> %s" % (bibmatch_recid, recid))
             matches_found.append(recid)
-        elif match_ratio >= CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT:
+        elif match_ratio >= CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT or fuzzy:
             # This means that some matches failed, but some succeeded as well. That's fuzzy...
             CFG_BIBMATCH_LOGGER.info("Matching of record %d: Fuzzy match found -> %s" % \
                                      (bibmatch_recid, recid))
@@ -191,6 +192,9 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
                       a successful match will cause validation to immediately exit as a success.
         'joker'     : a failed match will cause the validation to continue on other rules (if any).
                       a successful match will cause validation to immediately exit as a success.
+        'fuzzy'     : a failed match will cause the validation to continue on other rules (if any)
+                      so long as it is the only rule that is failing, else exit as failure.
+                      a successful match will cause the validation to continue on other rules (if any)
 
     Fields are considered matching when all its subfields or values match. ALL matching strategy
     must return successfully for a match to be validated (except for 'joker' mode).
@@ -216,6 +220,7 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
     """
     total_number_of_matches = 0
     total_number_of_comparisons = 0
+    fuzzy_flag = False
     for field_tags, threshold, compare_mode, match_mode, result_mode in ruleset:
         field_tag_list = field_tags.split(',')
         if verbose > 8:
@@ -272,7 +277,7 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
                 # Not the same number of fields, not a valid match
                 # Unless this is a joker, we return indicating failure
                 if result_mode != 'joker':
-                    return 0.0
+                    return (0.0, fuzzy_flag)
                 continue
             matches_needed = len(original_record_values)
             ignore_order = False
@@ -320,23 +325,31 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
                 sys.stderr.write("Fields matched successfully.\n")
             if result_mode in ['final', 'joker']:
                 # Matching success. Return 5,5 indicating exact-match when final or joker.
-                return 1.0
+                return (1.0, False)
             total_number_of_matches += 1
         else:
             # Matching failed. Not a valid match
             if result_mode == 'final':
                 # Final does not allow failure
-                return 0.0
+                return (0.0, False)
             elif result_mode == 'joker':
                 if verbose > 8:
                     sys.stderr.write("Fields not matching. (Joker)\n")
+            elif result_mode == 'fuzzy':
+                if not fuzzy_flag:
+                    fuzzy_flag = True
+                    total_number_of_matches += 1
+                else:
+                    return (0.0, False)
             else:
                 if verbose > 8:
                     sys.stderr.write("Fields not matching. \n")
+
     if total_number_of_matches < CFG_BIBMATCH_MIN_VALIDATION_COMPARISONS \
         or total_number_of_comparisons == 0:
-        return 0.0
-    return total_number_of_matches / float(total_number_of_comparisons)
+        return (0.0, fuzzy_flag)
+    ratio = total_number_of_matches / float(total_number_of_comparisons)
+    return (ratio, fuzzy_flag)
 
 def transform_record_to_marc(record, options={'text-marc':1, 'aleph-marc':0}):
     """ This function will transform a given bibrec record into marc using
@@ -837,7 +850,7 @@ def get_reversed_string_variants(s, sep=','):
     @rtype: tuple
     """
     # Extract the different parts of the name using partition function.
-    left, sep, right = string_partition(s, sep)
+    left, sep, right = s.partition(sep)
     return (left + sep + right, right + sep + left)
 
 def _get_grouped_pairs(first_list, second_list):

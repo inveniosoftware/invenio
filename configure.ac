@@ -570,7 +570,10 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthorid/lib/Makefile \
      modules/bibauthorid/etc/Makefile \
      modules/bibauthorid/etc/name_authority_files/Makefile \
+     modules/bibauthorid/etc/templates/Makefile \
      modules/bibauthorid/web/Makefile \
+     modules/bibauthorid/css/Makefile \
+     modules/bibauthorid/fonts/Makefile \
      modules/bibauthority/Makefile \
      modules/bibauthority/bin/Makefile \
      modules/bibauthority/doc/Makefile \
@@ -614,6 +617,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibconvert/Makefile \
      modules/bibconvert/bin/Makefile \
      modules/bibconvert/bin/bibconvert \
+     modules/bibconvert/bin/kbload \
      modules/bibconvert/doc/Makefile \
      modules/bibconvert/doc/admin/Makefile \
      modules/bibconvert/doc/hacking/Makefile \
@@ -643,6 +647,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibedit/doc/hacking/Makefile \
      modules/bibedit/etc/Makefile \
      modules/bibedit/lib/Makefile \
+     modules/bibedit/lib/ticket_templates/Makefile \
      modules/bibedit/web/Makefile \
      modules/bibencode/Makefile \
      modules/bibencode/bin/Makefile \
@@ -799,6 +804,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/plotextractor \
      modules/miscutil/bin/hepdataharvest \
      modules/miscutil/bin/bibtex \
+     modules/miscutil/bin/orcidpush \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \
      modules/miscutil/doc/hacking/Makefile \
@@ -808,6 +814,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/etc/ckeditor_scientificchar/Makefile \
      modules/miscutil/etc/ckeditor_scientificchar/dialogs/Makefile \
      modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
+     modules/miscutil/etc/templates/Makefile \
      modules/miscutil/lib/Makefile \
      modules/miscutil/lib/upgrades/Makefile \
      modules/miscutil/sql/Makefile \

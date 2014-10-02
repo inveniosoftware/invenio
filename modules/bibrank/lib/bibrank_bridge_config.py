@@ -55,7 +55,7 @@ else:
 
 
 # keyword:
-marc_tag_keyword = get_tag_from_name('keyword')
+marc_tag_keyword = get_tag_from_name('%keyword')
 if marc_tag_keyword:
     CFG_MARC_KEYWORD= marc_tag_keyword
 else:

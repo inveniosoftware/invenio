@@ -38,6 +38,7 @@ modules/bibauthorid/bin/bibauthorid
 modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify
 modules/bibconvert/bin/bibconvert
+modules/bibconvert/bin/kbload
 modules/bibdocfile/bin/bibdocfile
 modules/bibedit/bin/bibedit
 modules/bibrecord/bin/textmarc2xmlmarc
@@ -74,6 +75,7 @@ modules/miscutil/bin/inveniocfg
 modules/miscutil/bin/plotextractor
 modules/miscutil/bin/bibtex
 modules/miscutil/bin/hepdataharvest
+modules/miscutil/bin/orcidpush
 modules/miscutil/etc/bash_completion.d/inveniocfg
 modules/miscutil/lib/build
 modules/webaccess/bin/authaction

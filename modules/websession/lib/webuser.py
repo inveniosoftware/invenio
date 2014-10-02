@@ -62,8 +62,9 @@ from invenio.config import \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
-     CFG_BIBAUTHORID_ENABLED, \
      CFG_SITE_RECORD
+
+from bibauthorid_config import CFG_BIBAUTHORID_ENABLED
 
 try:
     from invenio.session import get_session
@@ -1120,12 +1121,9 @@ def get_uid_based_on_pref(prefname, prefvalue):
     return the_uid
 
 def get_user_preferences(uid):
-    pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
-    if pref:
-        try:
-            return deserialize_via_marshal(pref[0][1])
-        except:
-            pass
+    pref = run_sql("SELECT settings FROM user WHERE id=%s", (uid,))
+    if pref and pref[0][0]:
+        return deserialize_via_marshal(pref[0][0])
     return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
@@ -1233,6 +1231,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_usepaperattribution' : False,
         'precached_canseehiddenmarctags' : False,
         'precached_sendcomments' : False,
+        'oauth2_access_token' : ''
     }
 
     try:
@@ -1277,16 +1276,14 @@ def collect_user_info(req, login_time=False, refresh=False):
         user_info['group'] = []
         user_info['guest'] = str(isGuestUser(uid))
 
-        if user_info['guest'] == '1' and CFG_INSPIRE_SITE:
+        if user_info['guest'] == '1' and CFG_BIBAUTHORID_ENABLED:
             usepaperattribution = False
             viewclaimlink = False
 
-            if (CFG_BIBAUTHORID_ENABLED
-                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
+            if (acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
                 usepaperattribution = True
 
-#            if (CFG_BIBAUTHORID_ENABLED
-#                and usepaperattribution
+#            if (usepaperattribution
 #                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers"))):
 #                viewclaimlink = True
             if is_req:
@@ -1299,8 +1296,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             else:
                 viewlink = False
 
-            if (CFG_BIBAUTHORID_ENABLED
-                and usepaperattribution
+            if (usepaperattribution
                 and viewlink):
                 viewclaimlink = True
 
@@ -1310,7 +1306,14 @@ def collect_user_info(req, login_time=False, refresh=False):
         if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
-            login_method = prefs['login_method']
+            try:
+                login_method = prefs['login_method']
+            except KeyError:
+                # login_method is missing for some reason, bad news..
+                msg = "Data error: The mandatory key 'login_method' is missing"
+                register_exception(prefix=msg,
+                                   alert_admin=True)
+                login_method = get_default_user_preferences()['login_method']
             ## NOTE: we fall back to default login_method if the login_method
             ## specified in the user settings does not exist (e.g. after
             ## a migration.)

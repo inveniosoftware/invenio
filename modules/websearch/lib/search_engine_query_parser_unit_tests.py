@@ -728,16 +728,40 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             inv_search = "year:2002"
             self._compare_searches(inv_search, spi_search)
 
+        def test_date_before_yr(self):
+            """SPIRES search syntax - searching by date before year"""
+            spi_search = "find date before 2002"
+            inv_search = 'year:0->2002 AND NOT year:2002'
+            self._compare_searches(inv_search, spi_search)
+
         def test_date_by_lt_yr(self):
             """SPIRES search syntax - searching by date < year"""
             spi_search = "find date < 2002"
-            inv_search = 'year:0->2002'
+            inv_search = 'year:0->2002 AND NOT year:2002'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_after_yr(self):
+            """SPIRES search syntax - searching by date after year"""
+            spi_search = "find date after 1980"
+            inv_search = 'year:1980->9999-01-01 AND NOT year:1980'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_gt_yr(self):
             """SPIRES search syntax - searching by date > year"""
             spi_search = "find date > 1980"
-            inv_search = 'year:1980->9999'
+            inv_search = 'year:1980->9999-01-01 AND NOT year:1980'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_le_yr(self):
+            """SPIRES search syntax - searching by date <= year"""
+            spi_search = "find date <= 2002"
+            inv_search = 'year:0->2002'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_ge_yr(self):
+            """SPIRES search syntax - searching by date >= year"""
+            spi_search = "find date >= 1980"
+            inv_search = 'year:1980->9999-01-01'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_yr_mo(self):
@@ -758,22 +782,58 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             inv_search = 'year:1976-04-05 and title:dog'
             self._compare_searches(inv_search, spi_search)
 
-        def test_date_by_eq_yr_mo(self):
-            """SPIRES search syntax - searching by date 1976-04"""
-            spi_search = "find date 1976-04"
-            inv_search = 'year:1976-04'
+        def test_date_by_yr_mo_d(self):
+            """SPIRES search syntax - searching by date 1978-10-21"""
+            spi_search = "find date 1978-10-21"
+            inv_search = 'year:1978-10-21'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_lt_yr_mo(self):
-            """SPIRES search syntax - searching by date < 1978-10-21"""
-            spi_search = "find date < 1978-10-21"
-            inv_search = 'year:0->1978-10-21'
+            """SPIRES search syntax - searching by date < 1978-10"""
+            spi_search = "find date < 1978-10"
+            inv_search = 'year:0->1978-10 AND NOT year:1978-10'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_gt_yr_mo(self):
+            """SPIRES search syntax - searching by date > 1978-10"""
+            spi_search = "find date > 1978-10"
+            inv_search = 'year:1978-10->9999-01-01 AND NOT year:1978-10'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_le_yr_mo(self):
+            """SPIRES search syntax - searching by date <= 1978-10"""
+            spi_search = "find date <= 1978-10"
+            inv_search = 'year:0->1978-10'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_ge_yr_mo(self):
+            """SPIRES search syntax - searching by date >= 1978-10"""
+            spi_search = "find date >= 1978-10"
+            inv_search = 'year:1978-10->9999-01-01'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_lt_yr_mo_d(self):
+            """SPIRES search syntax - searching by date < 1978-10-21"""
+            spi_search = "find date < 1978-10-21"
+            inv_search = 'year:0->1978-10-21 AND NOT year:1978-10-21'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_gt_yr_mo_d(self):
             """SPIRES search syntax - searching by date > 1978-10-21"""
             spi_search = "find date > 1978-10-21"
-            inv_search = 'year:1978-10-21->9999'
+            inv_search = 'year:1978-10-21->9999-01-01 AND NOT year:1978-10-21'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_le_yr_mo_d(self):
+            """SPIRES search syntax - searching by date <= 1978-10-21"""
+            spi_search = "find date <= 1978-10-21"
+            inv_search = 'year:0->1978-10-21'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_date_by_ge_yr_mo_d(self):
+            """SPIRES search syntax - searching by date >= 1978-10-21"""
+            spi_search = "find date >= 1978-10-21"
+            inv_search = 'year:1978-10-21->9999-01-01'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_before_1900(self):
@@ -784,7 +844,7 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
 
         if DATEUTIL_AVAILABLE:
             def test_date_2_digits_year_month_day(self):
-                """SPIRES search syntax - searching by date > 78-10-21"""
+                """SPIRES search syntax - searching by date 78-10-21"""
                 spi_search = "find date 78-10-21"
                 inv_search = 'year:1978-10-21'
                 self._compare_searches(inv_search, spi_search)
@@ -821,22 +881,46 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             self._compare_searches(invenio_search, spi_search)
 
         if DATEUTIL_AVAILABLE:
+            def test_date_by_d_MO_yr(self):
+                """SPIRES search syntax - searching by date 23 Sep 2010: will only work with dateutil installed"""
+                spi_search = "find date 23 Sep 2010"
+                inv_search = 'year:2010-09-23'
+                self._compare_searches(inv_search, spi_search)
+
             def test_date_by_lt_d_MO_yr(self):
                 """SPIRES search syntax - searching by date < 23 Sep 2010: will only work with dateutil installed"""
                 spi_search = "find date < 23 Sep 2010"
+                inv_search = 'year:0->2010-09-23 AND NOT year:2010-09-23'
+                self._compare_searches(inv_search, spi_search)
+
+            def test_date_by_le_d_MO_yr(self):
+                """SPIRES search syntax - searching by date <= 23 Sep 2010: will only work with dateutil installed"""
+                spi_search = "find date <= 23 Sep 2010"
                 inv_search = 'year:0->2010-09-23'
+                self._compare_searches(inv_search, spi_search)
+
+            def test_date_by_d_MO_yr_parentheses(self):
+                """SPIRES search syntax - searching by date 23 Sep 2010 using parentheses: will only work with dateutil installed"""
+                spi_search = "find (date 23 Sep 2010)"
+                inv_search = 'year:2010-09-23'
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_before_1900(self):
                 """SPIRES search syntax - searching by date < 23 Sep 1889: will only work with dateutil installed"""
                 spi_search = "find date < 23 Sep 1889"
-                inv_search = 'year:0->1889-09-23'
+                inv_search = 'year:0->1889-09-23 AND NOT year:1889-09-23'
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_by_gt_d_MO_yr(self):
                 """SPIRES search syntax - searching by date > 12 Jun 1960: will only work with dateutil installed"""
                 spi_search = "find date > 12 Jun 1960"
-                inv_search = 'year:1960-06-12->9999'
+                inv_search = 'year:1960-06-12->9999-01-01 AND NOT year:1960-06-12'
+                self._compare_searches(inv_search, spi_search)
+
+            def test_date_by_ge_d_MO_yr(self):
+                """SPIRES search syntax - searching by date >= 12 Jun 1960: will only work with dateutil installed"""
+                spi_search = "find date >= 12 Jun 1960"
+                inv_search = 'year:1960-06-12->9999-01-01'
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_today(self):
@@ -1011,6 +1095,90 @@ class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
             """SPIRES and invenio search syntax - find a ellis refersto:author:hawking"""
             combo_search = 'find a ellis refersto:author:hawking'
             inv_search = 'author:ellis refersto:author:hawking'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_cc_United_States(self):
+            """SPIRES search syntax - find cc United States"""
+            inv_search = 'country:"United States"'
+            spi_search = 'find cc United States'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_find_cc_Italy(self):
+            """SPIRES search syntax - find cc Italy"""
+            inv_search = 'country:Italy'
+            spi_search = 'find cc Italy'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_find_country_Italy(self):
+            """SPIRES search syntax - find country Italy"""
+            inv_search = 'country:Italy'
+            spi_search = 'find country Italy'
+            self._compare_searches(inv_search, spi_search)
+
+        def test_find_conf_number_123(self):
+            """SPIRES and invenio search syntax - find conf-number 123"""
+            combo_search = 'find conf-number 123'
+            inv_search = 'confnumber:123'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_cnum_123(self):
+            """SPIRES and invenio search syntax - find cnum 123"""
+            combo_search = 'find cnum 123'
+            inv_search = 'confnumber:123'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_conf_number_123_456(self):
+            """SPIRES and invenio search syntax - find conf-number 123 456"""
+            combo_search = 'find conf-number 123 456'
+            inv_search = 'confnumber:"123 456"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_country_Switzerland(self):
+            """SPIRES and invenio search syntax - find country Switzerland"""
+            combo_search = 'find country Switzerland'
+            inv_search = 'country:Switzerland'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_cc_Switzerland(self):
+            """SPIRES and invenio search syntax - find cc Switzerland"""
+            combo_search = 'find cc Switzerland'
+            inv_search = 'country:Switzerland'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_country_United_States(self):
+            """SPIRES and invenio search syntax - find country United States"""
+            combo_search = 'find country United States'
+            inv_search = 'country:"United States"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_note_blabla(self):
+            """SPIRES and invenio search syntax - find note blabla"""
+            combo_search = 'find note blabla'
+            inv_search = 'note:blabla'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_texkey_blabla(self):
+            """SPIRES and invenio search syntax - find texkey blabla"""
+            combo_search = 'find texkey blabla'
+            inv_search = 'texkey:blabla'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_texkey_bla_space_bla(self):
+            """SPIRES and invenio search syntax - find texkey bla space bla"""
+            combo_search = 'find texkey bla space bla'
+            inv_search = 'texkey:"bla space bla"'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_address_Geneva(self):
+            """SPIRES and invenio search syntax - find address Geneva"""
+            combo_search = 'find address Geneva'
+            inv_search = 'address:Geneva'
+            self._compare_searches(inv_search, combo_search)
+
+        def test_find_hidden_note_bla(self):
+            """SPIRES and invenio search syntax - find hidden-note bla"""
+            combo_search = 'find hidden-note bla'
+            inv_search = '595:bla'
             self._compare_searches(inv_search, combo_search)
 
     if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:

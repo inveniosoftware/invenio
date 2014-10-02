@@ -88,7 +88,7 @@ def cli_allocate_record(req):
         _log(msg)
         return _write(req, msg)
 
-    recid = run_sql("insert into bibrec (creation_date,modification_date) values(NOW(),NOW())")
+    recid = run_sql("insert into bibrec (creation_date,modification_date,earliest_date) values(NOW(),NOW(),NOW())")
     return recid
 
 def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None, special_treatment=None):

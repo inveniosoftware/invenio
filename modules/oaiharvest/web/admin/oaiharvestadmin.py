@@ -500,11 +500,12 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, **records):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
+def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None,
+            enable_reporting=None, confirm=0):
     form = dict(req.form)
     content = {
-               'confirm': (int, 0),
-               'enable_reporting': (str, None),
+               'confirm': (int, confirm),
+               'enable_reporting': (str, enable_reporting),
                'record_id': (str, record_id),
                'oai_src_id': (str, oai_src_id),
                'ln': (str, ln),

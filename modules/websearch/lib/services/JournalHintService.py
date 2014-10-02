@@ -65,7 +65,10 @@ class JournalHintService(SearchService):
     def answer(self, req, user_info, of, cc,
                colls_to_search, p, f, search_units, ln):
         """Answer question given by context.
+<<<<<<< HEAD
 
+=======
+>>>>>>> WebSearch: quick checks in journal hint service
         Return (relevance, html_string) where relevance is integer
         from 0 to 100 indicating how relevant to the question the
         answer is (see C{CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE}

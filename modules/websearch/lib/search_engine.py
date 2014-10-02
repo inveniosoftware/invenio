@@ -86,11 +86,16 @@ from invenio.config import \
      CFG_BIBSORT_ENABLED, \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BASE_URL
+     CFG_BASE_URL, \
+     CFG_WEBSEARCH_BLACKLISTED_FORMATS, \
+     CFG_WEBSEARCH_MAX_RECORDS_REFERSTO, \
+     CFG_WEBSEARCH_MAX_RECORDS_CITEDBY
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
      InvenioWebSearchWildcardLimitError, \
+     InvenioWebSearchReferstoLimitError, \
+     InvenioWebSearchCitedbyLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
 from invenio.search_engine_utils import (get_fieldvalues,
@@ -1706,13 +1711,19 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     return dterms.keys()
 
 
-def wash_output_format(ouput_format):
+def wash_output_format(ouput_format, verbose=False, req=None):
     """Wash output format FORMAT.  Currently only prevents input like
     'of=9' for backwards-compatible format that prints certain fields
     only.  (for this task, 'of=tm' is preferred)"""
     if str(ouput_format[0:3]).isdigit() and len(ouput_format) != 6:
         # asked to print MARC tags, but not enough digits,
         # so let's switch back to HTML brief default
+        return 'hb'
+    elif format in CFG_WEBSEARCH_BLACKLISTED_FORMATS:
+        if verbose:
+            write_warning("Selected format is not available through perform_request_search", req=req)
+            # Returning an empty list seems dangerous because you wouldn't know
+            # right away that the list is not supposed to be empty.
         return 'hb'
     else:
         return ouput_format
@@ -2154,6 +2165,15 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
                 write_warning(_("Search term too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchReferstoLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after reference operator too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchCitedbyLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after citedby operator too generic, displaying only partial results..."), req=req)
+
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             write_warning(_("No phrase index available for fulltext yet, looking for word combination..."), req=req)
@@ -2188,6 +2208,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p) and bsu_f != 'refersto' and bsu_f != 'citedby':
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
+                elif bsu_f == 'journal' and len(bsu_p.split(',')) == 3 and '-' in bsu_p.split(',')[-1]:
+                    jrn, vol, page = bsu_p.split(',')
+                    bsu_pn = "%s,%s,%s" % (jrn, vol, page.split('-')[0])
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
@@ -2425,6 +2448,8 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
         hitset = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
         hitset = search_unit_in_bibrec(p, p, 'm')
+    elif f == 'earliestdate':
+        hitset = search_unit_in_bibrec(p, p, 'e')
     elif f == 'refersto':
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
@@ -2567,6 +2592,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
         raise InvenioWebSearchWildcardLimitError(hitset)
     # okay, return result set:
     return hitset
+
 
 def search_unit_in_idxpairs(p, f, search_type, wl=0):
     """Searches for pair 'p' inside idxPAIR table for field 'f' and
@@ -2895,6 +2921,8 @@ def search_unit_in_bibrec(datetext1, datetext2, search_type='c'):
     hitset = intbitset()
     if search_type and search_type.startswith("m"):
         search_type = "modification_date"
+    elif search_type and search_type.startswith("e"):
+        search_type = "earliest_date"
     else:
         search_type = "creation_date" # by default we are searching for creation dates
 
@@ -2937,7 +2965,11 @@ def search_unit_refersto(query):
     """
     if query:
         ahitset = search_pattern(p=query)
-        return get_refersto_hitset(ahitset)
+        res = get_refersto_hitset(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(res)
+        return res
     else:
         return intbitset([])
 
@@ -2949,11 +2981,14 @@ def search_unit_refersto_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citers = intbitset()
-        citations = get_cited_by_list(ahitset)
-        selfcitations = get_self_cited_by_list(ahitset)
+        citations = get_cited_by_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+        selfcitations = get_self_cited_by_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
         for cites, selfcites in zip(citations, selfcitations):
             # cites is in the form [(citee, citers), ...]
             citers += cites[1] - selfcites[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(citers)
         return citers
     else:
         return intbitset([])
@@ -3000,7 +3035,11 @@ def search_unit_citedby(query):
     if query:
         ahitset = search_pattern(p=query)
         if ahitset:
-            return get_citedby_hitset(ahitset)
+            res = get_citedby_hitset(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+
+            if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+                raise InvenioWebSearchCitedbyLimitError(res)
+            return res
         else:
             return intbitset([])
     else:
@@ -3014,11 +3053,14 @@ def search_unit_citedby_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citees = intbitset()
-        references = get_refers_to_list(ahitset)
-        selfreferences = get_self_refers_to_list(ahitset)
+        references = get_refers_to_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+        selfreferences = get_self_refers_to_list(ahitset, input_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
         for refs, selfrefs in zip(references, selfreferences):
             # refs is in the form [(citer, citees), ...]
             citees += refs[1] - selfrefs[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+            raise InvenioWebSearchCitedbyLimitError(citees)
         return citees
     else:
         return intbitset([])
@@ -3060,6 +3102,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         else:
             permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
 
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Your permitted collections: %s" % (str(permitted_restricted_collections),), req=req)
+
         # let's build the list of the both public and restricted
         # child collections of the collection from which the user
         # started his/her search. This list of children colls will be
@@ -3074,6 +3119,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
         colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
         colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Collections to display: %s" % (str(colls_to_be_displayed),), req=req)
 
         if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
             #we need this to be able to remove records that are both in a public and restricted collection
@@ -3096,6 +3144,9 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
         for coll in colls_to_be_displayed:
             results[coll] = results.get(coll, intbitset()) | (records_that_can_be_displayed & get_collection_reclist(coll))
             results_nbhits += len(results[coll])
+
+        if verbose and of.startswith("h"):
+            write_warning("Search stage 4: Final results (%d): %s " % (results_nbhits, str(results),), req=req)
 
     if results_nbhits == 0:
         # no hits found, try to search in Home and restricted and/or hidden collections:
@@ -3276,7 +3327,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         nearest_terms = []
         if index_id:
             nearest_terms = get_nearest_terms_in_idxphrase(p, index_id, n, n)
-        if f == 'datecreated' or f == 'datemodified':
+        if f in ('datecreated', 'datemodified', 'earliestdate'):
             nearest_terms = get_nearest_terms_in_bibrec(p, f, n, n)
         if not nearest_terms:
             nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
@@ -3291,7 +3342,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         else:
             if index_id:
                 hits = get_nbhits_in_idxphrases(term, f)
-            elif f == 'datecreated' or f == 'datemodified':
+            elif f in ('datecreated', 'datemodified', 'earliestdate'):
                 hits = get_nbhits_in_bibrec(term, f)
             else:
                 hits = get_nbhits_in_bibxxx(term, f)
@@ -3472,13 +3523,15 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
 
 def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
     """Return list of nearest terms and counts from bibrec table.
-    p is usually a date, and f either datecreated or datemodified.
+    p is usually a date, and f either datecreated or datemodified or earliestdate.
 
     Note: below/above count is very approximative, not really respected.
     """
     col = 'creation_date'
     if f == 'datemodified':
         col = 'modification_date'
+    elif f == 'earliestdate':
+        col = 'earliest_date'
     res_above = run_sql("""SELECT DATE_FORMAT(%s,'%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s')
                              FROM bibrec WHERE %s < %%s
                             ORDER BY %s DESC LIMIT %%s""" % (col, col, col),
@@ -3498,10 +3551,12 @@ def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
 
 def get_nbhits_in_bibrec(term, f):
     """Return number of hits in bibrec table.  term is usually a date,
-    and f is either 'datecreated' or 'datemodified'."""
+    and f is either 'datecreated' or 'datemodified' or 'earliestdate'."""
     col = 'creation_date'
     if f == 'datemodified':
         col = 'modification_date'
+    elif f == 'earliestdate':
+        col = 'earliest_date'
     res = run_sql("SELECT COUNT(*) FROM bibrec WHERE %s LIKE %%s" % (col,),
                   (term + '%',))
     return res[0][0]
@@ -3855,6 +3910,14 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
     "Returns the date of last modification for the record 'recID'."
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
+    if res:
+        out = res[0][0]
+    return out
+
+def get_earliest_date(recID, fmt="%Y-%m-%d"):
+    "Returns the earliest date for the record 'recID'."
+    out = ""
+    res = run_sql("SELECT DATE_FORMAT(earliest_date,%s) FROM bibrec WHERE id=%s", (fmt, recID), 1)
     if res:
         out = res[0][0]
     return out
@@ -4710,7 +4773,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         selfcited = get_self_cited_by(recid)
                         selfcited = rank_by_citations(get_self_cited_by(recid), verbose=verbose)
                         selfcited = reversed(selfcited[0])
-                        selfcited = [recid for recid, dummy in selfcited]
+                        # recid is already used, let's use recordid
+                        selfcited = [recordid for recordid, dummy in selfcited]
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
@@ -4734,6 +4798,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                         # Citation log
                         entries = get_citers_log(recid)
+                        if verbose > 3:
+                            write_warning("Citation log debug: %s" % len(entries), req=req)
                         req.write(websearch_templates.tmpl_detailed_record_citations_citation_log(ln, entries))
 
 
@@ -4756,7 +4822,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     elif tab == 'keywords':
                         from invenio.bibclassify_webinterface import main_page
                         main_page(req, recid, tabs, ln,
-                                  webstyle_templates)
+                                  webstyle_templates,
+                                  websearch_templates)
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
@@ -4768,7 +4835,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
 
-                    elif tab == 'hepdata':
+                    elif tab == 'data':
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
                                                                                    ln,
@@ -4800,9 +4867,11 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
                         creationdate = None
                         modificationdate = None
+                        earliestdate = None
                         if record_exists(recid) == 1:
                             creationdate = get_creation_date(recid)
                             modificationdate = get_modification_date(recid)
+                            earliestdate = get_earliest_date(recid)
 
                         content = print_record(recid, format, ot, ln,
                                                search_pattern=search_pattern,
@@ -4814,6 +4883,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             format=format,
                             creationdate=creationdate,
                             modificationdate=modificationdate,
+                            earliestdate=earliestdate,
                             content=content)
                         # display of the next-hit/previous-hit/back-to-search links
                         # on the detailed record pages
@@ -4826,6 +4896,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       ln,
                                                                                       creationdate=creationdate,
                                                                                       modificationdate=modificationdate,
+                                                                                      earliestdate=earliestdate,
                                                                                       show_short_rec_p=False))
 
                         if len(tabs) > 0:
@@ -4947,8 +5018,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     # the record is included in the collections to which bibauthorid is limited.
     if user_info:
         display_claim_this_paper = (user_info.get("precached_viewclaimlink", False) and
+                                (not BIBAUTHORID_LIMIT_TO_COLLECTIONS or
                                 recID in intbitset.union(*[get_collection_reclist(x)
-                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS]))
+                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS])))
     else:
         display_claim_this_paper = False
 
@@ -5664,7 +5736,7 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
     """
 
     # wash output format:
-    of = wash_output_format(of)
+    of = wash_output_format(of, verbose=verbose, req=req)
 
     # wash all arguments requiring special care
     p = wash_pattern(p)
@@ -6331,7 +6403,7 @@ def prs_split_into_collections(kwargs=None, results_final=None, colls_to_search=
     # we have to avoid counting it multiple times.  The price to
     # pay for this accuracy of results_final_nb_total is somewhat
     # increased CPU time.
-    if results_final.keys() == 1:
+    if len(results_final.keys()) == 1:
         # only one collection; no need to union them
         results_final_for_all_selected_colls = results_final.values()[0]
         results_final_nb_total = results_final_nb.values()[0]
@@ -6687,8 +6759,10 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
 
 def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
                                                kwargs=None, req=None, of=None,
-                                               **dummy):
+                                               verbose=None, **dummy):
     # search stage 4: intersection with collection universe:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 4: Starting with %s hits." % str(results_in_any_collection), req=req)
     results_final = {}
     output = prs_intersect_results_with_collrecs(results_final, results_in_any_collection, kwargs, **kwargs)
     if output is not None:
@@ -6704,6 +6778,8 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
         raise Exception
 
     # search stage 5: apply search option limits and restrictions:
+    if verbose and of.startswith("h"):
+        write_warning("Search stage 5: Starting with %s hits." % str(results_final), req=req)
     output = prs_apply_search_limits(results_final, kwargs=kwargs, **kwargs)
     kwargs['results_final'] = results_final
     if output is not None:

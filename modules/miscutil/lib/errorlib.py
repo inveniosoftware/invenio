@@ -231,34 +231,34 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
         print >> tracestack_data_stream, \
                 "\n** Traceback details \n"
         traceback.print_exc(file=tracestack_data_stream)
-        stack = [frame[0] for frame in inspect.trace()]
+        stack = [frame[0:4] for frame in inspect.trace()]
         #stack = [frame[0] for frame in inspect.getouterframes(exc_info[2])][skip_frames:]
         try:
             stack.reverse()
             print >> tracestack_data_stream, \
                     "\n** Stack frame details"
             values_to_hide = set()
-            for frame in stack:
+            for frame, frame_filename, frame_line, frame_name in stack:
                 try:
                     print >> tracestack_data_stream
                     print >> tracestack_data_stream, \
                             "Frame %s in %s at line %s" % (
-                                frame.f_code.co_name,
-                                frame.f_code.co_filename,
-                                frame.f_lineno)
+                                frame_name,
+                                frame_filename,
+                                frame_line)
                     ## Dereferencing f_locals
                     ## See: http://utcc.utoronto.ca/~cks/space/blog/python/FLocalsAndTraceFunctions
                     local_values = frame.f_locals
                     try:
                         values_to_hide |= find_all_values_to_hide(local_values)
 
-                        code = open(frame.f_code.co_filename).readlines()
-                        first_line = max(1, frame.f_lineno-3)
-                        last_line = min(len(code), frame.f_lineno+3)
+                        code = open(frame_filename).readlines()
+                        first_line = max(1, frame_line-3)
+                        last_line = min(len(code), frame_line+3)
                         print >> tracestack_data_stream, "-" * 79
                         for line in xrange(first_line, last_line+1):
                             code_line = code[line-1].rstrip()
-                            if line == frame.f_lineno:
+                            if line == frame_line:
                                 print >> tracestack_data_stream, \
                                     "----> %4i %s" % (line, code_line)
                             else:
@@ -385,34 +385,40 @@ def register_exception(stream='error',
     @return: 1 if successfully wrote to stream, 0 if not
     """
 
-    if CFG_ERRORLIB_SENTRY_URI:
-        from raven import Client
-        client = Client(CFG_ERRORLIB_SENTRY_URI)
-        try:
-            if req:
-                from invenio.webuser import collect_user_info
-                user_info = collect_user_info(req)
-                client.user_context({'id': user_info['uid'],
-                                    'is_anonymous': user_info['guest'] == '1',
-                                    'is_authenticated': user_info['guest'] == '0',
-                                    'email': user_info['email'],
-                                    'group': user_info['group'],
-                                    'nickname': user_info['nickname']})
-                client.http_context({'url': req.full_uri,
-                                    'remote_ip': user_info['remote_ip'],
-                                    'agent': user_info['agent'],
-                                    'referer': user_info['referer'],
-                                    'method': req.method,
-                                    'query_string': req.args,
-                                    'headers': dict(req.headers_in),
-                                    'https': req.is_https(),
-                                    'env': req.environ})
-                client.extra_context(user_info)
-            filename = _get_filename_and_line(sys.exc_info())[0]
-            client.tags_context({'filename': filename}, {'version', CFG_VERSION})
-            client.captureException()
-        finally:
-            client.context.clear()
+    try:
+        if CFG_ERRORLIB_SENTRY_URI:
+            from raven import Client
+            client = Client(CFG_ERRORLIB_SENTRY_URI)
+            try:
+                if req:
+                    from invenio.webuser import collect_user_info
+                    user_info = collect_user_info(req)
+                    client.user_context({'id': user_info['uid'],
+                                        'is_anonymous': user_info['guest'] == '1',
+                                        'is_authenticated': user_info['guest'] == '0',
+                                        'email': user_info['email'],
+                                        'group': user_info['group'],
+                                        'nickname': user_info['nickname']})
+                    client.http_context({'url': req.full_uri,
+                                        'remote_ip': user_info['remote_ip'],
+                                        'agent': user_info['agent'],
+                                        'referer': user_info['referer'],
+                                        'method': req.method,
+                                        'query_string': req.args,
+                                        'headers': dict(req.headers_in),
+                                        'https': req.is_https(),
+                                        'env': req.environ})
+                    client.extra_context(user_info)
+                filename = _get_filename_and_line(sys.exc_info())[0]
+                client.tags_context({'filename': filename, 'version': CFG_VERSION})
+                client.captureException()
+            finally:
+                client.context.clear()
+    except:
+        ## Sentry troubles...
+        pass
+
+    from invenio.webinterface_handler import ClientDisconnected
 
     if CFG_PROPAGATE_EXCEPTIONS:
         raise
@@ -421,6 +427,10 @@ def register_exception(stream='error',
         ## Let's extract exception information
         exc_info = sys.exc_info()
         exc_name = exc_info[0].__name__
+
+        if exc_info[0] in (ClientDisconnected, KeyboardInterrupt):
+            raise
+
         output = get_pretty_traceback(
             req=req, exc_info=exc_info, skip_frames=2)
         if output:
@@ -467,7 +477,10 @@ def register_exception(stream='error',
 
             ## let's log the exception and see whether we should report it.
             pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
-            if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
+            #dont report KeyboardInterrupt exceptions
+            if exc_name == "KeyboardInterrupt":
+                return 1
+            elif exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
                 (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
                 not written_to_log):
                 ## If requested or if it's impossible to write in the log

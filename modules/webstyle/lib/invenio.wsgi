@@ -41,15 +41,15 @@ except:
 # citation dictionaries are loaded lazily, which is good for CLI
 # processes such as bibsched, but for web user queries we want them to
 # be available right after web server start-up):
-#from invenio.bibrank_citation_searcher import get_cited_by_weight
-#get_cited_by_weight([])
+from invenio.bibrank_citation_searcher import get_cited_by_weight
+get_cited_by_weight([])
 
 # pre-load docextract knowledge bases
-#from invenio.refextract_kbs import get_kbs
-#get_kbs()
+from invenio.refextract_kbs import get_kbs
+get_kbs()
 # pre-load docextract author regexp
-#from invenio.authorextract_re import get_author_regexps
-#get_author_regexps()
+from invenio.authorextract_re import get_author_regexps
+get_author_regexps()
 # increase compile regexps cache size for further
 # speed improvements in docextract
 import re

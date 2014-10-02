@@ -28,7 +28,7 @@ CFG_TESTUTILS_VERBOSE = 1
 import os
 import sys
 import time
-import unittest
+import unittest2 as unittest
 import cgi
 import subprocess
 import difflib

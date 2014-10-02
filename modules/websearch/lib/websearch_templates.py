@@ -95,6 +95,40 @@ from invenio import hepdatadisplayutils
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
 
+
+def tmpl_citesummary_get_link(search_pattern_for_coll, searchfield, colldef):
+    link_url = CFG_BASE_URL + '/search?p='
+    if search_pattern_for_coll:
+        p = search_pattern_for_coll
+        if searchfield:
+            if " " in p:
+                p = searchfield + ':"' + p + '"'
+            else:
+                p = searchfield + ':' + p
+        link_url += quote(p)
+    if colldef:
+        link_url += '%20AND%20' + quote(colldef)
+
+    return link_url
+
+def tmpl_citesummary_get_link_for_rep_breakdown(search_pattern_for_coll, searchfield, colldef, keyword, low, high):
+    link_url = CFG_BASE_URL + '/search?p='
+    if search_pattern_for_coll:
+        p = search_pattern_for_coll
+        if searchfield:
+            if " " in p:
+                p = searchfield + ':"' + p + '"'
+            else:
+                p = searchfield + ':' + p
+        link_url += quote(p) + '%20AND%20'
+    if colldef:
+        link_url += quote(colldef) + '%20AND%20'
+    if low == 0 and high == 0:
+        link_url += quote('%s:0' % keyword)
+    else:
+        link_url += quote('%s:%i->%i' % (keyword, low, high))
+    return link_url
+
 class Template:
 
     # This dictionary maps Invenio language code to locale codes (ISO 639)
@@ -3511,16 +3545,18 @@ class Template:
          </td>
          </tr>
          <tr>
-          <td><table>
+          <td>
         ''' % { 'title': cgi.escape(title) }
-        for recid, score in recID_score_list_to_be_printed:
-            out += '''
-            <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
-                'score': score,
-                'info' : print_record(recid, format="hs", ln=ln),
+        if len(recID_score_list_to_be_printed) > 0:
+            out += '<table>'
+            for recid, score in recID_score_list_to_be_printed:
+                out += '''
+                <tr><td><font class="rankscoreinfo"><a>(%(score)s)&nbsp;</a></font><small>&nbsp;%(info)s</small></td></tr>''' % {
+                    'score': score,
+                    'info' : print_record(recid, format="hs", ln=ln),
                 }
-
-        out += """</table></td></tr></table> """
+            out += '</table>'
+        out += "</td></tr></table> "
         return out
 
     def tmpl_print_record_brief(self, ln, recID):
@@ -3950,7 +3986,8 @@ class Template:
     def tmpl_detailed_record_metadata(self, recID, ln, format,
                                       content,
                                       creationdate=None,
-                                      modificationdate=None):
+                                      modificationdate=None,
+                                      earliestdate=None):
         """Returns the main detailed page of a record
 
         Parameters:
@@ -3966,6 +4003,8 @@ class Template:
           - 'creationdate' *string* - The creation date of the printed record
 
           - 'modificationdate' *string* - The last modification date of the printed record
+
+          - 'earliestdate' *string* - The earliest date of the printed record
         """
         _ = gettext_set_language(ln)
 
@@ -4402,8 +4441,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = []
+        out.append('<tr><td>')
         if log_entries:
-            out.append('<style>td.citationlogdate { width: 5.4em; }</style>')
             out.append('<table><tr><td class="blocknote">Citation Log: </td></tr><tr><td><a id="citationlogshow" class="moreinfo" style="text-decoration: underline; " onclick="$(\'#citationlog\').show(); $(\'#citationlogshow\').hide();">show</a></td></tr></table>')
             out.append('<table id="citationlog" style="display: none;">')
             for recid, action_type, action_date in log_entries:
@@ -4413,10 +4452,11 @@ class Template:
                     record_str = 'The record with id %s was deleted' % recid
                 out.append("""<tr>
   <td>%s</td>
-  <td class="citationlogdate">%s</td>
+  <td class="citationlogdate" style="width: 5.4em;">%s</td>
   <td>%s</td>
 </tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), record_str))
             out.append('</table>')
+            out.append('</td></tr>')
 
         return '\n'.join(out)
 
@@ -4870,22 +4910,13 @@ class Template:
         out += """<tr><td><strong>%(msg_recs)s</strong></td>""" % \
                {'msg_recs': _("Total number of papers analyzed:"), }
         for coll, colldef in collections:
-            link_url = CFG_BASE_URL + '/search?p='
-            if search_patterns[coll]:
-                p = search_patterns[coll]
-                if searchfield:
-                    if " " in p:
-                        p = searchfield + ':"' + p + '"'
-                    else:
-                        p = searchfield + ':' + p
-                link_url += quote(p)
-            if colldef:
-                link_url += '%20AND%20' + quote(colldef)
+            link_url = tmpl_citesummary_get_link(search_patterns[coll], searchfield, colldef)
             link_text = self.tmpl_nice_number(len(coll_recids[coll]), ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
                                                                    link_text)
         out += '</tr>'
         return out
+
 
     def tmpl_citesummary_overview(self, collections, d_total_cites,
                                   d_avg_cites, ln=CFG_SITE_LANG):
@@ -4958,21 +4989,8 @@ class Template:
                 keyword = 'citedexcludingselfcites'
             else:
                 keyword = 'cited'
-            link_url = CFG_BASE_URL + '/search?p='
-            if searchpatterns.get(coll, None):
-                p = searchpatterns.get(coll, None)
-                if searchfield:
-                    if " " in p:
-                        p = searchfield + ':"' + p + '"'
-                    else:
-                        p = searchfield + ':' + p
-                link_url += quote(p) + '%20AND%20'
-            if colldef:
-                link_url += quote(colldef) + '%20AND%20'
-            if low == 0 and high == 0:
-                link_url += quote('%s:0' % keyword)
-            else:
-                link_url += quote('%s:%i->%i' % (keyword, low, high))
+
+            link_url = tmpl_citesummary_get_link_for_rep_breakdown(searchpatterns.get(coll, None), searchfield, colldef, keyword, low, high)
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
                                                                    link_text)

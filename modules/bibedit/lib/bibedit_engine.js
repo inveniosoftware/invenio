@@ -61,6 +61,7 @@
  *   - onNewRecordClick
  *   - getRecord
  *   - onGetRecordSuccess
+ *   - initAutoComplete
  *   - onSubmitClick
  *   - onPreviewClick
  *   - onCancelClick
@@ -69,7 +70,7 @@
  *   - onMergeClick
  *   - bindNewRecordHandlers
  *   - cleanUp
- *   - addHandler_autocompleteAffiliations
+ *   - addHandler_autocomplete
  *
  * 7. Editor UI
  *   - colorFields
@@ -157,7 +158,7 @@ var gReadOnlyMode = false;
 
 // revisions history
 var gRecRevisionHistory = [];
-
+var gRecRevisionAuthors = {};
 var gUndoList = []; // list of possible undo operations
 var gRedoList = []; // list of possible redo operations
 
@@ -167,9 +168,11 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
+// Autocomplete related variables
+var gPrimaryCollection = null;
 // KB related variables
 var gKBSubject = null;
-var gKBInstitution = null;
+var gLoadedKBs = {};
 
 // Does the record have a PDF attached?
 var gRecordHasPDF = false;
@@ -188,6 +191,9 @@ var gLastChecked = null;
 
 // Indicates if profiling is on
 var gProfile = false;
+
+// Log of all the actions effectuated by the user
+var gActionLog = [];
 
 /*
  * **************************** 2. Initialization ******************************
@@ -337,7 +343,7 @@ function initMisc(){
 function initJeditable(){
   /*
    * Overwrite Jeditable plugin function to add the autocomplete handler
-   * to textboxes corresponding to fields in gTagsToAutocomplete
+   * to textboxes corresponding to fields in gAutocomplete
    */
 
    $.editable.types['textarea'].element = function(settings, original) {
@@ -376,13 +382,11 @@ function initJeditable(){
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
 
-    /* Add autocomplete handler to fields in gTagsToAutocomplete */
-    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html();
-    if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
-        addHandler_autocompleteAffiliations(textarea);
-    }
-
+    /* Add autocomplete handler to fields in gAutocomplete */
+    var fieldInfo = $(original).parents("tr").siblings().andSelf().eq(0).children().eq(1).html();
+    addHandler_autocomplete(fieldInfo + $(original).siblings('#' + subfield_id).text(), textarea);
     initInputHotkeys(textarea, original);
+
     return(textarea);
   };
 
@@ -431,6 +435,11 @@ function initJeditable(){
  * **************************** 3. Ajax ****************************************
  */
 
+function log_action(msg) {
+    gActionLog.unshift(msg)
+    gActionLog = gActionLog.slice(0, 200);
+}
+
 function initAjax(){
   /*
    * Initialize Ajax.
@@ -449,6 +458,8 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
   /*
    * Create Ajax request.
    */
+  data.action_log = gActionLog;
+
   if (typeof onError === "undefined") {
     onError = onAjaxError;
   }
@@ -568,7 +579,7 @@ function onAjaxSuccess(json, onSuccess){
       : gSITE_URL + '/'+ gSITE_RECORD +'/edit/';
     return;
   }
-  else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109]) != -1) {
+  else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109, 111]) != -1) {
     cleanUp(!gNavigatingRecordSet, null, null, true, true, false);
     args = [];
     if (resCode == 104) {
@@ -685,6 +696,7 @@ function resetBibeditState(){
   gDisabledHpEntries = {};
   gReadOnlyMode = false;
   gRecRevisionHistory = [];
+  gRecRevisionAuthors = {};
   gUndoList = [];
   gRedoList = [];
   gPhysCopiesNum = 0;
@@ -946,6 +958,7 @@ function deleteFieldFromTag(tag, fieldPosition){
   /*
    * Delete a specified field.
    */
+  log_action("deleteFieldFromTag " + tag + ' ' + fieldPosition)
   var field = gRecord[tag][fieldPosition];
   var fields = gRecord[tag];
   for (var change in gHoldingPenChanges) {
@@ -1633,6 +1646,7 @@ function onNewRecordClick(event){
   /*
    * Handle 'New' button (new record).
    */
+  log_action("onNewRecordClick")
   updateStatus('updating');
   if ( gRecordDirty || gReqQueue.length > 0 ) {
     if (!displayAlert('confirmLeavingChangedRecord')){
@@ -1662,6 +1676,7 @@ function onNewRecordClick(event){
 
 function onTemplateRecordClick(event){
     /* Handle 'Template management' button */
+    log_action("onTemplateRecordClick");
     var template_window = window.open('/record/edit/templates', '', 'resizeable,scrollbars');
     template_window.document.close(); // needed for chrome and safari
 }
@@ -1689,10 +1704,11 @@ function getRecord(recID, recRev, onSuccess, args){
    *             callback loads the retrieved record into the bibEdit user
    *             interface
    */
-
+  log_action("getRecord recid:" + recID + " " + "recRev:" + recRev);
   /* Make sure the record revision exists, otherwise default to current */
   if ($.inArray(recRev, gRecRevisionHistory) === -1) {
     recRev = 0;
+
   }
 
   /* If we are changing recids always change to write mode */
@@ -1753,6 +1769,7 @@ function onGetRecordSuccess(json){
   /*
    * Handle successfull 'getRecord' requests.
    */
+  log_action("onGetRecordSuccess");
   cleanUp(!gNavigatingRecordSet);
   // Store record data.
   gRecID = json['recID'];
@@ -1768,7 +1785,7 @@ function onGetRecordSuccess(json){
 
   // Get KB information
   gKBSubject = json['KBSubject'];
-  gKBInstitution = json['KBInstitution'];
+  gPrimaryCollection = json['primaryCollection']
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
@@ -1812,6 +1829,7 @@ function onGetRecordSuccess(json){
   gReadOnlyMode = (json['inReadOnlyMode'] != undefined) ? json['inReadOnlyMode'] : false;
   gRecLatestRev = (json['lastRevision'] != undefined) ? json['lastRevision'] : null;
   gRecRevisionHistory = (json['revisionsHistory'] != undefined) ? json['revisionsHistory'] : null;
+  gRecRevisionAuthors = (json['revisionsAuthors'] != undefined) ? json['revisionsAuthors'] : null;
 
   if (json["resultCode"] === 103) {
     gReadOnlyMode = true;
@@ -1837,12 +1855,51 @@ function onGetRecordSuccess(json){
   adjustGeneralHPControlsVisibility();
   $("#loadingTickets").show();
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+  initAutoComplete();
 
   // Refresh top toolbar
   updateToolbar(false);
   updateToolbar(true);
 }
 
+function initAutoComplete(){
+  /*
+   * Loads asynchronously KBs with preloaded setting
+   * Loads only needed KBs according to record's collection
+   */
+   if (typeof gAutoComplete == "undefined")
+        return
+
+  /*
+   * Look first at the common autocomplete rules
+   */
+   for (var tag in gAutoComplete['COMMON']) {
+        var tagObj = gAutoComplete['COMMON'][tag];
+        // check if KB is already loaded
+        if ( tagObj.preload && !(tagObj.kb in gLoadedKBs) ) {
+            var onSuccess = onGetKBContent(tagObj.kb);
+            $.getJSON("/kb/export",
+                { kbname: tagObj.kb, format: 'json'},
+                  onSuccess);
+        }
+     }
+
+  /*
+   * And now we apply the rules of the collection the record belongs to
+   */
+   var recordCollection = gAutoComplete[gPrimaryCollection];
+   if ( recordCollection != undefined ) {
+     for (var tag in recordCollection ) {
+        var tagObj = recordCollection[tag];
+        if ( tagObj.preload && !(tagObj.kb in gLoadedKBs) ) {
+            var onSuccess = onGetKBContent(tagObj.kb);
+            $.getJSON("/kb/export",
+                { kbname: tagObj.kb, format: 'json'},
+                  onSuccess);
+        }
+     }
+   }
+}
 
 function onGetTemplateSuccess(json) {
   onGetRecordSuccess(json);
@@ -1856,11 +1913,12 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
    * dialog: object containing the different parts of the modal dialog
    * html_preview: a formatted preview of the record content
   */
+  log_action("onSubmitPreviewSuccess");
   updateStatus('ready');
   addContentToDialog(dialogPreview, html_preview, "Do you want to submit the record?");
   dialogPreview.dialogDiv.dialog({
         title: "Confirm submit",
-        close: function() { updateStatus('ready'); },
+        close: function() { updateStatus('ready'); $('#btnSubmit').prop('disabled', false);},
         buttons: {
             "Submit changes": function() {
                         var reqData = {
@@ -1894,6 +1952,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
                     },
             Cancel: function() {
                         updateStatus('ready');
+                        $('#btnSubmit').prop('disabled', false);
                         $( this ).remove();
                     }
     }});
@@ -1971,13 +2030,15 @@ function onSubmitClick() {
   /*
    * Handle 'Submit' button (submit record).
    */
+  log_action("onSubmitClick");
+  $('#btnSubmit').prop('disabled', true);
   save_changes().done(function() {
     updateStatus('updating');
     /* Save all opened fields before submitting */
     var savingOpenedFields = saveOpenedFields(savingOpenedFields);
 
     savingOpenedFields.done(function() {
-      var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+      var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true, true);
 
       // Get preview of the record and let the user confirm submit
       getPreview(dialogPreview, onSubmitPreviewSuccess);
@@ -1993,6 +2054,7 @@ function onPreviewClick() {
   /*
    * Handle 'Preview' button (preview record).
    */
+  log_action("onPreviewClick");
   clearWarnings();
   var reqData = {
               'new_window': true,
@@ -2039,6 +2101,7 @@ function onPrintClick() {
    * Print page, makes use of special css rules @media print
    */
   // If we are in textarea view, copy the contents to the helper div
+  log_action("onPrintClick");
   $('#print_helper').text($('#textmarc_textbox').val());
   $("#bibEditContentTable").css('height', "100%");
   window.print();
@@ -2061,6 +2124,20 @@ function onTextMarcClick() {
   * 2) Remove editor table and display content in textbox
   * 3) Activate flag to know we are in text marc mode (for submission)
   */
+  log_action("onTextMarcClick");
+  var stop = false;
+  for (changeInd in gHoldingPenChanges){
+    var changeObj = gHoldingPenChanges[changeInd];
+    if ( (!changeObj.hasOwnProperty('applied_change') || changeObj.applied_change !== true ) &&
+        changeObj.change_type !== "subfield_same"){
+      stop = true;
+    }
+  }
+  if (stop) {
+    displayAlert('alertSwitchHoldingPenToMarc');
+    event.preventDefault();
+    return;
+  }
 
   $("#img_textmarc").off("click");
 
@@ -2132,8 +2209,10 @@ function onTableViewClick() {
    *    content
    * 2) Get the record from the cache and display it in the table
   */
+  log_action("onTableViewClick");
   createReq({recID: gRecID, textmarc: $('#textmarc_textbox').val(),
-      requestType: 'getTableView', recordDirty: gRecordDirty
+      requestType: 'getTableView', recordDirty: gRecordDirty,
+      disabled_hp_changes: gDisabledHpEntries
        }, function(json) {
           var resCode = json['resultCode'];
           if (resCode == 115) {
@@ -2163,6 +2242,7 @@ function onOpenPDFClick() {
   /*
    * Create request to retrieve PDF from record and open it in new window
    */
+   log_action("onOpenPDFClick");
    createReq({recID: gRecID, requestType: 'get_pdf_url'
        }, function(json){
         // Preview was successful.
@@ -2186,6 +2266,7 @@ function getPreview(dialog, onSuccess) {
     /*
      * Get preview to be added to the dialog before submission
      */
+    log_action("getPreview");
     clearWarnings();
     var html_preview;
     var reqData = {
@@ -2217,38 +2298,31 @@ function onCancelClick(){
   /*
    * Handle 'Cancel' button (cancel editing).
    */
+  log_action("onCancelClick");
   updateStatus('updating');
   if (!gRecordDirty || displayAlert('confirmCancel')) {
-  createReq({
-    recID: gRecID,
-    requestType: 'cancel'
-  }, function(json){
-    // Cancellation was successful.
+    createReq({
+      recID: gRecID,
+      requestType: 'cancel'
+    }, function(json) {
+      // Cancellation was successful.
       changeAndSerializeHash({
           state: 'cancel',
           recid: gRecID
-        });
-        cleanUp(!gNavigatingRecordSet, '', null, true, true, false);
-        updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      }, false);
+      });
+      cleanUp(!gNavigatingRecordSet, '', null, true, true, false);
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
       holdingPenPanelRemoveEntries();
-      gUndoList = [];
-      gRedoList = [];
-      gReadOnlyMode = false;
-      gRecRevisionHistory = [];
-      gHoldingPenLoadedChanges = [];
-      gHoldingPenChanges = [];
-      gPhysCopiesNum = 0;
-      gBibCircUrl = null;
       // making the changes visible
       updateBibCirculationPanel();
       updateRevisionsHistory();
       updateUrView();
       updateToolbar(false);
-    }
-    else {
-      updateStatus('ready');
-    }
+      }, false);
+  }
+  else {
+    updateStatus('ready');
+  }
 }
 
 
@@ -2256,6 +2330,7 @@ function onCloneRecordClick() {
   /*
    * Handle 'Clone' button (clone record).
    */
+  log_action("onCloneRecordClick");
   updateStatus('updating');
   if (!displayAlert('confirmClone')){
     updateStatus('ready');
@@ -2283,6 +2358,7 @@ function onDeleteRecordClick(){
   /*
    * Handle 'Delete record' button.
    */
+  log_action("onDeleteRecordClick");
   if (gPhysCopiesNum > 0){
     displayAlert('errorPhysicalCopiesExist');
     return;
@@ -2320,6 +2396,7 @@ function onMergeClick(event){
    * Handle click on 'Merge' link (to merge outdated cache with current DB
    * version of record).
    */
+  log_action("onMergeClick");
   notImplemented(event);
 
   updateStatus('updating');
@@ -2483,28 +2560,136 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gManagedDOIs = [];
 }
 
-
-function addHandler_autocompleteAffiliations(tg) {
+function addHandler_autocomplete(tag, cell) {
     /*
-     * Add autocomplete handler to a given cell
+     * Add autocomplete handler to a given cell according to the given tag
      */
-    /* If gKBInstitution is not defined in the system, do nothing */
-    if ($.inArray(gKBInstitution,gAVAILABLE_KBS) == -1)
+    /* If gAutoComplete is not defined in the system, do nothing */
+    if (typeof gAutoComplete == "undefined")
         return
-    $(tg).autocomplete({
-    source: function( request, response ) {
-                $.getJSON("/kb/export",
-                { kbname: gKBInstitution, format: 'jquery', term: request.term},
-                response);
-    },
-    search: function() {
-                var term = this.value;
-                if (term.length < 3) {
-                    return false;
-                }
-                return true;
+    var tagInRecordCollection = false;
+    if ( gPrimaryCollection != undefined ) {
+      var recordCollection = gAutoComplete[gPrimaryCollection];
+      if ( recordCollection != undefined )
+        tagInRecordCollection = tag in recordCollection;
     }
+    if ( (gAutoComplete.hasOwnProperty('COMMON') && tag in gAutoComplete['COMMON'] ) || tagInRecordCollection ){
+        if (tagInRecordCollection) {
+          var tagObject = gAutoComplete[gPrimaryCollection][tag];
+        }
+        else {
+           var tagObject = gAutoComplete['COMMON'][tag];
+        }
+        var callBack = getKBContents(tagObject);
+        $(cell).autocomplete({
+        source: callBack,
+        minLength: tagObject.searchChars,
+        select: function(event, ui) {
+                    $(cell).val(ui.item.label || ui.item);
+                    event.preventDefault();
+        },
+        focus: function(event, ui) {
+                    event.preventDefault();
+                    var value = ui.item.label || ui.item;
+                    $(cell).val(value);
+                    if ( tagObject.fixed ) {
+                        $(cell).attr('maxlength',value.length);
+                    }
+        },
+        open: function(event, ui) {
+          if ( tagObject.fixed ) {
+              var end = $(this).val().length;
+              $(this).selectRange(end);
+          }
+        }
+        }).focus(function() {
+          if ( tagObject.fixed ) {
+              if($(this).val() != ""){
+                $( this ).autocomplete( "option", "autoFocus", false );
+              } else {
+                $( this ).autocomplete( "option", "autoFocus", true );
+              }
+              $(this).autocomplete("search", "");
+          }
+          else{
+          var end = $(this).val().length;
+          $(this).selectRange(end);
+          }
+        });
+    }
+}
+
+$.fn.selectRange = function(start, end) {
+  /*
+   * Moves the cursor to the end of text area
+   */
+    if(!end) end = start;
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
     });
+};
+
+function getKBContents(tagObj){
+  /*
+   * Handles how data will be retrieved for every search,
+   * depending on tag's settings.
+   */
+    var callback = function(request, response) {
+        // preload case
+        if ( tagObj.preload && (tagObj.kb in gLoadedKBs) ) {
+            if (tagObj.fixed) {
+                response(gLoadedKBs[tagObj.kb]);
+            }
+            else {
+                var searchMethod = "";
+                if (tagObj.searchMethod == "startsWith")
+                  searchMethod = "^";
+                var matcher = new RegExp( searchMethod + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                response( $.grep( gLoadedKBs[tagObj.kb], function( item ){
+                    return matcher.test( item.label || item);
+                }));
+            }
+        }
+        // fetch case
+        else {
+            $.getJSON( "/kb/export",
+                       { kbname: tagObj.kb, format: 'json', term: request.term},
+                       function(json) {
+                          // case where preload didn't succeed
+                          if (tagObj.preload)
+                            gLoadedKBs[tagObj.kb] = json;
+                          response(json);
+                       })
+                       .error(function(jqxhr, textStatus, error) {
+                          var err = textStatus + ", " + error;
+                          if (jqxhr.responseText.indexOf('There is no knowledge base with that name') != -1 ) {
+                            err = 'There is no knowledge base with that name';
+                          }
+                          console.log( "Request Failed: " + err );
+                          response(null);
+                       });
+        }
+    }
+    return callback;
+}
+
+function onGetKBContent(kbName) {
+  /*
+   * Stores retrieved data of a Knowledge Base in a dict.
+   */
+  var callback = function(json) {
+      gLoadedKBs[kbName] = json;
+  };
+  return callback;
 }
 
 /*
@@ -2536,6 +2721,7 @@ function onMARCTagsClick(event){
   /*
    * Handle 'MARC' link (MARC tags).
    */
+  log_action("onMARCTagsClick");
   $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat', tagFormat: 'MARC'});
   gTagFormat = 'MARC';
@@ -2549,6 +2735,7 @@ function onHumanTagsClick(event){
   /*
    * Handle 'Human' link (Human tags).
    */
+  log_action("onHumanTagsClick");
   $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat',
        tagFormat: 'human'});
@@ -2623,6 +2810,7 @@ function onFieldBoxClick(e, box){
   /*
    * Handle field select boxes.
    */
+  log_action("onFieldBoxClick " + box);
    if ( !jQuery.contains(document.documentElement, gLastChecked)) {
        gLastChecked = box;
        clickBox(box);
@@ -2670,6 +2858,7 @@ function onSubfieldBoxClick(box){
   /*
    * Handle subfield select boxes.
    */
+  log_action("onSubfieldBoxClick " + box);
   var tmpArray = box.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2],
     subfieldIndex = tmpArray[3];
@@ -2892,7 +3081,7 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
       $('#bibEditTable tbody').eq(insertionPoint).after(
       createAddFieldForm(fieldTmpNo, initialTemplateNo));
   }
-  
+
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
@@ -2981,6 +3170,7 @@ function onAddFieldClick(){
   /*
    * Handle 'Add field' button.
    */
+  log_action("onAddFieldClick");
   if (failInReadOnly())
     return;
   activateSubmitButton();
@@ -3090,9 +3280,7 @@ function onAddFieldChange(event) {
             if (fieldInd2 == '') {
                 fieldInd2 = '_';
             }
-            if ($.inArray(fieldTag +  fieldInd1 + fieldInd2 + this.value, gTagsToAutocomplete) != -1) {
-                addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
-            }
+            addHandler_autocomplete(fieldTag +  fieldInd1 + fieldInd2 + this.value, $(this).parent().next().children('input'));
 	    $(this).parent().next().children('input').focus();
 	    break;
 	  default:
@@ -3297,6 +3485,7 @@ function onAddSubfieldsClick(img){
    * Handle 'Add subfield' buttons.
    */
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
+  log_action("onAddSubfieldsClick " + fieldID);
   addSubfield(fieldID);
 }
 
@@ -3305,6 +3494,7 @@ function onDOISearchClick(button){
    * Handle 'Search for DOI' button.
    */
   // gets the doi based from appropriate cell
+  log_action("onDOISearchClick");
   var doi = $(button).parent().prev().text();
   createReq({doi: doi, requestType: 'DOISearch'}, function(json)
   {
@@ -3369,11 +3559,9 @@ function onAddSubfieldsChange(event){
         $(this).removeClass('bibEditInputError');
       }
       if (event.keyCode != 9 && event.keyCode != 16){
-        /* If we are creating a new field present in gTagsToAutocomplete, add autocomplete handler */
+        /* If we are creating a new field present in gAutocomplete, add autocomplete handler */
         var fieldInfo = $(this).parents("tr").siblings().eq(0).children().eq(1).html();
-        if ($.inArray(fieldInfo + this.value, gTagsToAutocomplete) != -1) {
-          addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
-        }
+        addHandler_autocomplete(fieldInfo + this.value , $(this).parent().next().children('input'));
         $(this).parent().next().children('input').focus();
       }
     }
@@ -3656,7 +3844,7 @@ function onContentClick(event, cell) {
 }
 
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, 
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
         subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode){
   var requestType;
   if (modifySubfieldCode == true) {
@@ -3684,14 +3872,14 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
 }
 
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
                             value, consumedChange, undoDescriptor,
                             modifySubfieldCode){
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
   }
-  
+
   var data = getUpdateSubfieldValueRequestData(tag,
                                                fieldPosition,
                                                subfieldIndex,
@@ -3979,6 +4167,7 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   /*
    * Handle subfield moving arrows.
    */
+  log_action("onMoveSubfieldClick " + type + ' ' + tag);
   if (failInReadOnly()){
     return;
   }
@@ -4010,6 +4199,7 @@ function onDeleteClick(event){
   /*
    * Handle 'Delete selected' button or delete hotkeys.
    */
+  log_action("onDeleteClick");
   if (failInReadOnly()){
     return;
   }
@@ -4058,6 +4248,7 @@ function onMoveFieldUp(tag, fieldPosition) {
   if (failInReadOnly()){
     return;
   }
+  log_action('onMoveFieldUp ' + tag + ' ' + fieldPosition)
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition > 0) {
@@ -4077,6 +4268,7 @@ function onMoveFieldDown(tag, fieldPosition) {
   if (failInReadOnly()){
     return;
   }
+  log_action('onMoveFieldDown ' + tag + ' ' + fieldPosition)
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition < gRecord[tag].length-1) {
@@ -4114,6 +4306,7 @@ function switchToReadOnlyMode(){
     alert("Please submit the record or cancel your changes before going to the read-only mode ");
     return false;
   }
+  log_action("switchToReadOnlyMode");
   gReadOnlyMode = true;
   createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
             true, undefined, onDeleteRecordCacheError);
@@ -4177,6 +4370,7 @@ function onRevertClick(revisionId){
   /*
    * Handle 'Revert' button (submit record).
    */
+  log_action("onRevertClick " + revisionId);
   updateStatus('updating');
   if (displayAlert('confirmRevert')){
     createReq({recID: gRecID, revId: revisionId, lastRevId: gRecLatestRev, requestType: 'revert',
@@ -4342,6 +4536,7 @@ function getSelectionMarcXml(){
 function onPerformCopy(){
   /** The handler performing the copy operation
    */
+  log_action("onPerformCopy");
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
     return;
@@ -4357,9 +4552,10 @@ function onPerformPaste(){
 
      According to the default behaviour, the fields are appended as last of the same kind
    */
-   if (!gRecord) {
+  log_action("onPerformPaste");
+  if (!gRecord) {
     return;
-   }
+  }
 
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
@@ -4759,7 +4955,7 @@ function prepareUndoHandlerChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, new
   result.ind1 = newInd1;
   result.ind2 = newInd2;
   result.fieldPos = fieldPos;
-  
+
   if (gRecord[newTag] == undefined) {
       result.newFieldPos = 0;
   }
@@ -5188,6 +5384,7 @@ function performMoveSubfield(tag, fieldPosition, subfieldIndex, direction, undoR
 
 
 function onRedo(evt){
+  log_action("redo");
   if (gRedoList.length <= 0){
     alert("No Redo operations to process");
     return;
@@ -5320,6 +5517,7 @@ function urMarkSelectedUntil(entry){
 
 
 function onUndo(evt){
+  log_action("undo");
   if (gUndoList.length <= 0){
     alert("No Undo operations to process");
     return;
@@ -6093,6 +6291,7 @@ function sanitize_value(value) {
  * @return {String}
  */
 function onFieldTagChange(value, cell) {
+    log_action("onFieldTagChange " + value);
 
     function updateModel() {
         var currentField = gRecord[oldTag][cell.fieldPosition];
@@ -6166,6 +6365,7 @@ function onFieldTagChange(value, cell) {
  * @return {Object}
  */
 function onSubfieldCodeChange(value, cell) {
+  log_action("onSubfieldCodeChange " + value);
 
   function updateModel() {
     subfield_instance[0] = value;
@@ -6208,6 +6408,7 @@ function onSubfieldCodeChange(value, cell) {
  * @return {String}
  */
 function onContentChange(value, cell) {
+  log_action("onContentChange " + value);
 
   function redrawTags() {
     redrawFieldPosition(cell.tag, cell.fieldPosition);
@@ -6410,6 +6611,8 @@ function onEditableCellChange(value, th) {
 /*****************************************************************************/
 
 function onfocusreference(check_box) {
+  log_action("onfocusreference");
+
   var $reference_checkbox = $("#focuson_references");
 
   /* For cases when we call the function without click on the interface */
@@ -6432,6 +6635,7 @@ function onfocusreference(check_box) {
 
 
 function onfocusauthor(check_box) {
+  log_action("onfocusauthor");
 
   if (gRecordHideAuthors) {
     gRecordHideAuthors = false;
@@ -6461,6 +6665,8 @@ function onfocusauthor(check_box) {
 
 
 function onfocusother(check_box) {
+  log_action("onfocusother");
+
   var $others_checkbox = $("#focuson_others");
 
   /* For cases when we call the function without click on the interface */
@@ -6486,6 +6692,8 @@ function onfocusother(check_box) {
 }
 
 function onfocuscurator(check_box) {
+  log_action("onfocuscurator");
+
   var $curator_checkbox = $("#focuson_curator");
 
   if ( $curator_checkbox.length === 0 ) {
@@ -6590,10 +6798,11 @@ function displayAll() {
   onfocusauthor();
 }
 
-
 /*************** Functions related to affiliation guess ***************/
 
 function onGuessAffiliations() {
+  log_action("onGuessAffiliations");
+
   var reqData = {
               recID: gRecID,
               requestType: 'guessAffiliations'

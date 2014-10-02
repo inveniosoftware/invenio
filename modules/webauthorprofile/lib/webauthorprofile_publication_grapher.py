@@ -154,5 +154,5 @@ def get_graph_code(graph_file_name, graph_data):
     normal_graph_path = get_graph_path(graph_file_name, graph_data)
     icon_graph_path = get_graph_path(graph_file_name + '_icon', graph_data, [350, 200])
 
-    html_graph_code = """<p> %s""" % html_image(normal_graph_path, icon_graph_path)
+    html_graph_code = html_image(normal_graph_path, icon_graph_path)
     return html_graph_code

@@ -188,7 +188,11 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
                        'CFG_REDIS_HOSTS',
                        'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
-                       'CFG_ICON_CREATION_FORMAT_MAPPINGS']:
+                       'CFG_ICON_CREATION_FORMAT_MAPPINGS',
+                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_SIZE',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_DOCTYPES',
+                       'CFG_BIBEDIT_AUTOCOMPLETE']:
         try:
             option_value = option_value[1:-1]
             if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):
@@ -228,6 +232,7 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_BIBUPLOAD_DELETE_FORMATS',
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
+                       'CFG_WEBSEARCH_INSTITUTION_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
                        'CFG_BIBAUTHORID_EXTERNAL_CLAIMED_RECORDS_KEY',
                        'CFG_BIBCIRCULATION_ITEM_STATUS_OPTIONAL',
@@ -243,7 +248,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_OAUTH2_PROVIDERS',
                        'CFG_BIBFORMAT_CACHED_FORMATS',
                        'CFG_BIBEDIT_ADD_TICKET_RT_QUEUES',
-                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',]:
+                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',
+                       'CFG_WEBSEARCH_BLACKLISTED_FORMATS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -851,8 +857,13 @@ def cli_cmd_create_demo_site(conf):
     run_sql("TRUNCATE schTASK")
     run_sql("TRUNCATE session")
     run_sql("DELETE FROM user WHERE email=''")
-    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % \
-                   (CFG_PREFIX, CFG_PREFIX),]:
+    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql"
+                    % (CFG_PREFIX, CFG_PREFIX),
+                "%s/bin/kbload \
+                    '%s/etc/bibconvert/KB/countrycode-to-country.kb' \
+                    COUNTRYCODE-TO-COUNTRY \
+                    -d 'Maps country codes to country names'"
+                    % (CFG_PREFIX, CFG_PREFIX),]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -877,21 +888,27 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibupload 1" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
                 "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
-                "%s/bin/bibindex -u admin" % CFG_PREFIX,
+                "%s/bin/bibindex -u admin -w collection" % CFG_PREFIX,
                 "%s/bin/bibindex 2" % CFG_PREFIX,
-                "%s/bin/bibindex -u admin -w global" % CFG_PREFIX,
-                "%s/bin/bibindex 3" % CFG_PREFIX,
-                "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
-                "%s/bin/bibreformat 4" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 5" % CFG_PREFIX,
+                "%s/bin/webcoll 3" % CFG_PREFIX,
+                "%s/bin/bibindex -u admin" % CFG_PREFIX,
+                "%s/bin/bibindex 4" % CFG_PREFIX,
+                "%s/bin/bibindex -u admin -l" % CFG_PREFIX,
+                "%s/bin/bibindex 5" % CFG_PREFIX,
+                "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
+                "%s/bin/bibreformat 6" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
-                "%s/bin/bibrank 6" % CFG_PREFIX,
+                "%s/bin/bibrank 7" % CFG_PREFIX,
+                "%s/bin/bibcheck -u admin -e earliest_date -c example_rules.cfg" % CFG_PREFIX,
+                "%s/bin/bibcheck 8" % CFG_PREFIX,
                 "%s/bin/bibsort -u admin -R" % CFG_PREFIX,
-                "%s/bin/bibsort 7" % CFG_PREFIX,
+                "%s/bin/bibsort 9" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
-                "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
-                "%s/bin/bibupload 9" % CFG_PREFIX,]:
+                "%s/bin/oairepositoryupdater 10" % CFG_PREFIX,
+                "%s/bin/bibupload 11" % CFG_PREFIX,
+                "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
+                "%s/bin/bibauthorid 12" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -1185,6 +1202,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
@@ -1251,6 +1269,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
@@ -1412,7 +1431,7 @@ def detect_apache_version():
     """
     from invenio.shellutils import run_shell_command
     out = []
-    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
+    dummy1, cmd_out, dummy2 = run_shell_command("which httpd || which apache2")
     for apache in cmd_out.split("\n"):
         apache_version = _grep_version_from_executable(apache, '^Apache\/')
         if apache_version:

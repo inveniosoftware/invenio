@@ -398,13 +398,17 @@
 }
 
 .bibEditRevHistoryEntryContent {
-    display: table-cell;
     font-size: 80%;
     cursor: pointer;
 }
 
 .bibEditRevHistoryEntryControls {
-    display: table-cell;
+}
+
+.bibEditRevHistoryAuthor {
+  font-size: 80%;
+  word-wrap:break-word;
+  word-break:break-all;
 }
 
 .bibEditRevHistoryLink {
@@ -415,6 +419,7 @@
 .bibEditRevHistoryLinkImg {
     border-width: 0px;
     border-style: none;
+    padding-bottom: 5px;
 }
 .bibEditRevHistoryMenuSection {
     max-height: 200px;
@@ -985,6 +990,16 @@ label {
     position: relative;
     top: 1px!important;
     font-size: 0.9em;
+}
+
+.rtInfoLoader {
+  display: none;
+  color: #5B74A8;
+}
+
+.rtInfoLoader span {
+  position: relative;
+  top: -3px;
 }
 
 #queue {

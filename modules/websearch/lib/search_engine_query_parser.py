@@ -425,6 +425,7 @@ class SpiresToInvenioSyntaxConverter:
     # Constants defining fields
     _DATE_ADDED_FIELD = 'datecreated:'
     _DATE_UPDATED_FIELD = 'datemodified:'
+    _EARLIEST_DATE_FIELD = 'earliestdate:'
     _DATE_FIELD = 'year:'
 
     _A_TAG = 'author:'
@@ -465,11 +466,11 @@ class SpiresToInvenioSyntaxConverter:
         'collab-name' : 'collaboration:',
         'cn' : 'collaboration:',
         # conference number
-        'conf-number' : '111__g:',
-        'cnum' : '773__w:',
+        'conf-number' : 'confnumber:',
+        'cnum' : 'confnumber:',
         # country
-        'cc' : '044__a:',
-        'country' : '044__a:',
+        'cc' : 'country:',
+        'country' : 'country:',
         # date
         'date': _DATE_FIELD,
         'd': _DATE_FIELD,
@@ -481,6 +482,9 @@ class SpiresToInvenioSyntaxConverter:
         'date-updated': _DATE_UPDATED_FIELD,
         'dupd': _DATE_UPDATED_FIELD,
         'du': _DATE_UPDATED_FIELD,
+        'de': _EARLIEST_DATE_FIELD,
+        'dear': _EARLIEST_DATE_FIELD,
+        'earliest-date': _EARLIEST_DATE_FIELD,
         # first author
         'fa' : 'firstauthor:',
         'first-author' : 'firstauthor:',
@@ -507,8 +511,8 @@ class SpiresToInvenioSyntaxConverter:
         'spicite' : 'journal:',
         'vol' : 'volume:',
         # journal page
-        'journal-page' : '773__c:',
-        'jp' : '773__c:',
+        'journal-page' : 'journalpage:',
+        'jp' : 'journalpage:',
         # journal year
         'journal-year' : '773__y:',
         'jy' : '773__y:',
@@ -523,7 +527,7 @@ class SpiresToInvenioSyntaxConverter:
         'keywords' : 'keyword:',
         'kw' : 'keyword:',
         # note
-        'note' : '500__a:',
+        'note' : 'note:',
         # old title
         'old-title' : '246__a:',
         'old-t' : '246__a:',
@@ -532,7 +536,6 @@ class SpiresToInvenioSyntaxConverter:
         #postal code
         'postalcode' : 'postalcode:',
         'zip' : 'postalcode:',
-        'cc' : 'postalcode:',
         # ppf subject
         'ppf-subject' : '650__a:',
         'status' : '650__a:',
@@ -573,7 +576,7 @@ class SpiresToInvenioSyntaxConverter:
         'parx' : '037__c:',
         'primarch' : '037__c:',
         # texkey
-        'texkey' : '035__%:',
+        'texkey' : 'texkey:',
         # type code
         'tc' : 'collection:',
         'ty' : 'collection:',
@@ -615,8 +618,8 @@ class SpiresToInvenioSyntaxConverter:
         'exact-exp' : '',
         'exact-expno' : '',
         # hidden note
-        'hidden-note' : '',
-        'hn' : '',
+        'hidden-note' : '595:',
+        'hn' : '595:',
         # ppf
         'ppf' : '',
         'ppflist' : '',
@@ -642,11 +645,11 @@ class SpiresToInvenioSyntaxConverter:
         #'cited:', # topcite is technically a phrase index - this isn't necessary
         '773__y:', # journal-year
         '773__c:', # journal-page
-        '773__w:', # cnum
-        '044__a:', # country code
+        'confnumber:', # cnum
+        'country:', # country code and country name
         'subject:', # field code
         'collection:', # type code
-        '035__z:', # texkey
+        'texkey:', # texkey
         # also exact expno, corp-auth, url, abstract, doi, mycite, citing
         # but we have no invenio equivalents for these ATM
     ]
@@ -717,13 +720,19 @@ class SpiresToInvenioSyntaxConverter:
                 (?=\ and\ not\ |\ and\ |\ or\ |\ not\ |$)''')
 
         # regular expression matching date after pattern
-        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
-        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
+        # regular expression matching date greater-or-equal pattern
+        self._re_date_greater_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(>=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
+        # regular expression matching date less-or-equal pattern
+        self._re_date_less_equal_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated|de|dear|earliest-date)\b\s*(<=)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # match date searches which have been keyword-substituted
-        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._EARLIEST_DATE_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |\)|$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(f|fin|find)\s+', re.IGNORECASE)
@@ -773,6 +782,14 @@ class SpiresToInvenioSyntaxConverter:
             if not query.startswith('find'):
                 query = 'find ' + query
 
+            # These calls are before the equals signs removal because there is
+            # a '=' in the operators that we want to match.
+            # They are before date_before and date_after replacement
+            # because the regexps that matche the operators '>' and '<' may
+            # also match the operators '>=' and '<='.
+            query = self._convert_spires_date_greater_equal_to_invenio_span_query(query)
+            query = self._convert_spires_date_less_equal_to_invenio_span_query(query)
+
             # a holdover from SPIRES syntax is e.g. date = 2000 rather than just date 2000
             query = self._remove_extraneous_equals_signs(query)
 
@@ -810,17 +827,17 @@ class SpiresToInvenioSyntaxConverter:
 
         # this dictionary is used when generating match patterns for months
         self._months = {'jan':'01', 'january':'01',
-                         'feb':'02', 'february':'02',
-                         'mar':'03', 'march':'03',
-                         'apr':'04', 'april':'04',
-                         'may':'05', 'may':'05',
-                         'jun':'06', 'june':'06',
-                         'jul':'07', 'july':'07',
-                         'aug':'08', 'august':'08',
-                         'sep':'09', 'september':'09',
-                         'oct':'10', 'october':'10',
-                         'nov':'11', 'november':'11',
-                         'dec':'12', 'december':'12'}
+                        'feb':'02', 'february':'02',
+                        'mar':'03', 'march':'03',
+                        'apr':'04', 'april':'04',
+                        'may':'05', 'may':'05',
+                        'jun':'06', 'june':'06',
+                        'jul':'07', 'july':'07',
+                        'aug':'08', 'august':'08',
+                        'sep':'09', 'september':'09',
+                        'oct':'10', 'october':'10',
+                        'nov':'11', 'november':'11',
+                        'dec':'12', 'december':'12'}
         # this dictionary is used to transform name of the month
         # to a number used in the date format. By this reason it
         # contains also the numbers itself to simplify the conversion
@@ -1017,7 +1034,10 @@ class SpiresToInvenioSyntaxConverter:
 
         def create_replacement_pattern(match):
             """method used for replacement with regular expression"""
-            return match.group('searchop') + ' ' + match.group('search_content') + '->9999'
+            return '(' \
+            + match.group('searchop') + ' ' + match.group('search_content')+ '->9999-01-01' \
+            + ' AND NOT ' + match.group('searchop') + ' ' + match.group('search_content') \
+            + ')'
 
         query = self._re_date_after_match.sub(create_replacement_pattern, query)
 
@@ -1026,12 +1046,43 @@ class SpiresToInvenioSyntaxConverter:
     def _convert_spires_date_before_to_invenio_span_query(self, query):
         """Converts date before SPIRES search term into invenio span query"""
 
-        # method used for replacement with regular expression
         def create_replacement_pattern(match):
-            return match.group('searchop') + ' ' + '0->' + match.group('search_content')
+            """method used for replacement with regular expression"""
+            return ' (' \
+            + match.group('searchop') + ' 0->' + match.group('search_content') \
+            + ' AND NOT ' + match.group('searchop') + ' ' + match.group('search_content') \
+            + ')'
 
         query = self._re_date_before_match.sub(create_replacement_pattern, query)
 
+        return query
+
+    def _convert_spires_date_greater_equal_to_invenio_span_query(self, query):
+        """Converts date after SPIRES search term into invenio span query"""
+
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return match.group('searchop') + ' ' \
+                + match.group('search_content') + '->9999-01-01'
+
+        query = self._re_date_greater_equal_match.sub(
+            create_replacement_pattern,
+            query
+        )
+        return query
+
+    def _convert_spires_date_less_equal_to_invenio_span_query(self, query):
+        """Converts date before SPIRES search term into invenio span query"""
+
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return match.group('searchop') + ' 0->'\
+                + match.group('search_content')
+
+        query = self._re_date_less_equal_match.sub(
+            create_replacement_pattern,
+            query
+        )
         return query
 
     def _expand_search_patterns(self, query):

@@ -20,15 +20,16 @@ import os
 import time
 import shutil
 
-from invenio.config import \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_SITE_LANG, \
-     CFG_TMPSHAREDDIR, \
-     CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, \
-     CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_SITE_RECORD, \
-     CFG_INSPIRE_SITE
+from invenio.config import (CFG_ACCESS_CONTROL_LEVEL_SITE,
+                            CFG_SITE_LANG,
+                            CFG_TMPSHAREDDIR,
+                            CFG_SITE_URL,
+                            CFG_SITE_SECURE_URL,
+                            CFG_WEBSUBMIT_STORAGEDIR,
+                            CFG_SITE_RECORD,
+                            CFG_INSPIRE_SITE,
+                            CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_DOCTYPES,
+                            CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_SIZE)
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
@@ -396,8 +397,8 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
             else:
                 move_uploaded_files_to_storage(working_dir=working_dir,
                                                recid=argd['recid'],
-                                               icon_sizes=['180>', '700>'],
-                                               create_icon_doctypes=['*'],
+                                               icon_sizes=CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_SIZE,
+                                               create_icon_doctypes=CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_DOCTYPES,
                                                force_file_revision=False)
                 # Clean temporary directory
                 shutil.rmtree(working_dir)

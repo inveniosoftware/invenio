@@ -56,7 +56,7 @@ from invenio.websearch_external_collections import \
      external_collection_sort_engine_by_name
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
     write_message, task_has_option, task_update_progress, \
-    task_sleep_now_if_required
+    task_sleep_now_if_required, task_set_task_param
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
@@ -894,6 +894,10 @@ class Collection:
         # last but not least, update the speed-up flag:
         self.calculate_reclist_run_already = 1
 
+    def get_added_records(self):
+        """Return new records added since last run."""
+        return self.reclist - self.old_reclist
+
     def update_reclist(self):
         "Update the record universe for given collection; nbrecs, reclist of the collection table."
         if self.update_reclist_run_already:
@@ -1016,7 +1020,7 @@ def get_database_last_updated_timestamp():
     database_tables_timestamps.append(get_table_update_time('bibrec'))
     ## In INSPIRE bibfmt is on innodb and there is not such configuration
     bibfmt_last_update = run_sql("SELECT max(last_updated) FROM bibfmt")
-    if bibfmt_last_update and bibfmt_last_update[0][0]:
+    if bibfmt_last_update and bibfmt_last_update[0][0] is not None:
         database_tables_timestamps.append(str(bibfmt_last_update[0][0]))
     try:
         database_tables_timestamps.append(get_table_update_time('idxWORD%'))
@@ -1153,6 +1157,8 @@ def task_run_core():
 ##
     task_run_start_timestamp = get_current_time_timestamp()
     colls = []
+    params = {}
+    task_set_task_param("post_process_params", params)
     # decide whether we need to run or not, by comparing last updated timestamps:
     write_message("Database timestamp is %s." % get_database_last_updated_timestamp(), verbose=3)
     write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp(), verbose=3)
@@ -1178,6 +1184,7 @@ def task_run_core():
                 colls.append(get_collection(row[0]))
         # secondly, update collection reclist cache:
         if task_get_option('part', 1) == 1:
+            all_recids_added = intbitset()
             i = 0
             for coll in colls:
                 i += 1
@@ -1188,7 +1195,9 @@ def task_run_core():
                     coll.calculate_reclist()
                 coll.update_reclist()
                 task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+                all_recids_added.update(coll.get_added_records())
                 task_sleep_now_if_required(can_stop_too=True)
+            params.update({'recids': list(all_recids_added)})
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
             # Updates cache only for chosen languages or for all available ones if none was chosen
@@ -1212,6 +1221,7 @@ def task_run_core():
         if not task_has_option("collection"):
             set_cache_last_updated_timestamp(task_run_start_timestamp)
             write_message("Collection cache timestamp is set to %s." % get_cache_last_updated_timestamp(), verbose=3)
+        task_set_task_param("post_process_params", params)
     else:
         ## cache up to date, we don't have to run
         write_message("Collection cache is up to date, no need to run.")

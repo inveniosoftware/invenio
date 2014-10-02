@@ -98,8 +98,8 @@ def format_element(bfo, name, tag_name='', tag='', kb='', kb_default_output='', 
       # existence of $e subfield is a sign. Since this assumption
       # might be wrong, put some strong conditions in order to get
       # into this branch, with easy way to bypass.
-      values = [field_instance[tags[0][-1]] for field_instance in bfo.fields(tags[0][:-1], escape=9) \
-                if not field_instance.has_key('e')]
+      values = [field_instance[tags[0][-1]] for field_instance in bfo.fields(tags[0][:-1], escape=9)
+                if 'e' not in field_instance and tags[0][-1] in field_instance]
     else:
         # Standard fetching of values
         values = [bfo.fields(marctag, escape=9) for marctag in tags]

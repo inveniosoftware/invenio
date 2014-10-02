@@ -87,6 +87,7 @@ from invenio.errorlib import register_exception
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.intbitset import intbitset
 from invenio.urlutils import make_user_agent_string
+from invenio.textutils import wash_for_xml
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, \
@@ -124,7 +125,7 @@ def check_bibcatalog():
     """
     Return True if bibcatalog is available.
     """
-    global CFG_HAS_BIBCATALOG # pylint: disable=W0603
+    global CFG_HAS_BIBCATALOG  # pylint: disable=W0603
     if CFG_HAS_BIBCATALOG != "UNKNOWN":
         return CFG_HAS_BIBCATALOG
     CFG_HAS_BIBCATALOG = True
@@ -155,7 +156,7 @@ def resolve_identifier(tmps, identifier):
 
     is_tmp, tmp_id = parse_identifier(identifier)
     if is_tmp:
-        if not tmp_id in tmps:
+        if tmp_id not in tmps:
             raise StandardError("Temporary identifier %s not present in the dictionary" % (tmp_id, ))
         if tmps[tmp_id] == -1:
             # the identifier has been signalised but never assigned a value - probably error during processing
@@ -190,14 +191,15 @@ def bibupload_pending_recids():
         # Let's grep for the 001
         try:
             xml = open(xmlfile).read()
-            ret += [int(group[1]) for group in _re_find_001.findall(xml)]
-        except:
+        except (IOError, OSError):
             continue
+        else:
+            ret += [int(group[1]) for group in _re_find_001.findall(xml)]
     return ret
 
 ### bibupload engine functions:
-def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=False,
-        tmp_ids=None, tmp_vers=None):
+def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="",
+              pretend=False, tmp_ids=None, tmp_vers=None):
     """Main function: process a record and fit it in the tables
     bibfmt, bibrec, bibrec_bibxxx, bibxxx with proper record
     metadata.
@@ -221,14 +223,14 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         write_message(msg, verbose=1, stream=sys.stderr)
         return (1, -1, msg)
 
-
     error = None
     affected_tags = {}
     original_record = {}
     rec_old = {}
-    now = datetime.now() # will hold record creation/modification date
+    now = datetime.now()  # will hold record creation/modification date
     record_had_altered_bit = False
     is_opt_mode_delete = False
+    job_id = task_get_task_param('task_id', 0)
 
     # Extraction of the Record Id from 001, SYSNO or OAIID or DOI tags:
     rec_id = retrieve_rec_id(record, opt_mode, pretend=pretend)
@@ -244,7 +246,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if not unique_p:
             write_message(msg, verbose=1, stream=sys.stderr)
             return (1, int(rec_id), msg)
-        if not record.has_key('001'):
+        if '001' not in record:
             # Found record ID by means of SYSNO or OAIID or DOI, and the
             # input MARCXML buffer does not have this 001 tag, so we
             # should add it now:
@@ -261,6 +263,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
 
     record_deleted_p = False
+    original_005 = None
     if opt_mode == 'insert' or \
     (opt_mode == 'replace_or_insert') and rec_id is None:
         insert_mode_p = True
@@ -288,6 +291,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 error = None
         else:
             write_message("   Note: 005 already existing upon inserting of new record. Keeping it.", verbose=2)
+        original_005 = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(record['005'][0][3].split('.')[0], "%Y%m%d%H%M%S"))
 
     elif opt_mode != 'insert':
         insert_mode_p = False
@@ -376,8 +380,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                         affected_tags[tag] = [(field[1], field[2]) for field in fields]
 
         # In Replace mode, take over old strong tags if applicable:
-        if opt_mode == 'replace' or \
-            opt_mode == 'replace_or_insert':
+        if opt_mode in ('replace', 'replace_or_insert'):
             copy_strong_tags_from_old_record(record, rec_old)
 
         # Delete tags to correct in the record
@@ -418,11 +421,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             record = append_new_tag_to_old_record(record, rec_old)
             write_message("   -Append new tags to the old record: DONE", verbose=2)
 
-        write_message("     -Affected Tags found after comparing upload and original records: %s"%(str(affected_tags)), verbose=2)
+        write_message("     -Affected Tags found after comparing upload and original records: %s" % (str(affected_tags)), verbose=2)
 
         # 005 tag should be added everytime the record is modified
         # If an exiting record is modified, its 005 tag should be overwritten with a new revision value
-        if record.has_key('005'):
+        if '005' in record:
             record_delete_field(record, '005')
             write_message("  Deleted the existing 005 tag.", verbose=2)
         last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))[0][0]
@@ -437,7 +440,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             write_message("   Failed: Error during adding to 005 controlfield to record", verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
         else:
-            error=None
+            error = None
             write_message(lambda: "   -Added tag 005: DONE. " + str(record_get_field_value(record, '005', '', '')), verbose=2)
 
         # adding 005 to affected tags will delete the existing 005 entry
@@ -491,7 +494,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     bibrecdocs = BibRecDocs(rec_id)
                 record = synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=pretend)
                 # in case if FFT is in affected list make appropriate changes
-                if not insert_mode_p: # because for insert, all tags are affected
+                if not insert_mode_p:  # because for insert, all tags are affected
                     if ('4', ' ') not in affected_tags.get('856', []):
                         if '856' not in affected_tags:
                             affected_tags['856'] = [('4', ' ')]
@@ -569,9 +572,15 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
                 # archive MARCXML format of this record for version history purposes:
                 if insert_mode_p:
-                    error = archive_marcxml_for_history(rec_id, affected_fields={}, pretend=pretend)
+                    error = archive_marcxml_for_history(rec_id=rec_id,
+                                                        affected_fields={},
+                                                        job_id=job_id,
+                                                        pretend=pretend)
                 else:
-                    error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
+                    error = archive_marcxml_for_history(rec_id=rec_id,
+                                                        affected_fields=affected_tags,
+                                                        job_id=job_id,
+                                                        pretend=pretend)
                 if error == 1:
                     msg = "   ERROR: Failed to archive MARCXML for history"
                     write_message(msg, verbose=1, stream=sys.stderr)
@@ -582,11 +591,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # delete some formats like HB upon record change:
         if updates_exist or record_had_FFT:
             for format_to_delete in CFG_BIBUPLOAD_DELETE_FORMATS:
-                try:
-                    delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
-                except:
-                    # OK, some formats like HB could not have been deleted, no big deal
-                    pass
+                delete_bibfmt_format(rec_id, format_to_delete, pretend=pretend)
         write_message("   -Stage COMPLETED", verbose=2)
 
         ## Let's assert that one and only one 005 tag is existing at this stage.
@@ -599,7 +604,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             update_database_with_metadata(record, rec_id, oai_rec_id, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         elif opt_mode in ('replace', 'replace_or_insert',
-            'append', 'correct', 'delete') and updates_exist:
+                'append', 'correct', 'delete') and updates_exist:
             # now we clear all the rows from bibrec_bibxxx from the old
             record_deleted_p = True
             delete_bibrec_bibxxx(rec_old, rec_id, affected_tags, pretend=pretend)
@@ -624,8 +629,12 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     verbose=2)
         if opt_notimechange == 0 and (updates_exist or record_had_FFT):
             bibrec_now = convert_datestruct_to_datetext(time.localtime())
+            update_bibrec_date(now=bibrec_now,
+                               bibrec_id=rec_id,
+                               insert_mode_p=insert_mode_p,
+                               original_005=original_005,
+                               pretend=pretend)
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -637,7 +646,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             stat['nb_records_updated'] += 1
 
         # Upload of this record finish
-        write_message("Record "+str(rec_id)+" DONE", verbose=1)
+        write_message("Record %s DONE" % rec_id, verbose=1)
         return (0, int(rec_id), "")
     finally:
         if record_deleted_p:
@@ -675,16 +684,16 @@ def find_record_ids_by_oai_id(oaiId):
         # particularly 037. Idea: to avoid double insertions)
         repnumber = oaiId.split(":")[-1]
         if repnumber:
-            recids |= search_pattern(p = repnumber,
-                                    f = "reportnumber",
-                                    m = 'e' )
+            recids |= search_pattern(p=repnumber,
+                                    f="reportnumber",
+                                    m='e')
 
         # Is this record already in invenio (matching by reportnumber i.e.
         # particularly 037. Idea:  to avoid double insertions)
         repnumber = "arXiv:" + oaiId.split(":")[-1]
-        recids |= search_pattern(p = repnumber,
-                                f = "reportnumber",
-                                m = 'e' )
+        recids |= search_pattern(p=repnumber,
+                                f="reportnumber",
+                                m='e')
 
         if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
             return recids
@@ -706,7 +715,7 @@ def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
                 register_exception()
                 write_message("   Stage failed: ERROR: while elaborating %s tags: %s" % (tag, e),
                               verbose=1, stream=sys.stderr)
-                return (1, int(rec_id)) # TODO: ?
+                return (1, int(rec_id))  # TODO: ?
             if record is None:
                 write_message("   Stage failed: ERROR: while elaborating %s tags" % (tag, ),
                               verbose=1, stream=sys.stderr)
@@ -718,18 +727,17 @@ def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
         tmp_ids = {}
     if tmp_vers is None:
         tmp_vers = {}
-    _elaborate_tag(record, "BDR", lambda: elaborate_brt_tags(record, rec_id = rec_id,
-                                                     mode = mode,
-                                                     pretend = pretend,
-                                                     tmp_ids = tmp_ids,
-                                                     tmp_vers = tmp_vers))
+    _elaborate_tag(record, "BDR", lambda: elaborate_brt_tags(record, rec_id=rec_id,
+                                                     mode=mode,
+                                                     pretend=pretend,
+                                                     tmp_ids=tmp_ids,
+                                                     tmp_vers=tmp_vers))
 
-
-    _elaborate_tag(record, "BDM", lambda: elaborate_mit_tags(record, rec_id = rec_id,
-                                                     mode = mode,
-                                                     pretend = pretend,
-                                                     tmp_ids = tmp_ids,
-                                                     tmp_vers = tmp_vers))
+    _elaborate_tag(record, "BDM", lambda: elaborate_mit_tags(record, rec_id=rec_id,
+                                                     mode=mode,
+                                                     pretend=pretend,
+                                                     tmp_ids=tmp_ids,
+                                                     tmp_vers=tmp_vers))
 
 def submit_ticket_for_holding_pen(rec_id, err, msg, pretend=False):
     """
@@ -746,8 +754,8 @@ def submit_ticket_for_holding_pen(rec_id, err, msg, pretend=False):
     if user:
         try:
             uid = get_uid_from_email(get_email_from_username(user))
-        except Exception, err:
-            write_message("WARNING: can't reliably retrieve uid for user %s: %s" % (user, err), stream=sys.stderr)
+        except Exception, e:
+            write_message("WARNING: can't reliably retrieve uid for user %s: %s" % (user, e), stream=sys.stderr)
 
     if check_bibcatalog():
         text = """
@@ -797,13 +805,13 @@ def print_out_bibupload_statistics():
     """Print the statistics of the process"""
     out = "Task stats: %(nb_input)d input records, %(nb_updated)d updated, " \
           "%(nb_inserted)d inserted, %(nb_errors)d errors, %(nb_holdingpen)d inserted to holding pen.  " \
-          "Time %(nb_sec).2f sec." % { \
+          "Time %(nb_sec).2f sec." % {
               'nb_input': stat['nb_records_to_upload'],
               'nb_updated': stat['nb_records_updated'],
               'nb_inserted': stat['nb_records_inserted'],
               'nb_errors': stat['nb_errors'],
               'nb_holdingpen': stat['nb_holdingpen'],
-              'nb_sec': time.time() - time.mktime(stat['exectime']) }
+              'nb_sec': time.time() - time.mktime(stat['exectime'])}
     write_message(out)
 
 def open_marc_file(path):
@@ -827,6 +835,7 @@ def open_marc_file(path):
 def xml_marc_to_records(xml_marc):
     """create the records"""
     # Creation of the records from the xml Marc in argument
+    xml_marc = wash_for_xml(xml_marc)
     recs = create_records(xml_marc, 1, 1)
     if recs == []:
         msg = "ERROR: Cannot parse MARCXML file."
@@ -837,8 +846,7 @@ def xml_marc_to_records(xml_marc):
         write_message(msg, verbose=1, stream=sys.stderr)
         raise RecoverableError(msg)
     else:
-        recs = map((lambda x:x[0]), recs)
-        return recs
+        return [x[0] for x in recs]
 
 def find_record_format(rec_id, bibformat):
     """Look whether record REC_ID is formatted in FORMAT,
@@ -860,8 +868,7 @@ def find_record_from_recid(rec_id):
     Try to find record in the database from the REC_ID number.
     Return record ID if found, None otherwise.
     """
-    res = run_sql("SELECT id FROM bibrec WHERE id=%s",
-                    (rec_id,))
+    res = run_sql("SELECT id FROM bibrec WHERE id=%s", (rec_id,))
     if res:
         return res[0][0]
     else:
@@ -884,7 +891,7 @@ def find_record_from_sysno(sysno):
         if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
             return recid[0]
         else:
-            if record_exists(recid[0]) > 0: ## Only non deleted records
+            if record_exists(recid[0]) > 0:  # Only non deleted records
                 return recid[0]
     return None
 
@@ -952,7 +959,7 @@ def find_record_from_oaiid(oaiid):
         if CFG_BIBUPLOAD_MATCH_DELETED_RECORDS:
             return recid[0]
         else:
-            if record_exists(recid[0]) > 0: ## Only non deleted records
+            if record_exists(recid[0]) > 0:  # Only non deleted records
                 return recid[0]
     return None
 
@@ -998,7 +1005,7 @@ def extract_tag_from_record(record, tag_number):
         return record.get(tag_number, None)
     return None
 
-def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
+def retrieve_rec_id(record, opt_mode, pretend=False, post_phase=False):
     """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or DOI
     tag. opt_mod is the desired mode.
 
@@ -1015,9 +1022,9 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         rec_id = tag_001[0][3]
         # if we are in insert mode => error
         if opt_mode == 'insert' and not post_phase:
-            write_message("   Failed: tag 001 found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
+            write_message("   Failed: tag 001 found in the xml"
+                          " submitted, you should use the option replace,"
+                          " correct or append to replace an existing"
                           " record. (-h for help)",
                           verbose=1, stream=sys.stderr)
             return -1
@@ -1062,14 +1069,14 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         # 2nd step we look for the SYSNO
         sysnos = record_get_field_values(record,
             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[0:3],
-            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and \
+            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] != "_" and
             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[3:4] or "",
-            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and \
+            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] != "_" and
             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[4:5] or "",
             CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[5:6])
         if sysnos:
-            sysno = sysnos[0] # there should be only one external SYSNO
-            write_message("   -Checking if SYSNO " + sysno + \
+            sysno = sysnos[0]  # there should be only one external SYSNO
+            write_message("   -Checking if SYSNO " + sysno +
                           " exists in the database", verbose=9)
             # try to find the corresponding rec id from the database
             rec_id = find_record_from_sysno(sysno)
@@ -1090,9 +1097,9 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         # 2nd step we look for the external OAIID
         extoai_fields = record_get_field_instances(record,
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
-            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or "",
-            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or "")
         if extoai_fields:
             for field in extoai_fields:
@@ -1124,14 +1131,14 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
         # 4th step we look for the OAI ID
         oaiidvalues = record_get_field_values(record,
             CFG_OAI_ID_FIELD[0:3],
-            CFG_OAI_ID_FIELD[3:4] != "_" and \
+            CFG_OAI_ID_FIELD[3:4] != "_" and
             CFG_OAI_ID_FIELD[3:4] or "",
-            CFG_OAI_ID_FIELD[4:5] != "_" and \
+            CFG_OAI_ID_FIELD[4:5] != "_" and
             CFG_OAI_ID_FIELD[4:5] or "",
             CFG_OAI_ID_FIELD[5:6])
         if oaiidvalues:
-            oaiid = oaiidvalues[0] # there should be only one OAI ID
-            write_message("   -Check if local OAI ID " + oaiid + \
+            oaiid = oaiidvalues[0]  # there should be only one OAI ID
+            write_message("   -Check if local OAI ID " + oaiid +
                           " exist in the database", verbose=9)
 
             # try to find the corresponding rec id from the database
@@ -1160,17 +1167,17 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
             if len(matching_recids) > 1:
                 # Oops, this record refers to DOI existing in multiple records.
                 # Dunno which one to choose.
-                write_message("   Failed: Multiple records found in the" \
-                          " database %s that match the DOI(s) in the input" \
+                write_message("   Failed: Multiple records found in the"
+                          " database %s that match the DOI(s) in the input"
                           " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
                           verbose=1, stream=sys.stderr)
                 return -1
             elif len(matching_recids) == 1:
                 rec_id = matching_recids.pop()
                 if opt_mode == 'insert':
-                    write_message("   Failed: DOI tag matching record #%s found in the xml" \
-                          " submitted, you should use the option replace," \
-                          " correct or append to replace an existing" \
+                    write_message("   Failed: DOI tag matching record #%s found in the xml"
+                          " submitted, you should use the option replace,"
+                          " correct or append to replace an existing"
                           " record. (-h for help)" % rec_id,
                           verbose=1, stream=sys.stderr)
                     return -1
@@ -1186,17 +1193,17 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
     # tags.  (None otherwise.)
     if rec_id:
         if opt_mode == 'insert':
-            write_message("   Failed: Record found in the database," \
-                          " you should use the option replace," \
-                          " correct or append to replace an existing" \
+            write_message("   Failed: Record found in the database,"
+                          " you should use the option replace,"
+                          " correct or append to replace an existing"
                           " record. (-h for help)",
                           verbose=1, stream=sys.stderr)
             return -1
     else:
         if opt_mode != 'insert' and \
            opt_mode != 'replace_or_insert':
-            write_message("   Failed: Record not found in the database."\
-                          " Please insert the file before updating it."\
+            write_message("   Failed: Record not found in the database."
+                          " Please insert the file before updating it."
                           " (-h for help)", verbose=1, stream=sys.stderr)
             return -1
 
@@ -1262,14 +1269,14 @@ def create_new_record(rec_id=None, pretend=False):
         else:
             return run_sql("SELECT max(id)+1 FROM bibrec")[0][0]
     if rec_id is not None:
-        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date) VALUES (%s, NOW(), NOW())", (rec_id, ))
+        return run_sql("INSERT INTO bibrec (id, creation_date, modification_date, earliest_date) VALUES (%s, NOW(), NOW(), NOW())", (rec_id, ))
     else:
-        return run_sql("INSERT INTO bibrec (creation_date, modification_date) VALUES (NOW(), NOW())")
+        return run_sql("INSERT INTO bibrec (creation_date, modification_date, earliest_date) VALUES (NOW(), NOW(), NOW())")
 
 def insert_bibfmt(id_bibrec, marc, bibformat, modification_date='1970-01-01 00:00:00', pretend=False):
     """Insert the format in the table bibfmt"""
     # compress the marc value
-    pickled_marc =  compress(marc)
+    pickled_marc = compress(marc)
     try:
         time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
@@ -1326,7 +1333,7 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
         field_number, id_bibrec, pretend=False):
     """Insert the record into bibrec_bibxxx"""
     # determine into which table one should insert the record
-    full_table_name = 'bibrec_'+ table_name
+    full_table_name = 'bibrec_' + table_name
 
     # insert the proper row into the table
     query = """INSERT INTO %s """ % full_table_name
@@ -1388,7 +1395,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
                           generated after BibDocFile tables.
         """
         write_message('Merging subfields %s into field %s' % (subfields, field), verbose=9)
-        subfields = dict(subfields) ## We make a copy not to have side-effects
+        subfields = dict(subfields)  # We make a copy not to have side-effects
         subfield_to_delete = []
         for subfield_position, (code, value) in enumerate(field_get_subfield_instances(field)):
             ## For each subfield instance already existing...
@@ -1472,7 +1479,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
                     # internal BibDoc structures. This could have happen in the case of renaming a document
                     # or its removal. In both cases we have to remove link... a new one will be created
                     positions_tags8564s_to_remove.append(local_position)
-                    write_message("%s to be deleted and re-synchronized" % (field, ),  verbose=9)
+                    write_message("%s to be deleted and re-synchronized" % (field, ), verbose=9)
                     break
 
     record_delete_fields(record, '856', positions_tags8564s_to_remove)
@@ -1492,14 +1499,14 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
 
 def _get_subfield_value(field, subfield_code, default=None):
     res = field_get_subfield_values(field, subfield_code)
-    if res != [] and res != None:
+    if res != [] and res is not None:
         return res[0]
     else:
         return default
 
 
-def elaborate_mit_tags(record, rec_id, mode, pretend = False, tmp_ids = {},
-                       tmp_vers = {}):
+def elaborate_mit_tags(record, rec_id, mode, pretend=False, tmp_ids={},
+                       tmp_vers={}):
     """
     Uploading MoreInfo -> BDM tags
     """
@@ -1525,8 +1532,8 @@ def elaborate_mit_tags(record, rec_id, mode, pretend = False, tmp_ids = {},
             bibdoc_fmt = _get_subfield_value(mit, "f")
             moreinfo_str = _get_subfield_value(mit, "m")
 
-            if bibdoc_id == None:
-                if bibdoc_name == None:
+            if bibdoc_id is None:
+                if bibdoc_name is None:
                     raise StandardError("Incorrect relation. Neither name nor identifier of the first obejct has been specified")
                 else:
                     # retrieving the ID based on the document name (inside current record)
@@ -1536,22 +1543,22 @@ def elaborate_mit_tags(record, rec_id, mode, pretend = False, tmp_ids = {},
                     except:
                         raise StandardError("BibDoc of a name %s does not exist within a record" % (bibdoc_name, ))
             else:
-                if bibdoc_name != None:
+                if bibdoc_name is not None:
                     write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
             if (moreinfo_str is None or mode in ("replace", "correct")) and (not pretend):
 
-                MoreInfo(docid=bibdoc_id , version = bibdoc_ver,
-                         docformat = bibdoc_fmt, relation = relation_id).delete()
+                MoreInfo(docid=bibdoc_id , version=bibdoc_ver,
+                         docformat=bibdoc_fmt, relation=relation_id).delete()
 
-            if (not moreinfo_str is None) and (not pretend):
+            if (moreinfo_str is not None) and (not pretend):
                 MoreInfo.create_from_serialised(moreinfo_str,
                                                 docid=bibdoc_id,
-                                                version = bibdoc_ver,
-                                                docformat = bibdoc_fmt,
-                                                relation = relation_id)
+                                                version=bibdoc_ver,
+                                                docformat=bibdoc_fmt,
+                                                relation=relation_id)
     return record
 
-def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_vers = {}):
+def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids={}, tmp_vers={}):
     """
     Process BDR tags describing relations between existing objects
     """
@@ -1560,7 +1567,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
     # Now gathering information from BDR tags - to be processed later
     relations_to_create = []
     write_message("Processing BDR entries of the record ")
-    recordDocs = BibRecDocs(rec_id) #TODO: check what happens if there is no record yet ! Will the class represent an empty set?
+    recordDocs = BibRecDocs(rec_id)  # TODO: check what happens if there is no record yet ! Will the class represent an empty set?
 
     if tuple_list:
         for brt in record_get_field_instances(record, 'BDR', ' ', ' '):
@@ -1580,9 +1587,8 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                 bibdoc1_id = _get_subfield_value(brt, "i")
                 bibdoc1_name = _get_subfield_value(brt, "n")
 
-
-                if bibdoc1_id == None:
-                    if bibdoc1_name == None:
+                if bibdoc1_id is None:
+                    if bibdoc1_name is None:
                         raise StandardError("Incorrect relation. Neither name nor identifier of the first obejct has been specified")
                     else:
                         # retrieving the ID based on the document name (inside current record)
@@ -1590,24 +1596,24 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                         try:
                             bibdoc1_id = recordDocs.get_docid(bibdoc1_name)
                         except:
-                            raise StandardError("BibDoc of a name %s does not exist within a record" % \
+                            raise StandardError("BibDoc of a name %s does not exist within a record" %
                                                     (bibdoc1_name, ))
                 else:
                     # resolving temporary identifier
                     bibdoc1_id = resolve_identifier(tmp_ids, bibdoc1_id)
-                    if bibdoc1_name != None:
+                    if bibdoc1_name is not None:
                         write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
 
                 bibdoc1_ver = _get_subfield_value(brt, "v")
-                if not (bibdoc1_ver is None):
+                if bibdoc1_ver is not None:
                     bibdoc1_ver = resolve_identifier(tmp_vers, bibdoc1_ver)
                 bibdoc1_fmt = _get_subfield_value(brt, "f")
 
                 bibdoc2_id = _get_subfield_value(brt, "j")
                 bibdoc2_name = _get_subfield_value(brt, "o")
 
-                if bibdoc2_id == None:
-                    if bibdoc2_name == None:
+                if bibdoc2_id is None:
+                    if bibdoc2_name is None:
                         raise StandardError("Incorrect relation. Neither name nor identifier of the second obejct has been specified")
                     else:
                         # retrieving the ID based on the document name (inside current record)
@@ -1618,10 +1624,8 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                             raise StandardError("BibDoc of a name %s does not exist within a record" % (bibdoc2_name, ))
                 else:
                     bibdoc2_id = resolve_identifier(tmp_ids, bibdoc2_id)
-                    if bibdoc2_name != None:
+                    if bibdoc2_name is not None:
                         write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
-
-
 
                 bibdoc2_ver = _get_subfield_value(brt, "w")
                 if not (bibdoc2_ver is None):
@@ -1640,13 +1644,13 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
             # MoreInfo table instead of other fields
             rel_obj = None
             if not relation_id:
-                rels = BibRelation.get_relations(rel_type = relation_type,
-                                                 bibdoc1_id = bibdoc1_id,
-                                                 bibdoc2_id = bibdoc2_id,
-                                                 bibdoc1_ver = bibdoc1_ver,
-                                                 bibdoc2_ver = bibdoc2_ver,
-                                                 bibdoc1_fmt = bibdoc1_fmt,
-                                                 bibdoc2_fmt = bibdoc2_fmt)
+                rels = BibRelation.get_relations(rel_type=relation_type,
+                                                 bibdoc1_id=bibdoc1_id,
+                                                 bibdoc2_id=bibdoc2_id,
+                                                 bibdoc1_ver=bibdoc1_ver,
+                                                 bibdoc2_ver=bibdoc2_ver,
+                                                 bibdoc1_fmt=bibdoc1_fmt,
+                                                 bibdoc2_fmt=bibdoc2_fmt)
                 if len(rels) > 0:
                     rel_obj = rels[0]
                     relation_id = rel_obj.id
@@ -1664,16 +1668,16 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
         # now creating relations between objects based on the data
         if not pretend:
             for (relation_id, bibdoc1_id, bibdoc1_ver, bibdoc1_fmt,
-                 bibdoc2_id,  bibdoc2_ver, bibdoc2_fmt, rel_type,
+                 bibdoc2_id, bibdoc2_ver, bibdoc2_fmt, rel_type,
                  more_info, rel_obj, control_command) in relations_to_create:
-                if rel_obj == None:
-                    rel_obj = BibRelation.create(bibdoc1_id = bibdoc1_id,
-                                                    bibdoc1_ver = bibdoc1_ver,
-                                                    bibdoc1_fmt = bibdoc1_fmt,
-                                                    bibdoc2_id = bibdoc2_id,
-                                                    bibdoc2_ver = bibdoc2_ver,
-                                                    bibdoc2_fmt = bibdoc2_fmt,
-                                                    rel_type = rel_type)
+                if rel_obj is None:
+                    rel_obj = BibRelation.create(bibdoc1_id=bibdoc1_id,
+                                                    bibdoc1_ver=bibdoc1_ver,
+                                                    bibdoc1_fmt=bibdoc1_fmt,
+                                                    bibdoc2_id=bibdoc2_id,
+                                                    bibdoc2_ver=bibdoc2_ver,
+                                                    bibdoc2_fmt=bibdoc2_fmt,
+                                                    rel_type=rel_type)
                     relation_id = rel_obj.id
 
                 if mode in ("replace"):
@@ -1681,7 +1685,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                     rel_obj.get_more_info().delete()
 
                 if more_info:
-                    MoreInfo.create_from_serialised(more_info, relation = relation_id)
+                    MoreInfo.create_from_serialised(more_info, relation=relation_id)
 
                 if control_command == "DELETE":
                     rel_obj.delete()
@@ -1690,7 +1694,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
     return record
 
 def elaborate_fft_tags(record, rec_id, mode, pretend=False,
-                       tmp_ids = {}, tmp_vers = {}, bibrecdocs=None):
+                       tmp_ids={}, tmp_vers={}, bibrecdocs=None):
     """
     Process FFT tags that should contain $a with file pathes or URLs
     to get the fulltext from.  This function enriches record with
@@ -1710,7 +1714,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s, modification_date: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, flags, modification_date), verbose=9)
         try:
-            if not url: # Not requesting a new url. Just updating comment & description
+            if not url:  # Not requesting a new url. Just updating comment & description
                 return _update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend)
             try:
                 if not pretend:
@@ -1758,7 +1762,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         return True
 
     def _process_document_moreinfos(more_infos, docname, version, docformat, mode):
-        if not mode in ('correct', 'append', 'replace_or_insert', 'replace', 'insert'):
+        if mode not in ('correct', 'append', 'replace_or_insert', 'replace', 'insert'):
             #print "exited because the mode is incorrect"
             return
 
@@ -1775,35 +1779,34 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         doc_moreinfo_s, version_moreinfo_s, version_format_moreinfo_s, format_moreinfo_s = more_infos
 
         if mode in ("replace", "replace_or_insert"):
-            if doc_moreinfo_s: #only if specified, otherwise do not touch
-                MoreInfo(docid = docid).delete()
+            if doc_moreinfo_s:  # only if specified, otherwise do not touch
+                MoreInfo(docid=docid).delete()
 
-            if format_moreinfo_s: #only if specified... otherwise do not touch
-                MoreInfo(docid = docid, docformat = docformat).delete()
+            if format_moreinfo_s:  # only if specified... otherwise do not touch
+                MoreInfo(docid=docid, docformat=docformat).delete()
 
-        if not doc_moreinfo_s is None:
-            MoreInfo.create_from_serialised(ser_str = doc_moreinfo_s, docid = docid)
+        if doc_moreinfo_s is not None:
+            MoreInfo.create_from_serialised(ser_str=doc_moreinfo_s, docid=docid)
 
-        if not version_moreinfo_s is None:
-            MoreInfo.create_from_serialised(ser_str = version_moreinfo_s,
-                                            docid = docid, version = version)
-        if not version_format_moreinfo_s is None:
-            MoreInfo.create_from_serialised(ser_str = version_format_moreinfo_s,
-                                            docid = docid, version = version,
-                                            docformat = docformat)
-        if not format_moreinfo_s is None:
-            MoreInfo.create_from_serialised(ser_str = format_moreinfo_s,
-                                            docid = docid, docformat = docformat)
+        if version_moreinfo_s is not None:
+            MoreInfo.create_from_serialised(ser_str=version_moreinfo_s,
+                                            docid=docid, version=version)
+        if version_format_moreinfo_s is not None:
+            MoreInfo.create_from_serialised(ser_str=version_format_moreinfo_s,
+                                            docid=docid, version=version,
+                                            docformat=docformat)
+        if format_moreinfo_s is not None:
+            MoreInfo.create_from_serialised(ser_str=format_moreinfo_s,
+                                            docid=docid, docformat=docformat)
 
     if mode == 'delete':
         raise StandardError('FFT tag specified but bibupload executed in --delete mode')
 
     tuple_list = extract_tag_from_record(record, 'FFT')
 
-
-    if tuple_list: # FFT Tags analysis
+    if tuple_list:  # FFT Tags analysis
         write_message("FFTs: "+str(tuple_list), verbose=9)
-        docs = {} # docnames and their data
+        docs = {}  # docnames and their data
 
         for fft in record_get_field_instances(record, 'FFT', ' ', ' '):
             # Very first, we retrieve the potentially temporary odentifiers...
@@ -1816,18 +1819,15 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 version = None
             else:
                 bibdoc_tmpver = None
-            if not version: #treating cases of empty string etc...
+            if not version:  # treating cases of empty string etc...
                 version = None
 
             bibdoc_tmpid = field_get_subfield_values(fft, 'i')
             if bibdoc_tmpid:
                 bibdoc_tmpid = bibdoc_tmpid[0]
-            else:
-                bibdoc_tmpid
             is_tmp_id, bibdoc_tmpid = parse_identifier(bibdoc_tmpid)
             if not is_tmp_id:
                 bibdoc_tmpid = None
-
 
             # In the case of having temporary id's, we dont resolve them yet but signaklise that they have been used
             # value -1 means that identifier has been declared but not assigned a value yet
@@ -1843,11 +1843,10 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 else:
                     tmp_vers[bibdoc_tmpver] = -1
 
-
             # Let's discover the type of the document
             # This is a legacy field and will not be enforced any particular
             # check on it.
-            doctype = _get_subfield_value(fft, 't', 'Main') #Default is Main
+            doctype = _get_subfield_value(fft, 't', 'Main')  # Default is Main
 
             # Let's discover the url.
             url = field_get_subfield_values(fft, 'a')
@@ -1856,32 +1855,18 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 try:
                     check_valid_url(url)
                 except StandardError, e:
-                    raise StandardError, "fft '%s' specifies in $a a location ('%s') with problems: %s" % (fft, url, e)
+                    raise StandardError("fft '%s' specifies in $a a location ('%s') with problems: %s" % (fft, url, e))
             else:
                 url = ''
 
 #TODO: a lot of code can be compactified using similar syntax ... should be more readable on the longer scale
 #      maybe right side expressions look a bit cryptic, but the elaborate_fft function would be much clearer
 
-
             if mode == 'correct' and doctype != 'FIX-MARC':
                 arg2 = ""
             else:
                 arg2 = KEEP_OLD_VALUE
-            description =  _get_subfield_value(fft, 'd', arg2)
-
-            # Let's discover the description
-#            description = field_get_subfield_values(fft, 'd')
-#            if description != []:
-#                description = description[0]
-#            else:
-#                if mode == 'correct' and doctype != 'FIX-MARC':
-                    ## If the user require to correct, and do not specify
-                    ## a description this means she really want to
-                    ## modify the description.
-#                    description = ''
-#                else:
-#                    description = KEEP_OLD_VALUE
+            description = _get_subfield_value(fft, 'd', arg2)
 
             # Let's discover the desired docname to be created/altered
             name = field_get_subfield_values(fft, 'n')
@@ -1892,7 +1877,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if url:
                     name = get_docname_from_url(url)
                 elif mode != 'correct' and doctype != 'FIX-MARC':
-                    raise StandardError, "WARNING: fft '%s' doesn't specifies either a location in $a or a docname in $n" % str(fft)
+                    raise StandardError("WARNING: fft '%s' doesn't specifies either a location in $a or a docname in $n" % str(fft))
                 else:
                     continue
 
@@ -1921,7 +1906,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                     try:
                         check_valid_url(icon)
                     except StandardError, e:
-                        raise StandardError, "fft '%s' specifies in $x an icon ('%s') with problems: %s" % (fft, icon, e)
+                        raise StandardError("fft '%s' specifies in $x an icon ('%s') with problems: %s" % (fft, icon, e))
             else:
                 icon = ''
 
@@ -1947,12 +1932,10 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 else:
                     restriction = KEEP_OLD_VALUE
 
-
             document_moreinfo = _get_subfield_value(fft, 'w')
             version_moreinfo = _get_subfield_value(fft, 'p')
             version_format_moreinfo = _get_subfield_value(fft, 'b')
             format_moreinfo = _get_subfield_value(fft, 'u')
-
 
             # Let's discover the timestamp of the file (if any)
             timestamp = field_get_subfield_values(fft, 's')
@@ -1969,21 +1952,21 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
             for flag in flags:
                 if flag not in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
-                    raise StandardError, "fft '%s' specifies a non available flag: %s" % (fft, flag)
+                    raise StandardError("fft '%s' specifies a non available flag: %s" % (fft, flag))
 
-            if docs.has_key(name): # new format considered
-                (doctype2, newname2, restriction2, version2, urls, dummybibdoc_moreinfos2, dummybibdoc_tmpid2, dummybibdoc_tmpver2 ) = docs[name]
+            if name in docs:  # new format considered
+                (doctype2, newname2, restriction2, version2, urls, dummybibdoc_moreinfos2, dummybibdoc_tmpid2, dummybibdoc_tmpver2) = docs[name]
                 if doctype2 != doctype:
-                    raise StandardError, "fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name)
+                    raise StandardError("fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name))
                 if newname2 != newname:
-                    raise StandardError, "fft '%s' specifies a different newname from previous fft with docname '%s'" % (str(fft), name)
+                    raise StandardError("fft '%s' specifies a different newname from previous fft with docname '%s'" % (str(fft), name))
                 if restriction2 != restriction:
-                    raise StandardError, "fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name)
+                    raise StandardError("fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name))
                 if version2 != version:
-                    raise StandardError, "fft '%s' specifies a different version than the previous fft with docname '%s'" % (str(fft), name)
+                    raise StandardError("fft '%s' specifies a different version than the previous fft with docname '%s'" % (str(fft), name))
                 for (dummyurl2, format2, dummydescription2, dummycomment2, dummyflags2, dummytimestamp2) in urls:
                     if docformat == format2:
-                        raise StandardError, "fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, docformat, name)
+                        raise StandardError("fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, docformat, name))
                 if url or docformat:
                     urls.append((url, docformat, description, comment, flags, timestamp))
                 if icon:
@@ -2006,8 +1989,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         ## Let's pre-download all the URLs to see if, in case of mode 'correct' or 'append'
         ## we can avoid creating a new revision.
 
-
-        for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver ) in docs.items():
+        for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver) in docs.items():
             downloaded_urls = []
             try:
                 bibdoc = bibrecdocs.get_bibdoc(docname)
@@ -2059,7 +2041,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                     ## we discard the whole FFT
                     del docs[docname]
 
-        if mode == 'replace': # First we erase previous bibdocs
+        if mode == 'replace':  # First we erase previous bibdocs
             if not pretend:
                 for bibdoc in bibrecdocs.list_bibdocs():
                     bibdoc.delete()
@@ -2067,7 +2049,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
         for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver) in docs.iteritems():
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, urls, mode), verbose=9)
-            if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
+            if mode in ('insert', 'replace'):  # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names():
                     write_message("('%s', '%s') not inserted because docname already exists." % (newname, urls), stream=sys.stderr)
                     raise StandardError("('%s', '%s') not inserted because docname already exists." % (newname, urls), stream=sys.stderr)
@@ -2082,7 +2064,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                     raise e
                 for (url, docformat, description, comment, flags, timestamp) in urls:
                     assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
-            elif mode == 'replace_or_insert': # to be thought as correct_or_insert
+            elif mode == 'replace_or_insert':  # to be thought as correct_or_insert
                 try:
                     bibdoc = bibrecdocs.get_bibdoc(docname)
                     found_bibdoc = True
@@ -2262,7 +2244,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if bibdoc_tmpver in tmp_vers and tmp_vers[bibdoc_tmpver] != -1:
                     write_message("WARNING: the temporary version identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpver, ), stream=sys.stderr)
                 else:
-                    if version == None:
+                    if version is None:
                         if version:
                             tmp_vers[bibdoc_tmpver] = version
                         else:
@@ -2274,11 +2256,11 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
 ### Update functions
 
-def update_bibrec_date(now, bibrec_id, insert_mode_p, pretend=False):
+def update_bibrec_date(now, bibrec_id, insert_mode_p, original_005=None, pretend=False):
     """Update the date of the record in bibrec table """
     if insert_mode_p:
-        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s WHERE id=%s"""
-        params = (now, now, bibrec_id)
+        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s, earliest_date=%s WHERE id=%s"""
+        params = (original_005, now, now, bibrec_id)
     else:
         query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
         params = (now, bibrec_id)
@@ -2301,7 +2283,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
     if nb_found == 1:
         # we are going to update the format
         # compress the format_value value
-        pickled_format_value =  compress(format_value)
+        pickled_format_value = compress(format_value)
         # update the format:
         query = """UPDATE LOW_PRIORITY bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
         params = (modification_date, pickled_format_value, id_bibrec, format_name)
@@ -2336,32 +2318,33 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
     return 0
 
 
-def archive_marcxml_for_history(recID, affected_fields, pretend=False):
+def archive_marcxml_for_history(rec_id, affected_fields, job_id, pretend=False):
     """
     Archive current MARCXML format of record RECID from BIBFMT table
     into hstRECORD table.  Useful to keep MARCXML history of records.
 
     Return 0 if everything went fine.  Return 1 otherwise.
     """
-    res = run_sql("SELECT id_bibrec, value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
-                    (recID,))
+    res = run_sql("SELECT value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
+                    (rec_id,))
 
     db_affected_fields = ""
     if affected_fields:
         tmp_affected_fields = {}
         for field in affected_fields:
-            if field.isdigit(): #hack for tags from RevisionVerifier
+            if field.isdigit():  # hack for tags from RevisionVerifier
                 for ind in affected_fields[field]:
                     tmp_affected_fields[(field + ind[0] + ind[1] + "%").replace(" ", "_")] = 1
             else:
-                pass #future implementation for fields
+                pass  # future implementation for fields
         tmp_affected_fields = tmp_affected_fields.keys()
         tmp_affected_fields.sort()
         db_affected_fields = ",".join(tmp_affected_fields)
     if res and not pretend:
+        marcxml, job_date = res[0]
         run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details, affected_fields)
                                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
-                (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user', 'UNKNOWN'), res[0][2],
+                (rec_id, marcxml, job_id, 'bibupload', task_get_task_param('user', 'UNKNOWN'), job_date,
                     'mode: ' + task_get_option('mode', 'UNKNOWN') + '; file: ' + task_get_option('file_path', 'UNKNOWN') + '.',
                 db_affected_fields))
     return 0
@@ -2554,7 +2537,7 @@ def delete_tags_to_correct(record, rec_old):
     fields_to_readd = {}
     for tag in CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS:
         if tag[:3] in record:
-            tmp_field_instances = record_get_field_instances(record, tag[:3], tag[3], tag[4]) ## Let's discover the provenance that will be updated
+            tmp_field_instances = record_get_field_instances(record, tag[:3], tag[3], tag[4])  # Let's discover the provenance that will be updated
             provenances_to_update = []
             for instance in tmp_field_instances:
                 for code, value in instance[0]:
@@ -2567,7 +2550,7 @@ def delete_tags_to_correct(record, rec_old):
                     ## let's add the special empty provenance.
                     if '' not in provenances_to_update:
                         provenances_to_update.append('')
-            potential_fields_to_readd = record_get_field_instances(rec_old, tag[:3], tag[3], tag[4]) ## Let's take all the field corresponding to tag
+            potential_fields_to_readd = record_get_field_instances(rec_old, tag[:3], tag[3], tag[4])  # Let's take all the field corresponding to tag
             ## Let's save apart all the fields that should be updated, but
             ## since they have a different provenance not mentioned in record
             ## they should be preserved.
@@ -2608,7 +2591,7 @@ def delete_bibrec_bibxxx(record, id_bibrec, affected_tags={}, pretend=False):
     for tag in affected_tags:
         # sanity check with record keys just to make sure its fine.
         if tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:
-            write_message("%s found in record"%tag, verbose=2)
+            write_message("%s found in record" % tag, verbose=2)
             # for each name construct the bibrec_bibxxx table name
             table_name = 'bib'+tag[0:2]+'x'
             bibrec_table = 'bibrec_'+table_name
@@ -2634,7 +2617,7 @@ def delete_bibrec_bibxxx(record, id_bibrec, affected_tags={}, pretend=False):
                 if not pretend:
                     run_sql(query, params)
         else:
-            write_message("%s not found"%tag, verbose=2)
+            write_message("%s not found" % tag, verbose=2)
 
 def main():
     """Main that construct all the bibtask."""
@@ -2686,7 +2669,7 @@ Examples:
             task_run_fnc=task_run_core,
             task_submit_check_options_fnc=task_submit_check_options)
 
-def task_submit_elaborate_specific_parameter(key, value, opts, args): # pylint: disable=W0613
+def task_submit_elaborate_specific_parameter(key, value, opts, args):  # pylint: disable=W0613
     """ Given the string key it checks it's meaning, eventually using the
     value. Usually it fills some key in the options dict.
     It must return True if it has elaborated the key, False, if it doesn't
@@ -2821,7 +2804,7 @@ def writing_rights_p():
         if open(filename).read() != 'TEST':
             raise IOError("Can not successfully write and readback %s" % filename)
         os.remove(filename)
-    except:
+    except (IOError, OSError):
         register_exception(alert_admin=True)
         return False
     return True
@@ -2890,12 +2873,12 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
             write_message("Inserting into main database", verbose=3)
             error = bibupload(
                 record,
-                opt_mode = opt_mode,
-                opt_notimechange = opt_notimechange,
-                oai_rec_id = record_id,
-                pretend = pretend,
-                tmp_ids = tmp_ids,
-                tmp_vers = tmp_vers)
+                opt_mode=opt_mode,
+                opt_notimechange=opt_notimechange,
+                oai_rec_id=record_id,
+                pretend=pretend,
+                tmp_ids=tmp_ids,
+                tmp_vers=tmp_vers)
             results.append(error)
             if error[0] == 1:
                 if record:
@@ -2924,8 +2907,8 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
                 if callback_url:
                     results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
             # stat us a global variable
-            task_update_progress("Done %d out of %d." % \
-                                     (stat['nb_records_inserted'] + \
+            task_update_progress("Done %d out of %d." %
+                                     (stat['nb_records_inserted'] +
                                           stat['nb_records_updated'],
                                       stat['nb_records_to_upload']))
 
@@ -2935,14 +2918,13 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
     write_message("Uploading BDR and BDM fields")
     if opt_mode != "holdingpen":
         for record in records:
-            record_id = retrieve_rec_id(record, opt_mode, pretend=pretend, post_phase = True)
+            record_id = retrieve_rec_id(record, opt_mode, pretend=pretend, post_phase=True)
             bibupload_post_phase(record,
-                                 rec_id = record_id,
-                                 mode = opt_mode,
-                                 pretend = pretend,
-                                 tmp_ids = tmp_ids,
-                                 tmp_vers = tmp_vers)
-
+                                 rec_id=record_id,
+                                 mode=opt_mode,
+                                 pretend=pretend,
+                                 tmp_ids=tmp_ids,
+                                 tmp_vers=tmp_vers)
 
     return results
 
@@ -2988,7 +2970,7 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db, pretend=False):
-    if oai_rec_id != "" and oai_rec_id != None:
+    if oai_rec_id != "" and oai_rec_id is not None:
         query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         if not pretend:
             run_sql(query, (str(insertion_db), str(bibrec_id), str(oai_rec_id), str(task_id), ))

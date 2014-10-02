@@ -23,10 +23,15 @@ notifications:
 python:
   - "2.6"
 
+before_install:
+  - sudo apt-get -qqy update
+
 install:
-  - sudo apt-get update
-  - git clone https://github.com/tiborsimko/invenio-devscripts /tmp/invenio-devscripts
-  - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-devscripts/invenio-kickstart --yes-i-know --yes-i-really-know
+  - sudo pip install -q devpi-client
+  - devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
+  - curl -L https://raw.githubusercontent.com/inspirehep/invenio-devscripts/master/invenio-kickstart > /tmp/invenio-kickstart
+  - chmod +x /tmp/invenio-kickstart
+  - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-kickstart --yes-i-know --yes-i-really-know
 
 script:
   - sudo -u www-data nosetests /opt/invenio/lib/python/invenio/*_unit_tests.py
