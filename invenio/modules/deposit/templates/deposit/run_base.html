@@ -131,7 +131,7 @@
           pluploader: {
             url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
             max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
-            drop_element: $('#field-plupload_file')[0],
+            drop_element: $('#field-plupload_file')[0]
           },
 
           dropboxuploader: {

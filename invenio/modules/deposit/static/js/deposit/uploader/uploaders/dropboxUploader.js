@@ -27,7 +27,8 @@
 
 
     this.attributes({
-      dropbox_url: "http://httpbin.org/post"
+      dropbox_url: "http://httpbin.org/post",
+      preupload_hooks: {}
     });
 
     var self;
@@ -92,8 +93,8 @@
       });
 
       this.on('uploadFiles', function (ev, data) {
-        if (data && data.uuid) {
-          self.attr.dropbox_url = self.attr.dropbox_url.replace("-1", data.uuid);
+        for (var key in self.attr.preupload_hooks) {
+          if (self.attr.preupload_hooks.hasOwnProperty(key)) self.attr.preupload_hooks[key](self);
         }
         pause = false;
 

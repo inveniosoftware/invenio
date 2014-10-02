@@ -55,32 +55,6 @@ define(function (require) {
       return size;
     }
 
-    this.getUUID = function () {
-      var Component = this,
-          url = Component.attr.resolve_uuid_url,
-          uuid;
-
-      if (typeof url !== 'undefined') {
-        $.ajax({
-            url: url,
-            type: 'POST',
-            cache: false
-        }).done(function (data) {
-          Component.trigger('resolveURLAndUpload', {
-            uuid: data,
-          });
-        }).fail(function() {
-          Component.trigger('uploaderError', {
-            message: "Problem while trying to get new uuid."
-          });
-        });
-      } else {
-        Component.trigger('uploaderError', {
-            message: "Cannot find url for resolving uuid."
-        });
-      }
-    };
-
   }
 
   return Util;

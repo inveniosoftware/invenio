@@ -43,7 +43,8 @@ define(function (require) {
       get_file_url: null,
       resolve_uuid_url: null,
       resolve_uuid: false,
-      autoupload: false
+      autoupload: false,
+      preupload_hooks: {}
     });
 
     /**
@@ -97,25 +98,15 @@ define(function (require) {
     this.handleUploadButtonClick = function (ev, data) {
       Uploader.select('uploadButtonSelector').hide();
       Uploader.select('stopButtonSelector').show();
-      if (Uploader.attr.resolve_uuid) {
-        Uploader.getUUID();
-      } else {
-        Uploader.handleUpload();
+      for (var key in Uploader.attr.preupload_hooks) {
+        if (Uploader.attr.preupload_hooks.hasOwnProperty(key)) Uploader.attr.preupload_hooks[key](Uploader);
       }
+      Uploader.handleUpload();
     }
 
     this.handleUpload = function (ev, data) {
       $.each(this.select('uploadersSelector'), function (i, uploader) {
         Uploader.trigger(uploader, 'uploadFiles');
-      });
-    }
-
-    this.resolveURLAndUpload = function (ev, data) {
-      Uploader.attr.get_file_url = Uploader.attr.get_file_url.replace("-1", data.uuid);
-      Uploader.attr.delete_url = Uploader.attr.delete_url.replace("-1", data.uuid);
-      Uploader.attr.continue_url = Uploader.attr.continue_url.replace("-1", data.uuid);
-      $.each(this.select('uploadersSelector'), function (i, uploader) {
-        Uploader.trigger(uploader, 'uploadFiles', data);
       });
     }
 
@@ -217,8 +208,6 @@ define(function (require) {
 
     this.after('initialize', function () {
       Uploader = this;
-
-      this.on('resolveURLAndUpload', this.resolveURLAndUpload);
       this.on('filesAdded', this.handleFilesAdded);
       this.on('fileRemovedByUser', this.handleFileRemovedByUser);
       this.on('fileProgressUpdated', this.handleFileProgressUpdated);

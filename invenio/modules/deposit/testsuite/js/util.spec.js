@@ -24,27 +24,27 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
       this.setupComponent();
     });
 
-    it('should works for 0 bytes', function () {
+    it('should work for 0 bytes', function () {
       expect(this.component.bytesToSize(0)).toEqual('0 Bytes');
     });
-    it('should works for KB, MB, GB, TB', function () {
+    it('should work for KB, MB, GB, TB', function () {
        expect(this.component.bytesToSize(10)).toEqual('10.00 Bytes');
        expect(this.component.bytesToSize(1e3)).toEqual('1.00 KB');
        expect(this.component.bytesToSize(1e6)).toEqual('1.00 MB');
        expect(this.component.bytesToSize(1e9)).toEqual('1.00 GB');
        expect(this.component.bytesToSize(1e12)).toEqual('1.00 TB');
     });
-    it('should works for boundry values', function () {
+    it('should work for boundry values', function () {
       expect(this.component.bytesToSize(999)).toEqual('999.00 Bytes');
       expect(this.component.bytesToSize(1.1e+3)).toEqual('1.10 KB');
     });
-    it('should works only for number', function () {
+    it('should work only for number', function () {
       expect(this.component.bytesToSize('0')).toEqual(NaN);
       expect(this.component.bytesToSize({})).toEqual(NaN);
       expect(this.component.bytesToSize([2])).toEqual(NaN);
       expect(this.component.bytesToSize(true)).toEqual(NaN);
     });
-    it('should returns NaN for values other then number', function () {
+    it('should return NaN for values other then number', function () {
       expect(this.component.bytesToSize('0')).toEqual(NaN);
       expect(this.component.bytesToSize({})).toEqual(NaN);
     });
@@ -55,13 +55,13 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
       this.setupComponent();
     });
 
-    it('should returns string', function () {
+    it('should return string', function () {
       expect(typeof this.component.guid()).toEqual('string');
     });
     it('should be 36 characters long', function () {
       expect(this.component.guid().length).toBe(36);
     });
-    it('should returns pseudo-random strings', function () {
+    it('should return pseudo-random strings', function () {
       var unique_array = function (arr) {
         return arr.reduce(function (p, c) {
           if (p.indexOf(c) < 0) p.push(c);
@@ -79,13 +79,16 @@ describeMixin('js/deposit/uploader/mixins/util', function () {
     });
   });
 
-  describe('getUUID', function () {
-    it ('should trigger uploaderError event if no url is defined', function () {
+  describe('getObjectSize', function () {
+    beforeEach(function () {
       this.setupComponent();
-      var spy = spyOnEvent(this.component.$node, 'uploaderError');
-      this.component.getUUID();
-      expect(spy.callCount).toBe(1);
-      expect(spy).toHaveBeenTriggeredOn(this.component.$node);
+    });
+
+    it('should return the length of the object', function () {
+      expect(this.component.getObjectSize({1:1, 2:2, 3:3, 4:4})).toBe(4);
+    });
+    it('should return the length of the array', function () {
+      expect(this.component.getObjectSize([1,2,3,4])).toBe(4);
     });
   });
 

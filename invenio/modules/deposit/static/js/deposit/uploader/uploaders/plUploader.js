@@ -29,7 +29,8 @@ define(function (require) {
     this.attributes({
       url: "http://httpbin.org/post",
       drop_element: null,
-      max_file_size: null
+      max_file_size: null,
+      preupload_hooks: {}
     });
 
 
@@ -54,10 +55,10 @@ define(function (require) {
         */
 
       that.on('uploadFiles', function (ev, data) {
-        if (data && data.uuid) {
-          that.attr.url = that.attr.url.replace("-1", data.uuid);
-          PlUploader.settings.url = that.attr.url;
+        for (var key in that.attr.preupload_hooks) {
+          if (that.attr.preupload_hooks.hasOwnProperty(key)) that.attr.preupload_hooks[key](that);
         }
+        PlUploader.settings.url = that.attr.url;
         PlUploader.start();
       });
 
