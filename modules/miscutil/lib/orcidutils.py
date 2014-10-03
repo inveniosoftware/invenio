@@ -21,9 +21,10 @@
 
 from invenio.bibauthorid_backinterface import get_orcid_id_of_author
 from invenio.bibauthorid_dbinterface import _get_doi_for_paper, \
-        get_all_signatures_of_paper, get_name_by_bibref, \
-        get_personid_signature_association_for_paper, \
-        get_orcid_id_of_author, get_papers_of_author
+    get_all_signatures_of_paper, get_name_by_bibref, \
+    get_personid_signature_association_for_paper, \
+    get_orcid_id_of_author, get_papers_of_author, get_token, get_all_tokens, \
+    delete_token, trigger_aidtoken_change
 from invenio.bibauthorid_general_utils import get_doi
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibformat import format_record as bibformat_record
@@ -33,7 +34,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.errorlib import get_pretty_traceback
 from invenio.orcid_xml_exporter import OrcidXmlExporter
 from invenio.search_engine import get_record
-from invenio.textutils import encode_for_xml, RE_ALLOWED_XML_1_0_CHARS
+from invenio.textutils import encode_for_jinja_and_xml, RE_ALLOWED_XML_1_0_CHARS
 
 from invenio import bibtask
 
@@ -412,49 +413,63 @@ def _orcid_fetch_works(pid):
 
     return (doid, xml_to_push)
 
-def _orcid_push_with_bibtask():
 
-    '''Push ORCID papers using bibtask scheduling
+def _orcid_push_with_bibtask():
+    '''Push ORCID papers using bibtask scheduling.
 
     @return: did the task finish successfully
     @rtype: bool
     '''
+    pid_tokens = get_all_tokens()
+    success = True
 
-    pid = bibtask.task_get_option('pid')
-    token = bibtask.task_get_option('token')
+    for pid_token in pid_tokens:
 
-    if pid == None:
-        bibtask.write_message("You should provide '--author_id' option!",
-                              stream=sys.stderr)
-        return False
-    if token == None:
-        bibtask.write_message("You should provide '--token' option!",
-                              stream=sys.stderr)
-        return False
+        pid = pid_token[0]
+        token = pid_token[1]
 
-    doid, xml_to_push = _orcid_fetch_works(int(pid))
+        if pid_token[2]:
+            # pid_token[2] indicates a change in the list of claimed papers
+            bibtask.write_message("Fetching works for %s" % (pid,))
 
-    url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
-          doid + '/orcid-works'
+            # The order of operations is important here. We need to trigger the
+            # record in the database before fetching, as the claims might
+            # change when the papers' data is being fetched.
+            trigger_aidtoken_change(pid, 1)
+            doid, xml_to_push = _orcid_fetch_works(int(pid))
 
-    headers = {'Accept': 'application/vnd.orcid+xml',
-               'Content-Type': 'application/vnd.orcid+xml',
-               'Authorization': 'Bearer ' + token
-              }
+            url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
+                doid + '/orcid-works'
 
-    response = requests.post(url, xml_to_push, headers=headers)
+            headers = {'Accept': 'application/vnd.orcid+xml',
+                       'Content-Type': 'application/vnd.orcid+xml',
+                       'Authorization': 'Bearer ' + token
+                       }
 
-    code = response.status_code
+            bibtask.write_message("Pushing works for %s. The token is %s" % (
+                pid, token))
 
-    if code != 201:
-        try:
-            response.raise_for_status()
-        except HTTPError, exc:
-            bibtask.write_message(exc)
-            bibtask.write_message(response.text)
-        return False
+            response = requests.post(url, xml_to_push, headers=headers)
 
-    return True
+            code = response.status_code
+
+            if code == 401:
+                # The token has expired or the user revoke his token
+                delete_token(pid)
+                bibtask.write_message("Token deleted for %s" % pid)
+                register_exception(subject="The ORCID token expired.")
+            elif code == 201:
+                trigger_aidtoken_change(pid, 0)
+            else:
+                try:
+                    response.raise_for_status()
+                except HTTPError, exc:
+                    bibtask.write_message(exc)
+                    bibtask.write_message(response.text)
+                success = False
+
+    return success
+
 
 def _get_orcid_dictionaries(papers, personid, old_external_ids):
 
@@ -494,18 +509,18 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
         work_dict['work_external_identifiers'] = external_ids
 
         work_dict['work_title']['title'] = \
-                encode_for_xml(record_get_field_value(recstruct, '245', '',
+                encode_for_jinja_and_xml(record_get_field_value(recstruct, '245', '',
                                                       '', 'a'))
 
         short_description = \
             record_get_field_value(recstruct, '520', '', '', 'a')
         if short_description:
             work_dict['short_description'] = \
-                   encode_for_xml(short_description)
+                   encode_for_jinja_and_xml(short_description)
 
         journal_title = record_get_field_value(recstruct, '773', '', '', 'p')
         if journal_title:
-            work_dict['journal-title'] = encode_for_xml(journal_title)
+            work_dict['journal-title'] = encode_for_jinja_and_xml(journal_title)
 
         citation = _get_citation(recid)
         if citation:
@@ -526,11 +541,11 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
         work_source = record_get_field_value(recstruct, '359', '', '', '9')
         if work_source:
             work_dict['work_source']['work-source'] = \
-                    encode_for_xml(work_source)
+                    encode_for_jinja_and_xml(work_source)
 
         language = record_get_field_value(recstruct, '041', '', '', 'a')
         if language:
-            work_dict['language_code'] = encode_for_xml(language)
+            work_dict['language_code'] = encode_for_jinja_and_xml(language)
 
         work_dict['visibility'] = 'public'
         orcid_list.append(work_dict)
@@ -596,7 +611,7 @@ def _get_citation(recid):
     '''
 
     tex_str = bibformat_record(recid, 'hx')
-    bibtex_content = encode_for_xml(tex_str[tex_str.find('@') : \
+    bibtex_content = encode_for_jinja_and_xml(tex_str[tex_str.find('@') : \
             tex_str.rfind('}')+1])
 
     return ('bibtex', bibtex_content)
@@ -631,19 +646,29 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
         for single_doi in doi:
             if single_doi in old_external_ids['DOI']:
                 raise OrcidRecordExisting
-            external_ids.append(('doi', single_doi))
+            external_ids.append(('doi', encode_for_jinja_and_xml(single_doi)))
     if isbn:
         if isbn in old_external_ids['ISBN']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', isbn))
+        external_ids.append(('isbn', encode_for_jinja_and_xml(isbn)))
     if isbn2:
         if isbn2 in old_external_ids['ISBN']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', isbn2))
-    if arxivid:
-        if arxivid in old_external_ids['ARXIV']:
-            raise OrcidRecordExisting
-        external_ids.append(('arxiv', arxivid))
+        external_ids.append(('isbn', encode_for_jinja_and_xml(isbn2)))
+
+    for rec in record_ext_ids:
+        arxiv = False
+        the_id = None
+        for field in rec[0]:
+            if field[0] == '9' and field[1].lower() == 'arxiv':
+                arxiv = True
+            elif field[0] == 'a':
+                the_id = field[1]
+        if arxiv:
+            if the_id in old_external_ids['ARXIV']:
+                raise OrcidRecordExisting
+            external_ids.append(('arxiv', encode_for_jinja_and_xml(the_id)))
+
     if url in old_external_ids['OTHER_ID']:
         raise OrcidRecordExisting
     if not (doi or arxivid):
@@ -692,32 +717,10 @@ def _get_work_contributors(recid, personid):
 
     return work_contributors
 
-def _orcid_push_get_arg(key, value, opts, args):
-
-    '''Parses single argument given to orcidpush task.'''
-
-    if key in ("--author_id",):
-        if value.count("="):
-            value = value[1:]
-        bibtask.task_set_option("pid", value)
-        return True
-    if key in ("--token",):
-        if value.count("="):
-            value = value[1:]
-        bibtask.task_set_option("token", value)
-        return True
-    return False
-
 
 def main():
-
     '''Daemon responsible for pushing papers to ORCID.'''
-
     bibtask.task_init(
         authorization_action="orcidpush",
-        specific_params=("", ["author_id=", "token="]),
-        task_submit_elaborate_specific_parameter_fnc=_orcid_push_get_arg,
         task_run_fnc=_orcid_push_with_bibtask
     )
-
-

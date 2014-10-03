@@ -724,7 +724,7 @@
 .bai-box-content {
     padding-left: 5px;
     min-height: 32px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 #pubs_list {
@@ -802,61 +802,7 @@ ul.pub-tabs, .pub-tabs li {
     float: left;
 }
 
-/*
-.addToMergeButton {
-/*    font-size: 11px;
+.form-group.required .control-label:after { 
+   content:" *";
+   color:#bd362f;
 }
-/*.new_person_link {
-    background-color: lightgreen!important;
-    color: blue;
-}*/
-
-/*.new_person_link:hover{
-    background-color: green!important;
-    color: red;
-    background: #28597a!important;
-    color: white!important;
-}*/
-
-/*.new_person_link:active{
-    position: relative;
-    top: 1px;
-    background: #1b435e!important;
-}*/
-/*.even {
-    background: #fff!important;
-}
-
-.odd {
-    background: #F0F0F6!important;
-}*/
-
-/*.pagination {
-    position: relative;
-    background-color: #D0D0D0;
-    border-color: #AAAAAA;
-    border-radius: 6px;
-    border-width: 1px;
-    border-style: solid;
-    height: 30px;
-}
-
-.paginationInfo {
-    position: absolute;
-    margin-left: 8px;
-    margin-top: 7px;
-    font-size: 1.1em;
-}
-
-.paginationSelection {
-    position: absolute;
-    right: 950px;
-    /*margin-right: 950px;*/
-/*    margin-top: 3px;
-    font-size: 1.1em;
-}
-
-.paginationSelection button {
-    width:70px;
-
-}*/

@@ -1891,6 +1891,21 @@ jQuery(function($) {
        $contactTrigger.click(contactModalInit);
     }
 
+    var orcidHelp = $('#orcidHelp');
+
+    var orcidHelpShow = function () {
+        orcidHelp.popover('show');
+    }
+    var orcidHelpHide = function () {
+        orcidHelp.popover('hide');
+    }
+
+    orcidHelp.popover({trigger: 'manual'})
+        .on('mouseenter', orcidHelpShow)
+        .on('mouseleave', orcidHelpHide)
+
+
+
 });
 
 $(document).ready(function() {
@@ -2185,7 +2200,7 @@ $(document).ready(function() {
 		};
 
 		var errorCallback = function () {
-			alert("Your suggestion was not sent! The ORCiD is not valid.");
+			alert("Your suggestion was not sent! The ORCID is not valid.");
 		};
 
 		$.ajax({
