@@ -2005,18 +2005,18 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     fin_output += """
     <table>
     <tr>
-    <td>0.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_showall">Show all</a></small></td>
-    <td>1.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollection">Create new collection</a></small></td>
-    <td>2.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
-    <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
+    <td>0.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_showall">Show all</a></small></td>
+    <td>1.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_addcollection">Create new collection</a></small></td>
+    <td>2.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_addcollectiontotree">Attach collection to tree</a></small></td>
+    <td>3.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
+    <td>4.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     </tr><tr>
-    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
-    <td>6.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkexternalcollections">Check external collections</a></small></td>
-    <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
+    <td>5.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
+    <td>6.&nbsp;<small><a href="{cfg_site_url}/admin/websearch/websearchadmin.py?colID={col_id}&amp;ln={ln}&amp;mtype=perform_checkexternalcollections">Check external collections</a></small></td>
+    <td>7.&nbsp;<small><a href="{cfg_site_url}/help/admin/websearch-admin-guide?ln={col_id}">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
+    """.format(cfg_site_url=CFG_SITE_URL, col_id=colID, ln=ln)
 
     if mtype == "":
         fin_output += """<br /><br /><b><span class="info">To manage the collections, select an item from the menu.</span><b><br />"""
