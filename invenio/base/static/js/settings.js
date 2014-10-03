@@ -30,6 +30,8 @@ require.config({
         text: 'vendors/requirejs-hogan-plugin/text',
         flight: 'vendors/flight/lib',
         typeahead: 'vendors/typeahead.js/dist/typeahead.bundle',
+        'moment': 'vendors/moment/moment',
+        'bootstrap-datetimepicker': 'vendors/bootstrap-datetimepicker/src/js/bootstrap-datetimepicker',
     },
     shim: {
         jquery: { exports: '$' },
@@ -37,5 +39,6 @@ require.config({
         'jqueryui-timepicker/jquery-ui-timepicker-addon': {deps: ['jquery', 'ui/slider']},
         'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']},
         typeahead: {deps: ['jquery'], exports: 'Bloodhound'},
+        "bootstrap-datetimepicker": {deps: ['jquery', 'bootstrap', 'moment'], exports: '$.fn.datetimepicker' },
     }
 })

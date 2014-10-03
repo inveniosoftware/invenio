@@ -41,8 +41,8 @@ define(function(require, exports, module) {
     require('./dynamic_field_list')
     // provides $.fn.sortable
     require('ui/sortable')
-    // provides $.fn.datepicker
-    require('ui/datepicker')
+    // provides $.fn.datetimepicker
+    require('bootstrap-datetimepicker')
     // provides $.fn.typeahead
     require('typeahead')
 
@@ -56,7 +56,10 @@ define(function(require, exports, module) {
         save_all_url: "",
         complete_url: "",
         autocomplete_url: "",
-        datepicker_options: {dateFormat: "yy-mm-dd"},
+        datepicker_options: {
+          format: "YYYY-MM-DD",
+          pickTime: false,
+        },
 
         // Selectors
         datepickerSelector: '.datepicker',
@@ -781,7 +784,7 @@ define(function(require, exports, module) {
       $(e.target).css("overflow", "visible");
     })
     // Initialize jquery_plugins
-    $(this.attr.datepickerSelector).datepicker(this.attr.datepicker_options);
+    $(this.attr.datepickerSelector).datetimepicker(this.attr.datepicker_options);
   });
 
   }
