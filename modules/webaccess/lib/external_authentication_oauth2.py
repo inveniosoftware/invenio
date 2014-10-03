@@ -47,7 +47,7 @@ class ExternalOAuth2(ExternalAuth):
         req.g['oauth2_debug_msg'] = ''
         req.g['oauth2_response'] = None
 
-    def auth_user(self, username, password, req=None):
+    def auth_user(self, username, password, req=None, oauth_token_only=False):
         """
         Tries to find email and identity of the user from OAuth2 provider. If it
         doesn't find any of them, returns (None, None)
@@ -60,6 +60,10 @@ class ExternalOAuth2(ExternalAuth):
 
         @param req: request
         @type req: invenio.webinterface_handler_wsgi.SimulatedModPythonRequest
+
+        @param oauth_token_only: if True, don't authenticate, just add token to
+        request
+        @type oauth_token_only: bool
 
         @rtype: str|NoneType, str|NoneType
         """
@@ -143,6 +147,8 @@ class ExternalOAuth2(ExternalAuth):
 
         if req.g['oauth2_provider_name'] == 'orcid':
             req.g['oauth2_orcid'] = token_content['orcid']
+            if oauth_token_only:
+                return None, None
             email, identity = self._get_user_email_and_id_from_orcid(req)
         else:
             # Some providers send the user information and access token together.

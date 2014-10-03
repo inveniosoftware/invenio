@@ -57,8 +57,9 @@ from invenio.shellutils import retry_mkstemp
 from invenio.bibrecord import record_xml_output, record_add_field, record_get_field_instances,\
     record_get_field_value, record_get_field_values, record_has_field
 from invenio.bibtask import task_low_level_submission
-from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  # pylint: disable-msg=W0614
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
+from invenio.bibauthorid_dbinterface import get_external_ids_of_author, \
+    add_arxiv_papers_to_author, get_arxiv_papers_of_author, trigger_aidtoken_change  # pylint: disable-msg=W0614
 
 
 #
@@ -669,8 +670,12 @@ def add_person_external_id(person_id, ext_sys, ext_id, userinfo=''):
         uid = ''
 
     tag = 'extid:%s' % ext_sys
+
     dbapi.set_person_data(person_id, tag, ext_id)
     webauthorapi.expire_all_cache_for_personid(person_id)
+
+    if ext_sys == "ORCID":
+        update_hepname_with_orcid(person_id, ext_id)
 
     log_value = '%s %s %s' % (person_id, tag, ext_id)
     dbapi.insert_user_log(
@@ -3332,6 +3337,7 @@ def add_cname_to_hepname_record(cname, recid, uid=None):
 
 def connect_author_with_hepname(cname, hepname, uid):
     subject = "HepNames record match: %s %s" % (cname, hepname)
+
     content = "Hello! Please connect the author profile "\
               "%s/author/profile/%s " \
               "with the HepNames record "\
@@ -3599,6 +3605,7 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
     def commit_ticket_user(ticket, userinfo, uid, modified_pids):
         ok_ops = list()
         for op in list(ticket):
+            trigger_aidtoken_change(op['pid'], 2)
             if op['status'] == 'granted':
                 bibrefrec = op['bibref'] + ',' + str(op['rec'])
                 op['execution_result'] = _execute_operation(
@@ -3627,6 +3634,7 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
 
     def commit_ticket_admin(ticket, userinfo, uid, modified_pids):
         for op in ticket:
+            trigger_aidtoken_change(op['pid'], 2)
             bibrefrec = op['bibref'] + ',' + str(op['rec'])
             op['execution_result'] = _execute_operation(
                 op['action'],

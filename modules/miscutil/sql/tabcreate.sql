@@ -4799,6 +4799,12 @@ CREATE TABLE IF NOT EXISTS `aidCACHE` (
   INDEX `last_updated-b` (`last_updated`)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS `aidTOKEN` (
+  `personid` BIGINT( 16 ) UNSIGNED PRIMARY
+  KEY NOT NULL, `token` VARCHAR( 255 ) NOT NULL,
+  `was_changed` SMALLINT( 6 ) NOT NULL
+) ENGINE=MyISAM;
+
 -- tables for search engine
 
 CREATE TABLE IF NOT EXISTS `aidDENSEINDEX` (
@@ -5155,4 +5161,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_11_new_field_dat
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_07_new_journalpage_index',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_earliest_date',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_28_remove_author_duplicates',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_14_new_aidTOKEN', NOW());
 -- end of file

@@ -20,13 +20,13 @@
       <form id="contactForm" novalidate="novalidate" role="form" action="/author/claim/action" method="POST">
         <hr>
         <!-- Text input-->
-        <div class="form-group">
+        <div class="form-group required">
             <label class="control-label" for="Name">Full Name</label>
             <input id="Name" name="Name" placeholder="e.g John Smith" class="form-control input-md" required="true" data-parsley-trigger="change keyup focusin focusout" data-parsley-required-message="This field is required." data-parsley-minlength="2" data-parsley-minlength-message="Your input is too short." type="text" value="{{ name_prefill }}">
         </div>
 
         <!-- Text input-->
-        <div class="form-group">
+        <div class="form-group required">
             <label class="control-label" for="E-mail">Email</label>
             <input id="E-mail" name="E-mail" placeholder="e.g. john@smith.com" class="form-control input-md" required="true" data-parsley-trigger="change keyup focusin focusout"
                    data-parsley-required-message="This field is required." data-parsley-minlength="3"

@@ -39,6 +39,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL
 
 from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
 from invenio import bibtask
 
 from msgpack import packb as serialize
@@ -4694,7 +4695,7 @@ def populate_table_with_limit(table_name, column_names, values, values_tuple_siz
 
 #
 #
-# other staff                                        ###
+# other stuff                                        ###
 #
 #
 
@@ -4995,3 +4996,69 @@ def get_records_of_authors(personids_set):
 def author_exists(personid):
     return any((bool(run_sql("select * from aidPERSONIDDATA where personid=%s limit 1", (personid,))),
                 bool(run_sql("select * from aidPERSONIDPAPERS where personid=%s limit 1", (personid,)))))
+
+#
+#
+# aidTOKEN ###
+#
+#
+
+# ********** errors **********#
+
+
+class TokenExistingException(Exception):
+    """We don't support updating the token.
+
+    When sb wants to update, we should raise an exception.
+    """
+    pass
+
+# ********** setters **********#
+
+
+def set_token(personid, token):
+    """Set the ORCID token for an author.
+
+    This is the token which is valid for 20 years.
+    """
+    if get_token(personid):
+        # there was a token, but we can update it
+        # currently it is not supported
+        run_sql("update aidTOKEN set `token`=%s where personid=%s",
+                (token, personid))
+        try:
+            raise TokenExistingException
+        except:
+            register_exception(subject="""The token in aidTOKEN was updated.
+                                          This behaviour was not expected.""")
+    else:
+        # default behaviour
+        change = 1
+        run_sql("insert into aidTOKEN values \
+                (%s, %s, %s)", (personid, token, change))
+
+
+def delete_token(personid):
+    """Delete a token for an author.
+
+    It should be run when the token expires.
+    """
+    run_sql("delete from aidTOKEN where personid=%s", (personid,))
+
+
+def trigger_aidtoken_change(personid, change):
+    """Trigger the change in aidTOKEN table on."""
+    run_sql("update aidTOKEN set was_changed=%s where personid=%s",
+            (change, personid))
+
+# ********** getters **********#
+
+
+def get_token(personid):
+    """Get the ORCID token for an author."""
+    return run_sql("select personid, token, was_changed from aidTOKEN where personid=%s", (personid,))
+
+
+def get_all_tokens():
+    """Get the ORCID token for every author."""
+    return run_sql("select personid, token, was_changed from aidTOKEN")
