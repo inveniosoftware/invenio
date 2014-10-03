@@ -95,7 +95,10 @@ require(["jquery", "js/deposit/form", "js/deposit/plupload"], function($, form) 
         complete_url: complete_url,
         autocomplete_url: autocomplete_url,
         datepicker_element: '.datepicker',
-        datepicker_options: {dateFormat: "yy-mm-dd"}
+        datepicker_options: {
+          format: 'YYYY-MM-DD',
+          pickTime: false,
+        }
       });
 
       $('.pluploader').pluploadWidget({

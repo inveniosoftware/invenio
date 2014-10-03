@@ -33,6 +33,8 @@ require.config({
     "jquery-caret": "vendors/jquery.caret/dist/jquery.caret-1.5.2",
     "jquery-tokeninput": "vendors/jquery-tokeninput/src/jquery.tokeninput",
     "jquery-jeditable": "vendors/jquery.jeditable/index",
+    "moment": "vendors/moment/moment",
+    "bootstrap-datetimepicker": "vendors/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker",
     bootstrap: "vendors/bootstrap/dist/js/bootstrap",
   },
   shim: {
@@ -72,6 +74,10 @@ require.config({
     },
     bootstrap: {
       deps: ["jquery"]
+    },
+    "bootstrap-datetimepicker": {
+      deps: ["jquery", "bootstrap", "moment"],
+      exports: "$.fn.datetimepicker"
     },
   }
 })
