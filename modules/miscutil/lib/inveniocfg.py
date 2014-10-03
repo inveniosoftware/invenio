@@ -188,7 +188,11 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
                        'CFG_REDIS_HOSTS',
                        'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
-                       'CFG_ICON_CREATION_FORMAT_MAPPINGS']:
+                       'CFG_ICON_CREATION_FORMAT_MAPPINGS',
+                       'CFG_BIBSCHED_INCOMPATIBLE_TASKS',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_SIZE',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_ICON_DOCTYPES',
+                       'CFG_BIBEDIT_AUTOCOMPLETE']:
         try:
             option_value = option_value[1:-1]
             if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):
@@ -891,7 +895,9 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibsort 7" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
-                "%s/bin/bibupload 9" % CFG_PREFIX,]:
+                "%s/bin/bibupload 9" % CFG_PREFIX,
+                "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
+                "%s/bin/bibauthorid 10" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -1185,6 +1191,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
@@ -1251,6 +1258,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/

@@ -229,25 +229,26 @@ def _parse_cookie(str, Class, names=None):
 
     return result
 
-def get_cookies(req, Class=Cookie, **kw):
+
+def get_cookies(req, cls=Cookie, **kw):
     """
     A shorthand for retrieveing and parsing cookies given
     a Cookie class. The class must be one of the classes from
     this module.
     """
-
-    if not req.headers_in.has_key("cookie"):
+    if not "cookie" in getattr(req, "headers_in", {}):
         return {}
 
     cookies = req.headers_in["cookie"]
-    if type(cookies) == type([]):
+    if isinstance(cookies, list):
         cookies = '; '.join(cookies)
 
-    return Class.parse(cookies, **kw)
+    return cls.parse(cookies, **kw)
 
-def get_cookie(req, name, Class=Cookie, **kw):
-    cookies = get_cookies(req, Class, names=[name], **kw)
-    if cookies.has_key(name):
+
+def get_cookie(req, name, cls=Cookie, **kw):
+    cookies = get_cookies(req, cls, names=[name], **kw)
+    if name in cookies:
         return cookies[name]
 
 

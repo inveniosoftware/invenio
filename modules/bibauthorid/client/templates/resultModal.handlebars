@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h2 class="modal-title">
+        {{#error}}
+        There has been a problem
+        {{/error}}
+        {{^error}}
+
+            {{#admin}}
+            Actions Completed
+            {{/admin}}
+
+            {{^admin}}
+            Thank you for your suggestions
+            {{/admin}}
+
+        {{/error}}
+    </h2>
+</div>
+
+<div class="modal-body">
+    <p>
+        {{#error}}
+        Your changes were not submitted. This might be because of a problem with your connection. However, if this problem persists, please let us know at feedback@inspirehep.net.
+        {{/error}}
+        {{^error}}
+        {{text}}
+        {{/error}}
+    </p>
+</div>
+
+<div class="modal-footer">
+  <a href="#" class="btn back btn-primary" data-dismiss="modal">Close</a>
+</div>

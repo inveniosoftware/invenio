@@ -28,7 +28,7 @@ def info():
 
 def do_upgrade():
     """ Implement your upgrades here  """
-    run_sql("ALTER TABLE seqSTORE MODIFY COLUMN seq_value varchar(60);")
+    run_sql("ALTER TABLE seqSTORE MODIFY COLUMN seq_value varchar(255);")
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """

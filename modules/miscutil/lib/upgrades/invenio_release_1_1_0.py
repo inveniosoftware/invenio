@@ -228,7 +228,7 @@ def do_upgrade():
           `bibref_table` ENUM(  '100',  '700' ) NOT NULL ,
           `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
           `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
-          `name` VARCHAR( 256 ) NOT NULL ,
+          `name` VARCHAR( 255 ) NOT NULL ,
           `flag` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
           `lcul` SMALLINT( 2 ) NOT NULL DEFAULT  '0' ,
           `last_updated` TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ,
@@ -246,7 +246,7 @@ def do_upgrade():
 
     _create_table(tables, "aidRESULTS", """
         CREATE TABLE IF NOT EXISTS `aidRESULTS` (
-          `personid` VARCHAR( 256 ) NOT NULL ,
+          `personid` VARCHAR( 255 ) NOT NULL ,
           `bibref_table` ENUM(  '100',  '700' ) NOT NULL ,
           `bibref_value` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
           `bibrec` MEDIUMINT( 8 ) UNSIGNED NOT NULL ,
@@ -261,10 +261,10 @@ def do_upgrade():
         CREATE TABLE IF NOT EXISTS `aidPERSONIDDATA` (
           `personid` BIGINT( 16 ) UNSIGNED NOT NULL ,
           `tag` VARCHAR( 64 ) NOT NULL ,
-          `data` VARCHAR( 256 ) NOT NULL ,
+          `data` VARCHAR( 255 ) NOT NULL ,
           `opt1` MEDIUMINT( 8 ) NULL DEFAULT NULL ,
           `opt2` MEDIUMINT( 8 ) NULL DEFAULT NULL ,
-          `opt3` VARCHAR( 256 ) NULL DEFAULT NULL ,
+          `opt3` VARCHAR( 255 ) NULL DEFAULT NULL ,
           INDEX `personid-b` (`personid`) ,
           INDEX `tag-b` (`tag`) ,
           INDEX `data-b` (`data`) ,

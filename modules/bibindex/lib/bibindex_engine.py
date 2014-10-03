@@ -178,19 +178,9 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.bibauthorid_dbinterface import get_data_of_papers
-    lwords = []
-    res = get_data_of_papers([recID])
-    if res is None:
-        ## BibAuthorID is not enabled
-        return lwords
-    else:
-        dpersons, dpersoninfos = res
-    for aid in dpersoninfos.keys():
-        author_canonical_id = dpersoninfos[aid].get('canonical_id', '')
-        if author_canonical_id:
-            lwords.append(author_canonical_id)
-    return lwords
+    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
+        tag='canonical_name' AND flag>-2""", (recID, ))]
 
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
@@ -1917,7 +1907,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
     if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
-        rec_list_author = intbitset(get_recids_affected_since(dates[0]))
+        rec_list_author = get_recids_affected_since(dates[0], dates[1])
         res = res | rec_list_author
     return set(res)
 

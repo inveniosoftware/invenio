@@ -29,7 +29,7 @@ def do_upgrade():
     warnings.filterwarnings('ignore')
     run_sql("""CREATE TABLE IF NOT EXISTS `aidDENSEINDEX` (
                 `name_id` INT( 10 ) NOT NULL,
-                `person_name` VARCHAR( 256 ) NOT NULL,
+                `person_name` VARCHAR( 255 ) NOT NULL,
                 `personids` LONGBLOB NOT NULL,
                 PRIMARY KEY (`name_id`)
                ) ENGINE=MyISAM""")

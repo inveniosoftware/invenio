@@ -1,4 +1,4 @@
-from bibauthorid_prob_matrix import Bib_matrix
+from invenio.bibauthorid_prob_matrix import Bib_matrix
 
 def meld_edges(p1, p2):
     '''
