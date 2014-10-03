@@ -570,6 +570,11 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        from invenio.search_engine import record_exists
+
+        if record_exists(recid) < 1:
+            return ('', '', '')
+
         title = get_fieldvalues(recid, "245__a") or \
                 get_fieldvalues(recid, "111__a")
 
