@@ -16,19 +16,31 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
+'use strict';
 
-require(
-  [
-    'jquery',
-    'js/deposit/form',
-    'js/deposit/uploader/uploader',
-    "js/deposit/uploader/uploaders/plUploader",
-    "js/deposit/uploader/uploaders/dropboxUploader",
-    "js/deposit/uploader/ui/filelist",
-    "js/deposit/uploader/ui/errorList"
-  ], function() {
-    /*
-     * It preloads js/deposit/form to give it a name so you're free to use it
-     * from any places.
-     */
+define( function (require) {
+
+  return require('flight/lib/component')(ErrorList);
+
+  function ErrorList() {
+
+    this.attributes({
+      errorListSelector : "#errorList"
+    });
+
+    var erroListRow = require('hgn!../../templates/error');
+
+    this.handleErrorOccurred = function (ev, error) {
+      var html = "";
+      this.$node.css("visibility", "visible");
+      html = erroListRow(error);
+      this.select('errorListSelector').append(html);
+    };
+
+    this.after('initialize', function () {
+      this.on('errorOccurred', this.handleErrorOccurred);
+    });
+  }
 });
+
+//## TODO: not show 
