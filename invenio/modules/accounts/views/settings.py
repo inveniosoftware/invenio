@@ -1,29 +1,23 @@
 # -*- coding: utf-8 -*-
-#
-## This file is part of ZENODO.
+##
+## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
-## ZENODO is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
 ##
-## ZENODO is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
-"""
-GitHub Settings Blueprint
-"""
+"""GitHub Settings Blueprint."""
 
 from __future__ import absolute_import
 
@@ -53,6 +47,7 @@ blueprint = Blueprint(
 
 @blueprint.before_app_first_request
 def register_menu_items():
+    """Register empty account breadcrumb."""
     item = current_menu.submenu('breadcrumbs.settings')
     item.register('', _('Account'))
 
@@ -61,6 +56,7 @@ def register_menu_items():
 @ssl_required
 @login_required
 def index():
+    """Index page."""
     return redirect(url_for(".profile"))
 
 
@@ -75,6 +71,7 @@ def index():
 )
 @register_breadcrumb(blueprint, 'breadcrumbs.settings.profile', _('Profile'))
 def profile():
+    """Change password form for authenticated users."""
     form = ChangePasswordForm(request.form)
     if form.validate_on_submit():
         u = User.query.filter_by(id=current_user.get_id()).first()
@@ -94,7 +91,7 @@ def profile():
     blueprint, 'breadcrumbs.settings.profile.lost', _('Lost password')
 )
 def lost():
-    """ Lost password form for authenticated users """
+    """Lost password form for authenticated users."""
     form = LostPasswordForm(request.form)
     if form.validate_on_submit():
         if reset_password(form.data['email'], g.ln):

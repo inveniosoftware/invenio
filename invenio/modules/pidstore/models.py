@@ -25,6 +25,7 @@ PersistentIdentifier store and registration.
 
 Usage example for registering new identifiers::
 
+    from flask import url_for
     from invenio.modules.pidstore.models import PersistentIdentifier
 
     # Reserve a new DOI internally first
@@ -36,7 +37,7 @@ Usage example for registering new identifiers::
     # Assign it to a record.
     pid.assign('rec', 1234)
 
-    url = "http://www.zenodo.org/record/1234"
+    url = url_for("record.metadata", recid=1234, _external=True)
     doc = "<resource ...."
 
     # Pre-reserve the DOI in DataCite
