@@ -162,18 +162,14 @@ define(function(require, exports, module) {
     /**
      * Update values of fields for an element
      */
-    update_element_values: function (root, data, field_prefix_index, selector_prefix) {
-      var field_prefix, newdata;
-
-      if(selector_prefix ===undefined){
-        selector_prefix = '#' + this.options.prefix + this.options.sep + this.options.index_suffix + this.options.sep;
+    update_element_values: function (root, data, field_index) {
+      if (field_index === undefined) {
+        field_index = this.options.index_suffix;
       }
+      var newdata,
+          field_prefix = this.options.prefix + this.options.sep + field_index,
+          selector_prefix = '#' + field_prefix;
 
-      if(field_prefix_index === undefined){
-        field_prefix = this.options.prefix + this.options.sep + this.options.index_suffix + this.options.sep;
-      } else {
-        field_prefix = this.options.prefix + this.options.sep + field_prefix_index + this.options.sep;
-      }
       if(root === null) {
         root = $(document);
       }
@@ -183,6 +179,9 @@ define(function(require, exports, module) {
         // Remove prefix from field name
         newdata = {};
         if (typeof data == 'object'){
+          field_prefix = field_prefix + this.options.sep;
+          selector_prefix = '#' + field_prefix;
+
           for(var field in data) {
             if(field.indexOf(field_prefix) === 0){
               newdata[field.slice(field_prefix.length)] = data[field];
@@ -199,10 +198,10 @@ define(function(require, exports, module) {
           });
         } else {
           newdata.value = data;
-          var input = root.find('#' + this.options.prefix + this.options.sep + this.options.index_suffix);
+          var input = root.find(selector_prefix);
           if(input.length !== 0) {
             // Keep old value
-            input.val(input.val()+data);
+            input.val(data);
           }
         }
 
@@ -273,14 +272,16 @@ define(function(require, exports, module) {
       var num_elements = all_elements.length;
       if (idx < num_elements){
         this.element = $(all_elements[idx]);
-        this.update_element_values(this.$element, data, idx, '#' + this.options.prefix + this.options.sep + idx + this.options.sep);
+        this.update_element_values(this.$element, data, idx);
+      }else{
+        this.append_element(data)
       }
     },
 
     /**
      * Handler for add new element events
      */
-    append_element: function (data, field_prefix_index) {
+    append_element: function (data) {
       //
       // Append action
       //
@@ -290,7 +291,7 @@ define(function(require, exports, module) {
       new_element.removeClass(this.options.empty_cssclass);
       new_element.addClass(this.options.element_css_class);
       // Pre-populate field values
-      this.update_element_values(new_element, data, field_prefix_index);
+      this.update_element_values(new_element, data, undefined);
       // Update ids
       this.update_element_index(new_element, next_index);
       // Insert before template element
@@ -345,7 +346,7 @@ define(function(require, exports, module) {
         if(elements_values.length > 0) {
           $.each(elements_values, function(idx, clipboard_data){
             if(idx === 0) {
-              that.update_element_values(root_element, clipboard_data, undefined, selector_prefix);
+              that.update_element_values(root_element, clipboard_data, 0);
             } else {
               that.append_element(clipboard_data);
             }
