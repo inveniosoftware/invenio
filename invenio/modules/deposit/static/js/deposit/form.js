@@ -579,7 +579,7 @@ define(function(require, exports, module) {
 
   this.onFieldChanged = function (event) {
     if(event.target.name.indexOf('__input__') == -1){
-              save_field(this.attr.save_url, event.target.name, event.target.value);
+              save_field(this.attr.save_url, event.target.name, $(event.target).val());
           }
   }
 
