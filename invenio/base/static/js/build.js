@@ -31,23 +31,5 @@
         warnings: true,
         mangle: false
     },
-    paths: {
-        jquery: 'empty:',
-        'ui': 'vendors/jquery-ui/ui',
-        'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/dist',
-        'jquery-form': 'vendors/jquery-form/jquery.form',
-	'jquery-ui': 'vendors/jquery-ui/jquery-ui.min',
-        hgn: 'vendors/requirejs-hogan-plugin/hgn',
-        hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
-        text: 'vendors/requirejs-hogan-plugin/text',
-        flight: 'vendors/flight/lib',
-        typeahead: 'vendors/typeahead.js/dist/typeahead.bundle',
-    },
-    shim: {
-        jquery: { exports: '$' },
-        'jqueryui-timepicker/jqueryui-sliderAccess': {deps: ['jquery']},
-        'jqueryui-timepicker/jqueryui-timepicker-addon': {deps: ['jquery', 'ui/slider']},
-        'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']},
-        typeahead: {deps: ['jquery'], exports: 'Bloodhound'},
-    }
+    mainConfigFile: './settings.js',
 })
