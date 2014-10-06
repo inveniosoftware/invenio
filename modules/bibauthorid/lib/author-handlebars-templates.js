@@ -324,7 +324,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, helper, functionType="function";
 
 
-  buffer += "<div id=\"debug-dialog\" class=\"panel panel-default\">\n\n    <div class=\"panel-heading\">Operations Debugging Information</div>\n\n    <div class=\"panel-body\"></div>\n\n</div>\n\n<h2>Your Suggested Changes:</h2>\n\n";
+  buffer += "<h2>Your Suggested Changes:</h2>\n\n";
   if (helper = helpers.operations) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.operations); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   if(stack1 || stack1 === 0) { buffer += stack1; }
