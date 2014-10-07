@@ -1,0 +1,165 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "previewer/preview.html" %}
+
+{% block head %}
+
+	<style>
+        /*body {
+            padding-top: 150px;
+            padding-bottom: 20px;
+        }*/
+
+        /* css/tree-styles.css */
+
+		
+		.file_info{
+			margin: 0px 0;
+			position: relative;
+			padding: 20px 20px 0px 15px;
+		}
+
+		.tree ul{
+			padding-left: 15px;
+		}
+		.tree li {
+		    margin: 0px 0;
+			list-style-type: none;
+		    position: relative;
+			padding: 5px 0px 0px 5px;
+			/*border: 1px solid #333;*/
+		}
+
+		.tree li::before{
+		    content: '';
+			position: absolute; 
+		    top: 0;
+			width: 1px; 
+		    height: 100%;
+			right: auto; 
+		    left: -8px;
+			border-left: 1px solid #ccc;
+		    bottom: 50px;
+		}
+		.tree li::after{
+		    content: '';
+			position: absolute; 
+		    top: 15px; 
+			width: 10px; 
+		    height: 20px;
+			right: auto; 
+		    left: -8px;
+			border-top: 1px solid #ccc;
+		}
+
+		.tree li {
+		    cursor:default;
+		}
+
+		/*Remove connectors before root*/
+		.tree > ul > li::before, .tree > ul > li::after{
+			border: 0;
+		}
+		/*Remove connectors after last child*/
+		.tree li:last-child::before{ 
+		      height: 15px;
+		}
+
+
+		span.li_wrap{
+			display: block;
+		}
+
+		span.li_wrap:hover{
+			background: #E0F0FF;
+			-moz-border-radius-topleft: 3px;
+			-moz-border-radius-topright: 3px;
+			-moz-border-radius-bottomright: 3px;
+			-moz-border-radius-bottomleft: 3px;
+			-webkit-border-radius: 3px 3px 3px 3px;
+			border-radius: 3px 3px 3px 3px;
+		}
+
+		/*Connector styles on hover*/
+		.tree li :hover +ul li::after, 
+		.tree li :hover +ul li::before, 
+		.tree li :hover +ul::before, 
+		.tree li :hover +ul ul::before{
+			border-color:  #94a0b4;
+		}
+    </style>
+    
+{% endblock %}
+
+{% block body %}
+	<div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">Zip Files Preview</h3>
+              </div>
+              <div class="file_info"><p><span><i class="glyphicon glyphicon-compressed"></i></span> {{ archive_name }} <span class="pull-right">Size: <b> {# Here should be the total size of the ziped folder #}Mb</b></span></p>
+                          <hr>
+              </div>
+              <div class="panel-body">
+              
+	              <div class="tree">
+	               
+	                <ul>
+	                    {%- for t in tree recursive %}
+	                        <li><span class="li_wrap">
+	                        	<span><i class="glyphicon {{ 'glyphicon-folder-close' if t.type == 'folder' else 'glyphicon-file'}}"></i> {{ t.name }}</span>
+	                        	{% if t.type != 'folder' %}
+	                        		<span class="pull-right">{{ t.size|filesizeformat }} </span> 
+	                        	{% endif %}
+	                        	</span>
+	                        {%- if t.children -%}
+	                            <ul>{{ loop(t.children) }}</ul>
+	                        {%- endif %}
+	                        </li>
+	                    {%- endfor %}
+	                    </ul>
+	           	  </div> 
+
+                
+
+              </div> <!-- panel-body close -->
+    </div> <!-- panel panel-default close -->
+	<script type="text/javascript">
+	        $(function () {
+			    $('.tree li').hide();
+			    $('.tree li:first').show();
+			    $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', 'Expand folder');
+
+			    $('.tree li.parent_li > span').on('click', function (e) {
+			        var children = $(this).parent('li.parent_li').find(' > ul > li');
+			        if (children.is(":visible")) {
+			            children.hide('fast');
+			            $(this).attr('title', 'Expand folder').find('span > i').addClass('glyphicon-folder-close').removeClass('glyphicon-folder-open');
+			        } else {
+			            children.show('fast');
+			            $(this).attr('title', 'Close folder').find(' span > i').addClass('glyphicon-folder-open').removeClass('glyphicon-folder-close');
+			        }
+			        e.stopPropagation();
+			    });
+			});
+		</script>
+
+{% endblock %}
+
+
