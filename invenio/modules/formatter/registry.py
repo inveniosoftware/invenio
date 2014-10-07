@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
+"""Implement registries for formatter."""
+
 import os
 
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
@@ -54,8 +56,15 @@ output_formats = RegistryProxy(
     '.', registry_namespace=output_formats_directories
 )
 
+template_context_functions = RegistryProxy(
+    'template_context_functions',
+    ModuleAutoDiscoverySubRegistry,
+    'template_context_functions'
+)
+
 
 def create_format_templates_lookup():
+    """Create format templates."""
     out = {}
 
     def _register(path, level=1):
@@ -78,6 +87,7 @@ format_templates_lookup = LazyDict(create_format_templates_lookup)
 
 
 def create_output_formats_lookup():
+    """Create output formats."""
     out = {}
 
     for f in output_formats:

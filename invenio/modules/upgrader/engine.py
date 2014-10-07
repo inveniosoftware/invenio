@@ -17,6 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Upgrader engine."""
+
 from __future__ import absolute_import
 
 from datetime import datetime
@@ -26,6 +28,7 @@ import sys
 import warnings
 
 from flask import current_app
+from flask.ext.registry import RegistryProxy, ImportPathRegistry
 from sqlalchemy import desc
 from invenio.ext.sqlalchemy import db
 
@@ -35,14 +38,15 @@ from .checks import pre_check_bibsched, post_check_bibsched
 
 
 class InvenioUpgrader(object):
-    """
-    Class responsible for loading, sorting and executing upgrades
+
+    """Class responsible for loading, sorting and executing upgrades.
 
     A note on cross graph dependencies: An upgrade is uniquely identified
     by it's id (part of the filename). This means we do not get into
     a situation where an upgrade id will exist in two repositories. One
     repository will simply overwrite the other on install.
     """
+
     FILE_LOG_FMT = '*%(prefix)s %(asctime)s %(levelname)-8s ' \
                    '%(plugin_id)s%(message)s'
     CONSOLE_LOG_INFO_FMT = '>>> %(prefix)s%(message)s'
@@ -50,7 +54,8 @@ class InvenioUpgrader(object):
 
     def __init__(self, packages=None, global_pre_upgrade=None,
                  global_post_upgrade=None):
-        """
+        """Init.
+
         @param global_pre_upgrade: List of callables. Each check will be
             executed once per upgrade-batch run. Useful e.g. to check if
             bibsched is running.
@@ -68,9 +73,11 @@ class InvenioUpgrader(object):
         self.global_post_upgrade = global_post_upgrade or [
             post_check_bibsched
         ]
-
-        self.packages = packages or \
-            current_app.extensions['registry']['packages']
+        if packages is None:
+            self.packages = current_app.extensions['registry']['packages']
+        else:
+            self.packages = RegistryProxy(
+                'upgrader.packages', ImportPathRegistry, initial=packages)
 
         # Warning related
         self.old_showwarning = None
@@ -82,8 +89,7 @@ class InvenioUpgrader(object):
             self.CONSOLE_LOG_FMT, info=self.CONSOLE_LOG_INFO_FMT,)
 
     def estimate(self, upgrades):
-        """
-        Estimate the time needed to apply upgrades.
+        """Estimate the time needed to apply upgrades.
 
         If an upgrades does not specify and estimate it is assumed to be
         in the order of 1 second.
@@ -99,9 +105,7 @@ class InvenioUpgrader(object):
         return val
 
     def human_estimate(self, upgrades):
-        """
-        Make a human readable string of the estimated time to complete the
-        upgrades
+        """Make a human readable estimated time to completion string.
 
         @param upgrades: List of upgrades sorted in topological order.
         """
@@ -128,26 +132,23 @@ class InvenioUpgrader(object):
             return "more than 1 day"
 
     def _setup_log_prefix(self, plugin_id=''):
-        """
-        Setup custom warning notification
-        """
+        """Setup custom warning notification."""
         self._logger_console_fmtter.prefix = '%s: ' % plugin_id
         self._logger_console_fmtter.plugin_id = plugin_id
         self._logger_file_fmtter.prefix = '*'
         self._logger_file_fmtter.plugin_id = '%s: ' % plugin_id
 
     def _teardown_log_prefix(self):
-        """
-        Tear down custom warning notification
-        """
+        """Tear down custom warning notification."""
         self._logger_console_fmtter.prefix = ''
         self._logger_console_fmtter.plugin_id = ''
         self._logger_file_fmtter.prefix = ' '
         self._logger_file_fmtter.plugin_id = ''
 
     def get_logger(self, logfilename=None):
-        """
-        Setup logger to allow outputting to both a log file and console at the
+        """Setup logger.
+
+        Allow outputting to both a log file and console at the
         same time.
         """
         if self._logger is None:
@@ -179,16 +180,17 @@ class InvenioUpgrader(object):
         return self._logger
 
     def has_warnings(self):
-        """ Determine if a warning has occurred in this upgrader instance. """
+        """Determine if a warning has occurred in this upgrader instance."""
         return self.warning_occured != 0
 
     def get_warnings_count(self):
-        """ Get number of warnings issued """
+        """Get number of warnings issued."""
         return self.warning_occured
 
     def pre_upgrade_checks(self, upgrades):
-        """
-        Run upgrade pre-checks prior to applying upgrades. Pre-checks should
+        """Run upgrade pre-checks prior to applying upgrades.
+
+        Pre-checks should
         in general be fast to execute. Pre-checks may the use the wait_for_user
         function, to query the user for confirmation, but should respect the
         --yes-i-know option to run unattended.
@@ -221,8 +223,7 @@ class InvenioUpgrader(object):
                            " following errors:")
 
     def _check_errors(self, errors, prefix):
-        """
-        Check for errors and possible raise and format an error message.
+        """Check for errors and possible raise and format an error message.
 
         @param errors: List of error messages.
         @param prefix: str, Prefix message for error messages
@@ -240,9 +241,9 @@ class InvenioUpgrader(object):
             raise RuntimeError(*args)
 
     def post_upgrade_checks(self, upgrades):
-        """
-        Run post-upgrade checks after applying all pending upgrades. Post
-        checks may be used to emit warnings encountered when applying an
+        """Run post-upgrade checks after applying all pending upgrades.
+
+        Post checks may be used to emit warnings encountered when applying an
         upgrade, but post-checks can also be used to advice the user to run
         re-indexing or similar long running processes.
 
@@ -276,8 +277,7 @@ class InvenioUpgrader(object):
                            "following errors:")
 
     def apply_upgrade(self, upgrade):
-        """
-        Apply a upgrade and register that it was successful.
+        """Apply a upgrade and register that it was successful.
 
         A upgrade may throw a RuntimeError, if an unrecoverable error happens.
 
@@ -307,8 +307,7 @@ class InvenioUpgrader(object):
             self._teardown_log_prefix()
 
     def load_history(self):
-        """
-        Load upgrade history from database table.
+        """Load upgrade history from database table.
 
         If upgrade table does not exists, the history is assumed to be empty.
         """
@@ -320,9 +319,7 @@ class InvenioUpgrader(object):
                 self.ordered_history.append(u.upgrade)
 
     def latest_applied_upgrade(self, repository='invenio'):
-        """
-        Get the latest applied upgrade for a repository.
-        """
+        """Get the latest applied upgrade for a repository."""
         u = Upgrade.query.filter(
             Upgrade.upgrade.like("%s_%%" % repository)
         ).order_by(desc(Upgrade.applied)).first()
@@ -330,19 +327,18 @@ class InvenioUpgrader(object):
         return u.upgrade if u else None
 
     def register_success(self, upgrade):
-        """ Register a successful upgrade """
+        """Register a successful upgrade."""
         u = Upgrade(upgrade=upgrade['id'], applied=datetime.now())
         db.session.add(u)
         db.session.commit()
 
     def get_history(self):
-        """ Get history of applied upgrades """
+        """Get history of applied upgrades."""
         self.load_history()
         return map(lambda x: (x, self.history[x]), self.ordered_history)
 
     def _load_upgrades(self, remove_applied=True):
-        """
-        Load upgrade modules
+        """Load upgrade modules.
 
         Upgrade modules are loaded using pluginutils. The pluginutils module
         is either loaded from site-packages via normal or via a user-loaded
@@ -353,8 +349,8 @@ class InvenioUpgrader(object):
             be included, if False the entire upgrade graph will be
             returned.
         """
+        from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
         from invenio.utils.autodiscovery import create_enhanced_plugin_builder
-        from invenio.base.utils import import_submodules_from_packages
 
         if remove_applied:
             self.load_history()
@@ -380,22 +376,17 @@ class InvenioUpgrader(object):
             data['id'] = plugin_id
             data['repository'] = self._parse_plugin_id(plugin_id)
             return plugin_id, data
-
         # Load all upgrades from installed packages
         plugins = dict(map(
             builder,
-            import_submodules_from_packages(
-                'upgrades',
-                packages=self.packages
-            )
-        ))
+            ModuleAutoDiscoverySubRegistry(
+                'upgrades', registry_namespace=self.packages
+            )))
 
         return plugins
 
     def _parse_plugin_id(self, plugin_id):
-        """
-        Determine repository from plugin id
-        """
+        """Determine repository from plugin id."""
         m = re.match("(.+)(_\d{4}_\d{2}_\d{2}_)(.+)", plugin_id)
         if m:
             return m.group(1)
@@ -407,8 +398,7 @@ class InvenioUpgrader(object):
                            "the upgrade identifier: %s." % plugin_id)
 
     def get_upgrades(self, remove_applied=True):
-        """
-        Get upgrades (ordered according to their dependencies).
+        """Get upgrades (ordered according to their dependencies).
 
         @param remove_applied: Set to false to return all upgrades, otherwise
             already applied upgrades are removed from their graph (incl. all
@@ -423,8 +413,7 @@ class InvenioUpgrader(object):
         return self.upgrades
 
     def _create_graph(self, upgrades, history={}):
-        """
-        Create dependency graph from upgrades
+        """Create dependency graph from upgrades.
 
         @param upgrades: Dict of upgrades
         @param history: Dict of applied upgrades
@@ -448,9 +437,7 @@ class InvenioUpgrader(object):
         return (graph_incoming, graph_outgoing)
 
     def find_endpoints(self):
-        """
-        Find upgrade end-points (i.e nodes without dependents).
-        """
+        """Find upgrade end-points (i.e nodes without dependents)."""
         plugins = self._load_upgrades(remove_applied=False)
 
         dummy_graph_incoming, graph_outgoing = self._create_graph(plugins, {})
@@ -466,8 +453,9 @@ class InvenioUpgrader(object):
         return endpoints
 
     def order_upgrades(self, upgrades, history={}):
-        """
-        Order upgrades according to their dependencies (topological sort using
+        """Order upgrades according to their dependencies.
+
+        (topological sort using
         Kahn's algorithm - http://en.wikipedia.org/wiki/Topological_sorting).
 
         @param upgrades: Dict of upgrades
@@ -538,12 +526,12 @@ class InvenioUpgrader(object):
 
 
 def dummy_signgature():
-    """ Dummy function signature for pluginutils """
+    """Dummy function signature for pluginutils."""
     pass
 
 
 def _upgrade_doc_mapper(x):
-    """ Map function for ingesting documentation strings into plug-ins """
+    """Map function for ingesting documentation strings into plug-ins."""
     try:
         x["__doc__"] = x['info']().split("\n")[0].strip()
     except Exception:

@@ -53,7 +53,6 @@ from six import iteritems
 from werkzeug.utils import cached_property
 
 from invenio.base.globals import cfg
-from invenio.base.utils import autodiscover_template_context_functions
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_BIBFORMAT_CACHED_FORMATS, \
@@ -93,6 +92,7 @@ from invenio.modules.knowledge.api import get_kbr_values
 from invenio.ext.template import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.formatter.registry import template_context_functions
 
 # Cache for data we have already read and parsed
 format_templates_cache = {}
@@ -216,7 +216,7 @@ class LazyTemplateContextFunctionsCache(object):
     @cached_property
     def template_context_functions(self):
         """Returns template context functions"""
-        modules = autodiscover_template_context_functions()
+        modules = template_context_functions
         elem = {}
         for m in modules:
             register_func = getattr(m, 'template_context_function', None)

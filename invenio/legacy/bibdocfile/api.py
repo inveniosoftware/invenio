@@ -118,14 +118,13 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
-from invenio.base.utils import import_submodules_from_packages
 from invenio.utils.hash import md5
 
 import invenio.legacy.template
 
 
 def _plugin_bldr(plugin_code):
-    """Preparing the plugin dictionary structure"""
+    """Preparing the plugin dictionary structure."""
     if not plugin_code.__name__.split('.')[-1].startswith('bom_'):
         return
     ret = {}
@@ -135,17 +134,16 @@ def _plugin_bldr(plugin_code):
 
 
 _CFG_BIBDOC_PLUGINS = None
+
+
 def get_plugins():
-    """
-    Lazy loading of plugins
-    """
+    """Lazy loading of plugins."""
     global _CFG_BIBDOC_PLUGINS
     if _CFG_BIBDOC_PLUGINS is None:
         _CFG_BIBDOC_PLUGINS = filter(None, map(
-            _plugin_bldr, import_submodules_from_packages(
-                'plugins', packages=['invenio.legacy.bibdocfile'])))
+            _plugin_bldr,
+            plugins))
     return _CFG_BIBDOC_PLUGINS
-
 
 
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
