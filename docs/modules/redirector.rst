@@ -15,66 +15,27 @@
     along with Invenio; if not, write to the Free Software Foundation, Inc.,
     59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-.. _api:
+Redirector
+==========
+
+.. automodule:: invenio.modules.redirector
+    :members:
+
+Model
+-----
+
+.. automodule:: invenio.modules.redirector.models
+    :members:
 
 API
-===
+----
 
-.. toctree::
-   :maxdepth: 1
+.. automodule:: invenio.modules.redirector.api
+    :members:
 
-   base
-
-Extensions
-----------
-
-.. toctree::
-   :maxdepth: 1
-
-   ext/assets
-   ext/arxiv
-   ext/crossref
-   ext/elasticsearch
-   ext/logging
-   ext/login
-   ext/session
-   ext/sqlalchemy
-   ext/template
-
-Modules
--------
-
-.. toctree::
-   :maxdepth: 1
-
-   modules/annotations
-   modules/apikeys
-   modules/documentation
-   modules/documents
-   modules/formatter
-   modules/jsonalchemy
-   modules/multimedia
-   modules/oauthclient
-   modules/redirector
-   modules/tags
-   modules/upgrader
-   modules/uploader
-   modules/workflows
-
-
-Utilities
----------
-
-.. toctree::
-   :maxdepth: 1
-
-   utils/datastructures
-   utils/washers
-
-Legacy
+Manage
 ------
 
-.. toctree::
-   :maxdepth: 1
+.. automodule:: invenio.modules.redirector.manage
+    :members:
 
-   legacy/bibrecord

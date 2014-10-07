@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,18 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Simple plugin to register an internal redirection
-"""
+"""Simple plugin to register an internal redirection."""
+
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 
+
 def goto(url):
-    """
-    Redirect to url (assuming it is internal to the system)
-    """
+    """Redirect to url (assuming it is internal to the system)."""
     if url.startswith('/'):
         url = CFG_SITE_URL + url
     if url.startswith(CFG_SITE_URL) or url.startswith(CFG_SITE_SECURE_URL):
         return url
-
-

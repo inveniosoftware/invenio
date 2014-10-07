@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,17 +23,19 @@ import inspect
 
 from invenio.config import CFG_SITE_URL
 from invenio.ext.legacy.handler import WebInterfaceDirectory
+from invenio.ext.logging import register_exception
+from invenio.legacy.webuser import collect_user_info
+from invenio.modules.redirector.api import get_redirection_data
+from invenio.modules.redirector.registry import get_redirect_method
 from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.utils.url import redirect_to_url
-from invenio.modules.redirector.api import get_redirection_data
-from invenio.legacy.webuser import collect_user_info
-from invenio.ext.logging import register_exception
+
 
 class WebInterfaceGotoPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         try:
             redirection_data = get_redirection_data(component)
-            goto_plugin = redirection_data['plugin']
+            goto_plugin = get_redirect_method(redirection_data['plugin'])
             args, dummy_varargs, dummy_varkw, defaults = inspect.getargspec(goto_plugin)
             args = args and list(args) or []
             args.reverse()

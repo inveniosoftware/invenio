@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,16 +18,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
+Demostrative PURL.
+
 Demostrative PURL implementing a redirection to the very last record
-(of a collection)
+(of a collection).
 """
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_RECORD
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 
-def goto(cc=CFG_SITE_NAME, p='', f='', sf='date', so='d', docname='', format=''):
+
+def goto(cc=CFG_SITE_NAME, p='', f='', sf='date', so='d',
+         docname='', format=''):
     """
+    Redirect the user to the latest record in the given collection.
+
     Redirect the user to the latest record in the given collection,
     optionally within the specified pattern and field. If docname
     and format are specified, redirect the user to the corresponding
