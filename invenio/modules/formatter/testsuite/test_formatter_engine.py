@@ -276,8 +276,8 @@ class FormatElementTest(InvenioTestCase):
         del self.app.extensions['registry']['format_elements']
         from invenio.modules.formatter.registry import format_elements
         list(format_elements)
-        bibformat_engine.TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements.cache.clear()
-        #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = self.old_import_path
+        bibformat_engine.TEMPLATE_CONTEXT_FUNCTIONS_CACHE = \
+            bibformat_engine.LazyTemplateContextFunctionsCache()
         tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
         self.failUnless(len(tags) == 4,
                         'Could not correctly identify tags used in bfe_abstract.py')
