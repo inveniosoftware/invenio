@@ -17,13 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Previews Blueprint"""
+"""Implementation of Blueprint for previewers."""
 
 from flask import Blueprint, request
 from flask.ext.breadcrumbs import default_breadcrumb_root
 
 from invenio.base.globals import cfg
 from invenio.config import CFG_SITE_RECORD
+from invenio.modules.records.views import request_record
 
 from .registry import previewers
 
@@ -34,9 +35,13 @@ blueprint = Blueprint('previewer', __name__, url_prefix="/" + CFG_SITE_RECORD,
 
 default_breadcrumb_root(blueprint, '.')
 
+from flask import current_app
+
 
 @blueprint.route('/<int:recid>/preview', methods=['GET', 'POST'])
+@request_record
 def preview(recid):
+    """Preview file for given record."""
     from invenio.legacy.bibdocfile.api import BibRecDocs
 
     files = BibRecDocs(recid).list_latest_files(list_hidden=False)
@@ -53,13 +58,16 @@ def preview(recid):
                     ordered).keys()
 
             for plugin_id in ordered:
+                current_app.logger.info(plugin_id)
                 if previewers[plugin_id]['can_preview'](f):
                     return previewers[plugin_id]['preview'](f)
     return previewers['default']['preview'](None)
 
 
 @blueprint.route('/<int:recid>/preview/pdfmaxpage', methods=['GET', 'POST'])
+@request_record
 def get_pdf_maxpage(recid):
+    """Get maximal page from pdf."""
     from invenio.legacy.bibdocfile.api import BibRecDocs
     from .previewerext.pdftk import maxpage
 
