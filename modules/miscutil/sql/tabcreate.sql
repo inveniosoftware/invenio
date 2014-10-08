@@ -5154,4 +5154,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_10_new_field_add
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_11_new_field_datasource',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_07_new_journalpage_index',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_earliest_date',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_28_remove_author_duplicates',NOW());
 -- end of file
