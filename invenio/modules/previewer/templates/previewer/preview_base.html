@@ -28,20 +28,21 @@
 ## and body when extending this base.
 #}
 
-{%- bundles "jquery.js",
-            "invenio.js",
-            "invenio.css" %}
+{%- block global_bundles %}
+  {%- include "base/bundles.html" %}
+{%- endblock %}
 
 <!DOCTYPE html>
 <html>
   <head>
     <title>Preview</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {%- for bundle in get_bundle('css') -%}
-      {%- assets bundle %}
-        <link rel="{{ EXTRA.rel }}" type="text/css" href="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"/>
-      {%- endassets %}
-    {%- endfor -%}
+    {%- block _top_assets %}
+      {%- block global_stylesheets %}
+        {%- include "base/stylesheets.html" %}
+      {%- endblock %}
+    {%- endblock %}
+    {%- block css %}{% endblock %}
     {% block head %}
     {% endblock %}
   </head>
@@ -56,9 +57,10 @@
       </div>
       {% include 'previewer/bottom.html' %}
   </body>
-  {%- for bundle in get_bundle('js') -%}
-    {%- assets bundle %}
-      <script type="text/javascript" src="{{ EXTRA.static_url_path }}{{ ASSET_URL }}"></script>
-    {%- endassets %}
-  {%- endfor -%}
+  {%- block _bottom_assets %}
+    {% block global_scripts %}
+      {%- include "base/scripts.html" %}
+    {% endblock %}
+  {%- endblock %}
+  {%- block javascript %}{% endblock %}
 </html>
