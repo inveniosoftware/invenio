@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,12 +20,14 @@ __lastupdated__ = "$Date$"
 
 import os, sys
 from urllib import unquote
+from time import localtime
 from invenio import webinterface_handler_config as apache
 
 from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_CERN_SITE
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
@@ -950,7 +952,14 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
     # CUSTOM REPORT SECTION
     def custom_summary(self, req, form):
         """Custom report page"""
-        argd = wash_urlargd(form, {'query': (str, ""),
+
+        if CFG_CERN_SITE:
+            # NOTE: See RQF0382332
+            query = "690C_a:CERN and year:%i" % (localtime()[0],)
+        else:
+            query = ""
+
+        argd = wash_urlargd(form, {'query': (str, query),
                                    'tag': (str, CFG_JOURNAL_TAG.replace("%", "p")),
                                    'title': (str, "Publications"),
                                    'ln': (str, CFG_SITE_LANG)})
