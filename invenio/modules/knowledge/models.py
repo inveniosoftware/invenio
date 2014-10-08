@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2011, 2012, 2014 CERN.
 ##
@@ -38,6 +38,12 @@ class KnwKB(db.Model):
     description = db.Column(db.Text, nullable=True)
     kbtype = db.Column(db.Char(1), nullable=True)
 
+    def to_dict(self):
+        """ Return a dict representation of KnwKB."""
+        return {'id': self.id, 'name': self.name,
+                'description': self.description,
+                'kbtype': self.kbtype}
+
 
 class KnwKBDDEF(db.Model):
 
@@ -54,6 +60,13 @@ class KnwKBDDEF(db.Model):
     kb = db.relationship(KnwKB, backref='kbdefs')
     collection = db.relationship(Collection, backref='kbdefs')
 
+    def to_dict(self):
+        """ Return a dict representation of KnwKBDDEF."""
+        return {'field': self.output_tag,
+                'expression': self.search_expression,
+                'coll_id': self.id_collection,
+                'collection': self.collection.name if self.collection else None}
+
 
 class KnwKBRVAL(db.Model):
 
@@ -69,6 +82,12 @@ class KnwKBRVAL(db.Model):
                          nullable=False, server_default='0')
     kb = db.relationship(KnwKB, backref='kbrvals')
 
+    def to_dict(self):
+        """ Return a dict representation of KnwKBRVAL."""
+        return {'id': self.id, 'key': self.m_key,
+                'value': self.m_value,
+                'kbid': self.kb.id if self.kb else None,
+                'kbname': self.kb.name if self.kb else None}
 
 __all__ = ('KnwKB',
            'KnwKBDDEF',
