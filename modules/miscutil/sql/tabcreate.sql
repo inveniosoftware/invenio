@@ -5061,4 +5061,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_11_28_bibauthorid_s
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_01_new_aidAFFILIATIONS',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_10_aidAFFILIATIONS_change_pk',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_23_bibauthorid_rabbit_matchable_name_column', NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_28_remove_author_duplicates',NOW());
 -- end of file
