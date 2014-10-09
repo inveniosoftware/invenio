@@ -38,7 +38,7 @@ var ticketbox = {
         };
     }(),
 
-    app: { debug: true, hasFocus: false },
+    app: { debug: false, hasFocus: false },
 
     sureUpdate: function() {
         var time = 1000;
