@@ -176,8 +176,6 @@ from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLL
 from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
-from invenio.legacy.bibauthorid.config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT_TO_COLLECTIONS
-
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
 ## global vars:

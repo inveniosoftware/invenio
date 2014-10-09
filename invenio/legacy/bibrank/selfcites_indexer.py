@@ -36,8 +36,7 @@ import ConfigParser
 from invenio.modules.formatter.utils import parse_tag
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibrank.citation_indexer import tagify
-from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
-                           CFG_BIBRANK_SELFCITES_PRECOMPUTE
+from invenio.config import CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibrank.citation_searcher import get_cited_by
 from invenio.modules.ranker.registry import configuration
@@ -91,21 +90,17 @@ def get_authors_tags():
     return tags
 
 
-def get_authors_from_record(recID, tags,
-                                use_bibauthorid=CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID):
+def get_authors_from_record(recID, tags):
     """Get all authors for a record
 
     We need this function because there's 3 different types of authors
     and to fetch each one of them we need look through MARC tags
     """
-    if use_bibauthorid:
-        authors = get_personids_from_record(recID)
-    else:
-        authors_list = chain(
-             get_fieldvalues(recID, tags['first_author']),
-             get_fieldvalues(recID, tags['additional_author']),
-             get_fieldvalues(recID, tags['alternative_author_name']))
-        authors = set(hash(author) for author in list(authors_list)[:21])
+    authors_list = chain(
+         get_fieldvalues(recID, tags['first_author']),
+         get_fieldvalues(recID, tags['additional_author']),
+         get_fieldvalues(recID, tags['alternative_author_name']))
+    authors = set(hash(author) for author in list(authors_list)[:21])
 
     return authors
 

@@ -81,15 +81,21 @@ from invenio.legacy.refextract.api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
 from invenio.legacy.bibrecord.textmarc2xmlmarc import transform_file, ParseError
-from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
-                                        create_normalized_name
 from invenio.modules.knowledge.api import get_kbr_values
 from invenio.modules.editor.registry import field_templates, record_templates, \
     ticket_templates
 
 from invenio.base.globals import cfg
-from invenio.legacy.webauthorprofile.config import deserialize
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
+
+try:
+    from cPickle import loads
+except ImportError:
+    from pickle import loads
+from msgpack import packb, unpackb
+
+serialize = packb
+deserialize = unpackb
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % cfg['CFG_BIBEDIT_CACHEDIR'])
@@ -1171,3 +1177,150 @@ def load_ticket_templates(recId):
         else:
             raise BibEditPluginException("Plugin not valid in %s" % (name,))
     return ticket_templates
+
+
+# ###################### Name utils ####################################
+
+surname_cleaning = re.compile("-([a-z])")
+name_separators = ',;.=\-\(\)'
+substitution_regexp = re.compile('[%s]' % (name_separators))
+
+
+def split_name_parts(name_string, return_all_lower=False):
+    '''
+    Splits name_string in three arrays of strings :
+        surname, initials (without trailing dot), names
+    RETURNS an array containing a string and two arrays of strings.
+    delete_name_additions defines if extensions
+        e.g. Jr., (Ed.) or (spokesperson)
+        will be ignored
+
+    @param name_string: the name to be spli
+    @type name: string
+    @param delete_name_additions: determines whether to delete name additions
+    @type delete_name_additions: boolean
+    @param reverse_name_surname: if true names come first
+
+    @return: list of [surname string, initials list, names list]
+        e.g. split_name_parts("Ellis, John R.")
+        --> ['Ellis', ['J', 'R'], ['John'], [0]]
+        --> ['Ellis', ['K', 'J', 'R'], ['John', 'Rob'], [1,2]]
+    @rtype: list of lists
+    '''
+    surname_separators = ','
+
+    surname = ""
+    rest_of_name = ""
+    found_sep = ''
+    name_string = name_string.strip()
+
+    for sep in surname_separators:
+        if name_string.count(sep) >= 1:
+            found_sep = sep
+            surname, rest_of_name = name_string.partition(sep)[0::2]
+            surname = surname.strip()
+            # Fix for dashes
+            surname = surname_cleaning.sub(lambda n: '-' + n.group(1), surname)
+            break
+
+    if not found_sep:
+        if name_string.count(" ") > 0:
+            rest_of_name, surname = name_string.rpartition(' ')[0::2]
+            surname = surname.strip()
+            # Fix for dashes
+            surname = surname_cleaning.sub(lambda n: '-' + n.group(1), surname)
+        else:
+            surname = name_string
+            surname = surname.strip()
+            # Fix for dashes
+            surname = surname_cleaning.sub(lambda n: '-' + n.group(1), surname)
+            if not return_all_lower:
+                return [surname, [], [], []]
+            else:
+                return [surname.lower(), [], [], []]
+
+    if rest_of_name.count(","):
+        rest_of_name = rest_of_name.rpartition(",")[0]
+
+    initials_names_list = substitution_regexp.sub(' ', rest_of_name).split()
+    names = []
+    initials = []
+    positions = []
+    pos_counter = 0
+    for i in initials_names_list:
+        if len(i) == 1:
+            initials.append(i)
+            pos_counter += 1
+        else:
+            names.append(i.strip())
+            initials.append(i[0])
+            positions.append(pos_counter)
+            pos_counter += 1
+
+    retval = [surname, initials, names, positions]
+
+    if return_all_lower:
+
+        retval = [surname.lower(), [i.lower() for i in initials], [n.lower() for n in names], positions]
+
+    return retval
+
+
+def create_normalized_name(splitted_name, fix_capitalization=False):
+    '''
+    Creates a normalized name from a given name array. A normalized name
+    looks like "Lastname, Firstnames and Initials"
+
+    @param splitted_name: name array from split_name_parts
+    @type splitted_name: list in form [string, list, list]
+
+    @param fix_capitalization: ensures first letter of each word is capital
+    @type fix_capitalization: bool
+
+    @return: normalized name
+    @rtype: string
+    '''
+    name = splitted_name[0]
+
+    if not splitted_name[1] and not splitted_name[2]:
+        if fix_capitalization:
+            return name.title()
+        else:
+            return name
+
+    name = name + ','
+
+    for i in range(len(splitted_name[1])):
+        try:
+            fname = splitted_name[2][splitted_name[3].index(i)]
+            name = ' '.join([name, fname])
+        except (IndexError, ValueError):
+            name = ' '.join([name, splitted_name[1][i] + '.'])
+        if fix_capitalization:
+            name = ' '.join(map(lambda x: x.title(), name.split()))
+    return name
+
+
+def string_partition(s, sep, direc='l'):
+    '''
+    Partition a string by the first occurrence of the separator.
+    Mimics the string.partition function, which is not available in Python2.4
+
+    @param s: string to be partitioned
+    @type s: string
+    @param sep: separator to partition by
+    @type sep: string
+    @param dir: direction (left 'l' or right 'r') to search the separator from
+    @type dir: string
+    @return: tuple of (left or sep, sep, right of sep)
+    @rtype: tuple
+
+    '''
+    if direc == 'r':
+        i = s.rfind(sep)
+    else:
+        i = s.find(sep)
+    if i < 0:
+        return (s, '', '')
+    else:
+        return (s[0:i], s[i:i + 1], s[i + 1:])

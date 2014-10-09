@@ -864,22 +864,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         uid = webuser.getUid(req)
 
-        # If user has logged in to ORCID through oauth2, store his ORCID id
-        if uid > 0 and args['login_method'] == 'oauth2' and args['provider'] == 'orcid':
-            from invenio.legacy.bibauthorid.webapi import get_pid_from_uid, add_orcid_to_pid
-
-            CFG_EXTERNAL_AUTHENTICATION['oauth2'].auth_user(None, None, req)
-
-            pid = get_pid_from_uid(uid)
-            try:
-                orcid = str(req.g['oauth2_orcid'])
-            except KeyError:
-                return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
-
-            add_orcid_to_pid(pid, orcid)
-
-            return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
-
         # If user is already logged in, redirect it to referer or your account
         # page
         if uid > 0:

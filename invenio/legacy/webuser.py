@@ -560,8 +560,6 @@ def merge_usera_into_userb(id_usera, id_userb):
             #run_sql("LOCK TABLE %s WRITE" % table)
 
         ## Special treatment for BibAuthorID
-        from invenio.legacy.bibauthorid.dbinterface import webuser_merge_user
-        webuser_merge_user(id_usera, id_userb)
         index = 0
         table = ''
         try:

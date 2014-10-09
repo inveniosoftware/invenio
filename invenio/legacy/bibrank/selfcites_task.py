@@ -45,8 +45,7 @@ from datetime import datetime
 from invenio.utils.redis import get_redis
 from invenio.legacy.dbquery import serialize_via_marshal
 from intbitset import intbitset
-from invenio.config import CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
-                           CFG_ETCDIR
+from invenio.config import CFG_ETCDIR
 from invenio.legacy.bibsched.bibtask import \
     task_get_option, write_message, \
     task_sleep_now_if_required, \
@@ -57,7 +56,6 @@ from invenio.legacy.bibrank.selfcites_indexer import update_self_cites_tables, \
                                               compute_simple_self_citations, \
                                               get_authors_tags
 from invenio.legacy.bibrank.citation_searcher import get_refers_to
-from invenio.legacy.bibauthorid.daemon import get_user_logs as bibauthorid_user_log
 from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
 from invenio.legacy.bibrank.tag_based_indexer import intoDB, fromDB
 from invenio.modules.ranker.registry import configuration
@@ -69,7 +67,7 @@ def compute_and_store_self_citations(recid, tags, citations_fun, selfcites_dic,
 
     Args:
      - recid
-     - tags: used when bibauthorid is desactivated see get_author_tags()
+     - tags: used when bibauthorid is deactivated see get_author_tags()
             in bibrank_selfcites_indexer
     """
     assert recid
@@ -143,35 +141,15 @@ def rebuild_tables(rank_method_code, config):
     fill_self_cites_tables(rank_method_code, config)
     return True
 
-
-def fetch_bibauthorid_last_update():
-    """Fetch last runtime of bibauthorid"""
-    bibauthorid_log = bibauthorid_user_log(userinfo='daemon',
-                                           action='PID_UPDATE',
-                                           only_most_recent=True)
-    try:
-        bibauthorid_end_date = bibauthorid_log[0][2]
-    except IndexError:
-        bibauthorid_end_date = datetime(year=1900, month=1, day=1)
-
-    return bibauthorid_end_date.strftime("%Y-%m-%d %H:%M:%S")
-
-
 def fetch_index_update():
     """Fetch last runtime of given task"""
     end_date = get_bibrankmethod_lastupdate('citation')
-
-    if CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID:
-        bibauthorid_end_date = fetch_bibauthorid_last_update()
-        end_date = min(end_date, bibauthorid_end_date)
 
     return end_date
 
 
 def fetch_records(start_date, end_date):
     """Filter records not indexed out of recids
-
-    We need to run after bibauthorid // bibrank citation indexer
     """
     sql = """SELECT `id` FROM `bibrec`
              WHERE `modification_date` <= %s

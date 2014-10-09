@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 ## This file is part of Invenio.
 ## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
 ##
@@ -29,7 +31,11 @@ import sys
 import pprint
 import difflib
 
+from copy import deepcopy
+from jellyfish import levenshtein_distance as distance
 from six import iteritems
+
+from invenio.utils.text import translate_to_ascii
 
 from invenio.config import CFG_BIBMATCH_MATCH_VALIDATION_RULESETS, \
                            CFG_BIBMATCH_FUZZY_MATCH_VALIDATION_LIMIT, \
@@ -40,9 +46,9 @@ from invenio.legacy.bibmatch.config import CFG_BIBMATCH_VALIDATION_MATCHING_MODE
                                     CFG_BIBMATCH_LOGGER
 from invenio.legacy.bibrecord import create_records, record_get_field_values
 from invenio.legacy.bibrecord.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.legacy.bibauthorid.name_utils import (soft_compare_names,
-                                                   string_partition)
+from invenio.legacy.bibedit.utils import string_partition, split_name_parts
 from invenio.utils.text import translate_to_ascii
+
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
 
@@ -866,3 +872,97 @@ def _get_grouped_pairs(first_list, second_list):
             pair_group.append((first_item, second_item))
         pairs.append(tuple(pair_group))
     return pairs
+
+#Name utils
+
+
+M_NAME_SPECIAL_CHARACTER_MAPPING = {'-': ' ',
+                                    '.': ' ',
+                                    '\'': ''}
+
+M_NAME_LOCALE_CHARACTER_MAPPING = {'ß': 'ss',
+                                   'ä': 'ae',
+                                   'ö': 'oe',
+                                   'ü': 'ue',
+                                   }
+
+alphanum_spaces = re.compile(ur'[^\w\s]', re.UNICODE)
+digits = re.compile(ur'\d', re.UNICODE)
+parentheses_cleanup = re.compile(r'\([^)]*\)')
+
+def clean_string(string, title_strings=False):
+
+    string = _replace_content_in_parentheses(string, '')
+    string = _apply_character_mapping_to_name(string,
+                                              M_NAME_LOCALE_CHARACTER_MAPPING)
+    string = _apply_character_mapping_to_name(string,
+                                              M_NAME_SPECIAL_CHARACTER_MAPPING)
+    string = translate_to_ascii(string)[0]
+    string = _remove_special_characters_and_numbers(string)
+
+    if title_strings:
+        return string.title()
+    return string
+
+def _replace_content_in_parentheses(content, replacement):
+    return parentheses_cleanup.sub(replacement, content)
+
+
+def _apply_character_mapping_to_name(name, mapping):
+    for character, replacement in mapping.iteritems():
+        name = name.replace(character, replacement)
+    return name
+
+def _remove_special_characters_and_numbers(name):
+    name = alphanum_spaces.sub('', name, re.UNICODE)
+    return digits.sub('', name, re.UNICODE)
+
+def soft_compare_names(origin_name, target_name):
+    '''
+    Soft comparison of names, to use in search engine an similar
+    Base results:
+    If surname is equal in [0.6,1.0]
+    If surname similar in [0.4,0.8]
+    If surname differs in [0.0,0.4]
+    all depending on average compatibility of names and initials.
+    '''
+    jaro_fctn = distance
+
+    score = 0.0
+    oname = deepcopy(origin_name)
+    tname = deepcopy(target_name)
+
+    oname = translate_to_ascii(oname)[0]
+    tname = translate_to_ascii(tname)[0]
+
+    orig_name = split_name_parts(oname.lower())
+    targ_name = split_name_parts(tname.lower())
+    orig_name[0] = clean_string(orig_name[0])
+    targ_name[0] = clean_string(targ_name[0])
+    if orig_name[0].lower() == targ_name[0].lower():
+        score += 0.6
+    else:
+        if ((jaro_fctn(orig_name[0].lower(), targ_name[0].lower()) < .95)
+                or min(len(orig_name[0]), len(targ_name[0])) <= 4):
+            score += 0.0
+        else:
+            score += 0.4
+
+    if orig_name[1] and targ_name[1]:
+        max_initials = max(len(orig_name[1]), len(targ_name[1]))
+        matching_i = 0
+        if len(orig_name[1]) >= 1 and len(targ_name[1]) >= 1:
+            for i in orig_name[1]:
+                if i in targ_name[1]:
+                    matching_i += 1
+        max_names = max(len(orig_name[2]), len(targ_name[2]))
+        matching_n = 0
+        if len(orig_name[2]) >= 1 and len(targ_name[2]) >= 1:
+            cleaned_targ_name = [clean_string(i) for i in targ_name[2]]
+            for i in orig_name[2]:
+                if clean_string(i) in cleaned_targ_name:
+                    matching_n += 1
+
+        name_score = (matching_i + matching_n) * 0.4 / (max_names + max_initials)
+        score += name_score
+    return score
