@@ -49,9 +49,9 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
         </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
+      </div>{# /.modal-content #}
+    </div>{# /.modal-dialog #}
+  </div>{# /.modal #}
 
 {%- endmacro %}
 
@@ -62,12 +62,12 @@
         {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length)  }}
         {% do id.append(1) %}
       {% else %}
-      </div>
-      <div class="list-group">
-        {{ display_workflow_definition(item, id) }}
-        {% do id.append(1) %}
-      </div>
-      <div class="list-group">
+        </div>
+        <div class="list-group">
+          {{ display_workflow_definition(item, id) }}
+          {% do id.append(1) %}
+        </div>
+        <div class="list-group">
       {% endif %}
     {% endfor %}
   </div>
@@ -106,36 +106,35 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
         </div>
-      </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-  {% endmacro %}
-
+      </div>{# /.modal-content #}
+    </div>{#/.modal-dialog #}
+  </div>{# /.modal #}
+{% endmacro %}
 
 {% macro render_field(field) %}
   <div class="form-group">
-  {% if field.name != "core" %}
-    {% if field.name != "submit" %}
-      {{ field.label }}
-    {% endif %}
-    <div class="col-sm-10">
-      {{ field(**kwargs)|safe }}
-    </div>
-  {% else %}
-    <div class="col-sm-10">
-      <div class="checkbox">
-        <label>
-          <strong>{{ _('Core') }}</strong> {{ field(**kwargs)|safe }}
-        </label>
+    {% if field.name != "core" %}
+      {% if field.name != "submit" %}
+        {{ field.label }}
+      {% endif %}
+      <div class="col-sm-10">
+        {{ field(**kwargs)|safe }}
       </div>
-    </div>
-  {% endif %}
+    {% else %}
+      <div class="col-sm-10">
+        <div class="checkbox">
+          <label>
+            <strong>{{ _('Core') }}</strong> {{ field(**kwargs)|safe }}
+          </label>
+        </div>
+      </div>
+    {% endif %}
   </div>
   {% if field.errors %}
     <ul class=errors>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
+      {% for error in field.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
     </ul>
   {% endif %}
 {% endmacro %}

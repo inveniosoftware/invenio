@@ -21,100 +21,100 @@
 {% import 'workflows/utils.html' as utils %}
 
 {% block header%}
-    {{ super() }}
-    {% bundles "workflows.js", "vendors.js", "vendors.css", "actions.js", "jquery.js" %}
+  {{ super() }}
+  {% bundles "workflows.js", "vendors.js", "vendors.css", "actions.js", "jquery.js" %}
 {% endblock header %}
 
 {% block javascript %}
-    {{ super() }}
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
-            window.jQuery.ajax({
-                url: context_url,
-                success: function(data) {
-                    WORKFLOWS_HP_DETAILS.init(data, {{ bwobject.id }});
-                }
-            })
-        });
-    </script>
+  {{ super() }}
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
+      window.jQuery.ajax({
+        url: context_url,
+        success: function(data) {
+          WORKFLOWS_HP_DETAILS.init(data, {{ bwobject.id }});
+        }
+      })
+    });
+  </script>
 {%- endblock javascript %}
 
 {% block hpbody %}
 
   {% block hp_navbar %}
-      <nav class="navbar navbar-default navbar-static-top" role="navigation">
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
-            </li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Actions') }}<b class="caret"></b></a>
-              <ul class="dropdown-menu" role="menu">
-                <li>
-                  <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                    <i class="icon-repeat"></i>
-                    {{ _('Restart workflow from beginning') }}
-                  </button>
-                </li>
-                <li>
-                  <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                    <i class="icon-step-backward"></i>
-                    {{ _('Restart current task') }}
-                  </button>
-                </li>
-                <li>
-                  <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                    <i class="icon-step-forward"></i>
-                    {{ _('Skip this task') }}
-                  </button>
-                </li>
-                <li>
-                  <button id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button">
-                    <i class="icon-trash"></i>
-                    {{ _('Delete this record') }}
-                  </button>
-                </li>
-              </ul>
-            </li>
-            <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                    <h3 id="myModalLabel">{{ _('Please confirm') }}</h3>
-                  </div>
-                  <div class="modal-body">
-                    <p>{{ _('Are you sure you want to delete this record?') }}</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
-                    <a class="btn btn-danger" href="{{ url_for('holdingpen.delete', objectid=bwobject.id) }}" >{{ _('Yes, delete this record') }}</a>
-                  </div>
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Actions') }}<b class="caret"></b></a>
+            <ul class="dropdown-menu" role="menu">
+              <li>
+                <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                  <i class="icon-repeat"></i>
+                  {{ _('Restart workflow from beginning') }}
+                </button>
+              </li>
+              <li>
+                <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                  <i class="icon-step-backward"></i>
+                  {{ _('Restart current task') }}
+                </button>
+              </li>
+              <li>
+                <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
+                  <i class="icon-step-forward"></i>
+                  {{ _('Skip this task') }}
+                </button>
+              </li>
+              <li>
+                <button id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button">
+                  <i class="icon-trash"></i>
+                  {{ _('Delete this record') }}
+                </button>
+              </li>
+            </ul>
+          </li>
+          <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                  <h3 id="myModalLabel">{{ _('Please confirm') }}</h3>
+                </div>
+                <div class="modal-body">
+                  <p>{{ _('Are you sure you want to delete this record?') }}</p>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
+                  <a class="btn btn-danger" href="{{ url_for('holdingpen.delete', objectid=bwobject.id) }}" >{{ _('Yes, delete this record') }}</a>
                 </div>
               </div>
             </div>
-          </ul>
-{% block previous_next %}
-<div class="navbar-form navbar-right">
-  <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
-     class="btn btn-default"
-     {% if previous_object == None %}disabled="disabled"{% endif %}>
-      <span class="glyphicon glyphicon-circle-arrow-left"></span>
-      <strong>{{ _('Previous') }}</strong>
-  </a>
+          </div>
+        </ul>
+      {% block previous_next %}
+        <div class="navbar-form navbar-right">
+          <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
+             class="btn btn-default"
+             {% if previous_object == None %}disabled="disabled"{% endif %}>
+              <span class="glyphicon glyphicon-circle-arrow-left"></span>
+              <strong>{{ _('Previous') }}</strong>
+          </a>
 
-  <a href="{{ url_for('holdingpen.details', objectid=next_object)}}"
-     class="btn btn-default"
-     {% if next_object == None %}disabled="disabled"{% endif %}>
-        <span class="glyphicon glyphicon-circle-arrow-right"></span>
-        <strong>{{ _('Next') }}</strong>
-  </a>
+          <a href="{{ url_for('holdingpen.details', objectid=next_object)}}"
+             class="btn btn-default"
+             {% if next_object == None %}disabled="disabled"{% endif %}>
+                <span class="glyphicon glyphicon-circle-arrow-right"></span>
+                <strong>{{ _('Next') }}</strong>
+          </a>
 
-</div>
-{% endblock %}
         </div>
-      </nav>
+      {% endblock %}
+      </div>
+    </nav>
   {% endblock %}
 
   <div class="container" style="padding-left:0px;">
@@ -147,28 +147,25 @@
                   <span class="caret"></span>
                 </a>
               </h6>
-              <table class="table table-striped">
-                <tbody>
-                  <br/>
-                  <br/>
-                  {% set id = [] %}
-                  {% if task_history %}
-                    <div id="completed-tasks" class="collapse">
-                      <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
-                      <div class="list-group">
-                        {% for item in task_history %}
-                          {{ utils.display_task_history(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length) }}
-                          {% do id.append(1) %}
-                        {% endfor %}
-                      </div>
+              <div class="table table-striped">
+                <div class="row"></div>
+                {% set id = [] %}
+                {% if task_history %}
+                  <div id="completed-tasks" class="collapse">
+                    <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
+                    <div class="list-group">
+                      {% for item in task_history %}
+                        {{ utils.display_task_history(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length) }}
+                        {% do id.append(1) %}
+                      {% endfor %}
                     </div>
-                  {% endif %}
-                  <div id="workflow-definition" class="collapse">
-                    <div class="muted"><strong>{{ _('Workflow definition') }}:</strong></div>
-                    {{ utils.display_workflow_definition(workflow_definition, id) }}
                   </div>
-                </tbody>
-              </table>
+                {% endif %}
+                <div id="workflow-definition" class="collapse">
+                  <div class="muted"><strong>{{ _('Workflow definition') }}:</strong></div>
+                  {{ utils.display_workflow_definition(workflow_definition, id) }}
+                </div>
+              </div>
             </div>
           </div>
           {% if bwobject.get_error_message() %}
@@ -218,62 +215,56 @@
                 <span class="caret"></span>
               </a>
               </h6>
+              <div class="row"></div>
               <div id="record-metadata-table" class="collapse">
-                <table class="table table-striped">
-                  <tbody>
+                <div class="table table-striped">
                     {% for key, value in info.items() %}
                       <b>{{ key }}</b> = {{ value }}
                       <hr>
                     {% endfor %}
                     <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
-                  </tbody>
-                </table>
+                </div>
               </div>
             </div>
           </div>
 
           {% if history_objects %}
-
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ _('History') }}</h3>
-            </div>
-            <div class="panel-body">
-              <h6 class="pull-right">
-                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#History">{{ _('More') }}<span class="caret"></span></a>
-              </h6>
-              </br>
-              <div id="History" class="collapse">
-                <table class="table table-striped">
-                  <tbody>
-                  {% for object in history_objects %}
-                    {% if  object.id == bwobject.id %}
-                      <a href="#">{{ _('current') }} </a> -
-                      {% else %}
-                      <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{ object.id }}</a> -
-                    {% endif %}
-                    <span class="label label-{{ object._class }}">{{ object.message }}</span>
-                   {{ pretty_date(object.modified) }}
-                  <hr>
-                  {% endfor %}
-                  </tbody>
-                </table>
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ _('History') }}</h3>
+              </div>
+              <div class="panel-body">
+                <h6 class="pull-right">
+                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#History">{{ _('More') }}<span class="caret"></span></a>
+                </h6>
+                <div class="row"></div>
+                <div id="History" class="collapse">
+                  <div class="table table-striped">
+                    {% for object in history_objects %}
+                      {% if  object.id == bwobject.id %}
+                        <a href="#">{{ _('current') }} </a> -
+                        {% else %}
+                        <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{ object.id }}</a> -
+                      {% endif %}
+                      <span class="label label-{{ object._class }}">{{ object.message }}</span>
+                     {{ pretty_date(object.modified) }}
+                    <hr>
+                    {% endfor %}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
           {% endif %}
         {% endblock %}
-        </div>
-        <div class="col-md-9">
-
+      </div>
+      <div class="col-md-9">
         {% block hp_action_main %}
           {% if "main" in rendered_actions %}
             {{ rendered_actions["main"]|safe }}
           {% endif %}
         {% endblock %}
 
-        {% if 'message' in bwobject.get_extra_data() and
-            bwobject.get_action() != None %}
+        {% if 'message' in bwobject.get_extra_data() and bwobject.get_action() != None %}
           <div id="usermessage" class="alert alert-warning alert-dismissible">
             {{ bwobject.get_extra_data()['_message'] }}
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -311,7 +302,7 @@
             {% endfor %}
           {% endif %}
         {% endblock %}
-        </div>
       </div>
     </div>
+  </div>
 {% endblock %}
