@@ -79,17 +79,18 @@ definition of the field 'title'::
 
 
 A field definition is made out several sections, each of them identified
-by its indentation (like python does).
+by its indentation (like in python).
 
-In this example we can find the three more common sections that a field can
-have, ``schema``, ``creator`` and ``producer``.  There could be more sections,
-we will explain the ones that *Invenio* provides but be aware that new sections
-could come via extensions, actually only the ones mentioned before are inside
-the core of the *JSONAlchemy* the rest are already defined as extensions.
+In this example exist the three most common sections that a field can have:
+``schema``, ``creator`` and ``producer``.  Even though there could be more
+sections, we will explain only the ones that *Invenio* provides,  In fact, the
+aforementioned ones are inside the core of the *JSONAlchemy*, while the rest
+are already defined as extensions by *Invenio*. Be aware that new sections
+could come via extensions.
 
-Each of this section will add some information to the dictionary representing
-the field definition, for example the dictionary generated for the field
-defined above would be something like::
+Each of these sections adds some information to the dictionary representing the
+field definition. For example, the dictionary generated for the field defined
+above would be something like::
 
     {'aliases': [],
      'extend': False,
@@ -113,9 +114,9 @@ defined above would be something like::
              'source_tags': ['245__'],
              'type': 'creator'}]}}
 
-Here we are just showing one field but one file could contain from one up to
-*n* field definitions. Check out the ``atlantis.cfg`` file from the *Invenio demo
-site* to get a quick view about how your configuration file for your fields
+Only one field is shown here, but one file could contain from one up to *n*
+field definitions. Check out the ``atlantis.cfg`` file from the *Invenio demo
+site* to get a quick view about how the configuration file for your fields
 should look like.
 
 For the BFN lovers, this is something close to the grammar used to parse this::
@@ -139,51 +140,51 @@ For the BFN lovers, this is something close to the grammar used to parse this::
 Creator
 ^^^^^^^
 
-This is the one of most important part of the field definition, here the
-content of the field is defined depending on its origin.
+The creator is the one of most important parts of the field definition: Inside
+it, the content of the field is created, while the way this happens depends on
+its origin.
 
-The creator section is the one used to define the fields that are coming from
-the input file directly and don't depend on any type of calculation from any
-other source, we also call this kind of field **real fields**.
+The creator section is the one used to define the fields that are coming
+directly from the input file and don't depend on any type of calculation from
+another source. We also call this kind of field a **real field**.
 
-This section could be made out of several lines, one at least, where each one
-represents the translation of this field from the input format to JSON.
+This section can be made out of one or several lines, each one representing the
+translation of the field, from whatever the input format is, into JSON.
 
 For example::
 
     marc, '245..', {'title': value['a'], 'subtitle': value[b]}
 
-Is telling us that for the master format ``marc`` we will take any field that
-matches the regular expression ``245..`` (more regular expressions could be
-specified space separated) and then we will apply the transformation ``{'title':
-value['a'], 'subtitle': value[b]}``.
+This tells us that any field that matches the regular expression ``245..``
+(more regular expressions could be specified space separated), the master
+format ``marc`` will be used, and that the transformation ``{'title':
+value['a'], 'subtitle': value[b]}`` will be applied.
 
-The last part of the line needs to be a valid python expression as it will be
-evaluated assuming that. For this part we have available the value of the field
-that we are dealing with inside ``value``, which is typically a dictionary.
-This python expression could be also a function call, in this case either you
-manage the import using ``__import__()`` function or if you put the function
-implementation inside the ``/functions`` folder it will be imported
-automatically.
+The transformation must be a valid python expression as it will be evaluated as
+such. In it, the value of the field with which we are dealing with is available
+as ``value`` (typically a dictionary). This python expression can also be a
+function call. This function can either be imported via the ``__import__()``
+function or implemented in the ``/functions`` folder, the contents of which it
+are imported automatically.
 
 For each master format that we want to deal with we need to have a ``Reader``, we
-will see afterwards what it that and how to create one. A reader for JSON and
+will see afterwards what that is and how to create one. A reader for JSON and
 for MARC21 is provided by default with *Invenio*. See :ref:`readers` for more
 information about readers and :ref:`how-to-extend-jsonalchemy-behaviour` to
-learn about how to write your own reader.
+learn how to write your own reader.
 
-Together with each creator rule there could be one or more decorators (as in
+Along with each creator rule there could be one or more decorators (like in
 python). We will describe the default decorators that are implemented and how
 to do more later in the :ref:`decorators` section.
 
 Derived
 ^^^^^^^
 
-When a field comes from other place that is not the input file and it could be
-calculated only onces, meaning that it might change just a few times we call it
-derived, and it is also **virtual field**.
+When a field is derived from a source that is *not* the input file and needs to
+be calculated only when the source it depends on changes (this is expected to
+happen infrequently) it is called a **derived virtual field**.
 
-An example of kind of field could be something like::
+An example of a virtual field could be something like this::
 
     number_of_authors:
         derived:
@@ -197,12 +198,12 @@ line is just a valid python expression.
 Calculated
 ^^^^^^^^^^
 
-Another type of **virtual field** are the ones which values changes a lot
-during time, for example the number of comments that a record inside *Invenio*
+Another type of **virtual fields** are the ones which values' change a lot
+over time; for example the number of comments that a record inside *Invenio*
 has or the number of reviews that a paper has.
 
-In this cases we use calculated field definitions. Following the example of
-the number of comments this could be its definition::
+In these cases we use calculated field definitions. Following the example of
+the number of comments, this could be its definition::
 
     number_of_comments:
         calculated:
@@ -212,25 +213,31 @@ the number of comments this could be its definition::
 
 The way that a calculate rule is defined is the same as for the derived fields.
 
-One important point about the calculated fields is caching, one field could be
-cached always until someone (some other module) changes its name, could be
-cached for a period of time (like in the example) or could be not cached at all
-so its value is calculated every time. See the :ref:`decorators` for more
-information about it.
+One important point about the calculated fields is caching. One field could be:
+
+* Always cached - until someone (some other module) changes its name
+
+* Cached for a period of time - like in the example,
+
+* Not cached at all - so its value is calculated every time.
+
+See the :ref:`decorators` for more information about this.
 
 Schema
 ^^^^^^
 
 Here we can specify the **schema** or structure that the field should follow.
-This is using `nicolaiarocci/cerberus
+This is done using `nicolaiarocci/cerberus
 <http://github.com/nicolaiarocci/cerberus>`_ and you read the documentation on
 how to use it in `read the docs <http://cerberus.readthedocs.org/en/latest/>`_.
 
 *JSONAlchemy* only adds two things to the default *cerberus*:
 
-1. ``force``, boolean value that tells if the value of the filed needs to be
-   casted to ``type``.  2. ``default``, function without any parameter to call
-   if the field has a default value.
+1. The ``force`` boolean value that tells if the value of the filed needs to be
+   casted to ``type``. 
+
+2. The ``default`` function (which has no parameters) that is used if the field
+   has a default value.
 
 An example of the schema section could be::
 
@@ -243,7 +250,7 @@ Description
 This is an special section as it could be used without the block::
 
     uuid:
-        ""
+        """
         This is the main persistent identifier of a document and will be
         used
         internally as this, therefore the pid important should always
@@ -254,8 +261,8 @@ This is an special section as it could be used without the block::
         description:
             """Record main identifier. """
 
-Both cases are the same and the syntax of is the same, triple quoted string
-(like python doc string).
+Both cases have the same syntax (triple-quoted strings a-la python) and the
+same end result.
 
 .. note:: The docstrings are not used anywhere else but inside the
     configuration files, for now. The plan is to use them to build the sites
@@ -265,13 +272,17 @@ Both cases are the same and the syntax of is the same, triple quoted string
 JSON
 ^^^^
 
-Not all the fields that we want to use have a JSON friendly representation,
-think about a date, we would like to use it as a ``datetime`` object but we
-still want to store as a JSON object.
+Not all the fields that we want to use have a JSON-friendly representation.
+Consider a date that we would like to use as a ``datetime`` object, yet 
+we want to store it as a JSON object.
 
-To solve this issue we introduce the json section where a couple of functions
-could be used to **load** the JSON representation from the database into and
-object and **dumps** which does the opposite.
+To solve this issue, we introduced the JSON section where a couple of
+functions:
+
+* **loads** to load the JSON representation from the database into an object,
+  and
+
+* **dumps** which does the opposite.
 
 A clear example of that is the ``creation_date`` field::
 
@@ -285,10 +296,11 @@ Both functions take only one argument, which is the value of the field.
 Producer
 ^^^^^^^^
 
-Generating a different output from a JSON object is not always easy, there
-might be implications among fields or any kind or rules. For that we introduce
-the producer section, which could also be seen as a short of documentation of
-how a field is exported to different formats and which are those formats.
+Generating a different output from a JSON object is not always easy: there
+might be implications among fields or rules. For this reason the producer
+section was introduced. The producer section can also be seen as a kind of
+documentation on how a field is exported to different formats and which formats
+those are.
 
 This is an example of its use::
 
@@ -299,22 +311,22 @@ This is an example of its use::
             json_for_marc(), {'a': 'title', 'b': 'subtitle'}
             json_for_dc(), {'dc:title': 'title'}
 
-Each rule inside the producer section follows the same pattern, first we
+Each rule inside the producer section follows the same pattern: first we
 specify the function that we want to use (what we want to produce), which
-should be placed inside the ``/producers`` folder. This function is not a real
-function call the function, it is just a way to specify which producer we will
-use an which parameter we what to use for this field. In the case of the MARC21
-producer we can put ``245__`` as parameter and only if title came from a
-``245__`` MARC21 field this function will generate the output. This parameter
+should be placed inside the ``/producers`` folder. This is not a real function
+call, but only a way to specify which producer we will use and which parameter
+we would like  to use for this field. In the case of the MARC21 producer we can
+put ``245__`` as parameter, so that only if title originated from a ``245__``
+MARC21 field this function will be used to generate the output. This parameter
 could be used differently depending on each producer.
 
 The second part, after the comma, is the rule that we will apply and it is
 typically a dictionary. In the case of the MARC21 producer we can put full name
-of the field as key, ``245__a`` or just the subfield like in the example. The
-value for this keys could a function call, a subfield or empty if we want the
-value of the full field.
+of the field as key, ``245__a``, or just the subfield like in the example. The
+value for this key could a function call, a subfield or even empty (if we want
+to use the entire field as a value).
 
-For more information about the MARC21 producer please check
+For more information about the MARC22 producer please check
 :ref:`json-for-marc` documentation.
 
 Inside any JSONAlchemy object, like records or documents, there is a method,
@@ -344,22 +356,27 @@ This type of decorators should be used outside of the field definition and
 affects the whole field, maybe adding some information to the dictionary that
 defines it.
 
-*Invenio* provides already three different field decorators:
-``@persitent_identifier(int)`` identifies a field as a *PID* with a priority,
-afterwards this field could be accessed using the ``persistent_identifiers``
-property; ``@override`` as it name points out allow us to override completely
-the field definition; and ``@extend`` which let us extend an existing field
-with, for example, new creator rules.
+*Invenio* provides three different field decorators:
 
-.. note:: For this type of decorators there are currently no extensions.
-    It is in the road map to allow each *Invenio* instace to extend this
+* ``@persitent_identifier(int)``: Identifies a field as a *PID* with a
+  priority, which could later be accessed using the ``persistent_identifiers``
+  property
+
+* ``@override``: As its name points out, it allows us to completely override
+  the field definition.
+
+* ``@extend``: Allows us extend an existing field with, for example, new
+  creator rules.
+
+.. note:: There are currently no extensions for this type of decorators.
+    It is in the road map to allow each *Invenio* instace to extend these
     decorators with any other that they might need.
 
 Rule Decorators
 """""""""""""""
 
-The other type of decorators applies to the creator/derived/calculated rules,
-for example::
+This other type of decorators applies to the creator/derived/calculated rules.
+For example::
 
     authors:
     """List with all the authors, connected with main_author and rest_authors"""
@@ -370,10 +387,10 @@ for example::
         @only_if('_firs_author' in self or '_additional_authors' in self)
         util_merge_fields_info_list(self, ['_first_author', '_additional_authors'])
 
-The for decorators are applied only if the derived rule of the field
-``authors`` is applied.
+These decorators are applied only if the derived rule of the field ``authors``
+is applied.
 
-Within the rule decorators there are three different kinds depending on when
+The rule decorators are split into three different kinds depending on when
 they are evaluated: before the rule gets evaluated, during the evaluation of
 the rule and after the rule evaluation.
 
@@ -381,57 +398,57 @@ This is the list of rule decorators available in *Invenio* and what they are
 used for.
 
 ``connect(field_name, handler=None)``
-    This is an after evaluation decorator that allows the connection between
-    fields. This connection is bidirectional, if the connected field gets
-    modify the decorated field also gets modified and vice versa.
+    This is an post-evaluation decorator that allows the connection between
+    fields. This connection is bidirectional: if the connected field gets
+    modified, then the decorated field also gets modified and vice versa.
 
     The optional handler function will be called whenever there is any
-    modification in any of the field. The default behavior is to propagate the
+    modification in any of the fields. The default behavior is to propagate the
     value across all the connected fields.
 
 ``depends_on(*field_names)``
-    Before rule evaluation decorator that simply tells JSONAlchemy whether the
-    rule will be evaluated depending on the existence of the ``field_names``
-    inside the current JSON object.
+    This decorator acts before rule evaluation and tells JSONAlchemy whether
+    the rule will be evaluated depending on the existence of the
+    ``field_names`` inside the current JSON object.
 
-    If the fields are not in the JSON object and their rules were not evaluated
-    yet, then it will try to evaluate them before failing.
+    If the fields are not in the JSON object and their rules have not been
+    evaluated yet, then it will try to evaluate them before failing.
 
 ``legacy(master_format, legay_field, matching)``
-    On evaluation decorator that add some legacy information the rule that its
-    being applied.
+    An on-evaluation decorator that adds some legacy information to the rule
+    that its being applied.
     The master format is not important if dealing with a creator rule (it will
     be derived from the rule), otherwise it needs to specified.
     The matching argument is typically a tuple where we connect the legacy
     field with the subfields.
 
 ``memoize(life_time=0)``
-    This after evaluation decorator only works with calculated fields, it
+    This post-evaluation decorator only works with calculated fields. It
     creates a cached value of the field that is decorated for a determined
     time.
 
 ``only_if_master_value(*boolean_expresions)``
-    On evaluation decorator that gives access to the current master value. It
-    is typically use to evaluate one rule only if the master value matches a
+    On-evaluation decorator that gives access to the current master value. It
+    is typically used to evaluate one rule only if the master value matches a
     series of conditions.
 
     The boolean expression could be any python expression that is evaluated to
     ``True`` or ``Flase``.
 
 ``only_if(*boolean_expresions)``
-    Like the previous one but in this case we don't have access to the current
+    Like the previous one, but in this case we don't have access to the current
     master value, only to the current JSON object.
 
 ``parse_first(*field_names)``
-    It could be seen as a lighter version of ``depends_on``, in this case the
-    rule will be evaluated even though the fields names are not inside the JSON
-    object, it only triggers parsing the rules for the fields.
+    This could be seen as a lighter version of ``depends_on``. However, in this
+    case the rule will be evaluated even if the fields names are not inside the
+    JSON object - it only triggers parsing the rules for the fields.
 
 For more information about the decorators, and also about the other extensions,
 check the :ref:`parsers` section.
 
 
-.. note:: Be aware that right now the order of the decorators is not respected.
+.. note:: Be aware that, right now, the order of the decorators is not respected.
 
 
 Model Configuration File
