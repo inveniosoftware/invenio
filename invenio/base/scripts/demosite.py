@@ -25,6 +25,7 @@ import os
 import pkg_resources
 import sys
 
+from invenio.base.globals import cfg
 from invenio.ext.script import Manager
 
 manager = Manager(usage=__doc__)
@@ -72,9 +73,12 @@ def populate(packages=[], default_data=True, files=None,
     db.session.execute("TRUNCATE schTASK")
     db.session.commit()
     if files is None:
-        files = [pkg_resources.resource_filename(
-            'invenio',
-            os.path.join('testsuite', 'data', 'demo_record_marc_data.xml'))]
+        if cfg.get('BASE_DEMOSITE_RECORDS_FIXTURE'):
+            files = cfg.get('BASE_DEMOSITE_RECORDS_FIXTURE', [])
+        else:
+            files = [pkg_resources.resource_filename('invenio',
+                     os.path.join('testsuite', 'data',
+                                  'demo_record_marc_data.xml'))]
 
     # upload demo site files:
     bibupload_flags = '-i'
