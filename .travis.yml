@@ -28,7 +28,7 @@ before_install:
 
 install:
   - sudo pip install -q devpi-client
-  - devpi use http://inspireprovisioning.cern.ch/root/inspire --set-cfg
+  - devpi use http://inspireprovisioning.cern.ch/root/prod --set-cfg
   - curl -L https://raw.githubusercontent.com/inspirehep/invenio-devscripts/master/invenio-kickstart > /tmp/invenio-kickstart
   - chmod +x /tmp/invenio-kickstart
   - CFG_INVENIO_SRCDIR=$(pwd) /tmp/invenio-kickstart --yes-i-know --yes-i-really-know
