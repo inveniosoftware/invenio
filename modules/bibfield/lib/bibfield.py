@@ -88,7 +88,7 @@ def create_records(blob, master_format='marc', verbose=0, **additional_info):
     return [create_record(record_blob, master_format, verbose=verbose, **additional_info) for record_blob in record_blods]
 
 
-def get_record(recid, reset_cache=False, fields=()):
+def get_record(recid, reset_cache=False):
     """
     Record factory, it retrieves the record from bibfmt table if it is there,
     if not, or reset_cache is set to True, it searches for the appropriate
@@ -130,9 +130,4 @@ def get_record(recid, reset_cache=False, fields=()):
         run_sql("REPLACE INTO bibfmt(id_bibrec, format, last_updated, value) VALUES (%s, 'recjson', NOW(), %s)",
                 (recid, msgpack.dumps(record.dumps())))
 
-    if fields:
-        chunk = SmartDict()
-        for key in fields:
-            chunk[key] = record.get(key)
-        record = chunk
     return record

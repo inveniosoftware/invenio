@@ -86,15 +86,6 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
         self.assertEqual(4, record['number_of_citations'])
 
 
-    def test_get_record_using_field_filter(self):
-        """BibField - get record filtering fields"""
-        authors = get_record(12, fields=('authors',))
-        self.assertEquals(len(authors['authors']), 19)
-        mainauthor_title = get_record(12, fields=('authors[0]', 'title'))
-        self.assertTrue('authors[0].full_name' in mainauthor_title)
-        self.assertTrue('title' in mainauthor_title)
-
-
 class BibFieldCreateRecordTests(InvenioTestCase):
     """
     Bibfield - demo file parsing test
