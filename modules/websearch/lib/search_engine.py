@@ -75,6 +75,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
+     CFG_BIBFORMAT_HIDDEN_RECJSON_FIELDS, \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SOLR_URL, \
@@ -4995,14 +4996,28 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if format == 'recstruct':
         return get_record(recID)
 
-    if format.startswith('recjson'):
+    #check from user information if the user has the right to see hidden fields/tags in the
+    #records as well
+    can_see_hidden = False
+    if user_info:
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
+
+    if format == 'recjson':
         import json
         from invenio.bibfield import get_record as get_recjson
-        if ot:
-            ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
-            return json.dumps(dict(get_recjson(recID, fields=ot)))
-        else:
-            return json.dumps(get_recjson(recID).dumps())
+        from invenio.bibfield_utils import SmartDict
+        recjson = get_recjson(recID)
+        record = SmartDict()
+        keys = ot or recjson.keys()
+        for key in keys:
+            if key == 'bibdocs':
+                continue
+            if not can_see_hidden and key in CFG_BIBFORMAT_HIDDEN_RECJSON_FIELDS:
+                continue
+            record[key] = recjson.get(key)
+        # skipkeys is True to skip e.g. the bibdocs key, which is a non
+        # primitive object.
+        return json.dumps(dict(record), skipkeys=True)
 
     _ = gettext_set_language(ln)
 
@@ -5016,19 +5031,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     else:
         display_claim_this_paper = False
 
-
-
-
-    #check from user information if the user has the right to see hidden fields/tags in the
-    #records as well
-    can_see_hidden = False
-    if user_info:
-        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
-
     can_edit_record = False
     if check_user_can_edit_record(user_info, recID):
         can_edit_record = True
-
 
     out = ""
 
@@ -5092,9 +5097,12 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             out += "%s" % decompress(res[0][0])
         elif ot:
             # field-filtered output was asked for; print only some fields
+            record = get_record(recID)
             if not can_see_hidden:
+                for tag in CFG_BIBFORMAT_HIDDEN_TAGS:
+                    del record[tag]
                 ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
-            out += record_xml_output(get_record(recID), ot)
+            out += record_xml_output(record, ot)
         else:
             # record 'recID' is not formatted in 'format' or we ask
             # for field-filtered output -- they are not in "bibfmt"
