@@ -84,7 +84,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                {% for row in folder_metadata|sort(attribute='isdir', reverse=True) %}
+                {% for row in folder_metadata %}
                   <tr>
                     <td>
                       {% if row["isdir"] %}

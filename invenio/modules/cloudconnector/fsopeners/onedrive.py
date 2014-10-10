@@ -26,7 +26,6 @@ Please note, when using onedrive and this factory the redirect url has
 to be a real web site e.g. "https://invenio.com" and not localhost.
 """
 
-from onedrive import api_v5
 from fs.errors import ResourceNotFoundError
 
 from invenio.base.globals import cfg
@@ -44,6 +43,8 @@ class Factory(object):
     def build_fs(self, current_user, credentials, root=None,
                  callback_url=None, request=None, session=None):
         """Build OneDrive filesystem."""
+        from onedrive import api_v5
+
         if root == "/":
             root = cfg['CFG_ONEDRIVE_ROOT']
 
