@@ -146,15 +146,23 @@ class BibCheckAmendableRecordTest(InvenioTestCase):
         self.assertTrue(self.record.valid)
         self.record.set_invalid("test message")
         self.assertFalse(self.record.valid)
-        self.assertEqual(self.record.errors, ["Rule test_rule: test message"])
+        self.assertEqual(len(self.record._errors), 1)
+        error = self.record._errors[0]
+        self.assertEqual(error.nature, "error")
+        self.assertEqual(error.rule, "test_rule")
+        self.assertEqual(error.msg, "test message")
 
     def test_amend(self):
         """ Test the amend method """
-        self.assertFalse(self.record.amendments)
+        self.assertFalse(self.record._amendments)
         self.record.amend_field(("100__a", 0, 0), "Pepe", "Changed author")
         self.assertEqual(self.record["100"][0][0][0][1], "Pepe")
         self.assertTrue(self.record.amended)
-        self.assertEqual(self.record.amendments, ["Rule test_rule: Changed author"])
+        self.assertEqual(len(self.record._amendments), 1)
+        amendment = self.record._amendments[0]
+        self.assertEqual(amendment.nature, "amendment")
+        self.assertEqual(amendment.rule, "test_rule")
+        self.assertEqual(amendment.msg, "Changed author")
 
     def test_itertags(self):
         """ Test the itertags method """
