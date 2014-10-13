@@ -19,7 +19,9 @@
 
 """Custom hooks and hacks needed for Flask-Babel."""
 
+import sys
 import pkg_resources
+import six
 
 from babel import support
 from contextlib import contextmanager
@@ -28,6 +30,7 @@ from flask.ext.babel import Babel, gettext
 
 from invenio.utils.datastructures import LaziestDict
 from .selectors import get_locale, get_timezone
+from .errors import NoCompiledTranslationError
 
 babel = Babel()
 
@@ -53,7 +56,13 @@ def get_translation(locale):
         if translations is None:
             translations = support.Translations.load(dirname, [locale])
         else:
-            translations.merge(support.Translations.load(dirname, [locale]))
+            try:
+                translations.merge(support.Translations.load(dirname, [locale]))
+            except AttributeError:
+                # translations is probably support.NullTranslations
+                six.reraise(NoCompiledTranslationError,
+                            "Compiled translations seems to be missing",
+                            sys.exc_info()[2])
     return translations
 
 # Lazy translation cache.
