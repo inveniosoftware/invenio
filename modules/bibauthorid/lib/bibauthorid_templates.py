@@ -697,7 +697,7 @@ class Template:
             'b_confirm': 'Confirm',
             'b_repeal': 'Repeal',
             'b_to_others':
-            'Assign to other person',
+            'Assign to another person',
             'b_forget': 'Forget decision'},
         buttons_verbiage_dict={
             'mass_buttons': {'no_doc_string': 'Sorry, there are currently no documents to be found in this category.',
@@ -706,7 +706,7 @@ class Template:
                              'b_repeal':
                              'Repeal',
                              'b_to_others':
-                             'Assign to other person',
+                             'Assign to another person',
                              'b_forget': 'Forget decision'},
             'record_undecided': {'alt_confirm': 'Confirm!',
                                  'confirm_text':
@@ -965,7 +965,7 @@ class Template:
                             'mass_buttons': {'no_doc_string': 'Sorry, there are currently no documents to be found in this category.',
                                              'b_confirm': 'Confirm',
                                              'b_repeal': 'Repeal',
-                                             'b_to_others': 'Assign to other person',
+                                             'b_to_others': 'Assign to another person',
                                              'b_forget': 'Forget decision'},
                         'record_undecided': {'alt_confirm': 'Confirm!',
                                              'confirm_text': 'Confirm record assignment.',
@@ -2570,7 +2570,7 @@ buttons_verbiage_dict = {
     'guest': {'mass_buttons': {'no_doc_string': 'Sorry, there are currently no documents to be found in this category.',
                                'b_confirm': 'Yes, those papers are by this person.',
                                'b_repeal': 'No, those papers are not by this person',
-                               'b_to_others': 'Assign to other person',
+                               'b_to_others': 'Assign to another person',
                                'b_forget': 'Forget decision'},
               'record_undecided': {'alt_confirm': 'Confirm!',
                                    'confirm_text': 'Yes, this paper is by this person.',
@@ -2624,7 +2624,7 @@ buttons_verbiage_dict = {
              'not_owner': {'mass_buttons': {'no_doc_string': 'Sorry, there are currently no documents to be found in this category.',
                                             'b_confirm': 'Yes, those papers are by this person.',
                                             'b_repeal': 'No, those papers are not by this person',
-                                            'b_to_others': 'Assign to other person',
+                                            'b_to_others': 'Assign to another person',
                                             'b_forget': 'Forget decision'},
                            'record_undecided': {'alt_confirm': 'Confirm!',
                                                 'confirm_text':
@@ -2655,7 +2655,7 @@ buttons_verbiage_dict = {
     'admin': {'mass_buttons': {'no_doc_string': 'Sorry, there are currently no documents to be found in this category.',
                                'b_confirm': 'Yes, those papers are by this person.',
                                'b_repeal': 'No, those papers are not by this person',
-                               'b_to_others': 'Assign to other person',
+                               'b_to_others': 'Assign to another person',
                                'b_forget': 'Forget decision'},
               'record_undecided': {'alt_confirm': 'Confirm!',
                                    'confirm_text': 'Yes, this paper is by this person.',
