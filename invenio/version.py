@@ -91,7 +91,7 @@ def git_revision():
         import subprocess
         call = subprocess.Popen(r'git log -1 --pretty=format:%ct --quiet HEAD',
                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                shell=True)
+                                stderr=subprocess.PIPE, shell=True)
         stdout, _ = call.communicate()
         try:
             timestamp = int(stdout.decode())
