@@ -254,7 +254,7 @@ PROFILE_IDENTIFIER_URL_MAPPING = {
     "orcid": "https://orcid.org/{0}"
 }
 
-NON_EMPTY_PERSON_TAGS = ['canonical_name']
+NON_EMPTY_PERSON_TAGS = ['canonical_name', 'user-created']
 
 QGRAM_LEN = 2
 MATCHING_QGRAMS_PERCENTAGE = 0.8

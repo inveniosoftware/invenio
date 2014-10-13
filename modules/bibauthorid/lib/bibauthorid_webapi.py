@@ -3364,8 +3364,6 @@ def connect_author_with_orcid(cname, orcid, uid):
 
 def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
     pid = operation_parts['pid']
-    if pid == bconfig.CREATE_NEW_PERSON:
-        pid = create_new_person(uid)
     action = operation_parts['action']
     bibref, rec = split_bibrefrec(operation_parts['bibrefrec'])
     bibrefs = None
