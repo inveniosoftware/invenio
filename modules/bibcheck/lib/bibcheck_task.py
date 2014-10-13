@@ -29,6 +29,8 @@ import traceback
 import time
 import inspect
 import itertools
+import collections
+import functools
 
 from ConfigParser import RawConfigParser
 from datetime import datetime
@@ -49,7 +51,8 @@ from invenio.config import \
     CFG_PYLIBDIR, \
     CFG_SITE_URL, \
     CFG_TMPSHAREDDIR, \
-    CFG_CERN_SITE
+    CFG_CERN_SITE, \
+    CFG_SITE_RECORD
 from invenio.search_engine import \
     perform_request_search, \
     search_unit_in_bibxxx, \
@@ -73,18 +76,167 @@ class RulesParseError(Exception):
             error))
 
 
+class Tickets(object):
+
+    """Handle ticket accumulation and dispatching."""
+
+    def __init__(self, records):
+        self.records = records
+        self.policy_method = None
+
+    def resolve_ticket_creation_policy(self):
+        """Resolve the policy for creating tickets."""
+        ticket_creation_policy = \
+            task_get_option('ticket_creation_policy', 'per-record')
+
+        known_policies = ('per-rule',
+                          'per-record',
+                          'per-rule-per-record',
+                          'no-tickets')
+        if ticket_creation_policy not in known_policies:
+            raise Exception("Invalid ticket_creation_policy in config '{0}'".
+                            format(ticket_creation_policy))
+
+        if task_get_option('no_tickets', False):
+            ticket_creation_policy = 'no-tickets'
+
+        policy_translator = {
+            'per-rule': self.tickets_per_rule,
+            'per-record': self.tickets_per_record,
+            'per-rule-per-record': self.tickets_per_rule_per_record
+        }
+        self.policy_method = policy_translator[ticket_creation_policy]
+
+    @staticmethod
+    def submit_ticket(msg_subject, msg, record_id):
+        """Submit a single ticket."""
+        if isinstance(msg, unicode):
+            msg = msg.encode("utf-8")
+
+        submit = functools.partial(BIBCATALOG_SYSTEM.ticket_submit,
+                                   subject=msg_subject, text=msg,
+                                   queue=task_get_option("queue", "Bibcheck"))
+        if record_id is not None:
+            submit = functools.partial(submit, recordid=record_id)
+        res = submit()
+        write_message("Bibcatalog returned %s" % res)
+        if res > 0:
+            BIBCATALOG_SYSTEM.ticket_comment(None, res, msg)
+
+    def submit(self):
+        """Generate and submit tickets for the bibcatalog system."""
+        self.resolve_ticket_creation_policy()
+        for ticket_information in self.policy_method():
+            self.submit_ticket(*ticket_information)
+
+    def _generate_subject(self, issue_type, record_id, rule_name):
+        """Generate a fitting subject based on what information is given."""
+        assert any((i is not None for i in (issue_type, record_id, rule_name)))
+        return "[BibCheck{issue_type}]{record_id}{rule_name}".format(
+            issue_type=":" + issue_type if issue_type else "",
+            record_id=" [ID:" + record_id + "]" if self.ticket_creation_policy
+            in ("per-record", "per-rule-per-record") else "",
+            rule_name=" [Rule:" + rule_name + "]" if self.ticket_creation_policy
+            in ("per-rule", "per-rule-per-record") else "")
+
+    @staticmethod
+    def _get_url(record):
+        """Resolve the URL required to edit a record."""
+        return "%s/%s/%s/edit" % (CFG_SITE_URL, CFG_SITE_RECORD,
+                                  record.record_id)
+
+    def tickets_per_rule(self):
+        """Generate with the `per-rule` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[issue.rule].append((record, issue.nature, issue.msg))
+        for rule_name in output.iterkeys():
+            msg = []
+            for record, issue_nature, issue_msg in output[rule_name]:
+                msg.append("{issue_nature}: {issue_msg}".format(
+                    issue_nature=issue_nature, issue_msg=issue_msg))
+                msg.append("Edit record ({record_id}) {url}\n".format(
+                    record_id=record.record_id, url=self._get_url(record)))
+            msg_subject = self._generate_subject(None, None, rule_name)
+            yield (msg_subject, "\n".join(msg), None)
+
+    def tickets_per_record(self):
+        """Generate with the `per-record` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[record].append((issue.nature, issue.msg))
+        for record in output.iterkeys():
+            msg = []
+            for issue in output[record]:
+                issue_nature, issue_msg = issue
+                msg.append("{issue_type}: {rule_messages}".
+                           format(record_id=record.record_id,
+                                  issue_type=issue_nature,
+                                  rule_messages=issue_msg))
+            msg.append("Edit record: {url}".format(url=self._get_url(record)))
+            msg_subject = self._generate_subject(None, record.record_id, None)
+            yield (msg_subject, "\n".join(msg), record.record_id)
+
+    def tickets_per_rule_per_record(self):
+        """Generate with the `per-rule-per-record` policy."""
+        output = collections.defaultdict(list)
+        for record in self.records:
+            for issue in record.issues:
+                output[(issue.rule, record)].append((issue.nature, issue.msg))
+        for issue_rule, record in output.iterkeys():
+            msg = []
+            for issue_nature, issue_msg in output[(issue_rule, record)]:
+                msg.append("{issue_message}".format(issue_message=issue_msg))
+            msg.append("Edit record ({record_id}): {url}".format(url=self._get_url(record),
+                                                                 record_id=record.record_id))
+            msg_subject = self._generate_subject(issue_nature, record.record_id,
+                                                 issue_rule)
+            yield (msg_subject, "\n".join(msg), record.record_id)
+
+
+class Issue(object):
+
+    """Holds information about a single record issue."""
+
+    def __init__(self, nature, rule, msg):
+        self._nature = None
+        self.nature = nature
+        self.rule = rule
+        self.msg = msg
+
+    @property
+    def nature(self):
+        return self._nature
+
+    @nature.setter
+    def nature(self, value):
+        assert value in ('error', 'amendment', 'warning')
+        self._nature = value
+
 class AmendableRecord(dict):
     """ Class that wraps a record (recstruct) to pass to a plugin """
     def __init__(self, record):
         dict.__init__(self, record)
-        self.errors = []
-        self.amendments = []
-        self.warnings = []
+        self.issues = []
         self.valid = True
         self.amended = False
         self.holdingpen = False
         self.rule = None
         self.record_id = self["001"][0][3]
+
+    @property
+    def _errors(self):
+        return [i for i in self.issues if i.nature == 'error']
+
+    @property
+    def _amendments(self):
+        return [i for i in self.issues if i.nature == 'amendment']
+
+    @property
+    def _warnings(self):
+        return [i for i in self.issues if i.nature == 'warning']
 
     def iterfields(self, fields):
         """
@@ -198,21 +350,24 @@ class AmendableRecord(dict):
         """ Mark the record as amended """
         write_message("Amended record %s by rule %s: %s" %
                 (self.record_id, self.rule["name"], message))
-        self.amendments.append("Rule %s: %s" % (self.rule["name"], message))
+        self.issues.append(Issue('amendment', self.rule['name'], message))
         self.amended = True
         if self.rule["holdingpen"]:
             self.holdingpen = True
 
     def set_invalid(self, reason):
         """ Mark the record as invalid """
-        write_message("Record %s marked as invalid by rule %s: %s" %
-                (CFG_SITE_URL + "/record/%s" % self.record_id, self.rule["name"], reason))
-        self.errors.append("Rule %s: %s" % (self.rule["name"], reason))
+        url = "{site}/{record}/{record_id}".format(site=CFG_SITE_URL,
+                                                   record=CFG_SITE_RECORD,
+                                                   record_id=self.record_id)
+        write_message("Record {url} marked as invalid by rule {name}: {reason}".
+                      format(url=url, name=self.rule["name"], reason=reason))
+        self.issues.append(Issue('error', self.rule['name'], reason))
         self.valid = False
 
     def warn(self, msg):
         """ Add a warning to the record """
-        self.warnings.append("Rule %s: %s" % (self.rule["name"], msg))
+        self.issues.append(Issue('warning', self.rule['name'], msg))
         write_message("[WARN] record %s by rule %s: %s" %
                 (self.record_id, self.rule["name"], msg))
 
@@ -255,6 +410,8 @@ def task_parse_options(key, val, *_):
         task_set_option("queue", val)
     elif key in ("--no-tickets", "-t"):
         task_set_option("no_tickets", True)
+    elif key in ("--ticket-creation-policy", "-p"):
+        task_set_option("ticket_creation_policy", val)
     elif key in ("--no-upload", "-b"):
         task_set_option("no_upload", True)
     elif key in ("--dry-run", "-n"):
@@ -307,6 +464,7 @@ def task_run_core():
 
     records_to_upload_holdingpen = []
     records_to_upload_replace = []
+    records_to_submit_tickets = []
     for batch in iter_batches(all_recids, CFG_BATCH_SIZE):
 
         for rule_name in batch_rules:
@@ -320,7 +478,7 @@ def task_run_core():
             if len(records):
                 check_records(rule, records)
 
-        # Then run them trught normal rules
+        # Then run them through normal rules
         for i, record_id, record in batch:
             progress_percent = int(float(i) / len(all_recids) * 100)
             task_update_progress("Processing record %s/%s (%i%%)." %
@@ -341,7 +499,9 @@ def task_run_core():
                     records_to_upload_replace.append(record)
 
             if not record.valid:
-                submit_ticket(record, record_id)
+                records_to_submit_tickets.append(record)
+
+        Tickets(records).submit()
 
         if len(records_to_upload_holdingpen) >= CFG_BATCH_SIZE:
             upload_amendments(records_to_upload_holdingpen, True)
@@ -363,47 +523,6 @@ def task_run_core():
 
     return True
 
-def submit_ticket(record, record_id):
-    """ Submit the errors to bibcatalog """
-
-    if task_get_option("no_tickets", False):
-        return
-
-    msg = """
-Bibcheck found some problems with the record with id %s:
-
-Errors:
-%s
-
-Amendments:
-%s
-
-Warnings:
-%s
-
-Edit this record: %s
-"""
-    msg = msg % (
-        record_id,
-        "\n".join(record.errors),
-        "\n".join(record.amendments),
-        "\n".join(record.warnings),
-        "%s/record/%s/edit" % (CFG_SITE_URL, record_id),
-    )
-    if isinstance(msg, unicode):
-        msg = msg.encode("utf-8")
-
-    subject = "Bibcheck rule failed in record %s" % record_id
-
-    res = BIBCATALOG_SYSTEM.ticket_submit(
-        subject=subject,
-        recordid=record_id,
-        text=subject,
-        queue=task_get_option("queue", "Bibcheck")
-    )
-    write_message("Bibcatalog returned %s" % res)
-    if res > 0:
-        BIBCATALOG_SYSTEM.ticket_comment(None, res, msg)
 
 
 def upload_amendments(records, holdingpen):

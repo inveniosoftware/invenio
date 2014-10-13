@@ -72,7 +72,7 @@ class BibCheckPluginsTest(InvenioTestCase):
         record.set_rule(RULE_MOCK)
         test.check_record(record, **kwargs)
         self.assertTrue(record.amended)
-        self.assertEqual(len(record.amendments), len(changes))
+        self.assertEqual(len(record._amendments), len(changes))
         for field, val in changes.iteritems():
             if val is not None:
                 self.assertEqual(
@@ -91,7 +91,7 @@ class BibCheckPluginsTest(InvenioTestCase):
         record.set_rule(RULE_MOCK)
         test.check_record(record, **kwargs)
         self.assertFalse(record.valid)
-        self.assertTrue(len(record.errors) > 0)
+        self.assertTrue(len(record._errors) > 0)
 
     def assertOk(self, test, **kwargs):
         """
@@ -103,8 +103,8 @@ class BibCheckPluginsTest(InvenioTestCase):
         test.check_record(record, **kwargs)
         self.assertTrue(record.valid)
         self.assertFalse(record.amended)
-        self.assertEqual(len(record.amendments), 0)
-        self.assertEqual(len(record.errors), 0)
+        self.assertEqual(len(record._amendments), 0)
+        self.assertEqual(len(record._errors), 0)
 
     def test_mandatory(self):
         """ Mandatory fields plugin test """
