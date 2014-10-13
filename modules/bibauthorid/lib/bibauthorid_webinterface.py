@@ -35,6 +35,7 @@ except ImportError:
     json = None
 
 from invenio.bibauthorid_webapi import add_cname_to_hepname_record
+from invenio.bibauthorid_webapi import create_new_person
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL
 from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
@@ -1098,9 +1099,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 # person id! (crr %s)" %repr(argd))
 
             bibrefrecs = argd['selection']
+            pid_to_assign = None
+
 
             if argd['confirm']:
                 action = 'assign'
+                pid_to_assign = create_new_person(getUid(req))
             elif argd['repeal']:
                 action = 'reject'
             elif argd['reset']:
@@ -1112,7 +1116,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 form['jsondata'] = json.dumps({'pid': str(pid),
                                                'action': action,
                                                'bibrefrec': bibrefrec,
-                                               'on': 'user'})
+                                               'on': 'user',
+                                               'pid_to_assign': pid_to_assign})
 
                 t = WebInterfaceAuthorTicketHandling()
                 t.add_operation(req, form)
@@ -3234,7 +3239,8 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
         try:
             operation_parts = {'pid': int(json_data['pid']),
                                'action': json_data['action'],
-                               'bibrefrec': json_data['bibrefrec']}
+                               'bibrefrec': json_data['bibrefrec'],
+                               'pid_to_assign': json_data['pid_to_assign']}
             on_ticket = json_data['on']
         except:
             return self._fail(req, apache.HTTP_NOT_FOUND)
