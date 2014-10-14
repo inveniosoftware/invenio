@@ -62,6 +62,7 @@ from invenio.dbquery import run_sql
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.shellutils import split_cli_ids_arg
 from invenio.jsonutils import json
+from invenio.websearch_webcoll import get_cache_last_updated_timestamp
 
 CFG_BATCH_SIZE = 1000
 
@@ -277,6 +278,15 @@ def task_run_core():
     task_set_option('plugins', plugins)
     recids_for_rules = get_recids_for_rules(rules)
 
+    update_database = not (task_has_option('record_ids') or
+                           task_get_option('no_upload', False) or
+                           task_get_option('no_tickets', False))
+
+    if update_database:
+        next_starting_dates = {}
+        for rule_name, rule in rules.iteritems():
+            next_starting_dates[rule_name] = get_next_starting_date(rule)
+
     all_recids = intbitset([])
     single_rules = set()
     batch_rules = set()
@@ -338,9 +348,10 @@ def task_run_core():
     if records_to_upload_replace:
         upload_amendments(records_to_upload_replace, False)
 
-    # Update the database with the last time the rules was ran
-    for rule in rules.keys():
-        update_rule_last_run(rule)
+    # Update the database with the last time each rule was ran
+    if update_database:
+        for rule_name, rule in rules.iteritems():
+            update_rule_last_run(rule_name, next_starting_dates[rule_name])
 
     return True
 
@@ -446,22 +457,47 @@ def get_rule_lastrun(rule_name):
         return res[0][0]
 
 
-def update_rule_last_run(rule_name):
-    """
-    Set the last time a rule was run to now. This function should be called
-    after a rule has been ran.
-    """
+def get_next_starting_date(rule):
+    """Calculate the date the next bibcheck run should consider as initial.
 
-    if task_has_option('record_ids') or task_get_option('no_upload', False) \
-            or task_get_option('no_tickets', False):
-        return   # We don't want to update the database in this case
+    If no filter has been specified then the time that is set is the time the
+    task was started. Otherwise, it is set to the earliest date among last time
+    webcoll was run and the last bibindex last_update as the last_run to prevent
+    records that have yet to be categorized from being perpetually ignored.
+    """
+    def dt(t):
+        return datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+
+    # Upper limit
+    task_starting_time = dt(task_get_task_param('task_starting_time'))
+
+    for key, val in rule.iteritems():
+        if key.startswith("filter_") and val:
+            break
+    else:
+        return task_starting_time
+
+    # Lower limit
+    min_last_updated = run_sql("select min(last_updated) from idxINDEX")[0][0]
+    cache_last_updated = dt(get_cache_last_updated_timestamp())
+
+    return min(min_last_updated, task_starting_time, cache_last_updated)
+
+
+def update_rule_last_run(rule_name, next_starting_date):
+    """
+    Set the last time a rule was run.
+
+    This function should be called after a rule has been ran.
+    """
+    next_starting_date_str = datetime.strftime(next_starting_date,
+                                               "%Y-%m-%d %H:%M:%S")
 
     updated = run_sql("UPDATE bibcheck_rules SET last_run=%s WHERE name=%s;",
-                      (task_get_task_param('task_starting_time'), rule_name,))
+                      (next_starting_date_str, rule_name,))
     if not updated: # rule not in the database, insert it
         run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)",
-                (rule_name, task_get_task_param('task_starting_time')))
-
+                (rule_name, next_starting_date_str))
 
 def reset_rule_last_run(rule_name):
     """
