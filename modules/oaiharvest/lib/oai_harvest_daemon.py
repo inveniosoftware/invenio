@@ -1406,6 +1406,7 @@ def get_dates(dates):
 
 
 def get_identifier_names(identifier):
+    """Return list of identifiers from a comma-separated string."""
     if identifier:
         # Let's see if the user had a comma-separated list of OAI ids.
         stripped_idents = []
@@ -1416,9 +1417,6 @@ def get_identifier_names(identifier):
                 elif "arXiv" in ident:
                     # New style arXiv ID
                     ident = ident.replace("arXiv", "oai:arXiv.org")
-                elif "/" in ident:
-                    # Old style arXiv ID?
-                    ident = "%s%s" % ("oai:arXiv.org:", ident)
             stripped_idents.append(ident.strip())
         return stripped_idents
 
