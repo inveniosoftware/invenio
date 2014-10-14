@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -409,7 +409,8 @@ def register_exception(stream='error',
                                     'env': req.environ})
                 client.extra_context(user_info)
             filename = _get_filename_and_line(sys.exc_info())[0]
-            client.tags_context({'filename': filename}, {'version', CFG_VERSION})
+            client.tags_context({'filename': filename},
+                                {'version': CFG_VERSION})
             client.captureException()
         finally:
             client.context.clear()
