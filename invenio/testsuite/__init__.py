@@ -1250,7 +1250,7 @@ def iter_suites(packages=None):
         testsuite.register(testsuite_celery)
     else:
         exclude = map(lambda x: x + '.testsuite',
-                      app.config('PACKAGES_EXCLUDE', []))
+                      app.config.get('PACKAGES_EXCLUDE', []))
         testsuite = ImportPathRegistry(initial=packages, exclude=exclude,
                                        load_modules=True)
 
