@@ -323,7 +323,7 @@ the original files. As a developer you may want to have symbolic links instead.
 .. code-block:: console
 
     # Developer only
-    (invenio)$ inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link
+    (invenio)$ inveniomanage config set COLLECT_STORAGE flask.ext.collect.storage.link
 
 
     (invenio)$ inveniomanage collect

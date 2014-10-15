@@ -18,3 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Custom *Flask-Collect* storages."""
+
+import warnings
+
+warnings.warn("Use of custom Invenio link storage has been deprecated."
+              " Please use flask.ext.collect.storage.link instead.",
+              DeprecationWarning)
