@@ -364,7 +364,7 @@ def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False, user_collect
     query = """SELECT c.id, c.id_bibrec, c.id_user,
                       DATE_FORMAT(c.date_creation, '%%Y-%%m-%%d %%H:%%i:%%S'), c.body,
                       c.status, c.nb_abuse_reports,
-                      c.body_format
+                      c.body_format,
                       %s
                       u.email, u.nickname
                FROM cmtRECORDCOMMENT c LEFT JOIN user u
