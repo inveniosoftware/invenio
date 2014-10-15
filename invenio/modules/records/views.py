@@ -47,12 +47,14 @@ default_breadcrumb_root(blueprint, '.')
 
 
 def request_record(f):
+    """Perform standard operation to check record availability for user."""
     @wraps(f)
     def decorated(recid, *args, **kwargs):
         from invenio.modules.access.mailcookie import \
             mail_cookie_create_authorize_action
         from invenio.modules.access.local_config import VIEWRESTRCOLL
-        from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
+        from invenio.legacy.search_engine import \
+            guess_primary_collection_of_a_record, \
             check_user_can_view_record
         from invenio.legacy.websearch.adminlib import get_detailed_page_tabs,\
             get_detailed_page_tabs_counts
@@ -64,7 +66,8 @@ def request_record(f):
 
         (auth_code, auth_msg) = check_user_can_view_record(current_user, recid)
 
-        # only superadmins can use verbose parameter for obtaining debug information
+        # only superadmins can use verbose parameter for obtaining debug
+        # information
         if not current_user.is_super_admin and 'verbose' in kwargs:
             kwargs['verbose'] = 0
 
@@ -78,7 +81,8 @@ def request_record(f):
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
-        from invenio.legacy.search_engine import record_exists, get_merged_recid
+        from invenio.legacy.search_engine import record_exists, \
+            get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
         # will be redirect to the new one
@@ -126,12 +130,16 @@ def request_record(f):
         if cfg.get('CFG_WEBLINKBACK_TRACKBACK_ENABLED'):
             @register_template_context_processor
             def trackback_context():
-                from invenio.legacy.weblinkback.templates import get_trackback_auto_discovery_tag
-                return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
+                from invenio.legacy.weblinkback.templates import \
+                    get_trackback_auto_discovery_tag
+                return {'headerLinkbackTrackbackLink':
+                        get_trackback_auto_discovery_tag(recid)}
 
-        def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):
+        def _format_record(recid, of='hd', user_info=current_user, *args,
+                           **kwargs):
             from invenio.modules.formatter import format_record
-            return format_record(recid, of, user_info=user_info, *args, **kwargs)
+            return format_record(recid, of, user_info=user_info, *args,
+                                 **kwargs)
 
         @register_template_context_processor
         def record_context():
@@ -160,11 +168,15 @@ def request_record(f):
 @wash_arguments({'of': (unicode, 'hd'), 'ot': (unicode, None)})
 @request_record
 def metadata(recid, of='hd', ot=None):
-    from invenio.legacy.bibrank.downloads_similarity import register_page_view_event
+    """Display formated record metadata."""
+    from invenio.legacy.bibrank.downloads_similarity import \
+        register_page_view_event
     from invenio.modules.formatter import get_output_format_content_type
-    register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
+    register_page_view_event(recid, current_user.get_id(),
+                             str(request.remote_addr))
     if get_output_format_content_type(of) != 'text/html':
-        from invenio.modules.search.views.search import response_formated_records
+        from invenio.modules.search.views.search import \
+            response_formated_records
         return response_formated_records([recid], g.collection, of, qid=None)
 
     # Send the signal 'document viewed'
@@ -180,12 +192,14 @@ def metadata(recid, of='hd', ot=None):
 @blueprint.route('/<int:recid>/references', methods=['GET', 'POST'])
 @request_record
 def references(recid):
+    """Return references overview."""
     return render_template('records/references.html')
 
 
 @blueprint.route('/<int:recid>/files', methods=['GET', 'POST'])
 @request_record
 def files(recid):
+    """Return overview of attached files."""
     def get_files():
         from invenio.legacy.bibdocfile.api import BibRecDocs
         for bibdoc in BibRecDocs(recid).list_bibdocs():
@@ -210,11 +224,14 @@ def file(recid, filename):
     return send_file(document['uri'])
 
 
+
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
 @request_record
 def citations(recid):
-    from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list,\
-        get_self_cited_by, calculate_co_cited_with_list
+    """Return citations overview."""
+    from invenio.legacy.bibrank.citation_searcher import \
+        calculate_cited_by_list, get_self_cited_by, \
+        calculate_co_cited_with_list
     citations = dict(
         citinglist=calculate_cited_by_list(recid),
         selfcited=get_self_cited_by(recid),
@@ -227,6 +244,7 @@ def citations(recid):
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
 def keywords(recid):
+    """Return keywords overview."""
     from invenio.legacy.bibclassify.webinterface import record_get_keywords
     found, keywords, record = record_get_keywords(recid)
     return render_template('records/keywords.html',
@@ -237,8 +255,11 @@ def keywords(recid):
 @blueprint.route('/<int:recid>/usage', methods=['GET', 'POST'])
 @request_record
 def usage(recid):
-    from invenio.legacy.bibrank.downloads_similarity import calculate_reading_similarity_list
-    from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
+    """Return usage statistics."""
+    from invenio.legacy.bibrank.downloads_similarity import \
+        calculate_reading_similarity_list
+    from invenio.legacy.bibrank.downloads_grapher import \
+        create_download_history_graph_and_box
     viewsimilarity = calculate_reading_similarity_list(recid, "pageviews")
     downloadsimilarity = calculate_reading_similarity_list(recid, "downloads")
     downloadgraph = create_download_history_graph_and_box(recid)
@@ -251,4 +272,5 @@ def usage(recid):
 
 @blueprint.route('/', methods=['GET', 'POST'])
 def no_recid():
+    """Redirect to homepage."""
     return redirect("/")
