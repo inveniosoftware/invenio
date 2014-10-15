@@ -119,10 +119,150 @@ centor
     1.4.14
 
 
-2.3. Extra tools
+.. _OS X:
+
+
+2.3. OS X
+~~~~~~~~~~
+
+The steps below can be used to install invenio on a machine running MacOSX 10.9 or later.
+Feel free to give them a try.
+
+First things first, we need to install the `Homebrew <http://brew.sh/>`_ package manager.
+So open your terminal and type the following command:
+
+.. code-block:: console
+
+    $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+In order for the ``/usr/local/bin`` to occur before the ``/usr/bin`` , please do the following
+
+.. code-block:: console
+
+    $ echo export PATH="/usr/local/bin:$PATH" >> ~/.bash_profile
+    $ source ~/.bash_profile (to reload the profile)
+
+Next, need to see if everything is up-to-date!
+
+.. code-block:: console
+
+    $ brew update
+    $ brew doctor
+    $ brew upgrade
+
+Now it is time to start installing the prerequisites:
+
+.. code-block:: console
+
+    $ brew install python --framework -- universal
+    $ sudo pip install virtualenv
+    $ sudo pip install virtualenvwrapper
+    $ nano ~/.bash_profile (to edit the bash_profile)
+
+| Add the following to the file you opened and paste the following lines
+|   ``export WORKON_HOME=~/.virtualenvs``
+|   ``source /usr/local/bin/virtualenvwrapper.sh``
+
+Save the file and reload it by typing:
+
+.. code-block:: console
+
+    $ source ~/.bash_profile
+
+Continuing with the installation of prerequisite packages:
+
+.. code-block:: console
+
+    $ brew install redis
+    $ brew install mongodb
+
+.. note:: redis can be started by typing ``redis-server``
+
+See `MYSQL on OS X`_ for installing ``mysql``
+
+For ``libxml2`` and ``libxslt`` do:
+
+.. code-block:: console
+
+    $ brew install automake autoconf libtool libxml2 libxslt
+    $ brew link --force libxml2 libxslt
+
+The following might not be necessary but is good to have for completeness.
+
+.. code-block:: console
+
+    $ brew install libjpeg libtiff freetype
+    $ pip install -I pillow
+
+Install ``node`` by following `Node on OS X`_
+
+For ``bower``, type:
+
+.. code-block:: console
+
+    sudo npm install -g bower
+
+After the configuration section install the following(required for the assets):
+
+.. code-block:: console
+
+    $ sudo npm install -g less clean-css requirejs uglify-js
+
+See the following sections `Installation`_ , `Configuration`_ and `Development`_
+The commands for ``OS X`` are the same as in ``Linux``. 
+
+.. note:: 
+    When initializing the database, type:
+
+.. code-block:: console
+
+    $ inveniomanage database init --user=root --yes-i-know (because we have no root password)
+
+.. note:: 
+    For developers, honcho is recommended and will make your life 
+    easier because it launches all the servers together as it finds the ``Procfile``.
+
+
+.. _MYSQL on OS X:
+
+2.3.1. MySQL
+++++++++++++
+
+We will install mysql but without a root password.
+It should be easy to set the root password once you are connected in mysql.
+
+.. code-block:: console
+
+    $ brew install mysql
+    $ unset TMPDIR
+    $ mysql_install_db --verbose --user=`whoami` \
+     --basedir="$(brew --prefix mysql)" \
+     --datadir=/usr/local/var/mysql \
+     --tmpdir=/tmp
+
+You can start/stop/restart mysql server by typing:
+
+.. code-block:: console
+
+    $ mysql.server (start | stop | restart)
+
+
+.. _Node on OS X:
+
+2.3.2. Node.js in OS X
++++++++++++++++++++++++
+
+Install ``node`` by typing:
+
+.. code-block:: console
+
+    $ brew install node
+
+
+2.4. Extra tools
 ~~~~~~~~~~~~~~~~
 
-2.3.1. Bower
+2.4.1. Bower
 ++++++++++++
 
 Bower is used to manage the static assets such as JavaScript libraries (e.g.,
@@ -137,7 +277,7 @@ globally (``-g``) but you're free to choose your preferred way.
     $ npm install bower
 
 
-2.3.2 ``git-new-workdir`` (optional)
+2.4.2 ``git-new-workdir`` (optional)
 ++++++++++++++++++++++++++++++++++++
 
 For the rest of the tutorial you may want to use ``git-new-workdir``. It's a
@@ -165,6 +305,9 @@ This installation process is tailored for running the development version of
 Invenio, check out the :py:ref:`overlay` documentation for the production
 setup.
 
+
+.. _Installation:
+
 3.1. Installation
 ~~~~~~~~~~~~~~~~~
 
@@ -182,7 +325,7 @@ branch.
 
 We recommend to work using
 `virtual environments <http://www.virtualenv.org/>`_ so packages are installed
-locally and it will make your live easier. ``(invenio)$`` tells your that the
+locally and it will make your life easier. ``(invenio)$`` tells your that the
 *invenio* environment is the active one.
 
 .. code-block:: console
@@ -278,6 +421,8 @@ The last step, which is very important will be to collect all the assets, but
 it will be done after the configuration step.
 
 
+.. _Configuration:
+
 3.2. Configuration
 ~~~~~~~~~~~~~~~~~~
 
@@ -335,6 +480,9 @@ the original files. As a developer you may want to have symbolic links instead.
     js
     vendors
     ...
+
+
+.. _Development:
 
 3.3. Development
 ~~~~~~~~~~~~~~~~
