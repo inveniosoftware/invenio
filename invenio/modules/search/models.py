@@ -220,7 +220,7 @@ class Collection(db.Model):
     @property
     def name_ln(self):
         from invenio.legacy.search_engine import get_coll_i18nname
-        return get_coll_i18nname(self.name, g.ln).decode('utf-8')
+        return get_coll_i18nname(self.name, g.ln)
         # Another possible implementation with cache memoize
         # @cache.memoize
         #try:
