@@ -3870,6 +3870,7 @@ CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   id_user int(15) unsigned NOT NULL default '0',
   title varchar(255) NOT NULL default '',
   body text NOT NULL default '',
+  body_format varchar(10) NOT NULL default 'TXT',
   date_creation datetime NOT NULL default '0000-00-00 00:00:00',
   star_score tinyint(5) unsigned NOT NULL default '0',
   nb_votes_yes int(10) NOT NULL default '0',
