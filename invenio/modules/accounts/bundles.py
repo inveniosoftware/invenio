@@ -19,10 +19,9 @@
 
 """Accounts bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
 
-from invenio.base.bundles import styles as _styles
-
+from invenio.base.bundles import styles as _styles, jquery as _j, invenio as _i
 
 # The underscore makes it "hidden" for the bundle collector.
 _styles.contents += ("css/accounts/login.css",)
@@ -31,7 +30,7 @@ js = Bundle(
     "js/accounts/init.js",
     output="accounts.js",
     weight=80,
-    filters="requirejs",
+    filters=RequireJSFilter(exclude=[_j, _i]),
     bower={
         "jquery-ui": "~1.11"
     }

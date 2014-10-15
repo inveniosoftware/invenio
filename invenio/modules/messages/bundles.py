@@ -19,9 +19,9 @@
 
 """Messages bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
 
-from invenio.base.bundles import styles as _styles
+from invenio.base.bundles import styles as _styles, jquery as _j, invenio as _i
 
 _styles.contents.append(
     "vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"
@@ -31,7 +31,7 @@ js = Bundle(
     'js/messages/init.js',
     output='messages.js',
     weight=70,
-    filters='requirejs',
+    filters=RequireJSFilter(exclude=[_j, _i]),
     bower={
         "jquery-ui": "~1.11",
         "jqueryui-timepicker-addon": "latest"
