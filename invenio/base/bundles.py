@@ -62,18 +62,11 @@
 
 import mimetypes
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
 
 
 mimetypes.add_type("text/css", ".less")
 
-
-invenio = Bundle(
-    "js/invenio.js",
-    output="invenio.js",
-    filters="requirejs",
-    weight=90
-)
 
 styles = Bundle(
     "vendors/jquery-tokeninput/styles/token-input.css",
@@ -97,10 +90,6 @@ styles = Bundle(
     }
 )
 
-# FIXME
-#if config.CFG_WEBSTYLE_TEMPLATE_SKIN != "default":
-#    styles.contents.append("css/" + config.CFG_WEBSTYLE_TEMPLATE_SKIN + ".css")
-
 jquery = Bundle(
     "vendors/jquery/dist/jquery.js",
     "vendors/jquery.jeditable/index.js",
@@ -108,6 +97,7 @@ jquery = Bundle(
     "vendors/jquery.caret/dist/jquery.caret-1.5.2.js",
     "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
     "vendors/bootstrap/dist/js/bootstrap.js",
+    "vendors/typeahead.js/dist/typeahead.bundle.js",
     "js/bootstrap-select.js",
     "js/translate.js",
     "js/init.js",
@@ -140,6 +130,13 @@ jquery = Bundle(
         "uploadify": "latest"  # orphan
         #"bootstrap": "*", is set by invenio.css already.
     }
+)
+
+invenio = Bundle(
+    "js/invenio.js",
+    output="invenio.js",
+    filters=RequireJSFilter(exclude=[jquery]),
+    weight=90
 )
 
 # less.js is only used when the following configuration is set:

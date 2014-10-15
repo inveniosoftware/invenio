@@ -17,7 +17,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(['jquery', 'jquery-form', 'jquery-ui'], function($) {
+require([
+    'jquery',
+    'jquery-form',
+    'jquery-ui',
+    'ui/core',
+    'ui/mouse',
+    'ui/widget',
+    'ui/sortable',
+    'ui/datepicker',
+    'typeahead',
+    ], function() {
     // loading all the jQuery modules for the not require.js ready scripts
     // everywhere.
 })

@@ -41,10 +41,11 @@ Additional extensions and functions for the `flask.ext.assets` module.
 from .commands import AssetsCommand, BowerCommand
 from .extensions import BundleExtension
 from .registry import bundles
-from .wrappers import Bundle
+from .wrappers import Bundle, RequireJSFilter
 
 
-__all__ = ("bower", "bundles", "command", "setup_app", "Bundle")
+__all__ = ("bower", "bundles", "command", "setup_app", "Bundle",
+           "RequireJSFilter")
 
 command = AssetsCommand()
 bower = BowerCommand()
