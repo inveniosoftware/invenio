@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -88,6 +88,8 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
         ## Maybe one ExCern and primary at the same time. In this case let's give precedence to ExCern
         types = {}
         for result in results:
+            if result[1]['employeeType'][0] == 'Primary' and result[1]['userAccountControl'][0] == '512':
+                return result[1]
             types[result[1]['employeeType'][0]] = result[1]
         if 'ExCern' in types and 'Primary' in types:
             return types['ExCern']
