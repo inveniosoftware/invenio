@@ -30,10 +30,13 @@ def info():
 
 def do_upgrade():
     # First, insert the new column in the table.
-    run_sql("""ALTER TABLE  cmtRECORDCOMMENT
-               ADD COLUMN   body_format VARCHAR(10) NOT NULL DEFAULT %s
-               AFTER        body;""",
-            (CFG_WEBCOMMENT_BODY_FORMATS["HTML"],))
+    cmtRECORDCOMMENT_definition = run_sql("SHOW CREATE TABLE cmtRECORDCOMMENT")[0][1]
+    if "body_format" not in cmtRECORDCOMMENT_definition:
+        run_sql("""ALTER TABLE  cmtRECORDCOMMENT
+                   ADD COLUMN   body_format VARCHAR(10) NOT NULL DEFAULT %s
+                   AFTER        body;""",
+                (CFG_WEBCOMMENT_BODY_FORMATS["TEXT"],)
+               )
 
     number_of_comments = run_sql("""SELECT  COUNT(id)
                                     FROM    cmtRECORDCOMMENT""")[0][0]
@@ -61,7 +64,8 @@ def do_upgrade():
                                     LIMIT   %s, %s"""
 
         comments_update_query = """ UPDATE  cmtRECORDCOMMENT
-                                    SET     body = %s
+                                    SET     body = %s,
+                                            body_format = %s
                                     WHERE   id = %s"""
 
         for number_of_select_iteration in xrange(number_of_select_iterations):
@@ -83,7 +87,9 @@ def do_upgrade():
 
                     run_sql(
                         comments_update_query,
-                        (comment_body, comment_id)
+                        (comment_body,
+                         CFG_WEBCOMMENT_BODY_FORMATS["HTML"],
+                         comment_id)
                     )
 
 
