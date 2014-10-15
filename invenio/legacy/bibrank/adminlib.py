@@ -802,7 +802,9 @@ alternate_row_colors_p - if alternate background colours should be used for the 
 
         if type(firstrow) not in [int, long, str, dict]:
             # for data in firstrow: extra += '<td class="%s">%s</td>\n' % ('admintd', data)
-            for i in range(len(firstrow)): extra += '<td class="%s">%s</td>\n' % (align[i], firstrow[i])
+            for i in range(len(firstrow)):
+                extra += '<td class="{0}">{1}</td>\n'.format(
+                    align[i], firstrow[i])
         else:
             extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
         extra += '<td class="extracolumn" rowspan="%s" style="vertical-align: top;">\n%s\n</td>\n</tr>\n' % (len(tuple), extracolumn)
@@ -819,7 +821,8 @@ alternate_row_colors_p - if alternate background colours should be used for the 
         # row = tuple[i]
         if type(row) not in [int, long, str, dict]:
             # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
-            for i in range(len(row)): tblstr += '<td class="%s">%s</td>\n' % (align[i], row[i])
+            for i in range(len(row)):
+                tblstr += '<td class="{0}">{1}</td>\n'.format(align[i], row[i])
         else:
             tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
         tblstr += ' </tr> \n'
