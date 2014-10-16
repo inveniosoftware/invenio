@@ -101,7 +101,6 @@ install_requires = [
     "numpy>=1.7",
     "nydus>=0.10.8",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
-    "pycrypto>=2.0.1",
     "pyparsing>=2.0.1,<2.0.2",
     "python-twitter>=0.8.7",
     "pyPDF>=1.13",
