@@ -678,6 +678,33 @@ class BibWorkflowObject(db.Model):
         os.close(tmp_fd)
         return filename
 
+    def get_log(self, *criteria, **filters):
+        """Return a list of log entries from BibWorkflowObjectLog.
+
+        You can specify additional filters following the SQLAlchemy syntax.
+
+        Get all the logs for the object:
+
+        .. code-block:: python
+
+            b = BibWorkflowObject.query.get(1)
+            b.get_log()
+
+        Get all the logs for the object labeled as ERROR.
+
+        .. code-block:: python
+
+            b = BibWorkflowObject.query.get(1)
+            b.get_log(BibWorkflowObjectLog.log_type == logging.ERROR)
+
+        :return: list of BibWorkflowObjectLog
+        """
+        criterions = [BibWorkflowObjectLog.id_object == self.id] + list(criteria)
+        res = BibWorkflowObjectLog.query.filter(
+            *criterions
+        ).filter_by(**filters)
+        return res.all()
+
     def __getstate__(self):
         """Return internal dict."""
         return self.__dict__

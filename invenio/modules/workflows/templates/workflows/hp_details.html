@@ -302,6 +302,21 @@
             {% endfor %}
           {% endif %}
         {% endblock %}
+
+        {% block hp_task_logs %}
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+            {{ _("Task logs") }}
+          </div>
+          <div class="panel-body">
+            <div class="list-group">
+              {% for entry in bwobject.get_log() %}
+                <a href="#" class="list-group-item">{{ entry.created }}: {{ entry.message }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endblock %}
       </div>
     </div>
   </div>
