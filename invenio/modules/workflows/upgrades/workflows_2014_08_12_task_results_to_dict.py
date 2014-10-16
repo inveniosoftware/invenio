@@ -79,6 +79,11 @@ def estimate():
 def convert_to_dict(results):
     """Convert WorkflowTask object to dict."""
     results_new = {}
+    if isinstance(results, list):
+        if len(results) == 0:
+            return results_new
+        else:
+            raise RuntimeError("Cannot convert task result.")
     for task, res in results.iteritems():
         result_list = []
         for result in res:
