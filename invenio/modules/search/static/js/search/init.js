@@ -19,6 +19,7 @@
 
 require(
     [
+        "js/search/facet",
         "js/search/search",
         "js/search/form",
         "js/search/search_parser",

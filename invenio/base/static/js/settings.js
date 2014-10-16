@@ -18,24 +18,60 @@
  */
 
 require.config({
-    baseUrl: '/',
-    paths: {
-        jquery: 'vendors/jquery/dist/jquery',
-        'ui': 'vendors/jquery-ui/ui',
-        'jqueryui-timepicker': 'vendors/jqueryui-timepicker-addon/dist',
-        'jquery-form': 'vendors/jquery-form/jquery.form',
-	'jquery-ui': 'vendors/jquery-ui/jquery-ui.min',
-        hgn: 'vendors/requirejs-hogan-plugin/hgn',
-        hogan: 'vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd',
-        text: 'vendors/requirejs-hogan-plugin/text',
-        flight: 'vendors/flight/lib',
-        typeahead: 'vendors/typeahead.js/dist/typeahead.bundle',
+  baseUrl: "/",
+  paths: {
+    jquery: "vendors/jquery/dist/jquery",
+    ui: "vendors/jquery-ui/ui",
+    "jqueryui-timepicker": "vendors/jqueryui-timepicker-addon/dist",
+    "jquery-form": "vendors/jquery-form/jquery.form",
+    hgn: "vendors/requirejs-hogan-plugin/hgn",
+    hogan: "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd",
+    text: "vendors/requirejs-hogan-plugin/text",
+    flight: "vendors/flight/lib",
+    typeahead: "vendors/typeahead.js/dist/typeahead.bundle",
+    "bootstrap-select": "js/bootstrap-select",
+    "jquery-caret": "vendors/jquery.caret/dist/jquery.caret-1.5.2",
+    "jquery-tokeninput": "vendors/jquery-tokeninput/src/jquery.tokeninput",
+    "jquery-jeditable": "vendors/jquery.jeditable/index",
+    bootstrap: "vendors/bootstrap/dist/js/bootstrap",
+  },
+  shim: {
+    jquery: {
+      exports: "$"
     },
-    shim: {
-        jquery: { exports: '$' },
-        'jqueryui-timepicker/jquery-ui-sliderAccess': {deps: ['jquery']},
-        'jqueryui-timepicker/jquery-ui-timepicker-addon': {deps: ['jquery', 'ui/slider']},
-        'jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n': {deps: ['jqueryui-timepicker/jquery-ui-timepicker-addon']},
-        typeahead: {deps: ['jquery'], exports: 'Bloodhound'},
-    }
+    "jqueryui-timepicker/jquery-ui-sliderAccess": {
+      deps: ["jquery"]
+    },
+    "jqueryui-timepicker/jquery-ui-timepicker-addon": {
+      deps: ["jquery",
+        "ui/slider"
+      ]
+    },
+    "jqueryui-timepicker/i18n/jquery-ui-timepicker-addon-i18n": {
+      deps: ["jqueryui-timepicker/jquery-ui-timepicker-addon"]
+    },
+    typeahead: {
+      deps: ["jquery"],
+      exports: "Bloodhound"
+    },
+    "bootstrap-select": {
+      deps: ["jquery"],
+      exports: "$.fn.buttonSelect"
+    },
+    "jquery-caret": {
+      deps: ["jquery"],
+      exports: "$.fn.caret"
+    },
+    "jquery-tokeninput": {
+      deps: ["jquery"],
+      exports: "$.fn.tokenInput"
+    },
+    "jquery-jeditable": {
+      deps: ["jquery"],
+      exports: "$.fn.editable"
+    },
+    bootstrap: {
+      deps: ["jquery"]
+    },
+  }
 })

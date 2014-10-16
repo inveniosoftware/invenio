@@ -257,6 +257,8 @@
 {% block javascript %}
 {{ super() }}
 <script type="text/javascript">
+require(["jquery", "bootstrap"], function($) {
+
   function show_username_form(element) {
     $('#form_field').html($(element).html())
     return false
@@ -273,5 +275,6 @@
 
     });
   })(jQuery);
+});
 </script>
 {% endblock %}

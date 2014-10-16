@@ -91,15 +91,6 @@ styles = Bundle(
 )
 
 jquery = Bundle(
-    "vendors/jquery/dist/jquery.js",
-    "vendors/jquery.jeditable/index.js",
-    "vendors/jquery-tokeninput/src/jquery.tokeninput.js",
-    "vendors/jquery.caret/dist/jquery.caret-1.5.2.js",
-    "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.js",
-    "vendors/bootstrap/dist/js/bootstrap.js",
-    "vendors/typeahead.js/dist/typeahead.bundle.js",
-    "js/bootstrap-select.js",
-    "js/translate.js",
     "js/init.js",
     output="jquery.js",
     filters="requirejs",

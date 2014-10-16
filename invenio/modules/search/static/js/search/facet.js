@@ -19,8 +19,7 @@
 
 
 /* A file containing functions treating the faceting functionality. */
-
-!function( $ ){
+define(['jquery'], function($) {
 
   "use strict"
 
@@ -418,4 +417,4 @@
       resizeFn();
       $(window).resize(resizeFn);
   });
-}( window.jQuery )
+});

@@ -150,6 +150,7 @@ define([
   'jquery',
   'js/search/search_parser',
   'typeahead', // $.fn.typeahead()
+  'jquery-caret',
 ], function($, SearchParser, Bloodhound) {
   "use strict";
 
@@ -432,7 +433,7 @@ define([
       var followingStr = input_field_value.slice(
         query_range.end, input_field_value.length);
 
-      if (precedingStr[precedingStr.length - 1] == '"' && 
+      if (precedingStr[precedingStr.length - 1] == '"' &&
           to_merge[0] == '"') {
         precedingStr = precedingStr.slice(0, precedingStr.length - 1);
       }

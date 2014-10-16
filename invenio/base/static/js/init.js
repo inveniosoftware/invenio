@@ -18,15 +18,18 @@
  */
 
 require([
-    'jquery',
-    'jquery-form',
-    'jquery-ui',
-    'ui/core',
-    'ui/mouse',
-    'ui/widget',
-    'ui/sortable',
-    'ui/datepicker',
-    'typeahead',
+    "jquery",
+    "jquery-form",
+    "ui/core",
+    "ui/mouse",
+    "ui/widget",
+    "ui/sortable",
+    "ui/datepicker",
+    "bootstrap",
+    "bootstrap-select",
+    "hogan",
+    "typeahead",
+    "js/translate",
     ], function() {
     // loading all the jQuery modules for the not require.js ready scripts
     // everywhere.

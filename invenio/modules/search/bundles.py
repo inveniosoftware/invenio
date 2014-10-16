@@ -24,7 +24,6 @@ from invenio.base.bundles import jquery as _j, invenio as _i
 
 js = Bundle(
     'js/search/default_typeahead_configuration.js',
-    'js/search/facet.js',
     'js/search/init.js',
     filters=RequireJSFilter(exclude=[_j, _i]),
     output="search.js",
