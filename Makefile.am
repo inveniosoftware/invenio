@@ -236,17 +236,29 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
-		rm -f jquery.dataTables.ColVis.min.js && \
-        rm -f jquery.hotkeys.js && \
-        rm -f jquery.tablesorter.min.js && \
-        rm -f jquery-ui-1.7.3.custom.min.js && \
-        rm -f jquery.metadata.js && \
-        rm -f jquery-latest.js && \
-        rm -f jquery-ui.min.js)
+	rm -f jquery.dataTables.ColVis.min.js && \
+	rm -f jquery.hotkeys.js && \
+	rm -f jquery.tablesorter.min.js && \
+	rm -f jquery-ui-1.7.3.custom.min.js && \
+	rm -f jquery.metadata.js && \
+	rm -f jquery-latest.js && \
+	rm -f jquery-ui.min.js && \
+	rm -rf jquery-lightbox && \
+	rm -f jquery-ui-timepicker-addon.js && \
+	rm -rf jqueryFileTree && \
+	rm -f swfobject.js && \
+	rm -f jquery.blockUI.js && \
+	rm -f sly.min.js && \
+	rm -f parsley.js && \
+	rm -f spin.min.js && \
+	rm -f jquery.omniwindow.js)
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
 	rm -f datatables_jquery-ui.css \
-	rm -f bookmarks.png) && \
+	rm -f bookmarks.png \
+	rm -f demo_table_jui.css \
+	rm -f calendar.gif \
+	rm -rf jquery-ui/themes) && \
 	(cd ${prefix}/var/www/css && \
 	rm -f jquery.bookmark.css)
 	@echo "***********************************************************"
