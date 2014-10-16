@@ -21,6 +21,12 @@
 
 from __future__ import print_function
 
+import warnings
+
+warnings.warn("Use of `inveniomanage demosite populate` is being deprecated. "
+              "Please use `uploader` module to insert demo records.",
+              PendingDeprecationWarning)
+
 import os
 import pkg_resources
 import sys
