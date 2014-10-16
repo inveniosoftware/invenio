@@ -20,9 +20,11 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import os
 from flask.ext.assets import Bundle as BundleBase
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
 from werkzeug.utils import import_string
+from webassets.filter.requirejs import RequireJSFilter as RequireJSFilterBase
 
 
 class Bundle(BundleBase):
@@ -105,3 +107,32 @@ class BundlesAutoDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
                 bundle = getattr(bundles, var)
                 if isinstance(bundle, Bundle):
                     self.register((module, bundle))
+
+
+class RequireJSFilter(RequireJSFilterBase):
+
+    """Optimizes AMD-style modularized JavaScript into a single asset.
+
+    Adds support for exclusion of files already in defined in other bundles.
+    """
+
+    def __init__(self, *args, **kwargs):
+        """Initialize filter."""
+        self.excluded_bundles = kwargs.pop('exclude', [])
+        super(RequireJSFilter, self).__init__(*args, **kwargs)
+
+    def setup(self):
+        """Setup filter (only called when filter is actually used)."""
+        super(RequireJSFilter, self).setup()
+
+        excluded_files = []
+        for bundle in self.excluded_bundles:
+            excluded_files.extend(
+                map(lambda f: os.path.splitext(f)[0],
+                    bundle.contents)
+            )
+
+        if excluded_files:
+            self.argv.append(
+                "exclude={0}".format(",".join(excluded_files))
+            )

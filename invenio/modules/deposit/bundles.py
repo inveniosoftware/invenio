@@ -19,15 +19,15 @@
 
 """Deposit bundles."""
 
-from invenio.ext.assets import Bundle
-
+from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.base.bundles import jquery as _j, invenio as _i
 
 js = Bundle(
     "vendors/plupload/js/moxie.js",
     "vendors/plupload/js/plupload.dev.js",
     "js/deposit/init.js",
     output="deposit.js",
-    filters="requirejs",
+    filters=RequireJSFilter(exclude=[_j, _i]),
     weight=51,
     bower={
         "plupload": "latest",
