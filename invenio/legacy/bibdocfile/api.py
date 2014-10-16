@@ -119,6 +119,7 @@ from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.utils.hash import md5
+from invenio.legacy.bibdocfile.registry import plugins
 
 import invenio.legacy.template
 
