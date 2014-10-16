@@ -21,41 +21,40 @@
 
 {% block workflowbody %}
 
-    <div class="row">
-        <div class="col-md-12">
-            <h3 class="modal-title" id="myModalLabel">{{ workflow_metadata.name }}</h3>
-            <p>Owner: <strong>{{ workflow_metadata.uid }}</strong> | {{ _('Creation date') }}: <strong>{{ workflow_metadata.created }}</strong> | {{ _('Last modification date') }}: <strong>{{ workflow_metadata.modified }}</strong></p>
-        </div>
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="modal-title" id="myModalLabel">{{ workflow_metadata.name }}</h3>
+      <p>Owner: <strong>{{ workflow_metadata.uid }}</strong> | {{ _('Creation date') }}: <strong>{{ workflow_metadata.created }}</strong> | {{ _('Last modification date') }}: <strong>{{ workflow_metadata.modified }}</strong></p>
     </div>
-    <div class="row">
-        <div class="col-md-5">
-           {{ _('Workflow definition') }}:
-           <div class="well">
-               {{ utils.function_display(workflow_tasks, [-1]) }}
-           </div>
+  </div>
+  <div class="row">
+    <div class="col-md-5">
+      {{ _('Workflow definition') }}:
+      <div class="well">
+        {{ utils.function_display(workflow_tasks, [-1]) }}
+      </div>
 
-            {{_('Workflow status')}}
-            <div class="well">
-                <div id="workflow_preview">
-                    <p>{{ _('All objects count') }}: {{ workflow_metadata.counter_initial }}</p>
-                    <p>{{ _('Finished objects count') }}: {{ workflow_metadata.counter_finished }}</p>
-                    <p>{{ _('Halted objects count') }}: {{ workflow_metadata.counter_halted }}</p>
-                    <p>{{ _('Error objects count') }}: {{ workflow_metadata.counter_error }}</p>
-                </div>
-            </div>
+      {{_('Workflow status')}}
+      <div class="well">
+        <div id="workflow_preview">
+          <p>{{ _('All objects count') }}: {{ workflow_metadata.counter_initial }}</p>
+          <p>{{ _('Finished objects count') }}: {{ workflow_metadata.counter_finished }}</p>
+          <p>{{ _('Halted objects count') }}: {{ workflow_metadata.counter_halted }}</p>
+          <p>{{ _('Error objects count') }}: {{ workflow_metadata.counter_error }}</p>
         </div>
-        <div class="col-md-7">
-           {{ _('Error message') }}
-           <div class="well">
-                <div class="workflow_message">
-                    <p>{{ workflow_metadata.error_msg }}</p>
-                </div>
-            </div>
+      </div>
+    </div>
+    <div class="col-md-7">
+      {{ _('Error message') }}
+      <div class="well">
+        <div class="workflow_message">
+          <p>{{ workflow_metadata.error_msg }}</p>
         </div>
+      </div>
     </div>
-    <div class="row">
-        {{ _('Log') }}:
-        <pre>{{ log }}</pre>
-    </div>
-
+  </div>
+  <div class="row">
+    {{ _('Log') }}:
+    <pre>{{ log }}</pre>
+  </div>
 {% endblock %}

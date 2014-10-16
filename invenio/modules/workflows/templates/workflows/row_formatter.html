@@ -21,9 +21,9 @@
 <!--sep-->
 <input type="checkbox" class="hp-check">
 <!--sep-->
-    <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
-        {{ title }}
-    </a>
+<a href="{{url_for('holdingpen.details', objectid=object.id)}}">
+  {{ title }}
+</a>
 <!--sep-->
 {{ description|safe }}
 <!--sep-->
@@ -34,7 +34,7 @@
 {{ object.data_type }}
 <!--sep-->
 {% if mini_action != None %}
-    {% set action = action() %}
-    {{ action.render_mini(object)|safe }}
+  {% set action = action() %}
+  {{ action.render_mini(object)|safe }}
 {% endif %}
 

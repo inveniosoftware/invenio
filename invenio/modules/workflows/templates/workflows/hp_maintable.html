@@ -20,95 +20,90 @@
 {% import 'workflows/utils.html' as utils %}
 
 {% block header%}
-    {{ super() }}
-    {% bundles "workflows.js", "vendors.js", "datatables.js", "vendors.css", "actions.js", "jquery.js" %}
+  {{ super() }}
+  {% bundles "workflows.js", "vendors.js", "datatables.js", "vendors.css", "actions.js", "jquery.js" %}
 {% endblock header %}
 
 {% block javascript %}
-    {{ super() }}
+  {{ super() }}
 
 
-<script type="text/javascript">
+  <script type="text/javascript">
     $(document).ready(function(){
-        var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
-        window.jQuery.ajax({
-            url: context_url,
-            success: function(data) {
-                WORKFLOWS_HOLDINGPEN.init(data);
-                WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
-            }
-        });
+      var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
+      window.jQuery.ajax({
+        url: context_url,
+        success: function(data) {
+          WORKFLOWS_HOLDINGPEN.init(data);
+          WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
+        }
+      });
     });
-</script>
+  </script>
 {% endblock javascript %}
 
 {% block hpbody %}
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
-      <!-- Brand and toggle get grouped for better mobile display -->
-
-      <!-- Collect the nav links, forms, and other content for toggling -->
-      <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
-        <ul class="nav navbar-nav">
-           <!--  <li><a href="#">Assigned to me</a></li> -->
-            <p class="navbar-text" style="margin-right:0px; color:light gray;">{{ _('Show Records by') }}:</p>
-            <li class="dropdown">
-                <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Actions') }}<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                    {% if user_list %}
-                        {% set i = 0 %}
-                        {% for task, object_count in action_list.items() %}
-                            <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{ task }}: {{ object_count }}</a></li>
-                            {% set i = i + 1 %}
-                        {% endfor %}
-                    {% else %}
-                            <li><a class="task-btn">{{ _('No actions left') }}</a></li>
-                    {% endif %}
-                    </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a id="version-halted" class="version-selection" name="Need action">{{ _('Need action') }}</a></li>
-                    <li><a id="version-halted" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
-                    <li><a id="version-completed" class="version-selection" name="Done">{{ _('Done') }}</a></li>
-                    <li><a id="version-running" class="version-selection" name="In process">{{ _('In process') }}</a></li>
-                    <li><a id="version-initial" class="version-selection" name="New">{{ _('New') }}</a></li>
-                    <li><a id="version-error" class="version-selection" name="Error">{{ _('Error') }}</a></li>
-                </ul>
-            </li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Options') }}<b class="caret"></b></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a id="option-autorefresh" name="autorefresh-option">{{ _('Auto-refresh') }}</a></li>
-                </ul>
-            </li>
-        </ul>
-        <ul id="navbar-right" class="nav navbar-nav navbar-right">
-        </ul>
-      </div>
-    </nav>
-    <input class="tags" id="tags" type="text" placeholder="{{ _("Add to search") }}" value="{{tags}}"/>
-    <br>
-
-    <div class="container">
-        <div class="row">
-            <table id="maintable" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>{{ _('Id') }}</th>
-                        <th><input id="select-all" type="checkbox"></th>
-                        <th>{{ _('Title') }}</th>
-                        <th>{{ _('Description') }}</th>
-                        <th>{{ _('Created') }}</th>
-                        <th>{{ _('Status') }}</th>
-                        <th>{{ _('Type') }}</th>
-                        <th>{{ _('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-
-                </tbody>
-            </table>
-        </div>
+  <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <div id="bs-example-navbar-collapse-1" class="collapse navbar-collapse">
+      <ul class="nav navbar-nav">
+        <p class="navbar-text" style="margin-right:0px; color:light gray;">{{ _('Show Records by') }}:</p>
+        <li class="dropdown">
+          <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Actions') }}<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            {% if user_list %}
+              {% set i = 0 %}
+              {% for task, object_count in action_list.items() %}
+                <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{ task }}: {{ object_count }}</a></li>
+                {% set i = i + 1 %}
+              {% endfor %}
+            {% else %}
+              <li><a class="task-btn">{{ _('No actions left') }}</a></li>
+            {% endif %}
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a id="version-halted" class="version-selection" name="Need action">{{ _('Need action') }}</a></li>
+            <li><a id="version-halted" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
+            <li><a id="version-completed" class="version-selection" name="Done">{{ _('Done') }}</a></li>
+            <li><a id="version-running" class="version-selection" name="In process">{{ _('In process') }}</a></li>
+            <li><a id="version-initial" class="version-selection" name="New">{{ _('New') }}</a></li>
+            <li><a id="version-error" class="version-selection" name="Error">{{ _('Error') }}</a></li>
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Options') }}<b class="caret"></b></a>
+          <ul class="dropdown-menu" role="menu">
+            <li><a id="option-autorefresh" name="autorefresh-option">{{ _('Auto-refresh') }}</a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul id="navbar-right" class="nav navbar-nav navbar-right">
+      </ul>
     </div>
+  </nav>
+  <input class="tags" id="tags" type="text" placeholder="{{ _("Add to search") }}" value="{{tags}}"/>
+
+  <div class="container">
+    <div class="row">
+      <table id="maintable" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
+        <thead>
+          <tr>
+            <th>{{ _('Id') }}</th>
+            <th><input id="select-all" type="checkbox"></th>
+            <th>{{ _('Title') }}</th>
+            <th>{{ _('Description') }}</th>
+            <th>{{ _('Created') }}</th>
+            <th>{{ _('Status') }}</th>
+            <th>{{ _('Type') }}</th>
+            <th>{{ _('Actions') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

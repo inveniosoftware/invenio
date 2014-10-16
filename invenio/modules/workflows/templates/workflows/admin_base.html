@@ -16,39 +16,40 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+
 {% extends "page.html" %}
+
 {% block body %}
-    <div class="row">
-        <div class="col-md-2">
-            <div class="well sidebar-nav">
-                <ul class="nav nav-list">
-                    <li><a href="{{ url_for('workflows.index') }}"
-                        {% if request.path == url_for('workflows.index') %}
-                            class="active"
-                        {% endif %}>
-                        {{ _('Running workflows') }}
-                    </a></li>
-                    <li><a href="{{ url_for('workflows.show_workflows') }}"
-                    {% if request.path == url_for('workflows.show_workflows') %}
-                        class="active"
-                    {% endif %}>
-                        {{ _('Defined workflows') }}
-                    </a></li>
-                    <li>Logs</li>
-                </ul>
-            </div>
-        </div>
-        <div class="col-md-10">
-            {% block workflowbody %}{% endblock %}
-        </div>
-
+  <div class="row">
+    <div class="col-md-2">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li><a href="{{ url_for('workflows.index') }}"
+            {% if request.path == url_for('workflows.index') %}
+              class="active"
+            {% endif %}>
+            {{ _('Running workflows') }}
+          </a></li>
+          <li><a href="{{ url_for('workflows.show_workflows') }}"
+            {% if request.path == url_for('workflows.show_workflows') %}
+              class="active"
+            {% endif %}>
+            {{ _('Defined workflows') }}
+          </a></li>
+          <li>Logs</li>
+        </ul>
+      </div>
     </div>
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div id='workflow_details' class='modal-dialog'>
-            <div class="modal-content">
-                {% block modalbody %}{% endblock %}
-            </div>
-        </div>
+    <div class="col-md-10">
+      {% block workflowbody %}{% endblock %}
     </div>
 
+  </div>
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div id='workflow_details' class='modal-dialog'>
+      <div class="modal-content">
+        {% block modalbody %}{% endblock %}
+      </div>
+    </div>
+  </div>
 {% endblock %}

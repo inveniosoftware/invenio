@@ -20,23 +20,23 @@
 {% extends "workflows/results/results_base.html" %}
 
 {% block results_body %}
-<div class="panel panel-default">
+  <div class="panel panel-default">
     <div class="panel-heading">
-        {{ results["name"] }}
+      {{ results["name"] }}
     </div>
     <div class="panel-body">
-        {% set index = 1 %}
-        {% for  reference  in results['result'] %}
-            <strong>[{{ index }}] :</strong>
-            {{ reference['authors']}}
-            {% for key, value in reference.iteritems() %}
-                {% if key not in ['number', 'authors'] %}
-                    {{ value }}
-                {% endif %}
-            {% endfor %}
-            <br/>
-            {% set index = index + 1 %}
+      {% set index = 1 %}
+      {% for reference  in results['result'] %}
+        <strong>[{{ index }}] :</strong>
+        {{ reference['authors']}}
+        {% for key, value in reference.iteritems() %}
+          {% if key not in ['number', 'authors'] %}
+           {{ value }}
+          {% endif %}
         {% endfor %}
+        <br/>
+        {% set index = index + 1 %}
+      {% endfor %}
     </div>
-</div>
+  </div>
 {% endblock %}

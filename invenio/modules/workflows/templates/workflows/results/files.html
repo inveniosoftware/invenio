@@ -20,11 +20,11 @@
 {% extends "workflows/results/results_base.html" %}
 
 {% block results_body %}
-<div class="panel-body">
+  <div class="panel-body">
     <a href="{{ url_for('holdingpen.get_file_from_task_result', object_id=obj.id, filename=results.result.filename) }}">
-        <button type="button" class="btn btn-default btn-lg">
-          <span class="glyphicon glyphicon-file"></span> {{results.name}}
-        </button>
+      <button type="button" class="btn btn-default btn-lg">
+        <span class="glyphicon glyphicon-file"></span> {{results.name}}
+      </button>
     </a>
-</div>
+  </div>
 {% endblock %}

@@ -19,16 +19,16 @@
 
 {% block approval_action %}
 
-<p><a class="btn btn-success approval-action"
-      role="button"
-      data-objectid="{{object.id}}"
-      data-value="accept"
-      data-url="{{resolve_url}}">{{_("Accept")}}</a></p>
-<p><a href="#"
-      class="approval-action"
-      data-url="{{resolve_url}}"
-      data-objectid="{{object.id}}"
-      data-value="reject"
-      role="button">{{_("Delete")}}</a></p>
+  <p><a class="btn btn-success approval-action"
+        role="button"
+        data-objectid="{{object.id}}"
+        data-value="accept"
+        data-url="{{resolve_url}}">{{_("Accept")}}</a></p>
+  <p><a href="#"
+        class="approval-action"
+        data-url="{{resolve_url}}"
+        data-objectid="{{object.id}}"
+        data-value="reject"
+        role="button">{{_("Delete")}}</a></p>
 
 {% endblock %}

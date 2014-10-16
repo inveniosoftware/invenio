@@ -21,43 +21,44 @@
 {% bundles "workflows.js" %}
 
 {% block javascript %}
-    {{ super() }}
-    <script type="text/javascript">
-         $(document).ready(function(){
-             var url_run_workflow = "{{ url_for('workflows.run_workflow') }}";
-             init_workflow(url_run_workflow);
-         });
-    </script>
+  {{ super() }}
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var url_run_workflow = "{{ url_for('workflows.run_workflow') }}";
+      init_workflow(url_run_workflow);
+    });
+  </script>
 {% endblock javascript %}
 
 {% block workflowbody %}
-    <div id = "alert_placeholder"></div>
+  <div id="alert_placeholder"></div>
 
-    <div class="alert alert-block">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <h4>{{ _('Warning') }}!</h4>
-      {{ _('This functionality is not fully supported at the moment as you cannot pass
-      any data to the workflows yet') }}.
-    </div>
+  <div class="alert alert-block">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <h4>{{ _('Warning') }}!</h4>
+    {{ _('This functionality is not fully supported at the moment as you cannot pass
+    any data to the workflows yet') }}.
+  </div>
 
-    <h1>{{ _("Available workflows") }}</h1>
+  <h1>{{ _("Available workflows") }}</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>{{ _("Workflow name") }}</th>
-                <th>{{ _("Options") }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for workflow in workflows %}
-            <tr>
-                <td>{{ workflow }}</td>
-                <td><input id="example_{{ workflow }}
-                " class="btn" type="submit" rel="popover" name="{{ workflow }}"/></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>{{ _("Workflow name") }}</th>
+        <th>{{ _("Options") }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for workflow in workflows %}
+        <tr>
+          <td>{{ workflow }}</td>
+          <td>
+            <input id="example_{{ workflow }}" class="btn" type="submit" rel="popover" name="{{ workflow }}"/>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
 {% endblock %}

@@ -19,107 +19,104 @@
 {% extends "workflows/admin_base.html" %}
 
 {% block workflowbody %}
-    <div class="alert alert-warning">
-      <button type="button" class="close" data-dismiss="alert">&times;</button>
-      <h4>{{ _('Warning') }}!</h4>
-      {{ _('Much of the functionality of the BibWorkflow admin pages are placeholder
-      only and are not working as expected') }}.
-    </div>
+  <div class="alert alert-warning">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <h4>{{ _('Warning') }}!</h4>
+    {{ _('Much of the functionality of the BibWorkflow admin pages are placeholder
+    only and are not working as expected') }}.
+  </div>
 
-    <h1>{{ _('Workflows list') }}</h1>
+  <h1>{{ _('Workflows list') }}</h1>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>{{ _('Workflow name') }}</th>
-                <th>{{ _('Started') }}</th>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>{{ _('Workflow name') }}</th>
+        <th>{{ _('Started') }}</th>
+        <th>{{ _('Modified') }}</th>
+        <th>{{ _('Last task') }}</th>
+        <th>{{ _('Progress') }}</th>
+        <th>{{ _('Error msg.') }}</th>
+        <th>{{ _('View') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for workflow in workflows %}
+      <tr class="workflow" name="{{ workflow.uuid }}">
+        <td>{{ workflow.name }}</td>
+        <td>{{ workflow.created }}</td>
+        <td>{{ workflow.modified }}</td>
+        <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
+        <td title="Elements: {{ workflow.counter_initial }}
+        Halted: {{ workflow.counter_halted }}
+        Error: {{ workflow.counter_error }}
+        Finished: {{ workflow.counter_finished }}">
+          {% if workflow.counter_initial %}
+            {%- set progress = (workflow.counter_error + workflow.counter_finished + workflow.counter_halted) / workflow.counter_initial * 100 -%}
+          {% else %}
+            {%- set progress = 0 -%}
+          {% endif %}
+          {{ _('Progress') }}: <span class="pull-right strong">{{ progress|int }}%</span>
+          {% if workflow.status == 0 %}
+            <div class="progress progress active">
+            <div class="bar" style="width: {{ progress }}%;"></div>
+          {% elif workflow.status == 1 %}
+            <div class="progress progress-striped active">
+            <div class="bar" style="width: {{ progress }}%;"></div>
+          {% elif workflow.status == 2 %}
+            <div class="progress progress-warning active">
+            <div class="bar" style="width: {{ progress }}%;"></div>
+          {% elif workflow.status == 3 %}
+            <div class="progress progress-danger active">
+            <div class="bar" style="width: {{ progress }}%;"></div>
+          {% elif workflow.status == 4 %}
+            <div class="progress progress-success active">
+            <div class="bar" style="width: {{ progress }}%;"></div>
+          {% endif %}
+          </div>
+        </td>
+        <td>{{ workflow.error_msg }}</td>
+        <td><a href="{{ url_for('workflows.workflow_details', id_workflow=workflow.uuid) }}/">{{ _('View') }}</a></td>
+      </tr>
+      {%- if workflow.objects -%}
+      <tr>
+        <td colspan="8">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>{{ _('Id') }}</th>
+                <th>{{ _('Created') }}</th>
                 <th>{{ _('Modified') }}</th>
-                <th>{{ _('Last task') }}</th>
-                <th>{{ _('Progress') }}</th>
-                <th>{{ _('Error msg.') }}</th>
+                <th>{{ _('Task') }}</th>
+                <th>{{ _('Status') }}</th>
                 <th>{{ _('View') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for workflow in workflows %}
-                <tr class="workflow" name="{{ workflow.uuid }}">
-                    <td>{{ workflow.name }}</td>
-                    <td>{{ workflow.created }}</td>
-                    <td>{{ workflow.modified }}</td>
-                    <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
-                    <td title="Elements: {{ workflow.counter_initial }}
-Halted: {{ workflow.counter_halted }}
-Error: {{ workflow.counter_error }}
-Finished: {{ workflow.counter_finished }}">
-                        {% if workflow.counter_initial %}
-                            {%- set progress = (workflow.counter_error + workflow.counter_finished + workflow.counter_halted) / workflow.counter_initial * 100 -%}
-                        {% else %}
-                            {%- set progress = 0 -%}
-                        {% endif %}
-                        {{ _('Progress') }}: <span class="pull-right strong">{{ progress|int }}%</span>
-                            {% if workflow.status == 0 %}
-                                <div class="progress progress active">
-                                    <div class="bar" style="width: {{ progress }}%;"></div>
-                            {% elif workflow.status == 1 %}
-                                <div class="progress progress-striped active">
-                                    <div class="bar" style="width: {{ progress }}%;"></div>
-                            {% elif workflow.status == 2 %}
-                                <div class="progress progress-warning active">
-                                    <div class="bar" style="width: {{ progress }}%;"></div>
-                            {% elif workflow.status == 3 %}
-                                <div class="progress progress-danger active">
-                                    <div class="bar" style="width: {{ progress }}%;"></div>
-                            {% elif workflow.status == 4 %}
-                                <div class="progress progress-success active">
-                                    <div class="bar" style="width: {{ progress }}%;"></div>
-                            {% endif %}
-                                <!-- closing progress bar -->
-                                </div>
-                    </td>
-                    <td>{{ workflow.error_msg }}</td>
-                    <td><a href="{{ url_for('workflows.workflow_details', id_workflow=workflow.uuid) }}/">{{ _('View') }}</a></td>
-                </tr>
-                {%- if workflow.objects -%}
-                <tr>
-                    <td colspan="8">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>{{ _('Id') }}</th>
-                                <th>{{ _('Created') }}</th>
-                                <th>{{ _('Modified') }}</th>
-                                <th>{{ _('Task') }}</th>
-                                <th>{{ _('Status') }}</th>
-                                <th>{{ _('View') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for object in workflow.objects %}
-
-                                <tr class="object" name="{{ object.id }}">
-                                    <td>{{ object.id }}</td>
-                                    <td>{{ object.created }}</td>
-                                    <td>{{ object.modified }}</td>
-                                    <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
-                                    <td>
-                                        {% if object.version == 0 %}
-                                            <span class="badge alert-info">>{{ _('Initial') }}</span>
-                                        {% elif object.version == 1 %}
-                                            <span class="badge alert-success">>{{ _('Final') }}</span>
-                                        {% elif object.version == 2 %}
-                                            <span class="badge alert-danger">{{ _('Error') }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td><a href="{{ url_for('workflows.details', objectid=object.id) }}/">>{{ _('View') }}</a></tr>
-                                </tr>
-
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    </td>
-                </tr>
-                {%- endif -%}
-            {% endfor %}
-        </tbody>
-        </table>
-        {% endblock %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for object in workflow.objects %}
+              <tr class="object" name="{{ object.id }}">
+                <td>{{ object.id }}</td>
+                <td>{{ object.created }}</td>
+                <td>{{ object.modified }}</td>
+                <td title="{{ workflow.last_task_description }}">{{ workflow.last_task_name }}</td>
+                <td>
+                  {% if object.version == 0 %}
+                    <span class="badge alert-info">>{{ _('Initial') }}</span>
+                  {% elif object.version == 1 %}
+                    <span class="badge alert-success">>{{ _('Final') }}</span>
+                  {% elif object.version == 2 %}
+                    <span class="badge alert-danger">{{ _('Error') }}</span>
+                  {% endif %}
+                </td>
+                <td><a href="{{ url_for('workflows.details', objectid=object.id) }}/">>{{ _('View') }}</a></tr>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {%- endif -%}
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
