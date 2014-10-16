@@ -78,7 +78,7 @@ def do_upgrade():
 
             for (comment_id, comment_body, comment_body_format) in comments:
 
-                if comment_body_format == CFG_WEBCOMMENT_BODY_FORMATS["HTML"]:
+                if comment_body_format == CFG_WEBCOMMENT_BODY_FORMATS["TEXT"]:
 
                     comment_body = email_quoted_txt2html(
                         comment_body,
