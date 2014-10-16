@@ -18,17 +18,17 @@
 #}
 
 {% block approval_action %}
-
-  <p><a class="btn btn-success approval-action"
+<div class="approval-action">
+  <p><a class="btn btn-success approval-action-resolve"
         role="button"
         data-objectid="{{object.id}}"
         data-value="accept"
         data-url="{{resolve_url}}">{{_("Accept")}}</a></p>
   <p><a href="#"
-        class="approval-action"
+        class="approval-action-resolve"
         data-url="{{resolve_url}}"
         data-objectid="{{object.id}}"
         data-value="reject"
         role="button">{{_("Delete")}}</a></p>
-
+</div>
 {% endblock %}

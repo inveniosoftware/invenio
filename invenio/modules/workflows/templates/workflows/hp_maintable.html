@@ -19,27 +19,29 @@
 {% extends "workflows/hp_base.html" %}
 {% import 'workflows/utils.html' as utils %}
 
-{% block header%}
+{% block header %}
   {{ super() }}
-  {% bundles "workflows.js", "vendors.js", "datatables.js", "vendors.css", "actions.js", "jquery.js" %}
+  {% bundles "workflows.js", "workflows.css", "jquery.js" %}
 {% endblock header %}
 
 {% block javascript %}
   {{ super() }}
 
-
   <script type="text/javascript">
-    $(document).ready(function(){
-      var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
-      window.jQuery.ajax({
-        url: context_url,
-        success: function(data) {
-          WORKFLOWS_HOLDINGPEN.init(data);
-          WORKFLOWS_HOLDINGPEN.init_datatable(WORKFLOWS_HP_SELECTION);
-        }
-      });
+    require(["jquery",
+             "js/workflows/maintable"],
+            function($,
+                     initialize) {
+      var context = {
+        load_table_url: "{{ url_for('holdingpen.load_table')|safe }}",
+        tags: JSON.parse('{{tags|safe}}'),
+        action_url: "{{ url_for('holdingpen.resolve_action')|safe }}"
+      }
+      initialize(context);
+      $(document).trigger("initHoldingPenTable");
     });
   </script>
+
 {% endblock javascript %}
 
 {% block hpbody %}
@@ -50,20 +52,20 @@
         <li class="dropdown">
           <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Actions') }}<b class="caret"></b></a>
           <ul class="dropdown-menu">
-            {% if user_list %}
+            {% if action_list %}
               {% set i = 0 %}
               {% for task, object_count in action_list.items() %}
                 <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{ task }}: {{ object_count }}</a></li>
                 {% set i = i + 1 %}
               {% endfor %}
             {% else %}
-              <li><a class="task-btn">{{ _('No actions left') }}</a></li>
+              <li><a class="task-btn">{{ _('No actions') }}</a></li>
             {% endif %}
           </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
-          <ul class="dropdown-menu" role="menu">
+          <ul id="tags-menu" class="dropdown-menu" role="menu">
             <li><a id="version-halted" class="version-selection" name="Need action">{{ _('Need action') }}</a></li>
             <li><a id="version-halted" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
             <li><a id="version-completed" class="version-selection" name="Done">{{ _('Done') }}</a></li>
@@ -72,26 +74,29 @@
             <li><a id="version-error" class="version-selection" name="Error">{{ _('Error') }}</a></li>
           </ul>
         </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Options') }}<b class="caret"></b></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a id="option-autorefresh" name="autorefresh-option">{{ _('Auto-refresh') }}</a></li>
-          </ul>
-        </li>
       </ul>
       <ul id="navbar-right" class="nav navbar-nav navbar-right">
       </ul>
     </div>
   </nav>
-  <input class="tags" id="tags" type="text" placeholder="{{ _("Add to search") }}" value="{{tags}}"/>
+
+  <input class="tags"
+         id="tags"
+         type="text"
+         placeholder="{{ _("Add to search") }}"
+         value="" />
 
   <div class="container">
     <div class="row">
-      <table id="maintable" cellpadding="0" cellspacing="0" border="0" class="table table-bordered">
+      <table id="maintable"
+             cellpadding="0"
+             cellspacing="0"
+             border="0"
+             class="table table-bordered">
         <thead>
           <tr>
+            <th></th>
             <th>{{ _('Id') }}</th>
-            <th><input id="select-all" type="checkbox"></th>
             <th>{{ _('Title') }}</th>
             <th>{{ _('Description') }}</th>
             <th>{{ _('Created') }}</th>

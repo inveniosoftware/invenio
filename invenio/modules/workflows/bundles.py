@@ -19,65 +19,43 @@
 
 """Workflows bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.base.bundles import jquery as _j, invenio as _i
+
 
 js = Bundle(
-    'js/workflows/entry_details.js',
-    'js/workflows/hp_details.js',
-    'js/workflows/hp_maintable.js',
-    'js/workflows/hp_selection.js',
-    'js/workflows/hp_tags.js',
-    'js/workflows/hp_utilities.js',
-    'js/workflows/utilities.js',
-    'js/workflows/workflows.js',
-    filters="uglifyjs",
+    'js/workflows/init.js',
+    filters=RequireJSFilter(exclude=[_j, _i]),
     output='workflows.js',
     weight=50,
-)
-
-actions = Bundle(
-    'js/workflows/actions/approval.js',
-    filters="uglifyjs",
-    output='actions.js',
-    weight=50
-)
-
-vendors_js = Bundle(
-    'vendors/bootstrap-tagsinput/dist/bootstrap-tagsinput.js',
-    'vendors/prism/prism.js',
-    filters="uglifyjs",
-    output='vendors.js',
-    weight=40,
     bower={
+        "bootstrap-tagsinput": "git://github.com/inspirehep/bootstrap-tagsinput.git#master",
+        "datatables": "latest",
+        "datatables-plugins": "latest",
+        "datatables-tabletools": "latest",
         "prism": "gh-pages",
-        "bootstrap-tagsinput": "latest"
+        "flight": "latest"
     }
 )
 
-vendors_css = Bundle(
+css = Bundle(
     'vendors/prism/themes/prism.css',
-    filters="cleancss",
-    output='vendors.css',
-    weight=40
-)
-
-dataTables_css = Bundle(
+    'vendors/bootstrap-tagsinput/src/'
+    'bootstrap-tagsinput.css',
+    'vendors/datatables/media/css/'
+    'jquery.dataTables.css',
     'vendors/datatables-plugins/integration/bootstrap/3'
     '/dataTables.bootstrap.css',
+    'vendors/datatables-tabletools/css/dataTables.tableTools.css',
+    'css/workflows/workflows.css',
     filters="less,cleancss",
-    output='datatables.css',
-    weight=30
-)
-
-dataTables_js = Bundle(
-    'vendors/datatables/media/js/jquery.dataTables.js',
-    'vendors/datatables-plugins/integration/bootstrap/3'
-    '/dataTables.bootstrap.js',
-    filters="uglifyjs",
-    output='datatables.js',
+    output='workflows.css',
     weight=30,
     bower={
-        "datatables": "~1.10",
-        "datatables-plugins": "https://github.com/greut/Plugins.git#amdify"
+        "bootstrap-tagsinput": "git://github.com/inspirehep/bootstrap-tagsinput.git#master",
+        "datatables": "latest",
+        "datatables-plugins": "latest",
+        "datatables-tabletools": "latest",
+        "prism": "gh-pages"
     }
 )

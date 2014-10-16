@@ -17,16 +17,32 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_UTILITIES = (function ($) {
+"use strict"
 
-    return {
-        bootstrap_alert: function (message, category) {
-            $("#alert-message").html(
-                '<div class="alert alert-' + category + ' alert-dismissable">' +
-                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
-                '<span>' + message + '</span></div>'
-            );
-        }
-    };
+define(
+  [
+     "js/workflows/details_preview",
+     "js/workflows/details_preview_menu",
+     "js/workflows/actions/approval"
+  ],
+  function(
+    DetailsPreview,
+    DetailsPreviewMenu,
+    ApprovalAction) {
 
-})(window.jQuery);
+    function initialize(context) {
+      DetailsPreview.attachTo(document, {
+        preview_url: context.preview_url,
+        id_object: context.id_object,
+      });
+      DetailsPreviewMenu.attachTo("#object-preview");
+
+      // Actions init
+      ApprovalAction.attachTo(document, {
+        action_url: context.action_url
+      });
+    }
+
+    return initialize;
+  }
+);

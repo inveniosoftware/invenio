@@ -17,7 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var WORKFLOWS_HOLDINGPEN = (function ($) {
+define(["jquery"], function ($) {
     var oTable,
         oSettings,
         selectedRow,
@@ -45,12 +45,12 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
         actions: actions,
         utilities: utilities,
 
-        init: function (data) {
+        init: function (data, selection, tags, utilities) {
             this.context = data;
-            this.tag = window.WORKFLOWS_HP_TAGS;
+            this.tag = tags;
             this.tag.init();
-            this.datatable = window.WORKFLOWS_HP_SELECTION;
-            this.utilities = window.WORKFLOWS_HP_UTILITIES;
+            this.datatable = selection;
+            this.utilities = utilities;
             this.datatable.init(this.oTable, this.oSettings);
             this.utilities.autorefresh();
         },
@@ -107,5 +107,4 @@ var WORKFLOWS_HOLDINGPEN = (function ($) {
 
         }
     };
-})(window.jQuery);
-
+});

@@ -25,7 +25,9 @@ with halted workflows.
 
 For example, accepting submissions or other tasks.
 """
+
 import os
+import json
 
 from six import text_type
 
@@ -102,13 +104,16 @@ def maintable():
                 if key not in tags:
                     tags.append(key)
 
-    tags_to_print = ""
+    tags_to_print = []
     for tag in tags:
         if tag:
-            tags_to_print += tag + ','
+            tags_to_print.append({
+                "text": str(_(tag)),
+                "value": tag,
+            })
     return dict(bwolist=bwolist,
                 action_list=action_list,
-                tags=tags_to_print)
+                tags=json.dumps(tags_to_print))
 
 
 @blueprint.route('/details/<int:objectid>', methods=['GET', 'POST'])

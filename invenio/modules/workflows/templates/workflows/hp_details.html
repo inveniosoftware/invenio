@@ -22,20 +22,23 @@
 
 {% block header%}
   {{ super() }}
-  {% bundles "workflows.js", "vendors.js", "vendors.css", "actions.js", "jquery.js" %}
+  {% bundles "workflows.js", "workflows.css", "jquery.js" %}
 {% endblock header %}
 
 {% block javascript %}
   {{ super() }}
+
   <script type="text/javascript">
-    $(document).ready(function(){
-      var context_url = "{{ url_for('holdingpen.get_context')|safe }}";
-      window.jQuery.ajax({
-        url: context_url,
-        success: function(data) {
-          WORKFLOWS_HP_DETAILS.init(data, {{ bwobject.id }});
-        }
-      })
+    require(["jquery",
+             "js/workflows/details"],
+            function($,
+                     initialize) {
+      var context = {
+        preview_url: "{{ url_for('holdingpen.entry_data_preview')|safe }}",
+        action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
+        id_object: "{{ bwobject.id }}"
+      }
+      initialize(context);
     });
   </script>
 {%- endblock javascript %}
@@ -43,59 +46,15 @@
 {% block hpbody %}
 
   {% block hp_navbar %}
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+    <nav class="navbar navbar-default" role="navigation">
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      {% block top_left %}
         <ul class="nav navbar-nav">
           <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
           </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ _('Actions') }}<b class="caret"></b></a>
-            <ul class="dropdown-menu" role="menu">
-              <li>
-                <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                  <i class="icon-repeat"></i>
-                  {{ _('Restart workflow from beginning') }}
-                </button>
-              </li>
-              <li>
-                <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                  <i class="icon-step-backward"></i>
-                  {{ _('Restart current task') }}
-                </button>
-              </li>
-              <li>
-                <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/>
-                  <i class="icon-step-forward"></i>
-                  {{ _('Skip this task') }}
-                </button>
-              </li>
-              <li>
-                <button id="delete_btn" class="btn btn-sm btn-block btn-danger" data-toggle="modal" data-target="#confirmationModal" role="button">
-                  <i class="icon-trash"></i>
-                  {{ _('Delete this record') }}
-                </button>
-              </li>
-            </ul>
-          </li>
-          <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                  <h3 id="myModalLabel">{{ _('Please confirm') }}</h3>
-                </div>
-                <div class="modal-body">
-                  <p>{{ _('Are you sure you want to delete this record?') }}</p>
-                </div>
-                <div class="modal-footer">
-                  <button class="btn" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
-                  <a class="btn btn-danger" href="{{ url_for('holdingpen.delete', objectid=bwobject.id) }}" >{{ _('Yes, delete this record') }}</a>
-                </div>
-              </div>
-            </div>
-          </div>
         </ul>
-      {% block previous_next %}
+      {% endblock %}
+      {% block top_right %}
         <div class="navbar-form navbar-right">
           <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
              class="btn btn-default"
@@ -279,14 +238,16 @@
 
         {% block hp_preview %}
           {{ _('Display:') }}
-          <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
-            <button class="preview btn btn-xs btn-primary active"
+          <div id="object-preview"
+               class="btn-group btn-group-xs"
+               name="object_preview_btn"
+               data-toggle="buttons-radio">
+            <button class="btn btn-primary preview"
+                    type="button"
                     data-id="{{ bwobject.id }}"
                     name="hd">HTML</button>
-            <button class="preview btn btn-xs btn-primary"
-                    data-id="{{ bwobject.id }}"
-                    name="xo">RAW</button>
-            <button class="preview btn btn-xs btn-primary"
+            <button class="btn btn-primary preview"
+                    type="button"
                     data-id="{{ bwobject.id }}"
                     name="xm">MARC</button>
           </div>

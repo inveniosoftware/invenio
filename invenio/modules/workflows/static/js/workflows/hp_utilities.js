@@ -19,7 +19,7 @@
 
 //Utility functions
 //***********************************
-var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
+define(['jquery', 'js/workflows/hp_maintable'], function($, holdingpen) {
 
     $.fn.exists = function () {
         return this.length !== 0;
@@ -67,11 +67,18 @@ var WORKFLOWS_HP_UTILITIES = function ($, holdingpen) {
         autorefresh: function () {
             window.setInterval( function() {
                 if($('#option-autorefresh').hasClass("btn-danger")) {
-                    WORKFLOWS_HP_UTILITIES.requestNewObjects();
+                    _requestNewObjects.requestNewObjects();
                 }}, 3000);
+        },
+
+        bootstrap_alert: function (message, category) {
+            $("#alert-message").html(
+                '<div class="alert alert-' + category + ' alert-dismissable">' +
+                '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' +
+                '<span>' + message + '</span></div>'
+            );
         },
     };
 
     return utilities;
-}($, WORKFLOWS_HOLDINGPEN);
-//***********************************
+});

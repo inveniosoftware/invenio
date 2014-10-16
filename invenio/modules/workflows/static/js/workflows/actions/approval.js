@@ -17,74 +17,80 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-var approval = (function ($, holdingpen, utilities) {
-    "use strict";
+'use strict';
 
-    $(document).ready(function(){
-        subscribe();
-    });
+define(
+  [
+    'jquery',
+    'flight/component',
+  ],
+  function(
+    $,
+    defineComponent) {
 
+    return defineComponent(ApprovalAction);
 
-    var get_action_values = function(elem) {
+    /**
+    * .. js:class:: ApprovalAction()
+    *
+    * Handles the events from the UI button elements for acceping/rejecting
+    * records by sending the selected action to the server.
+    *
+    * The actionGroupSelector is required for handling display of any action
+    * elements to be hidden or shown. It should be wrapped around every action
+    * UI component.
+    *
+    * :param string actionResolveSelector: DOM selector of elements resolving actions.
+    * :param string actionGroupSelector: DOM selector for wrapping display elements
+    * :param string action_url: URL for resolving the action.
+    *
+    */
+    function ApprovalAction() {
+
+      this.attributes({
+        actionResolveSelector: ".approval-action-resolve",
+        actionGroupSelector: ".approval-action",
+        action_url: ""
+      });
+
+      this.get_action_values = function (elem) {
         return {
-            "url": elem.attr("data-url"),
-            "value": elem.attr("data-value"),
-            "objectid": elem.attr("data-objectid"),
+          "value": elem.data("value"),
+          "objectid": elem.data("objectid"),
         }
-    };
+      };
 
-    var post_request = function(data) {
-        utilities.bootstrap_alert(data.message, data.category)
-    };
+      this.post_request = function(data, element) {
+        console.log(data.message);
+        var parent = element.parents(".approval-action");
+        if (typeof parent !== 'undefined') {
+          parent.fadeOut();
+        }
+        $(document).trigger("");
+      };
 
-    var subscribe = function () {
+      this.onActionClick = function (ev, data) {
+        var element = $(data.el);
+        var payload = this.get_action_values(element);
+        var $this = this;
 
-        /*
-        * Approval action click event for mini maintable view.
-        *
-        * Binds the click event to every element with class
-        * "approval-action" to handle the resolution of the
-        * action..
-        */
-        $("#maintable").on("click", ".approval-action", function (event) {
-            var data = get_action_values($(this));
-
-            jQuery.ajax({
-                type: "POST",
-                url: data.url,
-                data: {"objectid": data.objectid,
-                       "value": data.value},
-                success: function(data) {
-                    post_request(data);
-                    holdingpen.oTable.fnDraw(false);
-                }
-            });
+        jQuery.ajax({
+          type: "POST",
+          url: $this.attr.action_url,
+          data: payload,
+          success: function(data) {
+            $this.post_request(data, element);
+          }
         });
+      };
 
-        /*
-        * Approval action click event details page view.
-        *
-        * Binds the click event to every element with class
-        * "approval-action" to handle the resolution of the
-        * action..
-        */
-        $("#approval-widget").on("click", ".approval-action", function (event) {
-            var data = get_action_values($(this));
-
-            jQuery.ajax({
-                type: "POST",
-                url: data.url,
-                data: {"objectid": data.objectid,
-                       "value": data.value},
-                success: post_request,
-            });
+      this.after('initialize', function() {
+        // Custom handlers
+        this.on("click", {
+          actionResolveSelector: this.onActionClick
         });
-
-
-    };
-
-    return {
-        subscribe: subscribe,
-    };
-})(window.jQuery, window.WORKFLOWS_HOLDINGPEN, window.WORKFLOWS_UTILITIES);
-
+        console.log("Approval init");
+      });
+    }
+  }
+);

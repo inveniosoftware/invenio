@@ -19,7 +19,7 @@
 
 // Tags functions
 //***********************************
-var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
+define(["jquery", "js/workflows/hp_maintable", "js/workflows/hp_utilities"], function ($, holdingpen, utilities) {
     "use strict";
     var tagList = [];
 
@@ -49,7 +49,7 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
             if ($.inArray($(this)[0].name, tagList) <= -1) {
                 var widget_name = $(this)[0].name;
                 $("#tags").tagsinput('add', $(this)[0].text);
-                WORKFLOWS_HP_UTILITIES.requestNewObjects();
+                utilities.requestNewObjects();
             } else {
                 closeTag(widget_name);
                 holdingpen.oTable.fnFilter('^$', 4, true, false);
@@ -74,12 +74,12 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
 
         $("#tags").on('itemRemoved', function (event) {
             tagList = $("#tags").val().split(',');
-            WORKFLOWS_HP_UTILITIES.requestNewObjects();
+            utilities.requestNewObjects();
         });
 
         $("#tags").on('itemAdded', function (event) {
             tagList =  $("#tags").val().split(',');
-            WORKFLOWS_HP_UTILITIES.requestNewObjects();
+            utilities.requestNewObjects();
         });
     };
 
@@ -93,5 +93,4 @@ var WORKFLOWS_HP_TAGS = function ($, holdingpen) {
         tagList: function () { return tagList; },
         closeTag: closeTag
     };
-}($, WORKFLOWS_HOLDINGPEN);
-//***********************************
+});

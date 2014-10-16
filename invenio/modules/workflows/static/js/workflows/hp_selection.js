@@ -17,10 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
-// DataTables row selection functions
-//***********************************
-var WORKFLOWS_HP_SELECTION = function ($, holdingpen) {
+define(['jquery', 'js/workflows/hp_maintable'], function ($, holdingpen) {
     var oTable = {},
         oSettings = {},
         hoveredRow = -1;
@@ -304,5 +301,4 @@ var WORKFLOWS_HP_SELECTION = function ($, holdingpen) {
             }
         }
     };
-}($, WORKFLOWS_HOLDINGPEN);
-//***********************************
+});
