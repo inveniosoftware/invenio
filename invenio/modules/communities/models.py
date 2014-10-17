@@ -48,6 +48,7 @@ from datetime import datetime
 from flask import url_for
 
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload_all
 from invenio.base.globals import cfg
 from invenio.config import CFG_SITE_LANG
 from invenio.ext.sqlalchemy import db
@@ -166,13 +167,13 @@ class Community(db.Model):
         Collection, uselist=False, backref='community_provisional',
         foreign_keys=[id_collection_provisional]
     )
-    """ Relationship to restricted collection containing uncurated records. """
+    """Relationship to restricted collection containing uncurated records."""
 
     oai_set = db.relationship(
         OaiREPOSITORY, uselist=False, backref='community',
         foreign_keys=[id_oairepository]
     )
-    """ Relation to the owner (User) of the community"""
+    """Relation to the owner (User) of the community."""
 
     #
     # Properties
@@ -270,6 +271,7 @@ class Community(db.Model):
                 cfg['COMMUNITIES_ID_PREFIX'], self.id)
 
     def get_title(self, provisional=False):
+        """Get collection title."""
         if provisional:
             return "Provisional: %s" % self.title
         else:
@@ -776,6 +778,10 @@ class Community(db.Model):
         self.delete_collection(provisional=True)
         after_delete_collections.send(self)
 
+    def __str__(self):
+        """Return a string representation of an object."""
+        return self.id
+
 
 def update_changed_fields(obj, fields):
     """Utility method to update fields on an object if they have changed.
@@ -792,6 +798,7 @@ def update_changed_fields(obj, fields):
 
 
 def signalresult2list(extra_colls):
+    """Convert signal's result to the list."""
     replace = list(set(reduce(sum, map(
         lambda x: x[1].get('replace', []) if x[1] else [],
         extra_colls or [(None, None)]))))
@@ -800,3 +807,39 @@ def signalresult2list(extra_colls):
         extra_colls or [(None, None)]))))
 
     return (append, replace)
+
+
+class FeaturedCommunity(db.Model):
+
+    """Featured community representation."""
+
+    __tablename__ = 'communityFEATURED'
+
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                   autoincrement=True)
+    """Featured community identifier."""
+
+    id_community = db.Column(
+        db.String(100), db.ForeignKey(Community.id),
+        nullable=False
+    )
+    """Specific community."""
+
+    start_date = db.Column(
+        db.DateTime(), nullable=False, default=datetime.now
+    )
+    """The date from which it should start to take effect."""
+
+    community = db.relationship(Community,
+                                backref="featuredcommunity")
+    """Relation to the community."""
+
+    @classmethod
+    def get_current(cls, start_date=None):
+        """Get the latest featured community."""
+        start_date = start_date or datetime.now()
+
+        return cls.query.options(joinedload_all(
+            'community.collection')).filter(
+            cls.start_date <= start_date).order_by(
+            cls.start_date.desc()).first()

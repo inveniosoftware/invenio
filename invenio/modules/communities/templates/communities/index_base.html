@@ -21,39 +21,78 @@
 
 {% block title %}{% endblock %}
 
-{% block javascript %}
-{{super()}}
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "communities.css" %}
 {% endblock %}
 
 {% block body %}
 <div class="row">
-  <div class="col-xs-12 col-sm-12 col-md-12">
-      <nav class="navbar navbar-default" role="navigation">
-        <div class="collapse navbar-collapse">
-            <form action="." method="GET" id="search_form" class="navbar-form" role="form">
-            <div class="input-group">
-                {{ form.p(class_="form-control " + form.p.short_name, ) }}
-                <span class="input-group-btn"  style="width: 1%;">
-                    <button type="submit" class="btn btn-primary"><i class="glyphicon glyphicon-search glyphicon-white"></i> {{ _("Search") }}</button>
-                </span>
-            </div>
-            </form>
-        </div>
-      </nav>
 
-    <h1><i class="fa fa-group"></i> Communities <small>created and curated by {{config.CFG_SITE_NAME}} users</small></h1>
+  <div class="col-xs-12 col-sm-12 col-md-12">
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="collapse navbar-collapse">
+        <form action="." method="GET" id="search_form" class="navbar-form" role="form">
+          <div class="input-group">
+            {{ form.p(class_="form-control " + form.p.short_name, ) }}
+            <span class="input-group-btn"  style="width: 1%;">
+              <button type="submit" class="btn btn-primary">
+                <i class="glyphicon glyphicon-search glyphicon-white"></i> {{ _("Search") }}
+              </button>
+            </span>
+          </div>
+        </form>
+      </div>
+    </nav>
+    <h1>
+      <i class="fa fa-group"></i>
+      {{ _("Communities") }} <small>{{ _("created and curated by ") + config.CFG_SITE_NAME + _(" users") }}</small>
+    </h1>
   </div>
 
   <div class="col-sm-8 col-md-8">
-  {%- set args = request.args.copy().to_dict() -%}
-
-
-
+    {%- set args = request.args.copy().to_dict() -%}
     {% if communities %}
-    <p>
-    <div class="form-inline">
+
+      {% if featured_community %}
+      <div class="wrapper">
+        <div class="ribbon-wrapper-green">
+          <div class="ribbon-green">{{ _("Featured") }}</div>
+        </div>
+        <h2>{{ featured_community.community.title }}</h2>
+        <div>
+          {{ featured_community.community.description }}
+        </div>
+        <p style="position: absolute; right:25px;">
+          <a class="btn btn-info" href="{{ featured_community.community.community_url }}">{{ _("View") }}</a>
+          {% if featured_community.community.id_user == current_user.id %}
+            <a href="{{ featured_community.community_provisional_url }}" class="btn btn-info">{{ _("Curate") }}</a>
+          {% endif %}
+        </p>
+        <h3>{{ _("The most recent upload:") }}</h3>
+        {% if featured_community.community.collection.reclist %}
+          {%- set recid = featured_community.community.collection.reclist[-1] -%}
+          <div class="row recent-upload">
+            <div class="col-md-12 record-list-elem">
+              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+            </div>
+          </div>
+        {%- else %}
+          <div class="row">
+            <div class="col-md-12" align="center" style="margin-top: 40px;">
+              <em class="text-muted">_("This collection is currently empty.")</em>
+            </div>
+          </div>
+        {%- endif %}
+      </div>
+      {% endif %}
+
+      <br />
+      <div class="form-inline">
         <div class="form-group">
-            <p class="help-block hidden-xs">{{ _('Showing communties %(x_from)d to %(x_to)d out of %(x_total)d results.', x_from=r_from, x_to=r_to, x_total=r_total) }}</p>
+          <p class="help-block hidden-xs">
+            {{ _('Showing communties %(x_from)d to %(x_to)d out of %(x_total)d results.', x_from=r_from, x_to=r_to, x_total=r_total) }}
+          </p>
         </div>
         <div class="form-group pull-right">
           <div class="btn-group">
@@ -62,86 +101,86 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              {%- for opt in ['title', 'ranking'] -%}
-                {%- set new_args = args.copy() -%}
-                {%- do new_args.update({'so': opt}) -%}
-                <li><a
-                   href="{{ url_for('communities.index', **new_args) }}"
-                   class="active">
+            {%- for opt in ['title', 'ranking'] -%}
+              {%- set new_args = args.copy() -%}
+              {%- do new_args.update({'so': opt}) -%}
+              <li>
+                <a href="{{ url_for('communities.index', **new_args) }}" class="active">
                   <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if args.get('so', 'ranking')==opt }}"></i>
                   {{ opt }}
-                </a></li>
-              {%- endfor -%}
+                </a>
+              </li>
+            {%- endfor -%}
             </ul>
-            </div>
+          </div>
         </div>
-    </div>
-    <p>
+      </div>
+      <br />
 
-    {%- for row in communities|batch(2) %}
-    <div class="row">
-        {%- for obj in row %}
-          {% if obj %}
-            <div class="col-sm-12 col-md-6">
-              <div class="well">
-                <ul class="pager pull-right" style="margin-top: 10px">
-                  <li><a href="{{obj.community_url}}" class="btn btn-info">View</a></li>
-                  {% if obj.id_user == current_user.id %}
-                    <li><a href="{{obj.community_provisional_url}}" class="btn btn-info">Curate</a></li>
-                  {% endif %}
-                </ul>
-                <h4>{{obj.title}}</h4><br />
-                <p>{{obj.description|striptags|truncate}}</p>
-                <small class="text-muted">Curated by: {{obj.owner.nickname}}</small>
+      {%- for row in communities|batch(2) %}
+        <div class="row">
+          {%- for obj in row %}
+            {% if obj %}
+              <div class="col-sm-12 col-md-6">
+                <div class="well">
+                  <div class="pull-right" style="margin-top: 10px">
+                    <a href="{{ obj.community_url }}" class="btn btn-info">{{ _('View') }}</a>
+                    {% if obj.id_user == current_user.id %}
+                      <a href="{{ obj.community_provisional_url }}" class="btn btn-info">{{ _('Curate') }}</a>
+                    {% endif %}
+                  </div>
+                  <h4>{{ obj.title }}</h4><br />
+                  <p>{{ obj.description|striptags|truncate }}</p>
+                  <small class="text-muted">Curated by: {{ obj.owner.nickname }}</small>
+                </div>
               </div>
-            </div>
-          {% endif %}
-        {%- endfor %}
-    </div>
-    {%- endfor %}
+            {% endif %}
+          {%- endfor %}
+        </div>
+      {%- endfor %}
 
-    {% if pagination.total_count > pagination.per_page %}
-    <div align="center">
-    <ul class="pagination">
-      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
-        {%- set new_args = args.copy() -%}
-        {%- do new_args.update({'page': 1}) -%}
-        <a title="first" href="{{ url_for('communities.index', **new_args) }}">«</a>
-      </li>
-      <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
-        {%- do args.update({'page': pagination.page-1 }) -%}
-        <a title="prev" href="{{ url_for('communities.index', **args) }}">&lsaquo;</a>
-      </li>
-      {%- for page_p in pagination.iter_pages() %}
-        {%- if page_p -%}
-          {%- set new_args = args.copy() -%}
-          {%- do new_args.update({'page': page_p}) -%}
-          <li{{ ' class="active"'|safe if page_p == pagination.page }}>
-          <a href="{{ url_for('communities.index', **new_args) }}">{{ page_p }}</a>
-        </li>
-        {%- else -%}
-          <li class="disabled"><a href="#">...</a></li>
-        {%- endif -%}
-      {%- endfor -%}
-      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
-        {%- set new_args = args.copy() -%}
-        {%- do new_args.update({'page': pagination.page+1}) -%}
-        <a href="{{ url_for('communities.index', **new_args) }}">&rsaquo;</a>
-      </li>
-      <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
-        {%- set new_args = args.copy() -%}
-        {%- do new_args.update({'page': pagination.pages }) -%}
-        <a title="last" href="{{ url_for('communities.index', **new_args) }}">»</a>
-      </li>
-    </ul>
-    </div>
-    {% endif %}
+      {% if pagination.total_count > pagination.per_page %}
+        <div align="center">
+          <ul class="pagination">
+            <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+              {%- set new_args = args.copy() -%}
+              {%- do new_args.update({'page': 1}) -%}
+              <a title="first" href="{{ url_for('communities.index', **new_args) }}">«</a>
+            </li>
+            <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
+              {%- do args.update({'page': pagination.page-1 }) -%}
+              <a title="prev" href="{{ url_for('communities.index', **args) }}">&lsaquo;</a>
+            </li>
+            {%- for page_p in pagination.iter_pages() %}
+              {%- if page_p -%}
+                {%- set new_args = args.copy() -%}
+                {%- do new_args.update({'page': page_p}) -%}
+                <li{{ ' class="active"'|safe if page_p == pagination.page }}>
+                  <a href="{{ url_for('communities.index', **new_args) }}">{{ page_p }}</a>
+                </li>
+              {%- else -%}
+                <li class="disabled"><a href="#">...</a></li>
+              {%- endif -%}
+            {%- endfor -%}
+            <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+              {%- set new_args = args.copy() -%}
+              {%- do new_args.update({'page': pagination.page+1}) -%}
+              <a href="{{ url_for('communities.index', **new_args) }}">&rsaquo;</a>
+            </li>
+            <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
+              {%- set new_args = args.copy() -%}
+              {%- do new_args.update({'page': pagination.pages }) -%}
+              <a title="last" href="{{ url_for('communities.index', **new_args) }}">»</a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+
     {% else %}
-    <p class="text-muted text-center"><strong>
-    {{ _('Your search did not match any communities. Please try again.')}}
-    </strong></p>
+      <p class="text-muted text-center">
+        <strong>{{ _('Your search did not match any communities. Please try again.') }}</strong>
+      </p>
     {% endif %}
-
   </div>
 
   <div class="col-sm-4 col-md-4">

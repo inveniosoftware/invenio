@@ -28,3 +28,10 @@ js = Bundle(
     output="communities.js",
     weight=91
 )
+
+styles = Bundle(
+    "css/communities/communities.less",
+    filters="less,cleancss",
+    output="communities.css",
+    weight=91
+)

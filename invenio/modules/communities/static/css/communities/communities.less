@@ -1,0 +1,101 @@
+/**
+ * -*- mode: text; coding: utf-8; -*-
+ *
+ * This file is part of Invenio.
+ * Copyright (C) 2014 CERN.
+
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+@charset "utf-8";
+
+@featured-community-background-color: #EEE;
+@ribbon-gradient-start-color: #2AABD2;
+@ribbon-gradient-end-color: #70e1fa;
+
+.box-shadow(@style, @c) when (iscolor(@c)) {
+  -webkit-box-shadow: @style @c;
+  -moz-box-shadow:    @style @c;
+  box-shadow:         @style @c;
+}
+
+.rotate(@rot) {
+  -webkit-transform: rotate(@rot);
+  -moz-transform:    rotate(@rot);
+  -ms-transform:     rotate(@rot);
+  -o-transform:      rotate(@rot);
+}
+
+.background-image-gradient(@point, @col-st, @col-nd) {
+  background-image: -webkit-linear-gradient(@point, @col-st, @col-nd);
+  background-image:    -moz-linear-gradient(@point, @col-st, @col-nd);
+  background-image:     -ms-linear-gradient(@point, @col-st, @col-nd);
+  background-image:      -o-linear-gradient(@point, @col-st, @col-nd);
+}
+
+.wrapper {
+  position: relative;
+  margin: 5px auto;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: @featured-community-background-color;
+  .box-shadow(0px 0px 8px, rgba(0,0,0,0.3));
+  z-index: 90;
+}
+
+.ribbon-wrapper-green {
+  position: absolute;
+  overflow: hidden;
+  width: 85px;
+  height: 88px;
+  top: -3px;
+  right: -3px;
+}
+
+.ribbon-green {
+  position: relative;
+  top: 15px;
+  left: -5px;
+  width: 120px;
+  padding: 7px 0;
+  .rotate(45deg);
+  font: bold 12px Sans-Serif;
+  color: white;
+  text-align: center;
+  .background-image-gradient(top, @ribbon-gradient-start-color, @ribbon-gradient-end-color);
+  .box-shadow(0px 0px 3px, rgba(0,0,0,0.3));
+}
+
+.ribbon-green:before, .ribbon-green:after {
+  position:absolute;
+  bottom: -3px;
+  content: "";
+  border-top:   3px solid black;
+  border-left:  3px solid transparent;
+  border-right: 3px solid transparent;
+}
+
+.ribbon-green:before {
+  left: 0;
+}
+
+.ribbon-green:after {
+  right: 0;
+}
+
+.recent-upload {
+  padding: 10px;
+  background-color: white;
+  border-radius: 10px;
+}

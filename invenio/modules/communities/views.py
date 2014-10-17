@@ -34,9 +34,10 @@ from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 from invenio.utils.pagination import Pagination
+from invenio.modules.formatter import format_record
 
 from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm, SearchForm
-from .models import Community
+from .models import Community, FeaturedCommunity
 from .signals import curate_record
 from invenio.base.globals import cfg
 
@@ -145,6 +146,7 @@ def index(p, so, page):
         so = cfg.get('COMMUNITIES_DEFAULT_SORTING_OPTION')
 
     communities = Community.filter_communities(p, so)
+    featured_community = FeaturedCommunity.get_current()
     form = SearchForm(p=p)
     per_page = cfg.get('COMMUNITIES_DISPLAYED_PER_PAGE', 10)
     page = max(page, 1)
@@ -159,6 +161,8 @@ def index(p, so, page):
         'title': _('Community Collections'),
         'communities': communities.slice(
             per_page*(page-1), per_page*page).all(),
+        'featured_community': featured_community,
+        'format_record': format_record,
     })
 
     return render_template(
