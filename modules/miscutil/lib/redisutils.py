@@ -41,7 +41,6 @@ def get_redis(redis_namespace='default'):
 
     redis = create_cluster({
         'backend': 'nydus.db.backends.redis.Redis',
-        'router': 'nydus.db.routers.keyvalue.ConsistentHashingRouter',
         'hosts': hosts_dict
     })
     _REDIS_CONN[redis_namespace] = redis
