@@ -33,6 +33,7 @@ from invenio.bibrank_citation_searcher import get_cited_by
 from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
 from invenio.bibformat_dblayer import save_preformatted_record
 from invenio.shellutils import split_cli_ids_arg
+from invenio.bibfield import get_record
 from invenio.bibtask import task_init, \
     write_message, \
     task_set_option, \
@@ -197,6 +198,38 @@ def check_validity_input_formats(input_formats):
 ### Bibreformat all selected records (using new python bibformat)
 ### (see iterate_over_old further down)
 
+
+def _update_recjson_format(recid, *args, **kwargs):
+    """Update RECJSON cache.
+
+    :param int recid: record id to process
+    """
+    dummy = get_record(recid, reset_cache=True)
+
+
+def _update_format(recid, fmt):
+    """Usual format update procedure, gets the formatted record and saves it.
+
+    :param int recid: record id to process
+    :param str fmt: format to update/create, i.e. 'HB'
+    """
+    record, needs_2nd_pass = format_record_1st_pass(recID=recid,
+                                                    of=fmt,
+                                                    on_the_fly=True,
+                                                    save_missing=False)
+    save_preformatted_record(recID=recid,
+                             of=fmt,
+                             res=record,
+                             needs_2nd_pass=needs_2nd_pass,
+                             low_priority=True)
+
+
+_CFG_BIBFORMAT_UPDATE_FORMAT_FUNCTIONS = {'recjson': _update_recjson_format}
+"""Specific functions to be used for each format if needed.
+If not set `_update_format` will be used.
+"""
+
+
 def iterate_over_new(recIDs, fmt):
     """Iterate over list of IDs.
 
@@ -209,17 +242,11 @@ def iterate_over_new(recIDs, fmt):
     tbibupload = 0     # time taken up by external call
 
     tot = len(recIDs)
+    reformat_function = _CFG_BIBFORMAT_UPDATE_FORMAT_FUNCTIONS.get(
+        fmt.lower(), _update_format)
     for count, recID in enumerate(recIDs):
         t1 = os.times()[4]
-        formatted_record, needs_2nd_pass = format_record_1st_pass(recID=recID,
-                                                  of=fmt,
-                                                  on_the_fly=True,
-                                                  save_missing=False)
-        save_preformatted_record(recID=recID,
-                                 of=fmt,
-                                 res=formatted_record,
-                                 needs_2nd_pass=needs_2nd_pass,
-                                 low_priority=True)
+        reformat_function(recID, fmt)
         t2 = os.times()[4]
         tbibformat += t2 - t1
         if count % 100 == 0:
@@ -313,8 +340,7 @@ def task_run_core():
 
     This is what BibSched will be invoking via daemon call.
     """
-
-    fmts = task_get_option('format', 'HB')
+    fmts = task_get_option('format', 'HB,RECJSON')
     for fmt in fmts.split(','):
         last_updated = fetch_last_updated(fmt)
         write_message("last stored run date is %s" % last_updated)
@@ -374,7 +400,7 @@ Option -m cannot be used at the same time as option -c.
 Option -c prevents from finding records in private collections.
 
 Examples:
-  bibreformat                    Format all new or modified records (in HB).
+  bibreformat                    Format all new or modified records (in HB and RECJSON).
   bibreformat -o HD              Format all new or modified records in HD.
   bibreformat -o HD,HB           Format all new or modified records in HD and HB.
 
