@@ -21,41 +21,41 @@
 
 {% block styles_body %}
 
-{% if result_progress %}
-  <h5>{{ _('Progress') }}:</h5>
+  {% if result_progress %}
+    <h5>{{ _('Progress') }}:</h5>
 
-  <div class="progress">
-    <div class="progress-bar progress-bar-success" style="width: {{(result_progress.total - result_progress.failed)* 100 / result_progress.total}}%">
-      <span class="sr-only">{{ _('Succeeded') }}</span>
+    <div class="progress">
+      <div class="progress-bar progress-bar-success" style="width: {{(result_progress.total - result_progress.failed)* 100 / result_progress.total}}%">
+        <span class="sr-only">{{ _('Succeeded') }}</span>
+      </div>
+      <div class="progress-bar progress-bar-danger" style="width: {{result_progress.failed * 100 / result_progress.total}}%">
+        <span class="sr-only">{{ _('Failed') }}</span>
+      </div>
     </div>
-    <div class="progress-bar progress-bar-danger" style="width: {{result_progress.failed * 100 / result_progress.total}}%">
-      <span class="sr-only">{{ _('Failed') }}</span>
-    </div>
-  </div>
 
-  <h5>{{result_progress.total - result_progress.failed}}</h5> {{_("out of")}} <h5>{{result_progress.total}}</h5> {{_("record(s) done")}}.
+    <strong>{{result_progress.total - result_progress.failed}}</strong> {{_("out of")}} <strong>{{result_progress.total}}</strong> {{_("record(s) done")}}.
 
-  {% if result_progress.failed %}
-  <p class="text-warning">
-    {{ result_progress.failed }} {{ _('failed') }}.
-  </p>
+    {% if result_progress.failed %}
+      <p class="text-warning">
+        {{ result_progress.failed }} {{ _('failed') }}.
+      </p>
+    {% endif %}
   {% endif %}
-{% endif %}
 
-{% if identifiers %}
-  <h5>{{ _('Identifiers') }}:</h5>
-  <ul class="list-unstyled">
-    {% for identifier in identifiers %}
-    <li>
-      {% if 'arxiv' in identifier.lower() %}
-        {% set identifier = identifier.split(':')[-1] %}
-        <a href="http://arxiv.org/abs/{{identifier}}">{{identifier}}</a>
-      {% else %}
-        {{ identifier }}
-      {% endif %}
-    </li>
-    {% endfor %}
-  </ul>
-{% endif %}
+  {% if identifiers %}
+    <h5>{{ _('Identifiers') }}:</h5>
+    <ul class="list-unstyled">
+      {% for identifier in identifiers %}
+        <li>
+          {% if 'arxiv' in identifier.lower() %}
+            {% set identifier = identifier.split(':')[-1] %}
+            <a href="http://arxiv.org/abs/{{identifier}}">{{identifier}}</a>
+          {% else %}
+            {{ identifier }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
 {% endblock %}
