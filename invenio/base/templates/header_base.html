@@ -58,16 +58,14 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
         {% if current_user.is_guest %}
-          <div style="padding-top: 10px;">
-            <button class="btn btn-sm btn-default" onclick="window.location='{{url_for('webaccount.login')}}'">
-              <i class="fa fa-sign-in"></i> {{ _('Login') }}
-            </button>
-            {% if config.CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS in [0, 1] %}
-              <button class="btn btn-sm btn-warning" onclick="window.location='{{url_for('webaccount.register')}}'">
-                <i class="fa fa-edit"></i> {{ _('Register') }}
-              </button>
-            {% endif %}
-          </div>
+          <a class="btn navbar-btn btn-default btn-sm" href="{{url_for('webaccount.login')}}" title="{{ _('Login') }}">
+            <i class="fa fa-sign-in"></i> {{ _('Login') }}
+          </a>
+          {% if config.CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS in [0, 1] %}
+            <a class="btn navbar-btn btn-warning btn-sm" href="{{url_for('webaccount.register')}}" title="{{ _('Register') }}">
+              <i class="fa fa-edit"></i> {{ _('Register') }}
+            </a>
+          {% endif %}
         {% else %}
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
