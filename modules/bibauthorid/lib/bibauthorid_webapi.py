@@ -3373,11 +3373,15 @@ def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
     # No bibref specified and no bibref candidates to select from.
     if not bibref and not bibrefs:
 
-        BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
-                                        subject="[Author] No authors on record: %s" % rec,
-                                        text="No authors seem to exist on record %s" % rec,
-                                        queue="Authors",
-                                        requestor=CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL)
+        recstruct = get_record(rec)
+        if not record_get_field_value(recstruct, '110', '', '', 'a'):
+
+            BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                            subject="[Author] No authors on record: %s" % rec,
+                                            text="No authors seem to exist on record %s" % rec,
+                                            queue="Authors",
+                                            recordid=rec,
+                                            requestor=CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL)
         return None
 
     if should_have_bibref and not bibref:
