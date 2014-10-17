@@ -32,12 +32,14 @@ js = Bundle(
     bower={
         "plupload": "latest",
         "ckeditor": "latest",
-        "flight": "latest"
+        "flight": "latest",
+        "eonasdan-bootstrap-datetimepicker": "latest",
     }
 )
 
 styles = Bundle(
     "css/deposit/form.css",
+    "vendors/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css",
     output="deposit.css",
     filters="cleancss",
     weight=51
