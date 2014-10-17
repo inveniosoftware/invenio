@@ -29,7 +29,7 @@ import shutil
 import cgi
 import re
 from datetime import datetime, timedelta
-from bleach import clean
+from bleach import clean, linkify
 
 # Invenio imports:
 
@@ -973,6 +973,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
             (round_name, restriction) = comment[11:13]
 
     if editor_type == "ckeditor":
+        msg = linkify(msg)
         msg = clean(
             msg,
             tags=CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST,
