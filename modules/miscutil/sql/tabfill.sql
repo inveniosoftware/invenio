@@ -310,6 +310,7 @@ INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (26
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (27,'Mobile brief','mobb', 'Mobile brief format.', 'text/html', 0);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (28,'Mobile detailed','mobd', 'Mobile detailed format.', 'text/html', 0);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (29,'WebAuthorProfile data helper','wapdat', 'cPickled dicts', 'text', 0);
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (30,'recjson','recjson', 'recjson record representation', 'application/json', 0);
 
 INSERT INTO tag VALUES (1,'first author name','100__a','authors[0].full_name');
 INSERT INTO tag VALUES (2,'additional author name','700__a','contributor.full_name');

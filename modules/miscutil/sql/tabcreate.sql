@@ -5041,5 +5041,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_varchar20',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjson',NOW());
 
 -- end of file
