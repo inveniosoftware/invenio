@@ -1915,6 +1915,7 @@ RECORD CONCERNED:
 
 %(comment_or_review_caps)s:
     %(comment_or_review)s ID    = %(comID)s %(review_stuff)s
+    URL         = <%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/#C%(comID)s>
     Body        =
 <--------------->
 
@@ -1964,6 +1965,7 @@ The following %(comment_or_review)s has just been posted (%(date)s).
 <p>%(comment_or_review_caps)s:</p>
 <ul style="list-style-type: none;">
   <li>%(comment_or_review)s ID    = %(comID)s %(review_stuff)s</li>
+  <li>URL                         = &lt;<a href='%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/#C%(comID)s'>%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/%(comments_or_reviews)s/#C%(comID)s</a>&gt;</li>
   <li>Body                        = </li>
 </ul>
 
