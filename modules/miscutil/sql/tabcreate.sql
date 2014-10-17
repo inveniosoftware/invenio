@@ -5162,4 +5162,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_07_new_journalpa
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_04_15_bibrec_earliest_date',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_28_remove_author_duplicates',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_10_14_new_aidTOKEN', NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjson',NOW());
 -- end of file
