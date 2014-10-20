@@ -21,15 +21,15 @@
 
 from __future__ import absolute_import
 
+import six
 
 from flask import current_app
 from flask.ext.login import current_user
-
+from sqlalchemy_utils import URLType
 from werkzeug.security import gen_salt
 from wtforms import validators
-from sqlalchemy_utils import URLType
-import six
 
+from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login.legacy_user import UserInfo
 
@@ -42,6 +42,7 @@ class OAuthUserProxy(object):
     """Proxy object to an Invenio User."""
 
     def __init__(self, user):
+        """Initialize proxy object with user instance."""
         self._user = user
 
     def __getattr__(self, name):
@@ -56,18 +57,25 @@ class OAuthUserProxy(object):
 
     @property
     def id(self):
+        """Return user identifier."""
         return self._user.get_id()
 
     def check_password(self, password):
+        """Check user password."""
         return self.password == password
 
     @classmethod
     def get_current_user(cls):
+        """Return an instance of current user object."""
         return cls(current_user._get_current_object())
 
 
 class Scope(object):
+
+    """OAuth scope definition."""
+
     def __init__(self, id_, help_text='', group='', internal=False):
+        """Initialize scope values."""
         self.id = id_
         self.group = group
         self.help_text = help_text
@@ -102,8 +110,8 @@ class Client(db.Model):
     name = db.Column(
         db.String(40),
         info=dict(
-            label='Name',
-            description='Name of application (displayed to users).',
+            label=_('Name'),
+            description=_('Name of application (displayed to users).'),
             validators=[validators.Required()]
         )
     )
@@ -113,9 +121,9 @@ class Client(db.Model):
         db.Text(),
         default=u'',
         info=dict(
-            label='Description',
-            description='Optional. Description of the application'
-                        ' (displayed to users).',
+            label=_('Description'),
+            description=_('Optional. Description of the application'
+                          ' (displayed to users).'),
         )
     )
     """Human readable description."""
@@ -123,8 +131,8 @@ class Client(db.Model):
     website = db.Column(
         URLType(),
         info=dict(
-            label='Website URL',
-            description='URL of your application (displayed to users).',
+            label=_('Website URL'),
+            description=_('URL of your application (displayed to users).'),
         ),
         default=u'',
     )

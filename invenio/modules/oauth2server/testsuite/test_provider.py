@@ -606,6 +606,7 @@ class OAuth2ProviderTestCase(ProviderTestCase):
                 name='Test',
                 description='Test description',
                 website='http://invenio-software.org',
+                is_confidential=1,
                 redirect_uris="http://localhost/oauth/authorized/"
             )
         )
@@ -619,6 +620,7 @@ class OAuth2ProviderTestCase(ProviderTestCase):
                 name='Test',
                 description='Test description',
                 website='http://invenio-software.org',
+                is_confidential=1,
                 redirect_uris="http://example.org/oauth/authorized/"
             )
         )
@@ -632,6 +634,7 @@ class OAuth2ProviderTestCase(ProviderTestCase):
                 name='Test',
                 description='Test description',
                 website='http://invenio-software.org',
+                is_confidential=1,
                 redirect_uris="https://example.org/oauth/authorized/\n"
                               "http://localhost:4000/oauth/authorized/"
             )

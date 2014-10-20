@@ -17,12 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Forms for generating access tokens and clients."""
+"""Define forms for generating access tokens and clients."""
 
 from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
     InvalidRedirectURIError
 from wtforms_alchemy import model_form_factory
 from wtforms import fields, validators, widgets
+
+from invenio.base.i18n import _
 from invenio.utils.forms import InvenioBaseForm
 
 from .models import Client
@@ -33,7 +35,7 @@ from .validators import validate_redirect_uri
 # Widget
 #
 def scopes_multi_checkbox(field, **kwargs):
-    """ Render multi checkbox widget. """
+    """Render multi checkbox widget."""
     kwargs.setdefault('type', 'checkbox')
     field_id = kwargs.pop('id', field.id)
 
@@ -70,7 +72,7 @@ def scopes_multi_checkbox(field, **kwargs):
 #
 class RedirectURIField(fields.TextAreaField):
 
-    """ Process redirect URI field data. """
+    """Process redirect URI field data."""
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -85,7 +87,7 @@ class RedirectURIField(fields.TextAreaField):
 
 class RedirectURIValidator(object):
 
-    """ Validate if redirect URIs. """
+    """Validate if redirect URIs."""
 
     def __call__(self, form, field):
         errors = []
@@ -112,16 +114,26 @@ class ClientFormBase(model_form_factory(InvenioBaseForm)):
         exclude = [
             'client_secret',
             'is_internal',
-            'is_confidential',
         ]
         strip_string_fields = True
-        field_args = dict(website=dict(
-            validators=[validators.Required(), validators.URL()],
-            widget=widgets.TextInput(),
-        ))
+        field_args = dict(
+            website=dict(
+                validators=[validators.Required(), validators.URL()],
+                widget=widgets.TextInput(),
+            ),
+        )
 
 
 class ClientForm(ClientFormBase):
+    is_confidential = fields.SelectField(
+        label=_('Client Type'),
+        description=_('If you select public option, your application '
+                      'MUST validate redirect URI.'),
+        coerce=int,
+        choices=[(1, _('Confidential')), (0, _('Public'))],
+        widget=widgets.Select(),
+    )
+
     # Trick to make redirect_uris render in the bottom of the form.
     redirect_uris = RedirectURIField(
         label="Redirect URIs (one per line)",
