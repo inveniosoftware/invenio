@@ -73,42 +73,77 @@
 {%- block form_script_options %}
 {%- endblock form_script_options %}
 <script type="text/javascript">
-require(["jquery", "js/deposit/form", "js/deposit/plupload"], function($, form) {
-    $(function(){
-      var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
-      var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
-      var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
-      var autocomplete_url = '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}';
+  require(
+    [
+      "jquery",
+      "js/deposit/form",
+      "js/deposit/uploader/uploader",
+      "js/deposit/uploader/uploaders/pluploader",
+      "js/deposit/uploader/uploaders/dropboxuploader",
+      "js/deposit/uploader/ui/filelist",
+      "js/deposit/uploader/ui/errorlist"
+    ],
 
-      // Initialize form
-      form.attachTo("#submitForm", {
-        save_url: save_url,
-        save_all_url: save_all_url,
-        complete_url: complete_url,
-        autocomplete_url: autocomplete_url,
-        datepicker_element: '.datepicker',
-        datepicker_options: {
-          format: 'YYYY-MM-DD',
-          pickTime: false,
-        }
-      });
+    function(
+      $,
+      form,
+      Uploader,
+      PlUploader,
+      DropboxUploader,
+      FileList,
+      ErrorList
+    ) {
 
-      $('.pluploader').pluploadWidget({
-        max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
-        save_url: save_url,
-        url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
-        delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
-        get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
-        dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}',
-        files: {{ form.files|safe }},
-        form_selector: "#submitForm"
-        // Those are missing
-        // uuid:,
-        // newdep_url:,
-        // continue_url
+      $(function () {
+
+        var config = {
+          form: {
+            save_url: '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}',
+            save_all_url: '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}',
+            complete_url: '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}',
+            autocomplete_url: '{{ url_for(".autocomplete", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, field_name="__FIELDNAME__") }}',
+            datepicker_element: '.datepicker',
+            datepicker_options: {
+                format: "YYYY-MM-DD",
+                pickTime: false
+            }
+          },
+
+          uploader: {
+            get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
+            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
+            form_selector: "#submitForm",
+            form_files: {{ form.files|safe }},
+            resolve_uuid_url: '{{ url_for(".create", deposition_type=deposition_type) }}',
+            resolve_uuid: false,
+            continue_url: '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}',
+            autoupload: false,
+            fileListSelector: '#uploader-filelist',
+            errorListSelector: '#uploader-errorlist'
+          },
+
+          pluploader: {
+            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
+            max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+            drop_element: $('#field-plupload_file')[0]
+          }{% if config.DEPOSIT_DROPBOX_API_KEY %},
+
+          dropboxuploader: {
+            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
+          }{% endif %}
+        };
+
+        form.attachTo("#submitForm", config.form);
+        Uploader.attachTo("#uploader", config.uploader);
+        PlUploader.attachTo("#pluploader", config.pluploader);
+        {% if config.DEPOSIT_DROPBOX_API_KEY %}DropboxUploader.attachTo("#dropboxuploader", config.dropboxuploader);{% endif %}
+        FileList.attachTo("#uploader-filelist");
+        ErrorList.attachTo("#uploader-errorlist");
       });
-    });
-});
+    }
+  );
 </script>
-<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
+{%- if config.DEPOSIT_DROPBOX_API_KEY %}
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="{{config.DEPOSIT_DROPBOX_API_KEY}}"></script>
+{%- endif %}
 {% endblock javascript %}
