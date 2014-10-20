@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -160,6 +160,7 @@ def send_email(fromaddr,
                replytoaddr="",
                attachments=None,
                bccaddr="",
+               forward_failures_to_admin=True,
                ):
     """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -189,6 +190,11 @@ def send_email(fromaddr,
         every element of the list could be a tuple: (filename, mimetype)
     @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
                     (if string, then receivers are separated by ',')
+    @param forward_failures_to_admin: [bool] prevents infinite recursion
+                                             in case of admin reporting,
+                                             when the problem is not in
+                                             the e-mail address format,
+                                             but rather in the network
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -238,6 +244,8 @@ This message would have been sent to the following recipients:
 #        log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
     sent = False
+    failure_reason = ''
+    failure_details = ''
     while not sent and attempt_times > 0:
         try:
             server = smtplib.SMTP(CFG_MISCUTIL_SMTP_HOST, CFG_MISCUTIL_SMTP_PORT)
@@ -257,7 +265,9 @@ This message would have been sent to the following recipients:
             server.sendmail(fromaddr, toaddr + bccaddr, body)
             server.quit()
             sent = True
-        except (smtplib.SMTPException, socket.error):
+        except (smtplib.SMTPException, socket.error) as e:
+            failure_reason = type(e).__name__
+            failure_details = str(e)
             register_exception()
             if debug_level > 1:
                 try:
@@ -271,6 +281,28 @@ This message would have been sent to the following recipients:
             if attempt_times > 0:  # sleep only if we shall retry again
                 sleep(attempt_sleeptime)
     if not sent:
+        # report failure to the admin with the intended message, its
+        # sender and recipients
+        if forward_failures_to_admin:
+            # prepend '> ' to every line of the original message
+            quoted_body = '> ' + '> '.join(body.splitlines(True))
+
+            # define and fill in the report template
+            admin_report_subject = _('Error while sending an email: %s') % (subject)
+            admin_report_body = _("\nError while sending an email.\n"
+                                  "Reason: %s\n"
+                                  "Details: %s\n"
+                                  "Sender: \"%s\"\n"
+                                  "Recipient(s): \"%s\"\n\n"
+                                  "The content of the mail was as follows:\n"
+                                  "%s") % (failure_reason, failure_details,
+                                           fromaddr, ', '.join(toaddr),
+                                           quoted_body)
+
+            send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL,
+                       admin_report_subject, admin_report_body,
+                       forward_failures_to_admin=False)
+
         try:
             raise InvenioMiscUtilError(_('Error in sending email from %s to %s with body %s.') % (fromaddr, toaddr, body))
         except InvenioMiscUtilError, exc:
