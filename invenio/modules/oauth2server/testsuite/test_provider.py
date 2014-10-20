@@ -19,31 +19,32 @@
 
 from __future__ import absolute_import, print_function
 
-import os
 import logging
+import os
 
+from datetime import datetime, timedelta
 from flask import url_for
-
-from invenio.testsuite import InvenioTestCase, make_test_suite, \
-    run_test_suite
-from invenio.ext.sqlalchemy import db
-from invenio.base.globals import cfg
-from mock import MagicMock
 from flask_oauthlib.client import prepare_request
+from mock import MagicMock
 try:
     from six.moves.urllib.parse import urlparse
 except ImportError:
     from urllib.parse import urlparse
+
+from invenio.base.globals import cfg
+from invenio.ext.sqlalchemy import db
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 from .helpers import create_client
 
 logging.basicConfig(level=logging.DEBUG)
 
 
-class OAuth2ProviderTestCase(InvenioTestCase):
+class ProviderTestCase(InvenioTestCase):
+
     def create_app(self):
         try:
-            app = super(OAuth2ProviderTestCase, self).create_app()
+            app = super(ProviderTestCase, self).create_app()
             app.testing = True
             app.config.update(dict(
                 OAUTH2_CACHE_TYPE='simple',
@@ -81,7 +82,7 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         return make_request
 
     def setUp(self):
-        super(OAuth2ProviderTestCase, self).setUp()
+        super(ProviderTestCase, self).setUp()
         # Set environment variable DEBUG to true, to allow testing without
         # SSL in oauthlib.
         if self.app.config.get('CFG_SITE_SECURE_URL').startswith('http://'):
@@ -147,7 +148,7 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         )
 
     def tearDown(self):
-        super(OAuth2ProviderTestCase, self).tearDown()
+        super(ProviderTestCase, self).tearDown()
         # Set back any previous value of DEBUG environment variable.
         if self.app.config.get('CFG_SITE_SECURE_URL').startswith('http://'):
             os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = self.os_debug
@@ -164,6 +165,9 @@ class OAuth2ProviderTestCase(InvenioTestCase):
             url_unparse((scheme, netloc, script_root, '', '')),
             url_decode(anchor if parse_fragment else qs)
         )
+
+
+class OAuth2ProviderTestCase(ProviderTestCase):
 
     def test_client_salt(self):
         from ..models import Client
@@ -635,7 +639,188 @@ class OAuth2ProviderTestCase(InvenioTestCase):
         self.assertStatus(res, 302)
 
 
-TEST_SUITE = make_test_suite(OAuth2ProviderTestCase)
+class OAuth2ProviderExpirationTestCase(ProviderTestCase):
+
+    @property
+    def config(self):
+        ctx = super(OAuth2ProviderExpirationTestCase, self).config
+        ctx.update(
+            OAUTH2_PROVIDER_TOKEN_EXPIRES_IN=1,  # make them all expired
+        )
+        return ctx
+
+    def test_refresh_flow(self):
+        # First login on provider site
+        self.login("tester", "tester")
+
+        data = dict(
+            redirect_uri='%s/oauth2test/authorized' % self.base_url,
+            scope='test:scope',
+            response_type='code',
+            client_id='confidential',
+            state='mystate'
+        )
+
+        r = self.client.get(url_for('oauth2server.authorize', **data))
+        self.assertStatus(r, 200)
+
+        data['confirm'] = 'yes'
+        data['scope'] = 'test:scope'
+        data['state'] = 'mystate'
+
+        # Obtain one time code
+        r = self.client.post(
+            url_for('oauth2server.authorize'), data=data
+        )
+        self.assertStatus(r, 302)
+        next_url, res_data = self.parse_redirect(r.location)
+        assert res_data['code']
+        assert res_data['state'] == 'mystate'
+
+        # Exchange one time code for access token
+        r = self.client.post(
+            url_for('oauth2server.access_token'), data=dict(
+                client_id='confidential',
+                client_secret='confidential',
+                grant_type='authorization_code',
+                code=res_data['code'],
+            )
+        )
+        self.assertStatus(r, 200)
+        assert r.json['access_token']
+        assert r.json['refresh_token']
+        assert r.json['expires_in'] > 0
+        assert r.json['scope'] == 'test:scope'
+        assert r.json['token_type'] == 'Bearer'
+        refresh_token = r.json['refresh_token']
+        old_access_token = r.json['access_token']
+
+        # Access token valid
+        r = self.client.get(url_for('oauth2server.info',
+                            access_token=old_access_token))
+        self.assert200(r)
+
+        from ..models import Token
+        Token.query.filter_by(access_token=old_access_token).update(
+            dict(expires=datetime.utcnow() - timedelta(seconds=1))
+        )
+        db.session.commit()
+
+        # Access token is expired
+        r = self.client.get(url_for('oauth2server.info',
+                            access_token=old_access_token),
+                            base_url=cfg['CFG_SITE_SECURE_URL'])
+        self.assert401(r)
+
+        # Obtain new access token with refresh token
+        r = self.client.post(
+            url_for('oauth2server.access_token'), data=dict(
+                client_id='confidential',
+                client_secret='confidential',
+                grant_type='refresh_token',
+                refresh_token=refresh_token,
+            )
+        )
+        self.assertStatus(r, 200)
+        assert r.json['access_token']
+        assert r.json['refresh_token']
+        assert r.json['expires_in'] > 0
+        assert r.json['access_token'] != old_access_token
+        assert r.json['refresh_token'] != refresh_token
+        assert r.json['scope'] == 'test:scope'
+        assert r.json['token_type'] == 'Bearer'
+
+        # New access token valid
+        r = self.client.get(url_for('oauth2server.info',
+                                    access_token=r.json['access_token']))
+        self.assert200(r)
+
+        # Old access token no longer valid
+        r = self.client.get(url_for('oauth2server.info',
+                                    access_token=old_access_token,),
+                            base_url=cfg['CFG_SITE_SECURE_URL'])
+        self.assert401(r)
+
+    def test_not_allowed_public_refresh_flow(self):
+        # First login on provider site
+        self.login("tester", "tester")
+
+        data = dict(
+            redirect_uri='%s/oauth2test/authorized' % self.base_url,
+            scope='test:scope',
+            response_type='code',
+            client_id='dev',
+            state='mystate'
+        )
+
+        r = self.client.get(url_for('oauth2server.authorize', **data))
+        self.assertStatus(r, 200)
+
+        data['confirm'] = 'yes'
+        data['scope'] = 'test:scope'
+        data['state'] = 'mystate'
+
+        # Obtain one time code
+        r = self.client.post(
+            url_for('oauth2server.authorize'), data=data
+        )
+        self.assertStatus(r, 302)
+        next_url, res_data = self.parse_redirect(r.location)
+        assert res_data['code']
+        assert res_data['state'] == 'mystate'
+
+        # Exchange one time code for access token
+        r = self.client.post(
+            url_for('oauth2server.access_token'), data=dict(
+                client_id='dev',
+                client_secret='dev',
+                grant_type='authorization_code',
+                code=res_data['code'],
+            )
+        )
+        self.assertStatus(r, 200)
+        assert r.json['access_token']
+        assert r.json['refresh_token']
+        assert r.json['expires_in'] > 0
+        assert r.json['scope'] == 'test:scope'
+        assert r.json['token_type'] == 'Bearer'
+        refresh_token = r.json['refresh_token']
+        old_access_token = r.json['access_token']
+
+        # Access token valid
+        r = self.client.get(url_for('oauth2server.info',
+                            access_token=old_access_token))
+        self.assert200(r)
+
+        from ..models import Token
+        Token.query.filter_by(access_token=old_access_token).update(
+            dict(expires=datetime.utcnow() - timedelta(seconds=1))
+        )
+        db.session.commit()
+
+        # Access token is expired
+        r = self.client.get(url_for('oauth2server.info',
+                            access_token=old_access_token),
+                            follow_redirects=True)
+        self.assert401(r)
+
+        # Obtain new access token with refresh token
+        r = self.client.post(
+            url_for('oauth2server.access_token'), data=dict(
+                client_id='dev',
+                client_secret='dev',
+                grant_type='refresh_token',
+                refresh_token=refresh_token,
+            ),
+            follow_redirects=True
+        )
+
+        # Only confidential clients can refresh expired token.
+        self.assert401(r)
+
+
+TEST_SUITE = make_test_suite(OAuth2ProviderTestCase,
+                             OAuth2ProviderExpirationTestCase)
 
 
 if __name__ == "__main__":

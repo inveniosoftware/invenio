@@ -27,7 +27,7 @@ from flask_oauthlib.provider import OAuth2Provider
 
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User
-from .models import Token
+from .models import Token, Client
 
 
 oauth2 = OAuth2Provider()
@@ -35,7 +35,7 @@ oauth2 = OAuth2Provider()
 
 @oauth2.usergetter
 def get_user(username, password, *args, **kwargs):
-    """ Get user for grant type password.
+    """Get user for grant type password.
 
     Needed for grant type 'password'. Note, grant type password is by default
     disabled.
@@ -61,9 +61,11 @@ def get_token(access_token=None, refresh_token=None):
             )
         return t
     elif refresh_token:
-        return Token.query.filter_by(
-            refresh_token=refresh_token, is_personal=False,
-            ).first()
+        return Token.query.join(Token.client).filter(
+            Token.refresh_token == refresh_token,
+            Token.is_personal == False,
+            Client.is_confidential == True,
+        ).first()
     else:
         return None
 
@@ -86,7 +88,7 @@ def save_token(token, request, *args, **kwargs):
             db.session.delete(tk)
         db.session.commit()
 
-    expires_in = token.pop('expires_in')
+    expires_in = token.get('expires_in')
     expires = datetime.utcnow() + timedelta(seconds=int(expires_in))
 
     tok = Token(
