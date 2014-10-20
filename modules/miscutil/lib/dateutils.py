@@ -83,6 +83,18 @@ class datetime(real_datetime):
         return datetime(*(time.strptime(date_string, format)[0:6]))
 
 
+def convert_simple_date_to_array(datestring):
+    """
+    Convert:
+    '2005-11-16' -> [2005,11,16]
+    '2005-11' -> [2005,11]
+    '2005' -> [2005]
+    '2005/11/16' -> [2005,11,16]
+    etc.
+    """
+    return re.findall("\d+", datestring)
+
+
 def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     """
     Convert:

@@ -21,15 +21,16 @@
 
 from invenio.bibauthorid_backinterface import get_orcid_id_of_author
 from invenio.bibauthorid_dbinterface import _get_doi_for_paper, \
-        get_all_signatures_of_paper, get_name_by_bibref, \
-        get_personid_signature_association_for_paper, \
-        get_orcid_id_of_author, get_papers_of_author
+    get_all_signatures_of_paper, get_name_by_bibref, \
+    get_personid_signature_association_for_paper, \
+    get_orcid_id_of_author, get_papers_of_author
 from invenio.bibauthorid_general_utils import get_doi
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibformat import format_record as bibformat_record
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
-         record_get_field_instances
+    record_get_field_instances
 from invenio.config import CFG_SITE_URL
+from invenio.dateutils import convert_simple_date_to_array
 from invenio.errorlib import get_pretty_traceback
 from invenio.orcid_xml_exporter import OrcidXmlExporter
 from invenio.search_engine import get_record
@@ -38,6 +39,7 @@ from invenio.textutils import encode_for_xml, RE_ALLOWED_XML_1_0_CHARS
 from invenio import bibtask
 
 import requests
+import re
 from requests.exceptions import HTTPError
 import sys
 
@@ -51,10 +53,10 @@ from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
 ORCID_ENDPOINT_PUBLIC = CFG_OAUTH2_CONFIGURATIONS['orcid']['public_url']
 
 ORCID_JSON_TO_XML_EXT_ID = {
-    'ARXIV' : 'arxiv',
-    'DOI' : 'doi',
-    'ISBN' : 'isbn',
-    'OTHER_ID' : 'other-id'
+    'ARXIV': 'arxiv',
+    'DOI': 'doi',
+    'ISBN': 'isbn',
+    'OTHER_ID': 'other-id'
 }
 
 ############################### PULLING ########################################
@@ -513,9 +515,9 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
 
         work_dict['work_type'] = _get_work_type(recstruct)
 
-        publication_year = record_get_field_value(recstruct, '773', '', '', 'y')
-        if publication_year:
-            work_dict['publication-date'] = {'year' : publication_year}
+        publication_date = _get_publication_date(recstruct)
+        if publication_date:
+            work_dict['publication_date'] = publication_date
 
         work_dict['url'] = url
 
@@ -539,6 +541,68 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
             " records to ORCID.")
 
     return orcid_list
+
+def _get_date_from_field_number(recstruct, field, subfield):
+
+    '''Get date dictionary from MARC record.
+
+    The dictionary can have keys 'year', 'month' and 'day'
+
+    @param recstruct: MARC record
+    @param field: number of field inside MARC record. The function will extract
+                  the date from the field indicated by this field
+    @type field: string
+
+    @return: dictionary
+    @rtype: dict
+    '''
+
+    result = {}
+
+    publication_date = record_get_field_value(recstruct, field, '', '', subfield)
+    publication_array = convert_simple_date_to_array(publication_date)
+    if len(publication_array) > 0 and \
+            re.match(r'[12]\d{3}$', publication_array[0]):
+        result['year'] = publication_array[0]
+        if len(publication_array) > 1 and \
+                re.match(r'[01]\d$', publication_array[1]):
+            result['month'] = publication_array[1]
+            if len(publication_array) > 2 and \
+                    re.match(r'[012]\d{3}$', publication_array[2]):
+                result['day'] = publication_array[2]
+
+        return result
+
+    return None
+
+
+def _get_publication_date(recstruct):
+
+    '''Get work publication date from MARC record.
+
+    @param recstruct: MARC record
+
+    @return: dictionary
+    @rtype: dict
+    '''
+
+    first_try = _get_date_from_field_number(recstruct, '269', 'c')
+    if first_try:
+        return first_try
+
+    second_try = _get_date_from_field_number(recstruct, '260', 'c')
+    if second_try:
+        return second_try
+
+    third_try = _get_date_from_field_number(recstruct, '502', 'd')
+    if third_try:
+        return third_try
+
+    publication_year = record_get_field_value(recstruct, '773', '', '', 'y')
+    if publication_year and re.match(r'[12]\d{3}$', publication_year):
+        return {'year' : publication_year}
+
+    return {}
 
 def _get_work_type(recstruct):
 
@@ -626,27 +690,41 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
     # There are two different fields in MARC records responsiple for ISBN id.
     isbn = record_get_field_value(recstruct, '020', '', '', 'a')
     isbn2 = record_get_field_value(recstruct, '773', '', '', 'z')
-    arxivid = record_get_field_value(recstruct, '037', '', '', 'a')
+    record_ext_ids = record_get_field_instances(recstruct, '037')
     if doi:
         for single_doi in doi:
             if single_doi in old_external_ids['DOI']:
                 raise OrcidRecordExisting
-            external_ids.append(('doi', single_doi))
+            external_ids.append(('doi', encode_for_xml(single_doi)))
     if isbn:
         if isbn in old_external_ids['ISBN']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', isbn))
+        external_ids.append(('isbn', encode_for_xml(isbn)))
     if isbn2:
         if isbn2 in old_external_ids['ISBN']:
             raise OrcidRecordExisting
-        external_ids.append(('isbn', isbn2))
-    if arxivid:
-        if arxivid in old_external_ids['ARXIV']:
-            raise OrcidRecordExisting
-        external_ids.append(('arxiv', arxivid))
+        external_ids.append(('isbn', encode_for_xml(isbn2)))
+
+    for rec in record_ext_ids:
+        arxiv = False
+        the_id = None
+        for field in rec[0]:
+            if field[0] == '9' and field[1].lower() == 'arxiv':
+                arxiv = True
+            elif field[0] == 'a':
+                the_id = field[1]
+        if arxiv:
+            if the_id in old_external_ids['ARXIV']:
+                raise OrcidRecordExisting
+            external_ids.append(('arxiv', encode_for_xml(the_id)))
+        else:
+            if the_id in old_external_ids['OTHER_ID']:
+                raise OrcidRecordExisting
+            external_ids.append(('other-id', encode_for_xml(the_id)))
+
     if url in old_external_ids['OTHER_ID']:
         raise OrcidRecordExisting
-    if not (doi or arxivid):
+    if len(external_ids) == 0:
         external_ids.append(('other-id', url))
     return external_ids
 
