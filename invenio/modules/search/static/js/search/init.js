@@ -24,6 +24,7 @@ require(
         "js/search/form",
         "js/search/search_parser",
         "js/search/typeahead",
+        "js/search/facet",
     ],
     function() {
         // This file is simply here to make sure the above dependencies are

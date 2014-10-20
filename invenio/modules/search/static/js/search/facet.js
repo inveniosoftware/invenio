@@ -19,7 +19,7 @@
 
 
 /* A file containing functions treating the faceting functionality. */
-define(['jquery'], function($) {
+require(['jquery'], function($) {
 
   "use strict"
 
