@@ -28,13 +28,23 @@ def get_self_cited_by(recid):
     return intbitset(run_sql(sql, [recid]))
 
 
-def get_self_cited_by_list(recids):
-    in_sql = ','.join('%s' for dummy in recids)
+def get_self_cited_by_list(recids, input_limit=None):
+
+    if not recids:
+        return []
+
+    # We don't want to overwrite the input parameter
+    if input_limit is not None:
+        limited_recids = recids[:input_limit]
+    else:
+        limited_recids = recids
+
+    in_sql = ','.join('%s' for dummy in limited_recids)
     sql = "SELECT citee, citer FROM rnkSELFCITEDICT WHERE citee IN (%s)"
     cites = {}
-    for citee, citer in run_sql(sql % in_sql, recids):
+    for citee, citer in run_sql(sql % in_sql, limited_recids):
         cites.setdefault(citee, set()).add(citer)
-    return [(recid, cites.get(recid, set())) for recid in recids]
+    return [(recid, cites.get(recid, set())) for recid in limited_recids]
 
 
 def get_self_refers_to(recid):
