@@ -2390,13 +2390,6 @@ def create_request_ticket(userinfo, ticket):
     m("\nLinks to all issued Person-based requests:\n")
 
     for pid, cname in tic:
-        data = list()
-        for i in udata:
-            data.append(i)
-        data.append(['date', ctime()])
-        data.append(['operations', tic[(pid, cname)]])
-
-        dbapi.update_request_ticket_for_author(pid, dict(data))
         m("%s/author/claim/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, cname))
 
     m("\nPlease remember that you have to be logged in "
@@ -2411,13 +2404,23 @@ def create_request_ticket(userinfo, ticket):
             if 'uid' in userinfo:
                 uid = userinfo['uid']
             if 'email' in userinfo:
-                email =  userinfo['email']
+                email = userinfo['email']
 
         rtid = BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
                                                subject="[Author] Change Request for %s" % first_cname,
                                                text="\n".join(mailcontent),
                                                queue="AUTHORS_claim_manual",
                                                requestor=email)
+
+    for pid, cname in tic:
+        data = list()
+        for i in udata:
+            data.append(i)
+        data.append(['date', ctime()])
+        data.append(['operations', tic[(pid, cname)]])
+        data.append(['rtid', rtid])
+
+        dbapi.update_request_ticket_for_author(pid, dict(data))
 
     return True
 

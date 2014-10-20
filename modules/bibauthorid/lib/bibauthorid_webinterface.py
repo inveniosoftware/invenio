@@ -42,7 +42,7 @@ from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_P
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL
 
-from invenio.bibauthorid_name_utils import most_relevant_name
+from invenio.bibauthorid_name_utils import most_relevant_name, clean_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.messages import gettext_set_language  # , wash_language
 from invenio.template import load
@@ -73,7 +73,8 @@ from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arx
 from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
     get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author, \
     get_free_author_id
-from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
+from invenio.bibauthorid_dbinterface import defaultdict, \
+    remove_arxiv_papers_of_author, remove_rtid_from_ticket
 from invenio.orcidutils import get_dois_from_orcid, get_dois_from_orcid_using_pid
 
 from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \
@@ -81,6 +82,8 @@ from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id,
 
 from invenio.bibauthorid_templates import WebProfileMenu, WebProfilePage
 from invenio.bibauthorid_general_utils import get_inspire_record_url
+
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 
 # Imports related to hepnames update form
 from invenio.bibedit_utils import get_bibrecord
@@ -688,7 +691,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'rt_action': (str, None),
                              'rt_id': (int, None),
                              'selection': (list, None),
-
+                             'rtid': (int, None),
                              # permitted actions
                              'add_external_id': (str, None),
                              'set_uid': (str, None),
@@ -706,6 +709,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'checkout_submit': (str, None),
                              'assign': (str, None),
                              'commit_rt_ticket': (str, None),
+                             'close_rt_ticket': (str, None),
                              'confirm': (str, None),
                              'delete_external_ids': (str, None),
                              'merge': (str, None),
@@ -737,6 +741,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'checkout_remove_transaction',
                              'checkout_submit',
                              'assign',
+                             'close_rt_ticket',
                              'commit_rt_ticket',
                              'confirm',
                              'delete_external_ids',
@@ -1114,6 +1119,11 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
+        def close_rt_ticket():
+            BIBCATALOG_SYSTEM.ticket_set_attribute(0, argd['rtid'], 'status', 'resolved')
+            remove_rtid_from_ticket(argd['rtid'], argd['pid'])
+            return redirect_to_url(req, "%s/author/claim/%s#tabTickets" % (CFG_SITE_URL, webapi.get_person_redirect_link(argd['pid'])))
+
         def delete_external_ids():
             '''
             deletes association between the user with pid and the external id ext_id
@@ -1323,6 +1333,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                             'checkout_submit': checkout_submit,
                             'assign': claim,
                             'commit_rt_ticket': commit_rt_ticket,
+                            'close_rt_ticket': close_rt_ticket,
                             'confirm': confirm_repeal_reset,
                             'delete_external_ids': delete_external_ids,
                             'merge': merge,
@@ -2362,7 +2373,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         for t in list(tickets):
             tickets.remove(t)
-            tickets.append([webapi.get_most_frequent_name_from_pid(int(t[0])),
+            tickets.append([clean_string(webapi.get_most_frequent_name_from_pid(int(t[0]))),
                             webapi.get_person_redirect_link(t[0]), t[0], t[1]])
 
         content = TEMPLATE.tmpl_tickets_admin(tickets)
