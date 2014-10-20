@@ -22,7 +22,7 @@
 define(
   [
     'jquery',
-    'flight/component',
+    'flight/lib/component',
   ],
   function(
     $,
