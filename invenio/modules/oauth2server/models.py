@@ -26,15 +26,40 @@ import six
 from flask import current_app
 from flask.ext.login import current_user
 from sqlalchemy_utils import URLType
+from sqlalchemy_utils.types.encrypted import EncryptedType, AesEngine
 from werkzeug.security import gen_salt
 from wtforms import validators
 
+from invenio.config import SECRET_KEY as secret_key
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login.legacy_user import UserInfo
 
 from .validators import validate_redirect_uri, validate_scopes
 from .errors import ScopeDoesNotExists
+
+
+class NoneAesEngine(AesEngine):
+
+    """Filter None values from encrypting."""
+
+    def __init__(self, key):
+        super(NoneAesEngine, self).__init__(key)
+
+    def encrypt(self, value):
+        """Encrypt a value on the way in."""
+        if value is not None:
+            return super(NoneAesEngine, self).encrypt(value)
+
+    def decrypt(self, value):
+        """Decrypt value on the way out."""
+        if value is not None:
+            return super(NoneAesEngine, self).decrypt(value)
+
+
+class String255EncryptedType(EncryptedType):
+
+    impl = db.String(255)
 
 
 class OAuthUserProxy(object):
@@ -275,9 +300,16 @@ class Token(db.Model):
     token_type = db.Column(db.String(255), default='bearer')
     """Token type - only bearer is supported at the moment."""
 
-    access_token = db.Column(db.String(255), unique=True)
+    access_token = db.Column(String255EncryptedType(
+                                 type_in=lambda: db.String(255),
+                                 key=secret_key),
+                             unique=True)
 
-    refresh_token = db.Column(db.String(255), unique=True, nullable=True)
+    refresh_token = db.Column(String255EncryptedType(
+                                  type_in=lambda: db.String(255),
+                                  key=secret_key,
+                                  engine=NoneAesEngine),
+                              unique=True, nullable=True)
 
     expires = db.Column(db.DateTime, nullable=True)
 
