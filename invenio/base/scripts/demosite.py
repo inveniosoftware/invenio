@@ -60,9 +60,17 @@ option_packages = manager.option('-p', '--packages', dest='packages',
 @option_file
 @option_jobid
 @option_extrainfo
+@option_yes_i_know
 def populate(packages=[], default_data=True, files=None,
-             job_id=0, extra_info=None):
+             job_id=0, extra_info=None, yes_i_know=False):
     """Load demo records.  Useful for testing purposes."""
+    from invenio.utils.text import wrap_text_in_a_box, wait_for_user
+
+    ## Step 0: confirm deletion
+    wait_for_user(wrap_text_in_a_box(
+        "WARNING: You are going to override data in tables!"
+    ))
+
     if not default_data:
         print('>>> Default data has been skiped (--no-data).')
         return

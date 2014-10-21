@@ -84,7 +84,7 @@ before_script:
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
   - "inveniomanage database init --yes-i-know || echo ':('"
   - "inveniomanage database create --quiet || echo ':('"
-#  - "inveniomanage demosite populate"
+#  - "inveniomanage demosite populate --yes-i-know"
 
 script:
   - "sphinx-build -qnNW docs docs/_build/html"
