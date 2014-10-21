@@ -512,7 +512,7 @@ which must be running alongside with the web server.
 
     # launch celery
     $ workon invenio
-    (invenio)$ celeryd -E -A invenio.celery.celery --workdir=$VIRTUAL_ENV
+    (invenio)$ celery worker -E -A invenio.celery.celery --workdir=$VIRTUAL_ENV
 
     # in a new terminal
     $ workon invenio
