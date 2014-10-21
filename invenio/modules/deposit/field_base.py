@@ -96,8 +96,11 @@ Auto-complete
 
 """
 
+import warnings
+
 from wtforms import Field
 from .form import CFG_FIELD_FLAGS
+from six import string_types
 
 
 __all__ = ('WebDepositField', )
@@ -142,6 +145,7 @@ class WebDepositField(Field):
         self.group = kwargs.pop('group', None)
         self.icon = kwargs.pop('icon', None)
         self.autocomplete = kwargs.pop('autocomplete', None)
+        self.autocomplete_fn = kwargs.pop('autocomplete_fn', None)
         self.processors = kwargs.pop('processors', None)
         self.export_key = kwargs.pop('export_key', None)
         self.widget_classes = kwargs.pop('widget_classes', None)
@@ -178,8 +182,16 @@ class WebDepositField(Field):
         elif self.widget_classes:
             kwargs['class_'] = self.widget_classes
         if self.autocomplete:
-            kwargs['data-autocomplete'] = "1"
+            if callable(self.autocomplete):
+                warnings.warn("Autocomplete functions use now "
+                              "'autocomplete_fn' attribute",
+                              DeprecationWarning)
+            else:
+                # set default for basic typeahead
+                kwargs['data-autocomplete'] = self.autocomplete
             kwargs['data-autocomplete-limit'] = self.autocomplete_limit
+        elif self.autocomplete_fn:
+            kwargs['data-autocomplete'] = "default"
         return super(WebDepositField, self).__call__(*args, **kwargs)
 
     def reset_field_data(self, exclude=[]):
@@ -235,8 +247,8 @@ class WebDepositField(Field):
         This method should not be called directly, instead use
         Form.autocomplete().
         """
-        if name == self.name and self.autocomplete:
-            return self.autocomplete(form, self, term, limit=limit)
+        if name == self.name and self.autocomplete_fn:
+            return self.autocomplete_fn(form, self, term, limit=limit)
         return None
 
     def add_message(self, msg, state=None):
