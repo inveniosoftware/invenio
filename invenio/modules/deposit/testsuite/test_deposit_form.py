@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ class WebDepositFormTest(InvenioTestCase):
         class IdentifierTestForm(WebDepositForm):
             scheme = fields.TextField(
                 processors=[reset_processor],
-                autocomplete=dummy_autocomplete,
+                autocomplete_fn=dummy_autocomplete,
             )
             identifier = fields.TextField()
 
@@ -59,7 +59,7 @@ class WebDepositFormTest(InvenioTestCase):
         class TestForm(WebDepositForm):
             title = fields.TextField(
                 processors=[reset_processor],
-                autocomplete=dummy_autocomplete,
+                autocomplete_fn=dummy_autocomplete,
             )
             subtitle = fields.TextField()
             related_identifier = fields.DynamicFieldList(
@@ -104,6 +104,7 @@ class WebDepositFormTest(InvenioTestCase):
 
     def test_autocomplete_routing(self):
         form = self.form_class()
+
         self.assertEqual(
             form.autocomplete('title', 'Nothing', limit=3),
             []
