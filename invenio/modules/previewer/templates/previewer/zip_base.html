@@ -29,17 +29,18 @@
   <div class="panel-body">
     <ul class="tree list-unstyled">
       {%- for t in tree recursive %}
+      {%- set folder_identifier = range(loop.depth)|join('_') ~ '_' ~ loop.index %}
       <li>
         {% if t.type != 'folder' %}
           <span><i class="glyphicon glyphicon-file"></i> {{ t.name }}</span>
           <span class="pull-right">{{ t.size|filesizeformat }}</span>
         {% else %}
-          <a data-toggle="collapse" href="#tree_{{ loop.index }}_{{ loop.depth }}">
+          <a data-toggle="collapse" href="#tree_{{ folder_identifier }}">
             <i class="glyphicon glyphicon-folder-close"></i> {{ t.name }}
           </a>
         {% endif %}
         {%- if t.children -%}
-        <ul id="tree_{{ loop.index }}_{{ loop.depth }}"
+        <ul id="tree_{{ folder_identifier }}"
           class="collapse{{ " in" if loop.depth < 2}}">
           {{ loop(t.children) }}
         </ul>
