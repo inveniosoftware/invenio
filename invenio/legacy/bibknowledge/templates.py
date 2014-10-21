@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""HTML Templates for BibKnowledge administration"""
+"""HTML Templates for BibKnowledge administration."""
 
 __revision__ = ""
 
@@ -29,7 +29,7 @@ import cgi
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR
 
-MAX_MAPPINGS = 100 #show max this number of mappings on one page
+MAX_MAPPINGS = 100  # show max this number of mappings on one page
 
 
 class Template:
@@ -230,7 +230,7 @@ class Template:
 
         if 'expression' in dyn_config:
             expression = dyn_config['expression']
-        if 'collection' in dyn_config:
+        if 'collection' in dyn_config and dyn_config['collection']:
             collection = dyn_config['collection']
 
         pleaseconf = _("Please configure")+"<P>"

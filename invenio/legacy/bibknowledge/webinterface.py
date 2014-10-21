@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,8 +23,11 @@ from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.legacy.bibknowledge import admin as bibknowledgeadmin
 from invenio.config import CFG_SITE_LANG
 
+
 class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
+
     """ Handle /kb/ etc set of pages."""
+
     extrapath = ""
 
     def __init__(self, extrapath=""):
@@ -32,34 +35,52 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         self.extrapath = extrapath
 
     def _lookup(self, component, path):
-        """This handler parses dynamic URLs (/kb, /kb/export, /kb/upload etc)."""
-        return WebInterfaceBibKnowledgePages(component), path
+        """
+        The parser handle dynamic URLs.
 
+        URL (/kb, /kb/export, /kb/upload etc).
+        """
+        return WebInterfaceBibKnowledgePages(component), path
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'kb': (int, -1),
-                                   'search': (str, ''), #what to search in the rules
-                                   'descriptiontoo': (int, 0), #search descriptions, too
-                                   'action': (str, ''),  #delete/new/attributes/update_attributes/add_mapping/edit_mapping/dynamic_update
-                                   'chosen_option': (str, ''),  #for the 'really delete' dialog
-                                   'sortby': (str, ''),  #sort rules by key or value
-                                   'startat': (int, 0),  #sort rules by key or value
-                                   'name': (str, ''), #name in new/rename operations
-                                   'description': (str, ''), #description in new/rename operations
-                                   'mapFrom': (str, ''), 'mapTo': (str, ''), #mappings
-                                   'forcetype': (str, ''), #force mapping
-                                   'replacements':  (str, ''), #needed for overlapping mappings
-                                   'save_mapping':  (str, ''), #type of edit_mapping
-                                   'delete_mapping':  (str, ''), #type of edit_mapping
-                                   'field':  (str, ''), #for dynamic kbs
-                                   'expression':  (str, ''), #for dynamic kbs
-                                   'collection':  (str, ''), #for dynamic kbs
-                                   'kbname':  (str, ''), #for exporting
-                                   'format':  (str, ''), #for exporting
-                                   'term': (str, ''), #for exporting to JQuery UI
-                                   'searchkey': (str, ''), #for exporting to JQuery UI
+                                   # what to search in the rules
+                                   'search': (str, ''),
+                                   # search descriptions, too
+                                   'descriptiontoo': (int, 0),
+                                   # delete/new/attributes/update_attributes/add_mapping/edit_mapping/dynamic_update
+                                   'action': (str, ''),
+                                   # for the 'really delete' dialog
+                                   'chosen_option': (str, ''),
+                                   # sort rules by key or value
+                                   'sortby': (str, ''),
+                                   # sort rules by key or value
+                                   'startat': (int, 0),
+                                   # name in new/rename operations
+                                   'name': (str, ''),
+                                   # description in new/rename operations
+                                   'description': (str, ''),
+                                   # mappings
+                                   'mapFrom': (str, ''), 'mapTo': (str, ''),
+                                   'key': (str, ''),  # key
+                                   'forcetype': (str, ''),  # force mapping
+                                   # needed for overlapping mappings
+                                   'replacements': (str, ''),
+                                   # type of edit_mapping
+                                   'save_mapping': (str, ''),
+                                   # type of edit_mapping
+                                   'delete_mapping': (str, ''),
+                                   'field': (str, ''),  # for dynamic kbs
+                                   'expression': (str, ''),  # for dynamic kbs
+                                   'collection': (str, ''),  # for dynamic kbs
+                                   'kbname': (str, ''),  # for exporting
+                                   'format': (str, ''),  # for exporting
+                                   # for exporting to JQuery UI
+                                   'term': (str, ''),
+                                   # for exporting to JQuery UI
+                                   'searchkey': (str, ''),
                                    'kbtype': (str, ''),
                                    'limit': (int, None)})
         ln = argd['ln']
@@ -76,6 +97,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         startat = argd['startat']
         mapFrom = argd['mapFrom']
         mapTo = argd['mapTo']
+        key = argd['key']
         kbtype = argd['kbtype']
         field = argd['field']
         expression = argd['expression']
@@ -88,35 +110,52 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         format = argd['format']
         limit = argd['limit']
 
-        req.argd = argd #needed by some lower level modules
+        req.argd = argd  # needed by some lower level modules
 
-        #check upload
+        # check upload
         if self.extrapath == "upload":
             return bibknowledgeadmin.kb_upload(req, kb=kb, ln=ln)
-        #check if this is "export"
+        # check if this is "export"
         if self.extrapath == "export":
-            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, ln=ln, searchkey=searchkey, searchvalue=term, limit=limit)
+            return bibknowledgeadmin.kb_export(req, kbname=kbname,
+                                               format=format, ln=ln,
+                                               searchkey=searchkey,
+                                               searchvalue=term,
+                                               limit=limit)
 
-        #first check if this is a specific action
+        # first check if this is a specific action
         if action == "new":
-            return bibknowledgeadmin.kb_add(req, kbtype=kbtype, sortby=sortby, ln=ln)
+            return bibknowledgeadmin.kb_add(req, kbtype=kbtype,
+                                            sortby=sortby, ln=ln)
         if action == "attributes":
             return bibknowledgeadmin.kb_show_attributes(req, kb=kb, ln=ln)
         if action == "update_attributes":
-            return bibknowledgeadmin.kb_update_attributes(req, kb=kb, name=name, description=description, ln=ln)
+            return bibknowledgeadmin.kb_update_attributes(
+                req, kb=kb, name=name, description=description, ln=ln)
         if action == "delete":
-            return bibknowledgeadmin.kb_delete(req, kb=kb, ln=ln, chosen_option=chosen_option)
+            return bibknowledgeadmin.kb_delete(
+                req, kb=kb, ln=ln, chosen_option=chosen_option)
         if action == "add_mapping":
-            return bibknowledgeadmin.kb_add_mapping(req, kb=kb, ln=ln, mapFrom=mapFrom, mapTo=mapTo, forcetype=forcetype, replacements=replacements, kb_type=kbtype)
+            return bibknowledgeadmin.kb_add_mapping(
+                req, kb=kb, ln=ln, mapFrom=mapFrom, mapTo=mapTo,
+                forcetype=forcetype, replacements=replacements,
+                kb_type=kbtype)
         if action == "edit_mapping":
-            return bibknowledgeadmin.kb_edit_mapping(req, kb=kb, key=mapFrom, mapFrom=mapFrom, mapTo=mapTo, update=save_mapping, delete=delete_mapping, sortby=sortby, ln=ln)
+            return bibknowledgeadmin.kb_edit_mapping(
+                req, kb=kb, key=key, mapFrom=mapFrom, mapTo=mapTo,
+                update=save_mapping, delete=delete_mapping,
+                sortby=sortby, ln=ln)
         if action == "dynamic_update":
-            return bibknowledgeadmin.kb_dynamic_update(req, kb_id=kb, ln=ln, field=field, expression=expression, collection=collection)
-        #then, check if this is a "list all" or "show kb" request..
+            return bibknowledgeadmin.kb_dynamic_update(
+                req, kb_id=kb, ln=ln, field=field, expression=expression,
+                collection=collection)
+        # then, check if this is a "list all" or "show kb" request..
         if (kb > -1):
-            return bibknowledgeadmin.kb_show(req, ln=ln, sortby=sortby, startat=startat, kb=kb, search=search)
+            return bibknowledgeadmin.kb_show(
+                req, ln=ln, sortby=sortby, startat=startat, kb=kb,
+                search=search)
         else:
-            return bibknowledgeadmin.index(req, ln=ln, search=search, descriptiontoo=descriptiontoo)
+            return bibknowledgeadmin.index(
+                req, ln=ln, search=search, descriptiontoo=descriptiontoo)
 
     index = __call__
-
