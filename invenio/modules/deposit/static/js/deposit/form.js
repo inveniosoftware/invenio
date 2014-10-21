@@ -590,7 +590,7 @@ define(function(require, exports, module) {
    * Click form-button
    */
   this.onButtonClick = function (event) {
-    save_field(this.attr.save_url, this.name, true);
+    save_field(this.attr.save_url, event.target.name, true);
     return false;
   }
 
