@@ -1238,6 +1238,60 @@ class Template:
             <noscript>
             <input type="file" name="commentattachment[]" /><br />
             </noscript>
+            <script>
+
+            function GetFileSize(file_element) {
+            try
+            {
+                if (file_element[0] != undefined){
+                file_element = file_element[0];
+                }
+            }
+            catch (e)
+            {
+            }
+            console.log("gonna check filesize of");
+            console.log(file_element,file_element.value, file_element.files[0].size);
+             try {
+              var filesize = 0;
+              //for IE
+              if ($.browser.msie) {
+               //before making an object of ActiveXObject,
+               //please make sure ActiveX is enabled in your IE browser
+                var objFSO = new ActiveXObject("Scripting.FileSystemObject");
+                var filePath = file_element.value;
+                var objFile = objFSO.getFile(filePath);
+                var filesize = objFile.size; //size in kb
+                }
+                //for FF, Safari, Opeara and Others
+                else
+                {
+                  filesize = file_element.files[0].size //size in bytes
+                }
+               }
+               catch (e)
+               {
+                 console.log(e);
+               }
+               return filesize;
+            }
+
+            var filesize_limit = %(file_size_limit)s;
+
+            $(function (){
+            $("#MultiFile1_wrap").change( function(e) {
+            elem_array = $("input[name='commentattachment[]']");
+            element = elem_array[elem_array.length-2];
+            //element = $("#MultiFile1_wrap > input[id*='MultiFile']").last()
+            filesize = GetFileSize(element);
+             if (filesize > filesize_limit)
+                {
+                 $(".MultiFile-remove").last().trigger('click')
+                 alert("The file " + element.value +" is larger than " + filesize_limit/(1024*1024) + " mb");
+                }
+            })
+            })
+            </script>
             </div>
             ''' % \
             {'CFG_WEBCOMMENT_MAX_ATTACHED_FILES': CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
@@ -1245,7 +1299,8 @@ class Template:
                            _("Optionally, attach files to this comment"),
              'nb_files_limit_msg': _("Max one file") and CFG_WEBCOMMENT_MAX_ATTACHED_FILES == 1 or \
                               _("Max %i files") % CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
-             'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or ''}
+             'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or '',
+             'file_size_limit': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE}
 
         editor = get_html_text_editor(name='msg',
                                       content=msg,
