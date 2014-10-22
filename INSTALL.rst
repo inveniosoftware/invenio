@@ -181,7 +181,9 @@ and continue with the installation of prerequisite packages:
     $ brew install mongodb
 
 
-.. note:: See `MySQL on OS X`_ for installing ``mysql``.
+.. note::
+
+    See `MySQL on OS X`_ for installing ``mysql``.
 
 In order to install ``libxml2`` and ``libxslt`` packages run:
 
@@ -203,18 +205,19 @@ For ``bower``, type:
 
 .. code-block:: console
 
-    sudo npm install -g bower
+    $ npm install -g bower
 
 After the configuration section install the following(required for the assets):
 
 .. code-block:: console
 
-    $ sudo npm install -g less clean-css requirejs uglify-js
+    $ npm install -g less clean-css requirejs uglify-js
 
 See the following sections `Installation`_ , `Configuration`_ and `Development`_
 The commands for ``OS X`` are the same as in ``Linux``.
 
 .. note::
+
     When initializing the database, type:
 
     .. code-block:: console
@@ -222,6 +225,7 @@ The commands for ``OS X`` are the same as in ``Linux``.
         $ inveniomanage database init --user=root --yes-i-know (because we have no root password)
 
 .. note::
+
     For developers, honcho is recommended and will make your life
     easier because it launches all the servers together as it finds the ``Procfile``.
 
