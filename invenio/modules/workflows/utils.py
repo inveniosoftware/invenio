@@ -158,9 +158,9 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 2:
-        bwolist.sort(key=lambda x: msgpack.loads(cache.get(x.id))["title"], reverse=should_we_reverse)
+        bwolist.sort(key=lambda x: msgpack.loads(cache.get("workflows_holdingpen_{0}".format(x.id)))["title"], reverse=should_we_reverse)
     elif iSortCol_0 == 3:
-        bwolist.sort(key=lambda x: msgpack.loads(cache.get(x.id))["description"], reverse=should_we_reverse)
+        bwolist.sort(key=lambda x: msgpack.loads(cache.get("workflows_holdingpen_{0}".format(x.id)))["description"], reverse=should_we_reverse)
     elif iSortCol_0 == 4:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
     elif iSortCol_0 == 5:
@@ -244,13 +244,13 @@ def get_versions_from_tags(tags):
 
 def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
     """Return the formatted output, from cache if available."""
-    results = cache.get(str(bwo.id))
+    results = cache.get("workflows_holdingpen_{0}".format(bwo.id))
     if results:
-        results = msgpack.loads(cache.get(str((bwo.id))))
+        results = msgpack.loads(cache.get("workflows_holdingpen_{0}".format(bwo.id)))
         if results["date"] == bwo.modified.strftime(date_format):
             return results
     results = generate_formatted_holdingpen_object(bwo)
-    cache.set(str(bwo.id), msgpack.dumps(results))
+    cache.set("workflows_holdingpen_{0}".format(bwo.id), msgpack.dumps(results))
     return results
 
 
