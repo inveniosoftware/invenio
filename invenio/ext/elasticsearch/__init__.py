@@ -818,7 +818,7 @@ def index_collections(sender, collections):
     return index_collections.delay(sender, [])
 
 
-def drop_index(sender, yes_i_know, default_data=None):
+def drop_index(sender, *args, **kwargs):
     """
     Remove the elasticsearch index.
 
@@ -829,7 +829,7 @@ def drop_index(sender, yes_i_know, default_data=None):
     es.delete_index()
 
 
-def create_index(sender, yes_i_know=False, default_data=None):
+def create_index(sender, *args, **kwargs):
     """
     Create the elasticsearch index.
 
