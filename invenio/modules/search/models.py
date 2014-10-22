@@ -164,7 +164,7 @@ class Collection(db.Model):
 
     def __unicode__(self):
         suffix = ' ({0})'.format(_('default')) if self.id == 1 else ''
-        return "{0.id}. {0.name}{1}".format(self, suffix)
+        return u"{0.id}. {0.name}{1}".format(self, suffix)
 
     def __str__(self):
         return unicode(self).encode('utf-8')
