@@ -136,7 +136,15 @@ class SessionInterface(FlaskSessionInterface):
             # map(lambda (cat, msg): flash(msg, cat), flashes)
             pass
         # Set all user id keys for compatibility.
+
+        if len(session.keys()) == 1 and '_id' in session:
+            session.delete()
+            return
+        elif not session.modified:
+            return
+
         session.uid = uid
+        session.save_ip(request)
         self.backend.set(sid,
                          self.serializer.dumps(dict(session)),
                          timeout=timeout)

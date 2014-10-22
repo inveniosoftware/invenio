@@ -66,29 +66,24 @@ class Session(CallbackDict, SessionMixin):
         self._remember_me = remember_me
         self['_permanent'] = remember_me
 
+    def save_ip(self, request):
+        """Save IP for current scheme."""
+        remote_ip = request.remote_addr
+        scheme_a = '_http_ip' if request.scheme == 'https' else '_https_ip'
+        scheme_b = '_https_ip' if request.scheme == 'https' else '_http_ip'
+
+        if scheme_a not in self:
+            self[scheme_a] = remote_ip
+        if scheme_b not in self:
+            self[scheme_b] = None
+
     def check_ip(self, request):
         """Check that session is used from the same IP where it was created."""
         remote_ip = request.remote_addr
 
-        if '_https_ip' not in self:
-            self['_https_ip'] = remote_ip
-        if '_http_ip' not in self:
-            self['_http_ip'] = remote_ip
-
-        if request.scheme == 'https':
-            if self.get('_https_ip', remote_ip) != remote_ip:
-                return False
-            self['_https_ip'] = remote_ip
-            if not self['_http_ip']:
-                self['_http_ip'] = None
-            return True
-        else:
-            if self.get('_http_ip', remote_ip) != remote_ip:
-                return False
-            self['_http_ip'] = remote_ip
-            if not self['_https_ip']:
-                self['_https_ip'] = None
-            return True
+        if self.get('_{0}_ip'.format(request.scheme), remote_ip) != remote_ip:
+            return False
+        return True
 
     def _get_uid(self):
         return self.get('user_id', -1)
