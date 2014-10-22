@@ -129,7 +129,7 @@ if HAS_SSL:
             try:
                 self.sock = ssl.wrap_socket(
                     sock, self.key_file, self.cert_file,
-                    ssl_version=ssl.PROTOCOL_SSLv3
+                    ssl_version=ssl.PROTOCOL_TLSv1
                 )
             except ssl.SSLError:
                 self.sock = ssl.wrap_socket(
