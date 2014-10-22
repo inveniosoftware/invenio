@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -19,56 +20,46 @@
 """Generic record process in harvesting with backwards compatibility."""
 
 from invenio.modules.workflows.definitions import RecordWorkflow
-from invenio.modules.workflows.tasks.logic_tasks import workflow_if
+from invenio.modules.workflows.tasks.logic_tasks import (
+    workflow_if,
+    workflow_else,
+)
+from invenio.modules.workflows.tasks.workflows_tasks import log_info
 from invenio.modules.workflows.tasks.marcxml_tasks import (
     convert_record_to_bibfield,
+    quick_match_record,
+    approve_record,
+    was_approved
 )
 from ..tasks.postprocess import (
     convert_record_with_repository,
-    post_process_selected,
-    arxiv_fulltext_download,
-    plot_extract,
-    refextract,
-    author_list,
-    filter_step,
     upload_step
 )
 
 
-class oaiharvest_record_post_process(RecordWorkflow):
+class oaiharvest_record_approval(RecordWorkflow):
 
     """Workflow run for each record OAI harvested."""
 
     object_type = "OAI harvest"
 
     workflow = [
-        workflow_if(post_process_selected("c")),
+        convert_record_with_repository(),
+        convert_record_to_bibfield,
+        workflow_if(quick_match_record, True),
         [
-            convert_record_with_repository(),
-            convert_record_to_bibfield,
+            approve_record,
+            workflow_if(was_approved),
+            [
+                upload_step,
+            ],
+            workflow_else,
+            [
+                log_info("Record has been rejected")
+            ]
         ],
-        workflow_if(post_process_selected("t")),
+        workflow_else,
         [
-            arxiv_fulltext_download,
-        ],
-        workflow_if(post_process_selected("p")),
-        [
-            plot_extract(),
-        ],
-        workflow_if(post_process_selected("a")),
-        [
-            author_list,
-        ],
-        workflow_if(post_process_selected("r")),
-        [
-            refextract,
-        ],
-        workflow_if(post_process_selected("f")),
-        [
-            filter_step,
-        ],
-        workflow_if(post_process_selected("u")),
-        [
-            upload_step,
+            log_info("Record is already in the database"),
         ],
     ]

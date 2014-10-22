@@ -29,7 +29,8 @@ from invenio.modules.workflows.tasks.workflows_tasks import (
     get_nb_workflow_created,
     get_workflows_progress,
     write_something_generic,
-    num_workflow_running_greater
+    num_workflow_running_greater,
+    get_workflow_from_engine_definition
 )
 
 from invenio.modules.workflows.tasks.logic_tasks import (
@@ -44,7 +45,7 @@ from invenio.legacy.bibsched.bibtask import (
     task_update_progress,
     write_message
 )
-from invenio.modules.workflows.definitions import WorkflowBase
+from invenio.modules.workflows.definitions import RecordWorkflow
 
 
 from ..tasks.harvesting import (
@@ -56,11 +57,12 @@ from ..tasks.harvesting import (
 )
 
 
-class oaiharvest_harvest_repositories(WorkflowBase):
+class oaiharvest_harvest_repositories(RecordWorkflow):
 
     """A workflow for use with OAI harvesting in BibSched."""
 
     object_type = "workflow"
+    record_workflow = "oaiharvest_record_post_process"
 
     workflow = [
         init_harvesting,
@@ -80,9 +82,9 @@ class oaiharvest_harvest_repositories(WorkflowBase):
                         workflow_if(num_workflow_running_greater(10), neg=True),
                         [
                             start_async_workflow(
-                                "oaiharvest_record_post_process",
                                 preserve_data=True,
-                                preserve_extra_data_keys=["repository"]
+                                preserve_extra_data_keys=["repository"],
+                                get_workflow_from=get_workflow_from_engine_definition,
                             ),
                         ],
                         workflow_else,
@@ -93,9 +95,9 @@ class oaiharvest_harvest_repositories(WorkflowBase):
                                  write_message]),
                             wait_for_a_workflow_to_complete(10.0),
                             start_async_workflow(
-                                "oaiharvest_record_post_process",
                                 preserve_data=True,
                                 preserve_extra_data_keys=["repository"],
+                                get_workflow_from=get_workflow_from_engine_definition,
                             ),
                         ],
                     ],
