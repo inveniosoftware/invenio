@@ -43,6 +43,12 @@ def approve_record(obj, eng):
         obj.extra_data["_error_msg"] = 'Could not assign action'
 
 
+def was_approved(obj, eng):
+    """Check if the record was approved."""
+    extra_data = obj.get_extra_data()
+    return extra_data.get("approved", False)
+
+
 def convert_record_to_bibfield(obj, eng):
     """Convert to record from MARCXML.
 

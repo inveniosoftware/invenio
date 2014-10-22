@@ -93,9 +93,11 @@ def get_nb_workflow_running(obj, eng):
         return "0"
 
 
-def start_async_workflow(workflow_to_run,
+def start_async_workflow(workflow_to_run="",
                          preserve_data=True,
-                         preserve_extra_data_keys=None, **kwargs):
+                         preserve_extra_data_keys=None,
+                         get_workflow_from=None,
+                         **kwargs):
     """Run a new asynchronous workflow on new objects.
 
     This function allows you to run a new asynchronous workflow. This
@@ -114,6 +116,10 @@ def start_async_workflow(workflow_to_run,
 
     :param preserve_extra_data_keys: extra data from current object to preserve.
     :type preserve_extra_data_keys: list
+
+    :param get_workflow_from_engine_definition: function that returns which
+        workflow to run (optional).
+    :type get_workflow_from_engine_definition: function
     """
     from ...workflows.models import BibWorkflowObject
     from invenio.modules.workflows.api import start_delayed
@@ -131,7 +137,12 @@ def start_async_workflow(workflow_to_run,
 
         if preserve_data:
             record_object.set_data(obj.data)
-        workflow_id = start_delayed(workflow_to_run,
+        if not workflow_to_run and get_workflow_from:
+            # We get the workflow from the definition variables
+            workflow = get_workflow_from(eng)
+        else:
+            workflow = workflow_to_run
+        workflow_id = start_delayed(workflow,
                                     data=[record_object],
                                     stop_on_error=True,
                                     module_name=eng.module_name,
@@ -432,3 +443,18 @@ def log_info(message):
 
     _log_info.description = "Log info"
     return _log_info
+
+
+def get_workflow_from_engine_definition(eng):
+    """Get the record_workflow defined in `WorkflowDefinitino.record_workflow`."""
+    from ..registry import workflows
+    from ..errors import WorkflowDefinitionError
+
+    if eng.name not in workflows:
+        # No workflow with that name exists
+        raise WorkflowDefinitionError("Workflow '%s' does not exist"
+                                      % (eng.name,),
+                                      workflow_name=eng.name)
+    workflow_name = workflows[eng.name].record_workflow
+    eng.log.info("Found workflow '{0}' to execute.".format(workflow_name))
+    return workflow_name
