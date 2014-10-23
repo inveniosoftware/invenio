@@ -42,7 +42,7 @@ from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_P
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL
 
-from invenio.bibauthorid_name_utils import most_relevant_name
+from invenio.bibauthorid_name_utils import most_relevant_name, clean_string
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.messages import gettext_set_language  # , wash_language
 from invenio.template import load
@@ -73,7 +73,8 @@ from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arx
 from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
     get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author, \
     get_free_author_id
-from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
+from invenio.bibauthorid_dbinterface import defaultdict, \
+    remove_arxiv_papers_of_author, remove_rtid_from_ticket
 from invenio.orcidutils import get_dois_from_orcid, get_dois_from_orcid_using_pid
 
 from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \
@@ -81,6 +82,8 @@ from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id,
 
 from invenio.bibauthorid_templates import WebProfileMenu, WebProfilePage
 from invenio.bibauthorid_general_utils import get_inspire_record_url
+
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 
 # Imports related to hepnames update form
 from invenio.bibedit_utils import get_bibrecord
@@ -688,7 +691,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'rt_action': (str, None),
                              'rt_id': (int, None),
                              'selection': (list, None),
-
+                             'rtid': (int, None),
                              # permitted actions
                              'add_external_id': (str, None),
                              'set_uid': (str, None),
@@ -706,6 +709,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'checkout_submit': (str, None),
                              'assign': (str, None),
                              'commit_rt_ticket': (str, None),
+                             'close_rt_ticket': (str, None),
                              'confirm': (str, None),
                              'delete_external_ids': (str, None),
                              'merge': (str, None),
@@ -737,6 +741,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'checkout_remove_transaction',
                              'checkout_submit',
                              'assign',
+                             'close_rt_ticket',
                              'commit_rt_ticket',
                              'confirm',
                              'delete_external_ids',
@@ -1114,6 +1119,11 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
+        def close_rt_ticket():
+            BIBCATALOG_SYSTEM.ticket_set_attribute(0, argd['rtid'], 'status', 'resolved')
+            remove_rtid_from_ticket(argd['rtid'], argd['pid'])
+            return redirect_to_url(req, "%s/author/claim/%s#tabTickets" % (CFG_SITE_URL, webapi.get_person_redirect_link(argd['pid'])))
+
         def delete_external_ids():
             '''
             deletes association between the user with pid and the external id ext_id
@@ -1201,9 +1211,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip),
                             'name': name,
                             'email': email,
-                            'merge link': "%s/author/merge_profiles?primary_profile=%s&selection=%s" % (CFG_SITE_URL, primary_cname, selection_str)}
+                            'merge link': "%s/author/merge_profiles?primary_profile=%s&selection=%s" % (CFG_SITE_URL, primary_cname, selection_str),
+                            'uid': uid}
                 # a message is sent to the admin with info regarding the currently attempted merge
-                webapi.create_request_message(userinfo, subj='Merge profiles request')
+                webapi.create_request_message(userinfo, subj=('Merge profiles request: %s' % primary_cname))
 
                 # when redirected back to the manage profile page display a message about the merge
                 pinfo['merge_info_message'] = ("success", "confirm_operation")
@@ -1280,7 +1291,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                         'name_given': name_given,
                         'email_given': email_given,
                         'name_changed': name_changed,
-                        'email_changed': email_changed}
+                        'email_changed': email_changed,
+                        'uid': uid}
 
             webapi.create_request_message(userinfo)
 
@@ -1321,6 +1333,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                             'checkout_submit': checkout_submit,
                             'assign': claim,
                             'commit_rt_ticket': commit_rt_ticket,
+                            'close_rt_ticket': close_rt_ticket,
                             'confirm': confirm_repeal_reset,
                             'delete_external_ids': delete_external_ids,
                             'merge': merge,
@@ -2360,7 +2373,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         for t in list(tickets):
             tickets.remove(t)
-            tickets.append([webapi.get_most_frequent_name_from_pid(int(t[0])),
+            tickets.append([clean_string(webapi.get_most_frequent_name_from_pid(int(t[0]))),
                             webapi.get_person_redirect_link(t[0]), t[0], t[1]])
 
         content = TEMPLATE.tmpl_tickets_admin(tickets)
@@ -2942,9 +2955,11 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         else:
             return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid hepname.")
 
-        webapi.connect_author_with_hepname(cname, hepname)
         webapi.session_bareinit(req)
         session = get_session(req)
+
+        webapi.connect_author_with_hepname(cname, hepname, session['uid'])
+
         pinfo = session['personinfo']
         last_visited_page = webapi.history_get_last_visited_url(pinfo['visit_diary'], just_page=True)
 
@@ -2981,7 +2996,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session = get_session(req)
         pinfo = session['personinfo']
         if not self._is_admin(pinfo):
-            webapi.connect_author_with_hepname(cname, hepname)
+            webapi.connect_author_with_hepname(cname, hepname, session['uid'])
         else:
             uid = getUid(req)
             add_cname_to_hepname_record(cname, hepname, uid)
@@ -3001,7 +3016,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         else:
             return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid ORCiD.")
 
-        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+        session = get_session(req)
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
         redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, pid))
 
     def suggest_orcid_ajax(self, req, form):
@@ -3034,7 +3051,9 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         if not is_valid_orcid(orcid):
             return self._fail(req, apache.HTTP_NOT_FOUND)
 
-        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+        session = get_session(req)
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
 
     def _fail(self, req, code):
         req.status = code
@@ -3369,6 +3388,7 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
         @return:
         @rtype: json data
         '''
+
         # Abort if the simplejson module isn't available
         assert CFG_JSON_AVAILABLE, "Json not available"
         # Fail if no json data exists in the Ajax request

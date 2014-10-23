@@ -1091,6 +1091,7 @@ class Template:
                 email = self._('Not provided')
                 date = self._('Not Available')
                 actions = []
+                rtid = None
 
                 for info in t[0]:
                     if info[0] == 'firstname':
@@ -1107,6 +1108,9 @@ class Template:
                         date = info[1]
                     elif info[0] in ['assign', 'reject']:
                         actions.append(info)
+                    elif info[0] == 'rtid':
+                        rtid = info[1]
+
 
                 if 'delete' in ticket_links:
                     h(('<strong>Ticket number: %(tnum)s </strong> <a rel="nofollow" id="cancel" href=%(url)s/author/claim/action?cancel_rt_ticket=True&selection=%(tnum)s&pid=%(pid)s>' + self._(' Delete this ticket') + ' </a>')
@@ -1152,6 +1156,10 @@ class Template:
 
                     h(' - <a rel="nofollow" id="show_paper" target="_blank" href="%(url)s/record/%(record)s"> View record </a><br>' %
                       ({'url': CFG_SITE_URL, 'record': str(bibrec)}))
+                if rtid:
+                    h('<a rel="nofollow" id="closert" href="%(url)s/author/claim/action?close_rt_ticket=True&rtid=%(rtid)s&pid=%(pid)s">Close this ticket in RT</a>'
+                      % ({'url': CFG_SITE_URL, 'rtid': rtid,
+                          'pid': str(person_id)}))
                 h('</dd>')
                 h('</dd><br>')
                 # h(str(open_rt_tickets))

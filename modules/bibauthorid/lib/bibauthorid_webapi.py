@@ -48,9 +48,9 @@ from invenio.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_INSPIRE_SITE, CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL, \
     CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS, CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES, \
     CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-    CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, CFG_BIBAUTHORID_ENABLED
+    CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, CFG_BIBAUTHORID_ENABLED, \
+    CFG_TMPSHAREDDIR
 from invenio.config import CFG_SITE_URL
-from invenio.mailutils import send_email
 from invenio.bibauthorid_name_utils import most_relevant_name
 from invenio.bibauthorid_general_utils import is_arxiv_id_or_doi
 from invenio.shellutils import retry_mkstemp
@@ -58,6 +58,7 @@ from invenio.bibrecord import record_xml_output, record_add_field, record_get_fi
     record_get_field_value, record_get_field_values, record_has_field
 from invenio.bibtask import task_low_level_submission
 from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  # pylint: disable-msg=W0614
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 
 
 #
@@ -2357,6 +2358,8 @@ def create_request_ticket(userinfo, ticket):
 
     m("\nOperations:")
 
+    first_cname = None
+
     tic = dict()
     for op in ticket:
         bibrefrec = op['bibref'] + ',' + str(op['rec'])
@@ -2373,6 +2376,8 @@ def create_request_ticket(userinfo, ticket):
             continue
 
         cname = get_person_redirect_link(op['pid'])
+        if not first_cname:
+            first_cname = cname
 
         try:
             tic[(op['pid'], cname)].append((op['action'], bibrefrec))
@@ -2385,28 +2390,37 @@ def create_request_ticket(userinfo, ticket):
     m("\nLinks to all issued Person-based requests:\n")
 
     for pid, cname in tic:
-        data = list()
-        for i in udata:
-            data.append(i)
-        data.append(['date', ctime()])
-        data.append(['operations', tic[(pid, cname)]])
-
-        dbapi.update_request_ticket_for_author(pid, dict(data))
         m("%s/author/claim/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, cname))
 
     m("\nPlease remember that you have to be logged in "
       "in order to see the ticket of a person.\n")
 
     if ticket and tic and mailcontent:
-        sender = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 
-        if bconfig.TICKET_SENDING_FROM_USER_EMAIL and userinfo['email']:
-            sender = userinfo['email']
+        uid = None
+        email = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 
-        send_email(sender,
-                   CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-                   subject="[Author] Change Request",
-                   content="\n".join(mailcontent))
+        if bconfig.TICKET_SENDING_FROM_USER_EMAIL:
+            if 'uid' in userinfo:
+                uid = userinfo['uid']
+            if 'email' in userinfo:
+                email = userinfo['email']
+
+        rtid = BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                               subject="[Author] Change Request for %s" % first_cname,
+                                               text="\n".join(mailcontent),
+                                               queue="AUTHORS_claim_manual",
+                                               requestor=email)
+
+    for pid, cname in tic:
+        data = list()
+        for i in udata:
+            data.append(i)
+        data.append(['date', ctime()])
+        data.append(['operations', tic[(pid, cname)]])
+        data.append(['rtid', rtid])
+
+        dbapi.update_request_ticket_for_author(pid, dict(data))
 
     return True
 
@@ -2432,17 +2446,18 @@ def create_request_message(userinfo, subj=None):
 
     if not subj:
         subj = "[Author] Help Request"
-    send_email(sender,
-               CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-               subject=subj,
-               content="\n".join(mailcontent))
 
+    BIBCATALOG_SYSTEM.ticket_submit(uid=userinfo['uid'],
+                                    subject=subj,
+                                    text="\n".join(mailcontent),
+                                    queue="Authors",
+                                    requestor=sender)
 
-def send_user_commit_notification_email(userinfo, ticket):
+def send_user_commit_notification_email(userinfo, ticket, uid):
     '''
     Sends commit notification email to RT system
     '''
-    # send eMail to RT
+
     mailcontent = []
     m = mailcontent.append
     m("A user committed a change through the web interface.")
@@ -2466,12 +2481,17 @@ def send_user_commit_notification_email(userinfo, ticket):
                     pass
         m(" --- <end> --- \n")
 
+    if userinfo['email']:
+        requestor = userinfo['email']
+    else:
+        requestor = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
+
     if ticket and mailcontent:
-        sender = CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
-        send_email(sender,
-                   CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-                   subject="[Author] NO ACTIONS NEEDED. Changes performed by SSO user.",
-                   content="\n".join(mailcontent))
+        BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                        subject="[Author] NO ACTIONS NEEDED. Changes performed by SSO user.",
+                                        text="\n".join(mailcontent),
+                                        queue="AUTHORS_claim_sso",
+                                        requestor=requestor)
 
     return True
 
@@ -2611,12 +2631,52 @@ def get_orcids_by_pid(pid):
     return tuple(str(x[0]) for x in orcids)
 
 
+def update_hepname_with_orcid(pid, orcid):
+
+    cname = get_person_redirect_link(pid)
+    searchid = '035:"%s"' % cname
+    hepRecord = perform_request_search(rg=0, cc='HepNames', p=' %s ' %
+                                       searchid)[0]
+
+    record = {}
+
+    record_add_field(record,
+                     tag="035",
+                     subfields=[
+                         ('9', "ORCID"),
+                         ('a', str(orcid))
+                     ])
+    record_add_field(record,
+                     tag="001",
+                     controlfield_value=hepRecord)
+
+    record = record_xml_output(record)
+
+    from tempfile import mkstemp
+
+    tmp_file_fd, tmp_file = mkstemp(
+        suffix='.xml',
+        prefix="orcidupdatefile_%s" % strftime("%Y-%m-%d_%H:%M:%S", gmtime()),
+        dir=CFG_TMPSHAREDDIR
+    )
+
+    os.write(tmp_file_fd, record)
+    os.close(tmp_file_fd)
+    os.chmod(tmp_file, 0644)
+
+    task_low_level_submission("bibupload", cname, "-a", tmp_file, "-P5", "-N",
+                              "bibauthorid")
+
+
 def add_orcid_to_pid(pid, orcid):
     if len(get_orcids_by_pid(pid)) > 0:
         return
 
     dbapi.add_orcid_id_to_author(pid, orcid)
     webauthorapi.expire_all_cache_for_personid(pid)
+    # every time an orcid is added to pid we should change the
+    # corresponding hepnames record
+    update_hepname_with_orcid(pid, orcid)
 
 
 def get_person_info_by_pid(pid):
@@ -3265,26 +3325,33 @@ def add_cname_to_hepname_record(cname, recid, uid=None):
     tmp_file.close()
     task_low_level_submission('bibupload', get_nickname(uid) or "", "-a", tmp_file_name, "-P5", "-N", "bibauthorid")
 
-
-def connect_author_with_hepname(cname, hepname):
+def connect_author_with_hepname(cname, hepname, uid):
     subject = "HepNames record match: %s %s" % (cname, hepname)
-    content = "Hello! Please connect the author profile %s " \
-              "with the HepNames record %s. Best regards" % (cname, hepname)
-    send_email(CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL,
-               CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL,
-               subject=subject,
-               content=content)
+    content = "Hello! Please connect the author profile "\
+              "%s/author/profile/%s " \
+              "with the HepNames record "\
+              "%s/record/%s. Best regards" % (CFG_SITE_URL, cname,
+                                               CFG_SITE_URL, hepname)
 
+    BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                    subject=subject,
+                                    text=content,
+                                    queue="Authors",
+                                    recordid=hepname,
+                                    requestor=CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL)
 
-def connect_author_with_orcid(cname, orcid):
+def connect_author_with_orcid(cname, orcid, uid):
     subject = "ORCiD record match: %s %s" % (cname, orcid)
-    content = "Hello! Please connect the author profile %s " \
-              "with the HepNames record %s. Best regards" % (cname, orcid)
-    send_email(CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL,
-               CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL,
-               subject=subject,
-               content=content)
+    content = "Hello! Please connect the author profile " \
+              "%s/author/profile/%s " \
+              "with the Orcid record http://www.orcid.org/%s" \
+              ". Best regards" % (CFG_SITE_URL, cname, orcid)
 
+    BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                    subject=subject,
+                                    text=content,
+                                    queue="Authors",
+                                    requestor=CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL)
 
 #
 # Exposed Ticket Functions            #
@@ -3308,10 +3375,16 @@ def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
 
     # No bibref specified and no bibref candidates to select from.
     if not bibref and not bibrefs:
-        send_email(CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-                   CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL,
-                   subject="[Author] No authors on record: %s" % rec,
-                   content="No authors seem to exist on record %s" % rec)
+
+        recstruct = get_record(rec)
+        if not record_get_field_value(recstruct, '110', '', '', 'a'):
+
+            BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
+                                            subject="[Author] No authors on record: %s" % rec,
+                                            text="No authors seem to exist on record %s" % rec,
+                                            queue="Authors",
+                                            recordid=rec,
+                                            requestor=CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL)
         return None
 
     if should_have_bibref and not bibref:
@@ -3337,7 +3410,8 @@ def fill_out_userinfo(additional_info, uid, ip, ulevel, strict_check=True):
                 'comments': additional_info['comments'],
                 'firstname': additional_info['first_name'],
                 'lastname': additional_info['last_name'],
-                'email': additional_info['email']}
+                'email': additional_info['email'],
+                'uid': uid}
 
     if ulevel in ['guest', 'user'] and not userinfo['comments']:
         userinfo['comments'] = 'No comments submitted.'
@@ -3538,7 +3612,7 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
             create_request_ticket(userinfo, ticket)
 
         if CFG_INSPIRE_SITE and ok_ops:
-            send_user_commit_notification_email(userinfo, ok_ops)
+            send_user_commit_notification_email(userinfo, ok_ops, uid)
 
         for op in ticket:
             op['execution_result'] = {'success': True, 'operation': 'ticketized'}

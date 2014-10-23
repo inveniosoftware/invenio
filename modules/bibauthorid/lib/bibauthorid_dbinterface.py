@@ -1817,6 +1817,29 @@ def update_request_ticket_for_author(pid, ticket_dict, tid=None):  # update_requ
            (pid, 'request_tickets', request_tickets, request_tickets_num))
 
 
+def remove_rtid_from_ticket(rtid, pid):
+    '''
+    Remove rtid from ticket blob in aidPERSONIDDATA.
+    '''
+    request_tickets = get_request_tickets_for_author(pid)
+    request_tickets_exist = bool(request_tickets)
+
+    for request_ticket in request_tickets:
+        if request_ticket['rtid'] == rtid:
+            request_ticket.pop('rtid')
+            break
+
+    request_tickets_num = len(request_tickets)
+    request_tickets = serialize(request_tickets)
+
+    if request_tickets_exist:
+        remove_request_ticket_for_author(pid)
+
+    run_sql("""insert into aidPERSONIDDATA
+               (personid, tag, datablob, opt1)
+               values (%s, %s, %s, %s)""",
+            (pid, 'request_tickets', request_tickets, request_tickets_num))
+
 def remove_request_ticket_for_author(pid, tid=None):  # delete_request_ticket
     '''
     Removes a request ticket from the given author. If ticket identifier is not
@@ -1857,7 +1880,7 @@ def remove_request_ticket_for_author(pid, tid=None):  # delete_request_ticket
     run_sql("""insert into aidPERSONIDDATA
                (personid, tag, datablob, opt1)
                values (%s, %s, %s, %s)""",
-           (pid, 'request_tickets', request_tickets, request_tickets_num))
+            (pid, 'request_tickets', request_tickets, request_tickets_num))
 
 
 def modify_canonical_name_of_authors(pids_newcnames=None):  # change_personID_canonical_names
