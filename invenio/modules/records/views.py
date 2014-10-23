@@ -19,25 +19,27 @@
 
 """WebSearch Flask Blueprint."""
 
+import cStringIO
+
 from functools import wraps
 from six import iteritems
 from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint, send_file
 from flask.ext.login import current_user
+from flask.ext.breadcrumbs import default_breadcrumb_root
 
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.base.signals import pre_template_render
 from invenio.config import CFG_SITE_RECORD
 from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.modules.search.models import Collection
-from invenio.modules.search.signals import record_viewed
 from invenio.modules.records.api import get_record
 from invenio.modules.records.models import Record as Bibrec
-from invenio.base.i18n import _
-from invenio.base.signals import pre_template_render
+from invenio.modules.search.models import Collection
+from invenio.modules.search.signals import record_viewed
 from invenio.utils import apache
-from flask.ext.breadcrumbs import default_breadcrumb_root
 
 blueprint = Blueprint('record', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
@@ -212,17 +214,38 @@ def files(recid):
 @blueprint.route('/<int:recid>/files/<path:filename>', methods=['GET'])
 @request_record
 def file(recid, filename):
+    """Serve attached documents."""
     from invenio.modules.documents import api
     record = get_record(recid)
-    duuid = [uuid for (k, uuid) in record.get('_documents', [])
-             if k == filename]
-    if len(duuid) != 1:
-        #TODO log
-        abort(404)
-    document = api.Document.get_document(duuid[0])
-    #TODO document.can_access(current_user)
-    return send_file(document['uri'])
+    duuids = [uuid for (k, uuid) in record.get('_documents', [])
+              if k == filename]
+    error = 404
+    for duuid in duuids:
+        document = api.Document.get_document(duuid)
+        if not document.is_authorized(current_user):
+            current_app.logger.info(
+                "Unauthorized access to /{recid}/files/{filename} "
+                "({document}) by {current_user}".format(
+                    recid=recid, filename=filename, document=document,
+                    current_user=current_user))
+            error = 401
+            continue
 
+        # TODO add logging of downloads
+
+        if document.get('linked', False):
+            if document.get('uri').startswith('http://') or \
+                    document.get('uri').startswith('https://'):
+                return redirect(document.get('uri'))
+
+            # FIXME create better streaming support
+
+            file_ = cStringIO.StringIO(document.open('rb').read())
+            file_.seek(0)
+            return send_file(file_, mimetype='application/octet-stream',
+                             attachment_filename=filename)
+        return send_file(document['uri'])
+    abort(error)
 
 
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])

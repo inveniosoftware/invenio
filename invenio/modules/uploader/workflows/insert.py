@@ -17,15 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.uploader.workflows.insert
-    -----------------------------------------
+"""Default workflows for insert records using the uploader.
 
-    Default workflows for insert records using the uploader.
-
-
-    :py:data:`insert`
-    :py:data:`undo`
+:py:data:`insert`
+:py:data:`undo`
 """
 
 from workflow.patterns import IF
@@ -33,12 +28,14 @@ from workflow.patterns import IF
 from invenio.modules.uploader.errors import UploaderWorkflowException
 from invenio.modules.uploader.uploader_tasks import \
     create_records_for_workflow, \
+    legacy, \
     manage_attached_documents, \
     raise_, \
-    reserve_record_id, save_record, \
+    reserve_record_id, \
     retrieve_record_id_from_pids, \
     return_recordids_only, \
     save_master_format, \
+    save_record, \
     update_pidstore,\
     validate
 
@@ -67,6 +64,7 @@ insert = dict(
         save_record(step=5),
         update_pidstore(step=6),
         save_master_format(step=7),
+        legacy(step=8),
     ],
     post_tasks=[
         return_recordids_only,

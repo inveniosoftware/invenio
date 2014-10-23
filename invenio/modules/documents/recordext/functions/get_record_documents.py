@@ -17,12 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Record field function."""
+
+
 def get_record_documents(record):
-    """@todo: Docstring for get_record_documents.
+    """Return list of Document instances.
 
-    :record: @todo
-    :returns: @todo
-
+    :record: Record instance
+    :returns: list of Document instances
     """
     from invenio.modules.documents import api
-    return [api.Document.get_document(d[1]) for d in record.get('_files', [])]
+
+    def _document(mapping):
+        document = api.Document.get_document(d[1])
+        document.__record_filename__ = d[0]
+        return document
+    return [_document(d) for d in record.get('_documents', [])]

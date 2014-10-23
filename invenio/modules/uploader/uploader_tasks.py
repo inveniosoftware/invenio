@@ -25,7 +25,6 @@ inside the workflows defined in :py:mod:`~invenio.modules.uploader.workflows`.
 
 See: `Simple workflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
 """
-import os
 
 from invenio.base.globals import cfg
 from invenio.modules.pidstore.models import PersistentIdentifier
@@ -127,7 +126,7 @@ def retrieve_record_id_from_pids(step):
                     possible_pid.get('provider'))
                 if pid:
                     eng.log.info("PID found in the data base %s",
-                                (pid.object_value, ))
+                                 (pid.object_value, ))
                     matching_recids.add(pid.object_value)
             if len(matching_recids) > 1:
                 raise UploaderWorkflowException(
@@ -189,7 +188,11 @@ def save_master_format(step):
                         format=obj[1].additional_info.master_format,
                         kind='master',
                         last_updated=obj[1]['modification_date'],
-                        value=compress(utf8ifier(obj[0])))
+                        value=compress(utf8ifier(
+                            obj[0]
+                            if obj[1].additional_info.master_format == 'marc'
+                            else obj[1].legacy_export_as_marc()
+                        )))
         db.session.add(bibfmt)
         db.session.commit()
         eng.log.info('Master record saved to DB')
@@ -219,7 +222,7 @@ def update_pidstore(step):
                     pid = PersistentIdentifier.create(
                         pid_value.get('type'), pid_value.get('value'),
                         pid_value.get('provider'))
-                if not pid.has_object('rec', recod['recid']):
+                if not pid.has_object('rec', record['recid']):
                     pid.assign('rec', record['recid'])
         eng.log.info('Finish looking for PIDs inside the current record and '
                      'register them in the DB')
@@ -236,23 +239,30 @@ def manage_attached_documents(step):
     def _manage_attached_documents(obj, eng):
         record = obj[1]
         eng.log.info('Look documents to manage')
+
+        def _create_document(metadata, record):
+            if '_documents' not in record:
+                record['_documents'] = []
+
+            model = metadata.pop('model', 'record_document_base')
+
+            if 'recids' not in metadata:
+                metadata['recids'] = list()
+            if record.get('recid', -1) not in metadata['recids']:
+                metadata['recids'].append(record.get('recid', -1), )
+
+            document = api.Document.create(metadata, model=model)
+            eng.log.info('Document %s created', (document['_id'],))
+
+            record['_documents'].append((document['title'], document['_id']))
+            return document
+
         if 'files_to_upload' in record:
             eng.log.info('Documents to upload found')
-            record['_files'] = []
             files_to_upload = record.get('files_to_upload', [])
 
             for file_to_upload in files_to_upload:
-                model = file_to_upload.pop('model', 'record_document_base')
-
-                if 'recids' not in file_to_upload:
-                    file_to_upload['recids'] = list()
-                if record.get('recid', -1) not in file_to_upload['recids']:
-                    file_to_upload['recids'].append(record.get('recid', -1), )
-
-                document = api.Document.create(file_to_upload, model=model)
-                eng.log.info('Document %s created', (document['_id'],))
-
-                record['_files'].append((document['title'], document['_id']))
+                document = _create_document(file_to_upload, record)
 
                 set_document_contents.delay(
                     document['_id'],
@@ -265,6 +275,59 @@ def manage_attached_documents(step):
 
         if 'files_to_link' in record:
             eng.log.info('Documents to link found')
+            files_to_link = record.get('files_to_link', [])
+
+            for file_to_link in files_to_link:
+                _create_document(file_to_link, record)
+
+            eng.log.info('Finish linking documents, delete temporary key')
             del record['files_to_link']
 
     return _manage_attached_documents
+
+
+def legacy(step):
+    """Update legacy bibxxx tables."""
+    def _legacy(obj, eng):
+        record = obj[1]
+        if record.additional_info.master_format != 'marc':
+            return
+        import marshal
+        from invenio.legacy.bibupload.engine import (
+            CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS,
+            CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE,
+            archive_marcxml_for_history,
+            update_bibfmt_format,
+            update_database_with_metadata,
+        )
+
+        modification_date = record['modification_date'].strftime(
+            '%Y-%m-%d %H:%M:%S')
+
+        update_bibfmt_format(
+            record['recid'],
+            record.legacy_export_as_marc(),
+            'xm',
+            modification_date
+        )
+        if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
+            update_bibfmt_format(
+                record['recid'],
+                marshal.dumps(record.legacy_create_recstruct()),
+                'recstruct',
+                modification_date
+            )
+        if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
+            archive_marcxml_for_history(
+                record['recid'], affected_fields={}
+            )
+
+        update_database_with_metadata(
+            record.legacy_create_recstruct(),
+            record['recid']
+        )
+        eng.log.info(
+            'Finishing legacy task for record {0}'.format(record['recid'])
+        )
+
+    return _legacy
