@@ -54,7 +54,6 @@ class _install_lib(install_lib):
 
 dependency_links = [
     "git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0",
-    "git+git://github.com/inveniosoftware/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow",
 ]
 
 install_requires = [
@@ -123,7 +122,7 @@ install_requires = [
     "SQLAlchemy>=0.9.8",
     "SQLAlchemy-Utils>=0.27",
     "unidecode",
-    "workflow>=1.1.0",
+    "workflow>=1.2.0",
     # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
     "WTForms>=1.0.5,<2.0",
     "wtforms-alchemy>=0.12.6"
