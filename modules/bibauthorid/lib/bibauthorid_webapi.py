@@ -2635,8 +2635,12 @@ def update_hepname_with_orcid(pid, orcid):
 
     cname = get_person_redirect_link(pid)
     searchid = '035:"%s"' % cname
-    hepRecord = perform_request_search(rg=0, cc='HepNames', p=' %s ' %
-                                       searchid)[0]
+    hepRecords = perform_request_search(rg=0, cc='HepNames', p=' %s ' %
+                                        searchid)
+
+    if len(hepRecords) == 0:
+        return
+    hepRecord = hepRecords[0]
 
     record = {}
 
