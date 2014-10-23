@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,13 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Validation functions
-"""
+"""Validation functions."""
 
 import six
 import re
-from wtforms.validators import ValidationError, StopValidation, Regexp
+from wtforms.validators import ValidationError, StopValidation
 from invenio.utils import persistentid as pidutils
 from flask import current_app
 
@@ -140,16 +138,45 @@ def number_validate(form, field, submit=False,
 #
 # DOI-related validators
 #
-doi_syntax_validator = Regexp(
-    "(^$|(doi:)?10\.\d+(.\d+)*/.*)",
-    flags=re.I,
-    message="The provided DOI is invalid - it should look similar to "
-            "'10.1234/foo.bar'."
-)
 
-"""
-DOI syntax validator
-"""
+
+def doi_syntax_validator(form, field):
+    """DOI syntax validator. Deprecated.
+
+    :param field: validated field.
+    :param form: validated form.
+    """
+    import warnings
+    warnings.warn("Please use DOISyntaxValidator instead.", DeprecationWarning)
+    return DOISyntaxValidator()(form, field)
+
+
+class DOISyntaxValidator(object):
+
+    """DOI syntax validator."""
+
+    pattern = "(^$|(doi:)?10\.\d+(.\d+)*/.*)"
+
+    def __init__(self, message=None):
+        """Constructor.
+
+        :param message: message to override the default one.
+        """
+        self.regexp = re.compile(self.pattern, re.I)
+        self.message = message if message else (
+            "The provided DOI is invalid - it should look similar to "
+            "'10.1234/foo.bar'.")
+
+    def __call__(self, form, field):
+        """Validate.
+
+        :param field: validated field.
+        :param form: validated form.
+        """
+        doi = field.data
+        if doi and not self.regexp.match(doi):
+            # no point to further validate DOI which is invalid
+            raise StopValidation(self.message)
 
 
 class InvalidDOIPrefix(object):

@@ -17,9 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""DOI field."""
+
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from ..validation_utils import doi_syntax_validator
+from ..validation_utils import DOISyntaxValidator
 from ..filter_utils import strip_prefixes, strip_string
 from ..processor_utils import datacite_lookup
 
@@ -28,8 +30,9 @@ __all__ = ['DOIField']
 
 def missing_doi_warning(dummy_form, field, submit=False, fields=None):
     """
-    Field processor, checking for existence of a DOI, and otherwise
-    asking people to provide it.
+    Field processor.
+
+    Checks for existence of a DOI, and otherwise asks people to provide it.
     """
     if not field.errors and not field.data:
         field.add_message("Please provide a DOI if possible.", state="warning")
@@ -37,11 +40,14 @@ def missing_doi_warning(dummy_form, field, submit=False, fields=None):
 
 
 class DOIField(WebDepositField, TextField):
+
+    """DOIField."""
+
     def __init__(self, **kwargs):
         defaults = dict(
             icon='barcode',
             validators=[
-                doi_syntax_validator,
+                DOISyntaxValidator(),
             ],
             filters=[
                 strip_string,
