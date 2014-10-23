@@ -16,30 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-
-{%- import "accounts/settings/helpers.html" as helpers with context %}
-{%- from "_formhelpers.html" import render_field with context %}
-{%- extends "accounts/settings/index_base.html" %}
-
-{% block settings_body %}
-{{helpers.panel_start(
-    subtitle,
-    icon='fa fa-users fa-fw',
-)}}
-<form role="form" method="POST">
-{%- for field in form %}
-{{ render_field(field, show_description=True) }}
-{%- endfor %}
-<div class="form-group">
-    <div class="">
-      <a href="{{url_for('.index')}}" class="btn btn-default">
-        <i class="fa fa-times"></i> {{ _('Cancel') }}
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fa fa-check"></i> {{ action }}
-      </button>
-    </div>
-  </div>
-</form>
-{{helpers.panel_end()}}
-{% endblock %}
+{%- extends "groups/members_base.html" -%}

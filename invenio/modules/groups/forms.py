@@ -17,14 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Group Forms"""
+"""Group Forms."""
 
-from wtforms_alchemy import model_form_factory
+# from flask import url_for
 from wtforms import validators, widgets
+from wtforms.fields import BooleanField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms_alchemy import model_form_factory
+
 from invenio.base.i18n import _
-from invenio.utils.forms import InvenioBaseForm
 from invenio.modules.accounts.models import Usergroup
+from invenio.utils.forms import InvenioBaseForm
 
 ModelForm = model_form_factory(InvenioBaseForm)
 
@@ -59,5 +62,18 @@ class JoinUsergroupForm(InvenioBaseForm):
         _('Join group'),
         get_pk=lambda i: i.id,
         get_label=lambda i: i.name,
-        query_factory=lambda: Usergroup.query.all()
     )
+
+
+class UserJoinGroupForm(InvenioBaseForm):
+
+    """Select a user that Join an existing group."""
+
+    # TODO use a autocomplete field instead a select
+    id_user = QuerySelectField(
+        _('Add user'),
+        get_pk=lambda i: i.id,
+        get_label=lambda i: i.nickname,
+    )
+    # set as admin of the group
+    user_status = BooleanField(label=_('as Admin'))

@@ -20,9 +20,15 @@
 """Account database models."""
 
 # General imports.
-from invenio.ext.sqlalchemy import db
+from flask.ext.login import current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils.types.choice import ChoiceType
+
+# Invenio import
+from invenio.ext.sqlalchemy import db
+
+from .errors import AccountSecurityError, IntegrityUsergroupError
+
 # Create your models here.
 
 
@@ -44,6 +50,7 @@ class User(db.Model):
     """Represents a User record."""
 
     def __str__(self):
+        """Return string representation."""
         return "%s <%s>" % (self.nickname, self.email)
 
     __tablename__ = 'user'
@@ -62,40 +69,60 @@ class User(db.Model):
     last_login = db.Column(db.DateTime, nullable=False,
                            server_default='1900-01-01 00:00:00')
 
-    #TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
+    # TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
     _password_comparator = db.PasswordComparator(_password)
 
     @hybrid_property
     def password(self):
+        """Return the password."""
         return self._password
 
     @password.setter
     def password(self, password):
+        """Set the password."""
         self._password = self._password_comparator.hash(password)
 
     @password.comparator
     def password(self):
+        """Compare password."""
         return self._password_comparator
 
     @property
     def guest(self):
+        """Return True if the user is a guest."""
         return False if self.email else True
 
     #
     # Basic functions for user authentification.
     #
     def get_id(self):
+        """Return the id."""
         return self.id
 
     def is_guest(self):
+        """Return if the user is a guest."""
         return self.guest
 
     def is_authenticated(self):
+        """Return True if user is a authenticated user."""
         return True if self.email else False
 
     def is_active(self):
+        """Return True if use is active."""
         return True
+
+
+def get_groups_user_not_joined(id_user, group_name=None):
+    """Return the list of group that user not joined."""
+    query = Usergroup.query.outerjoin(
+        Usergroup.users).filter(
+            Usergroup.id.notin_(
+                db.select([UserUsergroup.id_usergroup],
+                          UserUsergroup.id_user == id_user)))
+    if group_name:
+        query = query.filter(Usergroup.name.like(group_name))
+    return query
 
 
 class Usergroup(db.Model):
@@ -103,6 +130,7 @@ class Usergroup(db.Model):
     """Represent a Usergroup record."""
 
     def __str__(self):
+        """Return string representation."""
         return "%s <%s>" % (self.name, self.description)
 
     __tablename__ = 'usergroup'
@@ -123,7 +151,7 @@ class Usergroup(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                    primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False,
-                     server_default='', index=True)
+                     server_default='', unique=True, index=True)
     description = db.Column(db.Text, nullable=True)
     join_policy = db.Column(
         ChoiceType(
@@ -147,39 +175,92 @@ class Usergroup(db.Model):
         assert len(visible) > 1  # if implementation chage use == instead of in
         return cls.query.filter(cls.join_policy.in_(visible))
 
-    def join(self, id_user=None, status=None):
+    @property
+    def login_method_is_external(self):
+        """Return True if the group is external."""
+        return self.login_method == Usergroup.LOGIN_METHODS['EXTERNAL']
+
+    def join(self, user, status=None):
         """Join user to group.
 
-        If ``id_user`` is not defined the current user's id is used.
-
-        :param id_user: User identifier.
+        :param user: User to add into the group.
+        :param status: status of user
         """
-        if id_user is None:
-            from flask.ext.login import current_user
-            id_user = current_user.get_id()
+        # if I want to join another user from the group
+        if(user.id != current_user.get_id()
+           # I need to be an admin of the group
+           and not self.is_admin(current_user.get_id())):
+            raise AccountSecurityError(
+                'Not enough right to '
+                'add user "{0}" from group "{1}"'
+                .format(user.nickname, self.name))
+
+        # join group
         self.users.append(
             UserUsergroup(
-                id_user=id_user or current_user.get_id(),
+                id_user=user.id,
                 user_status=status or self.new_user_status,
             )
         )
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
 
-    def leave(self, id_user=None):
+    def leave(self, user):
         """Remove user from group.
 
-        If ``id_user`` is not defined the current user's id is used.
-
-        :param id_user: User identifier.
+        :param user: User to remove from the group.
         """
-        if id_user is None:
-            from flask.ext.login import current_user
-            id_user = current_user.get_id()
+        # if I want to remove another user from the group
+        if(user.id != current_user.get_id()
+           # I need to be an admin of the group
+           and not self.is_admin(current_user.get_id())):
+            raise AccountSecurityError(
+                'Not enough right to '
+                'remove user "{0}" from group "{1}"'
+                .format(user.nickname, self.name))
 
-        # FIXME check that I'm not the last admin before leaving the group.
+        # check that I'm not the last admin before leaving the group.
+        if self.is_admin(user.id) and self.admins.count() == 1:
+            raise IntegrityUsergroupError(
+                'User can leave the group '
+                'without admins, please delete the '
+                'group if you want to leave.')
+
+        # leave the group
         UserUsergroup.query.filter_by(
             id_usergroup=self.id,
-            id_user=id_user,
+            id_user=user.id,
         ).delete()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
+            raise
+
+    def is_admin(self, id_user):
+        """Return True if the user is an admin of the group."""
+        return db.session.query(self.admins.filter(
+            UserUsergroup.id_user == id_user).exists()).scalar()
+
+    def get_users_not_in_this_group(self, nickname=None, email=None,
+                                    limit=None):
+        """Return users that not joined this group."""
+        # base query
+        query = User.query.outerjoin(User.usergroups).filter(
+            User.id.notin_(db.select([UserUsergroup.id_user],
+                           UserUsergroup.id_usergroup == self.id)))
+        # additional optional filters
+        if nickname:
+            query = query.filter(User.nickname.like(nickname))
+        if email:
+            query = query.filter(User.email.like(email))
+        if limit:
+            query = query.limit(limit)
+        # return results
+        return query
 
     @property
     def new_user_status(self):
@@ -200,6 +281,7 @@ class UserUsergroup(db.Model):
     }
 
     def __str__(self):
+        """Return string representation."""
         return "%s:%s" % (self.user.nickname, self.usergroup.name)
 
     __tablename__ = 'user_usergroup'
@@ -215,8 +297,24 @@ class UserUsergroup(db.Model):
     user_status = db.Column(db.CHAR(1), nullable=False, server_default='')
     user_status_date = db.Column(db.DateTime, nullable=False,
                                  server_default='1900-01-01 00:00:00')
-    user = db.relationship(User, backref='usergroups')
-    usergroup = db.relationship(Usergroup, backref='users')
+    user = db.relationship(
+        User,
+        backref=db.backref('usergroups'))
+    usergroup = db.relationship(
+        Usergroup,
+        backref=db.backref('users', cascade="all, delete-orphan"))
+
+    def is_admin(self):
+        """Return True if user is a admin."""
+        return self.user_status == self.USER_STATUS['ADMIN']
+
+# define query to get admins
+Usergroup.admins = db.relationship(
+    UserUsergroup,
+    lazy="dynamic",
+    primaryjoin=db.and_(
+        Usergroup.id == UserUsergroup.id_usergroup,
+        UserUsergroup.user_status == UserUsergroup.USER_STATUS['ADMIN']))
 
 
 class UserEXT(db.Model):
