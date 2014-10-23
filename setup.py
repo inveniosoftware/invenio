@@ -87,7 +87,7 @@ install_requires = [
     "Flask-Script>=2.0.5",
     # Development version is used, will switch to >=2.0 once released.
     "Flask-SQLAlchemy>=2.0",
-    "Flask-WTF>=0.9.5",
+    "Flask-WTF>=0.10.2",
     "fs>=0.4",
     "intbitset>=2.0",
     "jellyfish>=0.3.2",
@@ -124,7 +124,7 @@ install_requires = [
     "unidecode",
     "workflow>=1.2.0",
     # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
-    "WTForms>=1.0.5,<2.0",
+    "WTForms>=1.0.5",
     "wtforms-alchemy>=0.12.6"
 ]
 
