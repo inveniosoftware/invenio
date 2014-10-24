@@ -296,22 +296,12 @@ def _create_neareset_term_box(argd_orig):
         return '<!-- not found -->'  # no comments
 
 
-def sort_and_rank_records(recids, so=None, rm=None, p=''):
+def sort_and_rank_records(recids, so=None, rm=None, sf=None, sp=None, p=''):
     """TODO."""
-    output = recids.tolist()
-    if so:
-        output.reverse()
-    elif rm:
-        from invenio.legacy.bibrank.record_sorter import rank_records
-        ranked = rank_records(rm, 0, output, p.split())
-        if ranked[0]:
-            output = ranked[0]
-            output.reverse()
-        else:
-            output = output.tolist()
-    else:
-        output.reverse()
-    return output
+    from invenio.legacy.search_engine import sort_or_rank_records
+    return sort_or_rank_records(
+        request.get_legacy_request(), recids, rm, sf, so, sp, p
+    )
 
 
 def crumb_builder(url):
@@ -408,9 +398,6 @@ def rss(collection, p, jrec, so, rm):
     qid = get_search_query_id(**argd)
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
-    if so or rm:
-        recids.reverse()
-
     ctx = dict(
         records=len(get_current_user_records_that_can_be_displayed(qid)),
         qid=qid,
@@ -456,10 +443,6 @@ def search(collection, p, of, ot, so, rm):
 
     qid = get_search_query_id(**argd)
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
-
-    #if so or rm:
-    if len(of) > 0 and of[0] in ['h', 't']:
-        recids.reverse()
 
     # back-to-search related code
     if request and not isinstance(request.get_legacy_request(),
@@ -517,8 +500,10 @@ def facet(name, qid):
 @wash_arguments({'p': (unicode, ''),
                  'of': (unicode, 'hb'),
                  'so': (unicode, None),
+                 'sf': (unicode, None),
+                 'sp': (unicode, None),
                  'rm': (unicode, None)})
-def results(qid, p, of, so, rm):
+def results(qid, p, of, so, sf, sp, rm):
     """
     Generate results for cached query using POSTed filter.
 
@@ -544,7 +529,8 @@ def results(qid, p, of, so, rm):
                                         facets)
         jrec = request.values.get('jrec', 1, type=int)
         rg = request.values.get('rg', 10, type=int)
-        recids = sort_and_rank_records(recids, so=so, rm=rm, p=p)
+        recids = sort_and_rank_records(recids, so=so, rm=rm, sf=sf,
+                                       sp=sp, p=p)
         records = len(recids)
 
         if records > 0 and records < jrec:

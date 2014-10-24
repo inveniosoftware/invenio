@@ -95,6 +95,13 @@ from invenio.config import \
      CFG_BASE_URL, \
      CFG_BIBFORMAT_HIDDEN_TAGS
 
+try:
+    from invenio.config import CFG_BIBSORT_DEFAULT_FIELD, \
+        CFG_BIBSORT_DEFAULT_FIELD_ORDER
+except ImportError:
+    CFG_BIBSORT_DEFAULT_FIELD = 'latest first'
+    CFG_BIBSORT_DEFAULT_FIELD_ORDER = 'd'
+
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
      InvenioWebSearchWildcardLimitError
@@ -1356,7 +1363,7 @@ def get_sortby_fields(ln='en', colID=None):
                                  ORDER BY cff.score DESC, f.name ASC""",)
     fields = [{
                 'value': '',
-                'text': _("latest first")
+                'text': _(CFG_BIBSORT_DEFAULT_FIELD)
               }]
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
@@ -4245,23 +4252,43 @@ def sort_records_latest(recIDs, jrec, rg, sort_order):
         recIDs.reverse()
     return slice_records(recIDs, jrec, rg)
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
+
+def sort_or_rank_records(req, recIDs, rm, sf, so, sp, p, verbose=0, of='hb',
+                         ln=CFG_SITE_LANG, rg=None, jrec=None, field='',
+                         sorting_methods=SORTING_METHODS):
+    """Sort or rank records.
+
+    Entry point for deciding to either sort or rank records."""
+    if rm:
+        ranking_result = rank_records(req, rm, 0, recIDs, p, verbose, so,
+                                      of, ln, rg, jrec, field,
+                                      sorting_methods=sorting_methods)
+        if ranking_result[0]:
+            return ranking_result[0]  # ranked recids
+    elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS):
+        return sort_records(req, recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
+    return recIDs.tolist()
+
+
+def sort_records(req, recIDs, sort_field='', sort_order='a', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sorting_methods=SORTING_METHODS):
     """Initial entry point for sorting records, acts like a dispatcher.
        (i) sort_field is in the bsrMETHOD, and thus, the BibSort has sorted the data for this field, so we can use the cache;
        (ii)sort_field is not in bsrMETHOD, and thus, the cache does not contain any information regarding this sorting method"""
 
     _ = gettext_set_language(ln)
 
-    #bibsort does not handle sort_pattern for now, use bibxxx
+    # bibsort does not handle sort_pattern for now, use bibxxx
     if sort_pattern:
-        return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, sort_pattern, verbose, of, ln, rg, jrec)
+        return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order,
+                                   sort_pattern, verbose, of, ln, rg, jrec)
 
-    #ignore the use of buckets, use old fashion sorting
+    # ignore the use of buckets, use old fashion sorting
     use_sorting_buckets = CFG_BIBSORT_ENABLED and sorting_methods
 
+    # Default sorting
     if not sort_field:
         if use_sorting_buckets:
-            return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
+            return sort_records_bibsort(req, recIDs, CFG_BIBSORT_DEFAULT_FIELD, sort_field, CFG_BIBSORT_DEFAULT_FIELD_ORDER, verbose, of, ln, rg, jrec)
         else:
             return sort_records_latest(recIDs, jrec, rg, sort_order)
 
@@ -4280,7 +4307,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     tags, error_field = get_tags_from_sort_fields(sort_fields)
     if error_field:
         if use_sorting_buckets:
-            return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
+            return sort_records_bibsort(req, recIDs, CFG_BIBSORT_DEFAULT_FIELD, sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
             if of.startswith('h'):
                 write_warning(_("Sorry, %(x_option)s does not seem to be a valid sort option. The records will not be sorted.", x_option=cgi.escape(error_field)), "Error", req=req)
@@ -4342,7 +4369,9 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
     if sort_order == 'd':
         bucket_numbers.reverse()
     for bucket_no in bucket_numbers:
-        solution.union_update(input_recids & sort_cache['bucket_data'][bucket_no])
+        solution.union_update(
+            input_recids & sort_cache['bucket_data'][bucket_no]
+        )
         if len(solution) >= irec_max:
             break
 
@@ -4352,35 +4381,31 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
         try:
             dict_solution[recid] = sort_cache['data_dict_ordered'][recid]
         except KeyError:
-            #recid is in buckets, but not in the bsrMETHODDATA,
-            #maybe because the value has been deleted, but the change has not yet been propagated to the buckets
+            # recid is in buckets, but not in the bsrMETHODDATA,
+            # maybe because the value has been deleted, but the change has not
+            # yet been propagated to the buckets
             missing_records.add(recid)
-    #check if there are recids that are not in any bucket -> to be added at the end/top, ordered by insertion date
+
+    # check if there are recids that are not in any bucket -> to be added at
+    # the end/top, ordered by insertion date
     if len(solution) < irec_max:
         #some records have not been yet inserted in the bibsort structures
         #or, some records have no value for the sort_method
         missing_records += input_recids - solution
-    #the records need to be sorted in reverse order for the print record function
-    #the return statement should be equivalent with the following statements
-    #(these are clearer, but less efficient, since they revert the same list twice)
-    #sorted_solution = (missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='d'))[:irec_max]
-    #sorted_solution.reverse()
-    #return sorted_solution
+
     reverse = sort_order == 'd'
 
-    if sort_method.strip().lower().startswith('latest') and reverse:
-        # If we want to sort the records on their insertion date, add the missing records at the top
-        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=True) + sorted(missing_records, reverse=True)
+    if sort_method.strip().lower() == CFG_BIBSORT_DEFAULT_FIELD and reverse:
+        # If we want to sort the records on their insertion date, add the
+        # missing records at the top.
+        solution = sorted(missing_records, reverse=True) + \
+            sorted(dict_solution, key=dict_solution.__getitem__, reverse=True)
     else:
-        solution = sorted(missing_records) + sorted(dict_solution, key=dict_solution.__getitem__, reverse=reverse)
+        solution = sorted(dict_solution, key=dict_solution.__getitem__,
+                          reverse=reverse) + sorted(missing_records)
 
     # Only keep records, we are going to display
-    index_min = jrec - 1
-    if rg:
-        index_max = index_min + rg
-        solution = solution[index_min:index_max]
-    else:
-        solution = solution[index_min:]
+    solution = slice_records(solution, jrec, rg)
 
     if sort_or_rank == 'r':
         # We need the recids, with their ranking score
@@ -6778,7 +6803,7 @@ def prs_intersect_with_colls_and_apply_search_limits(results_in_any_collection,
 def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=None,
                         so=None, sp=None, verbose=None, p=None, p1=None, p2=None, p3=None,
                         cc=None, ln=None, _=None, ec=None, colls_to_search=None, rm=None, cpu_time=None,
-                        f=None, em=None, jrec=0, rg=None, **dummy
+                        f=None, em=None, jrec=None, rg=None, **dummy
                      ):
     ## search stage 6: display results:
 
@@ -6816,10 +6841,8 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
                     recIDs = results_final_for_all_colls_rank_records_output[0]
             elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
                 recIDs = sort_records(req, recIDs, sf, so, sp, verbose, of, ln)
-            if rg:
-                return recIDs[jrec:jrec+rg]
-            else:
-                return recIDs[jrec:]
+
+            return slice_records(recIDs, jrec, rg)
 
         elif of.startswith("h"):
             if of not in ['hcs', 'hcs2', 'hcv', 'htcv', 'tlcv']:

@@ -134,41 +134,35 @@
             {%- set new_args = args.copy() -%}
           {% block search_result_settings_sort scoped %}
           <div class="btn-group">
+            {%- if 'sf' not in new_args -%}{%- do new_args.update({'sf': config.CFG_BIBSORT_DEFAULT_FIELD}) -%}{%- endif -%}
+
+            {%- set current_sf = new_args.get('sf') -%}
+            {%- set current_so = new_args.get('so', config.CFG_BIBSORT_DEFAULT_FIELD_ORDER)-%}
+            {%- set so_alternative = 'd' if current_so == 'a' else 'a' -%}
+
+            {%- set used_args = new_args.copy() -%}
+            {%- do used_args.update({'so': so_alternative}) -%}
+            <a class="btn btn-default" href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}" tooltip="{{_('Sort ascending') if so_alternative == 'a' else _('Sort descending')}}">
+              <i class="fa fa-sort-alpha-{{'desc' if so_alternative == 'a' else 'asc'}}"></i>
+            </a>
             <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
-              <i class="glyphicon glyphicon-random"></i> {{ _('Sort by') }}
+              <i class="fa fa-random"></i> {{ _('Sort by') }}
               <span class="caret"></span>
             </a>
 
-            {%- if 'so' in new_args -%}
-              {%- do new_args.pop('so') -%}
-            {%- endif -%}
-            {%- if 'rm' in new_args -%}
-              {%- do new_args.pop('rm') -%}
-            {%- endif -%}
-
+            {%- do new_args.pop('sf', None) -%}
+            {%- if 'so' not in new_args -%}{%- do new_args.update({'so': 'a'}) -%}{%- endif -%}
             <ul class="dropdown-menu">
-            {%- for (k,v,vv) in [('Most recent', 'rm', ''), ('Most cited', 'rm', 'citation'), ('Most relevant', 'rm', 'wrd')] -%}
-              {%- set active = request.values.get(v,'') == vv -%}
+            {%- for sort_method in collection.sort_methods -%}
+              {%- set active = current_sf == sort_method.name -%}
               {%- set used_args = new_args.copy() -%}
-              {%- do used_args.update({v:vv}) -%}
-              <li>
+              {%- do used_args.update({'sf': sort_method.name}) -%}
+              <li{% if active %} class="active"{% endif %}>
                 <a href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
-                   class="{{ 'active' if active }}">
-                  <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if active }}"></i>
-                    {{ _(k) }}
+                   class="{{ 'active' if active }}">{{ sort_method.get_name_ln(g.ln) }}
                 </a>
               </li>
             {%- endfor -%}
-            {% if collection.rnkMETHODs|length %}
-              <li class="divider"></li>
-            {% for rnk_method in collection.rnkMETHODs %}
-              {%- set used_args = new_args.copy() -%}
-              {%- do used_args.update({'rm': rnk_method.rnkMETHOD.name }) -%}
-              <li><a href="{{ url_for('search.search', **used_args) }}">
-                {{ rnk_method.rnkMETHOD.get_name_ln() }}
-              </a></li>
-            {% endfor %}
-            {% endif %}
             </ul>
           </div>
           {%- endblock search_result_settings_sort %}

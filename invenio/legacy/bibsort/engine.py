@@ -151,9 +151,7 @@ def get_data_for_definition_marc(tags, recids):
     #user: 140s, sys: 21s, total: 160s - cdsdev
     if isinstance(recids, (int, long)):
         recids = intbitset([recids, ])
-    # for each recid we need only one value
-    #on which we sort, so we can stop looking for a value
-    # as soon as we find one
+    # for each recid we sort by all tag values.
     tag_index = 0
     field_data_dict = {}
     while len(recids) > 0 and tag_index < len(tags):
@@ -161,18 +159,10 @@ def get_data_for_definition_marc(tags, recids):
                       %(len(recids), tags), verbose=5)
         res = _get_values_from_marc_tag(tags[tag_index], recids)
         res_dict = dict(res)
-        #field_data_dict.update(res_dict)
-        #we can not use this, because res_dict might contain recids
-        #that are already in field_data_dict, and we should not overwrite their value
-        field_data_dict = dict(res_dict, **field_data_dict)
-        #there might be keys that we do not want (ex: using 'between')
-        #so we should remove them
-        res_dict_keys = intbitset(res_dict.keys())
-        recids_not_needed = res_dict_keys.difference(recids)
-        for recid in recids_not_needed:
-            del field_data_dict[recid]
-        #update the recids to contain only the recid that do not have values yet
-        recids.difference_update(res_dict_keys)
+        for recid, value in res_dict.items():
+            if recid not in field_data_dict:
+                field_data_dict[recid] = []
+            field_data_dict[recid].append(value)
         tag_index += 1
     return field_data_dict
 
@@ -257,8 +247,9 @@ def apply_washer(data_dict, washer):
         method = BibSortWasher(washer)
         write_message('Washer method found: %s' %washer, verbose=5)
         for recid in data_dict:
-            new_val = method.get_transformed_value(data_dict[recid])
-            data_dict[recid] = new_val
+            data_dict[recid] = map(
+                method.get_transformed_value, data_dict[recid]
+            )
     except InvenioBibSortWasherNotImplementedError as err:
         write_message("Washer %s is not implemented [%s]." \
                       %(washer, err), stream=sys.stderr)
@@ -288,6 +279,7 @@ def run_sorting_method(recids, method_name, method_id, definition, washer):
                 sort_dict(field_data_dictionary, CFG_BIBSORT_WEIGHT_DISTANCE, run_sorting_for_rnk, sorting_locale)
     executed = write_to_methoddata_table(method_id, field_data_dictionary, \
                                          sorted_data_dict, sorted_data_list)
+
     if not executed:
         return False
     if CFG_BIBSORT_BUCKETS > 1:

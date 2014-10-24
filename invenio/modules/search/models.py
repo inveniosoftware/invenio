@@ -387,6 +387,36 @@ class Collection(db.Model):
         except:
             return ""
 
+    @property
+    def sort_methods(self):
+        """Get sort methods for collection.
+
+        If not sort methods are defined for a collection the root collections
+        sort methods are retuned. If not methods are defined for the root
+        collection, all possible sort methods are returned.
+
+        Note: Noth sorting methods and ranking methods are now defined via
+        the sorter.
+        """
+        from invenio.modules.sorter.models import BsrMETHOD, \
+            Collection_bsrMETHOD
+
+        get_method = lambda obj: obj.bsrMETHOD
+
+        for coll_id in (self.id, 1):
+            methods = Collection_bsrMETHOD.query.filter_by(
+                id_collection=coll_id
+            ).order_by(
+                Collection_bsrMETHOD.score
+            ).options(
+                db.joinedload(Collection_bsrMETHOD.bsrMETHOD)
+            ).all()
+
+            if len(methods) > 0:
+                return map(get_method, methods)
+
+        return BsrMETHOD.query.order_by(BsrMETHOD.name).all()
+
     def get_collectionbox_name(self, ln=None, box_type="r"):
         """Return collection-specific labelling subtrees.
 

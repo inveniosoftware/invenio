@@ -32,7 +32,9 @@ def get_search_query_id(**kwargs):
     f = kwargs.get('f', '')
     cc = kwargs.get('cc', '')
     wl = kwargs.get('wl', '')
-    return md5(repr((p, f, cc, wl))).hexdigest()
+    so = kwargs.get('so', '')
+    sf = kwargs.get('sf', '')
+    return md5(repr((p, f, cc, wl, sf, so))).hexdigest()
 
 
 def get_search_results_cache_key(**kwargs):
