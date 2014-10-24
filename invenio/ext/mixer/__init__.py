@@ -29,7 +29,7 @@ import sys
 
 from mixer.backend.flask import Mixer as _Mixer
 
-from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy import db, models
 
 from .registry import mixers
 
@@ -139,7 +139,7 @@ class Mixer(_Mixer):
     def __init__(self, fake=True, factory=None, loglevel=logging.WARN,
                  silence=False, **params):
         super(Mixer, self).__init__(fake=fake, factory=factory,
-                                    loglevel=loglevel, silence=silence)
+                                    loglevel=loglevel, silence=silence, commit=False)
 
     def blend(self, scheme, drop=True, **values):
         """Blend scheme object.
@@ -164,6 +164,7 @@ class Mixer(_Mixer):
                     super(Mixer, self).blend(scheme.__model__,
                                              **fixture_values)
                 )
+
         return result
 
     def unblend(self, scheme, output_file=None, *criterion):
@@ -192,14 +193,24 @@ def blend_all(sender, yes_i_know=False, drop=True, **kwargs):
     :param drop: If `True` delete the previous data.
     """
     print('>>> Mixer: Blending DB')
+
+    # Load all models
+    list(models)
+
     for table in db.metadata.sorted_tables:
         if table.name in mixers:
-            mixer.blend(mixers[table.name], drop)
+            result = mixer.blend(mixers[table.name], drop)
+            db.session.add_all(result)
+            db.session.commit()
 
 
 def unblend_all(sender, **kwargs):
     """Unblend all the possible models found in the package."""
     print('>>> Mixer: Unblending DB')
+
+    # Load all models
+    list(models)
+
     for table in db.metadata.sorted_tables:
         if table.name in mixers:
             mixer.unblend(mixers[table.name])
