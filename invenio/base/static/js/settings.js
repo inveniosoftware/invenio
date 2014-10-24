@@ -41,10 +41,14 @@ require.config({
     "bootstrap-tagsinput": "vendors/bootstrap-tagsinput/src/bootstrap-tagsinput",
     bootstrap: "vendors/bootstrap/dist/js/bootstrap",
     prism: "vendors/prism/prism",
+    d3: "vendors/d3/d3.js"
   },
   shim: {
     jquery: {
       exports: "$"
+    },
+    d3: {
+      exports: "d3"
     },
     "jqueryui-timepicker/jquery-ui-sliderAccess": {
       deps: ["jquery"]

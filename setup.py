@@ -65,6 +65,7 @@ install_requires = [
     "celery>=3.1.8",
     # Cerberus>=0.7.1 api changes and is not yet supported
     "Cerberus>=0.7,<0.7.1",
+    "chardet>=2.3.0",
     "dictdiffer>=0.0.3",
     "feedparser>=5.1",
     "fixture>=1.5",

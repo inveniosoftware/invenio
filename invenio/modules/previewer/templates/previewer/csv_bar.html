@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-##
+{#
 ## This file is part of Invenio.
 ## Copyright (C) 2014 CERN.
 ##
@@ -16,32 +15,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
 
-"""Previewer bundles."""
-
-from invenio.ext.assets import Bundle, RequireJSFilter
-
-
-pdfjs = Bundle(
-    "js/previewer/pdf_viewer.js",
-    filters="uglifyjs",
-    output="previewer/pdf.js",
-    weight=20
-)
-
-csv_previewer = Bundle(
-    "js/previewer/csv_previewer/init.js",
-    filters=RequireJSFilter(),
-    output="previewer/csv_previewer.js",
-    weight=20,
-    bower={
-        "d3": "latest"
-    }
-)
-
-pdfcss = Bundle(
-    "css/previewer/pdf_viewer.css",
-    filters="cleancss",
-    output="previewer/pdf.css",
-    weight=20
-)
+{%- extends "previewer/csv_bar_base.html" -%}
