@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -438,7 +438,7 @@ class Template:
 
         toggle_visibility_block = ''
         if not isGuestUser(user_info['uid']):
-            toggle_visibility_block = """<div class="webcomment_toggle_visibility"><a id="collapsible_ctr_%(comid)s" class="%(collapse_ctr_class)s" href="%(toggle_url)s" onclick="return toggle_visibility(this, %(comid)i);" title="%(collapse_label)s"><span style="display:none">%(collapse_label)s</span></a></div>""" % \
+            toggle_visibility_block = """<div class="webcomment_toggle_visibility"><a id="collapsible_ctr_%(comid)s" class="%(collapse_ctr_class)s" href="javascript:void(0)" onclick="return toggle_visibility(this, %(comid)i);" title="%(collapse_label)s"><span style="display:none">%(collapse_label)s</span></a></div>""" % \
                                     {'comid': com_id,
                                      'toggle_url': create_url(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID) + '/comments/toggle', {'comid': com_id, 'ln': ln, 'collapse': collapsed_p and '0' or '1', 'referer': user_info['uri']}),
                                      'collapse_ctr_class': collapsed_p and 'webcomment_collapse_ctr_right' or 'webcomment_collapse_ctr_down',
