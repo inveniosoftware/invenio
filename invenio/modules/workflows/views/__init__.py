@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2013, 2014 CERN.
 ##
@@ -15,19 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 331, Boston, MA 02111-1307, USA.
-"""
-    invenio.modules.workflows.views
-    -------------------------------
 
-    Blueprints for workflows admin area and Holding Pen.
-"""
+"""View blueprints for Holding Pen."""
 
 from .holdingpen import blueprint as holdingpen_blueprint
-from .admin import blueprint as admin_blueprint
 from .settings import blueprint as settings_blueprint
 
 blueprints = [
     holdingpen_blueprint,
-    admin_blueprint,
     settings_blueprint,
 ]
