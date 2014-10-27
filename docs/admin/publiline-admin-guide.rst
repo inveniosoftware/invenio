@@ -38,6 +38,12 @@ Configure Publiline
 Step 1 : Define a Publication Committee Chair
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The first step to configuring Publiline is to create a Publication Committee Chair (PCC). This chair forms the first part of the workflow and is responsible for choosing the referee for the document. To do this, one is required to create a new action using either the Action Administration Page, or by manually specifying a new action called pubcomchair in the associated configuration file. The action takes one argument or keyword doctype. (NOTE : By loading the Invenio demo records, this step is already done for you).
+
+Once the action is created, it is necessary to create a role for each type of document you wish to submit and have approved using PCAW. For this one creates a role called pubcomchair_<doctype>_<category>, where the doctype and category represent the physical names of the particular doctype and category in question.
+
+The last step is to attach a user (the PCC) and an action (pubcomchair) to this new role. To do so, use the Role Administration page.
+
 Step 2 : Create a Group
 ~~~~~~~~~~~~~~~~~~~~~~~
 
