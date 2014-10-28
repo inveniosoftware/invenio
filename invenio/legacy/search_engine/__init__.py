@@ -5042,7 +5042,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
             return json.dumps(get_recjson(recID).dumps(keywords=ot))
         else:
-            return json.dumps(get_recjson(recID).dumps())
+            return json.dumps(get_recjson(recID).dumps(clean=True))
 
     _ = gettext_set_language(ln)
 
