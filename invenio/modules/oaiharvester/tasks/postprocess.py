@@ -309,7 +309,11 @@ def refextract(obj, eng):
         obj.extra_data["_result"] = {}
 
     pdf = None
-    if "pdf" not in obj.extra_data["_result"] or not os.path.isfile(obj.extra_data["_result"]["pdf"]):
+
+    if "_result" in obj.extra_data and "pdf" in obj.extra_data["_result"]:
+        pdf = obj.extra_data["_result"]["pdf"]
+
+    if not pdf:
         extract_path = os.path.join(
             cfg['CFG_TMPSHAREDDIR'],
             str(eng.uuid)
