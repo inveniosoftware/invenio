@@ -29,15 +29,19 @@
 
   <script type="text/javascript">
     require(["jquery",
-             "js/workflows/maintable"],
+             "js/workflows/maintable",
+             "js/workflows/actions/init"],
             function($,
-                     initialize) {
+                     initialize,
+                     initialize_actions) {
       var context = {
         load_table_url: "{{ url_for('holdingpen.load_table')|safe }}",
         tags: JSON.parse('{{tags|safe}}'),
-        action_url: "{{ url_for('holdingpen.resolve_action')|safe }}"
+        action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
+        attach_action_to: "#maintable"
       }
       initialize(context);
+      initialize_actions(context);
       $(document).trigger("initHoldingPenTable");
     });
   </script>

@@ -17,23 +17,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-"use strict"
+'use strict';
 
 define(
   [
-     "js/workflows/details_preview",
-     "js/workflows/details_preview_menu",
+    "js/workflows/actions/approval"
   ],
   function(
-    DetailsPreview,
-    DetailsPreviewMenu) {
+    ApprovalAction) {
 
     function initialize(context) {
-      DetailsPreview.attachTo(document, {
-        preview_url: context.preview_url,
-        id_object: context.id_object,
+      ApprovalAction.attachTo(context.attach_action_to, {
+        action_url: context.action_url
       });
-      DetailsPreviewMenu.attachTo("#object-preview");
     }
 
     return initialize;

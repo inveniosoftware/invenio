@@ -31,7 +31,7 @@ require(
     "js/workflows/tags_menu",
     "js/workflows/details",
     "js/workflows/details_preview_menu",
-    "js/workflows/actions/approval",
+    "js/workflows/actions/init"
   ],
   function() {
     // This file is simply here to make sure the above dependencies are

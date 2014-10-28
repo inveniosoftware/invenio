@@ -30,15 +30,19 @@
 
   <script type="text/javascript">
     require(["jquery",
-             "js/workflows/details"],
+             "js/workflows/details",
+             "js/workflows/actions/init"],
             function($,
-                     initialize) {
+                     initialize,
+                     initialize_actions) {
       var context = {
         preview_url: "{{ url_for('holdingpen.entry_data_preview')|safe }}",
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
-        id_object: "{{ bwobject.id }}"
+        id_object: "{{ bwobject.id }}",
+        attach_action_to: document,
       }
       initialize(context);
+      initialize_actions(context);
     });
   </script>
 {%- endblock javascript %}

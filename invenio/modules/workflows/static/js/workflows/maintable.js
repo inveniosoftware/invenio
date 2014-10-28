@@ -24,13 +24,11 @@ define(
     "js/workflows/holdingpen",
     "js/workflows/tags",
     "js/workflows/tags_menu",
-    "js/workflows/actions/approval"
   ],
   function(
     HoldingPen,
     HoldingPenTags,
-    HoldingPenTagsMenu,
-    ApprovalAction) {
+    HoldingPenTagsMenu) {
 
     function initialize(context) {
       HoldingPen.attachTo("#maintable", {
@@ -40,11 +38,6 @@ define(
         tags: context.tags,
       });
       HoldingPenTagsMenu.attachTo("#tags-menu");
-
-      // Actions init
-      ApprovalAction.attachTo("#maintable", {
-        action_url: context.action_url
-      });
     }
 
     return initialize;
