@@ -88,7 +88,7 @@ def inject_utils():
 
     user = current_user._get_current_object()
     canonical_url, alternate_urls = get_canonical_and_alternates_urls(
-        request.environ['PATH_INFO'])
+        request.path)
     alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                           for ln, alternate_url in iteritems(alternate_urls))
     try:
