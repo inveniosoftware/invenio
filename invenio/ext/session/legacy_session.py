@@ -69,8 +69,8 @@ class Session(CallbackDict, SessionMixin):
     def save_ip(self, request):
         """Save IP for current scheme."""
         remote_ip = request.remote_addr
-        scheme_a = '_http_ip' if request.scheme == 'https' else '_https_ip'
-        scheme_b = '_https_ip' if request.scheme == 'https' else '_http_ip'
+        scheme_a = '_http_ip' if request.scheme == 'http' else '_https_ip'
+        scheme_b = '_https_ip' if request.scheme == 'http' else '_http_ip'
 
         if scheme_a not in self:
             self[scheme_a] = remote_ip
@@ -80,7 +80,6 @@ class Session(CallbackDict, SessionMixin):
     def check_ip(self, request):
         """Check that session is used from the same IP where it was created."""
         remote_ip = request.remote_addr
-
         if self.get('_{0}_ip'.format(request.scheme), remote_ip) != remote_ip:
             return False
         return True

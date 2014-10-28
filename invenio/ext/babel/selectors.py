@@ -53,6 +53,10 @@ def get_locale():
             else:
                 ## Too bad! We stick to the default :-)
                 required_ln = current_app.config.get('CFG_SITE_LANG')
+    elif required_ln is None:
+        required_ln = session.get('ln')
+
+    assert required_ln is not None
 
     if required_ln != session.get('ln',
                                   current_app.config.get('CFG_SITE_LANG')):
