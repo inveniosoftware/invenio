@@ -65,88 +65,60 @@ class RecordWorkflow(WorkflowBase):
     @staticmethod
     def get_title(bwo):
         """Get the title."""
-        extracted_title = []
         record = bwo.get_data()
+        extracted_titles = []
         if hasattr(record, "get") and "title" in record:
             if isinstance(record["title"], str):
-                extracted_title = [record["title"]]
+                extracted_titles = [record["title"]]
             else:
                 for a_title in record["title"]:
-                    extracted_title.append(record["title"][a_title])
-        else:
-            extracted_title = [" No title"]
-        title_final = ""
-        for i in extracted_title:
-            title_final += "{0} ".format(i)
-        return title_final
+                    extracted_titles.append(record["title"][a_title])
+        return ", ".join(extracted_titles)
 
     @staticmethod
     def get_description(bwo):
-        """Get the description column part."""
-        message = None
-        try:
-            record = bwo.get_data()
-            from invenio.modules.records.api import Record
-
-            try:
-                identifiers = Record(record.dumps()).persistent_identifiers
-                final_identifiers = []
-                for i in identifiers:
-                    final_identifiers.append(i['value'])
-            except Exception as e:
-                if hasattr(record, "get"):
-                    final_identifiers = [record.get("system_control_number", {}).get("value", 'No ids')]
-                else:
-                    final_identifiers = [' No ids']
-
-            categories = [" No categories"]
-            if hasattr(record, "get"):
-                if 'subject' in record:
-                    lookup = ["subject", "term"]
-                elif "subject_term":
-                    lookup = ["subject_term", "term"]
-                else:
-                    lookup = None
-                categories = []
-                if lookup:
-                    primary, secondary = lookup
-                    category_list = record.get(primary, [])
-                    if isinstance(category_list, dict):
-                        category_list = [category_list]
-                    for subject in category_list:
-                        category = subject[secondary]
-                        if len(subject) == 2:
-                            if subject.keys()[1] == secondary:
-                                source_list = subject[subject.keys()[0]]
-                            else:
-                                source_list = subject[subject.keys()[1]]
-                        else:
-                            try:
-                                source_list = subject['source']
-                            except KeyError:
-                                source_list = ""
-                        categories.append(category + "(" + source_list + ")")
-        except Exception as e:
-            categories = None
-            final_identifiers = None
-            from invenio.modules.workflows.models import ObjectVersion
-
-            if bwo.version == ObjectVersion.INITIAL:
-                message = categories = "The process has not started!!!"
-            else:
-                message = categories = "The process CRASHED!!! \n {0}".format(str(e.message))
-
+        """Get the description (identifiers and categories) from the object data."""
+        from invenio.modules.records.api import Record
         from flask import render_template
+
+        record = bwo.get_data()
+        try:
+            identifiers = Record(record.dumps()).persistent_identifiers
+            final_identifiers = [i['value'] for i in identifiers]
+        except Exception:
+            if hasattr(record, "get"):
+                final_identifiers = [
+                    record.get(
+                        "system_control_number", {}
+                    ).get("value", 'No ids')
+                ]
+            else:
+                final_identifiers = []
+
+        categories = []
+        if hasattr(record, "get"):
+            if 'subject' in record:
+                lookup = ["subject", "term"]
+            elif "subject_term" in record:
+                lookup = ["subject_term", "term"]
+            else:
+                lookup = None
+            if lookup:
+                primary, secondary = lookup
+                category_list = record.get(primary, [])
+                if isinstance(category_list, dict):
+                    category_list = [category_list]
+                categories = [subject[secondary] for subject in category_list]
+
         return render_template('workflows/styles/harvesting_record.html',
                                categories=categories,
-                               identifiers=final_identifiers,
-                               message=message)
+                               identifiers=final_identifiers)
 
     @staticmethod
     def formatter(bwo, **kwargs):
         """Nicely format the record."""
-        from flask import Markup
         from pprint import pformat
+        from invenio.modules.records.api import Record
 
         data = bwo.get_data()
         if not data:
@@ -158,7 +130,6 @@ class RecordWorkflow(WorkflowBase):
             # A separate formatter is supplied
             return formatter(data)
 
-        from invenio.modules.records.api import Record
         if isinstance(data, collections.Mapping):
             # Dicts are cool on its own, but maybe its SmartJson (record)
             try:
@@ -169,9 +140,9 @@ class RecordWorkflow(WorkflowBase):
         if isinstance(data, string_types):
             # We can try formatter!
             # If already XML, format_record does not like it.
-            if of != 'xm':
+            if of and of != 'xm':
                 try:
-                    from invenio.modules.formatter.engine import format_record
+                    from invenio.modules.formatter import format_record
                     formatted_data = format_record(
                         recID=None,
                         of=of,
@@ -199,7 +170,4 @@ class RecordWorkflow(WorkflowBase):
 
         if isinstance(formatted_data, dict):
             formatted_data = pformat(formatted_data)
-        elif of == "xm":
-            formatted_data = Markup.escape(formatted_data)
-        elif of == 'xo':
-            formatted_data = Markup.escape(formatted_data[0])
+        return formatted_data

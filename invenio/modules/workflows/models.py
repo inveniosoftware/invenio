@@ -381,8 +381,7 @@ class BibWorkflowObject(db.Model):
             workflow_definition = workflows[self.get_workflow_name()]
             formatted_data = workflow_definition.formatter(
                 self,
-                formatter=None,
-                format=of
+                of=of
             )
         except (KeyError, AttributeError):
             # Somehow the workflow or formatter does not exist
