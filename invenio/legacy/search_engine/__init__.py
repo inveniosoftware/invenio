@@ -5076,7 +5076,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         from invenio.modules.records.api import get_record as get_recjson
         ot = ot if ot and len(ot) else None
         return json.dumps(get_recjson(recID).dumps(
-            keywords=ot, filter_hidden=not can_see_hidden))
+            keywords=ot, filter_hidden=not can_see_hidden, clean=True))
 
     _ = gettext_set_language(ln)
 
