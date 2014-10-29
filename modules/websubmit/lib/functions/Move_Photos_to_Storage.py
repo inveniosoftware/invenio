@@ -49,8 +49,10 @@ from cgi import escape
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.config import CFG_BINDIR, CFG_SITE_URL
 from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+
 
 def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -111,23 +113,19 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     if not icon_format:
         icon_format = 'gif'
 
-    PHOTO_MANAGER_ICONS = read_param_file(curdir, 'PHOTO_MANAGER_ICONS', split_lines=True)
-    photo_manager_icons_dict = dict([value.split('/', 1) \
-                                     for value in PHOTO_MANAGER_ICONS \
-                                     if '/' in value])
-    PHOTO_MANAGER_ORDER = read_param_file(curdir, 'PHOTO_MANAGER_ORDER', split_lines=True)
+    PHOTO_MANAGER_ORDER = read_param_file(curdir, 'PHOTO_MANAGER_ORDER')
+    PHOTO_MANAGER_DELETE = read_param_file(curdir, 'PHOTO_MANAGER_DELETE')
+    PHOTO_MANAGER_NEW = read_param_file(curdir, 'PHOTO_MANAGER_NEW')
+
     photo_manager_order_list = [value for value in PHOTO_MANAGER_ORDER if value.strip()]
-    PHOTO_MANAGER_DELETE = read_param_file(curdir, 'PHOTO_MANAGER_DELETE', split_lines=True)
     photo_manager_delete_list = [value for value in PHOTO_MANAGER_DELETE if value.strip()]
-    PHOTO_MANAGER_NEW = read_param_file(curdir, 'PHOTO_MANAGER_NEW', split_lines=True)
-    photo_manager_new_dict = dict([value.split('/', 1) \
-                               for value in PHOTO_MANAGER_NEW \
-                               if '/' in value])
+    photo_manager_new_dict = dict([value.split('/', 1) for value in PHOTO_MANAGER_NEW if '/' in value])
 
     ## Create an instance of BibRecDocs for the current recid(sysno)
     bibrecdocs = BibRecDocs(sysno)
     for photo_id in photo_manager_order_list:
-        photo_description = read_param_file(curdir, 'PHOTO_MANAGER_DESCRIPTION_' + photo_id)
+        photo_description = read_param_file(curdir, 'PHOTO_MANAGER_DESCRIPTION_' + photo_id,
+                                            split_lines=False)
         # We must take different actions depending if we deal with a
         # file that already exists, or if it is a new file
         if photo_id in photo_manager_new_dict.keys():
@@ -149,17 +147,18 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                         # Create icon if needed
                         try:
                             (icon_path, icon_name) = create_icon(
-                                { 'input-file'           : filepath,
-                                  'icon-name'            : icon_filename,
-                                  'icon-file-format'     : icon_format,
-                                  'multipage-icon'       : False,
-                                  'multipage-icon-delay' : 100,
-                                  'icon-scale'           : icon_size, # Resize only if width > 300
-                                  'verbosity'            : 0,
-                                  })
+                                {'input-file': filepath,
+                                 'icon-name': icon_filename,
+                                 'icon-file-format': icon_format,
+                                 'multipage-icon': False,
+                                 'multipage-icon-delay': 100,
+                                 'icon-scale': icon_size,  # Resize only if width > 300
+                                 'verbosity': 0,
+                                 })
                             fileiconpath = os.path.join(icon_path, icon_name)
                         except InvenioWebSubmitIconCreatorError, e:
                             _do_log(curdir, "Icon could not be created to %s: %s" % (filepath, e))
+                            register_exception(prefix=e.message)
                             pass
                         if os.path.exists(fileiconpath):
                             try:
@@ -173,11 +172,12 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                     _do_log(curdir, "Added icon %s" % fileiconpath)
                             except InvenioBibDocFileError, e:
                                 # Most probably icon already existed.
+                                register_exception(prefix=e.message)
                                 pass
 
                     if photo_description and bibdoc:
-                        for file_format in [bibdocfile.get_format() \
-                                       for bibdocfile in bibdoc.list_latest_files()]:
+                        for file_format in [bibdocfile.get_format()
+                                            for bibdocfile in bibdoc.list_latest_files()]:
                             bibdoc.set_comment(photo_description, file_format)
                             _do_log(curdir, "Added comment %s" % photo_description)
         else:
@@ -189,8 +189,8 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                 _do_log(curdir, "Deleted  %s" % bibdocname)
             else:
                 bibdoc = bibrecdocs.get_bibdoc(bibdocname)
-                for file_format in [bibdocfile.get_format() \
-                               for bibdocfile in bibdoc.list_latest_files()]:
+                for file_format in [bibdocfile.get_format()
+                                    for bibdocfile in bibdoc.list_latest_files()]:
                     bibdoc.set_comment(photo_description, file_format)
                     _do_log(curdir, "Added comment %s" % photo_description)
 
@@ -200,8 +200,9 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
             bibdocname = bibrecdocs.get_docname(int(photo_id))
             bibrecdocs.delete_bibdoc(bibdocname)
             _do_log(curdir, "Deleted  %s" % bibdocname)
-        except:
+        except Exception as e:
             # we tried to delete a photo that does not exist (maybe already deleted)
+            register_exception(prefix=e.message)
             pass
 
     # Update the MARC
@@ -215,22 +216,24 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
 
     return ""
 
-def read_param_file(curdir, param, split_lines=False):
-    "Helper function to access files in submission dir"
-    param_value = ""
+
+def read_param_file(curdir, param, split_lines=True):
+    """Helper function to access files in submission dir"""
+
     path = os.path.join(curdir, param)
     try:
         if os.path.abspath(path).startswith(curdir):
-            fd = file(path)
-            if split_lines:
-                param_value = [line.strip() for line in fd.readlines()]
-            else:
-                param_value = fd.read()
-            fd.close()
+            with open(path) as fd:
+                if split_lines:
+                    param_value = [line.strip() for line in fd.readlines()]
+                else:
+                    param_value = fd.read()
+                return param_value
     except Exception, e:
         _do_log(curdir, 'Could not read %s: %s' % (param, e))
-        pass
-    return param_value
+        register_exception(prefix=e.message)
+        return []
+
 
 def _do_log(log_dir, msg):
     """
@@ -239,10 +242,9 @@ def _do_log(log_dir, msg):
 
     Should be removed when the development is over.
     """
-    log_file = os.path.join(log_dir, 'performed_actions.log')
-    file_desc = open(log_file, "a+")
-    file_desc.write("%s --> %s\n" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
-    file_desc.close()
+    with open(os.path.join(log_dir, 'performed_actions.log'), "a+") as file_desc:
+        file_desc.write("%s --> %s\n" % (time.strftime("%Y-%m-%d %H:%M:%S"), msg))
+
 
 def get_session_id(req, uid, user_info):
     """
@@ -264,6 +266,7 @@ def get_session_id(req, uid, user_info):
         raise ValueError("Cannot retrieve user session")
 
     return session_id
+
 
 def create_photos_manager_interface(sysno, session_id, uid,
                                     doctype, indir, curdir, access,
@@ -297,13 +300,14 @@ def create_photos_manager_interface(sysno, session_id, uid,
     """
     out = ''
 
-    PHOTO_MANAGER_ICONS = read_param_file(curdir, 'PHOTO_MANAGER_ICONS', split_lines=True)
+    PHOTO_MANAGER_ICONS = read_param_file(curdir, 'PHOTO_MANAGER_ICONS')
+    PHOTO_MANAGER_ORDER = read_param_file(curdir, 'PHOTO_MANAGER_ORDER')
+    PHOTO_MANAGER_DELETE = read_param_file(curdir, 'PHOTO_MANAGER_DELETE')
+    PHOTO_MANAGER_NEW = read_param_file(curdir, 'PHOTO_MANAGER_NEW')
+
     photo_manager_icons_dict = dict([value.split('/', 1) for value in PHOTO_MANAGER_ICONS if '/' in value])
-    PHOTO_MANAGER_ORDER = read_param_file(curdir, 'PHOTO_MANAGER_ORDER', split_lines=True)
     photo_manager_order_list = [value for value in PHOTO_MANAGER_ORDER if value.strip()]
-    PHOTO_MANAGER_DELETE = read_param_file(curdir, 'PHOTO_MANAGER_DELETE', split_lines=True)
     photo_manager_delete_list = [value for value in PHOTO_MANAGER_DELETE if value.strip()]
-    PHOTO_MANAGER_NEW = read_param_file(curdir, 'PHOTO_MANAGER_NEW', split_lines=True)
     photo_manager_new_dict = dict([value.split('/', 1) for value in PHOTO_MANAGER_NEW if '/' in value])
     photo_manager_descriptions_dict = {}
 
@@ -317,9 +321,8 @@ def create_photos_manager_interface(sysno, session_id, uid,
         bibarchive = BibRecDocs(sysno)
         for doc in bibarchive.list_bibdocs():
             if doc.get_icon() is not None:
-                original_url = doc.list_latest_files()[0].get_url()
                 doc_id = str(doc.get_id())
-                icon_url = doc.get_icon(subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE_DEFAULT).get_url() # Get "default" icon
+                icon_url = doc.get_icon(subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE_DEFAULT).get_url()  # Get "default" icon
                 description = ""
                 for bibdoc_file in doc.list_latest_files():
                     #format = bibdoc_file.get_format().lstrip('.').upper()
@@ -327,10 +330,9 @@ def create_photos_manager_interface(sysno, session_id, uid,
                     #photo_files.append((format, url))
                     if not description and bibdoc_file.get_comment():
                         description = escape(bibdoc_file.get_comment())
-                name = bibarchive.get_docname(doc.id)
                 photo_manager_descriptions_dict[doc_id] = description
                 photo_manager_icons_dict[doc_id] = icon_url
-                photo_manager_order_list.append(doc_id) # FIXME: respect order
+                photo_manager_order_list.append(doc_id)  # FIXME: respect order
 
     # Prepare the list of photos to display.
     photos_img = []
@@ -340,7 +342,8 @@ def create_photos_manager_interface(sysno, session_id, uid,
         icon_url = photo_manager_icons_dict[doc_id]
         if PHOTO_MANAGER_ORDER:
             # Get description from disk only if some changes have been done
-            description = escape(read_param_file(curdir, 'PHOTO_MANAGER_DESCRIPTION_' + doc_id))
+            description = escape(read_param_file(curdir, 'PHOTO_MANAGER_DESCRIPTION_' + doc_id,
+                                                 split_lines=False))
         else:
             description = escape(photo_manager_descriptions_dict[doc_id])
         photos_img.append('''
