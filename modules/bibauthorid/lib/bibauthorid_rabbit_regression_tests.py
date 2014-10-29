@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibtask import setup_loggers
 from invenio.bibtask import task_set_task_param
 from invenio.bibupload_regression_tests import wipe_out_record_from_all_tables
 from invenio.dbquery import run_sql
@@ -52,6 +51,10 @@ import invenio.config as config
 
 from copy import deepcopy
 from mock import patch
+
+from invenio.bibauthorid_dbinterface import add_orcid_id_to_author,\
+    get_free_author_id, remove_author_data, get_signatures_of_paper,\
+    get_orcid_id_of_signature,populate_partial_marc_caches
 
 is_test_paper_claimed = nottest(is_test_paper_claimed)
 get_modified_marc_for_test = nottest(get_modified_marc_for_test)
@@ -632,12 +635,38 @@ class MnamesFunctionsTest(BibAuthorIDRabbitTestCase):
         self.assertTrue(m_name_func_1.has_been_called)
         self.assertTrue(m_name_func_2.has_been_called)
 
+
+class RetrieveOrcidTest(InvenioTestCase):
+
+    def setUp(self):
+        self._pid = get_free_author_id()
+        self._orcid = '1234-1234-1234-1234'
+        add_orcid_id_to_author(self._pid, self._orcid)
+        marc = get_new_marc_for_test('Orcid test paper',
+                                     author_name='Author, SomeAuthor',
+                                     ext_id='ORCID:' + self._orcid)
+        self._rec = get_bibrec_for_record(marc, opt_mode="insert")
+        rabbit([self._rec])
+        populate_partial_marc_caches([self._rec])
+
+
+    def test_has_orcid(self):
+        sig = get_signatures_of_paper(self._rec)[0][1:-1]
+        self.assertEqual(get_orcid_id_of_signature(sig), self._orcid)
+
+    def tearDown(self):
+        remove_author_data('extid:ORCID', self._pid)
+        wipe_out_record_from_all_tables(self._rec)
+        clean_authors_tables(self._rec)
+
+
 TEST_SUITE = make_test_suite(BibAuthorIDRabbitTestCase,
                              AuthorRabbitTestCase,
                              CoauthorsRabbitTestCase,
                              MatchableNameRabbitTestCase,
                              MnamesCacheConsistencyTestCase,
-                             MnamesFunctionsTest)
+                             MnamesFunctionsTest,
+                             RetrieveOrcidTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=False)
