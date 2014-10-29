@@ -124,7 +124,7 @@ install_requires = [
     "unidecode",
     "workflow>=1.2.0",
     # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
-    "WTForms>=1.0.5",
+    "WTForms==1.0.5",
     "wtforms-alchemy>=0.12.6"
 ]
 
