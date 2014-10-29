@@ -750,7 +750,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                     canonical_name = get_canonical_name_of_author(person_id)[0][0]
                 except IndexError:
                     canonical_name = None
-                all_pubs_search_link = "%s/search?p=exactauthor%%3A%s" % (CFG_BASE_URL, canonical_name)
+                all_pubs_search_link = "%s/search?p=exactauthor%%3A%s&sf=earliestdate" % (CFG_BASE_URL, canonical_name)
 
                 if datasets_pubs:
                     datasets_pubs_recs = ['recid%%3A%s' % pub for pub in datasets_pubs]
