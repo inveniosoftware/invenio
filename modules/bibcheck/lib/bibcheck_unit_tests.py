@@ -174,6 +174,35 @@ class BibCheckAmendableRecordTest(InvenioTestCase):
             set(self.record.iterfields(["1%%%%%"]))
         )
         self.assertEqual(
+            set([(("695__a", 0, 0, 1), "gravitation: nonlocal")]),
+            set(self.record.iterfields(["695__a"],
+                                       subfield_filter=('2', 'INSPIRE')))
+        )
+        self.assertEqual(
+            set([(("696__a", 0, 1, 0), "gravitation: nonlocal")]),
+            set(self.record.iterfields(["696__a"],
+                                       subfield_filter=('2', 'INSPIRE')))
+        )
+        self.assertEqual(
+            set(),
+            set(self.record.iterfields(["697__a"],
+                                       subfield_filter=('2', 'INSPIRE')))
+        )
+        self.assertEqual(
+            set([(("698__a", 0, 0, 2), "gravitation: nonlocal"),
+                 (("698__a", 0, 1, 2), "propagator"),
+                 (("698__a", 0, 3, 2), "singularity")
+                 ]),
+            set(self.record.iterfields(["698__a"],
+                                       subfield_filter=('2', 'INSPIRE')))
+        )
+        self.assertEqual(
+            set([(("699__a", 0, 1, 0), "gravitation"),
+                 (("699__a", 1, 1, 0), "antigravitation")]),
+            set(self.record.iterfields(["699__a"],
+                                       subfield_filter=('2', 'INSPIRE')))
+        )
+        self.assertEqual(
             set([(("9944_u", 0, 0), self.record["994"][0][0][0][1]),
             (("9954_u", 0, 0), self.record["995"][0][0][0][1]),
             (("9964_u", 0, 0), self.record["996"][0][0][0][1]),
