@@ -45,6 +45,8 @@ class Format(db.Model):
 
     content_type = db.Column(db.String(255), server_default='')
 
+    mime_type = db.Column(db.String(255), unique=True, nullable=True)
+
     visibility = db.Column(
         db.TinyInteger(4),
         nullable=False,

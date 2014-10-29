@@ -1621,6 +1621,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML MARC.'
         content_type = u'text/html'
+        mime_type = u'application/MARC'
         visibility = 1
         name = u'MARC'
 
@@ -1637,6 +1638,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML MARC.'
         content_type = u'text/xml'
+        mime_type = u'application/marcxml+xml'
         visibility = 1
         name = u'MARCXML'
 
@@ -1661,6 +1663,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'BibTeX.'
         content_type = u'text/html'
+        mime_type = u'application/x-bibtex'
         visibility = 1
         name = u'BibTeX'
 
@@ -1677,6 +1680,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'XML NLM.'
         content_type = u'text/xml'
+        mime_type = u'application/x-nlm'
         visibility = 1
         name = u'NLM'
 
@@ -1837,6 +1841,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'Recjson format.'
         content_type = u'application/json'
+        mime_type = u'application/json'
         visibility = 0
         name = u'Recjson Format'
 
