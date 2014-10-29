@@ -46,6 +46,13 @@ MOCK_RECORD = {
     '340': [([('a', 'FI\xc3\x28LM')], ' ', ' ', '', 7)], # Invalid utf-8
     '595': [([('a', ' Press')], ' ', ' ', '', 7)], # Leading spaces
     '653': [([('a', 'LEP')], '1', ' ', '', 7)],
+    '695': [([('a', 'gravitation: nonlocal'), ('2', 'INSPIRE')], ' ', ' ', '', 7)],
+    '696': [([('2', 'INSPIRE'), ('a', 'gravitation: nonlocal')], ' ', ' ', '', 7)],
+    '697': [([('2', 'author'), ('a', 'gravitation')], ' ', ' ', '', 7)],
+    '698': [([('a', 'gravitation: nonlocal'), ('a', 'propagator'), ('2', 'INSPIRE'), ('a', 'singularity')], ' ', ' ', '', 7)],
+    '699': [([('2', 'INSPIRE'), ('a', 'gravitation')], ' ', ' ', '', 7),
+            ([('2', 'INSPIRE'), ('a', 'antigravitation')], ' ', ' ', '', 7)
+            ],
     '856': [([('f', 'neil.calder@cern.ch')], '0', ' ', '', 7)],
     '994': [([('u', 'http://httpstat.us/200')], '4', ' ', '', 7)], # Url that works
     '995': [([('u', 'www.google.com/favicon.ico')], '4', ' ', '', 7)],  # url without protocol

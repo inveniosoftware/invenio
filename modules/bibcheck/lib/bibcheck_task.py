@@ -30,6 +30,7 @@ import time
 import inspect
 import itertools
 
+from collections import namedtuple
 from ConfigParser import RawConfigParser
 from datetime import datetime
 from tempfile import mkstemp
@@ -85,33 +86,51 @@ class AmendableRecord(dict):
         self.rule = None
         self.record_id = self["001"][0][3]
 
-    def iterfields(self, fields):
+    def iterfields(self, fields, subfield_filter=(None, None)):
         """
+        Iterates over marc tags that match a marc expression.
+
         This function accepts a list of marc tags (a 6 character string
         containing a 3 character tag, two 1 character indicators and an 1
         character subfield code) and returns and yields tuples of marc tags
-        (without wildcards) and the field value.
+        (without wildcards) and the field value. Optionally filters for subfield
+        values.
 
         Examples:
         record.iterfields(["%%%%%%", "%%%%%_"])
             --> Iterator of all the field and subfield values.
+                ('_' is for control fields that have no codes)
         record.iterfields(["100__a"])
             --> The author of record
         record.iterfields(["%%%%%u"])
             --> All "u" subfields
 
-        @param list of marc tags (accepts wildcards)
-        @yields tuple (position, field_value)
+        :param fields: marc tags (accepts wildcards)
+        :type fields: list of str
+        :param subfield_filter: filter for a specific subfield
+        :type subfield_filter: (str, str)
+        :yields: (position, field_value)
+            `position` is (tag, localpos, fieldpos) if filter was disabled, or
+                          (tag, localpos, fieldpos, filterpos) if filter was enabled
         """
         for field in fields:
-            for res in self.iterfield(field):
+            for res in self.iterfield(field, subfield_filter=subfield_filter):
                 yield res
 
-    def iterfield(self, field):
-        """ Like iterfields with only a field """
+    def iterfield(self, field, subfield_filter=(None, None)):
+        """Like iterfields for a single field."""
         assert len(field) == 6
         field = field.replace("_", " ")
         ind1, ind2, code = field[3:]
+
+        assert len(subfield_filter) == 2
+        SubfieldFilter = namedtuple('SubfieldFilter', ['code', 'value'])
+        subfield_filter = SubfieldFilter(*subfield_filter)
+        filter_enabled = subfield_filter.code is not None
+
+        def filter_passes(subfield_code, result):
+            return subfield_filter.code in ('%', subfield_code) and \
+                subfield_filter.value == result
 
         for tag in self.itertags(field[:3]):
             for (local_position, field_obj) in enumerate(self[tag]):
@@ -120,13 +139,27 @@ class AmendableRecord(dict):
                     field_name = field_name.replace(' ', '_')
                     if code == " " and field_obj[3]:
                         position = field_name + "_", local_position, None
-                        yield position, field_obj[3]
+                        value = field_obj[3]
+                        yield position, value
                     else:
-                        for subfield_position, subfield_tuple in enumerate(field_obj[0]):
-                            subfield_code, value = subfield_tuple
-                            if code in ("%", subfield_code):
-                                position = field_name + subfield_code, local_position, subfield_position
-                                yield position, value
+                        # `code` is code from `field`
+                        # `subfield_code` is from `field_obj` (storage)
+                        if filter_enabled:
+                            for subfield_position, subfield_tuple in enumerate(field_obj[0]):
+                                subfield_code, value = subfield_tuple
+                                filter_position = None # Until challenged
+                                if filter_passes(subfield_code, value):
+                                    filter_position = subfield_position
+                                    break
+                        if not filter_enabled or filter_position is not None:
+                            for subfield_position, subfield_tuple in enumerate(field_obj[0]):
+                                subfield_code, value = subfield_tuple
+                                if code in ("%", subfield_code):
+                                    position = field_name + subfield_code, local_position, \
+                                        subfield_position
+                                    if filter_enabled:
+                                        position = position + (filter_position,)
+                                    yield position, value
 
     def _query(self, position):
         """ Return a position """
