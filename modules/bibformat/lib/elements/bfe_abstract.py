@@ -92,7 +92,7 @@ def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_c
         if max_chars != "" and max_chars.isdigit() and \
                int(max_chars) < len(abstract_en):
             print_extension = True
-            abstract_en = abstract_en[:int(max_chars)]
+            abstract_en = abstract_en[:int(max_chars)] + " [...]"
 
         if limit != "" and limit.isdigit():
             s_abstract = abstract_en.split(". ") # Split around
@@ -129,7 +129,7 @@ def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_c
         if max_chars != "" and max_chars.isdigit() and \
                int(max_chars) < len(abstract_fr):
             print_extension = True
-            abstract_fr = abstract_fr[:int(max_chars)]
+            abstract_fr = abstract_fr[:int(max_chars)] + " [...]"
 
         if limit != "" and limit.isdigit():
             s_abstract = abstract_fr.split(". ") # Split around

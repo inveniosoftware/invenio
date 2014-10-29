@@ -350,9 +350,7 @@ def interface(req,
 
     ## update the "journal of submission":
     ## Does the submission already exist in the log?
-    submission_exists = \
-         submission_exists_in_log(doctype, act, access, uid_email)
-    if submission_exists == 1:
+    if submission_exists_in_log(doctype, act, access, uid_email) == 1:
         ## update the modification-date of this submission in the log:
         update_submission_modified_date_in_log(doctype, act, access, uid_email)
     else:
@@ -829,37 +827,32 @@ def endaction(req,
     """
     # load the right message language
     _ = gettext_set_language(ln)
-
-    dismode = mode
     ln = wash_language(ln)
     sys.stdout = req
     rn = ""
-    t = ""
     # get user ID:
     uid = getUid(req)
     uid_email = get_email(uid)
 
     ## Get the submission storage directory from the DB:
-    submission_dir = get_storage_directory_of_action(act)
-    if submission_dir:
-        indir = submission_dir
-    else:
+    indir = get_storage_directory_of_action(act)
+    if not indir:
         ## Unable to determine the submission-directory:
         return warning_page(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, ln)
+
     curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
+
     if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
-        fp = open(os.path.join(curdir, "combo%s" % doctype), "r");
-        categ = fp.read()
-        fp.close()
+        categ = websubmit_engine_read_file(os.path.join(curdir, "combo%s" % doctype))
     else:
         categ = req.form.get('combo%s' % doctype, '*')
 
     # is user authorized to perform this action?
-    (auth_code, auth_message) = acc_authorize_action(req, 'submit', \
-                                                     authorized_if_no_roles=not isGuestUser(uid), \
-                                                     verbose=0, \
-                                                     doctype=doctype, \
-                                                     act=act, \
+    (auth_code, auth_message) = acc_authorize_action(req, 'submit',
+                                                     authorized_if_no_roles=not isGuestUser(uid),
+                                                     verbose=0,
+                                                     doctype=doctype,
+                                                     act=act,
                                                      categ=categ)
     if not auth_code == 0:
         return warning_page("""<center><font color="red">%s</font></center>""" % auth_message, req, ln)
@@ -897,26 +890,14 @@ def endaction(req,
         wrnmsg = """<b>This submission has been completed. Please go to the""" \
                  """ <a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s">""" \
                  """main menu</a> to start a new submission.</b>""" \
-                 % { 'doctype' : quote_plus(doctype), 'ln' : ln }
+                 % {'doctype': quote_plus(doctype), 'ln': ln}
         return warning_page(wrnmsg, req, ln)
 
     ## Get the number of pages for this submission:
     subname = "%s%s" % (act, doctype)
-
-    ## retrieve the action and doctype data
-    ## Get the submission storage directory from the DB:
-    submission_dir = get_storage_directory_of_action(act)
-    if submission_dir:
-        indir = submission_dir
-    else:
-        ## Unable to determine the submission-directory:
-        return warning_page(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, ln)
-
     # The following words are reserved and should not be used as field names
-    reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
+    reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act",
                       "indir", "doctype", "mode", "step", "deleted", "file_path", "userfile_name"]
-    # This defines the path to the directory containing the action data
-    curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
     try:
         assert(curdir == os.path.abspath(curdir))
     except AssertionError:
@@ -932,16 +913,14 @@ def endaction(req,
             return warning_page(_("Unable to create a directory for this submission. The administrator has been alerted."), req, ln)
 
     # retrieve the original main menu url ans save it in the "mainmenu" file
+    path_main_menu_file = os.path.join(curdir, "mainmenu")
     if mainmenu != "":
-        fp = open(os.path.join(curdir, "mainmenu"), "w")
-        fp.write(mainmenu)
-        fp.close()
+        websubmit_engine_write_file(path_main_menu_file, mainmenu)
+
     # and if the file containing the URL to the main menu exists
     # we retrieve it and store it in the $mainmenu variable
-    if os.path.exists(os.path.join(curdir, "mainmenu")):
-        fp = open(os.path.join(curdir, "mainmenu"), "r");
-        mainmenu = fp.read()
-        fp.close()
+    if os.path.exists(path_main_menu_file):
+        mainmenu = websubmit_engine_read_file(path_main_menu_file )
     else:
         mainmenu = "%s/submit" % (CFG_SITE_URL,)
 
@@ -950,16 +929,13 @@ def endaction(req,
         nbpages = num_submission_pages
     else:
         ## Unable to determine the number of pages for this submission:
-        return warning_page(_("Unable to determine the number of submission pages."), \
-                        req, ln)
+        return warning_page(_("Unable to determine the number of submission pages."), req, ln)
 
     ## Retrieve the previous page, as submitted to curdir (before we
     ## overwrite it with our curpage as declared from the incoming
     ## form)
     try:
-        fp = open(os.path.join(curdir, "curpage"))
-        previous_page_from_disk = fp.read()
-        fp.close()
+        previous_page_from_disk = websubmit_engine_read_file(os.path.join(curdir, "curpage"))
     except:
         previous_page_from_disk = str(num_submission_pages)
 
@@ -972,20 +948,12 @@ def endaction(req,
         ## Unknown value for edsrn - set it to an empty string:
         edsrn = ""
 
-    ## Determine whether the action is finished
-    ## (ie there are no other steps after the current one):
-    finished = function_step_is_last(doctype, act, step)
-
     ## Let's write in curdir file under curdir the curdir value
     ## in case e.g. it is needed in FFT.
-    fp = open(os.path.join(curdir, "curdir"), "w")
-    fp.write(curdir)
-    fp.close()
+    websubmit_engine_write_file(os.path.join(curdir, "curdir"), curdir)
 
     ## Let's write in ln file the current language
-    fp = open(os.path.join(curdir, "ln"), "w")
-    fp.write(ln)
-    fp.close()
+    websubmit_engine_write_file(os.path.join(curdir, "ln"), ln)
 
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
@@ -1010,11 +978,11 @@ def endaction(req,
             # page, or on the previously visited one, which means that
             # admin authorized it. Note that in endaction() curpage is
             # equivalent to the "previous" page value
-            if not ((previous_page_from_disk.isdigit() and \
-                    filename in [submission_field[3] for submission_field in \
-                                  get_form_fields_on_submission_page(subname, int(previous_page_from_disk))]) or \
-                    (str(curpage).isdigit() and int(curpage) > 1 and \
-                     filename in [submission_field[3] for submission_field in \
+            if not ((previous_page_from_disk.isdigit() and
+                    filename in [submission_field[3] for submission_field in
+                                  get_form_fields_on_submission_page(subname, int(previous_page_from_disk))]) or
+                    (str(curpage).isdigit() and int(curpage) > 1 and
+                     filename in [submission_field[3] for submission_field in
                                   get_form_fields_on_submission_page(subname, int(curpage) - 1)])):
                 # might have been called by functions such as
                 # Create_Modify_Interface function in MBI step, or
@@ -1037,10 +1005,8 @@ def endaction(req,
             fp.close()
         # the field is a normal string
         elif isinstance(formfields, types.StringTypes) and formfields != "":
-            value = formfields
-            fp = open(file_to_open, "w")
-            fp.write(specialchars(value))
-            fp.close()
+            websubmit_engine_write_file(file_to_open, specialchars(formfields))
+
         # the field is a file
         elif hasattr(formfields, "filename") and formfields.filename:
             dir_to_open = os.path.join(curdir, 'files', key)
@@ -1056,7 +1022,8 @@ def endaction(req,
                     os.makedirs(dir_to_open)
                 except:
                     register_exception(req=req, alert_admin=True)
-                    return warning_page(_("Cannot create submission directory. The administrator has been alerted."), req, ln)
+                    return warning_page(_("Cannot create submission directory."
+                                          " The administrator has been alerted."), req, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
             ## washing away UNIX and Windows (e.g. DFS) paths):
@@ -1071,12 +1038,8 @@ def endaction(req,
                     else:
                         break
                 fp.close()
-                fp = open(os.path.join(curdir, "lastuploadedfile"), "w")
-                fp.write(filename)
-                fp.close()
-                fp = open(file_to_open, "w")
-                fp.write(filename)
-                fp.close()
+                websubmit_engine_write_file(os.path.join(curdir, "lastuploadedfile"), filename)
+                websubmit_engine_write_file(file_to_open, filename)
             else:
                 return warning_page(_("No file uploaded?"), req, ln)
         ## if the found field is the reference of the document
@@ -1112,26 +1075,28 @@ def endaction(req,
 
     # Calls all the function's actions
     function_content = ''
+    start_time = time.time()
     try:
         ## Handle the execution of the functions for this
         ## submission/step:
-        start_time = time.time()
         (function_content, last_step, action_score, rn) = \
-                           print_function_calls(req=req,
-                                                doctype=doctype,
-                                                action=act,
-                                                step=step,
-                                                form=form,
-                                                start_time=start_time,
-                                                access=access,
-                                                curdir=curdir,
-                                                dismode=mode,
-                                                rn=rn,
-                                                last_step=last_step,
-                                                action_score=action_score,
-                                                ln=ln)
+            print_function_calls(req=req,
+                                 doctype=doctype,
+                                 action=act,
+                                 step=step,
+                                 form=form,
+                                 start_time=start_time,
+                                 access=access,
+                                 curdir=curdir,
+                                 dismode=mode,
+                                 rn=rn,
+                                 last_step=last_step,
+                                 action_score=action_score,
+                                 ln=ln)
     except InvenioWebSubmitFunctionError, e:
-        register_exception(req=req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
+        register_exception(req=req, alert_admin=True,
+                           prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"'
+                                  % (doctype, act, step, form, start_time))
         ## There was a serious function-error. Execution ends.
         if CFG_DEVEL_SITE:
             raise
@@ -1158,10 +1123,10 @@ def endaction(req,
         ## If the action was mandatory we propose the next
         ## mandatory action (if any)
         if action_score != -1 and last_step == 1:
-            next_action = Propose_Next_Action(doctype, \
-                                              action_score, \
-                                              access, \
-                                              current_level, \
+            next_action = Propose_Next_Action(doctype,
+                                              action_score,
+                                              access,
+                                              current_level,
                                               indir)
 
         ## If we are in the last step of an action, we can update
@@ -1170,47 +1135,45 @@ def endaction(req,
             if uid_email != "" and uid_email != "guest":
                 ## update the "journal of submission":
                 ## Does the submission already exist in the log?
-                submission_exists = \
-                     submission_exists_in_log(doctype, act, access, uid_email)
-                if submission_exists == 1:
+                if submission_exists_in_log(doctype, act, access, uid_email) == 1:
                     ## update the rn and status to finished for this submission
                     ## in the log:
-                    update_submission_reference_and_status_in_log(doctype, \
-                                                                  act, \
-                                                                  access, \
-                                                                  uid_email, \
-                                                                  rn, \
+                    update_submission_reference_and_status_in_log(doctype,
+                                                                  act,
+                                                                  access,
+                                                                  uid_email,
+                                                                  rn,
                                                                   "finished")
                 else:
                     ## Submission doesn't exist in log - create it:
-                    log_new_completed_submission(doctype, \
-                                                 act, \
-                                                 access, \
-                                                 uid_email, \
+                    log_new_completed_submission(doctype,
+                                                 act,
+                                                 access,
+                                                 uid_email,
                                                  rn)
 
     ## Having executed the functions, create the page that will be displayed
     ## to the user:
     t = websubmit_templates.tmpl_page_endaction(
-          ln = ln,
-          # these fields are necessary for the navigation
-          nextPg = nextPg,
-          startPg = startPg,
-          access = access,
-          curpage = curpage,
-          nbPg = nbPg,
-          nbpages = nbpages,
-          doctype = doctype,
-          act = act,
-          docname = docname,
-          actname = actname,
-          mainmenu = mainmenu,
-          finished = finished,
-          function_content = function_content,
-          next_action = next_action,
-        )
+        ln=ln,
+        # these fields are necessary for the navigation
+        nextPg=nextPg,
+        startPg=startPg,
+        access=access,
+        curpage=curpage,
+        nbPg=nbPg,
+        nbpages=nbpages,
+        doctype=doctype,
+        act=act,
+        docname=docname,
+        actname=actname,
+        mainmenu=mainmenu,
+        finished=last_step,
+        function_content=function_content,
+        next_action=next_action,
+    )
 
-    if finished:
+    if last_step:
         # register event in webstat
         try:
             register_customevent("websubmissions", [get_longname_of_doctype(doctype)])
@@ -1225,9 +1188,9 @@ def endaction(req,
 
     p_navtrail = '<a href="/submit?ln='+ln+'" class="navtrail">' + _("Submit") +\
                  """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>""" % {
-                   'doctype' : quote_plus(doctype),
-                   'docname' : docname,
-                   'ln' : ln,
+                   'doctype': quote_plus(doctype),
+                   'docname': docname,
+                   'ln': ln,
                  }
 
     ## add MathJax if wanted
@@ -1237,16 +1200,17 @@ def endaction(req,
     else:
         metaheaderadd = ''
 
-    return page(title= actname,
-                body = t,
-                navtrail = p_navtrail,
+    return page(title=actname,
+                body=t,
+                navtrail=p_navtrail,
                 description="submit documents",
                 keywords="submit",
-                uid = uid,
-                language = ln,
-                req = req,
+                uid=uid,
+                language=ln,
+                req=req,
                 navmenuid='submit',
                 metaheaderadd=metaheaderadd)
+
 
 def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """This function generates the WebSubmit "home page".
@@ -1841,11 +1805,11 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
     return t
 
 def specialchars(text):
-    text = string.replace(text, "&#147;", "\042");
-    text = string.replace(text, "&#148;", "\042");
-    text = string.replace(text, "&#146;", "\047");
-    text = string.replace(text, "&#151;", "\055");
-    text = string.replace(text, "&#133;", "\056\056\056");
+    text = string.replace(text, "&#147;", "\042")
+    text = string.replace(text, "&#148;", "\042")
+    text = string.replace(text, "&#146;", "\047")
+    text = string.replace(text, "&#151;", "\055")
+    text = string.replace(text, "&#133;", "\056\056\056")
     return text
 
 def log_function(curdir, message, start_time, filename="function_log"):
@@ -1861,3 +1825,13 @@ def log_function(curdir, message, start_time, filename="function_log"):
         fd = open("%s/%s" % (curdir, filename), "a+")
         fd.write("""%s --- %s\n""" % (message, time_lap))
         fd.close()
+
+
+def websubmit_engine_write_file(file_path, data_to_write):
+    with open(file_path, "w") as f:
+        f.write(data_to_write)
+
+def websubmit_engine_read_file(file_path):
+    with open(file_path) as f:
+        content = f.read()
+    return content

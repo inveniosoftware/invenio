@@ -4962,8 +4962,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
 
     can_edit_record = False
-    if check_user_can_edit_record(user_info, recID):
-        can_edit_record = True
+    # Speeding up the search process by not doing this check for search result listings
+    # if check_user_can_edit_record(user_info, recID):
+    #     can_edit_record = True
 
 
     out = ""

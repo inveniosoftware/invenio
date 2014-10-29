@@ -1607,7 +1607,8 @@ def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
         tag_name = args['tag']
     path = WEBSTAT_GRAPH_DIRECTORY + os.path.basename("tmp_webstat_custom_summary_"
                                                 + args['query'] + args['tag'])
-    create_custom_summary_graph(data[:-1], path, args['title'])
+    if not create_custom_summary_graph(data[:-1], path, args['title']):
+        path = None
     return TEMPLATES.tmpl_display_custom_summary(tag_name, data, args['title'],
                                     args['query'], args['tag'], path, ln=ln)
 

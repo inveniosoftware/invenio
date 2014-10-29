@@ -11,9 +11,10 @@ pep8
 selenium
 winpdb
 mock
-ipython
+ipython==1.2.1
 cython
 nose
 nosexcover
 flake8
 raven==4.2.1
+matplotlib==1.3.1

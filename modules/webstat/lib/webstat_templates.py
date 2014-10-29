@@ -794,8 +794,11 @@ Distribution across %s
 <td>%s</td>
 </tr>
 """ % (CFG_SITE_URL, cgi.escape(urllib.quote(query + " " + tag + ':"' + title + '"')), ln, number, cgi.escape(title))
-        out += """</table></div>
-<div><img src="%s" /></div>""" % cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
+        if path:
+            out += """</table></div>
+            <div><img src="%s" /></div>""" % cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
+        else:
+            out += """</table></div>"""
         return out
 
     # INTERNALS
