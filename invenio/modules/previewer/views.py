@@ -19,6 +19,8 @@
 
 """Implementation of Blueprint for previewers."""
 
+import itertools
+
 from flask import Blueprint, request
 from flask.ext.breadcrumbs import default_breadcrumb_root
 
@@ -27,7 +29,7 @@ from invenio.config import CFG_SITE_RECORD
 from invenio.modules.records.views import request_record
 
 from .registry import previewers
-
+from .utils import get_record_documents, get_record_files
 
 blueprint = Blueprint('previewer', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
@@ -40,12 +42,10 @@ default_breadcrumb_root(blueprint, '.')
 @request_record
 def preview(recid):
     """Preview file for given record."""
-    from invenio.legacy.bibdocfile.api import BibRecDocs
-
-    files = BibRecDocs(recid).list_latest_files(list_hidden=False)
     filename = request.args.get('filename', type=str)
 
-    for f in files:
+    for f in itertools.chain(get_record_documents(recid, filename),
+                             get_record_files(recid, filename)):
         if f.name + f.superformat == filename or filename is None:
             ordered = previewers.keys()
             if "CFG_PREVIEW_PREFERENCE" in cfg and \
