@@ -2403,6 +2403,7 @@ def create_request_ticket(userinfo, ticket):
         if bconfig.TICKET_SENDING_FROM_USER_EMAIL:
             if 'uid' in userinfo:
                 uid = userinfo['uid']
+
             if 'email' in userinfo:
                 email = userinfo['email']
 
@@ -3581,6 +3582,9 @@ def _check_operation_permission(uid, bibrefrec, pid, action):
 
     access_right = _resolve_maximum_acces_rights(uid)
     if override_claim and access_right[1] >= old_lcul:
+        return 'granted'
+
+    if owner_of_paper:
         return 'granted'
 
     return 'denied'

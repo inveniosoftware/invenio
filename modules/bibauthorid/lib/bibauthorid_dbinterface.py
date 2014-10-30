@@ -1825,7 +1825,7 @@ def remove_rtid_from_ticket(rtid, pid):
     request_tickets_exist = bool(request_tickets)
 
     for request_ticket in request_tickets:
-        if request_ticket['rtid'] == rtid:
+        if 'rtid' in request_ticket and request_ticket['rtid'] == rtid:
             request_ticket.pop('rtid')
             break
 
