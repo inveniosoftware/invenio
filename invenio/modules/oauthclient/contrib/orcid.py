@@ -74,6 +74,10 @@ In templates you can add a sign in/up link:
 """
 
 import copy
+from flask import session
+from invenio.ext.sqlalchemy import db
+from ..handlers import token_session_key
+
 
 REMOTE_APP = dict(
     title='ORCID',
@@ -113,9 +117,17 @@ REMOTE_SANDBOX_APP['params'].update(dict(
 
 def account_info(remote, resp):
     """ Retrieve remote account information used to find local user. """
+    # Store ORCID of the user in session for later retrieval
+    session[token_session_key(remote.name) + "_orcid"] = resp.get("orcid")
     return dict(email=None, nickname=None)
 
 
 def account_setup(remote, token):
     """ Perform additional setup after user have been logged in. """
-    pass
+    extra_data = {
+        "orcid": session.get(token_session_key(remote.name) + "_orcid")
+        }
+    token.remote_account.extra_data = extra_data
+    db.session.commit()
+    # Remove ORCID from session
+    del session[token_session_key(remote.name) + "_orcid"]
