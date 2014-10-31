@@ -44,9 +44,6 @@ def visit_create_index(element, compiler, **kw):
     index = element.element
     preparer = compiler.preparer
     table = preparer.format_table(index.table)
-    # @deprecated FIXED [object].quote in SQLAlchemy >= 0.9.*
-    # name = preparer.quote(index.name, index.quote)
-    # use this:
     name = preparer.quote(index.name, index.name.quote)
 
     text = "ALTER TABLE %s ADD " % (table, )
@@ -97,15 +94,12 @@ def visit_primary_key_constraint(*element):
         text += "CONSTRAINT %s " % \
                 compiler.preparer.format_constraint(constraint)
     text += "PRIMARY KEY "
-    # FIXED with SQLAlchemy >= 0.9.*
-    # text += "(%s)" % ', '.join(compiler.preparer.quote(c.name, c.quote) +
-    # use this:
     text += "(%s)" % ', '.join(c.name +
-                               ((str(c.type).startswith('TEXT')
-                                 and (c.type.length is not None))
+                               (c.type != types.NULLTYPE
+                                and (str(c.type).startswith('TEXT')
+                                     and (c.type.length is not None))
                                 and '(%d)' % c.type.length
-                                or ''
-                                )
+                                or '')
                                for c in constraint)
     text += compiler.define_constraint_deferrability(constraint)
     return text
