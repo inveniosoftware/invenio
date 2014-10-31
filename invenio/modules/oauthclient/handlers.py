@@ -47,7 +47,7 @@ def token_session_key(remote_app):
 def response_token_setter(remote, resp):
     """ Extract token from response and set it for the user. """
     if resp is None:
-        raise OAuthRejectedRequestError("User rejected request.", remote)
+        raise OAuthRejectedRequestError("User rejected request.", remote, resp)
     else:
         if 'access_token' in resp:
             return oauth2_token_setter(remote, resp)
