@@ -217,8 +217,8 @@ def get_file_from_task_result(object_id=None, filename=None):
     task_results = bwobject.get_tasks_results()
     if filename in task_results and task_results[filename]:
         fileinfo = task_results[filename][0].get("result", dict())
-        directory = os.path.split(fileinfo.get("full_path", ""))[0]
-        return send_from_directory(directory, filename)
+        directory, actual_filename = os.path.split(fileinfo.get("full_path", ""))
+        return send_from_directory(directory, actual_filename)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
