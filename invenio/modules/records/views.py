@@ -22,11 +22,11 @@
 import cStringIO
 
 from functools import wraps
-from six import iteritems
 from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint, send_file
-from flask.ext.login import current_user
 from flask.ext.breadcrumbs import default_breadcrumb_root
+from flask.ext.login import current_user
+from flask.ext.menu import register_menu
 
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
@@ -35,11 +35,13 @@ from invenio.base.signals import pre_template_render
 from invenio.config import CFG_SITE_RECORD
 from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.modules.records.api import get_record
-from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Collection
 from invenio.modules.search.signals import record_viewed
 from invenio.utils import apache
+from .api import get_record
+from .models import Record as Bibrec
+from .utils import references_nb_counts, citations_nb_counts, \
+    visible_collection_tabs
 
 blueprint = Blueprint('record', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
@@ -58,8 +60,6 @@ def request_record(f):
         from invenio.legacy.search_engine import \
             guess_primary_collection_of_a_record, \
             check_user_can_view_record
-        from invenio.legacy.websearch.adminlib import get_detailed_page_tabs,\
-            get_detailed_page_tabs_counts
         # ensure recid to be integer
         recid = int(recid)
         g.collection = collection = Collection.query.filter(
@@ -102,32 +102,7 @@ def request_record(f):
             return render_template('404.html')
 
         title = record.get(cfg.get('RECORDS_BREADCRUMB_TITLE_KEY'), '')
-
-        # b = [(_('Home'), '')] + collection.breadcrumbs()[1:]
-        # b += [(title, 'record.metadata', dict(recid=recid))]
-        # current_app.config['breadcrumbs_map'][request.endpoint] = b
-        g.record_tab_keys = []
         tabs = []
-        counts = get_detailed_page_tabs_counts(recid)
-        for k, v in iteritems(get_detailed_page_tabs(collection.id, recid,
-                                                     g.ln)):
-            t = {}
-            b = 'record'
-            if k == '':
-                k = 'metadata'
-            if k == 'comments' or k == 'reviews':
-                b = 'comments'
-            if k == 'linkbacks':
-                b = 'weblinkback'
-                k = 'index'
-
-            t['key'] = b + '.' + k
-            t['count'] = counts.get(k.capitalize(), -1)
-
-            t.update(v)
-            tabs.append(t)
-            if v['visible']:
-                g.record_tab_keys.append(b+'.'+k)
 
         if cfg.get('CFG_WEBLINKBACK_TRACKBACK_ENABLED'):
             @register_template_context_processor
@@ -169,6 +144,10 @@ def request_record(f):
 @blueprint.route('/<int:recid>/export/<of>', methods=['GET', 'POST'])
 @wash_arguments({'of': (unicode, 'hd'), 'ot': (unicode, None)})
 @request_record
+@register_menu(blueprint, 'record.metadata', _('Information'), order=1,
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               visible_when=visible_collection_tabs('metadata'))
 def metadata(recid, of='hd', ot=None):
     """Display formated record metadata."""
     from invenio.legacy.bibrank.downloads_similarity import \
@@ -193,13 +172,22 @@ def metadata(recid, of='hd', ot=None):
 
 @blueprint.route('/<int:recid>/references', methods=['GET', 'POST'])
 @request_record
+@register_menu(blueprint, 'record.references', _('References'), order=2,
+               visible_when=visible_collection_tabs('references'),
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               count=references_nb_counts)
 def references(recid):
-    """Return references overview."""
+    """Display references."""
     return render_template('records/references.html')
 
 
 @blueprint.route('/<int:recid>/files', methods=['GET', 'POST'])
 @request_record
+@register_menu(blueprint, 'record.files', _('Files'), order=8,
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               visible_when=visible_collection_tabs('files'))
 def files(recid):
     """Return overview of attached files."""
     def get_files():
@@ -250,11 +238,15 @@ def file(recid, filename):
 
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
 @request_record
+@register_menu(blueprint, 'record.citations', _('Citations'), order=3,
+               visible_when=visible_collection_tabs('citations'),
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               count=citations_nb_counts)
 def citations(recid):
-    """Return citations overview."""
-    from invenio.legacy.bibrank.citation_searcher import \
-        calculate_cited_by_list, get_self_cited_by, \
-        calculate_co_cited_with_list
+    """Display citations."""
+    from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list,\
+        get_self_cited_by, calculate_co_cited_with_list
     citations = dict(
         citinglist=calculate_cited_by_list(recid),
         selfcited=get_self_cited_by(recid),
@@ -266,6 +258,10 @@ def citations(recid):
 
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
+@register_menu(blueprint, 'record.keywords', _('Keywords'), order=4,
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               visible_when=visible_collection_tabs('keywords'))
 def keywords(recid):
     """Return keywords overview."""
     from invenio.legacy.bibclassify.webinterface import record_get_keywords
@@ -277,6 +273,10 @@ def keywords(recid):
 
 @blueprint.route('/<int:recid>/usage', methods=['GET', 'POST'])
 @request_record
+@register_menu(blueprint, 'record.usage', _('Usage statistics'), order=7,
+               endpoint_arguments_constructor=lambda:
+               dict(recid=request.view_args.get('recid')),
+               visible_when=visible_collection_tabs('usage'))
 def usage(recid):
     """Return usage statistics."""
     from invenio.legacy.bibrank.downloads_similarity import \

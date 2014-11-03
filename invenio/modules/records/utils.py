@@ -25,15 +25,20 @@ import errno
 import os
 import six
 
+from flask import g, request
 from werkzeug.utils import cached_property, import_string
 
 from invenio.base.globals import cfg
-from invenio.modules.records.api import get_record
-from invenio.legacy.search_engine import perform_request_search
+from invenio.config import (CFG_CERN_SITE, CFG_INSPIRE_SITE,
+                            CFG_BIBRANK_SHOW_CITATION_LINKS)
+from invenio.ext.cache import cache
+
+from .api import get_record
 
 
 def get_unique_record_json(param):
     """API to query records from the database."""
+    from invenio.legacy.search_engine import perform_request_search
     data, query = {}, {}
     data['status'] = 'notfound'
 
@@ -95,3 +100,69 @@ class NameGenerator(object):
         return self.generator(*args, **kwargs)
 
 name_generator = NameGenerator()
+
+
+def references_nb_counts():
+    """Get number of references for the record `recid`."""
+    recid = request.view_args.get('recid')
+    if recid is None:
+        return
+
+    from invenio.legacy.bibrecord import record_get_field_instances
+    from invenio.legacy.search_engine import get_field_tags
+    from invenio.modules.records.api import get_record
+
+    if not CFG_CERN_SITE:
+        reftag = ""
+        reftags = get_field_tags("reference")
+        if reftags:
+            reftag = reftags[0]
+        tmprec = get_record(recid)
+        if reftag and len(reftag) > 4:
+            return len(record_get_field_instances(tmprec, reftag[0:3],
+                       reftag[3], reftag[4]))
+    return 0
+
+
+def citations_nb_counts():
+    """Get number of citations for the record `recid`."""
+    recid = request.view_args.get('recid')
+    if recid is None:
+        return
+
+    from intbitset import intbitset
+    from invenio.legacy.bibrank.citation_searcher import (get_cited_by,
+                                                          get_cited_by_count)
+
+    if CFG_BIBRANK_SHOW_CITATION_LINKS:
+        if CFG_INSPIRE_SITE:
+            from invenio.legacy.search_engine import search_unit
+            citers_recids = intbitset(get_cited_by(recid))
+            citeable_recids = search_unit(p='citeable', f='collection')
+            return len(citers_recids & citeable_recids)
+        else:
+            return get_cited_by_count(recid)
+    return 0
+
+
+def visible_collection_tabs(endpoint):
+    """Define if a collection tab is visible."""
+    def visible_when():
+        if hasattr(g, 'collection') and \
+                len(g.collection.collectiondetailedrecordpagetabs):
+            key = g.collection.name+'_'+endpoint
+
+            @cache.memoize()
+            def is_visible_tab(key):
+                for visible_tabs in \
+                        g.collection.collectiondetailedrecordpagetabs:
+                    if endpoint in set(visible_tabs.tabs.split(';')):
+                        return True
+                # collection hasn't been found in the preference list
+                return False
+            return is_visible_tab(key)
+        else:
+            # no preference set for this collection.
+            # assume all tabs are displayed
+            return True
+    return visible_when

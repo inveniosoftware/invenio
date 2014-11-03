@@ -43,7 +43,7 @@
 
 {% block global_bundles %}
   {{ super() }}
-  {% bundles "records.js", "formatter.css" %}
+  {% bundles "records.js", "formatter.css", "record.css" %}
 {% endblock %}
 
 {% block body %}
@@ -59,13 +59,16 @@
 
   {% block record_tabs %}
   <ul id="record-links" class="nav nav-tabs">
-  {%- for tab in tabs|sort(attribute='order') -%}
+  {%- for tab in current_menu.submenu('record').children -%}
   {%- if tab.visible -%}
-    <li class="{{ 'active' if tab.key == request.endpoint }} {{ 'disabled' if not tab.enabled }}">
-      <a href="{{ url_for(tab.key, recid=recid) if tab.enabled else '#' }}">
-        {{ tab.label }}
-        {% if tab.count and tab.count > -1 %}
-          &nbsp;<small class="text-muted">({{ tab.count }})</small>
+    <li class="{{ 'active' if tab.active else '' }}">
+      <a href="{{ tab.url }}">
+        {{ tab.text }}
+        {% if tab.count %}
+          {% set tab_count = tab.count() %}
+          {% if tab_count > -1 %}
+            &nbsp;<small class="text-muted">({{ tab_count }})</small>
+          {% endif %}
         {% endif %}
       </a>
     </li>

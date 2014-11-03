@@ -17,21 +17,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Records bundles."""
+"""Comment utility functions."""
 
-from invenio.ext.assets import Bundle
+from flask import request
 
 
-js = Bundle(
-    "js/records/records.js",
-    output="records.js",
-    weight=20,
-    filters="uglifyjs"
-)
+def comments_nb_counts():
+    """Get number of comments for the record `recid`."""
+    recid = request.view_args.get('recid')
 
-css = Bundle(
-    "css/records/record.css",
-    output="record.css",
-    weight=20,
-    filters="cleancss"
-)
+    if recid is None:
+        return
+    elif recid == 0:
+        return 0
+    else:
+        from invenio.legacy.webcomment.adminlib import get_nb_comments
+
+        return get_nb_comments(recid, count_deleted=False)
+
+
+def reviews_nb_counts():
+    """Get number of reviews for the record `recid`."""
+    recid = request.view_args.get('recid')
+
+    if recid is None:
+        return
+    elif recid == 0:
+        return 0
+    else:
+        from invenio.legacy.webcomment.adminlib import get_nb_reviews
+
+        return get_nb_reviews(recid, count_deleted=False)
