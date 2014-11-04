@@ -20,7 +20,11 @@
 """Flask-Admin page to configure facets sets per collection."""
 
 from wtforms.fields import SelectField, IntegerField
-from wtforms.validators import ValidationError, Required
+from wtforms.validators import ValidationError
+try:
+    from wtforms.validators import Required
+except ImportError:
+    from wtforms.validators import DataRequired as Required
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db

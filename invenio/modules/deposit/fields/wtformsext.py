@@ -33,9 +33,15 @@ an example):
 """
 
 import itertools
-from werkzeug import MultiDict
 import wtforms
-from wtforms.fields.core import _unset_value
+
+from werkzeug import MultiDict
+
+try:
+    from wtforms.fields.core import _unset_value
+except ImportError:
+    from wtforms.utils import unset_value as _unset_value
+
 from ..field_base import WebDepositField
 
 
@@ -374,11 +380,16 @@ class DynamicFieldList(FieldList):
         self._add_empty_entry()
 
     def _add_empty_entry(self):
-        name = '%s-%s' % (self.short_name, self.empty_index)
-        field_id = '%s-%s' % (self.id, self.empty_index)
-        field = self.unbound_field.bind(
-            form=None, name=name, prefix=self._prefix, id=field_id
+        kwargs = dict(
+            form=None,
+            name='%s-%s' % (self.short_name, self.empty_index),
+            prefix=self._prefix,
+            id='%s-%s' % (self.id, self.empty_index),
         )
+        _meta = getattr(self, 'meta', None)
+        if _meta is not None:
+            kwargs['_meta'] = _meta
+        field = self.unbound_field.bind(**kwargs)
         field.process(None, None)
         self.entries.append(field)
         return field
@@ -395,11 +406,15 @@ class DynamicFieldList(FieldList):
         Create a bound subfield for this list.
         """
         if idx.isdigit() or idx in [self.empty_index, '__input__'] or force:
-            field = self.unbound_field.bind(
+            kwargs = dict(
                 form=None,
-                name="%s-%s" % (self.name, idx),
+                name='%s-%s' % (self.name, idx),
                 prefix=self._prefix,
-                id="%s-%s" % (self.id, idx),
+                id='%s-%s' % (self.id, idx),
             )
+            _meta = getattr(self, 'meta', None)
+            if _meta is not None:
+                kwargs['_meta'] = _meta
+            field = self.unbound_field.bind(**kwargs)
             return field
         return None

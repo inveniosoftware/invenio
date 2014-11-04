@@ -19,7 +19,10 @@
 
 """WebAccount Forms"""
 
-from wtforms.validators import Required
+try:
+    from wtforms.validators import Required
+except ImportError:
+    from wtforms.validators import DataRequired as Required
 from flask.ext.login import current_user
 from flask.ext.wtf import Form, validators
 from wtforms.fields import SubmitField, BooleanField, TextField, \
