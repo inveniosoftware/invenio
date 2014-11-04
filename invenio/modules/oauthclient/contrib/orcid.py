@@ -76,9 +76,6 @@ In templates you can add a sign in/up link:
 import copy
 from flask import session
 
-from invenio.ext.sqlalchemy import db
-from ..handlers import token_session_key
-
 
 REMOTE_APP = dict(
     title='ORCID',
@@ -99,7 +96,7 @@ REMOTE_APP = dict(
         request_token_url=None,
         access_token_url="https://pub.orcid.org/oauth/token",
         access_token_method='POST',
-        authorize_url="https://orcid.org/oauth/authorize",
+        authorize_url="https://orcid.org/oauth/authorize#show_login",
         app_key="ORCID_APP_CREDENTIALS",
         content_type="application/json",
     )
@@ -112,12 +109,15 @@ REMOTE_SANDBOX_APP = copy.deepcopy(REMOTE_APP)
 REMOTE_SANDBOX_APP['params'].update(dict(
     base_url="https://api.sandbox.orcid.org/",
     access_token_url="https://api.sandbox.orcid.org/oauth/token",
-    authorize_url="https://sandbox.orcid.org/oauth/authorize",
+    authorize_url="https://sandbox.orcid.org/oauth/authorize#show_login",
 ))
 
 
 def account_info(remote, resp):
     """ Retrieve remote account information used to find local user. """
+
+    from ..handlers import token_session_key
+
     # Store ORCID of the user in session for later retrieval
     session[token_session_key(remote.name) + "_orcid"] = resp.get("orcid")
     return dict(email=None, nickname=None)
@@ -125,6 +125,10 @@ def account_info(remote, resp):
 
 def account_setup(remote, token):
     """ Perform additional setup after user have been logged in. """
+
+    from invenio.ext.sqlalchemy import db
+    from ..handlers import token_session_key
+
     extra_data = {
         "orcid": session.get(token_session_key(remote.name) + "_orcid")
         }
