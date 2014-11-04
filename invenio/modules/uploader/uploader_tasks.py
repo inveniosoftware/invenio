@@ -26,6 +26,8 @@ inside the workflows defined in :py:mod:`~invenio.modules.uploader.workflows`.
 See: `Simple workflows for Python <https://pypi.python.org/pypi/workflow/1.0>`_
 """
 
+import os
+
 from invenio.base.globals import cfg
 from invenio.modules.pidstore.models import PersistentIdentifier
 
@@ -238,9 +240,28 @@ def manage_attached_documents(step):
 
     def _manage_attached_documents(obj, eng):
         record = obj[1]
+        filename = eng.getVar('options').get('filename')
+        dirname = os.path.abspath(os.path.dirname(filename)) \
+            if filename is not None else os.curdir
+
+        def _check_path(source):
+            """Check if the ``source`` path.
+
+            If it is relative path than the directory path of original blob
+            filename, if defined, or the current directory will be prepended.
+            """
+            if not os.path.isabs(source):
+                new_source = os.path.join(dirname, source)
+                if os.path.exists(new_source):
+                    return new_source
+                eng.log.error('File %s does not exist.', (new_source,))
+            return source
+
         eng.log.info('Look documents to manage')
 
         def _create_document(metadata, record):
+            metadata['source'] = _check_path(metadata['source'])
+
             if '_documents' not in record:
                 record['_documents'] = []
 

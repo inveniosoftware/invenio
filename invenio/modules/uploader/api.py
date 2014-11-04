@@ -57,6 +57,7 @@ def run(name, input_file, master_format='marc', reader_info={}, **kwargs):
         * pretend:
         * sync: False by default, if set to True the hole process will be
           teated synchronously
+        * filename: original blob filename if it contains relative paths
     """
     signals.uploader_started.send(mode=name,
                                   blob=input_file,
