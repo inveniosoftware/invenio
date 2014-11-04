@@ -54,6 +54,8 @@ def filtering_oai_pmh_identifier(obj, eng):
     :param obj: BibworkflowObject being processed
     :param eng: BibWorkflowEngine processing the object
     """
+    from ..utils import identifier_extraction_from_string
+
     if "oaiharvest" not in eng.extra_data:
         eng.extra_data["oaiharvest"] = {}
     if "identifiers" not in eng.extra_data["oaiharvest"]:
@@ -64,12 +66,9 @@ def filtering_oai_pmh_identifier(obj, eng):
     else:
         obj_data_list = obj.data
     for record in obj_data_list:
-        delimiter_start = "<identifier>"
-        delimiter_end = "</identifier>"
-        identifier = record[
-            record.index(delimiter_start) +
-            len(delimiter_start):record.index(delimiter_end)
-        ]
+        identifier = (identifier_extraction_from_string(record) or
+                      identifier_extraction_from_string(record, oai_namespace="") or
+                      "")
         if identifier in eng.extra_data["oaiharvest"]["identifiers"]:
             return False
         else:
@@ -186,7 +185,7 @@ def harvest_records(obj, eng):
 
 def get_records_from_file(path=None):
     """Allow to retrieve the records from a file."""
-    from invenio.legacy.oaiharvest.utils import record_extraction_from_file
+    from ..utils import record_extraction_from_file
 
     @wraps(get_records_from_file)
     def _get_records_from_file(obj, eng):

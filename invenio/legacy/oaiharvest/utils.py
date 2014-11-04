@@ -287,55 +287,6 @@ Logs :
     return subject, text
 
 
-def record_extraction_from_file(path):
-    """
-    Get an harvested file, and transform each record as if
-    it was another independent harvested document.
-
-    :param path: is the path of the file harvested
-    :return : return a table of records encapsulated with markup of the
-              document designated by path
-
-    *This function much FASTER (3-5 TIMES) than using regex.*
-    """
-
-    #Will contains all the records
-    list_of_records = []
-    temporary_record = ""
-    footer = ""
-    #will contains the header of the file ie: all lines before the first record
-    header = ""
-    step = 0
-    for line in open(path, 'r+'):
-        # Extraction of the header
-        if step == 0:
-            if not line.startswith("<record>"):
-                header += line
-            else:
-                step = 1
-                temporary_record = line
-        elif step == 1:
-            if line.startswith("</ListRecords>") or line.startswith("</GetRecord>"):
-                step = 2
-                footer = line
-            elif line.startswith("<record>"):
-                temporary_record = line
-            elif line.startswith("</record>"):
-                temporary_record += line
-                list_of_records.append(temporary_record)
-            else:
-                temporary_record += line
-        elif step == 2:
-            footer += line
-
-    #Reassembling of the records and the footer and header
-
-    for i in range(0, len(list_of_records)):
-        list_of_records[i] = header + list_of_records[i] + footer
-
-    return list_of_records
-
-
 def harvest_step(obj, harvestpath):
     """
     Performs the entire harvesting step.
