@@ -31,19 +31,26 @@ from invenio.bibauthority_config import \
     CFG_BIBAUTHORITY_PREFIX_SEP
 from invenio.bibauthority_engine import \
     get_low_level_recIDs_from_control_no
+from invenio.errorlib import register_exception
+
 
 def format_element(bfo, limit, separator=' ; ',
-           extension='[...]',
-           print_links="yes",
-           print_affiliations='no',
-           affiliation_prefix=' (',
-           affiliation_suffix=')',
-           interactive="no",
-           highlight="no",
-           link_author_pages="no",
-           link_mobile_pages="no",
-           relator_code_pattern=None,
-           multiple_affiliations="no"):
+                   extension='[...]',
+                   print_links="yes",
+                   print_affiliations='no',
+                   affiliation_prefix=' (',
+                   affiliation_suffix=')',
+                   interactive="no",
+                   highlight="no",
+                   link_author_pages="no",
+                   link_mobile_pages="no",
+                   relator_code_pattern=None,
+                   multiple_affiliations="no",
+                   print_orcid="no",
+                   orcid_type="text",
+                   orcid_text="no",
+                   orcid_prefix="[",
+                   orcid_postfix="]"):
     """
     Prints the list of authors of a record.
 
@@ -60,6 +67,11 @@ def format_element(bfo, limit, separator=' ; ',
     @param link_mobile_pages: should we link to mobile app pages if print_links in on?
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     @param multiple_affiliations: whether all affiliations should be displayed
+    @param print_orcid: if yes, make each author name followed by its ORCID
+    @param orcid_type: the type of ORCID to be displayed. Accepted values: logo link, text
+    @param orcid_text: text to put in a link, if left blank it will use an ORCID
+    @param orcid_prefix: prefix for link and plain text
+    @param orcid_postfix: postfix for link and plain text
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
@@ -94,7 +106,7 @@ def format_element(bfo, limit, separator=' ; ',
 
     bibrec_id = bfo.control_field("001")
 
-    # Process authors to add link, highlight and format affiliation
+    # Process authors to add orcid, link, highlight and format affiliation
     for author in authors:
 
         if author.has_key('a'):
@@ -151,13 +163,33 @@ def format_element(bfo, limit, separator=' ; ',
                     author['u'] = affiliation_prefix + author['u'] + \
                               affiliation_suffix
 
+        if 'j' in author:
+            if print_orcid == "yes":
+                orcid = author.get('j', "")
+                if orcid[0]:
+                    orcid = orcid[0].split(':')[1]
+                    if orcid_type == 'logo':
+                        author['j'] = '<a href="http://orcid.org/%s" target="_blank" class="author_orcid_image_link" title="%s">&nbsp;</a>' % (orcid, orcid)
+                    elif orcid_type == 'link':
+                        if orcid_text == "no":
+                            author['j'] = '%s<a href="http://orcid.org/%s" target="_blank">%s</a>%s' % (orcid_prefix, orcid, orcid, orcid_postfix)
+                        else:
+                            author['j'] = '%s<a href="http://orcid.org/%s" target="_blank">%s</a>%s' % (orcid_prefix, orcid, orcid_text, orcid_postfix)
+                    else:
+                        author['j'] = '%s%s%s' % (orcid_prefix, orcid, orcid_postfix)
+                else:
+                    author['j'] = ""
+
     # Flatten author instances
-    if print_affiliations == 'yes':
-        authors = [author.get('a', '') + author.get('u', '')
-                   for author in authors]
-    else:
-        authors = [author.get('a', '')
-                   for author in authors]
+    new_authors = []
+    for author in authors:
+        auth = author.get('a', '')
+        if print_orcid == 'yes':
+            auth = auth + author.get('j', '')
+        if print_affiliations == 'yes':
+            auth = auth + author.get('u', '')
+        new_authors.append(auth)
+    authors = new_authors
 
     if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
