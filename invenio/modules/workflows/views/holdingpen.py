@@ -73,7 +73,7 @@ HOLDINGPEN_WORKFLOW_STATES = {
 @login_required
 @register_menu(blueprint, 'personalize.holdingpen', _('Your Pending Actions'))
 @register_breadcrumb(blueprint, '.', _('Holdingpen'))
-@templated('workflows/hp_index.html')
+@templated('workflows/index.html')
 def index():
     """
     Display main interface of Holdingpen.
@@ -91,7 +91,7 @@ def index():
 @register_breadcrumb(blueprint, '.records', _('Records'))
 @login_required
 @permission_required(viewholdingpen.name)
-@templated('workflows/hp_maintable.html')
+@templated('workflows/maintable.html')
 def maintable():
     """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
@@ -176,7 +176,7 @@ def details(objectid):
 
     workflow_definition = get_workflow_info(extracted_data['workflow_func'])
     task_history = bwobject.get_extra_data().get('_task_history', [])
-    return render_template('workflows/hp_details.html',
+    return render_template('workflows/details.html',
                            bwobject=bwobject,
                            rendered_actions=rendered_actions,
                            history_objects=history_objects,
@@ -332,7 +332,7 @@ def get_context():
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @login_required
 @permission_required(viewholdingpen.name)
-@templated('workflows/hp_maintable.html')
+@templated('workflows/maintable.html')
 def load_table():
     """Get JSON data for the Holdingpen table.
 
