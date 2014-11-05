@@ -50,7 +50,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from six import iteritems
+from six import iteritems, string_types
 
 ## import Invenio stuff:
 from invenio.base.globals import cfg
@@ -6995,7 +6995,7 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     ## sanity check:
     if not exclude_values:
         exclude_values = []
-    if isinstance(tags, str):
+    if isinstance(tags, string_types):
         tags = (tags,)
     ## find values to count:
     vals_to_count = []
