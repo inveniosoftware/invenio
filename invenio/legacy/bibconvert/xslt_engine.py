@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,8 +37,9 @@ from __future__ import print_function
 
 import os
 import sys
-from lxml import etree
+from StringIO import StringIO
 
+from lxml import etree
 from invenio.utils.text import encode_for_xml
 
 from .api import FormatField
@@ -46,6 +47,15 @@ from .registry import templates
 
 CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
 """The namespace used for BibConvert functions"""
+
+
+class FileResolver(etree.Resolver):
+
+    """Local file resolver."""
+
+    def resolve(self, url, pubid, context):
+        """Resolve local name."""
+        return self.resolve_filename(url, context)
 
 
 def _bibconvert_function(dummy_ctx, value, func):
@@ -150,6 +160,8 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     result = ""
 
+    parser = etree.XMLParser()
+    parser.resolvers.add(FileResolver())
     try:
         try:
             if (-1 < xmltext.index('?') < 3):
@@ -158,7 +170,7 @@ def convert(xmltext, template_filename=None, template_source=None):
             # if index doesn't find the '?' then it raises a useless exception
             pass
 
-        xml = etree.XML(xmltext)
+        xml = etree.parse(StringIO(xmltext), parser)
     except etree.XMLSyntaxError as e:
         error = 'The XML code given is invalid. [%s]' % e
         raise Exception(error)
@@ -167,7 +179,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         raise Exception(error)
 
     try:
-        xsl = etree.XML(template)
+        xsl = etree.parse(StringIO(template), parser)
     except etree.XMLSyntaxError as e:
         error = 'The XSL code given is invalid. [%s]' % e
         raise Exception(error)
@@ -188,16 +200,8 @@ def convert(xmltext, template_filename=None, template_source=None):
     except etree.XSLTParseError as e:
         error = 'The XSL code given is invalid. [%s]' % e
         raise Exception(error)
-    except:
-        error = 'Failed to process the XSL code.'
-        raise Exception(error)
 
-    try:
-        temporary_result = xslt(xml)
-    except:
-        error = 'Failed to perform the XSL transformation.'
-        raise Exception(error)
-
+    temporary_result = xslt(xml)
     result = str(temporary_result)
 
     # Housekeeping
