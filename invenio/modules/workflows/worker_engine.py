@@ -195,9 +195,14 @@ def generate_snapshot(workflow_object, engine):
     :returns: BibWorkflowObject -- workflow_object instance
     :raises: WorkflowObjectVersionError
     """
-    if workflow_object.version in (ObjectVersion.INITIAL,
-                                   ObjectVersion.FINAL,
-                                   ObjectVersion.HALTED):
+    if workflow_object.version == ObjectVersion.RUNNING:
+        # Trying to run an object that is running. Dangerous!
+        msg = "Object is already in RUNNING state!"
+        workflow_object.log.debug(msg)
+        raise WorkflowObjectVersionError(msg,
+                                         obj_version=workflow_object.version,
+                                         id_object=workflow_object.id)
+    elif workflow_object.version in ObjectVersion.MAPPING.values():
         # Create initial snapshot
         initial_object = BibWorkflowObject.create_object_revision(
             workflow_object,
@@ -209,13 +214,6 @@ def generate_snapshot(workflow_object, engine):
         # Propagate the parent id
         initial_object.id_parent = workflow_object.id
         workflow_object.save()
-    elif workflow_object.version == ObjectVersion.RUNNING:
-        # Trying to run an object that is running. Dangerous!
-        msg = "Object is already in RUNNING state!"
-        workflow_object.log.debug(msg)
-        raise WorkflowObjectVersionError(msg,
-                                         obj_version=workflow_object.version,
-                                         id_object=workflow_object.id)
     else:
         # Ehm, this version does not exist.. ( magic or huge dev error,
         # surely the second one)

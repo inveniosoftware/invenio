@@ -586,6 +586,33 @@ distances from it.
         self.assertEqual(restarted_objects[1].id_parent,
                          restarted_objects[0].id)
 
+    def test_restart_failed_workflow(self):
+        """Test restarting workflow for given workflow id."""
+        from invenio.modules.workflows.models import (BibWorkflowObject,
+                                                      ObjectVersion)
+        from invenio.modules.workflows.engine import WorkflowStatus
+        from invenio.modules.workflows.api import start, start_by_oids
+        from invenio.modules.workflows.errors import WorkflowError
+
+        initial_data = BibWorkflowObject.create_object()
+        initial_data.set_data(1)
+        initial_data.save()
+
+        self.assertRaises(
+            WorkflowError,
+            start,
+            workflow_name="test_workflow_error",
+            data=[initial_data],
+            module_name="unit_tests"
+        )
+        self.assertEqual(initial_data.version, ObjectVersion.ERROR)
+
+        restarted_workflow = start_by_oids("test_workflow",
+                                           oids=[initial_data.id],
+                                           module_name="unit_tests")
+        self.assertEqual(initial_data.version, ObjectVersion.WAITING)
+        self.assertEqual(restarted_workflow.status, WorkflowStatus.HALTED)
+
     def _check_workflow_execution(self, objects, initial_data):
         """Test correct workflow execution."""
         from invenio.modules.workflows.models import ObjectVersion
