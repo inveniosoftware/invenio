@@ -303,26 +303,24 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     if processor_type == 1:
         # lxml
+        class FileResolver(etree.Resolver):
+            def resolve(self, url, pubid, context):
+                return self.resolve_filename(url, context)
+        from StringIO import StringIO
 
+        parser = etree.XMLParser()
+        parser.resolvers.add(FileResolver())
         try:
-            xml = etree.XML(xmltext)
+            xml = etree.parse(StringIO(xmltext), parser)
         except etree.XMLSyntaxError, e:
             error = 'The XML code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
             return None
-        except:
-            error = 'Failed to process the XML code.'
-            sys.stderr.write(error)
-            return None
 
         try:
-            xsl = etree.XML(template)
+            xsl = etree.parse(StringIO(template), parser)
         except etree.XMLSyntaxError, e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
-            sys.stderr.write(error)
-            return None
-        except:
-            error = 'Failed to process the XSL code.'
             sys.stderr.write(error)
             return None
 
@@ -341,17 +339,8 @@ def convert(xmltext, template_filename=None, template_source=None):
             error = 'The XSL code given is invalid. [%s]' % (e,)
             sys.stderr.write(error)
             return None
-        except:
-            error = 'Failed to process the XSL code.'
-            sys.stderr.write(error)
-            return None
 
-        try:
-            temporary_result = xslt(xml)
-        except:
-            error = 'Failed to perform the XSL transformation.'
-            sys.stderr.write(error)
-            return None
+        temporary_result = xslt(xml)
 
         result = str(temporary_result)
 
