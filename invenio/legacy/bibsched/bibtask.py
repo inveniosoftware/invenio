@@ -1200,16 +1200,21 @@ def _task_run(task_run_fnc):
 
     #Lets call the post-process tasklets
     if task_get_task_param("post-process"):
-
         split = re.compile(r"(bst_.*)\[(.*)\]")
         for tasklet in task_get_task_param("post-process"):
-            if not split.match(tasklet): # wrong syntax
+            if not split.match(tasklet):  # wrong syntax
                 _usage(1, "There is an error in the post processing option "
-                        "for this task.")
+                       "for this task.")
 
             aux_tasklet = split.match(tasklet)
-            _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
+            task = aux_tasklet.group(1)
+            passed_parameters = task_get_task_param("post_process_params") or dict()
+            parameters = eval("dict(%s)" % (aux_tasklet.group(2)))
+            parameters.update(passed_parameters)
+            _TASKLETS[task](**parameters)
+
     return True
+
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     """Prints usage info."""
