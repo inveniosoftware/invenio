@@ -149,6 +149,7 @@ from __future__ import absolute_import
 from .views import blueprint
 from . import bundles
 from ..assets.registry import bundles as bundles_registry
+from .registry import specs as specs_registry
 
 
 def setup_app(app):
@@ -161,3 +162,12 @@ def setup_app(app):
         with app.app_context():
             bundles_registry.register((bundles, bundles.jasmine_js))
             bundles_registry.register((bundles, bundles.jasmine_styles))
+            # invenio/invenio/base seems to be working dir here
+            specs_registry.register(
+                '../ext/jasmine/testsuite/js/jasmine_configuration.spec.js',
+                'invenio.ext.jasmine/jasmine_configuration.spec.js'
+            )
+            specs_registry.register(
+                '../ext/jasmine/testsuite/js/jquery_object_mock.js',
+                'invenio.ext.jasmine/jquery_object_mock.js'
+            )

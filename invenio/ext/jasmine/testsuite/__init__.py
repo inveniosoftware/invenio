@@ -16,28 +16,3 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-"""Bundles for Jasmine test runner."""
-
-from invenio.ext.assets import Bundle
-
-jasmine_js = Bundle(
-    # es5-shim is needed by PhantomJS
-    # 'vendors/es5-shim/es5-shim.js',
-    # 'vendors/es5-shim/es5-sham.js',
-    output="jasmine.js",
-    # Must be included prior to RequireJS
-    weight=-1,
-    bower={
-        "jasmine": ">=2",
-        "jasmine-jquery": ">=2",
-        "jasmine-flight": ">=3",
-        "jasmine-ajax": ">=2",
-    }
-)
-
-jasmine_styles = Bundle(
-    'vendors/jasmine/lib/jasmine-core/jasmine.css',
-    weight=-1,
-    output='jasmine.css'
-)

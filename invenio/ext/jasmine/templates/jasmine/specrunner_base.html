@@ -28,13 +28,15 @@
     // Test files are loaded using RequireJS. Each test file in turns uses RequireJS
     // to load the JS files they test.
     require(
-        [{% for m in modules %}'{{m}}'{%if not loop.last %}, {% endif %}{% endfor %}],
-        function () {
+        ['jasmine-boot',
+        {% for m in modules %}'{{m}}'{%if not loop.last %}, {% endif %}{% endfor %}
+        ],
+        function (executeTests) {
             // Jasmine runs tests on window.onload() by default, thus before
             // require.js has had a chance to load them. Thus we use a custom
             // boot.js file which renames window.onload to window.executeTests and
             // calls the executeTests() once the test modules have been loaded.
-            window.executeTests();
+            executeTests();
         }
     )
     </script>

@@ -18,13 +18,23 @@
  */
 
 /**
- * Removes originally installed `onload` function which runs the tests to
- * let us run it manually at the moment we desire.
+ * Helper file to test conflict between 'jquery' loaded here, and the one
+ * accessed in spec files. 
+ * If there is another instance of jQuery loaded globaly, spies handlers 
+ * attached in the spec file are not fired when an event is triggered from this 
+ * file.
  */
 define([
-  'vendors/jasmine/lib/jasmine-core/boot',
-], function(onload) {
+  'jquery'
+], function($) {
 
-  window.onload = undefined;
-  return onload;
+  function JqueryObjectMock($element) {
+    this.$element = $element;
+  }
+
+  JqueryObjectMock.prototype.triggersEvent = function () {
+    this.$element.trigger('event');
+  };
+
+  return JqueryObjectMock;
 });

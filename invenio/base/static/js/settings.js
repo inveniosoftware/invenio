@@ -41,7 +41,12 @@ require.config({
     "bootstrap-tagsinput": "vendors/bootstrap-tagsinput/src/bootstrap-tagsinput",
     bootstrap: "vendors/bootstrap/dist/js/bootstrap",
     prism: "vendors/prism/prism",
-    d3: "vendors/d3/d3.js"
+    d3: "vendors/d3/d3.js",
+    "jasmine-jquery": "vendors/jasmine-jquery/lib/jasmine-jquery",
+    "jasmine-core": "vendors/jasmine/lib/jasmine-core/jasmine",
+    "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
+    "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
+    "jasmine-boot": "js/jasmine/boot",
   },
   shim: {
     jquery: {
@@ -106,5 +111,22 @@ require.config({
     prism: {
       exports: "Prism"
     },
+    "jasmine-core": {
+      exports: "jasmineRequire"
+    },
+    "jasmine-jquery": {
+      deps: ["jquery", "jasmine-boot"]
+    },
+    "jasmine-ajax": {
+      deps: ["jasmine-boot"],
+    },
+    "jasmine-html": {
+      deps: ["jasmine-core"],
+      exports: "jasmineRequire"
+    },
+    "vendors/jasmine/lib/jasmine-core/boot": {
+      deps: ['jasmine-html'],
+      exports: "window.onload",
+    },
   }
-})
+});
