@@ -413,10 +413,9 @@ def author_list(obj, eng):
         if match:
             obj.log.info("Found a match for author extraction")
 
-            if 'a_stylesheet' not in obj.extra_data["repository"]["arguments"]:
-                a_stylesheet = "authorlist2marcxml.xsl"
-            else:
-                a_stylesheet = obj.extra_data["repository"]["arguments"]["a_stylesheet"]
+            a_stylesheet = obj.extra_data["repository"]["arguments"].get(
+                "a_stylesheet"
+            ) or "authorlist2marcxml.xsl"
             authors = convert(xml_content, a_stylesheet)
             authorlist_record = create_records(authors)
             if len(authorlist_record) == 1:
@@ -463,7 +462,6 @@ def upload_step(obj, eng):
         default_args.extend(['-N', arguments.get('u_name', "")])
     if arguments.get('u_priority', 5):
         default_args.extend(['-P', str(arguments.get('u_priority', 5))])
-    arguments = obj.extra_data["repository"]["arguments"]
 
     extract_path = os.path.join(
         cfg['CFG_TMPSHAREDDIR'],
@@ -519,30 +517,32 @@ def filter_step(obj, eng):
     from invenio.modules.records.api import Record
     from invenio.utils.shell import run_shell_command
 
-    arguments = obj.extra_data["repository"]["arguments"]
-    script_name = arguments.get("f_filter-file", "")
-    marcxml_value = Record(obj.data.dumps()).legacy_export_as_marc()
-    extract_path = os.path.join(
-        cfg['CFG_TMPSHAREDDIR'],
-        str(eng.uuid)
-    )
-    if not os.path.exists(extract_path):
-        os.makedirs(extract_path)
-
-    # Now we launch BibUpload tasks for the final MARCXML files
-    marcxmlfile = extract_path + os.sep + str(obj.id)
-    file_fd = open(marcxmlfile, 'w')
-    file_fd.write(marcxml_value)
-    file_fd.close()
-
-    exitcode, cmd_stdout, cmd_stderr = run_shell_command(
-        cmd="%s '%s'",
-        args=(str(script_name),
-              str(marcxmlfile)))
-    if exitcode != 0 or cmd_stderr != "":
-        obj.log.error(
-            "Error while running filtering script on %s\nError:%s"
-            % (marcxmlfile, cmd_stderr)
+    script_name = obj.extra_data["repository"]["arguments"].get("f_filter-file")
+    if script_name:
+        marcxml_value = Record(obj.data.dumps()).legacy_export_as_marc()
+        extract_path = os.path.join(
+            cfg['CFG_TMPSHAREDDIR'],
+            str(eng.uuid)
         )
+        if not os.path.exists(extract_path):
+            os.makedirs(extract_path)
+
+        # Now we launch BibUpload tasks for the final MARCXML files
+        marcxmlfile = extract_path + os.sep + str(obj.id)
+        file_fd = open(marcxmlfile, 'w')
+        file_fd.write(marcxml_value)
+        file_fd.close()
+
+        exitcode, cmd_stdout, cmd_stderr = run_shell_command(
+            cmd="%s '%s'",
+            args=(str(script_name),
+                  str(marcxmlfile)))
+        if exitcode != 0 or cmd_stderr != "":
+            obj.log.error(
+                "Error while running filtering script on %s\nError:%s"
+                % (marcxmlfile, cmd_stderr)
+            )
+        else:
+            obj.log.info(cmd_stdout)
     else:
-        obj.log.info(cmd_stdout)
+        obj.log.error("No script file found!")
