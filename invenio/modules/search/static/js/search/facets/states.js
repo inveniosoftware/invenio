@@ -17,18 +17,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(
-    [
-        "js/search/search",
-        "js/search/form",
-        "js/search/search_parser",
-        "js/search/typeahead",
-    ],
-    function() {
-        // This file is simply here to make sure the above dependencies are
-        // properly loaded and ready to be used by inline scripts.
-        //
-        // Without it, we have to rely on non-anonymous modules.
-        console.info("js/search/init is loaded")
-    }
-);
+define([], function() {
+  /**
+   * Enum with possible states of an option:
+   *
+   * add - "limit to" mode
+   * exclude - "exclude" mode
+   * inactive - filter not active
+   * partiallyActive - not active but at least one (not necessarily direct)
+   *  children is active
+   *
+   * @type {{limitTo: string, exclude: string, inactive: string, partiallyActive: string}}
+   */
+  var states = {
+    limitTo: '+',
+    exclude: '-',
+    inactive: 'inactive',
+    partiallyActive: 'partiallyActive'
+  };
+
+  return states;
+
+});

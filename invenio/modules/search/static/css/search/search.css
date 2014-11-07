@@ -22,30 +22,6 @@
     background-color: rgba(255,255,255,0.5);
 }
 
-#facet_list .panel-heading {
-    background-color: whiteSmoke;
-}
-
-#facet_list .panel-heading a:after {
-    content: ' ';
-    float: right;
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    line-height: 14px;
-    vertical-align: text-top;
-    background-image: url("../img/glyphicons-halflings.png");
-    background-position: 14px 14px;
-    background-repeat: no-repeat;
-    /* list alt */
-    background-position: -264px -24px;
-}
-
-#facet_list ul.list-unstyled ul.list-unstyled {
-    padding-left: 10px;
-    font-size: 90%;
-}
-
 #facet_list.affix {
     top: 28px;
 }

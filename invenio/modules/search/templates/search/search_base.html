@@ -36,6 +36,7 @@
   {{ super() }}
   {{ portalboxes.te }}
 {% endblock %}
+
 {% block header %}
   {{ super() }}
   {%- set args = request.args.copy().to_dict() -%}
@@ -68,21 +69,12 @@
       {%- block index_results -%}
         <div class="row">
           {%- block facets %}
-            <div class="col-md-3 col-lg-2 visible-md visible-lg" id="facetparent">
+            <div class="col-md-3 visible-md visible-lg" id="facetparent">
               <div class="facet" id="facet_list" data-clampedwidth="#facetparent"></div>
             </div>
           {%- endblock facets %}
           {%- block index_right -%}
-            <div class="col-md-9 col-lg-10">
-              {%- block facets_filter %}
-                <div class="row visible-md visible-lg">
-                  <div class="col-md-10">
-                    <div class="well" id="facet_filter" style="clear:both; display: none;">
-                      <input type="hidden" value="{{ request.args.get('p', '') }}" name="p" />
-                    </div>
-                  </div>
-                </div>
-              {%- endblock facets_filter %}
+            <div class="col-md-9 col-lg-9">
               {%- block results %}
                 <div class="row">
                   <div id="search_results" class="col-md-12">
@@ -112,20 +104,27 @@
   {{ super() }}
   {% if recids|length %}
 <script type="text/javascript">
-require(['jquery', 'js/search/search'], function($, search) {
-  search({
-    elem: '#facet_list',
-    data: {{ facets | tojson | safe }},
-    searchResultsUrl: '{{ url_for('search.results', qid=qid) }}',
-    args: {{ request.args.to_dict() | tojson | safe }},
-    labels: {
-      action: '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-danger">exclude</em></abbr> selected term from results.') | safe }}',
-      exclude: '{{ _('Exclude') }}',
-      didyouknow: '{{ _('Did you know?') }}',
-      alreadyin: '{{ _('An item is already in the facet filter.') }}'
-    }
-  })
-})
+require([
+  'jquery',
+  'js/search/search',
+  {%- block facets_configuration -%}
+  'js/search/facets/configuration/tree/main'
+  {%- endblock facets_configuration -%},
+], function($, SearchResultsPage, facets_configuration) {
+  var request_args = {{ request.args.to_dict()|tojson|safe }};
+  var search_url = '{{ url_for('search.results', qid=qid) }}';
+  var facets_content = {{ facets|tojson|safe }};
+
+  var searchResultsPage = new SearchResultsPage({
+    $facets_element: $('#facet_list'),
+    $search_results: $('#search_results'),
+    $search_query_field: $('#search-box-main input[name=p]'),
+    facets_configuration: facets_configuration,
+    request_args: request_args,
+    search_url: search_url,
+    facets_content: facets_content,
+  });
+});
 </script>
   {% endif %}
 {% endblock %}

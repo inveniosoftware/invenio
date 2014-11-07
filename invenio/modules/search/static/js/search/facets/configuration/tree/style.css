@@ -17,18 +17,34 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(
-    [
-        "js/search/search",
-        "js/search/form",
-        "js/search/search_parser",
-        "js/search/typeahead",
-    ],
-    function() {
-        // This file is simply here to make sure the above dependencies are
-        // properly loaded and ready to be used by inline scripts.
-        //
-        // Without it, we have to rely on non-anonymous modules.
-        console.info("js/search/init is loaded")
-    }
-);
+.facet-list label {
+  display: inline-block;
+}
+
+.facet-list .glyphicon-spacer {
+  visibility: hidden;
+}
+
+.facet-list .facet-more-button,
+.facet-list .facet-less-button {
+  color: #777;
+  cursor: pointer;
+  font-size: smaller;
+}
+
+.facet-list .list-content .list-content {
+  padding-left: 10px;
+}
+
+.facet-list a.toggle-filter-button,
+.facet-list a.reset-button {
+  cursor: pointer;
+  display: inline-block;
+  vertical-align: top;
+  font-size: 13px;
+  width: 77%;
+}
+
+.facet-list .reset-button[disabled="disabled"] {
+  cursor: default;
+}
