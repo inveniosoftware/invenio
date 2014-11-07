@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,18 +19,20 @@
 
 """Facet utility functions."""
 
-from operator import itemgetter
 from itertools import groupby
-from six import iteritems
-from flask import g, url_for, request
+from operator import itemgetter
+
+from flask import g, request, url_for
 from flask.ext.login import current_user
 
-from .cache import search_results_cache, \
-    get_search_results_cache_key_from_qid
-from .models import Collection
+from intbitset import intbitset
 
 from invenio.base.globals import cfg
-from intbitset import intbitset
+
+from six import iteritems
+
+from .cache import get_search_results_cache_key_from_qid, search_results_cache
+from .models import Collection
 
 
 def get_current_user_records_that_can_be_displayed(qid):
@@ -112,7 +114,7 @@ class FacetBuilder(object):
 
     def get_title(self, **kwargs):
         """Return facet title."""
-        return g._('Any ' + self.name.capitalize())
+        return g._(self.name.capitalize())
 
     def get_url(self, qid=None):
         """Return facet data url."""
@@ -128,7 +130,7 @@ class FacetBuilder(object):
         """Return record ids as intbitset."""
         try:
             return get_current_user_records_that_can_be_displayed(qid)
-        except:
+        except Exception:
             return intbitset([])
 
     def get_recids(self, qid):
@@ -139,9 +141,15 @@ class FacetBuilder(object):
         """Return facet data."""
         from invenio.legacy.search_engine import get_most_popular_field_values,\
             get_field_tags
-        return get_most_popular_field_values(self.get_recids(qid),
-                                             get_field_tags(self.name)
-                                             )[0:limit]
+        most_popular_fields = get_most_popular_field_values(
+            self.get_recids(qid), get_field_tags(self.name))[0:limit]
+        most_popular_fields = map(lambda x: {
+            'id': x[0],
+            'records_num': x[1],
+            'label': x[0],
+            'is_expandable': False
+        }, most_popular_fields)
+        return most_popular_fields
 
     def get_value_recids(self, value):
         """Return record ids in intbitset for given field value."""
@@ -187,6 +195,12 @@ class CollectionFacetBuilder(FacetBuilder):
         facet = []
         for c in collection.collection_children_r:
             num_records = len(c.reclist.intersection(recIDsHitSet))
+            is_expandable = len(c.collection_children_r) > 0
             if num_records:
-                facet.append((c.name, num_records, c.name_ln))
-        return sorted(facet, key=lambda x: x[1], reverse=True)[0:limit]
+                facet.append({
+                    'id': c.name,
+                    'records_num': num_records,
+                    'label': c.name_ln,
+                    'is_expandable': is_expandable
+                })
+        return sorted(facet, key=lambda x: x['label'])[0:limit]
