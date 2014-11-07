@@ -171,3 +171,15 @@ def setup_app(app):
                 '../ext/jasmine/testsuite/js/jquery_object_mock.js',
                 'invenio.ext.jasmine/jquery_object_mock.js'
             )
+            specs_registry.register(
+                '../ext/jasmine/testsuite/js/initialization_checker.spec.js',
+                'invenio.ext.jasmine/initialization_checker.spec.js'
+            )
+            specs_registry.register(
+                '../ext/jasmine/testsuite/js/events_checker.spec.js',
+                'invenio.ext.jasmine/events_checker.spec.js'
+            )
+            specs_registry.register(
+                '../ext/jasmine/testsuite/js/simple_div.html',
+                'invenio.ext.jasmine/simple_div.html'
+            )
