@@ -33,6 +33,7 @@ js = Bundle(
 styles = Bundle(
     'css/search/search.css',
     'css/search/searchbar.css',
+    'js/search/facets/configuration/tree/style.css',
     filters="cleancss",
     output="search.css",
     weight=60
