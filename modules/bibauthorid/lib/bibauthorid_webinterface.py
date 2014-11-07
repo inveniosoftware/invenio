@@ -2759,7 +2759,12 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                                    'comments': 'Assigned automatically when autoclaim was triggered.'}
                 userinfo = webapi.fill_out_userinfo(additional_info, uid, req.remote_ip, ulevel, strict_check=False)
 
+                if 'email' in session:
+                    userinfo['email'] = session['email']
+                elif 'email' not in userinfo:
+                    userinfo['email'] = None
                 webapi.commit_operations_from_ticket(autoclaim_ticket, userinfo, uid, ulevel)
+
                 already_claimed_recids = set(
                     [rec for _, _, rec in get_claimed_papers_of_author(person_id)]) & papers_to_autoclaim
                 successful_recids = set([op['rec'] for op in webapi.get_ticket_status(
