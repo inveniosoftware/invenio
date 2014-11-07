@@ -55,15 +55,13 @@ def visit_create_index(element, compiler, **kw):
 
     columns = []
     for i, c in enumerate(index.columns):
-        # FIXED with SQLAlchemy >= 0.9.*
-        # cname = preparer.quote(c.name, c.quote)
-        # use this:
         cname = c.name
         suffix = ''
         if isinstance(lst, (list, tuple)) and len(lst) > i \
                 and lst[i] is not None:
             suffix = '(%d)' % lst[i]
-        elif str(c.type).startswith('TEXT') \
+        elif c.type != types.NULLTYPE \
+                and str(c.type).startswith('TEXT') \
                 and (c.type.length is not None):
             suffix = '(%d)' % c.type.length
         columns.append(cname + suffix)
