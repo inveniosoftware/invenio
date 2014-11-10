@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import re
 
-from invenio.bibfield_reader import Reader
+from invenio.bibfield_reader import Reader, ReaderException
 
 
 class MarcReader(Reader):
@@ -90,8 +90,15 @@ class MarcReader(Reader):
             d[key] = value
 
         self.rec_tree = SaveDict()
-        tmp = create_record(self.blob)[0]
-        for key, values in tmp.iteritems():
+        record, status_code, errors = create_record(self.blob)
+        if status_code == 0:
+            if isinstance(errors, list):
+                errors = "\n".join(errors)
+            # There was an error
+            raise ReaderException(
+                "There was an error while parsing MARCXML: %s" % (errors,))
+
+        for key, values in record.iteritems():
             if key < '010' and key.isdigit():
                 self.rec_tree[key] = [value[3] for value in values]
             else:
