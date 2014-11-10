@@ -136,7 +136,7 @@ invenio = Bundle(
 #  - LESS_RUN_IN_DEBUG is False
 #
 lessjs = Bundle(
-    "vendors/less/dist/less-1.7.0.js",
+    "vendors/less/dist/less.js",
     output="less.js",
     filters="uglifyjs",
     weight=0,
