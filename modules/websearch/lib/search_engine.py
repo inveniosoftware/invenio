@@ -4974,23 +4974,19 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if format == 'recjson':
         import json
         from invenio.bibfield import get_record as get_recjson
+        from invenio.bibfield_utils import SmartDict
         recjson = get_recjson(recID)
-        record = {}
-        if ot:
-            for key in ot:
-                record[key] = recjson[key]
-        else:
-            for key in recjson:
-                record[key] = recjson[key]
-        if not can_see_hidden:
-            for field in CFG_BIBFORMAT_HIDDEN_RECJSON_FIELDS:
-                if field in record:
-                    del record[field]
+        record = SmartDict()
+        keys = ot or recjson.keys()
+        for key in keys:
+            if key == 'bibdocs':
+                continue
+            if not can_see_hidden and key in CFG_BIBFORMAT_HIDDEN_RECJSON_FIELDS:
+                continue
+            record[key] = recjson.get(key)
         # skipkeys is True to skip e.g. the bibdocs key, which is a non
         # primitive object.
-        if 'bibdocs' in record:
-            del record['bibdocs']
-        return json.dumps(record, skipkeys=True)
+        return json.dumps(dict(record), skipkeys=True)
 
     _ = gettext_set_language(ln)
 
