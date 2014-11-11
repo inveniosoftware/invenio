@@ -59,7 +59,7 @@ def setup_app(app):
         'CFG_EMAIL_BACKEND', 'flask.ext.email.backends.smtp.Mail'))
     app.config.setdefault('DEFAULT_FROM_EMAIL', cfg['CFG_SITE_SUPPORT_EMAIL'])
     app.config.setdefault('SERVER_EMAIL', cfg['CFG_SITE_ADMIN_EMAIL'])
-    app.config.setdefault('ADMINS', (cfg['CFG_SITE_ADMIN_EMAIL'], ))
+    app.config.setdefault('ADMINS', (('', cfg['CFG_SITE_ADMIN_EMAIL']),))
     app.config.setdefault('MANAGERS', (cfg['CFG_SITE_SUPPORT_EMAIL'], ))
 
     CFG_MISCUTIL_SMTP_HOST = cfg.get('CFG_MISCUTIL_SMTP_HOST')
