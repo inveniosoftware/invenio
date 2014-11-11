@@ -1285,7 +1285,6 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     is allowed (i.e. all the administrative action which are connected to
     an web area in Invenio) and the corresponding url.
     """
-    _ = gettext_set_language(ln)
     your_role_actions = acc_find_user_role_actions(user_info)
     your_admin_activities = {}
     for (role, action) in your_role_actions:
@@ -1322,7 +1321,7 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
 
     ret = {}
     for action, (name, url) in iteritems(your_admin_activities):
-        ret[_(name)] = url % ln
+        ret[name] = url % ln
 
     return ret
 
