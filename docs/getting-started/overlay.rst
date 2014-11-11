@@ -273,7 +273,7 @@ needs to declare a Flask blueprint. Create the following file:
 
     blueprint = Blueprint(
         "myoverlay",
-        __name__
+        __name__,
         url_prefix="/",
         template_folder="templates",  # where your custom templates will go
         static_folder="static"        # where the assets go
