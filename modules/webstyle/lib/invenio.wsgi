@@ -37,23 +37,41 @@ try:
 except:
     pass
 
+# load register_exception() in a gentle way
+try:
+    from invenio.errorlib import register_exception
+except Exception:
+    def register_exception(*args, **kwargs):
+        pass
+
 # pre-load citation dictionaries upon WSGI application start-up (the
 # citation dictionaries are loaded lazily, which is good for CLI
 # processes such as bibsched, but for web user queries we want them to
 # be available right after web server start-up):
-from invenio.bibrank_citation_searcher import get_cited_by_weight
-get_cited_by_weight([])
+try:
+    from invenio.bibrank_citation_searcher import get_cited_by_weight
+    get_cited_by_weight([])
+except Exception:
+    register_exception()
 
 # pre-load docextract knowledge bases
-from invenio.refextract_kbs import get_kbs
-get_kbs()
-# pre-load docextract author regexp
-from invenio.authorextract_re import get_author_regexps
-get_author_regexps()
+try:
+    from invenio.refextract_kbs import get_kbs
+    get_kbs()
+except Exception:
+    register_exception()
+
 # increase compile regexps cache size for further
 # speed improvements in docextract
 import re
 re._MAXCACHE = 2000
+
+# pre-load docextract author regexp
+try:
+    from invenio.authorextract_re import get_author_regexps
+    get_author_regexps()
+except Exception:
+    register_exception()
 
 
 try:
