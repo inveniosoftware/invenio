@@ -38,7 +38,18 @@ define(function(require, exports, module) {
     this.request_args = $.extend({}, options.request_args);
     this.search_url = options.search_url;
 
-    this.setUpFacets(options.facets_configuration, options.facets_content);
+    this.facet_engine = this.$facets_element.facet($.extend({},
+      options.facets_configuration,
+    {
+      facets: options.facets_content,
+      activate_modifier_keys: true,
+      translations: options.translations,
+    }))[0];
+
+    this.facet_engine.loaded_promise.done(function() {
+      this.synchronizePageState();
+    }.bind(this));
+
     this.connectEvents();
 
     // Load facets state on page load
@@ -118,16 +129,7 @@ define(function(require, exports, module) {
 
     setUpFacets: function(facet_configuration, facets_content) {
 
-      this.facet_engine = this.$facets_element.facet($.extend({},
-        facet_configuration,
-      {
-        facets: facets_content,
-        activate_modifier_keys: true
-      }))[0];
 
-      this.facet_engine.loaded_promise.done(function() {
-        this.synchronizePageState();
-      }.bind(this));
     },
 
     updateSearchResults: function(queryStructure) {

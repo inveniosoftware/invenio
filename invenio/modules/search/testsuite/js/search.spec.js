@@ -44,6 +44,11 @@ define([
     request_args: {"action_search": "", "ln": "en", "p": ""},
     search_url: '/search',
     facets_content: mocks.facetsContentMock,
+    translations: {
+      any: 'Any_tr',
+      more: 'More_tr',
+      less: 'Less_tr',
+    },
   };
 
   var collectionRequest;
@@ -122,6 +127,25 @@ define([
         yearFilter.getOption('2002').activate('+');
         yearFilter.getOption('2000').activate('-');
         expect($searchField.val()).toEqual('year:2002 AND NOT year:2000')
+      });
+
+      it('has translations available in facets', function() {
+        expect(yearFilter.translations).toEqual({
+          any: 'Any_tr',
+          more: 'More_tr',
+          less: 'Less_tr',
+        });
+        expect(yearFilter.getOption('2002').translations).toEqual({
+          any: 'Any_tr',
+          more: 'More_tr',
+          less: 'Less_tr',
+        });
+        expect(yearFilter.$main_facet_box.data('facet-options-list')
+          .translations).toEqual({
+          any: 'Any_tr',
+          more: 'More_tr',
+          less: 'Less_tr',
+        });
       });
 
     });

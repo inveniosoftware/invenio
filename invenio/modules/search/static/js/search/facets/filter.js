@@ -36,7 +36,10 @@ define([
   function Filter(element, options) {
 
     this.$element = $(element);
-    this.options = $.extend({}, $.fn.facet_filter.defaults, options);
+    this.options = $.extend({}, $.fn.facet_filter.defaults, {
+      translations: $.extend(
+        {}, $.fn.facet_filter.defaults.translations, options.translations),
+    }, options);
 
     /**
      * Has value 'true' when the filter content loading is finished
@@ -52,17 +55,17 @@ define([
     this.id = this.options.id;
     this.filter_area = this.id;
     this.facet_engine = this.options.facet_engine;
+    this.translations = this.options.translations;
 
     this.$element.append(this.options.template({
-      header: this.header
+      header: this.header,
+      any: this.translations.any,
     }));
 
     this.$reset_button = this.$element.find(
       this.options.reset_button_selector);
 
     this.$main_facet_box = this.$element.find(this.options.content_selector);
-
-    this.saved_state_copy = {};
 
     /**
      * Collects ids of facet options with activated filters.
@@ -150,14 +153,15 @@ define([
 
           option_details: this.options.option_details,
           list_details: this.options.list_details,
+          translations: this.translations,
 
           facet_engine: this.facet_engine,
           filter: this,
-          parent: undefined, // no parent, first level options
+          parent: null, // no parent, first level options
           activate_modifier_keys: this.options.activate_modifier_keys
         })
       )[0].loadedPromise.then(function () {
-        that._loadState(that.saved_state_copy);
+        that._loadState(that.stored_state);
         that.is_loaded = true;
       });
 
@@ -313,17 +317,17 @@ define([
      */
     loadState: function loadState(saved_state) {
 
-      var saved_state_copy = $.extend({}, saved_state);
+      var stored_state = $.extend({}, saved_state);
 
       // if not loaded this function will be executed again
       // with the value this.stored_state as the argument,
       // when the filter is ready from deferred in constructor.
       if (!this.is_loaded) {
-        this.saved_state_copy = saved_state;
+        this.stored_state = saved_state;
         return;
       }
 
-      this._loadState(saved_state_copy);
+      this._loadState(stored_state);
     },
 
     /**

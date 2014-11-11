@@ -38,7 +38,10 @@ define([
   function OptionsList(element, options) {
 
     this.$element = $(element);
-    this.options = $.extend({}, $.fn.facet_options_list.defaults, options);
+    this.options = $.extend({}, $.fn.facet_options_list.defaults, {
+      translations: $.extend(
+        {}, $.fn.facet_options_list.defaults.translations, options.translations),
+    }, options);
     this.name = options.id;
     this.facet_engine = this.options.facet_engine;
     this.parent = this.options.parent;
@@ -47,11 +50,12 @@ define([
     this.template = this.options.template;
 
     this.option_wrapper = '<li class="facet-option"></li>';
+    this.translations = this.options.translations;
 
     // render
     this.$element.append(this.template({
-      lessLabel: this.options.title_less,
-      moreLabel: this.options.title_more
+      lessLabel: this.translations.less,
+      moreLabel: this.translations.more
     }));
 
     this.$list = this.$element.find(this.options.option_list_selector);
@@ -213,6 +217,7 @@ define([
         activate_modifier_keys: this.options.activate_modifier_keys,
         list_details: this.options.list_details,
         option_details: this.options.option_details,
+        translations: this.translations,
       }));
       // All rows are hidden by default.
       // After the list is loaded first items are shown.
@@ -248,21 +253,10 @@ define([
 
   $.fn.facet_options_list.defaults = {
 
-    /**
-     * The label of the link to show more options than the number
-     * at 'split_by' parameter
-     *
-     * @type {String}
-     */
-    title_more: 'More',
-
-    /**
-     * The label of the link to show less options by the number
-     * at 'split_by' parameter, after showing more before
-     *
-     * @type {String}
-     */
-    title_less: 'Less',
+    translations: {
+      more: 'More',
+      less: 'Less'
+    },
 
     /**
      * Display by chunks of N elements

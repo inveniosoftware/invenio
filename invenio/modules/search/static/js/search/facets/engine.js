@@ -39,9 +39,11 @@ define([
     this.$element = $(element);
 
     this.options = $.extend({}, $.fn.facet.defaults, options, {
-      option_details: $.extend({}, $.fn.facet.defaults.option_details, options.option_details),
-      list_details: $.extend({}, $.fn.facet.defaults.list_details, options.list_details),
-      filter_details: $.extend({}, $.fn.facet.defaults.filter_details, options.filter_details)
+      option_details: $.extend({}, options.option_details),
+      list_details: $.extend({}, options.list_details),
+      filter_details: $.extend({}, options.filter_details),
+      translations: $.extend(
+        {}, $.fn.facet.defaults.translations, options.translations),
     });
 
     /**
@@ -51,6 +53,7 @@ define([
     this.filters = {};
     this.filter_wrapper = '<div class="facet-filter"></div>';
     this.is_loaded = false;
+    this.translations = this.options.translations;
   }
 
   var dataLabel = 'facet-engine';
@@ -90,7 +93,8 @@ define([
           facet_engine: this,
           option_details: this.options.option_details,
           list_details: this.options.list_details,
-          activate_modifier_keys: this.options.activate_modifier_keys
+          activate_modifier_keys: this.options.activate_modifier_keys,
+          translations: this.translations,
         }))[0];
 
         $new_filter.on(Filter.events.updated, function(event) {
@@ -212,14 +216,12 @@ define([
      * Path of an additional stylesheet for facets to load.
      * @type {String}
      */
-    stylesheet: undefined,
-
+    stylesheet: null,
     /**
      * The class of the facets section.
      * @type {String}
      */
     main_css_class: 'facet-list',
-
     /**
      * Should modifier keys be used.
      *

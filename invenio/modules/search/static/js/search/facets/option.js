@@ -37,7 +37,10 @@ define([
   function Option(element, options) {
 
     this.$element = $(element);
-    this.options = $.extend({}, $.fn.facet_option.defaults, options);
+    this.options = $.extend({}, $.fn.facet_option.defaults, {
+      translations: $.extend(
+        {}, $.fn.facet_option.defaults.translations, options.translations),
+    }, options);
 
     this.is_expanded = false;
     this.is_sublist_built = false;
@@ -48,6 +51,7 @@ define([
     this.records_num = this.options.entry.records_num;
     this.label = this.options.entry.label;
     this.template = this.options.template;
+    this.translations = this.options.translations;
 
     this.$element.attr('data-facet-name', this.id);
 
@@ -122,7 +126,7 @@ define([
       this.$element.append(this.template({
         label: this.label,
         records_num: this.records_num,
-        id: this.id
+        id: this.id,
       }));
     },
 

@@ -27,7 +27,12 @@ define([], function() {
    * partiallyActive - not active but at least one (not necessarily direct)
    *  children is active
    *
-   * @type {{limitTo: string, exclude: string, inactive: string, partiallyActive: string}}
+   * @type {{
+   *  limitTo: string,
+   *  exclude: string,
+   *  inactive: string,
+   *  partiallyActive: string
+   *  }}
    */
   var states = {
     limitTo: '+',
