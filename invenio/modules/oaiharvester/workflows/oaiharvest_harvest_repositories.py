@@ -83,7 +83,7 @@ class oaiharvest_harvest_repositories(RecordWorkflow):
                         [
                             start_async_workflow(
                                 preserve_data=True,
-                                preserve_extra_data_keys=["repository"],
+                                preserve_extra_data_keys=["repository", "oai_identifier"],
                                 get_workflow_from=get_workflow_from_engine_definition,
                             ),
                         ],
@@ -96,7 +96,7 @@ class oaiharvest_harvest_repositories(RecordWorkflow):
                             wait_for_a_workflow_to_complete(10.0),
                             start_async_workflow(
                                 preserve_data=True,
-                                preserve_extra_data_keys=["repository"],
+                                preserve_extra_data_keys=["repository", "oai_identifier"],
                                 get_workflow_from=get_workflow_from_engine_definition,
                             ),
                         ],

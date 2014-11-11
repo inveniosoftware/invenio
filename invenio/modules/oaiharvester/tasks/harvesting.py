@@ -49,11 +49,7 @@ init_harvesting.description = 'Start harvesting'
 
 
 def filtering_oai_pmh_identifier(obj, eng):
-    """Get the OAI-PMH identifier in the OAI request.
-
-    :param obj: BibworkflowObject being processed
-    :param eng: BibWorkflowEngine processing the object
-    """
+    """Check if the current OAI record has been processed already this run."""
     from ..utils import identifier_extraction_from_string
 
     if "oaiharvest" not in eng.extra_data:
@@ -61,19 +57,23 @@ def filtering_oai_pmh_identifier(obj, eng):
     if "identifiers" not in eng.extra_data["oaiharvest"]:
         eng.extra_data["oaiharvest"]["identifiers"] = []
 
-    if not isinstance(obj.data, list):
-        obj_data_list = [obj.data]
+    if not obj.data:
+        obj.log.error("No data found in object!")
+        return False
+    elif isinstance(obj.data, list):
+        # In case it is a list
+        obj.data = obj.data[0]
+
+    identifier = (identifier_extraction_from_string(obj.data) or
+                  identifier_extraction_from_string(obj.data, oai_namespace="") or
+                  "")
+    obj.extra_data["oai_identifier"] = identifier
+    if identifier in eng.extra_data["oaiharvest"]["identifiers"]:
+        # The record has already been harvested in this run
+        return False
     else:
-        obj_data_list = obj.data
-    for record in obj_data_list:
-        identifier = (identifier_extraction_from_string(record) or
-                      identifier_extraction_from_string(record, oai_namespace="") or
-                      "")
-        if identifier in eng.extra_data["oaiharvest"]["identifiers"]:
-            return False
-        else:
-            eng.extra_data["oaiharvest"]["identifiers"].append(identifier)
-            return True
+        eng.extra_data["oaiharvest"]["identifiers"].append(identifier)
+        return True
 
 
 def get_repositories_list(repositories=()):

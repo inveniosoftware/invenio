@@ -25,7 +25,7 @@ from invenio.modules.workflows.testsuite.test_workflows import WorkflowTasksTest
 
 class OAIHarvesterTasks(WorkflowTasksTestCase):
 
-    """Class to test the marcxml tasks."""
+    """Class to test the harvesting related workflow tasks."""
 
     def setUp(self):
         """Setup tests."""
@@ -39,7 +39,6 @@ class OAIHarvesterTasks(WorkflowTasksTestCase):
 
     def test_filtering(self):
         """Test filtering functionality."""
-        from invenio.ext.sqlalchemy import db
         from ..tasks.harvesting import filtering_oai_pmh_identifier
         from invenio.modules.workflows.api import start
         from invenio.modules.workflows.models import BibWorkflowObject
@@ -57,23 +56,33 @@ class OAIHarvesterTasks(WorkflowTasksTestCase):
                        my_test_obj,
                        module_name="unit_tests")
 
+        # Initialize these attributes to simulate task running in workflows
         my_test_obj.data = my_test_obj.get_data()
+        my_test_obj.extra_data = my_test_obj.get_extra_data()
         my_test_obj_b.data = my_test_obj_b.get_data()
+        my_test_obj_b.extra_data = my_test_obj_b.get_extra_data()
         engine.extra_data = engine.get_extra_data()
+
+        # Try to add an identifier
         self.assertTrue(filtering_oai_pmh_identifier(my_test_obj, engine))
+
+        # Update engine with the added identifier
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
+
+        # False because it is already added
         self.assertFalse(filtering_oai_pmh_identifier(my_test_obj, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
+
         self.assertTrue(filtering_oai_pmh_identifier(my_test_obj_b, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
+
+        # False because it is already added
         self.assertFalse(filtering_oai_pmh_identifier(my_test_obj_b, engine))
         engine.set_extra_data(engine.extra_data)
         engine.extra_data = engine.get_extra_data()
-        self.assertFalse(filtering_oai_pmh_identifier(my_test_obj, engine))
-        db.session.delete(my_test_obj_b)
 
     def test_init_harvesting(self):
         """Test harvesting."""
