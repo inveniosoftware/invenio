@@ -42,7 +42,7 @@ For more information see http://flask-debugtoolbar.readthedocs.org/en/latest/
 def setup_app(app):
     """Setup Flask with the DebugToolbar application."""
     # Enable Flask Debug Toolbar early to also catch HTTPS redirects
-    if app.debug:
+    if app.debug and app.config.get('DEBUG_TB_ENABLED', app.debug):
         try:
             from flask.ext.debugtoolbar import module, DebugToolbarExtension
             module.static_folder = 'static'
