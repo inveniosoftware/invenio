@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+##               2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1080,6 +1081,16 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
             recids = get_recids_matching_query(p=journal,
                                                f=tags['refs_journal'],
                                                config=config)
+
+            # Since the query is executed on a MARC field, the search
+            # is not fuzzy but exact. In case of references that
+            # contained only the starting _and not_ the ending page,
+            # the simple query above was unable to locate those that
+            # contained both.
+            recids |= get_recids_matching_query(p=journal + "-*",
+                                                f=tags['refs_journal'],
+                                                config=config)
+
             write_message("These records match %s in %s: %s"
                     % (journal, tags['refs_journal'], list(recids)), verbose=9)
 
