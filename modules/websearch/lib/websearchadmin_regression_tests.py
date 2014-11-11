@@ -75,11 +75,8 @@ class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
         error_messages = test_web_page_content(url,
                                                username='admin',
                                                password='',
-                                               expected_text=['CollectionNameSearchService',
-                                                              'collections of interest',
-                                                              'OK',
-                                                              'SubmissionNameSearchService',
-                                                              'submissions of interest'])
+                                               expected_text=['OK',
+                                                              'JournalHintService'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
