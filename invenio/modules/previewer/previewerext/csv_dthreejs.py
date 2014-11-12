@@ -30,8 +30,17 @@ def validate_csv(f):
     """Return dialect information about given csv file."""
     with open(f.fullpath, 'rU') as csvfile:
         is_valid = False
+        try:
+            dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        except Exception as e:
+            current_app.logger.debug(
+                'File %s is not valid CSV: %s' % (f.name+f.superformat, e))
+            return {
+                'delimiter': '',
+                'encoding': '',
+                'is_valid': is_valid
+            }
         u = UniversalDetector()
-        dialect = csv.Sniffer().sniff(csvfile.read(1024))
         dialect.strict = True
         csvfile.seek(0)
         reader = csv.reader(csvfile, dialect)

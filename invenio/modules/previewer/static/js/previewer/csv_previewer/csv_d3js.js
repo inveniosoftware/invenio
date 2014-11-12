@@ -16,62 +16,99 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
+'use strict';
 
 define(function(require) {
-  'use strict';
 
-  /**
-   * Module dependencies
-   */
-  var d3 = require('vendors/d3/d3');
+  var $ = require('jquery'),
+      d3 = require('vendors/d3/d3');
 
-  var previewer = document.querySelector('div[data-previewer="d3csv"]');
-  var delimiter = previewer.dataset.csvDelimiter
-  var encoding = previewer.dataset.csvEncoding
-  var resource = previewer.dataset.source;
+  return require('flight/lib/component')(CSV_D3JS);
 
-  function tabulate(data, target, columns) {
+  function CSV_D3JS() {
 
-    var table = d3.select(target).append("table").classed({
-      'table': true,
-      'table-hover': true,
-      'table-bordered': true,
-    }),
-    thead = table.append("thead"),
-    tbody = table.append("tbody");
+    var CSV_D3JS;
 
-    // append the header row
-    thead.append("tr")
-    .selectAll("th")
-    .data(columns)
-    .enter()
-    .append("th")
-    .text(function(column) { return column; });
+    this.tabulate = function (data, target, columns) {
 
-    // create a row for each object in the data
-    var rows = tbody.selectAll("tr")
-    .data(data)
-    .enter()
-    .append("tr");
-
-    // create a cell in each row for each column
-    var cells = rows.selectAll("td")
-    .data(function(row) {
-      return columns.map(function(column) {
-        return {column: column, value: row[column]};
+      var table = d3.select(target).append("table").classed({
+        'table': true,
+        'table-hover': true,
+        'table-bordered': true,
       });
-    })
-    .enter()
-    .append("td")
-    .text(function(d) { return d.value; });
+      CSV_D3JS.thead = table.append("thead");
+      CSV_D3JS.tbody = table.append("tbody");
+      CSV_D3JS.columns = columns;
+      CSV_D3JS.data = data;
 
-    return table;
+      // append the header row
+      CSV_D3JS.thead.append("tr")
+      .selectAll("th")
+      .data(CSV_D3JS.columns)
+      .enter()
+      .append("th")
+      .text(function(column) { return column; });
+
+      CSV_D3JS.next = 1;
+      CSV_D3JS.chunk_size = 500;
+      CSV_D3JS.chunks = Math.ceil(CSV_D3JS.data.length/CSV_D3JS.chunk_size);
+
+      CSV_D3JS.loadNext(undefined, {
+        id: CSV_D3JS.id
+      });
+      if (CSV_D3JS.chunks > 1) {
+        CSV_D3JS.trigger(document, "showLoader", {
+          id: CSV_D3JS.id
+        });
+      }
+
+      return true;
+    }
+
+    this.loadNext = function (ev, data) {
+      if (data.id===CSV_D3JS.id && CSV_D3JS.next <= CSV_D3JS.chunks) {
+        // create a row for each object in the data chunk
+        var rows = CSV_D3JS.tbody.selectAll("tr")
+        .data(CSV_D3JS.data.slice(0,CSV_D3JS.next*CSV_D3JS.chunk_size))
+        .enter()
+        .append("tr");
+        // create a cell in each row for each column
+        var cells = rows.selectAll("td")
+        .data(function(row) {
+          return CSV_D3JS.columns.map(function(column) {
+            return {column: column, value: row[column]};
+          });
+        })
+        .enter()
+        .append("td")
+        .text(function(d) { return d.value; });
+
+        if (CSV_D3JS.next === CSV_D3JS.chunks) {
+          CSV_D3JS.trigger(document, "hideLoader", {
+            id: CSV_D3JS.id
+          });
+        }
+        CSV_D3JS.next+=1;
+      }
+    }
+
+    this.after('initialize', function () {
+      CSV_D3JS = this;
+      CSV_D3JS.id = CSV_D3JS.node.id;
+
+      var delimiter = CSV_D3JS.$node.data("csv-delimiter"),
+          encoding = CSV_D3JS.$node.data("csv-encoding"),
+          resource = CSV_D3JS.$node.data("csv-source"),
+          dsv = d3.dsv(delimiter, "text/csv; charset=" + encoding);
+
+      dsv(resource, function(data) {
+        var col = Object.keys(data[0]);
+        CSV_D3JS.tabulate(data, CSV_D3JS.node, col);
+      });
+
+      this.on(document, 'loadNext', this.loadNext)
+    });
+
   }
-
-  var dsv = d3.dsv(delimiter, "text/csv; charset="+encoding);
-  dsv(resource, function(data) {
-    var col = Object.keys(data[0]);
-    tabulate(data, previewer, col);
-  });
 
 });

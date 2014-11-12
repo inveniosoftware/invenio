@@ -17,9 +17,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(['js/previewer/csv_previewer/csv_d3js'], function() {
-    /*
-     * It preloads necessary scripts to give it a name so you're free to use it
-     * from any places.
-     */
+require(['js/previewer/csv_previewer/csv_d3js', 'js/previewer/csv_previewer/loader'], function(CSV_D3JS, Loader) {
+  $(function () {
+    $("[data-csv-source]").each(function () {
+      CSV_D3JS.attachTo($(this));
+    });
+    $("[data-csv-target]").each(function () {
+      Loader.attachTo($(this));
+    });
+  });
 })

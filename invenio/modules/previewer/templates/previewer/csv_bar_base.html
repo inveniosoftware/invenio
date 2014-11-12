@@ -27,5 +27,6 @@
 {%- endblock %}
 
 {% block body %}
-  <div data-source="{{ f.url }}" data-csv-delimiter="{{ delimiter }}" data-csv-encoding="{{ encoding }}" data-previewer="d3csv"></div>
+  <div id="d3_csv_previewer" data-csv-source="{{ f.url }}" data-csv-delimiter="{{ delimiter }}" data-csv-encoding="{{ encoding }}"></div>
+  <a data-csv-target="d3_csv_previewer" href="">{{ _("Show more") }}</a>
 {% endblock %}
