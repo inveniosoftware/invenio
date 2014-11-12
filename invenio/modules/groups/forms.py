@@ -21,13 +21,12 @@
 
 # from flask import url_for
 from wtforms import validators, widgets
-from wtforms.fields import BooleanField
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.fields import BooleanField, HiddenField
 from wtforms_alchemy import model_form_factory
 
 from invenio.base.i18n import _
 from invenio.modules.accounts.models import Usergroup
-from invenio.utils.forms import InvenioBaseForm
+from invenio.utils.forms import InvenioBaseForm, RemoteAutocompleteField
 
 ModelForm = model_form_factory(InvenioBaseForm)
 
@@ -58,10 +57,15 @@ class JoinUsergroupForm(InvenioBaseForm):
 
     """Join existing group."""
 
-    id_usergroup = QuerySelectField(
-        _('Join group'),
-        get_pk=lambda i: i.id,
-        get_label=lambda i: i.name,
+    id_usergroup = RemoteAutocompleteField(
+        # without label
+        '',
+        remote='',
+        display_key='name',
+        min_length=1,
+        highlight='true',
+        data_key='id',
+        data_value='name'
     )
 
 
@@ -69,11 +73,18 @@ class UserJoinGroupForm(InvenioBaseForm):
 
     """Select a user that Join an existing group."""
 
-    # TODO use a autocomplete field instead a select
-    id_user = QuerySelectField(
-        _('Add user'),
-        get_pk=lambda i: i.id,
-        get_label=lambda i: i.nickname,
+    id_usergroup = HiddenField()
+    id_user = RemoteAutocompleteField(
+        # without label
+        '',
+        remote='',
+        display_key='nickname',
+        min_length=3,
+        highlight='true',
+        data_key='id',
+        data_value='nickname'
     )
     # set as admin of the group
     user_status = BooleanField(label=_('as Admin'))
+    # return page
+    redirect_url = HiddenField()

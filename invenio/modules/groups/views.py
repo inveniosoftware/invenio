@@ -19,7 +19,7 @@
 
 """Groups Flask Blueprint."""
 
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from flask import (Blueprint, render_template, request, jsonify, flash,
                    url_for, redirect)
@@ -28,6 +28,7 @@ from flask.ext.login import current_user, login_required
 from flask.ext.menu import register_menu
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
+from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.errors import AccountSecurityError, \
     IntegrityUsergroupError
@@ -35,6 +36,8 @@ from invenio.modules.accounts.models import User, Usergroup, UserUsergroup, \
     get_groups_user_not_joined
 
 from forms import JoinUsergroupForm, UsergroupForm, UserJoinGroupForm
+from config import GROUPS_AUTOCOMPLETE_LIMIT
+
 
 blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
                       template_folder='templates', static_folder='static')
@@ -52,13 +55,15 @@ default_breadcrumb_root(blueprint, '.settings.groups')
 )
 @register_breadcrumb(blueprint, '.', _('Groups'))
 @login_required
+@permission_required('usegroups')
 def index():
     """List all user groups."""
     uid = current_user.get_id()
     current_user.reload()
     form = JoinUsergroupForm()
-    form.id_usergroup.query = get_groups_user_not_joined(
-        current_user['uid']).order_by(Usergroup.name).all()
+    form.id_usergroup.set_remote(
+        url_for('webgroup.search_groups', id_user=uid)
+        + "?query=%QUERY")
     user = User.query.get(uid)
     uugs = dict(map(lambda uug: (uug.usergroup.name, uug),
                     user.usergroups))
@@ -73,6 +78,7 @@ def index():
 @blueprint.route('/new', methods=['GET', 'POST'])
 @register_breadcrumb(blueprint, '.new', _('New Group'))
 @login_required
+@permission_required('usegroups')
 def new():
     """Create new user group."""
     form = UsergroupForm(request.form)
@@ -119,6 +125,7 @@ def new():
 @blueprint.route('/leave/<int:id_usergroup>')
 @blueprint.route('/leave/<int:id_usergroup>/user/<int:id_user>')
 @login_required
+@permission_required('usegroups')
 def leave(id_usergroup, id_user=None):
     """Leave user group.
 
@@ -132,21 +139,21 @@ def leave(id_usergroup, id_user=None):
     except AccountSecurityError:
         flash(_(
             'You have not enough right to '
-            'remove user "{0}" from group "{1}"'
-            .format(user2remove.nickname, group.name)), "error")
+            'remove user "%(x_nickname)s" from group "%(x_groupname)s"',
+            x_nickname=user2remove.nickname, x_groupname=group.name), "error")
         return redirect(url_for('.index'))
     except IntegrityUsergroupError:
         flash(_(
-            'Sorry, user "{0}" can leave the group "{1}" '
-            'without admins, please delete the '
-            'group if you want to leave.'
-            .format(user2remove.nickname, group.name)), "error")
+            'Sorry, user "%(x_nickname)s" can leave the group '
+            '"%(x_groupname)s" without admins, please delete the '
+            'group if you want to leave.',
+            x_nickname=user2remove.nickname, x_groupname=group.name), "error")
         return redirect(url_for('.index'))
 
     try:
         db.session.merge(group)
         db.session.commit()
-    except:
+    except SQLAlchemyError:
         db.session.rollback()
         raise
 
@@ -165,6 +172,7 @@ def leave(id_usergroup, id_user=None):
                  methods=['GET', 'POST'])
 @login_required
 @wash_arguments({"id_usergroup": (int, 0), "id_user": (int, 0)})
+@permission_required('usegroups')
 def join(id_usergroup, id_user=None, status=None):
     """Join group."""
     group = Usergroup.query.get_or_404(id_usergroup)
@@ -180,22 +188,30 @@ def join(id_usergroup, id_user=None, status=None):
     except AccountSecurityError:
         flash(_(
             'You have not enough right to '
-            'add user "{0}" to the group "{1}"'
-            .format(user2join.nickname, group.name)), "error")
+            'add user "%(x_nickname)s" to the group "%(x_groupname)s"',
+            x_nickname=user2join.nickname, x_groupname=group.name), "error")
         return redirect(url_for('.index'))
+    except SQLAlchemyError:
+        flash(_('User "%(x_nickname)s" can\'t join the group "%(x_groupname)s"',
+                x_nickname=user2join.nickname, x_groupname=group.name), "error")
+        if id_user:
+            return redirect(url_for('.members', id_usergroup=id_usergroup))
+        else:
+            return redirect(url_for('.index'))
 
     current_user.reload()
     flash(_('%(user)s join the group "%(name)s".',
             user='User "'+user2join.nickname+'"' if id_user else "You",
             name=group.name), 'success')
-    if id_user:
-        return redirect(url_for('.members', id_usergroup=id_usergroup))
-    else:
-        return redirect(url_for('.index'))
+
+    redirect_url = form.redirect_url.data or url_for('.index')
+    return redirect(redirect_url)
 
 
 @blueprint.route('/manage/<int:id_usergroup>', methods=['GET', 'POST'])
+@login_required
 @register_breadcrumb(blueprint, '.manage', _('Manage Group'))
+@permission_required('usegroups')
 def manage(id_usergroup):
     """Manage user group."""
     ug = Usergroup.query.filter_by(id=id_usergroup).one()
@@ -232,7 +248,7 @@ def manage(id_usergroup):
                 action=_('Update'),
                 subtitle=oldname,
             )
-        except:
+        except SQLAlchemyError:
             db.session.rollback()
             raise
 
@@ -249,6 +265,8 @@ def manage(id_usergroup):
 
 @blueprint.route('/manage/<int:id_usergroup>/delete',
                  methods=['GET', 'DELETE'])
+@login_required
+@permission_required('usegroups')
 def delete(id_usergroup):
     """Delete a group."""
     group = Usergroup.query.get_or_404(id_usergroup)
@@ -265,7 +283,9 @@ def delete(id_usergroup):
 
 
 @blueprint.route('/members/<int:id_usergroup>', methods=['GET', 'POST'])
+@login_required
 @register_breadcrumb(blueprint, '.members', _('Members'))
+@permission_required('usegroups')
 def members(id_usergroup):
     """List user group members."""
     group = Usergroup.query.get_or_404(id_usergroup)
@@ -273,8 +293,12 @@ def members(id_usergroup):
         UserUsergroup.id_user == current_user.get_id(),
         UserUsergroup.id_usergroup == group.id).one()
     users_not_in_this_group = UserJoinGroupForm(request.form)
-    users_not_in_this_group.id_user.query = group \
-        .get_users_not_in_this_group().order_by(User.nickname).all()
+    users_not_in_this_group.id_user.set_remote(
+        url_for('webgroup.search_users', id_usergroup=id_usergroup)
+        + "?query=%QUERY")
+    users_not_in_this_group.id_usergroup.data = id_usergroup
+    users_not_in_this_group.redirect_url.data = url_for(
+        ".members", id_usergroup=id_usergroup)
 
     return render_template(
         "groups/members.html",
@@ -285,7 +309,9 @@ def members(id_usergroup):
 
 
 @blueprint.route("/search", methods=['GET', 'POST'])
+@login_required
 @wash_arguments({"query": (unicode, ""), "term": (unicode, "")})
+@permission_required('usegroups')
 def search(query, term):
     """Search user groups."""
     if query == 'users' and len(term) >= 3:
@@ -300,10 +326,39 @@ def search(query, term):
     return jsonify()
 
 
+@blueprint.route("/search/group/<int:id_usergroup>/users",
+                 methods=['GET', 'POST'])
+@login_required
+@wash_arguments({"query": (unicode, "")})
+@permission_required('usegroups')
+def search_users(id_usergroup, query):
+    """Search user not in a specific group."""
+    group = Usergroup.query.get_or_404(id_usergroup)
+    users = group.get_users_not_in_this_group(nickname="%%%s%%" % query) \
+        .limit(10).all()
+    return jsonify(results=[{'id': user.id, 'nickname': user.nickname}
+                            for user in users])
+
+
+@blueprint.route("/search/user/<int:id_user>/groups",
+                 methods=['GET', 'POST'])
+@login_required
+@wash_arguments({"query": (unicode, "")})
+@permission_required('usegroups')
+def search_groups(id_user, query):
+    """Search groups that user not joined."""
+    groups = get_groups_user_not_joined(id_user, "%%%s%%" % query) \
+        .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
+    return jsonify(results=[{'id': group.id, 'name': group.name}
+                            for group in groups])
+
+
 @blueprint.route("/tokenize", methods=['GET', 'POST'])
+@login_required
 @wash_arguments({"q": (unicode, "")})
+@permission_required('usegroups')
 def tokenize(q):
     """FIXME."""
     res = Usergroup.query.filter(
-        Usergroup.name.like("%s%%" % q)).limit(10).all()
+        Usergroup.name.like("%s%%" % q)).limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(data=map(dict, res))

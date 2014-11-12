@@ -17,6 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
+{%- bundles "groups.js" -%}
+
 {%- import "accounts/settings/helpers.html" as helpers with context %}
 {%- from "_formhelpers.html" import render_field with context %}
 {%- extends "accounts/settings/index_base.html" -%}
@@ -63,17 +65,15 @@
   </ul>
   <div class="panel-footer">
     {% if user_is_admin  %}
-    <form class="form-inline" action="{{ url_for('webgroup.join',
-        id_usergroup=group.id) }}"
-          method="post" role="form">
+    <form class="form-inline" action="{{ url_for('webgroup.join') }}"
+          method="post" role="form" id="form-add-user-in-group">
       <div class="form-group">
-      {% if form.id_user.query | count %}
-          {{ render_field(form.id_user, with_label=False) }}
-          {{ render_field(form.user_status) }}
+        {%- for field in form %}
+          {{ render_field(field, with_label= field.label.text != '') }}
+        {%- endfor %}
         <button type="submit" class="btn btn-default">
           <i class="fa fa-chain"></i> {{ _('Join group') }}
         </button>
-      {% endif %}
       </div>
     </form>
     {% endif %}

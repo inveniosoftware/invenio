@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Extended WTForms field
+Extended WTForms field.
 
 Classes TimeField, DatePickerWidget, DateTimePickerWidget and TimePickerWidget
 are taken from `flask-admin` extension.
@@ -37,20 +37,18 @@ from wtforms.fields import Field, StringField, HiddenField, FileField
 from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
 from wtforms.compat import text_type
-#from invenio.config import CFG_SITE_SECRET_KEY
 
 
 class RowWidget(object):
-    """
-    Renders a list of fields as a set of table rows with th/td pairs.
-    """
+
+    """Renders a list of fields as a set of table rows with th/td pairs."""
+
     def __init__(self, **kwargs):
+        """Init class."""
         self.defaults = kwargs
 
     def __call__(self, field, class_='', row_class='row', **kwargs):
-        """
-        There are Bootstrap 3 specific improvements for row wrapping.
-        """
+        """There are Bootstrap 3 specific improvements for row wrapping."""
         html = []
         hidden = ''
         arguments = self.defaults
@@ -75,11 +73,14 @@ class RowWidget(object):
 
 
 class TimeField(Field):
+
     """A text field which stores a `time.time` matching a format."""
+
     widget = TextInput()
 
     def __init__(self, label=None, validators=None,
                  format='%H:%M:%S', **kwargs):
+        """Init."""
         super(TimeField, self).__init__(label, validators, **kwargs)
         self.format = format
 
@@ -90,6 +91,7 @@ class TimeField(Field):
             return self.data and self.data.strftime(self.format) or u''
 
     def process_formdata(self, valuelist):
+        """Join time string."""
         if valuelist:
             time_str = u' '.join(valuelist)
             try:
@@ -101,66 +103,143 @@ class TimeField(Field):
 
 
 class DatePickerWidget(TextInput):
+
     """
+    TextInput widget that adds a 'datepicker' class.
+
     TextInput widget that adds a 'datepicker' class to the html input
     element; this makes it easy to write a jQuery selector that adds a
     UI widget for date picking.
     """
+
     def __call__(self, field, **kwargs):
+        """Call."""
         c = kwargs.pop('class', '') or kwargs.pop('class_', '')
         kwargs['class'] = u'datepicker %s' % c
         return super(DatePickerWidget, self).__call__(field, **kwargs)
 
 
 class DateTimePickerWidget(TextInput):
-    """TextInput widget that adds a 'datetimepicker' class to the html
+
+    """
+    TextInput widget that adds a 'datetimepicker' class.
+
+    TextInput widget that adds a 'datetimepicker' class to the html
     adds a UI widget for datetime picking.
     """
+
     def __call__(self, field, **kwargs):
+        """Add class datepicker."""
         c = kwargs.pop('class', '') or kwargs.pop('class_', '')
         kwargs['class'] = u'datetimepicker %s' % c
         return super(DateTimePickerWidget, self).__call__(field, **kwargs)
 
 
 class TimePickerWidget(TextInput):
-    """TextInput widget that adds a 'timepicker' class to the html
+
+    """
+    TextInput widget that adds a 'timepicker' class.
+
+    TextInput widget that adds a 'timepicker' class to the html
     input element; this makes it easy to write a jQuery selector that
     adds a UI widget for time picking.
     """
+
     def __call__(self, field, **kwargs):
+        """Add class timepicker."""
         c = kwargs.pop('class', '') or kwargs.pop('class_', '')
         kwargs['class'] = u'timepicker %s' % c
         return super(TimePickerWidget, self).__call__(field, **kwargs)
 
 
 class AutocompleteField(StringField):
-    def __init__(self, label=None, validators=None, data_provide="typeahead", data_source=None, **kwargs):
+
+    """Text field with simple autocompletion."""
+
+    def __init__(self, label=None, validators=None, data_provide="typeahead",
+                 data_source=None, **kwargs):
+        """Init."""
         super(AutocompleteField, self).__init__(label, validators, **kwargs)
         if data_source:
             self.widget = TypeheadWidget(data_source, data_provide)
 
 
 class TypeheadWidget(object):
+
+    """TextInput that use typeahead for autocompletion."""
+
     def __init__(self, autocomplete_list, data_provide):
+        """Init autocompletion."""
         if callable(autocomplete_list):
             self.autocomplete_list = autocomplete_list()
         else:
-            self.autocomplete_list = '["{}"]'.format('","'.join(autocomplete_list))
+            self.autocomplete_list = '["{}"]'.format(
+                '","'.join(autocomplete_list))
         self.data_provide = data_provide
 
     def __call__(self, field, **kwargs):
+        """Define special attributes."""
         kwargs.setdefault('id', field.id)
         kwargs.setdefault('type', 'text')
         kwargs.setdefault('data-provide', self.data_provide)
         kwargs.setdefault('data-source', self.autocomplete_list)
         if 'value' not in kwargs:
             kwargs['value'] = field._value()
-        return HTMLString(u'<input %s />' % html_params(name=field.name, **kwargs))
+        return HTMLString(u'<input %s />' % html_params(name=field.name,
+                                                        **kwargs))
+
+
+class RemoteAutocompleteField(StringField):
+
+    """Define a text field with autocompletion from remote."""
+
+    def __init__(self, label=None, validators=None, remote=None,
+                 display_key=None, min_length=None, highlight=None,
+                 data_key=None, data_value=None, *args, **kwargs):
+        """Init class."""
+        super(RemoteAutocompleteField, self).__init__(label, validators,
+                                                      *args, **kwargs)
+        self.kwargs = {}
+        self.kwargs['data-remoteautocomplete-remote'] = remote or ''
+        self.kwargs['data-remoteautocomplete-displayKey'] = display_key or ''
+        self.kwargs['data-remoteautocomplete-minLength'] = min_length or 3
+        self.kwargs['data-remoteautocomplete-highlight'] = highlight or 'true'
+        self.kwargs['data-remoteautocomplete-data-key'] = data_key or ''
+        self.kwargs['data-remoteautocomplete-data-value'] = data_value or ''
+        self.widget = RemoteTypeheadWidget(label, **kwargs)
+
+    def set_remote(self, value):
+        """Update remote url."""
+        self.widget.set_remote(value)
+
+
+class RemoteTypeheadWidget(TextInput):
+
+    """Typeahead widget that acquire data from remote."""
+
+    def __init__(self, label, **kwargs):
+        """Init class."""
+        self.label = label
+        self.kwargs = {}
+        super(RemoteTypeheadWidget, self).__init__()
+
+    def __call__(self, field, **kwargs):
+        """Configure the html field."""
+        kwargs.update(field.kwargs)
+        kwargs.update(self.kwargs)
+        kwargs['class_'] = kwargs['class_'] + ' remote-typeahead-widget '
+        return super(RemoteTypeheadWidget, self).__call__(field, **kwargs)
+
+    def set_remote(self, value):
+        """Update remote url."""
+        self.kwargs['data-remoteautocomplete-remote'] = value
 
 
 def has_file_field(form):
-    """Test whether or not a form has a FileField in it. This is used
-    to know whether or not we need to set enctype to
+    """
+    Test whether or not a form has a FileField in it.
+
+    This is used to know whether or not we need to set enctype to
     multipart/form-data.
     """
     for field in form:
@@ -171,9 +250,13 @@ def has_file_field(form):
 
 
 class FilterTextField(StringField):
+
+    """Define a FilterTextField."""
+
     alias = None
 
     def __init__(self, *args, **kwargs):
+        """Init."""
         self.alias = kwargs.get('alias')
         if 'alias' in kwargs:
             del kwargs['alias']
@@ -188,33 +271,42 @@ class FilterTextField(StringField):
 
 
 class InvenioForm(WTForm):
+
+    """Define a Invenio Form."""
+
     @property
     def required_field_names(self):
+        """Return all required field names."""
         return [field.name for field in self if hasattr(field, 'required')]
 
 
 class InvenioBaseForm(Form, SessionSecureForm):
-    #SECRET_KEY = CFG_SITE_SECRET_KEY
+
+    """Define a InvenioBaseForm."""
+
+    # SECRET_KEY = CFG_SITE_SECRET_KEY
     TIME_LIMIT = 1200.0
 
     def __init__(self, *args, **kwargs):
+        """Init."""
         super(InvenioBaseForm, self).__init__(
             *args, csrf_context=session, **kwargs
         )
 
     def add_fields(self, name, field):
+        """Add a field."""
         self.__setattr__(name, field)
 
     def validate_csrf_token(self, field):
-        # Disable CRSF proection during testing
+        """Disable CRSF proection during testing."""
         if current_app.testing:
             return
         super(InvenioBaseForm, self).validate_csrf_token(field)
 
 
 class FilterForm(InvenioBaseForm):
-    """
-    Filter forms contains hidden fields to keep sorting.
-    """
+
+    """Filter forms contains hidden fields to keep sorting."""
+
     sort_by = HiddenField()
     order = HiddenField()
