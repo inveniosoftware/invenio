@@ -76,19 +76,16 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
     Function which creates the harvesting logs
     @param task_id bibupload task id
     """
-    try:
-        records = create_records(xml_content)
-        for record in records:
-            oai_id = record_extract_oai_id(record[0])
-            my_new_harvest_log = OaiHARVESTLOG()
-            my_new_harvest_log.id_oaiHARVEST = oai_src_id
-            my_new_harvest_log.oai_id = oai_id
-            my_new_harvest_log.date_harvested = datetime.datetime.now
-            my_new_harvest_log.bibupload_task_id = task_id
-            db.session.add(my_new_harvest_log)
-            db.session.commit()
-    except Exception as msg:
-        print("Logging exception : %s   " % (str(msg),))
+    records = create_records(xml_content)
+    for record in records:
+        oai_id = record_extract_oai_id(record[0])
+        my_new_harvest_log = OaiHARVESTLOG()
+        my_new_harvest_log.id_oaiHARVEST = oai_src_id
+        my_new_harvest_log.oai_id = oai_id
+        my_new_harvest_log.date_harvested = datetime.now()
+        my_new_harvest_log.bibupload_task_id = task_id
+        db.session.add(my_new_harvest_log)
+        db.session.commit()
 
 
 def get_history_entries(oai_src_id, oai_date, method="harvested"):
