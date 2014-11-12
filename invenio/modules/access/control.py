@@ -1182,9 +1182,9 @@ def acc_get_role_users(id_role):
 def acc_get_roles_emails(id_roles):
     from invenio.modules.accounts.models import User
     return set(map(lambda u: u.email.lower().strip(),
-        db.session.query(User.email).join(User.roles).filter(db.and_(
-            UserAccROLE.expiration >= db.func.now(),
-            UserAccROLE.id_accROLE.in_(id_roles))).all()))
+        db.session.query(db.func.distinct(User.email)).join(
+            User.active_roles
+        ).filter(UserAccROLE.id_accROLE.in_(id_roles)).all()))
 
 # ARGUMENT RELATED
 

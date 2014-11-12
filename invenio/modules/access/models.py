@@ -21,6 +21,13 @@
 
 # General imports.
 from invenio.ext.sqlalchemy import db
+from invenio.base.wrappers import lazy_import
+
+SUPERADMINROLE = lazy_import(
+    'invenio.modules.access.local_config.SUPERADMINROLE')
+CFG_ACC_ACTIVITIES_URLS = lazy_import(
+    'invenio.modules.access.local_config.CFG_ACC_ACTIVITIES_URLS')
+
 
 # Create your models here.
 
@@ -115,9 +122,45 @@ class UserAccROLE(db.Model):
                            primary_key=True)
     expiration = db.Column(db.DateTime, nullable=False,
                            server_default='9999-12-31 23:59:59')
+
     user = db.relationship(User, backref='roles')
     role = db.relationship(AccROLE, backref='users')
 
+User.active_roles = db.relationship(
+    UserAccROLE,
+    lazy="dynamic",
+    primaryjoin=db.and_(
+        User.id == UserAccROLE.id_user,
+        UserAccROLE.expiration >= db.func.now()
+    )
+)
+
+User.has_admin_role = property(lambda self:
+    self.has_super_admin_role or db.object_session(self).query(
+        db.func.count(User.id)>0
+    ).join(
+        User.active_roles,
+        UserAccROLE.role,
+        AccROLE.authorizations
+    ).filter(
+        AccAuthorization.id_accACTION.in_(
+            db.select([AccACTION.id]).where(
+                AccACTION.name.in_(CFG_ACC_ACTIVITIES_URLS.keys())
+            )
+        ),
+        User.id == self.id
+    ).scalar()
+)
+
+User.has_super_admin_role = property(lambda self:
+    db.object_session(self).query(db.func.count(User.id)>0).join(
+        User.active_roles,
+        UserAccROLE.role
+    ).filter(
+        AccROLE.name == SUPERADMINROLE,
+        User.id == self.id
+    ).scalar()
+)
 
 __all__ = ('AccACTION',
            'AccARGUMENT',
