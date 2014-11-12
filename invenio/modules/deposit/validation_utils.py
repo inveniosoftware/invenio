@@ -78,8 +78,12 @@ class RequiredIf(object):
 
     def __call__(self, form, field):
         try:
+            from invenio.modules.deposit.fields.file_upload import FileUploadField
             other_field = getattr(form, self.other_field_name)
-            other_val = other_field.data
+            if isinstance(other_field, FileUploadField):
+                other_val = form.files
+            else:
+                other_val = other_field.data
             for v in self.values:
                 # Check if field value is required
                 if (callable(v) and v(other_val)) or (other_val == v):
