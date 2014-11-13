@@ -63,7 +63,7 @@ def do_upgrade():
 
             duplicates += len(duplicate_entries)
 
-logger.log("""%s duplicate entries removed in
+    logger.log("""%s duplicate entries removed in
               aidPERSONIDPAPERS.""" % duplicates)
 
 
