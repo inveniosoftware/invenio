@@ -62,6 +62,7 @@ from invenio.bibauthorid_general_utils import monitored
 from invenio.bibauthorid_logutils import Logger
 import time
 from intbitset import intbitset
+import re
 
 
 # run_sql = monitored(run_sql)
@@ -4386,18 +4387,27 @@ def get_inspire_id_of_signature(sig):  # get_inspire_id
 
 
 def get_orcid_id_of_signature(sig):
-    '''
-    Gets the external identifier of Inspire system for the given signature.
+    """
+    Gets the external identifier of ORCID system for the given signature.
+    The field to check is either '100__j' or '700__j'
+    and the prefix is 'ORCID:'
 
     @param sig: signature (bibref_table, bibref_value, bibrec)
     type sig: tuple (int, int, int)
 
     @return Orcid external identifier
-    @rtype: list [str]
-    '''
+    @rtype: str
+    """
+    table, ref, rec = sig
+    ext_ids_field = (str(table), ref, rec), str(table) + '__j'
 
-    return None
-
+    ext_ids = get_grouped_records(*ext_ids_field).values()[0]
+    for ext_id in ext_ids:
+        if ext_id.startswith('ORCID:'):
+            try:
+                return re.search(r"(\d{4}\-){3}\d{4}", ext_id).group()
+            except AttributeError:
+                pass
 
 def get_author_names_from_db(pid):  # get_person_db_names_set
     '''

@@ -129,17 +129,24 @@ def get_modified_marc_for_test(marcxml_string, author_name=None,
     return tostring(marcxml)
 
 
-def build_test_marcxml_field(record, tag, content, is_controlfield=False):
+def build_test_marcxml_field(record, tag, content, is_controlfield=False,
+                             code='a'):
     if is_controlfield:
         marc_field = SubElement(record, 'controlfield',
                                 {'tag': str(tag)})
         marc_field.text = content
     else:
-        marc_field = SubElement(record, 'datafield',
-                                {'tag': str(tag),
-                                    'ind1': '', 'ind2': ''})
-        marc_sub = SubElement(marc_field, 'subfield', {'code': 'a'})
-        marc_sub.text = content
+        if code != 'a':
+            for sub in record.getchildren():
+                if sub.attrib['tag'] == '100':
+                    ext_id_sub = SubElement(sub, 'subfield', {'code': code})
+                    ext_id_sub.text = content
+        else:
+            marc_field = SubElement(record, 'datafield',
+                                    {'tag': str(tag),
+                                     'ind1': '', 'ind2': ''})
+            marc_sub = SubElement(marc_field, 'subfield', {'code': code})
+            marc_sub.text = content
 
 
 def get_new_marc_for_test(name, author_name=None, co_authors_names=None,
@@ -155,6 +162,8 @@ def get_new_marc_for_test(name, author_name=None, co_authors_names=None,
     if co_authors_names:
         for co_author_name in co_authors_names:
             build_test_marcxml_field(record, 700, co_author_name)
+    if ext_id:
+        build_test_marcxml_field(record, 100, ext_id, code='j')
 
     return tostring(record)
 
