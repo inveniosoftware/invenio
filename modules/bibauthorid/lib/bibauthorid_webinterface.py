@@ -35,6 +35,7 @@ except ImportError:
     json = None
 
 from invenio.bibauthorid_webapi import add_cname_to_hepname_record
+from invenio.bibauthorid_webapi import create_new_person
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL
 from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
     BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
@@ -1101,6 +1102,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             if argd['confirm']:
                 action = 'assign'
+                if pid == CREATE_NEW_PERSON:
+                    pid = create_new_person(getUid(req))
             elif argd['repeal']:
                 action = 'reject'
             elif argd['reset']:
