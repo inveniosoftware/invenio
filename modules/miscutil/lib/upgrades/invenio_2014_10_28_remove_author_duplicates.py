@@ -61,7 +61,7 @@ def do_upgrade():
                     'limit 1',
                     entry)
 
-            duplicates += len(duplicate_entries)
+        duplicates += len(duplicate_entries)
 
     logger.log("""%s duplicate entries removed in
               aidPERSONIDPAPERS.""" % duplicates)
