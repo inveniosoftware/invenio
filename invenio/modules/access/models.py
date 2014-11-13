@@ -47,6 +47,9 @@ class AccACTION(db.Model):
     optional = db.Column(db.Enum('yes', 'no', name='yes_no'), nullable=False,
                          server_default='no')
 
+    def __repr__(self):
+        return "{0.name}".format(self)
+
 
 class AccARGUMENT(db.Model):
 
@@ -58,6 +61,9 @@ class AccARGUMENT(db.Model):
     value = db.Column(db.String(255), nullable=True)
     __table_args__ = (db.Index('KEYVAL', keyword, value),
                       db.Model.__table_args__)
+
+    def __repr__(self):
+        return "{0.keyword}={0.value}".format(self)
 
 
 class AccMAILCOOKIE(db.Model):
@@ -86,6 +92,9 @@ class AccROLE(db.Model):
     description = db.Column(db.String(255), nullable=True)
     firerole_def_ser = db.Column(db.iBinary, nullable=True)
     firerole_def_src = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return "{0.name} - {0.description}".format(self)
 
 
 class AccAuthorization(db.Model):
