@@ -318,12 +318,25 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
     @return: confirmation status and message key for each signature [(status, message_key),]
     @rtype: list [(bool, str),]
     '''
-    new_pid = get_free_author_id()
+
+    matchable_name = get_matchable_name_of_author(pid)
+    matched_authors_pids = get_authors_by_name(matchable_name,
+                                               use_matchable_name=True)
+    matched_authors_pids.remove(pid)
+
     pids_to_update = set([pid])
     statuses = list()
 
     for s in sigs_str:
         sig = _split_signature_string(s)
+
+        new_pid = None
+        for potential_pid in matched_authors_pids:
+            if not author_has_rejected_signature(potential_pid, sig):
+                new_pid = potential_pid
+                break
+        if not new_pid:
+            new_pid = get_free_author_id()
         table, ref, rec = sig
 
         # the paper should be present, either assigned or rejected
@@ -341,7 +354,7 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
         # it will be reassigned by tortoise) and reject it from the current person.
         current_pid, name = sig_exists[0]
         if current_pid == pid:
-            move_signature(sig, new_pid, force_claimed=True, set_unclaimed=True)
+            move_signature(sig, new_pid, force_claimed=False, set_unclaimed=True)
             pids_to_update.add(new_pid)
             add_signature((table, ref, rec), name, pid, flag=-2, user_level=user_level)
 
@@ -349,6 +362,24 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
 
     return statuses
 
+
+def author_has_rejected_signature(pid, sig):
+    """
+    Checks whether a particular author has rejected one signature.
+    @param pid: the person id of the author
+    @type pid: int
+    @param sig: the signature in question (100 / 700, bibref, bibrec)
+    @type sig: tuple of 3 elements
+    @return: A boolean indicating whether the paper has rejected a signature.
+    """
+    try:
+        return bool(run_sql("""select * from aidPERSONIDPAPERS
+                               where personid = %s and bibref_table = %s
+                               and bibref_value = %s and bibrec = %s
+                               and flag = -2""",
+                            (pid, str(sig[0]), sig[1], sig[2]))[0][0])
+    except IndexError:
+        return False
 
 def reset_papers_of_author(pid, sigs_str):  # reset_papers_flag
     '''
@@ -2989,6 +3020,16 @@ def get_names_of_author(pid, sort_by_count=True):  # get_person_db_names_count
 
     return names_count
 
+
+def get_matchable_name_of_author(pid):
+    """
+    Returns the matchable name currently associated with this person in
+    aidPERSONIDPAPERS.
+    @param pid: the person id of the author
+    @return: The matchable name of the author
+    """
+    query = 'select distinct m_name from aidPERSONIDPAPERS where personid=%s'
+    return run_sql(query, (pid,))[0][0]
 
 def merger_errors_exist():  # check_merger
     '''
