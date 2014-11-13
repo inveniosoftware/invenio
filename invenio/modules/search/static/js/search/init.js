@@ -20,6 +20,7 @@
 require(
     [
         "js/search/search",
+        "js/search/facets/configuration/tree/main",
         "js/search/form",
         "js/search/search_parser",
         "js/search/typeahead",
