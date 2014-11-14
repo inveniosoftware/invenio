@@ -492,11 +492,11 @@ def _fill_dict_of_indexes_with_empty_sets():
     index_dict = {}
     tmp_all_indexes = get_all_indexes(virtual=False)
     for index in tmp_all_indexes:
-        index_dict[index] = set([])
+        index_dict[index] = intbitset()
     return index_dict
 
 
-def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=False):
+def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes=False):
     """
         Function checks which records need to be changed/reindexed
         for given index/indexes.
@@ -509,6 +509,10 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
                        [[range1_down, range1_up],[range2_down, range2_up]..]
         @param force_all_indexes: should we index all indexes?
     """
+    if indexes is None:
+        indexes = []
+    if recIDs is None:
+        recIDs = {}
 
     tmp_dates = dict(get_last_updated_all_indexes())
     modification_dates = dict([(date, tmp_dates[date] or datetime(1000, 1, 1, 1, 1, 1))
@@ -529,24 +533,21 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
             return False
 
     if force_all_indexes:
-        records_for_indexes = {}
-        all_recIDs = []
-        for recIDs_range in recIDs:
-            all_recIDs.extend(range(recIDs_range[0], recIDs_range[1]+1))
-        for index in indexes:
-            records_for_indexes[index] = all_recIDs
-        return records_for_indexes
+        return recIDs
 
     min_last_updated = get_min_last_updated(indexes)[0][0] or \
                        datetime(1000, 1, 1, 1, 1, 1)
     indexes_to_change = _fill_dict_of_indexes_with_empty_sets()
     recIDs_info = []
-    for recIDs_range in recIDs:
+    all_recids = intbitset()
+    for recids in recIDs.itervalues():
+        all_recids |= recids
+
+    for recIDs_range in create_range_list(all_recids):
         query = """SELECT id_bibrec,job_date,affected_fields FROM hstRECORD
                    WHERE id_bibrec BETWEEN %s AND %s AND
-                         job_date > '%s'""" % \
-                   (recIDs_range[0], recIDs_range[1], min_last_updated)
-        res = run_sql(query)
+                         job_date > %s"""
+        res = run_sql(query, (recIDs_range[0], recIDs_range[1], min_last_updated))
         if res:
             recIDs_info.extend(res)
 
@@ -567,7 +568,14 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
         for index in indexes_for_recID_filtered:
             indexes_to_change[index].add(recID)
 
-    indexes_to_change = dict((k, list(sorted(v))) for k, v in indexes_to_change.iteritems() if v)
+    # After all the above crazy optimization, just not too loose external
+    # updates, we restore for special indexes what was computed before.
+    for index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor', 'fulltext'):
+        if index_name in recIDs:
+            indexes_to_change[index_name] |= recIDs[index_name]
+
+    # We remove empty indexes
+    indexes_to_change = dict((k, v) for (k, v) in indexes_to_change.iteritems() if v)
     return indexes_to_change
 
 
@@ -1918,8 +1926,8 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
         rec_list_author = intbitset(get_recids_affected_since(dates[0]))
-        res = res | rec_list_author
-    return set(res)
+        res |= rec_list_author
+    return res
 
 
 def get_recIDs_by_date_authority(dates, index_name, force_all=False):
@@ -1936,7 +1944,7 @@ def get_recIDs_by_date_authority(dates, index_name, force_all=False):
         query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
         res = run_sql(query, (index_id,))
         if not res:
-            return set([])
+            return intbitset([])
         if not res[0][0] or force_all:
             dates = ("0000-00-00", None)
         else:
@@ -1965,7 +1973,7 @@ def get_recIDs_by_date_authority(dates, index_name, force_all=False):
                     tag_0 = tag_match[:5] + '0' # possibly do the same for '4' subfields ?
                     fieldvalue = '"' + control_no + '"'
                     res |= search_pattern(p=tag_0 + ':' + fieldvalue)
-    return set(res)
+    return res
 
 
 def get_not_updated_recIDs(modified_dates, indexes, force_all=False):
@@ -1976,12 +1984,12 @@ def get_not_updated_recIDs(modified_dates, indexes, force_all=False):
        @type indexes: string separated by coma
        @param force_all: if True all records will be taken
     """
-    found_recIDs = set()
+    found_recIDs = {}
     write_message(CFG_BIBINDEX_UPDATE_MESSAGE)
     for index in indexes:
-        found_recIDs |= get_recIDs_by_date_bibliographic(modified_dates, index, force_all)
-        found_recIDs |= get_recIDs_by_date_authority(modified_dates, index, force_all)
-    return list(sorted(found_recIDs))
+        found_recIDs[index] = get_recIDs_by_date_bibliographic(modified_dates, index, force_all)
+        found_recIDs[index] |= get_recIDs_by_date_authority(modified_dates, index, force_all)
+    return found_recIDs
 
 
 def get_recIDs_from_cli(indexes=[]):
@@ -2002,21 +2010,27 @@ def get_recIDs_from_cli(indexes=[]):
                        WHERE name=%s""", (index_name,))
 
     if task_get_option("id"):
-        return task_get_option("id")
+        recIDs = intbitset()
+        for (start, end) in task_get_option("id"):
+            recIDs |= intbitset(xrange(start, end + 1))
+        recIDs = intbitset([task_get_option("id")])
+        recs = {}
+        for index_name in indexes:
+            recs[index_name] = recIDs
+        return recs
     elif task_get_option("collection"):
         l_of_colls = task_get_option("collection").split(",")
         recIDs = perform_request_search(c=l_of_colls)
-        recIDs_range = []
-        for recID in recIDs:
-            recIDs_range.append([recID, recID])
-        return recIDs_range
+        recs = {}
+        for index_name in indexes:
+            recs[index_name] = recIDs
+        return recs
     elif task_get_option("cmd") == "add":
         recs = get_not_updated_recIDs(task_get_option("modified"),
                                       indexes,
                                       task_get_option("force"))
-        recIDs_range = beautify_range_list(create_range_list(recs))
-        return recIDs_range
-    return []
+        return recs
+    return {}
 
 
 def get_indexes_from_cli():
@@ -2156,12 +2170,17 @@ def task_run_core():
         return True
 
     # regular index: initialization for Words,Pairs,Phrases
-    recIDs_range = get_recIDs_from_cli(regular_indexes)
+    recs = get_recIDs_from_cli(regular_indexes)
     recIDs_for_index = find_affected_records_for_index(regular_indexes,
-                                                       recIDs_range,
+                                                       recs,
                                                        (task_get_option("force") or \
                                                        task_get_option("reindex") or \
                                                        task_get_option("cmd") == "del"))
+
+    all_recs = intbitset()
+    for recids in recs.itervalues():
+        all_recs |= recids
+    recIDs_range = create_range_list(all_recs)
 
     if len(recIDs_for_index.keys()) == 0:
         write_message("Selected indexes/recIDs are up to date.")
