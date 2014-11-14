@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,5 +23,10 @@
 
 
 {% block body %}
-  {{ f }} cannot be previewed.
+<div class="container">
+    <div class="col-md-2 col-md-offset-3">
+        <h3><i class="glyphicon glyphicon-remove"></i> Cannot preview file</h3>
+        <p>Sorry, we are unfortunately not able to preview this file.</p>
+    </div>
+</div>
 {% endblock %}

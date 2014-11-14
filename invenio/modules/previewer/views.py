@@ -21,7 +21,7 @@
 
 import itertools
 
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from flask.ext.breadcrumbs import default_breadcrumb_root
 
 from invenio.base.globals import cfg
@@ -55,9 +55,17 @@ def preview(recid):
                     cfg["CFG_PREVIEW_PREFERENCE"][f.superformat] +
                     ordered).keys()
 
-            for plugin_id in ordered:
-                if previewers[plugin_id]['can_preview'](f):
-                    return previewers[plugin_id]['preview'](f)
+            try:
+                for plugin_id in ordered:
+                    if previewers[plugin_id]['can_preview'](f):
+                        return previewers[plugin_id]['preview'](f)
+            except Exception:
+                current_app.logger.exception(
+                    "Preview plugin {0} failed "
+                    "previewing {1} in record {2}".format(
+                        plugin_id, filename, recid
+                    )
+                )
     return previewers['default']['preview'](None)
 
 

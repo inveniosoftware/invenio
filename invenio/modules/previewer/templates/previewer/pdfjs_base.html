@@ -1,45 +1,47 @@
-﻿<!DOCTYPE html>
-<!--
-Copyright 2012 Mozilla Foundation
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-#}
+{#-
+# Copyright 2012 Mozilla Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+-#}
+<!DOCTYPE html>
 <html dir="ltr" mozdisallowselectionprint moznomarginboxes>
   <head>
+
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta name="google" content="notranslate">
-    <title>PDF.js viewer</title>
 
+    <link rel="resource" type="application/l10n" href="{{ url_for('static', filename='/vendors/pdfjs-build/generic/web/locale/locale.properties') }}"/>
 
-    <link rel="stylesheet" href="viewer.css"/>
-
-    <script type="text/javascript" src="compatibility.js"></script>
-
-
-
-<!-- This snippet is used in production, see Makefile -->
-<link rel="resource" type="application/l10n" href="locale/locale.properties"/>
-<script type="text/javascript" src="l10n.js"></script>
-<script type="text/javascript" src="../build/pdf.js"></script>
-
-
-
-    <script type="text/javascript" src="debugger.js"></script>
-    <script type="text/javascript" src="viewer.js"></script>
 
   </head>
-
   <body tabindex="1">
     <div id="outerContainer" class="loadingInProgress">
 
@@ -84,13 +86,17 @@ limitations under the License.
 
         <div id="secondaryToolbar" class="secondaryToolbar hidden doorHangerRight">
           <div id="secondaryToolbarButtonContainer">
-            <button id="secondaryPresentationMode" class="secondaryToolbarButton presentationMode visibleLargeView" title="Switch to Presentation Mode" tabindex="18" data-l10n-id="presentation_mode">
+<!--             <button id="secondaryPresentationMode" class="secondaryToolbarButton presentationMode visibleLargeView" title="Switch to Presentation Mode" tabindex="18" data-l10n-id="presentation_mode">
               <span data-l10n-id="presentation_mode_label">Presentation Mode</span>
+            </button> -->
+
+            <button id="secondaryFullScreenMode" class="secondaryToolbarButton presentationMode visibleLargeView" title="Switch to Full Screen Mode" tabindex="18">
+              <span>Full Screen Mode</span>
             </button>
 
-            <button id="secondaryOpenFile" class="secondaryToolbarButton openFile visibleLargeView" title="Open File" tabindex="19" data-l10n-id="open_file">
+<!--             <button id="secondaryOpenFile" class="secondaryToolbarButton openFile visibleLargeView" title="Open File" tabindex="19" data-l10n-id="open_file">
               <span data-l10n-id="open_file_label">Open</span>
-            </button>
+            </button> -->
 
             <button id="secondaryPrint" class="secondaryToolbarButton print visibleMediumView" title="Print" tabindex="20" data-l10n-id="print">
               <span data-l10n-id="print_label">Print</span>
@@ -100,9 +106,9 @@ limitations under the License.
               <span data-l10n-id="download_label">Download</span>
             </button>
 
-            <a href="#" id="secondaryViewBookmark" class="secondaryToolbarButton bookmark visibleSmallView" title="Current view (copy or open in new window)" tabindex="22" data-l10n-id="bookmark">
+<!--             <a href="#" id="secondaryViewBookmark" class="secondaryToolbarButton bookmark visibleSmallView" title="Current view (copy or open in new window)" tabindex="22" data-l10n-id="bookmark">
               <span data-l10n-id="bookmark_label">Current View</span>
-            </a>
+            </a> -->
 
             <div class="horizontalToolbarSeparator visibleLargeView"></div>
 
@@ -127,7 +133,7 @@ limitations under the License.
             <button id="toggleHandTool" class="secondaryToolbarButton handTool" title="Enable hand tool" tabindex="27" data-l10n-id="hand_tool_enable">
               <span data-l10n-id="hand_tool_enable_label">Enable hand tool</span>
             </button>
-            
+
             <div class="horizontalToolbarSeparator"></div>
 
             <button id="documentProperties" class="secondaryToolbarButton documentProperties" title="Document Properties…" tabindex="28" data-l10n-id="document_properties">
@@ -161,13 +167,18 @@ limitations under the License.
                 <span id="numPages" class="toolbarLabel"></span>
               </div>
               <div id="toolbarViewerRight">
-                <button id="presentationMode" class="toolbarButton presentationMode hiddenLargeView" title="Switch to Presentation Mode" tabindex="12" data-l10n-id="presentation_mode">
+
+<!--                 <button id="presentationMode" class="toolbarButton presentationMode hiddenLargeView" title="Switch to Presentation Mode" tabindex="12" data-l10n-id="presentation_mode">
                   <span data-l10n-id="presentation_mode_label">Presentation Mode</span>
+                </button> -->
+
+                <button id="fullScreenMode" class="toolbarButton presentationMode hiddenLargeView" title="Switch to Full Screen Mode" tabindex="12">
+                  <span>Full Screen Mode</span>
                 </button>
 
-                <button id="openFile" class="toolbarButton openFile hiddenLargeView" title="Open File" tabindex="13" data-l10n-id="open_file">
+<!--                 <button id="openFile" class="toolbarButton openFile hiddenLargeView" title="Open File" tabindex="13" data-l10n-id="open_file">
                   <span data-l10n-id="open_file_label">Open</span>
-                </button>
+                </button> -->
 
                 <button id="print" class="toolbarButton print hiddenMediumView" title="Print" tabindex="14" data-l10n-id="print">
                   <span data-l10n-id="print_label">Print</span>
@@ -177,15 +188,15 @@ limitations under the License.
                   <span data-l10n-id="download_label">Download</span>
                 </button>
                 <!-- <div class="toolbarButtonSpacer"></div> -->
-                <a href="#" id="viewBookmark" class="toolbarButton bookmark hiddenSmallView" title="Current view (copy or open in new window)" tabindex="16" data-l10n-id="bookmark">
+<!--                 <a href="#" id="viewBookmark" class="toolbarButton bookmark hiddenSmallView" title="Current view (copy or open in new window)" tabindex="16" data-l10n-id="bookmark">
                   <span data-l10n-id="bookmark_label">Current View</span>
-                </a>
+                </a> -->
 
                 <div class="verticalToolbarSeparator hiddenSmallView"></div>
-                
+
                 <button id="secondaryToolbarToggle" class="toolbarButton" title="Tools" tabindex="17" data-l10n-id="tools">
                   <span data-l10n-id="tools_label">Tools</span>
-                </button> 
+                </button>
               </div>
               <div class="outerCenter">
                 <div class="innerCenter" id="toolbarViewerMiddle">
@@ -316,7 +327,7 @@ limitations under the License.
               <span data-l10n-id="document_properties_page_count">Page Count:</span> <p id="pageCountField">-</p>
             </div>
             <div class="buttonRow">
-	          <button id="documentPropertiesClose" class="overlayButton"><span data-l10n-id="document_properties_close">Close</span></button>
+            <button id="documentPropertiesClose" class="overlayButton"><span data-l10n-id="document_properties_close">Close</span></button>
             </div>
           </div>
         </div>
@@ -325,64 +336,6 @@ limitations under the License.
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
 <div id="mozPrintCallback-shim" hidden>
-  <style scoped>
-#mozPrintCallback-shim {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  z-index: 9999999;
-
-  display: block;
-  text-align: center;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-#mozPrintCallback-shim[hidden] {
-  display: none;
-}
-@media print {
-  #mozPrintCallback-shim {
-    display: none;
-  }
-}
-
-#mozPrintCallback-shim .mozPrintCallback-dialog-box {
-  display: inline-block;
-  margin: -50px auto 0;
-  position: relative;
-  top: 45%;
-  left: 0;
-  min-width: 220px;
-  max-width: 400px;
-
-  padding: 9px;
-
-  border: 1px solid hsla(0, 0%, 0%, .5);
-  border-radius: 2px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-
-  background-color: #474747;
-
-  color: hsl(0, 0%, 85%);
-  font-size: 16px;
-  line-height: 20px;
-}
-#mozPrintCallback-shim .progress-row {
-  clear: both;
-  padding: 1em 0;
-}
-#mozPrintCallback-shim progress {
-  width: 100%;
-}
-#mozPrintCallback-shim .relative-progress {
-  clear: both;
-  float: right;
-}
-#mozPrintCallback-shim .progress-actions {
-  clear: both;
-}
-  </style>
   <div class="mozPrintCallback-dialog-box">
     <!-- TODO: Localise the following strings -->
     Preparing document for printing...
@@ -396,6 +349,11 @@ limitations under the License.
   </div>
 </div>
 
+    {% bundle "previewer/pdfjs.js", "previewer/pdfjs.css" %}
+    {%- include "base/stylesheets.html" -%}
+    {%- include "base/scripts.html" -%}
+  <script>
+    PDFView.open('{{f.fullurl}}',0);
+  </script>
   </body>
 </html>
-

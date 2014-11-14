@@ -1,3 +1,22 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2014 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
 /* -*- Mode: Java; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*- */
 /* vim: set shiftwidth=2 tabstop=2 autoindent cindent expandtab: */
 /* Copyright 2012 Mozilla Foundation
@@ -24,7 +43,7 @@
 'use strict';
 
 var DEFAULT_URL = 'compressed.tracemonkey-pldi-09.pdf';
-var DEFAULT_SCALE = 'auto';
+var DEFAULT_SCALE = 'page-width';
 var DEFAULT_SCALE_DELTA = 1.1;
 var UNKNOWN_SCALE = 0;
 var CACHE_SIZE = 20;
@@ -54,8 +73,8 @@ var FindStates = {
   FIND_PENDING: 3
 };
 
-PDFJS.imageResourcesPath = './images/';
-  PDFJS.workerSrc = '../build/pdf.worker.js';
+PDFJS.imageResourcesPath = '/vendors/pdfjs-build/generic/web/images/';
+  PDFJS.workerSrc = '/vendors/pdfjs-build/generic/build/pdf.worker.js';
 
 var mozL10n = document.mozL10n || document.webL10n;
 
@@ -1133,7 +1152,7 @@ var PDFFindController = {
         if (!this.hadMatch) {
           // No point in wrapping there were no matches.
           this.updateMatch(false);
-          // while matches were not found, searching for a page 
+          // while matches were not found, searching for a page
           // with matches should nevertheless halt.
           return true;
         }
@@ -2397,7 +2416,7 @@ var DocumentProperties = {
 
   parseDate: function documentPropertiesParseDate(inputDate) {
     // This is implemented according to the PDF specification (see
-    // http://www.gnupdf.org/Date for an overview), but note that 
+    // http://www.gnupdf.org/Date for an overview), but note that
     // Adobe Reader doesn't handle changing the date to universal time
     // and doesn't use the user's time zone (they're effectively ignoring
     // the HH' and mm' parts of the date string).
@@ -4078,7 +4097,7 @@ var PageView = function pageView(container, id, scale,
     }
 
     if (scale && scale !== PDFView.currentScale) {
-      PDFView.setScale(scale, true, true);
+      PDFView.setScale('page-width', true, true);
     } else if (PDFView.currentScale === UNKNOWN_SCALE) {
       PDFView.setScale(DEFAULT_SCALE, true, true);
     }
@@ -5035,11 +5054,11 @@ document.addEventListener('DOMContentLoaded', function webViewerLoad(evt) {
     document.getElementById('secondaryPrint').classList.add('hidden');
   }
 
-  if (!PDFView.supportsFullscreen) {
-    document.getElementById('presentationMode').classList.add('hidden');
-    document.getElementById('secondaryPresentationMode').
-      classList.add('hidden');
-  }
+  // if (!PDFView.supportsFullscreen) {
+  //   document.getElementById('presentationMode').classList.add('hidden');
+  //   document.getElementById('secondaryPresentationMode').
+  //     classList.add('hidden');
+  // }
 
   if (PDFView.supportsIntegratedFind) {
     document.getElementById('viewFind').classList.add('hidden');
@@ -5121,20 +5140,14 @@ document.addEventListener('DOMContentLoaded', function webViewerLoad(evt) {
       PDFView.setScale(this.value);
     });
 
-  document.getElementById('presentationMode').addEventListener('click',
-    SecondaryToolbar.presentationModeClick.bind(SecondaryToolbar));
-
-  document.getElementById('openFile').addEventListener('click',
-    SecondaryToolbar.openFileClick.bind(SecondaryToolbar));
+  // document.getElementById('presentationMode').addEventListener('click',
+  //   SecondaryToolbar.presentationModeClick.bind(SecondaryToolbar));
 
   document.getElementById('print').addEventListener('click',
     SecondaryToolbar.printClick.bind(SecondaryToolbar));
 
   document.getElementById('download').addEventListener('click',
     SecondaryToolbar.downloadClick.bind(SecondaryToolbar));
-
-
-  PDFView.open(file, 0);
 
 }, true);
 
@@ -5204,9 +5217,8 @@ function updateViewarea() {
     store.set('scrollLeft', intLeft);
     store.set('scrollTop', intTop);
   });
-  var href = PDFView.getAnchorUrl(pdfOpenParams);
-  document.getElementById('viewBookmark').href = href;
-  document.getElementById('secondaryViewBookmark').href = href;
+  // var href = PDFView.getAnchorUrl(pdfOpenParams);
+  // document.getElementById('secondaryViewBookmark').href = href;
 
   // Update the current bookmark in the browsing history.
   PDFHistory.updateCurrentBookmark(pdfOpenParams, pageNumber);
@@ -5609,5 +5621,3 @@ window.addEventListener('afterprint', function afterPrint(evt) {
     });
   });
 })();
-
-

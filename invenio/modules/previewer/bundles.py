@@ -19,13 +19,34 @@
 
 """Previewer bundles."""
 
-from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.ext.assets import Bundle, RequireJSFilter, CleanCSSFilter
 
 
 pdfjs = Bundle(
+    "vendors/pdfjs-build/generic/web/compatibility.js",
+    "vendors/pdfjs-build/generic/web/l10n.js",
+    "vendors/pdfjs-build/generic/build/pdf.js",
+    "js/previewer/pdfjs/viewer.js",
+    "js/previewer/pdfjs/fullscreen.js",
+    filters="uglifyjs",
+    output="previewer/pdfjs.js",
+    weight=20,
+    bower={
+        "pdfjs-build": "latest"
+    }
+)
+
+pdftk = Bundle(
     "js/previewer/pdf_viewer.js",
     filters="uglifyjs",
-    output="previewer/pdf.js",
+    output="previewer/pdftk.js",
+    weight=20
+)
+
+pdfjscss = Bundle(
+    "css/previewer/pdfjs/viewer.css",
+    filters=CleanCSSFilter(),
+    output="previewer/pdfjs.css",
     weight=20
 )
 
@@ -39,9 +60,9 @@ csv_previewer = Bundle(
     }
 )
 
-pdfcss = Bundle(
+pdftkcss = Bundle(
     "css/previewer/pdf_viewer.css",
-    filters="cleancss",
-    output="previewer/pdf.css",
+    filters=CleanCSSFilter(),
+    output="previewer/pdftk.css",
     weight=20
 )

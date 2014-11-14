@@ -19,14 +19,14 @@
 
 """Records bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
 
 
 js = Bundle(
-    "js/records/records.js",
+    "js/records/init.js",
+    filters=RequireJSFilter(),
     output="records.js",
-    weight=20,
-    filters="uglifyjs"
+    weight=20
 )
 
 css = Bundle(

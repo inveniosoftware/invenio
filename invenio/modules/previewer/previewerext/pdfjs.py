@@ -17,29 +17,19 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Annotations bundles."""
+"""PDF previewer based on pdf.js."""
 
-from invenio.ext.assets import Bundle
-
-from invenio.modules.previewer.bundles import pdftk as _pdftk
-from invenio.modules.comments.bundles import (js as _commentsjs,
-                                              css as _commentscss)
+from flask import render_template, request
 
 
-_pdftk.contents += ("js/annotations/pdf_notes_helpers.js",)
+def can_preview(f):
+    """Check if file can be previewed."""
+    if f.superformat.lower() == '.pdf':
+        return True
+    return False
 
-_commentsjs.contents += ("js/annotations/notes_popover.js",)
-_commentscss.contents += ("css/annotations/annotations.css",)
 
-js = Bundle(
-    "vendors/plupload/js/moxie.js",
-    "vendors/plupload/js/plupload.dev.js",
-    "js/annotations/annotations.js",
-    "js/annotations/plupload_helper.js",
-    filters="uglifyjs",
-    output="annotations.js",
-    weight=30,
-    bower={
-        "plupload": "latest"
-    }
-)
+def preview(f):
+    """Preview file."""
+    return render_template("previewer/pdfjs.html", f=f,
+                           embed=request.args.get('embed', type=bool))
