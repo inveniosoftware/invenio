@@ -728,10 +728,13 @@ class BibWorkflowObject(db.Model):
     def save(self, version=None, task_counter=None, id_workflow=None):
         """Save object to persistent storage."""
         if task_counter is not None:
-            self.log.debug("Saving task counter: %s" % (task_counter,))
-            extra_data = self.get_extra_data()
-            extra_data["_task_counter"] = task_counter
-            self.set_extra_data(extra_data)
+            if isinstance(task_counter, list):
+                self.log.debug("Saving task counter: %s" % (task_counter,))
+                extra_data = self.get_extra_data()
+                extra_data["_task_counter"] = task_counter
+                self.set_extra_data(extra_data)
+            else:
+                raise ValueError("Task counter must be a list!")
 
         if version is not None:
             if version != self.version:
