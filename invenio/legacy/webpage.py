@@ -31,8 +31,6 @@ from invenio.config import \
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webuser import \
      create_userinfobox_body, \
-     create_useractivities_menu, \
-     create_adminactivities_menu, \
      getUid
 
 import invenio.legacy.template
@@ -126,8 +124,6 @@ def page(title, body, navtrail="", description="", keywords="",
                           keywords = keywords,
                           metaheaderadd = metaheaderadd,
                           userinfobox = create_userinfobox_body(req, uid, language),
-                          useractivities_menu = create_useractivities_menu(req, uid, navmenuid, language),
-                          adminactivities_menu = create_adminactivities_menu(req, uid, navmenuid, language),
                           navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                                 and title or '',
                                                                 navtrail,
@@ -175,8 +171,6 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                       keywords = keywords,
                       metaheaderadd = metaheaderadd,
                       userinfobox = create_userinfobox_body(req, uid, language),
-                      useractivities_menu = create_useractivities_menu(req, uid, navmenuid, language),
-                      adminactivities_menu = create_adminactivities_menu(req, uid, navmenuid, language),
                       navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                             and title or '',
                                                             navtrail,

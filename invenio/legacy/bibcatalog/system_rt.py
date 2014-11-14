@@ -24,9 +24,11 @@ This is a subclass of BibCatalogSystem
 
 import os
 import re
-import invenio.legacy.webuser
+
+from invenio.utils.serializers import deserialize_via_marshal
 from invenio.utils.shell import run_shell_command, escape_shell_arg
 from invenio.legacy.bibcatalog.system import BibCatalogSystem, get_bibcat_from_prefs
+from invenio.legacy.dbquery import run_sql
 
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \
@@ -34,6 +36,20 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD, \
                            CFG_BIBEDIT_ADD_TICKET_RT_QUEUES
+
+
+def get_uid_based_on_pref(prefname, prefvalue):
+    """get the user's UID based where his/her preference prefname has value prefvalue in preferences"""
+    prefs = run_sql("SELECT id, settings FROM user WHERE settings is not NULL")
+    the_uid = None
+    for pref in prefs:
+        try:
+            settings = deserialize_via_marshal(pref[1])
+            if (prefname in settings) and (settings[prefname] == prefvalue):
+                the_uid = pref[0]
+        except:
+            pass
+    return the_uid
 
 
 class BibCatalogSystemRT(BibCatalogSystem):
@@ -403,7 +419,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             # Change the ticket owner into invenio UID
             if 'owner' in tdict:
                 rt_owner = tdict["owner"]
-                uid = invenio.legacy.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
+                uid = get_uid_based_on_pref("bibcatalog_username", rt_owner)
                 candict['owner'] = uid
             if len(attributes) == 0: # return all fields
                 return candict

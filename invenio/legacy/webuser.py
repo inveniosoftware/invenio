@@ -74,8 +74,7 @@ try:
 except ImportError:
     pass
 from invenio.legacy.dbquery import run_sql, OperationalError
-from invenio.utils.serializers import serialize_via_marshal, \
-    deserialize_via_marshal
+from invenio.utils.serializers import serialize_via_marshal
 
 
 from invenio.base.i18n import gettext_set_language, wash_languages, wash_language
@@ -369,17 +368,16 @@ def isUserReferee(user_info):
 
 def isUserAdmin(user_info):
     """Return True if the user has some admin rights; False otherwise."""
-    return acc_find_possible_activities(user_info) != {}
+    user = User.query.get(user_info['uid'])
+    return user and user.has_admin_role
 
 def isUserSuperAdmin(user_info):
     """Return True if the user is superadmin; False otherwise."""
-    if run_sql("""SELECT r.id
-        FROM accROLE r LEFT JOIN user_accROLE ur
-        ON r.id = ur.id_accROLE
-        WHERE r.name = %s AND
-        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1, run_on_slave=True):
+    user = User.query.get(user_info['uid'])
+    if user and user.has_super_admin_role:
         return True
-    return acc_firerole_check_user(user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
+    return acc_firerole_check_user(
+        user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
 
 def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
@@ -800,16 +798,10 @@ def drop_external_settings(userId):
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
-    if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-        uid = createGuestUser()
-        session['uid'] = uid
-        session.set_remember_me(False)
-    else:
-        uid = 0
-        session.invalidate()
-    if hasattr(req, '_user_info'):
-        delattr(req, '_user_info')
-    return uid
+    from invenio.ext.login import logout_user
+    logout_user()
+    return current_user.get_id()
+
 
 def username_exists_p(username):
     """Check if USERNAME exists in the system.  Username may be either
@@ -821,8 +813,8 @@ def username_exists_p(username):
     if username == "":
         # return not exists if asked for guest users
         return 0
-    res = run_sql("SELECT email FROM user WHERE email=%s", (username,)) + \
-          run_sql("SELECT email FROM user WHERE nickname=%s", (username,))
+    res = run_sql("SELECT email FROM user WHERE email=%s OR nicname=%s",
+                  (username, username))
     if len(res) > 0:
         return 1
     return 0
@@ -960,122 +952,6 @@ def create_userinfobox_body(req, uid, language="en"):
     except OperationalError:
         return ""
 
-def create_useractivities_menu(req, uid, navmenuid, ln="en"):
-    """Create user activities menu.
-
-    @param req: request object
-    @param uid: user id
-    @type uid: int
-    @param navmenuid: the section of the website this page belongs (search, submit, baskets, etc.)
-    @type navmenuid: string
-    @param ln: language
-    @type ln: string
-    @return: HTML menu of the user activities
-    @rtype: string
-    """
-
-    if req:
-        if req.is_https():
-            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
-        else:
-            url_referer = CFG_SITE_URL + req.unparsed_uri
-        if '/youraccount/logout' in url_referer:
-            url_referer = ''
-    else:
-        url_referer = CFG_SITE_URL
-
-    user_info = collect_user_info(req)
-
-    is_user_menu_selected = False
-    if navmenuid == 'personalize' or  \
-       navmenuid.startswith('your') and \
-       navmenuid != 'youraccount':
-        is_user_menu_selected = True
-
-    try:
-        return tmpl.tmpl_create_useractivities_menu(
-            ln=ln,
-            selected=is_user_menu_selected,
-            url_referer=url_referer,
-            guest=int(user_info['guest']),
-            username=get_nickname_or_email(uid),
-            submitter=user_info['precached_viewsubmissions'],
-            referee=user_info['precached_useapprove'],
-            admin=user_info['precached_useadmin'],
-            usebaskets=user_info['precached_usebaskets'],
-            usemessages=user_info['precached_usemessages'],
-            usealerts=user_info['precached_usealerts'],
-            usegroups=user_info['precached_usegroups'],
-            useloans=user_info['precached_useloans'],
-            usestats=user_info['precached_usestats'],
-            usecomments=user_info['precached_sendcomments'],
-            )
-    except OperationalError:
-        return ""
-
-def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
-    """Create admin activities menu.
-
-    @param req: request object
-    @param uid: user id
-    @type uid: int
-    @param navmenuid: the section of the website this page belongs (search, submit, baskets, etc.)
-    @type navmenuid: string
-    @param ln: language
-    @type ln: string
-    @return: HTML menu of the user activities
-    @rtype: string
-    """
-    _ = gettext_set_language(ln)
-    if req:
-        if req.is_https():
-            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
-        else:
-            url_referer = CFG_SITE_URL + req.unparsed_uri
-        if '/youraccount/logout' in url_referer:
-            url_referer = ''
-    else:
-        url_referer = CFG_SITE_URL
-
-    user_info = collect_user_info(req)
-    activities = acc_find_possible_activities(user_info, ln)
-
-    # For BibEdit and BibDocFile menu items, take into consideration
-    # current record whenever possible
-    if _("Run Record Editor") in activities or \
-           _("Run Document File Manager") in activities and \
-           user_info['uri'].startswith('/' + CFG_SITE_RECORD + '/'):
-        try:
-            # Get record ID and try to cast it to an int
-            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
-        except:
-            pass
-        else:
-            if _("Run Record Editor") in activities:
-                activities[_("Run Record Editor")] = activities[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
-            if _("Run Document File Manager") in activities:
-                activities[_("Run Document File Manager")] = activities[_("Run Document File Manager")] + '&amp;recid=' + str(current_record_id)
-
-    try:
-        return tmpl.tmpl_create_adminactivities_menu(
-            ln=ln,
-            selected=navmenuid == 'admin',
-            url_referer=url_referer,
-            guest=int(user_info['guest']),
-            username=get_nickname_or_email(uid),
-            submitter=user_info['precached_viewsubmissions'],
-            referee=user_info['precached_useapprove'],
-            admin=user_info['precached_useadmin'],
-            usebaskets=user_info['precached_usebaskets'],
-            usemessages=user_info['precached_usemessages'],
-            usealerts=user_info['precached_usealerts'],
-            usegroups=user_info['precached_usegroups'],
-            useloans=user_info['precached_useloans'],
-            usestats=user_info['precached_usestats'],
-            activities=activities
-            )
-    except OperationalError:
-        return ""
 
 def list_registered_users():
     """List all registered users."""
@@ -1119,95 +995,18 @@ def list_users_in_roles(role_list):
         return map(lambda x: int(x[0]), res)
     return []
 
-def get_uid_based_on_pref(prefname, prefvalue):
-    """get the user's UID based where his/her preference prefname has value prefvalue in preferences"""
-    prefs = run_sql("SELECT id, settings FROM user WHERE settings is not NULL")
-    the_uid = None
-    for pref in prefs:
-        try:
-            settings = deserialize_via_marshal(pref[1])
-            if (prefname in settings) and (settings[prefname] == prefvalue):
-                the_uid = pref[0]
-        except:
-            pass
-    return the_uid
-
 def get_user_preferences(uid):
-    pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
-    if pref:
-        try:
-            # FIXME: return User.query.get(uid).settings
-            return deserialize_via_marshal(pref[0][1])
-        except:
-            pass
+    user = User.query.get(uid)
+    if user is not None:
+        return user.settings
+    from invenio.modules.accounts.models import get_default_user_preferences
     return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):
-    assert(type(pref) == type({}))
+    assert isinstance(pref, dict)
     run_sql("UPDATE user SET settings=%s WHERE id=%s",
             (serialize_via_marshal(pref), uid))
 
-def get_default_user_preferences():
-    user_preference = {
-        'login_method': ''}
-
-    if CFG_EXTERNAL_AUTH_DEFAULT in CFG_EXTERNAL_AUTHENTICATION:
-        user_preference['login_method'] = CFG_EXTERNAL_AUTH_DEFAULT
-    return user_preference
-
-def get_preferred_user_language(req):
-    def _get_language_from_req_header(accept_language_header):
-        """Extract langs info from req.headers_in['Accept-Language'] which
-        should be set to something similar to:
-        'fr,en-us;q=0.7,en;q=0.3'
-        """
-        tmp_langs = {}
-        for lang in accept_language_header.split(','):
-            lang = lang.split(';q=')
-            if len(lang) == 2:
-                lang[1] = lang[1].replace('"', '') # Hack for Yeti robot
-                try:
-                    tmp_langs[float(lang[1])] = lang[0]
-                except ValueError:
-                    pass
-            else:
-                tmp_langs[1.0] = lang[0]
-        ret = []
-        priorities = tmp_langs.keys()
-        priorities.sort()
-        priorities.reverse()
-        for priority in priorities:
-            ret.append(tmp_langs[priority])
-        return ret
-
-    uid = getUid(req)
-    guest = isGuestUser(uid)
-    new_lang = None
-    preferred_lang = None
-
-    if not guest:
-        user_preferences = get_user_preferences(uid)
-        preferred_lang = new_lang = user_preferences.get('language', None)
-
-    if not new_lang:
-        try:
-            new_lang = wash_languages(cgi.parse_qs(req.args)['ln'])
-        except (TypeError, AttributeError, KeyError):
-            pass
-
-    if not new_lang:
-        try:
-            new_lang = wash_languages(_get_language_from_req_header(req.headers_in['Accept-Language']))
-        except (TypeError, AttributeError, KeyError):
-            pass
-
-    new_lang = wash_language(new_lang)
-
-    if new_lang != preferred_lang and not guest:
-        user_preferences['language'] = new_lang
-        set_user_preferences(uid, user_preferences)
-
-    return new_lang
 
 def collect_user_info(req, login_time=False, refresh=False):
     """Given the mod_python request object rec or a uid it returns a dictionary
@@ -1227,225 +1026,6 @@ def collect_user_info(req, login_time=False, refresh=False):
         return UserInfo(req)
 
     return current_user._get_current_object()
-
-    ##
-    ## NOT USED ANYMORE
-    ## please see inveno.ext.login
-    ##
-
-    #FIXME move EXTERNAL SSO functionality
-
-    from invenio.legacy.search_engine import get_permitted_restricted_collections
-    user_info = {
-        'remote_ip' : '',
-        'remote_host' : '',
-        'referer' : '',
-        'uri' : '',
-        'agent' : '',
-        'uid' :-1,
-        'nickname' : '',
-        'email' : '',
-        'group' : [],
-        'guest' : '1',
-        'session' : None,
-        'precached_permitted_restricted_collections' : [],
-        'precached_usebaskets' : False,
-        'precached_useloans' : False,
-        'precached_usegroups' : False,
-        'precached_usealerts' : False,
-        'precached_usemessages' : False,
-        'precached_viewsubmissions' : False,
-        'precached_useapprove' : False,
-        'precached_useadmin' : False,
-        'precached_usestats' : False,
-        'precached_viewclaimlink' : False,
-        'precached_usepaperclaim' : False,
-        'precached_usepaperattribution' : False,
-        'precached_canseehiddenmarctags' : False,
-        'precached_sendcomments' : False,
-    }
-
-    try:
-        is_req = False
-        is_flask = False
-        session = None
-        if not req:
-            uid = -1
-        elif type(req) in (type(1), type(1L)):
-            ## req is infact a user identification
-            uid = req
-        elif type(req) is dict:
-            ## req is by mistake already a user_info
-            try:
-                assert('uid' in req)
-                assert('email' in req)
-                assert('nickname' in req)
-            except AssertionError:
-                ## mmh... misuse of collect_user_info. Better warn the admin!
-                register_exception(alert_admin=True)
-            user_info.update(req)
-            return user_info
-        elif isinstance(req, Request):
-            is_flask = True
-            from flask import session
-            uid = session.uid
-            if 'user_info' in session:
-                user_info = session['user_info']
-            if not login_time and not refresh:
-                return user_info
-            user_info['remote_ip'] = req.remote_addr
-            user_info['session'] = session.sid
-            user_info['remote_host'] = req.environ.get('REMOTE_HOST', '')
-            user_info['referer'] = req.referrer
-            user_info['uri'] = req.url or ''
-            user_info['agent'] = req.user_agent or 'N/A'
-        else:
-            is_req = True
-            uid = getUid(req)
-            if hasattr(req, '_user_info') and not login_time:
-                user_info = req._user_info
-                if not refresh:
-                    return req._user_info
-            req._user_info = user_info
-            try:
-                user_info['remote_ip'] = req.remote_ip
-            except gaierror:
-                #FIXME: we should support IPV6 too. (hint for FireRole)
-                pass
-            user_info['session'] = session.sid
-            user_info['remote_host'] = req.remote_host or ''
-            user_info['referer'] = req.headers_in.get('Referer', '')
-            user_info['uri'] = req.unparsed_uri or ''
-            user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
-        user_info['uid'] = uid
-        user_info['nickname'] = get_nickname(uid) or ''
-        user_info['email'] = get_email(uid) or ''
-        user_info['group'] = []
-        user_info['guest'] = str(isGuestUser(uid))
-
-        if user_info['guest'] == '1' and CFG_INSPIRE_SITE:
-            usepaperattribution = False
-            viewclaimlink = False
-
-            if (CFG_BIBAUTHORID_ENABLED
-                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
-                usepaperattribution = True
-
-#            if (CFG_BIBAUTHORID_ENABLED
-#                and usepaperattribution
-#                and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers"))):
-#                viewclaimlink = True
-            viewlink = False
-            if is_req or is_flask:
-                try:
-                    viewlink = session['personinfo']['claim_in_process']
-                except (KeyError, TypeError):
-                    pass
-
-            if (CFG_BIBAUTHORID_ENABLED
-                and usepaperattribution
-                and viewlink):
-                viewclaimlink = True
-
-            user_info['precached_viewclaimlink'] = viewclaimlink
-            user_info['precached_usepaperattribution'] = usepaperattribution
-
-        if user_info['guest'] == '0':
-            user_info['group'] = [group[1] for group in get_groups(uid)]
-            prefs = get_user_preferences(uid)
-            login_method = prefs['login_method']
-            ## NOTE: we fall back to default login_method if the login_method
-            ## specified in the user settings does not exist (e.g. after
-            ## a migration.)
-            login_object = CFG_EXTERNAL_AUTHENTICATION.get(login_method, CFG_EXTERNAL_AUTHENTICATION[CFG_EXTERNAL_AUTH_DEFAULT])
-            if login_object and ((datetime.datetime.now() - get_last_login(uid)).seconds > 3600):
-                ## The user uses an external authentication method and it's a bit since
-                ## she has not performed a login
-                if not CFG_EXTERNAL_AUTH_USING_SSO or (
-                    is_req and login_object.in_shibboleth(req)):
-                    ## If we're using SSO we must be sure to be in HTTPS and Shibboleth handler
-                    ## otherwise we can't really read anything, hence
-                    ## it's better skip the synchronization
-                    try:
-                        groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
-                        # groups is a dictionary {group_name : group_description,}
-                        new_groups = {}
-                        for key, value in groups.items():
-                            new_groups[key + " [" + str(login_method) + "]"] = value
-                        groups = new_groups
-                    except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
-                        pass
-                    else: # Groups synchronization
-                        from invenio.webgroup import synchronize_external_groups
-                        synchronize_external_groups(uid, groups, login_method)
-                        user_info['group'] = [group[1] for group in get_groups(uid)]
-
-                    try:
-                        # Importing external settings
-                        new_prefs = login_object.fetch_user_preferences(user_info['email'], req=req)
-                        for key, value in new_prefs.items():
-                            prefs['EXTERNAL_' + key] = value
-                    except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
-                        pass
-                    else:
-                        set_user_preferences(uid, prefs)
-                        prefs = get_user_preferences(uid)
-
-                    run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid,))
-            if prefs:
-                for key, value in iteritems(prefs):
-                    user_info[key.lower()] = value
-            if login_time:
-                ## Heavy computational information
-                from invenio.modules.access.engine import acc_authorize_action
-                user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
-                user_info['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
-                user_info['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0
-                user_info['precached_usegroups'] = acc_authorize_action(user_info, 'usegroups')[0] == 0
-                user_info['precached_usealerts'] = acc_authorize_action(user_info, 'usealerts')[0] == 0
-                user_info['precached_usemessages'] = acc_authorize_action(user_info, 'usemessages')[0] == 0
-                user_info['precached_usestats'] = acc_authorize_action(user_info, 'runwebstatadmin')[0] == 0
-                user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
-                user_info['precached_useapprove'] = isUserReferee(user_info)
-                user_info['precached_useadmin'] = isUserAdmin(user_info)
-                user_info['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
-                user_info['precached_sendcomments'] = acc_authorize_action(user_info, 'sendcomment', '*')[0] == 0
-                usepaperclaim = False
-                usepaperattribution = False
-                viewclaimlink = False
-
-                if (CFG_BIBAUTHORID_ENABLED
-                    and acc_is_user_in_role(user_info, acc_get_role_id("paperclaimviewers"))):
-                    usepaperclaim = True
-
-                if (CFG_BIBAUTHORID_ENABLED
-                    and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
-                    usepaperattribution = True
-
-                viewlink = False
-                if is_req or is_flask:
-                    try:
-                        viewlink = session['personinfo']['claim_in_process']
-                    except (KeyError, TypeError):
-                        pass
-
-                if (CFG_BIBAUTHORID_ENABLED
-                    and usepaperattribution
-                    and viewlink):
-                    viewclaimlink = True
-
-#                if (CFG_BIBAUTHORID_ENABLED
-#                    and ((usepaperclaim or usepaperattribution)
-#                         and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionlinkviewers")))):
-#                    viewclaimlink = True
-
-                user_info['precached_viewclaimlink'] = viewclaimlink
-                user_info['precached_usepaperclaim'] = usepaperclaim
-                user_info['precached_usepaperattribution'] = usepaperattribution
-
-    except Exception as e:
-        register_exception()
-    return user_info
 
 
 def generate_csrf_token(req):

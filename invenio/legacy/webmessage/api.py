@@ -108,10 +108,11 @@ def perform_request_display(uid, warnings=[], infos=[], ln=CFG_SITE_LANG):
     rows = []
     rows = db.get_all_messages_for_user(uid)
     nb_messages = db.count_nb_messages(uid)
-    no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
-    no_quota = False
-    if uid in no_quota_users:
-        no_quota = True
+    from invenio.modules.accounts.models import User
+    from invenio.modules.access.models import AccROLE
+    no_quota = User.query.get(uid).active_roles.join(AccROLE).filter(
+        AccROLE.name.in_(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
+    ).first() is not None
     body = webmessage_templates.tmpl_display_inbox(messages=rows,
                                                    infos=infos,
                                                    warnings=warnings,

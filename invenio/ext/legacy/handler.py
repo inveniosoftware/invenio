@@ -47,9 +47,8 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
     CFG_SITE_RECORD, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.base.i18n import wash_language
 from invenio.utils.url import redirect_to_url
+from invenio.ext.login import current_user, login_user
 from invenio.ext.logging import register_exception
-from invenio.legacy.webuser import get_preferred_user_language, isGuestUser, \
-    getUid, isUserSuperAdmin, collect_user_info, setUid
 from invenio.legacy.wsgi.utils import StringField
 from invenio.modules import apikeys as web_api_key
 from invenio.legacy.wsgi.utils import StringField
@@ -250,10 +249,6 @@ class WebInterfaceDirectory(object):
         warnings.warn("Accessed deprecated page {0.uri}".format(req),
                       PendingDeprecationWarning, stacklevel=2)
         form = req.form
-        #if 'ln' not in form and \
-        #        req.uri not in CFG_NO_LANG_RECOGNITION_URIS:
-        #    ln = get_preferred_user_language(req)
-        #    form.add_field('ln', ln)
         result = _check_result(req, obj(req, form))
         return result
 
@@ -302,9 +297,9 @@ def create_handler(root):
                 if uid < 0:
                     raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
                 else:
-                    setUid(req=req, uid=uid)
+                    login_user(uid)
 
-        guest_p = isGuestUser(getUid(req), run_on_slave=False)
+        guest_p = int(current_user.is_guest)
 
         uri = req.uri
         if uri == '/':
