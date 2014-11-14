@@ -21,10 +21,12 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import os
+from flask import current_app
 from flask.ext.assets import Bundle as BundleBase
 from flask.ext.registry import ModuleAutoDiscoveryRegistry
 from werkzeug.utils import import_string
 from webassets.filter.requirejs import RequireJSFilter as RequireJSFilterBase
+from webassets.filter import ExternalTool
 
 
 class Bundle(BundleBase):
@@ -136,3 +138,38 @@ class RequireJSFilter(RequireJSFilterBase):
             self.argv.append(
                 "exclude={0}".format(",".join(excluded_files))
             )
+
+
+class CleanCSSFilter(ExternalTool):
+
+    """Minify css using cleancss.
+
+    Implements opener capable of rebasing relative CSS URLs against
+    ``COLLECT_STATIC_ROOT``.
+    """
+
+    name = 'cleancssurl'
+    method = 'open'
+    options = {
+        'binary': 'CLEANCSS_BIN',
+    }
+
+    def setup(self):
+        """Initialize filter just before it will be used."""
+        super(CleanCSSFilter, self).setup()
+        self.root = current_app.config.get('COLLECT_STATIC_ROOT')
+
+    def open(self, out, source_path, **kw):
+        """Open source."""
+        self.subprocess(
+            [self.binary or 'cleancss', '--root', self.root, source_path],
+            out
+        )
+
+    def output(self, _in, out, **kw):
+        """Output filtering."""
+        self.subprocess([self.binary or 'cleancss'], out, _in)
+
+    def input(self, _in, out, **kw):
+        """Input filtering."""
+        self.subprocess([self.binary or 'cleancss'], out, _in)
