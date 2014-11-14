@@ -20,11 +20,28 @@
 {% extends "previewer/preview.html" %}
 
 {% block body %}
+<style>
+.panel-heading {
+    background-image: radial-gradient(circle farthest-corner at left top, #0B5FB1 0%, #0B5FB1 100%) !important;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.panel-title {
+     color: hsl(0,0%,85%);
+     font-size: 14px;
+}
+.panel-default {
+    border-color: #fff;
+    border: 0;
+}
+</style>
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h2 class="panel-title">
-      <i class="glyphicon glyphicon-compressed"></i> {{ f.name + f.superformat }}
-    </h2>
+    <div class="panel-title">
+      <i class="fa fa-file-zip-o"></i> {{ f.name + f.superformat }}
+    </div>
   </div>
   <div class="panel-body">
     <ul class="tree list-unstyled">
@@ -32,11 +49,11 @@
       {%- set folder_identifier = range(loop.depth)|join('_') ~ '_' ~ loop.index %}
       <li>
         {% if t.type != 'folder' %}
-          <span><i class="glyphicon glyphicon-file"></i> {{ t.name }}</span>
+          <span><i class="fa fa-file-o"></i> {{ t.name }}</span>
           <span class="pull-right">{{ t.size|filesizeformat }}</span>
         {% else %}
-          <a data-toggle="collapse" href="#tree_{{ folder_identifier }}">
-            <i class="glyphicon glyphicon-folder-close"></i> {{ t.name }}
+          <i class="fa fa-folder"></i> <a data-toggle="collapse" href="#tree_{{ folder_identifier }}">
+             {{ t.name }}
           </a>
         {% endif %}
         {%- if t.children -%}

@@ -54,9 +54,10 @@ def make_tree(archive_name):
 
 def children_to_list(node):
     """Organize children structure."""
-    if node['type'] == 'item':
+    if node['type'] == 'item' and len(node['children']) == 0:
         del node['children']
     else:
+        node['type'] = 'folder'
         node['children'] = list(node['children'].values())
         node['children'].sort(key=lambda x: x['name'])
         node['children'] = map(children_to_list, node['children'])
@@ -65,7 +66,7 @@ def children_to_list(node):
 
 def can_preview(f):
     """Return True if filetype can be previewed."""
-    return f.superformat == '.zip'
+    return f.superformat.lower() == '.zip'
 
 
 def preview(f):

@@ -48,13 +48,13 @@
   </head>
   <body>
       {# currently still has a wrapper div to use when pushing bottom to the bottom #}
-      <div id="wrap">
+
         {% if embed %}
           {% include 'previewer/top.html' %}
         {% endif %}
         {% block body %}
         {% endblock %}
-      </div>
+
       {% include 'previewer/bottom.html' %}
   </body>
   {%- block _bottom_assets %}
