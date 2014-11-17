@@ -25,9 +25,9 @@ jasmine_js = Bundle(
     # es5-shim is needed by PhantomJS
     # 'vendors/es5-shim/es5-shim.js',
     # 'vendors/es5-shim/es5-sham.js',
+    "js/jasmine/init.js",
     output="jasmine.js",
-    # Must be included prior to RequireJS
-    weight=-1,
+    weight=50,
     bower={
         "jasmine": ">=2",
         "jasmine-jquery": ">=2",
