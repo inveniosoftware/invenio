@@ -31,7 +31,8 @@ from ..tasks.postprocess import (
     refextract,
     author_list,
     filter_step,
-    upload_step
+    upload_step,
+    check_record
 )
 
 
@@ -45,6 +46,7 @@ class oaiharvest_record_post_process(RecordWorkflow):
         workflow_if(post_process_selected("c")),
         [
             convert_record_with_repository(),
+            check_record,
             convert_record_to_bibfield,
         ],
         workflow_if(post_process_selected("t")),

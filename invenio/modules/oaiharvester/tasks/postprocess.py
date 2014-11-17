@@ -548,3 +548,16 @@ def filter_step(obj, eng):
             obj.log.info(cmd_stdout)
     else:
         obj.log.error("No script file found!")
+
+
+def check_record(obj, eng):
+    """Check if there is a valid record in the data.
+
+    If not, skip this object.
+    """
+    try:
+        assert obj.data
+        assert obj.data != '<?xml version="1.0"?>\n<collection/>\n'
+    except AssertionError as e:
+        obj.log.info("No data found in record. Skipping: {0}".format(str(e)))
+        eng.continueNextToken()
