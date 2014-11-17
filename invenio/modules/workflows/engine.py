@@ -405,6 +405,10 @@ BibWorkflowEngine
                               (str(callbacks), repr(obj))
                         self.log.debug(msg)
                         obj.log.debug(msg)
+
+                    # Processing for the object is stopped!
+                    obj.save(version=ObjectVersion.FINAL)
+                    self.increase_counter_finished()
                     break
                 except JumpTokenBack as step:
                     if step.args[0] > 0:
@@ -415,6 +419,10 @@ BibWorkflowEngine
                                        step.args[0])
                     i[0] = max(-1, i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
+
+                    # This object is skipped for some reason. So we're done
+                    obj.save(version=ObjectVersion.FINAL)
+                    self.increase_counter_finished()
                 except JumpTokenForward as step:
                     if step.args[0] < 0:
                         raise WorkflowError("JumpTokenForward cannot"
@@ -423,11 +431,19 @@ BibWorkflowEngine
                         self.log.debug('We skip [%s] objects' % step.args[0])
                     i[0] = min(len(objects), i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
+
+                    # This object is skipped for some reason. So we're done
+                    obj.save(version=ObjectVersion.FINAL)
+                    self.increase_counter_finished()
                 except ContinueNextToken:
                     if DEBUG:
                         self.log.debug('Stop processing for this object, '
                                        'continue with next')
                     i[1] = [0]  # reset the callbacks pointer
+
+                    # This object is skipped for some reason. So we're done
+                    obj.save(version=ObjectVersion.FINAL)
+                    self.increase_counter_finished()
                     continue
                 except (HaltProcessing, WorkflowHalt) as e:
                     self.increase_counter_halted()
@@ -461,7 +477,7 @@ BibWorkflowEngine
                             id_workflow=self.uuid,
                             id_object=self.getCurrObjId(),
                         )
-            # We save the object once it is fully run through
+            # We save each object once it is fully run through
             obj.save(version=ObjectVersion.FINAL)
             self.increase_counter_finished()
             i[1] = [0]  # reset the callbacks pointer

@@ -150,7 +150,6 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
         except Exception as e:
             msg = "Could not convert record: %s\n%s" % \
                   (str(e), traceback.format_exc())
-            obj.extra_data["_error_msg"] = msg
             raise WorkflowError("Error: %s" % (msg,),
                                 id_workflow=eng.uuid,
                                 id_object=obj.id)
