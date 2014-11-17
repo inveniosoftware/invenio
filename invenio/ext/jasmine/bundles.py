@@ -19,15 +19,17 @@
 
 """Bundles for Jasmine test runner."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.base.bundles import jquery as _j, invenio as _i
 
 jasmine_js = Bundle(
     # es5-shim is needed by PhantomJS
     # 'vendors/es5-shim/es5-shim.js',
     # 'vendors/es5-shim/es5-sham.js',
+    "js/jasmine/init.js",
     output="jasmine.js",
-    # Must be included prior to RequireJS
-    weight=-1,
+    weight=50,
+    filters=RequireJSFilter(exclude=[_j, _i]),
     bower={
         "jasmine": ">=2",
         "jasmine-jquery": ">=2",
