@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012, 2014 CERN.
+ * Copyright (C) 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,17 +17,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-.modal-backdrop {
-    /* Show lighter modal window for search. */
-    background-color: rgba(255,255,255,0.5);
+.facet-list .facet-more-button, .facet-list .facet-less-button {
+  color: #777;
+  cursor: pointer;
+  font-size: smaller;
 }
 
-#facet_list.affix {
-    top: 28px;
+.facet-list .toggle-filter-button {
+  cursor: pointer;
 }
 
-#facet_list.affix-bottom {
-    position: absolute;
-    top: auto;
-    bottom: 170px;
+.facet-list .reset-button {
+  cursor:pointer;
+}
+
+.facet-list .option-active {
+  color: #31708f;
+  font-weight: bold;
+}
+
+.facet-list .list-content .list-content {
+  padding-left: 10px;
+  font-size: 90%;
 }

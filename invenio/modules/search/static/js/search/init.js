@@ -19,8 +19,8 @@
 
 require(
     [
-        "js/search/facet",
         "js/search/search",
+        "js/search/facets/configuration/tree/main",
         "js/search/form",
         "js/search/search_parser",
         "js/search/typeahead",
@@ -32,4 +32,4 @@ require(
         // Without it, we have to rely on non-anonymous modules.
         console.info("js/search/init is loaded")
     }
-)
+);

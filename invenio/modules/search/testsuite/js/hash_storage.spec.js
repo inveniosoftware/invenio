@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012, 2014 CERN.
+ * Copyright (C) 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,17 +17,33 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-.modal-backdrop {
-    /* Show lighter modal window for search. */
-    background-color: rgba(255,255,255,0.5);
-}
+define([
+  'js/search/hash_storage',
+  'jasmine-boot',
+], function(HashStorage) {
 
-#facet_list.affix {
-    top: 28px;
-}
+  describe('Hash storage', function() {
 
-#facet_list.affix-bottom {
-    position: absolute;
-    top: auto;
-    bottom: 170px;
-}
+    afterEach(function () {
+      HashStorage.clean();
+    });
+
+    it('does not corrupt state stored in the hash', function() {
+
+      var sampleObj = {
+        state: {
+          a: 'b_?',
+          '+': 'r',
+        },
+        array: ['$$$', 'a']
+      };
+
+      HashStorage.update(sampleObj);
+      expect(HashStorage.getContent()).toEqual(sampleObj);
+    });
+
+    it('returns `null` on empty state', function() {
+      expect(HashStorage.getContent()).toBe(null);
+    });
+  });
+});

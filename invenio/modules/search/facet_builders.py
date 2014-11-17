@@ -112,7 +112,7 @@ class FacetBuilder(object):
 
     def get_title(self, **kwargs):
         """Return facet title."""
-        return g._('Any ' + self.name.capitalize())
+        return g._(self.name.capitalize())
 
     def get_url(self, qid=None):
         """Return facet data url."""
@@ -139,9 +139,15 @@ class FacetBuilder(object):
         """Return facet data."""
         from invenio.legacy.search_engine import get_most_popular_field_values,\
             get_field_tags
-        return get_most_popular_field_values(self.get_recids(qid),
-                                             get_field_tags(self.name)
-                                             )[0:limit]
+        most_popular_fields = get_most_popular_field_values(
+            self.get_recids(qid), get_field_tags(self.name))[0:limit]
+        most_popular_fields = map(lambda x: {
+            'id': x[0],
+            'records_num': x[1],
+            'label': x[0],
+            'is_expandable': False
+        }, most_popular_fields)
+        return most_popular_fields
 
     def get_value_recids(self, value):
         """Return record ids in intbitset for given field value."""
@@ -187,6 +193,12 @@ class CollectionFacetBuilder(FacetBuilder):
         facet = []
         for c in collection.collection_children_r:
             num_records = len(c.reclist.intersection(recIDsHitSet))
+            is_expandable = len(c.collection_children_r) > 0
             if num_records:
-                facet.append((c.name, num_records, c.name_ln))
-        return sorted(facet, key=lambda x: x[1], reverse=True)[0:limit]
+                facet.append({
+                    'id': c.name,
+                    'records_num': num_records,
+                    'label': c.name_ln,
+                    'is_expandable': is_expandable
+                })
+        return sorted(facet, key=lambda x: x['label'])[0:limit]

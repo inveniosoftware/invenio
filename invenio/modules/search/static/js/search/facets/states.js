@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012, 2014 CERN.
+ * Copyright (C) 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,17 +17,30 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-.modal-backdrop {
-    /* Show lighter modal window for search. */
-    background-color: rgba(255,255,255,0.5);
-}
+define([], function() {
+  /**
+   * Enum with possible states of an option:
+   *
+   * add - "limit to" mode
+   * exclude - "exclude" mode
+   * inactive - filter not active
+   * partiallyActive - not active but at least one (not necessarily direct)
+   *  children is active
+   *
+   * @type {{
+   *  limitTo: string,
+   *  exclude: string,
+   *  inactive: string,
+   *  partiallyActive: string
+   *  }}
+   */
+  var states = {
+    limitTo: '+',
+    exclude: '-',
+    inactive: 'inactive',
+    partiallyActive: 'partiallyActive'
+  };
 
-#facet_list.affix {
-    top: 28px;
-}
+  return states;
 
-#facet_list.affix-bottom {
-    position: absolute;
-    top: auto;
-    bottom: 170px;
-}
+});

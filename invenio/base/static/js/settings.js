@@ -47,6 +47,8 @@ require.config({
     "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
     "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
     "jasmine-boot": "js/jasmine/boot",
+    "jasmine-events": "js/jasmine/events_checker",
+    "jasmine-initialization": "js/jasmine/initialization_checker",
   },
   shim: {
     jquery: {
@@ -127,6 +129,13 @@ require.config({
     "vendors/jasmine/lib/jasmine-core/boot": {
       deps: ['jasmine-html'],
       exports: "window.onload",
+    },
+    "jasmine-events": {
+      deps: ["jasmine-jquery"],
+      exports: "jasmine.EventsChecker",
+    },
+    "jasmine-initialization": {
+      deps: ["jasmine-boot"],
     },
   }
 });
