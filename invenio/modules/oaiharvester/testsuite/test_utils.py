@@ -86,20 +86,18 @@ class OAIHarvesterUtils(InvenioTestCase):
     def test_records_extraction_with_namespace_getrecord(self):
         """Test extracting records from OAI XML with GetRecord."""
         from invenio.modules.oaiharvester.utils import record_extraction_from_string
-        xml_sample = """
-        <OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
-        <responseDate>2014-11-05T09:32:51Z</responseDate>
+        xml_sample = """<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"><responseDate>2014-11-05T09:32:51Z</responseDate>
         <request verb="GetRecord" identifier="oai:arXiv.org:0804.2273" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
         <GetRecord>
         <record>
         <header>
-         <identifier>oai:arXiv.org:0804.2273</identifier>
-         <datestamp>2008-04-16</datestamp>
-         <setSpec>cs</setSpec>
+        <identifier>oai:arXiv.org:0804.2273</identifier>
+        <datestamp>2008-04-16</datestamp>
+        <setSpec>cs</setSpec>
         </header>
         <metadata>
-         <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
-         <id>0804.2273</id><created>2008-04-14</created><authors><author><keyname>Lagoze</keyname><forenames>Carl</forenames></author><author><keyname>Van de Sompel</keyname><forenames>Herbert</forenames></author><author><keyname>Nelson</keyname><forenames>Michael L.</forenames></author><author><keyname>Warner</keyname><forenames>Simeon</forenames></author><author><keyname>Sanderson</keyname><forenames>Robert</forenames></author><author><keyname>Johnston</keyname><forenames>Pete</forenames></author></authors><title>Object Re-Use &amp; Exchange: A Resource-Centric Approach</title><categories>cs.DL cs.NI</categories><acm-class>C.2.3</acm-class><license>http://creativecommons.org/licenses/by/3.0/</license><abstract>  The OAI Object Reuse and Exchange (OAI-ORE) framework recasts the
+        <arXiv xmlns="http://arxiv.org/OAI/arXiv/">
+        <id>0804.2273</id><created>2008-04-14</created><authors><author><keyname>Lagoze</keyname><forenames>Carl</forenames></author><author><keyname>Van de Sompel</keyname><forenames>Herbert</forenames></author><author><keyname>Nelson</keyname><forenames>Michael L.</forenames></author><author><keyname>Warner</keyname><forenames>Simeon</forenames></author><author><keyname>Sanderson</keyname><forenames>Robert</forenames></author><author><keyname>Johnston</keyname><forenames>Pete</forenames></author></authors><title>Object Re-Use &amp; Exchange: A Resource-Centric Approach</title><categories>cs.DL cs.NI</categories><acm-class>C.2.3</acm-class><license>http://creativecommons.org/licenses/by/3.0/</license><abstract>  The OAI Object Reuse and Exchange (OAI-ORE) framework recasts the
         repository-centric notion of digital object to a bounded aggregation of Web
         resources. In this manner, digital library content is more integrated with the
         Web architecture, and thereby more accessible to Web applications and clients.
@@ -114,8 +112,7 @@ class OAIHarvesterUtils(InvenioTestCase):
         </metadata>
         </record>
         </GetRecord>
-        </OAI-PMH>
-        """
+        </OAI-PMH>"""
         self.assertEqual(len(record_extraction_from_string(xml_sample)),
                          1)
 

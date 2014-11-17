@@ -22,11 +22,14 @@
 from lxml import etree
 
 
-def record_extraction_from_file(path, oai_namespace="{http://www.openarchives.org/OAI/2.0/}"):
+def record_extraction_from_file(path, oai_namespace="http://www.openarchives.org/OAI/2.0/"):
     """Given a harvested file return a list of every record incl. headers.
 
     :param path: is the path of the file harvested
     :type path: str
+
+    :param oai_namespace: optionally provide the OAI-PMH namespace
+    :type oai_namespace: str
 
     :return: return a list of XML records as string
     :rtype: str
@@ -37,25 +40,32 @@ def record_extraction_from_file(path, oai_namespace="{http://www.openarchives.or
     return list_of_records
 
 
-def record_extraction_from_string(xml_string, oai_namespace="{http://www.openarchives.org/OAI/2.0/}"):
+def record_extraction_from_string(xml_string, oai_namespace="http://www.openarchives.org/OAI/2.0/"):
     """Given a OAI-PMH XML return a list of every record incl. headers.
 
     :param xml_string: OAI-PMH XML
     :type xml_string: str
 
+    :param oai_namespace: optionally provide the OAI-PMH namespace
+    :type oai_namespace: str
+
     :return: return a list of XML records as string
     :rtype: str
     """
+    nsmap = {
+        None: oai_namespace,
+    }
+    namespace_prefix = "{{{0}}}".format(oai_namespace)
     root = etree.fromstring(xml_string)
     headers = []
-    headers.extend(root.findall(".//{0}responseDate".format(oai_namespace)))
-    headers.extend(root.findall(".//{0}request".format(oai_namespace)))
+    headers.extend(root.findall(".//{0}responseDate".format(namespace_prefix), nsmap))
+    headers.extend(root.findall(".//{0}request".format(namespace_prefix), nsmap))
 
-    records = root.findall(".//{0}record".format(oai_namespace))
+    records = root.findall(".//{0}record".format(namespace_prefix), nsmap)
 
     list_of_records = []
     for record in records:
-        wrapper = etree.Element("{0}OAI-PMH".format(oai_namespace))
+        wrapper = etree.Element("OAI-PMH", nsmap=nsmap)
         for header in headers:
             wrapper.append(header)
         wrapper.append(record)
@@ -63,16 +73,23 @@ def record_extraction_from_string(xml_string, oai_namespace="{http://www.openarc
     return list_of_records
 
 
-def identifier_extraction_from_string(xml_string, oai_namespace="{http://www.openarchives.org/OAI/2.0/}"):
+def identifier_extraction_from_string(xml_string, oai_namespace="http://www.openarchives.org/OAI/2.0/"):
     """Given a OAI-PMH XML string return the OAI identifier.
 
     :param xml_string: OAI-PMH XML
     :type xml_string: str
 
+    :param oai_namespace: optionally provide the OAI-PMH namespace
+    :type oai_namespace: str
+
     :return: OAI identifier
     :rtype: str
     """
+    nsmap = {
+        None: oai_namespace,
+    }
+    namespace_prefix = "{{{0}}}".format(oai_namespace)
     root = etree.fromstring(xml_string)
-    node = root.find(".//{0}identifier".format(oai_namespace))
+    node = root.find(".//{0}identifier".format(namespace_prefix), nsmap)
     if node is not None:
         return node.text
