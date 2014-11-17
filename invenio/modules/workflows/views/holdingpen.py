@@ -49,7 +49,6 @@ from ..utils import (sort_bwolist, extract_data, get_action_list,
                      get_holdingpen_objects,
                      get_rendered_task_results,
                      get_previous_next_objects)
-from ..engine import WorkflowStatus
 from ..api import continue_oid_delayed, start_delayed
 from ..acl import viewholdingpen
 
@@ -130,15 +129,10 @@ def details(objectid):
     bwobject = BibWorkflowObject.query.get(objectid)
     if 'holdingpen_current_ids' in session:
         objects = session['holdingpen_current_ids']
+        previous_object, next_object = get_previous_next_objects(objects, objectid)
     else:
-        bwobject_list = get_holdingpen_objects([str(ObjectVersion.HALTED)])
-        objects = []
-        for obj in bwobject_list:
-            version = extract_data(obj)['w_metadata'].status
-            if version == WorkflowStatus.HALTED:
-                objects.append(obj.id)
+        previous_object, next_object = None, None
 
-    previous_object, next_object = get_previous_next_objects(objects, objectid)
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)
 
