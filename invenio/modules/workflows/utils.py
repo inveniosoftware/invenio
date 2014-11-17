@@ -180,7 +180,7 @@ def parse_bwids(bwolist):
     return list(ast.literal_eval(bwolist))
 
 
-def get_holdingpen_objects(ptags=[]):
+def get_holdingpen_objects(ptags=["Need action"]):
     """Get BibWorkflowObject's for display in Holding Pen.
 
     Uses DataTable naming for filtering/sorting. Work in progress.
@@ -218,7 +218,7 @@ def get_holdingpen_objects(ptags=[]):
             }
             results.update(get_formatted_holdingpen_object(bwo))
 
-            if check_ssearch_over_data(ssearch, results):
+            if check_term_in_data(ssearch, results):
                 bwobject_list_tmp.append(bwo)
 
         bwobject_list = bwobject_list_tmp
@@ -275,23 +275,25 @@ def generate_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'
     return results
 
 
-def check_ssearch_over_data(ssearch, data):
-    """Check for DataTables search request.
+def check_term_in_data(term_list, data):
+    """Check each term if present in data dictionary values.
 
-    Checks if the data match with one of the search tags in data.
+    :param term_list: list of tags used for filtering.
+    :type term_list: list
 
-    :param ssearch: list of tags used for filtering.
     :param data: data to check.
+    :type data: dict
 
-    :return: True if present, False otherwise.
+    :return: True if all terms present, False otherwise.
     """
     total = 0
-    for terms in ssearch:
-        for datum in data:
-            if data[datum] and terms.lower() in data[datum].lower():
+    for term in term_list:
+        term = term.encode("utf-8")
+        for datum in data.values():
+            if datum and term.lower() in datum.lower():
                 total += 1
                 break
-    return total == len(ssearch)
+    return total == len(term_list)
 
 
 def get_pretty_date(bwo):

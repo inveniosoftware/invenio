@@ -386,6 +386,9 @@ class BibWorkflowObject(db.Model):
         """Get the formatted representation for this object."""
         from .registry import workflows
         try:
+            name = self.get_workflow_name()
+            if not name:
+                return ""
             workflow_definition = workflows[self.get_workflow_name()]
             formatted_data = workflow_definition.formatter(
                 self,

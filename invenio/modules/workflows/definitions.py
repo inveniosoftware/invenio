@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -65,32 +65,33 @@ class RecordWorkflow(WorkflowBase):
     @staticmethod
     def get_title(bwo):
         """Get the title."""
+        field_map = {"title": "title"}
         record = bwo.get_data()
         extracted_titles = []
         if hasattr(record, "get") and "title" in record:
             if isinstance(record["title"], str):
                 extracted_titles = [record["title"]]
             else:
-                for a_title in record["title"]:
-                    extracted_titles.append(record["title"][a_title])
-        return ", ".join(extracted_titles)
+                extracted_titles.append(record["title"][field_map["title"]])
+        return ", ".join(extracted_titles) or "No title found"
 
     @staticmethod
     def get_description(bwo):
         """Get the description (identifiers and categories) from the object data."""
         from invenio.modules.records.api import Record
-        from flask import render_template
+        from flask import render_template, current_app
 
         record = bwo.get_data()
+        final_identifiers = {}
         try:
             identifiers = Record(record.dumps()).persistent_identifiers
-            final_identifiers = [i['value'] for i in identifiers]
+            for values in identifiers.values():
+                final_identifiers.extend([i.get("value") for i in values])
         except Exception:
+            current_app.logger.exception("Could not get identifiers")
             if hasattr(record, "get"):
                 final_identifiers = [
-                    record.get(
-                        "system_control_number", {}
-                    ).get("value", 'No ids')
+                    record.get("system_control_number", {}).get("value", 'No ids')
                 ]
             else:
                 final_identifiers = []

@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -86,34 +86,37 @@
 
         {% block hpbody_details %}
 
-          {% if "side" in rendered_actions %}
-            {{ rendered_actions["side"]|safe }}
-          {% endif %}
+          {% block action_side %}
+            {% if "side" in rendered_actions %}
+              {{ rendered_actions["side"]|safe }}
+            {% endif %}
+          {% endblock %}
 
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ _('Workflow status') }}</h3>
-            </div>
-            <div class="panel-body">
-              <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
-              {% if task_history %}
-              <h6 class="pull-left">
-                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#completed-tasks">
-                  {{ _('Completed tasks') }}
-                  <span class="caret"></span>
-                </a>
-              </h6>
-              {% endif %}
-              <h6 class="pull-right">
-                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#workflow-definition">
-                  {{ _('Definition') }}
-                  <span class="caret"></span>
-                </a>
-              </h6>
-              <div class="table table-striped">
-                <div class="row"></div>
-                {% set id = [] %}
+          {% block workflow_history %}
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ _('Workflow status') }}</h3>
+              </div>
+              <div class="panel-body">
+                <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
                 {% if task_history %}
+                <h6 class="pull-left">
+                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#completed-tasks">
+                    {{ _('Completed tasks') }}
+                    <span class="caret"></span>
+                  </a>
+                </h6>
+                {% endif %}
+                <h6 class="pull-right">
+                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#workflow-definition">
+                    {{ _('Definition') }}
+                    <span class="caret"></span>
+                  </a>
+                </h6>
+                  {# This row is needed to avoid a weird collapsing effect. #}
+                  <div class="row"></div>
+                  {% set id = [] %}
+                  {% if task_history %}
                   <div id="completed-tasks" class="collapse">
                     <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
                     <div class="list-group">
@@ -130,97 +133,132 @@
                 </div>
               </div>
             </div>
-          </div>
-          {% if bwobject.get_error_message() %}
-          <div class="panel panel-danger">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ _('Error occurred') }}</h3>
-            </div>
-            <div class="panel-body">
-              <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}</h5>
-              <div class="text-right">
-                <h6 id="show-more" class="text-right">
-                  <a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">
-                    {{ _('Open details') }}</a>
-                </h6>
-              </div>
+          {% endblock %}
 
-              <div class="modal fade" id="error_details_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                      <h4 class="modal-title" id="myModalLabel">{{ _('Problem with') }}: {{ bwobject.get_extra_data()['_last_task_name'] }}</h4>
-                    </div>
-                    <div class="modal-body">
-                      <p>{{ bwobject.get_error_message()[0] }}</p>
-                      <p>{{ bwobject.get_error_message()[1] }}</p>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
+          {% block workflow_error %}
+            {% if bwobject.get_error_message() %}
+            <div class="panel panel-danger">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ _('Error occurred') }}</h3>
+              </div>
+              <div class="panel-body">
+                <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}</h5>
+                <div class="text-right">
+                  <h6 id="show-more" class="text-right">
+                    <a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">
+                      {{ _('Open details') }}</a>
+                  </h6>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-12">
+                    <a href="{{ url_for('holdingpen.restart_record_prev', objectid=bwobject.id)}}"
+                       class="btn btn-warning"
+                       {% if bwobject.version == 1 %}disabled="disabled"{% endif %}>
+                      <span class="glyphicon glyphicon-repeat"></span>
+                      <strong>{{ _('Restart current task') }}</strong>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="modal fade" id="error_details_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">{{ _('Problem with') }}: {{ bwobject.get_extra_data()['_last_task_name'] }}</h4>
+                      </div>
+                      <div class="modal-body">
+                        <p>{{ bwobject.get_error_message()[0] }}</p>
+                        <p>{{ bwobject.get_error_message()[1] }}</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+            {% endif %}
+          {% endblock %}
 
-          {% endif %}
-
-          <div class="panel panel-info">
-            <div class="panel-heading">
-              <h3 class="panel-title">{{ _('Other information') }}</h3>
-            </div>
-            <div class="panel-body">
-              <h6 class="pull-right">
-              <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
-                {{ _('More') }}
-                <span class="caret"></span>
-              </a>
-              </h6>
-              <div class="row"></div>
-              <div id="record-metadata-table" class="collapse">
-                <div class="table table-striped">
-                    {% for key, value in info.items() %}
-                      <b>{{ key }}</b> = {{ value }}
-                      <hr>
-                    {% endfor %}
-                    <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {% if history_objects %}
+          {% block workflow_information %}
             <div class="panel panel-info">
               <div class="panel-heading">
-                <h3 class="panel-title">{{ _('History') }}</h3>
+                <h3 class="panel-title">{{ _('Other information') }}</h3>
               </div>
               <div class="panel-body">
                 <h6 class="pull-right">
-                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#History">{{ _('More') }}<span class="caret"></span></a>
+                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
+                  {{ _('More') }}
+                  <span class="caret"></span>
+                </a>
                 </h6>
+                {# This row is needed to avoid a weird collapsing effect. #}
                 <div class="row"></div>
-                <div id="History" class="collapse">
-                  <div class="table table-striped">
-                    {% for object in history_objects %}
-                      {% if  object.id == bwobject.id %}
-                        <a href="#">{{ _('current') }} </a> -
-                        {% else %}
-                        <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{ object.id }}</a> -
-                      {% endif %}
-                      <span class="label label-{{ object._class }}">{{ object.message }}</span>
-                     {{ pretty_date(object.modified) }}
-                    <hr>
+                <div id="record-metadata-table" class="collapse">
+                  <table class="table table-striped">
+                    <tr>
+                      <td><strong>{{ _("status") }}</strong></td>
+                      <td>
+                        <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
+                      </td>
+                    </tr>
+                    {% for key, value in info.items() %}
+                      <tr>
+                        <td><strong>{{ key }}</strong></td>
+                        <td>{{ value }}</td>
+                      </tr>
                     {% endfor %}
-                  </div>
+                  </table>
                 </div>
               </div>
             </div>
-          {% endif %}
+          {% endblock %}
+
+          {% block object_history %}
+            {% if history_objects %}
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{ _('History') }}</h3>
+                </div>
+                <div class="panel-body">
+                  <h6 class="pull-right">
+                    <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#History">{{ _('More') }}<span class="caret"></span></a>
+                  </h6>
+                  <div class="row"></div>
+                  <div id="History" class="collapse">
+                    <table class="table table-striped">
+                      {% for object in history_objects %}
+                        <tr>
+                          <td>
+                            {% if object.id == bwobject.id %}
+                              <a href="#">{{ _('current') }} </a>
+                            {% else %}
+                              <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{ object.id }}</a>
+                            {% endif %}
+                          </td>
+                          <td>
+                            <span class="label label-{{ object._class }}">{{ object.message }}</span>
+                          </td>
+                          <td>
+                            {{ pretty_date(object.modified) }}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </table>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endblock %}
         {% endblock %}
       </div>
+
       <div class="col-md-9">
+      {% block hp_details_main %}
+
         {% block hp_action_main %}
           {% if "main" in rendered_actions %}
             {{ rendered_actions["main"]|safe }}
@@ -228,12 +266,15 @@
         {% endblock %}
 
 
-        {% if 'message' in bwobject.get_extra_data() and bwobject.get_action() != None %}
-          <div id="usermessage" class="alert alert-warning alert-dismissible">
-            {{ bwobject.get_extra_data()['_message'] }}
-            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-          </div>
-        {% endif %}
+        {%- block action_alert -%}
+          {% if 'message' in bwobject.get_extra_data() and bwobject.get_action() != None %}
+            <div id="usermessage" class="alert alert-warning alert-dismissible">
+              {{ bwobject.get_extra_data()['_message'] }}
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            </div>
+          {% endif %}
+        {%- endblock -%}
+
         {%- block workflow_completed -%}
           {% if bwobject.version == 1 %}
             <div id="successmessage" class="alert alert-success">
@@ -242,6 +283,7 @@
             </div>
           {% endif %}
         {%- endblock -%}
+
         {% block hp_preview %}
           {{ _('Display:') }}
           <div id="object-preview"
@@ -271,19 +313,21 @@
         {% endblock %}
 
         {% block hp_task_logs %}
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            {{ _("Task logs") }}
-          </div>
-          <div class="panel-body">
-            <div class="list-group">
-              {% for entry in bwobject.get_log() %}
-                <a href="#" class="list-group-item">{{ entry.created }}: {{ entry.message }}</a>
-              {% endfor %}
+          <div class="panel panel-warning">
+            <div class="panel-heading">
+              {{ _("Task logs") }}
+            </div>
+            <div class="panel-body">
+              <div class="list-group">
+                {% for entry in bwobject.get_log() %}
+                  <a href="#" class="list-group-item">{{ entry.created }}: {{ entry.message }}</a>
+                {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
         {% endblock %}
+      {% endblock %}
+
       </div>
     </div>
   </div>

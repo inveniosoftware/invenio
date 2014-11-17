@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,7 +43,7 @@ from invenio.ext.principal import permission_required
 from invenio.utils.date import pretty_date
 
 from ..models import BibWorkflowObject, Workflow, ObjectVersion
-from ..registry import actions
+from ..registry import actions, workflows
 from ..utils import (sort_bwolist, extract_data, get_action_list,
                      get_formatted_holdingpen_object,
                      get_holdingpen_objects,
@@ -95,7 +95,7 @@ def maintable():
     """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
-    tags = session.get("holdingpen_tags", list())
+    tags = session.get("holdingpen_tags", ["Need action"])
 
     if 'version' in request.args:
         for key, value in ObjectVersion.MAPPING.items():
@@ -126,7 +126,7 @@ def details(objectid):
     from itertools import groupby
 
     of = "hd"
-    bwobject = BibWorkflowObject.query.get(objectid)
+    bwobject = BibWorkflowObject.query.get_or_404(objectid)
     previous_object, next_object = get_previous_next_objects(
         session.get("holdingpen_current_ids"),
         objectid
@@ -185,6 +185,7 @@ def details(objectid):
                            workflow_definition=workflow_definition,
                            versions=ObjectVersion,
                            pretty_date=pretty_date,
+                           workflow_class=workflows.get(extracted_data['w_metadata'].name),
                            )
 
 
@@ -206,7 +207,7 @@ def get_file_from_task_result(object_id=None, filename=None):
         }
 
     """
-    bwobject = BibWorkflowObject.query.get(object_id)
+    bwobject = BibWorkflowObject.query.get_or_404(object_id)
     task_results = bwobject.get_tasks_results()
     if filename in task_results and task_results[filename]:
         fileinfo = task_results[filename][0].get("result", dict())
@@ -220,7 +221,7 @@ def get_file_from_task_result(object_id=None, filename=None):
 @wash_arguments({'objectid': (int, 0)})
 def restart_record(objectid, start_point='continue_next'):
     """Restart the initial object in its workflow."""
-    bwobject = BibWorkflowObject.query.get(objectid)
+    bwobject = BibWorkflowObject.query.get_or_404(objectid)
 
     workflow = Workflow.query.filter(
         Workflow.uuid == bwobject.id_workflow).first()
@@ -276,13 +277,13 @@ def delete_multi(bwolist):
 @blueprint.route('/resolve', methods=['GET', 'POST'])
 @login_required
 @permission_required(viewholdingpen.name)
-@wash_arguments({'objectid': (text_type, '-1')})
+@wash_arguments({'objectid': (int, 0)})
 def resolve_action(objectid):
     """Resolve the action taken.
 
     Will call the resolve() function of the specific action.
     """
-    bwobject = BibWorkflowObject.query.get(int(objectid))
+    bwobject = BibWorkflowObject.query.get_or_404(objectid)
     action_name = bwobject.get_action()
     action_form = actions[action_name]
     res = action_form().resolve(bwobject)
@@ -292,11 +293,11 @@ def resolve_action(objectid):
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @login_required
 @permission_required(viewholdingpen.name)
-@wash_arguments({'objectid': (text_type, '0'),
+@wash_arguments({'objectid': (int, 0),
                  'of': (text_type, None)})
 def entry_data_preview(objectid, of):
     """Present the data in a human readble form or in xml code."""
-    bwobject = BibWorkflowObject.query.get(int(objectid))
+    bwobject = BibWorkflowObject.query.get_or_404(objectid)
     if not bwobject:
         flash("No object found for %s" % (objectid,))
         return jsonify(data={})
@@ -337,7 +338,7 @@ def load_table():
 
     :return: JSON formatted str from dict of DataTables args.
     """
-    tags = session.setdefault("holdingpen_tags", list())
+    tags = session.setdefault("holdingpen_tags", ["Need action"])
     if request.method == "POST":
         if request.json and "tags" in request.json:
             tags = request.json["tags"]
