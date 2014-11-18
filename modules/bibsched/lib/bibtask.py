@@ -60,18 +60,22 @@ from socket import gethostname
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, \
-                           CFG_BINDIR, \
-                           CFG_BIBSCHED_PROCESS_USER, \
-                           CFG_TMPDIR, \
-                           CFG_SITE_SUPPORT_EMAIL, \
-                           CFG_VERSION, \
-                           CFG_BIBSCHED_FLUSH_LOGS
+from invenio.config import (
+    CFG_PREFIX,
+    CFG_BINDIR,
+    CFG_BIBSCHED_PROCESS_USER,
+    CFG_TMPDIR,
+    CFG_SITE_SUPPORT_EMAIL,
+    CFG_VERSION,
+    CFG_BIBSCHED_FLUSH_LOGS,
+    CFG_SITE_NAME,
+    CFG_SITE_URL
+)
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
                                           CFG_EXTERNAL_AUTHENTICATION
-from invenio.webuser import get_user_preferences, get_email
+from invenio.webuser import get_user_preferences, get_email, get_email_from_username
 from invenio.bibtask_config import (CFG_BIBTASK_VALID_TASKS,
                                     CFG_BIBTASK_DEFAULT_TASK_SETTINGS,
                                     CFG_BIBTASK_FIXEDTIMETASKS,
@@ -619,12 +623,15 @@ def task_init(authorization_action="",
                 write_message("Exiting.", sys.stderr)
                 if task_get_task_param('stop_queue_on_error'):
                     task_update_status("ERROR")
-                elif isinstance(e, RecoverableError) and task_get_task_param('email_logs_to'):
-                    task_update_status("ERRORS REPORTED")
                 else:
                     task_update_status("CERROR")
+                if not task_get_task_param('email_logs_to') and task_get_task_param('email_logs_on_error'):
+                    email_error_logs_to = get_email_from_username(task_get_task_param('user'))
+                    _task_email_logs(email_error_logs_to, error_message=str(e))
+                    task_update_status("ERRORS REPORTED")
         finally:
-            _task_email_logs()
+            email_logs_to = task_get_task_param('email_logs_to')
+            _task_email_logs(email_logs_to)
             logging.shutdown()
 
 def _task_build_params(task_name,
@@ -667,6 +674,7 @@ def _task_build_params(task_name,
                 "fixed-time",
                 "email-logs-to=",
                 "host=",
+                "email-logs-on-error",
             ] + long_params)
     except getopt.GetoptError, err:
         raise InvalidParams(err)
@@ -710,6 +718,8 @@ def _task_build_params(task_name,
                 params["email_logs_to"] = opt[1].split(',')
             elif opt[0] in ("--host",):
                 params["host"] = opt[1]
+            elif opt[0] in ("--email-logs-on-error",):
+                params["email_logs_on_error"] = True
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                                                                  opt[1],
@@ -1010,35 +1020,52 @@ def task_get_options(task_id, task_name):
     write_message('Options retrieved: %s' % (out, ), verbose=9)
     return out
 
-def _task_email_logs():
-    """
-    In case this was requested, emails the logs.
-    """
-    email_logs_to = task_get_task_param('email_logs_to')
 
+def _task_email_logs(email_logs_to, error_message=""):
+    """In case this was requested, emails the logs."""
     if not email_logs_to:
         return
-
     status = task_read_status()
     task_name = task_get_task_param('task_name')
     task_specific_name = task_get_task_param('task_specific_name')
     if task_specific_name:
-        task_name += '%s:%s' % (task_name, task_specific_name)
+        task_name = '{0}:{1}'.format(task_name, task_specific_name)
     runtime = task_get_task_param('runtime')
 
-    title = "Execution of %s: %s" % (task_name, status)
+    title = "{0}: The task {1} has finished: {2}".format(
+        CFG_SITE_NAME,
+        task_name,
+        status
+    )
     body = """
-Attached you can find the stdout and stderr logs of the execution of
-name: %s
-id: %s
-runtime: %s
-options: %s
-status: %s
-""" % (task_name, _TASK_PARAMS['task_id'], runtime, _OPTIONS, status)
+On {0} ({7}) the task "{1}" finished as {5}
+
+{6}
+
+See specific task logs attached to this e-mail.
+
+Task ID: {2}
+Date: {3}
+Status: {5}
+
+Contact {4} for any further questions.
+""".format(CFG_SITE_NAME,
+           task_name,
+           _TASK_PARAMS['task_id'],
+           runtime,
+           CFG_SITE_SUPPORT_EMAIL,
+           status,
+           error_message,
+           CFG_SITE_URL)
     log_file = task_log_path(_TASK_PARAMS['task_id'], 'log')
     err_file = task_log_path(_TASK_PARAMS['task_id'], 'err')
-    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body,
-                      attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
+    res = send_email(
+        CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body,
+        attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')]
+    )
+    if res:
+        write_message("Email sent to {0}".format(email_logs_to))
+    return res
 
 
 def get_task_old_runtime(task_params):
@@ -1145,10 +1172,13 @@ def _task_run(task_run_fnc):
     try:
         if callable(task_run_fnc) and task_run_fnc():
             task_update_status("DONE")
-        elif task_get_task_param('email_logs_to'):
-            task_update_status("ERRORS REPORTED")
         else:
             task_update_status("DONE WITH ERRORS")
+            if not task_get_task_param('email_logs_to') and task_get_task_param('email_logs_on_error'):
+                email_error_logs_to = get_email_from_username(task_get_task_param('user'))
+                _task_email_logs(email_error_logs_to)
+                task_update_status("ERRORS REPORTED")
+
     finally:
         task_status = task_read_status()
         if sleeptime:
@@ -1229,6 +1259,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified\n\t\t\tbibtasklet with the given parameters between square\n\t\t\tbrackets.\n")
     sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr=\n\t\t\t'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',\n\t\t\tcontent='help']\"\n")
     sys.stderr.write("  --email-logs-to=EMAILS Sends an email with the results of the execution\n\t\t\tof the task, and attached the logs (EMAILS could be a comma-\n\t\t\tseparated lists of email addresses)\n")
+    sys.stderr.write("  --email-logs-on-error\tSend an e-mail to user that ran the task in case of ERROR.\n")
     sys.stderr.write("  --host=HOSTNAME Bind the task to the specified host, it will only ever run on that host.\n")
     if description:
         sys.stderr.write(description)
