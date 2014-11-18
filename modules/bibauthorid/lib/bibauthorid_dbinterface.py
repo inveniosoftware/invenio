@@ -325,6 +325,16 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
 
     for s in sigs_str:
         sig = _split_signature_string(s)
+
+        new_pid = None
+        for potential_pid in matched_authors_pids:
+            if not author_has_claimed_signature(potential_pid,
+                                                sig,
+                                                negative=True):
+                new_pid = potential_pid
+                break
+        if not new_pid:
+            new_pid = get_free_author_id()
         table, ref, rec = sig
 
         # the paper should be present, either assigned or rejected
@@ -342,7 +352,10 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
         # it will be reassigned by tortoise) and reject it from the current person.
         current_pid, name = sig_exists[0]
         if current_pid == pid:
-            move_signature(sig, new_pid, force_claimed=True, set_unclaimed=True)
+            sig_is_claimed = author_has_claimed_signature(pid, sig)
+            move_signature(sig, new_pid,
+                           force_claimed=sig_is_claimed,
+                           set_unclaimed=True)
             pids_to_update.add(new_pid)
             add_signature((table, ref, rec), name, pid, flag=-2, user_level=user_level)
 
@@ -351,6 +364,28 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
     return statuses
 
 
+def author_has_claimed_signature(pid, sig, negative=False):
+    """
+    Checks whether a particular author has claimed one signature.
+    @param pid: the person id of the author
+    @type pid: int
+    @param sig: the signature in question (100 / 700, bibref, bibrec)
+    @type sig: tuple of 3 elements
+    @param negative: if this is a "disclaim"
+    @type negative: boolean
+    @return: A boolean indicating whether the person has claimed a signature.
+    """
+    try:
+        return bool(run_sql("""select * from aidPERSONIDPAPERS
+                               where personid = %s and bibref_table = %s
+                               and bibref_value = %s and bibrec = %s
+                               and flag = %s""",
+                            (pid, str(sig[0]), sig[1], sig[2],
+                            -2 if negative else 2))[0][0])
+    except IndexError:
+        return False
+
+>>>>>>> BibAuthorID: fix for rejection of claimed signatures
 def reset_papers_of_author(pid, sigs_str):  # reset_papers_flag
     '''
     Redefines the relationship of the given author and the specified papers as
@@ -2818,19 +2853,19 @@ def get_papers_affected_since(date_from, date_to=None):  # personid_get_recids_a
     """
     Gets the records whose bibauthorid informations changed between
     date_from and date_to (inclusive).
-    
+
     If date_to is None, gets the records whose bibauthorid informations
     changed after date_to (inclusive).
-    
+
     @param date_from: the date after which this function will look for
         affected records.
     @type date_from: datetime.datetime
-    
+
     @param date_to: the date before which this function will look for
         affected records. Currently this is not supported and is
         ignored. Should be supported in the future.
     @type date_to: datetime.datetime or None
-    
+
     @return: affected record ids
     @return type: intbitset
     """
