@@ -84,7 +84,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   if (helper = helpers.cname) { stack1 = helper.call(depth0, {hash:{},data:data}); }
   else { helper = (depth0 && depth0.cname); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
   buffer += escapeExpression(stack1)
-    + "</strong>.<br>\n	It will take a few days for INSPIRE to review your suggestion.\n	</p>\n\n	<div class=\"list-group confirmation-preview\">\n	</div>\n\n</div>\n\n<div class=\"modal-footer\">\n	<a href=\"#\" class=\"btn back btn-primary\" data-dismiss=\"modal\">No</a>\n	<a href=\"#\" class=\"btn btn-default confirm\">Yes, go ahead</a>\n</div>\n";
+    + "</strong>.<br>\n	It will take a few days for INSPIRE to review your suggestion.\n	</p>\n\n	<div class=\"list-group confirmation-preview\">\n	</div>\n\n</div>\n\n<div class=\"modal-footer\">\n	<a href=\"#\" id=\"hepModalDismiss\" class=\"btn back btn-default\" data-dismiss=\"modal\">No</a>\n	<a href=\"#\" class=\"btn btn-primary confirm\">Yes, go ahead</a>\n</div>\n";
   return buffer;
   });
 templates['loginPrompt'] = template(function (Handlebars,depth0,helpers,partials,data) {
