@@ -30,14 +30,14 @@ class WorkflowHalt(HaltProcessing):
     """
 
     def __init__(self, message, action=None, **kwargs):
-        """ Instanciate a WorkflowHalt object."""
+        """Instanciate a WorkflowHalt object."""
         HaltProcessing.__init__(self)
         self.message = message
         self.action = action
         self.payload = kwargs
 
     def to_dict(self):
-        """ Return a dict representation of WorkflowHalt."""
+        """Return a dict representation of WorkflowHalt."""
         rv = dict(self.payload or ())
         rv['message'] = self.message
         rv['action'] = self.action
@@ -54,7 +54,7 @@ class WorkflowError(Exception):
     """Raised when workflow experiences an error."""
 
     def __init__(self, message, id_workflow, id_object, payload=[]):
-        """ Instanciate a WorkflowError object."""
+        """Instanciate a WorkflowError object."""
         self.message = message
         self.id_workflow = id_workflow
         self.id_object = id_object
@@ -63,7 +63,7 @@ class WorkflowError(Exception):
         Exception.__init__(self, message, message, id_object, payload)
 
     def to_dict(self):
-        """ Return a dict representation of WorkflowError."""
+        """Return a dict representation of WorkflowError."""
         rv = list(self.payload or [])
         rv['message'] = self.message
         rv['id_workflow'] = self.id_workflow
@@ -83,7 +83,7 @@ class WorkflowDefinitionError(Exception):
     """Raised when workflow definition is missing."""
 
     def __init__(self, message, workflow_name, **kwargs):
-        """ Instanciate a WorkflowDefinitionError object."""
+        """Instanciate a WorkflowDefinitionError object."""
         Exception.__init__(self)
         # if isinstance(message, unicode):
         #     message = message.encode('utf-8', 'ignore')
@@ -92,7 +92,7 @@ class WorkflowDefinitionError(Exception):
         self.payload = kwargs
 
     def to_dict(self):
-        """ Return a dict representation of WorkflowDefinitionError."""
+        """Return a dict representation of WorkflowDefinitionError."""
         rv = dict(self.payload or ())
         rv['message'] = self.message
         rv['workflow_name'] = self.workflow_name
@@ -110,14 +110,14 @@ class WorkflowWorkerError(Exception):
     """Raised when there is a problem with workflow workers."""
 
     def __init__(self, message, worker_name="No Name Given", **kwargs):
-        """ Instanciate a WorkflowWorkerError object."""
+        """Instanciate a WorkflowWorkerError object."""
         Exception.__init__(self)
         self.message = message
         self.worker_name = worker_name
         self.payload = kwargs
 
     def to_dict(self):
-        """ Return a dict representation of WorkflowWorkerError."""
+        """Return a dict representation of WorkflowWorkerError."""
         rv = dict(self.payload or ())
         rv['message'] = self.message
         rv['worker_name'] = self.worker_name
@@ -132,16 +132,16 @@ class WorkflowWorkerError(Exception):
 
 class WorkflowObjectVersionError(Exception):
 
-    """ Raised when workflow object has an unknown or missing version."""
+    """Raised when workflow object has an unknown or missing version."""
 
     def __init__(self, message, id_object, obj_version):
-        """ Instanciate a WorkflowObjectVersionError object."""
+        """Instanciate a WorkflowObjectVersionError object."""
         self.message = message
         self.obj_version = obj_version
         self.id_object = id_object
 
     def to_dict(self):
-        """ Return a dict representation of WorkflowObjectVersionError."""
+        """Return a dict representation of WorkflowObjectVersionError."""
         rv = {}
         rv['message'] = self.message
         rv['obj_version'] = self.obj_version
@@ -157,6 +157,16 @@ class WorkflowObjectVersionError(Exception):
 
 class WorkflowAPIError(Exception):
 
-    """ Raised when there is a problem with parameters at the API level."""
+    """Raised when there is a problem with parameters at the API level."""
 
     pass
+
+
+class SkipToken(Exception):
+
+    """Used by workflow engine to skip the current process of an object."""
+
+
+class AbortProcessing(Exception):
+
+    """Used by workflow engine to abort the engine execution."""
