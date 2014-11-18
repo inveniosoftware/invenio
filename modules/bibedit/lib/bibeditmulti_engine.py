@@ -36,7 +36,6 @@ base class.
 
 __revision__ = "$Id"
 
-import subprocess
 import re
 from invenio import search_engine
 from invenio import bibrecord
@@ -219,7 +218,7 @@ class ReplaceTextInSubfieldCommand(BaseSubfieldCommand):
             for field in record[tag]:
                 if field[4] == field_number:
                     subfields = field[0]
-                    (field_code, field_value) = subfields[subfield_index]
+                    (dummy_field_code, field_value) = subfields[subfield_index]
             replace_string = re.escape(self._value)
             for val in self._additional_values:
                 replace_string += "|" + re.escape(val)
@@ -393,7 +392,7 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
     response['search_html'] = multiedit_templates.detailed_record(record_content, language)
     return response
 
-def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, 
+def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display,
                                 language, outputTags, collection="", compute_modifications=0,
                                 upload_mode='-c', req=None, checked_records=None):
     """Returns the results of a test search.
@@ -609,7 +608,7 @@ def _create_marc(records_xml):
     aleph_marc_output = ""
 
     records = bibrecord.create_records(records_xml)
-    for (record, status_code, list_of_errors) in records:
+    for (record, dummy_status_code, dummy_list_of_errors) in records:
 
         sysno = ""
 
@@ -681,7 +680,9 @@ def _upload_file_with_bibupload(file_path, upload_mode, num_records, req):
     """
     user_info = collect_user_info(req)
     user_name = user_info.get('nickname') or 'multiedit'
+    user_email = user_info.get('email') or None
     task_options = ['bibupload', user_name, '-N', 'multiedit', '-P', '4', upload_mode]
+    task_options.extend(["--email-logs-on-error"])
 
     if num_records < CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING:
         task_options.append('%s' % file_path)
