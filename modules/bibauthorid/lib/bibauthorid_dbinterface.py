@@ -319,7 +319,19 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
     @return: confirmation status and message key for each signature [(status, message_key),]
     @rtype: list [(bool, str),]
     '''
-    new_pid = get_free_author_id()
+
+    matchable_name = get_matchable_name_of_author(pid)
+    matched_authors_pids = get_authors_by_name(matchable_name,
+                                               use_matchable_name=True)
+
+    # We will choose a new author from the matched_authors_pids list.
+    # We need to ensure that the current author's pid is no longer in the list.
+    try:
+        matched_authors_pids.remove(pid)
+    except ValueError:
+        # Happens when the signature name differs from current author's name.
+        pass
+
     pids_to_update = set([pid])
     statuses = list()
 
