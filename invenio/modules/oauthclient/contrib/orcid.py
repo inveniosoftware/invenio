@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Pre-configured remote application for enabling sign in/up with ORCID.
+"""Pre-configured remote application for enabling sign in/up with ORCID.
 
 **Usage:**
 
@@ -114,25 +114,20 @@ REMOTE_SANDBOX_APP['params'].update(dict(
 
 
 def account_info(remote, resp):
-    """ Retrieve remote account information used to find local user. """
+    """Retrieve remote account information used to find local user."""
+    account_info = dict(external_id=resp.get("orcid"), external_method="orcid")
 
-    from ..handlers import token_session_key
-
-    # Store ORCID of the user in session for later retrieval
-    session[token_session_key(remote.name) + "_orcid"] = resp.get("orcid")
-    return dict(email=None, nickname=None)
+    return account_info
 
 
 def account_setup(remote, token):
-    """ Perform additional setup after user have been logged in. """
-
+    """Perform additional setup after user have been logged in."""
     from invenio.ext.sqlalchemy import db
     from ..handlers import token_session_key
 
     extra_data = {
-        "orcid": session.get(token_session_key(remote.name) + "_orcid")
+        "orcid": session.get(token_session_key(remote.name) +
+                             "_account_info").get("external_id")
         }
     token.remote_account.extra_data = extra_data
     db.session.commit()
-    # Remove ORCID from session
-    del session[token_session_key(remote.name) + "_orcid"]

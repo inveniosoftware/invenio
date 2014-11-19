@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -330,6 +330,8 @@ class UserEXT(db.Model):
     method = db.Column(db.String(50), primary_key=True, nullable=False)
     id_user = db.Column(db.Integer(15, unsigned=True),
                         db.ForeignKey(User.id), nullable=False)
+
+    user = db.relationship(User, backref="external_identifiers")
 
     __table_args__ = (db.Index('id_user', id_user, method, unique=True),
                       db.Model.__table_args__)

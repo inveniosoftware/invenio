@@ -19,11 +19,12 @@
 
 """ Utility methods to help find, authenticate or register a remote user. """
 
+from flask import current_app
 from flask.ext.login import logout_user
 from invenio.ext.login import authenticate, UserInfo
 from invenio.ext.sqlalchemy import db
 from invenio.ext.script import generate_secret_key
-from invenio.modules.accounts.models import User
+from invenio.modules.accounts.models import User, UserEXT
 
 from .models import RemoteToken, RemoteAccount
 
@@ -40,10 +41,17 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
         if token:
             return UserInfo(token.remote_account.user_id)
 
-    if account_info and account_info.get('email'):
-        u = User.query.filter_by(email=account_info['email']).first()
-        if u:
-            return UserInfo(u.id)
+    if account_info:
+        if all(k in account_info for k in ("external_id", "external_method")):
+            u = UserEXT.query.filter_by(id=account_info['external_id'],
+                                        method=account_info['external_method']
+                                        ).first()
+            if u:
+                return UserInfo(u.id_user)
+        elif account_info.get('email'):
+            u = User.query.filter_by(email=account_info['email']).first()
+            if u:
+                return UserInfo(u.id)
     return None
 
 
@@ -61,24 +69,37 @@ def oauth_authenticate(client_id, userinfo, require_existing_link=False,
     return False
 
 
-def oauth_register(account_info):
+def oauth_register(account_info, form_data=None):
     """ Register user if possible. """
     from invenio.modules.accounts.models import User
-    if account_info and account_info.get('email'):
-        if not User.query.filter_by(email=account_info['email']).first():
+
+    email = account_info.get("email")
+    if form_data and form_data.get("email"):
+        email = form_data.get("email")
+
+    if email:
+        if not User.query.filter_by(email=email).first():
             # Email does not already exists. so we can proceed to register
             # user.
             u = User(
                 nickname=account_info.get('nickname', ''),
-                email=account_info['email'],
+                email=email,
                 password=generate_secret_key(),
                 note='1',  # Activated - assumes email is validated
             )
 
             try:
+                if all(k in account_info for k in ("external_id",
+                                                   "external_method")):
+                    u.external_identifiers.append(UserEXT(
+                        id=account_info.get('external_id'),
+                        method=account_info.get('external_method'),
+                        id_user=u.id
+                    ))
+
                 db.session.add(u)
                 db.session.commit()
                 return UserInfo(u.id)
             except Exception:
-                pass
+                current_app.logger.exception("Cannot create user")
     return None

@@ -206,6 +206,8 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
             if user is None:
                 # Auto sign-up requires extra information
                 session[token_session_key(remote.name)+'_autoregister'] = True
+                session[token_session_key(remote.name) +
+                        "_account_info"] = account_info
                 return redirect(url_for(
                     ".signup",
                     remote_app=remote.name,
@@ -276,8 +278,10 @@ def signup_handler(remote, *args, **kwargs):
     form = EmailSignUpForm(request.form)
 
     if form.validate_on_submit():
+        account_info = session.get(token_session_key(remote.name) +
+                                   "_account_info")
         # Register user
-        user = oauth_register(form.data)
+        user = oauth_register(account_info, form.data)
 
         if user is None:
             raise OAuthError("Could not create user.", remote)
@@ -300,6 +304,9 @@ def signup_handler(remote, *args, **kwargs):
 
         if not token.remote_account.extra_data:
             handlers['setup'](token)
+
+        # Remove account info from session
+        session.pop(token_session_key(remote.name)+'_account_info', None)
 
         # Redirect to next
         if request.args.get('next', None):
