@@ -323,5 +323,6 @@ def access():
             'success'
         )
     except:
+        current_app.logger.exception("Authorization failed.")
         flash(_('The authorization token is invalid.'), 'error')
     return redirect('/')

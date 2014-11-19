@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,14 +20,24 @@
 """Access database models."""
 
 # General imports.
-from invenio.ext.sqlalchemy import db
+from cPickle import dumps, loads
+from datetime import datetime, timedelta
+from random import random
+from sqlalchemy import bindparam
+from sqlalchemy.orm import validates, column_property, undefer
+
 from invenio.base.wrappers import lazy_import
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
+from invenio.utils.hash import md5
+
+from .errors import (
+    InvenioWebAccessMailCookieError, InvenioWebAccessMailCookieDeletedError)
 
 SUPERADMINROLE = lazy_import(
     'invenio.modules.access.local_config.SUPERADMINROLE')
 CFG_ACC_ACTIVITIES_URLS = lazy_import(
     'invenio.modules.access.local_config.CFG_ACC_ACTIVITIES_URLS')
-
 
 # Create your models here.
 
@@ -71,14 +81,78 @@ class AccMAILCOOKIE(db.Model):
     """Represent an email cookie."""
 
     __tablename__ = 'accMAILCOOKIE'
+
+    AUTHORIZATIONS_KIND = (
+        'pw_reset', 'mail_activation', 'role', 'authorize_action',
+        'comment_msg', 'generic'
+    )
+
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
                    autoincrement=True)
-    data = db.Column(db.iBinary, nullable=False)
+    _data = db.Column('data', db.iBinary, nullable=False)
     expiration = db.Column(db.DateTime, nullable=False,
                            server_default='9999-12-31 23:59:59', index=True)
     kind = db.Column(db.String(32), nullable=False)
     onetime = db.Column(db.TinyInteger(1), nullable=False, server_default='0')
     status = db.Column(db.Char(1), nullable=False, server_default='W')
+
+    @validates('kind')
+    def validate_kind(self, key, kind):
+        """Validate cookie kind."""
+        assert kind in self.AUTHORIZATIONS_KIND
+        return kind
+
+    @classmethod
+    def get(cls, cookie, delete=False):
+        """Get cookie if it is valid."""
+        password = cookie[:16]+cookie[-16:]
+        cookie_id = int(cookie[16:-16], 16)
+
+        obj, data = db.session.query(
+            cls,
+            db.func.aes_decrypt(
+                cls._data, bindparam('password')
+            ).label('decrypted')
+        ).params(password=password).filter_by(id=cookie_id).one()
+        obj.data = loads(data)
+
+        (kind_check, params, expiration, onetime_check) = obj.data
+        assert obj.kind in cls.AUTHORIZATIONS_KIND
+
+        if not (obj.kind == kind_check and obj.onetime == onetime_check):
+            raise InvenioWebAccessMailCookieError("Cookie is corrupted")
+        if obj.status == 'D':
+            raise InvenioWebAccessMailCookieDeletedError(
+                "Cookie has been deleted")
+        if obj.onetime or delete:
+            obj.status = 'D'
+            db.session.merge(obj)
+            db.session.commit()
+        return obj
+
+    @classmethod
+    def create(cls, kind, params, cookie_timeout=timedelta(days=1),
+               onetime=False):
+        """Create cookie with given params."""
+        expiration = datetime.today() + cookie_timeout
+        data = (kind, params, expiration, onetime)
+        password = md5(str(random())).hexdigest()
+        cookie = cls(
+            expiration=expiration,
+            kind=kind,
+            onetime=int(onetime),
+        )
+        cookie._data = db.func.aes_encrypt(dumps(data), password)
+        db.session.add(cookie)
+        db.session.commit()
+        db.session.refresh(cookie)
+        return password[:16]+hex(cookie.id)[2:-1]+password[-16:]
+
+    @classmethod
+    @session_manager
+    def gc(cls):
+        """Remove expired items."""
+        return cls.query.filter(cls.expiration<db.func.now()).delete()
 
 
 class AccROLE(db.Model):
