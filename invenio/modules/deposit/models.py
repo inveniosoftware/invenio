@@ -32,7 +32,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
 from flask import redirect, render_template, flash, url_for, request, \
-    session
+    session, current_app
 from flask.ext.login import current_user
 from flask.ext.restful import fields, marshal
 from invenio.ext.restful import UTCISODateTime
@@ -1398,7 +1398,11 @@ class Deposition(object):
             BibWorkflowObject.modified.desc()).all()
 
         def _create_obj(o):
-            obj = cls(o)
+            try:
+                obj = cls(o)
+            except InvalidDepositionType as err:
+                current_app.logger.exception(err)
+                return None
             if type is None or obj.type == type:
                 return obj
             return None
