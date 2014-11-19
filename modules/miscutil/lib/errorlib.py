@@ -28,6 +28,8 @@ import time
 import datetime
 import re
 import inspect
+import json
+
 from cStringIO import StringIO
 
 from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
@@ -390,6 +392,14 @@ def register_exception(stream='error',
         client = Client(CFG_ERRORLIB_SENTRY_URI)
         try:
             if req:
+                # Inner class that will be used to preprocess the data
+                class SentryEncoder(json.JSONEncoder):
+                    def default(self, obj):
+                        try:
+                            return obj.__dict___
+                        except AttributeError:
+                            return str(obj)
+
                 from invenio.webuser import collect_user_info
                 user_info = collect_user_info(req)
                 client.user_context({'id': user_info['uid'],
@@ -406,11 +416,25 @@ def register_exception(stream='error',
                                     'query_string': req.args,
                                     'headers': dict(req.headers_in),
                                     'https': req.is_https(),
-                                    'env': req.environ})
+                                    # Encode thanks to SentryEncoder to let
+                                    # data intact for the invenio serializer.
+                                    #
+                                    # Indeed req.environ can contain C-Object which are not all
+                                    # implementing the pickle protocol.
+                                    'env': json.loads(json.dumps(req.environ, cls=SentryEncoder))
+                                     })
                 client.extra_context(user_info)
             filename = _get_filename_and_line(sys.exc_info())[0]
             client.tags_context({'filename': filename, 'version': CFG_VERSION})
             client.captureException()
+        except Exception:
+            # Exception management of exception management
+            try:
+                client.captureException()
+            except Exception as err:
+                print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
+                    CFG_LOGDIR + '/invenio.' + stream, err)
+                return 0
         finally:
             client.context.clear()
 
