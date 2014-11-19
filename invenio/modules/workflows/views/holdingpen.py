@@ -127,11 +127,10 @@ def details(objectid):
 
     of = "hd"
     bwobject = BibWorkflowObject.query.get(objectid)
-    if 'holdingpen_current_ids' in session:
-        objects = session['holdingpen_current_ids']
-        previous_object, next_object = get_previous_next_objects(objects, objectid)
-    else:
-        previous_object, next_object = None, None
+    previous_object, next_object = get_previous_next_objects(
+        session.get("holdingpen_current_ids"),
+        objectid
+    )
 
     formatted_data = bwobject.get_formatted_data(of)
     extracted_data = extract_data(bwobject)

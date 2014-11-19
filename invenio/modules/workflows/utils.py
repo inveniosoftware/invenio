@@ -404,21 +404,23 @@ def get_rendered_task_results(obj):
 
 def get_previous_next_objects(object_list, current_object_id):
     """Return tuple of (previous, next) object for given Holding Pen object."""
+    if not object_list:
+        return None, None
     try:
         current_index = object_list.index(current_object_id)
-        try:
-            next_object_id = object_list[current_index + 1]
-        except IndexError:
-            next_object_id = None
-        try:
-            if current_index == 0:
-                previous_object_id = None
-            else:
-                previous_object_id = object_list[current_index - 1]
-        except IndexError:
-            previous_object_id = None
     except ValueError:
-        next_object_id = object_list[0]
+        # current_object_id not in object_list:
+        return None, None
+    try:
+        next_object_id = object_list[current_index + 1]
+    except IndexError:
+        next_object_id = None
+    try:
+        if current_index == 0:
+            previous_object_id = None
+        else:
+            previous_object_id = object_list[current_index - 1]
+    except IndexError:
         previous_object_id = None
     return previous_object_id, next_object_id
 
