@@ -212,6 +212,9 @@ def is_orcid(val):
 
     See http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
     """
+    if val.startswith('http://orcid.org/'):
+        val = val[len('http://orcid.org/'):]
+
     val = val.replace("-", "").replace(" ", "")
     if is_isni(val):
         val = int(val[:-1], 10)  # Remove check digit and convert to int.
@@ -301,13 +304,13 @@ CFG_PID_SCHEMES = [
     ('purl', is_purl),
     ('lsid', is_lsid),
     ('urn', is_urn),
-    ('url', is_url),
     ('ads', is_ads),
     ('arxiv', is_arxiv),
     ('pmcid', is_pmcid),
     ('isbn', is_isbn),
     ('issn', is_issn),
     ('orcid', is_orcid),
+    ('url', is_url),
     ('isni', is_isni),
     ('ean13', is_ean13),
     ('ean8', is_ean8),
@@ -359,6 +362,15 @@ def normalize_ads(val):
     return m.group(2)
 
 
+def normalize_orcid(val):
+    """Normalize an ADS bibliographic code."""
+    if val.startswith("http://orcid.org/"):
+        val = val[len("http://orcid.org/"):]
+    val = val.replace("-", "").replace(" ", "")
+
+    return "-".join([val[0:4], val[4:8], val[8:12], val[12:16]])
+
+
 def normalize_pmid(val):
     """Normalize an PubMed ID."""
     m = pmid_regexp.match(val)
@@ -402,6 +414,8 @@ def normalize_pid(val, scheme):
         return normalize_pmid(val)
     elif scheme == 'arxiv':
         return normalize_arxiv(val)
+    elif scheme == 'orcid':
+        return normalize_orcid(val)
     return val
 
 
