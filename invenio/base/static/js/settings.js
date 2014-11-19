@@ -27,7 +27,7 @@ require.config({
     hgn: "vendors/requirejs-hogan-plugin/hgn",
     hogan: "vendors/hogan/web/builds/3.0.2/hogan-3.0.2.amd",
     text: "vendors/requirejs-hogan-plugin/text",
-    flight: "vendors/flight/lib",
+    flight: "vendors/flight",
     typeahead: "vendors/typeahead.js/dist/typeahead.bundle",
     "bootstrap-select": "js/bootstrap-select",
     "jquery-caret": "vendors/jquery.caret/dist/jquery.caret-1.5.2",

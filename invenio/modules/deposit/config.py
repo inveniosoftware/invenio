@@ -22,8 +22,7 @@ import os
 import sys
 
 DEPOSIT_TYPES = []
-"""
-List of DepositionType import strings
+"""List of DepositionType import strings.
 
 Import string must be to the actual subclass of DepositionType, e.g.::
 
@@ -47,14 +46,16 @@ Then your config will look like something like this::
         # ...
         "mysite.modules.myappmodule.workflows.mydep:MyDepTypeSubclass"
     ]
-
 """
 
 DEPOSIT_DEFAULT_TYPE = None
-""" Import string of default deposition type """
+"""Import string of default deposition type."""
 
 DEPOSIT_STORAGEDIR = os.path.join(sys.prefix, "var/data/deposit/storage")
-""" Default storage directory for uploaded depositions """
+"""Default storage directory for uploaded depositions."""
 
 DEPOSIT_MAX_UPLOAD_SIZE = 104857600
-""" Maximum upload size """
+"""Maximum upload size."""
+
+DEPOSIT_DROPBOX_API_KEY = None
+"""API key DropBox Saver widget."""

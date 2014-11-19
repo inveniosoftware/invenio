@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013, 2014 CERN.
+ * Copyright (C) 2014 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -16,13 +16,29 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
+'use strict';
 
-require([
-    'jquery',
-    'js/deposit/form',
-    'js/deposit/uploader/uploader',
-    "js/deposit/uploader/uploaders/pluploader",
-    "js/deposit/uploader/uploaders/dropboxuploader",
-    "js/deposit/uploader/ui/filelist",
-    "js/deposit/uploader/ui/errorlist"
-], function() {});
+define(function(require) {
+
+    return require('flight/lib/component')(ErrorList);
+
+    function ErrorList() {
+
+        this.attributes({
+            errorListSelector: "#errorList"
+        });
+
+        var errorListRow = require('hgn!../../templates/error');
+
+        this.handleErrorOccurred = function(ev, error) {
+            var html = "";
+            this.$node.css("visibility", "visible");
+            html = erroListRow(error);
+            this.select('errorListSelector').append(html);
+        };
+
+        this.after('initialize', function() {
+            this.on('errorOccurred', this.handleErrorOccurred);
+        });
+    }
+});
