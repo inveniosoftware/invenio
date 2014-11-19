@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2014 CERN.
+## Copyright (C) 2011, 2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,11 +19,15 @@
 
 """Knowledge database models."""
 
-from sqlalchemy.orm.collections import attribute_mapped_collection
+import os
 
+from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.search.models import Collection
+
+from sqlalchemy.event import listens_for
+from sqlalchemy.orm.collections import attribute_mapped_collection
 
 
 class KnwKB(db.Model):
@@ -165,6 +169,20 @@ class KnwKB(db.Model):
             self.kbdefs = KnwKBDDEF(output_tag=field,
                                     search_expression=expression,
                                     collection=collection)
+
+    def get_filename(self):
+        """Construct the file name for taxonomy knoledge."""
+        return cfg['CFG_WEBDIR'] + "/kbfiles/" \
+            + str(self.id) + ".rdf"
+
+
+@listens_for(KnwKB, 'after_delete')
+def del_kwnkb(mapper, connection, target):
+    """Remove taxonomy file."""
+    if(target.kbtype == KnwKB.KNWKB_TYPES['taxonomy']):
+        # Delete taxonomy file
+        if os.path.isfile(target.get_filename()):
+            os.remove(target.get_filename())
 
 
 class KnwKBDDEF(db.Model):

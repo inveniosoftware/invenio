@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2013, 2014 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,14 +23,15 @@ import json
 import os
 import re
 import warnings
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
 
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.search.models import Collection
 from invenio.utils.memoise import Memoise
+
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 from . import models
 
@@ -82,6 +83,16 @@ def get_all_kb_names():
     return [row.name for row in models.KnwKB.query.all()]
 
 get_kb_by_name_memoised = Memoise(get_kb_by_name)
+
+
+def query_get_kb_by_type(kbtype):
+    """Return a query to filter kb by type.
+
+    :param kbtype: type to filter (e.g: taxonomy)
+    :return: query to filter kb
+    """
+    return models.KnwKB.query.filter_by(
+        kbtype=models.KnwKB.KNWKB_TYPES[kbtype])
 
 
 def query_kb_mappings(kbid, sortby="to", key="", value="",
@@ -191,6 +202,7 @@ def remove_kb_mapping(kb_name, key):
     del kb.kbrvals[key]
 
 
+@session_manager
 def update_kb_mapping(kb_name, old_key, key, value):
     """Update an existing kb mapping with key old_key with a new key and value.
 
@@ -202,7 +214,7 @@ def update_kb_mapping(kb_name, old_key, key, value):
     db.session.query(models.KnwKBRVAL).join(models.KnwKB) \
         .filter(models.KnwKB.name == kb_name,
                 models.KnwKBRVAL.m_key == old_key) \
-        .update({"m_key": key, "m_value": value})
+        .update({"m_key": key, "m_value": value}, synchronize_session=False)
 
 
 def get_kb_mappings_json(kb_name="", key="", value="", match_type="s",
@@ -321,7 +333,7 @@ def add_kb(kb_name="Untitled", kb_type=None, tries=10):
             name = kb_name + " " + str(index)
             i = i + 1
             created = False
-        except:
+        except Exception:
             db.session.rollback()
             raise
 
