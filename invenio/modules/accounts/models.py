@@ -55,6 +55,7 @@ class User(db.Model):
         return "%s <%s>" % (self.nickname, self.email)
 
     __tablename__ = 'user'
+    __mapper_args__ = {'confirm_deleted_rows': False}
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
                    autoincrement=True)
     email = db.Column(db.String(255), nullable=False, server_default='',

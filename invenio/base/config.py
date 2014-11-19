@@ -63,12 +63,13 @@ PACKAGES = [
 ]
 
 PACKAGES_EXCLUDE = [
-    'invenio.modules.archiver',
     'invenio.modules.annotations',
+    'invenio.modules.archiver',
+    'invenio.modules.authors',
     'invenio.modules.communities',
-    'invenio.modules.pages',
     'invenio.modules.linkbacks',
     'invenio.modules.multimedia',
+    'invenio.modules.pages',
 ]
 
 LEGACY_WEBINTERFACE_EXCLUDE = [
