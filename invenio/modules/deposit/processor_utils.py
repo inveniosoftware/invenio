@@ -42,7 +42,7 @@ def replace_field_data(field_name, getter=None):
 
 
 def set_flag(flag_name):
-    """ Return processor which will set a given flag on a field."""
+    """Return processor which will set a given flag on a field."""
     def _inner(form, field, submit=False, fields=None):
         setattr(field.flags, flag_name, True)
     return _inner
@@ -71,13 +71,23 @@ class PidNormalize(object):
 
     """Normalize a persistent identifier."""
 
-    def __init__(self, scheme_field=None):
+    def __init__(self, scheme_field=None, scheme=None):
         self.scheme_field = scheme_field
+        self.scheme = scheme
 
     def __call__(self, form, field, submit=False, fields=None):
-        scheme = getattr(form, self.scheme_field).data
+        scheme = None
+        if self.scheme_field:
+            scheme = getattr(form, self.scheme_field).data
+        elif self.scheme:
+            scheme = self.scheme
+        else:
+            schemes = pidutils.detect_identifier_schemes(field.data)
+            if schemes:
+                scheme = schemes[0]
         if scheme:
-            field.data = pidutils.normalize_pid(field.data, scheme=scheme)
+            if field.data:
+                field.data = pidutils.normalize_pid(field.data, scheme=scheme)
 
 
 #
