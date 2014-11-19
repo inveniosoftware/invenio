@@ -47,6 +47,7 @@ require.config({
     "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
     "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
     "jasmine-boot": "js/jasmine/boot",
+    "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
   },
   shim: {
     jquery: {

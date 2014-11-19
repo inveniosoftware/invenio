@@ -18,78 +18,82 @@
  */
 
 /**
-* Generates configuration of invenio syntax for search field typeahead
-*
-* @method getInvenioParserConf
-* @param {Array of strings} Contains values of possible query type
-*  keywords as 'author', 'abstract' etc.
-*/
-function getDefaultParserConf(area_keywords) {
+  * Generates configuration of invenio syntax for search field typeahead
+  *
+  * @method getInvenioParserConf
+  * @param {Array of strings} Contains values of possible query type
+  *  keywords as 'author', 'abstract' etc.
+  */
+define([], function() {
+  return function (area_keywords) {
 
-  var get_next_word_type = function(previous_word_type, word_types) {
-    // returns the next type according to syntax order
+    var get_next_word_type = function(previous_word_type, word_types) {
+      // returns the next type according to syntax order
 
-    // the case when this is the first word
-    if (previous_word_type == undefined)
-      return [word_types.QUERY_TYPE, word_types.NOT];
+      // the case when this is the first word
+      if (previous_word_type == undefined)
+        return [word_types.QUERY_TYPE, word_types.NOT];
 
-    if (previous_word_type == word_types.QUERY_TYPE)
-      return word_types.QUERY_VALUE;
+      if (previous_word_type == word_types.QUERY_TYPE)
+        return word_types.QUERY_VALUE;
 
-    if (previous_word_type == word_types.QUERY_VALUE)
-      return [word_types.QUERY_TYPE, word_types.LOGICAL_EXP, word_types.NOT]
+      if (previous_word_type == word_types.QUERY_VALUE)
+        return [word_types.QUERY_TYPE, word_types.LOGICAL_EXP, word_types.NOT]
 
-    if (previous_word_type == word_types.LOGICAL_EXP)
-      return [word_types.QUERY_TYPE, word_types.NOT];
+      if (previous_word_type == word_types.LOGICAL_EXP)
+        return [word_types.QUERY_TYPE, word_types.NOT];
 
-    if (previous_word_type == word_types.NOT)
-      return word_types.QUERY_TYPE;
-  }
+      if (previous_word_type == word_types.NOT)
+        return word_types.QUERY_TYPE;
+    }
 
-  function endsWithColon(str, char_roles, start_idx, end_idx) {
-    return str[end_idx] == ':';
-  }
+    function endsWithColon(str, char_roles, start_idx, end_idx) {
+      return str[end_idx] == ':';
+    }
 
-  function notStartsNorEndsWithColon(str, char_roles, start_idx, end_idx) {
-    return !endsWithColon(str, char_roles, start_idx, end_idx)
-      && !(start_idx > 0 && str[start_idx - 1] == ':');
-  }
+    function notStartsNorEndsWithColon(str, char_roles, start_idx, end_idx) {
+      return !endsWithColon(str, char_roles, start_idx, end_idx)
+        && !(start_idx > 0 && str[start_idx - 1] == ':');
+    }
 
-  return {
-    keywords: {
-      SEARCH: {
-        LOGICAL_EXP: {
-          min_length: 1,
-          values: ['AND', 'OR'],
-          detection_condition: notStartsNorEndsWithColon,
-          autocomplete_suffix: ' '
+    var invenio_syntax = {
+      keywords: {
+        SEARCH: {
+          LOGICAL_EXP: {
+            min_length: 1,
+            values: ['AND', 'OR'],
+            detection_condition: notStartsNorEndsWithColon,
+            autocomplete_suffix: ' '
+          },
+          NOT: {
+            min_length: 1,
+            values: ['NOT'],
+            detection_condition: notStartsNorEndsWithColon,
+            autocomplete_suffix: ' '
+          }
         },
-        NOT: {
-          min_length: 1,
-          values: ['NOT'],
-          detection_condition: notStartsNorEndsWithColon,
-          autocomplete_suffix: ' '
+        ORDER: {
+          QUERY_TYPE: {
+            min_length: 1,
+            detection_condition: endsWithColon,
+            values: area_keywords,
+            autocomplete_suffix: ':'
+          },
+          QUERY_VALUE: {
+            min_length: 3,
+            terminating_separators: [' ']
+          }
         }
       },
-      ORDER: {
-        QUERY_TYPE: {
-          min_length: 1,
-          detection_condition: endsWithColon,
-          values: area_keywords,
-          autocomplete_suffix: ':'
-        },
-        QUERY_VALUE: {
-          min_length: 3,
-          terminating_separators: [' ']
-        }
-      }
-    },
-    get_next_word_type: get_next_word_type,
-    value_type_interpretation: {
-      author: 'exactauthor'
-    },
-    separators: [' ', ':', '(', ')']
-  };
+      get_next_word_type: get_next_word_type,
+      value_type_interpretation: {
+        author: 'exactauthor'
+      },
+      separators: [' ', ':', '(', ')']
+    };
 
-
-}
+    return {
+      invenio: invenio_syntax,
+    };
+  }
+});

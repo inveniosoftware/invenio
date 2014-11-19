@@ -18,7 +18,11 @@
  */
 
 
-define(['jquery', 'js/search/typeahead'], function($) {
+define([
+    'jquery',
+    'searchtypeahead-configuration',
+    'js/search/typeahead',
+], function($, getParserConf, Bloodhound) {
     "use strict";
 
     $("form[name=search]").submit(function() {
@@ -345,9 +349,7 @@ define(['jquery', 'js/search/typeahead'], function($) {
 
         $('form[name=search] input[name=p]').searchTypeahead({
           value_hints_url: form.hintsUrl,
-          options_sets: {
-            invenio: getDefaultParserConf(areaKeywords)
-          },
+          options_sets: getParserConf(areaKeywords),
           default_set: form.defaultSet
         })
     }
