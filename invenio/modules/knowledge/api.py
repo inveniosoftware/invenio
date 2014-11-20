@@ -84,8 +84,8 @@ def get_all_kb_names():
 get_kb_by_name_memoised = Memoise(get_kb_by_name)
 
 
-def get_kb_mappings(kb_name="", sortby="to", key="", value="",
-                    match_type="s"):
+def get_kb_mappings(kb_name="", key="", value="", match_type="s", sortby="to",
+                    limit=None):
     """Return a list of all mappings from the given kb, ordered by key.
 
     If key given, give only those with left side (mapFrom) = key.
@@ -95,6 +95,7 @@ def get_kb_mappings(kb_name="", sortby="to", key="", value="",
     :param sortby: the sorting criteria ('from' or 'to')
     :param key: return only entries where key matches this
     :param value: return only entries where value matches this
+    :limit return only X number of entries
     """
     # query
     query = db.session.query(models.KnwKBRVAL).join(models.KnwKB)
@@ -119,11 +120,14 @@ def get_kb_mappings(kb_name="", sortby="to", key="", value="",
         query = query.order_by(models.KnwKBRVAL.m_key)
     else:
         query = query.order_by(models.KnwKBRVAL.m_value)
+    if limit:
+        query = query.limit(limit)
     # return results
     return [kbv.to_dict() for (kbv) in query.all()]
 
 
-def get_kb_mapping(kb_name="", key="", value="", match_type="e", default=""):
+def get_kb_mapping(kb_name="", key="", value="", match_type="e", default="",
+                   limit=None):
     """Get one unique mapping. If not found, return default.
 
     :param kb_name: the name of the kb
@@ -134,7 +138,7 @@ def get_kb_mapping(kb_name="", key="", value="", match_type="e", default=""):
     :return: a mapping
     """
     mappings = get_kb_mappings(kb_name, key=key, value=value,
-                               match_type=match_type)
+                               match_type=match_type, limit=limit)
 
     if len(mappings) == 0:
         return default
