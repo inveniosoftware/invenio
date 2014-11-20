@@ -340,9 +340,9 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
 
         new_pid = None
         for potential_pid in matched_authors_pids:
-            if not author_has_claimed_signature(potential_pid,
-                                                sig,
-                                                negative=True):
+            if not get_signatures_of_paper_and_author(sig,
+                                                      potential_pid,
+                                                      include_rejected=True):
                 new_pid = potential_pid
                 break
         if not new_pid:
@@ -1468,7 +1468,7 @@ def get_wrong_names():
     return chain(wrong100, wrong700), total
 
 
-def get_signatures_of_paper_and_author(sig, pid):  # find_conflicts
+def get_signatures_of_paper_and_author(sig, pid, include_rejected=False):  # find_conflicts
     '''
     Gets confirmed signatures for the given signature and author.
 
@@ -1480,11 +1480,12 @@ def get_signatures_of_paper_and_author(sig, pid):  # find_conflicts
     @return: confirmed signatures
     @rtype: tuple ((bibref_table, bibref_value, bibrec, flag),)
     '''
-    return run_sql('select bibref_table, bibref_value, bibrec, flag '
-                   'from aidPERSONIDPAPERS '
-                   'where personid=%s '
-                   'and bibrec=%s '
-                   'and flag <> -2', (pid, sig[2]))
+    query = """select bibref_table, bibref_value, bibrec, flag
+               from aidPERSONIDPAPERS where personid=%s
+               and bibrec=%s """
+    if not include_rejected:
+        query += 'and flag <> -2'
+    return run_sql(query, (pid, sig[2]))
 
 
 def paper_affirmed_from_user_input(pid, sig_str):  # person_bibref_is_touched_old
