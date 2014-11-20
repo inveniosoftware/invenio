@@ -80,6 +80,7 @@ from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
 from weakref import ref
+from urlparse import urlsplit, parse_qs
 
 
 from invenio import webinterface_handler_config as apache
@@ -3663,17 +3664,24 @@ def decompose_bibdocfile_fullpath(fullpath):
     except:
         raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
 
-_RE_BIBDOCFILE_URL = re.compile("(%s|%s)/%s/(?P<recid>\d+)(?P<rest>.*)" % (re.escape(CFG_SITE_URL), re.escape(CFG_SITE_SECURE_URL), re.escape(CFG_SITE_RECORD)))
+_RE_BIBDOCFILE_URL = re.compile("/%s/(?P<recid>\d+)/files/(?P<rest>.*)" % (re.escape(CFG_SITE_RECORD), ))
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
         return decompose_bibdocfile_very_old_url(url)
 
-    g = _RE_BIBDOCFILE_URL.match(urllib.unquote(url))
+    scheme, netloc, path, query, dummy_fragment = urlsplit(url)
+    if "%s://%s" % (scheme, netloc) not in (CFG_SITE_URL, CFG_SITE_SECURE_URL):
+        raise InvenioBibDocFileError("URL %s doesn't correspond to a valid BibDocFile URL." % url)
+
+    g = _RE_BIBDOCFILE_URL.match(urllib.unquote(path))
     if g:
         recid = int(g.group('recid'))
         rest = g.group('rest')
         dummy, docname, docformat = decompose_file(rest)
+        query = parse_qs(query)
+        if 'subformat' in query:
+            docformat += ";%s" % query['subformat'][0]
         return recid, docname, docformat
     else:
         raise InvenioBibDocFileError, "Url %s doesn't correspond to a valid record inside the system." % url
@@ -3693,7 +3701,7 @@ def decompose_bibdocfile_very_old_url(url):
         params = urllib.splitquery(url)[1]
         if params:
             try:
-                params = cgi.parse_qs(params)
+                params = parse_qs(params)
                 if 'docid' in params:
                     docid = int(params['docid'][0])
                     bibdoc = BibDoc.create_instance(docid)
@@ -3723,27 +3731,27 @@ def decompose_bibdocfile_very_old_url(url):
 
 def get_docname_from_url(url):
     """Return a potential docname given a url"""
-    path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
+    path = urlsplit(urllib.unquote(url))[2]
     filename = os.path.split(path)[-1]
     return file_strip_ext(filename)
 
 def get_format_from_url(url):
     """Return a potential format given a url"""
-    path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
+    path = urlsplit(urllib.unquote(url))[2]
     filename = os.path.split(path)[-1]
     return filename[len(file_strip_ext(filename)):]
 
 def clean_url(url):
     """Given a local url e.g. a local path it render it a realpath."""
     if is_url_a_local_file(url):
-        path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
+        path = urlsplit(urllib.unquote(url))[2]
         return os.path.abspath(path)
     else:
         return url
 
 def is_url_a_local_file(url):
     """Return True if the given URL is pointing to a local file."""
-    protocol = urllib2.urlparse.urlsplit(url)[0]
+    protocol = urlsplit(url)[0]
     return protocol in ('', 'file')
 
 def check_valid_url(url):
@@ -3756,7 +3764,7 @@ def check_valid_url(url):
     """
     try:
         if is_url_a_local_file(url):
-            path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
+            path = urlsplit(urllib.unquote(url))[2]
             if os.path.abspath(path) != path:
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
             for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_STORAGEDIR]:
@@ -3813,7 +3821,7 @@ def download_local_file(filename, docformat=None):
 
     # Now try to copy.
     try:
-        path = urllib2.urlparse.urlsplit(urllib.unquote(filename))[2]
+        path = urlsplit(urllib.unquote(filename))[2]
         if os.path.abspath(path) != path:
             raise StandardError, "%s is not a normalized path (would be %s)." \
                     % (path, os.path.normpath(path))
