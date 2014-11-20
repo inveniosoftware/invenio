@@ -107,8 +107,7 @@ jquery = Bundle(
         "jquery.jeditable": "http://invenio-software.org/download/jquery/"
                             "v1.5/js/jquery.jeditable.mini.js",
         "jquery-migrate": "latest",  # orphan
-        "jquery-multifile": "svn+http://jquery-multifile-plugin.googlecode.com"
-                            "/svn/",  # orphan
+        "jquery-multifile": "https://github.com/fyneworks/multifile",
         "jquery-tablesorter": "http://invenio-software.org/download/jquery/"
                               "jquery.tablesorter.20111208.zip",  # orphan
         "jquery-tokeninput": "latest",
