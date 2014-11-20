@@ -39,15 +39,19 @@
     {%- set uug = uugs[group] -%}
     {%- set usergroup = uug.usergroup if uug else None -%}
     {%- set is_external = group not in uugs -%}
+    {% set is_admin = uug.is_admin() %}
+    {% set is_member = uug.is_member() %}
+    {% set is_part_of = uug.is_part_of() %}
     <li class="list-group-item">
       <div class="pull-right">
       {% if not is_external %}
-        {% set is_admin = uug.is_admin() %}
+        {% if is_part_of %}
         <a class="btn btn-xs btn-default"
            href="{{ url_for('webgroup.members',
              id_usergroup=usergroup.id) }}">
           <i class="fa fa-users"></i> {{ _('Members') }}
         </a>
+        {% endif %}
         {% if is_admin %}
         <a class="btn btn-xs btn-default"
            href="{{ url_for('webgroup.manage',
@@ -67,7 +71,14 @@
         </a>
       {% endif %}
       </div>
-      <h4 class="list-group-item-heading"><i class="fa fa-group fa-fw"></i>
+      <h4 class="list-group-item-heading">
+        {% if is_admin %}
+        <i class="fa fa-group fa-fw text-danger"></i>
+        {% elif is_member %}
+        <i class="fa fa-group fa-fw"></i>
+        {% elif not is_part_of %}
+        <i class="fa fa-group fa-fw text-warning"></i>
+        {% endif %}
           {{ group }}</h4>
       <small class="list-group-item-text">
         {{ usergroup.description
