@@ -34,10 +34,12 @@ from __future__ import print_function
 import base64
 import os
 import re
-import sqlalchemy
+
 import sys
 
 from intbitset import intbitset
+
+import sqlalchemy
 
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declared_attr
@@ -165,10 +167,10 @@ def session_manager(orig_func):
     """
     from invenio.ext.sqlalchemy import db
 
-    def new_func(self, *a, **k):
+    def new_func(*args, **kwargs):
         """Wrapper function to manage DB session."""
         try:
-            resp = orig_func(self, *a, **k)
+            resp = orig_func(*args, **kwargs)
             db.session.commit()
             return resp
         except Exception:

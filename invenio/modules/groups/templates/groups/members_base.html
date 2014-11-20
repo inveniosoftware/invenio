@@ -43,8 +43,16 @@
   <ul class="list-group">
   {% for uug in group.users %}
     {%- set is_admin = uug.is_admin() -%}
+    {%- set is_pending = uug.is_pending() -%}
     <li class="list-group-item">
       <div class="pull-right">
+        {% if user_is_admin and is_pending  %}
+        <a class="btn btn-xs btn-warning"
+           href="{{ url_for('webgroup.approve',
+             id_usergroup=group.id, id_user=uug.user.id) }}">
+          <i class="fa fa-chain"></i> {{ _('Approve') }}
+        </a>
+        {% endif %}
         {% if user_is_admin or uug.user.id == current_uug.user.id  %}
         <a class="btn btn-xs btn-danger"
            href="{{ url_for('webgroup.leave',
@@ -55,7 +63,9 @@
       </div>
       <h4 class="list-group-item-heading">
         {% if is_admin %}
-          <i class="fa fa-user text-danger" style="color:red"></i>
+          <i class="fa fa-user text-danger"></i>
+        {% elif is_pending %}
+          <i class="fa fa-user text-warning"></i>
         {% else %}
           <i class="fa fa-user"></i>
         {% endif %}
