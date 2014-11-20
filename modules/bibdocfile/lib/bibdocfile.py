@@ -58,6 +58,7 @@ import base64
 import binascii
 import cgi
 import sys
+import copy
 
 if sys.hexversion < 0x2060000:
     from md5 import md5
@@ -2992,6 +2993,23 @@ class BibDocFile(object):
             self.__bibdoc = ref(bibdoc)
             return bibdoc
         return self.__bibdoc()
+
+    def __getstate__(self):
+        """Remove weakref so the object can be pickled."""
+        dict_ = copy.copy(self.__dict__)
+        dict_['_BibDocFile__bibdoc'] = self.bibdoc
+        return  dict_
+
+    def __setstate__(self, data_dict):
+        """Undo what `__getstate__` did setting back the weakref.
+
+        :param data_dict: `dict` from `__getstate__`
+        """
+        for (name, value) in data_dict.iteritems():
+            setattr(self, name, value)
+
+        if self.__bibdoc is not None:
+            self.__bibdoc = ref(self.__bibdoc)
 
     def __repr__(self):
         return ('BibDocFile(%s,  %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), self.version, repr(self.name), repr(self.format), self.recids_doctypes[0][0], self.docid, repr(self.status), repr(self.checksum), repr(self.more_info), repr(self.human_readable)))
