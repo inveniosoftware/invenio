@@ -91,6 +91,7 @@ install_requires = [
     "libmagic>=1.0",
     "lxml>=3.3",
     "mechanize>=0.2.5",
+    "mistune>=0.4.1",
     "msgpack-python>=0.3",
     "MySQL-python>=1.2.5",
     "numpy>=1.7",
