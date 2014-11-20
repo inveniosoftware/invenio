@@ -136,10 +136,10 @@ def session_manager(orig_func):
     """
     from invenio.ext.sqlalchemy import db
 
-    def new_func(self, *a, **k):
+    def new_func(*args, **kwargs):
         """Wrapper function to manage DB session."""
         try:
-            resp = orig_func(self, *a, **k)
+            resp = orig_func(*args, **kwargs)
             db.session.commit()
             return resp
         except:

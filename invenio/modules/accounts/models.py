@@ -24,10 +24,11 @@ from datetime import datetime
 from flask.ext.login import current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils.types.choice import ChoiceType
+from sqlalchemy.exc import DBAPIError
 
 # Invenio import
 from invenio.ext.sqlalchemy import db
-
+from invenio.ext.sqlalchemy.utils import session_manager
 from .errors import AccountSecurityError, IntegrityUsergroupError
 
 # Create your models here.
@@ -182,34 +183,47 @@ class Usergroup(db.Model):
         """Return True if the group is external."""
         return self.login_method == Usergroup.LOGIN_METHODS['EXTERNAL']
 
+    @session_manager
     def join(self, user, status=None):
         """Join user to group.
 
         :param user: User to add into the group.
         :param status: status of user
         """
-        # if I want to join another user from the group
-        if(user.id != current_user.get_id()
-           # I need to be an admin of the group
-           and not self.is_admin(current_user.get_id())):
-            raise AccountSecurityError(
-                'Not enough right to '
-                'add user "{0}" from group "{1}"'
-                .format(user.nickname, self.name))
+        curr_uid = current_user.get_id()
+        user_id = user.id
 
-        # join group
-        self.users.append(
-            UserUsergroup(
-                id_user=user.id,
-                user_status=status or self.new_user_status,
+        if not self.is_admin(curr_uid):
+            if curr_uid == user_id:
+                new_status = self.new_user_status()
+            else:
+                # non administrator tries to add a user to group
+                raise AccountSecurityError(
+                    'Not enough right to '
+                    'add user "{0}" from group "{1}"'.format(
+                        user.nickname, self.name)
+                )
+        else:
+            # current user is administrator in group
+            new_status = status or self.new_user_status()
+        # check if user exists in group
+        uug = UserUsergroup.query.filter(
+            UserUsergroup.id_user == user_id,
+            UserUsergroup.id_usergroup == self.id
+        ).first()
+        if not uug:
+            # add user to group
+            uug_entry = UserUsergroup(
+                id_user=user_id, id_usergroup=self.id,
+                user_status=new_status
             )
-        )
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            raise
+            db.session.add(uug_entry)
+        else:
+            # user exists, update his status
+            uug.user_status = new_status
+            db.session.merge(uug)
 
+    @session_manager
     def leave(self, user):
         """Remove user from group.
 
@@ -236,11 +250,6 @@ class Usergroup(db.Model):
             id_usergroup=self.id,
             id_user=user.id,
         ).delete()
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            raise
 
     def is_admin(self, id_user):
         """Return True if the user is an admin of the group."""
