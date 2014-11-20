@@ -20,7 +20,10 @@
 'use strict';
 
 
-define(['js/groups/remote.autocomplete.field'], function(autocomplete) {
+define([
+  'js/groups/remote.autocomplete.field',
+  'jasmine-jquery',
+], function(autocomplete, jasmineJQuery) {
   "use strict"
 
   describe("A suite", function() {
@@ -54,6 +57,4 @@ define(['js/groups/remote.autocomplete.field'], function(autocomplete) {
       expect(obj.attr('name')).toBe('user_id');
     });
   });
-
-
 });
