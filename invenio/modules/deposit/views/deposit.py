@@ -44,7 +44,8 @@ from ..signals import template_context_created
 from ..models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
-    DepositionDraftCacheManager, FilenameAlreadyExists, ForbiddenAction
+    DepositionDraftCacheManager, FilenameAlreadyExists, ForbiddenAction, \
+    InvalidDepositionAction
 from ..storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
 
@@ -76,6 +77,9 @@ def deposition_error_handler(endpoint='.index'):
                 return redirect(url_for(endpoint))
             except (DepositionNotDeletable,):
                 flash(_("Deposition cannot be deleted."), 'danger')
+                return redirect(url_for(endpoint))
+            except (InvalidDepositionAction, ):
+                flash(_("Invalid action."), 'warning')
                 return redirect(url_for(endpoint))
             except (DraftDoesNotExists,):
                 abort(400)

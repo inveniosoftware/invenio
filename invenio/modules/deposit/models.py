@@ -17,7 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
+"""Deposition data model classes.
+
 Classes for wrapping BibWorkflowObject and friends to make it easier to
 work with the data attributes.
 """
@@ -52,55 +53,57 @@ from .storage import Storage, DepositionStorage
 # Exceptions
 #
 class DepositionError(Exception):
-    """ Base class for deposition errors """
+    """Base class for deposition errors."""
     pass
 
 
 class InvalidDepositionType(DepositionError):
-    """ Raised when a deposition type cannot be found """
+    """Raise when a deposition type cannot be found."""
+    pass
+
+
+class InvalidDepositionAction(DepositionError):
+    """Raise when deposition is in an invalid state for action."""
     pass
 
 
 class DepositionDoesNotExists(DepositionError):
-    """ Raised when a deposition does not exists """
+    """Raise when a deposition does not exists."""
     pass
 
 
 class DraftDoesNotExists(DepositionError):
-    """ Raised when a draft does not exists """
+    """Raise when a draft does not exists."""
     pass
 
 
 class FormDoesNotExists(DepositionError):
-    """ Raised when a draft does not exists """
+    """Raise when a draft does not exists."""
     pass
 
 
 class FileDoesNotExists(DepositionError):
-    """ Raised when a draft does not exists """
+    """Raise when a draft does not exists."""
     pass
 
 
 class DepositionNotDeletable(DepositionError):
-    """ Raised when a deposition cannot be deleted """
+    """Raise when a deposition cannot be deleted."""
     pass
 
 
 class FilenameAlreadyExists(DepositionError):
-    """ Raised when an identical filename is already present in a deposition"""
+    """Raise when an identical filename is already present in a deposition."""
     pass
 
 
 class ForbiddenAction(DepositionError):
-    """
-    Raised when an action on a deposition, draft or file is not
-    authorized
-    """
+    """Raise when action on a deposition, draft or file is not authorized."""
     pass
 
 
 class InvalidApiAction(DepositionError):
-    """ Raised when an invalid API action is requested """
+    """Raise when an invalid API action is requested."""
     pass
 
 
@@ -108,9 +111,7 @@ class InvalidApiAction(DepositionError):
 # Helpers
 #
 class FactoryMixin(object):
-    """
-    Mix-in class to help create objects from persisted object state.
-    """
+    """Mix-in class to help create objects from persisted object state."""
     @classmethod
     def factory(cls, state, *args, **kwargs):
         obj = cls(*args, **kwargs)
@@ -1130,8 +1131,8 @@ class Deposition(object):
         Reinitialize a workflow object (i.e. prepare it for editing)
         """
         if self.state != 'done':
-            raise DepositionError("Action only allowed for depositions in "
-                                  "state 'done'.")
+            raise InvalidDepositionAction("Action only allowed for "
+                                          "depositions in state 'done'.")
 
         if not self.authorize('reinitialize'):
             raise ForbiddenAction('reinitialize', self)
@@ -1143,8 +1144,8 @@ class Deposition(object):
         Stop a running workflow object (e.g. discard changes while editing).
         """
         if self.state != 'inprogress' or not self.submitted:
-            raise DepositionError("Action only allowed for depositions in "
-                                  "state 'inprogress'.")
+            raise InvalidDepositionAction("Action only allowed for "
+                                          "depositions in state 'inprogress'.")
 
         if not self.authorize('stop'):
             raise ForbiddenAction('stop', self)

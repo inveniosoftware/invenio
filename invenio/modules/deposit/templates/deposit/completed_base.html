@@ -25,7 +25,7 @@
     <div class="well">
         <span class="pull-right">
             {%- if deposition.type.editable -%}
-            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default" data-toggle="tooltip" title="" ><i class="fa fa-pencil"></i> {{ _('Edit') }}</a> &nbsp;
+            <a href="{{url_for('webdeposit.edit', deposition_type=deposition_type, uuid=deposition.id)}}" class="btn btn-default{{ ' disabled' if deposition.state != 'done' else ''}}" data-toggle="tooltip" title="{{ 'Editing is only possible after your upload have been fully integrated. Please wait a few moments, then try to reload the page.' if deposition.state != 'done' else ''}}" ><i class="fa fa-pencil"></i> {{ _('Edit') }}</a> &nbsp;
             {%- endif -%}
             <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-default" data-toggle="tooltip" title=""><i class="fa fa-eye"></i> {{ _('View') }}</a>
         </span>
