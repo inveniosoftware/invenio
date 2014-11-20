@@ -98,19 +98,32 @@ var ticketbox = {
                       hepname: hepRecord
                   };
 
+                  anyCallback = function() {
+                    $modal.find(".modal-footer>a.back").text("Close");
+                    $modal.find(".modal-footer>a.back").removeClass("disabled");
+                    $modal.find(".modal-footer>a.confirm").remove();
+                  }
+
                   successCallback = function () {
+                    anyCallback();
                     $modal.find(".modal-body").html("<p>Your contribution has been submitted and will be processed soon.</p>");
                     $modal.find(".modal-header>.modal-title").text("Thank You");
-                    $modal.find(".modal-footer>a.confirm").remove();
-                    $modal.find(".modal-footer>a.back").text("Close");
+
                   };
 
                   errorCallback = function () {
+                    anyCallback();
                     $modal.find(".modal-body").html("<p>There is a problem with INSPIRE at the moment. Please try again in a couple of minutes.</p>");
                     $modal.find(".modal-header>.modal-title").text("Try again later");
-                    $modal.find(".modal-footer>a.confirm").remove();
-                    $modal.find(".modal-footer>a.back").text("Close");
                   };
+
+                  $modal.find(".modal-body").html('<div id="spinDiv">' +
+                    '<span id="hepSpin"></span></div>');
+                  var spin = new Spinner({corners: 0.8}).spin().el;
+                  $modal.find("#hepSpin").append(spin);
+                  $modal.find(".modal-footer>a.confirm").addClass("disabled");
+                  $modal.find(".modal-footer>a.back").addClass("disabled");
+                  $modal.find(".modal-header>.modal-title").text("Please wait");
 
                   $.ajax({
                     dataType: 'json',

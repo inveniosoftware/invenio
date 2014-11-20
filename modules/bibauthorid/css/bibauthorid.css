@@ -787,6 +787,21 @@ ul.pub-tabs, .pub-tabs li {
     pointer-events: auto;
 }
 
+#hepSpin {
+    position: absolute;
+    display: block;
+    top: 50%;
+    left: 50%;
+}
+
+#spinDiv {
+    height: 100px;
+}
+
+#hepModalDismiss {
+    float: left;
+}
+
 /*
 .addToMergeButton {
 /*    font-size: 11px;
