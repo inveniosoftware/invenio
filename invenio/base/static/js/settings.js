@@ -46,6 +46,7 @@ require.config({
     "jasmine-core": "vendors/jasmine/lib/jasmine-core/jasmine",
     "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
     "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
+    "jasmine-flight": "vendors/jasmine-flight/lib/jasmine-flight",
     "jasmine-boot": "js/jasmine/boot",
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
     "jasmine-events": "js/jasmine/events_checker",
@@ -117,18 +118,27 @@ require.config({
     "jasmine-core": {
       exports: "jasmineRequire"
     },
+    "jasmine-boot": {
+      exports: "jasmine",
+    },
     "jasmine-jquery": {
-      deps: ["jquery", "jasmine-boot"]
+      deps: ["jquery", "jasmine-boot"],
+      exports: "jasmine",
     },
     "jasmine-ajax": {
       deps: ["jasmine-boot"],
+      exports: "jasmine",
     },
     "jasmine-html": {
       deps: ["jasmine-core"],
       exports: "jasmineRequire"
     },
+    "jasmine-flight": {
+      deps: ["jasmine-boot", "jasmine-jquery"],
+      exports: "jasmine",
+    },
     "vendors/jasmine/lib/jasmine-core/boot": {
-      deps: ['jasmine-html'],
+      deps: ["jasmine-html"],
       exports: "window.onload",
     },
     "jasmine-events": {

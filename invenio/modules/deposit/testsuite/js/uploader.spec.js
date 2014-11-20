@@ -16,41 +16,48 @@
  * along with Invenio; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
-describeComponent('js/deposit/uploader/uploader', function () {
 
-  'use strict';
+define([
+  'js/deposit/uploader/uploader',
+  'jasmine-flight',
+  'jasmine-jquery',
+], function(uploader, jasmineFlight, jasmineJQuery) {
+  describeComponent('js/deposit/uploader/uploader', function () {
 
-  jasmine.getFixtures().fixturesPath = '/jasmine/spec/invenio.modules.deposit/fixtures/';
-  var uploaderFixture = readFixtures('uploader.html');
+    'use strict';
 
-  describe('basic', function () {
-    var config = {
-      get_file_url: '',
-      delete_url: '',
-      form_selector: "#submitForm",
-      form_files: [],
-      resolve_uuid_url: '',
-      resolve_uuid: true,
-      autoupload: false,
-      continue_url: ''
-    };
+    jasmine.getFixtures().fixturesPath = '/jasmine/spec/invenio.modules.deposit/fixtures/';
+    var uploaderFixture = readFixtures('uploader.html');
 
-    beforeEach(function () {
-      this.setupComponent(uploaderFixture, config);
+    describe('basic', function () {
+      var config = {
+        get_file_url: '',
+        delete_url: '',
+        form_selector: "#submitForm",
+        form_files: [],
+        resolve_uuid_url: '',
+        resolve_uuid: true,
+        autoupload: false,
+        continue_url: ''
+      };
+
+      beforeEach(function () {
+        this.setupComponent(uploaderFixture, config);
+      });
+
+      it('', function () {
+
+      });
     });
 
-    it('', function () {
-
+    describe('autoupload', function () {
+      it('', function () {
+      });
     });
-  });
 
-  describe('autoupload', function () {
-    it('', function () {
-    });
-  });
-
-  describe('resolve_uuid', function () {
-    it('', function () {
+    describe('resolve_uuid', function () {
+      it('', function () {
+      });
     });
   });
 });
