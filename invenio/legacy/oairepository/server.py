@@ -96,8 +96,8 @@ CFG_ERRORS = {
     "noSetHierarchy": "The repository does not support sets:"
 }
 
-CFG_MIN_DATE = localtime_to_utc("1970-01-01 00:00:00")
-CFG_MAX_DATE = localtime_to_utc("9999-12-31 23:59:59")
+CFG_MIN_DATE = "1970-01-01T00:00:00Z"
+CFG_MAX_DATE = "9999-12-31T23:59:59Z"
 
 
 def oai_error(argd, errors):
