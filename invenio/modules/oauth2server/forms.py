@@ -125,15 +125,6 @@ class ClientFormBase(model_form_factory(InvenioBaseForm)):
 
 
 class ClientForm(ClientFormBase):
-    is_confidential = fields.SelectField(
-        label=_('Client Type'),
-        description=_('If you select public option, your application '
-                      'MUST validate redirect URI.'),
-        coerce=int,
-        choices=[(1, _('Confidential')), (0, _('Public'))],
-        widget=widgets.Select(),
-    )
-
     # Trick to make redirect_uris render in the bottom of the form.
     redirect_uris = RedirectURIField(
         label="Redirect URIs (one per line)",
@@ -142,6 +133,19 @@ class ClientForm(ClientFormBase):
                     "hosts except localhost (for testing purposes).",
         validators=[RedirectURIValidator(), validators.Required()],
         default='',
+    )
+
+    is_confidential = fields.SelectField(
+        label=_('Client type'),
+        description=_(
+            'Select confidential if your application is capable of keeping the '
+            'issued client secret confidential (e.g. a web application), select'
+            ' public if your application cannot (e.g. a browser-based '
+            'JavaScript application). If you select public, your application '
+            'MUST validate the redirect URI.'),
+        coerce=int,
+        choices=[(1, _('Confidential')), (0, _('Public'))],
+        default=1,
     )
 
 
