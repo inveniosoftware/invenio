@@ -26,31 +26,33 @@ class RecordError(Exception):
 
     def __init__(self, message=None, status=None):
         """Initialization."""
-        super(RecordError, self).__init__()
         self.message = message or self.__class__.__name__
-        self.status = status or 400
+        self.status = status or 500
+        super(RecordError, self).__init__(self.message)
 
-    def __str__(self):
+    def __unicode__(self):
         """String representation of the error."""
-        return repr("Error message: {}, Error status: {}".format(
+        return "Error message: {}, Error status: {}".format(
             self.message, self.status
-        ))
+        )
 
 
 class RecordNotFoundError(RecordError):
 
     """Error indicating that a record was not found."""
 
-    def __init__(self, message=None, status=None):
-        super(RecordNotFoundError, self).__init__(message, status=404)
+    def __init__(self, message=None, status=404):
+        super(RecordNotFoundError, self).__init__(message, status=status)
 
 
 class RecordUnsuppotedMediaTypeError(RecordError):
 
-    def __init__(self, message=None, status=None):
+    """Error indicating that an unsupported media type was requested."""
+
+    def __init__(self, message=None, status=415):
         super(RecordUnsuppotedMediaTypeError, self).__init__(
-            message,
-            status=415
+            message=message,
+            status=status
         )
 
 
@@ -58,13 +60,17 @@ class RecordForbiddenViewError(RecordError):
 
     """Error indicating that user is forbidden to view a record."""
 
-    def __init__(self, message=None, status=None):
-        super(RecordNotFoundError, self).__init__(message, status=403)
+    def __init__(self, message=None, status=403):
+        super(RecordForbiddenViewError, self).__init__(
+            message=message, status=status
+        )
 
 
 class RecordDeletedError(RecordError):
 
     """Error indicating that a record is deleted."""
 
-    def __init__(self, message=None, status=None):
-        super(RecordNotFoundError, self).__init__(message, status=410)
+    def __init__(self, message=None, status=410):
+        super(RecordDeletedError, self).__init__(
+            message=message, status=status
+        )

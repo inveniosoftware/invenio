@@ -21,19 +21,17 @@
 
 
 from functools import wraps
+import json
+
 from flask import make_response
 from flask.ext.login import current_user
 from flask.ext.restful import abort, Resource
 from flask import request
-from invenio.ext.restful import (
-    require_api_auth
-)
+from invenio.ext.restful import require_api_auth, pagination
 from invenio.modules.formatter.models import Format
-from .errors import (
-    RecordError, RecordNotFoundError,
-    RecordDeletedError,
+from invenio.modules.formatter import format_record
+from .errors import RecordError, RecordNotFoundError, RecordDeletedError, \
     RecordForbiddenViewError, RecordUnsuppotedMediaTypeError
-)
 
 
 def error_handler(f):
@@ -54,78 +52,80 @@ def error_handler(f):
     return inner
 
 
-class RecordResource(Resource):
-
-    """The record resource."""
-
-    method_decorators = [
-        require_api_auth(),
-        error_handler
-    ]
-
+class BaseRecordResource(Resource):
     def __init__(self):
         self.representations = {}
         # get all mime-types that are not None
-        all_mimetypes = [mime for mime in map(
-            lambda f: f.mime_type, Format.query.all()) if mime is not None
-        ]
-        for mime_type in all_mimetypes:
+        self.mimetypes = dict([(f.mime_type, f.code) for f in Format.query.all()
+                               if f.mime_type is not None])
+
+        for mime_type in self.mimetypes.keys():
             self.representations[mime_type] = (
                 lambda r, s, h:  make_response(r, s, h)
             )
 
-    def get(self, record_id):
-        from invenio.legacy.search_engine import (
-            record_exists,
-            check_user_can_view_record
-        )
-        from invenio.modules.formatter import format_record
+    def get_output_format(self):
+        # Check requested output format.
+        # Set default mime type if 'Accept' is not in headers.
+        given_mimetype = request.headers.get('Accept', 'application/json')
 
-        # check record's existence
+        for t in given_mimetype.split(","):
+            output_format = self.mimetypes.get(t.split(';')[0])
+            if output_format is not None:
+                return output_format
+
+        raise RecordUnsuppotedMediaTypeError(
+            message="Output format(s) {} are/is not supported.".format(
+                given_mimetype
+            )
+        )
+
+
+class RecordResource(BaseRecordResource):
+
+    """The record resource."""
+
+    method_decorators = [
+        #require_api_auth(),
+        error_handler
+    ]
+
+    def get(self, record_id):
+        from invenio.legacy.search_engine import record_exists, \
+            check_user_can_view_record
+
+        # Get output format
+        output_format = self.get_output_format()
+
+        # Check record's existence
         record_status = record_exists(record_id)
         if record_status == 0:
             raise RecordNotFoundError(
-                message="Record {} does not exist".format(record_id),
-                status=404
+                message="Record {} does not exist.".format(record_id),
             )
         elif record_status == -1:
             raise RecordDeletedError(
-                message="Record {} is deleted".format(record_id),
-                status=410
+                message="Record {} was deleted.".format(record_id),
             )
-        # check record's access
+
+        # Check record's access
         (auth_code, auth_mesg) = check_user_can_view_record(
             current_user,
             record_id
         )
         if auth_code == 1:
             raise RecordForbiddenViewError(
-                message="Access to record {} is forbidden".format(record_id),
-                status=403
+                message="Access to record {} is forbidden.".format(record_id),
             )
-        # check requested output format
-        # set default mime type if 'Accept' is not in headers
-        given_mimetype = request.headers.get('Accept', 'application/json')
-        try:
-            format_returned = Format.query.filter(
-                Format.mime_type == given_mimetype
-            ).one()
-        except Exception:
-            raise RecordUnsuppotedMediaTypeError(
-                message="Output Format {} is not supported".format(
-                    given_mimetype
-                ),
-                status=415
-            )
-        output_format = format_returned.code
-        # return record with requested output format
+
+        # Return record with requested output format.
         result = format_record(recID=record_id, of=output_format)
         return (result, 200)
 
-    def post(self):
+    def post(self, record_id):
         abort(405)
 
-    def head(self):
+    def head(self, record_id):
         abort(405)
 
     def put(self, record_id):
@@ -138,46 +138,28 @@ class RecordResource(Resource):
         abort(405)
 
 
-class RecordListResource(Resource):
+class RecordListResource(BaseRecordResource):
 
     method_decorators = [
-        require_api_auth(),
+        #require_api_auth(),
         error_handler
     ]
 
-    def __init__(self):
-        self.representations = {}
-        all_mimetypes = [mime for mime in map(
-            lambda f: f.mime_type, Format.query.all()) if mime is not None
-        ]
-        for mime_type in all_mimetypes:
-            self.representations[mime_type] = (
-                lambda r, s, h:  make_response(r, s, h)
-            )
-
     def get(self):
-        import json
-        from invenio.legacy.search_engine import (
-            perform_request_search,
-            record_exists,
-            check_user_can_view_record
-        )
-        from invenio.ext.restful import pagination
-        from invenio.modules.formatter import format_record
+        # Temporarily disable search until fully tested.
+        abort(405)
+
+        from invenio.legacy.search_engine import perform_request_search, \
+            record_exists, check_user_can_view_record
 
         given_mimetype = request.headers.get('Accept', 'application/json')
-        try:
-            format_returned = Format.query.filter(
-                Format.mime_type == given_mimetype
-            ).one()
-        except Exception:
+        output_format = self.mimetypes.get(given_mimetype)
+        if output_format is None:
             raise RecordUnsuppotedMediaTypeError(
-                message="Output Format {} is not supported".format(
+                message="Output format {} is not supported.".format(
                     given_mimetype
-                ),
-                status=415
-            )
-        output_format = format_returned.code
+                ))
+
         # get URL parameters
         query = request.args.get('query', '')
         sort_field = request.args.get('sort_field', 'title')

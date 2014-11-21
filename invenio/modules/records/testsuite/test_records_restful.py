@@ -53,7 +53,8 @@ class TestRecordsRestfulAPI(APITestCase):
 
     def test_405_methods_recordresource(self):
         """Test methods that return 405."""
-        methods_405_recordresource = [self.patch, self.options, self.put]
+        methods_405_recordresource = [self.patch, self.options, self.put,
+                                      self.post, self.head]
         for m in methods_405_recordresource:
             m(
                 'recordresource',
@@ -64,7 +65,7 @@ class TestRecordsRestfulAPI(APITestCase):
             )
 
     def test_get_record_marcxml(self):
-        answer = self.get(
+        response = self.get(
             'recordresource',
             user_id=self.user_a.id,
             is_json=False,
@@ -72,8 +73,8 @@ class TestRecordsRestfulAPI(APITestCase):
             data='',
             headers=[('Accept', 'application/marcxml+xml')]
         )
-        self.assertEqual(answer.status_code, 200)
-        self.assertEqual(answer.headers['Content-Type'],
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers['Content-Type'],
                          'application/marcxml+xml')
 
     def test_get_record_recjson(self):
