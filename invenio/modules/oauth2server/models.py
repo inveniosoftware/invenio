@@ -301,15 +301,17 @@ class Token(db.Model):
     """Token type - only bearer is supported at the moment."""
 
     access_token = db.Column(String255EncryptedType(
-                                 type_in=lambda: db.String(255),
-                                 key=secret_key),
-                             unique=True)
+        type_in=lambda: db.String(255),
+        key=secret_key),
+        unique=True
+    )
 
     refresh_token = db.Column(String255EncryptedType(
-                                  type_in=lambda: db.String(255),
-                                  key=secret_key,
-                                  engine=NoneAesEngine),
-                              unique=True, nullable=True)
+        type_in=lambda: db.String(255),
+        key=secret_key,
+        engine=NoneAesEngine),
+        unique=True, nullable=True
+    )
 
     expires = db.Column(db.DateTime, nullable=True)
 

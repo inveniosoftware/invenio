@@ -17,8 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import current_app
-
 from invenio.legacy.dbquery import run_sql
 
 
@@ -39,7 +37,9 @@ def do_upgrade():
         run_sql(
             "UPDATE oauth2TOKEN SET access_token=%s, "
             "refresh_token=%s WHERE id=%s",
-            (engine.encrypt(row[1]), engine.encrypt(row[2]), row[0]))
+            (engine.encrypt(row[1]),
+             engine.encrypt(row[2]) if row[2] else None,
+             row[0]))
 
 
 def estimate():
