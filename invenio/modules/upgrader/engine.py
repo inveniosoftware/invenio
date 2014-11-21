@@ -34,7 +34,7 @@ from invenio.ext.sqlalchemy import db
 
 from .models import Upgrade
 from .logging import InvenioUpgraderLogFormatter
-from .checks import pre_check_bibsched, post_check_bibsched
+from .checks import post_check_bibsched
 
 
 class InvenioUpgrader(object):
@@ -67,9 +67,7 @@ class InvenioUpgrader(object):
         self.history = {}
         self.ordered_history = []
 
-        self.global_pre_upgrade = global_pre_upgrade or [
-            pre_check_bibsched
-        ]
+        self.global_pre_upgrade = global_pre_upgrade or []
         self.global_post_upgrade = global_post_upgrade or [
             post_check_bibsched
         ]
