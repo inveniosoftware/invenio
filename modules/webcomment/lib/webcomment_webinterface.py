@@ -19,6 +19,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """ Comments and reviews for records: web interface """
+from docutils.nodes import note
 
 __lastupdated__ = """$Date$"""
 
@@ -316,16 +317,21 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                           this discussion
         @return the full html page.
         """
-        argd = wash_urlargd(form, {'action': (str, "DISPLAY"),
-                                   'msg': (str, ""),
-                                   'note': (str, ''),
-                                   'score': (int, 0),
-                                   'comid': (int, 0),
-                                   'editor_type': (str, ""),
-                                   'subscribe': (str, ""),
-                                   'cookie': (str, ""),
-                                   'relate_file': (str, "")
-                                   })
+        argd = wash_urlargd(
+            form,
+            {
+                'action': (str, "DISPLAY"),
+                'msg': (str, ""),
+                'note': (str, ''),
+                'score': (int, 0),
+                'comid': (int, 0),
+                'editor_type': (str, ""),
+                'subscribe': (str, ""),
+                'cookie': (str, ""),
+                'relate_file': (str, ""),
+                'extra_checkbox': (str, ""),
+            }
+        )
         _ = gettext_set_language(argd['ln'])
 
         actions = ['DISPLAY', 'REPLY', 'SUBMIT']
@@ -506,13 +512,17 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 # User is not already subscribed, and asked to subscribe
                 subscribe = True
 
+            note = argd['note']
+            if argd['extra_checkbox']:
+                note = argd['extra_checkbox']
+
             body = perform_request_add_comment_or_remark(
                 recID=self.recid,
                 ln=argd['ln'],
                 uid=uid,
                 action=argd['action'],
                 msg=argd['msg'],
-                note=argd['note'],
+                note=note,
                 score=argd['score'],
                 reviews=self.discussion,
                 comID=argd['comid'],

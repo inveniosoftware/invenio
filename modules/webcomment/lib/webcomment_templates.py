@@ -28,9 +28,11 @@ import markdown2
 import json
 from datetime import datetime, date
 
-from invenio.webcomment_config import \
-    CFG_WEBCOMMENT_BODY_FORMATS, \
-    CFG_WEBCOMMENT_OUTPUT_FORMATS
+from invenio.webcomment_config import (
+    CFG_WEBCOMMENT_BODY_FORMATS,
+    CFG_WEBCOMMENT_OUTPUT_FORMATS,
+    CFG_WEBCOMMENT_EXTRA_CHECKBOX
+)
 from invenio.urlutils import create_html_link, create_url
 from invenio.webuser import (
     get_user_info,
@@ -71,6 +73,7 @@ from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.webcomment_config import CFG_WEBCOMMENT_DEADLINE_CONFIGURATION
 
+
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
 
@@ -94,8 +97,8 @@ class Template:
         c_body = 3
         c_status = 4
         c_nb_reports = 5
-        c_id = 6
-        c_body_format = 10
+        c_id = 7
+        c_body_format = 11
 
         warnings = self.tmpl_warnings(warnings, ln)
 
@@ -396,6 +399,7 @@ class Template:
         body_format,
         status,
         nb_reports,
+        cmt_title,
         reply_link=None,
         report_link=None,
         undelete_link=None,
@@ -516,7 +520,8 @@ class Template:
                                      'toggle_url': create_url(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID) + '/comments/toggle', {'comid': com_id, 'ln': ln, 'collapse': collapsed_p and '0' or '1', 'referer': user_info['uri']}),
                                      'collapse_ctr_class': collapsed_p and 'webcomment_collapse_ctr_right' or 'webcomment_collapse_ctr_down',
                                      'collapse_label': collapsed_p and _("Open") or _("Close")}
-        related_file_element = ''
+
+        related_file_element = ""
         try:
             related_file = related_files[com_id]
             related_file_element = """
@@ -531,10 +536,15 @@ class Template:
         except (TypeError, KeyError):
             pass
 
+        title_element = ""
+        if cmt_title:
+            title_element = """<div> %s </div>""" % (cmt_title)
+
         out += """
 <div class="webcomment_comment_box">
     %(toggle_visibility_block)s
     <div class="webcomment_comment_avatar"><img class="webcomment_comment_avatar_default" src="%(site_url)s/img/user-icon-1-24x24.gif" alt="avatar" /></div>
+    %(title_element)s
     <div class="webcomment_comment_content">
         <div class="webcomment_comment_title">
             %(title)s
@@ -553,18 +563,19 @@ class Template:
         <div class="clearer"></div>
     </div>
     <div class="clearer"></div>
-</div>""" % \
-                {'title'         : title,
-                 'body'          : final_body,
-                 'links'         : links,
-                 'attached_files_html': attached_files_html,
-                 'date': date_creation,
-                 'site_url': CFG_SITE_URL,
-                 'comid': com_id,
-                 'collapsible_content_style': collapsed_p and 'display:none' or '',
-                 'toggle_visibility_block': toggle_visibility_block,
-                 'related_file_element': related_file_element
-                 }
+</div>""" % {
+            'title': title,
+            'body': final_body,
+            'links': links,
+            'attached_files_html': attached_files_html,
+            'date': date_creation,
+            'site_url': CFG_SITE_URL,
+            'comid': com_id,
+            'collapsible_content_style': collapsed_p and 'display:none' or '',
+            'toggle_visibility_block': toggle_visibility_block,
+            'related_file_element': related_file_element,
+            'title_element': title_element,
+            }
         return out
 
     def tmpl_get_comment_with_ranking(
@@ -810,12 +821,13 @@ class Template:
             c_body = 3
             c_status = 4
             c_nb_reports = 5
-            c_id = 6
-            c_round_name = 7
-            c_restriction = 8
-            reply_to = 9
-            c_body_format = 10
-            c_visibility = 11
+            c_title = 6
+            c_id = 7
+            c_round_name = 8
+            c_restriction = 9
+            reply_to = 10
+            c_body_format = 11
+            c_visibility = 12
             discussion = 'comments'
             comments_link = '<strong>%s (%i)</strong>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/%s/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, CFG_SITE_RECORD, recID, _('Reviews'), total_nb_reviews)
@@ -1008,6 +1020,7 @@ class Template:
                         comment[c_body_format],
                         comment[c_status],
                         comment[c_nb_reports],
+                        comment[c_title],
                         reply_link,
                         report_link,
                         undelete_link,
@@ -1479,7 +1492,8 @@ class Template:
         relate_to_file=None
     ):
         """
-        Add form for comments
+        Add form for comments.
+
         @param recID: record id
         @param uid: user id
         @param ln: language
@@ -1488,20 +1502,35 @@ class Template:
         @param textual_msg: same as 'msg', but contains the textual
                             version in case user cannot display CKeditor
         @param warnings: list of warning tuples (warning_text, warning_color)
-        @param can_attach_files: if user can upload attach file to record or not
-        @param user_is_subscribed_to_discussion: True if user already receives new comments by email
-        @param reply_to: the ID of the comment we are replying to. None if not replying
+        @param can_attach_files: if user can upload attach file to record or
+                                 not
+        @param user_is_subscribed_to_discussion: True if user already receives
+                                                 new comments by email
+        @param reply_to: the ID of the comment we are replying to. None if
+                         not replying
         @return html add comment form
         """
         _ = gettext_set_language(ln)
-        link_dic =  {   'siteurl'    : CFG_SITE_URL,
-                        'CFG_SITE_RECORD' : CFG_SITE_RECORD,
-                        'module'    : 'comments',
-                        'function'  : 'add',
-                        'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
-                        'recID'     : recID}
+        link_dic = {
+            'siteurl': CFG_SITE_URL,
+            'CFG_SITE_RECORD': CFG_SITE_RECORD,
+            'module': 'comments',
+            'function': 'add',
+            'arguments': 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
+            'recID': recID
+        }
         if textual_msg is None:
             textual_msg = msg
+
+        # check if is editor
+        has_extra_checkbox = ()
+        for (matching_value, (matching_key, data)) in CFG_WEBCOMMENT_EXTRA_CHECKBOX.items():
+            if matching_value in get_fieldvalues(recID, matching_key):
+                callback = data.get("callback")
+                extra_checkbox = callback(uid, recID, data)
+                if extra_checkbox:
+                    has_extra_checkbox = extra_checkbox, data.get('label'), data.get('value')
+                    break
 
         # FIXME a cleaner handling of nicknames is needed.
         if not nickname:
@@ -1518,7 +1547,7 @@ class Template:
 
         if not CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR:
             if CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING:
-                note +=  '<br />' + '&nbsp;'*10 + cgi.escape('You can use Markdown syntax to write your comment.')
+                note += '<br />' + '&nbsp;'*10 + cgi.escape('You can use Markdown syntax to write your comment.')
             else:
                 # NOTE: Currently we escape all HTML tags before displaying plain text. Should we go back to this approach?
                 #       To go back to this approach we probably simply have to run email_quoted_text2html with wash_p=True
@@ -1555,27 +1584,40 @@ class Template:
                               _("Max %i files") % CFG_WEBCOMMENT_MAX_ATTACHED_FILES,
              'file_size_limit_msg': CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and _("Max %(x_nb_bytes)s per file") % {'x_nb_bytes': (CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE < 1024*1024 and (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB') or  (str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/(1024*1024)) + 'MB'))} or ''}
 
+        # Check if the user is editor, CFG_WEBCOMMENT_USER_EDITOR should
+        # be configured first
+        extra_checkbox = ""
+        if has_extra_checkbox and len(has_extra_checkbox) == 3:
+            extra_checkbox = (
+                "<input type='checkbox' name='extra_checkbox' value='{0}' />"
+                "{1}<br />").format(
+                    has_extra_checkbox[2], has_extra_checkbox[1])
+
         if CFG_CERN_SITE:
-             editor = get_html_text_editor(name='msg',
-                                          content=msg,
-                                          textual_content=textual_msg,
-                                          width='100%',
-                                          height='400px',
-                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
-                                          file_upload_url=file_upload_url,
-                                          toolbar_set = "WebComment",
-                                          custom_configurations_path='/ckeditor/cds-ckeditor-config.js',
-                                          ln=ln)
+            editor = get_html_text_editor(
+                name='msg',
+                content=msg,
+                textual_content=textual_msg,
+                width='100%',
+                height='400px',
+                enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                file_upload_url=file_upload_url,
+                toolbar_set="WebComment",
+                custom_configurations_path='/ckeditor/cds-ckeditor-config.js',
+                ln=ln
+            )
         else:
-            editor = get_html_text_editor(name='msg',
-                                          content=msg,
-                                          textual_content=textual_msg,
-                                          width='100%',
-                                          height='400px',
-                                          enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
-                                          file_upload_url=file_upload_url,
-                                          toolbar_set = "WebComment",
-                                          ln=ln)
+            editor = get_html_text_editor(
+                name='msg',
+                content=msg,
+                textual_content=textual_msg,
+                width='100%',
+                height='400px',
+                enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                file_upload_url=file_upload_url,
+                toolbar_set="WebComment",
+                ln=ln
+            )
 
         subscribe_to_discussion = ''
         if not user_is_subscribed_to_discussion:
@@ -1599,17 +1641,18 @@ class Template:
                 "{1}</div>").format(relate_file_title, relate_file_selector)
 
         form = """<div id="comment-write"><h2>%(add_comment)s</h2>
-                %(editor)s
+                    %(editor)s
                     %(relate_file_element)s
+                    %(extra_checkbox)s
                     %(simple_attach_file_interface)s
-                  <div class="submit-area">
+                    <div class="submit-area">
                       <br />
                       <span class="reportabuse">%(note)s</span> <br /> <br />
                       %(subscribe_to_discussion)s<br /><br />
                       <input class="adminbutton" type="submit" value="Add comment" onclick="user_must_confirm_before_leaving_page = false;return true;"/>
                       %(reply_to)s
+                    </div>
                   </div>
-               </div>
                 """ % {'note': note,
                        'record_label': _("Article") + ":",
                        'comment_label': _("Comment") + ":",
@@ -1618,7 +1661,8 @@ class Template:
                        'subscribe_to_discussion': subscribe_to_discussion,
                        'reply_to': reply_to and '<input type="hidden" name="comid" value="%s"/>' % reply_to or '',
                        'simple_attach_file_interface': simple_attach_file_interface,
-                       'relate_file_element': relate_file_element
+                       'relate_file_element': relate_file_element,
+                       'extra_checkbox': extra_checkbox,
                        }
         form_link = "%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
         form = self.create_write_comment_hiddenform(action=form_link, method="post", text=form, button='Add comment',

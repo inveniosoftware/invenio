@@ -840,7 +840,8 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
                       cmt.body,
                       cmt.status,
                       cmt.nb_abuse_reports,
-                      %(ranking)s cmt.id,
+                      %(ranking)s cmt.title,
+                      cmt.id,
                       cmt.round_name,
                       cmt.restriction,
                       %(reply_to_column)s,
@@ -851,7 +852,7 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
                %(ranking_only)s
                %(display_since)s
                ORDER BY %(display_order)s
-               """ % {'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, cmt.title, ' or '',
+               """ % {'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, ' or '',
                       'ranking_only'  : ranking and ' AND cmt.star_score>0 ' or ' AND cmt.star_score=0 ',
 #                      'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
 #                      'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
@@ -870,7 +871,7 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
             restriction = row[12]
         else:
             # when dealing with comments, row[8] holds restriction info:
-            restriction = row[8]
+            restriction = row[9]
         if user_info and check_user_can_view_comment(user_info, None, restriction)[0] != 0:
             # User cannot view comment. Look further
             continue
@@ -1646,7 +1647,7 @@ def group_comments_by_round(comments, ranking=0):
     comment_rounds = {}
     ordered_comment_round_names = []
     for comment in comments:
-        comment_round_name = ranking and comment[11] or comment[7]
+        comment_round_name = ranking and comment[11] or comment[8]
         if not comment_rounds.has_key(comment_round_name):
             comment_rounds[comment_round_name] = []
             ordered_comment_round_names.append(comment_round_name)
