@@ -20,6 +20,7 @@
 """Account database models."""
 
 # General imports.
+from datetime import datetime
 from flask.ext.login import current_user
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utils.types.choice import ChoiceType
@@ -296,7 +297,8 @@ class UserUsergroup(db.Model):
                              primary_key=True)
     user_status = db.Column(db.CHAR(1), nullable=False, server_default='')
     user_status_date = db.Column(db.DateTime, nullable=False,
-                                 server_default='1900-01-01 00:00:00')
+                                 default=datetime.now,
+                                 onupdate=datetime.now)
     user = db.relationship(
         User,
         backref=db.backref('usergroups'))
