@@ -35,7 +35,7 @@ def do_upgrade():
                   db.String(length=255), unique=True, nullable=True))
     mime_type_dict = dict(
         xm='application/marcxml+xml',
-        hm='application/MARC',
+        hm='application/marc',
         recjson='application/json',
         hx='application/x-bibtex',
         xn='application/x-nlm',

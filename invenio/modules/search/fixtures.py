@@ -1621,7 +1621,7 @@ class FormatData(DataSet):
         last_updated = None
         description = u'HTML MARC.'
         content_type = u'text/html'
-        mime_type = u'application/MARC'
+        mime_type = u'application/marc'
         visibility = 1
         name = u'MARC'
 
