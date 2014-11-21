@@ -48,17 +48,26 @@ except ImportError:
 
 
 def get_kb_by_id(kb_id):
-    """
-    Return the knwKB object with given id.
+    """Return the knwKB object with given id.
 
     :raises: :exc:`~sqlalchemy.orm.exc.NoResultFound` in case not exist.
     """
     return models.KnwKB.query.filter_by(id=kb_id).one()
 
 
-def get_kb_by_name(kb_name):
+def get_kb_id(kb_name):
+    """Get the id by name.
+
+    :param kb_name: knowledge base name
     """
-    Return the knwKB object with given name.
+    warnings.warn("The method get_kb_id(kb_name) is deprecated! "
+                  "Use instead get_kb_by_id()'",
+                  DeprecationWarning)
+    return get_kb_by_id(kb_name).id
+
+
+def get_kb_by_name(kb_name):
+    """Return the knwKB object with given name.
 
     :raises: :exc:`~sqlalchemy.orm.exc.NoResultFound` in case not exist.
     """
@@ -66,47 +75,45 @@ def get_kb_by_name(kb_name):
 
 
 def get_all_kb_names():
-    """
-    Return all knowledge base names.
+    """Return all knowledge base names.
 
-    :return list of names
+    :return: list of names
     """
     return [row.name for row in models.KnwKB.query.all()]
 
 get_kb_by_name_memoised = Memoise(get_kb_by_name)
 
 
-def get_kb_mappings(kb_name="", sortby="to", keylike="", valuelike="",
+def get_kb_mappings(kb_name="", sortby="to", key="", value="",
                     match_type="s"):
-    """
-    Return a list of all mappings from the given kb, ordered by key.
+    """Return a list of all mappings from the given kb, ordered by key.
 
     If key given, give only those with left side (mapFrom) = key.
     If value given, give only those with right side (mapTo) = value.
 
-    :param kb_name knowledge base name. if "", return all
-    :param sortby the sorting criteria ('from' or 'to')
-    :keylike return only entries where key matches this
-    :valuelike return only entries where value matches this
+    :param kb_name: knowledge base name. if "", return all
+    :param sortby: the sorting criteria ('from' or 'to')
+    :param key: return only entries where key matches this
+    :param value: return only entries where value matches this
     """
     # query
     query = db.session.query(models.KnwKBRVAL).join(models.KnwKB)
     # filter
     if kb_name:
         query = query.filter(models.KnwKB.name == kb_name)
-    if len(keylike) > 0:
+    if len(key) > 0:
         if match_type == "s":
-            keylike = "%"+keylike+"%"
+            key = "%"+key+"%"
     else:
-        keylike = '%'
-    if len(valuelike) > 0:
+        key = '%'
+    if len(value) > 0:
         if match_type == "s":
-            valuelike = "%"+valuelike+"%"
+            value = "%"+value+"%"
     else:
-        valuelike = '%'
+        value = '%'
     query = query.filter(
-        models.KnwKBRVAL.m_key.like(keylike),
-        models.KnwKBRVAL.m_value.like(valuelike))
+        models.KnwKBRVAL.m_key.like(key),
+        models.KnwKBRVAL.m_value.like(value))
     # order by
     if sortby == "from":
         query = query.order_by(models.KnwKBRVAL.m_key)
@@ -116,10 +123,28 @@ def get_kb_mappings(kb_name="", sortby="to", keylike="", valuelike="",
     return [kbv.to_dict() for (kbv) in query.all()]
 
 
+def get_kb_mapping(kb_name="", key="", value="", match_type="e", default=""):
+    """Get one unique mapping. If not found, return default.
+
+    :param kb_name: the name of the kb
+    :param key: include only lines matching this on left side in the results
+    :param value: include only lines matching this on right side in the results
+    :param match_type: s = substring match, e = exact match
+    :param default: default value if no mapping is found
+    :return: a mapping
+    """
+    mappings = get_kb_mappings(kb_name, key=key, value=value,
+                               match_type=match_type)
+
+    if len(mappings) == 0:
+        return default
+    else:
+        return mappings[0]
+
+
 @session_manager
 def add_kb_mapping(kb_name, key, value=""):
-    """
-    Add a new mapping to given kb.
+    """Add a new mapping to given kb.
 
     :param kb_name: the name of the kb where to insert the new value
     :param key: the key of the mapping
@@ -136,8 +161,7 @@ def add_kb_mapping(kb_name, key, value=""):
 
 @session_manager
 def remove_kb_mapping(kb_name, key):
-    """
-    Delete an existing kb mapping in kb.
+    """Delete an existing kb mapping in kb.
 
     :param kb_name: the name of the kb where to insert the new value
     :param key: the key of the mapping
@@ -147,8 +171,7 @@ def remove_kb_mapping(kb_name, key):
 
 
 def update_kb_mapping(kb_name, old_key, key, value):
-    """
-    Update an existing kb mapping with key old_key with a new key and value.
+    """Update an existing kb mapping with key old_key with a new key and value.
 
     :param kb_name: the name of the kb where to insert the new value
     :param old_key: the key of the mapping in the kb
@@ -163,8 +186,7 @@ def update_kb_mapping(kb_name, old_key, key, value):
 
 def get_kb_mappings_json(kb_name="", key="", value="", match_type="s",
                          limit=None):
-    """
-    Get leftside/rightside mappings from kb kb_name formatted as json dict.
+    """Get leftside/rightside mappings from kb kb_name formatted as json dict.
 
     If key given, give only those with left side (mapFrom) = key.
     If value given, give only those with right side (mapTo) = value.
@@ -174,7 +196,7 @@ def get_kb_mappings_json(kb_name="", key="", value="", match_type="s",
     :param value: include only lines matching this on right side in the results
     :param match_type: s = substring match, e = exact match
     :param limit: maximum number of results to return (are ALL if set to None)
-    :return a list of mappings
+    :return: a list of mappings
     """
     mappings = get_kb_mappings(kb_name, key, value, match_type)
     ret = []
@@ -189,8 +211,7 @@ def get_kb_mappings_json(kb_name="", key="", value="", match_type="s",
 
 def get_kb_mappings_embedded_json(kb_name="", key="", value="",
                                   match_type="s", limit=None):
-    """
-    Get leftside/rightside mappings from kb kb_name formatted as json dict.
+    """Get leftside/rightside mappings from kb kb_name formatted as json dict.
 
     The rightside is actually considered as a json string and hence embedded
     within the final result.
@@ -203,7 +224,7 @@ def get_kb_mappings_embedded_json(kb_name="", key="", value="",
     :param value: include only lines matching this on right side in the results
     :param match_type: s = substring match, e = exact match
     :param limit: maximum number of results to return (are ALL if set to None)
-    :return a list of mappings
+    :return: a list of mappings
     """
     mappings = get_kb_mappings(kb_name, key, value, match_type)
     ret = []
@@ -217,8 +238,7 @@ def get_kb_mappings_embedded_json(kb_name="", key="", value="",
 
 
 def kb_exists(kb_name):
-    """
-    Return True if a kb with the given name exists.
+    """Return True if a kb with the given name exists.
 
     :param kb_name: the name of the knowledge base
     """
@@ -228,8 +248,7 @@ def kb_exists(kb_name):
 
 
 def get_kb_name(kb_id):
-    """
-    Return the name of the kb given by id.
+    """Return the name of the kb given by id.
 
     :param kb_id: the id of the knowledge base
     """
@@ -238,8 +257,7 @@ def get_kb_name(kb_id):
 
 @session_manager
 def update_kb_attributes(kb_name, new_name, new_description=''):
-    """
-    Update kb kb_name with a new name and (optionally) description.
+    """Update kb kb_name with a new name and (optionally) description.
 
     :param kb_name: the name of the kb to update
     :param new_name: the new name for the kb
@@ -250,8 +268,7 @@ def update_kb_attributes(kb_name, new_name, new_description=''):
 
 
 def add_kb(kb_name="Untitled", kb_type=None, tries=10):
-    """
-    Add a new kb in database, return the id.
+    """Add a new kb in database, return the id.
 
     Add a new kb in database, and returns its id
     The name of the kb will be 'Untitled#'
@@ -261,7 +278,7 @@ def add_kb(kb_name="Untitled", kb_type=None, tries=10):
     :param kb_type: the type of the kb, incl 'taxonomy' and 'dynamic'.
                    None for typical (leftside-rightside).
     :param tries: exit after <n> retry
-    :return the id of the newly created kb
+    :return: the id of the newly created kb
     """
     created = False
     name = kb_name
@@ -296,14 +313,20 @@ def add_kb(kb_name="Untitled", kb_type=None, tries=10):
     return kb.id
 
 
-def save_kb_dyn_config(kb_id, field, expression, collection=None):
-    """
-    Save a dynamic knowledge base configuration.
+def add_dynamic_kb(kbname, tag, collection="", searchwith=""):
+    """A convenience method."""
+    kb_id = add_kb(kb_name=kbname, kb_type='dynamic')
+    save_kb_dyn_config(kb_id, tag, searchwith, collection)
+    return kb_id
 
-    :param kb_id the id
-    :param field the field where values are extracted
-    :param expression ..using this expression
-    :param collection ..in a certain collection (default is all)
+
+def save_kb_dyn_config(kb_id, field, expression, collection=None):
+    """Save a dynamic knowledge base configuration.
+
+    :param kb_id: the id
+    :param field: the field where values are extracted
+    :param expression: ..using this expression
+    :param collection: ..in a certain collection (default is all)
     """
     # check that collection exists
     if collection:
@@ -314,8 +337,7 @@ def save_kb_dyn_config(kb_id, field, expression, collection=None):
 
 
 def kb_mapping_exists(kb_name, key):
-    """
-    Return the information if a mapping exists.
+    """Return the information if a mapping exists.
 
     :param kb_name: knowledge base name
     :param key: left side (mapFrom)
@@ -329,8 +351,7 @@ def kb_mapping_exists(kb_name, key):
 
 @session_manager
 def delete_kb(kb_name):
-    """
-    Delete given kb from database.
+    """Delete given kb from database.
 
     :param kb_name: knowledge base name
     """
@@ -344,8 +365,7 @@ def delete_kb(kb_name):
 
 def get_elements_that_use_kb(name):
     # FIXME remove the obsolete function
-    """
-    Return a list of elements that call given kb.
+    """Return a list of elements that call given kb.
 
     WARNING: this routine is obsolete.
 
@@ -355,7 +375,7 @@ def get_elements_that_use_kb(name):
       ...
     ]
 
-    Returns elements sorted by name
+    :return: elements sorted by name
     """
     warnings.warn("The method 'get_elements_that_use_kb(name) is obsolete!'",
                   DeprecationWarning)
@@ -398,8 +418,7 @@ def get_elements_that_use_kb(name):
 
 
 def get_kbs_info(kbtype="", searchkbname=""):
-    """
-    A convenience method that calls dblayer.
+    """A convenience method.
 
     :param kbtype: type of kb -- get only kb's of this type
     :param searchkbname: get only kb's where this sting appears in the name
@@ -416,10 +435,58 @@ def get_kbs_info(kbtype="", searchkbname=""):
     return [row.to_dict() for row in models.KnwKB.query.all()]
 
 
+def get_kba_values(kb_name, searchname="", searchtype="s"):
+    """Return an array of values "authority file" type = just values.
+
+    :param kb_name: name of kb
+    :param searchname: get these values, according to searchtype
+    :param searchtype: s=substring, e=exact, , sw=startswith
+    """
+    if searchtype == 's' and searchname:
+        searchname = '%'+searchname+'%'
+    if searchtype == 'sw' and searchname:  # startswith
+        searchname = searchname+'%'
+
+    if not searchname:
+        searchname = '%'
+
+    query = db.session.query(models.KnwKBRVAL).join(models.KnwKB) \
+        .filter(models.KnwKBRVAL.m_value.like(searchname),
+                models.KnwKB.name.like(kb_name))
+
+    return [(k.m_value,) for k in query.all()]
+
+
+def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
+    """Return an array of keys.
+
+    :param kb_name: the name of the knowledge base
+    :param searchkey: search using this key
+    :param searchvalue: search using this value
+    :param searchtype: s = substring, e=exact
+    """
+    if searchtype == 's' and searchkey:
+        searchkey = '%'+searchkey+'%'
+    if searchtype == 's' and searchvalue:
+        searchvalue = '%'+searchvalue+'%'
+    if searchtype == 'sw' and searchvalue:  # startswith
+        searchvalue = searchvalue+'%'
+    if not searchvalue:
+        searchvalue = '%'
+    if not searchkey:
+        searchkey = '%'
+
+    query = db.session.query(models.KnwKBRVAL).join(models.KnwKB) \
+        .filter(models.KnwKBRVAL.m_key.like(searchkey),
+                models.KnwKBRVAL.m_value.like(searchvalue),
+                models.KnwKB.name.like(kb_name))
+
+    return [(k.m_key,) for k in query.all()]
+
+
 def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
                    use_memoise=False):
-    """
-    Return a tuple of values from key-value mapping kb.
+    """Return a tuple of values from key-value mapping kb.
 
     :param kb_name:     the name of the knowledge base
     :param searchkey:   search using this key
@@ -439,8 +506,7 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
 
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
-    """
-    Return a list of dictionaries that match the search.
+    """Return a list of dictionaries that match the search.
 
     :param kb_name: the name of the knowledge base
     :param searchkey: search using this key
@@ -453,8 +519,7 @@ def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
 
 
 def get_kbd_values(kbname, searchwith=""):
-    """
-    Return a list of values by searching a dynamic kb.
+    """Return a list of values by searching a dynamic kb.
 
     :param kbname:     name of the knowledge base
     :param searchwith: a term to search with
@@ -512,8 +577,7 @@ def get_kbd_values(kbname, searchwith=""):
 
 
 def get_kbd_values_json(kbname, searchwith=""):
-    """
-    Return values from searching a dynamic kb as a json-formatted string.
+    """Return values from searching a dynamic kb as a json-formatted string.
 
     This IS probably the method you want.
 
@@ -526,8 +590,7 @@ def get_kbd_values_json(kbname, searchwith=""):
 
 def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
                                expression=""):
-    """
-    Dynamically create a dynamic KB for a specific search; then destroy it.
+    """Dynamically create a dynamic KB for a specific search; then destroy it.
 
     This probably isn't the method you want.
 
@@ -563,8 +626,7 @@ def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
 
 
 def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
-    """
-    A simplifield, customized version of the function get_kbt_items.
+    """A simplifield, customized version of the function get_kbt_items.
 
     Traverses an RDF document. By default returns all leaves. If
     tag defined returns the content of that tag.
@@ -575,7 +637,6 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     :param kbtname: name of the taxonony kb
     :param tag: name of tag whose content
     :param searchwith: a term to search with
-
     """
     # get the actual file based on the kbt name
     kb = get_kb_by_name(kbtname)
