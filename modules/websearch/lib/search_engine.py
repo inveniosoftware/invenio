@@ -5069,7 +5069,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             record = get_record(recID)
             if not can_see_hidden:
                 for tag in CFG_BIBFORMAT_HIDDEN_TAGS:
-                    del record[tag]
+                    record.pop(tag, None)
                 ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
             out += record_xml_output(record, ot)
         else:
