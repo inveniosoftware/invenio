@@ -181,6 +181,10 @@ def task_run_core():
         if 'c' in repository["postprocess"]:
             post_process_functions.append(convert_step)
 
+        # Filter?
+        if 'f' in repository["postprocess"]:
+            post_process_functions.append(filter_step)
+
         # Fulltext?
         if 't' in repository["postprocess"]:
             post_process_functions.append(fulltext_step)
@@ -196,10 +200,6 @@ def task_run_core():
         # Authorlist?
         if 'a' in repository["postprocess"]:
             post_process_functions.append(authorlist_step)
-
-        # Filter?
-        if 'f' in repository["postprocess"]:
-            post_process_functions.append(filter_step)
 
         # Upload?
         if 'u' in repository["postprocess"]:
@@ -476,8 +476,13 @@ def plotextract_step(repository, active_files_list, downloaded_material_dict, *a
     for active_file in active_files_list:
         i += 1
         task_sleep_now_if_required()
-        task_update_progress("Extracting plots from harvested material from %s (%i/%i)" % \
+        task_update_progress("Extracting plots from harvested material from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
+        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+            # Only process new records
+            updated_files_list.append(active_file)
+            continue
+        write_message("Insert detected (%s): extracting plots." % (active_file,))
         updated_file = "%s.plotextracted" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_plotextractor(active_file,
@@ -514,6 +519,11 @@ def refextract_step(repository, active_files_list, downloaded_material_dict, *ar
         task_sleep_now_if_required()
         task_update_progress("Extracting references from material harvested from %s (%i/%i)" % \
                              (repository["name"], i, len(active_files_list)))
+        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+            # Only process new records
+            updated_files_list.append(active_file)
+            continue
+        write_message("Insert detected (%s): extracting references." % (active_file,))
         updated_file = "%s.refextracted" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_refextract(active_file,
@@ -548,8 +558,13 @@ def authorlist_step(repository, active_files_list, downloaded_material_dict, *ar
     for active_file in active_files_list:
         i += 1
         task_sleep_now_if_required()
-        task_update_progress("Extracting any authorlists from material harvested from %s (%i/%i)" % \
+        task_update_progress("Extracting any authorlists from material harvested from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
+        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+            # Only process new records
+            updated_files_list.append(active_file)
+            continue
+        write_message("Insert detected (%s): extracting authors." % (active_file,))
         updated_file = "%s.authextracted" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_authorlist_extract(active_file,
@@ -585,8 +600,14 @@ def fulltext_step(repository, active_files_list, downloaded_material_dict, *args
     for active_file in active_files_list:
         i += 1
         task_sleep_now_if_required()
-        task_update_progress("Attaching fulltext to records harvested from %s (%i/%i)" % \
+        task_update_progress("Attaching fulltext to records harvested from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
+        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+            # Only process new records
+            updated_files_list.append(active_file)
+            write_message("Skipping updates (%s)" % (active_file,))
+            continue
+        write_message("Insert detected (%s): downloading fulltexts." % (active_file,))
         updated_file = "%s.fulltext" % (os.path.splitext(active_file)[0],)
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_fulltext(active_file,
@@ -651,10 +672,10 @@ def upload_step(repository, active_files_list, uploaded_task_ids=None, *args, **
     """
     write_message("upload step started")
     if 'f' in repository["postprocess"]:
-        upload_modes = {'.insert.xml': '-i',
-                        '.correct.xml': '-c',
-                        '.append.xml': '-a',
-                        '.holdingpen.xml': '-o'}
+        upload_modes = {'insert': '-i',
+                        'correct': '-c',
+                        'append': '-a',
+                        'holdingpen': '-o'}
     else:
         upload_modes = {'': '-ir'}
 
@@ -674,7 +695,7 @@ def upload_step(repository, active_files_list, uploaded_task_ids=None, *args, **
         # Now we launch BibUpload tasks for the final MARCXML files
         for suffix, mode in upload_modes.items():
             # We check for each upload-mode in question.
-            if not suffix or active_file.endswith(suffix):
+            if not suffix or suffix in active_file:
                 last_upload_task_id = call_bibupload(active_file, \
                                                      [mode], \
                                                      repository["id"], \
