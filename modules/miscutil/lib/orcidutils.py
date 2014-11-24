@@ -21,7 +21,7 @@
 
 from invenio.bibauthorid_backinterface import get_orcid_id_of_author
 from invenio.bibauthorid_dbinterface import _get_doi_for_paper, \
-    get_all_signatures_of_paper, get_name_by_bibref, \
+    get_signatures_of_paper, get_name_by_bibref, \
     get_personid_signature_association_for_paper, \
     get_orcid_id_of_author, get_papers_of_author, get_token, get_all_tokens, \
     delete_token, trigger_aidtoken_change
@@ -59,6 +59,8 @@ ORCID_JSON_TO_XML_EXT_ID = {
     'ISBN': 'isbn',
     'OTHER_ID': 'other-id'
 }
+
+ORCID_SINGLE_REQUEST_WORKS = 50
 
 ############################### PULLING ########################################
 
@@ -365,13 +367,15 @@ def _get_public_orcids_from_member(orcid_id, access_token,
 
     return res
 
-############################### PUSHING ########################################
+############################### PUSHING #######################################
+
 
 class OrcidRecordExisting(Exception):
 
     '''Indicates that a record is present in ORCID database.'''
 
     pass
+
 
 def push_orcid_papers(pid, token):
 
@@ -390,6 +394,7 @@ def push_orcid_papers(pid, token):
                                              '--token=' + token,
                                              '-P', '1')
 
+
 def _orcid_fetch_works(pid):
 
     '''Get claimed works - only those that are not already put into ORCID.
@@ -403,13 +408,16 @@ def _orcid_fetch_works(pid):
 
     doid, existing_papers = _get_ext_orcids_using_pid(pid)
     papers_recs = get_papers_of_author(pid, claimed_only=True)
-    orcid_dict = _get_orcid_dictionaries(papers_recs, pid, existing_papers)
 
-    xml_to_push = OrcidXmlExporter.export(orcid_dict, 'works.xml')
+    # chunks the works from orcid_list
 
-    xml_to_push = RE_ALLOWED_XML_1_0_CHARS.sub('', xml_to_push).encode('utf-8')
+    for orcid_small_list in _get_orcid_dictionaries(papers_recs, pid,
+                                                    existing_papers):
 
-    return (doid, xml_to_push)
+        xml_to_push = OrcidXmlExporter.export(orcid_small_list, 'works.xml')
+        xml_to_push = RE_ALLOWED_XML_1_0_CHARS.sub('',
+                                                   xml_to_push).encode('utf-8')
+        yield (doid, xml_to_push, len(orcid_small_list))
 
 
 def _orcid_push_with_bibtask():
@@ -434,37 +442,41 @@ def _orcid_push_with_bibtask():
             # record in the database before fetching, as the claims might
             # change when the papers' data is being fetched.
             trigger_aidtoken_change(pid, 1)
-            doid, xml_to_push = _orcid_fetch_works(int(pid))
-
-            url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
-                doid + '/orcid-works'
 
             headers = {'Accept': 'application/vnd.orcid+xml',
                        'Content-Type': 'application/vnd.orcid+xml',
                        'Authorization': 'Bearer ' + token
                        }
 
-            bibtask.write_message("Pushing works for %s. The token is %s" % (
-                pid, token))
+            for (doid, xml_to_push, number) in _orcid_fetch_works(int(pid)):
 
-            response = requests.post(url, xml_to_push, headers=headers)
+                url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
+                    doid + '/orcid-works'
 
-            code = response.status_code
+                bibtask.write_message(
+                    "Pushing %s works for %s. The token is %s" %
+                    (number, pid, token))
 
-            if code == 401:
-                # The token has expired or the user revoke his token
-                delete_token(pid)
-                bibtask.write_message("Token deleted for %s" % pid)
-                register_exception(subject="The ORCID token expired.")
-            elif code == 201:
-                trigger_aidtoken_change(pid, 0)
-            else:
-                try:
-                    response.raise_for_status()
-                except HTTPError, exc:
-                    bibtask.write_message(exc)
-                    bibtask.write_message(response.text)
-                success = False
+                response = requests.post(url, xml_to_push, headers=headers)
+
+                code = response.status_code
+
+                if code == 401:
+                    # The token has expired or the user revoke his token
+                    delete_token(pid)
+                    bibtask.write_message("Token deleted for %s" % pid)
+                    register_exception(subject="The ORCID token expired.")
+                    break
+                elif code != 201:
+                    try:
+                        response.raise_for_status()
+                    except HTTPError, exc:
+                        bibtask.write_message(exc)
+                        bibtask.write_message(response.text)
+                    success = False
+                    break
+
+            trigger_aidtoken_change(pid, 0)
 
     return success
 
@@ -473,13 +485,13 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
 
     '''Returns list of dictionaries which can be used in ORCID library.
 
+    Yields orcid list of ORCID_SINGLE_REQUEST_WORKS works of given person.
+
     @param papers: list of papers' records ids.
     @type papers: list (tuple(int,))
     @param personid: personid of person who is requesting orcid dictionary of
         his works
     @type personid: int
-    @return: a structure which can be passed to ORCID library
-    @rtype: list of dictionaries
     '''
 
     orcid_list = []
@@ -489,7 +501,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
         recid = rec[0]
 
         work_dict = {
-            'work_title' : {}
+            'work_title': {}
         }
 
         recstruct = get_record(recid)
@@ -500,21 +512,21 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
             external_ids = _get_external_ids(recid, url,
                                              recstruct, old_external_ids)
         except OrcidRecordExisting:
-            #We will not push this record, skip it.
+            # We will not push this record, skip it.
             continue
 
-        #There always will be some external identifiers.
+        # There always will be some external identifiers.
         work_dict['work_external_identifiers'] = external_ids
 
         work_dict['work_title']['title'] = \
-                encode_for_jinja_and_xml(record_get_field_value(recstruct, '245', '',
-                                                      '', 'a'))
+            encode_for_jinja_and_xml(record_get_field_value(recstruct,
+                                     '245', '', '', 'a'))
 
         short_description = \
             record_get_field_value(recstruct, '520', '', '', 'a')
         if short_description:
             work_dict['short_description'] = \
-                   encode_for_jinja_and_xml(short_description)
+                encode_for_jinja_and_xml(short_description)
 
         journal_title = record_get_field_value(recstruct, '773', '', '', 'p')
         if journal_title:
@@ -539,7 +551,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
         work_source = record_get_field_value(recstruct, '359', '', '', '9')
         if work_source:
             work_dict['work_source']['work-source'] = \
-                    encode_for_jinja_and_xml(work_source)
+                encode_for_jinja_and_xml(work_source)
 
         language = record_get_field_value(recstruct, '041', '', '', 'a')
         if language:
@@ -548,10 +560,19 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
         work_dict['visibility'] = 'public'
         orcid_list.append(work_dict)
 
-    bibtask.write_message("I will push "+ str(len(orcid_list)) + \
-            " records to ORCID.")
+        if len(orcid_list) == ORCID_SINGLE_REQUEST_WORKS:
+            bibtask.write_message("I will push " +
+                                  str(ORCID_SINGLE_REQUEST_WORKS) +
+                                  " records to ORCID.")
+            yield orcid_list
+            orcid_list = []
 
-    return orcid_list
+    if len(orcid_list) > 0:
+        # empty message might be invalid
+        bibtask.write_message("I will push last " + str(len(orcid_list)) +
+                              " records to ORCID.")
+        yield orcid_list
+
 
 def _get_date_from_field_number(recstruct, field, subfield):
 
@@ -615,6 +636,7 @@ def _get_publication_date(recstruct):
 
     return {}
 
+
 def _get_work_type(recstruct):
 
     '''Get work type from MARC record.
@@ -657,6 +679,7 @@ def _get_work_type(recstruct):
 
     return 'other'
 
+
 def _get_citation(recid):
 
     '''Get citation in BibTeX format.
@@ -675,6 +698,7 @@ def _get_citation(recid):
             tex_str.rfind('}')+1])
 
     return ('bibtex', bibtex_content)
+
 
 def _get_external_ids(recid, url, recstruct, old_external_ids):
 
@@ -735,6 +759,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
         external_ids.append(('other-id', url))
     return external_ids
 
+
 def _get_work_contributors(recid, personid):
 
     '''Get contributors data used by ORCID.
@@ -749,29 +774,18 @@ def _get_work_contributors(recid, personid):
     '''
 
     work_contributors = []
-    signatures = get_all_signatures_of_paper(recid)
-    signatures = [([int(y) for y in x['bibref'].split(':')] + \
-            [recid]) for x in signatures]
-    associations = get_personid_signature_association_for_paper(recid)
+    signatures = get_signatures_of_paper(recid)
 
-    for table, ref, _ in signatures:
-        try:
-            pid = associations[str(table) + ':' + str(ref)]
-        except KeyError:
-            pid = None
+    for sig in signatures:
 
-        if pid == personid:
-            #The author himself is not a contributor for his work
+        if sig[0] == personid:
+            # The author himself is not a contributor for his work
             continue
 
         contributor_dict = {
-            'name' : get_name_by_bibref([table, ref]),
-            'attributes' : {'role' : 'author'}
+            'name': encode_for_jinja_and_xml(sig[4]),
+            'attributes': {'role': 'author'}
         }
-
-        orcid = get_orcid_id_of_author(pid)
-        if orcid:
-            contributor_dict['orcid'] = orcid[0][0]
 
         work_contributors.append(contributor_dict)
 
