@@ -20,6 +20,7 @@
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
 
+
 INSERT INTO field VALUES (1,'any field','anyfield');
 INSERT INTO field VALUES (2,'title','title');
 INSERT INTO field VALUES (3,'author','author');
@@ -63,6 +64,10 @@ INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcluding
 INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
 INSERT INTO field VALUES (43,'file name','filename');
+INSERT INTO field VALUES (47,'data source','datasource');
+INSERT INTO field VALUES (48,'simple author','simpleauthor');
+INSERT INTO field VALUES (49,'exact simple author','exactsimpleauthor');
+
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -70,8 +75,6 @@ INSERT INTO field_tag VALUES (12,15,10);
 INSERT INTO field_tag VALUES (13,116,10);
 INSERT INTO field_tag VALUES (2,3,100);
 INSERT INTO field_tag VALUES (2,4,90);
-INSERT INTO field_tag VALUES (3,1,100);
-INSERT INTO field_tag VALUES (3,2,90);
 INSERT INTO field_tag VALUES (4,5,100);
 INSERT INTO field_tag VALUES (5,6,100);
 INSERT INTO field_tag VALUES (6,7,30);
@@ -89,8 +92,6 @@ INSERT INTO field_tag VALUES (19,131,100);
 INSERT INTO field_tag VALUES (20,132,100);
 INSERT INTO field_tag VALUES (21,133,100);
 INSERT INTO field_tag VALUES (21,134,90);
-INSERT INTO field_tag VALUES (22,1,100);
-INSERT INTO field_tag VALUES (22,2,90);
 INSERT INTO field_tag VALUES (27,135,100);
 INSERT INTO field_tag VALUES (28,1,100);
 INSERT INTO field_tag VALUES (29,1,100);
@@ -280,6 +281,13 @@ INSERT INTO field_tag VALUES (39,223,10);
 INSERT INTO field_tag VALUES (39,224,10);
 INSERT INTO field_tag VALUES (39,225,10);
 INSERT INTO field_tag VALUES (39,226,10);
+--
+INSERT INTO field_tag VALUES (47,235,10);
+-- author fields
+INSERT INTO field_tag VALUES (48,1,100);
+INSERT INTO field_tag VALUES (48,2,90);
+INSERT INTO field_tag VALUES (49,1,100);
+INSERT INTO field_tag VALUES (49,2,90);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -540,12 +548,13 @@ INSERT INTO tag VALUES (223,'FIXME_ALEPH_base_number','909C0b','FIXME_ALEPH_base
 INSERT INTO tag VALUES (224,'FIXME_accelerator','909C0a','FIXME_accelerator');
 INSERT INTO tag VALUES (225,'FIXME_code','909C0o','FIXME_code');
 INSERT INTO tag VALUES (226,'FIXME_909C2','909C2%','FIXME_909C2');
-
+--
+INSERT INTO tag VALUES (235,'data source','786__w','');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (3,'abstract','This index contains words/phrases from abstract fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
-INSERT INTO idxINDEX VALUES (4,'author','This index contains fuzzy words/phrases from author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (4,'author','This index contains words/phrases from author indexes.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexEmptyTokenizer');
 INSERT INTO idxINDEX VALUES (5,'keyword','This index contains words/phrases from keyword fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (6,'reference','This index contains words/phrases from references fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (7,'reportnumber','This index contains words/phrases from report numbers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
@@ -555,7 +564,7 @@ INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from y
 INSERT INTO idxINDEX VALUES (11,'journal','This index contains words/phrases from journal publication information fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexJournalTokenizer');
 INSERT INTO idxINDEX VALUES (12,'collaboration','This index contains words/phrases from collaboration name fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from affiliation fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
-INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains words/phrases from exact author indexes.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexEmptyTokenizer');
 INSERT INTO idxINDEX VALUES (15,'caption','This index contains exact words/phrases from figure captions.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (16,'firstauthor','This index contains fuzzy words/phrases from first author field.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
 INSERT INTO idxINDEX VALUES (17,'exactfirstauthor','This index contains exact words/phrases from first author field.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactAuthorTokenizer');
@@ -570,7 +579,12 @@ INSERT INTO idxINDEX VALUES (25,'filetype','This index contains extensions of fi
 INSERT INTO idxINDEX VALUES (26,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (27,'doi','This index contains words/phrases from doi fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDOITokenizer');
 INSERT INTO idxINDEX VALUES (28,'filename','This index contains file names of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFilenameTokenizer');
-
+INSERT INTO idxINDEX VALUES (30,'simpleauthor','This index contains fuzzy words/phrases from author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (31,'canonicalauthor','This index contains canonical author ids from the record','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexCanonicalAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (32,'parentauthor','This index contains fuzzy words/phrases from the parent record author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexParentAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (33,'parentcanonicalauthor','This index contains canonical author ids from the parent record.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexParentCanonicalAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (34,'exactsimpleauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (35,'exactparentauthor','This index contains exact words/phrases from the parent record author fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactParentAuthorTokenizer');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -600,7 +614,11 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (25,38);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (26,39);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (27,18);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (28,43);
-
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (30,48);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (32,47);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (33,47);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (34,49);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (35,47);
 
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 2);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 3);
@@ -614,6 +632,14 @@ INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 13);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 19);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 26);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 27);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (4, 30);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (4, 31);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (4, 32);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (4, 33);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (14, 31);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (14, 33);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (14, 34);
+INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (14, 35);
 
 
 

@@ -340,7 +340,8 @@ class PluginContainer(object):
                 'enabled': enabled,
                 'api_version': api_version,
             }
-        except Exception:
+        except Exception as e:
+
             self._plugin_map[plugin_name] = {
                 'plugin': None,
                 'error': sys.exc_info(),

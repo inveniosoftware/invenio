@@ -37,6 +37,7 @@ from invenio.bibfield import get_record
 
 
 class TermCollector(object):
+
     """
     Objects of this class take care of collecting phrases from
     records metadata and tokenizing them in order to get
@@ -46,11 +47,12 @@ class TermCollector(object):
     Please don't use it for other standards, of course
     you can, but it won't work. Use NonmarcTermCollector instead.
     """
+
     def __init__(self, tokenizer,
-                       tokenizer_type,
-                       table_type,
-                       tags,
-                       recIDs_range):
+                 tokenizer_type,
+                 table_type,
+                 tags,
+                 recIDs_range):
         self.table_type = table_type
         self.tokenizer = tokenizer
         self.tokenizer_type = tokenizer_type
@@ -62,8 +64,8 @@ class TermCollector(object):
         self.last_recID = recIDs_range[1]
 
         if self.tokenizer_type not in CFG_BIBINDEX_TOKENIZER_TYPE.values():
-            raise UnknownTokenizer("Tokenizer has not been recognized: %s" \
-                                    % self.tokenizer.__class__.__name__)
+            raise UnknownTokenizer("Tokenizer has not been recognized: %s"
+                                   % self.tokenizer.__class__.__name__)
 
     def set_special_tags(self, special_tags):
         """
@@ -114,10 +116,10 @@ class TermCollector(object):
         Used together with string tokenizer.
         """
         for tag in self.tags:
-            tokenizing_function = self.special_tags.get(tag, self.tokenizing_function)
+            tokenizing_function = self.special_tags.get(
+                tag, self.tokenizing_function)
             phrases = self._get_phrases_for_tokenizing(tag, recIDs)
-            for row in phrases:
-                recID, phrase = row
+            for recID, phrase in phrases:
                 if recID in recIDs:
                     if not recID in termslist:
                         termslist[recID] = []
@@ -141,15 +143,16 @@ class TermCollector(object):
                    AND bb.id_bibxxx=b.id AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
         phrases = run_sql(query, (self.first_recID, self.last_recID, tag))
         if tag == '8564_u':
-            ## FIXME: Quick hack to be sure that hidden files are
-            ## actually indexed.
+            # FIXME: Quick hack to be sure that hidden files are
+            # actually indexed.
             phrases = set(phrases)
             for recID in recIDs:
                 for bibdocfile in BibRecDocs(recID).list_latest_files():
                     phrases.add((recID, bibdocfile.get_url()))
-        #authority records
+        # authority records
         pattern = tag.replace('%', '*')
-        matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
+        matches = fnmatch.filter(
+            CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
         if not len(matches):
             return phrases
         phrases = set(phrases)
@@ -165,16 +168,17 @@ class TermCollector(object):
 
 
 class NonmarcTermCollector(TermCollector):
+
     """
         TermCollector for standards other than MARC.
         Uses bibfield's records and fields.
     """
 
     def __init__(self, tokenizer,
-                       tokenizer_type,
-                       table_type,
-                       tags,
-                       recIDs_range):
+                 tokenizer_type,
+                 table_type,
+                 tags,
+                 recIDs_range):
         super(NonmarcTermCollector, self).__init__(tokenizer,
                                                    tokenizer_type,
                                                    table_type,
@@ -182,7 +186,6 @@ class NonmarcTermCollector(TermCollector):
                                                    recIDs_range)
         self.tokenizing_function = \
             self.tokenizer.get_nonmarc_tokenizing_function(table_type)
-
 
     def _collect_string(self, recIDs, termslist):
         """
@@ -195,7 +198,8 @@ class NonmarcTermCollector(TermCollector):
             new_words = []
             extend = new_words.extend
             for tag in tags:
-                tokenizing_function = self.special_tags.get(tag, self.tokenizing_function)
+                tokenizing_function = self.special_tags.get(
+                    tag, self.tokenizing_function)
                 phrases = []
                 recjson_field = rec.get(tag)
                 get_values_recursively(recjson_field, phrases)
@@ -206,4 +210,3 @@ class NonmarcTermCollector(TermCollector):
             if new_words:
                 termslist[recID] = list_union(new_words, termslist[recID])
         return termslist
-

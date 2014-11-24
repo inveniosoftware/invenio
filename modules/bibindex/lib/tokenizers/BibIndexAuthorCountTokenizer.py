@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ from invenio.bibfield import get_record
 
 
 class BibIndexAuthorCountTokenizer(BibIndexMultiFieldTokenizer):
+
     """
         Returns a number of authors who created a publication
         with given recID in the database.
@@ -38,15 +39,14 @@ class BibIndexAuthorCountTokenizer(BibIndexMultiFieldTokenizer):
         BibIndexAuthorCountTokenizer base class.
     """
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         self.tags = ['100__a', '700__a']
         self.nonmarc_tag = 'number_of_authors'
-
 
     def tokenize(self, recID):
         """Uses get_field_count from bibindex_engine_utils
            for finding a number of authors of a publication and pass it in the list"""
-        return [str(get_field_count(recID, self.tags)),]
+        return [str(get_field_count(recID, self.tags)), ]
 
     def tokenize_via_recjson(self, recID):
         """

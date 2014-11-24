@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,8 +20,9 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_BIBRANK_PATH_TO_STOPWORDS_FILE, \
-     CFG_ETCDIR
+    CFG_ETCDIR
 from invenio.bibindex_engine_utils import get_all_index_names_and_column_values
+
 
 def create_stopwords(filename=CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
     """Create stopword dictionary out of FILENAME."""
@@ -31,7 +32,7 @@ def create_stopwords(filename=CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
         return {}
     lines = file_descriptor.readlines()
     file_descriptor.close()
-    stopdict  = {}
+    stopdict = {}
     for line in lines:
         stopdict[line.rstrip()] = 1
     return stopdict
@@ -49,17 +50,19 @@ def map_stopwords_paths_to_stopwords_kb():
     stopwords_kb_map = {}
     stopwords_kb_map[CFG_BIBRANK_PATH_TO_STOPWORDS_FILE] = create_stopwords()
     index_stopwords = get_all_index_names_and_column_values("remove_stopwords")
-    for index, stopwords in index_stopwords:
+    for _, stopwords in index_stopwords:
         if stopwords and stopwords != 'No':
             stopwords_path = CFG_ETCDIR + "/bibrank/" + stopwords
             if not stopwords_kb_map.has_key(stopwords_path):
-                stopwords_kb_map[stopwords_path] = create_stopwords(stopwords_path)
+                stopwords_kb_map[
+                    stopwords_path] = create_stopwords(stopwords_path)
     return stopwords_kb_map
 
 
 stopwords_kb = map_stopwords_paths_to_stopwords_kb()
 
-def is_stopword(word, stopwords_path = CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
+
+def is_stopword(word, stopwords_path=CFG_BIBRANK_PATH_TO_STOPWORDS_FILE):
     """Return true if WORD is found among stopwords for given index, false otherwise.
        It searches in the default stopwords knowledge base if stopwords_path is not specified
        which is useful for bibrank module. If one wants to search in diffrent stopwords knowledge base

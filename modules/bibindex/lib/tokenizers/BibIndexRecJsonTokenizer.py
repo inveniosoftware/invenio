@@ -31,6 +31,7 @@ from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
 
 
 class BibIndexRecJsonTokenizer(BibIndexTokenizer):
+
     """
         BibIndexRecJsonTokenizer is an abstract tokenizer.
         It should be used only for inheritance.
@@ -47,9 +48,8 @@ class BibIndexRecJsonTokenizer(BibIndexTokenizer):
         For example of use please check: BibIndexFiletypeTokenizer
     """
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         pass
-
 
     def tokenize(self, record):
         """'record' is a recjson record from bibfield module

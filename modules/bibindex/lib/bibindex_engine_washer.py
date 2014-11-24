@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@ import re
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH, \
-     CFG_ETCDIR
+    CFG_ETCDIR
 
 re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
@@ -65,6 +65,7 @@ re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
 re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
 
+
 def lower_index_term(term):
     """
     Return safely lowered index term TERM.  This is done by converting
@@ -77,7 +78,10 @@ def lower_index_term(term):
     """
     return unicode(term, 'utf-8').lower().encode('utf-8')
 
-latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
+latex_markup_re = re.compile(
+    r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
+
+
 def remove_latex_markup(phrase):
     ret_phrase = ''
     index = 0
@@ -103,7 +107,7 @@ def apply_stemming(word, stemming_language):
     return word
 
 
-def remove_stopwords(word, stopwords_kb = False):
+def remove_stopwords(word, stopwords_kb=False):
     """Returns word after stopword check.
        One must specify the name of the knowledge base.
 
@@ -118,6 +122,7 @@ def remove_stopwords(word, stopwords_kb = False):
             return ""
     return word
 
+
 def length_check(word):
     """Returns word after length check.
 
@@ -127,6 +132,7 @@ def length_check(word):
     if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
         return ""
     return word
+
 
 def wash_index_term(term, max_char_length=50, lower_term=True):
     """
@@ -156,6 +162,7 @@ def wash_index_term(term, max_char_length=50, lower_term=True):
     else:
         # truncate the term in a safe position:
         return washed_term[:max_char_length].encode('utf-8')
+
 
 def wash_author_name(p):
     """

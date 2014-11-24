@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,8 +25,8 @@
 from invenio.bibindex_tokenizers.BibIndexTokenizer import BibIndexTokenizer
 
 
-
 class BibIndexStringTokenizer(BibIndexTokenizer):
+
     """
        BibIndexStringTokenizer is an abstract tokenizer.
        It should be used only for inheritance.
@@ -40,7 +40,7 @@ class BibIndexStringTokenizer(BibIndexTokenizer):
        Good examples of StringTokenizer is DeafultTokenizer.
     """
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         """@param stemming_language: dummy
            @param remove_stopwords: dummy
            @param remove_html_markup: dummy
@@ -48,11 +48,9 @@ class BibIndexStringTokenizer(BibIndexTokenizer):
         """
         pass
 
-
     def get_tokenizing_function(self, wordtable_type):
         """Picks correct tokenize_for_xxx function depending on type of tokenization (wordtable_type)"""
         raise NotImplementedError
-
 
     def tokenize_for_words(self, phrase):
         raise NotImplementedError
@@ -62,4 +60,3 @@ class BibIndexStringTokenizer(BibIndexTokenizer):
 
     def tokenize_for_phrases(self, phrase):
         raise NotImplementedError
-

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,17 +31,19 @@ from invenio.dbquery import run_sql, \
 from invenio.bibtask import write_message
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import \
-     CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
+    CFG_BIBINDEX_CHARS_PUNCTUATION, \
+    CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.pluginutils import PluginContainer
 from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZERS_PATH, \
     CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 
+from invenio.memoiseutils import Memoise
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
 phrase_delimiter_re = re.compile(r'[\.:;\?\!]')
 space_cleaner_re = re.compile(r'\s+')
-re_block_punctuation_begin = re.compile(r"^" + CFG_BIBINDEX_CHARS_PUNCTUATION + "+")
+re_block_punctuation_begin = re.compile(
+    r"^" + CFG_BIBINDEX_CHARS_PUNCTUATION + "+")
 re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + "+$")
 re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 re_separators = re.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
@@ -51,7 +53,6 @@ re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.]')
 # FIXME: re_pattern_fuzzy_author_trigger could be removed and an
 # BibAuthorID API function could be called instead after we
 # double-check that there are no circular imports.
-
 
 
 def load_tokenizers():
@@ -73,7 +74,8 @@ def get_all_index_names_and_column_values(column_name):
         for row in res:
             out.append((row[0], row[1]))
     except DatabaseError:
-        write_message("Exception caught for SQL statement: %s; column %s might not exist" % (query, column_name), sys.stderr)
+        write_message("Exception caught for SQL statement: %s; column %s might not exist" %
+                      (query, column_name), sys.stderr)
     return out
 
 
@@ -88,7 +90,8 @@ def get_all_synonym_knowledge_bases():
         kb_data = row[1]
         # ignore empty strings
         if len(kb_data):
-            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
+            out[row[0]] = tuple(
+                kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
     return out
 
 
@@ -99,7 +102,8 @@ def get_index_remove_stopwords(index_id):
        @param index_id: id of the index
     """
     try:
-        result = run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql(
+            "SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
     except:
         return False
     if result == 'No' or result == '':
@@ -112,7 +116,8 @@ def get_index_remove_html_markup(index_id):
         changes it  to True, False.
         Just for consistency with WordTable."""
     try:
-        result = run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql(
+            "SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
     except:
         return False
     if result == 'Yes':
@@ -125,7 +130,8 @@ def get_index_remove_latex_markup(index_id):
         changes it  to True, False.
         Just for consistency with WordTable."""
     try:
-        result = run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql(
+            "SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
     except:
         return False
     if result == 'Yes':
@@ -174,7 +180,7 @@ def run_sql_drop_silently(query):
         query = query.replace(" IF EXISTS", "")
         run_sql(query)
     except Exception, e:
-        if  str(e).find("Unknown table") > -1:
+        if str(e).find("Unknown table") > -1:
             pass
         else:
             raise e
@@ -239,6 +245,7 @@ def is_index_virtual(index_id):
         return True
     return False
 
+
 def filter_for_virtual_indexes(index_list):
     """
         Function removes all non-virtual indexes
@@ -252,6 +259,7 @@ def filter_for_virtual_indexes(index_list):
     except IndexError:
         return []
     return []
+
 
 def get_virtual_index_building_blocks(index_id):
     """Returns indexes that made up virtual index of given index_id.
@@ -297,7 +305,6 @@ def get_field_tags(field, tagtype="marc"):
        @param tagtype: can be: "marc" or "nonmarc", default value
             is "marc" for backward compatibility
     """
-    out = []
     query = """SELECT t.%s FROM tag AS t,
                                 field_tag AS ft,
                                 field AS f
@@ -323,8 +330,8 @@ def get_marc_tag_indexes(tag, virtual=True):
        @param tag: MARC tag in one of the forms:
             'xx%', 'xxx', 'xxx__a', 'xxx__%'
        @param virtual: if True function will also return virtual indexes"""
-    tag2 = tag[0:2] + "%" #for tags in the form: 10%
-    tag3 = tag[:-1] + "%" #for tags in the form: 100__%
+    tag2 = tag[0:2] + "%"  # for tags in the form: 10%
+    tag3 = tag[:-1] + "%"  # for tags in the form: 100__%
     query = """SELECT DISTINCT w.id,w.name FROM idxINDEX AS w,
                                                 idxINDEX_field AS wf,
                                                 field_tag AS ft,
@@ -339,7 +346,7 @@ def get_marc_tag_indexes(tag, virtual=True):
         missing_piece = "t.value LIKE %s"
     elif tag[-1] != "%" and len(tag) == 3:
         missing_piece = "t.value LIKE %s"
-        tag3 = tag + "%" #for all tags which start from 'tag'
+        tag3 = tag + "%"  # for all tags which start from 'tag'
     else:
         missing_piece = "t.value=%s"
     query = query % missing_piece
@@ -380,7 +387,8 @@ def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
     in_the_middle = '%%,' + nonmarc_tag + ',%%'
     at_the_end = '%%,' + nonmarc_tag
 
-    res = run_sql(query, (at_the_begining, in_the_middle, at_the_end, nonmarc_tag))
+    res = run_sql(
+        query, (at_the_begining, in_the_middle, at_the_end, nonmarc_tag))
     if res:
         if virtual:
             response = list(res)
@@ -417,7 +425,8 @@ def get_index_tags(indexname, virtual=True, tagtype="marc"):
     if not out and virtual:
         index_id = get_index_id_from_index_name(indexname)
         try:
-            dependent_indexes = map(str, zip(*get_virtual_index_building_blocks(index_id))[0])
+            dependent_indexes = map(
+                str, zip(*get_virtual_index_building_blocks(index_id))[0])
         except IndexError:
             return out
         tags = set()
@@ -434,14 +443,35 @@ def get_index_tags(indexname, virtual=True, tagtype="marc"):
     return out
 
 
+def get_field_indexes(field):
+    """Returns indexes names and ids corresponding to the given field"""
+    if recognize_marc_tag(field):
+        # field is actually a tag
+        return get_marc_tag_indexes(field, virtual=False)
+    else:
+        return get_nonmarc_tag_indexes(field, virtual=False)
+
+
+get_field_indexes_memoised = Memoise(get_field_indexes)
+
+
+def get_last_updated(index_name):
+    """Returns min modification date for 'indexes':
+       min(last_updated)
+       @param indexes: list of indexes
+    """
+    query = """SELECT last_updated FROM idxINDEX WHERE name = %s"""
+    res = run_sql(query, (index_name,))
+    return res[0][0]
+
+
 def get_min_last_updated(indexes):
     """Returns min modification date for 'indexes':
        min(last_updated)
        @param indexes: list of indexes
     """
-    query= """SELECT min(last_updated) FROM idxINDEX WHERE name IN ("""
-    for index in indexes:
-        query += "%s,"
+    query = """SELECT min(last_updated) FROM idxINDEX WHERE name IN ("""
+    query += "%s,"*len(indexes)
     query = query[:-1] + ")"
     res = run_sql(query, tuple(indexes))
     return res
@@ -509,14 +539,14 @@ def get_index_fields(index_id):
                      wf.id_idxINDEX=w.id AND
                      w.id=%s
             """
-    index_fields = run_sql(query, (index_id, ) )
+    index_fields = run_sql(query, (index_id, ))
     return index_fields
 
 
 def recognize_marc_tag(tag):
     """Checks if tag is a MARC tag or not"""
     tag_len = len(tag)
-    if 3 <= tag_len <= 6  and tag[0:3].isdigit():
+    if 3 <= tag_len <= 6 and tag[0:3].isdigit():
         return True
     if tag_len == 3 and tag[0:2].isdigit() and tag[2] == '%':
         return True
@@ -553,3 +583,51 @@ def get_values_recursively(subfield, phrases):
             get_values_recursively(s, phrases)
     elif subfield is not None:
         phrases.append(str(subfield))
+
+
+def get_author_canonical_ids_for_recid(recID):
+    """
+    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
+    given record.  Done by consulting BibAuthorID module.
+    """
+    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
+        tag='canonical_name' AND flag>-2""", (recID, ))]
+
+
+def create_range_list(int_list):
+    """Converts an ordered list of integers to a range list.
+    If the input list is not ordered, the resulting range list can be
+    unordered and non maximal.
+
+    @param int_list: an **ordered** list of positive integers (not zero)
+    @return: an ordered, maximal, non overlapping list of ranges [start, end]
+        edge inclusive
+    """
+    if not int_list:
+        return []
+    row = int_list[0]
+    if not row:
+        return []
+    else:
+        range_list = [[row, row]]
+    for row in int_list[1:]:
+        row_id = row
+        if row_id == range_list[-1][1] + 1:
+            range_list[-1][1] = row_id
+        else:
+            range_list.append([row_id, row_id])
+    return range_list
+
+
+def unroll_range_list(range_list):
+    """Converts a **non overlapping** range list to a list of integers.
+
+    @param range_list: unordered list of non overlapping ranges [start, end],
+        edge inclusive. e.g. [[1,3], [123, 125], [20, 22]]
+    @return: unordered list of unique integers
+    """
+    int_list = []
+    for single_range in range_list:
+        int_list.extend(range(single_range[0], single_range[1] + 1))
+    return int_list

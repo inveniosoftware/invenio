@@ -20,7 +20,9 @@ from invenio.search_engine import get_record
 from invenio.bibrecord import record_get_field_instances
 from invenio.bibindex_tokenizers.BibIndexMultiFieldTokenizer import BibIndexMultiFieldTokenizer
 
+
 class BibIndexFilteringTokenizer(BibIndexMultiFieldTokenizer):
+
     """
         This tokenizer would tokenize phrases from tag
         only if another tag was present in the record's metadata,
@@ -53,7 +55,6 @@ class BibIndexFilteringTokenizer(BibIndexMultiFieldTokenizer):
     def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         self.rules = ()
 
-
     def tokenize(self, recID):
         phrases = []
         try:
@@ -65,11 +66,13 @@ class BibIndexFilteringTokenizer(BibIndexMultiFieldTokenizer):
                 ind = tag_to_index[3:5]
                 sub_tag = tag_to_index[5]
 
-                fields = [dict(instance[0]) for instance in record_get_field_instances(rec, core_tag, ind[0], ind[1])]
+                fields = [dict(instance[0])
+                          for instance in record_get_field_instances(rec, core_tag, ind[0], ind[1])]
                 for field in fields:
-                    tag_condition = necessary_tag and field.has_key(necessary_tag) or necessary_tag == ''
+                    tag_condition = necessary_tag and field.has_key(
+                        necessary_tag) or necessary_tag == ''
                     value_condition = necessary_value and field.get(necessary_tag, '') == necessary_value or \
-                                      necessary_value == ''
+                        necessary_value == ''
                     if tag_condition and field.has_key(sub_tag) and value_condition:
                         phrases.append(field[sub_tag])
             return phrases

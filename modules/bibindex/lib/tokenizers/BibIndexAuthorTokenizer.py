@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,8 +28,8 @@ from invenio.config import CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
 
 
-
 class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
+
     """Human name tokenizer.
 
     Human names are divided into three classes of tokens:
@@ -38,16 +38,17 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
     'titles', both incidental and permanent, e.g., 'VIII', '(ed.)', 'Msc'
     """
 
-    def __init__(self, stemming_language = None, remove_stopwords = False, remove_html_markup = False, remove_latex_markup = False):
+    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
         BibIndexDefaultTokenizer.__init__(self, stemming_language,
-                                                remove_stopwords,
-                                                remove_html_markup,
-                                                remove_latex_markup)
+                                          remove_stopwords,
+                                          remove_html_markup,
+                                          remove_latex_markup)
         self.single_initial_re = re.compile('^\w\.$')
         self.split_on_re = re.compile('[\.\s-]')
         # lastname_stopwords describes terms which should not be used for indexing,
         # in multiple-word last names.  These are purely conjunctions, serving the
-        # same function as the American hyphen, but using linguistic constructs.
+        # same function as the American hyphen, but using linguistic
+        # constructs.
         self.lastname_stopwords = set(['y', 'of', 'and', 'de'])
 
     def scan_string_for_phrases(self, s):
@@ -68,11 +69,13 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             }
         @rtype: dict
         """
-        retval = {'TOKEN_TAG_LIST' : ['lastnames', 'nonlastnames', 'titles', 'raw'],
-                  'lastnames'      : [],
-                  'nonlastnames'   : [],
-                  'titles'         : [],
-                  'raw'            : s}
+        retval = {
+            'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles', 'raw'],
+            'lastnames': [],
+            'nonlastnames': [],
+            'titles': [],
+            'raw': s
+        }
         l = s.split(',')
         if len(l) < 2:
             # No commas means a simple name
@@ -85,9 +88,11 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
                 retval['nonlastnames'] = new[:-1]
                 for tag in ['lastnames', 'nonlastnames']:
                     retval[tag] = [x.strip() for x in retval[tag]]
-                    retval[tag] = [re.split(self.split_on_re, x) for x in retval[tag]]
+                    retval[tag] = [re.split(self.split_on_re, x)
+                                   for x in retval[tag]]
                         # flatten sublists
-                    retval[tag] = [item for sublist in retval[tag] for item in sublist]
+                    retval[tag] = [item for sublist in retval[tag]
+                                   for item in sublist]
                     retval[tag] = [x for x in retval[tag] if x != '']
         else:
             # Handle lastname-first multiple-names case
@@ -95,9 +100,11 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             retval['nonlastnames'] = l[1]
             retval['lastnames'] = l[0]
             for tag in ['lastnames', 'nonlastnames']:
+                # pylint: disable=E1101
                 retval[tag] = retval[tag].strip()
+                # pylint: enable=E1101
                 retval[tag] = re.split(self.split_on_re, retval[tag])
-                    # filter empty strings
+                # filter empty strings
                 retval[tag] = [x for x in retval[tag] if x != '']
             retval['titles'] = [x.strip() for x in retval['titles'] if x != '']
 
@@ -125,7 +132,7 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         @rtype: list of string
         """
 
-        def _fully_expanded_last_name(first, lastlist, title = None):
+        def _fully_expanded_last_name(first, lastlist, title=None):
             """Return a list of all of the first / last / title combinations.
 
             @param first: one possible non-last name
@@ -156,7 +163,6 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         last_parts = scanned['lastnames']
         first_parts = scanned['nonlastnames']
         titles = scanned['titles']
-        raw = scanned['raw']
 
         if len(first_parts) == 0:                       # rare single-name case
             return scanned['lastnames']
@@ -169,11 +175,14 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
                 # leaves XI, for example.  This gets rid of the surprising behavior that searching
                 # for 'author:ed' retrieves people who have been editors, but whose names aren't
                 # Ed.
-                # TODO: Make editorship and other special statuses a MARC field.
+                # TODO: Make editorship and other special statuses a MARC
+                # field.
                 if title.find('(') != -1:
                     continue
-                # XXX: remember to document that titles can only be applied to complete last names
-                expanded.extend(_fully_expanded_last_name(exp, [' '.join(last_parts)], title))
+                # XXX: remember to document that titles can only be applied to
+                # complete last names
+                expanded.extend(
+                    _fully_expanded_last_name(exp, [' '.join(last_parts)], title))
 
         return sorted(list(set(expanded)))
 
@@ -205,7 +214,7 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
                 return [head]
             l = []
             l.extend([head + ' ' + tail[0]])
-            #l.extend([head + '-' + tail[0]])
+            # l.extend([head + '-' + tail[0]])
             l.extend(_pair_items(head, tail[1:]))
             return l
 
@@ -222,17 +231,17 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             l = []
             l.extend(_pair_items(head, _expand_name(tail[0])))
             l.extend([' '.join(_cons(head, tail)).strip()])
-            #l.extend(['-'.join(_cons(head, tail)).strip()])
+            # l.extend(['-'.join(_cons(head, tail)).strip()])
             l.extend(_collect(head, tail[1:]))
             return l
 
         def _expand_contract(namelist):
             """Runs collect with every head in namelist and its tail"""
             val = []
-            for i  in range(len(namelist)):
+            for i in range(len(namelist)):
                 name = namelist[i]
                 for expansion in _expand_name(name):
-                    val.extend(_collect(expansion, namelist[i+1:]))
+                    val.extend(_collect(expansion, namelist[i + 1:]))
             return val
 
         def _add_squashed(namelist):
@@ -256,7 +265,6 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             return val
 
         return _add_squashed(_expand_contract(namelist))
-
 
     def tokenize_for_fuzzy_authors(self, phrase):
         """Output the list of strings expanding phrase.
@@ -284,7 +292,6 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         """
         return self.parse_scanned_for_phrases(self.scan_string_for_phrases(phrase))
 
-
     def tokenize_for_phrases(self, phrase):
         """
             Another name for tokenize_for_fuzzy_authors.
@@ -293,11 +300,9 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         """
         return self.tokenize_for_fuzzy_authors(phrase)
 
-
     def tokenize_for_words_default(self, phrase):
         """Default tokenize_for_words inherited from default tokenizer"""
         return super(BibIndexAuthorTokenizer, self).tokenize_for_words(phrase)
-
 
     def get_author_family_name_words_from_phrase(self, phrase):
         """ Return list of words from author family names, not his/her first names.
@@ -322,7 +327,6 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
                 d_family_names_words[word] = 1
         return d_family_names_words.keys()
 
-
     def tokenize_for_words(self, phrase):
         """
             If CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES is 1 we tokenize only for family names.
@@ -332,5 +336,3 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             return self.get_author_family_name_words_from_phrase(phrase)
         else:
             return self.tokenize_for_words_default(phrase)
-
-
