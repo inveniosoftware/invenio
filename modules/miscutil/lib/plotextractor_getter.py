@@ -262,7 +262,7 @@ def tarballs_by_recids(recids, sdir, docname=None, doctype=None, docformat=None)
 
     else:
         if '-' in recids:
-            low, high = recid.split('-')
+            low, high = recids.split('-')
             list_of_ids = range(int(low), int(high))
         else:
             list_of_ids = [int(recids)]
@@ -281,13 +281,13 @@ def tarballs_by_recids(recids, sdir, docname=None, doctype=None, docformat=None)
             bibarchive = BibRecDocs(recid)
             all_files = bibarchive.list_latest_files()
             if doctype:
-                all_files = [docfile for docfile in all_files if \
+                all_files = [docfile for docfile in all_files if
                              docfile.get_type() == doctype]
             if docname:
-                all_files = [docfile for docfile in all_files if \
+                all_files = [docfile for docfile in all_files if
                              docfile.get_name() == docname]
             if docformat:
-                all_files = [docfile for docfile in all_files if \
+                all_files = [docfile for docfile in all_files if
                              docfile.get_format() == docformat]
             local_files.extend([(docfile.get_path(), recid) for docfile in all_files])
 
