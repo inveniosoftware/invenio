@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,14 +19,14 @@
 
 __revision__ = "$Id$"
 
-from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.legacy.bibknowledge import admin as bibknowledgeadmin
 from invenio.config import CFG_SITE_LANG
+from invenio.ext.legacy.handler import WebInterfaceDirectory, wash_urlargd
+from invenio.legacy.bibknowledge import admin as bibknowledgeadmin
 
 
 class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
 
-    """ Handle /kb/ etc set of pages."""
+    """Handle /kb/ etc set of pages."""
 
     extrapath = ""
 
@@ -35,8 +35,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         self.extrapath = extrapath
 
     def _lookup(self, component, path):
-        """
-        The parser handle dynamic URLs.
+        """The parser handle dynamic URLs.
 
         URL (/kb, /kb/export, /kb/upload etc).
         """
@@ -76,6 +75,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
                                    'expression': (str, ''),  # for dynamic kbs
                                    'collection': (str, ''),  # for dynamic kbs
                                    'kbname': (str, ''),  # for exporting
+                                   'searchtype': (str, ''),  # for exporting
                                    'format': (str, ''),  # for exporting
                                    # for exporting to JQuery UI
                                    'term': (str, ''),
@@ -108,6 +108,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         delete_mapping = argd['delete_mapping']
         kbname = argd['kbname']
         format = argd['format']
+        searchtype = argd['searchtype']
         limit = argd['limit']
 
         req.argd = argd  # needed by some lower level modules
@@ -121,6 +122,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
                                                format=format, ln=ln,
                                                searchkey=searchkey,
                                                searchvalue=term,
+                                               searchtype=searchtype,
                                                limit=limit)
 
         # first check if this is a specific action
