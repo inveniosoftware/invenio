@@ -73,3 +73,8 @@ Webassets
 
     A webasset :ref:`Bundle <webassets:bundles>` that combines resources such a
     JavaScript or CSS stylesheets.
+
+.. py:class:: webassets.filter.ExternalTool
+
+    Subclass that helps creating filters that need to run an external
+    program.
