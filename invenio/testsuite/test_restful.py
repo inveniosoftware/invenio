@@ -188,7 +188,7 @@ class RestfulPaginationTestCase(InvenioTestCase):
                 import json
                 from flask import make_response
                 from invenio.ext.restful.errors import(
-                    RestfulError, InvalidPageError
+                    InvalidPageError
                 )
                 from invenio.ext.restful import pagination
                 # Test to see that the exceptions are raised correctly
@@ -202,21 +202,9 @@ class RestfulPaginationTestCase(InvenioTestCase):
                     args = request.args
                     page = int(args.get('page', 1))
                     per_page = int(args.get('per_page', 10))
-                    # check values arguments and raise exceptions if any errors
-                    if per_page < 0:
-                        raise RestfulError(
-                            error_msg="Invalid per_page: {}".format(per_page),
-                            status_code=400
-                        )
-
                     p = pagination.RestfulPagination(
                         page=page, per_page=per_page, total_count=len(testdata)
                     )
-                    if (page < 0) or (page > p.pages):
-                        raise InvalidPageError(
-                            error_msg="Invalid page: {}".format(page),
-                            status_code=400
-                        )
                     data_to_return = p.slice(testdata)
                     kwargs = {}
                     kwargs['endpoint'] = endpoint
@@ -225,7 +213,7 @@ class RestfulPaginationTestCase(InvenioTestCase):
                     response = make_response(json.dumps(data_to_return))
                     response.headers[link_header[0]] = link_header[1]
                     response.headers['Content-Type'] = request.headers['Content-Type']
-                except (RestfulError, InvalidPageError) as e:
+                except InvalidPageError as e:
                     exception = {}
                     exception['message'] = e.error_msg
                     exception['type'] = "{0}".format(type(e))
@@ -333,11 +321,12 @@ class RestfulPaginationTestCase(InvenioTestCase):
         answer_get = self.client.get(
             url_for('testdataresource',
                     access_token=self.token.access_token,
-                    page=-2),
+                    page=-2, per_page=10),
             headers=[('Content-Type', 'application/json')])
         # Test/assert to see that the exceptions are raised correctly
         expected = {}
-        expected['message'] = "Invalid page: {0}".format(-2)
+        error_msg = "Invalid page number ('{0}').".format(-2)
+        expected['message'] = error_msg
         expected['type'] = "{0}".format(errors.InvalidPageError)
         self.assertEqual(answer_get.json, expected)
 
@@ -346,12 +335,16 @@ class RestfulPaginationTestCase(InvenioTestCase):
         answer_get = self.client.get(
             url_for('testdataresource',
                     access_token=self.token.access_token,
-                    per_page=-5),
+                    page=1, per_page=-5),
             headers=[('Content-Type', 'application/json')])
         # Test/assert to see that the exceptions are raised correctly
         expected = {}
-        expected['message'] = "Invalid per_page: {0}".format(-5)
-        expected['type'] = "{0}".format(errors.RestfulError)
+        error_msg = (
+            "Invalid per_page argument ('{0}'). Number of items "
+            "per pages must be positive integer.".format(-5)
+        )
+        expected['message'] = error_msg
+        expected['type'] = "{0}".format(errors.InvalidPageError)
         self.assertEqual(answer_get.json, expected)
 
 

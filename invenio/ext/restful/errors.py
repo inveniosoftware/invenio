@@ -40,6 +40,6 @@ class InvalidPageError(RestfulError):
 
     """Error indicating an invalid page."""
 
-    def __init__(self, error_msg="Invalid page", status_code=None):
+    def __init__(self, error_msg="Invalid page", status_code=400):
         """Initialize default error message for invalid page error."""
         super(InvalidPageError, self).__init__(error_msg, status_code)

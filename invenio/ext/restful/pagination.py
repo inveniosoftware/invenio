@@ -21,6 +21,7 @@
 
 from flask import request, url_for
 from invenio.utils.pagination import Pagination as InvenioPagination
+from .errors import InvalidPageError
 
 
 class RestfulPaginationMixIn(object):
@@ -126,6 +127,23 @@ class RestfulSQLAlchemyPagination(SQLAlchemyPaginationHelper,
 class RestfulPagination(InvenioPagination, RestfulPaginationMixIn):
 
     """Implement Restful pagination for list of data."""
+
+    def __init__(self, page, per_page, total_count, validate=True):
+        super(RestfulPagination, self).__init__(page, per_page, total_count)
+        if validate:
+            self.validate()
+
+    def validate(self):
+        """Validate the range of page and per_page."""
+        if self.per_page < 0:
+            error_msg = (
+                "Invalid per_page argument ('{0}'). Number of items "
+                "per pages must be positive integer.".format(self.per_page)
+            )
+            raise InvalidPageError(error_msg)
+        if self.page < 0 or self.page > self.pages:
+            error_msg = "Invalid page number ('{0}').".format(self.page)
+            raise InvalidPageError(error_msg)
 
     def slice(self, items):
         """Return items on current page."""
