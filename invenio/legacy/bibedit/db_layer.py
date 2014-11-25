@@ -184,10 +184,10 @@ def get_cache(recid, uid):
 
 def update_cache(recid, uid, data):
     data_str = Pickle.dumps(data)
-    r = run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
-                   VALUES (%s, %s, %s, NOW())
-                   ON DUPLICATE KEY UPDATE data = %s, post_date = NOW(), is_active = 1""",
-                   (recid, uid, data_str, data_str))
+    run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
+            VALUES (%s, %s, %s, NOW())
+            ON DUPLICATE KEY UPDATE data = %s, post_date = NOW(), is_active = 1""",
+            (recid, uid, data_str, data_str))
 
 def get_cache_post_date(recid, uid):
     r = run_sql("""SELECT post_date FROM bibEDITCACHE
@@ -208,8 +208,8 @@ def uids_with_active_caches(recid):
     from invenio.config import CFG_BIBEDIT_TIMEOUT
     datecut = datetime.now() - timedelta(seconds=CFG_BIBEDIT_TIMEOUT)
     rows = run_sql("""SELECT uid FROM bibEDITCACHE
-                      WHERE id_bibrec = %s AND post_date > %s""",
-                      (recid, datecut))
+                   WHERE id_bibrec = %s AND post_date > %s""",
+                   (recid, datecut))
     return [int(row[0]) for row in rows]
 
 # End of cache related functions

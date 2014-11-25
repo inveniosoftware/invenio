@@ -19,6 +19,7 @@
 
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry, RegistryProxy
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 
 editorext = RegistryProxy(
     'editorext', ModuleAutoDiscoveryRegistry, 'editorext'
@@ -31,4 +32,8 @@ field_templates = RegistryProxy('editorext.field_templates',
 record_templates = RegistryProxy('editorext.record_templates',
                                  PkgResourcesDirDiscoveryRegistry,
                                  'record_templates',
+                                 registry_namespace=editorext)
+ticket_templates = RegistryProxy('editorext.ticket_templates',
+                                 ModuleAutoDiscoverySubRegistry,
+                                 'ticket_templates',
                                  registry_namespace=editorext)

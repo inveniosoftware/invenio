@@ -35,6 +35,7 @@ import time
 import zlib
 import tempfile
 import sys
+import traceback
 from datetime import datetime
 from MySQLdb import ProgrammingError
 
@@ -46,7 +47,7 @@ except ImportError:
 from invenio.legacy.bibedit.db_layer import (get_record_last_modification_date,
     delete_hp_change, cache_exists, update_cache_post_date, get_cache,
     update_cache, get_cache_post_date, uids_with_active_caches,
-    delete_cache as _delete_cache)
+    get_record_revision_author, delete_cache as _delete_cache)
 from invenio.legacy.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
@@ -54,13 +55,14 @@ from invenio.legacy.bibrecord import create_record, create_records, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
     record_get_field_values, print_rec, record_modify_subfield, \
-    record_modify_controlfield
+    record_modify_controlfield, record_make_all_subfields_volatile
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, \
+    CFG_PYLIBDIR
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.text import wash_for_xml
 from invenio.legacy.bibedit.db_layer import get_bibupload_task_opts, \
@@ -70,7 +72,8 @@ from invenio.legacy.search_engine import record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.legacy.webuser import get_user_info, getUid, get_email
+from invenio.legacy.webuser import get_user_info, get_email, \
+     collect_user_info, get_user_preferences, list_registered_users
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
@@ -81,9 +84,12 @@ from invenio.legacy.bibrecord.textmarc2xmlmarc import transform_file, ParseError
 from invenio.legacy.bibauthorid.name_utils import split_name_parts, \
                                         create_normalized_name
 from invenio.modules.knowledge.api import get_kbr_values
-from invenio.modules.editor.registry import field_templates, record_templates
+from invenio.modules.editor.registry import field_templates, record_templates, \
+    ticket_templates
 
 from invenio.base.globals import cfg
+from invenio.legacy.webauthorprofile.config import deserialize
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % cfg['CFG_BIBEDIT_CACHEDIR'])
@@ -98,6 +104,14 @@ re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*)
 
 
 VOLATILE_PREFIX = "VOLATILE:"
+
+
+class InvalidCache(Exception):
+    pass
+
+class BibEditPluginException(Exception):
+    """Raised when something is wrong with ticket plugins"""
+    pass
 
 # Authorization
 
@@ -114,7 +128,8 @@ def user_can_edit_record_collection(req, recid):
     # Get the collections the record belongs to
     record_collections = get_all_collections_of_a_record(recid)
 
-    uid = getUid(req)
+    user_info = collect_user_info(req)
+    uid = user_info["uid"]
     # In case we are creating a new record
     if cache_exists(recid, uid):
         record = get_cache_contents(recid, uid)[2]
@@ -277,6 +292,8 @@ def get_cache_contents(recid, uid):
         assert_undo_redo_lists_correctness(undo_list, redo_list)
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
+    else:
+        raise InvalidCache()
 
 def update_cache_contents(recid, uid, record_revision, record, pending_changes,
                           disabled_hp_changes, undo_list, redo_list):
@@ -357,12 +374,13 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
 
     user_name = get_user_info(uid)[1]
     if to_upload:
-        args = ['bibupload', task_name, '-P', '5', '-r',
+        args = ['bibupload', user_name, '-P', '5', '-r',
                 file_path, '-u', user_name]
         if task_name == "bibedit":
-            args += ['--name', 'bibedit']
+            args.extend(['--name', 'bibedit'])
         if sequence_id:
-            args += ["-I", sequence_id]
+            args.extend(["-I", sequence_id])
+        args.extend(['--email-logs-on-error'])
         task_low_level_submission(*args)
     return True
 
@@ -487,6 +505,19 @@ def get_record_revision_timestamps(recid):
     result = []
     for rev_id in rev_ids:
         result.append(rev_id.split(".")[1])
+    return result
+
+def get_record_revision_authors(recid):
+    """return dictionary of < timestamp : author > of all revisions
+     of a given record """
+    rev_ids = get_record_revision_ids(recid)
+    result = {}
+    for rev_id in rev_ids:
+        try:
+            revision = rev_id.split(".")[1]
+            result[revision] = get_record_revision_author(recid, timestamp_to_revision(revision))
+        except IndexError:
+            continue
     return result
 
 def get_record_revision_ids(recid):
@@ -678,8 +709,6 @@ def _record_in_files_p(recid, filenames):
     # Get id tags of record in question
     rec_oaiid = rec_sysno = -1
     rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
-    if rec_oaiid_tag:
-        rec_oaiid = rec_oaiid_tag[0]
     rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
     if rec_sysno_tag:
         rec_sysno = rec_sysno_tag[0]
@@ -689,15 +718,15 @@ def _record_in_files_p(recid, filenames):
         try:
             if CFG_BIBEDIT_QUEUE_CHECK_METHOD == 'regexp':
                 # check via regexp: this is fast, but may not be precise
-                re_match_001 = re.compile('<controlfield tag="001">%s</controlfield>' % (recid))
-                re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], rec_oaiid))
-                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], rec_sysno))
                 file_content = open(filename).read()
+                re_match_001 = re.compile('<controlfield tag="001">%s</controlfield>' % (recid))
                 if re_match_001.search(file_content):
                     return True
-                if rec_oaiid_tag:
+                for rec_oaiid in rec_oaiid_tag:
+                    re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], re.escape(rec_oaiid)))
                     if re_match_oaiid.search(file_content):
                         return True
+                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], re.escape(str(rec_sysno))))
                 if rec_sysno_tag:
                     if re_match_sysno.search(file_content):
                         return True
@@ -785,13 +814,15 @@ def extend_record_with_template(recid=0, recstruct=None):
     return False
 
 
-def merge_record_with_template(rec, template_name):
+def merge_record_with_template(rec, template_name, is_hp_record=False):
     """ Extend the record rec with the contents of the template and return it"""
     template = get_record_template(template_name)
     if not template:
         return
     template_bibrec = create_record(template)[0]
-
+    # if the record is a holding pen record make all subfields volatile
+    if is_hp_record:
+        record_make_all_subfields_volatile(template_bibrec)
     for field_tag in template_bibrec:
         if not record_has_field(rec, field_tag):
             for field_instance in template_bibrec[field_tag]:
@@ -1062,3 +1093,81 @@ def get_affiliation_for_paper(rec, name):
         return None
 
     return list(deserialize(affs[0][0]))
+
+
+####################### rt system utils ################################
+
+
+def get_new_ticket_RT_info(uid, recId):
+    response = {}
+    response['resultCode'] = 0
+    if BIBCATALOG_SYSTEM is None:
+        response['description'] = "<!--No ticket system configured-->"
+    elif BIBCATALOG_SYSTEM and uid:
+        bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
+        if bibcat_resp == "":
+            # add available owners
+            users = []
+            users_list = list_registered_users()
+            for user_tuple in users_list:
+                try:
+                    user = {'username': get_user_preferences(user_tuple[0])['bibcatalog_username'],
+                        'id': user_tuple[0]}
+                except KeyError:
+                    continue
+                users.append(user)
+            response['users'] = users
+            # add available queues
+            response['queues'] = BIBCATALOG_SYSTEM.get_queues(uid)
+            # add user email
+            response['email'] = get_email(uid)
+            # TODO try catch
+            response['ticketTemplates'] = load_ticket_templates(recId)
+            response['resultCode'] = 1
+        else:
+            # put something in the tickets container, for debug
+            response['description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
+    return response
+
+
+def _bibedit_plugin_builder(plugin_code):  # pylint: disable-msg=W0613
+    """
+    Custom builder for pluginutils.
+
+    @param plugin_name: the name of the plugin.
+    @type plugin_name: string
+    @param plugin_code: the code of the module as just read from
+        filesystem.
+    @type plugin_code: module
+    @return: the plugin
+    """
+    final_plugin = {}
+    final_plugin["get_template_data"] = getattr(plugin_code, "get_template_data", None)
+    return plugin_code.__name__.split('.')[-1], final_plugin
+
+
+def load_ticket_plugins():
+    """Load all the ticket plugins."""
+    return dict(map(_bibedit_plugin_builder, ticket_templates))
+
+
+def load_ticket_templates(recId):
+    """
+    Loads all enabled ticket plugins and calls them.
+    @return dictionary with the following structure:
+        key: string: name of queue
+        value: dict: a dictionary with 2 keys,
+        the template subject and content of the queue
+    @rtype dict
+    """
+    ticket_templates = {}
+    plugins = load_ticket_plugins()
+    record = get_record(recId)
+    for name, plugin in plugins.items():
+        if plugin:
+            queue_data = plugin['get_template_data'](record)
+            if queue_data:
+                ticket_templates[queue_data[0]] = { 'subject' : queue_data[1], 'content' : queue_data[2] }
+        else:
+            raise BibEditPluginException("Plugin not valid in %s" % (name,))
+    return ticket_templates

@@ -214,6 +214,12 @@ class SimulatedModPythonRequest(object):
     def get_uri(self):
         return request.environ['PATH_INFO']
 
+    def get_full_uri(self):
+        if self.is_https():
+            return CFG_SITE_SECURE_URL + self.get_unparsed_uri()
+        else:
+            return CFG_SITE_URL + self.get_unparsed_uri()
+
     def get_headers_in(self):
         return request.headers
 
@@ -405,9 +411,14 @@ class SimulatedModPythonRequest(object):
         assert not self.__tainted, "The original WSGI environment is tainted since at least req.write or req.form has been used."
         return self.__environ, self.__start_response
 
+    def get_environ(self):
+        return self.__environ
+
+    environ = property(get_environ)
     content_type = property(get_content_type, set_content_type)
     unparsed_uri = property(get_unparsed_uri)
     uri = property(get_uri)
+    full_uri = property(get_full_uri)
     headers_in = property(get_headers_in)
     subprocess_env = property(get_subprocess_env)
     args = property(get_args)

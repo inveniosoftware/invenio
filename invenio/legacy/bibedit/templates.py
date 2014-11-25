@@ -322,21 +322,6 @@ class Template:
          </p>
        </div>''' % (title, comparison)
 
-    def clean_value(self, value, format):
-        """ This function clean value for HTML interface and inverse. """
-
-        if format != "html":
-            value = value.replace('"', '&quot;')
-            value = value.replace('<', '&lt;')
-            value = value.replace('>', '&gt;')
-
-        else:
-            value = value.replace('&quot;', '"')
-            value = value.replace('&lt;', '<')
-            value = value.replace('&gt;', '>')
-
-        return value
-
     def focuson(self):
         """ Returns the html of the display options box on the left panel. """
 

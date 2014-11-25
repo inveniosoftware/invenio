@@ -155,6 +155,8 @@ function onSearchClick(event) {
   updateStatus('updating');
 
   var searchPattern = $('#txtSearchPattern').val();
+  log_action("onSearchClick " + searchPattern);
+
   var searchType = $('#sctSearchType').val();
 
   if ( searchType == 'recID' ) {
@@ -247,6 +249,7 @@ function onNextRecordClick(){
   /*
    * Handle click on the 'Next' button in the record browser.
    */
+  log_action("onNextRecordClick");
   updateStatus('updating');
   if (gRecordDirty){
     if (!displayAlert('confirmLeavingChangedRecord')){
@@ -272,6 +275,7 @@ function onPrevRecordClick(){
   /*
    * Handle click on the 'Previous' button in the record browser.
    */
+  log_action("onPrevRecordClick");
   updateStatus('updating');
   if (gRecordDirty){
     if (!displayAlert('confirmLeavingChangedRecord')){
@@ -377,33 +381,12 @@ function onGetTicketsSuccess(json) {
        $('#tickets').append(ticketToHtml(ticket, i));
     }
     // new ticket link
-    $('.bibEditTicketsMenuSection').append('<div id="newTicketDiv" class="bibEditMenuMore"><a id=newTicketLink href="#" \
-                                               target="_blank" title="Create new ticket">[new ticket]</a>\
-                                            <select id="queue" name="queue" >\
-                                               <option value="0">in Queue:</option>\
-                                            </select></div>');
-    // produce html for every queue
-    var queues = json['queues'];
-    for(var i=0; i < queues.length; i++) {
-      var queue = queues[i];
-      $('#queue').append('<option value="'+ queue.id + '">' + queue.name + '</option>');
-    }
+    $('.bibEditTicketsMenuSection').append(
+      '<div id="newTicketDiv" class="bibEditMenuMore">\
+           <a id=newTicketLink href="#" title="Create new ticket">[new ticket]</a>\
+       </div>');
     // new ticket link
-    $("#newTicketLink").on('click', function(event) {
-      if ($("#queue").val() == 0) {
-        if ($("#queueError").length <= 0) {
-            $("#queue").after('<span id="queueError">\
-                                 Please select a queue\
-                               </span>')
-        }
-        event.preventDefault();
-      }
-      else {
-        $("#queueError").remove();
-        var href = gBIBCATALOG_SYSTEM_RT_URL +'/Ticket/Create.html?Queue=' + $("#queue").val();
-        $(this).attr("href", href);
-      }
-    });
+    $("#newTicketLink").on('click', onCreateNewTicket);
     // preview link
     $(".ticketButtons .bibEditPreviewTicketLink").on('click',function(event) {
       if ($(this).siblings(".bibeditTicketPreviewBox").is(":visible")) {
@@ -432,103 +415,12 @@ function onGetTicketsSuccess(json) {
                   undefined, undefined, errorCallback);
        event.preventDefault();
     });
-    // closeTicket link
-    $(".ticketButtons .bibEditCloseTicketLink").on('click',function(event) {
-       var ticketId = $(this).parent().parent().attr('id').substring(6);// e.g ticket195561
-       $(this).siblings(".bibeditTicketPreviewBox").hide();
-       $("#ticket" + ticketId).children().hide();
-       $("#ticket" + ticketId).children(".ajaxLoader").children().show();
-       $("#ticket" + ticketId).children(".ajaxLoader").show();
-       var errorCallback = onCloseTicketError(ticketId);
-       createReq({recID: gRecID, ticketid:ticketId, requestType: 'closeTicket'}, onCloseTicketSuccess,
-                  undefined, undefined, errorCallback);
-       event.preventDefault();
-    });
   }
   else if(json['resultCode'] == 125) {
     rtConnectionError(json['tickets']);
   }
 }
 
-function onCloseTicketSuccess(json) {
-/*
- * Handle successfull 'closeTicket' requests.
- */
- var ticketID = json['ticketid'];
- //stop ajaxloader
- $("#ticket" + ticketID).children(".ajaxLoader").hide();
- removeTicketError(ticketID);
- if (json['ticket_closed_code'] == 121 && json['ticket_closed_description'] && gRecID) {
-    $("#ticket" + ticketID + " .ticketSpan").children("br:first-child").before(' resolved');
-    $("#ticket" + ticketID + " .ticketSpan").addClass("ticketResolved");
-    // undo link
-    var link = '<a href="#" title="Open ticket" class ="openTicketLink" id="openTicket' + ticketID + '" >Undo</a>';
-    $("#ticket" + ticketID + " .ticketSpan").after(link);
-    $("#openTicket" + ticketID).on('click', function(event) {
-         var ticketId = $(this).attr('id').substring(10);//e.g openTicket195561
-         $("#ticket" + ticketID).children().hide();
-         $("#ticket" + ticketID).children(".ajaxLoader").children().show();
-         $("#ticket" + ticketID).children(".ajaxLoader").show();
-         var errorCallback = onOpenTicketError(ticketId);
-          createReq({recID: gRecID, ticketid:ticketId, requestType: 'openTicket'}, onOpenTicketSuccess,
-                    undefined, undefined, onOpenTicketError);
-         event.preventDefault();
-    });
-    $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-    $("#ticket" + ticketID + " .ticketButtons").hide();
- }
- else {
-    if (json['ticket_closed_code'] == 125) {
-       $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-       rtConnectionError(json['ticket_closed_description']);
-    }
-    else {
-        $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-        addErrorMsg(ticketID, json['ticket_closed_description']);
-    }
- }
-}
-
-function onCloseTicketError(ticketid) {
-  /*
-   * Handle failed 'closeTicket' requests.
-   */
-   return function (XHR, textStatus, errorThrown) {
-      var ticketID = ticketid;
-      //stop ajaxloader
-      $("#ticket" + ticketID).children(".ajaxLoader").hide();
-      removeTicketError(ticketID);
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-        addErrorMsg(ticketID, 'Error occured.Try again');
-    };
-}
-
-function onOpenTicketSuccess(json) {
-/*
- * Handle successfull 'openTicket' requests.
- */
- var ticketID = json['ticketid'];
- //stop ajaxloader
- $("#ticket" + ticketID).children(".ajaxLoader").hide();
- removeTicketError(ticketID);
- if (json['ticket_opened_code'] == 123 && json['ticket_opened_description'] && gRecID) {
-    var span_html = $("#ticket" + ticketID +" .ticketSpan").html();
-    $("#ticket" + ticketID + " .ticketSpan").html(span_html.split(" resolved").join(""));// remove resolved
-    $("#ticket" + ticketID + " .ticketSpan").removeClass("ticketResolved");
-    $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-    $("#openTicket" + ticketID).remove();
- }
- else {
-    if(json['ticket_opened_code'] == 125) {
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-      rtConnectionError(json['ticket_opened_description']);
-    }
-    else {
-      $("#ticket" + ticketID).children(":not(.ajaxLoader)").show();
-      addErrorMsg(ticketID, json['ticket_opened_description']);
-    }
- }
-}
 
 function onOpenTicketError(ticketid) {
 /*
@@ -685,9 +577,259 @@ function updateStatus(statusType, reporttext, enableToolbar){
   $('#cellStatus').html(text);
 }
 
+function onCreateNewTicket(event) {
+  /*
+   * Creates a dialog interface for submitting a new RT ticket.
+   */
+  $(this).unbind(event);
+  var dialogPreview = createDialog("Loading...", "Retrieving data...", 750, 700, true);
+  var errorCallback = onGetNewTicketRTInfoError(dialogPreview);
+  var contentHtml = generateNewTicketHtml();
+  addContentToDialog(dialogPreview, contentHtml, "Do you want to create a new ticket?");
+  dialogPreview.dialogDiv.attr('id', 'newTicketDialog');
+  dialogPreview.dialogDiv.dialog({
+        title: "Confirm submit",
+        close: function() {
+            $("#newTicketLink").on('click', onCreateNewTicket);
+            if ( $('#cancelTicketButton').hasClass("successfulTicket") ) {
+                $("#tickets").children().hide();
+                $("#loadingTickets").show();
+                createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+            }
+            $(this).remove();
+        },
+        buttons: [{
+            text: "Submit ticket",
+            id: "submitTicketButton",
+            click: function() {
+                if ( $(this).find('#Queue').val() == 0 ) {
+                  alert('Please select a queue!');
+                  return false;
+                }
+                var reqData = {
+                    recID: gRecID,
+                    requestType: 'createTicket',
+                    queue: $(this).find('#Queue').val(),
+                    status: $(this).find('#Status').val(),
+                    owner: $(this).find('#Owner').val(),
+                    requestor: $(this).find('#Requestor').val(),
+                    subject: $(this).find('#Subject').val(),
+                    text: $(this).find('#TemplateContent').val() + "\n\n" +
+                    "User's comment:\n\n" + $(this).find('#Content').val(),
+                    priority: ""
+                };
+                makeDialogLoading(dialogPreview, "Submitting ticket...");
+                var successCallback = onCreateTicketSuccess(dialogPreview);
+                var errorCallback = onCreateTicketError(dialogPreview);
+                createReq(reqData, successCallback,
+                undefined, undefined, errorCallback);
+            }
+          },
+          {
+            text: "Cancel",
+            id: "cancelTicketButton",
+            click: function() {
+                          $(this).dialog("close");
+                      }
+          }]
+  });
+
+  createReq({recID: gRecID, requestType: 'getNewTicketRTInfo'}, function(json){
+      if(json['resultCode'] == 0) {
+        var title = "Error: New ticket cannot be created";
+        var message = "Necessary data cannot be retrieved.";
+        displayResponse(dialogPreview, title, message);
+        $('#submitTicketButton').hide();
+        return;
+      }
+      var ticketTemplates = json['ticketTemplates'];
+      var queues = json['queues'];
+      var users = json['users'];
+      var email = json['email'];
+
+      fillQueues(queues, ticketTemplates);
+      fillUsers(users);
+      $('#Requestor').val(email);
+      $('.rtInfoLoader').hide();
+      $('#Queue').show();
+      $('#Owner').show();
+  },undefined, undefined, errorCallback);
+
+  $('#Queue').hide();
+  $('#Owner').hide();
+  $('.rtInfoLoader').show();
+
+  event.preventDefault();
+
+  function fillQueues(queues, ticketTemplates) {
+    /*
+     * Fills queues dropdown list with queues' static and template data.
+     */
+      // Add queues to dropdown content
+      var queuesDropdown = $("#Queue");
+      for (var i = 0; i < queues.length; i++) {
+          var queue = queues[i];
+          queuesDropdown.append('<option value="' + queue.id + '">' + queue.name + "</option>");
+      }
+      // Add template content for queues
+      queuesDropdown.data("previous", queuesDropdown.find("option:selected").text());
+      queuesDropdown.change(function() {
+          var previousQueue = $(this).data("previous");
+          var queue = $(this).find("option:selected").text();
+          $(this).data("previous", queue);
+          if (ticketTemplates[queue] !== undefined) {
+              $("#Subject").val(ticketTemplates[queue].subject);
+              $("#TemplateContent").val(ticketTemplates[queue].content);
+          } else if (ticketTemplates[previousQueue] !== undefined) {
+              $("#Subject").val("");
+              $("#TemplateContent").val("");
+          }
+      });
+  }
+
+  function fillUsers(users) {
+    /*
+     * Fills users dropdown list with users' data.
+     */
+      for (var i = 0; i < users.length; i++) {
+          var user = users[i];
+          $("#Owner").append('<option value="' + user.id + '">' + user.username + "</option>");
+      }
+  }
+}
+
+function displayResponse(dialog, title, message) {
+  /*
+   * Displays response message in the center of the dialog.
+   */
+  addContentToDialog(dialog, message, title);
+  dialog.contentParagraph.addClass('dialog-box-centered');
+  dialog.iconSpan.hide();
+}
+
+function onGetNewTicketRTInfoError(dialog) {
+  /*
+   * Handles unsuccessful request for getting RT informations.
+   */
+   return function(XHR, textStatus, errorThrown) {
+     var title = "Error: New ticket cannot be created";
+     var message = "Necessary data cannot be retrieved.";
+     displayResponse(dialog, title, message);
+     $('#submitTicketButton').hide();
+   };
+}
+
+function onCreateTicketSuccess(dialog) {
+  /*
+   * Handles successful submission of a ticket.
+   */
+    return function(json) {
+      var resultCode = json['ticket_created_code'];
+      var resultMessage = json['ticket_created_description'];
+      var title = "";
+      var message = "";
+      if (resultCode == 126) {
+          title = "Ticket was succesfully submitted";
+          message = 'You can view ticket <a href="' + gBIBCATALOG_SYSTEM_RT_URL +
+          '/Ticket/Display.html?id=' + resultMessage + '" target="_blank">here</a>';
+      }
+      else {
+        title = "Error: Ticket could not be submitted";
+        message = resultMessage;
+      }
+      displayResponse(dialog, title, message);
+      $('#cancelTicketButton .ui-button-text').text("Close window").show();
+      $('#cancelTicketButton').addClass("successfulTicket").show();
+    };
+}
+
+function onCreateTicketError(dialog){
+  /*
+   * Handles unsuccessful submission of a ticket.
+   */
+    return function(XHR, textStatus, errorThrown) {
+        var title = "Error: Ticket could not be submitted";
+        var message = "There was a connection problem";
+        displayResponse(dialog, title, message);
+        $('#cancelTicketButton').show();
+    };
+}
+
 function collapseMenuSections() {
     $('#ImgHistoryMenu').trigger('click');
     $('#ImgViewMenu').trigger('click');
     $('#ImgRecordMenu').trigger('click');
     $('#ImgBibCirculationMenu').trigger('click');
+}
+
+function generateNewTicketHtml() {
+  var html = '\
+        <table id="newTicketTable" border="0" cellpadding="4" cellspacing="0">\
+            <tbody>\
+                <tr>\
+                  <td class="label" width="50px">Queue:</td>\
+                  <td class="value" width="125px">\
+                    <select id="Queue" >\
+                      <option value="0" selected></option>\
+                    </select>\
+                    <div class="rtInfoLoader">\
+                      <img src="/img/indicator.gif">\
+                      <span> loading queues..<span>\
+                    <div>\
+                  </td>\
+                  <td class="label" width="50px">Status:\
+                  </td>\
+                  <td class="value" width="100px">\
+                    <select id="Status">\
+                      <option selected="" value="new">new</option>\
+                      <option value="open">open</option>\
+                      <option value="stalled">stalled</option>\
+                      <option value="resolved">resolved</option>\
+                      <option value="rejected">rejected</option>\
+                      <option value="deleted">deleted</option>\
+                    </select>\
+                  </td>\
+                  <td class="label" width="50px">\
+                    Owner:\
+                  </td>\
+                  <td class="value">\
+                    <select id="Owner">\
+                      <option selected="" value="10">Nobody</option>\
+                    </select>\
+                    <div class="rtInfoLoader">\
+                      <img src="/img/indicator.gif">\
+                      <span> loading users..<span>\
+                    <div>\
+                  </td>\
+                  <input type="hidden" id="Requestor" value="">\
+                </tr>\
+                <tr>\
+                <td class="label">\
+                Subject:\
+                </td>\
+                <td class="value" colspan="5">\
+                <input id="Subject" size="60" maxsize="200" value="">\
+                </td>\
+                </tr>\
+                <tr>\
+                <td colspan="6">\
+                Template content:<br>\
+                <textarea class="messagebox" cols="72" rows="5" wrap="HARD" id="TemplateContent" style="margin-top:5px;"></textarea>\
+                <br>\
+                </td>\
+                </tr>\
+                <tr>\
+                <td colspan="6">\
+                Describe the issue below:<br>\
+                <textarea class="messagebox" cols="72" rows="10" wrap="HARD" id="Content" style="margin-top:5px;"></textarea>\
+                <br>\
+                </td>\
+                </tr>\
+                <tr>\
+                <td align="right" colspan="2">\
+                </td>\
+                </tr>\
+            </tbody>\
+        </table>';
+  return html;
 }

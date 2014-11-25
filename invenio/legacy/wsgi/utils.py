@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -244,24 +245,25 @@ def add_cookies(req, cookies):
     for cookie in cookies:
         req.headers_out.add("Set-Cookie", str(cookie))
 
-def get_cookies(req, Class=Cookie, **kw):
+
+def get_cookies(req, cls=Cookie, **kw):
     """
     A shorthand for retrieveing and parsing cookies given
     a Cookie class. The class must be one of the classes from
     this module.
     """
-
-    if "cookie" not in req.headers_in:
+    if "cookie" not in getattr(req, "headers_in", {}):
         return {}
 
     cookies = req.headers_in["cookie"]
-    if type(cookies) == type([]):
+    if isinstance(cookies, list):
         cookies = '; '.join(cookies)
 
-    return Class.parse(cookies, **kw)
+    return cls.parse(cookies, **kw)
 
-def get_cookie(req, name, Class=Cookie, **kw):
-    cookies = get_cookies(req, Class, names=[name], **kw)
+
+def get_cookie(req, name, cls=Cookie, **kw):
+    cookies = get_cookies(req, cls, names=[name], **kw)
     if name in cookies:
         return cookies[name]
 
@@ -852,7 +854,7 @@ def handle_file_post(req, allowed_mimetypes=None):
     ## Let's read the file
     while True:
         chunk = req.read(min(10240, clen))
-        if len(chunk) < clen:
+        if len(chunk) < min(10240, clen):
             ## We expected to read at least clen (which is different than 0)
             ## but chunk was shorter! Gosh! Error! Panic!
             the_file.close()

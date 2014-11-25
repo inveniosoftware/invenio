@@ -28,12 +28,15 @@ import pstats
 
 from flask.ext.login import current_user
 
-from invenio.utils.json import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
+from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.legacy.bibedit.engine import perform_request_ajax, perform_request_init, \
-    perform_request_newticket, perform_request_compare, \
-    perform_request_init_template_interface, \
-    perform_request_ajax_template_interface
+from invenio.legacy.bibedit.engine import (
+    perform_request_ajax,
+    perform_request_init,
+    perform_request_newticket,
+    perform_request_compare,
+    perform_request_init_template_interface,
+    perform_request_ajax_template_interface)
 from invenio.legacy.bibedit.utils import user_can_edit_record_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.base.i18n import gettext_set_language
@@ -95,22 +98,6 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         """
         uid = current_user.get_id()
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
-        # Abort if the simplejson module isn't available
-        if not CFG_JSON_AVAILABLE:
-            title = 'Record Editor'
-            body = '''Sorry, the record editor cannot operate when the
-                `simplejson' module is not installed.  Please see the INSTALL
-                file.'''
-            return page(title       = title,
-                        body        = body,
-                        errors      = [],
-                        warnings    = [],
-                        uid         = uid,
-                        language    = argd['ln'],
-                        navtrail    = navtrail,
-                        lastupdated = __lastupdated__,
-                        req         = req,
-                        body_css_classes = ['bibedit'])
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid = False, None
@@ -130,7 +117,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                auth_code, auth_message = acc_authorize_action(req,
+                dummy_auth_code, auth_message = acc_authorize_action(req,
                                                                'runbibedit')
                 referer = '/edit/'
                 if self.recid:
@@ -143,7 +130,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                 return json.dumps(json_response)
 
         elif self.recid:
-            # Handle RESTful calls from logged in users by redirecting to
+            # Handle redirects from /record/<record id>/edit
             # generic URL.
             redirect_to_url(req, '%s/%s/edit/#state=edit&recid=%s&recrev=%s' % (
                     CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, ""))
@@ -244,22 +231,6 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         """handle a edit/templates request"""
         uid = current_user.get_id()
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
-        # Abort if the simplejson module isn't available
-        if not CFG_JSON_AVAILABLE:
-            title = 'Record Editor Template Manager'
-            body = '''Sorry, the record editor cannot operate when the
-                `simplejson' module is not installed.  Please see the INSTALL
-                file.'''
-            return page(title       = title,
-                        body        = body,
-                        errors      = [],
-                        warnings    = [],
-                        uid         = uid,
-                        language    = argd['ln'],
-                        navtrail    = navtrail_bibedit,
-                        lastupdated = __lastupdated__,
-                        req         = req,
-                        body_css_classes = ['bibedit'])
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request = False

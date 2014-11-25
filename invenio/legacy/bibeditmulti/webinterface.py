@@ -235,7 +235,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             elif action == self._subfield_action_types.replace_text:
                 subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield, additional_values=additional_values)
             else:
-                subfield_command = multi_edit_engine.BaseFieldCommand(subfield_code, value, new_value)
+                raise ValueError("Invalid action: %s" % action)
 
             commands_list.append(subfield_command)
 
@@ -278,8 +278,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             elif action == self._field_action_types.update:
                 command = multi_edit_engine.UpdateFieldCommand(tag, ind1, ind2, subfield_commands)
             else:
-                # if someone send wrong action type, we use empty command
-                command = multi_edit_engine.BaseFieldCommand()
+                raise ValueError("Invalid action: %s" % action)
 
             commands_list.append(command)
 

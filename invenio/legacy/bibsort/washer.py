@@ -1,7 +1,7 @@
-## -*- mode: python; coding: utf-8; -*-
+# -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,12 +19,13 @@
 
 """Applies a transformation function to a value"""
 
-from time import strptime
-from invenio.utils.date import strftime
-from invenio.utils.text import strip_accents
+import re
+from invenio.utils.date import strftime, strptime
+from invenio.utils.text import decode_to_unicode, translate_to_ascii
 
 LEADING_ARTICLES = ['the', 'a', 'an', 'at', 'on', 'of']
 
+_RE_NOSYMBOLS = re.compile("\w+")
 
 class InvenioBibSortWasherNotImplementedError(Exception):
     """Exception raised when a washer method
@@ -60,10 +61,11 @@ class BibSortWasher(object):
         """
         if not val:
             return ''
-        val_tokens = str(val).split(" ", 1) #split in leading_word, phrase_without_leading_word
-        if len(val_tokens) == 2 and val_tokens[0].lower() in LEADING_ARTICLES:
-            return strip_accents(val_tokens[1].strip().lower())
-        return strip_accents(val.lower())
+        val = translate_to_ascii(val).pop().lower()
+        val_tokens = val.split(" ", 1) #split in leading_word, phrase_without_leading_word
+        if len(val_tokens) == 2 and val_tokens[0].strip() in LEADING_ARTICLES:
+            return val_tokens[1].strip()
+        return val.strip()
 
     def _sort_alphanumerically_remove_leading_articles(self, val):
         """
@@ -74,22 +76,29 @@ class BibSortWasher(object):
         """
         if not val:
             return ''
-        val_tokens = str(val).split(" ", 1) #split in leading_word, phrase_without_leading_word
-        if len(val_tokens) == 2 and val_tokens[0].lower() in LEADING_ARTICLES:
-            return val_tokens[1].strip().lower()
-        return val.lower()
+        val = decode_to_unicode(val).lower().encode('UTF-8')
+        val_tokens = val.split(" ", 1) #split in leading_word, phrase_without_leading_word
+        if len(val_tokens) == 2 and val_tokens[0].strip() in LEADING_ARTICLES:
+            return val_tokens[1].strip()
+        return val.strip()
 
     def _sort_case_insensitive_strip_accents(self, val):
         """Remove accents and convert to lower case"""
         if not val:
             return ''
-        return strip_accents(str(val).lower())
+        return translate_to_ascii(val).pop().lower()
+
+    def _sort_nosymbols_case_insensitive_strip_accents(self, val):
+        """Remove accents, remove symbols, and convert to lower case"""
+        if not val:
+            return ''
+        return ''.join(_RE_NOSYMBOLS.findall(translate_to_ascii(val).pop().lower()))
 
     def _sort_case_insensitive(self, val):
         """Conversion to lower case"""
         if not val:
             return ''
-        return str(val).lower()
+        return decode_to_unicode(val).lower().encode('UTF-8')
 
     def _sort_dates(self, val):
         """

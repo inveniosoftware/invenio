@@ -2519,8 +2519,16 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
         if stemming_language:
             word0 = lower_index_term(word0)
             word1 = lower_index_term(word1)
-            word0 = stem(word0, stemming_language)
-            word1 = stem(word1, stemming_language)
+            # We remove trailing truncation character before stemming
+            if word0.endswith('%'):
+                word0 = stem(word0[:-1], stemming_language) + '%'
+            else:
+                word0 = stem(word0, stemming_language)
+            if word1.endswith('%'):
+                word1 = stem(word1[:-1], stemming_language) + '%'
+            else:
+                word1 = stem(word1, stemming_language)
+
         word0_washed = wash_index_term(word0)
         word1_washed = wash_index_term(word1)
         if f.endswith('count'):
@@ -2544,7 +2552,11 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
             word = re_word.sub('', word)
         if stemming_language:
             word = lower_index_term(word)
-            word = stem(word, stemming_language)
+            # We remove trailing truncation character before stemming
+            if word.endswith('%'):
+                word = stem(word[:-1], stemming_language) + '%'
+            else:
+                word = stem(word, stemming_language)
         if word.find('%') >= 0: # do we have wildcard in the word?
             if f == 'journal':
                 # FIXME: quick hack for the journal index
@@ -5757,8 +5769,8 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl, pl_in_url = "", "" # no limits by default
-    if action != "browse" and req and not isinstance(req, cStringIO.OutputType) \
-           and req.args and not isinstance(req.args, dict): # we do not want to add options while browsing or while calling via command-line
+    if action != "browse" and req and not isinstance(req, (cStringIO.OutputType, dict)) \
+           and getattr(req, 'args', None): # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldcode in fieldargs:

@@ -88,11 +88,11 @@ CFG_BIBEDIT_REQUESTS_UNTIL_SAVE = 3
 ## by the Ajax engine.
 
 CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
-#TODO: all the result codes should be accessible through the constants rather than
-#      a direct number ! some parts of the bibedit_engine.py are not readable because
-#      of using the numbers
-#      The dictionary is convenient at this place because it can be imported with one command
-#      unlike a number of constants
+    #TODO: all the result codes should be accessible through the constants rather than
+    #      a direct number ! some parts of the bibedit_engine.py are not readable because
+    #      of using the numbers
+    #      The dictionary is convenient at this place because it can be imported with one command
+    #      unlike a number of constants
     'record_submitted': 4,
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
@@ -100,7 +100,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'autosuggestion_scanned' : 36,
     'error_rec_locked_by_user' : 104,
     'error_rec_locked_by_queue' : 105,
-    'error_wrong_cache_file_format' : 111,
+    'server_error' : 111,
     'error_physical_copies_exist': 112,
     'cache_updated_with_references': 114,
     'textmarc_parsing_error' : 115,
@@ -113,7 +113,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_ticket_closed': 122,
     'ticket_opened' : 123,
     'error_ticket_opened': 124,
-    'error_rt_connection': 125
+    'error_rt_connection': 125,
+    'ticket_created' : 126,
+    'error_ticket_created': 127
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
@@ -231,3 +233,33 @@ CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS = 0
 # - 1: protected with a warning (that can be bypassed)
 # - 2: fully protected (cannot delete internal DOIs field and record)
 CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL = 2
+
+# CFG_BIBEDIT_AUTOCOMPLETE -- Dictionary containing information about
+# the Knowledge Bases which are used for every field that is autocompleted.
+# Depending on the collection that the record belongs, different settings
+# can be applied.
+# Settings included in COMMON dictionary which must always be included
+# in the dictionary are applied to all records.
+# If setings for a field are included both to the COMMON dict and
+# to the dict of the collection that the record belongs priority
+# is given to the record's collection settings.
+# Available settings:
+#     kb(string): Knowledge Base's name
+#     fixed(boolean): the results are displayed in a dropdown list and
+#                     the user can't provide any search term,
+#                     when set to true, searchChars setting must be set to 0.
+#     searchMethod(string: startsWith,contains): the method used to filter results
+#     searchChars(int): sets after how many given chars from user,
+#                       autocomplete search function is called
+#     preload(boolean): sets whether Knowledge Base's data are retrieved
+#                       on page load or when field is being filled.
+#
+#     Example:
+#
+#     CFG_BIBEDIT_AUTOCOMPLETE = {
+#          'COMMON' : {
+#               '100__u' : { 'kb' : 'InstitutionsCollection', 'fixed' : False,
+#               'searchMethod' : 'startsWith', 'searchChars' : 2, 'preload' : False },
+#          }
+#     }
+CFG_BIBEDIT_AUTOCOMPLETE = {'COMMON': {}}

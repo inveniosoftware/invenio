@@ -37,11 +37,7 @@ try:
 except ImportError:
     CHARDET_AVAILABLE = False
 
-try:
-    from unidecode import unidecode
-    UNIDECODE_AVAILABLE = True
-except ImportError:
-    UNIDECODE_AVAILABLE = False
+from unidecode import unidecode
 
 CFG_LATEX_UNICODE_TRANSLATION_CONST = {}
 
@@ -624,18 +620,17 @@ def translate_to_ascii(values):
     for index, value in enumerate(values):
         if not value:
             continue
-        if not UNIDECODE_AVAILABLE:
-            ascii_text = strip_accents(value)
-        else:
-            encoded_text, encoding = guess_minimum_encoding(value)
-            unicode_text = unicode(encoded_text.decode(encoding))
-            decoded_text = ""
+        unicode_text = decode_to_unicode(value)
+        if u"[?]" in unicode_text:
+            decoded_text = []
             for unicode_char in unicode_text:
                 decoded_char = unidecode(unicode_char)
                 # Skip unrecognized characters
                 if decoded_char != "[?]":
-                    decoded_text += decoded_char
-            ascii_text = decoded_text.encode('ascii')
+                    decoded_text.append(decoded_char)
+            ascii_text = ''.join(decoded_text).encode('ascii')
+        else:
+            ascii_text = unidecode(unicode_text).replace(u"[?]", u"").encode('ascii')
         values[index] = ascii_text
     return values
 
@@ -814,11 +809,7 @@ def transliterate_ala_lc(value):
     """
     if not value:
         return value
-    if UNIDECODE_AVAILABLE:
-        text = unidecode(value)
-    else:
-        text = translate_to_ascii(value)
-        text = text.pop()
+    text = unidecode(value)
     return text
 
 
