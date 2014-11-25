@@ -26,7 +26,7 @@ from invenio.bibauthorid_dbinterface import _get_doi_for_paper, \
     get_orcid_id_of_author, get_papers_of_author, get_token, get_all_tokens, \
     delete_token, trigger_aidtoken_change
 from invenio.bibauthorid_general_utils import get_doi
-from invenio.bibcatalog import BIBCATALOG_SYSTEM
+from invenio.errorlib import register_exception
 from invenio.bibformat import format_record as bibformat_record
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
     record_get_field_instances
@@ -77,9 +77,7 @@ def get_dois_from_orcid_using_pid(pid):
     try:
         orcid_id = get_orcid_id_of_author(pid)[0][0]
     except IndexError:
-        formatted = get_pretty_traceback()
-        BIBCATALOG_SYSTEM.ticket_submit(subject='Wrong response content',
-                                        text=formatted)
+        register_exception(alert_admin=True)
         orcid_id = None
     return orcid_id, get_dois_from_orcid(orcid_id)
 
@@ -277,9 +275,7 @@ def _get_access_token_from_orcid(scope, extra_params=None):
         try:
             res = json.loads(response.content)['access_token']
         except KeyError:
-            formatted = get_pretty_traceback()
-            BIBCATALOG_SYSTEM.ticket_submit(subject='Wrong response content',
-                                            text=formatted)
+            register_exception(alert_admin=True)
             return None
     return res
 
