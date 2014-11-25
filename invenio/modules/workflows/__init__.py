@@ -187,8 +187,8 @@ we get 4 objects back as each object passed have a snapshot created.
     before the workflow started. These are created to allow for objects to
     be easily restarted in the workflow with the initial data intact.
 
-You can also query the engine instance to only give you the completed, halted
-or initial objects.
+You can also query the engine instance to only give you the objects which are in
+a certain state.
 
 .. code-block:: python
 
@@ -198,9 +198,23 @@ or initial objects.
 
     len(eng.completed_objects)  # outputs: 0
 
+    len(eng.running_objects)  # outputs: 0
+
+    len(eng.waiting_objects)  # outputs: 0
+
+    len(eng.error_objects)  # outputs: 0
+
 (`eng.completed_objects` is empty because both objects passed is halted.)
 
-For example, to retrieve the data from the first object, you can use
+This output is actually representative of snapshots of the objects, not the
+objects themselves. The _default_ snapshotting behaviour is also evident here:
+There is one snapshot taken in the beginning of the execution and one
+when the object reaches one of the other states. A snapshot can only be in a
+single state.
+
+No object will ever be in the `running` state under usual operation.
+
+Moreover, to retrieve the data from the first object, you can use
 `get_data()` as with single objects:
 
 .. code-block:: python

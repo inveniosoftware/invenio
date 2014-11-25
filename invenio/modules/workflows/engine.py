@@ -192,32 +192,42 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         """Return the objects associated with this workflow."""
         return self.db_obj.objects
 
-    @property
-    def final_objects(self):
-        """Return the objects associated with this workflow."""
+    def objects_of_statuses(self, statuses):
         results = []
         for obj in self.db_obj.objects:
-            if obj.version in [ObjectVersion.FINAL]:
+            if obj.version in statuses:
                 results.append(obj)
         return results
+
+    @property
+    def completed_objects(self):
+        """Return completed objects."""
+        return self.objects_of_statuses([ObjectVersion.FINAL])
 
     @property
     def halted_objects(self):
-        """Return the objects associated with this workflow."""
-        results = []
-        for obj in self.db_obj.objects:
-            if obj.version in [ObjectVersion.HALTED]:
-                results.append(obj)
-        return results
+        """Return halted objects."""
+        return self.objects_of_statuses([ObjectVersion.HALTED])
 
     @property
     def running_objects(self):
-        """Return the objects associated with this workflow."""
-        results = []
-        for obj in self.db_obj.objects:
-            if obj.version in [ObjectVersion.RUNNING]:
-                results.append(obj)
-        return results
+        """Return running objects."""
+        return self.objects_of_statuses([ObjectVersion.RUNNING])
+
+    @property
+    def initial_objects(self):
+        """Return initial objects."""
+        return self.objects_of_statuses([ObjectVersion.INITIAL])
+
+    @property
+    def waiting_objects(self):
+        """Return waiting objects."""
+        return self.objects_of_statuses([ObjectVersion.WAITING])
+
+    @property
+    def error_objects(self):
+        """Return error objects."""
+        return self.objects_of_statuses([ObjectVersion.ERROR])
 
     def __getstate__(self):
         """Pickling needed functions."""
