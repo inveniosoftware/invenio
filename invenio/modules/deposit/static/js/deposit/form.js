@@ -110,13 +110,23 @@ define(function(require, exports, module) {
       }
       var fields = $(selector).serializeArray(),
           uploader = this.select('uploaderSelector'),
-          $checkboxes = $('input[type=checkbox]:not(:checked)');
+          $checkboxes = $('input[type=checkbox]:not(:checked)'),
+          $bootstrap_multiselect = $("[multiple=multiple]");
 
       if (uploader.length) {
         fields.push({
           name: 'files',
           value: uploader.data('getOrderedFileList')()
         });
+      }
+
+      if ($bootstrap_multiselect.length && !$bootstrap_multiselect.val()) {
+        fields = fields.concat(
+          $bootstrap_multiselect.map(
+              function() {
+                return {name: this.name, value: $(this).val()}
+              }).get()
+        );
       }
 
       if ($checkboxes.length) {
@@ -598,7 +608,7 @@ define(function(require, exports, module) {
   }
 
   this.onCheckboxChanged = function (event) {
-    if(event.target.name.indexOf('__input__') == -1){
+    if(event.target.name.indexOf('__input__') == -1 && event.target.name ){
       if ($(event.target).prop("checked")) {
         save_field(this.attr.save_url, event.target.name, event.target.value);
       } else {
