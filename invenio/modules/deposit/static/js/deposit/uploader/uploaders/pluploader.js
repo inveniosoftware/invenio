@@ -31,7 +31,8 @@ define(function(require) {
             url: "http://httpbin.org/post",
             drop_element: null,
             max_file_size: null,
-            preupload_hooks: {}
+            preupload_hooks: {},
+            filters: {prevent_duplicates: true}
         });
 
 
@@ -46,9 +47,7 @@ define(function(require) {
                 drop_element: this.attr.drop_element,
                 dragdrop: true,
 
-                filters: {
-                    prevent_duplicates: true
-                }
+                filters: this.attr.filters
             });
 
             /**
