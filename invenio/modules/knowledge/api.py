@@ -432,7 +432,7 @@ def get_kbs_info(kbtype="", searchkbname=""):
     if searchkbname:
         query = query.filter_by(name=searchkbname)
 
-    return [row.to_dict() for row in models.KnwKB.query.all()]
+    return [row.to_dict() for row in query.all()]
 
 
 def get_kba_values(kb_name, searchname="", searchtype="s"):
