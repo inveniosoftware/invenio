@@ -33,7 +33,7 @@ define(function(require) {
         this.handleErrorOccurred = function(ev, error) {
             var html = "";
             this.$node.css("visibility", "visible");
-            html = erroListRow(error);
+            html = errorListRow(error);
             this.select('errorListSelector').append(html);
         };
 
