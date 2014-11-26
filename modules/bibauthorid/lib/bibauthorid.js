@@ -2431,6 +2431,13 @@ $(document).ready(function() {
                             $modal = $("#ticket-modal");
 
                         $confirmButton.click( function() {
+                            $modal.find(".modal-body").html('<div id="spinDiv">' +
+                            '<span id="hepSpin"></span></div>');
+                            var spin = new Spinner({corners: 0.8}).spin().el;
+                            $modal.find("#hepSpin").append(spin);
+                            $modal.find(".modal-footer>a.confirm").addClass("disabled");
+                            $modal.find(".modal-footer>a.back").addClass("disabled");
+                            $modal.find(".modal-header>.modal-title").text("Please wait");
                             $.ajax({
                                 url: "/author/claim/action",
                                 data: $form.serialize(),
@@ -2438,7 +2445,7 @@ $(document).ready(function() {
                                     $modal.find(".modal-body").html("<p>Profile merge will be processed soon.</p>");
                                     $modal.find(".modal-header>.modal-title").text("Thank You");
                                     $modal.find(".modal-footer>a.confirm").remove();
-                                    $modal.find(".modal-footer>a.back").text("Close");
+                                    $modal.find(".modal-footer>a.back").removeClass("disabled").text("Close");
                                     $form.data({"mergeConfirmed": true});
                                 },
                                 error: function (jqXHR, status, data) {
