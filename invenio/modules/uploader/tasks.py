@@ -19,15 +19,16 @@
 
 """Uploader celery tasks."""
 
-from werkzeug.utils import import_string
 from workflow.engine import GenericWorkflowEngine as WorkflowEngine
 
 from invenio.base.globals import cfg
 from invenio.celery import celery
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.records.api import Record
+from invenio.modules.workflows.registry import workflows
 
 from . import signals
+from .errors import UploaderException
 
 
 @celery.task
@@ -69,13 +70,16 @@ def run_workflow(records, name, **kwargs):
     #FIXME: don't know why this is needed but IT IS!
     records = records[0]
 
-    workflow = import_string(cfg['UPLOADER_WORKFLOWS'][name])
-    _run_pre_post_tasks(workflow['pre_tasks'])
+    if name in cfg['UPLOADER_WORKFLOWS']:
+        workflow = workflows.get(name)
+    else:
+        raise UploaderException("Workflow {0} not in UPLOADER_WORKFLOWS".format(name))
+    _run_pre_post_tasks(workflow.pre_tasks)
     wfe = WorkflowEngine()
-    wfe.setWorkflow(workflow['tasks'])
+    wfe.setWorkflow(workflow.tasks)
     wfe.setVar('options', kwargs)
     wfe.process(records)
-    _run_pre_post_tasks(workflow['post_tasks'])
+    _run_pre_post_tasks(workflow.post_tasks)
     signals.uploader_finished.send(uploader_workflow=name,
                                    result=records, **kwargs)
     return records

@@ -20,7 +20,7 @@
 """Default workflows for insert records using the uploader.
 
 :py:data:`insert`
-:py:data:`undo`
+:py:data:`insert.undo`
 """
 
 from workflow.patterns import IF
@@ -39,11 +39,16 @@ from invenio.modules.uploader.uploader_tasks import \
     update_pidstore,\
     validate
 
-insert = dict(
-    pre_tasks=[
+
+class insert(object):
+
+    """Default insert workflow."""
+
+    pre_tasks = [
         create_records_for_workflow,
-    ],
-    tasks=[
+    ]
+
+    tasks = [
         retrieve_record_id_from_pids(step=0),
         IF(
             lambda obj, eng: obj[1].get('recid') and
@@ -65,24 +70,16 @@ insert = dict(
         update_pidstore(step=6),
         save_master_format(step=7),
         legacy(step=8),
-    ],
-    post_tasks=[
+    ]
+
+    post_tasks = [
         return_recordids_only,
     ]
-)
-"""
-Defaul insert workflow.
 
-TBC.
-"""
+    class undo(object):
 
-undo = dict(
-    pre_tasks=[],
-    tasks=[],
-    post_tasks=[]
-)
-"""
-Default undo steps for the insert workflow.
+        """Default undo steps for the insert workflow."""
 
-TBC.
-"""
+        pre_tasks = []
+        tasks = []
+        post_tasks = []
