@@ -84,6 +84,23 @@ def get_all_kb_names():
 get_kb_by_name_memoised = Memoise(get_kb_by_name)
 
 
+def query_kb_mappings(kbid, sortby="to", key="", value="",
+                      match_type="s"):
+    """Return a list of all mappings from the given kb, ordered by key.
+
+    If key given, give only those with left side (mapFrom) = key.
+    If value given, give only those with right side (mapTo) = value.
+
+    :param kb_name: knowledge base name. if "", return all
+    :param sortby: the sorting criteria ('from' or 'to')
+    :param key: return only entries where key matches this
+    :param value: return only entries where value matches this
+    :param match_type: s=substring, e=exact, sw=startswith
+    """
+    return models.KnwKBRVAL.query_kb_mappings(kbid, sortby, key,
+                                              value, match_type)
+
+
 def get_kb_mappings(kb_name="", key="", value="", match_type="s", sortby="to",
                     limit=None):
     """Return a list of all mappings from the given kb, ordered by key.
@@ -627,6 +644,56 @@ def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
     # the tmp dyn kb is now useless, delete it
     delete_kb(kb_name)
     return myvalues
+
+
+def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
+    """
+    Get items from taxonomy file using a templatefile.
+
+    If searchwith is defined, return only items that match with it.
+    :param taxonomyfilename: full path+name of the RDF file
+    :param templatefile: full path+name of the XSLT file
+    :param searchwith: a term to search with
+    """
+    if processor_type == 1:
+        # lxml
+        doc = etree.XML(taxonomyfilename)
+        styledoc = etree.XML(templatefilename)
+        style = etree.XSLT(styledoc)
+        result = style(doc)
+        strres = str(result)
+        del result
+        del style
+        del styledoc
+        del doc
+    elif processor_type == 2:
+        # libxml2 & libxslt
+        styledoc = libxml2.parseFile(templatefilename)
+        style = libxslt.parseStylesheetDoc(styledoc)
+        doc = libxml2.parseFile(taxonomyfilename)
+        result = style.applyStylesheet(doc, None)
+        strres = style.saveResultToString(result)
+        style.freeStylesheet()
+        doc.freeDoc()
+        result.freeDoc()
+    else:
+        # no xml parser found
+        strres = ""
+
+    ritems = []
+    if len(strres) == 0:
+        return []
+    else:
+        lines = strres.split("\n")
+        for line in lines:
+            if searchwith:
+                if line.count(searchwith) > 0:
+                    ritems.append(line)
+            else:
+                if len(line) > 0:
+                    ritems.append(line)
+
+    return ritems
 
 
 def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):

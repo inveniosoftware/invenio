@@ -30,6 +30,12 @@ class KnwKB(db.Model):
 
     """Represent a KnwKB record."""
 
+    KNWKB_TYPES = {
+        'written_as': 'w',
+        'dynamic': 'd',
+        'taxonomy': 't',
+    }
+
     __tablename__ = 'knwKB'
     id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
                    primary_key=True, autoincrement=True)
@@ -92,6 +98,11 @@ class KnwKB(db.Model):
         :param searchtype s=substring, e=exact, sw=startswith
         :return a list of dictionaries [{'key'=>x, 'value'=>y},..]
         """
+        import warnings
+        warnings.warn("The function is deprecated. Please use the "
+                      "`KnwKBRVAL.query_kb_mappings()` instead. "
+                      "E.g. [kval.to_dict() for kval in "
+                      "KnwKBRVAL.query_kb_mappings(kb_id).all()]")
         if searchtype == 's' and searchkey:
             searchkey = '%'+searchkey+'%'
         if searchtype == 's' and searchvalue:
@@ -119,6 +130,11 @@ class KnwKB(db.Model):
         :param searchtype s=substring, e=exact, sw=startswith
         :return a list of dictionaries [{'key'=>x, 'value'=>y},..]
         """
+        import warnings
+        warnings.warn("The function is deprecated. Please use the "
+                      "`KnwKBRVAL.query_kb_mappings()` instead. "
+                      "E.g. [(kval.m_value,) for kval in "
+                      "KnwKBRVAL.query_kb_mappings(kb_id).all()]")
         # prepare filters
         if searchtype == 's':
             searchkey = '%'+searchkey+'%'
@@ -199,6 +215,48 @@ class KnwKBRVAL(db.Model):
             'kbrvals',
             cascade="all, delete-orphan",
             collection_class=attribute_mapped_collection("m_key")))
+
+    @staticmethod
+    def query_kb_mappings(kbid, sortby="to", key="", value="",
+                          match_type="s"):
+        """Return a list of all mappings from the given kb, ordered by key.
+
+        If key given, give only those with left side (mapFrom) = key.
+        If value given, give only those with right side (mapTo) = value.
+
+        :param kb_name: knowledge base name. if "", return all
+        :param sortby: the sorting criteria ('from' or 'to')
+        :param key: return only entries where key matches this
+        :param value: return only entries where value matches this
+        :param match_type: s=substring, e=exact, sw=startswith
+        """
+        # query
+        query = KnwKBRVAL.query.filter(
+            KnwKBRVAL.id_knwKB == kbid)
+        # filter
+        if len(key) > 0:
+            if match_type == "s":
+                key = "%"+key+"%"
+            elif match_type == "sw":
+                key = key+"%"
+        else:
+            key = '%'
+        if len(value) > 0:
+            if match_type == "s":
+                value = "%"+value+"%"
+            elif match_type == "sw":
+                value = value+"%"
+        else:
+            value = '%'
+        query = query.filter(
+            KnwKBRVAL.m_key.like(key),
+            KnwKBRVAL.m_value.like(value))
+        # order by
+        if sortby == "from":
+            query = query.order_by(KnwKBRVAL.m_key)
+        else:
+            query = query.order_by(KnwKBRVAL.m_value)
+        return query
 
     def to_dict(self):
         """Return a dict representation of KnwKBRVAL."""
