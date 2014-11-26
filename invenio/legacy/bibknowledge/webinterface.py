@@ -76,6 +76,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
                                    'expression': (str, ''),  # for dynamic kbs
                                    'collection': (str, ''),  # for dynamic kbs
                                    'kbname': (str, ''),  # for exporting
+                                   'searchtype': (str, ''),  # for exporting
                                    'format': (str, ''),  # for exporting
                                    # for exporting to JQuery UI
                                    'term': (str, ''),
@@ -108,6 +109,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         delete_mapping = argd['delete_mapping']
         kbname = argd['kbname']
         format = argd['format']
+        searchtype = argd['searchtype']
         limit = argd['limit']
 
         req.argd = argd  # needed by some lower level modules
@@ -121,6 +123,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
                                                format=format, ln=ln,
                                                searchkey=searchkey,
                                                searchvalue=term,
+                                               searchtype=searchtype,
                                                limit=limit)
 
         # first check if this is a specific action
