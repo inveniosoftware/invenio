@@ -17,10 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.record.models
-    -----------------------------
-"""
+"""Record models."""
 
 from invenio.ext.sqlalchemy import db
 from flask import current_app
@@ -28,7 +25,8 @@ from werkzeug import cached_property
 
 
 class Record(db.Model):
-    """Represents a record object inside the SQL database"""
+
+    """Represent a record object inside the SQL database."""
 
     __tablename__ = 'bibrec'
 
@@ -52,9 +50,7 @@ class Record(db.Model):
 
     @property
     def deleted(self):
-        """
-           Return True if record is marked as deleted.
-        """
+        """Return True if record is marked as deleted."""
         from invenio.legacy.bibrecord import get_fieldvalues
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(self.id, "980__%")
@@ -65,7 +61,7 @@ class Record(db.Model):
 
     @staticmethod
     def _next_merged_recid(recid):
-        """ Returns the ID of record merged with record with ID = recid """
+        """Return the ID of record merged with record with ID = recid."""
         from invenio.legacy.bibrecord import get_fieldvalues
         merged_recid = None
         for val in get_fieldvalues(recid, "970__d"):
@@ -82,20 +78,16 @@ class Record(db.Model):
 
     @cached_property
     def merged_recid(self):
-        """ Return the record object with
-        which the given record has been merged.
-        @param recID: deleted record recID
-        @type recID: int
-        @return: merged record recID
-        @rtype: int or None
+        """Return record object with which the given record has been merged.
+
+        :param recID: deleted record recID
+        :return: merged record recID
         """
         return Record._next_merged_recid(self.id)
 
     @property
     def merged_recid_final(self):
-        """ Returns the last record from hierarchy of
-            records merged with this one """
-
+        """Return the last record from hierarchy merged with this one."""
         cur_id = self.id
         next_id = Record._next_merged_recid(cur_id)
 
@@ -107,7 +99,7 @@ class Record(db.Model):
 
     @cached_property
     def is_restricted(self):
-        """Returns True is record is restricted."""
+        """Return True is record is restricted."""
         from invenio.legacy.search_engine import \
             get_restricted_collections_for_recid
 
@@ -122,14 +114,15 @@ class Record(db.Model):
 
     @cached_property
     def is_processed(self):
-        """Returns True is recods is processed (not in any collection)."""
+        """Return True is recods is processed (not in any collection)."""
         from invenio.legacy.search_engine import is_record_in_any_collection
         return not is_record_in_any_collection(self.id,
                                                recreate_cache_if_needed=False)
 
 
 class RecordMetadata(db.Model):
-    """Represents a json record inside the SQL database"""
+
+    """Represent a json record inside the SQL database."""
 
     __tablename__ = 'record_json'
 
@@ -145,5 +138,5 @@ class RecordMetadata(db.Model):
 
     record = db.relationship(Record, backref='record_json')
 
-__all__ = ['Record',
-           'RecordMetadata', ]
+__all__ = ('Record',
+           'RecordMetadata', )
