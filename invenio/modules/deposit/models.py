@@ -936,7 +936,8 @@ class Deposition(object):
             self.workflow_object = BibWorkflowObject.create_object(
                 id_user=user_id,
             )
-            self.workflow_object.set_data({})
+            # Ensure default data is set for all objects.
+            self.update()
         else:
             self.__setstate__(workflow_object.get_data())
         self.engine = None
