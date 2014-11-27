@@ -502,7 +502,7 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
             kb = get_kb_by_name(kb_name)
     except NoResultFound:
         return []
-    return kb.get_kbr_values(searchkey, searchvalue, searchtype)
+    return list(kb.get_kbr_values(searchkey, searchvalue, searchtype))
 
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
