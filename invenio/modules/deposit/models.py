@@ -1353,6 +1353,7 @@ class Deposition(object):
         if not t.authorize(None, 'create'):
             raise ForbiddenAction('create')
 
+        # Note: it is correct to pass 'type' and not 't' below to constructor.
         obj = cls(None, type=type, user_id=user.get_id())
         return obj
 
@@ -1369,8 +1370,11 @@ class Deposition(object):
             type = DepositionType.get(type)
 
         try:
-            workflow_object = BibWorkflowObject.query.filter_by(
-                id=object_id
+            workflow_object = BibWorkflowObject.query.filter(
+                BibWorkflowObject.id == object_id,
+                # id_user!=0 means current version, as opposed to some snapshot
+                # version.
+                BibWorkflowObject.id_user != 0,
             ).one()
         except NoResultFound:
             raise DepositionDoesNotExists(object_id)
@@ -1391,6 +1395,8 @@ class Deposition(object):
 
         if user:
             params.append(BibWorkflowObject.id_user == user.get_id())
+        else:
+            params.append(BibWorkflowObject.id_user != 0)
 
         if type:
             params.append(Workflow.name == type.get_identifier())
