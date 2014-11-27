@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -62,6 +62,7 @@ keys:
 - ``authorized_handler`` - Import path to authorized callback handler.
 - ``disconnect_handler`` - Import path to disconnect callback handler.
 - ``signup_handler`` - A dictionary of import path to sign up callback handler.
+- ``remember`` - Boolean indicating if the session should be permament.
 
 .. code-block:: python
 
@@ -78,6 +79,7 @@ keys:
                 view="...",
             ),
             params=dict(...),
+            remember=True
             )
         )
     )

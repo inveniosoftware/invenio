@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,10 +47,11 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
     return None
 
 
-def oauth_authenticate(client_id, userinfo, require_existing_link=False):
+def oauth_authenticate(client_id, userinfo, require_existing_link=False,
+                       remember=False):
     """ Authenticate an oauth authorized callback. """
     # Authenticate via the access token (access token used to get user_id)
-    if userinfo and authenticate(userinfo['email']):
+    if userinfo and authenticate(userinfo['email'], remember=remember):
         if require_existing_link:
             account = RemoteAccount.get(userinfo.get_id(), client_id)
             if account is None:

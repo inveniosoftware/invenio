@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -214,7 +214,8 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
         # Authenticate user
         if not oauth_authenticate(remote.consumer_key, user,
-                                  require_existing_link=False):
+                                  require_existing_link=False,
+                                  remember=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('remember', False)):
             return current_app.login_manager.unauthorized()
 
         # Link account
@@ -286,7 +287,8 @@ def signup_handler(remote, *args, **kwargs):
 
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
-                                  require_existing_link=False):
+                                  require_existing_link=False,
+                                  remember=cfg['OAUTHCLIENT_REMOTE_APPS'][remote.name].get('remember', False)):
             return current_app.login_manager.unauthorized()
 
         # Link account and set session data

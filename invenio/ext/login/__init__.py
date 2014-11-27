@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 import urllib
 
 from .legacy_user import UserInfo
-from flask import request, flash, g, url_for, redirect
+from flask import request, flash, g, url_for, redirect, session
 from flask.ext.login import (
     LoginManager,
     current_user,
@@ -93,7 +93,7 @@ def login_redirect(referer=None):
 
 
 def authenticate(nickname_or_email=None, password=None,
-                 login_method='Local'):
+                 login_method='Local', remember=False):
     """
     Find user identified by given information and login method.
 
@@ -129,8 +129,9 @@ def authenticate(nickname_or_email=None, password=None,
         flash(_("You have not yet confirmed the email address for the \
             '%(login_method)s' authentication method.",
               login_method=login_method), 'warning')
-
-    return login_user(user.id)
+    if remember:
+        session.permanent = True
+    return login_user(user.id, remember=remember)
 
 
 def setup_app(app):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -57,12 +57,12 @@ blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
                  'password': (unicode, None),
                  'login_method': (wash_login_method, 'Local'),
                  'action': (unicode, ''),
-                 'remember_me': (bool, False),
+                 'remember': (bool, False),
                  'referer': (unicode, None)})
 @register_breadcrumb(blueprint, '.login', _('Login'))
 @ssl_required
 def login(nickname=None, password=None, login_method=None, action='',
-          remember_me=False, referer=None):
+          remember=False, referer=None):
     if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
         return abort(401)  # page is not authorized
 
@@ -82,7 +82,8 @@ def login(nickname=None, password=None, login_method=None, action='',
     if request.method == "POST":
         try:
             if login_method == 'Local' and form.validate_on_submit() and \
-               authenticate(nickname, password, login_method=login_method):
+               authenticate(nickname, password, login_method=login_method,
+                            remember=remember):
                 flash(
                     _("You are logged in as %(nick)s.", nick=nickname),
                     "success"

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -85,7 +85,7 @@ def wash_urlargd(form, content):
 
         # Since we got here, 'value' is sure to be a single symbol,
         # not a list kind of structure anymore.
-        if dst_type in (int, float, long):
+        if dst_type in (int, float, long, bool):
             try:
                 result[k] = dst_type(value)
             except:
