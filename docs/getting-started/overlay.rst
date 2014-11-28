@@ -116,6 +116,8 @@ it later on. Here is its minimal content.
 .. code-block:: python
 
     from setuptools import setup
+    from setuptools import setup, find_packages
+    packages = find_packages()
 
     setup(
         name="My Overlay",
@@ -124,6 +126,7 @@ it later on. Here is its minimal content.
         author="Invenio Software",
         author_email="invenio@invenio-software.org",
         description="My first overlay",
+        packages=packages,
         install_requires=[
             "Invenio>=2"
         ],
@@ -387,6 +390,7 @@ helps again:
 
     (myoverlay)$ python setup.py compile_catalog
 
+If you install invenio in deveveloppement mode you must compile catalog also from the invenio directory project.
 
 .. note::
 
