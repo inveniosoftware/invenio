@@ -1185,9 +1185,11 @@ def _task_run(task_run_fnc):
             task_update_status("DONE")
         else:
             task_update_status("DONE WITH ERRORS")
+            write_message("Task #%d finished with errors." % _TASK_PARAMS['task_id'])
             if not task_get_task_param('email_logs_to') and task_get_task_param('email_logs_on_error'):
                 email_error_logs_to = get_email_from_username(task_get_task_param('user'))
                 _task_email_logs(email_error_logs_to)
+                write_message("Reported errors to %s." % (str(email_error_logs_to),))
                 task_update_status("ERRORS REPORTED")
 
     finally:
