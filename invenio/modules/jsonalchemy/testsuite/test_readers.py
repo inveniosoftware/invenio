@@ -1351,7 +1351,7 @@ class TestMarcReader(InvenioTestCase):
 
         json_for_marc = json.produce('json_for_marc')
         for d in partial_result:
-            self.assertTrue(d in json_for_marc)
+            self.assertIn(d, json_for_marc)
 
         FieldParser.field_definitions('testsuite')['title']['producer'][
             'json_for_marc'].append(
@@ -1404,8 +1404,61 @@ class TestMarcReader(InvenioTestCase):
 
         json_for_marc = json.produce('json_for_marc')
         for d in partial_result:
-            self.assertTrue(d in json_for_marc)
+            self.assertIn(d, json_for_marc)
 
+    def test_reserved_words(self):
+        """Test subfield name evaluation."""
+        from invenio.modules.records.api import Record
+        from invenio.modules.jsonalchemy.parser import FieldParser
+
+        blob = """
+            <record>
+                <datafield tag="502" ind1="" ind2="">
+                <subfield code="c">test</subfield>
+                <subfield code="b">type</subfield>
+                </datafield>
+            </record>
+        """
+
+        partial_result = [
+            {'502__b': 'type', '502__c': 'University of Fictive Science'},
+        ]
+
+        json = Record.create(blob, master_format='marc', namespace='testsuite')
+
+        # To avoid duplicates we remove rules that overlap
+        del FieldParser.field_definitions('testsuite')['title']['producer'][
+            'json_for_marc'][0]
+
+        json_for_marc = json.produce('json_for_marc')
+        for d in partial_result:
+            self.assertIn(d, json_for_marc)
+        marc = json.legacy_export_as_marc()
+        self.assertIn('<subfield code="b">type</subfield>', marc)
+
+        blob = """
+            <record>
+                <datafield tag="502" ind1="" ind2="">
+                <subfield code="c">test</subfield>
+                </datafield>
+            </record>
+        """
+
+        partial_result = [
+            {'502__c': 'University of Fictive Science'},
+        ]
+
+        json = Record.create(blob, master_format='marc', namespace='testsuite')
+
+        # To avoid duplicates we remove rules that overlap
+        del FieldParser.field_definitions('testsuite')['title']['producer'][
+            'json_for_marc'][0]
+
+        json_for_marc = json.produce('json_for_marc')
+        for d in partial_result:
+            self.assertIn(d, json_for_marc)
+        marc = json.legacy_export_as_marc()
+        self.assertNotIn('<subfield code="b">', marc)
 
 TEST_SUITE = make_test_suite(TestReader, TestMarcReader, TestJSONReader)
 

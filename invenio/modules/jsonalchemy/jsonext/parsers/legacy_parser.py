@@ -70,7 +70,7 @@ class LegacyParser(DecoratorOnEvalBaseExtensionParser):
             {'100'   : ['authors[0]'],
              '100__' : ['authors[0]'],
              '100__%': ['authors[0]'],
-             '100__a': ['auhtors[0].full_name'],
+             '100__a': ['authors[0].full_name'],
              .......
             }
         """
@@ -92,7 +92,7 @@ class LegacyParser(DecoratorOnEvalBaseExtensionParser):
                     inner_source_format] = {}
 
             for field_legacy_rule in legacy_rule:
-                #Allow string and tuple in the config file
+                # Allow string and tuple in the config file
                 legacy_fields = (field_legacy_rule[0], ) \
                     if isinstance(field_legacy_rule[0], six.string_types) \
                     else field_legacy_rule[0]
