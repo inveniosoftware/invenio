@@ -17,18 +17,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Function for tokenizing strings in models' files."""
+
 
 def util_split(string, separator, index):
     """
-    Helper function to split safely a string and get the
-    n-th element
+    Helper function to split safely a string and get the n-th element.
 
-    @param string: String to be split
-    @param separator:
-    @param index: n-th part of the split string to return
+    :param string: String to be split
+    :param separator:
+    :param index: n-th part of the split string to return
 
-    @return: The n-th part of the string or None in case of error
+    :return: The n-th part of the string or empty string in case of error
     """
+    print string
+    print separator
+    print index
     string_splitted = string.split(separator)
     try:
         return string_splitted[index].strip()

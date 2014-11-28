@@ -16,13 +16,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """Authors module.
 
-    This module is work in progress. To enable it, remove the entry from
-    PACKAGE_EXCLUDED in invenio.base.config.
+This module is work in progress. To enable it, remove the entry from
+PACKAGE_EXCLUDED in invenio.base.config.
 """
 
 from warnings import warn
 
-#TODO Remove this warning when authors module is stable.
+# TODO Remove this warning when authors module is stable.
 warn("This module is 'work in progress' and thus unstable.", ImportWarning)
