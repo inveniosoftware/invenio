@@ -1084,9 +1084,8 @@ class Template:
         body = '''
 %(comments_and_review_tabs)s
 %(filtering_script)s
+<div style="clear:both"></div>
 <br />
-<div class=""
-
 <!-- start comments table -->
 <div class="webcomment_comment_table">
   %(comments_rows)s
@@ -3023,6 +3022,8 @@ class Template:
         :param string ln: The language
         :param int page: the current page
         :param int nb_per_page: Number of comments per page
+        :param int nb_pages: Total pages
+        :param str ln: The current language
         """
 
         # load the right message language
@@ -3053,7 +3054,6 @@ class Template:
                 "data-state='closed' class='toggle-advance-search'>advanced "
                 "filtering</a></div>"
                 ).format(select_element_with_files)
-
 
         filter_element = """
         <script src="%(CFG_SITE_URL)s/js/jquery.ba-throttle-debounce.min.js" type="text/javascript"></script>
@@ -3255,6 +3255,7 @@ class Template:
         :param int reciID: The record id
         :param bool only_optgroup_elements_p: Show only top level files
         :param str select_file_title: The default file title
+        :param str ln: The current language
         """
         _ = gettext_set_language(ln)
 
