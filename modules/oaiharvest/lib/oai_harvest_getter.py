@@ -102,8 +102,10 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
                                      http_request_parameters(http_param_dict, method), method,
                                      secure, user, password, cert_file, key_file)
         if output:
-            # Write results to a file specified by 'output'
-            if harvested_data.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+            # Write results to a file specified by 'output', once we have any
+            # records retrieved. Thus we check for an "noRecordsMatch" error
+            # before continuation.
+            if harvested_data.lower().find('<error code="noRecordsMatch">'.lower()) == -1:
                 output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), \
                                                               prefix=output_name, dir=output_path)
                 os.write(output_fd, harvested_data)
