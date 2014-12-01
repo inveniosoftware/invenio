@@ -1099,26 +1099,23 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             dirname = "%s/rss" % (CFG_CACHEDIR)
             mymkdir(dirname)
             fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            try:
+            if os.path.exists(fullfilename):
                 # Remove the file just in case it already existed
                 # so that a bit of space is created
                 os.remove(fullfilename)
-            except OSError:
-                pass
 
             # Check if there's enough space to cache the request.
             if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
                 try:
                     os.umask(022)
-                    f = open(fullfilename, "w")
-                    f.write(rss_prologue + rss_body + rss_epilogue)
-                    f.close()
+                    with open(fullfilename, "w") as fd:
+                        fd.write(rss_prologue + rss_body + rss_epilogue)
                 except IOError, v:
                     if v[0] == 36:
                         # URL was too long. Never mind, don't cache
                         pass
                     else:
-                        raise repr(v)
+                        raise
 
     index = __call__
 
