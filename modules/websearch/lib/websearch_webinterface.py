@@ -1110,15 +1110,14 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
                 try:
                     os.umask(022)
-                    f = open(fullfilename, "w")
-                    f.write(rss_prologue + rss_body + rss_epilogue)
-                    f.close()
-                except IOError, v:
+                    with open(fullfilename, "w") as fd:
+                        fd.write(rss_prologue + rss_body + rss_epilogue)
+                except IOError as v:
                     if v[0] == 36:
                         # URL was too long. Never mind, don't cache
                         pass
                     else:
-                        raise repr(v)
+                        raise
 
     index = __call__
 
