@@ -21,6 +21,8 @@
 
 from lxml import etree
 
+from invenio.base.globals import cfg
+
 
 def record_extraction_from_file(path, oai_namespace="http://www.openarchives.org/OAI/2.0/"):
     """Given a harvested file return a list of every record incl. headers.
@@ -52,9 +54,12 @@ def record_extraction_from_string(xml_string, oai_namespace="http://www.openarch
     :return: return a list of XML records as string
     :rtype: str
     """
-    nsmap = {
-        None: oai_namespace,
-    }
+    if oai_namespace:
+        nsmap = {
+            None: oai_namespace
+        }
+    else:
+        nsmap = cfg.get("OAIHARVESTER_DEFAULT_NAMESPACE_MAP")
     namespace_prefix = "{{{0}}}".format(oai_namespace)
     root = etree.fromstring(xml_string)
     headers = []
@@ -85,9 +90,12 @@ def identifier_extraction_from_string(xml_string, oai_namespace="http://www.open
     :return: OAI identifier
     :rtype: str
     """
-    nsmap = {
-        None: oai_namespace,
-    }
+    if oai_namespace:
+        nsmap = {
+            None: oai_namespace
+        }
+    else:
+        nsmap = cfg.get("OAIHARVESTER_DEFAULT_NAMESPACE_MAP")
     namespace_prefix = "{{{0}}}".format(oai_namespace)
     root = etree.fromstring(xml_string)
     node = root.find(".//{0}identifier".format(namespace_prefix), nsmap)
