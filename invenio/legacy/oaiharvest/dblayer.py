@@ -23,6 +23,7 @@ from datetime import datetime
 from sqlalchemy import func
 
 from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.oaiharvester.models import OaiHARVEST, OaiHARVESTLOG
 from invenio.legacy.bibrecord import create_records, record_extract_oai_id
@@ -71,6 +72,7 @@ def update_lastrun(index):
         return (0, e)
 
 
+@session_manager
 def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
     """
     Function which creates the harvesting logs
@@ -85,7 +87,6 @@ def create_oaiharvest_log_str(task_id, oai_src_id, xml_content):
         my_new_harvest_log.date_harvested = datetime.now()
         my_new_harvest_log.bibupload_task_id = task_id
         db.session.add(my_new_harvest_log)
-        db.session.commit()
 
 
 def get_history_entries(oai_src_id, oai_date, method="harvested"):
