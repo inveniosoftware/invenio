@@ -20,7 +20,11 @@
 
 from __future__ import unicode_literals
 
+import os
+
 from flask import current_app
+
+from invenio.base.globals import cfg
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
@@ -28,12 +32,17 @@ from invenio.modules.pages.models import Page
 
 from jinja2 import TemplateNotFound
 
-from wtforms.validators import ValidationError
+from werkzeug import secure_filename
+from werkzeug.local import LocalProxy
+
+from wtforms.validators import DataRequired, ValidationError
 
 
 def template_exists(form, field):
     """Form validation: check that selected template exists."""
-    template_name = "pages/" + field.data
+    if not field.data:
+        return
+    template_name = "pages/" + secure_filename(field.data)
     try:
         current_app.jinja_env.get_template(template_name)
     except TemplateNotFound:
@@ -60,7 +69,8 @@ class PagesAdmin(ModelView):
 
     form_args = dict(
         template_name=dict(
-            validators=[template_exists]
+            default=LocalProxy(lambda: os.path.basename(cfg["PAGES_DEFAULT_TEMPLATE"])),
+            validators=[DataRequired(), template_exists]
         ))
 
     # FIXME if we want to prevent users from modifying the dates
