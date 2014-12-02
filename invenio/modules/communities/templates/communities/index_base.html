@@ -66,7 +66,7 @@
         <p style="position: absolute; right:25px;">
           <a class="btn btn-info" href="{{ featured_community.community.community_url }}">{{ _("View") }}</a>
           {% if featured_community.community.id_user == current_user.id %}
-            <a href="{{ featured_community.community_provisional_url }}" class="btn btn-info">{{ _("Curate") }}</a>
+            <a href="{{ featured_community.community.community_provisional_url }}" class="btn btn-info">{{ _("Curate") }}</a>
           {% endif %}
         </p>
         <h3>{{ _("The most recent upload:") }}</h3>
@@ -80,7 +80,7 @@
         {%- else %}
           <div class="row">
             <div class="col-md-12" align="center" style="margin-top: 40px;">
-              <em class="text-muted">_("This collection is currently empty.")</em>
+              <em class="text-muted">{{ _("This collection is currently empty.") }}</em>
             </div>
           </div>
         {%- endif %}
