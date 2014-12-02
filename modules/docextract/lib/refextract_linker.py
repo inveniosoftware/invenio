@@ -36,7 +36,7 @@ def config_cache(cache={}):
 def get_recids_matching_query(p, f, m='e'):
     """Return list of recIDs matching query for pattern and field."""
     config = config_cache()
-    recids = bibrank_search(p=p.encode('utf-8'), f=f, config=config, m=m)
+    recids = bibrank_search(p=p, f=f, config=config, m=m)
     return list(recids)
 
 
