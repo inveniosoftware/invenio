@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -105,7 +105,7 @@ def drop(yes_i_know=False, quiet=False):
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
     from invenio.legacy.bibdocfile.api import _make_base_dir
-    from invenio.modules.jsonalchemy.wrappers import StorageEngine
+    from invenio.modules.relationships.node import StorageEngine
 
     ## Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -191,7 +191,7 @@ def create(default_data=True, quiet=False):
     from invenio.utils.date import get_time_estimator
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
-    from invenio.modules.jsonalchemy.wrappers import StorageEngine
+    from invenio.modules.relationships.node import StorageEngine
 
     test_sqla_connection()
     test_sqla_utf8_chain()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -122,6 +122,11 @@ class Document(SmartJson):
         if not include_deleted and document['deleted']:
             raise errors.DeletedDocument
         return document
+
+    @classmethod
+    def get_entity(cls, id):
+        """Get document. Implementation of ``Node`` interface method."""
+        return cls.get_document(id)
 
     def _save(self):
         try:
