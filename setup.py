@@ -103,14 +103,13 @@ install_requires = [
     "pyPDF2",
     "PyLD>=0.5.2",
     "pyStemmer>=1.3",
-    # python-dateutil>=2.0 is only for Python3
-    "python-dateutil>=1.5,<2.0",
+    "python-dateutil>=1.5",
     "python-magic>=0.4.6",
     "pytz",
     "rauth",
     "raven>=5.0.0",
     "rdflib>=4.1.2",
-    "redis==2.8.0",  # Is it explicitly required?
+    "redis>=2.8.0",
     "reportlab>=2.7,<3.2",
     "requests>=2.3,<2.4",
     "setuptools>=2.2",
@@ -120,8 +119,7 @@ install_requires = [
     "SQLAlchemy-Utils[encrypted]>=0.27",
     "unidecode",
     "workflow>=1.2.0",
-    # Flask-WTF 0.9.5 doesn't support WTForms 2.0 as of yet.
-    "WTForms>=1.0.5",
+    "WTForms>=2.0.1",
     "wtforms-alchemy>=0.12.6"
 ]
 
