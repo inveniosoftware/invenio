@@ -25,7 +25,7 @@ from invenio.ext.cache import cache
 from .registry import workflows
 
 
-def convert_marcxml_to_bibfield(marcxml):
+def convert_marcxml_to_bibfield(marcxml, model=None):
     """Return a SmartJson representation of MARC XML string.
 
     This function converts a MARCXML string to a JSON-like
@@ -38,12 +38,17 @@ def convert_marcxml_to_bibfield(marcxml):
     """
     from invenio.modules.jsonalchemy.reader import Reader
     from invenio.modules.jsonalchemy.wrappers import SmartJson
+
+    if not model:
+        model = ["__default__"]
+
     if isinstance(marcxml, unicode):
         marcxml = marcxml.encode(errors='ignore')
     return Reader.translate(marcxml,
                             SmartJson,
                             master_format='marc',
-                            namespace='recordext')
+                            namespace='recordext',
+                            model=model)
 
 
 class BibWorkflowObjectIdContainer(object):

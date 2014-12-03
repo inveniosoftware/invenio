@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,7 +47,7 @@ class oaiharvest_record_post_process(RecordWorkflow):
         [
             convert_record_with_repository(),
             check_record,
-            convert_record_to_bibfield,
+            convert_record_to_bibfield(),
         ],
         workflow_if(post_process_selected("t")),
         [
