@@ -23,6 +23,7 @@ This 'getter' simply retrieve the records from an OAI repository.
 """
 
 __revision__ = "$Id$"
+from invenio.bibtask import write_message
 
 try:
     import sys
@@ -103,7 +104,12 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
                                      secure, user, password, cert_file, key_file)
         if output:
             # Write results to a file specified by 'output'
-            if harvested_data.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+            # FIXME
+            # This checks the wrong entity, e.g. CORIDS says <oai:ListRecrods>
+            # and not <ListRecords> as assumed here.
+            #     if harvested_data.lower().find('<'+http_param_dict['verb'].lower()) > -1:
+            # This seems the proper check for "are there any records":
+            if harvested_data.lower().find('<error code="noRecordsMatch">'.lower()) == -1:
                 output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), \
                                                               prefix=output_name, dir=output_path)
                 os.write(output_fd, harvested_data)
@@ -116,7 +122,9 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
         else:
             sys.stdout.write(harvested_data)
 
-        rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
+        # FIXME We should NOT use regular expressions to parse XML. This works
+        # for the time being to escape namespaces.
+        rt_obj = re.search('<.*resumptionToken.*>(.+)</.*resumptionToken.*>',
             harvested_data, re.DOTALL)
         if rt_obj is not None and rt_obj != "":
             http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
