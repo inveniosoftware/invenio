@@ -1840,12 +1840,13 @@ def get_user_pid(uid):
 def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
     '''
     Check if merging is allowed by finding the number of profiles that are owned by user. Merging can be perform
-    only if at most one profile is connected to a user. Only admins can merge profile when 2 or more of them have claimed papers
+    only if at most one profile is connected to a user. Only admins can merge profile when 2 or more of them have claimed papers.
+    Moreover, it is not possible to merge an author with a coauthor.
 
     @param profiles: all the profiles that are going to be merged including the primary profile
     @type list
 
-    @return: returs if merge is allowed
+    @return: returns if merge is allowed
     @rtype: boolean
     '''
     try:
@@ -1856,7 +1857,13 @@ def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
     for pid in pids_to_merge:
         has_uid = bool(dbapi.get_uid_of_author(pid))
         if has_uid:
-            return False, pid
+            return False, pid, 'This profile is associated to a user.'
+
+        coauthors = [pid for pid, _ in dbapi.get_coauthors_of_author(primary_pid)]
+        for pid in pids_to_merge:
+            if pid in coauthors:
+                return False, pid, """This profile is a coauthor to the primary
+                                      profile."""
 
         if primary_orcid:
             try:
@@ -1865,14 +1872,18 @@ def merge_is_allowed(primary_pid, pids_to_merge, is_admin):
                 orcid = None
 
             if orcid and primary_orcid != orcid:
-                return False, pid
+                return False, pid, """This profile has an ORCID which is
+                                      different from the ORCID of the primary
+                                      profile."""
 
         if not is_admin:
             has_claimed_papers = bool(dbapi.get_claimed_papers_of_author(pid))
             if has_claimed_papers:
-                return False, pid
+                return False, pid, """The profile has claimed papers.
+                                      Only admins can merge profiles with
+                                      claimed papers"""
 
-    return True, None
+    return True, None, None
 
 
 # def open_ticket_for_papers_of_merged_profiles(req, primary_profile, profiles):
