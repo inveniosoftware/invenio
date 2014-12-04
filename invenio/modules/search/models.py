@@ -20,6 +20,7 @@
 """Database models for search engine."""
 
 # General imports.
+import datetime
 import re
 
 from flask import g, url_for
@@ -834,7 +835,10 @@ class UserQuery(db.Model):
                          index=True, server_default='0')
     hostname = db.Column(db.String(50), nullable=True,
                          server_default='unknown host')
-    date = db.Column(db.DateTime, nullable=True)
+    date = db.Column(db.DateTime, nullable=True,
+                     default=datetime.datetime.now)
+
+    webquery = db.relationship(WebQuery, backref='executions')
 
 
 class CollectionFieldFieldvalue(db.Model):
