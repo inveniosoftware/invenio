@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,8 +21,8 @@
 
 from __future__ import absolute_import
 
-import traceback
 import sys
+import traceback
 import base64
 
 from uuid import uuid1 as new_uuid
@@ -193,6 +194,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         return self.db_obj.objects
 
     def objects_of_statuses(self, statuses):
+        """Get objects having given statuses."""
         results = []
         for obj in self.db_obj.objects:
             if obj.version in statuses:
@@ -409,6 +411,7 @@ BibWorkflowEngine
         while len(objects) - 1 > i[0] >= -1:
             i[0] += 1
             obj = objects[i[0]]
+            obj.reset_error_message()
             obj.save(version=ObjectVersion.RUNNING,
                      id_workflow=self.db_obj.uuid)
             callbacks = self.callback_chooser(obj, self)
@@ -471,27 +474,25 @@ BibWorkflowEngine
                     continue
                 except (HaltProcessing, WorkflowHalt) as e:
                     self.increase_counter_halted()
+
+                    # We keep the extra_data from the object this run
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
+
                     workflow_halted.send(obj)
-
-                    msg = 'Processing was halted at step: %s' % (i,)
-                    self.log.info(msg)
-                    obj.log.info(msg)
-
-                    # Re-raise the exception,
-                    # this is the only case when a WFE can be completely
-                    # stopped
                     if type(e) == WorkflowHalt:
                         reraise(*sys.exc_info())
                     else:
                         raise WorkflowHalt(e)
                 except (WorkflowErrorClient, WorkflowError, Exception) as e:
-                    # unless instructed otherwise.
-                    msg = "Error: %r\n%s" % (e, traceback.format_exc())
+                    self.increase_counter_error()
+
+                    # We keep the extra_data from the object this run
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
-                    self.increase_counter_error()
+
+                    msg = "Error: %r\n%s" % (e, traceback.format_exc())
+
                     if isinstance(e, WorkflowErrorClient):
                         reraise(*sys.exc_info())
                     else:
@@ -500,6 +501,7 @@ BibWorkflowEngine
                             id_workflow=self.uuid,
                             id_object=self.getCurrObjId(),
                         )
+
             # We save each object once it is fully run through
             obj.save(version=ObjectVersion.COMPLETED)
             self.increase_counter_finished()

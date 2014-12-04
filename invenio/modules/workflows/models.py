@@ -574,6 +574,13 @@ class BibWorkflowObject(db.Model):
         extra_data["_error_msg"] = msg
         self.set_extra_data(extra_data)
 
+    def reset_error_message(self):
+        """Reset the error message."""
+        extra_data = self.get_extra_data()
+        if "_error_msg" in extra_data:
+            del extra_data["_error_msg"]
+            self.set_extra_data(extra_data)
+
     def get_error_message(self):
         """Retrieve the error message, if any."""
         if "error_msg" in self.get_extra_data():
