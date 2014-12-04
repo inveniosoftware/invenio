@@ -55,10 +55,14 @@ CFG_EXTERNAL_COLLECTION_TIMEOUT, \
 CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
 from invenio.legacy.websearch_external_collections.getter import HTTPAsyncPageGetter, async_download
 from invenio.legacy.websearch_external_collections.utils import get_collection_id
+from invenio.modules.alerts.utils import logger
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')
 webalert_templates = invenio.legacy.template.load('webalert')
+
+log = logger.info
+
 
 def update_date_lastrun(alert):
     """Update the last time this alert was ran in the database."""
@@ -415,16 +419,6 @@ def update_arguments(argstr, date_from, date_until):
 
     return r
 
-def log(msg):
-    """Logs the given message in the alert engine log."""
-
-    try:
-        logfile = open(CFG_LOGDIR + '/alertengine.log', 'a')
-        logfile.write(strftime('%Y%m%d%H%M%S#'))
-        logfile.write(msg + '\n')
-        logfile.close()
-    except Exception:
-        register_exception()
 
 def process_alerts(alerts):
     """Process the given alerts and store the records found to the user defined baskets

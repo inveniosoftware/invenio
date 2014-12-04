@@ -1,0 +1,74 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{# %- bundles "alerts.js" -% #}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "_formhelpers.html" import render_field with context %}
+{%- extends "accounts/settings/index_base.html" -%}
+
+{% block settings_body %}
+{{helpers.panel_start(
+    _('Your Searches'),
+    icon='fa fa-search fa-fw',
+    btn=_('Your Searches'),
+    btn_icon='fa fa-history',
+    btn_href=url_for('.index'),
+    with_body=False)}}
+  <div class="panel-body">
+    <p>{{ _("You have defined %(x_total)s alerts.", x_total=alerts.total) }}</p>
+  </div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>{{ _('Name') }}</th>
+        <th>{{ _('Notification') }}</th>
+        <th>{{ _('Date last run') }}</th>
+        <th>{{ _('Creation date') }}</th>
+        <th>{{ _('Query') }}</th>
+        <th>{{ _('Actions') }}</th>
+      </tr>
+    </thead>
+    {% for alert in alerts.items %}
+    <tr>
+      <td>{{ alert.id_query }}</td>
+      <td>
+        <span class="label label-info">
+          {{ _('Pattern') }}: {{ query.webquery.urlargs }}
+        </span>
+      </td>
+      <td>
+        {{ query.date }}
+      </td>
+      <td>
+        <a class="btn btn-xs btn-default"
+           href="{{ url_for('search.search') }}?{{ query.webquery.urlargs }}">
+          <i class="fa fa-search"></i> {{ _('Execute search') }}
+        </a>
+        <a class="btn btn-xs btn-default"
+           href="{{ url_for('.add', id_query=query.id_query) }}">
+          <i class="fa fa-plus"></i> {{ _('Set new alert') }}
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+{{helpers.panel_end(with_body=False)}}
+{% endblock %}
