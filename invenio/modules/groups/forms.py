@@ -61,7 +61,6 @@ class JoinUsergroupForm(InvenioBaseForm):
         # without label
         '',
         remote='',
-        display_key='name',
         min_length=1,
         highlight='true',
         data_key='id',
@@ -78,7 +77,6 @@ class UserJoinGroupForm(InvenioBaseForm):
         # without label
         '',
         remote='',
-        display_key='nickname',
         min_length=3,
         highlight='true',
         data_key='id',

@@ -17,16 +17,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-define(function(require, exports, module) {
-  "use strict";
-  var $ = require('jquery')
-  var bloodhound = require('typeahead')
+/*
+ * Example:
+ * require([
+ *   'js/remote.autocomplete.field'
+ * ], function(autocomplete) {
+ *   autocomplete.attachTo($('input.remote-typeahead-widget'))
+ * })
+ */
 
-  module.exports = function() {
-   $('input.remote-typeahead-widget').each(function(){
-      var field_id = $(this).attr('id')
-      var interfacefield = $('#'+field_id)
+define([ 'jquery', 'typeahead', 'flight/lib/component' ], function($, bloodhound, flight_component){
+
+  "use strict";
+
+  var RemoteAutocomplete = flight_component(function(){
+    this.after('initialize', function() {
+      var tag = this.$node
+      var field_id = tag.attr('id')
+      var interfacefield = tag
       var form = interfacefield.closest("form");
+
       // define automatically interface field and hidden field
       var interfacefield_id = field_id + '_interface'
       var field = $('<input>').attr({
@@ -36,12 +46,11 @@ define(function(require, exports, module) {
       })
 
       // swap
-      interfacefield.attr('id', interfacefield_id).attr('name', interfacefield_id)
+      interfacefield.attr('id', interfacefield_id).removeAttr('name')
       field.appendTo(form);
 
       // load configuration
       var remote = interfacefield.data('remoteautocompleteRemote')
-      var displayKey = interfacefield.data('remoteautocompleteDisplaykey')
       var minLength = parseInt(interfacefield.data('remoteautocompleteMinlength'))
       var highlight = interfacefield.data('remoteautocompleteHighlight')
       var data_key = interfacefield.data('remoteautocompleteDataKey')
@@ -82,6 +91,7 @@ define(function(require, exports, module) {
         field.val(data[data_key])
       });
     });
-  }
-})
+  });
 
+  return RemoteAutocomplete
+})

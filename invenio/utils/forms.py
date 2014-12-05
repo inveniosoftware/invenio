@@ -191,17 +191,88 @@ class TypeheadWidget(object):
 
 class RemoteAutocompleteField(StringField):
 
-    """Define a text field with autocompletion from remote."""
+    """Define a text field with autocompletion from remote.
+
+    How to use it:
+
+    First, use RemoteAutocompleteField in a form.
+
+    .. code-block:: python
+
+        class MyForm(InvenioBaseForm):
+                myfield = RemoteAutocompleteField(
+                    'My Label',
+                    # remote url where the field can ask suggestions
+                    remote='/api/path/to/query?query=%QUERY',
+                    # minimum length to start query
+                    min_length=3,
+                    # highlight the results in suggestions
+                    highlight='true',
+                    # field to use as key to submit with the form
+                    data_key='field_to_use_as_key',
+                    # field to visualize in the input field
+                    data_value='field_to_visualize'
+                )
+
+    Then, create the API function that returns suggestions from
+    url path `/api/path/to/query`.
+
+    Note: you should return the results in JSON format, like:
+
+    .. code-block:: javascript
+
+        {
+            "results": [
+                {
+                    field_to_use_as_key: 'my_key_1',
+                    field_to_visualize: 'my_label_1'
+                },
+                {
+                    field_to_use_as_key: 'my_key_2',
+                    field_to_visualize: 'my_label_2'
+                },
+            ]
+        }
+
+    After that, you should manually initialize the javascript.
+
+    To do that, for example, you can create a javascript init
+    file `init.js` into your module's directory.
+
+    E.g: `invenio/modules/mymodule/static/js/mymodule/init.js`:
+
+    .. code-block:: javascript
+
+        require([
+            'js/remote.autocomplete.field'
+        ], function(autocomplete) {
+            // init the javascript interface
+            autocomplete.attachTo($('input.remote-typeahead-widget'))
+        })
+
+    Finally, if you create a new `init.js` file, you need to
+    add this in your bundle in your `bundles.py` file.
+
+    E.g:
+
+        .. code-block:: python
+
+            js = Bundle(
+                'js/mymodule/init.js',
+                filters=RequireJSFilter(exclude=[_j, _i]),
+                output="mymodule-init.js",
+                weight=50
+            )
+    """
 
     def __init__(self, label=None, validators=None, remote=None,
-                 display_key=None, min_length=None, highlight=None,
+                 min_length=None, highlight=None,
                  data_key=None, data_value=None, *args, **kwargs):
         """Init class."""
         super(RemoteAutocompleteField, self).__init__(label, validators,
                                                       *args, **kwargs)
         self.kwargs = {}
         self.kwargs['data-remoteautocomplete-remote'] = remote or ''
-        self.kwargs['data-remoteautocomplete-displayKey'] = display_key or ''
         self.kwargs['data-remoteautocomplete-minLength'] = min_length or 3
         self.kwargs['data-remoteautocomplete-highlight'] = highlight or 'true'
         self.kwargs['data-remoteautocomplete-data-key'] = data_key or ''

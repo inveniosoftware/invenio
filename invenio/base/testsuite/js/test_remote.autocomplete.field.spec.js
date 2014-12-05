@@ -21,16 +21,16 @@
 
 
 define([
-  'js/groups/remote.autocomplete.field',
+  'js/remote.autocomplete.field',
   'jasmine-jquery',
 ], function(autocomplete, jasmineJQuery) {
   "use strict"
 
-  describe("A suite", function() {
+  describe("RemoteAutocomplete suite", function() {
 
     beforeEach(function () {
       $('#test-form').remove()
-      jasmine.getFixtures().fixturesPath = '/jasmine/spec/invenio.modules.groups/fixtures/'
+      jasmine.getFixtures().fixturesPath = '/jasmine/spec/invenio.base/fixtures/'
       $('body').append(readFixtures('test.html'))
     });
 
@@ -39,22 +39,22 @@ define([
     })
 
 
-    it("Autocomplete text is as expected", function() {
-      autocomplete()
+    it("RemoteAutocomplete input text is as expected", function() {
+      autocomplete.attachTo($('input.remote-typeahead-widget'))
 
       var obj = $('#user_id')
       var iobj = $('#user_id_interface')
 
-      expect(iobj.attr('type')).toBe('text');
-      expect(iobj.attr('data-autocomplete-data-value')).toBe('nickname');
-      expect(iobj.attr('data-autocomplete-data-key')).toBe('id');
-      expect(iobj.attr('data-autocomplete-highlight')).toBe('true');
-      expect(iobj.attr('data-autocomplete-minlength')).toBe('2');
-      expect(iobj.attr('data-autocomplete-displaykey')).toBe('nickname');
-      expect(iobj.attr('data-autocomplete-remote')).toBe('spec/invenio.modules.groups/fixtures/users.json?name=%QUERY');
+      expect(typeof iobj.attr('name')).toEqual('undefined');
+      expect(iobj.attr('type')).toEqual('text');
+      expect(iobj.data('remoteautocomplete-data-value')).toEqual('nickname');
+      expect(iobj.data('remoteautocomplete-data-key')).toEqual('id');
+      expect(iobj.data('remoteautocomplete-highlight')).toEqual(true);
+      expect(iobj.data('remoteautocomplete-minlength')).toEqual(2);
+      expect(iobj.data('remoteautocomplete-remote')).toEqual('spec/invenio.modules.groups/fixtures/users.json?name=%QUERY');
 
-      expect(obj.attr('type')).toBe('hidden');
-      expect(obj.attr('name')).toBe('user_id');
+      expect(obj.attr('type')).toEqual('hidden');
+      expect(obj.attr('name')).toEqual('user_id');
     });
   });
 });

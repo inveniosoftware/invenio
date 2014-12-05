@@ -23,8 +23,6 @@ from invenio.ext.assets import Bundle, RequireJSFilter
 from invenio.base.bundles import jquery as _j, invenio as _i
 
 js = Bundle(
-    'vendors/jquery/dist/jquery.js',
-    'vendors/typeahead.js/dist/typeahead.bundle.js',
     'js/groups/init.js',
     filters=RequireJSFilter(exclude=[_j, _i]),
     output="groups.js",
