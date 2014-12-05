@@ -191,7 +191,14 @@ class TypeheadWidget(object):
 
 class RemoteAutocompleteField(StringField):
 
-    """Define a text field with autocompletion from remote."""
+    """Define a text field with autocompletion from remote.
+
+    Note: to use the autocomplete functionality,
+          include in your bundle the javascript:
+              js/remote.autocomplete.field
+          And it automatically enable it for all the
+          autocomplete fields.
+    """
 
     def __init__(self, label=None, validators=None, remote=None,
                  display_key=None, min_length=None, highlight=None,
