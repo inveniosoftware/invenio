@@ -17,7 +17,7 @@
   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 }}
 <tr id="{{file.id}}">
-  <td>
+  <td class="forcewrap">
   {{#downloadable}}
     <a href="{{get_file_url}}?file_id={{file.server_id}}">
   {{/downloadable}}
@@ -26,7 +26,7 @@
     </a>
   {{/downloadable}}
   </td>
-  <td>{{file.size}}</td>
+  <td class="nowrap">{{file.size}}</td>
   <td>
     {{^downloadable}}
     <div class="progress">
@@ -35,7 +35,7 @@
     </div>
     {{/downloadable}}
   </td>
-  <td class="text-center">
+  <td class="text-center nowrap">
     <a class="fa fa-sort fa-fw sortlink"></a>
     <a class="fa fa-trash-o fa-fw rmlink" style="margin-left: 20px"></a>
   </td>

@@ -17,12 +17,12 @@
   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 }}
 <tr id="{{id}}">
-    <td id="{{id}}_link">
+    <td class="forcewrap" id="{{id}}_link">
         {{#download_url}}
         <a href="{{download_url}}">{{filename}}</a>{{/download_url}}{{^download_url}}{{filename}}
         {{/download_url}}
     </td>
-    <td>{{filesize}}</td>
+    <td class="nowrap">{{filesize}}</td>
     <td width="30%">
         {{^completed}}
         <div class="progress{{#striped}} progress-striped{{/striped}} active">
@@ -31,7 +31,7 @@
             </div>
         </div>
     </td>
-    <td>
+    <td class="nowrap">
         <a id="{{id_sort}}" class="sortlink text-muted" rel="tooltip" title="Re-order files">
             <i class="fa fa-sort fa-fw"></i>
         </a>&nbsp;
