@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@
 
 """Workflows bundles."""
 
-from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.ext.assets import Bundle, RequireJSFilter, CleanCSSFilter
 from invenio.base.bundles import jquery as _j, invenio as _i
 
 
@@ -40,15 +40,12 @@ js = Bundle(
 
 css = Bundle(
     'vendors/prism/themes/prism.css',
-    'vendors/bootstrap-tagsinput/src/'
-    'bootstrap-tagsinput.css',
-    'vendors/datatables/media/css/'
-    'jquery.dataTables.css',
-    'vendors/datatables-plugins/integration/bootstrap/3'
-    '/dataTables.bootstrap.css',
+    'vendors/bootstrap-tagsinput/src/bootstrap-tagsinput.css',
+    'vendors/datatables/media/css/jquery.dataTables.css',
+    'vendors/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.css',
     'vendors/datatables-tabletools/css/dataTables.tableTools.css',
     'css/workflows/workflows.css',
-    filters="less,cleancss",
+    filters=CleanCSSFilter(),
     output='workflows.css',
     weight=30,
     bower={

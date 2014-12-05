@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -54,6 +54,13 @@ class ObjectVersion(object):
                 "instead of ObjectVersion.FINAL")
     def FINAL(cls):
         return cls.COMPLETED
+
+    @classmethod
+    def name_from_version(cls, version):
+        try:
+            return cls.MAPPING.keys()[cls.MAPPING.values().index(version)]
+        except ValueError:
+            return None
 
 
 def get_default_data():
@@ -389,7 +396,7 @@ class BibWorkflowObject(db.Model):
             name = self.get_workflow_name()
             if not name:
                 return ""
-            workflow_definition = workflows[self.get_workflow_name()]
+            workflow_definition = workflows[name]
             formatted_data = workflow_definition.formatter(
                 self,
                 of=of

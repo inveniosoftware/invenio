@@ -58,12 +58,30 @@ blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
 
 default_breadcrumb_root(blueprint, '.holdingpen')
 HOLDINGPEN_WORKFLOW_STATES = {
-    ObjectVersion.HALTED: {'message': _('Need Action'), 'class': 'danger'},
-    ObjectVersion.WAITING: {'message': _('Waiting'), 'class': 'warning'},
-    ObjectVersion.ERROR: {'message': _('Error'), 'class': 'danger'},
-    ObjectVersion.COMPLETED: {'message': _('Done'), 'class': 'success'},
-    ObjectVersion.INITIAL: {'message': _('New'), 'class': 'info'},
-    ObjectVersion.RUNNING: {'message': _('In process'), 'class': 'warning'}
+    ObjectVersion.HALTED: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.HALTED)),
+        'class': 'danger'
+    },
+    ObjectVersion.WAITING: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.WAITING)),
+        'class': 'warning'
+    },
+    ObjectVersion.ERROR: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.ERROR)),
+        'class': 'danger'
+    },
+    ObjectVersion.COMPLETED: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.COMPLETED)),
+        'class': 'success'
+    },
+    ObjectVersion.INITIAL: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.INITIAL)),
+        'class': 'info'
+    },
+    ObjectVersion.RUNNING: {
+        'message': _(ObjectVersion.name_from_version(ObjectVersion.RUNNING)),
+        'class': 'warning'
+    }
 }
 
 
@@ -95,7 +113,10 @@ def maintable():
     """Display main table interface of Holdingpen."""
     bwolist = get_holdingpen_objects()
     action_list = get_action_list(bwolist)
-    tags = session.get("holdingpen_tags", ["Need action"])
+    tags = session.get(
+        "holdingpen_tags",
+        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+    )
 
     if 'version' in request.args:
         for key, value in ObjectVersion.MAPPING.items():
@@ -338,7 +359,10 @@ def load_table():
 
     :return: JSON formatted str from dict of DataTables args.
     """
-    tags = session.setdefault("holdingpen_tags", ["Need action"])
+    tags = session.setdefault(
+        "holdingpen_tags",
+        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+    )
     if request.method == "POST":
         if request.json and "tags" in request.json:
             tags = request.json["tags"]
@@ -347,10 +371,11 @@ def load_table():
         # We return here as DataTables will call a GET here after.
         return None
 
-    i_sortcol_0 = request.args.get('iSortCol_0',
-                                   session.get('iSortCol_0', 0))
+    i_sortcol_0 = int(
+        request.args.get('iSortCol_0', session.get('holdingpen_iSortCol_0', 4))
+    )
     s_sortdir_0 = request.args.get('sSortDir_0',
-                                   session.get('sSortDir_0', None))
+                                   session.get('holdingpen_sSortDir_0', "desc"))
 
     session["holdingpen_iDisplayStart"] = int(request.args.get(
         'iDisplayStart', session.get('iDisplayLength', 10))
@@ -363,25 +388,7 @@ def load_table():
     ) + 1
 
     bwobject_list = get_holdingpen_objects(tags)
-
-    if (i_sortcol_0 and s_sortdir_0)\
-            or ("holdingpen_iSortCol_0" in session
-                and "holdingpen_sSortDir_0" in session):
-        if i_sortcol_0:
-            i_sortcol = int(str(i_sortcol_0))
-        else:
-            i_sortcol = session["holdingpen_iSortCol_0"]
-
-        if not ('holdingpen_iSortCol_0' in session
-                and "holdingpen_sSortDir_0" in session):
-            bwobject_list = sort_bwolist(bwobject_list, i_sortcol, s_sortdir_0)
-        elif i_sortcol != session['holdingpen_iSortCol_0']\
-                or s_sortdir_0 != session['holdingpen_sSortDir_0']:
-            bwobject_list = sort_bwolist(bwobject_list, i_sortcol, s_sortdir_0)
-        else:
-            bwobject_list = sort_bwolist(bwobject_list,
-                                         session["holdingpen_iSortCol_0"],
-                                         session["holdingpen_sSortDir_0"])
+    bwobject_list = sort_bwolist(bwobject_list, i_sortcol_0, s_sortdir_0)
 
     session["holdingpen_iSortCol_0"] = i_sortcol_0
     session["holdingpen_sSortDir_0"] = s_sortdir_0

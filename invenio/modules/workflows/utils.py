@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -153,6 +153,23 @@ class dictproperty(object):
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
 
+def _sort_from_cache(name):
+    def _sorter(item):
+        try:
+            results = cache.get("workflows_holdingpen_{0}".format(item.id))
+            if results:
+                return msgpack.loads(results)[name]
+        except:
+            from flask import current_app
+            current_app.logger.exception(
+                "Invalid format for object {0}: {1}".format(
+                    item.id,
+                    cache.get("workflows_holdingpen_{0}".format(item.id))
+                )
+            )
+    return _sorter
+
+
 def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     """Sort a list of BibWorkflowObjects for DataTables."""
     should_we_reverse = False
@@ -163,9 +180,9 @@ def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
     elif iSortCol_0 == 1:
         bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
     elif iSortCol_0 == 2:
-        bwolist.sort(key=lambda x: msgpack.loads(cache.get("workflows_holdingpen_{0}".format(x.id)))["title"], reverse=should_we_reverse)
+        bwolist.sort(key=_sort_from_cache("title"), reverse=should_we_reverse)
     elif iSortCol_0 == 3:
-        bwolist.sort(key=lambda x: msgpack.loads(cache.get("workflows_holdingpen_{0}".format(x.id)))["description"], reverse=should_we_reverse)
+        bwolist.sort(key=_sort_from_cache("description"), reverse=should_we_reverse)
     elif iSortCol_0 == 4:
         bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
     elif iSortCol_0 == 5:
@@ -185,13 +202,16 @@ def parse_bwids(bwolist):
     return list(ast.literal_eval(bwolist))
 
 
-def get_holdingpen_objects(ptags=["Need action"]):
+def get_holdingpen_objects(ptags=None):
     """Get BibWorkflowObject's for display in Holding Pen.
 
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
     from .models import (BibWorkflowObject,
                          ObjectVersion)
+
+    if ptags is None:
+        ptags = ObjectVersion.name_from_version(ObjectVersion.HALTED)
 
     tags_copy = ptags[:]
     version_showing = []
@@ -255,7 +275,8 @@ def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
         if results["date"] == bwo.modified.strftime(date_format):
             return results
     results = generate_formatted_holdingpen_object(bwo)
-    cache.set("workflows_holdingpen_{0}".format(bwo.id), msgpack.dumps(results))
+    if results:
+        cache.set("workflows_holdingpen_{0}".format(bwo.id), msgpack.dumps(results))
     return results
 
 
