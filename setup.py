@@ -123,7 +123,8 @@ install_requires = [
     "unidecode",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
-    "wtforms-alchemy>=0.12.6"
+    "wtforms-alchemy>=0.12.6",
+    "yaml",
 ]
 
 

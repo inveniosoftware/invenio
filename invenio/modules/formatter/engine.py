@@ -80,7 +80,6 @@ from .config import \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
      InvenioBibFormatError
 from invenio.modules.formatter.utils import \
-     record_get_xml, \
      parse_tag
 from invenio.utils.html import \
      HTMLWasher, \
@@ -709,7 +708,7 @@ def format_with_format_template(format_template_filename, bfo,
         else:
             # Fetch MARCXML. On-the-fly xm if we are now formatting in xm
             xml_record = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
-                         record_get_xml(bfo.recID, 'xm', on_the_fly=False)
+                         new_get_record(bfo.recID).legacy_export_as_marc()
 
         # Transform MARCXML using stylesheet
         evaluated_format = xslt.format(xml_record, template_source=format_content).decode('utf-8')
