@@ -30,6 +30,7 @@ from flask_oauthlib.contrib.oauth2 import bind_cache_grant, bind_sqlalchemy
 from flask.ext.login import login_required
 from flask.ext.breadcrumbs import register_breadcrumb
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
+from werkzeug.urls import url_encode
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.login import login_user
@@ -103,6 +104,21 @@ def error_handler(f):
     return decorated
 
 
+def urlreencode(f):
+    """Re-encode query string.
+
+    oauthlib's URL decoding is very strict and very often chokes on
+    common user mistakes like not encoding colons, hence let Flask decode the
+    request args and reencode them.
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.args:
+            request.url = request.base_url + "?" + url_encode(request.args)
+        return f(*args, **kwargs)
+    return decorated
+
+
 #
 # Views
 #
@@ -110,6 +126,7 @@ def error_handler(f):
 @register_breadcrumb(blueprint, '.', _('Authorize application'))
 @login_required
 @error_handler
+@urlreencode
 @oauth2.authorize_handler
 def authorize(*args, **kwargs):
     """View for rendering authorization request."""

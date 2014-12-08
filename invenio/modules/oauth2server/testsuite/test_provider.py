@@ -23,7 +23,7 @@ import logging
 import os
 
 from datetime import datetime, timedelta
-from flask import url_for
+from flask import url_for, request
 from flask_oauthlib.client import prepare_request
 from mock import MagicMock
 try:
@@ -822,8 +822,26 @@ class OAuth2ProviderExpirationTestCase(ProviderTestCase):
         self.assert401(r)
 
 
+class UtilsTestCase(InvenioTestCase):
+    def test_urleencode(self):
+        from invenio.modules.oauth2server.views.server import urlreencode
+
+        # Test encoding of unencoded colon which oauthlib will choke on if is
+        # not re-encoded,
+        testurl = '/test?a=b:d&a=d'
+
+        def test_fun(*args,  **kwargs):
+            pass
+
+        with self.app.test_request_context(testurl):
+            self.assertEqual(request.url, "http://localhost"+testurl)
+            urlreencode(test_fun)()
+            self.assertEqual(request.url, "http://localhost/test?a=b%3Ad&a=d")
+
+
 TEST_SUITE = make_test_suite(OAuth2ProviderTestCase,
-                             OAuth2ProviderExpirationTestCase)
+                             OAuth2ProviderExpirationTestCase,
+                             UtilsTestCase)
 
 
 if __name__ == "__main__":
