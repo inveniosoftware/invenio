@@ -296,26 +296,8 @@ def get_field_tags(field, tagtype="marc"):
        @param tagtype: can be: "marc" or "nonmarc", default value
             is "marc" for backward compatibility
     """
-    out = []
-    query = """SELECT t.%s FROM tag AS t,
-                                field_tag AS ft,
-                                field AS f
-                WHERE f.code=%%s AND
-                ft.id_field=f.id AND
-                t.id=ft.id_tag
-                ORDER BY ft.score DESC"""
-    if tagtype == "marc":
-        query = query % "value"
-        res = run_sql(query, (field,))
-        return [row[0] for row in res]
-    else:
-        query = query % "recjson_value"
-        res = run_sql(query, (field,))
-        values = []
-        for row in res:
-            if row[0] is not None:
-                values.extend(row[0].split(","))
-        return values
+    from invenio.modules.search.models import Field
+    return list(Field.get_field_tags(field, tagtype=tagtype))
 
 
 def get_marc_tag_indexes(tag, virtual=True):

@@ -25,7 +25,6 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME
-from invenio.legacy.search_engine import get_coll_sons
 from invenio.legacy.webstat.engine import get_invenio_error_details
 
 class Template:
@@ -313,7 +312,10 @@ class Template:
         """
         out = """<h3>Collections stats</h3>
                  <ul>"""
-        for coll in get_coll_sons(CFG_SITE_NAME):
+        from invenio.modules.search.models import Collection
+        for collection in Collection.query.filter_by(
+                name=CFG_SITE_NAME).one().collection_children_r:
+            coll = collection.name
             out += """<li><a href="%s/stats/collections?%s">%s</a></li>""" \
                         % (CFG_SITE_URL, urllib.urlencode({'collection': coll}) +
                            ((CFG_SITE_LANG != ln and '&ln=' + ln) or ''), coll)

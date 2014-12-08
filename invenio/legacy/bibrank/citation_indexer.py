@@ -71,7 +71,8 @@ def recids_cache(collections, cache={}):
 
 def deleted_recids_cache(cache={}):
     if 'deleted_records' not in cache:
-        cache['deleted_records'] = search_unit(p='DELETED', f='980', m='a')
+        cache['deleted_records'] = search_unit(
+            p='DELETED', f='collection', m='a')
     return cache['deleted_records']
 
 

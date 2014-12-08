@@ -107,13 +107,11 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to",
     dyn_config = None
     collections = None
     if kb_type == 'd':
-        from invenio.legacy.search_engine \
-            import get_alphabetically_ordered_collection_list
+        from invenio.modules.search.models import Collection
+        collections = [
+            c[0] for c in Collection.query.order_by('name').values('name')
+        ]
         dyn_config = kb.kbdefs.to_dict() if kb.kbdefs else {}
-        collections = []
-        collitems = get_alphabetically_ordered_collection_list()
-        for collitem in collitems:
-            collections.append(collitem[0])
     return bibknowledge_templates.tmpl_admin_kb_show(ln, kb_id, name,
                                                      mappings, sortby, startat,
                                                      kb_type, search_term,

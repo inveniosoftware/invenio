@@ -40,6 +40,8 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_is_role
+from invenio.modules.records.api import get_record
+from invenio.legacy.bibrecord import record_empty
 from invenio.legacy.webpage import page, pageheaderonly, \
     pagefooteronly, warning_page, write_warning
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
@@ -49,14 +51,15 @@ from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import \
-     guess_primary_collection_of_a_record, get_colID, record_exists, \
-     create_navtrail_links, check_user_can_view_record, record_empty, \
+     guess_primary_collection_of_a_record, record_exists, \
+     create_navtrail_links, check_user_can_view_record, \
      is_user_owner_of_record
 from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
+from invenio.modules.search.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
@@ -102,7 +105,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p>" % _("Requested record does not seem to exist.")
                 return warning_page(msg, req, ln)
 
-            if record_empty(self.recid):
+            if record_empty(get_record(self.recid).legacy_create_recstruct()):
                 msg = "<p>%s</p>" % _("Requested record does not seem to have been integrated.")
                 return warning_page(msg, req, ln)
 
@@ -244,7 +247,8 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 filelist=filelist)
 
             cc = guess_primary_collection_of_a_record(self.recid)
-            unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid, ln)
+            cc_id = Collection.query.filter_by(name=cc).value('id')
+            unordered_tabs = get_detailed_page_tabs(cc_id, self.recid, ln)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
             ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
             link_ln = ''

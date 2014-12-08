@@ -17,15 +17,17 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-BibSort database models.
-"""
+"""Sorter database models."""
 
 # General imports.
+from datetime import datetime
 from flask import g
-from sqlalchemy import and_
+from intbitset import intbitset
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm.collections import attribute_mapped_collection
+
 from invenio.ext.sqlalchemy import db
-from invenio.base.globals import cfg
+from invenio.utils.serializers import deserialize_via_marshal
 
 # Create your models here.
 from invenio.modules.search.models import Collection
@@ -33,7 +35,7 @@ from invenio.modules.search.models import Collection
 
 class BsrMETHOD(db.Model):
 
-    """Represents a BsrMETHOD record."""
+    """Represent a BsrMETHOD record."""
 
     __tablename__ = 'bsrMETHOD'
 
@@ -42,6 +44,8 @@ class BsrMETHOD(db.Model):
     name = db.Column(db.String(20), nullable=False, unique=True)
     definition = db.Column(db.String(255), nullable=False)
     washer = db.Column(db.String(255), nullable=False)
+
+    bucket_data = association_proxy('buckets', 'data')
 
     def get_name_ln(self, ln=None):
         """Return localized method name."""
@@ -52,10 +56,41 @@ class BsrMETHOD(db.Model):
         except:
             return self.name
 
+    @classmethod
+    def get_sorting_methods(cls):
+        """Return initialized method mapping."""
+        return dict(db.session.query(cls.name, cls.definition).filter(
+            db.session.query(BsrMETHODDATA).filter(
+                BsrMETHODDATA.id_bsrMETHOD == cls.id
+            ).exists()
+        ).all())
+
+    def get_cache(self):
+        """Return data to populate cache."""
+        if len(self.methoddata) < 1:
+            return {}
+        return dict(
+            data_dict_ordered=self.methoddata[0].ordered,
+            bucket_data=dict(self.bucket_data),
+        )
+
+    @classmethod
+    def timestamp_verifier(cls, name):
+        """Return last modification time for given sorting method."""
+        min_date = datetime(1970, 1, 1)
+        method_id = db.select([cls.id], cls.name == name)
+        data_updated = db.session.query(
+            db.func.max(BsrMETHODDATA.last_updated)
+        ).filter(BsrMETHODDATA.id_bsrMETHOD.in_(method_id)).scalar()
+        bucket_updated = db.session.query(
+            db.func.max(BsrMETHODDATABUCKET.last_updated)
+        ).filter(BsrMETHODDATABUCKET.id_bsrMETHOD.in_(method_id)).scalar()
+        return max(data_updated, bucket_updated, min_date)
+
 
 class BsrMETHODDATA(db.Model):
 
-    """Represents a BsrMETHODDATA record."""
+    """Represent a BsrMETHODDATA record."""
 
     __tablename__ = 'bsrMETHODDATA'
 
@@ -68,10 +103,17 @@ class BsrMETHODDATA(db.Model):
     data_list_sorted = db.Column(db.LargeBinary)
     last_updated = db.Column(db.DateTime)
 
+    @property
+    def ordered(self):
+        """Return deserialized orderd dict."""
+        return deserialize_via_marshal(self.data_dict_ordered)
+
+    method = db.relationship(BsrMETHOD, backref='methoddata')
+
 
 class BsrMETHODDATABUCKET(db.Model):
 
-    """Represents a BsrMETHODDATABUCKET record."""
+    """Represent a BsrMETHODDATABUCKET record."""
 
     __tablename__ = 'bsrMETHODDATABUCKET'
 
@@ -84,10 +126,22 @@ class BsrMETHODDATABUCKET(db.Model):
     bucket_last_value = db.Column(db.String(255))
     last_updated = db.Column(db.DateTime)
 
+    method = db.relationship(BsrMETHOD, backref=db.backref(
+        "buckets",
+        collection_class=attribute_mapped_collection("bucket_no"),
+        cascade="all, delete-orphan"
+        )
+    )
+
+    @property
+    def data(self):
+        """Return bucket data as intbitset."""
+        return intbitset(self.bucket_data)
+
 
 class BsrMETHODNAME(db.Model):
 
-    """Represents a BsrMETHODNAME record."""
+    """Represent a BsrMETHODNAME record."""
 
     __tablename__ = 'bsrMETHODNAME'
 
@@ -104,7 +158,7 @@ class BsrMETHODNAME(db.Model):
 
 class Collection_bsrMETHOD(db.Model):
 
-    """Represents a Collection_bsrMETHOD record."""
+    """Represent a Collection_bsrMETHOD record."""
 
     __tablename__ = 'collection_bsrMETHOD'
 

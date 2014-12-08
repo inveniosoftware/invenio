@@ -14,3 +14,4 @@
 -e git+git://github.com/inveniosoftware/flask-menu.git#egg=flask-menu
 -e git+git://github.com/inveniosoftware/flask-breadcrumbs.git#egg=flask-breadcrumbs
 -e git+git://github.com/inveniosoftware/flask-registry.git#egg=flask-registry
+-e git+git://github.com/inveniosoftware/invenio-query-parser.git#egg=invenio-query-parser

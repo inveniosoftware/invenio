@@ -25,9 +25,16 @@ from six import iteritems
 from flask import g, url_for, request
 from flask.ext.login import current_user
 
-from .cache import search_results_cache, \
-    get_search_results_cache_key_from_qid
-from .models import Collection
+from .cache import (
+    get_search_results_cache_key_from_qid,
+    search_results_cache,
+)
+from .engine import search_unit
+from .models import Collection, Field
+from .utils import (
+    get_most_popular_field_values,
+    get_records_that_can_be_displayed,
+)
 
 from invenio.base.globals import cfg
 from intbitset import intbitset
@@ -45,16 +52,14 @@ def get_current_user_records_that_can_be_displayed(qid):
 
     @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     def get_records_for_user(qid, uid):
-        from invenio.legacy.search_engine import \
-            get_records_that_can_be_displayed
         key = get_search_results_cache_key_from_qid(qid)
         data = search_results_cache.get(key)
         if data is None:
             return intbitset([])
         cc = search_results_cache.get(key + '::cc')
-        return get_records_that_can_be_displayed(current_user,
-                                                 intbitset().fastload(data),
-                                                 cc)
+        return get_records_that_can_be_displayed(
+            current_user.get('precached_permitted_restricted_collections', []),
+            intbitset().fastload(data), cc)
     # Simplifies API
     return get_records_for_user(qid, current_user.get_id())
 
@@ -137,19 +142,15 @@ class FacetBuilder(object):
 
     def get_facets_for_query(self, qid, limit=20, parent=None):
         """Return facet data."""
-        from invenio.legacy.search_engine import get_most_popular_field_values,\
-            get_field_tags
-        return get_most_popular_field_values(self.get_recids(qid),
-                                             get_field_tags(self.name)
-                                             )[0:limit]
+        return get_most_popular_field_values(
+            self.get_recids(qid), Field.get_field_tags(self.name)
+        )[0:limit]
 
     def get_value_recids(self, value):
         """Return record ids in intbitset for given field value."""
-        from invenio.legacy.search_engine import search_pattern
         if isinstance(value, unicode):
             value = value.encode('utf8')
-        p = '"' + str(value) + '"'
-        return search_pattern(p=p, f=self.name)
+        return search_unit(p=value, f=self.name, m='e')
 
     def get_facet_recids(self, values):
         """Return record ids in intbitset for all field values."""

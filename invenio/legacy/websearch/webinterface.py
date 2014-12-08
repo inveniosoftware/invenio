@@ -53,7 +53,6 @@ from invenio.config import \
     CFG_WEBDIR, \
     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-    CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
     CFG_INSPIRE_SITE, \
     CFG_WEBSEARCH_WILDCARD_LIMIT, \
@@ -73,20 +72,13 @@ from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import check_user_can_view_record, \
     collection_reclist_cache, \
     collection_restricted_p, \
-    create_similarly_named_authors_link_box, \
-    get_colID, \
     get_coll_i18nname, \
     get_most_popular_field_values, \
-    get_mysql_recid_from_aleph_sysno, \
     guess_primary_collection_of_a_record, \
-    page_end, \
-    page_start, \
-    perform_request_cache, \
-    perform_request_log, \
     perform_request_search, \
     restricted_collection_cache, \
-    get_coll_normalised_name, \
     EM_REPOSITORY
+from invenio.modules.search.models import Collection
 from invenio.legacy.websearch.webcoll import perform_display_collection
 from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
@@ -398,7 +390,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     """ Handling of the /search URL and its sub-pages. """
 
-    _exports = ['', 'authenticate', 'cache', 'log']
+    _exports = ['', 'authenticate', 'cache']
 
     def __call__(self, req, form):
         """ Perform a search. """
@@ -506,16 +498,6 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             return str(out)
         else:
             return out
-
-    def cache(self, req, form):
-        """Search cache page."""
-        argd = wash_urlargd(form, {'action': (str, 'show')})
-        return perform_request_cache(req, action=argd['action'])
-
-    def log(self, req, form):
-        """Search log page."""
-        argd = wash_urlargd(form, {'date': (str, '')})
-        return perform_request_log(req, date=argd['date'])
 
     def authenticate(self, req, form):
         """Restricted search results pages."""
@@ -676,19 +658,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         elif component == CFG_SITE_RECORD or component == 'record-restricted':
             try:
-                if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
-                    # let us try to recognize /<CFG_SITE_RECORD>/<SYSNO> style of URLs:
-                    # check for SYSNOs with an embedded slash; needed for [ARXIVINV-15]
-                    if len(path) > 1 and get_mysql_recid_from_aleph_sysno(path[0] + "/" + path[1]):
-                        path[0] = path[0] + "/" + path[1]
-                        del path[1]
-                    x = get_mysql_recid_from_aleph_sysno(path[0])
-                    if x:
-                        recid = x
-                    else:
-                        recid = int(path[0])
-                else:
-                    recid = int(path[0])
+                recid = int(path[0])
             except IndexError:
                 # display record #1 for URL /CFG_SITE_RECORD without a number
                 recid = 1
@@ -840,8 +810,9 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     navmenuid='search')
 
     # deduce collection id:
-    normalised_name = get_coll_normalised_name(c)
-    colID = get_colID(normalised_name)
+    collection = Collection.query.filter_by(name=c).first()
+    colID = collection.id if collection else None
+    normalised_name = collection.name if collection else c
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %(x_colname)s does not seem to exist.", x_colname='<strong>' + str(c) + '</strong>',)) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %(x_sitehref)s.", x_sitehref='<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'

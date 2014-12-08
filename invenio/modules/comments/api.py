@@ -71,9 +71,8 @@ from .config import CFG_WEBCOMMENT_ACTION_CODE, \
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.search_engine import \
     guess_primary_collection_of_a_record, \
-    check_user_can_view_record, \
-    get_collection_reclist, \
-    get_colID
+    check_user_can_view_record
+from invenio.modules.search.cache import get_collection_reclist
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.utils.htmlwasher import EmailWasher
 try:
@@ -1133,8 +1132,7 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
     # Get users automatically subscribed, based on the record metadata
     collections_with_auto_replies = CFG_WEBCOMMENT_EMAIL_REPLIES_TO.keys()
     for collection in collections_with_auto_replies:
-        if (get_colID(collection) is not None) and \
-               (recID in get_collection_reclist(collection)):
+        if recID in get_collection_reclist(collection):
             fields = CFG_WEBCOMMENT_EMAIL_REPLIES_TO[collection]
             for field in fields:
                 emails = get_fieldvalues(recID, field)
@@ -1289,8 +1287,7 @@ def get_record_status(recid):
     for collection in collections_with_rounds:
         # Find the first collection defines rounds field for this
         # record
-        if get_colID(collection) is not None and \
-               (recid in get_collection_reclist(collection)):
+        if recid in get_collection_reclist(collection):
             commenting_rounds = get_fieldvalues(recid, CFG_WEBCOMMENT_ROUND_DATAFIELD.get(collection, ""))
             if commenting_rounds:
                 commenting_round = commenting_rounds[0]
@@ -1301,8 +1298,7 @@ def get_record_status(recid):
     for collection in collections_with_restrictions:
         # Find the first collection that defines restriction field for
         # this record
-        if get_colID(collection) is not None and \
-               recid in get_collection_reclist(collection):
+        if recid in get_collection_reclist(collection):
             restrictions = get_fieldvalues(recid, CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.get(collection, ""))
             if restrictions:
                 restriction = restrictions[0]
