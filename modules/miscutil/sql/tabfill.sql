@@ -63,6 +63,11 @@ INSERT INTO field VALUES (40,'refers to excluding self cites','referstoexcluding
 INSERT INTO field VALUES (41,'cited by excluding self cites','citedbyexcludingselfcites');
 INSERT INTO field VALUES (42,'cataloguer nickname','cataloguer');
 INSERT INTO field VALUES (43,'file name','filename');
+INSERT INTO field VALUES (44,'country','country');
+INSERT INTO field VALUES (45,'note','note');
+INSERT INTO field VALUES (46,'address','address');
+INSERT INTO field VALUES (47,'data source','datasource');
+INSERT INTO field VALUES (50,'journal page','journalpage');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);
@@ -280,6 +285,22 @@ INSERT INTO field_tag VALUES (39,223,10);
 INSERT INTO field_tag VALUES (39,224,10);
 INSERT INTO field_tag VALUES (39,225,10);
 INSERT INTO field_tag VALUES (39,226,10);
+-- country field
+INSERT INTO field_tag VALUES (44,133,10);
+INSERT INTO field_tag VALUES (44,134,10);
+INSERT INTO field_tag VALUES (44,227,10);
+INSERT INTO field_tag VALUES (44,228,10);
+INSERT INTO field_tag VALUES (44,229,10);
+INSERT INTO field_tag VALUES (44,230,10);
+-- address fields
+INSERT INTO field_tag VALUES (45,231,10);
+INSERT INTO field_tag VALUES (46,232,10);
+INSERT INTO field_tag VALUES (46,233,10);
+INSERT INTO field_tag VALUES (46,234,10);
+INSERT INTO field_tag VALUES (46,149,10);
+--
+INSERT INTO field_tag VALUES (47,235,10);
+INSERT INTO field_tag VALUES (50,236,10);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -540,7 +561,19 @@ INSERT INTO tag VALUES (223,'FIXME_ALEPH_base_number','909C0b','FIXME_ALEPH_base
 INSERT INTO tag VALUES (224,'FIXME_accelerator','909C0a','FIXME_accelerator');
 INSERT INTO tag VALUES (225,'FIXME_code','909C0o','FIXME_code');
 INSERT INTO tag VALUES (226,'FIXME_909C2','909C2%','FIXME_909C2');
-
+-- country code
+INSERT INTO tag VALUES (227,'SPIRES name','110__u','');
+INSERT INTO tag VALUES (228,'country name','371__d','');
+INSERT INTO tag VALUES (229,'country code','371__g','');
+INSERT INTO tag VALUES (230,'extra','371__x','');
+--
+INSERT INTO tag VALUES (231,'note', '500__a','');
+INSERT INTO tag VALUES (232,'address', '371__%','');
+INSERT INTO tag VALUES (233,'110__(any)', '110__%','');
+INSERT INTO tag VALUES (234,'410__g', '410__g','');
+--
+INSERT INTO tag VALUES (235,'data source','786__w','');
+INSERT INTO tag VALUES (236,'journal page','773__c','');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
@@ -570,6 +603,8 @@ INSERT INTO idxINDEX VALUES (25,'filetype','This index contains extensions of fi
 INSERT INTO idxINDEX VALUES (26,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (27,'doi','This index contains words/phrases from doi fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDOITokenizer');
 INSERT INTO idxINDEX VALUES (28,'filename','This index contains file names of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFilenameTokenizer');
+INSERT INTO idxINDEX VALUES (29,'country','This index contains country names of the affiliated institutes of the authors.','1970-01-01 00:00:00', '', 'native', '','No','No','No', 'BibIndexCountryTokenizer');
+INSERT INTO idxINDEX VALUES (30,'journalpage','This index contains words/phrases from the journal page field.','1970-01-01 00:00:00', '', 'native', '','No','No','No', 'BibIndexJournalPageTokenizer');
 
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
@@ -600,6 +635,8 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (25,38);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (26,39);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (27,18);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (28,43);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (29,44);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (30,50);
 
 
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 2);
@@ -614,7 +651,6 @@ INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 13);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 19);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 26);
 INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (1, 27);
-
 
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');

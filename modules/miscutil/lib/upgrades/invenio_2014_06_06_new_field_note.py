@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,8 +17,35 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibconvert kbload
+from invenio.dbquery import run_sql
 
-EXTRA_DIST = bibconvert.in
+depends_on = ['invenio_release_1_1_0']
 
-CLEANFILES = *~ *.tmp
+
+def info():
+    return "New note field."
+
+
+def do_upgrade():
+    pass
+
+
+def do_upgrade_atlantis():
+    field_id = run_sql("""INSERT INTO field SET name='note', code='note'""")
+    tag_id = run_sql("""INSERT INTO tag SET name='note', value='500__a'""")
+    run_sql(
+        """INSERT INTO field_tag VALUES (%s, %s, 10)""",
+        (field_id, tag_id)
+    )
+
+
+def estimate():
+    return 1
+
+
+def pre_upgrade():
+    pass
+
+
+def post_upgrade():
+    pass

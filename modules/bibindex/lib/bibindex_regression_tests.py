@@ -28,7 +28,6 @@ from time import sleep
 
 from invenio.bibindex_engine import WordTable, \
     VirtualIndexTable, \
-    get_word_tables, \
     find_affected_records_for_index, \
     get_recIDs_by_date_authority, \
     get_recIDs_by_date_bibliographic, \
@@ -66,6 +65,8 @@ from invenio.bibtask import task_log_path
 
 from invenio.dbquery import get_table_update_time
 from invenio.search_engine import get_index_stemming_language as gis
+
+from invenio.bibknowledge import add_kb_mapping, remove_kb_mapping
 
 def reindex_for_type_with_bibsched(index_name, force_all=False, *other_options):
     """Runs bibindex for the specified index and returns the task_id.
@@ -774,6 +775,189 @@ class BibIndexCJKTokenizerTitleIndexTest(InvenioTestCase):
         self.assertEqual(iset, ['\xe6\x95\xac', '\xe7\x8d\xa8', '\xe4\xba\xad', '\xe5\x9d\x90'])
 
 
+class BibIndexCountryTokenizerCountryPhraseIndexTest(InvenioTestCase):
+    """
+       Checks country tokenization on country phrase index.
+    """
+
+    def test_phrase_indexing(self):
+        """
+           Country Tokenizer - searching for 'ch', 'switzerland', 'us', 'usa',
+           'united states' in country phrase index, forward table
+        """
+
+        test_pairs = [
+            ('ch', [12, 14, 17, 18, 44, 55]),
+            ('switzerland', [12, 14, 17, 18, 44, 55]),
+            ('us', []),
+            ('usa', []),  # because there is no synonym at indexing time
+            ('united states', []),
+            ('it', []),
+            ('italy', [])
+        ]
+
+        for term, result_list in test_pairs:
+            query = "SELECT * from idxPHRASE%02dF WHERE term='%s'" % (
+                get_index_id_from_index_name('country'),
+                term
+            )
+            res = run_sql(query)
+            iset = []
+            if res:
+                iset = intbitset(res[0][2])
+                iset = iset.tolist()
+            self.assertEqual(
+                iset, result_list,
+                "Searching for '%s': %s != %s" % (
+                    term, repr(iset), repr(result_list)
+                )
+            )
+
+    def test_indexing_country_name_equals_country_code(self):
+        """
+           Country Tokenizer - searching for country code and country name in
+           the country phrase index, checking that the search results are the
+           same
+        """
+        country_map = [
+            ('ch', 'switzerland'),
+            ('us', 'united states'),
+            ('it', 'italy'),
+        ]
+
+        for country_code, country_name in country_map:
+            query_code = "SELECT * from idxPHRASE%02dF WHERE term='%s'" % (
+                get_index_id_from_index_name('country'),
+                country_code
+            )
+            query_name = "SELECT * from idxPHRASE%02dF WHERE term='%s'" % (
+                get_index_id_from_index_name('country'),
+                country_name
+            )
+            res_code = run_sql(query_code)
+            res_name = run_sql(query_name)
+            iset_code = []
+            if res_code:
+                iset_code = intbitset(res_code[0][2])
+                iset_code = iset_code.tolist()
+            iset_name = []
+            if res_name:
+                iset_name = intbitset(res_name[0][2])
+                iset_name = iset_name.tolist()
+            self.assertEqual(
+                iset_code, iset_name,
+                "Searching for '%s' and '%s': %s != %s" % (
+                    country_code, country_name,
+                    repr(iset_code), repr(iset_name)
+                )
+            )
+
+
+class BibIndexCountryTokenizerCountryWordIndexTest(InvenioTestCase):
+    """
+       Checks country tokenization on country word index.
+    """
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            self.last_updated = reindex_word_tables_into_testtables(
+                'country',
+                parameters={'tokenizer':'BibIndexCountryTokenizer',
+                            'last_updated':'0000-00-00 00:00:00'}
+            )
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter >= 1:
+            remove_reindexed_word_testtables('country')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('country'),
+                parameters={'tokenizer':'BibIndexCountryTokenizer',
+                            'last_updated':self.last_updated}
+            )
+            run_sql(reverse_changes)
+
+    def test_word_indexing(self):
+        """
+           Country Tokenizer - searching for 'ch', 'switzerland', 'us', 'usa',
+           'united', 'states' in country word index, forward table
+        """
+
+        test_pairs = [
+            ('ch', [12, 14, 17, 18, 44, 55]),
+            ('switzerland', [12, 14, 17, 18, 44, 55]),
+            ('us', []),
+            ('usa', []),  # because there is no synonym at indexing time
+            ('united', []),
+            ('states', []),
+            ('it', []),
+            ('italy', []),
+        ]
+
+        for term, result_list in test_pairs:
+            query = "SELECT * from test_idxWORD%02dF WHERE term='%s'" % (
+                get_index_id_from_index_name('country'),
+                term
+            )
+            res = run_sql(query)
+            iset = []
+            if res:
+                iset = intbitset(res[0][2])
+                iset = iset.tolist()
+            self.assertEqual(
+                iset, result_list,
+                "Searching for '%s': %s != %s" % (
+                    term, repr(iset), repr(result_list)
+                )
+            )
+
+
+class BibIndexCountryTokenizerCountryPairIndexTest(InvenioTestCase):
+    """
+       Checks country tokenization on country pair index.
+    """
+
+    def test_pair_indexing(self):
+        """
+           Country Tokenizer - searching for 'ch', 'switzerland', 'us', 'usa',
+           'united states' in country pair index, forward table
+        """
+
+        test_pairs = [
+            ('ch', []),
+            ('switzerland', []),
+            ('us', []),
+            ('usa', []),  # because there is no synonym at indexing time
+            ('united states', []),
+            ('it', []),
+            ('italy', [])
+        ]
+
+        for term, result_list in test_pairs:
+            query = "SELECT * from idxPAIR%02dF WHERE term='%s'" % (
+                get_index_id_from_index_name('country'),
+                term
+            )
+            res = run_sql(query)
+            iset = []
+            if res:
+                iset = intbitset(res[0][2])
+                iset = iset.tolist()
+            self.assertEqual(
+                iset, result_list,
+                "Searching for '%s': %s != %s" % (
+                    term, repr(iset), repr(result_list)
+                )
+            )
+
+
 class BibIndexAuthorityRecordTest(InvenioTestCase):
     """Test if BibIndex correctly knows when to update the index for a
     bibliographic record if it is dependent upon an authority record changed
@@ -1169,7 +1353,7 @@ class BibIndexFindingIndexesForTags(InvenioTestCase):
         """bibindex - checks 'get_marc_tag_indexes' for tag '100'"""
         self.assertEqual(('author', 'affiliation', 'exactauthor', 'firstauthor',
                           'exactfirstauthor', 'authorcount', 'authorityauthor',
-                          'miscellaneous', 'global'),
+                          'miscellaneous', 'country', 'global'),
                          zip(*get_marc_tag_indexes('100'))[1])
 
     def test_author_exact_tag_virtual_indexes_off(self):
@@ -1441,42 +1625,35 @@ class BibIndexVirtualIndexAlsoChangesTest(InvenioTestCase):
                          deserialize_via_marshal(run_sql(query)[0][0]))
 
 
-class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
+class BibIndexVirtualIndexTest(InvenioTestCase):
 
-    counter = 0
     indexes = ["authorcount", "journal", "year"]
     _id = 40
     new_index_name = ""
 
     @classmethod
-    def setUp(self):
-        self.counter += 1
-        if self.counter == 1:
-            self.new_index_name = create_virtual_index(self._id, self.indexes)
-            wtabs = get_word_tables(self.indexes)
-            for index_name in self.indexes:
-                wordTable = WordTable(index_name=index_name,
-                                      table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
-                                      wash_index_terms=50)
-                wordTable.add_recIDs([[1, 113]], 1000)
-            vit = VirtualIndexTable(self.new_index_name,
-                                    CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-            vit.run_update()
-            #removal part
-            vit.remove_dependent_index("authorcount")
-
+    def setUpClass(cls):
+        cls.new_index_name = create_virtual_index(cls._id, cls.indexes)
+        for index_name in cls.indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 113]], 1000)
+        vit = VirtualIndexTable(cls.new_index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        vit.run_update()
+        #removal part
+        vit.remove_dependent_index("authorcount")
 
     @classmethod
-    def tearDown(self):
-        if self.counter == 9:
-            remove_virtual_index(self._id)
-
+    def tearDownClass(cls):
+        remove_virtual_index(cls._id)
 
     def test_authorcount_removal_number_of_items(self):
         """bibindex - checks virtual index after authorcount index removal - number of items"""
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
-        self.assertEqual(157, res[0][0])
+        self.assertEqual(220, res[0][0])
 
     def test_authorcount_removal_common_terms_intact(self):
         """bibindex - checks virtual index after authorcount index removal - common terms"""
@@ -1518,25 +1695,51 @@ class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
         terms = [re.sub(re_prefix, '', term) for term in terms]
         self.assertEqual(sorted(['2002', 'Eur. Phys. J., C']), sorted(terms))
 
+
+class BibIndexVirtualIndexRemovalTest(InvenioTestCase):
+
+    _id = 40
+    indexes = ["authorcount", "journal", "year"]
+    new_index_name = ""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.new_index_name = create_virtual_index(cls._id, cls.indexes)
+        for index_name in cls.indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            wordTable.add_recIDs([[1, 113]], 1000)
+        vit = VirtualIndexTable(cls.new_index_name,
+                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
+        vit.run_update()
+        #removal part
+        vit.remove_dependent_index("authorcount")
+        vit.remove_dependent_index("year")
+
+    @classmethod
+    def tearDownClass(cls):
+        remove_virtual_index(cls._id)
+
     def test_year_removal_number_of_items(self):
         """bibindex - checks virtual index after year removal - number of items"""
-        #must be run after: tearDown
-        vit = VirtualIndexTable(self.new_index_name,
-                                CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"])
-        vit.remove_dependent_index("year")
         query = """SELECT count(*) FROM idxWORD%02dF"""
         res = run_sql(query % self._id)
-        self.assertEqual(134, res[0][0])
+        self.assertEqual(197, res[0][0])
 
     def test_year_removal_record_18_hitlist(self):
         """bibindex - checks virtual index after year removal - termlist for record 18"""
-        #must be run after: tearDown, test_year_removal_number_of_items
         query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=18"""
         res = run_sql(query % self._id)
         terms = deserialize_via_marshal(res[0][0])
         terms = [re.sub(re_prefix, '', term) for term in terms]
-        self.assertEqual(sorted(['151', '357','1985', 'Phys. Lett., B 151 (1985) 357', 'Phys. Lett., B']),
+        self.assertEqual(sorted(['151', '1985', '357', '357-362',
+                         'Phys. Lett., B',
+                         'Phys. Lett., B 151',
+                         'Phys. Lett., B 151 (1985) 357',
+                         'Phys. Lett., B 151 (1985) 357-362']),
                          sorted(terms))
+
 
 class BibIndexCLICallTest(InvenioTestCase):
     """Tests if calls to bibindex from CLI (bibsched deamon) are run correctly"""
@@ -1823,6 +2026,58 @@ class BibIndexFilenameIndexTest(InvenioTestCase):
         self.assertTrue(len(res) == 2)
 
 
+class BibIndexJournalPageIndexTest(InvenioTestCase):
+    index_name = "journalpage"
+
+    @classmethod
+    def setUpClass(self):
+        """reindexation to new table"""
+        self.last_updated = reindex_word_tables_into_testtables(
+            self.index_name,
+            parameters={'last_updated': '0000-00-00 00:00:00'}
+        )
+
+    @classmethod
+    def tearDownClass(self):
+        """cleaning up"""
+        remove_reindexed_word_testtables(self.index_name)
+        reverse_changes = prepare_for_index_update(
+            get_index_id_from_index_name(self.index_name),
+            parameters={'last_updated': self.last_updated}
+        )
+        run_sql(reverse_changes)
+
+    def test_word_index_1(self):
+        """Journal Page Tokenizer - searching for '1' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("1",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [101, 102, 103, 112])
+
+    def test_word_index_173(self):
+        """Journal Page Tokenizer - searching for '173' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("173",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [108])
+
+    def test_word_index_173_180(self):
+        """Journal Page Tokenizer - searching for '173-180' in word table"""
+        query = """SELECT hitlist FROM idxWORD%02dF WHERE term = %%s"""
+        res = run_sql(
+            query % get_index_id_from_index_name(self.index_name),
+            ("173-180",)
+        )
+        hitlist = intbitset(res[0][0])
+        self.assertEqual(list(hitlist), [108])
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
@@ -1833,6 +2088,9 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexDOIIndexTest,
                              BibIndexJournalIndexTest,
                              BibIndexCJKTokenizerTitleIndexTest,
+                             BibIndexCountryTokenizerCountryPhraseIndexTest,
+                             BibIndexCountryTokenizerCountryWordIndexTest,
+                             BibIndexCountryTokenizerCountryPairIndexTest,
                              BibIndexAuthorityRecordTest,
                              BibIndexFindingAffectedIndexes,
                              BibIndexIndexingAffectedIndexes,
@@ -1845,9 +2103,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexCommonWordsInVirtualIndexTest,
                              BibIndexVirtualIndexQueueTableTest,
                              BibIndexSpecialTagsTest,
-                             BibIndexFilenameIndexTest)
+                             BibIndexFilenameIndexTest,
+                             BibIndexJournalPageIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
-

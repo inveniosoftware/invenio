@@ -178,19 +178,9 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.bibauthorid_dbinterface import get_data_of_papers
-    lwords = []
-    res = get_data_of_papers([recID])
-    if res is None:
-        ## BibAuthorID is not enabled
-        return lwords
-    else:
-        dpersons, dpersoninfos = res
-    for aid in dpersoninfos.keys():
-        author_canonical_id = dpersoninfos[aid].get('canonical_id', '')
-        if author_canonical_id:
-            lwords.append(author_canonical_id)
-    return lwords
+    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
+        tag='canonical_name' AND flag>-2""", (recID, ))]
 
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
@@ -377,22 +367,6 @@ def split_ranges(parse_string):
                 tmp_recIDs[1] = tmp
             recIDs.append([int(tmp_recIDs[0]), int(tmp_recIDs[1])])
     return recIDs
-
-
-def get_word_tables(tables):
-    """ Given a list of table names it return a list of tuples
-    (index_id, index_name, index_tags).
-    """
-    wordTables = []
-    if tables:
-        for index in tables:
-            index_id = get_index_id_from_index_name(index)
-            if index_id:
-                wordTables.append((index_id, index, get_index_tags(index)))
-            else:
-                write_message("Error: There is no %s words table." % \
-                               index, sys.stderr)
-    return wordTables
 
 
 def get_date_range(var):
@@ -749,8 +723,10 @@ class AbstractIndexTable(object):
             else:
                 value[word] = {recID: sign}
         except Exception as e:
-            write_message("Error: Cannot put word %s with sign %d for recID %s." % \
-                          (word, sign, recID))
+            write_message(
+                "Error: Cannot put word %s with sign %d for recID %s (%s)."
+                % (word, sign, recID, e)
+            )
 
     def load_old_recIDs(self, word):
         """Load existing hitlist for the word from the database index files."""
@@ -1543,9 +1519,11 @@ class WordTable(AbstractIndexTable):
                 value[word][recID] = sign
             else:
                 value[word] = {recID: sign}
-        except:
-            write_message("Error: Cannot put word %s with sign %d for recID %s." % (word, sign, recID))
-
+        except Exception as e:
+            write_message(
+                "Error: Cannot put word %s with sign %d for recID %s (%s)."
+                % (word, sign, recID, e)
+            )
 
     def del_recIDs(self, recIDs):
         """Fetches records which id in the recIDs range list and adds

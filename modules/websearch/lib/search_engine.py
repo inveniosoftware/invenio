@@ -2580,6 +2580,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
     # okay, return result set:
     return hitset
 
+
 def search_unit_in_idxpairs(p, f, search_type, wl=0):
     """Searches for pair 'p' inside idxPAIR table for field 'f' and
     returns hitset of recIDs found."""

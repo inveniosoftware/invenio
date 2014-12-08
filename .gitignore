@@ -38,6 +38,7 @@ modules/bibauthorid/bin/bibauthorid
 modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify
 modules/bibconvert/bin/bibconvert
+modules/bibconvert/bin/kbload
 modules/bibdocfile/bin/bibdocfile
 modules/bibedit/bin/bibedit
 modules/bibrecord/bin/textmarc2xmlmarc

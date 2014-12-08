@@ -26,7 +26,8 @@ __revision__ = "$Id$"
 
 from invenio.testutils import InvenioTestCase, InvenioXmlTestCase
 import re
-import urlparse, cgi
+import urlparse
+import cgi
 import sys
 import cStringIO
 
@@ -1406,7 +1407,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
                           64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 76, 80,
                           82, 83, 85, 86, 87, 88, 89, 90, 92, 93, 96, 97, 98,
                           99, 100, 101, 102, 103, 104, 107, 108, 109, 113, 127,
-                          128, 18, 74, 79, 91, 94, 77, 78, 95, 84, 81],
+                          128, 142, 143, 144, 145, 18, 74, 79, 91, 94, 77, 78,
+                          95, 84, 81],
                 perform_request_search(p='', rm='citation', so='a'))
 
     def test_search_engine_python_api_ranked_by_citation_desc(self):
@@ -1419,7 +1421,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
                           64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 76, 80,
                           82, 83, 85, 86, 87, 88, 89, 90, 92, 93, 96, 97, 98,
                           99, 100, 101, 102, 103, 104, 107, 108, 109, 113, 127,
-                          128, 18, 74, 79, 91, 94, 77, 78, 95, 84, 81])),
+                          128, 142, 143, 144, 145, 18, 74, 79, 91, 94, 77, 78,
+                          95, 84, 81])),
                 perform_request_search(p='', rm='citation', so='d'))
 
     def test_search_engine_python_api_textmarc_field_filtered(self):
@@ -4556,7 +4559,7 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a&rg=0',
-                                                  expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
+                                                  expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128, 142, 143, 144, 145]'))
 
 
 class WebSearchDateQueryTest(InvenioTestCase):
@@ -4879,9 +4882,11 @@ class WebSearchDOIQueryTest(InvenioTestCase):
 
     def test_span_doi_search(self):
         """websearch - doi, span query 1->9"""
-        errors = test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=doi%3A1->9&of=id',
-                                       expected_text="[128, 127, 96]")
-        self.assertEqual(True, errors == [])
+        errors = test_web_page_content(
+            CFG_SITE_URL + '/search?ln=en&p=doi%3A1->9&of=id',
+            expected_text="[128, 127, 96]"
+        )
+        self.assertEqual([], errors)
 
     def test_doi_wildcard(self):
         """websearch - doi, query for '10.1063%'"""
