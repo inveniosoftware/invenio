@@ -1099,10 +1099,12 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             dirname = "%s/rss" % (CFG_CACHEDIR)
             mymkdir(dirname)
             fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            if os.path.exists(fullfilename):
+            try:
                 # Remove the file just in case it already existed
                 # so that a bit of space is created
                 os.remove(fullfilename)
+            except OSError:
+                pass
 
             # Check if there's enough space to cache the request.
             if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
