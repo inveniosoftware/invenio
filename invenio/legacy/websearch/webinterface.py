@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -85,7 +85,6 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 from invenio.modules.collections.cache import get_collection_reclist
-from invenio.modules.formatter import format_records
 from invenio.modules.formatter.engine import get_output_formats
 from intbitset import intbitset
 from invenio.legacy.bibupload.engine import find_record_from_sysno
@@ -893,129 +892,9 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """RSS 2.0 feed service."""
-
-        # Keep only interesting parameters for the search
-        default_params = websearch_templates.rss_default_urlargd
-        # We need to keep 'jrec' and 'rg' here in order to have
-        # 'multi-page' RSS. These parameters are not kept be default
-        # as we don't want to consider them when building RSS links
-        # from search and browse pages.
-        default_params.update({'jrec':(int, 1),
-                               'rg': (int, CFG_WEBSEARCH_INSTANT_BROWSE_RSS)})
-        argd = wash_urlargd(form, default_params)
-        user_info = collect_user_info(req)
-
-        for coll in argd['c'] + [argd['cc']]:
-            if collection_restricted_p(coll):
-                (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest':
-                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
-                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
-                    return redirect_to_url(req, target, norobot=True)
-                elif auth_code:
-                    return page_not_authorized(req, "../", \
-                        text=auth_msg, \
-                        navmenuid='search')
-
-        # Create a standard filename with these parameters
-        current_url = websearch_templates.build_rss_url(argd)
-        cache_filename = current_url.split('/')[-1]
-
-        # In the same way as previously, add 'jrec' & 'rg'
-
-        req.content_type = "application/rss+xml"
-        req.send_http_header()
-        try:
-            # Try to read from cache
-            path = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            # Check if cache needs refresh
-            filedesc = open(path, "r")
-            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
-            assert(datetime.datetime.now() < last_update_time + datetime.timedelta(minutes=CFG_WEBSEARCH_RSS_TTL))
-            c_rss = filedesc.read()
-            filedesc.close()
-            req.write(c_rss)
-            return
-        except Exception as e:
-            # do it live and cache
-
-            previous_url = None
-            if argd['jrec'] > 1:
-                prev_jrec = argd['jrec'] - argd['rg']
-                if prev_jrec < 1:
-                    prev_jrec = 1
-                previous_url = websearch_templates.build_rss_url(argd,
-                                                                 jrec=prev_jrec)
-
-            #check if the user has rights to set a high wildcard limit
-            #if not, reduce the limit set by user, with the default one
-            if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
-                if acc_authorize_action(req, 'runbibedit')[0] != 0:
-                    argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
-
-            req.argd = argd
-            recIDs = perform_request_search(req, of="id",
-                                                          c=argd['c'], cc=argd['cc'],
-                                                          p=argd['p'], f=argd['f'],
-                                                          p1=argd['p1'], f1=argd['f1'],
-                                                          m1=argd['m1'], op1=argd['op1'],
-                                                          p2=argd['p2'], f2=argd['f2'],
-                                                          m2=argd['m2'], op2=argd['op2'],
-                                                          p3=argd['p3'], f3=argd['f3'],
-                                                          m3=argd['m3'], wl=argd['wl'])
-            nb_found = len(recIDs)
-            next_url = None
-            if len(recIDs) >= argd['jrec'] + argd['rg']:
-                next_url = websearch_templates.build_rss_url(argd,
-                                                             jrec=(argd['jrec'] + argd['rg']))
-
-            first_url = websearch_templates.build_rss_url(argd, jrec=1)
-            last_url = websearch_templates.build_rss_url(argd, jrec=nb_found - argd['rg'] + 1)
-
-            recIDs = recIDs[-argd['jrec']:(-argd['rg'] - argd['jrec']):-1]
-
-            rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
-            websearch_templates.tmpl_xml_rss_prologue(current_url=current_url,
-                                                      previous_url=previous_url,
-                                                      next_url=next_url,
-                                                      first_url=first_url, last_url=last_url,
-                                                      nb_found=nb_found,
-                                                      jrec=argd['jrec'], rg=argd['rg'],
-                                                      cc=argd['cc']) + '\n'
-            req.write(rss_prologue)
-            rss_body = format_records(recIDs,
-                                      of='xr',
-                                      ln=argd['ln'],
-                                      user_info=user_info,
-                                      record_separator="\n",
-                                      req=req, epilogue="\n")
-            rss_epilogue = websearch_templates.tmpl_xml_rss_epilogue() + '\n'
-            req.write(rss_epilogue)
-
-            # update cache
-            dirname = "%s/rss" % (CFG_CACHEDIR)
-            mymkdir(dirname)
-            fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            try:
-                # Remove the file just in case it already existed
-                # so that a bit of space is created
-                os.remove(fullfilename)
-            except OSError:
-                pass
-
-            # Check if there's enough space to cache the request.
-            if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
-                try:
-                    os.umask(022)
-                    with open(fullfilename, "w") as fd:
-                        fd.write(rss_prologue + rss_body + rss_epilogue)
-                except IOError as v:
-                    if v[0] == 36:
-                        # URL was too long. Never mind, don't cache
-                        pass
-                    else:
-                        raise
+        import warnings
+        warnings.warn("Legacy RSS handler has been deprecated.",
+                      DeprecationWarning)
 
     index = __call__
 

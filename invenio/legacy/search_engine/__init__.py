@@ -100,7 +100,6 @@ from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_sea
     get_field_tags
 from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.modules.formatter import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
 from invenio.legacy.miscutil.data_cacher import DataCacher
 from invenio.legacy.websearch_external_collections import print_external_results_overview, perform_external_collection_search
