@@ -26,7 +26,6 @@ from werkzeug.utils import cached_property
 from invenio.ext.registry import DictModuleAutoDiscoverySubRegistry, \
     ModuleAutoDiscoverySubRegistry
 from invenio.modules.search.models import FacetCollection
-from invenio.modules.search.facet_builders import FacetBuilder
 from invenio.utils.memoise import memoize
 
 searchext = RegistryProxy('searchext', ModuleAutoDiscoveryRegistry,
@@ -89,6 +88,7 @@ class FacetsRegistry(DictModuleAutoDiscoverySubRegistry):
         :param plugin_code: a module with facet definition - should have facet
             variable
         """
+        from invenio.modules.search.facet_builders import FacetBuilder
         if 'facet' in dir(plugin_code):
             candidate = getattr(plugin_code, 'facet')
             if isinstance(candidate, FacetBuilder):
@@ -138,3 +138,10 @@ class FacetsRegistry(DictModuleAutoDiscoverySubRegistry):
                 for facet in facets_set]
 
 facets = RegistryProxy('facets', FacetsRegistry, 'facets')
+
+units = RegistryProxy(
+    'searchext.units', DictModuleAutoDiscoverySubRegistry, 'units',
+    keygetter=lambda key, value, new_value: value.__name__.split('.')[-1],
+    valuegetter=lambda value: value.search_unit,
+    registry_namespace=searchext,
+)

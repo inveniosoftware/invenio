@@ -192,7 +192,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         from invenio.modules.access.engine import acc_authorize_action
         from invenio.modules.access.control import acc_get_role_id, \
             acc_is_user_in_role
-        from invenio.legacy.search_engine import \
+        from invenio.modules.search.utils import \
             get_permitted_restricted_collections
 
         data = {}

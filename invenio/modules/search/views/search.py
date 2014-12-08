@@ -57,7 +57,7 @@ from ..cache import get_search_query_id, get_collection_name_from_cache
 from ..facet_builders import get_current_user_records_that_can_be_displayed, \
     faceted_results_filter
 from ..forms import EasySearchForm
-from ..models import Collection
+from ..models import Collection, Field
 from ..washers import wash_search_urlargd
 from flask.ext.menu import register_menu
 from invenio.base.signals import websearch_before_browse
@@ -72,6 +72,9 @@ from invenio.ext.template.context_processor import \
 from invenio.utils.pagination import Pagination
 from invenio.utils.text import slugify
 from invenio.modules.search.registry import facets
+
+from ..api import SearchEngine
+
 
 blueprint = Blueprint('search', __name__, url_prefix="",
                       template_folder='../templates',
@@ -282,8 +285,7 @@ def _create_neareset_term_box(argd_orig):
             del argd_orig['rg']
         if f == '' and ':' in p:
             fx, px = p.split(':', 1)
-            from invenio.legacy.search_engine import get_field_name
-            if get_field_name(fx) != "":
+            if Field.get_field_name(fx) is not None:
                 f, p = fx, px
 
         from invenio.legacy.search_engine import create_nearest_terms_box
@@ -296,11 +298,13 @@ def _create_neareset_term_box(argd_orig):
         return '<!-- not found -->'  # no comments
 
 
-def sort_and_rank_records(recids, so=None, rm=None, sf=None, sp=None, p=''):
+def sort_and_rank_records(recids, so=None, rm=None, sf=None, sp=None, p='',
+                          jrec=None, rg=None, of='id'):
     """TODO."""
     from invenio.legacy.search_engine import sort_or_rank_records
     return sort_or_rank_records(
-        request.get_legacy_request(), recids, rm, sf, so, sp, p
+        request.get_legacy_request(), recids, rm, sf, so, sp, p,
+        jrec=jrec, rg=rg, of=of
     )
 
 
@@ -309,7 +313,6 @@ def crumb_builder(url):
     def _crumb_builder(collection):
         qargs = request.args.to_dict()
         qargs['cc'] = collection.name
-        #return (collection.name_ln, url, qargs)
         return dict(text=collection.name_ln, url=url_for(url, **qargs))
     return _crumb_builder
 
@@ -413,12 +416,12 @@ def rss(collection, p, jrec, so, rm):
                  'of': (unicode, collection_of),
                  'ot': (unicode, None),
                  'so': (unicode, None),
+                 'sf': (unicode, None),
+                 'sp': (unicode, None),
                  'rm': (unicode, None)})
 @check_collection(default_collection=True)
-def search(collection, p, of, ot, so, rm):
+def search(collection, p, of, ot, so, sf, sp, rm):
     """Render search page."""
-    from invenio.legacy.search_engine import perform_request_search
-
     if 'action_browse' in request.args \
             or request.args.get('action', '') == 'browse':
         return browse()
@@ -427,12 +430,17 @@ def search(collection, p, of, ot, so, rm):
             and len(request.args.getlist('c')) == 1:
         return redirect(url_for('.collection', name=request.args.get('c')))
 
+    if 'f' in request.args:
+        args = request.args.copy()
+        args['p'] = "{0}:{1}".format(args['f'], args['p'])
+        del args['f']
+        return redirect('.search', **args)
+
     argd = argd_orig = wash_search_urlargd(request.args)
-    argd['of'] = 'id'
 
     # fix for queries like `/search?p=+ellis`
-    if 'p' in argd:
-        argd['p'] = argd['p'].strip()
+    p = p.strip().encode('utf-8')
+    jrec = request.values.get('jrec', 1, type=int)
 
     # update search arguments with the search user preferences
     if 'rg' not in request.values and current_user.get('rg'):
@@ -441,8 +449,12 @@ def search(collection, p, of, ot, so, rm):
 
     collection_breadcrumbs(collection)
 
-    qid = get_search_query_id(**argd)
-    recids = perform_request_search(req=request.get_legacy_request(), **argd)
+    qid = get_search_query_id(p=p, cc=collection.name)
+    searcher = SearchEngine(p)
+    recids = searcher.search(collection=collection.name)
+    records = len(recids)
+    recids = sort_and_rank_records(recids, so=so, rm=rm, sf=sf,
+                                   sp=sp, p=p, of='id', rg=rg, jrec=jrec)
 
     # back-to-search related code
     if request and not isinstance(request.get_legacy_request(),
@@ -462,12 +474,35 @@ def search(collection, p, of, ot, so, rm):
 
     ctx = dict(
         facets=facets.get_facets_config(collection, qid),
-        records=len(get_current_user_records_that_can_be_displayed(qid)),
+        records=records,
         qid=qid, rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
         easy_search_form=EasySearchForm(csrf_enabled=False),
         ot=ot
     )
+
+    # TODO add search services
+    # # WebSearch services
+    # from invenio.modules.search import services
+    # if jrec <= 1 and \
+    #        (em == "" and True or (EM_REPOSITORY["search_services"] in em)):
+    #     user_info = collect_user_info(req)
+    #     # display only on first search page, and only if wanted
+    #     # when 'em' param set.
+    #     for answer_relevance, answer_html in services.get_answers(
+    #             req, user_info, of, cc, colls_to_search, p, f, ln):
+    #         req.write('<div class="searchservicebox">')
+    #         req.write(answer_html)
+    #         if verbose > 8:
+    #             write_warning("Service relevance: %i" %
+    #                           answer_relevance, req=req)
+    #         req.write('</div>')
+
+    # TODO add external collection search
+    # if not of in ['hcs', 'hcs2']:
+    #       perform_external_collection_search_with_em(
+    #           req, cc, [p, p1, p2, p3], f, ec, verbose,
+    #           ln, selected_external_collections_infos, em=em)
 
     return response_formated_records(recids, collection, of, **ctx)
 
@@ -538,8 +573,9 @@ def results(qid, p, of, so, sf, sp, rm):
             args["jrec"] = 1
             return redirect(url_for(request.endpoint, qid=qid, **args))
 
+        from invenio.legacy.search_engine import slice_records
         return response_formated_records(
-            recids[jrec-1:jrec-1+rg], collection, of,
+            slice_records(recids, jrec, rg), collection, of,
             create_nearest_terms_box=_create_neareset_term_box, qid=qid,
             records=records)
 

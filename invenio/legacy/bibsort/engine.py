@@ -404,7 +404,12 @@ def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False, sorting_locale=N
                 locale.setlocale(locale.LC_ALL, sorting_locale + '.UTF8')
             except locale.Error:
                 write_message("Setting locale to %s is not working.. ignoring locale")
-        sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, cmp=locale.strcoll, reverse=False)
+
+        def key_func(value):
+            item = dictionary.__getitem__(value)
+            return ' '.join(item) if isinstance(item, list) else item
+
+        sorted_records_list = sorted(dictionary, key=key_func, cmp=locale.strcoll, reverse=False)
         locale.setlocale(locale.LC_ALL, orig_locale)
     else:
         sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, reverse=False)

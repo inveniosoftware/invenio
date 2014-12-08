@@ -40,8 +40,7 @@ from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.legacy.webbasket.db_layer import get_basket_owner_id, add_to_basket
 from invenio.legacy.webbasket.api import format_external_records
-from invenio.legacy.search_engine import perform_request_search, wash_colls, \
-     get_coll_sons, is_hosted_collection, get_coll_normalised_name, \
+from invenio.legacy.search_engine import perform_request_search, \
      check_user_can_view_record
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.dbquery import run_sql
@@ -55,6 +54,7 @@ CFG_EXTERNAL_COLLECTION_TIMEOUT, \
 CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
 from invenio.legacy.websearch_external_collections.getter import HTTPAsyncPageGetter, async_download
 from invenio.legacy.websearch_external_collections.utils import get_collection_id
+from invenio.modules.search.models import Collection
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')
@@ -294,21 +294,25 @@ def get_record_ids(argstr, date_from, date_until):
 
     #alerts might contain collections that have been deleted
     #check if such collections are in the query, and if yes, do not include them in the search
-    cc =  get_coll_normalised_name(cc)
+    cc = Collection.query.filter_by(name=cc).value('name')
     if not cc and not c: #the alarm was for an entire collection that does not exist anymore
         return ([], ([], []))
     if c: # some collections were defined in the query
-        c = [c_norm_name for c_norm_name in [get_coll_normalised_name(c_name) for c_name in c] if c_norm_name] #remove unknown collections from c
+        c = [c_norm_name for c_norm_name in [
+            Collection.query.filter_by(name=c_name).value('name')
+            for c_name in c] if c_norm_name]
+        # remove unknown collections from c
         if not c: #none of the collection selected in the alert still exist
             return ([], ([], []))
 
-    washed_colls = wash_colls(cc, c, sc, 0)
-    hosted_colls = washed_colls[3]
-    if hosted_colls:
-        req_args = "p=%s&f=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, f, d1d, d1m, d1y, d2d, d2m, d2y, 0)
-        external_records = calculate_external_records(req_args, [p, p1, p2, p3], f, hosted_colls, CFG_EXTERNAL_COLLECTION_TIMEOUT, CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS)
-    else:
-        external_records = ([], [])
+    # washed_colls = wash_colls(cc, c, sc, 0)
+    # hosted_colls = washed_colls[3]
+    # if hosted_colls:
+    #     req_args = "p=%s&f=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, f, d1d, d1m, d1y, d2d, d2m, d2y, 0)
+    #     external_records = calculate_external_records(req_args, [p, p1, p2, p3], f, hosted_colls, CFG_EXTERNAL_COLLECTION_TIMEOUT, CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS)
+    # else:
+    # FIXME: removed support for hosted collections
+    external_records = ([], [])
 
     recids = perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
                                   aas=aas, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,
@@ -554,8 +558,14 @@ def calculate_desired_collection_list(c, cc, sc):
     if not cc[0]:
         cc = [CFG_SITE_NAME]
 
-    # quickly create the reverse function of is_hosted_collection
-    is_not_hosted_collection = lambda coll: not is_hosted_collection(coll)
+    # quickly create the reverse function of collection.is_hosted
+    def is_not_hosted_collection(coll):
+        collection = Collection.query.filter_by(name=coll).first()
+        return collection and not collection.is_hosted
+
+    def get_coll_sons(coll):
+        collection = Collection.query.filter_by(name=coll).first()
+        return [c.name for c in collection.collection_children_r]
 
     # calculate the list of non hosted, non restricted, regular sons of cc
     washed_cc_sons = filter(is_not_hosted_collection, get_coll_sons(cc[0]))

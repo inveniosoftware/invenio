@@ -51,10 +51,8 @@ from invenio.legacy.bibauthority.config import \
 from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no,\
      get_control_nos_from_recID
 from invenio.legacy.search_engine import perform_request_search, \
-     get_index_stemming_language, \
      get_synonym_terms, \
-     search_pattern, \
-     search_unit_in_bibrec
+     search_pattern
 from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
 from invenio.legacy.bibindex.engine_washer import wash_index_term
@@ -79,7 +77,6 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     get_all_indexes, \
     get_index_virtual_indexes, \
     get_virtual_index_building_blocks, \
-    get_index_id_from_index_name, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes, \
@@ -92,11 +89,14 @@ from invenio.legacy.bibindex.engine_utils import load_tokenizers, \
     make_prefix, \
     list_union, \
     recognize_marc_tag
+from invenio.modules.indexer.cache import get_index_stemming_language
 from invenio.modules.records.api import get_record
 from invenio.utils.memoise import Memoise
 from invenio.legacy.bibindex.termcollectors import \
     TermCollector, \
     NonmarcTermCollector
+
+from .engine_utils import get_index_id_from_index_name
 
 
 if sys.hexversion < 0x2040000:
@@ -1925,6 +1925,22 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
                                         (dates[0], dates[1],)))
 
     return set(res)
+
+
+def search_unit_in_bibrec(datetext1, datetext2, search_type='c'):
+    """Return hitset of recIDs found that were either created or modified.
+
+    Search according to 'search_type' argument being 'c' or 'm' from datetext1
+    until datetext2, inclusive. Does not pay attention to pattern, collection,
+    anything. Useful to intersect later on with the 'real' query.
+    """
+    from invenio.ext.sqlalchemy import db
+    from invenio.modules.records.models import Record
+    if datetext1 != datetext2:
+        datetext1 += '->' + datetext2
+
+    return intbitset(db.session.query(Record.id).filter(
+        *Record.filter_time_interval(datetext1, search_type)).all())
 
 
 def get_recIDs_by_date_authority(dates, index_name, force_all=False):

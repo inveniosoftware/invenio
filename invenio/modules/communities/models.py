@@ -57,17 +57,22 @@ from invenio.modules.access.models import \
     AccACTION, AccARGUMENT, \
     AccAuthorization, AccROLE, UserAccROLE
 from invenio.modules.accounts.models import User
-from invenio.modules.communities.signals import \
-    after_delete_collection, after_delete_collections, \
-    after_save_collection, after_save_collections, \
-    before_delete_collection, before_delete_collections, \
-    before_save_collection, before_save_collections, post_curation, \
-    pre_curation
-from invenio.modules.oaiharvester.models import OaiREPOSITORY
+from invenio.modules.communities.signals import before_save_collection, \
+    after_save_collection, before_save_collections, after_save_collections, \
+    before_delete_collection, after_delete_collection, \
+    before_delete_collections, after_delete_collections, \
+    pre_curation, post_curation
+from invenio.modules.records.api import get_record
 from invenio.modules.search.models import \
-    Collection, CollectionCollection, \
-    CollectionFormat, CollectionPortalbox, \
-    Collectiondetailedrecordpagetabs, Collectionname, Format, Portalbox
+    Collection, \
+    CollectionCollection, \
+    CollectionFormat, \
+    CollectionPortalbox, \
+    Collectiondetailedrecordpagetabs, \
+    Collectionname, \
+    Format, \
+    Portalbox
+from invenio.modules.oaiharvester.models import OaiREPOSITORY
 
 
 class Community(db.Model):
@@ -203,8 +208,7 @@ class Community(db.Model):
     @classmethod
     def from_recid(cls, recid, provisional=False):
         """Get user communities specified in recid."""
-        from invenio.legacy.search_engine import get_record
-        rec = get_record(recid)
+        rec = get_record(recid).legacy_create_recstruct()
         prefix = "%s-" % (
             cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL']
             if provisional else cfg['COMMUNITIES_ID_PREFIX'])
@@ -300,8 +304,7 @@ class Community(db.Model):
         @param replace_func: Function to replace the collection id.
         @param include_func: Function to test if collection should be included
         """
-        from invenio.legacy.search_engine import get_record
-        rec = get_record(recid)
+        rec = get_record(recid).legacy_create_recstruct()
         newcolls = []
         dirty = False
 

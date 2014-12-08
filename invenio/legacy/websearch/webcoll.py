@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 
 import calendar
 import copy
+import datetime
 import sys
 import cgi
 import re
@@ -46,10 +47,13 @@ from invenio.config import \
      CFG_SCOAP3_SITE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.base.i18n import gettext_set_language
-from invenio.legacy.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
+from invenio.modules.sorter.engine import sort_records
+from invenio.modules.records.recordext.functions.get_creation_date import get_creation_date
+from invenio.legacy.search_engine import get_field_i18nname, collection_restricted_p, EM_REPOSITORY
 from invenio.legacy.dbquery import run_sql, Error, get_table_update_time
 from invenio.legacy.bibrank.record_sorter import get_bibrank_methods
 from invenio.utils.date import convert_datestruct_to_dategui, strftime
+from invenio.modules.search.api import SearchEngine
 from invenio.modules.formatter import format_record
 from invenio.utils.shell import mymkdir
 from intbitset import intbitset
@@ -463,18 +467,21 @@ class Collection:
                 if self.name in ['CERN Yellow Reports','Videos']:
                     last_year = str(int(this_year) - 1)
                     # detect recIDs only from this and past year:
-                    recIDs = list(self.reclist & \
-                                  search_pattern_parenthesised(p='year:%s or year:%s' % \
-                                                 (this_year, last_year)))
+                    recIDs = list(self.reclist & SearchEngine(
+                        'year:%s or year:%s' % (this_year, last_year)
+                    ).search())
                 # apply special filters:
                 if self.name in ['Videos']:
                     # select only videos with movies:
-                    recIDs = list(intbitset(recIDs) & \
-                                  search_pattern_parenthesised(p='collection:"PUBLVIDEOMOVIE" -"Virtual Visit"'))
+                    recIDs = list(intbitset(recIDs) & SearchEngine(
+                        'collection:"PUBLVIDEOMOVIE" -"Virtual Visit"'
+                    ).search())
                     of = 'hvp'
                 if self.name in ['General Talks', 'Academic Training Lectures', 'Summer Student Lectures']:
                     #select only the lectures with material
-                    recIDs = list(self.reclist & search_pattern_parenthesised(p='856:MediaArchive'))
+                    recIDs = list(self.reclist & SearchEngine(
+                        '856:MediaArchive'
+                    ).search())
                 # sort some CERN collections specially:
                 if self.name in ['Videos',
                                  'Video Clips',
@@ -487,16 +494,16 @@ class Collection:
                                  'Restricted Video Rushes',
                                  'LHC First Beam Videos',
                                  'CERN openlab Videos']:
-                    recIDs = sort_records(None, recIDs, '269__c', 'a')
+                    recIDs = sort_records(recIDs, '269__c', 'a')
                 elif self.name in ['LHCb Talks']:
-                    recIDs = sort_records(None, recIDs, 'reportnumber', 'a')
+                    recIDs = sort_records(recIDs, 'reportnumber', 'a')
                 elif self.name in ['CERN Yellow Reports']:
-                    recIDs = sort_records(None, recIDs, '084__a', 'a')
+                    recIDs = sort_records(recIDs, '084__a', 'a')
                 elif self.name in ['CERN Courier Issues',
                                    'CERN Courier Articles',
                                    'CERN Bulletin Issues',
                                    'CERN Bulletin Articles']:
-                    recIDs = sort_records(None, recIDs, '773__y', 'a')
+                    recIDs = sort_records(recIDs, '773__y', 'a')
             # CERN hack ends.
 
             total = len(recIDs)
@@ -504,9 +511,10 @@ class Collection:
 
             for idx in range(total-1, total-to_display-1, -1):
                 recid = recIDs[idx]
+                creation_date = get_creation_date(recid) or datetime.now()
                 self.latest_additions_info.append({'id': recid,
                                                    'format': format_record(recid, of, ln=ln),
-                                                   'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
+                                                   'date': datetime.strptime(creation_date, "%Y-%m-%d<br />%H:%i")})
         return
 
     def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
@@ -840,10 +848,13 @@ class Collection:
             # B - collection does have dbquery, so compute it:
             #     (note: explicitly remove DELETED records)
             if CFG_CERN_SITE:
-                reclist = search_pattern_parenthesised(None, self.dbquery + \
-                                         ' -980__:"DELETED" -980__:"DUMMY"', ap=-9) #ap=-9 for allow queries containing hidden tags
+                reclist = SearchEngine(
+                    self.dbquery + ' -980__:"DELETED" -980__:"DUMMY"'
+                ).search()
             else:
-                reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"', ap=-9) #ap=-9 allow queries containing hidden tags
+                reclist = SearchEngine(
+                    self.dbquery + ' -980__:"DELETED"'
+                ).search()
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
 
         # store the results:

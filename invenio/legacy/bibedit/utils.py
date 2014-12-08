@@ -68,7 +68,7 @@ from invenio.utils.text import wash_for_xml
 from invenio.legacy.bibedit.db_layer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
-from invenio.legacy.search_engine import record_exists, get_colID, \
+from invenio.legacy.search_engine import record_exists, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.legacy.bibrecord import get_fieldvalues
@@ -87,6 +87,7 @@ from invenio.modules.editor.registry import field_templates, record_templates, \
 
 from invenio.base.globals import cfg
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
+from invenio.modules.search.models import Collection
 
 try:
     from cPickle import loads
@@ -778,7 +779,8 @@ def can_record_have_physical_copies(recid):
     if get_record(recid) is None:
         return False
 
-    col_id = get_colID(guess_primary_collection_of_a_record(recid))
+    col_id = Collection.query.filter_by(
+        name=guess_primary_collection_of_a_record(recid)).value('id')
     collections = get_detailed_page_tabs(col_id, recid)
 
     if ("holdings" not in collections or

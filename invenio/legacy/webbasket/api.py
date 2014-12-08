@@ -49,9 +49,7 @@ from invenio.legacy.webuser import isGuestUser, collect_user_info
 from invenio.legacy.search_engine import \
      record_exists, \
      get_merged_recid, \
-     check_user_can_view_record, \
-     print_records_prologue, \
-     print_records_epilogue
+     check_user_can_view_record
 #from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.legacy.webbasket.db_layer as db
 try:
@@ -2616,6 +2614,7 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
 
 def page_start(req, of='xm'):
     """Set the content type and send the headers for the page."""
+    from invenio.legacy.search_engine import print_records_prologue
 
     if of.startswith('x'):
         req.content_type = "text/xml"
@@ -2630,6 +2629,7 @@ def page_start(req, of='xm'):
 
 def page_end(req, of='xm'):
     """Print page footer"""
+    from invenio.legacy.search_engine import print_records_epilogue
     if of.startswith('x'):
         print_records_epilogue(req, of)
 

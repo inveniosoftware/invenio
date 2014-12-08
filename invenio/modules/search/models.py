@@ -23,7 +23,8 @@
 import datetime
 import re
 
-from flask import g, url_for
+from flask import g, url_for, request
+from flask_login import current_user
 from intbitset import intbitset
 from operator import itemgetter
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -31,6 +32,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
+from werkzeug.utils import cached_property
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _, gettext_set_language
@@ -166,6 +168,13 @@ class Collection(db.Model):
     # FIXME read only!!!
     reclist = db.Column(db.PickleType(pickler=IntbitsetPickle(),
                                       comparator=IntbitsetCmp))
+
+    @property
+    def is_hosted(self):
+        """Return True if collection is hosted elsewhere."""
+        return self.dbquery.startswith('hostedcollection:') if self.dbquery \
+            else False
+
     _names = db.relationship(lambda: Collectionname,
                              backref='collection',
                              collection_class=attribute_mapped_collection(
@@ -210,7 +219,8 @@ class Collection(db.Model):
     @property
     def name_ln(self):
         from invenio.legacy.search_engine import get_coll_i18nname
-        return get_coll_i18nname(self.name, g.ln)
+        return get_coll_i18nname(self.name,
+                                 getattr(g, 'ln', cfg['CFG_SITE_LANG']))
         # Another possible implementation with cache memoize
         # @cache.memoize
         # try:
@@ -333,7 +343,7 @@ class Collection(db.Model):
         """
         Collect search within options.
         """
-        default = [('', g._('any field'))]
+        default = [('', _('any field'))]
         found = [(o.field.code, o.field.name_ln) for o in self._search_within]
         if not found:
             found = [(f.name.replace(' ', ''), f.name_ln)
@@ -346,8 +356,7 @@ class Collection(db.Model):
     def search_options(self):
         return self._search_options
 
-    @property
-    # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
+    @cached_property
     def ancestors_ids(self):
         """Get list of parent collection ids."""
         output = intbitset([self.id])
@@ -358,8 +367,7 @@ class Collection(db.Model):
             output |= ancestors
         return output
 
-    @property
-    # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
+    @cached_property
     def descendants_ids(self):
         """Get list of child collection ids."""
         output = intbitset([self.id])
@@ -723,14 +731,31 @@ class Field(db.Model):
 
     @property
     def name_ln(self):
-        from invenio.legacy.search_engine import get_field_i18nname
-        return get_field_i18nname(self.name, g.ln)
+        from .cache import get_field_i18nname
+        return get_field_i18nname(self.name,
+                                  getattr(g, 'ln', cfg['CFG_SITE_LANG']))
         # try:
         #    return db.object_session(self).query(Fieldname).\
         #        with_parent(self).filter(db.and_(Fieldname.ln==g.ln,
         #            Fieldname.type=='ln')).first().value
         # except:
         #    return self.name
+
+    @classmethod
+    def get_field_name(cls, code):
+        """Return field name for given code."""
+        return cls.query.filter_by(code=code).value(cls.name)
+
+    @classmethod
+    def get_field_tags(cls, code, tagtype='marc'):
+        """Yield tag values for given field code."""
+        column = Tag.value if tagtype == 'marc' else Tag.recjson_value
+        tags = cls.query.join(cls.tags).join(FieldTag.tag).filter(
+            cls.code == code
+        ).values(column)
+        for tag in tags:
+            for value in tag[0].split(','):
+                yield value.strip()
 
 
 class Fieldvalue(db.Model):
@@ -839,6 +864,19 @@ class UserQuery(db.Model):
                      default=datetime.datetime.now)
 
     webquery = db.relationship(WebQuery, backref='executions')
+
+    @classmethod
+    def log(cls, urlargs=None, id_user=None):
+        id_user = id_user if not None else current_user.get_id()
+        urlargs = urlargs or request.query_string
+        if id_user < 0:
+            return
+        webquery = WebQuery.query.filter_by(urlargs=urlargs).first()
+        if webquery is None:
+            webquery = WebQuery(urlargs=urlargs)
+        db.session.add(cls(id_user=id_user, hostname=request.host,
+                           webquery=webquery))
+        db.session.commit()
 
 
 class CollectionFieldFieldvalue(db.Model):
