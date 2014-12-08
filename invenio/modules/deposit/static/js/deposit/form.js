@@ -607,8 +607,22 @@ define(function(require, exports, module) {
           }
   }
 
+  /**
+   * Fired when text is pasted into an input
+   *
+   * @event paste
+   * @param event {Event}
+   */
+  this.onFieldPasted = function(event) {
+    var that=this;
+    /* timeout allows the pasted content to be available */
+    setTimeout(function () {
+      that.onFieldChanged(event);
+    }, 0);
+  }
+
   this.onCheckboxChanged = function (event) {
-    if(event.target.name.indexOf('__input__') == -1 && event.target.name ){
+    if (event.target.name.indexOf('__input__') == -1 && event.target.name) {
       if ($(event.target).prop("checked")) {
         save_field(this.attr.save_url, event.target.name, event.target.value);
       } else {
@@ -839,6 +853,7 @@ define(function(require, exports, module) {
 
     this.on(this.attr.formSelector + ' .form-button', "click", this.onButtonClick);
     this.on('#submitForm input[type!=checkbox], #submitForm textarea, #submitForm select', "change", this.onFieldChanged);
+    this.on('#submitForm input[type!=checkbox], #submitForm textarea, #submitForm select', "paste", this.onFieldPasted);
     this.on('#submitForm input[type=checkbox]', 'change', this.onCheckboxChanged);
 
     this.init_autocomplete('[data-autocomplete]', this.attr.save_url, this.attr.autocomplete_url);
