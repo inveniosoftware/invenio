@@ -1,3 +1,2 @@
--e git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0
 # requires numpy before it can be installed
 #-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py

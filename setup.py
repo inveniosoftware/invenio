@@ -52,10 +52,6 @@ class _install_lib(install_lib):
         self.run_command('compile_catalog')
         install_lib.run(self)
 
-dependency_links = [
-    "git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0",
-]
-
 install_requires = [
     "alembic>=0.6.6",
     "Babel>=1.3",
@@ -70,8 +66,7 @@ install_requires = [
     "feedparser>=5.1",
     "fixture>=1.5",
     "Flask>=0.10.1",
-    # Development version is used, will switch to >=1.0.9 once released.
-    "Flask-Admin>=1.0.9.dev0",
+    "Flask-Admin>=1.0.9",
     "Flask-Assets>=0.10",
     "Flask-Babel>=0.9",
     "Flask-Breadcrumbs>=0.2",
@@ -285,7 +280,6 @@ setup(
         ]
     },
     install_requires=install_requires,
-    dependency_links=dependency_links,
     extras_require=extras_require,
     classifiers=[
         'Development Status :: 4 - Beta',
