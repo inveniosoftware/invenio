@@ -28,7 +28,7 @@ import re
 from invenio.config import CFG_BASE_URL, CFG_SITE_LANG, CFG_CERN_SITE
 from invenio.messages import gettext_set_language
 
-_RE_MODERN_ARXIV = re.compile('(arxiv:)?(?P<number>\d{4}.\d{4}(v\d+)?)')
+_RE_MODERN_ARXIV = re.compile('(arxiv:)?(?P<number>\d{4}.\d{4,5}(v\d+)?)')
 _RE_OLD_ARXIV = re.compile('(arxiv:)?(?P<number>\w+-\w+/\d{7}(v\d+)?)')
 _RE_BAD_OLD_ARXIV = re.compile('(arxiv:)?(?P<archive>\w+-\w+)-(?P<number>\d{7}(v\d+)?)')
 
