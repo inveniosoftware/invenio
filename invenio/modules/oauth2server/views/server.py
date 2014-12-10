@@ -66,7 +66,7 @@ def setup_app():
        cfg.get('CACHE_REDIS_URL'):
         from redis import from_url as redis_from_url
         cfg.setdefault(
-            'OAUTHLIB_CACHE_REDIS_HOST',
+            'OAUTH2_CACHE_REDIS_HOST',
             redis_from_url(cfg['CACHE_REDIS_URL'])
         )
 
