@@ -24,6 +24,7 @@ from datetime import datetime
 from time import strftime
 
 from invenio.ext.sqlalchemy import db, utils
+from invenio.base.i18n import _
 
 # Create your models here.
 
@@ -38,7 +39,11 @@ class UserQueryBasket(db.Model):
 
     """Represent a UserQueryBasket record."""
 
-    FREQUENCIES = ('day', 'week', 'month')
+    FREQUENCIES = {
+        'day': _('Day'),
+        'week': _('Week'),
+        'month': _('Month'),
+    }
 
     __tablename__ = 'user_query_basket'
 
@@ -73,6 +78,16 @@ class UserQueryBasket(db.Model):
     def validate_frequency(self, key, value):
         assert value in self.FREQUENCIES
         return value
+
+    @staticmethod
+    def exists(id_query):
+        """Return True if already exists a alert for a specific query.
+
+        :param id_query: query id
+        :return: True if exists
+        """
+        return db.session.query(UserQueryBasket.query.filter(
+            UserQueryBasket.id_query.like(id_query)).exists()).scalar()
 
     @classmethod
     def get_query_alerts(cls, date, **kwargs):

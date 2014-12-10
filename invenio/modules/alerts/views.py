@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,16 +20,20 @@
 """Alert interface."""
 
 # Flask
-from flask import render_template, request, Blueprint
+from flask import render_template, request, Blueprint, flash, redirect, url_for
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.login import current_user, login_required
 from flask.ext.menu import register_menu
 
 # Internal imports
+from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
+from invenio.modules.baskets.models import BskBASKET
 from invenio.modules.search.models import UserQuery
 
 from .models import UserQueryBasket
+from .forms import AlertForm
 
 blueprint = Blueprint('alerts', __name__, url_prefix='/youralerts',
                       template_folder='templates', static_folder='static')
@@ -38,15 +42,15 @@ default_breadcrumb_root(blueprint, '.settings.alerts')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
-@blueprint.route('/display2', methods=['GET', 'POST'])
-@login_required
+@blueprint.route('/display', methods=['GET', 'POST'])
 @register_menu(
     blueprint, 'settings.alerts',
     _('%(icon)s Search Alerts', icon='<i class="fa fa-search fa-fw"></i>'),
     order=10,
     active_when=lambda: request.endpoint.startswith("alerts.")
 )
-@register_breadcrumb(blueprint, '.index', _('Your Searches'))
+@register_breadcrumb(blueprint, '.index', _('Search History'))
+@login_required
 def index():
     """List users' search queries."""
     page = request.args.get('page', 1, type=int)
@@ -59,10 +63,9 @@ def index():
     )
 
 
-@blueprint.route('/', methods=['GET', 'POST'])
-@blueprint.route('/display2', methods=['GET', 'POST'])
+@blueprint.route('/list', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.', _('Alerts'))
 @login_required
-@register_breadcrumb(blueprint, '.', _('Search Alerts'))
 def list():
     """List users' search alerts."""
     page = request.args.get('page', 1, type=int)
@@ -75,13 +78,55 @@ def list():
     )
 
 
-@blueprint.route('/add22', methods=['GET', 'POST'])
-@blueprint.route('/input2', methods=['GET', 'POST'])
-@login_required
+@blueprint.route('/add', methods=['GET', 'POST'])
+@wash_arguments({"id_query": (int, 0)})
 @register_breadcrumb(blueprint, '.add', _('Register Alert'))
-def add():
-    """List users' search queries."""
-    return 'Foo'
+@login_required
+def add(id_query=None):
+    """Add new alert for search queries."""
+    already_exist = UserQueryBasket.exists(id_query)
+    # check if already exists the alert
+    if id_query and already_exist:
+        # and load the alert
+        alert = UserQueryBasket.query.filter_by(
+            id_query=id_query).first()
+    else:
+        alert = UserQueryBasket()
+
+    form = AlertForm(request.form, obj=alert)
+    id_user = current_user.get_id()
+
+    # fill the remaining fields
+    form.id_user.data = id_user
+    form.id_query.data = id_query or 0
+    # fill list of baskets available
+    form.id_basket.choices = [(0, _('- Nothing Selected -'))] + [
+        (basket.id, basket.name)
+        for basket in BskBASKET.query.filter_by(id_owner=id_user).all()
+    ]
+
+    # if user submit the form
+    if form.validate_on_submit():
+        alert = UserQueryBasket()
+        form.populate_obj(alert)
+        if already_exist:
+            db.session.merge(alert)
+        else:
+            db.session.add(alert)
+        try:
+            db.session.commit()
+            flash(_('Alert "%(name)s" successfully created',
+                    name=alert.alert_name), 'success')
+        except:
+            db.session.rollback()
+        return redirect(url_for('.index'))
+
+        form.populate_obj(alert)
+
     return render_template(
-        'alerts/add.html',
+        'alerts/new.html',
+        form=form,
+        action=_('Save'),
+        subtitle=_("Alert"),
+        alert=alert
     )

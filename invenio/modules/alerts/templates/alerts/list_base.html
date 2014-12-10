@@ -25,9 +25,9 @@
 
 {% block settings_body %}
 {{helpers.panel_start(
-    _('Your Searches'),
-    icon='fa fa-search fa-fw',
-    btn=_('Your Searches'),
+    _('Alerts'),
+    icon='fa fa-list fa-fw',
+    btn=_('Searches'),
     btn_icon='fa fa-history',
     btn_href=url_for('.index'),
     with_body=False)}}
@@ -40,31 +40,34 @@
         <th>#</th>
         <th>{{ _('Name') }}</th>
         <th>{{ _('Notification') }}</th>
-        <th>{{ _('Date last run') }}</th>
-        <th>{{ _('Creation date') }}</th>
+        <th>{{ _('Date Creation') }}</th>
+        <th>{{ _('Date Last Run') }}</th>
         <th>{{ _('Query') }}</th>
         <th>{{ _('Actions') }}</th>
       </tr>
     </thead>
     {% for alert in alerts.items %}
     <tr>
-      <td>{{ alert.id_query }}</td>
+      <td></td>
+      <td>{{ alert.alert_name }}</td>
+      <td>
+        {% if alert.notification == '1' %}
+          {{ _('yes') }}
+        {% else %}
+          {{ _('no') }}
+        {% endif %}
+      </td>
+      <td>{{ alert.date_creation }}</td>
+      <td>{{ alert.date_lastrun }}</td>
       <td>
         <span class="label label-info">
-          {{ _('Pattern') }}: {{ query.webquery.urlargs }}
+          {{ _('Pattern') }}: {{ alert.webquery.urlargs }}
         </span>
       </td>
       <td>
-        {{ query.date }}
-      </td>
-      <td>
         <a class="btn btn-xs btn-default"
-           href="{{ url_for('search.search') }}?{{ query.webquery.urlargs }}">
-          <i class="fa fa-search"></i> {{ _('Execute search') }}
-        </a>
-        <a class="btn btn-xs btn-default"
-           href="{{ url_for('.add', id_query=query.id_query) }}">
-          <i class="fa fa-plus"></i> {{ _('Set new alert') }}
+           href="{{ url_for('search.search') }}?{{ alert.webquery.urlargs }}">
+          <i class="fa fa-search"></i>
         </a>
       </td>
     </tr>

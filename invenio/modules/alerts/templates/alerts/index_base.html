@@ -25,7 +25,7 @@
 
 {% block settings_body %}
 {{helpers.panel_start(
-    _('Your Searches'),
+    _('Searches'),
     icon='fa fa-search fa-fw',
     btn=_('List Alerts'),
     btn_icon='fa fa-list',
@@ -38,7 +38,7 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>{{ _('Question') }}</th>
+        <th>{{ _('Query') }}</th>
         <th>{{ _('Last Run') }}</th>
         <th>{{ _('Action') }}</th>
       </tr>
@@ -61,7 +61,7 @@
         </a>
         <a class="btn btn-xs btn-default"
            href="{{ url_for('.add', id_query=query.id_query) }}">
-          <i class="fa fa-plus"></i> {{ _('Set new alert') }}
+          <i class="fa fa-plus"></i> {{ _('Set alert') }}
         </a>
       </td>
     </tr>
