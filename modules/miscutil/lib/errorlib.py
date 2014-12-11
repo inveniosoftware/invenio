@@ -409,8 +409,7 @@ def register_exception(stream='error',
                                     'env': req.environ})
                 client.extra_context(user_info)
             filename = _get_filename_and_line(sys.exc_info())[0]
-            client.tags_context({'filename': filename},
-                                {'version': CFG_VERSION})
+            client.tags_context({'filename': filename, 'version': CFG_VERSION})
             client.captureException()
         finally:
             client.context.clear()
