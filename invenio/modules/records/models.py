@@ -19,9 +19,11 @@
 
 """Record models."""
 
-from invenio.ext.sqlalchemy import db
 from flask import current_app
+from sqlalchemy.ext.declarative import declared_attr
 from werkzeug import cached_property
+
+from invenio.ext.sqlalchemy import db, utils
 
 
 class Record(db.Model):
@@ -46,7 +48,7 @@ class Record(db.Model):
         server_default='marc')
     additional_info = db.Column(db.JSON)
 
-    #FIXME: remove this from the model and add them to the record class, all?
+    # FIXME: remove this from the model and add them to the record class, all?
 
     @property
     def deleted(self):
@@ -104,9 +106,7 @@ class Record(db.Model):
             get_restricted_collections_for_recid
 
         if get_restricted_collections_for_recid(
-                self.id,
-                recreate_cache_if_needed=False
-                ):
+                self.id, recreate_cache_if_needed=False):
             return True
         elif self.is_processed:
             return True
@@ -138,5 +138,63 @@ class RecordMetadata(db.Model):
 
     record = db.relationship(Record, backref='record_json')
 
-__all__ = ('Record',
-           'RecordMetadata', )
+
+class BibxxxMixin(utils.TableNameMixin):
+
+    """Mixin for Bibxxx tables."""
+
+    id = db.Column(db.MediumInteger(8, unsigned=True),
+                   primary_key=True,
+                   autoincrement=True)
+    tag = db.Column(db.String(6), nullable=False, index=True,
+                    server_default='')
+    value = db.Column(db.Text(35), nullable=False,
+                      index=True)
+
+
+class BibrecBibxxxMixin(utils.TableFromCamelNameMixin):
+
+    """Mixin for BibrecBibxxx tables."""
+
+    @declared_attr
+    def _bibxxx(cls):
+        return globals()[cls.__name__[6:]]
+
+    @declared_attr
+    def id_bibrec(cls):
+        return db.Column(db.MediumInteger(8, unsigned=True),
+                         db.ForeignKey(Record.id), nullable=False,
+                         primary_key=True, index=True, server_default='0')
+
+    @declared_attr
+    def id_bibxxx(cls):
+        return db.Column(db.MediumInteger(8, unsigned=True),
+                         db.ForeignKey(cls._bibxxx.id), nullable=False,
+                         primary_key=True, index=True, server_default='0')
+
+    field_number = db.Column(db.SmallInteger(5, unsigned=True),
+                             primary_key=True)
+
+    @declared_attr
+    def bibrec(cls):
+        return db.relationship(Record)
+
+    @declared_attr
+    def bibxxx(cls):
+        return db.relationship(cls._bibxxx, backref='bibrecs')
+
+models = []
+
+for idx in range(100):
+    Bibxxx = "Bib{:02d}x".format(idx)
+    globals()[Bibxxx] = type(Bibxxx, (db.Model, BibxxxMixin), {})
+    BibrecBibxxx = "BibrecBib{:02d}x".format(idx)
+    globals()[BibrecBibxxx] = type(BibrecBibxxx,
+                                   (db.Model, BibrecBibxxxMixin), {})
+
+    models += [Bibxxx, BibrecBibxxx]
+
+__all__ = tuple([
+    'Record',
+    'RecordMetadata',
+] + models)
