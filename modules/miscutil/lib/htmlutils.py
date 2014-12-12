@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -595,6 +595,51 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
              evt.editor.resetDirty();
              } );
             /* End workaround */
+
+            // Catch any key being pressed
+            evt.editor.on('key', function(e) {
+
+                /*
+                Adding inline text can be difficult due to problebatic
+                blockquote breaking. The code below will catch the "Enter"
+                key being pressed and will try to break the blockquotes.
+                The following code has partially been taken from:
+                <http://dev.ckeditor.com/browser/CKEditor/trunk/_source/plugins/enterkey/plugin.js>
+                */
+                if ( e.data.keyCode == 13 ) {
+
+                    // The following will break all blockquotes, one Enter at a time
+                    var selection = oEditor.getSelection();
+                    var element = selection.getStartElement();
+                    var parent = element.getParent();
+                    var range_split_block = true;
+
+                    if ( element.is("blockquote") && parent.is("body") ) {
+                        if ( element.getText().trim() == "" ) {
+                            element.remove();
+                            range_split_block = false;
+                            // Adding an empty paragraph seems to make it smoother
+                            CKEDITOR.instances.msg.insertHtml("<p></p>");
+                        }
+                    }
+
+                    if ( range_split_block == true ) {
+                        var ranges = selection.getRanges(true);
+                        for ( var i = ranges.length - 1 ; i > 0 ; i-- ) {
+                            ranges[i].deleteContents();
+                        }
+                        var range = ranges[0];
+                        range.splitBlock("blockquote");
+                        if ( ! ( element.is("p") && parent.is("body") ) ) {
+                            // Adding an empty paragraph seems to make it smoother
+                            CKEDITOR.instances.msg.insertHtml("<p></p>");
+                        }
+                    }
+
+                }
+
+            });
+
           })
 
         //]]></script>
