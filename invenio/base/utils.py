@@ -17,7 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implement various utils."""
+"""Implement various utils.
+
+Utilities that could potentially exist in separate packages should be placed in
+this file.
+"""
 
 from flask import has_app_context, current_app
 from werkzeug.utils import import_string, find_modules
@@ -211,3 +215,25 @@ if sys.hexversion >= 0x2070000:
     captureWarnings = logging.captureWarnings
 else:
     captureWarnings = _captureWarnings
+
+# https://mail.python.org/pipermail/python-ideas/2011-January/008958.html
+class staticproperty(object):
+
+    """Property decorator for static methods."""
+
+    def __init__(self, function):
+        self._function = function
+
+    def __get__(self, instance, owner):
+        return self._function()
+
+
+class classproperty(object):
+
+    """Property decorator for class methods."""
+
+    def __init__(self, function):
+        self._function = function
+
+    def __get__(self, instance, owner):
+        return self._function(owner)

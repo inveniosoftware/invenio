@@ -458,7 +458,7 @@ class DepositionType(object):
         # Only reinitialize if really needed (i.e. you can only
         # reinitialize a fully completed workflow).
         wo = deposition.workflow_object
-        if wo.version == ObjectVersion.FINAL and \
+        if wo.version == ObjectVersion.COMPLETED and \
            wo.workflow.status == WorkflowStatus.COMPLETED:
 
             wo.version = ObjectVersion.INITIAL
@@ -471,13 +471,13 @@ class DepositionType(object):
     def stop_workflow(cls, deposition):
         # Only stop workflow if really needed
         wo = deposition.workflow_object
-        if wo.version != ObjectVersion.FINAL and \
+        if wo.version != ObjectVersion.COMPLETED and \
            wo.workflow.status != WorkflowStatus.COMPLETED:
 
             # Only workflows which has been fully completed once before
             # can be stopped
             if deposition.has_sip():
-                wo.version = ObjectVersion.FINAL
+                wo.version = ObjectVersion.COMPLETED
                 wo.workflow.status = WorkflowStatus.COMPLETED
 
                 # Clear all drafts

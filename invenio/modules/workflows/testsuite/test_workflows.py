@@ -187,7 +187,7 @@ distances from it.
         self.assertEqual(38, test_object.get_data())
         self.assertEqual(None, test_object.id_parent)
         self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
-        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(ObjectVersion.COMPLETED, test_object.version)
 
     def test_object_creation_halt(self):
         """Test status of object before/after workflow.
@@ -249,7 +249,7 @@ distances from it.
             for my_object_b in engine.getObjects():
                 engine = continue_oid(my_object_b[1].id, "restart_task")
         self.assertEqual(0, test_object.get_data())
-        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(ObjectVersion.COMPLETED, test_object.version)
         self.assertEqual(WorkflowStatus.COMPLETED, engine.status)
 
     def test_workflow_object_creation(self):
@@ -281,7 +281,7 @@ distances from it.
         self.assertEqual(ObjectVersion.INITIAL, initial_object.version)
         self.assertEqual(initial_data, initial_object.get_data())
         self.assertEqual(final_data, test_object.get_data())
-        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(ObjectVersion.COMPLETED, test_object.version)
 
     def test_workflow_object_creation_simple(self):
         """Test to see if the right snapshots or object versions are created."""
@@ -310,7 +310,7 @@ distances from it.
         # There should only be 2 objects (initial, final)
         self.assertEqual(2, len(all_objects))
         self.assertEqual(test_object.id_parent, initial_object.id)
-        self.assertEqual(ObjectVersion.FINAL, initial_object.version)
+        self.assertEqual(ObjectVersion.COMPLETED, initial_object.version)
         self.assertEqual(final_data, initial_object.get_data())
         self.assertEqual(initial_data, test_object.get_data())
         self.assertEqual(ObjectVersion.INITIAL, test_object.version)
@@ -407,7 +407,7 @@ distances from it.
         workflow = continue_oid(current.id,
                                 module_name="unit_tests")
         self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
-        self.assertEqual(ObjectVersion.FINAL, current.version)
+        self.assertEqual(ObjectVersion.COMPLETED, current.version)
 
     def test_workflow_for_finished_object(self):
         """Test starting workflow with finished object given."""
@@ -425,7 +425,7 @@ distances from it.
                          module_name="unit_tests")
 
         self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
-        self.assertEqual(ObjectVersion.FINAL, current.version)
+        self.assertEqual(ObjectVersion.COMPLETED, current.version)
         self.assertEqual(38, current.get_data())
 
         previous = BibWorkflowObject.query.get(current.id)
@@ -435,7 +435,7 @@ distances from it.
                            module_name="unit_tests")
 
         self.assertEqual(WorkflowStatus.COMPLETED, workflow_2.status)
-        self.assertEqual(ObjectVersion.FINAL, previous.version)
+        self.assertEqual(ObjectVersion.COMPLETED, previous.version)
         self.assertEqual(56, previous.get_data())
 
     def test_logging_for_workflow_objects_without_workflow(self):
@@ -543,14 +543,14 @@ distances from it.
         continue_oid(oid=obj_halted.id, module_name="unit_tests")
 
         self.assertEqual(19, obj_halted.get_data())
-        self.assertEqual(ObjectVersion.FINAL, obj_halted.version)
+        self.assertEqual(ObjectVersion.COMPLETED, obj_halted.version)
 
         # Let's do that last task again, shall we?
         continue_oid(oid=obj_halted.id, start_point="restart_prev",
                      module_name="unit_tests")
 
         self.assertEqual(37, obj_halted.get_data())
-        self.assertEqual(ObjectVersion.FINAL, obj_halted.version)
+        self.assertEqual(ObjectVersion.COMPLETED, obj_halted.version)
 
     def test_restart_workflow(self):
         """Test restarting workflow for given workflow id."""
@@ -701,7 +701,7 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
         self.assertEqual("gte9", test_object.get_extra_data()["test"])
 
         workflow = continue_oid(test_object.id)
-        self.assertEqual(ObjectVersion.FINAL, test_object.version)
+        self.assertEqual(ObjectVersion.COMPLETED, test_object.version)
         self.assertEqual(WorkflowStatus.COMPLETED, workflow.status)
 
     def test_workflow_without_workflow_object_saved(self):

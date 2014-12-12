@@ -30,6 +30,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.base.globals import cfg
+from invenio.base.utils import classproperty
+from invenio.ext.logging import deprecated
 
 from .logger import get_logger, BibWorkflowLogHandler
 
@@ -39,13 +41,19 @@ class ObjectVersion(object):
     """Specify the different versions possible."""
 
     INITIAL = 0
-    FINAL = 1
+    COMPLETED = 1
     HALTED = 2
     RUNNING = 3
     WAITING = 4
     ERROR = 5
     MAPPING = {"New": 0, "Done": 1, "Need action": 2,
                "In process": 3, "Waiting": 4, "Error": 5}
+
+    @classproperty
+    @deprecated("Please use ObjectVersion.COMPLETED "
+                "instead of ObjectVersion.FINAL")
+    def FINAL(cls):
+        return cls.COMPLETED
 
 
 def get_default_data():

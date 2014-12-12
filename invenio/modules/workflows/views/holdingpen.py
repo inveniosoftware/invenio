@@ -61,7 +61,7 @@ HOLDINGPEN_WORKFLOW_STATES = {
     ObjectVersion.HALTED: {'message': _('Need Action'), 'class': 'danger'},
     ObjectVersion.WAITING: {'message': _('Waiting'), 'class': 'warning'},
     ObjectVersion.ERROR: {'message': _('Error'), 'class': 'danger'},
-    ObjectVersion.FINAL: {'message': _('Done'), 'class': 'success'},
+    ObjectVersion.COMPLETED: {'message': _('Done'), 'class': 'success'},
     ObjectVersion.INITIAL: {'message': _('New'), 'class': 'info'},
     ObjectVersion.RUNNING: {'message': _('In process'), 'class': 'warning'}
 }

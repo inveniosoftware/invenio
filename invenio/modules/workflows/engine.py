@@ -202,7 +202,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     @property
     def completed_objects(self):
         """Return completed objects."""
-        return self.objects_of_statuses([ObjectVersion.FINAL])
+        return self.objects_of_statuses([ObjectVersion.COMPLETED])
 
     @property
     def halted_objects(self):
@@ -293,7 +293,7 @@ BibWorkflowEngine
             filter(BibWorkflowObject.id_workflow == self.uuid).\
             filter(BibWorkflowObject.version.in_(
                 [ObjectVersion.INITIAL,
-                 ObjectVersion.FINAL]
+                 ObjectVersion.COMPLETED]
             )).group_by(BibWorkflowObject.version).all()
         return len(res) == 2 and res[0] == res[1]
 
@@ -434,7 +434,7 @@ BibWorkflowEngine
                     obj.log.debug(msg)
 
                     # Processing for the object is stopped!
-                    obj.save(version=ObjectVersion.FINAL)
+                    obj.save(version=ObjectVersion.COMPLETED)
                     self.increase_counter_finished()
                     break
                 except JumpTokenBack as step:
@@ -447,7 +447,7 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.FINAL)
+                    obj.save(version=ObjectVersion.COMPLETED)
                     self.increase_counter_finished()
                 except JumpTokenForward as step:
                     if step.args[0] < 0:
@@ -458,7 +458,7 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.FINAL)
+                    obj.save(version=ObjectVersion.COMPLETED)
                     self.increase_counter_finished()
                 except ContinueNextToken:
                     self.log.debug('Stop processing for this object, '
@@ -466,7 +466,7 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.FINAL)
+                    obj.save(version=ObjectVersion.COMPLETED)
                     self.increase_counter_finished()
                     continue
                 except (HaltProcessing, WorkflowHalt) as e:
@@ -501,7 +501,7 @@ BibWorkflowEngine
                             id_object=self.getCurrObjId(),
                         )
             # We save each object once it is fully run through
-            obj.save(version=ObjectVersion.FINAL)
+            obj.save(version=ObjectVersion.COMPLETED)
             self.increase_counter_finished()
             i[1] = [0]  # reset the callbacks pointer
         self.after_processing(objects, self)

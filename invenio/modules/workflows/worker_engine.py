@@ -155,7 +155,7 @@ def get_workflow_object_instances(data, engine):
             if data_object.id:
                 data_object.log.debug("Existing workflow object found for "
                                       "this object. Saving a snapshot.")
-                if data_object.version == ObjectVersion.FINAL:
+                if data_object.version == ObjectVersion.COMPLETED:
                     data_object.version = ObjectVersion.INITIAL
                 workflow_objects.append(
                     generate_snapshot(data_object, engine)
