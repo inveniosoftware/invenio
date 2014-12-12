@@ -180,12 +180,7 @@ def run_sql_drop_silently(query):
             raise e
 
 
-def get_idx_indexer(name):
-    """Returns the indexer field value"""
-    try:
-        return run_sql("SELECT indexer FROM idxINDEX WHERE NAME=%s", (name, ))[0][0]
-    except StandardError as e:
-        return (0, e)
+from invenio.modules.indexer.utils import get_idx_indexer
 
 
 def get_all_indexes(virtual=True, with_ids=False):

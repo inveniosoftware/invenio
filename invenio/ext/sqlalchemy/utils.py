@@ -33,12 +33,38 @@ from __future__ import print_function
 
 import base64
 import os
+import re
 import sqlalchemy
 import sys
 
 from intbitset import intbitset
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import class_mapper, properties
+
+first_cap_re = re.compile('(.)([A-Z][a-z]+)')
+all_cap_re = re.compile('([a-z0-9])([A-Z])')
+
+
+class TableNameMixin(object):
+
+    """Define table name from class name."""
+
+    @declared_attr
+    def __tablename__(cls):
+        """Generate table name as class name with lower starting character."""
+        return cls.__name__[0].lower() + cls.__name__[1:]
+
+
+class TableFromCamelNameMixin(object):
+
+    """Define table name from class name."""
+
+    @declared_attr
+    def __tablename__(cls):
+        """Generate underscored table name from camel cased class name."""
+        s1 = first_cap_re.sub(r'\1_\2', cls.__name__)
+        return all_cap_re.sub(r'\1_\2', s1).lower()
 
 
 def get_model_type(ModelBase):
