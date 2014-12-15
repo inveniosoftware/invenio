@@ -1330,7 +1330,6 @@ def perform_request_bibcatalog(request_type, uid, data):
                     t_url = ticket_info['url_display']
                     t_close_url = ticket_info['url_close']
                     t_subject = ticket_info['subject']
-                    t_text = ticket_info['text']
                     t_queue = ticket_info['queue']
                     date_string = ticket_info['created']
                     date_splitted = date_string.split(" ")
@@ -1344,7 +1343,7 @@ def perform_request_bibcatalog(request_type, uid, data):
                         t_date = date_string
 
                     ticket = {"id": str(t_id), "queue": t_queue, "date": t_date, "url": t_url,
-                              "close_url": t_close_url, "subject": t_subject, "text": t_text}
+                              "close_url": t_close_url, "subject": t_subject}
                     tickets.append(ticket)
                 response['tickets'] = tickets
                 response['resultCode'] = 31
