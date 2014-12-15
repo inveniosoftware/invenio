@@ -40,7 +40,7 @@ from invenio.dateutils import strftime
 from time import time, gmtime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, get_session, getUid, email_valid_p
-from invenio.webuser import isUserSuperAdmin, get_nickname
+from invenio.webuser import isUserSuperAdmin, get_nickname, get_email
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_get_role_id, acc_get_user_roles
 from invenio.external_authentication_robot import ExternalAuthRobot
@@ -2452,6 +2452,13 @@ def create_request_message(userinfo, subj=None):
     '''
     mailcontent = []
 
+    # email is always set (might be empty)
+    if 'uid' in userinfo and not userinfo['email']:
+        email = get_email(userinfo['uid'])
+        # FIX ME: should not be hard-coded for guest
+        if email != "guest":
+            userinfo['email'] = email
+
     for info_type in userinfo:
         mailcontent.append(info_type + ': ')
         mailcontent.append(str(userinfo[info_type]) + '\n')
@@ -2469,6 +2476,7 @@ def create_request_message(userinfo, subj=None):
                                     text="\n".join(mailcontent),
                                     queue="Authors",
                                     requestor=sender)
+
 
 def send_user_commit_notification_email(userinfo, ticket, uid):
     '''
@@ -3355,12 +3363,16 @@ def connect_author_with_hepname(cname, hepname, uid):
               "%s/record/%s. Best regards" % (CFG_SITE_URL, cname,
                                                CFG_SITE_URL, hepname)
 
+    requestor = get_email(uid)
+    if requestor == "guest":
+        requestor = CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL
+
     BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
                                     subject=subject,
                                     text=content,
                                     queue="Authors",
                                     recordid=hepname,
-                                    requestor=CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL)
+                                    requestor=requestor)
 
 def connect_author_with_orcid(cname, orcid, uid):
     subject = "ORCiD record match: %s %s" % (cname, orcid)
@@ -3369,11 +3381,15 @@ def connect_author_with_orcid(cname, orcid, uid):
               "with the Orcid record http://www.orcid.org/%s" \
               ". Best regards" % (CFG_SITE_URL, cname, orcid)
 
+    requestor = get_email(uid)
+    if requestor == "guest":
+        requestor = CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL
+
     BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
                                     subject=subject,
                                     text=content,
                                     queue="Authors",
-                                    requestor=CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL)
+                                    requestor=requestor)
 
 #
 # Exposed Ticket Functions            #
