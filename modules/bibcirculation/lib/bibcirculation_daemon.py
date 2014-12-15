@@ -23,16 +23,21 @@ BibCirculation daemon.
 
 __revision__ = "$Id$"
 
+import os
 import sys
 import time
+import tempfile
+from invenio.config import CFG_TMPDIR
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, \
                             task_sleep_now_if_required, \
+                            task_low_level_submission, \
                             task_update_progress, \
                             task_set_option, \
                             task_get_option, \
                             write_message
 from invenio.mailutils import send_email
+from invenio.search_engine_utils import get_fieldvalues
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL, \
@@ -40,6 +45,8 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
                                           CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED
 
+from invenio.config import CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+                           CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN
 from invenio.bibcirculation_utils import generate_email_body, \
                                          book_title_from_MARC, \
                                          update_user_info_from_ldap, \
@@ -59,6 +66,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option('update-borrowers', True)
     elif key in ('-r', '--update-requests'):
         task_set_option('update-requests', True)
+    elif key in ('-p', '--add-physical-copies-shelf-number-to-marc'):
+        task_set_option('add-physical-copies-shelf-number-to-marc', True)
     else:
         return False
     return True
@@ -252,7 +261,68 @@ def task_run_core():
         task_update_progress("ILL recall: processed %d out of %d expired ills." % (done+1, total_expired_ills))
         write_message("Processed %d out of %d expired ills." % (done+1, total_expired_ills))
 
+    if task_get_option("add-physical-copies-shelf-number-to-marc"):
+        write_message("Started adding info. reg. physical copies and shelf number to records")
+        modified_rec_locs = db.get_modified_items_physical_locations()
+        #Tagging of records
+        if modified_rec_locs:
+            total_modified_rec_locs = len(modified_rec_locs)
+            MARC_RECS_STR = "<?xml version='1.0' encoding='UTF-8'?>\n<collection>"
+            recids_seen = []
+            for done, (recid, status, location, collection) in enumerate(modified_rec_locs):
+                if not int(recid) or not location or status not in [ CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
+                   CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN ]  or collection=='periodical' or\
+                   recid in recids_seen or 'DELETED' in get_fieldvalues(recid, '980__c'):
+                   #or location in get_fieldvalues(recid, '852__h'):
+                    continue
+                #MARC_RECS_STR: Compose a string with the records containing the controlfield(recid) and
+                #the 2 datafields(shelf no, physical copies) for each item retrieved from the query
+                copies = db.get_item_copies_details(recid)
+                MARC_RECS_STR += '<record><controlfield tag="001">' + str(recid) + '</controlfield>'
+                type_copies = get_fieldvalues(recid, '340__a')
+                if 'paper' not in type_copies:
+                    MARC_RECS_STR += '<datafield tag="340" ind1=" " ind2=" "> \
+                                      <subfield code="a">paper</subfield> \
+                                      </datafield>'
+                    if 'ebook' in type_copies or 'e-book' in type_copies:
+                        MARC_RECS_STR += '<datafield tag="340" ind1=" " ind2=" "> \
+                                          <subfield code="a">ebook</subfield> \
+                                          </datafield>'
+                lib_loc_tuples = []
+                for (_barcode, _loan_period, library_name, _library_id,
+                     location, _nb_requests,  _status, _collection,
+                     _description, _due_date) in copies:
+                    if not library_name or not location: continue
+                    if not (library_name, location) in lib_loc_tuples:
+                        lib_loc_tuples.append((library_name, location))
+                    else: continue
+                    MARC_RECS_STR += '<datafield tag="852" ind1=" " ind2=" "> \
+                                      <subfield code="c">' + library_name + '</subfield> \
+                                      <subfield code="h">' + location.replace('&', ' and ') +'</subfield> \
+                                      </datafield>'
+                MARC_RECS_STR += '</record>'
+                recids_seen.append(recid)
+                # Upload chunks of 100 records and sleep if needed
+                if (done+1)%100 == 0 or (done+1) == total_modified_rec_locs:
+                    MARC_RECS_STR += "</collection>"
+                    timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.localtime())
+                    marcxmlfile = 'MARCxml_booksearch' + '_' + timestamp + '_'
+                    fd, marcxmlfile = tempfile.mkstemp(dir=CFG_TMPDIR, prefix=marcxmlfile, suffix='.xml')
+                    os.write(fd, MARC_RECS_STR)
+                    os.close(fd)
+                    write_message("Composed MARCXML saved into %s" % marcxmlfile)
+                    #Schedule the bibupload task.
+                    task_id = task_low_level_submission("bibupload", "BibCirc", "-c", marcxmlfile, '-P', '-3')
+                    write_message("BibUpload scheduled with task id %s" % task_id)
+                    write_message("Processed %d out of %d modified record locations." % (done+1, total_modified_rec_locs))
+                    MARC_RECS_STR = "<?xml version='1.0' encoding='UTF-8'?>\n<collection>"
+                    task_sleep_now_if_required(can_stop_too=True)
+
+        else:
+            write_message("No new records modified. Not scheduling any bibupload task")
+
     return 1
+
 
 def main():
 
@@ -260,9 +330,11 @@ def main():
               authorization_msg="BibCirculation Task Submission",
               help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n
 -b,  --update-borrowers\tUpdate borrowers information from ldap.\n
--r,  --update-requests\tUpdate pending requests of users\n\n""",
+-r,  --update-requests\tUpdate pending requests of users\n
+-p,  --add-physical-copies-shelf-number-to-marc\tAdd info. reg. physical copies and shelf number to records' marc\n\n""",
               description="""Example: %s -u admin \n\n""" % (sys.argv[0]),
-              specific_params=("obr", ["overdue-letters", "update-borrowers", "update-requests"]),
+              specific_params=("obrp", ["overdue-letters", "update-borrowers", "update-requests",
+                                        "add-physical-copies-shelf-number-to-marc"]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               version=__revision__,
               task_run_fnc = task_run_core
