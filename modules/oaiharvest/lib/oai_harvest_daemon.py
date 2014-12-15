@@ -478,7 +478,7 @@ def plotextract_step(repository, active_files_list, downloaded_material_dict, *a
         task_sleep_now_if_required()
         task_update_progress("Extracting plots from harvested material from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+        if 'f' in repository["postprocess"] and not ".insert." in active_file:
             # Only process new records
             updated_files_list.append(active_file)
             continue
@@ -519,7 +519,7 @@ def refextract_step(repository, active_files_list, downloaded_material_dict, *ar
         task_sleep_now_if_required()
         task_update_progress("Extracting references from material harvested from %s (%i/%i)" % \
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+        if 'f' in repository["postprocess"] and not ".insert." in active_file:
             # Only process new records
             updated_files_list.append(active_file)
             continue
@@ -560,7 +560,7 @@ def authorlist_step(repository, active_files_list, downloaded_material_dict, *ar
         task_sleep_now_if_required()
         task_update_progress("Extracting any authorlists from material harvested from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+        if 'f' in repository["postprocess"] and not ".insert." in active_file:
             # Only process new records
             updated_files_list.append(active_file)
             continue
@@ -602,7 +602,7 @@ def fulltext_step(repository, active_files_list, downloaded_material_dict, *args
         task_sleep_now_if_required()
         task_update_progress("Attaching fulltext to records harvested from %s (%i/%i)" %
                              (repository["name"], i, len(active_files_list)))
-        if 'f' in repository["postprocess"] and not ".insert.xml" in active_file:
+        if 'f' in repository["postprocess"] and not ".insert." in active_file:
             # Only process new records
             updated_files_list.append(active_file)
             write_message("Skipping updates (%s)" % (active_file,))
