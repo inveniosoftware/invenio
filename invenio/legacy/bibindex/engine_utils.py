@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -56,6 +56,10 @@ def load_tokenizers():
     """
     Load all the bibindex tokenizers and returns it.
     """
+    import warnings
+    warnings.warn("The function is deprecated. Please use the "
+                  "`load_tokenizers()` from `invenio.modules.indexer.utils`",
+                  DeprecationWarning)
     from invenio.modules.indexer.registry import tokenizers
     return dict((module.__name__.split('.')[-1],
         getattr(module, module.__name__.split('.')[-1], ''))

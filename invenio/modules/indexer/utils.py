@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.utils.datastructures import LazyDict
 
 from .models import IdxINDEX, IdxINDEXField
+from .registry import tokenizers
 
 field_tokenizer_cache = LazyDict(
     lambda: dict(IdxINDEXField.get_field_tokenizers())
@@ -34,3 +35,10 @@ field_tokenizer_cache = LazyDict(
 def get_idx_indexer(name):
     """Return indexer field value."""
     return db.session.query(IdxINDEX.indexer).filter_by(name=name).scalar()
+
+
+def load_tokenizers():
+    """Load all the bibindex tokenizers and returns it."""
+    return dict((module.__name__.split('.')[-1],
+                 getattr(module, module.__name__.split('.')[-1], ''))
+                for module in tokenizers)

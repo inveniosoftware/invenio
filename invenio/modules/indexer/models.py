@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,16 +19,13 @@
 
 """Define database models for native indexer."""
 
-# General imports.
-from sqlalchemy.ext.declarative import declared_attr
-
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import TableNameMixin
-
-# Create your models here.
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Field
+
+from sqlalchemy.ext.declarative import declared_attr
 
 
 class IdxINDEX(db.Model):
@@ -111,6 +108,13 @@ class IdxINDEXIdxINDEX(db.Model):
     id_normal = db.Column(db.MediumInteger(9, unsigned=True),
                           db.ForeignKey(IdxINDEX.id), nullable=False,
                           server_default='0', primary_key=True)
+
+    @staticmethod
+    def is_virtual(id_virtual):
+        """Check if index is virtual."""
+        return db.session.query(
+            IdxINDEXIdxINDEX.query.filter_by(
+                id_virtual=id_virtual).exists()).scalar()
 
 
 class IdxINDEXNAME(db.Model):

@@ -1,6 +1,6 @@
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-##               2012, 2014 CERN.
+##               2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ import random
 
 from six import iteritems
 
+from invenio.base.helpers import utf8ifier
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_BINDIR
 from invenio.legacy.bibrank.adminlib import write_outcome, \
     modify_translations, \
@@ -746,7 +747,7 @@ def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=
 
         types = get_idx_nametypes()
         if len(types) > 1:
-            text  = """
+            text = """
             <span class="adminlabel">Name type</span>
             <select name="sel_type" class="form-control">
             """
@@ -828,7 +829,7 @@ def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=
 
         types = get_fld_nametypes()
         if len(types) > 1:
-            text  = """
+            text = """
             <span class="adminlabel">Name type</span>
             <select name="sel_type" class="form-control">
             """
@@ -1494,7 +1495,7 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
             idxMATCH = ''
 
         kb_html_element = """<select name="idxKB" class="form-control">"""
-        knowledge_base_names = get_all_kb_names()
+        knowledge_base_names = utf8ifier(get_all_kb_names())
         knowledge_base_names.append(CFG_BIBINDEX_SYNONYM_MATCH_TYPE["None"])
         knowledge_base_names.sort()
         for knowledge_base_name in knowledge_base_names:
