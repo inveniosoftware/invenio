@@ -98,7 +98,7 @@ install_requires = [
     "nydus>=0.10.8",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
     "pyparsing>=2.0.1,<2.0.2",
-    "python-twitter>=0.8.7",
+    "python-twitter>=2.0",
     "pyPDF>=1.13",
     "pyPDF2",
     "PyLD>=0.5.2",
