@@ -18,10 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 
+"""Default configuration for Celery."""
+
+
 def default_config(config):
-    """
-    Provide default configuration for Celery
-    """
+    """Default configuration."""
     ## Broker settings
     ## ---------------
     config.setdefault("BROKER_URL", "redis://localhost:6379/1")
@@ -62,15 +63,12 @@ def default_config(config):
     ## ------------
     config.setdefault("CELERY_SEND_TASK_ERROR_EMAILS", False)
 
-    if "CFG_SITE_EMERGENCY_EMAIL_ADDRESSES" in config:
-        try:
-            ADMINS = [
-                ('', x.strip()) for x in
-                config["CFG_SITE_EMERGENCY_EMAIL_ADDRESSES"]['*'].split(",")
-            ]
-            config.setdefault("ADMINS", ADMINS)
-        except Exception:
-            pass
+    # Note ADMINS is also set by invenio.ext.email
+    if config.get('CFG_SITE_ADMIN_EMAIL'):
+        config.setdefault(
+            'ADMINS',
+            [('', config.get('CFG_SITE_ADMIN_EMAIL')), ]
+        )
 
     config.setdefault(
         "SERVER_EMAIL", config.get("CFG_SITE_ADMIN_EMAIL", "celery@localhost")
