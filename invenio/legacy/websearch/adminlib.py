@@ -93,8 +93,8 @@ def fix_collection_scores():
     Re-calculate and re-normalize de scores of the collection relationship.
     """
     for id_dad in intbitset(run_sql("SELECT id_dad FROM collection_collection")):
-        for index, id_son in enumerate(run_sql("SELECT id_son FROM collection_collection WHERE id_dad=%s ORDER BY score DESC", (id_dad, ))):
-            run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s AND id_son=%s", (index * 10 + 10, id_dad, id_son[0]))
+        for index, id_son in enumerate(run_sql("SELECT id_son FROM collection_collection WHERE id_dad=%s ORDER BY score ASC", (id_dad, ))):
+            run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s AND id_son=%s", (index, id_dad, id_son[0]))
 
 def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a collection
@@ -2708,9 +2708,9 @@ def get_col_tree(colID, rtype=''):
         while len(stack) > 0:
             ccolID = stack.pop()
             if ccolID == colID and rtype:
-                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s AND type=%s ORDER BY score ASC,id_son", (ccolID, rtype))
+                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s AND type=%s ORDER BY score DESC,id_son", (ccolID, rtype))
             else:
-                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s ORDER BY score ASC,id_son", (ccolID, ))
+                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s ORDER BY score DESC,id_son", (ccolID, ))
             ssize += 1
             ntree = []
             for i in range(0, len(res)):

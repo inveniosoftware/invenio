@@ -701,7 +701,7 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
        Suitable for create_search_box()."""
     colls_nicely_ordered = []
     res = run_sql("""SELECT c.name,cc.id_son FROM collection_collection AS cc, collection AS c
-                     WHERE c.id=cc.id_son AND cc.id_dad=%s ORDER BY score DESC""", (collid, ))
+                     WHERE c.id=cc.id_son AND cc.id_dad=%s ORDER BY score ASC""", (collid, ))
     for c, cid in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
@@ -1876,7 +1876,7 @@ def get_coll_sons(coll, coll_type='r', public_only=1):
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
             "WHERE cc.type%s AND ccc.name=%%s" % coll_type_query
-    query += " ORDER BY cc.score DESC"
+    query += " ORDER BY cc.score ASC"
     res = run_sql(query, query_params)
     for name in res:
         if not public_only or not collection_restricted_p(name[0]):
@@ -1947,7 +1947,7 @@ def get_coll_real_descendants(coll, coll_type='_', get_hosted_colls=True):
     res = run_sql("""SELECT c.name,c.dbquery FROM collection AS c
                      LEFT JOIN collection_collection AS cc ON c.id=cc.id_son
                      LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad
-                     WHERE ccc.name=%s AND cc.type LIKE %s ORDER BY cc.score DESC""",
+                     WHERE ccc.name=%s AND cc.type LIKE %s ORDER BY cc.score ASC""",
                   (coll, coll_type,))
     for name, dbquery in res:
         if dbquery: # this is 'real' collection, so return it:
