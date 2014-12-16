@@ -145,6 +145,7 @@ img_DATA = add-small.png \
            left-part-trans.gif \
            left-trans.gif \
            left.gif \
+	   library_of_congress.png \
            line-up-trans.gif \
            line.gif \
            loading.gif \
@@ -316,8 +317,10 @@ img_DATA = add-small.png \
            openid_icon_48.png \
            twitter_icon_24.png \
            twitter_icon_48.png \
+	   viaf.png \
            verisign_icon_24.png \
            verisign_icon_48.png \
+	   wikipedia.png \
            wordpress_icon_24.png \
            wordpress_icon_48.png \
            yahoo_icon_24.png \

@@ -19,6 +19,15 @@
 # the authority record field containing the authority record control number
 CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD = '035__a'
 
+## the record field for authority control numbers
+CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS = {
+        'AUTHOR' : ['100','700'],
+        'INSTITUTE' : ['110','920'],
+        'JOURNAL' : ['130'],
+        'SUBJECT' : ['150']
+}
+
+
 # Separator to be used in control numbers to separate the authority type
 # PREFIX (e.g. "INSTITUTE") from the control_no (e.g. "(CERN)abc123"
 CFG_BIBAUTHORITY_PREFIX_SEP = '|'

@@ -120,8 +120,13 @@ def format_element(bfo, limit, separator=' ; ',
                         recIDs = get_low_level_recIDs_from_control_no(author['a0'])
                         if len(recIDs):
                             auth_coll_param = '&amp;c=' + \
-                                              CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
-                    author['a'] = '<a href="' + CFG_BASE_URL + \
+                                CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
+                        author['a'] = '<a href="' + CFG_BASE_URL + \
+                        '/record/' + str(recIDs[0]) + \
+                        '?ln=' + bfo.lang + \
+                        '">' + escape(author['a']) + '</a>'
+                    else:
+                        author['a'] = '<a href="' + CFG_BASE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                    auth_coll_param + \
                                   '&amp;ln=' + bfo.lang + \

@@ -52,6 +52,12 @@ etc_DATA = Default_HTML_captions.bft \
            Default_Mobile_brief.bft \
            Default_Mobile_detailed.bft \
            Authority_HTML_brief.bft \
+	   People_HTML_detailed.bft \
+	   People_HTML_brief.bft \
+	   Institute_HTML_detailed.bft \
+	   Institute_HTML_brief.bft
+	   Subject_HTML_detailed.bft \
+	   Subject_HTML_brief.bft \
            Authority_HTML_detailed.bft \
            Detailed_HEPDATA_dataset.bft \
            Default_HTML_citation_log.bft \
