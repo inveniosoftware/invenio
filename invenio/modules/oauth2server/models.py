@@ -43,9 +43,6 @@ class NoneAesEngine(AesEngine):
 
     """Filter None values from encrypting."""
 
-    def __init__(self, key):
-        super(NoneAesEngine, self).__init__(key)
-
     def encrypt(self, value):
         """Encrypt a value on the way in."""
         if value is not None:
@@ -301,13 +298,13 @@ class Token(db.Model):
     """Token type - only bearer is supported at the moment."""
 
     access_token = db.Column(String255EncryptedType(
-        type_in=lambda: db.String(255),
+        type_in=db.String(255),
         key=secret_key),
         unique=True
     )
 
     refresh_token = db.Column(String255EncryptedType(
-        type_in=lambda: db.String(255),
+        type_in=db.String(255),
         key=secret_key,
         engine=NoneAesEngine),
         unique=True, nullable=True

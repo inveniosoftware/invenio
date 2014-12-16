@@ -116,7 +116,7 @@ install_requires = [
     "six>=1.7.2",
     "Sphinx",
     "SQLAlchemy>=0.9.8",
-    "SQLAlchemy-Utils[encrypted]>=0.27",
+    "SQLAlchemy-Utils[encrypted]>=0.28.2",
     "unidecode",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
