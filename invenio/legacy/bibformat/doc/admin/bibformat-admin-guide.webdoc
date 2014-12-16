@@ -885,14 +885,14 @@ in order to decrease the load of your server. To do so, use the <code>bibreforma
  -c, --collection        Select records by collection
  -f, --field             Select records by field.
  -p, --pattern           Select records by pattern.
- -o, --format            Specify output format to be (re-)created. (default HB)
+ -o, --format            Specify output format to be (re-)created. (default HB and RECJSON)
  -n, --noprocess         Count records to be processed only (no processing done)
  Example: bibreformat -n Show how many records are to be bibreformated.
 </pre>
 </blockquote>
-For example, to reformat all records in HB (=HTML brief) format, you'd launch:
+For example, to reformat all records in HB (=HTML brief) and RECJSON formats, you'd launch:
 <blockquote>
-<pre>$ bibreformat -a -oHB
+<pre>$ bibreformat -a -oHB,RECJSON
 </pre>
 </blockquote>
 and you watch the progress of the process via <code>bibsched</code>.

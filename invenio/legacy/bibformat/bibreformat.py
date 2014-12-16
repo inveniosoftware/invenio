@@ -35,9 +35,14 @@ from invenio.legacy.bibrank.citation_searcher import get_cited_by
 from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
 from invenio.legacy.bibformat.dblayer import save_preformatted_record
 from invenio.utils.shell import split_cli_ids_arg
-from invenio.legacy.bibsched.bibtask import task_init, write_message, task_set_option, \
-        task_get_option, task_update_progress, task_has_option, \
-        task_sleep_now_if_required
+from invenio.modules.records.api import get_record
+from invenio.legacy.bibsched.bibtask import task_init, \
+    write_message, \
+    task_set_option, \
+    task_get_option, \
+    task_update_progress, \
+    task_has_option, \
+    task_sleep_now_if_required
 from invenio.modules.formatter.engine import format_record_1st_pass
 
 
@@ -61,14 +66,9 @@ def store_last_updated(fmt, iso_date):
 
 @with_app_context()
 def bibreformat_task(fmt, recids, without_fmt, process):
-    """
-    BibReformat main task
+    """BibReformat main task.
 
     @param fmt: output format to use
-    @param sql: dictionary with pre-created sql queries for various cases (for selecting records). Some of these queries will be picked depending on the case
-    @param sql_queries: a list of sql queries to be executed to select records to reformat.
-    @param cds_query: a search query to be executed to select records to reformat
-    @param process_format:
     @param process:
     @param recids: a list of record IDs to reformat
     @return: None
@@ -90,9 +90,10 @@ def bibreformat_task(fmt, recids, without_fmt, process):
                      WHERE id in (%s)""" % ','.join(str(r) for r in recids)
 
             def check_date(mod_date):
-                return mod_date.strftime("%Y-%m-%d %H:%M:%S") < latest_bibrank_run
+                return mod_date.strftime(
+                    "%Y-%m-%d %H:%M:%S") < latest_bibrank_run
             rel_recids = intbitset([recid for recid, mod_date in run_sql(sql)
-                                                    if check_date(mod_date)])
+                                    if check_date(mod_date)])
             for r in rel_recids:
                 recids |= intbitset(get_cited_by(r))
 
@@ -129,17 +130,15 @@ def bibreformat_task(fmt, recids, without_fmt, process):
     if without_fmt:
         write_message("Records to be processed: %d" % len(recIDs))
         write_message("Out of it records without existing cache: %d" %
-                                                        len(without_fmt))
+                      len(without_fmt))
     else:
         write_message("Records to be processed: %d" % len(recIDs))
 
-
 ### Initialize main loop
 
-    total_rec   = 0     # Total number of records
-    tbibformat  = 0     # time taken up by external call
-    tbibupload  = 0     # time taken up by external call
-
+    total_rec = 0     # Total number of records
+    tbibformat = 0     # time taken up by external call
+    tbibupload = 0     # time taken up by external call
 
 ### Iterate over all records prepared in lists I (option)
     if process:
@@ -173,9 +172,10 @@ def bibreformat_task(fmt, recids, without_fmt, process):
     message = " bibupload: %2f sec" % tbibupload
     write_message(message)
 
+
 def check_validity_input_formats(input_formats):
-    """
-    Checks the validity of every input format.
+    """Check the validity of every input format.
+
     @param input_formats: list of given formats
     @type input_formats: list
     @return: if there is any invalid input format it returns this value
@@ -200,33 +200,60 @@ def check_validity_input_formats(input_formats):
 ### Bibreformat all selected records (using new python bibformat)
 ### (see iterate_over_old further down)
 
-def iterate_over_new(recIDs, fmt):
+
+def _update_recjson_format(recid, *args, **kwargs):
+    """Update RECJSON cache.
+
+    :param int recid: record id to process
     """
-    Iterate over list of IDs
+    dummy = get_record(recid, reset_cache=True)
+
+
+def _update_format(recid, fmt):
+    """Usual format update procedure, gets the formatted record and saves it.
+
+    :param int recid: record id to process
+    :param str fmt: format to update/create, i.e. 'HB'
+    """
+    record, needs_2nd_pass = format_record_1st_pass(recID=recid,
+                                                    of=fmt,
+                                                    on_the_fly=True,
+                                                    save_missing=False)
+    save_preformatted_record(recID=recid,
+                             of=fmt,
+                             res=record,
+                             needs_2nd_pass=needs_2nd_pass,
+                             low_priority=True)
+
+
+_CFG_BIBFORMAT_UPDATE_FORMAT_FUNCTIONS = {'recjson': _update_recjson_format}
+"""Specific functions to be used for each format if needed.
+If not set `_update_format` will be used.
+"""
+
+
+def iterate_over_new(recIDs, fmt):
+    """Iterate over list of IDs.
 
     @param list: the list of record IDs to format
     @param fmt: the output format to use
-    @return: tuple (total number of records, time taken to format, time taken to insert)
+    @return: tuple (total number of records, time taken to format, time taken
+        to insert)
     """
-    tbibformat  = 0     # time taken up by external call
-    tbibupload  = 0     # time taken up by external call
+    tbibformat = 0     # time taken up by external call
+    tbibupload = 0     # time taken up by external call
 
     tot = len(recIDs)
+    reformat_function = _CFG_BIBFORMAT_UPDATE_FORMAT_FUNCTIONS.get(
+        fmt.lower(), _update_format)
     for count, recID in enumerate(recIDs):
         t1 = os.times()[4]
-        formatted_record, needs_2nd_pass = format_record_1st_pass(recID=recID,
-                                                  of=fmt,
-                                                  on_the_fly=True,
-                                                  save_missing=False)
-        save_preformatted_record(recID=recID,
-                                 of=fmt,
-                                 res=formatted_record,
-                                 needs_2nd_pass=needs_2nd_pass,
-                                 low_priority=True)
+        reformat_function(recID, fmt)
         t2 = os.times()[4]
         tbibformat += t2 - t1
         if count % 100 == 0:
-            write_message("   ... formatted %s records out of %s" % (count, tot))
+            write_message("   ... formatted %s records out of %s" %
+                          (count, tot))
             task_update_progress('Formatted %s out of %s' % (count, tot))
             task_sleep_now_if_required(can_stop_too=True)
 
@@ -237,7 +264,7 @@ def iterate_over_new(recIDs, fmt):
 
 
 def all_records():
-    """Produces record IDs for all available records"""
+    """Produce record IDs for all available records."""
     return intbitset(run_sql("SELECT id FROM bibrec"))
 
 
@@ -261,7 +288,7 @@ def outdated_caches(fmt, last_updated, chunk_size=5000):
 
 
 def missing_caches(fmt, chunk_size=100000):
-    """Produces record IDs to be formated, because their fmt cache is missing
+    """Produce record IDs to be formated, because their fmt cache is missing.
 
     @param fmt: format to query for
     @return: record IDs generator without pre-created format cache
@@ -282,8 +309,9 @@ def missing_caches(fmt, chunk_size=100000):
 
     return all_recids
 
+
 def query_records(params):
-    """Prduces record IDs from given query parameters
+    """Produce record IDs from given query parameters.
 
     By passing the appriopriate CLI options, we can query here for additional
     records.
@@ -310,9 +338,11 @@ def query_records(params):
 
 
 def task_run_core():
-    """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
+    """Run the task by fetching arguments from the BibSched task queue.
 
-    fmts = task_get_option('format', 'HB')
+    This is what BibSched will be invoking via daemon call.
+    """
+    fmts = task_get_option('format', 'HB,RECJSON')
     for fmt in fmts.split(','):
         last_updated = fetch_last_updated(fmt)
         write_message("last stored run date is %s" % last_updated)
@@ -372,7 +402,7 @@ Option -m cannot be used at the same time as option -c.
 Option -c prevents from finding records in private collections.
 
 Examples:
-  bibreformat                    Format all new or modified records (in HB).
+  bibreformat                    Format all new or modified records (in HB and RECJSON).
   bibreformat -o HD              Format all new or modified records in HD.
   bibreformat -o HD,HB           Format all new or modified records in HD and HB.
 
@@ -401,20 +431,21 @@ Pattern options:
   -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
                         \t partial (p), any of the words (o) or all of the words (a)
 """,
-            version=__revision__,
-            specific_params=("ac:f:p:lo:nm:i:",
-                ["all",
-                 "collection=",
-                 "matching=",
-                 "field=",
-                 "pattern=",
-                 "format=",
-                 "noprocess",
-                 "id=",
-                 "no-missing"]),
-            task_submit_check_options_fnc=task_submit_check_options,
-            task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-            task_run_fnc=task_run_core)
+              version=__revision__,
+              specific_params=("ac:f:p:lo:nm:i:",
+                               ["all",
+                                "collection=",
+                                "matching=",
+                                "field=",
+                                "pattern=",
+                                "format=",
+                                "noprocess",
+                                "id=",
+                                "no-missing"]),
+              task_submit_check_options_fnc=task_submit_check_options,
+              task_submit_elaborate_specific_parameter_fnc=
+                 task_submit_elaborate_specific_parameter,
+              task_run_fnc=task_run_core)
 
 
 def task_submit_check_options():
@@ -450,14 +481,17 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):  # pylint:
         task_set_option("matching", value)
     elif key in ("-o", "--format"):
         input_formats = value.split(',')
-        ## check the validity of the given output formats
+        # check the validity of the given output formats
         invalid_format = check_validity_input_formats(input_formats)
         if invalid_format:
             try:
                 raise Exception('Invalid output format.')
             except Exception:  # pylint: disable-msg=W0703
                 from invenio.ext.logging import register_exception
-                register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
+                register_exception(
+                    prefix="The given output format '%s' is not available or "
+                           "is invalid. Please try again" %
+                           (invalid_format, ), alert_admin=True)
                 return
         else:  # every given format is available
             task_set_option("format", value)
