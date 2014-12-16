@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@
 import six
 
 from flask import Blueprint, request, render_template, current_app
+from flask.ctx import after_this_request
 from sqlalchemy import event
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import NotFound
@@ -103,7 +104,6 @@ event.listen(Page, 'after_update', page_orm_handler)
 
 def handle_not_found(exception, **extra):
     """Custom blueprint exception handler."""
-
     if not isinstance(exception, NotFound):
         return
 
@@ -112,13 +112,20 @@ def handle_not_found(exception, **extra):
     if page is not None:
         _add_url_rule(page.url)
         # Modify request to call our errorhandler.
+        req_endpoint = request.url_rule.endpoint
         request.url_rule.endpoint = blueprint.name + '.view'
+
+        @after_this_request
+        def restore_url_map(response):
+            request.url_rule.endpoint = req_endpoint
+            return response
+
 
 before_handle_user_exception.connect(handle_not_found)
 
 
 def _add_url_rule(url_or_urls):
-    """Registers url rule to application url map."""
+    """Register url rule to application url map."""
     current_app.logger.info(url_or_urls)
     old = current_app._got_first_request
     # This is bit of cheating to overcome @flask.app.setupmethod decorator.
