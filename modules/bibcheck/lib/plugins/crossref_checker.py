@@ -22,7 +22,7 @@ Check the metadata of the records that contain a DOI by comparing it to the
 metadata returned by crossref.
 """
 
-from invenio.crossrefutils import get_metadata_for_dois
+from invenio.utils.crossref import get_metadata_for_dois
 from invenio.bibknowledge import get_kbr_values
 import difflib
 import re

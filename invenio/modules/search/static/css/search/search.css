@@ -1,0 +1,57 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2012, 2014 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+.modal-backdrop {
+    /* Show lighter modal window for search. */
+    background-color: rgba(255,255,255,0.5);
+}
+
+#facet_list .panel-heading {
+    background-color: whiteSmoke;
+}
+
+#facet_list .panel-heading a:after {
+    content: ' ';
+    float: right;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    vertical-align: text-top;
+    background-image: url("../img/glyphicons-halflings.png");
+    background-position: 14px 14px;
+    background-repeat: no-repeat;
+    /* list alt */
+    background-position: -264px -24px;
+}
+
+#facet_list ul.list-unstyled ul.list-unstyled {
+    padding-left: 10px;
+    font-size: 90%;
+}
+
+#facet_list.affix {
+    top: 28px;
+}
+
+#facet_list.affix-bottom {
+    position: absolute;
+    top: auto;
+    bottom: 170px;
+}

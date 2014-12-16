@@ -33,7 +33,7 @@ import itertools
 from ConfigParser import RawConfigParser
 from datetime import datetime
 from tempfile import mkstemp
-from invenio.bibtask import \
+from invenio.legacy.bibsched.bibtask import \
     task_init, \
     task_set_option, \
     task_has_option, \
@@ -50,18 +50,18 @@ from invenio.config import \
     CFG_SITE_URL, \
     CFG_TMPSHAREDDIR, \
     CFG_CERN_SITE
-from invenio.search_engine import \
+from invenio.legacy.search_engine import \
     perform_request_search, \
     search_unit_in_bibxxx, \
     search_pattern
-from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_xml_output, record_add_field
+from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.bibrecord import record_xml_output, record_add_field
 from invenio.pluginutils import PluginContainer
-from invenio.intbitset import intbitset
-from invenio.dbquery import run_sql
-from invenio.bibcatalog import BIBCATALOG_SYSTEM
-from invenio.shellutils import split_cli_ids_arg
-from invenio.jsonutils import json
+from intbitset import intbitset
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
+from invenio.utils.shell import split_cli_ids_arg
+from invenio.utils.json import json
 
 CFG_BATCH_SIZE = 1000
 

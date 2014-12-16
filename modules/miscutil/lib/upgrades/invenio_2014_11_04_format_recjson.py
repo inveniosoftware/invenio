@@ -19,7 +19,7 @@
 
 """Add new format `recjson` to format table."""
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 

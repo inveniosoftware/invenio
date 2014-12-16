@@ -1,0 +1,191 @@
+..  This file is part of Invenio
+    Copyright (C) 2014 CERN.
+
+    Invenio is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    Invenio is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Invenio; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+.. _webstat-admin-guide:
+
+WebStat Admin Guide
+===================
+
+::
+
+    Invenio Web usage analyzer
+    ==========================
+
+    Purpose:
+    --------
+
+      Walk through the Apache combined log and analyse the usage of the
+      site with respect to the searching habits, alert/basket pages, etc.
+
+      Note: Please analyze only moderately-sized logs, e.g. for a day or a week.
+
+    Usage:
+    ------
+
+       $ webstat example_access_log
+
+      or specify your preferred Common Lisp implementation:
+
+       $ LISP=sbcl webstat example_access_log
+
+    Supported Common Lisp implementations:
+    -------------------------------------
+
+       CMUCL, SBCL, CLISP.
+       GCL doesn't work at the moment.
+       Use CMUCL for fastest results.
+
+
+    Configuration:
+    --------------
+
+    Edit the config file:
+
+       $ vim /opt/invenio/etc/webstat/webstat.cfg
+
+    The file is self-explanatory.
+
+
+    Example output:
+    --------------
+
+    ** APACHE LOG FILE ANALYSIS
+    Filename: example_access_log
+    Excluding search engine hits from (137.138.249.162).
+
+    ** GENERAL STATS
+    There were 36109 website hits dating from 20041014 to 20041014.
+    This makes an average of 36109.0 website hits per day.
+    There were 1706 unique visitors in 1 days.
+    Visitor ............................................................ no. of hits
+    w1.x1.y1.z1 ............................................................... 1844
+    w2.x2.y2.z2 ............................................................... 1761
+    w3.x3.y3.z3 ............................................................... 1012
+    w4.x4.y4.z4 ................................................................ 913
+    w5.x5.y5.z5 ................................................................ 889
+    w6.x6.y6.z6 ................................................................ 562
+    w7.x7.y7.z7 ................................................................ 449
+    w8.x8.y8.z8 ................................................................ 373
+    w9.x9.y9.z9 ................................................................ 335
+
+    ** SEARCH COLLECTIONS USAGE ANALYSIS
+    There were 9059 visits of search interface pages.
+    There were 8688 visits of non-Home search interface pages. ( 4.1%)
+    Collection ....................................................... no. of visits
+    CERN Document Server ....................................................... 371
+    Photos ..................................................................... 207
+    Articles & Preprints ....................................................... 149
+    HEP Institutes .............................................................. 98
+    Periodicals ................................................................. 87
+    Weekly Bulletin ............................................................. 85
+    Preprints ................................................................... 84
+    Theses ...................................................................... 80
+    CERN PhotoLab ............................................................... 78
+    CERN Yellow Reports ......................................................... 77
+    Books ....................................................................... 75
+    ATLAS Photos ................................................................ 72
+    ATLAS ....................................................................... 68
+    CERN Archives ............................................................... 68
+    Academic Training Lectures .................................................. 66
+    Internet Resources .......................................................... 65
+    Books & Proceedings ......................................................... 62
+    Published Articles .......................................................... 60
+    Summer Student Lectures ..................................................... 60
+    Standards ................................................................... 59
+
+    ** SEARCH COLLECTIONS USAGE ANALYSIS
+    There were 5935 search engine hits.
+    There were 2586 searches originating from non-Home collections. (56.4%)
+    Originating collection ......................................... no. of searches
+    CERN Document Server ...................................................... 3349
+    News Articles .............................................................. 649
+    ATLAS eNews ................................................................ 481
+    Photos ..................................................................... 335
+    Weekly Bulletin ............................................................ 205
+    General Information ........................................................ 102
+    Articles & Preprints ........................................................ 85
+    CERN PhotoLab ............................................................... 76
+    CERN Yellow Reports ......................................................... 59
+    Official News ............................................................... 58
+    Training and Development .................................................... 50
+    Staff Association ........................................................... 45
+    Pension Fund ................................................................ 38
+    ATLAS Photos ................................................................ 36
+    CMS Photos .................................................................. 29
+    Books ....................................................................... 28
+    Preprints ................................................................... 21
+    Videos ...................................................................... 18
+    CERN Committee Documents .................................................... 17
+    Translation and Minutes ..................................................... 17
+
+    ** SEARCH ENGINE QUERY PATTERN ANALYSIS
+    Found 8692 search engine hits.
+    First search engine hit log is dated 20041014.
+    Last search engine hit log is dated 20041014.
+    This makes an average of 8692.0 search engine hits per day.
+    There were 5424 simple searches out of 8692 search engine hits. (62.4%)
+    There were 1886 advanced searches out of 8692 search engine hits. (21.7%)
+    There were 1382 detailed record pages out of 8692 search engine hits. (15.9%)
+    There are 2523 different query patterns for 8692 search engine hits. (29.0%)
+    There are 169 empty query pattern searches out of 8692 search engine hits. (1.94%)
+    There are 1264 phrase searches out of 8692 search engine hits. (14.5%)
+    There are 263 phrase query patterns out of 2523 query patterns. (10.4%)
+    There are 1748 one-time event searches out of 8692 search engine hits. (20.1%)
+    There are 1748 one-time query patterns out of 2523 query patterns. (69.3%)
+    There are 4276 one-word searches out of 8692 search engine hits. (49.2%)
+    There are 1602 one-word query patterns out of 2523 query patterns. (63.5%)
+    There are 223 wildcard searches out of 8692 search engine hits. (2.57%)
+    There are 35 wildcard query patterns out of 2523 query patterns. (1.39%)
+    There are 1466 punctuation-like searches out of 8692 search engine hits. (16.9%)
+    There are 407 punctuation-like query patterns out of 2523 query patterns. (16.1%)
+    There are 2424 any-field query patterns out of 2523 query patterns. (96.1%)
+    User query .................................................. no. of occurrences
+    200409 ..................................................................... 432
+     ........................................................................... 169
+    "42/2004" ................................................................... 64
+    "43/2004" ................................................................... 48
+    "40/2004" ................................................................... 46
+    internalnote:press internalnote:'Views*' .................................... 44
+    ALICE ....................................................................... 29
+    "27/2004" ................................................................... 28
+    0002235ATLATL ............................................................... 28
+    "36/2004" ................................................................... 26
+    "24/2004" ................................................................... 25
+    internet .................................................................... 24
+    intranet .................................................................... 24
+    0021317ADMBUL ............................................................... 23
+    internalnote:press internalnote:'physics diagrams*' ......................... 23
+    "19/2004" ................................................................... 22
+    "39/2004" ................................................................... 22
+    0005179UDCCER ............................................................... 22
+    "23/2004" ................................................................... 21
+    "38/2004" ................................................................... 21
+
+    ** USER BASKETS STATS
+    There were 196 user basket page hits.
+    This makes an average of 196.0 user basket page hits per day.
+    There were 47 unique basket page users in 1 days.
+    There were 82 additions to baskets.
+    There were 114 displays of baskets, out of which 39 public baskets accesses.
+
+    ** USER ALERTS STATS
+    There were 7 user alert page hits.
+    This makes an average of 7.0 user alert page hits per day.
+    There were 5 unique alert page users in 1 days.
+    There were 3 displays of user alerts.
+    There were 4 displays of user searches history.
+

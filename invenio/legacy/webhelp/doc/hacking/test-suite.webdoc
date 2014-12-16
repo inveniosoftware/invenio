@@ -1,0 +1,578 @@
+## This file is part of Invenio.
+## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: Test Suite Strategy -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">General considerations</a></strong><br />
+<strong>2. <a href="#2">Unit testing</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Unit testing philosophy</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Writing unit tests</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.3 <a href="#2.3">Running unit tests</a><br />
+<strong>3. <a href="#3">Regression testing</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Regression testing philosophy</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Writing regression tests</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Running regression tests</a><br />
+<strong>4. <a href="#4">Web testing (via real browser)</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Web testing philosophy</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Writing web tests</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Running web tests</a><br />
+<strong>5. <a href="#5">Conclusions</a></strong><br />
+<strong>6. <a href="#6">Additional information</a></strong><br />
+
+<a name="1"></a><h2>1. General considerations</h2>
+
+<p>This documents presents guidelines for unit testing and regression
+testing homogenisation throughout all Invenio modules.
+
+<p>Testing is an important coding activity.  Most authors believe that
+writing test cases should take between 10% and 30% of the project
+time.  But, even with such a large fraction, don't put too much belief
+on such a testing.  It cannot find bugs that aren't tested for.  So,
+while testing is an important activity inherent to safe software
+development practices, it cannot become a substitute for pro-active
+bug hunting, source code inspection, and bugfree-driven development
+approach from the start.
+
+<p>Testing should happen alongside with coding.  If you write a
+function, immediately load it into your toplevel, evaluate its
+definition, and call it for a couple of arguments to make sure the
+function works as expected.  If not, then change the function
+definition, re-evaluate it, re-call it, etc.  Dynamic languages with
+interactive toplevel such as Common Lisp or Python makes this easy for
+you.  Dynamic redefinition capabilities (full in Common Lisp, partial
+in Python) are very programmer-friendly in this respect.  If your test
+cases are interesting to be kept, then keep them in a test file.
+(It's almost all the time a good idea to store them in the test file,
+since you cannot predict whether you won't want to change something in
+the future.)  We'll see below how to store your tests in a test file.
+
+<p>When testing, it is nice to know some rules of thumb, like: check
+your edge cases (e.g. null array), check atypical input values
+(e.g. laaarge array instead of typically 5-6 elements only), check
+your termination conditions, ask whether your arguments have already
+been safe-proofed or whether it is in your mandate to check them,
+write a test case for each `if-else' branch of the code to explore all
+the possibilites, etc.  Another interesting rule of thumb is the bug
+frequency distribution.  Experience has shown that the bugs tend to
+cluster.  If you discover a bug, there are chances that other bugs are
+in the neighborhood.  The famous 80/20 rule of thumb applies here too:
+about 80% of bugs are located in about 20% of the code.  Another rule
+of thumb: if you find a bug caused by some coding practice pattern
+thay may be used elsewhere too, look and fix other pattern instances.
+</p>
+
+<p>In a nutshell, the best advice to write bug-free code is: <em>think
+ahead</em>.  Try to prepare in advance for unusual usage scenarios, to
+foresee problems before they happen.  Don't rely on typical input and
+typical usage scenarios.  Things have a tendency to become atypical
+one day.  Recall that testing is necessary, but not sufficient, to
+write good code.  Therefore, think ahead!
+</p>
+
+<a name="2"></a><h2>2. Unit testing</h2>
+
+<a name="2.1"></a><h3>2.1 Unit testing philosophy</h3>
+
+<p>Core functionality, such as the hit set intersection for the search
+engine, or the text input manipulating functions of the BibConvert
+language, should come with a couple of test cases to assure proper
+behaviour of the core functionality.  The test cases should cover
+typical input (e.g. hit set corresponding to the query for ``ellis''),
+as well as the edge cases (e.g. empty/full hit set) and other unusual
+situations (e.g. non-UTF-8 accented input for BibConvert functions to
+test a situation of different number of bytes per char).
+</p>
+
+<p>The test cases should be written for most important core
+functionality.  Not every function or class in the code is to be
+throughly tested.  Common sense will tell.
+</p>
+
+<p>Unit test cases are free of side-effects.  Users should be able to
+run them on production database without any harm to their data.  This
+is because the tests test ``units'' of the code, not the application
+as such.  If the behaviour of the function you would like to test
+depends on the status of the database, or some other parameters that
+cannot be passed to the function itself, the unit testing framework is
+not suitable for this kind of situation and you should use the
+regression testing framework instead (see below).
+</p>
+
+<p>For more information on Pythonic unit testing, see the
+documentation to the unittest module at <a
+href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>.
+For a tutorial, see for example <a
+href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>.
+</p>
+
+<a name="2.2"></a><h3>2.2 Writing unit tests</h3>
+
+<p>Each core file that is located in the lib directory (such as the
+<code>webbasketlib.py</code> in the example above) should come with a
+testing file where the test cases are stored.  The test file is to be
+named identically as the lib file it tests, but with the suffix
+<code>_unit_tests</code> (in our example,
+<code>webbasketlib_unit_tests.py</code>).
+</p>
+
+<p>The test cases are written using Pythonic unittest TestCase class.
+An example for testing search engine query parameter washing function:
+<blockquote>
+<pre>
+$ cat /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
+[...]
+import search_engine
+from invenio.testsuite import InvenioTestCase
+
+class TestWashQueryParameters(InvenioTestCase):
+    """Test for washing of search query parameters."""
+
+    def test_wash_url_argument(self):
+        """search engine washing of URL arguments"""
+        self.assertEqual(1, search_engine.wash_url_argument(['1'],'int'))
+        self.assertEqual("1", search_engine.wash_url_argument(['1'],'str'))
+        self.assertEqual(['1'], search_engine.wash_url_argument(['1'],'list'))
+        self.assertEqual(0, search_engine.wash_url_argument('ellis','int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument('ellis','str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument('ellis','list'))
+        self.assertEqual(0, search_engine.wash_url_argument(['ellis'],'int'))
+        self.assertEqual("ellis", search_engine.wash_url_argument(['ellis'],'str'))
+        self.assertEqual(["ellis"], search_engine.wash_url_argument(['ellis'],'list'))
+[...]
+</pre>
+</blockquote>
+</p>
+
+<p>In addition, each test file is supposed to define a
+<code>TEST_SUITE</code> variable that will return test suite with all
+the tests available in this file:
+
+<blockquote>
+<pre>
+$ cat /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
+[...]
+TEST_SUITE = make_test_suite(TestWashQueryParameters,
+                             TestStripAccents,
+                             TestQueryParser,)
+[...]
+</pre>
+</blockquote>
+</p>
+
+<p>In this way, all the test cases defined in the file
+<code>search_engine_unit_tests.py</code> will be executed when the global
+<code>testcase</code> executable is called.
+
+<p>Note that it may be time-consuming to run all the tests in one go.
+If you are interested in running tests only on a certain file (say
+<code>search_engine_unit_tests.py</code>), then launch:
+
+<blockquote>
+<pre>
+$ python /opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py
+</pre>
+</blockquote>
+</p>
+
+<p>For full-scale examples, you may follow
+<code>search_engine_unit_tests.py</code> and other <code>_unit_tests.py</code>
+files in the source distribution.
+</p>
+
+<a name="2.3"></a><h3>2.3 Running unit tests</h3>
+
+<p>Invenio test suite can be run at any time via:
+
+<blockquote>
+<pre>
+$ /opt/invenio/bin/inveniocfg --run-unit-tests
+</pre>
+</blockquote>
+
+This command will run all available unit tests provided with CDS
+Invenio.
+</p>
+
+<p>The informative output is of the form:
+
+<blockquote>
+<pre>
+Invenio v0.3.2.20040519 test suite results:
+===========================================
+search engine washing of query patterns ... ok
+search engine washing of URL arguments ... ok
+search engine stripping of accented letters ... ok
+bibindex engine list union ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.121s
+
+OK
+</pre>
+</blockquote>
+
+In case of problems you will see failures like:
+
+<blockquote>
+<pre>
+Invenio v0.3.2.20040519 test suite results:
+===========================================
+search engine washing of query patterns ... FAIL
+search engine washing of URL arguments ... ok
+search engine stripping of accented letters ... ok
+bibindex engine list union ... ok
+
+======================================================================
+FAIL: search engine washing of query patterns
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/invenio/lib/python/invenio.legacy.search_engine_unit_tests.py", line 25, in test_wash_pattern
+    self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
+  File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
+    raise self.failureException, \
+AssertionError: 'ell*' != 'ell'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.091s
+
+FAILED (failures=1)
+</pre>
+</blockquote>
+</p>
+
+<p>The test suite compliance should be checked before each CVS commit.
+(And, obviously, double-checked before each Invenio release.)
+</p>
+
+<a name="3"></a><h2>3. Regression testing</h2>
+
+<a name="3.1"></a><h3>3.1 Regression testing philosophy</h3>
+
+<p>In addition to the above-mentioned unit testing of important
+functions, a regression testing should ensure that the overall
+application functionality is behaving well and is not altered by code
+changes.  This is especially important if a bug had been previously
+found.  Then a regression test case should be written to assure that
+it will never reappear.  (It also helps to scan the neighborhood of
+the bug, or the whole codebase for occurrences of the same kind of
+bug, see the 80/20 thumb rule cited above.)
+</p>
+
+<p>Moreover, the regression test suite should be used when the
+functionality of the item we would like to test depends on
+extra-parametrical status, such as the database content.  Also, the
+regression framework is suitable for testing the overall behaviour of
+web pages.  (In extreme programming, the regression testing is called
+<em>acceptance testing</em>, the name that evolved from previous
+<em>functionality testing</em>.)
+</p>
+
+<p>Within the framework of the regression test suite, we have liberty
+to alter database content, unlike that of the unit testing framework.
+We can also simulate the web browser in order to test web
+applications.  (Note that for real browser tests, we have yet
+another <a href="#4">web test suite</a> described below.)
+</p>
+
+<p>As an example of a regression test, we can test whether the web
+pages are alive; whether searching for Ellis in the demo site produces
+indeed 12 records; whether searching for aoeuidhtns produces no hits
+but the box of nearest terms, and with which content; whether
+accessing the Theses collection page search prompts an Apache password
+prompt; whether the admin interface is really accessible only to
+admins or also to guests, etc.
+</p>
+
+<p>For more information on regression testing, see for example <a
+href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>.
+</p>
+
+<a name="3.2"></a><h3>3.2 Writing regression tests</h3>
+
+<p>Regression tests are written per application (or sub-module) in
+files named like <code>websearch_regression_unit_tests.py</code> or
+<code>websubmitadmin_regression_tests.py</code>.
+</p>
+
+<p>When writing regression tests, you can assume that the site is in
+the fresh demo mode (Atlantis Institute of Fictive Science).  You can
+also safely write not only database-read-only tests, but you can also
+safely insert/update/delete into/from the database whatever values you
+need for testing.  Users are warned prior to running the regression
+test suite about its possibly destructive side-effects. (See below.)
+Therefore you can create users, create user groups, attach users to
+groups to test the group joining process etc, as needed.
+</p>
+
+<p>For testing web pages using GET arguments, you can take advantage
+of the following helper function:
+
+<blockquote>
+<pre>
+$ cat /opt/invenio/lib/python/invenio.testsuite.py
+[...]
+def test_web_page_content(url, username="guest", expected_text="</html>"):
+    """Test whether web page URL as seen by user USERNAME contains
+       text EXPECTED_TEXT.  Before doing the tests, login as USERNAME.
+       (E.g. interesting values are "guest" or "admin".)
+
+       Return empty list in case of problems, otherwise list of error
+       messages that may have been encountered during processing of
+       page.
+    """
+</pre>
+</blockquote>
+
+For example you can test whether admins can access WebSearch Admin
+interface but guests cannot:
+
+<blockquote>
+<pre>
+test_web_page_content(CFG_SITE_URL + '/admin/websearch/websearchadmin.py',
+                      username='admin')
+
+test_web_page_content(CFG_SITE_URL + '/admin/websearch/websearchadmin.py',
+                      username='guest',
+                      expected_text='Authorization failure')
+</pre>
+</blockquote>
+
+or you can test whether searching for aoeuidhtns produces nearest
+terms box:
+
+<blockquote>
+<pre>
+test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns',
+                      expected_text='Nearest terms in any collection are')
+</pre>
+</blockquote>
+</p>
+
+<p>For testing web pages using POST argumens or for other more
+advanced testing you should use directly <code>mechanize</code> Python
+module that simulates the browser.  It can post forms, follow links,
+go back to previous pages, etc.  An example of how to test the login
+page functionality:
+
+<blockquote>
+<pre>
+browser = mechanize.Browser()
+browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
+browser.select_form(nr=0)
+browser['p_un'] = 'userfoo'
+browser['p_pw'] = 'passbar'
+browser.submit()
+username_account_page_body = browser.response().read()
+try:
+    string.index(username_account_page_body,
+                 "You are logged in as userfoo.")
+except ValueError:
+    self.fail('ERROR: Cannot login as userfoo.')
+</pre>
+</blockquote>
+
+<p>For full-scale examples, you may follow
+<code>websearch_regression_tests.py</code> and other
+<code>_regression_tests.py</code> files in the source distribution.
+</p>
+
+<p>It is to be noted that regression tests using the simple mechanize
+browser emulation (i) cannot test advanced web technologies such as
+JavaScript and AJAX.  Hence, for example, we cannot use them to test
+submission pages that are currently heavily replying on JavaScript.
+Moreover, with the mechanise browser emulation, it may be (ii)
+cumbersome to write tests for operations that require going through
+several pages etc.  For these purposes we use the <a href="#4">web
+test suite</a> that can run in a real browser.  We shall describe this
+test suite below.  Nevertheless, for quick testing of HTTP GET pages
+or other single-page web operations, the regression tests are very
+easy to write and more practical then using the below-described web
+test suite.</p>
+
+<a name="3.3"></a><h3>3.3 Running regression test suite</h3>
+
+<p>The regression test suite can be run by invoking:
+
+<blockquote>
+<pre>
+$ /opt/invenio/bin/inveniocfg --run-regression-tests
+</pre>
+</blockquote>
+
+similarly to the unit test suite cited above.  The notable exception
+when compared to running the unit test suite is:
+</p>
+
+<ul>
+
+<li>we assume the site to be in demo mode (Atlantis Institute of
+    Fictive Science)
+
+<li>we shall pollute the database with test data as it seems fit for
+    the regression testing purposes.
+
+</ul>
+
+<p>
+Therefore beware, <strong>running regression test suite requires clean
+demo site and may destroy your data forever</strong>.  The user is
+warned about this prior to running the suite and is given a chance to
+abort the process:
+
+
+<blockquote>
+<pre>
+$ /opt/invenio/bin/inveniocfg --run-regression-tests
+**********************************************************************
+**                                                                  **
+**  ***  I M P O R T A N T   W A R N I N G  ***                     **
+**                                                                  **
+** The regression test suite needs to be run on a clean demo site   **
+** that you can obtain by doing:                                    **
+**                                                                  **
+**    $ inveniocfg --drop-demo-site \                               **
+**                 --create-demo-site \                             **
+**                 --load-demo-records                              **
+**                                                                  **
+** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
+**                                                                  **
+** (In addition, due to the write nature of some of the tests,      **
+** the demo database may be altered with junk data, so that         **
+** it is recommended to rebuild the demo site anew afterwards.)     **
+**                                                                  **
+**********************************************************************
+
+Please confirm by typing "Yes, I know!": NO
+Aborted.
+</pre>
+</blockquote>
+</p>
+
+<p>If you choose to continue, the regression test suite will produce
+the output similar to the unit test suite that was discussed
+previously.
+</p>
+
+<a name="4"></a><h2>4. Web testing (via real browser)</h2>
+
+<a name="4.1"></a><h3>4.1 Web testing philosophy</h3>
+
+<p>The web test suite bears many similarities with the black-box
+functional acceptance testing that the regression test suite also
+provides.  We have seen that the regression test suite (using
+mechanize) can very well take care of testing of simple single-page
+web scenarios.  Nevertheless, it is useful to distinguish between
+testing of web pages via an emulated browser (mechanize) and testing
+of web pages via a real browser.  The latter tests run slower, but are
+closer to the end user environment, can use real JavaScript engine,
+and can generally more easily test various complex multi-page
+scenarios.  It is the latter type of acceptance tests that we are
+concerned with here.</p>
+
+<p>Invenio currently uses the
+<a href="http://www.mozilla.com/en-US/firefox/">Firefox</a> browser
+with the <a href="http://selenium-ide.openqa.org/">Selenium IDE</a>
+extension to automatize its real-browser web tests.</p>
+
+<a name="4.2"></a><h3>4.2 Writing web tests</h3>
+
+<p>Selenium IDE uses "Selenise HTML" to represent test cases via HTML
+tables with rows representing actions and expected results.  You can
+take a look at <code>test_search_ellis.html</code> example and emulate
+it.</p>
+
+<p>However, the most practical way to write web test cases might be to
+use Selenium IDE test recording capabilities: you surf in Firefox as a
+normal user would, and you add simple tests for the presence of
+certain text on the pages as you go.  Selenium IDE can record and
+store tests for further replaying.  (You can watch an explanatory
+screencast on <a href="http://seleniumhq.org/movies/intro.mov">how
+to record a test</a>.)
+
+<p>(Note that one inconvenience with recording test cases is that this
+is usually done <em>a posteriori</em> when the web pages are written
+already, which does not go well with with test-driven development
+practices.  But some of TDD goals can be met by using regression test
+suite with mechanize instead.)</p>
+
+<p>When the test is recorded and the Selenese HTML test case is
+written, edit its source and pay attention to using default URLs
+as <code>http://localhost</code>, and install it into <code>web</code>
+directory following e.g. <code>websearch/web</code> example.
+
+<a name="4.3"></a><h3>4.3 Running web tests</h3>
+
+<p>Run web tests via:
+
+<blockquote>
+<pre>
+$ /opt/invenio/bin/inveniocfg --run-web-tests
+</pre>
+</blockquote>
+
+<p>This will build complete web test suite out of
+module-specific <code>test_foo_bar.html</code> files, and will open a
+Firefox window with Selenium IDE running the built complete test
+suite.  Check the results there.
+
+<p>Note that if you want to web-test a remote Invenio demo site (say
+<code>foo.site.com</code>) using your local Firefox with Selenium IDE,
+you can install a local Invenio site as usual, and then do:</p>
+
+<blockquote>
+<pre>
+$ sudo -u apache perl -pi -e 's,localhost,foo.site.com,g' /opt/invenio/lib/webtest/invenio/test*html
+$ /opt/invenio/bin/inveniocfg --run-web-tests --yes-i-know
+</pre>
+</blockquote>
+
+<a name="5"></a><h2>5. Conclusions</h2>
+
+<p>A uniform testing technique and three test suites (unit test suite,
+regression test suite, web test suite) were discussed.  Each
+programmer should plan to write the test code alongside the core code
+development to test the building blocks of his/her code (unit tests)
+as well as the overall application behaviour (regression tests, web
+tests).  The guidelines were given how to do so.
+</p>
+
+<a name="6"></a><h2>6. Additional information</h2>
+
+<dl>
+<dt>More information can be found on the URLs mentioned above:
+<dd>
+<pre>
+<a href="http://c2.com/cgi/wiki?UnitTest">http://c2.com/cgi/wiki?UnitTest</a>
+<a href="http://c2.com/cgi/wiki?RegressionTesting">http://c2.com/cgi/wiki?RegressionTesting</a>
+<a href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>
+<a href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>
+<a href="http://wwwsearch.sourceforge.net/mechanize/">http://wwwsearch.sourceforge.net/mechanize/</a>
+<a href="http://selenium.openqa.org/">http://selenium.openqa.org/</a>
+</pre>
+</dl>
+
+<dl>
+<dt>and elsewhere:
+<dd>
+<pre>
+Steve McConnell: "Code Complete"
+FIXME: list of other interesting references, like Kent Beck papers, etc
+</pre>
+</dl>

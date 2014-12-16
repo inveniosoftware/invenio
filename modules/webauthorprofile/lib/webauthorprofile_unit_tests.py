@@ -25,15 +25,16 @@ WebAuthorProfile unit tests
 
 from threading import Thread
 from time import sleep
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.webauthorprofile_dbapi import expire_cache_element
-from invenio.webauthorprofile_corefunctions import foo, _foo
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+expire_cache_element = lazy_import('invenio.legacy.webauthorprofile.dbapi.expire_cache_element')
 
 class WebAuthorProfileTest(InvenioTestCase):
     """ Test functions to check the validator of WebAuthorProfile. """
 
     def test_caching(self):
         """ Test if the main corefuntions work correctly. """
+        from invenio.legacy.webauthorprofile.corefunctions import foo, _foo
         res1 = _foo(1, 2, 3, 0)
         res2, status2 = foo(1, 2, 3, 0)
         res3, status3 = foo(1, 2, 3, 0)
@@ -44,6 +45,10 @@ class WebAuthorProfileTest(InvenioTestCase):
 
     def test_caching2(self):
         """ Test if precaching works """
+        from invenio.base.factory import with_app_context
+        from invenio.legacy.webauthorprofile.corefunctions import foo
+
+        @with_app_context()
         def handler(reslist, secs):
             reslist.append(foo(1, 2, 3, secs))
 

@@ -1,0 +1,61 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "workflows/styles/styles_base.html" %}
+
+{% block styles_body %}
+
+  {% if result_progress %}
+    <h5>{{ _('Progress') }}:</h5>
+
+    <div class="progress">
+      <div class="progress-bar progress-bar-success" style="width: {{(result_progress.total - result_progress.failed)* 100 / result_progress.total}}%">
+        <span class="sr-only">{{ _('Succeeded') }}</span>
+      </div>
+      <div class="progress-bar progress-bar-danger" style="width: {{result_progress.failed * 100 / result_progress.total}}%">
+        <span class="sr-only">{{ _('Failed') }}</span>
+      </div>
+    </div>
+
+    <strong>{{result_progress.total - result_progress.failed}}</strong> {{_("out of")}} <strong>{{result_progress.total}}</strong> {{_("record(s) done")}}.
+
+    {% if result_progress.failed %}
+      <p class="text-warning">
+        {{ result_progress.failed }} {{ _('failed') }}.
+      </p>
+    {% endif %}
+  {% endif %}
+
+  {% if identifiers %}
+    <h5>{{ _('Identifiers') }}:</h5>
+    <ul class="list-unstyled">
+      {% for identifier in identifiers %}
+        <li>
+          {% if 'arxiv' in identifier.lower() %}
+            {% set identifier = identifier.split(':')[-1] %}
+            <a href="http://arxiv.org/abs/{{identifier}}">{{identifier}}</a>
+          {% else %}
+            {{ identifier }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+{% endblock %}

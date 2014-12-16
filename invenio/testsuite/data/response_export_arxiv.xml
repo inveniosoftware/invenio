@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2014-07-01T17:06:48Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:1007.5048" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<GetRecord>
+<record>
+<header>
+ <identifier>oai:arXiv.org:1007.5048</identifier>
+ <datestamp>2011-01-04</datestamp>
+ <setSpec>physics:hep-ex</setSpec>
+</header>
+<metadata>
+ <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+ <id>1007.5048</id><created>2010-07-28</created><updated>2011-01-03</updated><authors><author><keyname>Aaltonen</keyname><forenames>T.</forenames></author></authors><title>Diffractive W and Z Production at the Fermilab Tevatron</title><categories>hep-ex</categories><comments>10 pages, 6 figures</comments><report-no>FERMILAB-PUB-10-255-E</report-no><journal-ref>Phys.Rev.D82:112004,2010</journal-ref><doi>10.1103/PhysRevD.82.112004</doi><license>http://arxiv.org/licenses/nonexclusive-distrib/1.0/</license><abstract>  We report on a measurement of the fraction of events with a W or Z boson
+which are produced diffractively in antiproton-proton collisions at a center of
+mass energy of 1.96 TeV, using data from 0.6 inverse femtobarns of integrated
+luminosity collected with the CDF-II detector equipped with a Roman-pot
+spectrometer that detects the antiproton (pbar) from pbar+p --&gt; pbar+[X+W/Z].
+We find that (1.00+/- 0.11)% of Ws and (0.88+/-0.22)% of Zs are produced
+diffractively in a region of antiproton or proton fractional momentum loss
+(\xi) of 0.03&lt;\xi&lt;0.10 and 4-momentum transferred squared t of -1&lt;t&lt;0
+(GeV/c)^2, where we account for the events in which the proton scatters
+diffractively while the antiproton dissociates, pbar+p --&gt; [X+W/Z]+p, by
+doubling the measured proton dissociation fraction. We also report on searches
+for W and Z production in double Pomeron exchange, p+pbar --&gt; p+[X+W/Z]+pbar,
+and on exclusive Z production, pbar+p --&gt; pbar+Z+p. No signal is seen above
+background for these processes, and comparisons are made with expectations.
+</abstract></arXiv>
+</metadata>
+</record>
+</GetRecord>
+</OAI-PMH>

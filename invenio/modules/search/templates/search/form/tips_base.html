@@ -1,0 +1,58 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- block search_form_ctrls_help -%}
+<span class="input-group-btn">
+  <a class="dropdown-toggle btn btn-default"
+     rel="tooltip" title="{{ _('Search Tips and Examples') }}"
+     data-placement="bottom"
+     data-delay="100"
+     data-toggle="dropdown" role="button"
+     href="#"><i class="glyphicon glyphicon-question-sign"></i>
+  </a>
+  <ul class="searchexamples dropdown-menu">
+    <li>
+      <a href="/help/search-tips">
+        <strong>{{ _("Search Tips") }}</strong>
+        <i class="pull-right glyphicon glyphicon-info-sign"></i>
+      </a>
+    </li>
+    <li>
+      <a href="/help/search-guide">
+        <i class="pull-right glyphicon glyphicon-leaf"></i>
+        <strong>{{ _("Search Guide") }}</strong>
+      </a>
+    </li>
+{%- if collection.examples %}
+    <li class="divider"></li>
+    <li class="dropdown-header">
+      {{ _('Search examples') }}
+    </li>
+  {%- for e in collection.examples if e.body %}
+    <li>
+      <a href="{{ url_for('search.search', p=e.body) }}">
+        <i class="pull-right glyphicon glyphicon-chevron-right"></i>
+        <span class="after-fix">{{ e.body }}</span>
+      </a>
+    </li>
+  {%- endfor %}
+{%- endif %}
+  </ul>
+</span>
+{%- endblock search_form_ctrls_help-%}

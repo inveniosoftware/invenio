@@ -19,7 +19,7 @@
 
 from __future__ import print_function
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 depends_on = ['invenio_release_1_1_0']
 

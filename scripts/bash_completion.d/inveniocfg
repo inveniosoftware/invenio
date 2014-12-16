@@ -1,0 +1,52 @@
+## -*- mode: shell-script; coding: utf-8; -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2010, 2011 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+_inveniocfg()
+{
+    local cur prev opts base
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    # Basic options
+    opts="-h --help -v --version --create-apache-conf --create-tables --load-webstat-conf --drop-tables --check-openoffice-dir --create-secret-key --create-demo-site --load-demo-records --remove-demo-records --drop-demo-site --run-unit-tests --run-regression-tests --run-web-tests --run-flask-tests --update-all --update-config-py --update-dbquery-py --update-dbexec --update-bibconvert-tpl --update-web-tests --reset-all --reset-sitename --reset-siteadminemail --reset-fieldnames --reset-recstruct-cache --list --get --conf-dir --detect-system-details --upgrade --upgrade-check --upgrade-show-pending --upgrade-show-applied --upgrade-create-standard-recipe --upgrade-create-release-recipe"
+
+    # Option arguments
+    case "$prev" in
+        --conf-dir)
+            # Configuration directory
+            COMPREPLY=( $(compgen -d ${cur}) )
+            return 0
+            ;;
+        --get)
+            # Configuration options
+            local args=$(for arg in $(inveniomanage config list | grep ^CFG_ | cut -d' ' -f1); do echo $arg; done)
+            COMPREPLY=( $(compgen -W "${args}" -- ${cur}) )
+            return 0
+            ;;
+        *)
+            ;;
+    esac
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        return 0
+    fi
+}
+complete -F _inveniocfg inveniocfg

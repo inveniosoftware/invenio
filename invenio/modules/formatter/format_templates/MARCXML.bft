@@ -1,0 +1,3 @@
+<name>MARC XML</name>
+<description>Standard MARC XML output</description>
+<BFE_XML_RECORD type='xm' encodeForXML='no'/>

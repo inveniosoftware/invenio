@@ -1,0 +1,67 @@
+/**
+ * -*- mode: text; coding: utf-8; -*-
+ *
+ * This file is part of Invenio.
+ * Copyright (C) 2014 CERN.
+
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+@import (reference) "base.less";
+
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+
+.navbar-wrapper {
+  position:absolute;
+  top: @line-height-computed;
+  left: @line-height-computed;
+  right: @line-height-computed;
+  z-index: 20;
+  margin-top: @line-height-computed;
+  .container {
+    padding-left: @padding-large-horizontal;
+    padding-right: @padding-large-horizontal;
+  }
+  .navbar {
+    padding-left: @line-height-computed;
+    padding-right: @line-height-computed;
+  }
+}
+
+.navbar-content {
+   padding: @padding-large-horizontal;
+   padding-bottom: @padding-xs-vertical;
+   min-width: 250px;
+   .clearfix;
+}
+
+.navbar-footer {
+  background-color:@navbar-default-toggle-hover-bg;
+}
+
+.dropdown-menu {
+  padding: @padding-xs-vertical;
+  overflow: hidden;
+}
+
+.message-highlight {
+  background-color: @dropdown-link-hover-bg;
+}
+
+@media (max-width: 768px) {
+  .message-highlight{
+    background-color: @gray-dark !important;
+  }
+}

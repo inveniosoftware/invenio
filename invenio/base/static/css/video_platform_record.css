@@ -1,0 +1,726 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2011, 2014 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+/* ---------- Hacks to standard Invenio Elements ------------- */
+
+.pagebodystripemiddle > br {
+	display: none;
+}
+
+.moreinfo {
+	display: none;
+}
+
+/* ------------- WebComment HACK --------------- */
+
+.webcomment_review_title_table {
+	border: 0px;
+	border-collapse: separate;
+	border-spacing: 5px;
+	padding: 5px;
+	width: 100%;
+}
+
+.webcomment_deleted_comment_message,
+.webcomment_reported_comment_message,
+.webcomment_comment_pending_approval_message,
+.webcomment_review_pending_approval_message,
+.webcomment_deleted_review_message {
+	color:#a3a3a3;font-style:italic;
+}
+
+.webcomment_deleted_comment_undelete,
+.webcomment_reported_comment_unreport,
+.webcomment_deleted_review_undelete,
+.webcomment_reported_review_unreport,
+.webcomment_comment_delete,
+.webcomment_review_delete {
+	color:#8B0000;
+}
+
+.webcomment_comment_box {
+	margin: 0px;
+	background: none;
+	border: none;
+}
+
+.webcomment_comment_box blockquote {
+	margin: 0px;
+}
+
+.webcomment_comment_options {
+	margin: 5px 0 0 0;
+	float:right;
+}
+
+.webcomment_comment_box:after {
+	clear: both;
+}
+
+
+.webcomment_comment_title {
+	background: none;
+	padding:0px;
+	height: auto;
+	line-height: normal;
+	margin: 0 0 3px 0;
+}
+
+.webcomment_review_box {
+	background:#F9F9F9;
+	border:1px solid #DDD;
+}
+
+.webcomment_review_box_inner {
+	background-color:#EEE;
+	padding:2px;
+}
+.webcomment_review_box_inner > img {
+	margin-right:10px;
+}
+
+.webcomment_review_title {
+	font-weight: bold;
+}
+
+.webcomment_review_label_reviewed {
+
+}
+
+.webcomment_review_label_useful {
+
+}
+
+.webcomment_comment_table {
+	border: 0px solid black;
+	width: 95%;
+	margin:10px;
+	font-size:small;
+}
+
+.webcomment_container {
+	margin-left:10px;margin-right:10px;
+}
+
+.clearer {
+	clear: both;
+}
+
+.webcomment_header_comments {
+	display: none;
+}
+
+.webcomment_header_ratings {
+	display: none;
+}
+
+.websomment_header_comments_label {
+
+}
+
+.cmtRound > br {
+	display: none;
+}
+
+
+.webcomment_comment_report {
+
+}
+
+.webcomment_comment_reply {
+
+}
+
+.webcomment_comment_delete {
+
+}
+
+.webcomment_comment_date {
+	float: left;
+	margin: 0 0 0 10px;
+	color: #666;
+}
+
+.webcomment_comment_author {
+
+}
+
+.webcomment_comment_avatar {
+	float: left;
+	margin: 2px 5px;
+	width: 50px;
+	height: 50px;
+}
+
+
+.webcomment_comment_content {
+	float: right;
+	width: 575px;
+}
+
+.webcomment_comment_options > a {
+	margin: 0 0 0 10px;
+}
+
+.webcomment_comment_options > a:visited {
+
+}
+
+.commentbox {
+	width: auto;
+	margin-top: 5px;
+	color: #666;
+	font-size: 11px;
+}
+
+.webcomment_comment_depth_1 {
+	margin-left: 0px;
+}
+
+.webcomment_comment_avatar_default {
+	display: none;
+}
+
+.webcomment_comment_round_header {
+	margin: 0 0 0 10px;
+}
+
+.webcomment_view_all_comments {
+	float: right;
+	margin: 10px;
+	font-size: 12px;
+}
+
+.webcomment_review_first_introduction {
+
+}
+
+.webcomment_header_details {
+	display: none;
+}
+
+form {
+	float: left;
+}
+
+table, td {
+	border-spacing: 0;
+}
+
+/* Video download button */
+.adminbutton {
+	padding: 0;
+	font-weight: normal;
+	border: none;
+	font-size: 12px;
+	color: #797979;
+	text-align: center;
+	vertical-align: middle;
+	line-height: 30px;
+	width: 150px;
+	height: 30px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background-color: #FFFFFF;
+	background: -moz-linear-gradient(top, #ffffff 74%, #ebebeb 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(74%,#ffffff), color-stop(100%,#ebebeb));
+	background: -webkit-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	background: -o-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	background: -ms-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ebebeb',GradientType=0 );
+	background: linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	-webkit-box-shadow: 1px 1px 1px 1px #b3b3b3;
+	-moz-box-shadow: 1px 1px 1px 1px #b3b3b3;
+	box-shadow: 1px 1px 1px 1px #b3b3b3;
+}
+
+/* Video download button hover */
+.adminbutton:hover {
+	cursor:pointer;
+	color: #FFF;
+	background: rgb(125,126,125); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(125,126,125,1) 0%, rgba(58,58,58,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(125,126,125,1)), color-stop(100%,rgba(58,58,58,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#3a3a3a',GradientType=0 ); /* IE6-9 */
+	background: linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* W3C */
+}
+
+/* Video download button click */
+.adminbutton:active {
+	cursor:pointer;
+	color: #FFF;
+	background: rgb(58,58,58); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(58,58,58,1) 0%, rgba(125,126,125,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(58,58,58,1)), color-stop(100%,rgba(125,126,125,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3a3a3a', endColorstr='#7d7e7d',GradientType=0 ); /* IE6-9 */
+	background: linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* W3C */
+	-webkit-box-shadow: 0px 0px 0px 0px #b3b3b3;
+	-moz-box-shadow: 0px 0px 0px 0px #b3b3b3;
+	box-shadow: 0px 0px 0px 0px #b3b3b3;
+}
+
+/* END HACK */
+
+/* ---------------- VIDEO PLAYER --------------- */
+
+/* Black background around the video player */
+.video_black_band {
+	background-color: #000;
+	/*height: 360px;*/
+	margin-top: 20px;
+	background-image: -moz-radial-gradient(center center, ellipse closest-side, #323232 0%,#000000 150%);
+	background-image: -webkit-radial-gradient(center center, ellipse closest-side, #323232 0%,#000000 150%);
+	background-image: -o-radial-gradient(center center, ellipse closest-side, #323232 0%,#000000 150%);
+	background-image: -ms-radial-gradient(center center, ellipse closest-side, #323232 0%,#000000 150%);
+	background-image: radial-gradient(center center, ellipse closest-side, #323232 0%,#000000 150%)
+}
+
+/* Video Player wrapper */
+.video_player {
+	margin: 0 auto;
+}
+
+/* ---------------- COLUMNS --------------- */
+
+/* Content column below the video player */
+.video_content_wrapper {
+	background-color: #EBEBEB;
+}
+
+/* Left side of the content column with the description and comments */
+.video_content_left {
+	background-color: #EBEBEB;
+}
+
+/* Right side of the content column with video suggestions */
+.video_content_right {
+	background-color: #D7D7D7;
+	background: -moz-linear-gradient(left, #d7d7d7 0%, #b7b7b7 100%);
+	background: -webkit-gradient(linear, left top, right top, color-stop(0%,#d7d7d7), color-stop(100%,#b7b7b7));
+	background: -webkit-linear-gradient(left, #d7d7d7 0%,#b7b7b7 100%);
+	background: -o-linear-gradient(left, #d7d7d7 0%,#b7b7b7 100%);
+	background: -ms-linear-gradient(left, #d7d7d7 0%,#b7b7b7 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d7d7d7', endColorstr='#b7b7b7',GradientType=1 );
+	background: linear-gradient(left, #d7d7d7 0%,#b7b7b7 100%);
+}
+
+/* Fixes floaters */
+.video_content_clear {
+	clear: both;
+}
+
+/* ----------------  VIDEO CONTENT --------------- */
+
+.video_content_box {
+	padding: 10px;
+	margin: 0 0 0 0;
+}
+
+/* Title of the video */
+.video_content_title {
+	font-size: 18px;
+	color: #111111;
+}
+
+/* Author of the video */
+.video_content_author {
+	font-size: 12px;
+	color: #797979;
+	margin: 0 0 10px 0;
+}
+
+/* Year of the video*/
+.video_content_year {
+	font-size: 14px;
+	color: #797979;
+	float: right;
+}
+
+/* Video Description */
+.video_content_description {
+	font-size: 13px;
+	color: #000;
+}
+
+/* ----------------  DOWNLOAD POPUP --------------- */
+
+/* Outer popup box */
+#video_download_popup_box {
+	display: none;
+	position:absolute;
+	width: 180px;
+	padding: 3px;
+	margin:1em 0 3em;
+	color:#333;
+	background:#fff;
+	/* css3 */
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	border-radius:5px;
+	-webkit-box-shadow: 1px 1px 30px 5px #333;
+	-moz-box-shadow: 1px 1px 30px 5px #333;
+	box-shadow: 1px 1px 30px 5px #333;
+}
+
+/* Links within the popup box */
+#video_download_popup_box a {
+	text-decoration: none;
+	color:#333;
+}
+
+/* Links within the popup box */
+#video_download_popup_box a:hover {
+	text-decoration: none;
+	color:#fff;
+}
+
+/* creates the smaller  triangle */
+#video_download_popup_box:after {
+	content:"";
+	position:absolute;
+	bottom:-13px; /* value = - border-top-width - border-bottom-width */
+	left:80px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+	border-width:13px 13px 0;
+	border-style:solid;
+	border-color:#fff transparent;
+	/* reduce the damage in FF3.0 */
+	display:block;
+	width:0;
+}
+
+/* Popup elements */
+.video_download_popup_element {
+	height: 30px;
+	width: 180px;
+	border-bottom: 1px solid #CCCCCC;
+	line-height: 30px;
+	vertical-align: middle;
+}
+
+/* Click hover for popup elements */
+.video_download_popup_element:hover {
+	color: #FFF;
+	background: rgb(125,126,125); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(125,126,125,1) 0%, rgba(58,58,58,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(125,126,125,1)), color-stop(100%,rgba(58,58,58,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#3a3a3a',GradientType=0 ); /* IE6-9 */
+	background: linear-gradient(top, rgba(125,126,125,1) 0%,rgba(58,58,58,1) 100%); /* W3C */
+}
+
+/* Click hover for last popup element */
+.video_download_popup_element:nth-last-child(-n+2):hover {
+	color: #FFF;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-radius: 0px 0px 5px 5px;
+	border-radius: 0px 0px 5px 5px;
+}
+
+/* Click hover for first popup element */
+.video_download_popup_element:first-child:hover {
+	color: #FFF;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 0px;
+	-moz-border-radius-bottomleft: 0px;
+	-webkit-border-radius: 5px 5px 0px 0px;
+	border-radius: 5px 5px 0px 0px;
+}
+
+/* Click style for popup elements */
+.video_download_popup_element:active {
+	color: #FFF;
+	background: rgb(58,58,58); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(58,58,58,1) 0%, rgba(125,126,125,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(58,58,58,1)), color-stop(100%,rgba(125,126,125,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* Opera11.10+ */
+	background: -ms-linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* IE10+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3a3a3a', endColorstr='#7d7e7d',GradientType=0 ); /* IE6-9 */
+	background: linear-gradient(top, rgba(58,58,58,1) 0%,rgba(125,126,125,1) 100%); /* W3C */
+}
+
+/* Click style for last popup element */
+.video_download_popup_element:nth-last-child(-n+2):active {
+	color: #FFF;
+	-moz-border-radius-topleft: 0px;
+	-moz-border-radius-topright: 0px;
+	-moz-border-radius-bottomright: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-radius: 0px 0px 5px 5px;
+	border-radius: 0px 0px 5px 5px;
+}
+
+/* Click style for first popup element */
+.video_download_popup_element:first-child:active {
+	color: #FFF;
+	-moz-border-radius-topleft: 5px;
+	-moz-border-radius-topright: 5px;
+	-moz-border-radius-bottomright: 0px;
+	-moz-border-radius-bottomleft: 0px;
+	-webkit-border-radius: 5px 5px 0px 0px;
+	border-radius: 5px 5px 0px 0px;
+}
+
+
+/* Video codec/container inside the popup */
+.video_download_popup_element_codec {
+	font-size: 12px;
+	width: 50px;
+	display: inline;
+	padding: 0 0 0 10px;
+	float: left;
+}
+
+/* Resolution inside the popup */
+.video_download_popup_element_resolution {
+	font-size: 12px;
+	width: 50px;
+	font-style: italic;
+	display: inline;
+	float: right;
+	text-align: right;
+}
+
+/* Filesize inside the popup */
+.video_download_popup_element_filesize {
+	font-size: 12px;
+	float: right;
+	width: 60px;
+	text-align: right;
+	padding: 0 10px 0 0;
+}
+
+/* Rounded borders for the popups last child */
+.video_download_popup_element:nth-last-child(-n+2) {
+	border-bottom: none;
+}
+
+/* ---------------- VIDEO COMMENTS --------------- */
+
+/* Comments Heading */
+.video_comment_box, .webcomment_comment_box {
+	background-color: #EBEBEB;
+	border-bottom: 1px solid #FFF;
+	background: -moz-linear-gradient(top, #ebebeb 0%, #e1e1e1 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ebebeb), color-stop(100%,#e1e1e1));
+	background: -webkit-linear-gradient(top, #ebebeb 0%,#e1e1e1 100%);
+	background: -o-linear-gradient(top, #ebebeb 0%,#e1e1e1 100%);
+	background: -ms-linear-gradient(top, #ebebeb 0%,#e1e1e1 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebebeb', endColorstr='#e1e1e1',GradientType=0 );
+	background: linear-gradient(top, #ebebeb 0%,#e1e1e1 100%);
+	padding: 10px;
+}
+
+/* Comments Heading */
+.video_comment_heading {
+	font-size: 16px;
+	color: #111111;
+	margin: 0 0 0 10px;
+}
+
+/* Wraps the content of a comment, right side of the avatar */
+.video_comment_content_box, .webcomment_comment_content {
+
+}
+
+/* Comment Author */
+.video_comment_author, .webcomment_comment_title {
+	font-size: 11px;
+	color: #3366cc;
+}
+
+/* Comment Text */
+.video_comment_text, .webcomment_comment_box blockquote{
+	font-size: 12px;
+	color: #111111;
+}
+
+/* Comment Date */
+.video_comment_date, .webcomment_comment_date {
+	float: left;
+	font-size: 11px;
+	color: #797979;
+	display: inline;
+	margin: 5px 0 0 0;
+}
+
+/* Comment reply button */
+.video_comment_button_reply, .webcomment_comment_reply {
+	float: left;
+	font-size: 11px;
+	color: #3366cc;
+	display: inline;
+	margin: 5px 0 0 10px;
+}
+
+/* Comment report abuse button */
+.video_comment_button_abuse, .webcomment_comment_report {
+	font-size: 11px;
+	color: #3366cc;
+	display: inline;
+	float: right;
+	margin: 5px 0 0 10px;
+}
+
+/* Comment delete button */
+.video_comment_button_delete, .webcomment_comment_delete {
+	font-size: 11px;
+	color: #3366cc;
+	display: inline;
+	float: right;
+	margin: 5px 0 0 10px;
+}
+
+/* Comment Avatar */
+.video_comment_avatar, .webcomment_comment_avatar {
+	float: left;
+	width: 50px;
+	height: 50px;
+	border: 1px solid #A9A9A9;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	margin: 0 10px 0 0;
+	background-color: #FFF;
+	background-image: url("/img/default_avatar.png");
+}
+
+/* ---------------- VIDEO SUGGESTIONS -------------- */
+
+/* Box around a video suggestion */
+.video_suggestion_box {
+	width: 260px;
+	height: 175px;
+	margin: 10px 0 0 10px;
+	padding: 10px;
+	background-color: #FFFFFF;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	background: -moz-linear-gradient(top, #ffffff 74%, #ebebeb 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(74%,#ffffff), color-stop(100%,#ebebeb));
+	background: -webkit-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	background: -o-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	background: -ms-linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ebebeb',GradientType=0 );
+	background: linear-gradient(top, #ffffff 74%,#ebebeb 100%);
+	-webkit-box-shadow: 1px 1px 2px 1px #b3b3b3;
+	-moz-box-shadow: 1px 1px 2px 1px #b3b3b3;
+	box-shadow: 1px 1px 2px 1px #b3b3b3;
+	}
+
+/* Thumbnail for the video suggestion */
+.video_suggestion_thumbnail {
+	width: 260px;
+	height: 146px;
+	position: relative;
+}
+
+.video_suggestion_thumbnail img {
+	width: 260px;
+	height: 146px;
+}
+
+/* Title of the video suggestion */
+.video_suggestion_title {
+	color: #111111;
+	font-size: 12px;
+	margin: 5px 0 0 0;
+}
+
+/* Author of the video suggestion */
+.video_suggestion_author {
+	font-size: 10px;
+	color: #797979;
+	margin: 2px 0 0 0;
+}
+
+/* Duration of the video suggestion */
+.video_suggestion_duration {
+	min-width: 40px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #EBEBEB;
+	background-color: #000000;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	text-align: center;
+	position: absolute;
+	right: 10px;
+	bottom: 10px;
+}
+
+.video_suggestion_similar_button {
+	font-size: 12px;
+	color: #3366cc;
+	float: right;
+	margin: 10px 10px 0 0;
+}
+
+/* ------- MediaElement Elements & Custom Resolution Selection Box ------ */
+.mejs-container {
+	display: block;
+	margin: 0 auto;
+}
+.mjes-metadata {
+	padding: 0 20px 0 20px;
+}
+.mejs-container .mejs-controls .mejs-resolution {
+	width: 35px;
+	overflow: hidden;
+}
+#mejs-resolution {
+	-webkit-appearance: none;
+	background: transparent;
+	width: auto;
+	margin-top: 7px;
+	height: 17px;
+	text-align: left;
+	color: #fff;
+	border: none;
+	width: 43px;
+	font-size: 11px;
+}
+#mejs-resolution > option {
+	background: #000;
+	color: #fff;
+	text-align: center;
+}
+#mejs-resolution > option:focus {
+	border: none;
+	outline: none;
+}
+#mejs-resolution:focus {
+	border: none;
+	outline: none;
+}

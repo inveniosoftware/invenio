@@ -1,0 +1,92 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- extends "page.html" -%}
+
+{%- block title %}
+<div class="alert alert-warning">
+  <strong>{{ _("Note") }}</strong>
+    {% autoescape false %}
+    {{ _("This module is running via Invenio 1 compatibility mode. If you find any troubles, please %(x_url_open)ssubmit an issue%(x_url_close)s.",
+      x_url_open='<a href="https://github.com/inveniosoftware/invenio/issues?q=is%3Aopen+is%3Alabel%3Anext" target="_blank">',
+      x_url_close='</a>') }}
+    {% endautoescape %}
+</div>
+
+  {%- if title and show_title_p %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="page-header">
+      <h1>
+        {{- titleprologue | safe -}}
+        {{- title | safe -}}
+        {{- titleepilogue | safe -}}
+      </h1>
+    </div>
+  </div>
+</div>
+  {% endif %}
+{%- endblock title %}
+
+{%- block header %}
+  {%- include "base/scripts.html" %}
+  {{- super() }}
+{%- endblock header %}
+{%- block _bottom_assets %}
+  {# The legacy page requires that the scripts are loaded from the <head>
+   # rather than at the bottom of the page.
+   #}
+{%- endblock %}
+
+{%- block breadcrumb %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      {{- navtrailbox | safe -}}
+    </div>
+  </div>
+</div>
+{%- endblock breadcrumb %}
+
+{%- block body %}
+<div class="row">
+<div class="col-md-12">
+{{ pageheaderadd }}
+<div class="pagebody">
+  <div class="pagebodystripeleft">
+    <div class="pageboxlefttop">{{ boxlefttop | safe }}</div>
+    <div class="pageboxlefttopadd">{{ boxlefttopadd | safe }}</div>
+    <div class="pageboxleftbottomadd">{{ boxleftbottomadd | safe }}</div>
+    <div class="pageboxleftbottom">{{ boxleftbottom | safe }}</div>
+  </div>
+  <div class="pagebodystriperight">
+    <div class="pageboxrighttop">{{ boxrighttop | safe }}</div>
+    <div class="pageboxrighttopadd">{{ boxrighttopadd | safe }}</div>
+    <div class="pageboxrightbottomadd">{{ boxrightbottomadd | safe }}</div>
+    <div class="pageboxrightbottom">{{ boxrightbottom | safe }}</div>
+  </div>
+  <div class="pagebodystripemiddle">
+    {{ body | safe -}}
+  </div>
+  <div class="clear"></div>
+</div>
+</div>
+</div>
+{{ pagefooteradd }}
+{%- endblock %}

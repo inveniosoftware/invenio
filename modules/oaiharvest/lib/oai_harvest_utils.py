@@ -32,13 +32,13 @@ import traceback
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, \
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
-from invenio.bibrecord import record_get_field_instances, \
+from invenio.legacy.bibrecord import record_get_field_instances, \
                               record_modify_subfield, \
                               create_record, \
                               record_get_field_values
-from invenio.shellutils import run_shell_command
-from invenio.textutils import translate_latex2unicode
-from invenio.bibtask import write_message
+from invenio.utils.shell import run_shell_command
+from invenio.utils.text import translate_latex2unicode
+from invenio.legacy.bibsched.bibtask import write_message
 
 ## precompile some often-used regexp for speed reasons:
 REGEXP_OAI_ID = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)

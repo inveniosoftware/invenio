@@ -1,0 +1,122 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2014 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+/*
+  fix to keep datepicker widget above everything else,
+  particulary '.input-group .form-control' selector
+  which z-index equals 2 in bootstrap's css
+*/
+#ui-datepicker-div {
+  z-index: 100 !important;
+}
+
+span.ui-icon.ui-icon-circle-triangle-w {
+  color: transparent; cursor: pointer;
+}
+span.ui-icon.ui-icon-circle-triangle-e {
+  color: transparent; cursor: pointer;
+}
+
+.l{
+  size: 10px;
+}
+
+.required:after {
+  color: red;
+  content:" *";
+}
+
+.empty-element {
+  display: none;
+}
+.remove-element {
+  padding-left: 10px;
+}
+.field-list-element {
+  margin-bottom: 10px;
+}
+.field-list-element ul.list-inline {
+  margin: 0;
+}
+.tag {
+  cursor: move;
+}
+.upload-speed {
+  margin-right: 10px;
+}
+.upload-stop {
+  display:none;
+}
+
+/*Uploader*/
+
+.uploaders {
+  float: right;
+  margin-right: 5px;
+}
+
+#uploader-actions {
+  float: right;
+}
+
+#uploader-upload {
+  display: none;
+}
+
+#uploader-stop {
+  display: none;
+}
+
+#uploader-filelist th {
+    min-width: 60px;
+}
+
+@media (min-width:960px){
+  #uploader-filelist th {
+    min-width: 120px;
+  }
+}
+
+.table-striped > tbody > tr:nth-child(odd) > td {
+background-color: #fff;
+}
+
+#uploader-filelist .progress {
+  margin-bottom: 5px;
+}
+
+.rmlink {
+  cursor: pointer;
+  color: #000;
+}
+.rmlink:hover {
+  text-decoration: none;
+  color: #000;
+}
+.sortlink {
+  cursor: move;
+  color: #000;
+  margin-left: 10px;
+  text-decoration: none;
+}
+.sortlink:hover {
+  text-decoration: none;
+  cursor: move;
+  color: #000;
+}

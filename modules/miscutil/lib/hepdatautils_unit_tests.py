@@ -23,10 +23,10 @@ __revision__ = "$Id$"
 import os
 import cPickle
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio import hepdatautils
-from invenio.hepdatautils import Dataset
-from invenio import bibrecord
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.utils import hepdata as hepdatautils
+from invenio.utils.hepdata import Dataset
+from invenio.legacy import bibrecord
 
 
 class TestParsingSystematics(InvenioTestCase):
@@ -261,7 +261,7 @@ class TestDatasetPaperLogic(InvenioTestCase):
         """Test the method generating columns of a given dataset"""
         def generate_columns_longer(ds):
             """ a much longer implemntation of the column generation"""
-            from invenio.bibrecord import record_add_field
+            from invenio.legacy.bibrecord import record_add_field
             rec = {}
             columns = [[num, "", ""] for num in xrange(ds.num_columns)]
             # (number, header, title)

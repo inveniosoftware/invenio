@@ -1,0 +1,290 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "workflows/base.html" %}
+{% import 'workflows/utils.html' as utils %}
+
+{% block header%}
+  {{ super() }}
+  {% bundles "workflows.js", "workflows.css", "jquery.js" %}
+{% endblock header %}
+
+{% block javascript %}
+  {{ super() }}
+
+  <script type="text/javascript">
+    require(["jquery",
+             "js/workflows/details",
+             "js/workflows/actions/init"],
+            function($,
+                     initialize,
+                     initialize_actions) {
+      var context = {
+        preview_url: "{{ url_for('holdingpen.entry_data_preview')|safe }}",
+        action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
+        id_object: "{{ bwobject.id }}",
+        attach_action_to: document,
+      }
+      initialize(context);
+      initialize_actions(context);
+    });
+  </script>
+{%- endblock javascript %}
+
+{% block hpbody %}
+
+  {% block hp_navbar %}
+    <nav class="navbar navbar-default" role="navigation">
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      {% block top_left %}
+        <ul class="nav navbar-nav">
+          <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
+          </li>
+        </ul>
+      {% endblock %}
+      {% block top_right %}
+        <div class="navbar-form navbar-right">
+          <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
+             class="btn btn-default"
+             {% if previous_object == None %}disabled="disabled"{% endif %}>
+              <span class="glyphicon glyphicon-circle-arrow-left"></span>
+              <strong>{{ _('Previous') }}</strong>
+          </a>
+
+          <a href="{{ url_for('holdingpen.details', objectid=next_object)}}"
+             class="btn btn-default"
+             {% if next_object == None %}disabled="disabled"{% endif %}>
+                <span class="glyphicon glyphicon-circle-arrow-right"></span>
+                <strong>{{ _('Next') }}</strong>
+          </a>
+
+        </div>
+      {% endblock %}
+      </div>
+    </nav>
+  {% endblock %}
+
+  <div class="container" style="padding-left:0px;">
+    <div class="row">
+      <div class="col-md-3">
+
+        {% block hpbody_details %}
+
+          {% if "side" in rendered_actions %}
+            {{ rendered_actions["side"]|safe }}
+          {% endif %}
+
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{ _('Workflow status') }}</h3>
+            </div>
+            <div class="panel-body">
+              <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
+              {% if task_history %}
+              <h6 class="pull-left">
+                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#completed-tasks">
+                  {{ _('Completed tasks') }}
+                  <span class="caret"></span>
+                </a>
+              </h6>
+              {% endif %}
+              <h6 class="pull-right">
+                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#workflow-definition">
+                  {{ _('Definition') }}
+                  <span class="caret"></span>
+                </a>
+              </h6>
+              <div class="table table-striped">
+                <div class="row"></div>
+                {% set id = [] %}
+                {% if task_history %}
+                  <div id="completed-tasks" class="collapse">
+                    <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
+                    <div class="list-group">
+                      {% for item in task_history %}
+                        {{ utils.display_task_history(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length) }}
+                        {% do id.append(1) %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+                <div id="workflow-definition" class="collapse">
+                  <div class="muted"><strong>{{ _('Workflow definition') }}:</strong></div>
+                  {{ utils.display_workflow_definition(workflow_definition, id) }}
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if bwobject.get_error_message() %}
+          <div class="panel panel-danger">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{ _('Error occurred') }}</h3>
+            </div>
+            <div class="panel-body">
+              <h5>{{ bwobject.get_extra_data()['_last_task_name'] }}</h5>
+              <div class="text-right">
+                <h6 id="show-more" class="text-right">
+                  <a role="button" data-toggle="modal" style="cursor: pointer" data-target="#error_details_modal" class="float-right">
+                    {{ _('Open details') }}</a>
+                </h6>
+              </div>
+
+              <div class="modal fade" id="error_details_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                      <h4 class="modal-title" id="myModalLabel">{{ _('Problem with') }}: {{ bwobject.get_extra_data()['_last_task_name'] }}</h4>
+                    </div>
+                    <div class="modal-body">
+                      <p>{{ bwobject.get_error_message()[0] }}</p>
+                      <p>{{ bwobject.get_error_message()[1] }}</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% endif %}
+
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">{{ _('Other information') }}</h3>
+            </div>
+            <div class="panel-body">
+              <h6 class="pull-right">
+              <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
+                {{ _('More') }}
+                <span class="caret"></span>
+              </a>
+              </h6>
+              <div class="row"></div>
+              <div id="record-metadata-table" class="collapse">
+                <div class="table table-striped">
+                    {% for key, value in info.items() %}
+                      <b>{{ key }}</b> = {{ value }}
+                      <hr>
+                    {% endfor %}
+                    <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {% if history_objects %}
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ _('History') }}</h3>
+              </div>
+              <div class="panel-body">
+                <h6 class="pull-right">
+                  <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#History">{{ _('More') }}<span class="caret"></span></a>
+                </h6>
+                <div class="row"></div>
+                <div id="History" class="collapse">
+                  <div class="table table-striped">
+                    {% for object in history_objects %}
+                      {% if  object.id == bwobject.id %}
+                        <a href="#">{{ _('current') }} </a> -
+                        {% else %}
+                        <a href="{{ url_for('holdingpen.details', objectid=object.id) }}" >{{ object.id }}</a> -
+                      {% endif %}
+                      <span class="label label-{{ object._class }}">{{ object.message }}</span>
+                     {{ pretty_date(object.modified) }}
+                    <hr>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endblock %}
+      </div>
+      <div class="col-md-9">
+        {% block hp_action_main %}
+          {% if "main" in rendered_actions %}
+            {{ rendered_actions["main"]|safe }}
+          {% endif %}
+        {% endblock %}
+
+
+        {% if 'message' in bwobject.get_extra_data() and bwobject.get_action() != None %}
+          <div id="usermessage" class="alert alert-warning alert-dismissible">
+            {{ bwobject.get_extra_data()['_message'] }}
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+          </div>
+        {% endif %}
+        {%- block workflow_completed -%}
+          {% if bwobject.version == 1 %}
+            <div id="successmessage" class="alert alert-success">
+              {{ _('Workflow completed with success') }}
+              <a class="close" data-dismiss="alert">×</a>
+            </div>
+          {% endif %}
+        {%- endblock -%}
+        {% block hp_preview %}
+          {{ _('Display:') }}
+          <div id="object-preview"
+               class="btn-group btn-group-xs"
+               name="object_preview_btn"
+               data-toggle="buttons-radio">
+            <button class="btn btn-primary preview"
+                    type="button"
+                    data-id="{{ bwobject.id }}"
+                    name="hd">HTML</button>
+            <button class="btn btn-primary preview"
+                    type="button"
+                    data-id="{{ bwobject.id }}"
+                    name="xm">MARC</button>
+          </div>
+          <div id="object_preview_container{{bwobject.id}}" class="object_preview_container">
+            {{ data_preview|safe }}
+          </div>
+        {% endblock %}
+
+        {% block hp_task_results %}
+          {% if task_results %}
+            {% for template in task_results %}
+              {{ template|safe }}
+            {% endfor %}
+          {% endif %}
+        {% endblock %}
+
+        {% block hp_task_logs %}
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+            {{ _("Task logs") }}
+          </div>
+          <div class="panel-body">
+            <div class="list-group">
+              {% for entry in bwobject.get_log() %}
+                <a href="#" class="list-group-item">{{ entry.created }}: {{ entry.message }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

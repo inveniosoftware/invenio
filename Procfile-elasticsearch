@@ -1,0 +1,5 @@
+web: inveniomanage runserver
+cache: redis-server
+worker: celery worker -E -A invenio.celery.celery --loglevel=INFO --workdir=$VIRTUAL_ENV
+workermon: flower --broker=redis://localhost:6379/1
+indexer: elasticsearch -D es.config=invenio/ext/elasticsearch/config/elasticsearch.yml

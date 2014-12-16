@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2014-07-02T13:47:25Z</responseDate>
+<request verb="GetRecord" identifier="oai:arXiv.org:1007.5048v1" metadataPrefix="arXiv">http://export.arxiv.org/oai2</request>
+<error code="idDoesNotExist">This OAI interface supports only the notion of an arXiv article and not access to individual versions. You must not include the 'v1' at the end of the identifier.</error>
+</OAI-PMH>

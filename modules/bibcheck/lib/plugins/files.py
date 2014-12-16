@@ -19,7 +19,7 @@
 
 """ Plugin to validate the checksum of a record's files """
 
-from invenio.bibdocfile import BibRecDocs
+from invenio.legacy.bibdocfile.api import BibRecDocs
 import os
 
 try:
