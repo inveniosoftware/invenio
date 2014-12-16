@@ -18,8 +18,11 @@
 
 """Command-line tools for assets."""
 
+import argparse
 import os
 import pkg_resources
+import warnings
+
 from flask import current_app, json
 from flask.ext.assets import ManageAssets
 from flask.ext.script import Command, Option
@@ -57,13 +60,16 @@ class BowerCommand(Command):
     """Command-line operation for bower."""
 
     option_list = (
-        Option("-i", "--bower-json", help="input file to update",
+        Option("-i", "--bower-json", help="base input file",
                dest="filename", default=None),
-        Option("-x", "--override", help="override the input file",
-               dest="override", action="store_const", const=True)
+        Option("-o", "--output-file", help="write bower.json to output file",
+               dest="output_file", metavar="FILENAME",
+               type=argparse.FileType(mode='w')),
+        Option("-x", "--override", help="(DEPRECATED) override the input file",
+               dest="override", action="store_const", const=True),
     )
 
-    def run(self, filename=None, override=False):
+    def run(self, filename=None, override=False, output_file=None):
         """Generate a bower.json file.
 
         It comes with default values for the ignore. Name and version are set
@@ -80,7 +86,6 @@ class BowerCommand(Command):
         }
 
         if filename and os.path.exists(filename):
-            current_app.logger.debug("updating bower.json")
             with open(filename, "r") as f:
                 output = dict(output, **json.load(f))
 
@@ -89,9 +94,17 @@ class BowerCommand(Command):
                 current_app.logger.debug((pkg, bundle.bower))
             output['dependencies'].update(bundle.bower)
 
+        # Remove together with override kwarg, and Option object.
+        if override:
+            warnings.warn("Use of --override is deprecated and will "
+                          "be removed. Please use --output-file instead.",
+                          DeprecationWarning)
+            if filename and os.path.exists(filename) and output_file is None:
+                output_file = open(filename, 'w')
+
         options = dict(indent=4)
-        if not override:
+        if output_file is None:
             print(json.dumps(output, **options)).encode("utf-8")
         else:
-            with open(filename, "w") as f:
-                json.dump(output, f, **options)
+            json.dump(output, output_file, **options)
+            output_file.close()
