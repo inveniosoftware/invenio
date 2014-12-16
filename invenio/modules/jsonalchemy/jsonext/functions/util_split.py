@@ -30,9 +30,6 @@ def util_split(string, separator, index):
 
     :return: The n-th part of the string or empty string in case of error
     """
-    print string
-    print separator
-    print index
     string_splitted = string.split(separator)
     try:
         return string_splitted[index].strip()
