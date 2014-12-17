@@ -2128,16 +2128,17 @@ It holds a record of all your research activities. You can add your ORCID to all
         modal = ""
 
         if orcid_data['orcids']:
+            html_orcid += '<div class="alert alert-danger" role="alert">Due to technical problems beyond our control, the ORCID synchronisation' \
+                          ' is unavailable. The ORCID team is already working on a solution.<br/></br>We' \
+                          ' apologise for any inconveniences this may cause.</div>'
             html_orcid += _(
                 'This profile is already connected to the following ORCID: <strong>%s</strong></br><br>' %
                 (",".join(['<a rel="nofollow" href="http://www.orcid.org/' + orcidid + '"">' + orcidid + '</a>' for orcidid in orcid_data['orcids']]),))
             if orcid_data['push']:
                 html_orcid += '<div class="btn-group" role="group">'
-                html_orcid += '<button class="btn btn-default" data-toggle="modal" data-target="#orcidPushHelp">%s</button> ' % (
+                html_orcid += '<button class="btn btn-disabled">%s</button> ' % (
                     _("Export your publications to ORCID"))
-                html_orcid += '<button id="orcidHelp" class="btn btn-primary" data-toggle="popover" data-placement="bottom" \
-                    data-content="%s"><span class="glyphicon glyphicon-question-sign"></span>&nbsp' % \
-                    _("Please note that only the publications that are verified as yours on INSPIRE will be exported to ORCID.")
+                html_orcid += '<button id="orcidHelp" class="btn btn-disabeld"><span class="glyphicon glyphicon-question-sign"></span>&nbsp'
                 html_orcid += '</button></div>'
             else:
                 html_orcid += 'Your works will be pushed automatically.<br><br>'
