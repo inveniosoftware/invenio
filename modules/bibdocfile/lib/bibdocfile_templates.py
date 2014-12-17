@@ -22,7 +22,7 @@ from invenio.config import CFG_SITE_URL, \
      CFG_SITE_LANG, CFG_SITE_RECORD, CFG_INSPIRE_SITE
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datestruct_to_dategui
-from invenio.urlutils import create_html_link
+from invenio.urlutils import create_html_link, url_safe_escape
 from invenio.textutils import nice_size
 
 def list_types_from_array(bibdocs):
@@ -300,7 +300,7 @@ class Template:
                        <img src='%(imageurl)s' border="0" />&nbsp;&nbsp;%(docname)s
                      </td>
                    </tr>""" % {
-                     'imageurl' : imageurl,
+                     'imageurl' : url_safe_escape(imageurl),
                      'docname' : cgi.escape(docname),
                      'restriction_label': status and ('<tr><td colspan="2" class="restrictedfilerowheader">%s</td></tr>' % _('Restricted')) or ''
                    }
