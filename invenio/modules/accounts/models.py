@@ -24,13 +24,13 @@ from datetime import datetime
 
 from flask_login import current_user
 
-from invenio.ext.passlib import password_context
-from invenio.ext.passlib.hash import invenio_aes_encrypted_email
-from invenio.ext.sqlalchemy import db
-
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from sqlalchemy_utils.types.choice import ChoiceType
+
+from invenio.ext.passlib import password_context
+from invenio.ext.passlib.hash import invenio_aes_encrypted_email
+from invenio.ext.sqlalchemy import db
 
 from .errors import AccountSecurityError, IntegrityUsergroupError
 from .helpers import send_account_activation_email
@@ -257,13 +257,12 @@ class Usergroup(db.Model):
             map(lambda (k, v): (v, k), JOIN_POLICIES.items()),
             impl=db.CHAR(2)
         ), nullable=False, server_default='')
-    login_method = db.Column(
-        ChoiceType(map(lambda (k, v): (v, k), LOGIN_METHODS.items())),
-        nullable=False, server_default='INTERNAL')
+    login_method = db.Column(db.String(50), nullable=False,
+                             server_default='INTERNAL')
 
     # FIXME Unique(login_method(70), name)
-    __table_args__ = (db.Index('login_method_name', 'login_method', 'name',
-                               mysql_length={'login_method': 60, 'name': 255}),
+    __table_args__ = (db.Index('login_method_name', login_method, name,
+                               mysql_length=[60, None]),
                       db.Model.__table_args__)
 
     @classmethod

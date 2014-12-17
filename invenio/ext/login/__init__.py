@@ -90,7 +90,7 @@ def login_redirect(referer=None):
 
 
 def authenticate(nickname_or_email=None, password=None,
-                 login_method='Local', remember=False):
+                 login_method=None, remember=False):
     """
     Find user identified by given information and login method.
 
@@ -118,7 +118,7 @@ def authenticate(nickname_or_email=None, password=None,
         current_app.logger.exception("Problem checking password.")
         return False
 
-    if user.settings['login_method'] != login_method:
+    if login_method is not None and user.settings['login_method'] != login_method:
         flash(_("You are not authorized to use '%(x_login_method)s' login "
                 "method.", x_login_method=login_method), 'error')
         return False
