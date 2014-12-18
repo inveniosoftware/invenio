@@ -1182,22 +1182,19 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 is_admin = True
 
             # checking if there are restrictions regarding this merge
-            can_perform_merge, preventing_pid = webapi.merge_is_allowed(primary_pid, pids_to_merge, is_admin)
+            can_perform_merge, preventing_pid, error_message = webapi.merge_is_allowed(primary_pid, pids_to_merge, is_admin)
 
             if not can_perform_merge:
                 # when redirected back to the merge profiles page display an error message
                 # about the currently attempted merge
-                pinfo['merge_info_message'] = ("failure", "confirm_failure")
                 session.dirty = True
-
-                redirect_url = "%s/author/merge_profiles?primary_profile=%s" % (CFG_SITE_URL, primary_cname)
-                return redirect_to_url(req, redirect_url)
+                req.status = apache.HTTP_CONFLICT
+                c_name = webapi.get_canonical_id_from_person_id(preventing_pid)
+                return 'Cannot merge profile: %s Reason: %s' % (c_name,
+                                                                error_message)
 
             if is_admin:
                 webapi.merge_profiles(primary_pid, pids_to_merge)
-                # when redirected back to the manage profile page display a message about the currently attempted merge
-                pinfo['merge_info_message'] = ("success", "confirm_success")
-
             else:
                 name = ''
                 if 'user_last_name' in pinfo:

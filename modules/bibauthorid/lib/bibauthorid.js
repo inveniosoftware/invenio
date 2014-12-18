@@ -2448,8 +2448,16 @@ $(document).ready(function() {
                                     $modal.find(".modal-footer>a.back").removeClass("disabled").text("Close");
                                     $form.data({"mergeConfirmed": true});
                                 },
-                                error: function (jqXHR, status, data) {
-                                    $modal.modal("hide");
+                                error: function (data, status, jqXHR) {
+                                    if (data.status == 409) {
+                                        $modal.find(".modal-header>.modal-title").text("Conflict");
+                                        $modal.find(".modal-body").html("<p>" + data.responseText + "</p>");
+                                        $modal.find(".modal-footer>a.confirm").remove();
+                                        $modal.find(".modal-footer>a.back").removeClass("disabled").text("Close");
+                                    }
+                                    else {
+                                        $modal.modal("hide");
+                                    }
                                 }
                             });
                         });
