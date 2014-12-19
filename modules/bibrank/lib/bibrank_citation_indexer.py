@@ -752,7 +752,7 @@ def standardize_report_number(report_number):
     Currently we:
     * remove category for arxiv papers
     """
-    report_number = re.sub(ur'(?:arXiv:)?(\d{4}\.\d{4}) \[[a-zA-Z\.-]+\]',
+    report_number = re.sub(ur'(?:arXiv:)?(\d{4}\.\d{4,5}) \[[a-zA-Z\.-]+\]',
                   ur'arXiv:\g<1>',
                   report_number,
                   re.I | re.U)

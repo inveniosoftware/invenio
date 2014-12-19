@@ -498,7 +498,7 @@ def src_pdf_from_marc(marc_file):
     marc_text = marc_file.read()
     marc_file.close()
 
-    arXiv_match = '(([a-zA-Z\\-]+/\\d{7})|(\\d{4}\\.\\d{4}))'
+    arXiv_match = '(([a-zA-Z\\-]+/\\d{7})|(\\d{4}\\.\\d{4,5}))'
     DESY_match = 'DESY-\\d{2,4}-\\d{3}'
 
     pdf_loc = None
