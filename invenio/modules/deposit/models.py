@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1085,15 +1085,14 @@ class Deposition(object):
         for f in self.files:
             f.delete()
 
-        if self.workflow_object.id_workflow != '':
-            if self.workflow_object.id_workflow:
-                Workflow.delete(uuid=self.workflow_object.id_workflow)
+        if self.workflow_object.id_workflow:
+            Workflow.delete(uuid=self.workflow_object.id_workflow)
 
             BibWorkflowObject.query.filter_by(
                 id_workflow=self.workflow_object.id_workflow
             ).delete()
         else:
-            db.session.remove(self.workflow_object)
+            db.session.delete(self.workflow_object)
         db.session.commit()
 
     #
