@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,13 +20,10 @@ kb_DATA = entdec-to-latin1.kb entdec-to-utf8.kb \
           enthex-to-latin1.kb enthex-to-utf8.kb \
           latex-to-unicode.kb
 
-bfxdir = $(sysconfdir)/bibconvert/config
-bfx_DATA = oaidc2marcxml.bfx
-
 xsldir = $(sysconfdir)/bibconvert/config
 xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl oaiarxiv2marcxml.xsl \
            oaidmf2marcxml.xsl authorlist2marcxml.xsl crossref2marcxml.xsl bibtex2marcxml.cfg
 
-EXTRA_DIST = $(kb_DATA) $(bfx_DATA) $(xsl_DATA)
+EXTRA_DIST = $(kb_DATA) $(xsl_DATA)
 
 CLEANFILES = *~ *.tmp

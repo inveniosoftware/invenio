@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,6 @@ pylib_DATA = bibformat_config.py bibformat_templates.py \
              bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
              bibformat_utils.py bibformat.py \
              bibformatadmin_regression_tests.py bibformat_engine_unit_tests.py \
-             bibformat_bfx_engine.py bibformat_bfx_engine_config.py \
              bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py \
              bibformat_web_tests.py bibformat_utils_unit_tests.py
 

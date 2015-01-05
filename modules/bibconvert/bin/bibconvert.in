@@ -2,7 +2,7 @@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,7 +38,6 @@ except ImportError, e:
 
 try:
     from invenio.search_engine import perform_request_search
-    from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
     from invenio.config import *
     from invenio import bibconvert
 except ImportError, e:
@@ -46,7 +45,6 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    from invenio import bibconvert_bfx_engine
     from invenio import bibconvert_xslt_engine
 except ImportError, e:
     sys.stderr.write("Warning: %s" % e)
@@ -63,10 +61,9 @@ def usage(exitcode=0, msg=""):
 Usage: [options] < input.dat
 Examples:
        bibconvert -ctemplate.cfg < input.dat
-       bibconvert -ctemplate.bfx < input.xml
        bibconvert -ctemplate.xsl < input.xml
 
- XSL and BFX options:
+ XSL options:
  -c,  --config             transformation stylesheet file
 
  Plain text-oriented options:
@@ -92,10 +89,10 @@ Examples:
  -Ct,                      alternative to -c when config split to several files, *target*
 
  BibConvert can convert:
-  - XML data using XSL or bfx templates.
+  - XML data using XSL templates.
   - Plain text data using cfg templates files.
 
- Plain text-oriented options are not available with .xsl and .bfx configuration files
+ Plain text-oriented options are not available with .xsl configuration files
 """)
     sys.exit(exitcode)
 
@@ -144,10 +141,7 @@ Xcount  = 0
 
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
-        if opt_value.endswith('.'+
-                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
-            pass
-        elif opt_value.endswith('.xsl'):
+        if opt_value.endswith('.xsl'):
             pass
         else:
             separator            = bibconvert.get_other_par("_RECSEP_", opt_value)
@@ -164,10 +158,7 @@ for opt, opt_value in opts:
 for opt, opt_value in opts:
     if opt in ["-c", "--config"]:
         extract_tpl = opt_value
-        if opt_value.endswith('.'+
-                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
-            pass
-        elif opt_value.endswith('.xsl'):
+        if opt_value.endswith('.xsl'):
             pass
         else:
             extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
@@ -242,22 +233,7 @@ if(extract_tpl == ""):
     usage(1, "Error: configuration template missing")
 
 # Redirect to processor for given config file
-if opt_value.endswith('.'+
-                      CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION):
-    # BibConvert for bfx
-    source_xml = sys.stdin.read()
-    try:
-        print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
-    except NameError:
-        sys.stderr.write("Error: cannot use BibConvert BFX engine.\n")
-        sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.\n")
-        sys.exit(1)
-    except Exception, e:
-        sys.stderr.write("An error occurred during the conversion.\n")
-        sys.stderr.write(str(e))
-        sys.exit(1)
-
-elif opt_value.endswith('.xsl'):
+if opt_value.endswith('.xsl'):
     # BibConvert for XSLT
     source_xml = sys.stdin.read()
     try:

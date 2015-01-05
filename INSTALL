@@ -115,8 +115,6 @@ Contents
              <https://github.com/disqus/nydus>
           - (recommended) python-dateutil, for complex date processing:
              <http://labix.org/python-dateutil>
-          - (recommended) PyXML, for XML processing:
-             <http://pyxml.sourceforge.net/topics/download.html>
           - (recommended) PyRXP, for very fast XML MARC processing:
              <http://www.reportlab.org/pyrxp.html>
           - (recommended) lxml, for XML/XLST processing:

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -52,7 +52,6 @@ modules/bibformat/bin/bibreformat.in
 modules/bibformat/doc/admin/bibformat-admin-guide.webdoc
 modules/bibformat/etc/format_templates/Default_HTML_actions.bft
 modules/bibformat/etc/format_templates/Default_HTML_files.bft
-modules/bibformat/lib/bibformat_bfx_engine.py
 modules/bibformat/lib/bibformat_engine.py
 modules/bibformat/lib/bibformat_engine_unit_tests.py
 modules/bibformat/lib/bibformat_templates.py

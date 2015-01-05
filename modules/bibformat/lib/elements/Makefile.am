@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,7 +33,6 @@ pylib_DATA = __init__.py \
 	bfe_authority_subject.py \
 	bfe_authors_parent.py \
 	bfe_authors.py \
-	bfe_bfx_engine.py \
 	bfe_bibtex.py \
 	bfe_bookmark.py \
 	bfe_citation_suggestion_hepdata.py \
