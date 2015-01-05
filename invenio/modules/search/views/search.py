@@ -187,8 +187,19 @@ def index():
     return dict(collection=collection)
 
 
+def resolve_breadcrumb(name):
+    collection = Collection.query.filter(Collection.name == name) \
+                                 .first_or_404()
+    return collection.breadcrumbs(ln=g.ln)[2:]
+
+
 @blueprint.route('/collection/', methods=['GET', 'POST'])
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
+@register_breadcrumb(
+    blueprint, '.communities.collection', _('Collection'),
+    dynamic_list_constructor=lambda:
+        resolve_breadcrumb(request.view_args['name'])
+)
 def collection(name=None):
     """Render the collection page.
 
@@ -204,7 +215,7 @@ def collection(name=None):
 
     @register_template_context_processor
     def index_context():
-        breadcrumbs = current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:]
+        breadcrumbs = current_breadcrumbs + collection.breadcrumbs(ln=g.ln)[1:]#useless
         return dict(
             of=request.values.get('of', collection.formatoptions[0]['code']),
             format_record=format_record,

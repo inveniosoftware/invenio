@@ -19,18 +19,25 @@
 
 """Communities bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.base.bundles import jquery as _j, invenio as _i
 
 
 js = Bundle(
-    "js/communities/custom.js",
-    filters="uglifyjs",
+    "js/communities/init.js",
+    filters=RequireJSFilter(exclude=[_j, _i]),
     output="communities.js",
+    bower={
+        "ckeditor": "latest",
+    },
     weight=91
 )
 
 styles = Bundle(
     "css/communities/communities.less",
+    "css/communities/people.less",
+    "css/communities/teams.less",
+    "css/communities/settings.less",
     filters="less,cleancss",
     output="communities.css",
     weight=91

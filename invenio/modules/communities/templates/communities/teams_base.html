@@ -1,0 +1,157 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+{% bundles "communities_teams.js", "communities_teams.css" %}
+
+{% block body %}
+<div class="row">
+  <div class="row">
+    <!-- left panel -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ community.title }}</strong>
+        </div>
+        <div class="list-group">
+          <a href="{{ url_for('community_settings.edit', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-cog fa-fw"></i>
+            Settings
+          </a>
+          <a href="{{ url_for('community_teams.teams', community_id=community.id) }}" class="list-group-item active">
+            <i class="fa fa-users fa-fw"></i>
+            Teams
+          </a>
+          <a href="{{ url_for('community_people.people', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-user fa-fw"></i>
+            People
+          </a>
+          <a href="{{ url_for('community_guides.guides', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-external-link fw"></i>
+            Guides
+          </a>
+        </div>
+      </div>
+      <div style="margin-left: 40px; margin-top: 20px;">
+        <a href="{{ community.community_url }}" class="btn btn-default">
+          <i class="icon-file"></i> View
+        </a>
+        <a href="{{ community.community_provisional_url }}" class="btn btn-default">
+          <i class="icon-file"></i> Curate
+        </a>
+        <a href="{{ url_for('settings_communities.index') }}" class="btn btn-primary">My Communities</a>
+      </div>
+    </div>
+    <!-- left panel -->
+    <!-- right panel -->
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-users fa-fw"></i>
+          <strong>Teams</strong>
+          <div class="pull-right">
+            <a class="pull-right btn btn-xs btn-default" href ="">
+              <i class="fa fa-plus"></i>
+              Add new team
+            </a>
+          </div>
+        </div>
+        <div class="panel-body">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+          dipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit
+        </div>
+        <table id="list" class="table table-hover">
+          <thead>
+            <tr>
+              <th id="search">
+                <button id="search-act" class="btn btn-xs btn-primary">
+                  <i class="fa fa-search fa-fw"></i>
+                  <span>&nbsp;Search</span>
+                </button>
+                <input id="search-val" type="text" class="form-control" placeholder="Search team...">
+                <span>Name</span>
+              </th>
+              <th>Members</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-team="Owners">
+              <td>
+                <div>
+                  <b>Owners</b>
+                    <a class="label label-admin">Admin</a>
+                    <a class="label label-read">Read</a>
+                </div>
+                <br>
+                <small>And here goes some description</small>
+              </td>
+              <td>10</td>
+              <td>
+                <a class="fa fa-users fw" href="http://0.0.0.0:4000/communities/teams/ecfunded/Owners/members"></a>
+                <a class="fa fa-cog fw" href ="http://0.0.0.0:4000/communities/teams/ecfunded/Owners/edit"></a>
+              </td>
+            </tr>
+            <tr data-team="Curators">
+              <td>
+                <div>
+                  <b>Curators</b>
+                    <a class="label label-read">Read</a>
+                </div>
+                <br>
+                <small>And here goes some description</small>
+              </td>
+              <td>10</td>
+              <td>
+                <a class="fa fa-users fw" href="http://0.0.0.0:4000/communities/teams/ecfunded/Curators/members"></a>
+                <a class="fa fa-cog fw" href="http://0.0.0.0:4000/communities/teams/ecfunded/Curators/edit"></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!--pagination -->
+        <nav class="text-center">
+          <ul class="pagination pagination-sm">
+              <li>
+                <a href="">
+                  <span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span>
+                </a>
+              </li>
+                <li class="active">
+                  <a href="">
+                    1
+                  </a>
+                </li>
+              <li>
+                <a href="">
+                  <span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span>
+                </a>
+              </li>
+          </ul>
+        </nav>
+        <!--pagination -->
+      </div>
+    </div>
+    <!-- right panel -->
+  </div>
+</div>
+
+
+{% endblock %}

@@ -116,7 +116,6 @@ class GroupsAPI:
         self.user_group.name = group.name
         self.user_group.description = group.description
         self.user_group.join_policy = group.join_policy
-        self.user_group.login_method = group.login_method
         db.session.merge(self.user_group)
         # update user info
         current_user.reload()
@@ -283,10 +282,11 @@ class GroupsAPI:
         return self.user_group.new_user_status
 
     @staticmethod
-    def query_list_usergroups(id_user):
+    def query_list_usergroups(id_user, p=None):
         """Return query to have a list of groups of the user.
 
         :param id_user: user's id
+        :param q: search phrase
         :return: query to read list
         """
         curr_uid = current_user.get_id()
@@ -301,7 +301,7 @@ class GroupsAPI:
                   ' the groups of user "{1}"').format(
                       curr_user.nickname,
                       user.nickname))
-        return Usergroup.query_list_usergroups(id_user=id_user)
+        return Usergroup.query_list_usergroups(id_user=id_user, p=p)
 
     @staticmethod
     def query_list_userusergroups(id_user):
@@ -348,10 +348,10 @@ class GroupsAPI:
             id_user=id_user,
             group_name="%%%s%%" % group_name)
 
-    def query_members(self):
+    def query_members(self, p=None, s=None):
         """List all members of a group.
 
-        :param id_usergroup: the identifier of a group
+        :param p: search phrase
         """
         # check permissions
         if not self.user_group.is_part_of(self.curr_uid):
@@ -363,7 +363,24 @@ class GroupsAPI:
                 )
             )
         # return list of users
-        return UserUsergroup.query.filter_by(id_usergroup=self.user_group.id)
+        query = UserUsergroup.query.join(User).filter(
+            UserUsergroup.id_usergroup == self.user_group.id)
+        if p:
+            query = query.filter(
+                db.or_(
+                    User.email.like("%" + p + "%"),
+                    User.nickname.like("%" + p + "%"),
+                )
+            )
+        if s == 'des':
+            query = query.order_by(
+                db.desc(UserUsergroup.user_status),
+            )
+        elif s == 'asc':
+            query = query.order_by(
+                db.asc(UserUsergroup.user_status),
+            )
+        return query
 
     def query_users_not_in_this_group(self, query=''):
         """Return query to check a list of user not in this group.

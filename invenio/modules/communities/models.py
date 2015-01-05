@@ -48,6 +48,7 @@ from datetime import datetime
 
 from flask import url_for
 
+from sqlalchemy_utils.types.choice import ChoiceType
 from invenio.base.globals import cfg
 from invenio.config import CFG_SITE_LANG
 from invenio.ext.sqlalchemy import db
@@ -56,7 +57,7 @@ from invenio.legacy.bibrecord import record_add_field
 from invenio.modules.access.models import \
     AccACTION, AccARGUMENT, \
     AccAuthorization, AccROLE, UserAccROLE
-from invenio.modules.accounts.models import User
+from invenio.modules.accounts.models import User, Usergroup
 from invenio.modules.communities.signals import \
     after_delete_collection, after_delete_collections, \
     after_save_collection, after_save_collections, \
@@ -836,3 +837,38 @@ class FeaturedCommunity(db.Model):
             'community.collection')).filter(
             cls.start_date <= start_date).order_by(
             cls.start_date.desc()).first()
+
+
+class CommunityTeam(db.Model):
+
+    """Represent a CommunityTeam record."""
+
+    __tablename__ = "communityTEAM"
+
+    TEAM_RIGHTS = {
+        'ADMIN': 'A',
+        'WRITE': 'W',
+        'READ': 'R'
+    }
+
+    id_community = db.Column(db.String(100), db.ForeignKey(Community.id),
+                             primary_key=True, nullable=False)
+
+    id_usergroup = db.Column(db.Integer(15, unsigned=True),
+                             db.ForeignKey(Usergroup.id),
+                             primary_key=True, nullable=False)
+
+    team_rights = db.Column(
+        ChoiceType(
+            map(lambda (k, v): (v, k), TEAM_RIGHTS.items()),
+        ), nullable=False, server_default=TEAM_RIGHTS['READ'])
+
+    usergroup = db.relationship(
+        Usergroup,
+        backref=db.backref('communityteam',
+                           cascade="all, delete-orphan"),
+        cascade="all, delete-orphan", single_parent=True)
+
+    community = db.relationship(
+        Community,
+        backref=db.backref('teams', cascade="all, delete-orphan"))

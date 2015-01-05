@@ -1,0 +1,135 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+{% block body %}
+<div class="row">
+  <div class="row">
+    <!-- left panel -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ community.title }}</strong>
+        </div>
+        <div class="list-group">
+          <a href="{{ url_for('community_settings.edit', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-cog fa-fw"></i>
+            Settings
+          </a>
+          <a href="{{ url_for('community_teams.teams', community_id=community.id) }}" class="list-group-item active">
+            <i class="fa fa-users fa-fw"></i>
+            Teams
+          </a>
+          <a href="{{ url_for('community_people.people', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-user fa-fw"></i>
+            People
+          </a>
+          <a href="{{ url_for('community_guides.guides', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-external-link fw"></i>
+            Guides
+          </a>
+        </div>
+      </div>
+      <div style="margin-left: 40px; margin-top: 20px;">
+        <a href="{{ community.community_url }}" class="btn btn-default">
+          <i class="icon-file"></i> View
+        </a>
+        <a href="{{ community.community_provisional_url }}" class="btn btn-default">
+          <i class="icon-file"></i> Curate
+        </a>
+        <a href="{{ url_for('settings_communities.index') }}" class="btn btn-primary">My Communities</a>
+      </div>
+    </div>
+    <!-- left panel -->
+    <!-- right panel -->
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-users fa-fw"></i>
+
+<!--           <strong>Add new team</strong>
+        </div>
+        <div class="panel-body">
+          Lorem for new team ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+        </div> -->
+
+          <strong>Edit team Owners</strong>
+        </div>
+        <div class="panel-body">
+          Lorem for edit team ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+        </div>
+
+          <div class="list-group">
+            <div class="list-group-item clearfix">
+              <h6 style="text-align: left;">Team name: </h6>
+              <div class="form-group">
+                <input id="team_name" type="text" class="form-control" placeholder="Owners">
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display: none;"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display: none;"></span>
+              </div>
+              <h6 style="text-align: left;">Description: </h6>
+              <div class="form-group">
+                <input id="team_desc" type="text" class="form-control" placeholder="What is it about?">
+                <span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true" style="display: none;"></span>
+                <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true" style="display: none;"></span>
+              </div>
+              <div style="text-align: left; margin-left: 15px;">
+                  <h6 style="text-align: left; margin-left: -15px;">Choose the permision level: </h6>
+                  <div class="radio">
+                    <label>
+                      <input type="radio" name="perm_lvl" value="Read" checked>
+                      <b>Read</b>
+                      <small style="margin-left: 10px;">This team will be able to view the records.</small>
+                      <br>
+                    </label>
+                  </div>
+                  <div class="radio disabled">
+                    <label>
+                      <input type="radio" name="perm_lvl" value="Write" disabled>
+                      <b>Write</b>
+                      <small style="margin-left: 10px;">This team will be able to write.</small>
+                    </label>
+                  </div>
+                  <div class="radio disabled">
+                    <label>
+                      <input type="radio" name="perm_lvl" value="Admin" disabled>
+                      <b>Admin</b>
+                      <small style="margin-left: 10px;">This team will be able super powerful.</small>
+                    </label>
+                  </div>
+              </div>
+              <hr>
+              
+                <button id="delete_team" class="btn btn-danger pull-left">Delete</button><!-- icons in buttons -->
+              
+                <!-- <button id="add_team" style="margin-left: 15px;" class="btn btn-primary pull-right">Add team</button> -->
+              
+                <button id="update_team" style="margin-left: 15px;" class="btn btn-primary pull-right">Update</button>
+              
+              <a href="{{ url_for('communities_teams.teams', community_id=community.id) }}" class="btn btn-default pull-right">Close</a>
+            </div>
+          </div>
+      </div>
+    </div>
+    <!-- right panel -->
+  </div>
+</div>
+
+{% endblock %}

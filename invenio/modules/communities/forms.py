@@ -29,60 +29,19 @@ from wtforms import HiddenField, StringField, TextAreaField, validators
 from .models import Community
 
 
-class SearchForm(Form):
-
-    """Search Form."""
-
-    p = StringField(
-        validators=[validators.DataRequired()]
-    )
-
-
 class CommunityForm(Form):
 
     """Community form."""
 
-    field_sets = [
-        ('Information', [
-            'identifier', 'title', 'description', 'curation_policy',
-            'page'
-        ], {'classes': 'in'}),
-    ]
-
-    field_placeholders = {
-    }
-
-    field_state_mapping = {
-    }
-
     #
     # Methods
     #
-    def get_field_icon(self, name):
-        """Return field icon."""
-        return self.field_icons.get(name, '')
-
     def get_field_by_name(self, name):
         """Return field by name."""
         try:
             return self._fields[name]
         except KeyError:
             return None
-
-    def get_field_placeholder(self, name):
-        """Return field placeholder."""
-        return self.field_placeholders.get(name, "")
-
-    def get_field_state_mapping(self, field):
-        """Return field state mapping."""
-        try:
-            return self.field_state_mapping[field.short_name]
-        except KeyError:
-            return None
-
-    def has_field_state_mapping(self, field):
-        """Check if field has state mapping."""
-        return field.short_name in self.field_state_mapping
 
     def has_autocomplete(self, field):
         """Check if filed has autocomplete."""
@@ -114,8 +73,9 @@ class CommunityForm(Form):
 
     description = TextAreaField(
         description=_(
-            'Optional. A short description of the community collection,'
-            ' which will be displayed on the index page of the community.'),
+            'Optional. A short description of the community'
+            ' collection, which will be displayed on the index'
+            ' page of the community.'),
     )
 
     curation_policy = TextAreaField(
@@ -130,13 +90,6 @@ class CommunityForm(Form):
             ' which will be displayed on a separate page linked from'
             ' the index page.'),
     )
-
-    field_icons = {
-        'identifier': 'barcode',
-        'title': 'file-alt',
-        'description': 'pencil',
-        'curation_policy': 'check',
-    }
 
     #
     # Validation

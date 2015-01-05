@@ -57,3 +57,114 @@
         {% endif %}
     </span>
 {% endmacro %}
+
+{%- macro paginate(obj, endpoint) %} <!-- TODO: show status - displaying x from y -->
+  {%- set args = request.args.copy().to_dict() -%}
+  <div align="center">
+    <ul class="pagination">
+      <li{{ ' class="disabled"'|safe if not obj.has_prev }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': 1}) -%}
+        <a title="first" href="{{ url_for(endpoint, **new_args) }}">«</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not obj.has_prev }}>
+        {%- do args.update({'page': obj.page-1 }) -%}
+        <a title="prev" href="{{ url_for(endpoint, **args) }}">&lsaquo;</a>
+      </li>
+      {%- for page_p in obj.iter_pages() %}
+        {%- if page_p -%}
+          {%- set new_args = args.copy() -%}
+          {%- do new_args.update({'page': page_p}) -%}
+          <li{{ ' class="active"'|safe if page_p == obj.page }}>
+            <a href="{{ url_for(endpoint, **new_args) }}">{{ page_p }}</a>
+          </li>
+        {%- else -%}
+          <li class="disabled"><a href="#">...</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+      <li{{ ' class="disabled"'|safe if not obj.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': obj.page+1}) -%}
+        <a href="{{ url_for(endpoint, **new_args) }}">&rsaquo;</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not obj.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': obj.pages }) -%}
+        <a title="last" href="{{ url_for(endpoint, **new_args) }}">»</a>
+      </li>
+    </ul>
+  </div>
+{%- endmacro %}
+
+{%- macro paginate_bac(obj, href='') %} <!-- TODO: show status - displaying x from y -->
+  <nav class="text-center">
+    <ul class="pagination pagination-sm">
+      {%- if page == 1 %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page=1&per_page={{ per_page }}">
+      {% endif %}
+          <span aria-hidden="true">&laquo;</span><span class="sr-only">{{ _("First") }}</span>
+        </a>
+      </li>
+      {%- if page == 1 %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page={{ page - 1 }}&per_page={{ per_page }}">
+      {% endif %}
+          <span aria-hidden="true">&lsaquo;</span><span class="sr-only">{{ _("Previous") }}</span>
+        </a>
+      </li>
+      {%- for page in range(1, obj.pages + 1) %}
+        {%- if page == obj.page %}
+        <li class="active">
+        {% else %}
+        <li>
+        {%- endif %}
+          <a href="{{ href }}?page={{ page }}">
+            {{ loop.index }}
+          </a>
+        </li>
+      {%- endfor %}
+      {%- if page == obj.pages %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page={{ page + 1 }}">
+      {% endif %}
+          <span aria-hidden="true">&raquo;</span><span class="sr-only">{{ _("Next") }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{%- endmacro %}
+
+{%- macro rights_label(rights) %}
+  {%- if rights == "A" %}
+  <a class="label admin">{{ _("Admin") }}</a>
+  {%- elif rights == "W" %}
+  <a class="label write">{{ _("Write") }}</a>
+  {%- elif rights == "R" %}
+  <a class="label read">{{ _("Read") }}</a>
+  {%- endif %}
+{%- endmacro %}
+
+{%- macro searchbar() %}
+  <ul class="list-group">
+    <div class="list-group-item">
+        <form action="." method="get" class="input-group">
+          <input name="p" class="form-control" type="text" value="{{ p }}">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type=submit>
+              <i class="fa fa-fw fa-search"></i><span>&nbsp;{{ _("Search") }}</span>
+            </button>
+          </span>
+        </form>
+      </div>
+  </ul>
+{%- endmacro%}

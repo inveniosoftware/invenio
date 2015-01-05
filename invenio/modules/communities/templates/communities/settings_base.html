@@ -1,0 +1,100 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "communities/helpers.html" import paginate with context %}
+
+{%- extends "accounts/settings/index.html" %}
+
+{% bundles "communities.css" %}
+
+{%- block settings_body %}
+  {{ helpers.panel_start(
+      _("My Communities"),
+      with_body=False,
+      icon="fa fa-users fa-fw",
+      btn=_("Create new community"), btn_icon='fa fa-fw fa-plus', btn_href=url_for('.new')
+     ) }}
+  <!-- right panel -->
+  <!-- description -->
+  <div class="panel-body">  <!-- TODO: Hard coded/Configurable view description -->
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores.
+    Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia. dipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero
+    repellendus vero ex fugit
+  </div>
+  <!-- end description -->
+  {%- if communities.items|length == 0 %}  <!-- TODO: Nice encouragement for creating new community -->
+  <ul class="list-group">
+    <div class="list-group-item text-center">
+      <i class="fa fa-meh-o fa-fw"></i><span>{{ _("No communities found. Go ahead and create one!") }}</span>
+    </div>
+  </ul>
+  {%- else %}
+  <!-- search bar -->
+  <ul class="list-group">
+    <div class="list-group-item">
+        <form action="." method="get" class="input-group">
+          <input name="p" class="form-control" type="text" value="{{ p }}">
+          <span class="input-group-btn">
+            <button class="btn btn-primary" type=submit>
+              <i class="fa fa-fw fa-search"></i><span>&nbsp;{{ _("Search") }}</span>
+            </button>
+          </span>
+        </form>
+      </div>
+  </ul>
+  <!-- end search bar -->
+  <!-- communities list -->
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th class="col-md-6">{{ _("Name") }}</th>
+        <th class="col-md-2 text-center">{{ _("Teams") }}</th>
+        <th class="col-md-4"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {%- for community in communities.items %}
+      <tr>
+        <td>
+          <div>
+            <b>{{ community.id }}</b>
+          </div>
+          <br>
+          <small>{{ community.description|truncate(200, True)|safe }}</small>
+        </td>
+        <td class="text-center vcenter">{{ community.teams|count }}</td>
+        <td class="text-center btn-toolbar vcenter">
+          <a class="btn btn-xs btn-default" href="{{community.community_url}}">
+            <i class="fa fa-search fa-fw"></i>{{ _("View") }}</a>
+          <a class="btn btn-xs btn-default" href="{{community.community_provisional_url}}">
+            <i class="fa fa-fw fa-medkit"></i>{{ _("Curate") }}</a>
+          <a class="btn btn-xs btn-default" href="{{url_for('community_settings.edit', community_id=community.id)}}">
+            <i class="fa fa-wrench fa-fw"></i>{{ _("Manage") }}</a>
+        </td>
+      </tr>
+      {%- endfor %}
+    </tbody>
+  </table>
+  <!-- end communities list -->
+  {{ paginate(communities, '.index') }}
+  {%- endif %}
+  <!-- end right panel -->
+  {{ helpers.panel_end(with_body=False) }}
+{% endblock %}
