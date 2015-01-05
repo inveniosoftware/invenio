@@ -1,0 +1,88 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- from "communities/helpers.html" import community_panel_start  with context -%}
+{%- from "communities/helpers.html" import community_panel_end  with context -%}
+
+{%- extends "page.html" -%}
+
+{%- bundles "communities.css" -%}
+
+{% block body %}
+{{ community_panel_start(
+     active="guides",
+     title="Guides",
+     icon='fa fa-fw fa-external-link',
+   ) }}
+<div class="list-group">
+  <div class="list-group-item">
+    <fieldset>
+      <div class="form-group">
+        <label class="control-label col-md-3">
+          <i class="icon-share"></i>
+          Collection URL:
+        </label>
+        <div class="controls col-md-9">
+          <a href="{{ community.community_url }}">{{config.CFG_SITE_URL}}{{ community.community_url }}</a>
+          <p class="text-muted field-desc">
+            <small>Above address links directly to your community collection.</small>
+          </p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-md-3">
+          <i class="icon-share"></i>
+          Upload URL:
+        </label>
+        <div class="controls col-md-9">
+          <a href="{{ community.upload_url }}">{{config.CFG_SITE_URL}}{{ community.upload_url }}</a>
+          <p class="text-muted field-desc">
+          <small>Above address will autov class="controls col-md-9">matically ensure people who use it will have their record added to your community collection.</small>
+          </p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-md-3">
+          <i class="icon-share"></i>
+          Curation URL:
+        </label>
+        <div class="controls col-md-9">
+          <a href="{{ community.community_provisional_url }}">{{config.CFG_SITE_URL}}{{ community.community_provisional_url }}</a>
+          <p class="text-muted field-desc">
+            <small>Above address links to your private curation URL. You will find all uploads pending your curation.</small>
+          </p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-md-3">
+          <i class="icon-share"></i>
+          Harvesting URL:
+        </label>
+        <div class="controls col-md-9">
+          <a href="{{ community.oai_url }}">{{config.CFG_SITE_URL}}{{ community.oai_url }}</a>
+          <p class="text-muted field-desc">
+            <small>Above address links to a OAI-PMH feed, which can be used by other digital repositories to harvest this community collection.</small>
+          </p>
+        </div>
+      </div>
+    </fieldset>
+  </div>
+</div>
+{{ community_panel_end() }}
+{% endblock %}

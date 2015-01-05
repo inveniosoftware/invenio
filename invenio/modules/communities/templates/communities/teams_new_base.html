@@ -1,0 +1,69 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- from "_formhelpers.html" import render_field with context -%}
+{%- from "communities/helpers.html" import community_panel_start  with context -%}
+{%- from "communities/helpers.html" import community_panel_end  with context -%}
+{%- from "communities/helpers.html" import searchbar  with context -%}
+
+{% extends "page.html" %}
+
+{%- bundles "communities.css" -%}
+
+{% block body %}
+{{ community_panel_start(
+     active="teams",
+     title="New Team" if isNew else "Team",
+     icon='fa fa-fw fa-users',
+   ) }}
+<div class="list-group">
+  <div class="list-group-item clearfix">
+    {% if not isNew %}
+    <form action="{{ url_for('community_manage.teams_manage', community_id=community.id, team=group.name) }}" method="POST">
+    {%- else %}
+    <form action="{{ url_for('community_manage.teams_new', community_id=community.id) }}" method="POST">
+    {% endif %}
+      {%- for field in form %}
+        {{ render_field(field, show_description=True) }}
+      {%- endfor %}
+      <small class="help-block">
+        <ul>
+          <li><strong>Admin</strong> - Team members will be able to view closed/restricted access records in your community.</li>
+          <li><strong>Write</strong> - Team members will be able to curate records in your community.</li>
+          <li><strong>Read</strong> - Team members will be able to fully manage your community.</li>
+        </ul>
+      </small>
+      <hr />
+      <button type="submit" style="margin-left: 15px;" class="btn btn-primary pull-right"><i class="fa fa-fw fa-check"></i>
+      {% if not isNew %}
+      {{ _('Update') }}
+      {%- else %}
+      {{ _('Create') }}
+      {% endif %}
+      </button>
+      <a href="{{ url_for('community_manage.teams', community_id=community.id) }}" class="btn btn-default pull-right"><i class="fa fa-fw fa-times"></i>Close</a>
+    </form>
+    {% if not isNew %}
+    <form action="{{ url_for('community_manage.teams_delete', community_id=community.id, team=group.name) }}" method="POST">
+      <button id="delete_team" type="submit" class="btn btn-danger pull-left"><i class="fa fa-fw fa-trash-o"></i>Delete</a>
+    </form>
+    {% endif %}
+  </div>
+</div>
+{{ community_panel_end() }}
+{% endblock %}

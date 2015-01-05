@@ -1,0 +1,88 @@
+/**
+ * -*- mode: text; coding: utf-8; -*-
+ *
+ * This file is part of Invenio.
+ * Copyright (C) 2015 CERN.
+
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+@charset "utf-8";
+
+@link-cursor:          pointer;
+@border-color-default:   #cccccc;
+@border-color-focused:   #66afe9;
+@border-color-invalid:   #FF0022;
+@email-background-color: #F3F3F3;
+
+.box-shadow(@color_a, @color_b) {
+  -webkit-box-shadow: inset 0 1px 1px @color_a, 0 0 8px @color_b; /* Android 2.3+, iOS 4.0.2-4.2, Safari 3-4 */
+          box-shadow: inset 0 1px 1px @color_a, 0 0 8px @color_b; /* Chrome 6+, Firefox 4+, IE 9+, iOS 5+, Opera 10.50+ */
+}
+
+table a {
+  cursor: @link-cursor;
+}
+
+.vcenter {
+  vertical-align: middle !important;
+}
+
+#emptyprompt .btn-highlighted {
+  margin: 50px;
+}
+
+#emails {
+  height: initial;
+  min-height: 34px;
+  padding: 6px 12px;
+  border: 1px solid @border-color-default;
+  border-radius: 4px;
+  transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+#emails.focused {
+  outline: 0;
+  border-color: @border-color-focused;
+  .box-shadow(rgba(0,0,0,.075), rgba(102, 175, 233, 0.6));
+}
+
+#emails.invalid, .invalid {
+  outline: 0;
+  border: 1px solid @border-color-invalid;
+  .box-shadow(rgba(0,0,0,.075), rgba(240, 20, 30, 0.6));
+}
+
+.email {
+  position: relative;
+  padding: 5px;
+  margin: 3px 0px;
+  background-color: @email-background-color;
+}
+
+.email:hover {
+  background-color: darken(@email-background-color, 10%);
+}
+
+.email:focus, .new-email:focus{
+  outline:none;
+}
+
+.email .dismiss {
+  position: absolute;
+  top: 25%;
+  left: 95%;
+  cursor: @link-cursor;
+  color: darken(@email-background-color, 25%);
+}

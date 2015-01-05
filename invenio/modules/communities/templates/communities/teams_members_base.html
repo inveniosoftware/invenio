@@ -1,0 +1,61 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- from "communities/helpers.html" import community_panel_start  with context -%}
+{%- from "communities/helpers.html" import community_panel_end  with context -%}
+{%- from "communities/helpers.html" import searchbar  with context -%}
+
+{% extends "page.html" %}
+
+{%- bundles "communities.css" -%}
+
+{% block body %}
+{{ community_panel_start(
+     active="teams",
+     title="Owners Team Members",
+     icon='fa fa-fw fa-users',
+     btn='Invite member', btn_icon='fa fa-fw fa-plus', btn_href=url_for('community_manage.people_invite', community_id=community.id, team_name=group.name),
+   ) }}
+{{ searchbar() }}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="col-md-6">Email</th>
+      <th class="col-md-3"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for member in members %}
+    <tr>
+      <td>
+        <div class="col-md-6">{{ member.user.nickname }}</div>
+        <div class="col-md-6"><span class="text-muted">{{ member.user.email }}</span></div>
+      </td>
+      <td class="text-center btn-toolbar vcenter">
+        <a class="btn btn-xs btn-danger" href="{{ url_for('groups_settings.leave', ug_id=group.id, id_user=member.user.id) }}">
+          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Remove") }}
+        </a>
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{# paginate() #}
+{{ community_panel_end() }}
+{% endblock %}

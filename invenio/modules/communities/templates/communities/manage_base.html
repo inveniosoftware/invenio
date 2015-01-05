@@ -1,0 +1,77 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- from "_formhelpers.html" import render_field with context -%}
+{%- from "communities/helpers.html" import community_panel_start  with context -%}
+{%- from "communities/helpers.html" import community_panel_end  with context -%}
+
+{%- extends "accounts/settings/index.html" -%}
+
+{%- bundles "communities.js", "communities.css" -%}
+
+{% block body %}
+{{ community_panel_start(
+     active="settings",
+     title="Settings",
+     icon='fa fa-cog fa-fw',
+   ) }}
+<form class="list-group-item" action="." method="POST">
+  {%- for field in form %}
+    {{ render_field(field, show_description=True) }}
+  {%- endfor %}
+  <hr>
+  <div class="clearfix">
+    <a class="btn btn-danger pull-left" data-toggle="modal" data-target="#delete-community-modal">
+      <i class="fa fa-trash-o fa-fw"></i>{{ _("Delete") }}
+    </a>
+    <button type="submit" class="btn btn-primary pull-right">
+      <i class="fa fa-check fa-fw"></i>{{ _("Update") }}
+    </button>
+  </div>
+</form>
+{{ community_panel_end() }}
+<div id="delete-community-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ _('Community deletion') }}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{{ _("You are about to ") }}
+          <strong class=text-danger>{{ _("delete") }}</strong>
+          <strong>{{ community.title }}</strong>
+          {{ _("community.") }}
+        </p>
+        <p>{{ _("This action cannot be undone. Are you sure you want to proceed?") }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">
+          <i class="fa fa-times"></i> {{ _("Cancel") }}
+        </button>
+        <form class="pull-left" action="{{ url_for('community_manage.delete', community_id=community.id) }}" method="POST">
+          <button type="submit" class="btn btn-danger" href="{{ url_for('community_manage.delete', community_id=community.id) }}">
+            <i class="fa fa-fw fa-trash-o"></i> {{ _("Delete") }}
+          </button>
+        </form>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{% endblock %}

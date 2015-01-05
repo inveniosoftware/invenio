@@ -1,0 +1,67 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "_formhelpers.html" import render_field with context %}
+
+{%- extends "accounts/settings/index_base.html" %}
+
+{%- bundles "groups.js", "groups.css" %}
+
+{%- block settings_body %}
+{%- set header = (group.name + " <small class='text-muted'>New member</small>") if group else "New group"-%}
+{{ helpers.panel_start(
+    _(header),
+    with_body=False,
+    icon='fa fa-users fa-fw',
+   ) }}
+<div class="panel-body">
+  {%- block description %}
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores.
+  Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia. dipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero
+  repellendus vero ex fugit.
+  {%- endblock %}
+</div>
+<form id="new_member_form" role="form" method="POST" class="list-group-item">
+<!--
+  <div class="form-group">
+    <label class="control-label" for="user_status">{{ _("Status") }}</label>
+    <select name="user_status" id="user_status" class="form-control">
+      <option value="MEMBER" selected>Member</option>
+      <option value="ADMIN">Admin</option>
+    </select>
+    <div class="help-block user_status"><small>{{ _("Required. User status") }}</small></div>
+  </div>
+-->
+  <div class="form-group">
+    <label class="control-label" for="emails">{{ _("Emails") }}</label>
+    <div id="emails"></div>
+    <div class="help-block emails"><small>{{ _("Required. Put users emails here....") }}</small></div>
+  </div>
+ <div class="btn-toolbar">
+    <a href="{{ url_for('.index') }}" class="btn btn-default">
+      <i class="fa fa-times"></i> {{ _('Cancel') }}
+    </a>
+    <button type="submit" class="btn btn-primary">
+      <i class="fa fa-check"></i> {{ _('Invite') }}
+    </button>
+  </div>
+</form>
+{{ helpers.panel_end() }}
+{%- endblock %}

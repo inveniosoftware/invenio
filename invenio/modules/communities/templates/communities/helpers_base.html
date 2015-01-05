@@ -57,3 +57,199 @@
         {% endif %}
     </span>
 {% endmacro %}
+
+{%- macro paginate(obj, endpoint) %} <!-- TODO: show status - displaying x from y -->
+  {%- set args = request.args.copy().to_dict() -%}
+  <div align="center">
+    <ul class="pagination">
+      <li{{ ' class="disabled"'|safe if not obj.has_prev }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': 1}) -%}
+        <a title="first" href="{{ url_for(endpoint, **new_args) }}">«</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not obj.has_prev }}>
+        {%- do args.update({'page': obj.page-1 }) -%}
+        <a title="prev" href="{{ url_for(endpoint, **args) }}">&lsaquo;</a>
+      </li>
+      {%- for page_p in obj.iter_pages() %}
+        {%- if page_p -%}
+          {%- set new_args = args.copy() -%}
+          {%- do new_args.update({'page': page_p}) -%}
+          <li{{ ' class="active"'|safe if page_p == obj.page }}>
+            <a href="{{ url_for(endpoint, **new_args) }}">{{ page_p }}</a>
+          </li>
+        {%- else -%}
+          <li class="disabled"><a href="#">...</a></li>
+        {%- endif -%}
+      {%- endfor -%}
+      <li{{ ' class="disabled"'|safe if not obj.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': obj.page+1}) -%}
+        <a href="{{ url_for(endpoint, **new_args) }}">&rsaquo;</a>
+      </li>
+      <li{{ ' class="disabled"'|safe if not obj.has_next }}>
+        {%- set new_args = args.copy() -%}
+        {%- do new_args.update({'page': obj.pages }) -%}
+        <a title="last" href="{{ url_for(endpoint, **new_args) }}">»</a>
+      </li>
+    </ul>
+  </div>
+{%- endmacro %}
+
+{%- macro paginate_bac(obj, href='') %} <!-- TODO: show status - displaying x from y -->
+  <nav class="text-center">
+    <ul class="pagination pagination-sm">
+      {%- if page == 1 %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page=1&per_page={{ per_page }}">
+      {% endif %}
+          <span aria-hidden="true">&laquo;</span><span class="sr-only">{{ _("First") }}</span>
+        </a>
+      </li>
+      {%- if page == 1 %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page={{ page - 1 }}&per_page={{ per_page }}">
+      {% endif %}
+          <span aria-hidden="true">&lsaquo;</span><span class="sr-only">{{ _("Previous") }}</span>
+        </a>
+      </li>
+      {%- for page in range(1, obj.pages + 1) %}
+        {%- if page == obj.page %}
+        <li class="active">
+        {% else %}
+        <li>
+        {%- endif %}
+          <a href="{{ href }}?page={{ page }}">
+            {{ loop.index }}
+          </a>
+        </li>
+      {%- endfor %}
+      {%- if page == obj.pages %}
+      <li class="disabled">
+        <a>
+      {%- else %}
+      <li>
+        <a href="{{ href }}?page={{ page + 1 }}">
+      {% endif %}
+          <span aria-hidden="true">&raquo;</span><span class="sr-only">{{ _("Next") }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{%- endmacro %}
+
+{%- macro rights_label(rights) %}
+  {%- if rights == "A" %}
+  <a class="label admin">{{ _("Admin") }}</a>
+  {%- elif rights == "W" %}
+  <a class="label write">{{ _("Write") }}</a>
+  {%- elif rights == "R" %}
+  <a class="label read">{{ _("Read") }}</a>
+  {%- endif %}
+{%- endmacro %}
+
+{%- macro searchbar() %}
+{#- TODO: same code as in groups module -#}
+<ul class="list-group">
+  <div class="list-group-item">
+      <form  method="get" class="input-group input-group-sm">
+        <input name="p" class="form-control" type="text" value="{{ p }}">
+        <span class="input-group-btn">
+          <button class="btn btn-primary" type=submit>
+            <i class="fa fa-fw fa-search"></i><span>&nbsp;{{ _("Search") }}</span>
+          </button>
+        </span>
+      </form>
+    </div>
+</ul>
+{%- endmacro%}
+
+{%- macro emptyprompt(btn, btn_icon, btn_href, heading, footer) %}
+{#- TODO: same code as in groups module -#}
+<div id="emptyprompt" class="list-group">
+  <div class="list-group-item">
+    <div class="row" align="center">
+      <h1>{{ heading }}</h1>
+      <div class="btn-highlighted">
+        <a href="{{ btn_href }}" class="btn btn-default btn-lg"><i class="{{ btn_icon }}"></i>{{ btn }}</a>
+      </div>
+      <p class="text-muted">
+        {{ footer }}
+      </p>
+    </div>
+  </div>
+</div>
+{%- endmacro %}
+
+{%- macro community_panel_start(active, title, icon, btn, btn_icon, btn_href) %}
+<div class="row">
+  <div class="span12 breadcrumb" style="line-height: 280%;">
+    <strong style="font-size: 20px;">{{ community.title }}</strong>
+    <div class="pull-right">
+      <a href="{{ community.community_url }}" class="btn btn-default">
+        <i class="icon-file"></i>{{ _("View") }}
+      </a>
+      <a href="{{ community.community_provisional_url }}" class="btn btn-default">
+        <i class="icon-file"></i>{{ _("Curate") }}
+      </a>
+      <a href="{{ url_for('communities_settings.index') }}" class="btn btn-primary">{{ _("My Communities") }}</a>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+</div>
+<div class="row">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ _("Community Settings") }}</strong>
+        </div>
+        <div class="list-group">
+          <a href="{{ url_for('community_manage.manage', community_id=community.id) }}" class="list-group-item {{"active" if active=="settings"}}">
+            <i class="fa fa-cog fa-fw"></i>
+            {{ _("Manage") }}
+          </a>
+          <a href="{{ url_for('community_manage.teams', community_id=community.id) }}" class="list-group-item {{"active" if active=="teams"}}">
+            <i class="fa fa-users fa-fw"></i>
+            {{ _("Teams") }}
+          </a>
+          <a href="{{ url_for('community_manage.people', community_id=community.id) }}" class="list-group-item {{"active" if active=="people"}}">
+            <i class="fa fa-user fa-fw"></i>
+            {{ _("People") }}
+          </a>
+          <a href="{{ url_for('community_manage.guides', community_id=community.id) }}" class="list-group-item {{"active" if active=="guides"}}">
+            <i class="fa fa-external-link fw"></i>
+            {{ _("Guides") }}
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-9">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="{{ icon }}"></i>
+          <strong>{{ title }}</strong>
+          {%- if btn %}
+          <div class="pull-right">
+            <a class="btn btn-xs btn-default" href="{{ btn_href }}">
+              <i class="{{ btn_icon }}"></i>
+              {{ btn }}
+            </a>
+          </div>
+          {%- endif %}
+      </div>
+{%- endmacro %}
+
+{%- macro community_panel_end() %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endmacro %}

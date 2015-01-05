@@ -1,0 +1,62 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- from "communities/helpers.html" import community_panel_start  with context -%}
+{%- from "communities/helpers.html" import community_panel_end  with context -%}
+{%- from "communities/helpers.html" import searchbar  with context -%}
+
+{% extends "page.html" %}
+
+{%- bundles "groups.js", "groups.css", "communities.css" -%}
+
+{% block body %}
+{{ community_panel_start(
+     active="teams",
+     title="Invite Member",
+     icon='fa fa-fw fa-users',
+   ) }}
+<div class="panel-body" style="line-height: 25px;">
+  <ul>
+    <li>Users will receive an email.</li>
+    <li>They <strong>must</strong> accept it to join your team.</li>
+    <li><strong>Only</strong> existing Zenodo users can be invited currently.</li>
+    <li>You can later revoke invitation from page.</li>
+  </ul>
+</div>
+<form id="new_member_form" action="{{ url_for('community_manage.people_invite', community_id=community.id) }}" role="form" method="POST" class="list-group-item">
+  <div class="form-group">
+    <label class="control-label" for="emails">{{ _("Team:") }}</label>
+    <input id="team" class="form-control" placeholder="Deafult"></input>
+    <div class="help-block"><small>{{ _("Required. Choose team") }}</small></div>
+  </div>
+  <div class="form-group">
+    <label class="control-label" for="emails">{{ _("Emails") }}</label>
+    <div id="emails"></div>
+    <div class="help-block emails"><small>{{ _("Required. Paste users emails here....") }}</small></div>
+  </div>
+ <div class="btn-toolbar">
+    <a href="{{ url_for('community_manage.people', community_id=community.id) }}" class="btn btn-default">
+      <i class="fa fa-times"></i> {{ _('Cancel') }}
+    </a>
+    <button type="submit" class="btn btn-primary">
+      <i class="fa fa-check"></i> {{ _('Invite') }}
+    </button>
+  </div>
+</form>
+{{ community_panel_end() }}
+{% endblock %}

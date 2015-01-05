@@ -1,0 +1,155 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- from "communities/helpers.html" import searchbar with context %}
+{%- from "communities/helpers.html" import paginate with context %}
+
+{% extends "page.html" %}
+
+{% block title %}{% endblock %}
+
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "communities.css" %}
+{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12">
+      {{ searchbar() }}
+      <h1>
+        <i class="fa fa-group"></i>
+        {{ _("Communities") }} <small>{{ _("created and curated by ") + config.CFG_SITE_NAME + _(" users") }}</small>
+      </h1>
+    </div>
+    <div class="col-sm-12 col-md-12">
+      {%- set args = request.args.copy().to_dict() -%}
+      <!-- featured community -->
+      {%- if featured_community %}
+      <div class="wrapper">
+        <div class="ribbon-wrapper-green">
+          <div class="ribbon-green">{{ _("Featured") }}</div>
+        </div>
+        <h2>{{ featured_community.community.title }}</h2>
+        <div>
+          {{ featured_community.community.description }}
+        </div>
+        <h3>{{ _("The most recent upload:") }}</h3>
+        <div style="position: absolute; top: 79px; right:25px;">
+          <div class="btn-group" role="group" aria-label="...">
+            <div class="btn-group" role="group">
+              <a href="{{ featured_community.community.community_url }}" class="btn btn-info">{{ _("View") }}</a>
+            </div>
+            <div class="btn-group" role="group">
+              <a href="{{ featured_community.community.community_provisional_url }}" class="btn btn-info">{{ _("Curate") }}</a>
+            </div>
+            <div class="btn-group" role="group">
+              <a href="{{ url_for('community_manage.manage', community_id=featured_community.community.id) }}" class="btn btn-info">{{ _("Manage") }}</a>
+            </div>
+          </div>
+        </div>
+        {% if featured_community.community.collection.reclist %}
+          {%- set recid = featured_community.community.collection.reclist[-1] -%}
+          <div class="row recent-upload">
+            <div class="col-md-12 record-list-elem">
+              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+            </div>
+          </div>
+        {%- else %}
+          <div class="row">
+            <div class="col-md-12" align="center" style="margin-top: 40px;">
+              <em class="text-muted">{{ _("This collection is currently empty.") }}</em>
+            </div>
+          </div>
+        {%- endif %}
+      </div>
+      {% endif %}
+      <!-- end featured community -->
+      <br />
+      <!-- control panel -->
+      <div class="form-inline">
+        <div class="form-group">
+          <p class="help-block hidden-xs">
+            {{ _("Showing communties %(x_from)d to %(x_to)d out of %(x_total)d results.", x_from=r_from, x_to=r_to, x_total=r_total) }}
+          </p>
+        </div>
+        <div class="form-group pull-right">
+          <a href="{{ url_for('communities_settings.new') }}" class="btn btn-primary"><i class="fa fa-fw fa-plus"></i>{{ _("New") }}</a>
+          <a href="{{ url_for('communities_settings.index') }}" class="btn btn-primary">{{ _("My communities") }}</a>
+          <div class="btn-group">
+            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="fa fa-random"></i> {{ _("Sort by") }}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+            {%- for opt in ['title', 'ranking'] -%}
+              {%- set new_args = args.copy() -%}
+              {%- do new_args.update({'so': opt}) -%}
+              <li>
+                <a href="{{ url_for('communities.index', **new_args) }}" class="active">
+                  <i class="pull-right icon {{ 'fa fa-check fa-fw' if args.get('so', 'ranking')==opt }}"></i>
+                  {{ opt }}
+                </a>
+              </li>
+            {%- endfor -%}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- end control panel -->
+      <br />
+      <!-- communities list -->
+      {%- if communities %}
+      {%- for row in communities|batch(3) %}
+        <div class="row">
+        {%- for obj in row %}
+          {%- if obj %}
+            <div class="col-sm-12 col-md-4">
+              <div class="well">
+                <div class="pull-right" style="margin-top: 10px;">
+                  <a href="{{ obj.community_url }}" class="btn btn-info">{{ _('View') }}</a>
+                </div>
+                <div class="btn-group btn-group-vertical" style="position: absolute; top: 67px; right: 36px;">
+                  <div class="btn-group" role="group">
+                    <a href="{{ obj.community_provisional_url }}" class="btn btn-xs btn-info">Curate</a>
+                  </div>
+                  <div class="btn-group" role="group" style="margin-top:5px;">
+                    <a href="{{url_for('community_manage.manage', community_id=obj.id)}}" class="btn btn-xs btn-info">Manage</a>
+                  </div>
+                </div>
+                <h4 style="margin-top:30px">{{ obj.title }}</h4><br /><br />
+                <p>{{ obj.description|striptags|truncate }}</p>
+                <small class="text-muted">Curated by: {{ obj.owner.nickname }}</small>
+              </div>
+            </div>
+          {% endif %}
+        {%- endfor %}
+        </div>
+      {%- endfor %}
+      <!-- end communities list -->
+      {{ paginate(pagination, '.index') }}
+      {%- else %}
+      <br />
+      <p class="text-muted text-center">
+        <strong>{{ _("Your search did not match any communities. Please try again.") }}</strong>
+      </p>
+      {%- endif %}
+    </div>
+  </div>
+{% endblock %}

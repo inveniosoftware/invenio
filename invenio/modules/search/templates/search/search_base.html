@@ -52,6 +52,23 @@
 {% endblock %}
 
 {%- block inner_content -%}
+  {% if "provisional-user-" in collection.name %}
+      <div class="well well-sm">
+        <h1 style="float: left">{{ collection.name.replace("provisional-user-", "").title() }}</h1>
+        <div class="pull-right" style="margin-top: 20px;">
+          <a href="{{collection.community_provisional[0].community_url}}" class="btn btn-default">
+            <i class="icon-file"></i>{{ (" View") }}
+          </a>
+          <a href="{{ url_for('community_manage.manage', community_id=collection.community_provisional[0].id) }}" class="btn btn-default">
+            <i class="icon-file"></i>{{ (" Manage") }}
+          </a>
+          <a href="{{ url_for('communities_settings.index') }}" class="btn btn-primary">
+            <i class="icon-file"></i> {{ (" My Communities") }}
+          </a>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+  {% endif %}
   {%- block index -%}
     {%- if not recids|length -%}
       {%- block index_noresult -%}
