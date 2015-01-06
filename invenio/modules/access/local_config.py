@@ -93,8 +93,9 @@ CFG_EXTERNAL_AUTH_USING_SSO = False
 CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
 CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    #"Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
-    #"ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    # "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
+    # "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    # CFG_EXTERNAL_AUTH_USING_SSO : ea_sso.ExternalAuthSSO(enforce_external_nicknames=True),
 }
 
 # from invenio.legacy.external_authentication.robot import ExternalAuthRobot

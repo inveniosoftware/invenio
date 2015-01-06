@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -70,13 +70,6 @@ a supported XSLT processor on your machine, BibConvert can make use of standard
 XSLT to interpret your XML data.
 </dd>
 </dl>
-<p>In addition to XSLT, we provide a home-made solution for converting
-XML source data. It uses our own BFX language as transformation language,
-extended with XPath for node selections.<br/>
-You should consider using this solution only in the case where you have not installed (or do not
-want to install) an XSLT processor on your machine.
-</p>
-
 
 <a name="B"></a><h2>B XML-Oriented Mode</h2>
 <a name="B.1"></a><h3>1 Configuration File Examples</h3>
@@ -84,13 +77,6 @@ want to install) an XSLT processor on your machine.
 You can use standard XSL stylesheets to transform your source data. Have a look
 at the provided samples in <code>etc/bibconvert/config</code> directory
 of your Invenio installation.<br/>
-<h4>Using BFX</h4>
-BFX (BibFormat for XML) uses a syntax similar to XSLT. Roughly they only
-differ in the name of the tags.<br/>
-More documentation about it is to be added soon (FIXME).<br/>
-Have a look
-at the provided samples in <code>etc/bibconvert/config</code> directory
-of your Invenio installation to learn more about it.
 <a name="B.2"></a><h3>2. Running BibConvert</h3>
 BibConvert in XML-oriented mode has only 1 parameter: <code>-c</code>.
 It is used to specify which transformation stylesheet to apply to the piped XML.

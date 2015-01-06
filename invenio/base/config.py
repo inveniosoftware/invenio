@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -433,7 +433,7 @@ CFG_BIBSORT_DEFAULT_FIELD = 'latest first'
 CFG_BIBSORT_DEFAULT_FIELD_ORDER = 'd'
 CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE = ""
 CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS = ['6531_9', ]
-CFG_BIBUPLOAD_DELETE_FORMATS = ['hb', ]
+CFG_BIBUPLOAD_DELETE_FORMATS = ['hb', 'recjson']
 CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS = 0
 CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG = "035__9"
 CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = "035__a"

@@ -573,7 +573,7 @@ def oai_get_recid(identifier):
     record if multiple recids matches but some of them are deleted (e.g. in
     case of merging). Returns None if no record matches."""
     if identifier:
-        recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e')
+        recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e', ap=-9)
         if recids:
             restricted_recids = get_all_restricted_recids()
             for recid in recids:
