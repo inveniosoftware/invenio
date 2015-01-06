@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -745,7 +745,7 @@ class Template:
                                       'notes_action': number_of_notes and 'display' or 'write_note',
                                       'notes_inline_anchor': not number_of_notes and '#note' or '',
                                       'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -769,7 +769,7 @@ class Template:
                                       'notes_action': number_of_notes and 'display' or 'write_note',
                                       'notes_inline_anchor': not number_of_notes and '#note' or '',
                                       'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -778,7 +778,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info':  notes_html}
-                        
+
                 out += """
           </ol>
         </td>
@@ -854,7 +854,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display' or 'write_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -880,7 +880,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display' or 'write_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -888,7 +888,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -959,7 +959,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -984,7 +984,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -992,7 +992,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -1062,7 +1062,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -1087,7 +1087,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -1095,7 +1095,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -1815,13 +1815,13 @@ class Template:
         @return: html output
         """
         _ = gettext_set_language(ln)
-        message = _("Are you sure you want to delete this basket?")
+        message = cgi.escape(_("Are you sure you want to delete this basket?"), True)
         if nb_users:
-            message += '<p>' + _("%i users are subscribed to this basket.")% nb_users + '</p>'
+            message += '<p>' + cgi.escape(_("%i users are subscribed to this basket.") % nb_users, True) + '</p>'
         if nb_groups:
-            message += '<p>' + _("%i user groups are subscribed to this basket.")% nb_groups + '</p>'
+            message += '<p>' + cgi.escape(_("%i user groups are subscribed to this basket.") % nb_groups, True) + '</p>'
         if nb_alerts:
-            message += '<p>' + _("You have set %i alerts on this basket.")% nb_alerts + '</p>'
+            message += '<p>' + cgi.escape(_("You have set %i alerts on this basket.") % nb_alerts, True) + '</p>'
         out = """
 <table class="confirmoperation">
   <tr>
@@ -1851,7 +1851,7 @@ class Template:
       </form>
     </td>
   </tr>
-</table>"""% {'message': cgi.escape(message, True),
+</table>"""% {'message': message,
               'bskid': bskid,
               'url_ok': 'delete',
               'url_cancel': 'display',
@@ -2353,7 +2353,7 @@ class Template:
             add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i&amp;wait=1""" % (CFG_SITE_URL,selected_category,bskid,)
             add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
-        
+
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
             edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
