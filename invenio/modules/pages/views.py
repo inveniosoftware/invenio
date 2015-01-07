@@ -16,6 +16,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Views for Pages module."""
+
 import six
 
 from flask import Blueprint, request, render_template, current_app
@@ -45,13 +47,13 @@ def register():
 
 @blueprint.errorhandler(NoResultFound)
 def no_result_found(_dummy):
-    """Renders 404 page when no page has been found."""
+    """Render 404 page when no page has been found."""
     return render_template('404.html'), 404
 
 
 @blueprint.errorhandler(404)
 def errorhandler(exception):
-    """Tries to render the page otherwise continues to app error handler."""
+    """Try to render the page otherwise continues to app error handler."""
     try:
         return view()
     except NoResultFound:
@@ -76,9 +78,7 @@ def view():
 
 # @cache.memoize for guests?
 def render_page(path):
-    """
-    Internal interface to the page view.
-    """
+    """Internal interface to the page view."""
     page = Page.query.filter(db.or_(Page.url == request.path,
                                     Page.url == request.path + "/")).first()
     return render_template([page.template_name, cfg['PAGES_DEFAULT_TEMPLATE']],
@@ -86,6 +86,7 @@ def render_page(path):
 
 
 def before_url_insert(mapper, connection, target):
+    """Massage target url."""
     if not target.url.startswith("/"):
         target.url = "/" + target.url
     if not target.url.endswith("/") and cfg["PAGES_APPEND_SLASH"]:
@@ -93,6 +94,7 @@ def before_url_insert(mapper, connection, target):
 
 
 def page_orm_handler(mapper, connection, target):
+    """Handle model change."""
     _add_url_rule(target.url)
 
 
@@ -126,7 +128,6 @@ before_handle_user_exception.connect(handle_not_found)
 
 def _add_url_rule(url_or_urls):
     """Register url rule to application url map."""
-    current_app.logger.info(url_or_urls)
     old = current_app._got_first_request
     # This is bit of cheating to overcome @flask.app.setupmethod decorator.
     current_app._got_first_request = False
