@@ -560,6 +560,13 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             modification_date = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(record_get_field_value(record, '005'), '%Y%m%d%H%M%S.0'))
             error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
 
+            # Pre-generate recjson cache to prevent dog-piling behavior when
+            # concurrent processes call get_record at the same time and the
+            # does not exists (i.e. all process will try to generate and save
+            # the recjson)
+            from invenio.modules.records.api import get_record
+            get_record(rec_id, reset_cache=True)
+
             # Fire record signals.
             from invenio.base import signals
             if record_had_altered_bit:
