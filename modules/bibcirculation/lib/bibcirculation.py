@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -319,7 +319,7 @@ def perform_new_request_send(uid, recid,
                 message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
 
         else:
-            message = bibcirculation_templates.tmpl_message_request_send_ok_other()
+            message = bibcirculation_templates.tmpl_message_request_send_fail_other()
 
     body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
 
