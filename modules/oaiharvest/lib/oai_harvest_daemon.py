@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -573,7 +573,11 @@ def remove_duplicates(harvested_file_list):
     Go through a list of harvested files and remove any duplicate records.
     """
     from copy import deepcopy
-    import lxml.etree as etree
+    try:
+        import lxml.etree as etree
+    except ImportError:
+        write_message("Can not import lxml. Please install python lxml module.")
+        return
 
     harvested_identifiers = []
     for harvested_file in harvested_file_list:
