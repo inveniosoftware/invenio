@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -396,14 +396,6 @@ def workflows_reviews(stop_if_error=False, clean=True):
     """
     @wraps(workflows_reviews)
     def _workflows_reviews(obj, eng):
-        if eng.extra_data["_nb_workflow"] == 0:
-            raise WorkflowError("Nothing has been harvested ! Look into logs for errors !", eng.uuid, obj.id)
-        eng.log.info("%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]))
-
-        if eng.extra_data["_nb_workflow_failed"] and stop_if_error:
-            raise WorkflowError(
-                "%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]),
-                eng.uuid, obj.id, payload=eng.extra_data["_uuid_workflow_crashed"])
         obj.update_task_results(
             "review_workflow",
             [
@@ -414,6 +406,21 @@ def workflows_reviews(stop_if_error=False, clean=True):
                             "total": eng.extra_data["_nb_workflow"]}}
             ]
         )
+
+        eng.log.info("{0}/{1} finished successfully".format(
+            eng.extra_data["_nb_workflow_finish"], eng.extra_data["_nb_workflow"]
+        ))
+
+        if eng.extra_data["_nb_workflow"] == 0:
+            # Nothing has been harvested!
+            eng.log.info("Nothing harvested.")
+            return
+
+        if eng.extra_data["_nb_workflow_failed"] and stop_if_error:
+            raise WorkflowError(
+                "%s / %s failed" % (eng.extra_data["_nb_workflow_failed"], eng.extra_data["_nb_workflow"]),
+                eng.uuid, obj.id, payload=eng.extra_data["_uuid_workflow_crashed"])
+
         if clean:
             eng.extra_data["_nb_workflow_failed"] = 0
             eng.extra_data["_nb_workflow"] = 0
