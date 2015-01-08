@@ -605,6 +605,21 @@ class SpiresToInvenioSyntaxConverter:
         'rank' : 'rank:',
         'cat' : 'cataloguer:',
 
+        # selfcites
+        'citedexcludingselfcites': 'citedexcludingselfcites:',
+        'cited.excluding.selfcites': 'citedexcludingselfcites:',
+        'cited.nosc': 'citedexcludingselfcites:',
+        'citedx': 'citedexcludingselfcites:',
+        'cx': 'citedexcludingselfcites:',
+        'citedbyexcludingselfcites': 'citedbyexcludingselfcites:',
+        'citedby.excluding.selfcites': 'citedbyexcludingselfcites:',
+        'citedby.nosc': 'citedbyexcludingselfcites:',
+        'citedbyx': 'citedbyexcludingselfcites:',
+        'referstoexcludingselfcites': 'referstoexcludingselfcites:',
+        'refersto.excluding.selfcites': 'referstoexcludingselfcites:',
+        'refersto.nosc': 'referstoexcludingselfcites:',
+        'referstox': 'referstoexcludingselfcites:',
+
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
