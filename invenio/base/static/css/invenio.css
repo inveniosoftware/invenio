@@ -4088,4 +4088,14 @@ img.login_button_small {
     margin-bottom: 10px;
 }
 
+/* Author ORCID display */
+a.author_orcid_image_link {
+    display:inline-block;
+    width:16px;
+    height:16px;
+    background-image:url(orcid_icon_24.png);
+    background-size: 16px 16px;
+    text-decoration:none;
+}
+
 /* end of invenio.css */

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -170,6 +170,7 @@ def send_email(fromaddr,
                replytoaddr="",
                attachments=None,
                bccaddr="",
+               forward_failures_to_admin=True,
                ):
     """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -199,6 +200,11 @@ def send_email(fromaddr,
         every element of the list could be a tuple: (filename, mimetype)
     @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
                     (if string, then receivers are separated by ',')
+    @param forward_failures_to_admin: [bool] prevents infinite recursion
+                                             in case of admin reporting,
+                                             when the problem is not in
+                                             the e-mail address format,
+                                             but rather in the network
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -242,10 +248,12 @@ def send_email(fromaddr,
             register_exception()
         return False
     sent = False
+    failure_reason = ''
     while not sent and attempt_times > 0:
         try:
             sent = body.send()
-        except Exception:
+        except Exception as e:
+            failure_reason = str(e)
             register_exception()
             if debug_level > 1:
                 try:
@@ -265,6 +273,31 @@ def send_email(fromaddr,
             if attempt_times > 0:  # sleep only if we shall retry again
                 sleep(attempt_sleeptime)
     if not sent:
+        # report failure to the admin with the intended message, its
+        # sender and recipients
+        if forward_failures_to_admin:
+            # prepend '> ' to every line of the original message
+            quoted_body = '> ' + '> '.join(body.splitlines(True))
+
+            # define and fill in the report template
+            admin_report_subject = g._('Error while sending an email: %(x_subject)s',
+                                       x_subject=subject)
+            admin_report_body = g._(
+                "\nError while sending an email.\n"
+                "Reason: %(x_reason)s\n"
+                "Sender: \"%(x_sender)s\"\n"
+                "Recipient(s): \"%(x_recipient)s\"\n\n"
+                "The content of the mail was as follows:\n"
+                "%(x_body)s",
+                x_reason=failure_reason,
+                x_sender=fromaddr,
+                x_recipient=', '.join(toaddr),
+                x_body=quoted_body)
+
+            send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL,
+                       admin_report_subject, admin_report_body,
+                       forward_failures_to_admin=False)
+
         try:
             raise EmailError(g._(
                 'Error in sending email from %(x_from)s to %(x_to)s with body'
