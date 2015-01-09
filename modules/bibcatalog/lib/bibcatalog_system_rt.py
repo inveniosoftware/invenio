@@ -100,7 +100,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
            matching the subject, creator or owner of the ticket."""
 
         search_atoms = [] # the search expression will be made by and'ing these
-        if (recordid > -1):
+        if recordid > -1:
             #search by recid
             search_atoms.append("CF.{RecordID} = " + escape_shell_arg(str(recordid)))
         if subject:
@@ -337,7 +337,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return ticinfo[attribute]
         return None
 
-    def ticket_get_info(self, uid, ticketid, attributes = None):
+    def ticket_get_info(self, uid, ticketid, attributes=None):
         """return ticket info as a dictionary of pre-defined attribute names.
            Or just those listed in attrlist.
            Returns None on failure"""
@@ -355,9 +355,9 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return 0
 
         tdict = {}
-        for line in command_out.split("\n"):
-            if line.count(": ") > 0:
-                tattr, tvaluen = line.split(": ")[0], ": ".join(line.split(": ")[1:])
+        for line in command_out.splitlines():
+            if line.find(": ") > -1:
+                tattr, tvaluen = line.split(": ", 1)
                 tvalue = tvaluen.rstrip()
                 tdict[tattr] = tvalue
 
@@ -368,14 +368,29 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return 0
 
         attachments = []
-        regex = re.compile(r"[0-9]*:\s{2}[(]")  # attachment's format: 557408:  (text/plain / 131b)
-        for line in command_out.split("\n"):
-            for match in regex.findall(line):
-                attachments.append(match.split(":")[0])
+
+        # attachment's format:
+        #     557408: (?:Name|\(Unnamed\))? (text/plain / 131b)
+        #  (Unnamed) is new in rt4, in rt3 no Name resulted in empty string,
+        #   hence 2 spaces
+        #
+        # example:
+        # id: ticket/443299/attachments
+        #
+        # Attachments: 1410963: (Unnamed) (multipart/alternative / 0b),
+        #              1410964: (Unnamed) (text/plain / 257b),
+        #              1410965: (Unnamed) (text/html / 2.9k),
+        #              1410966: (Unnamed) (text/plain / 534b)
+
+        attregex = re.compile(r"(?P<attachmentid>\d+):\s{1,2}[(\w]")
+        for line in command_out.splitlines():
+            amatch = attregex.search(line)
+            if amatch:
+                attachments.append(amatch.group('attachmentid'))
 
         # Query again for each attachment
-        for att in attachments:
-            command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/" + att
+        for attid in attachments:
+            command = "%s show ticket/%s/attachments/%s" % (CFG_BIBCATALOG_SYSTEM_RT_CLI, ticketid, attid)
             command_out = self._run_rt_command(command, uid)
             if command_out is None:
                 return 0
@@ -385,7 +400,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
                     cstuff = line.split("Content: ")
                     tdict['Text'] = cstuff[1].rstrip()
 
-        if (len(tdict) > 0):
+        if len(tdict) > 0:
             # Iterate over TICKET_ATTRIBUTES to make a canonical ticket
             candict = {}
             for f in BibCatalogSystem.TICKET_ATTRIBUTES:
