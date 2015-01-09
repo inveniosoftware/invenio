@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,8 @@
 
 {% block styles_body %}
 
-  {% if result_progress %}
+  {% if result_progress and result_progress.total > 0 %}
+
     <h5>{{ _('Progress') }}:</h5>
 
     <div class="progress">
@@ -40,6 +41,11 @@
         {{ result_progress.failed }} {{ _('failed') }}.
       </p>
     {% endif %}
+
+  {% else %}
+
+    <strong>{{ _('No records harvested') }}</strong>
+
   {% endif %}
 
   {% if identifiers %}
