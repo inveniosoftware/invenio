@@ -40,7 +40,7 @@ def get_bibcatalog_system():
             if msg:
                 raise StandardError(msg)
         except Exception, err:
-            register_exception(alert_admin=True, prefix=err)
+            register_exception(alert_admin=True, prefix='BibCatalog error:')
             from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
             ## RT has some troubles... let's fall back on the dummy system
             bc_system = BibCatalogSystemDummy()
