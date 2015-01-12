@@ -21,6 +21,7 @@
 
 {% set nb_recids = recids|length %}
 
+{% if recid in recids %}
 <div>
   <span class='moreinfo'>
     <a href="{{ url_for(last_query, ln=g.ln) }}">
@@ -76,3 +77,4 @@
 
   </span>
 </div>
+{% endif %}
