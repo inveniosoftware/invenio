@@ -20,6 +20,7 @@ This module contains functions for basic containers (dict, list, str)
 """
 
 import re
+from six import iteritems
 
 def get_substructure(data, path):
     """
@@ -274,3 +275,144 @@ class SmartDict(object):
 
     def update(self, E, **F):
         self._dict.update(E, **F)
+
+
+class LazyDict(object):
+
+    """Lazy dictionary that evaluates its content when it is first accessed.
+
+    Example:
+
+    .. code-block:: python
+
+        def my_dict():
+            from werkzeug.utils import import_string
+            return {'foo': import_string('foo')}
+
+        lazy_dict = LazyDict(my_dict)
+        # at this point the internal dictionary is empty
+        lazy_dict['foo']
+    """
+
+    def __init__(self, function=dict):
+        """Initialize lazy dictionary with given function.
+
+        :param function: it must return a dictionary like structure
+        """
+        super(LazyDict, self).__init__()
+        self._cached_dict = None
+        self._function = function
+
+    def _evaluate_function(self):
+        self._cached_dict = self._function()
+
+    def __getitem__(self, key):
+        """Return item from cache if it exists else create it."""
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        """Set item to cache if it exists else create it."""
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.__setitem__(key, value)
+
+    def __delitem__(self, key):
+        """Delete item from cache if it exists else create it."""
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.__delitem__(key)
+
+    def __getattr__(self, key):
+        """Get cache attribute if it exists else create it."""
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return getattr(self._cached_dict, key)
+
+    def __iter__(self):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.__iter__()
+
+    def iteritems(self):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return iteritems(self._cached_dict)
+
+    def iterkeys(self):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.iterkeys()
+
+    def itervalues(self):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        return self._cached_dict.itervalues()
+
+    def expunge(self):
+        self._cached_dict = None
+
+    def get(self, key, default=None):
+        try:
+            return self.__getitem__(key)
+        except KeyError:
+            return default
+
+
+class LaziestDict(LazyDict):
+
+    """Even lazier dictionary (maybe the laziest).
+
+    It does not have content and when a key is accessed it tries to evaluate
+    only this key.
+
+    Example:
+
+    .. code-block:: python
+
+        def reader_discover(key):
+            from werkzeug.utils import import_string
+            return import_string(
+                'invenio.jsonalchemy.jsonext.readers%sreader:reader' % (key)
+            )
+
+        laziest_dict = LaziestDict(reader_discover)
+
+        laziest_dict['json']
+        # It will give you the JsonReader class
+    """
+
+    def __init__(self, function=dict):
+        """Initialize laziest dictionary with given function.
+
+        :param function: it must accept one parameter (the key of the
+            dictionary) and returns the element which will be store that key.
+        """
+        super(LaziestDict, self).__init__(function)
+
+    def _evaluate_function(self):
+        """Create empty dict if necessary."""
+        if self._cached_dict is None:
+            self._cached_dict = {}
+
+    def __getitem__(self, key):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        if key not in self._cached_dict:
+            try:
+                self._cached_dict.__setitem__(key, self._function(key))
+            except:
+                raise KeyError(key)
+        return self._cached_dict.__getitem__(key)
+
+    def __contains__(self, key):
+        if self._cached_dict is None:
+            self._evaluate_function()
+        if key not in self._cached_dict:
+            try:
+                self.__getitem__(key)
+            except:
+                return False
+        return True
+
