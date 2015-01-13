@@ -37,6 +37,7 @@ def do_upgrade():
     run_sql("""
     INSERT IGNORE INTO collectiondetailedrecordpagetabs (id_collection, tabs)
     SELECT id, "files;references;keywords;plots;hepdata;holdings;comments;linkbacks;citations;usage;metadata"
+    FROM collection WHERE name = 'Books'
     """)
 
     # Insert the rest of the rules
