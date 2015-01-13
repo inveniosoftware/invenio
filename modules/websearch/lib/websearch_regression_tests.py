@@ -5038,11 +5038,7 @@ class WebSearchDetailedRecordTabsTest(InvenioTestCase):
         self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
                                                    expected_text='Plots',
                                                    unexpected_text='The server encountered an error'))
-    def test_detailed_record_holdings_tab(self):
-        """websearch - check detailed record holdings tab"""
-        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
-                                                   expected_text='Holdings',
-                                                   unexpected_text='The server encountered an error'))
+
     def test_detailed_record_linkback_tab(self):
         """websearch - check detailed record linkback tab"""
         self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/record/81/linkbacks',
