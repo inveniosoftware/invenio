@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -45,7 +45,7 @@ from invenio.config import CFG_SITE_SECURE_URL, CFG_BIBMATCH_FUZZY_WORDLIMITS, \
                            CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT
 from invenio.legacy.bibmatch.config import CFG_BIBMATCH_LOGGER, \
                                     CFG_LOGFILE
-from invenio.utils.connector import InvenioConnector, \
+from invenio_client import InvenioConnector, \
                                       InvenioConnectorAuthError
 from invenio.legacy.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \

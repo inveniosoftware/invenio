@@ -8,6 +8,7 @@
 
 -e git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer
 -e git+git://github.com/inveniosoftware/intbitset.git#egg=intbitset
+-e git+git://github.com/inveniosoftware/invenio-client.git#egg=invenio-client
 -e git+git://github.com/inveniosoftware/workflow.git#egg=workflow
 -e git+git://github.com/inveniosoftware/flask-sso.git#egg=flask-sso
 -e git+git://github.com/inveniosoftware/flask-menu.git#egg=flask-menu
