@@ -3737,11 +3737,14 @@ def get_name_variants_for_authors(authors):  # get_indexable_name_personids
     @return: real author name and the author identifiers which carry that name ((name, pids),)
     @rtype: tuple ((str, bytes),)
     '''
-    name_variants = run_sql("""select id, personids
-                               from aidDENSEINDEX
-                               where id in %s
-                               and flag=1"""
-                            % _get_sqlstr_from_set(authors))
+
+    name_variants = []
+    if len(authors):
+        name_variants = run_sql("""select id, personids
+                                from aidDENSEINDEX
+                                where id in %s
+                                and flag=1"""
+                                % _get_sqlstr_from_set(authors))
     authors = list()
     author_to_name_variants_mapping = dict()
     for author, names in name_variants:
