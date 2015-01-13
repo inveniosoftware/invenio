@@ -1,0 +1,146 @@
+{% extends "profile_page_template.html" %}
+
+{% block personal_details %}
+    {% if visible["personal_details"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Personal Details <small>(HepNames)</small></span>
+            </div>
+            <div class="bai-box-content" id="hepdata" data-box-source="hepnames"></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block citations_summary %}
+    {% if visible["citations_summary"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Citations Summary</span>
+            </div>
+            <div class="bai-box-content" id="citations" data-box-source="citations-summary">
+                {% if papers_num and citeable and published %}
+                {% include 'citations_summary.html'%}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block name_variants %}
+    {% if visible["name_variants"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Name Variants</span>
+            </div>
+            <div class="bai-box-content" id="name_variants" data-box-source="name-variants"></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block affiliations %}
+    {% if visible["name_variants"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Affiliations</span>
+            </div>
+            <div class="bai-box-content" id="affiliations" data-box-source="affiliations"></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block collaborations %}
+    {% if visible["collaborations"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Collaborations</span>
+            </div>
+            <div class="bai-box-content" id="collaborations" data-box-source="collaborations"></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block publications %}
+    {% if element_width["publication_box"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <ul class="pub-tabs">
+                    {% if visible["publications"] %}
+                        <li><a href="#internal-pubs" data-toggle="tab">Publications</a>
+                        </li>
+                    {% endif %}
+                    {% if visible["datasets"] %}
+                        <li><a href="#datasets" data-toggle="tab">Datasets</a>
+                        </li>
+                    {% endif %}
+                    {% if visible["external"] %}
+                        <li><a href="#external-pubs" data-toggle="tab">External</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="bai-box-content" id="pubs_list" data-box-source="publications-list">{% include 'publications_box.html' %}</div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block publications_graph %}
+    {% if visible["publications_graph"] %}
+        <div class="well well-small inspire-well">
+            <div class="bai-box-title">
+                <span>Publication Graph</span></div>
+            <div class="bai-box-content" id="pubs_graph" data-box-source="publications-graph"></div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block coauthors %}
+    {% if visible["coauthors"] %}
+        <div class={{'col-md-' + element_width["coauthors"]}}>
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Co-Authors</span>
+                </div>
+                <div class="bai-box-content" id="coauthors" data-box-source="co-authors"></div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block papers %}
+    {% if visible["papers"] %}
+        <div class={{'col-md-' + element_width["papers"]}}>
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Papers</span>
+                </div>
+                <div class="bai-box-content" id="combined_papers" data-box-source="papers-summary"></div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block subject_categories %}
+    {% if visible["subject_categories"] %}
+        <div class={{'col-md-' + element_width["subject_categories"]}}>
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Subject Categories</span>
+                </div>
+                <div class="bai-box-content" id="fieldcodes" data-box-source="subject-categories"></div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block frequent_keywords %}
+    {% if visible["frequent_keywords"] %}
+        <div class={{'col-md-' + element_width["frequent_keywords"]}}>
+            <div class="well well-small inspire-well">
+                <div class="bai-box-title">
+                    <span>Frequent Keywords</span>
+                </div>
+                <div class="bai-box-content" id="keywords" data-box-source="keywords"></div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

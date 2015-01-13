@@ -1,0 +1,21 @@
+<div id="debug_info">
+    <span class="bsw">
+        <table class="table table-striped">
+            <caption><h2>Debug Information</h2></caption>
+            <thead>
+                <tr>
+                <th>Key</th>
+                <th>Value</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for key, value in debug.iteritems() %}
+                <tr>
+                <td>{{ key|e}}</td>
+                <td>{{ value|e }}</td>
+                </tr>{% endfor %}
+            </tbody>
+        </table>
+    </span>
+</div>

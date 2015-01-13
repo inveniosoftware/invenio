@@ -892,7 +892,9 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibsort 7" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater -u admin" % CFG_PREFIX,
                 "%s/bin/oairepositoryupdater 8" % CFG_PREFIX,
-                "%s/bin/bibupload 9" % CFG_PREFIX,]:
+                "%s/bin/bibupload 9" % CFG_PREFIX,
+                "%s/bin/bibauthorid -u admin --update-personid" % CFG_PREFIX,
+                "%s/bin/bibauthorid 10" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -1186,6 +1188,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
@@ -1252,6 +1255,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
+        Alias /fonts/ %(webdir)s/fonts/
         Alias /flash/ %(webdir)s/flash/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/

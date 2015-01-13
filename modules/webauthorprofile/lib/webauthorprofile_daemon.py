@@ -22,7 +22,7 @@ WebAuthorProfile daemon
 """
 
 from sys import stdout
-import bibtask
+from invenio import bibtask
 from invenio.bibauthorid_dbinterface import get_existing_authors
 from invenio.webauthorprofile_dbapi import get_expired_person_ids
 from invenio.webauthorprofile_corefunctions import _compute_cache_for_person

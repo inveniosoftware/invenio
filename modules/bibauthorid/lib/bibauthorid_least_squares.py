@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import operator
 from itertools import izip, starmap, repeat
-#python2.4 compatibility
+# python2.4 compatibility
 from invenio.bibauthorid_general_utils import bai_all as all
+from functools import reduce
+
 
 def approximate(xs, ys, power):
     assert len(xs) == len(ys)
@@ -31,7 +33,8 @@ def approximate(xs, ys, power):
     xs = map(float, xs)
     ys = map(float, ys)
 
-    xs = reduce(lambda x, y: x + [list(starmap(operator.mul, izip(x[-1], y)))], repeat(xs, variables - 1), [[1] * len(xs)])
+    xs = reduce(lambda x, y: x + [list(starmap(operator.mul, izip(x[-1], y)))], repeat(
+        xs, variables - 1), [[1] * len(xs)])
     assert len(xs) == variables
 
     s = map(sum, xs)
@@ -83,6 +86,7 @@ def approximate(xs, ys, power):
 
 def to_function(poly):
     power = len(poly) - 1
+
     def func(x):
         arr = [1.]
         for _ in xrange(power):

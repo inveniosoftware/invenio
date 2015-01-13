@@ -1,0 +1,11 @@
+<span class="bsw">
+    <ul id="authorid_menu" class="nav nav-pills">
+    {% for item in menu %}
+        <li{{ ' class="active"' if item.active }}{{ ' class="disabled"' if item.disabled }}>
+            <a href="{{ url }}/{{ item.page }}{% if not item.static %}/{{ item.canonical_name }}{% endif %}">{{ item.text }}</a>
+        </li>
+    {% endfor %}
+
+
+    </ul>
+</span>

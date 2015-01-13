@@ -367,6 +367,9 @@ except ValueError:
     RE_ALLOWED_XML_1_0_CHARS = re.compile(u'[^\U00000009\U0000000A\U0000000D\U00000020-\U0000D7FF\U0000E000-\U0000FFFD]')
     RE_ALLOWED_XML_1_1_CHARS = re.compile(u'[^\U00000001-\U0000D7FF\U0000E000-\U0000FFFD]')
 
+def encode_for_jinja_and_xml(text, wash=False, xml_version='1.0', quote=False):
+    return encode_for_xml(text, wash, xml_version, quote).decode('utf-8')
+
 def wash_for_xml(text, xml_version='1.0'):
     """
     Removes any character which is not in the range of allowed
@@ -466,7 +469,7 @@ def decode_to_unicode(text, default_encoding='utf-8'):
     if detected_encoding == None:
         # No chardet detection, try to make a basic guess
         dummy, detected_encoding = guess_minimum_encoding(text)
-    return text.decode(detected_encoding)
+    return text.decode(detected_encoding, 'ignore')
 
 def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
                             (CFG_ETCDIR,)):

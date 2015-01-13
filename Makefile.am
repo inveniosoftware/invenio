@@ -157,19 +157,18 @@ install-jquery-plugins:
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
-	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
-	mv jquery-1.7.1.min.js jquery.min.js && \
-	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-        wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
-	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
-	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
-	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
+	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js -O jquery.min.js && \
+	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js -O jquery-ui.min.js && \
+	wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
+	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate -O jquery.form.js && \
+	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js -O jquery.MultiFile.pack.js && \
+	wget http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip -O jquery.tablesorter.zip && \
 	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
-	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
-	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
-	unzip jquery.tablesorter.zip -d tablesorter && \
-	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
-	unzip jquery.fileTree-1.01.zip && \
+	wget http://cdn.datatables.net/1.9.0/js/jquery.dataTables.min.js  -O jquery.dataTables.min.js && \
+	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip -O jquery.bookmark.package-1.4.0.zip && \
+	unzip -u jquery.tablesorter.zip -d tablesorter && \
+	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip -O jquery.fileTree-1.01.zip && \
+	unzip -u jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
 	wget http://invenio-software.org/download/jquery/ColVis.min.js && \
 	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \

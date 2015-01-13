@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
@@ -26,13 +26,13 @@ from invenio.bibauthorid_backinterface import get_bib10x, get_bib70x
 from invenio.bibauthorid_backinterface import get_author_to_confirmed_names_mapping
 from invenio.bibauthorid_backinterface import get_signatures_from_bibrefs
 from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
-from invenio.bibauthorid_general_utils import  bibauthor_print
+from invenio.bibauthorid_logutils import Logger
 
+logger = Logger("cluster_set")
 
-#python2.4 compatibility
-from invenio.bibauthorid_general_utils import bai_all as all
 
 class Blob(object):
+
     def __init__(self, personid_records):
         '''
         @param personid_records:
@@ -97,7 +97,9 @@ def group_blobs(blobs):
 
 
 class ClusterSet(object):
+
     class Cluster(object):
+
         def __init__(self, bibs, hate=None):
             # hate is a symetrical relation
             self.bibs = set(bibs)
@@ -231,7 +233,7 @@ def delayed_create_from_mark(bibrefs, last_name):
 
 def delayed_cluster_sets_from_marktables(limit_to_surnames=False):
     # { name -> [(table, bibref)] }
-    bibauthor_print('Delayed_cluster_set_from_marktables limited to %s' % str(limit_to_surnames))
+    logger.log('Delayed_cluster_set_from_marktables limited to %s' % str(limit_to_surnames))
 
     name_buket = {}
     if limit_to_surnames:
@@ -244,14 +246,14 @@ def delayed_cluster_sets_from_marktables(limit_to_surnames=False):
             continue
         name_buket[name] = name_buket.get(name, []) + [(tab, ref)]
 
-    bibauthor_print('Delayed_cluster_set_from_marktables going to get %s  signatures....' % str(len(name_buket)))
+    logger.log('Delayed_cluster_set_from_marktables going to get %s  signatures....' % str(len(name_buket)))
 
     all_refs = ((name, refs, len(list(get_signatures_from_bibrefs(refs))))
                 for name, refs in name_buket.items())
     all_refs = sorted(all_refs, key=itemgetter(2))
     return ([delayed_create_from_mark(set(refs), name) for name, refs, _ in all_refs],
-             map(itemgetter(0), all_refs),
-             map(itemgetter(2), all_refs))
+            map(itemgetter(0), all_refs),
+            map(itemgetter(2), all_refs))
 
 
 def create_lastname_list_from_personid(last_modification):
@@ -264,7 +266,7 @@ def create_lastname_list_from_personid(last_modification):
 
     # ((personid, last_name, Nbibs) ... )
     all_names = ((row[0], generate_last_name_cluster_str(iter(row[1]).next()), row[2])
-                  for row in all_names)
+                 for row in all_names)
 
     # { (last_name, [(personid)... ], Nbibs) ... }
     all_names = groupby(sorted(all_names, key=itemgetter(1)), key=itemgetter(1))

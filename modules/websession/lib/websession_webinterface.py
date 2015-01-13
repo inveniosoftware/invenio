@@ -853,7 +853,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'provider': (str, None),
             'action': (str, ''),
             'remember_me' : (str, ''),
-            'referer': (str, '')})
+            'referer': (str, '')
+        })
 
         if CFG_OPENAIRE_SITE:
             from invenio.config import CFG_OPENAIRE_PORTAL_URL
@@ -879,20 +880,38 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         uid = webuser.getUid(req)
 
         # If user has logged in to ORCID through oauth2, store his ORCID id
-        if uid > 0 and args['login_method'] == 'oauth2' and args['provider'] == 'orcid':
+        if args['login_method'] == 'oauth2' and args['provider'] == 'orcid':
+
             from invenio.bibauthorid_webapi import get_pid_from_uid, add_orcid_to_pid
 
-            CFG_EXTERNAL_AUTHENTICATION['oauth2'].auth_user(None, None, req)
+            CFG_EXTERNAL_AUTHENTICATION['oauth2'].auth_user(None, None, req, oauth_token_only=True)
 
-            pid = get_pid_from_uid(uid)
-            try:
-                orcid = str(req.g['oauth2_orcid'])
-            except KeyError:
+            if uid < 1:
+                pid = -1
+            else:
+                pid = get_pid_from_uid(uid)
+
+            session = get_session(req)
+            if 'pushorcid' in session and 'oauth2_access_token' in req.g:
+                session.pop('pushorcid', None)
+                session['oauth2_access_token'] = req.g['oauth2_access_token']
+                session['oauth2_orcid'] = req.g['oauth2_orcid']
+                session.dirty = True
+                return redirect_to_url(req, '%s/author/manage_profile/push_orcid_pubs' % (CFG_SITE_SECURE_URL))
+
+            if pid < 0 and 'orcid_pid' in session:
+                pid = session['orcid_pid']
+                session.pop('orcid_pid')
+            if pid >= 0:
+
+                try:
+                    orcid = str(req.g['oauth2_orcid'])
+                except KeyError:
+                    return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
+
+                add_orcid_to_pid(pid, orcid)
+
                 return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
-
-            add_orcid_to_pid(pid, orcid)
-
-            return redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_SECURE_URL, pid))
 
         # If user is already logged in, redirect it to referer or your account
         # page
@@ -926,6 +945,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
             args['remember_me'] = False
+
         if iden:
             uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
             uid2 = webuser.getUid(req)
@@ -935,6 +955,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                     navmenuid='youraccount')
 
             # login successful!
+
             try:
                 register_customevent("login", [req.remote_host or req.remote_ip, uid, args['p_un']])
             except:
@@ -1233,7 +1254,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 return form_html
 
     def oauth2(self, req, form):
-        args = wash_urlargd(form, {'provider': (str, '')})
+        args = wash_urlargd(form, {'provider': (str, ''),
+                                   'scope': (str, None)
+                                  })
+        #You can override default scope by adding parameter in you URL.
 
         # If either provider isn't activated or OAuth2 authentication is
         # disabled, redirect to login page.
@@ -1310,6 +1334,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         params = config.get('authorize_parameters', {})
         params['redirect_uri'] = '%s/youraccount/login?login_method=oauth2\
 &provider=%s' % (CFG_SITE_URL, args['provider'])
+        if args['scope']:
+            params['scope'] = args['scope']
         url = provider.get_authorize_url(**params)
 
         redirect_to_url(req, url)
@@ -1423,6 +1449,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         # Construct the authorization url.
         authorize_parameters = config.get('authorize_parameters', {})
+
         authorize_url = provider.get_authorize_url(request_token,
                                                     **authorize_parameters)
 

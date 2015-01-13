@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = dbexec dbdump inveniocfg plotextractor hepdataharvest bibtex
+bin_SCRIPTS = dbexec dbdump inveniocfg plotextractor hepdataharvest bibtex orcidpush
 
-EXTRA_DIST = dbexec.in dbdump.in inveniocfg.in plotextractor.in hepdataharvest.in bibtex.in
+EXTRA_DIST = dbexec.in dbdump.in inveniocfg.in plotextractor.in hepdataharvest.in bibtex.in orcidpush.in
 
 CLEANFILES = *~ *.tmp

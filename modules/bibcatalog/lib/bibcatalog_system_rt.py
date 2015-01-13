@@ -456,9 +456,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return None
+        username, passwd = None, None
         if uid:
             username, passwd = get_bibcat_from_prefs(uid)
-        else:
+        if username is None or not uid:
             username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
             passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")

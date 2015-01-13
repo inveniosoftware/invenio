@@ -2,7 +2,6 @@
 # import numpy in their setup.py, which means they have to be
 # installed in a second step.
 gnuplot-py==1.8
-h5py==2.0.1
 
 # Following packages are optional (if you do development you probably want to install them):
 pylint
@@ -12,7 +11,7 @@ selenium
 winpdb
 mock
 ipython
-cython
+cython==0.20.2
 nose
 nosexcover
 flake8
