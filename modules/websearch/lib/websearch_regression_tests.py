@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -5083,6 +5083,22 @@ class WebSearchResolveDOITest(InvenioTestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
+
+class WebSearchPatternLimitTest(InvenioTestCase):
+    """Checks for pattern-limit style of queries."""
+
+    def test_search_pattern_limit(self):
+        """websearch - search pattern limit style of queries"""
+        # query Ellis without any limit:
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
+                                               expected_text="[47, 18, 17, 16, 15, 14, 13, 12, 11, 10]"))
+        # query Ellis with a limit on reportnumber:
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&reportnumber=CERN-PPE-92-085&of=id',
+                                               expected_text="[17]"))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -5137,7 +5153,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchItemCountQueryTest,
                              WebSearchCustomCollectionBoxesName,
                              WebSearchDetailedRecordTabsTest,
-                             WebSearchResolveDOITest)
+                             WebSearchResolveDOITest,
+                             WebSearchPatternLimitTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
