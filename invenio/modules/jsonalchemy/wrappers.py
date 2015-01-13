@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -327,7 +327,7 @@ class SmartJson(SmartDict):
         raise NotImplementedError()
 
     def dumps(self, without_meta_metadata=False, with_calculated_fields=False,
-              clean=False, keywords=None):
+              clean=False, keywords=None, filter_hidden=False):
         """Create the JSON friendly representation of the current object.
 
         :param without_meta_metadata: by default ``False``, if set to ``True``
@@ -341,21 +341,28 @@ class SmartJson(SmartDict):
         :return: JSON friendly object
         """
         dict_ = copy.copy(self._dict)
-        if with_calculated_fields:
-            for key, value in six.iteritems(self._dict):
+        filter_keywords = keywords is not None and any(keywords)
+
+        if without_meta_metadata:
+            del dict_['__meta_metadata__']
+
+        # skip the dict iteration
+        if not any([clean, filter_keywords, filter_hidden,
+                    with_calculated_fields]):
+            return dict_
+
+        for key, value in six.iteritems(self._dict):
+            if (clean and key.startswith('_')) or (
+                    filter_keywords and key not in keywords) or (
+                    filter_hidden and self.meta_metadata.get(key, {}).get(
+                        'hidden', False)):
+                del dict_[key]
+                continue
+
+            if with_calculated_fields:
                 if value is None and \
                         self.meta_metadata[key]['type'] == 'calculated':
                     dict_[key] = self[key]
-        if without_meta_metadata:
-            del dict_['__meta_metadata__']
-        if clean:
-            for key in list(dict_.keys()):
-                if key.startswith('_'):
-                    del dict_[key]
-
-        # Filter keywords
-        if keywords is not None and any(keywords):
-            dict_ = dict(((k, v) for (k, v) in six.iteritems(dict_) if k in keywords))
 
         return dict_
 

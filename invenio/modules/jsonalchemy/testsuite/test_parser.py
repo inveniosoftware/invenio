@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -173,6 +173,18 @@ class TestParser(InvenioTestCase):
         Field_parser.reparse('testsuite')
         self.assertEquals(
             len(Field_parser.field_definitions('testsuite')), len(tmp))
+
+    def test_field_hidden_decorator(self):
+        """JsonAlchemy - field hidden decorator."""
+        # Check that all files are parsed
+        self.assertTrue(
+            'hidden_basic' in Field_parser.field_definitions('testsuite'))
+        # Check default hidden value
+        self.assertFalse(
+            Field_parser.field_definitions('testsuite')['_id']['hidden'])
+        # Check hidden field
+        self.assertTrue(Field_parser.field_definitions(
+            'testsuite')['hidden_basic']['hidden'])
 
     def test_wrong_field_name_inside_model(self):
         """JSONAlchmey - wrong field name inside model"""

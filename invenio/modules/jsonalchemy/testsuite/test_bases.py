@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -50,7 +50,7 @@ def clean_field_model_definitions():
     Model_parser._model_definitions = {}
 
 
-class TestVersionable(InvenioTestCase):
+class RegistryMixin(object):
 
     def setUp(self):
         clean_field_model_definitions()
@@ -68,6 +68,9 @@ class TestVersionable(InvenioTestCase):
         del self.app.extensions['registry']['testsuite.fields']
         del self.app.extensions['registry']['testsuite.models']
         del self.app.extensions['registry']['testsuite']
+
+
+class TestVersionable(RegistryMixin, InvenioTestCase):
 
     def test_versionable_base(self):
         """Versionable - model creation"""
@@ -120,7 +123,28 @@ class TestVersionable(InvenioTestCase):
         self.assertTrue(v1['_id'] in v_older['newer_version'])
 
 
-TEST_SUITE = make_test_suite(TestVersionable)
+class TestHidden(RegistryMixin, InvenioTestCase):
+
+    def test_dumps_hidden(self):
+        from invenio.modules.jsonalchemy.wrappers import SmartJson
+        from invenio.modules.jsonalchemy.reader import Reader
+
+        data = {'title': 'Test Title'}
+
+        document = Reader.translate(
+            data, SmartJson, master_format='json',
+            model='test_hidden', namespace='testsuite')
+
+        json = document.dumps()
+        self.assertTrue('title' in json)
+        self.assertTrue('hidden_basic' in json)
+
+        json = document.dumps(filter_hidden=True)
+        self.assertTrue('title' in json)
+        self.assertFalse('hidden_basic' in json)
+
+
+TEST_SUITE = make_test_suite(TestVersionable, TestHidden)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

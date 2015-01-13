@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -99,9 +99,10 @@ def _create_field_parser():
         json_id    ::= (letter|"_") (letter|digit|_)*
         aliases    ::= json_id ["," aliases]
 
-        pid        ::= @persitent_identifier( level )
+        pid        ::= @persistent_identifier( level )
         extend     ::= @extend
         override   ::= @override
+        hidden     ::= @hidden
 
         body       ::=(creator* | derived | calculated) (extensions)*
 
@@ -124,9 +125,13 @@ def _create_field_parser():
     extend = Keyword('@extend').suppress()\
         .setResultsName('extend')\
         .setParseAction(lambda toks: True)
+    hidden = Keyword('@hidden').suppress()\
+        .setResultsName('hidden')\
+        .setParseAction(lambda toks: True)
     rule_decorators = (Optional(persistent_identifier) &
                        Optional(override) &
-                       Optional(extend))
+                       Optional(extend) &
+                       Optional(hidden))
 
     # Field definition decorators
     field_decorators = Each(
@@ -418,6 +423,7 @@ class FieldParser(object):
 
             {key: { override: True/False,
                     extend: True/False,
+                    hidden: True/False,
                     aliases: [],
                     pid: num/None,
                     rules: {'master_format_1': [{rule1}, {rule2}, ...],
@@ -477,6 +483,7 @@ class FieldParser(object):
         rule_dict['pid'] = rule.pid if rule.pid is not '' else None
         rule_dict['override'] = rule.override if rule.override else False
         rule_dict['extend'] = rule.extend if rule.extend else False
+        rule_dict['hidden'] = rule.hidden if rule.hidden else False
         rule_dict['rules'] = rules
 
         if rule.override:
@@ -485,6 +492,8 @@ class FieldParser(object):
         elif rule.extend:
             self.__class__._field_definitions[self.__namespace][json_id][
                 'aliases'].extend(rule_dict['aliases'])
+            self.__class__._field_definitions[self.__namespace][json_id][
+                'hidden'] |= rule_dict['hidden']
             self.__class__._field_definitions[self.__namespace][json_id][
                 'extend'] = True
         else:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -153,7 +153,8 @@ class Reader(object):  # pylint: disable=R0921
 
     @classmethod
     def set(cls, json, field, value=None, set_default_value=False):
-        """
+        """Set new field value to json object.
+
         When adding a new field to the json object finds as much information
         about it as possible and attaches it to the json object inside
         ``json['__meta_metadata__'][field]``.
@@ -210,10 +211,11 @@ class Reader(object):  # pylint: disable=R0921
 
     @classmethod
     def process_model_info(cls, json):
-        """
+        """Process model information.
+
         Fetches all the possible information about the current models and
         applies all the model extensions `evaluate` methods if any extension is
-        used
+        used.
         """
         reader = cls(json, no_blob=True)
         reader._process_model_info()
@@ -221,19 +223,17 @@ class Reader(object):  # pylint: disable=R0921
     @classmethod
     def update_meta_metadata(cls, json, blob=None, fields=None, section=None,
                              keep_core_values=True, store_backup=True):
-        """
-        Updates the meta-metadata for a guiven set of fields (if ``None`` all
-        fields will be used).
+        """Update the meta-metadata for a guiven set of fields.
 
-
+        If it is ``None`` all fields will be used.
         """
         reader = cls(json, blob)
         reader._update_meta_metadata(fields, section, keep_core_values,
                                      store_backup)
 
     def _process_model_info(self):
-        """
-        Dummy method to guess the model of a given input.
+        """Dummy method to guess the model of a given input.
+
         Should be redefined in the dedicated readers.
 
         :return: List of models found in the blob
@@ -251,8 +251,8 @@ class Reader(object):  # pylint: disable=R0921
             ModelParser.parser_extensions()[key].evaluate(self._json, value)
 
     def _guess_model_from_input(self):
-        """
-        Dummy method to guess the model of a given input.
+        """Dummy method to guess the model of a given input.
+
         Should be redefined in the dedicated readers.
 
         :return: List of models found in the blob
@@ -260,23 +260,25 @@ class Reader(object):  # pylint: disable=R0921
         return ['__default__']
 
     def _prepare_blob(self, *args, **kwargs):
-        """
+        """Dummy method to prepare blob.
+
         Responsible of doing any kind of transformation over the blob before
-        the translation begins.
-        It should create a common structure that all the methods, specially
-        ``_get_elements_from_blob`` understand.
+        the translation begins. It should create a common structure that all
+        the methods, specially ``_get_elements_from_blob`` understand.
         """
         raise NotImplementedError()
 
     def _post_process_json(self):
-        """
+        """Dummy method to process json data.
+
         Responsible of doing any kind of transformation over the json structure
         after it is created, e.g. pruning the json to delete singletons.
         """
         pass
 
     def _get_elements_from_blob(self, regex_key):
-        """
+        """Dummy method to get elements from blob.
+
         Like ``get`` for a normal python dictionary but in this case it should
         handle 'entire_record' and '*' as key.
 
@@ -288,9 +290,9 @@ class Reader(object):  # pylint: disable=R0921
         raise NotImplementedError()
 
     def _unpack_rule(self, json_id, field_name=None):
-        """
-        From the field definitions extract the rules an tries to apply them to
-        fill up the current json.
+        """Extract the rules from the field definitions and try to apply them.
+
+        It applies the rules to the current json.
 
         :param json_id: key to access the field description in
             ``FieldParser.field_definitions``
@@ -398,10 +400,10 @@ class Reader(object):  # pylint: disable=R0921
                         "field '%s'. \n%s" % (field_name, str(e)),)
 
     def _set_default_value(self, json_id, field_name):
-        """Finds the default value inside the schema, if any"""
-        #FIXME check how to update default values for items in a list!
+        """Find the default value inside the schema, if any."""
+        # FIXME check how to update default values for items in a list!
         def set_default_value(field, schema):
-            """Helper function to allow subfield default values"""
+            """Helper function to allow subfield default values."""
             if 'default' in schema:
                 return schema['default']()
             elif 'schema' in schema:
@@ -436,7 +438,7 @@ class Reader(object):  # pylint: disable=R0921
                         exclude=['decorators', 'extensions'])
 
     def _set_default_type(self, json_id, field_name):
-        """Finds the default type inside the schema, if `force` is used."""
+        """Find the default type inside the schema, if `force` is used."""
         from .validator import Validator
 
         def set_default_type(field, schema):
@@ -478,7 +480,8 @@ class Reader(object):  # pylint: disable=R0921
 
     def _find_field_metadata(self, json_id, field_name,
                              field_type=None, field_def=None):
-        """
+        """Find field metadata and fill up needed meta-metadata.
+
         Given one field definition fills up the parallel dictionary with the
         needed meta-metadata, inlcuding field extensions and after decorators.
 
@@ -527,6 +530,7 @@ class Reader(object):  # pylint: disable=R0921
         info['timestamp'] = datetime.datetime.now().isoformat()
         info['pid'] = rule.get('pid', None)
         info['type'] = field_type
+        info['hidden'] = rule.get('hidden', False)
         if field_type in ('calculated', 'derived'):
             info['function'] = (json_id, 'rules', field_type, 0, 'function')
         elif field_type == 'UNKNOWN':
