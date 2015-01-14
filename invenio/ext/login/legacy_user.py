@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,6 +36,8 @@ CFG_USER_DEFAULT_INFO = {
     'agent': '',
     'uid': -1,
     'nickname': '',
+    'given_names': '',
+    'family_name': '',
     'email': '',
     'group': [],
     'guest': '1',
@@ -60,14 +62,15 @@ CFG_USER_DEFAULT_INFO = {
 
 class UserInfo(CombinedMultiDict, UserMixin):
     """
-    This provides legacy implementations for the methods that Flask-Login
-    and Invenio 1.x expects user objects to have.
+    Provide legacy implementation.
+
+    Methods that Flask-Login and Invenio 1.x expect user objects to have.
     """
 
     def __init__(self, uid=None, force=False):
-        """Retreave information about user."""
+        """Retrieve information about user."""
         def on_update(self):
-            """ Changes own status when the user info is modified. """
+            """Change own status when the user info is modified."""
             self.modified = True
 
         self.modified = False
@@ -88,12 +91,12 @@ class UserInfo(CombinedMultiDict, UserMixin):
         self.save()
 
     def get_key(self):
-        """Generates key for caching user information."""
+        """Generate key for caching user information."""
         key = 'current_user::' + str(self.uid)
         return key
 
     def get_acc_key(self):
-        """Generates key for caching autorizations."""
+        """Generate key for caching autorizations."""
         remote_ip = str(request.remote_addr) if has_request_context() else '0'
         return 'current_user::' + str(self.uid) + '::' + remote_ip
 
@@ -115,6 +118,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         self.save()
 
     def update_request_info(self):
+        """Update request information."""
         self.req = self._get_request_info()
 
     def _get_request_info(self):
@@ -164,6 +168,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
             user = User.query.get(uid)
             data['id'] = data['uid'] = user.id or -1
             data['nickname'] = user.nickname or ''
+            data['given_names'] = user.given_names or ''
+            data['family_name'] = user.family_name or ''
             data['email'] = user.email or ''
             data['note'] = user.note or ''
             data['group'] = map(lambda x: x.usergroup.name,
@@ -182,7 +188,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
         FIXME: compatibility layer only !!!
         """
-
         CFG_BIBAUTHORID_ENABLED = current_app.config.get(
             'CFG_BIBAUTHORID_ENABLED', False)
         # get autorization key
@@ -266,26 +271,33 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return data
 
     def is_authenticated(self):
+        """Check if user is authenticated."""
         return not self.is_guest
 
     def is_authorized(self, name, **kwargs):
+        """Check if user is authorized."""
         from invenio.modules.access.engine import acc_authorize_action
         return acc_authorize_action(self, name)[0] == 0
 
     def is_active(self):
+        """Check if user is active."""
         return not self.is_guest
 
     @property
     def is_guest(self):
+        """Check if user is guest."""
         return True if self['email'] == '' else False
 
     @property
     def is_admin(self):
+        """Check if user is admin."""
         return self.get('precached_useadmin', False)
 
     @property
     def is_super_admin(self):
+        """Check if user is super admin."""
         return self.get('precached_usesuperadmin', False)
 
     def get_id(self):
+        """Get user id."""
         return self.get('id', -1)

@@ -63,6 +63,8 @@ class User(db.Model):
     _password = db.Column(db.LargeBinary, name="password",
                           nullable=False)
     note = db.Column(db.String(255), nullable=True)
+    given_names = db.Column(db.String(255), nullable=True)
+    family_name = db.Column(db.String(255), nullable=True)
     settings = db.Column(db.MutableDict.as_mutable(db.MarshalBinary(
         default_value=get_default_user_preferences, force_type=dict)),
         nullable=True)
