@@ -74,7 +74,11 @@ In templates you can add a sign in/up link:
 """
 
 import copy
-from flask import session
+
+from flask import current_app, session
+from flask.ext.login import current_user
+
+from invenio.ext.sqlalchemy.utils import session_manager
 
 
 REMOTE_APP = dict(
@@ -120,14 +124,56 @@ def account_info(remote, resp):
     return account_info
 
 
+@session_manager
 def account_setup(remote, token):
     """Perform additional setup after user have been logged in."""
+    from invenio.modules.accounts.models import User, UserEXT
     from invenio.ext.sqlalchemy import db
     from ..handlers import token_session_key
 
+    from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+
+    import json
+    import requests
+
+    orcid = session.get(token_session_key(remote.name) +
+                        "_account_info").get("external_id")
+
     extra_data = {
-        "orcid": session.get(token_session_key(remote.name) +
-                             "_account_info").get("external_id")
+        "orcid": orcid
         }
     token.remote_account.extra_data = extra_data
-    db.session.commit()
+
+    try:
+        user = User.query.join(UserEXT).filter_by(id=orcid,
+                                                  method="orcid").one()
+    except (MultipleResultsFound, NoResultFound):
+        current_app.logger.exception("No user entry in userEXT.")
+
+    # Fill user full name if not already set
+    if user and not any([user.given_names, user.family_name]):
+        # Query ORCID to get the real name
+        request_url = 'http://orcid.org/{0}/orcid-bio'.format(orcid)
+
+        headers = {'Accept': 'application/orcid+json'}
+        response = requests.get(request_url, headers=headers)
+        code = response.status_code
+
+        if code == requests.codes.ok:
+            try:
+                orcid_bio = json.loads(response.content)
+            except ValueError:
+                current_app.logger.exception("Not valid JSON response from " +
+                                             "ORCID:\n {0}".format(repr(orcid_bio)))
+                return
+            try:
+                name = orcid_bio["orcid-profile"]["orcid-bio"]["personal-details"]
+                user.given_names = name["given-names"]["value"]
+                user.family_name = name["family-name"]["value"]
+            except KeyError:
+                current_app.logger.exception("Unexpected return format " +
+                                             "from ORCID:\n {0}".format(repr(orcid_bio)))
+                return
+            db.session.add(user)
+            # Refresh user cache
+            current_user.reload()
