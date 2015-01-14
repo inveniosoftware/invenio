@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -96,15 +96,13 @@ def get_cache(taxonomy_id):
         cache_path = _get_cache_path(onto_name)
 
         # if source exists and is newer than the cache hold in memory
-        if os.access(onto_path, os.R_OK) and\
-                os.path.getmtime(cache_path) > ctime:
+        if os.path.isfile(onto_path) and os.path.getmtime(onto_path) > ctime:
             log.info('Forcing taxonomy rebuild as cached'
                      ' version is newer/updated.')
             return {}  # force cache rebuild
 
         # if cache exists and is newer than the cache hold in memory
-        if os.access(cache_path, os.R_OK) and\
-                os.path.getmtime(cache_path) > ctime:
+        if os.path.isfile(cache_path) and os.path.getmtime(cache_path) > ctime:
             log.info('Forcing taxonomy rebuild as source'
                      ' file is newer/updated.')
             return {}
