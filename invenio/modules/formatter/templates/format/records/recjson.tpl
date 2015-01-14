@@ -1,6 +1,6 @@
 {#-
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,6 +19,6 @@
 {%- set sep = joiner(", ") -%}
 [
 {%- for recid in recids -%}
-    {{ sep() }}{{- get_record(recid).dumps(clean=True, keywords=ot)|tojson() -}}
+    {{ sep() }}{{- get_record(recid).dumps(clean=True, keywords=ot, filter_hidden=True)|tojson() -}}
 {%- endfor -%}
 ]
