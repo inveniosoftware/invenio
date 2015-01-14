@@ -96,7 +96,7 @@ def get_cache(taxonomy_id):
         cache_path = _get_cache_path(onto_name)
 
         # if source exists and is newer than the cache hold in memory
-        if os.access(onto_path, os.R_OK) and os.path.getmtime(cache_path) > ctime:
+        if os.access(onto_path, os.R_OK) and os.path.getmtime(onto_path) > ctime:
             log.info('Forcing taxonony rebuild as cached version is newer/updated.')
             return {} # force cache rebuild
 
