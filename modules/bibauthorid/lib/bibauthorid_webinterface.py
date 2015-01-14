@@ -713,6 +713,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'close_rt_ticket': (str, None),
                              'confirm': (str, None),
                              'delete_external_ids': (str, None),
+                             'email': (str, None),
                              'merge': (str, None),
                              'reject': (str, None),
                              'repeal': (str, None),
@@ -1206,6 +1207,10 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 email = ''
                 if 'user_email' in pinfo:
                     email = pinfo['user_email']
+                elif 'email' in argd:
+                    # the email was submitted in form
+                    email = argd['email']
+                    pinfo['form_email'] = email
 
                 selection_str = "&selection=".join(profiles_to_merge)
 
@@ -1727,9 +1732,15 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         shown_element_functions['button_gen'] = TEMPLATE.merge_profiles_button_generator()
         shown_element_functions['pass_status'] = 'True'
 
+        gFormEmail = ""
+        if 'form_email' in pinfo:
+            gFormEmail = pinfo['form_email']
+
         merge_page.add_bootstrapped_data(json.dumps({
-            "other": "var gMergeProfile = %s; var gMergeList = %s;" %
-            ([primary_cname, '1' if is_available else '0'], profiles_to_merge)
+            "other": ("var gMergeProfile = %s; var gMergeList = %s;" +
+            "var gUserLevel = '%s'; var gFormEmail = '%s';") %
+            ([primary_cname, '1' if is_available else '0'],
+             profiles_to_merge, pinfo['ulevel'], gFormEmail)
         }))
 
         body += self.search_box(search_param, shown_element_functions)
@@ -2994,7 +3005,14 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session = get_session(req)
         pinfo = session['personinfo']
         if not self._is_admin(pinfo):
-            webapi.connect_author_with_hepname(cname, hepname, session['uid'])
+            if 'email' in json_data:
+                pinfo['form_email'] = json_data['email']
+                webapi.connect_author_with_hepname(cname, hepname,
+                                                   session['uid'],
+                                                   email=json_data['email'])
+            else:
+                webapi.connect_author_with_hepname(cname, hepname,
+                                                   session['uid'])
         else:
             uid = getUid(req)
             add_cname_to_hepname_record(cname, hepname, uid)

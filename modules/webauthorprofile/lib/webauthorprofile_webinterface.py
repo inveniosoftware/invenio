@@ -398,13 +398,19 @@ class WebAuthorPages(WebInterfaceDirectory):
         profile_page = WebProfilePage("profile", webapi.get_longest_name_from_pid(self.person_id))
         profile_page.add_profile_menu(menu)
 
+        if 'form_email' in pinfo:
+            gFormEmail = pinfo['form_email']
+        else:
+            gFormEmail = ""
+
         profile_page.add_bootstrapped_data(json.dumps({
             "backbone": """
             (function(ticketbox) {
                 var app = ticketbox.app;
                 app.userops.set(%s);
                 app.bodyModel.set({userLevel: "%s"});
-            })(ticketbox);""" % (WebInterfaceAuthorTicketHandling.bootstrap_status(pinfo, "user"), ulevel)
+            })(ticketbox);""" % (WebInterfaceAuthorTicketHandling.bootstrap_status(pinfo, "user"), ulevel),
+            "other": "var gUserLevel = '%s'; var gFormEmail = '%s';" % (ulevel, gFormEmail)
         }))
 
         if debug:

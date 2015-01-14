@@ -87,6 +87,12 @@ var ticketbox = {
                     $confirmationPreview = $(".confirmation-preview");
 
                 $confirmationPreview.append($choice);
+                // see webauthorprofile_webinterface for definition of gUserLevel
+                if(gUserLevel == "guest"){
+                    $confirmationPreview.append('<br>You are about to submit a ticket. Please provide your e-mail address to confirm this action, so that we can contact you in case of questions.')
+                    $confirmationPreview.append('<input type="email" class="form-control" id="hepEmail" placeholder="Enter email">');
+                    $("#hepEmail").val(gFormEmail);
+                }
 
                 $confirmButton.click( function() {
                   var successCallback =
@@ -97,6 +103,9 @@ var ticketbox = {
                       cname: cname,
                       hepname: hepRecord
                   };
+
+                  if(gUserLevel == "guest")
+                      data['email'] = $('#hepEmail')[0].value;
 
                   anyCallback = function() {
                     $modal.find(".modal-footer>a.back").text("Close");
@@ -2395,6 +2404,8 @@ $(document).ready(function() {
         }
 
         if (typeof gMergeProfile !== 'undefined' ) {
+            // see bibauthorid_webinterface for definitions of gMergeProfile,
+            // gMergeList and gUserLevel.
             // initiate merge list's html from javascript/session
             $('#primaryProfile').parent().parent().replaceWith('<tr><td><img src=\"' + isProfileAvailable(gMergeProfile[1]).img_src +
              '\" title=\"' + isProfileAvailable(gMergeProfile[1]).message + '\"></td><td><a id=\"primaryProfile\" href=\"profile/' +
@@ -2418,6 +2429,7 @@ $(document).ready(function() {
             });
 
             $("form>#mergeButton").parent().on("submit", function(event) {
+
                 var bodyModel = ticketbox.app.bodyModel,
                     $form = $(this),
                     primaryCname = $form.find("input[name='primary_profile']").first().val(),
@@ -2430,7 +2442,19 @@ $(document).ready(function() {
                         var $confirmButton = $(e.currentTarget).find("a.confirm"),
                             $modal = $("#ticket-modal");
 
+                        if(gUserLevel == "guest"){
+                            // If user is not authenticated, ask for email
+                            $modal.find(".modal-body").append('You are about to submit a ticket. Please provide your e-mail address to confirm this action, so that we can contact you in case of questions.');
+                            $modal.find(".modal-body").append('<input type="email" class="form-control" id="mergeEmail" placeholder="Enter email">');
+                            $("#mergeEmail").val(gFormEmail);
+                        }
+
                         $confirmButton.click( function() {
+                            var email;
+                            if(gUserLevel == "guest")
+                                email = '&email=' + $('#mergeEmail')[0].value;
+                            else
+                                email = ""
                             $modal.find(".modal-body").html('<div id="spinDiv">' +
                             '<span id="hepSpin"></span></div>');
                             var spin = new Spinner({corners: 0.8}).spin().el;
@@ -2440,7 +2464,8 @@ $(document).ready(function() {
                             $modal.find(".modal-header>.modal-title").text("Please wait");
                             $.ajax({
                                 url: "/author/claim/action",
-                                data: $form.serialize(),
+                                // adding email manually
+                                data: $form.serialize() + email,
                                 success: function (data, status, jqXHR) {
                                     $modal.find(".modal-body").html("<p>Profile merge will be processed soon.</p>");
                                     $modal.find(".modal-header>.modal-title").text("Thank You");

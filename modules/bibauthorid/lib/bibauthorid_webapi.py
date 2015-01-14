@@ -3354,7 +3354,7 @@ def add_cname_to_hepname_record(cname, recid, uid=None):
     tmp_file.close()
     task_low_level_submission('bibupload', get_nickname(uid) or "", "-a", tmp_file_name, "-P5", "-N", "bibauthorid")
 
-def connect_author_with_hepname(cname, hepname, uid):
+def connect_author_with_hepname(cname, hepname, uid, email=None):
     subject = "HepNames record match: %s %s" % (cname, hepname)
 
     content = "Hello! Please connect the author profile "\
@@ -3364,7 +3364,9 @@ def connect_author_with_hepname(cname, hepname, uid):
                                                CFG_SITE_URL, hepname)
 
     requestor = get_email(uid)
-    if requestor == "guest":
+    if email:
+        requestor = email
+    elif requestor == "guest":
         requestor = CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL
 
     BIBCATALOG_SYSTEM.ticket_submit(uid=uid,
