@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -46,7 +46,8 @@ def format_element(bfo, detail='no'):
     if len(main_dicts):
         main_dict = main_dicts[0]
         main = stringify_dict(main_dict)
-        out += "<p>" + "<strong>" + _("Main %(x_name)s name",x_name="journal") + "</strong>" + ": " + main + "</p>"
+        ##out += "<p>" + "<strong>" + _("Main %s name") % _("journal") + "</strong>" + ": " + main + "</p>"
+        out += "<a href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
     # detail
     if detail.lower() == "yes":
         sees = [stringify_dict(see_dict) for see_dict in bfo.fields('430%%')]

@@ -5038,14 +5038,18 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if format == 'recstruct':
         return get_record(recID)
 
-    if format.startswith('recjson'):
+    #check from user information if the user has the right to see hidden fields/tags in the
+    #records as well
+    can_see_hidden = False
+    if user_info:
+        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
+
+    if format == 'recjson':
         import json
         from invenio.modules.records.api import get_record as get_recjson
-        if ot:
-            ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
-            return json.dumps(get_recjson(recID).dumps(keywords=ot))
-        else:
-            return json.dumps(get_recjson(recID).dumps())
+        ot = ot if ot and len(ot) else None
+        return json.dumps(get_recjson(recID).dumps(
+            keywords=ot, filter_hidden=not can_see_hidden))
 
     _ = gettext_set_language(ln)
 
@@ -5058,19 +5062,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     else:
         display_claim_this_paper = False
 
-
-
-
-    #check from user information if the user has the right to see hidden fields/tags in the
-    #records as well
-    can_see_hidden = False
-    if user_info:
-        can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
-
     can_edit_record = False
     if check_user_can_edit_record(user_info, recID):
         can_edit_record = True
-
 
     out = ""
 
@@ -5134,9 +5128,13 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             out += "%s" % decompress(res[0][0])
         elif ot:
             # field-filtered output was asked for; print only some fields
+            record = get_record(recID)
             if not can_see_hidden:
+                for tag in cfg['CFG_BIBFORMAT_HIDDEN_TAGS']:
+                    del record[tag]
                 ot = list(set(ot) - set(cfg['CFG_BIBFORMAT_HIDDEN_TAGS']))
-            out += record_xml_output(get_record(recID), ot)
+
+            out += record_xml_output(record, ot)
         else:
             # record 'recID' is not formatted in 'format' or we ask
             # for field-filtered output -- they are not in "bibfmt"
@@ -6380,13 +6378,18 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2), req=req)
         try:
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_unit_in_bibrec(datetext1, datetext2, dt),
-                                                          ap,
-                                                          aptext= _("No match within your time limits, "
-                                                                    "discarding this condition..."),
-                                                          of=of)
+            results_temp = intersect_results_with_hitset(
+                req,
+                results_final,
+                search_unit_in_bibrec(datetext1, datetext2, dt),
+                ap,
+                aptext= _("No match within your time limits, "
+                          "discarding this condition..."),
+                of=of)
+            if results_temp:
+                results_final.update(results_temp)
+            else:
+                results_final.clear()
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
@@ -6409,13 +6412,18 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying search pattern limit %s..." % cgi.escape(pl), req=req)
         try:
-            results_final = intersect_results_with_hitset(req,
-                                                          results_final,
-                                                          search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
-                                                          ap,
-                                                          aptext=_("No match within your search limits, "
-                                                                   "discarding this condition..."),
-                                                          of=of)
+            results_temp = intersect_results_with_hitset(
+                req,
+                results_final,
+                search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
+                ap,
+                aptext=_("No match within your search limits, "
+                         "discarding this condition..."),
+                of=of)
+            if results_temp:
+                results_final.update(results_temp)
+            else:
+                results_final.clear()
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):

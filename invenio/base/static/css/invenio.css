@@ -2,7 +2,7 @@
 * -*- mode: text; coding: utf-8; -*-
 
    This file is part of Invenio.
-   Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
+   Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 
    Invenio is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -4096,6 +4096,12 @@ a.author_orcid_image_link {
     background-image:url(orcid_icon_24.png);
     background-size: 16px 16px;
     text-decoration:none;
+}
+
+.author_usefull_link {
+width:auto;
+height:20px;
+margin-right:10px;
 }
 
 /* end of invenio.css */

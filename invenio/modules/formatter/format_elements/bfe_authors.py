@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -136,7 +136,12 @@ def format_element(bfo, limit, separator=' ; ',
                         if len(recIDs):
                             auth_coll_param = '&amp;c=' + \
                                 CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
-                    author['a'] = '<a href="' + CFG_BASE_URL + \
+                        author['a'] = '<a href="' + CFG_BASE_URL + \
+                        '/record/' + str(recIDs[0]) + \
+                        '?ln=' + bfo.lang + \
+                        '">' + escape(author['a']) + '</a>'
+                    else:
+                        author['a'] = '<a href="' + CFG_BASE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                         auth_coll_param + \
                                   '&amp;ln=' + bfo.lang + \

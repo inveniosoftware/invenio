@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ from invenio.legacy.search_engine import \
     perform_request_search, \
     get_record
 
-def format_element(bfo, detail='no'):
+def format_element(bfo, main_name='yes', detail='no'):
     """ Prints the data of an institute authority record in HTML. By default prints
     brief version.
 
@@ -47,9 +47,10 @@ def format_element(bfo, detail='no'):
     out = ""
     # brief
     main_dicts = bfo.fields('110%%')
-    if len(main_dicts):
+    if len(main_dicts) and main_name=='yes':
         main = main_dicts[0].get('a') or ""
-        out += "<p>" + "<strong>" + _("Main %(x_name)s name", x_name=_("institution")).encode('utf8') + "</strong>" + ": " + main + "</p>"
+        ##out += "<p style='margin-top:0px;margin-bottom:0px>" + "<strong>" + _("Main %s name") % _("institute") + "</strong>" + ": " + main + "</p>"
+        out += "<a href='" +"/record/"+ str(bfo.recID) +"?ln=" + bfo.lang + "' >" + main + "</a>"
     # detail
     if detail.lower() == "yes":
         sees = [see_dict['a'] for see_dict in bfo.fields('410%%') if 'a' in see_dict]

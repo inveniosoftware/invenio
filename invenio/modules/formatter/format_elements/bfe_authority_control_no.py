@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,10 @@
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
 
 from invenio.legacy.bibauthority.config import \
-    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
+    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME, \
+    CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
+    CFG_BIBAUTHORITY_RECORD_AUTHOR_CONTROL_NUMBER_FIELDS as control_number_fields, \
+    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_IDENTIFIER as authority_identifier
 from invenio.legacy.bibauthority.engine import \
     get_low_level_recIDs_from_control_no, \
     get_dependent_records_for_control_no
@@ -30,7 +33,7 @@ from invenio.legacy.bibauthority.engine import \
 __revision__ = "$Id$"
 
 def format_element(bfo):
-    """ Prints the control number of an author authority record in HTML. 
+    """ Prints the control number of an author authority record in HTML.
     By default prints brief version.
 
     @param brief: whether the 'brief' rather than the 'detailed' format
@@ -40,21 +43,21 @@ def format_element(bfo):
     from invenio.base.i18n import gettext_set_language
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
-    control_nos = [d['a'] for d in bfo.fields('035__')]
-    control_nos = filter(None, control_nos) # fastest way to remove empty ""s
-        
+    control_nos = [d['a'] for d in bfo.fields('035__') if d.get('a')]
+    control_nos.extend([d['a'] for d in bfo.fields('970__') if d.get('a')])
+
+    authority_type = [d.get('a') for d in bfo.fields('980__') if d.get('a') and d.get('a')!=authority_identifier]
+    if authority_type and type(authority_type) is list:
+        authority_type = authority_type[0]
+
+    related_control_number_fields = ['510','970']
+    related_control_number_fields.extend(control_number_fields.get(authority_type,[]))
     control_nos_formatted = []
     for control_no in control_nos:
-#        recIDs = []
-#        types = guess_authority_types(bfo.recID)
-#        # control_no example: AUTHOR:(CERN)aaa0005"
-#        control_nos = [(type + CFG_BIBAUTHORITY_PREFIX_SEP + control_no) for type in types]
-#        for control_no in control_nos:
-#            recIDs.extend(list(search_pattern(p='"' + control_no + '"')))
         recIDs = get_dependent_records_for_control_no(control_no)
         count = len(recIDs)
         count_string = str(count) + " dependent records"
-        
+        from urllib import quote
         # if we have dependent records, provide a link to them
         if count:
             prefix_pattern = "<a href='" + CFG_SITE_URL + "%s" + "'>"
@@ -62,37 +65,39 @@ def format_element(bfo):
             url_str = ''
             # we have multiple dependent records
             if count > 1:
-                # joining control_nos might be more helpful for the user 
+                # joining control_nos might be more helpful for the user
                 # than joining recIDs... or maybe not...
-#                p_val = '"' + '" or "'.join(control_nos) + '"' # more understandable for the user
-                p_val = "recid:" + ' or recid:'.join([str(recID) for recID in recIDs]) # more efficient
-                # include "&c=" parameter for bibliographic records 
+                parameters = []
+                for control_number_field in related_control_number_fields:
+                    parameters.append(control_number_field + ":" + control_no )
+                p_val = quote(" or ".join(parameters))
+                # include "&c=" parameter for bibliographic records
                 # and one "&c=" parameter for authority records
                 url_str = \
                     "/search" + \
                     "?p=" + p_val + \
-                    "&c=" + CFG_SITE_NAME + \
+                    "&c=" + quote(CFG_SITE_NAME) + \
                     "&c=" + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
                     "&sc=1" + \
                     "&ln=" + bfo.lang
             # we have exactly one dependent record
             elif count == 1:
                 url_str = "/record/" + str(recIDs[0])
-            
+
             prefix = prefix_pattern % (url_str)
             count_string = prefix + count_string + postfix
         #assemble the html and append to list
         html_str = control_no + " (" + count_string + ")"
-        
+
         # check if there are more than one authority record with the same
-        # control number. If so, warn the user about this inconsistency. 
+        # control number. If so, warn the user about this inconsistency.
         # TODO: hide this warning from unauthorized users
         my_recIDs = get_low_level_recIDs_from_control_no(control_no)
         if len(my_recIDs) > 1:
             url_str = \
                     "/search" + \
-                    "?p=" + "recid:" + 'or recid:'.join([str(_id) for _id in my_recIDs]) + \
-                    "&c=" + CFG_SITE_NAME + \
+                    "?p=" + CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD + ":" + control_no + \
+                    "&c=" + quote(CFG_SITE_NAME) + \
                     "&c=" + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
                     "&sc=1" + \
                     "&ln=" + bfo.lang
@@ -102,13 +107,15 @@ def format_element(bfo):
                 '<a href="' + url_str + '">more than one authority record</a> ' + \
                 'with this Control Number)' + \
                 '</span>'
-        
+
         control_nos_formatted.append(html_str)
-    
+
     title = "<strong>" + _("Control Number(s)") + "</strong>"
-    content = ", ".join(control_nos_formatted) \
-        or "<strong style='color:red'>Missing !</strong>"
-    
+    if control_nos_formatted:
+        content = "<ul><li>" + "</li><li> ".join(control_nos_formatted) + "</li></ul>"
+    else:
+        content = "<strong style='color:red'>Missing !</strong>"
+
     return "<p>" + title + ": " + content + "</p>"
 
 def escape_values(bfo):

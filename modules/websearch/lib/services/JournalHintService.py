@@ -25,7 +25,7 @@ from invenio.websearch_services import SearchService
 from invenio.config import (CFG_SITE_URL,
                             CFG_SITE_LANG)
 from invenio.messages import gettext_set_language
-from invenio.search_engine import perform_request_search, print_record
+from invenio.legacy.search_engine import perform_request_search, print_record
 from invenio.webuser import collect_user_info
 from urllib import urlencode
 import re
