@@ -23,7 +23,6 @@ from intbitset import intbitset
 
 from invenio.base.globals import cfg
 from invenio.legacy.miscutil.data_cacher import DataCacher, DataCacherProxy
-from invenio.modules.search.engine import search_unit_in_idxphrases
 from invenio.utils.memoise import memoize
 
 from .models import Collection, Collectionname
@@ -73,6 +72,8 @@ class CollectionRecListDataCacher(DataCacher):
 
     def __init__(self):
         def cache_filler():
+            from invenio.modules.search.searchext.engines.native import \
+                search_unit_in_idxphrases
             collections = Collection.query.all()
             setattr(get_all_recids, 'cache', dict())
             setattr(get_collection_nbrecs, 'cache', dict())
@@ -93,6 +94,9 @@ collection_reclist_cache = DataCacherProxy(CollectionRecListDataCacher)
 
 def get_collection_reclist(coll, recreate_cache_if_needed=True):
     """Return hitset of recIDs that belong to the collection 'coll'."""
+    from invenio.modules.search.searchext.engines.native import \
+        search_unit_in_idxphrases
+
     if recreate_cache_if_needed:
         collection_reclist_cache.recreate_cache_if_needed()
     if coll not in collection_reclist_cache.cache:

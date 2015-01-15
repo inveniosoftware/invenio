@@ -25,11 +25,8 @@ from flask_login import current_user
 from invenio_query_parser.parser import Main
 from werkzeug.utils import cached_property
 
-from .cache import get_results_cache, set_results_cache
-from .utils import get_records_that_can_be_displayed
 from .walkers.terms import Terms
 from .walkers.match_unit import MatchUnit
-from .walkers.search_unit import SearchUnit
 
 
 class SearchEngine(object):
@@ -51,16 +48,8 @@ class SearchEngine(object):
     def search(self, user_info=None, collection=None):
         """Search records."""
         user_info = user_info or current_user
-        results = get_results_cache(self._query, collection)
-        if results is None:
-            results = self.query.accept(SearchUnit())
-            set_results_cache(results, self._query, collection)
-
-        return get_records_that_can_be_displayed(
-            user_info.get('precached_permitted_restricted_collections', []),
-            hitset_in_any_collection=results,
-            current_coll=collection
-        )
+        from .searchext.engines.native import search
+        return search(self, user_info=user_info, collection=collection)
 
     def match(self, record, user_info=None):
         """Return True if record match the query."""
