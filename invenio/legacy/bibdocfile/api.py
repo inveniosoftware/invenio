@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2148,8 +2148,7 @@ class BibDoc(object):
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-        run_sql('INSERT INTO hstDOCUMENT(action, docname, docformat, docversion, docsize, docchecksum, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, %s, %s, %s, %s, %s, NOW())',
-                ('', self.doctype, self.get_latest_version(), self.get_total_size_latest_version(), '', self.id, ))
+        run_sql('INSERT INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
         run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
         del self._docfiles
         del self.id

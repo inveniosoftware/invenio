@@ -55,7 +55,7 @@ def register_page_view_event(recid, uid, client_ip_address):
         # do not register access if we are in read-only access control
         # site mode:
         return []
-    return run_sql("INSERT DELAYED INTO rnkPAGEVIEWS " \
+    return run_sql("INSERT INTO rnkPAGEVIEWS " \
                    " (id_bibrec,id_user,client_host,view_time) " \
                    " VALUES (%s,%s,INET_ATON(%s),NOW())", \
                    (recid, uid, client_ip_address))

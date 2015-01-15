@@ -2063,7 +2063,7 @@ def toggle_comment_visibility(uid, comid, collapse, recid):
         params = (comid,)
         res = run_sql(query, params)
         if res:
-            query = """INSERT DELAYED IGNORE INTO cmtCOLLAPSED (id_bibrec, id_cmtRECORDCOMMENT, id_user)
+            query = """INSERT IGNORE INTO cmtCOLLAPSED (id_bibrec, id_cmtRECORDCOMMENT, id_user)
                               VALUES (%s, %s, %s)"""
             params = (res[0][0], comid, uid)
             run_sql(query, params)
