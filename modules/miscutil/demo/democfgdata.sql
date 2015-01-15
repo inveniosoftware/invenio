@@ -96,7 +96,6 @@ INSERT INTO collectiondetailedrecordpagetabs VALUES (29, 'files;references;keywo
 INSERT INTO collectiondetailedrecordpagetabs VALUES (30, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (31, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (32, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (33, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (34, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (35, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (36, 'files;references;keywords;plots;hepdata;comments;linkbacks;citations;usage;metadata');
