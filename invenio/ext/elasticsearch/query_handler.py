@@ -51,8 +51,8 @@ class QueryHandler(object):
             }
 
         # apply aggegation for facets
-        dsl_query["aggs"] = es_config.aggs
-        dsl_query["highlight"] = es_config.highlight
+        dsl_query["aggs"] = es_config.get_records_facets_config()
+        dsl_query["highlight"] = es_config.get_records_highlights_config()
         dsl_query["_source"] = es_config.should_return_source
         return dsl_query
 

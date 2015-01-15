@@ -142,8 +142,6 @@ class ElasticSearchWrapper(object):
             # mapping for records
             self.create_mapping(index, self.records_doc_type)
 
-            # mapping for documents
-            self.create_mapping(index, self.documents_doc_type)
             return True
         except:
             raise
@@ -151,15 +149,10 @@ class ElasticSearchWrapper(object):
 
     def create_mapping(self, index, doc_type):
         from invenio.ext.elasticsearch.config import es_config
-        mapping_cfg = es_config.mappings
-        try:
-            type_mapping = {str(doc_type): mapping_cfg.get(doc_type)}
-        except KeyError:
-            print "No such doc_type in cfg"
-            return False
+        mapping_cfg = es_config.get_records_fields_config()
         try:
             self.connection.put_mapping(index=index, doc_type=doc_type,
-                                        mapping=type_mapping)
+                                        mapping=mapping_cfg)
         except:
             return False
         return True
