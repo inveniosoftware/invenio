@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1230,6 +1230,8 @@ NameVirtualHost %(vhost_ip_address)s:%(vhost_site_secure_url_port)s
 %(ssl_pem_directive)s
 %(ssl_crt_directive)s
 %(ssl_key_directive)s
+%(ssl_protocol_directive)s
+%(ssl_cipher_directive)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -1289,6 +1291,12 @@ WSGIRestrictStdout Off
        'ssl_key_directive': ssl_pem_directive_needed and \
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
+       'ssl_protocol_directive': ssl_pem_directive_needed and \
+                            'SSLProtocol all -SSLv2 -SSLv3' or \
+                            '#SSLProtocol all -SSLv2 -SSLv3',
+       'ssl_cipher_directive': ssl_pem_directive_needed and \
+                            'SSLCipherSuite HIGH:MEDIUM:!ADH' or \
+                            '#SSLCipherSuite HIGH:MEDIUM:!ADH',
        'xsendfile_directive': xsendfile_directive,
        'directory_www_directive': directory_www_directive,
        'directory_wsgi_directive': directory_wsgi_directive,
