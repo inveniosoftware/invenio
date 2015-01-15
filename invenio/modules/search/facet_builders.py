@@ -34,7 +34,6 @@ from .cache import (
     get_search_results_cache_key_from_qid,
     search_results_cache,
 )
-from .engine import search_unit
 from .models import Field
 from .utils import (
     get_most_popular_field_values,
@@ -150,6 +149,7 @@ class FacetBuilder(object):
 
     def get_value_recids(self, value):
         """Return record ids in intbitset for given field value."""
+        from .searchext.engines.native import search_unit
         if isinstance(value, unicode):
             value = value.encode('utf8')
         return search_unit(p=value, f=self.name, m='e')

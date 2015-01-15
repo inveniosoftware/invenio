@@ -20,7 +20,6 @@
 """Search engine implementation."""
 
 import re
-import six
 import zlib
 
 from flask import current_app
@@ -31,16 +30,32 @@ from invenio.modules.indexer.models import IdxINDEX
 from invenio.modules.indexer.utils import field_tokenizer_cache
 from invenio.modules.records import models
 from invenio.modules.records.models import Record
+from invenio.modules.search.cache import get_results_cache, set_results_cache
+from invenio.modules.search.errors import InvenioWebSearchWildcardLimitError
+from invenio.modules.search.models import Field
+from invenio.modules.search.registry import units
+from invenio.modules.search.walkers.search_unit import SearchUnit
 from invenio.utils.serializers import deserialize_via_marshal
-
-from .errors import InvenioWebSearchWildcardLimitError
-from .models import Field
-from .registry import units
 
 re_word = re.compile(r'[\s]')
 
 
-def search_unit(p, f=None, m='a', wl=0, ignore_synonyms=None):
+def search(self, user_info=None, collection=None):
+    """FIXME new API."""
+    from invenio.modules.search.utils import get_records_that_can_be_displayed
+    results = get_results_cache(self._query, collection)
+    if results is None:
+        results = self.query.accept(SearchUnit())
+        set_results_cache(results, self._query, collection)
+
+    return get_records_that_can_be_displayed(
+        user_info.get('precached_permitted_restricted_collections', []),
+        hitset_in_any_collection=results,
+        current_coll=collection
+    )
+
+
+def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     """Search for basic search unit.
 
     The search unit is defined by pattern 'p' and field 'f' and matching type
@@ -107,7 +122,7 @@ def search_unit(p, f=None, m='a', wl=0, ignore_synonyms=None):
         f=f, p=p, m=m))
     # look up hits:
     if f in units:
-        hitset = units[f](p, f, m, wl)
+        hitset = units[f](p, f, m or 'a', wl)
     elif m == 'a' or m == 'r' or f == 'subject' or (
             f and len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit()):
         # we are doing either phrase search or regexp search
@@ -116,11 +131,11 @@ def search_unit(p, f=None, m='a', wl=0, ignore_synonyms=None):
             if m == 'a' and index_id in IdxINDEX.get_idxpair_field_ids():
                 # for exact match on the admin configured fields
                 # we are searching in the pair tables
-                hitset = search_unit_in_idxpairs(p, f, m, wl)
+                hitset = search_unit_in_idxpairs(p, f, m or 'a', wl)
             else:
-                hitset = search_unit_in_idxphrases(p, f, m, wl)
+                hitset = search_unit_in_idxphrases(p, f, m or 'a', wl)
         else:
-            hitset = search_unit_in_bibxxx(p, f, m, wl)
+            hitset = search_unit_in_bibxxx(p, f, m or 'a', wl)
     else:
         # we are doing bibwords search by default
         hitset = search_unit_in_bibwords(p, f, wl=wl)
@@ -129,40 +144,6 @@ def search_unit(p, f=None, m='a', wl=0, ignore_synonyms=None):
     hitset |= hitset_synonyms
     hitset |= hitset_cjk
     return hitset
-
-
-def match_unit(record, p, f=None, m='a', wl=None):
-    """Match record to basic match unit."""
-    from invenio.modules.jsonalchemy.parser import guess_legacy_field_names
-    from invenio.legacy.bibindex.engine_utils import get_field_tags
-
-    if record is None:
-        return p is None
-
-    if f is not None:
-        fields = (get_field_tags(f, 'nonmarc') +
-                  guess_legacy_field_names(f, 'marc', 'recordext')[f] + [f])
-        for field in fields:
-            if field not in record:
-                continue
-            if match_unit(record[field], p, f=None, m=m, wl=None):
-                return True
-        return False
-
-    # compile search value only once for non exact search
-    if m != 'e' and isinstance(p, six.string_types):
-        p = re.compile(p)
-
-    if isinstance(record, list):
-        return any([match_unit(field, p, f=f, m=m, wl=wl)
-                    for field in record])
-    elif isinstance(record, dict):
-        return any([match_unit(field, p, f=f, m=m, wl=wl)
-                    for field in record.values()])
-
-    if m == 'e':
-        return str(record) == p
-    return p.search(str(record)) is not None
 
 
 def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):

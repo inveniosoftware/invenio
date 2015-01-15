@@ -77,7 +77,7 @@ except ImportError:
     CFG_BIBSORT_DEFAULT_FIELD = 'latest first'
     CFG_BIBSORT_DEFAULT_FIELD_ORDER = 'd'
 
-from invenio.modules.search.engine import search_unit
+from invenio.modules.search.searchext.engines.native import search_unit
 from invenio.modules.search.utils import get_most_popular_field_values
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
@@ -329,7 +329,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
     return results
 
 
-from invenio.modules.search.engine import *
+from invenio.modules.search.searchext.engines.native import *
 
 
 def guess_primary_collection_of_a_record(recID):

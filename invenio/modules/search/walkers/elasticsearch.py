@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,9 +17,8 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implement AST vistor."""
+"""Implement AST convertor to Elastic Search DSL."""
 
-from intbitset import intbitset
 from invenio_query_parser.ast import (
     AndOp, KeywordOp, OrOp,
     NotOp, Keyword, Value,
@@ -30,12 +29,10 @@ from invenio_query_parser.ast import (
 )
 from invenio_query_parser.visitor import make_visitor
 
-from ..searchext.engines.native import search_unit
 
+class ElasticSearchDSL(object):
 
-class SearchUnit(object):
-
-    """Implement visitor using ``search_unit`` API."""
+    """Implement visitor to create Elastic Search DSL."""
 
     visitor = make_visitor()
 
@@ -43,54 +40,77 @@ class SearchUnit(object):
 
     @visitor(AndOp)
     def visit(self, node, left, right):
-        return left & right
+        return {'bool': {'must': [left, right]}}
 
     @visitor(OrOp)
     def visit(self, node, left, right):
-        return left | right
+        return {'bool': {'should': [left, right]}}
 
     @visitor(NotOp)
     def visit(self, node, op):
-        return intbitset(trailing_bits=1) - op
+        return {'bool': {'must_not': [op]}}
 
     @visitor(KeywordOp)
     def visit(self, node, left, right):
-        if isinstance(right, intbitset):  # second level operator
-            left.update(dict(p=right))
-        else:
-            left.update(right)
-        return search_unit(**left)
+        if callable(right):
+            return right(left)
+        raise RuntimeError("Not supported second level operation.")
 
     @visitor(ValueQuery)
     def visit(self, node, op):
-        return search_unit(**op)
+        return op('_all')
 
     @visitor(Keyword)
     def visit(self, node):
-        return dict(f=node.value)
+        # FIXME add mapping
+        return node.value
 
     @visitor(Value)
     def visit(self, node):
-        return dict(p=node.value)
+        return lambda keyword: {
+            'multi_match': {
+                'query': node.value,
+                'fields': [keyword]
+            }
+        }
 
     @visitor(SingleQuotedValue)
     def visit(self, node):
-        return dict(p=node.value, m='p')
+        return lambda keyword: {
+            'multi_match': {
+                'query': node.value,
+                'type': 'phrase',
+                'fields': [keyword]
+            }
+        }
 
     @visitor(DoubleQuotedValue)
     def visit(self, node):
-        return dict(p=node.value, m='e')
+        return lambda keyword: {
+            'term': {keyword: node.value}
+        }
 
     @visitor(RegexValue)
     def visit(self, node):
-        return dict(p=node.value, m='r')
+        return lambda keyword: {
+            'regexp': {keyword: node.value}
+        }
 
     @visitor(RangeOp)
     def visit(self, node, left, right):
-        return dict(p="%s->%s" % (left, right))
+        condition = {}
+        if left:
+            condition['gte'] = left
+        if right:
+            condition['lte'] = right
+        return lambda keyword: {
+            'range': {keyword: condition}
+        }
 
     @visitor(EmptyQuery)
     def visit(self, node):
-        return intbitset(trailing_bits=1)
+        return {
+            "match_all": {}
+        }
 
     # pylint: enable=W0612,E0102
