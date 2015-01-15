@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-## Invenio OAI repository unit tests.
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,12 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Unit tests for the oai repository."""
-
-__revision__ = "$Id$"
-
+"""Unit tests for the OAI-PMH repository."""
 
 import re
+from xml.etree import ElementTree as ET
 from six import StringIO
 
 from invenio.base.wrappers import lazy_import
@@ -47,6 +44,41 @@ class TestVerbs(InvenioTestCase):
         self.assertNotEqual(None, re.search("ListMetadataFormats", oai_repository_server.oai_list_metadata_formats({'verb': 'ListMetadataFormats'})))
         self.assertNotEqual(None, re.search("ListSets", oai_repository_server.oai_list_sets({'verb': 'ListSets'})))
         self.assertNotEqual(None, re.search("GetRecord", oai_repository_server.oai_get_record({'identifier': 'oai:atlantis.cern.ch:1', 'verb': 'GetRecord'})))
+
+    def test_metadataprefix_namespace(self):
+        """Test for schema and namespaces."""
+        elem = ET.fromstring(
+            oai_repository_server.oai_list_metadata_formats(
+                {'verb': 'ListMetadataFormats'}
+            )).find(
+                '{http://www.openarchives.org/OAI/2.0/}ListMetadataFormats'
+            )
+
+        formats = dict()
+        for n in elem:
+            ns = n.find(
+                '{http://www.openarchives.org/OAI/2.0/}metadataNamespace').text
+            prefix = n.find(
+                '{http://www.openarchives.org/OAI/2.0/}metadataPrefix').text
+            schema = n.find(
+                '{http://www.openarchives.org/OAI/2.0/}schema').text
+            formats[prefix] = (ns, schema)
+
+        assert 'oai_dc' in formats
+        self.assertEqual(
+            formats['oai_dc'][0], 'http://purl.org/dc/elements/1.1/'
+        )
+        self.assertEqual(
+            formats['oai_dc'][1], 'http://www.openarchives.org/OAI/1.1/dc.xsd'
+        )
+        assert 'marcxml' in formats
+        self.assertEqual(
+            formats['marcxml'][0], 'http://www.loc.gov/MARC21/slim'
+        )
+        self.assertEqual(
+            formats['marcxml'][1],
+            'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd'
+        )
 
 
 class TestErrorCodes(InvenioTestCase):
