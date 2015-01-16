@@ -22,6 +22,7 @@ class ElasticSearchWrapper(object):
         self.records_doc_type = "records"
         self.documents_doc_type = "documents"
 
+        self.enhancer = None
         if app is not None:
             self.init_app(app)
 
@@ -48,18 +49,13 @@ class ElasticSearchWrapper(object):
 
         app.extensions['elasticsearch'] = self
 
-    @cached_property
-    def connection(self):
-        """Return a pyelasticsearch connection object."""
-        return PyElasticSearch(self.app.config['ELASTICSEARCH_URL'])
-
     def set_query_handler(self, handler):
         """
         Specify a function to convert the invenio query into a ES query.
 
         :param handler: [function] take a query[string] parameter
         """
-        self.process_query = handler
+        self.query_handler = handler
 
     def set_results_handler(self, handler):
         """
@@ -69,7 +65,16 @@ class ElasticSearchWrapper(object):
 
         :param handler: [function] take a query[string] parameter
         """
-        self.process_results = handler
+        self.results_handler = handler
+
+    def set_enhancer(self, enhancer):
+        self.enhancer = enhancer
+
+    @cached_property
+    def connection(self):
+        """Return a pyelasticsearch connection object."""
+        return PyElasticSearch(self.app.config['ELASTICSEARCH_URL'])
+
 
     @property
     def status(self):

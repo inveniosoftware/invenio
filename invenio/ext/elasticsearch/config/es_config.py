@@ -25,6 +25,7 @@ should_return_source = False
 
 ################ Fields ###############
 
+
 def get_records_fields_config():
     """Mapping for records."""
     fields = FieldParser.field_definitions('recordext')

@@ -1,3 +1,5 @@
+""" Elasticsearch extension for Invenio."""
+
 from backend import ElasticSearchWrapper
 from query_handler import QueryHandler
 from results_handler import ResultsHandler
@@ -32,14 +34,13 @@ def setup_app(app):
     es = ElasticSearchWrapper(app)
 
     # initiate the query handler
-    es.query_handler = QueryHandler()
+    es.set_query_handler(QueryHandler())
 
     # initiate the results handler
-    es.results_handler = ResultsHandler()
+    es.set_results_handler(ResultsHandler())
 
     # initiate the enhancer FIXME initiate it here
-    # es.enhancer = Enhancer()
-    es.enhancer = None
+    # es.set_enhancer(Enhancer())
 
     packages = app.extensions["registry"]["packages"]
     packages.register("invenio.ext.elasticsearch")
@@ -48,5 +49,5 @@ def setup_app(app):
     from invenio.base.scripts.database import recreate, drop, create
     signals.pre_command.connect(drop_index, sender=drop)
     signals.post_command.connect(create_index, sender=create)
-    signals.pre_command.connect(drop_index, sender=drop)
+    signals.pre_command.connect(drop_index, sender=recreate)
     signals.post_command.connect(create_index, sender=recreate)
