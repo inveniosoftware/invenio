@@ -157,27 +157,26 @@ install-jquery-plugins:
 	mkdir -p ${prefix}/var/www/js
 	mkdir -p $(prefix)/var/www/css
 	(cd ${prefix}/var/www/js && \
-	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
-	mv jquery-1.7.1.min.js jquery.min.js && \
-	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-        wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
-	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
-	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
+	wget -O jquery.min.js http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
+	wget -N http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
+	wget -O jquery.jeditable.mini.js http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js && \
+	wget -N https://raw.githubusercontent.com/malsup/form/3.51/jquery.form.js --no-check-certificate && \
+	wget -N http://jquery-multifile-plugin.googlecode.com/svn-history/r54/trunk/jquery.MultiFile.pack.js
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
-	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
-	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
-	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
+	wget -O uploadify.zip http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip && \
+	wget -N http://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip -d tablesorter && \
-	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
+	wget -N http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
 	unzip jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
-	wget http://invenio-software.org/download/jquery/ColVis.min.js && \
+	wget -N http://invenio-software.org/download/jquery/ColVis.min.js && \
 	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
-	wget http://invenio-software.org/download/jquery/flot-0.6.zip && \
-	wget http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
+	wget -N http://invenio-software.org/download/jquery/flot-0.6.zip && \
+	wget -N http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
 	rm -rf jquery-lightbox && \
 	unzip -u jquery-lightbox-0.5.zip -d jquery-lightbox && \
 	sed -i 's/images\//\/js\/jquery-lightbox\/images\//g' jquery-lightbox/js/jquery.lightbox-0.5.js && \
@@ -190,21 +189,21 @@ install-jquery-plugins:
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
-	wget http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js -O jquery.hotkeys.js && \
-	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
+	wget -N https://github.com/douglascrockford/JSON-js/raw/master/json2.js --no-check-certificate && \
+	wget -O jquery.hotkeys.js http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.treeview.zip && \
 	unzip jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
-	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
+	wget -N http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
 	unzip jquery.bookmark.package-1.4.0.zip && \
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
-	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
-	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
@@ -212,8 +211,8 @@ install-jquery-plugins:
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
 	wget --no-check-certificate -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
+	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
+	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
 	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
