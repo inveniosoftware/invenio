@@ -3453,7 +3453,10 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
         # Syncing is done here. Entries that have been handled are removed from
         # unsuccessful_tickets so that they do not reappear in the next reload.
         if pinfo['autoclaim']['res']:
-            unsuccessful_recids = pinfo['autoclaim']['res']['unsuccessful_recids']
+            if 'unsuccessful_recids' in pinfo['autoclaim']['res']:
+                unsuccessful_recids = pinfo['autoclaim']['res']['unsuccessful_recids']
+            else:
+                unsuccessful_recids = []
             for entry in ticket:
                 recid = entry['rec']
                 unsuccessful_recids = [rec for rec in unsuccessful_recids if rec[2] != recid]
