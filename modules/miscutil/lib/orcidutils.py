@@ -61,6 +61,7 @@ ORCID_JSON_TO_XML_EXT_ID = {
 }
 
 ORCID_SINGLE_REQUEST_WORKS = 50
+MAX_COAUTHORS = 25
 
 ############################### PULLING ########################################
 
@@ -467,7 +468,7 @@ def _orcid_push_with_bibtask():
                     bibtask.write_message("Token deleted for %s" % pid)
                     register_exception(subject="The ORCID token expired.")
                     break
-                elif code != 201:
+                elif code != 201 and code != 200:
                     try:
                         response.raise_for_status()
                     except HTTPError, exc:
@@ -776,18 +777,21 @@ def _get_work_contributors(recid, personid):
     work_contributors = []
     signatures = get_signatures_of_paper(recid)
 
-    for sig in signatures:
+    if len(signatures) <= MAX_COAUTHORS:
+        # The ORCID servers can't process INSPIRE collaborations' papers
 
-        if sig[0] == personid:
-            # The author himself is not a contributor for his work
-            continue
+        for sig in signatures:
 
-        contributor_dict = {
-            'name': encode_for_jinja_and_xml(sig[4]),
-            'attributes': {'role': 'author'}
-        }
+            if sig[0] == personid:
+                # The author himself is not a contributor for his work
+                continue
 
-        work_contributors.append(contributor_dict)
+            contributor_dict = {
+                'name': encode_for_jinja_and_xml(sig[4]),
+                'attributes': {'role': 'author'}
+            }
+
+            work_contributors.append(contributor_dict)
 
     return work_contributors
 

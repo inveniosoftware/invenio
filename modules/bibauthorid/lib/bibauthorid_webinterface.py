@@ -2922,7 +2922,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
             # Authenticate
             session['pushorcid'] = True
             session.dirty = True
-            redirect_to_url(req, "%s/youraccount/oauth2?provider=%s&scope=/orcid-works/create" % (CFG_SITE_SECURE_URL, 'orcid'))
+            redirect_to_url(req, "%s/youraccount/oauth2?provider=%s&scope=/orcid-works/update+/orcid-works/create" % (CFG_SITE_SECURE_URL, 'orcid'))
 
         # We expect user to have only one ORCID
         assert(len(webapi.get_orcids_by_pid(session['orcid_pid'])) == 1)
