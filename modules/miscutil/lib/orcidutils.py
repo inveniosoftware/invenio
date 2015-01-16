@@ -378,6 +378,13 @@ class OrcidRecordExisting(Exception):
     pass
 
 
+class DoubledIds(Exception):
+
+    '''During fetching of the papers we encountered the same id twice.'''
+
+    pass
+
+
 def push_orcid_papers(pid, token):
 
     '''Pushes papers authored by chosen person.
@@ -721,6 +728,9 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
     @rtype: list
     '''
 
+    def _stub_method():
+        raise DoubledIds()
+
     external_ids = []
     doi = _get_doi_for_paper(recid, recstruct)
     # There are two different fields in MARC records responsiple for ISBN id.
@@ -731,7 +741,17 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
         for single_doi in doi:
             if single_doi in old_external_ids['DOI']:
                 raise OrcidRecordExisting
-            external_ids.append(('doi', encode_for_jinja_and_xml(single_doi)))
+            encoded = encode_for_jinja_and_xml(single_doi)
+            # This is parsed firstly, so no check for id name done.
+            if encoded in [x for (_, x) in external_ids]:
+                try:
+                    _stub_method()
+                except DoubledIds:
+                    register_exception(subject="The paper %s contains the same doi"
+                                       " %s twice." % (recid, encoded),
+                                       alert_admin=True)
+            else:
+                external_ids.append(('doi', encoded))
     if isbn:
         if isbn in old_external_ids['ISBN']:
             raise OrcidRecordExisting
@@ -752,7 +772,16 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
         if arxiv:
             if the_id in old_external_ids['ARXIV']:
                 raise OrcidRecordExisting
-            external_ids.append(('arxiv', encode_for_jinja_and_xml(the_id)))
+            encoded = encode_for_jinja_and_xml(the_id)
+            if encoded in [x for (y, x) in external_ids if y == 'arxiv']:
+                try:
+                    _stub_method()
+                except DoubledIds:
+                    register_exception(subject="The paper %s contains the"
+                                       "same ArXiv id %s twice." % (recid, encoded),
+                                       alert_admin=True)
+            else:
+                external_ids.append(('arxiv', encoded))
 
     if url in old_external_ids['OTHER_ID']:
         raise OrcidRecordExisting
