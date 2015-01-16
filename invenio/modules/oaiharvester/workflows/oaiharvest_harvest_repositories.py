@@ -26,7 +26,8 @@ from invenio.legacy.bibsched.bibtask import (
 
 from invenio.modules.workflows.definitions import RecordWorkflow
 
-from invenio.modules.workflows.tasks.logic_tasks import (
+from workflow.tasks.logic_tasks import (
+    foreach,
     end_for,
     foreach,
     simple_for,

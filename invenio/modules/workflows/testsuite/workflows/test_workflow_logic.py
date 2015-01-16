@@ -18,9 +18,9 @@
 
 """ Implements a workflow for testing."""
 
-from ...tasks.logic_tasks import (end_for, foreach, simple_for, workflow_else,
+from workflow.tasks.logic_tasks import (end_for, foreach, simple_for, workflow_else,
                                   workflow_if, compare_logic,)
-from ...tasks.sample_tasks import add_data
+from workflow.tasks.sample_tasks import add_data
 
 from ...tasks.workflows_tasks import interrupt_workflow
 

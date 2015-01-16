@@ -18,7 +18,8 @@
 
 """ Implements a workflow for testing. """
 
-from ...tasks.sample_tasks import halt_whatever
+# FIXME: This belongs to workflow
+from workflow.tasks.sample_tasks import halt_whatever
 
 
 class test_workflow_dummy(object):

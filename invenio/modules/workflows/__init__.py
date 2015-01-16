@@ -36,7 +36,7 @@ Create a workflow for your data using functions as individual tasks.
 
 .. code-block:: python
 
-    from invenio.modules.workflows.tasks.sample_tasks import (
+    from workflow.tasks.sample_tasks import (
         add_data,
         halt_if_higher_than_20,
     )

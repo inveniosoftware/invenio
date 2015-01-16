@@ -20,8 +20,8 @@
 """Showcase a sample workflow definition."""
 
 from ..definitions import WorkflowBase
-from ..tasks.sample_tasks import add_data
-from ..tasks.logic_tasks import execute_if
+from workflow.tasks.sample_tasks import add_data
+from workflow.tasks.logic_tasks import execute_if
 from ..tasks.marcxml_tasks import approve_record
 
 
