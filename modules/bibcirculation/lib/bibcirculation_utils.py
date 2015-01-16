@@ -101,20 +101,20 @@ def get_book_cover(isbn):
     from xml.dom import minidom
 
     # connect to AWS
-    cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
+    """cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
                                '?Service=AWSECommerceService&AWSAccessKeyId=' \
                                + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                '&Operation=ItemSearch&Condition=All&' \
                                'ResponseGroup=Images&SearchIndex=Books&' \
-                               'Keywords=' + isbn)
-
+                               'Keywords=' + isbn)"""
+    cover_xml=""
     # parse XML
 
     try:
         xml_img = minidom.parse(cover_xml)
         retrieve_book_cover = xml_img.getElementsByTagName('MediumImage')
         book_cover = retrieve_book_cover.item(0).firstChild.firstChild.data
-    except AttributeError:
+    except:
         book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
     return book_cover
