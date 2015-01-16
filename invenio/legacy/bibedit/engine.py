@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,8 @@ from invenio.legacy.bibrecord.xmlmarc2textmarc import create_marc_record
 from invenio.config import (CFG_SITE_LANG,
                             CFG_BIBCATALOG_SYSTEM_RT_URL,
                             CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
-                            CFG_BIBCATALOG_SYSTEM, CFG_BIBEDIT_AUTOCOMPLETE)
+                            CFG_BIBCATALOG_SYSTEM, CFG_BIBEDIT_AUTOCOMPLETE,
+                            CFG_BIBEDIT_AJAX_RESULT_CODES_REV)
 
 from invenio.legacy.bibedit.db_layer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
@@ -104,9 +105,6 @@ from invenio.legacy.bibrecord import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 
 from invenio.base.globals import cfg
-
-import invenio.legacy.template
-bibedit_templates = invenio.legacy.template.load('bibedit')
 
 try:
     BIBCATALOG_SYSTEM.ticket_search(0)

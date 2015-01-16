@@ -91,7 +91,7 @@ bibrecord_tests.py and bibupload_regression_tests.py.
 import re
 import string
 import sys
-from six import StringIO
+from six import StringIO, string_types
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -1593,8 +1593,8 @@ def _check_field_validity(field):
 
     for subfield in field[0]:
         if (type(subfield) not in (list, tuple) or
-                len(subfield) != 2 or type(subfield[0]) is not str or
-                type(subfield[1]) is not str):
+                len(subfield) != 2 or not isinstance(subfield[0], string_types) or
+                not isinstance(subfield[0], string_types)):
             raise InvenioBibRecordFieldError(
                 "Subfields are malformed. "
                 "Should a list of tuples of 2 strings.")

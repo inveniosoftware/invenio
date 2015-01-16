@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2012 CERN.
+ * Copyright (C) 2012, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -562,8 +562,12 @@
     margin-top: 5px;
 }
 
+.bibedit-container {
+  font-size: 16px;
+}
+
 #bibEditMenu {
-    width: 135px;
+    width: 150px;
     float: left;
     padding-left: 10px;
     font-size: 0.8em;
@@ -760,7 +764,7 @@ div.refextracted {
   margin-top: 5px;
   background-color: #EEEEEE;
   border: 1px solid #C7C7C7;
-  width: 135px;
+  width: 150px;
   padding: 10px;
   font-size: 0.8em;
 }
@@ -1021,4 +1025,21 @@ label {
     background-image: url('warning.png');
     background-repeat: no-repeat;
     background-position: 570px;
+}
+
+/* Classes used for diff between two records */
+
+.diff_field_deleted {
+   color: #ff0000;
+}
+
+.diff_field_added {
+   color: #00aa00;
+}
+
+.bibEditHistCompare{
+   float: left;
+   margin: 0px 10px 5px 0px;
+   font-size: small;
+   width: 70%;
 }

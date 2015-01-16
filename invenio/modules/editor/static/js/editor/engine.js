@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2012, 2013, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -449,7 +449,7 @@ function initAjax(){
       dataType: 'json',
       error: onAjaxError,
       type: 'POST',
-      url: '/'+ gSITE_RECORD +'/edit/'
+      url: '/'+ gSITE_RECORD +'/edit/api'
     }
   );
 }
@@ -6683,10 +6683,10 @@ function onfocusother(check_box) {
   });
 
   if ($others_checkbox.prop("checked") === true) {
-    $("tbody:[id^='rowGroup_']").not(myselector).show();
+    $("tbody[id^='rowGroup_']").not(myselector).show();
   }
   else {
-    $("tbody:[id^='rowGroup_']").not(myselector).hide();
+    $("tbody[id^='rowGroup_']").not(myselector).hide();
   }
   reColorFields();
 }

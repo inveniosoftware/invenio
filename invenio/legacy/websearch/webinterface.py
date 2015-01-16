@@ -102,7 +102,6 @@ from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
 from invenio.legacy.bibrank.downloads_indexer import get_download_weight_total
 from invenio.legacy.search_engine.summarizer import summarize_records
 from invenio.ext.logging import register_exception
-from invenio.legacy.bibedit.webinterface import WebInterfaceEditPages
 from invenio.legacy.bibeditmulti.webinterface import WebInterfaceMultiEditPages
 from invenio.legacy.bibmerge.webinterface import WebInterfaceMergePages
 from invenio.legacy.bibdocfile.webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
@@ -202,7 +201,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /CFG_SITE_RECORD/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
-                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'export', 'citations', 'holdings', 'keywords',
                 'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
@@ -223,7 +222,6 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.plots = self
         self.hepdata = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
-        self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
 
@@ -311,7 +309,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage', 'references',
-                'export', 'citations', 'holdings', 'edit', 'keywords',
+                'export', 'citations', 'holdings', 'keywords',
                 'multiedit', 'merge', 'plots', 'linkbacks', 'hepdata']
 
     #_exports.extend(output_formats)
@@ -331,7 +329,6 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.citations = self
         self.plots = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
-        self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
         self.linkbacks = WebInterfaceRecordLinkbacksPages(self.recid)
         self.hepdata = self
@@ -671,9 +668,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         elif component == CFG_SITE_RECORD and path and path[0] == 'merge':
             return WebInterfaceMergePages(), path[1:]
 
-        elif component == CFG_SITE_RECORD and path and path[0] == 'edit':
-            return WebInterfaceEditPages(), path[1:]
-
         elif component == CFG_SITE_RECORD and path and path[0] == 'multiedit':
             return WebInterfaceMultiEditPages(), path[1:]
 
@@ -716,7 +710,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
-                               'references', 'citations', 'holdings', 'edit',
+                               'references', 'citations', 'holdings',
                                'keywords', 'multiedit', 'merge', 'plots',
                                'linkbacks', 'hepdata']:
                     tab = path[1]

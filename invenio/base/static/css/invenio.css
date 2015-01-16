@@ -2045,12 +2045,7 @@ form input.hyperlinkformSubmitButton {
    margin: 0px 10px 5px 0px;
    width: 70%;
 }
-.bibEditHistCompare{
-   float: left;
-   margin: 0px 10px 5px 0px;
-   font-size: small;
-   width: 70%;
-}
+
 .bibEditHistForms{
    margin: 5px 0px 5px 10px;
 }
@@ -3929,16 +3924,6 @@ a#advbox-toggle{
     margin-left: 10px;
 }
 #mathpreviewareabar span{float:left; clear:none}
-
-/* Classes used for diff between two records */
-
-.diff_field_deleted {
-   color: #ff0000;
-}
-
-.diff_field_added {
-   color: #00aa00;
-}
 
 /* end of Classes used for diff between two records */
 
