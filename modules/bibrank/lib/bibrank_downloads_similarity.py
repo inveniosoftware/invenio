@@ -29,18 +29,8 @@ from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
 
 if CFG_ELASTICSEARCH_LOGGING:
-    from invenio.elasticsearch_logging import register_schema
     import logging
 
-    register_schema('events.pageviews',
-        {
-            '_source': {'enabled': True},
-            'properties': {
-                'id_bibrec': {'type': 'integer'},
-                'id_user': {'type': 'integer'},
-                'client_host': {'type': 'ip'}
-            }
-        })
     _PAGEVIEW_LOG = logging.getLogger('events.pageviews')
 
 def record_exists(recID):
