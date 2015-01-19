@@ -130,21 +130,7 @@ from invenio.pluginutils import PluginContainer
 import invenio.template
 
 if CFG_ELASTICSEARCH_LOGGING:
-    from invenio.elasticsearch_logging import register_schema
     import logging
-
-    register_schema('events.downloads',
-        {
-            '_source': {'enabled': True},
-            'properties': {
-                'id_bibrec': {'type': 'integer'},
-                'id_bibdoc': {'type': 'integer'},
-                'file_version': {'type': 'short'},
-                'file_format': {'type': 'string'},
-                'id_user': {'type': 'integer'},
-                'client_host': {'type': 'ip'}
-            }
-        })
 
     _DOWNLOAD_LOG = logging.getLogger('events.downloads')
 
