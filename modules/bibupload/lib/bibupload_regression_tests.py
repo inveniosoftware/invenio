@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1540,14 +1540,14 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
         # We call the function which should retrieve the record id
         rec_id = bibupload.retrieve_rec_id(recs[0], opt_mode='append')
         # Retrieve current localtime
-        now = time.localtime()
+        record_modification_date = time.localtime()
         # We update the modification date
-        bibupload.update_bibrec_date(convert_datestruct_to_datetext(now), rec_id, False)
+        bibupload.update_bibrec_date(convert_datestruct_to_datetext(record_modification_date), rec_id, False)
         # We retrieve the modification date from the database
         query = """SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec where id = %s"""
         res = run_sql(query, (str(rec_id), ))
         # We compare the two results
-        self.assertEqual(res[0][0], convert_datestruct_to_datetext(now))
+        self.assertEqual(res[0][0], convert_datestruct_to_datetext(record_modification_date))
         # clean up after ourselves:
 
     def test_append_complete_xml_marc(self):

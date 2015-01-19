@@ -854,7 +854,7 @@ class WebSearchTestSearch(InvenioTestCase):
         """ websearch - check different values of em return different parts of the search page"""
         for combi in string_combinations(["K", "A", "I", "O"]):
             url = '/search?ln=en&cc=Articles+%%26+Preprints&sc=1&c=Articles&c=Preprints&em=%s' % ','.join(combi)
-            expected_text = ["<strong>Development of photon beam diagnostics for VUV radiation from a SASE FEL</strong>"]
+            expected_text = ["<strong>Influence of processing parameters on the manufacturing of anode-supported solid oxide fuel cells by different wet chemical routes</strong>"]
             unexpected_text = []
             if "H" in combi:
                 expected_text.append(">Atlantis Institute of Fictive Science</a>")
@@ -953,7 +953,7 @@ class WebSearchTestWildcardLimit(InvenioTestCase):
         """websearch - wildcard limit is correctly passed when set"""
         self.assertEqual([],
             test_web_page_content(CFG_SITE_URL + '/search?p=e*&f=author&of=id&wl=5&rg=100',
-                                  expected_text="[96, 92, 88, 81, 74, 72, 67, 54, 53, 52, 51, 50, 48, 46, 17, 11, 10, 9]"))
+                                  expected_text="[96, 88, 81, 74, 72, 67, 54, 53, 52, 51, 50, 48, 46, 17, 11, 10, 9, 92]"))
 
     def test_wildcard_limit_correctly_not_active(self):
         """websearch - wildcard limit is not active when there is no wildcard query"""
@@ -1279,43 +1279,6 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         perform_request_search(req=req, p='higgs', of='tm', so='d')
         out = req.test_output_buffer.getvalue()
         self.assertMultiLineEqual(out, """\
-000000107 001__ 107
-000000107 003__ SzGeCERN
-000000107 005__ %(rec_107_rev)s
-000000107 035__ $$9SPIRES$$a4066995
-000000107 037__ $$aCERN-EP-99-060
-000000107 041__ $$aeng
-000000107 084__ $$2CERN Library$$aEP-1999-060
-000000107 088__ $$9SCAN-9910048
-000000107 088__ $$aCERN-L3-175
-000000107 110__ $$aCERN. Geneva
-000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
-000000107 260__ $$c1999
-000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
-000000107 300__ $$a18 p
-000000107 490__ $$aALEPH Papers
-000000107 500__ $$aPreprint not submitted to publication
-000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
-000000107 690C_ $$aCERN
-000000107 690C_ $$aPREPRINT
-000000107 693__ $$aCERN LEP$$eALEPH
-000000107 693__ $$aCERN LEP$$eDELPHI
-000000107 693__ $$aCERN LEP$$eL3
-000000107 693__ $$aCERN LEP$$eOPAL
-000000107 695__ $$9MEDLINE$$asearches Higgs bosons
-000000107 697C_ $$aLexiHiggs
-000000107 710__ $$5EP
-000000107 710__ $$gALEPH Collaboration
-000000107 710__ $$gDELPHI Collaboration
-000000107 710__ $$gL3 Collaboration
-000000107 710__ $$gLEP Working Group for Higgs Boson Searches
-000000107 710__ $$gOPAL Collaboration
-000000107 901__ $$uCERN
-000000107 916__ $$sh$$w199941
-000000107 960__ $$a11
-000000107 963__ $$aPUBLIC
-000000107 970__ $$a000330309CER
-000000107 980__ $$aARTICLE
 000000085 001__ 85
 000000085 003__ SzGeCERN
 000000085 005__ %(rec_85_rev)s
@@ -1392,6 +1355,43 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 000000001 909CP $$rCalder, N
 000000001 909CS $$sn$$w200231
 000000001 980__ $$aPICTURE
+000000107 001__ 107
+000000107 003__ SzGeCERN
+000000107 005__ %(rec_107_rev)s
+000000107 035__ $$9SPIRES$$a4066995
+000000107 037__ $$aCERN-EP-99-060
+000000107 041__ $$aeng
+000000107 084__ $$2CERN Library$$aEP-1999-060
+000000107 088__ $$9SCAN-9910048
+000000107 088__ $$aCERN-L3-175
+000000107 110__ $$aCERN. Geneva
+000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
+000000107 260__ $$c1999
+000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
+000000107 300__ $$a18 p
+000000107 490__ $$aALEPH Papers
+000000107 500__ $$aPreprint not submitted to publication
+000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
+000000107 690C_ $$aCERN
+000000107 690C_ $$aPREPRINT
+000000107 693__ $$aCERN LEP$$eALEPH
+000000107 693__ $$aCERN LEP$$eDELPHI
+000000107 693__ $$aCERN LEP$$eL3
+000000107 693__ $$aCERN LEP$$eOPAL
+000000107 695__ $$9MEDLINE$$asearches Higgs bosons
+000000107 697C_ $$aLexiHiggs
+000000107 710__ $$5EP
+000000107 710__ $$gALEPH Collaboration
+000000107 710__ $$gDELPHI Collaboration
+000000107 710__ $$gL3 Collaboration
+000000107 710__ $$gLEP Working Group for Higgs Boson Searches
+000000107 710__ $$gOPAL Collaboration
+000000107 901__ $$uCERN
+000000107 916__ $$sh$$w199941
+000000107 960__ $$a11
+000000107 963__ $$aPUBLIC
+000000107 970__ $$a000330309CER
+000000107 980__ $$aARTICLE
 """ % {'siteurl': CFG_SITE_URL,
        'rec_1_rev': get_fieldvalues(1, '005__')[0],
        'rec_85_rev': get_fieldvalues(85, '005__')[0],
@@ -1465,124 +1465,6 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         self.assertXmlEqual(out, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-  <controlfield tag="003">SzGeCERN</controlfield>
-  <controlfield tag="005">%(rec_107_rev)s</controlfield>
-  <datafield tag="035" ind1=" " ind2=" ">
-    <subfield code="9">SPIRES</subfield>
-    <subfield code="a">4066995</subfield>
-  </datafield>
-  <datafield tag="037" ind1=" " ind2=" ">
-    <subfield code="a">CERN-EP-99-060</subfield>
-  </datafield>
-  <datafield tag="041" ind1=" " ind2=" ">
-    <subfield code="a">eng</subfield>
-  </datafield>
-  <datafield tag="084" ind1=" " ind2=" ">
-    <subfield code="2">CERN Library</subfield>
-    <subfield code="a">EP-1999-060</subfield>
-  </datafield>
-  <datafield tag="088" ind1=" " ind2=" ">
-    <subfield code="9">SCAN-9910048</subfield>
-  </datafield>
-  <datafield tag="088" ind1=" " ind2=" ">
-    <subfield code="a">CERN-L3-175</subfield>
-  </datafield>
-  <datafield tag="110" ind1=" " ind2=" ">
-    <subfield code="a">CERN. Geneva</subfield>
-  </datafield>
-  <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
-  </datafield>
-  <datafield tag="260" ind1=" " ind2=" ">
-    <subfield code="c">1999</subfield>
-  </datafield>
-  <datafield tag="269" ind1=" " ind2=" ">
-    <subfield code="a">Geneva</subfield>
-    <subfield code="b">CERN</subfield>
-    <subfield code="c">26 Apr 1999</subfield>
-  </datafield>
-  <datafield tag="300" ind1=" " ind2=" ">
-    <subfield code="a">18 p</subfield>
-  </datafield>
-  <datafield tag="490" ind1=" " ind2=" ">
-    <subfield code="a">ALEPH Papers</subfield>
-  </datafield>
-  <datafield tag="500" ind1=" " ind2=" ">
-    <subfield code="a">Preprint not submitted to publication</subfield>
-  </datafield>
-  <datafield tag="650" ind1="1" ind2="7">
-    <subfield code="2">SzGeCERN</subfield>
-    <subfield code="a">Particle Physics - Experiment</subfield>
-  </datafield>
-  <datafield tag="690" ind1="C" ind2=" ">
-    <subfield code="a">CERN</subfield>
-  </datafield>
-  <datafield tag="690" ind1="C" ind2=" ">
-    <subfield code="a">PREPRINT</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">ALEPH</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">DELPHI</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">L3</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">OPAL</subfield>
-  </datafield>
-  <datafield tag="695" ind1=" " ind2=" ">
-    <subfield code="9">MEDLINE</subfield>
-    <subfield code="a">searches Higgs bosons</subfield>
-  </datafield>
-  <datafield tag="697" ind1="C" ind2=" ">
-    <subfield code="a">LexiHiggs</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="5">EP</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">ALEPH Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">DELPHI Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">L3 Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">OPAL Collaboration</subfield>
-  </datafield>
-  <datafield tag="901" ind1=" " ind2=" ">
-    <subfield code="u">CERN</subfield>
-  </datafield>
-  <datafield tag="916" ind1=" " ind2=" ">
-    <subfield code="s">h</subfield>
-    <subfield code="w">199941</subfield>
-  </datafield>
-  <datafield tag="960" ind1=" " ind2=" ">
-    <subfield code="a">11</subfield>
-  </datafield>
-  <datafield tag="963" ind1=" " ind2=" ">
-    <subfield code="a">PUBLIC</subfield>
-  </datafield>
-  <datafield tag="970" ind1=" " ind2=" ">
-    <subfield code="a">000330309CER</subfield>
-  </datafield>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">ARTICLE</subfield>
-  </datafield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <controlfield tag="003">SzGeCERN</controlfield>
@@ -1894,6 +1776,124 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     <subfield code="a">PICTURE</subfield>
   </datafield>
 </record>
+<record>
+  <controlfield tag="001">107</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_107_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SPIRES</subfield>
+    <subfield code="a">4066995</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP-99-060</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="084" ind1=" " ind2=" ">
+    <subfield code="2">CERN Library</subfield>
+    <subfield code="a">EP-1999-060</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="9">SCAN-9910048</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CERN-L3-175</subfield>
+  </datafield>
+  <datafield tag="110" ind1=" " ind2=" ">
+    <subfield code="a">CERN. Geneva</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">1999</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="a">Geneva</subfield>
+    <subfield code="b">CERN</subfield>
+    <subfield code="c">26 Apr 1999</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">18 p</subfield>
+  </datafield>
+  <datafield tag="490" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH Papers</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Preprint not submitted to publication</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Experiment</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">CERN</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">PREPRINT</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">ALEPH</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">DELPHI</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">L3</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">OPAL</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">MEDLINE</subfield>
+    <subfield code="a">searches Higgs bosons</subfield>
+  </datafield>
+  <datafield tag="697" ind1="C" ind2=" ">
+    <subfield code="a">LexiHiggs</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="5">EP</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">ALEPH Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">DELPHI Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">L3 Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">OPAL Collaboration</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">h</subfield>
+    <subfield code="w">199941</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">11</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">000330309CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+</record>
 </collection>""" % {'siteurl': CFG_SITE_URL,
                     'rec_1_rev': get_fieldvalues(1, '005__')[0],
                     'rec_85_rev': get_fieldvalues(85, '005__')[0],
@@ -1908,9 +1908,6 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
         self.assertXmlEqual(out, """<?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <datafield tag="100" ind1=" " ind2=" ">
@@ -1931,6 +1928,9 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
     <subfield code="a">Photolab</subfield>
   </datafield>
 </record>
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
 
 </collection>""")
 
@@ -1944,9 +1944,6 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
-  <controlfield tag="001">107</controlfield>
-</record>
-<record>
   <controlfield tag="001">85</controlfield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Girardello, L</subfield>
@@ -1959,6 +1956,9 @@ class WebSearchSearchEnginePythonAPITest(InvenioXmlTestCase):
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Photolab</subfield>
   </datafield>
+</record>
+<record>
+  <controlfield tag="001">107</controlfield>
 </record>
 
 </collection>""")
@@ -2085,43 +2085,6 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm',
                                                expected_text="""\
-000000107 001__ 107
-000000107 003__ SzGeCERN
-000000107 005__ %(rec_107_rev)s
-000000107 035__ $$9SPIRES$$a4066995
-000000107 037__ $$aCERN-EP-99-060
-000000107 041__ $$aeng
-000000107 084__ $$2CERN Library$$aEP-1999-060
-000000107 088__ $$9SCAN-9910048
-000000107 088__ $$aCERN-L3-175
-000000107 110__ $$aCERN. Geneva
-000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
-000000107 260__ $$c1999
-000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
-000000107 300__ $$a18 p
-000000107 490__ $$aALEPH Papers
-000000107 500__ $$aPreprint not submitted to publication
-000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
-000000107 690C_ $$aCERN
-000000107 690C_ $$aPREPRINT
-000000107 693__ $$aCERN LEP$$eALEPH
-000000107 693__ $$aCERN LEP$$eDELPHI
-000000107 693__ $$aCERN LEP$$eL3
-000000107 693__ $$aCERN LEP$$eOPAL
-000000107 695__ $$9MEDLINE$$asearches Higgs bosons
-000000107 697C_ $$aLexiHiggs
-000000107 710__ $$5EP
-000000107 710__ $$gALEPH Collaboration
-000000107 710__ $$gDELPHI Collaboration
-000000107 710__ $$gL3 Collaboration
-000000107 710__ $$gLEP Working Group for Higgs Boson Searches
-000000107 710__ $$gOPAL Collaboration
-000000107 901__ $$uCERN
-000000107 916__ $$sh$$w199941
-000000107 960__ $$a11
-000000107 963__ $$aPUBLIC
-000000107 970__ $$a000330309CER
-000000107 980__ $$aARTICLE
 000000085 001__ 85
 000000085 003__ SzGeCERN
 000000085 005__ %(rec_85_rev)s
@@ -2198,6 +2161,43 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
 000000001 909CP $$rCalder, N
 000000001 909CS $$sn$$w200231
 000000001 980__ $$aPICTURE
+000000107 001__ 107
+000000107 003__ SzGeCERN
+000000107 005__ %(rec_107_rev)s
+000000107 035__ $$9SPIRES$$a4066995
+000000107 037__ $$aCERN-EP-99-060
+000000107 041__ $$aeng
+000000107 084__ $$2CERN Library$$aEP-1999-060
+000000107 088__ $$9SCAN-9910048
+000000107 088__ $$aCERN-L3-175
+000000107 110__ $$aCERN. Geneva
+000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
+000000107 260__ $$c1999
+000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
+000000107 300__ $$a18 p
+000000107 490__ $$aALEPH Papers
+000000107 500__ $$aPreprint not submitted to publication
+000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
+000000107 690C_ $$aCERN
+000000107 690C_ $$aPREPRINT
+000000107 693__ $$aCERN LEP$$eALEPH
+000000107 693__ $$aCERN LEP$$eDELPHI
+000000107 693__ $$aCERN LEP$$eL3
+000000107 693__ $$aCERN LEP$$eOPAL
+000000107 695__ $$9MEDLINE$$asearches Higgs bosons
+000000107 697C_ $$aLexiHiggs
+000000107 710__ $$5EP
+000000107 710__ $$gALEPH Collaboration
+000000107 710__ $$gDELPHI Collaboration
+000000107 710__ $$gL3 Collaboration
+000000107 710__ $$gLEP Working Group for Higgs Boson Searches
+000000107 710__ $$gOPAL Collaboration
+000000107 901__ $$uCERN
+000000107 916__ $$sh$$w199941
+000000107 960__ $$a11
+000000107 963__ $$aPUBLIC
+000000107 970__ $$a000330309CER
+000000107 980__ $$aARTICLE
 """ % {'siteurl': CFG_SITE_URL,
        'rec_1_rev': get_fieldvalues(1, '005__')[0],
        'rec_85_rev': get_fieldvalues(85, '005__')[0],
@@ -2229,16 +2229,16 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
                                                username='admin',
                                                expected_text="""\
-000000107 595__ $$aNo authors
-000000107 595__ $$aCERN-EP
-000000107 595__ $$aOA
-000000107 595__ $$aSIS:200740 PR/LKR not found (from SLAC, INSPEC)
 000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
 000000085 595__ $$aLANL EDS
 000000085 595__ $$aSIS LANLPUBL2004
 000000085 595__ $$aSIS:2004 PR/LKR added
 000000001 100__ $$aPhotolab
 000000001 595__ $$aPress
+000000107 595__ $$aNo authors
+000000107 595__ $$aCERN-EP
+000000107 595__ $$aOA
+000000107 595__ $$aSIS:200740 PR/LKR not found (from SLAC, INSPEC)
 """))
 
     def test_search_engine_web_api_textmarc_subfield_values(self):
@@ -2258,124 +2258,6 @@ Zaffaroni, A
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-  <controlfield tag="003">SzGeCERN</controlfield>
-  <controlfield tag="005">%(rec_107_rev)s</controlfield>
-  <datafield tag="035" ind1=" " ind2=" ">
-    <subfield code="9">SPIRES</subfield>
-    <subfield code="a">4066995</subfield>
-  </datafield>
-  <datafield tag="037" ind1=" " ind2=" ">
-    <subfield code="a">CERN-EP-99-060</subfield>
-  </datafield>
-  <datafield tag="041" ind1=" " ind2=" ">
-    <subfield code="a">eng</subfield>
-  </datafield>
-  <datafield tag="084" ind1=" " ind2=" ">
-    <subfield code="2">CERN Library</subfield>
-    <subfield code="a">EP-1999-060</subfield>
-  </datafield>
-  <datafield tag="088" ind1=" " ind2=" ">
-    <subfield code="9">SCAN-9910048</subfield>
-  </datafield>
-  <datafield tag="088" ind1=" " ind2=" ">
-    <subfield code="a">CERN-L3-175</subfield>
-  </datafield>
-  <datafield tag="110" ind1=" " ind2=" ">
-    <subfield code="a">CERN. Geneva</subfield>
-  </datafield>
-  <datafield tag="245" ind1=" " ind2=" ">
-    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
-  </datafield>
-  <datafield tag="260" ind1=" " ind2=" ">
-    <subfield code="c">1999</subfield>
-  </datafield>
-  <datafield tag="269" ind1=" " ind2=" ">
-    <subfield code="a">Geneva</subfield>
-    <subfield code="b">CERN</subfield>
-    <subfield code="c">26 Apr 1999</subfield>
-  </datafield>
-  <datafield tag="300" ind1=" " ind2=" ">
-    <subfield code="a">18 p</subfield>
-  </datafield>
-  <datafield tag="490" ind1=" " ind2=" ">
-    <subfield code="a">ALEPH Papers</subfield>
-  </datafield>
-  <datafield tag="500" ind1=" " ind2=" ">
-    <subfield code="a">Preprint not submitted to publication</subfield>
-  </datafield>
-  <datafield tag="650" ind1="1" ind2="7">
-    <subfield code="2">SzGeCERN</subfield>
-    <subfield code="a">Particle Physics - Experiment</subfield>
-  </datafield>
-  <datafield tag="690" ind1="C" ind2=" ">
-    <subfield code="a">CERN</subfield>
-  </datafield>
-  <datafield tag="690" ind1="C" ind2=" ">
-    <subfield code="a">PREPRINT</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">ALEPH</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">DELPHI</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">L3</subfield>
-  </datafield>
-  <datafield tag="693" ind1=" " ind2=" ">
-    <subfield code="a">CERN LEP</subfield>
-    <subfield code="e">OPAL</subfield>
-  </datafield>
-  <datafield tag="695" ind1=" " ind2=" ">
-    <subfield code="9">MEDLINE</subfield>
-    <subfield code="a">searches Higgs bosons</subfield>
-  </datafield>
-  <datafield tag="697" ind1="C" ind2=" ">
-    <subfield code="a">LexiHiggs</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="5">EP</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">ALEPH Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">DELPHI Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">L3 Collaboration</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
-  </datafield>
-  <datafield tag="710" ind1=" " ind2=" ">
-    <subfield code="g">OPAL Collaboration</subfield>
-  </datafield>
-  <datafield tag="901" ind1=" " ind2=" ">
-    <subfield code="u">CERN</subfield>
-  </datafield>
-  <datafield tag="916" ind1=" " ind2=" ">
-    <subfield code="s">h</subfield>
-    <subfield code="w">199941</subfield>
-  </datafield>
-  <datafield tag="960" ind1=" " ind2=" ">
-    <subfield code="a">11</subfield>
-  </datafield>
-  <datafield tag="963" ind1=" " ind2=" ">
-    <subfield code="a">PUBLIC</subfield>
-  </datafield>
-  <datafield tag="970" ind1=" " ind2=" ">
-    <subfield code="a">000330309CER</subfield>
-  </datafield>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">ARTICLE</subfield>
-  </datafield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <controlfield tag="003">SzGeCERN</controlfield>
@@ -2687,6 +2569,124 @@ Zaffaroni, A
     <subfield code="a">PICTURE</subfield>
   </datafield>
 </record>
+<record>
+  <controlfield tag="001">107</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_107_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SPIRES</subfield>
+    <subfield code="a">4066995</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP-99-060</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="084" ind1=" " ind2=" ">
+    <subfield code="2">CERN Library</subfield>
+    <subfield code="a">EP-1999-060</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="9">SCAN-9910048</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CERN-L3-175</subfield>
+  </datafield>
+  <datafield tag="110" ind1=" " ind2=" ">
+    <subfield code="a">CERN. Geneva</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">1999</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="a">Geneva</subfield>
+    <subfield code="b">CERN</subfield>
+    <subfield code="c">26 Apr 1999</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">18 p</subfield>
+  </datafield>
+  <datafield tag="490" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH Papers</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Preprint not submitted to publication</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Experiment</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">CERN</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">PREPRINT</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">ALEPH</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">DELPHI</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">L3</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">OPAL</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">MEDLINE</subfield>
+    <subfield code="a">searches Higgs bosons</subfield>
+  </datafield>
+  <datafield tag="697" ind1="C" ind2=" ">
+    <subfield code="a">LexiHiggs</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="5">EP</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">ALEPH Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">DELPHI Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">L3 Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">OPAL Collaboration</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">h</subfield>
+    <subfield code="w">199941</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">11</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">000330309CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+</record>
 </collection>""" % {'siteurl': CFG_SITE_URL,
                     'rec_1_rev': get_fieldvalues(1, '005__')[0],
                     'rec_85_rev': get_fieldvalues(85, '005__')[0],
@@ -2700,9 +2700,6 @@ Zaffaroni, A
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <datafield tag="100" ind1=" " ind2=" ">
@@ -2723,6 +2720,9 @@ Zaffaroni, A
     <subfield code="a">Photolab</subfield>
   </datafield>
 </record>
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
 
 </collection>"""))
 
@@ -2734,9 +2734,6 @@ Zaffaroni, A
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <datafield tag="100" ind1=" " ind2=" ">
@@ -2751,6 +2748,9 @@ Zaffaroni, A
     <subfield code="a">Photolab</subfield>
   </datafield>
 </record>
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
 
 </collection>"""))
 
@@ -2763,21 +2763,6 @@ Zaffaroni, A
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Search-Engine-Total-Number-Of-Results: 3 -->
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-<record>
-  <controlfield tag="001">107</controlfield>
-  <datafield tag="595" ind1=" " ind2=" ">
-    <subfield code="a">No authors</subfield>
-  </datafield>
-  <datafield tag="595" ind1=" " ind2=" ">
-    <subfield code="a">CERN-EP</subfield>
-  </datafield>
-  <datafield tag="595" ind1=" " ind2=" ">
-    <subfield code="a">OA</subfield>
-  </datafield>
-  <datafield tag="595" ind1=" " ind2=" ">
-    <subfield code="a">SIS:200740 PR/LKR not found (from SLAC, INSPEC)</subfield>
-  </datafield>
-</record>
 <record>
   <controlfield tag="001">85</controlfield>
   <datafield tag="100" ind1=" " ind2=" ">
@@ -2802,6 +2787,21 @@ Zaffaroni, A
   </datafield>
   <datafield tag="595" ind1=" " ind2=" ">
     <subfield code="a">Press</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">107</controlfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">No authors</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">OA</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:200740 PR/LKR not found (from SLAC, INSPEC)</subfield>
   </datafield>
 </record>
 
@@ -3532,7 +3532,7 @@ class WebSearchRestrictedCollectionHandlingTest(InvenioTestCase):
         """websearch - record belongs to different public and restricted collections, user not has rights"""
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=geometry&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts&of=id&so=a',
                                                username='guest',
-                                               expected_text='[80, 86]',
+                                               expected_text='[86, 80]',
                                                unexpected_text='[40, 80, 86]')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
@@ -3542,7 +3542,7 @@ class WebSearchRestrictedCollectionHandlingTest(InvenioTestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=geometry&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts&of=id&so=a',
                                                username='admin',
                                                password='',
-                                               expected_text='[40, 80, 86]')
+                                               expected_text='[86, 40, 80]')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -4120,13 +4120,13 @@ class WebSearchMARCQueryTest(InvenioTestCase):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27&rg=100&so=a',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
+                                               expected_text="[91, 108, 1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 96]"))
 
     def test_single_marc_tag_regexp_query(self):
         """websearch - single MARC tag, regexp query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F&rg=100&so=a',
-                                               expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91, 96, 108]"))
+                                               expected_text="[91, 108, 1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 96]"))
 
 class WebSearchExtSysnoQueryTest(InvenioTestCase):
     """Test of queries using external system numbers."""
@@ -4482,7 +4482,7 @@ class WebSearchReferstoCitedbyTest(InvenioTestCase):
         'websearch - refersto:recid:84'
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Arecid%3A84&of=id&ap=0&so=a',
-                                               expected_text='[85, 88, 91]'))
+                                               expected_text='[91, 85, 88]'))
 
     def test_refersto_repno(self):
         'websearch - refersto:reportnumber:hep-th/0205061'
@@ -4494,19 +4494,19 @@ class WebSearchReferstoCitedbyTest(InvenioTestCase):
         'websearch - refersto:author:klebanov'
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Aauthor%3Aklebanov&of=id&ap=0&so=a',
-                                               expected_text='[85, 86, 88, 91]'))
+                                               expected_text='[86, 91, 85, 88]'))
 
     def test_refersto_author_phrase(self):
         'websearch - refersto:author:"Klebanov, I"'
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Aauthor%3A%22Klebanov,%20I%22&of=id&ap=0&so=a',
-                                               expected_text='[85, 86, 88, 91]'))
+                                               expected_text='[86, 91, 85, 88]'))
 
     def test_citedby_recid(self):
         'websearch - citedby:recid:92'
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Arecid%3A92&of=id&ap=0&so=a',
-                                               expected_text='[74, 91]'))
+                                               expected_text='[91, 74]'))
 
     def test_citedby_repno(self):
         'websearch - citedby:reportnumber:hep-th/0205061'
@@ -4556,7 +4556,7 @@ class WebSearchSPIRESSyntaxTest(InvenioTestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id&so=a&rg=0',
-                                                  expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 127, 128]'))
+                                                  expected_text='[90, 92, 91, 97, 89, 107, 108, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 87, 88, 93, 94, 95, 96, 99, 100, 101, 102, 103, 104, 113, 127, 128]'))
 
 
 class WebSearchDateQueryTest(InvenioTestCase):
@@ -4654,13 +4654,13 @@ class WebSearchAuthorCountQueryTest(InvenioTestCase):
         """websearch - author count, word query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=4&f=authorcount&of=id&so=a',
-                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+                                               expected_text="[92, 51, 54, 59, 66, 96]"))
 
     def test_journal_authorcount_phrase(self):
         """websearch - author count, phrase query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%224%22&f=authorcount&of=id&so=a',
-                                               expected_text="[51, 54, 59, 66, 92, 96]"))
+                                               expected_text="[92, 51, 54, 59, 66, 96]"))
 
     def test_journal_authorcount_span(self):
         """websearch - author count, span query"""
@@ -4750,7 +4750,7 @@ class WebSearchFilenameQueryTest(InvenioTestCase):
         """websearch - file name, query with wildcard"""
         self.assertEqual([],
                   test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filename:convert*&of=id&so=a',
-                                        expected_text="[66, 71, 97]"))
+                                        expected_text="[97, 66, 71]"))
 
     def test_search_for_file_name_with_span(self):
         """websearch - file name, query with span"""
