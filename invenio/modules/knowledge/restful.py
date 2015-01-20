@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,13 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""REST API for knowledges."""
+"""REST API for knowledge."""
 
-from flask.ext.restful import Resource, reqparse, abort, fields, marshal_with
 from functools import wraps
-from sqlalchemy.orm.exc import NoResultFound
+
+from flask.ext.restful import Resource, abort, fields, marshal_with, reqparse
 
 from invenio.ext.restful import pagination
+
+from sqlalchemy.orm.exc import NoResultFound
+
 
 from . import api, models
 
@@ -36,7 +39,7 @@ def error_handler(f):
             return f(*args, **kwargs)
         except NoResultFound:
             abort(404)
-        except:
+        except Exception:
             abort(500, message="Internal server error")
     return inner
 
@@ -404,17 +407,17 @@ def setup_app(app, api):
     """setup the resources urls."""
     api.add_resource(
         KnwKBResource,
-        '/api/knowledges/<int:id>'
+        '/api/knowledge/<int:id>'
     )
     api.add_resource(
         KnwKBMappingsResource,
-        '/api/knowledges/<int:id>/mappings'
+        '/api/knowledge/<int:id>/mappings'
     )
     api.add_resource(
         KnwKBMappingsToResource,
-        '/api/knowledges/<int:id>/mappings/to'
+        '/api/knowledge/<int:id>/mappings/to'
     )
     api.add_resource(
         KnwKBMappingsFromResource,
-        '/api/knowledges/<int:id>/mappings/from'
+        '/api/knowledge/<int:id>/mappings/from'
     )
