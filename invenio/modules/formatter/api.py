@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,19 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.formatter.api
-    -----------------------------------------
-    Database access related functions for BibFormat engine and
-    administration pages.
-"""
-import zlib
-from invenio.ext.sqlalchemy import db
-from sqlalchemy.exc import SQLAlchemyError
-from invenio.utils.date import convert_datetime_to_utc_string, strftime
+"""Formatter API."""
 
+import zlib
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from invenio.ext.sqlalchemy import db
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Tag
+from invenio.utils.date import convert_datetime_to_utc_string, strftime
 
 from .models import Format, Formatname, Bibfmt
 
@@ -325,23 +322,6 @@ def set_output_format_visibility(code, visibility):
     set_format_property(code, 'visibility', visibility)
 
 
-def get_existing_content_types():
-    """
-    Returns the list of all MIME content-types used in existing output
-    formats.
-
-    Always returns at least a list with 'text/html'
-
-    :return: a list of content-type strings
-    """
-
-    types = db.session.query(Format.content_type).distinct()
-
-    if 'text/html' not in types:
-        types.append('text/html')
-
-    return types
-
 
 def get_output_format_content_type(code):
     """
@@ -367,45 +347,6 @@ def set_output_format_content_type(code, content_type):
     """
     set_format_property(code, 'content_type', content_type)
 
-
-def get_output_format_names(code):
-    """
-    Returns the localized names of the output format designated by 'code'
-
-    The returned object is a dict with keys 'ln' (for long name)
-    and 'sn' (for short name), containing each a dictionary
-    with languages as keys.
-    The key 'generic' contains the generic name of the output format
-    (for use in admin interface)
-    For eg::
-           {'ln':
-           {'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
-           'sn':{'en': "a name", 'fr': "un nom", 'de': "ein Name"}
-           'generic': "a name"}
-
-    The returned dictionary is never None.
-    The keys 'ln' and 'sn' are always present.
-    However only languages present in the database are in dicts 'sn' and 'ln'.
-    Language "CFG_SITE_LANG" is always in dict.
-
-    The localized names of output formats are located in formatname table.
-
-    :param code: the code of the output format to get the names from
-    :return: a dict containing output format names
-    """
-    out = {'sn': {}, 'ln': {}, 'generic': ''}
-    format = get_format_by_code(code)
-    if format is None:
-        return out
-
-    out['generic'] = format.name
-    for fname in Formatname.query\
-            .filter(Formatname.id_format == format.id).all():
-
-        if fname.type == 'sn' or fname.type == 'ln':
-            out[fname.type][fname.ln] = fname.value
-
-    return out
 
 
 def set_output_format_name(code, name, lang="generic", type='ln'):
@@ -501,34 +442,3 @@ def get_preformatted_record_date(recID, of):
 
     except SQLAlchemyError:
         return None
-
-## def keep_formats_in_db(output_formats):
-##     """
-##     Remove from db formats that are not in the list
-##     TOBE USED ONLY ONCE OLD BIBFORMAT IS REMOVED
-##     (or old behaviours will be erased...)
-##     """
-##     query = "SELECT code FROM format"
-##     res = run_sql(query)
-##     for row in res:
-##         if not row[0] in output_formats:
-##             query = "DELETE FROM format WHERE code='%s'"%row[0]
-
-## def add_formats_in_db(output_formats):
-##     """
-##     Add given formats in db (if not already there)
-##     """
-##     for output_format in output_format:
-
-##         if get_format_from_db(output_format) is None:
-##             #Add new
-##             query = "UPDATE TABLE format "
-##         else:
-##             #Update
-##             query = "UPDATE TABLE format "
-
-##     query = "UPDATE TABLE format "
-##     res = run_sql(query)
-##     for row in res:
-##         if not row[0] in output_formats:
-##             query = "DELETE FROM format WHERE code='%s'"%row[0]

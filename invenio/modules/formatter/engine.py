@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Formats a single XML Marc record using specified format.
-There is no API for the engine. Instead use module L{bibformat}.
+"""Format a single record using specified format.
 
 You can have a look at the various escaping modes available in
 X{BibFormatObject} in function L{escape_field}
@@ -38,8 +36,6 @@ L{BibFormatObject} class directly. For eg:
 @see: bibformat.py, bibformat_utils.py
 """
 
-__revision__ = "$Id$"
-
 import re
 import sys
 import os
@@ -47,6 +43,7 @@ import inspect
 import traceback
 import cgi
 import types
+
 from flask import has_app_context, current_app
 from operator import itemgetter
 from six import iteritems
@@ -69,6 +66,7 @@ from invenio.legacy.bibrecord import \
      record_empty
 from . import registry
 from .engines import xslt
+from .models import Format
 from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
@@ -315,16 +313,16 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     page depending on the user's priviledges. 'user_info' is the same
     object as the one returned by 'webuser.collect_user_info(req)'
 
-    @param recID: the ID of record to format
-    @param of: an output format code (or short identifier for the output format)
-    @param ln: the language to use to format the record
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param recID: the ID of record to format
+    :param of: an output format code (or short identifier for the output format)
+    :param ln: the language to use to format the record
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
-    @param search_pattern: list of strings representing the user request in web interface
-    @param xml_record: an xml string representing the record to format
-    @param user_info: the information of the user who will view the formatted page
+    :param search_pattern: list of strings representing the user request in web interface
+    :param xml_record: an xml string representing the record to format
+    :param user_info: the information of the user who will view the formatted page
     @return: formatted record
     """
     if search_pattern is None:
@@ -416,23 +414,23 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
     is the same object as the one returned by
     'webuser.collect_user_info(req)'
 
-    @param recID: the ID of record to format.
+    :param recID: the ID of record to format.
     @type recID: int
-    @param of: an output format code (or short identifier for the output format)
+    :param of: an output format code (or short identifier for the output format)
     @type of: string
-    @param ln: the language to use to format the record
+    :param ln: the language to use to format the record
     @type ln: string
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
     @type verbose: int
-    @param search_pattern: list of strings representing the user request in web interface
+    :param search_pattern: list of strings representing the user request in web interface
     @type search_pattern: list(string)
-    @param xml_record: an xml string represention of the record to format
+    :param xml_record: an xml string represention of the record to format
     @type xml_record: string or None
-    @param user_info: the information of the user who will view the formatted page (if applicable)
-    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    :param user_info: the information of the user who will view the formatted page (if applicable)
+    :param on_the_fly: if False, try to return an already preformatted version of the record in the database
     @type on_the_fly: boolean
     @return: formatted record
     @rtype: string
@@ -576,8 +574,8 @@ def decide_format_template(bfo, of):
     To match we ignore lettercase and spaces before and after value of
     rule and value of record
 
-    @param bfo: a L{BibFormatObject}
-    @param of: the code of the output format to use
+    :param bfo: a L{BibFormatObject}
+    :param of: the code of the output format to use
     @return: name of a format template
     """
 
@@ -636,10 +634,10 @@ def format_with_format_template(format_template_filename, bfo,
     determine if bft or xsl transformation applies). This allows to preview format
     code without having to save file on disk.
 
-    @param format_template_filename: the dilename of a format template
-    @param bfo: the object containing parameters for the current formatting
-    @param format_template_code: if not empty, use code as template instead of reading format_template_filename (used for previews)
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param format_template_filename: the dilename of a format template
+    :param bfo: the object containing parameters for the current formatting
+    :param format_template_code: if not empty, use code as template instead of reading format_template_filename (used for previews)
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
@@ -729,9 +727,9 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
       1. Look for special tags
       2. replace special tags by their evaluation
 
-    @param format_template: the format template code
-    @param bfo: the object containing parameters for the current formatting
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param format_template: the format template code
+    :param bfo: the object containing parameters for the current formatting
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                     5: errors, 7: errors and warnings,
                     9: errors and warnings, stop if error (debug mode ))
     @return: tuple (result, errors)
@@ -746,7 +744,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
 
         Called by substitution in 'eval_format_template_elements(...)'
 
-        @param match: a match object corresponding to the special tag that must be interpreted
+        :param match: a match object corresponding to the special tag that must be interpreted
         """
 
         function_name = match.group("function_name")
@@ -815,10 +813,10 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
     name, with given L{BibFormatObject} and parameters. Also returns
     the errors of the evaluation.
 
-    @param format_element: a format element structure as returned by get_format_element
-    @param bfo: a L{BibFormatObject} used for formatting
-    @param parameters: a dict of parameters to be used for formatting. Key is parameter and value is value of parameter
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param format_element: a format element structure as returned by get_format_element
+    :param bfo: a L{BibFormatObject} used for formatting
+    :param parameters: a dict of parameters to be used for formatting. Key is parameter and value is value of parameter
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
@@ -1051,8 +1049,8 @@ def filter_languages(format_template, ln=CFG_SITE_LANG):
     """
     Filters the language tags that do not correspond to the specified language.
 
-    @param format_template: the format template code
-    @param ln: the language that is NOT filtered out from the template
+    :param format_template: the format template code
+    :param ln: the language that is NOT filtered out from the template
     @return: the format template with unnecessary languages filtered out
     """
     # First define search_lang_tag(match) and clean_language_tag(match), used
@@ -1064,7 +1062,7 @@ def filter_languages(format_template, ln=CFG_SITE_LANG):
 
         If current_lang cannot be found inside <lang> ... </lang>, try to use 'CFG_SITE_LANG'
 
-        @param match: a match object corresponding to the special tag that must be interpreted
+        :param match: a match object corresponding to the special tag that must be interpreted
         """
         current_lang = ln
 
@@ -1074,7 +1072,7 @@ def filter_languages(format_template, ln=CFG_SITE_LANG):
 
             Called by substitution in 'filter_languages(...)'
 
-            @param match: a match object corresponding to the special tag that must be interpreted
+            :param match: a match object corresponding to the special tag that must be interpreted
             """
             if match.group(1) == current_lang:
                 return match.group(2)
@@ -1110,8 +1108,8 @@ def get_format_template(filename, with_attributes=False):
        'attrs': {'name': "a name", 'description': "a description"}
       }
 
-    @param filename: the filename of an format template
-    @param with_attributes: if True, fetch the attributes (names and description) for format'
+    :param filename: the filename of an format template
+    :param with_attributes: if True, fetch the attributes (names and description) for format'
     @return: strucured content of format template
     """
     _ = gettext_set_language(CFG_SITE_LANG)
@@ -1173,7 +1171,7 @@ def get_format_templates(with_attributes=False):
       ...
       }
 
-    @param with_attributes: if True, fetch the attributes (names and description) for formats
+    :param with_attributes: if True, fetch the attributes (names and description) for formats
     @return: the list of format templates (with code and info)
     """
     format_templates = {}
@@ -1194,7 +1192,7 @@ def get_format_template_attrs(filename):
     The attributes are {'name', 'description'}
     Caution: the function does not check that path exists or
     that the format element is valid.
-    @param filename: the name of a format template
+    :param filename: the name of a format template
     @return: a structure with detailed information about given format template
     """
     _ = gettext_set_language(CFG_SITE_LANG)
@@ -1247,12 +1245,12 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False,
       'type':"field" or "python" depending if element is defined in file or table,
       'escape_function': the function to call to know if element output must be escaped}
 
-    @param element_name: the name of the format element to load
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param element_name: the name of the format element to load
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
-    @param with_built_in_params: if True, load the parameters built in all elements
+    :param with_built_in_params: if True, load the parameters built in all elements
     @return: a dictionary with format element attributes
     """
     _ = gettext_set_language(CFG_SITE_LANG)
@@ -1341,7 +1339,7 @@ def get_format_elements(with_built_in_params=False):
      Returns only elements that could be loaded (not error in code)
 
     @return: a dict of format elements with name as key, and a dict as attributes
-    @param with_built_in_params: if True, load the parameters built in all elements
+    :param with_built_in_params: if True, load the parameters built in all elements
     """
     format_elements = {}
 
@@ -1386,9 +1384,9 @@ def get_format_element_attrs_from_function(function, element_name,
                                             'default':"default value",
                                             'description': "a description"}, ...},
                         }
-    @param function: the formatting function of a format element
-    @param element_name: the name of the element
-    @param with_built_in_params: if True, load the parameters built in all elements
+    :param function: the formatting function of a format element
+    :param element_name: the name of the element
+    :param with_built_in_params: if True, load the parameters built in all elements
     @return: a structure with detailed information of a function
     """
 
@@ -1512,9 +1510,9 @@ def get_format_element_attrs_from_table(element_name,
                         'tags':["950.1", 203.a] #the list of tags printed by this element
                        }
 
-    @param element_name: an element name in database
-    @param element_name: the name of the element
-    @param with_built_in_params: if True, load the parameters built in all elements
+    :param element_name: an element name in database
+    :param element_name: the name of the element
+    :param with_built_in_params: if True, load the parameters built in all elements
     @return: a structure with detailed information of an element found in DB
     """
 
@@ -1615,9 +1613,9 @@ def get_output_format(code, with_attributes=False, verbose=0):
          'default':"filename_b.bft"
         }
 
-    @param code: the code of an output_format
-    @param with_attributes: if True, fetch the attributes (names and description) for format
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param code: the code of an output_format
+    :param with_attributes: if True, fetch the attributes (names and description) for format
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
@@ -1688,34 +1686,35 @@ def get_output_format(code, with_attributes=False, verbose=0):
     format_outputs_cache[filename] = output_format
     return output_format
 
+
 def get_output_format_attrs(code, verbose=0):
-    """
-    Returns the attributes of an output format.
+    """Return the attributes of an output format.
 
-    The attributes contain 'code', which is the short identifier of the output format
-    (to be given as parameter in format_record function to specify the output format),
-    'description', a description of the output format, 'visibility' the visibility of
-    the format in the output format list on public pages and 'names', the localized names
-    of the output format. If 'content_type' is specified then the search_engine will
-    send a file with this content type and with result of formatting as content to the user.
-    The 'names' dict always contais 'generic', 'ln' (for long name) and 'sn' (for short names)
-    keys. 'generic' is the default name for output format. 'ln' and 'sn' contain long and short
-    localized names of the output format. Only the languages for which a localization exist
-    are used::
+    The attributes contain 'code', which is the short identifier of the output
+    format (to be given as parameter in format_record function to specify the
+    output format), 'description', a description of the output format,
+    'visibility' the visibility of the format in the output format list on
+    public pages and 'names', the localized names of the output format. If
+    'content_type' is specified then the search_engine will send a file with
+    this content type and with result of formatting as content to the user.
+    The 'names' dict always contais 'generic', 'ln' (for long name) and 'sn'
+    (for short names) keys. 'generic' is the default name for output format.
+    'ln' and 'sn' contain long and short localized names of the output format.
+    Only the languages for which a localization exist are used::
 
-        {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
+        {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"},
+         'ln':{'en':"a long name"}}
          'description': "a description"
          'code': "fnm1",
          'content_type': "application/ms-excel",
          'visibility': 1
         }
 
-    @param code: the short identifier of the format
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
-    @return: strucured content of output format attributes
+    :param code: the short identifier of the format
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
+        5: errors, 7: errors and warnings,
+        9: errors and warnings, stop if error (debug mode ))
+    :return: strucured content of output format attributes
     """
     if code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = code[:-(len(CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION) + 1)]
@@ -1731,19 +1730,26 @@ def get_output_format_attrs(code, verbose=0):
     if filename is None:
         return attrs
 
-    attrs['names'] = bibformat_dblayer.get_output_format_names(code)
-    attrs['description'] = bibformat_dblayer.get_output_format_description(code)
-    attrs['content_type'] = bibformat_dblayer.get_output_format_content_type(code)
-    attrs['visibility'] = bibformat_dblayer.get_output_format_visibility(code)
-
+    try:
+        format_ = Format.query.filter_by(code=code).one()
+        attrs['names']['generic'] = format_.name
+        for name in format_.names:
+            attrs['names'][name.type][name.ln] = name.value
+        attrs['description'] = format_.description
+        attrs['content_type'] = format_.content_type
+        attrs['visibility'] = format_.visibility
+    except Exception:
+        current_app.logger.exception("Unknown code %s", code)
     return attrs
+
 
 def get_output_formats(with_attributes=False):
     """
-    Returns the list of all output format, as a dictionary with their filename as key
+    Return all output format as a dictionary with their filename as key.
 
-    If 'with_attributes' is true, also returns the names and description of the output formats,
-    else 'attrs' is not returned in dicts (it might, if it has already been loaded previously).
+    If 'with_attributes' is true, also returns the names and description of the
+    output formats, else 'attrs' is not returned in dicts (it might, if it has
+    already been loaded previously).
 
     See get_output_format_attrs() to learn more on the attributes::
 
@@ -1763,7 +1769,7 @@ def get_output_formats(with_attributes=False):
          'filename_2.bfo': {...},
           ...
         }
-    @param with_attributes: if returned output formats contain detailed info, or not
+    :param with_attributes: if returned output formats contain detailed info, or not
     @type with_attributes: boolean
     @return: the list of output formats
     """
@@ -1791,7 +1797,7 @@ def resolve_format_element_filename(element_name):
 
     The name of the element has to start with "BFE_".
 
-    @param element_name: a name for a format element
+    :param element_name: a name for a format element
     @return: the corresponding filename, with right case
     """
 
@@ -1827,8 +1833,8 @@ def resolve_output_format_filename(code, verbose=0):
     This is necessary since output formats names are not case sensitive
     but most file systems are.
 
-    @param code: the code for an output format
-    @param verbose: the level of verbosity from 0 to 9 (O: silent,
+    :param code: the code for an output format
+    :param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings,
                                                        9: errors and warnings, stop if error (debug mode ))
@@ -1863,7 +1869,7 @@ def get_fresh_format_template_filename(name):
 
     Returns (unique_filename, modified_name)
 
-    @param name: name for a format template
+    :param name: name for a format template
     @return: the corresponding filename, and modified name if necessary
     """
     #name = re.sub(r"\W", "", name) #Remove non alphanumeric chars
@@ -1898,7 +1904,7 @@ def get_fresh_output_format_filename(code):
     We return an uppercase code
     Returns (unique_filename, modified_code)
 
-    @param code: the code of an output format
+    :param code: the code of an output format
     @return: the corresponding filename, and modified code if necessary
     """
     _ = gettext_set_language(CFG_SITE_LANG)
@@ -2000,12 +2006,12 @@ class BibFormatObject(object):
                 'guest' : '1'
                 }
 
-        @param recID: the id of a record
-        @param ln: the language in which the record has to be formatted
-        @param search_pattern: list of string representing the request used by the user in web interface
-        @param xml_record: a xml string of the record to format
-        @param user_info: the information of the user who will view the formatted page
-        @param output_format: the output_format used for formatting this record
+        :param recID: the id of a record
+        :param ln: the language in which the record has to be formatted
+        :param search_pattern: list of string representing the request used by the user in web interface
+        :param xml_record: a xml string of the record to format
+        :param user_info: the information of the user who will view the formatted page
+        :param output_format: the output_format used for formatting this record
         """
         self.xml_record = None # *Must* remain empty if recid is given
         if xml_record is not None:
@@ -2050,8 +2056,8 @@ class BibFormatObject(object):
         """
         Returns the value of control field given by tag in record
 
-        @param tag: the marc code of a field
-        @param escape: 1 if returned value should be escaped. Else 0.
+        :param tag: the marc code of a field
+        :param escape: 1 if returned value should be escaped. Else 0.
         @return: value of field tag in record
         """
         if self.get_record() is None:
@@ -2093,8 +2099,8 @@ class BibFormatObject(object):
                       8. Same as mode 1, but also escape double-quotes
                       9. Same as mode 4, but also escape double-quotes
 
-        @param tag: the marc code of a field
-        @param escape: 1 if returned value should be escaped. Else 0. (see above for other modes)
+        :param tag: the marc code of a field
+        :param escape: 1 if returned value should be escaped. Else 0. (see above for other modes)
         @return: value of field tag in record
         """
         list_of_fields = self.fields(tag)
@@ -2167,8 +2173,8 @@ class BibFormatObject(object):
                       8. Same as mode 1, but also escape double-quotes
                       9. Same as mode 4, but also escape double-quotes
 
-        @param tag: the marc code of a field
-        @param escape: 1 if returned values should be escaped. Else 0.
+        :param tag: the marc code of a field
+        :param escape: 1 if returned values should be escaped. Else 0.
         @repeatable_subfields_p if True, returns the list of subfields in the dictionary
         @return: values of field tag in record
         """
@@ -2226,9 +2232,9 @@ class BibFormatObject(object):
         If kb does not exist or string does not exist in kb,
         returns 'default' string or empty string if not specified.
 
-        @param kb: a knowledge base name
-        @param string: the string we want to translate
-        @param default: a default value returned if 'string' not found in 'kb'
+        :param kb: a knowledge base name
+        :param string: the string we want to translate
+        :param default: a default value returned if 'string' not found in 'kb'
         @return: a string value corresponding to translated input with given kb
         """
         if not string:
@@ -2265,8 +2271,8 @@ def escape_field(value, mode=0):
       - mode 8: same as mode 1, but also escape double-quotes
       - mode 9: same as mode 4, but also escape double-quotes
 
-    @param value: value to escape
-    @param mode: escaping mode to use
+    :param value: value to escape
+    :param mode: escaping mode to use
     @return: an escaped version of X{value} according to chosen X{mode}
     """
     if mode == 1:
@@ -2363,20 +2369,22 @@ def make_filter_line(hide_tag):
     return 'datafield tag="%s" ind1="%s"  ind2="%s"' % (tag, ind1, ind2)
 
 
-def filter_hidden_fields(recxml, user_info=None,
-                         filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
+def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
                          force_filtering=False):
     """
-    Filter out tags specified by filter_tags from MARCXML. If the user
-    is allowed to run bibedit, then filter nothing, unless
+    Filter out tags specified by filter_tags from MARCXML.
+
+    If the user is allowed to run bibedit, then filter nothing, unless
     force_filtering is set to True.
 
-    @param recxml: marcxml presentation of the record
-    @param user_info: user information; if None, then assume invoked via CLI with all rights
-    @param filter_tags: list of MARC tags to be filtered
-    @param force_filtering: do we force filtering regardless of user rights?
-    @return: recxml without the hidden fields
+    :param recxml: marcxml presentation of the record
+    :param user_info: user information; if None, then assume invoked via CLI
+                      with all rights :param filter_tags: list of MARC tags to
+                      be filtered :param force_filtering: do we force filtering
+                      regardless of user rights?
+    :return: recxml without the hidden fields
     """
+    filter_tags = filter_tags or cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
     if force_filtering:
         pass
     else:
@@ -2401,22 +2409,3 @@ def filter_hidden_fields(recxml, user_info=None,
         if omit and ('</datafield>' in line or '</marc:datafield>' in line):
             omit = False
     return out
-
-
-def bf_profile():
-    """
-    Runs a benchmark
-
-    @return: None
-    """
-    for i in range(1, 51):
-        format_record(i, "HD", ln=CFG_SITE_LANG, verbose=9, search_pattern=[])
-    return
-
-if __name__ == "__main__":
-    import profile
-    import pstats
-    #bf_profile()
-    profile.run('bf_profile()', "bibformat_profile")
-    p = pstats.Stats("bibformat_profile")
-    p.strip_dirs().sort_stats("cumulative").print_stats()

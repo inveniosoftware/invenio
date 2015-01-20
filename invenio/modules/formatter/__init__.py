@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,14 +16,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-Format records using chosen format.
+
+"""Format records using chosen format.
 
 The main APIs are:
-  - format_record
-  - format_records
-  - create_excel
-  - get_output_format_content_type
+- format_record
+- format_records
+- create_excel
+- get_output_format_content_type
 
 This module wraps the BibFormat engine and its associated
 functions. This is also where special formatting functions of multiple
@@ -49,8 +49,7 @@ from invenio.base.globals import cfg
 def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False,
                   save_missing=True, force_2nd_pass=False, **kwargs):
-    """
-    Format a record in given output format.
+    """Format a record in given output format.
 
     Return a formatted version of the record in the specified
     language, search pattern, and with the specified output format.
@@ -98,34 +97,33 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
     from . import engine as bibformat_engine
 
     out, needs_2nd_pass = bibformat_engine.format_record_1st_pass(
-                                        recID=recID,
-                                        of=of,
-                                        ln=ln,
-                                        verbose=verbose,
-                                        search_pattern=search_pattern,
-                                        xml_record=xml_record,
-                                        user_info=user_info,
-                                        on_the_fly=on_the_fly,
-                                        save_missing=save_missing,
-                                        **kwargs)
+        recID=recID,
+        of=of,
+        ln=ln,
+        verbose=verbose,
+        search_pattern=search_pattern,
+        xml_record=xml_record,
+        user_info=user_info,
+        on_the_fly=on_the_fly,
+        save_missing=save_missing,
+        **kwargs)
     if needs_2nd_pass or force_2nd_pass:
         out = bibformat_engine.format_record_2nd_pass(
-                                    recID=recID,
-                                    of=of,
-                                    template=out,
-                                    ln=ln,
-                                    verbose=verbose,
-                                    search_pattern=search_pattern,
-                                    xml_record=xml_record,
-                                    user_info=user_info,
-                                    **kwargs)
+            recID=recID,
+            of=of,
+            template=out,
+            ln=ln,
+            verbose=verbose,
+            search_pattern=search_pattern,
+            xml_record=xml_record,
+            user_info=user_info,
+            **kwargs)
 
     return out
 
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
-    """
-    Return an XML string of the record given by recID.
+    """Return an XML string of the record given by recID.
 
     The function builds the XML directly from the database,
     without using the standard formatting process.
@@ -159,8 +157,7 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                    record_separator=None, record_suffix=None, prologue="",
                    epilogue="", req=None, on_the_fly=False,
                    extra_context=None):
-    """
-    Format records given by a list of record IDs or a list of records as xml.
+    """Format records given by a list of record IDs or a list of records as xml.
 
     Add a prefix before each record, a suffix after each record, plus a
     separator between records.
@@ -298,6 +295,7 @@ def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
 
 def format_with_format_template(format_template_filename, bfo,
                                 verbose=0, format_template_code=None):
+    """Wrapper around format template."""
     from . import engine as bibformat_engine
     evaluated_format, dummy = bibformat_engine.format_with_format_template(
         format_template_filename=format_template_filename,
@@ -309,8 +307,7 @@ def format_with_format_template(format_template_filename, bfo,
 
 def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ",
                  user_info=None):
-    """
-    Return an Excel readable format containing the given recIDs.
+    """Return an Excel readable format containing the given recIDs.
 
     If 'req' is given, also prints the output in 'req' while individual
     records are being formatted.
@@ -403,71 +400,6 @@ def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ",
                                              user_info=user_info)
 
     return excel_formatted_records
-
-
-# Utility functions
-##
-def make_filter_line(hide_tag):
-    """Generate a line used for filtering MARCXML."""
-    hide_tag = str(hide_tag)
-    tag = hide_tag[:3]
-    ind1 = hide_tag[3:4]
-    ind2 = hide_tag[4:5]
-
-    if ind1 == "_":
-        ind1 = " "
-    if ind2 == "_":
-        ind2 = " "
-
-    if not ind1 and not ind2:
-        return 'datafield tag="%s"' % tag
-    if not ind2 and ind1:
-        return 'datafield tag="%s" ind1="%s"' % (tag, ind1)
-    return 'datafield tag="%s" ind1="%s"  ind2="%s"' % (tag, ind1, ind2)
-
-
-def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
-                         force_filtering=False):
-    """
-    Filter out tags specified by filter_tags from MARCXML.
-
-    If the user is allowed to run bibedit, then filter nothing, unless
-    force_filtering is set to True.
-
-    :param recxml: marcxml presentation of the record
-    :param user_info: user information; if None, then assume invoked via CLI
-                      with all rights :param filter_tags: list of MARC tags to
-                      be filtered :param force_filtering: do we force filtering
-                      regardless of user rights?
-    :return: recxml without the hidden fields
-    """
-    filter_tags = filter_tags or cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
-    if force_filtering:
-        pass
-    else:
-        if user_info is None:
-            #by default
-            return recxml
-        else:
-            from invenio.modules.access.engine import acc_authorize_action
-            if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
-                #no need to filter
-                return recxml
-    #filter..
-    out = ""
-    omit = False
-    filter_lines = map(make_filter_line, filter_tags)
-    for line in recxml.splitlines(True):
-        #check if this block needs to be omitted
-        for hide_line in filter_lines:
-            if line.count(hide_line):
-                omit = True
-        if not omit:
-            out += line
-        if omit and line.count('</datafield>'):
-            omit = False
-
-    return out
 
 
 def get_output_format_content_type(of, default_content_type="text/html"):
