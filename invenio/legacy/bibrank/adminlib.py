@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ import ConfigParser
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_URL
+from invenio.base.helpers import utf8ifier
 import invenio.modules.access.engine as acce
 from invenio.base.i18n import language_list_long
 from invenio.legacy.dbquery import run_sql, wash_table_column_name
@@ -822,7 +823,7 @@ alternate_row_colors_p - if alternate background colours should be used for the 
         if type(row) not in [int, long, str, dict]:
             # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
             for i in range(len(row)):
-                tblstr += '<td class="{0}">{1}</td>\n'.format(align[i], row[i])
+                tblstr += '<td class="{0}">{1}</td>\n'.format(align[i], utf8ifier(row[i]))
         else:
             tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
         tblstr += ' </tr> \n'
