@@ -21,14 +21,18 @@
 
 import urllib
 
-from .legacy_user import UserInfo
-from flask import request, flash, g, url_for, redirect, session
+from datetime import datetime
+
+from flask import flash, g, redirect, request, session, url_for
 from flask.ext.login import (
     LoginManager,
     current_user,
     login_user as flask_login_user,
-    logout_user
+    logout_user,
+    user_logged_in
 )
+
+from .legacy_user import UserInfo
 
 
 def login_user(user, *args, **kwargs):
@@ -38,7 +42,7 @@ def login_user(user, *args, **kwargs):
     return flask_login_user(user, *args, **kwargs)
 
 
-#FIXME move to account module
+# FIXME move to account module
 def reset_password(email, ln=None):
     """Reset user password."""
     from datetime import timedelta
@@ -64,10 +68,8 @@ def reset_password(email, ln=None):
                       % (_("Password reset request for"),
                          CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
                       websession_templates.
-                      tmpl_account_reset_password_email_body(email,
-                                                             reset_key,
-                                                             request.remote_addr,
-                                                             ln)):
+                      tmpl_account_reset_password_email_body(
+                          email, reset_key, request.remote_addr, ln)):
         return False  # mail could not be sent
 
     return True  # password reset email send successfully
@@ -115,13 +117,12 @@ def authenticate(nickname_or_email=None, password=None,
         user = User.query.filter(*where).one()
     except NoResultFound:
         return None
-    except:
+    except Exception:
         return False
 
     if user.settings['login_method'] != login_method:
-        flash(
-            _("You are not authorized to use '%(x_login_method)s' login method.",
-              x_login_method=login_method), 'error')
+        flash(_("You are not authorized to use '%(x_login_method)s' login "
+                "method.", x_login_method=login_method), 'error')
         return False
 
     if user.note == '2':  # account is not confirmed
@@ -164,6 +165,14 @@ def setup_app(app):
                                                'webaccount.login')
     _login_manager.anonymous_user = UserInfo
     _login_manager.unauthorized_handler(do_login_first)
+
+    @user_logged_in.connect_via(app)
+    def _logged_in(sender, user):
+        """Update last login date."""
+        from invenio.modules.accounts.models import User
+        User.query.filter_by(id=user.get_id()).update(dict(
+            last_login=datetime.now()
+        ))
 
     @_login_manager.user_loader
     def _load_user(uid):
