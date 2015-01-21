@@ -697,7 +697,7 @@ def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
             name = "Untitled Taxonomy"
         if kbtype == "dynamic":
             name = "Untitled dynamic"
-        kb_id = bibknowledge.add_kb(kb_name=name, kb_type=kbtype)
+        kb_id = bibknowledge.add_kb(kb_name=name.decode('utf-8'), kb_type=kbtype)
         redirect_to_url(req, "kb?ln=%(ln)s&amp;action=attributes&amp;kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         navtrail_previous_links = ''' &gt; <a class="navtrail" href="%s/kb?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln, _("Manage Knowledge Bases"))

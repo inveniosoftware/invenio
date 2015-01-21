@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,14 +20,11 @@
 """Test knowledge REST API."""
 
 from __future__ import print_function
-# from collections import OrderedDict
-# from datetime import datetime
-# from dateutil.tz import tzutc
+
 from invenio.base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.ext.restful.utils import APITestCase
-# from invenio.ext.restful import validation_errors
 from invenio.ext.sqlalchemy.utils import session_manager
+from invenio.testsuite import make_test_suite, run_test_suite
 
 db = lazy_import('invenio.ext.sqlalchemy.db')
 
@@ -45,27 +42,27 @@ class TestKnowledgeRestfulAPI(APITestCase):
                           kbtype='w')
         db.session.add(self.kb_a)
 
-        # add tag
+        # add kbrval
         key = "testkey1"
         value = "testvalue1"
         self.kb_a.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag (with different key and same value)
+        # add kbrval (with different key and same value)
         key = "testkey1_1"
         value = "testvalue1"
         self.kb_a.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey2"
         value = "testvalue2"
         self.kb_a.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey3"
         value = "testvalue3"
         self.kb_a.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey4"
         value = "testvalue4"
         self.kb_a.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
@@ -74,22 +71,22 @@ class TestKnowledgeRestfulAPI(APITestCase):
                           kbtype='w')
         db.session.add(self.kb_b)
 
-        # add tag
+        # add kbrval
         key = "testkey1b"
         value = "testvalue1b"
         self.kb_b.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey2b"
         value = "testvalue2b"
         self.kb_b.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey3b"
         value = "testvalue3b"
         self.kb_b.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
 
-        # add tag
+        # add kbrval
         key = "testkey4b"
         value = "testvalue4b"
         self.kb_b.kbrvals.set(KnwKBRVAL(m_key=key, m_value=value))
@@ -108,7 +105,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbresource',
             urlargs={
-                'id': self.kb_a.id,
+                'slug': self.kb_a.slug,
                 'page': 1,
                 'per_page': per_page,
                 'from': '2'
@@ -131,7 +128,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbresource',
             urlargs={
-                'id': self.kb_b.id,
+                'slug': self.kb_b.slug,
                 'page': 1,
                 'per_page': per_page,
                 'from': 'not_existing_mapping_from'
@@ -149,7 +146,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbresource',
             urlargs={
-                'id': self.kb_b.id,
+                'slug': self.kb_b.slug,
                 'page': 1,
                 'per_page': per_page,
                 'from': 'testkey1b'
@@ -168,10 +165,10 @@ class TestKnowledgeRestfulAPI(APITestCase):
 
     def test_get_knwkb_not_exist(self):
         """Test return a knowledge that not exists."""
-        id = 10000
+        slug = 'testsuite-slug-not-exists-123'
         get_answer = self.get(
             'knwkbresource',
-            urlargs=dict(id=id),
+            urlargs=dict(slug=slug),
             user_id=1,
         )
 
@@ -188,7 +185,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbmappingsresource',
             urlargs=dict(
-                id=self.kb_a.id,
+                slug=self.kb_a.slug,
                 page=1,
                 per_page=10,
                 to="2"
@@ -207,7 +204,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbmappingstoresource',
             urlargs={
-                'id': self.kb_a.id,
+                'slug': self.kb_a.slug,
                 'page': 1,
                 'per_page': per_page,
                 'unique': '1'
@@ -230,7 +227,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
         get_answer = self.get(
             'knwkbmappingstoresource',
             urlargs={
-                'id': self.kb_a.id,
+                'slug': self.kb_a.slug,
                 'page': 1,
                 'per_page': per_page,
             },
@@ -246,6 +243,61 @@ class TestKnowledgeRestfulAPI(APITestCase):
         assert 'testvalue4' not in answer
         assert len(answer) == 4
 
+    def test_not_allowed_url(self):
+        """Check not allowed url."""
+        paths = [
+            'foo',
+            'foo/bar',
+            '123',
+            'test/url/foo',
+        ]
+
+        for path in paths:
+            self.get(
+                'notimplementedknowledegeresource',
+                urlargs={
+                    'slug': self.kb_a.slug,
+                    'foo': path,
+                },
+                user_id=1,
+                code=405,
+            )
+            self.head(
+                'notimplementedknowledegeresource',
+                urlargs={
+                    'slug': self.kb_a.slug,
+                    'foo': path,
+                },
+                user_id=1,
+                code=405,
+            )
+            self.options(
+                'notimplementedknowledegeresource',
+                urlargs={
+                    'slug': self.kb_a.slug,
+                    'foo': path,
+                },
+                user_id=1,
+                code=405,
+            )
+            self.post(
+                'notimplementedknowledegeresource',
+                urlargs={
+                    'slug': self.kb_a.slug,
+                    'foo': path,
+                },
+                user_id=1,
+                code=405,
+            )
+            self.put(
+                'notimplementedknowledegeresource',
+                urlargs={
+                    'slug': self.kb_a.slug,
+                    'foo': path,
+                },
+                user_id=1,
+                code=405,
+            )
 
 TEST_SUITE = make_test_suite(TestKnowledgeRestfulAPI)
 

@@ -25,8 +25,10 @@ from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.search.models import Collection
+from invenio.utils.text import slugify
 
 from sqlalchemy.event import listens_for
+
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 
@@ -43,9 +45,27 @@ class KnwKB(db.Model):
     __tablename__ = 'knwKB'
     id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
                    primary_key=True, autoincrement=True)
-    name = db.Column(db.String(255), server_default='', unique=True)
-    _description = db.Column(db.Text, nullable=False, name="description")
+    _name = db.Column(db.String(255), server_default='',
+                      unique=True, name="name")
+    _description = db.Column(db.Text, nullable=False,
+                             name="description", default="")
     _kbtype = db.Column(db.Char(1), nullable=True, default='w', name="kbtype")
+    slug = db.Column(db.String(255), unique=True, nullable=False, default="")
+    # Enable or disable the access from REST API
+    is_api_accessible = db.Column(db.Boolean, default=True, nullable=False)
+
+    @db.hybrid_property
+    def name(self):
+        """Get name."""
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        """Set name and generate the slug."""
+        self._name = value
+        # generate slug
+        if not self.slug:
+            self.slug = KnwKB.generate_slug(value)
 
     @db.hybrid_property
     def description(self):
@@ -169,6 +189,44 @@ class KnwKB(db.Model):
             self.kbdefs = KnwKBDDEF(output_tag=field,
                                     search_expression=expression,
                                     collection=collection)
+
+    @staticmethod
+    def generate_slug(name):
+        """Generate a slug for the knowledge.
+
+        :param name: text to slugify
+        :return: slugified text
+        """
+        slug = slugify(name)
+
+        i = KnwKB.query.filter(db.or_(
+            KnwKB.slug.like(slug),
+            KnwKB.slug.like(slug + '-%'),
+        )).count()
+
+        return slug + ('-{0}'.format(i) if i > 0 else '')
+
+    @staticmethod
+    def exists(kb_name):
+        """Return True if a kb with the given name exists.
+
+        :param kb_name: the name of the knowledge base
+        :return: True if kb exists
+        """
+        return KnwKB.query_exists(KnwKB.name.like(kb_name))
+
+    @staticmethod
+    def query_exists(filters):
+        """Return True if a kb with the given filters exists.
+
+        E.g: KnwKB.query_exists(KnwKB.name.like('FAQ'))
+
+        :param filters: filter for sqlalchemy
+        :return: True if kb exists
+        """
+        return db.session.query(
+            KnwKB.query.filter(
+                filters).exists()).scalar()
 
     def get_filename(self):
         """Construct the file name for taxonomy knoledge."""

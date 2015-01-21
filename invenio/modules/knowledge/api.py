@@ -25,6 +25,7 @@ import re
 import warnings
 
 from invenio.base.globals import cfg
+from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.search.models import Collection
@@ -48,9 +49,21 @@ except ImportError:
         pass
 
 
+def get_kb_by_slug(slug):
+    """Return the knwKB object with given slug.
+
+    :param slug: slug of knowledge
+    :return: knowledge's object
+    :raises: :exc:`~sqlalchemy.orm.exc.NoResultFound` in case not exist.
+    """
+    return models.KnwKB.query.filter_by(slug=slug).one()
+
+
 def get_kb_by_id(kb_id):
     """Return the knwKB object with given id.
 
+    :param kb_id: id of knowledge
+    :return: knowledge's object
     :raises: :exc:`~sqlalchemy.orm.exc.NoResultFound` in case not exist.
     """
     return models.KnwKB.query.filter_by(id=kb_id).one()
@@ -274,10 +287,9 @@ def kb_exists(kb_name):
     """Return True if a kb with the given name exists.
 
     :param kb_name: the name of the knowledge base
+    :return: True if kb exists
     """
-    return db.session.query(
-        models.KnwKB.query.filter(
-            models.KnwKB.name.like(kb_name)).exists()).scalar()
+    return models.KnwKB.exists(kb_name)
 
 
 def get_kb_name(kb_id):
@@ -300,7 +312,7 @@ def update_kb_attributes(kb_name, new_name, new_description=''):
         .update({"name": new_name, "description": new_description})
 
 
-def add_kb(kb_name="Untitled", kb_type=None, tries=10):
+def add_kb(kb_name=u"Untitled", kb_type=None, tries=10):
     """Add a new kb in database, return the id.
 
     Add a new kb in database, and returns its id
@@ -339,9 +351,9 @@ def add_kb(kb_name="Untitled", kb_type=None, tries=10):
 
     if created is False:
         # TODO raise the right exception
-        raise Exception("Can't create kb \"{0}\".\n" +
-                        "Probabily the server is busy! " +
-                        "Try again later.".format(kb_name))
+        raise Exception(_("Can't create knowledge base \"%(name)s\".\n"
+                          "Probabily the server is busy! "
+                          "Try again later.", name=kb_name))
 
     return kb.id
 

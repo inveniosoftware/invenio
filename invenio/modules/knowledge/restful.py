@@ -25,6 +25,7 @@ from flask.ext.restful import Resource, abort, fields, marshal_with, reqparse
 
 from invenio.ext.restful import pagination
 
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 
@@ -39,8 +40,8 @@ def error_handler(f):
             return f(*args, **kwargs)
         except NoResultFound:
             abort(404)
-        except Exception:
-            abort(500, message="Internal server error")
+        except IntegrityError:
+            abort(500)
     return inner
 
 
@@ -58,6 +59,41 @@ knwkb_resource_fields = {
 }
 
 
+def check_knowledge_access(kb):
+    """Check if the knowledge is accessible from api, otherwise abort."""
+    if not kb.is_api_accessible:
+        abort(403, message="Access Forbidden")
+
+
+class KnwKBAllResource(Resource):
+
+    """KnwKB resource."""
+
+    method_decorators = [
+        error_handler
+    ]
+
+    def get(self):
+        """Get KnwKB."""
+        abort(405)
+
+    def head(self):
+        """Head knowledge."""
+        abort(405)
+
+    def options(self):
+        """Option knowledge."""
+        abort(405)
+
+    def post(self):
+        """Post knowledge."""
+        abort(405)
+
+    def put(self):
+        """Put knowledge."""
+        abort(405)
+
+
 class KnwKBResource(Resource):
 
     """KnwKB resource."""
@@ -67,7 +103,7 @@ class KnwKBResource(Resource):
     ]
 
     @marshal_with(knwkb_resource_fields)
-    def get(self, id):
+    def get(self, slug):
         """Get KnwKB.
 
         Url parameters:
@@ -78,7 +114,11 @@ class KnwKBResource(Resource):
             - match_type: s=substring, e=exact, sw=startswith
             - sortby: 'from' or 'to'
         """
-        kb = api.get_kb_by_id(id)
+        kb = api.get_kb_by_slug(slug)
+
+        # check if is accessible from api
+        check_knowledge_access(kb)
+
         parser = reqparse.RequestParser()
         parser.add_argument(
             'from', type=str,
@@ -103,19 +143,19 @@ class KnwKBResource(Resource):
                              per_page=args['per_page'])
         return kb_dict
 
-    def head(self, id):
+    def head(self, slug):
         """Head knowledge."""
         abort(405)
 
-    def options(self, id):
+    def options(self, slug):
         """Option knowledge."""
         abort(405)
 
-    def post(self, id):
+    def post(self, slug):
         """Post knowledge."""
         abort(405)
 
-    def put(self, id):
+    def put(self, slug):
         """Put knowledge."""
         abort(405)
 
@@ -158,7 +198,7 @@ class KnwKBMappingsResource(Resource):
         return []
 
     @marshal_with(knwkb_mappings_resource_fields)
-    def get(self, id):
+    def get(self, slug):
         """Get list of mappings.
 
         Url parameters:
@@ -169,7 +209,11 @@ class KnwKBMappingsResource(Resource):
             - match_type: s=substring, e=exact, sw=startswith
             - sortby: 'from' or 'to'
         """
-        kb = api.get_kb_by_id(id)
+        kb = api.get_kb_by_slug(slug)
+
+        # check if is accessible from api
+        check_knowledge_access(kb)
+
         parser = reqparse.RequestParser()
         parser.add_argument(
             'from', type=str,
@@ -191,19 +235,19 @@ class KnwKBMappingsResource(Resource):
                              args['match_type'], args['sortby'],
                              args['page'], args['per_page'])
 
-    def head(self, id):
+    def head(self, slug):
         """Head knowledge."""
         abort(405)
 
-    def options(self, id):
+    def options(self, slug):
         """Option knowledge."""
         abort(405)
 
-    def post(self, id):
+    def post(self, slug):
         """Post knowledge."""
         abort(405)
 
-    def put(self, id):
+    def put(self, slug):
         """Put knowledge."""
         abort(405)
 
@@ -261,7 +305,7 @@ class KnwKBMappingsToResource(Resource):
             ).slice(items)
         return []
 
-    def get(self, id):
+    def get(self, slug):
         """Get list of "mapping to".
 
         Url parameters
@@ -271,7 +315,11 @@ class KnwKBMappingsToResource(Resource):
             - per_page
             - match_type: s=substring, e=exact, sw=startswith
         """
-        kb = api.get_kb_by_id(id)
+        kb = api.get_kb_by_slug(slug)
+
+        # check if is accessible from api
+        check_knowledge_access(kb)
+
         parser = reqparse.RequestParser()
         parser.add_argument(
             'unique', type=bool,
@@ -291,19 +339,19 @@ class KnwKBMappingsToResource(Resource):
                          args['match_type'],
                          args['page'], args['per_page'], args['unique'])
 
-    def head(self, id):
+    def head(self, slug):
         """Head knowledge."""
         abort(405)
 
-    def options(self, id):
+    def options(self, slug):
         """Option knowledge."""
         abort(405)
 
-    def post(self, id):
+    def post(self, slug):
         """Post knowledge."""
         abort(405)
 
-    def put(self, id):
+    def put(self, slug):
         """Put knowledge."""
         abort(405)
 
@@ -356,7 +404,7 @@ class KnwKBMappingsFromResource(Resource):
                     ).items]
         return []
 
-    def get(self, id):
+    def get(self, slug):
         """Get list of "mappings from".
 
         Url parameters
@@ -366,7 +414,11 @@ class KnwKBMappingsFromResource(Resource):
             - per_page
             - match_type: s=substring, e=exact, sw=startswith
         """
-        kb = api.get_kb_by_id(id)
+        kb = api.get_kb_by_slug(slug)
+
+        # check if is accessible from api
+        check_knowledge_access(kb)
+
         parser = reqparse.RequestParser()
         parser.add_argument(
             'unique', type=bool,
@@ -386,38 +438,77 @@ class KnwKBMappingsFromResource(Resource):
                          args['match_type'],
                          args['page'], args['per_page'], args['unique'])
 
-    def head(self, id):
+    def head(self, slug):
         """Head knowledge."""
         abort(405)
 
-    def options(self, id):
+    def options(self, slug):
         """Option knowledge."""
         abort(405)
 
-    def post(self, id):
+    def post(self, slug):
         """Post knowledge."""
         abort(405)
 
-    def put(self, id):
+    def put(self, slug):
         """Put knowledge."""
+        abort(405)
+
+
+class NotImplementedKnowledegeResource(Resource):
+
+    """Path not used in REST API."""
+
+    method_decorators = [
+        error_handler
+    ]
+
+    def get(self, slug, foo, bar=None):
+        """Get."""
+        abort(405)
+
+    def head(self, slug, foo, bar=None):
+        """Head."""
+        abort(405)
+
+    def options(self, slug, foo, bar=None):
+        """Option."""
+        abort(405)
+
+    def post(self, slug, foo, bar=None):
+        """Post."""
+        abort(405)
+
+    def put(self, slug, foo, bar=None):
+        """Put."""
         abort(405)
 
 
 def setup_app(app, api):
     """setup the resources urls."""
     api.add_resource(
+        KnwKBAllResource,
+        '/api/knowledge'
+    )
+    api.add_resource(
         KnwKBResource,
-        '/api/knowledge/<int:id>'
+        '/api/knowledge/<string:slug>'
     )
     api.add_resource(
         KnwKBMappingsResource,
-        '/api/knowledge/<int:id>/mappings'
+        '/api/knowledge/<string:slug>/mappings'
     )
     api.add_resource(
         KnwKBMappingsToResource,
-        '/api/knowledge/<int:id>/mappings/to'
+        '/api/knowledge/<string:slug>/mappings/to'
     )
     api.add_resource(
         KnwKBMappingsFromResource,
-        '/api/knowledge/<int:id>/mappings/from'
+        '/api/knowledge/<string:slug>/mappings/from'
+    )
+
+    # for other urls, return "Method Not Allowed"
+    api.add_resource(
+        NotImplementedKnowledegeResource,
+        '/api/knowledge/<string:slug>/<path:foo>'
     )
