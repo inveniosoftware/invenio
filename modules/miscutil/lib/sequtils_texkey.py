@@ -19,7 +19,8 @@
 
 from invenio.sequtils import SequenceGenerator
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_value, create_record
+from invenio.bibrecord import record_get_field_value, create_record, \
+                              record_get_field_values
 
 # Imports related to the texkey generation daemon
 from invenio.search_engine import perform_request_search, get_record
@@ -134,7 +135,13 @@ class TexkeySeq(SequenceGenerator):
                                             ind2="",
                                             code="a")
             if not main_author:
-                raise TexkeyNoAuthorError
+                # Check if it is a Proceedings record
+                collections = [collection.lower() for collection in
+                               record_get_field_values(bibrecord, "980", code="a")]
+                if "proceedings" in collections:
+                    main_author = "Proceedings"
+                else:
+                    raise TexkeyNoAuthorError
 
         # Remove utf-8 special characters
         main_author = unidecode(main_author.decode('utf-8'))
