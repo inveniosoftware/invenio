@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@
 
 """Deposit bundles."""
 
+from invenio.base.bundles import invenio as _i, jquery as _j
 from invenio.ext.assets import Bundle, RequireJSFilter
-from invenio.base.bundles import jquery as _j, invenio as _i
 
 js = Bundle(
     "vendors/plupload/js/moxie.js",
@@ -33,7 +33,7 @@ js = Bundle(
         "plupload": "latest",
         "ckeditor": "latest",
         "flight": "latest",
-        "eonasdan-bootstrap-datetimepicker": "latest",
+        "eonasdan-bootstrap-datetimepicker": "3.1.3",
     }
 )
 
