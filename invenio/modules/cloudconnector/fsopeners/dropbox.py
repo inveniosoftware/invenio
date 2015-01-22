@@ -17,9 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-DropBox Filesystem Factory
---------------------------
+"""DropBox Filesystem Factory.
+
 A factory for dropbox file system.
 
 You might need to add following config variable::
@@ -49,7 +48,6 @@ You might need to add following config variable::
         consumer_key="changeme",
         consumer_secret="changeme",
     )
-
 """
 
 from flask import url_for
@@ -62,10 +60,13 @@ from invenio.modules.oauthclient.views.client import oauth
 
 
 class Factory(object):
+
+    """Dropbox Factory."""
+
     def build_fs(self, current_user, credentials, root=None,
                  callback_url=None, request=None, session=None):
+        """Build dropbox filesystem."""
         url = url_for('oauthclient.login', remote_app='dropbox')
-
         client_id = oauth.remote_apps['dropbox'].consumer_key
         user_id = current_user.get_id()
         token = RemoteToken.get(user_id, client_id)

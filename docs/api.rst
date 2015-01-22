@@ -30,11 +30,11 @@ Extensions
 
 .. toctree::
    :maxdepth: 1
-
    ext/assets
    ext/arxiv
    ext/crossref
    ext/elasticsearch
+   ext/fs
    ext/jasmine
    ext/logging
    ext/login

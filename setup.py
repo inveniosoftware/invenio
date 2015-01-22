@@ -126,14 +126,27 @@ install_requires = [
 
 
 extras_require = {
+    "cloud": [
+        "dropbox",
+        "google_drive"
+    ],
     "docs": [
         "sphinx_rtd_theme"
     ],
     "development": [
         "Flask-DebugToolbar==0.9.0",
     ],
+    "dropbox": [
+        "dropbox>=2.1.0"
+    ],
     "elasticsearch": [
         "pyelasticsearch>=0.6.1"
+    ],
+    "google_drive": [
+        "google-api-python-client>=1.2",
+        "apiclient",
+        "oauth2client",
+        "urllib3>=1.8.3"
     ],
     "img": [
         "qrcode",
@@ -143,18 +156,14 @@ extras_require = {
         "pymongo"
     ],
     "misc": [  # was requirements-extras
-        "apiclient",  # extra=cloud?
-        "dropbox",  # extra=cloud?
         "gnuplot-py==1.8",
         "flake8",  # extra=kwalitee?
         "pep8",  # extra=kwalitee?
         "pychecker==0.8.19",  # extra=kwalitee?
         "pylint",  # extra=kwalitee?
         "nosexcover",  # test?
-        "oauth2client",  # extra=cloud?
         "python-onedrive",  # extra=cloud?
         "python-openid",  # extra=sso?
-        "urllib3",  # extra=cloud?
     ],
     "mixer": [
         "mixer",
