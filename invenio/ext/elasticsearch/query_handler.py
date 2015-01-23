@@ -35,19 +35,22 @@ class QueryHandler(object):
             Ths second list contains the forbiden collections
         """
         from flask.ext.login import current_user
-        #no_cols= current_user.get("precached_permitted_restricted_collections")
-        #yes_cols = []
-        no_cols= ["ALEPH"]
-        yes_cols = ["Articles", "Preprints"]
-        yes_cols = []
-        no_cols = []
-        return yes_cols, no_cols
+        allowed_from_restricted = current_user.get("precached_permitted_\
+                restricted_collections", [])
+        print allowed_from_restricted
+
+        from invenio.modules.collections.cache import \
+                restricted_collection_cache
+        restricted = restricted_collection_cache.cache
+        print restricted
+
+        final_restricted = list(set(restricted) - set(allowed_from_restricted))
+        return final_restricted
 
     def format_collection_filters(self):
-        yes_cols, no_cols = self.get_permitted_restricted_colleciton()
-        should_f = {"_collections": yes_cols}
+        no_cols = self.get_permitted_restricted_colleciton()
         must_not_f = {"_collections": no_cols}
-        return should_f, must_not_f
+        return must_not_f
 
     def format_filters(self, must_f, should_f, must_not_f):
         """Accepts three list of dictionaries
@@ -81,8 +84,8 @@ class QueryHandler(object):
 
     def format_query(self, query, user_filters=None):
         # FIXME handle the given filters
-        should, must_not = self.format_collection_filters()
-        filters = self.format_filters([], [should], [must_not])
+        must_not = self.format_collection_filters()
+        filters = self.format_filters([], [], [must_not])
 
         dsl_query = {"query": query}
         if filters:
