@@ -410,6 +410,23 @@ def normalize_format(docformat, allow_subformat=True):
         }.get(docformat, docformat)
     return docformat + subformat
 
+def guess_via_magic(local_path):
+    """
+    Returns the guessed extension using the magic library.
+    """
+    if CFG_HAS_MAGIC == 1:
+        magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
+        mimetype = magic_cookie.file(local_path)
+    elif CFG_HAS_MAGIC == 2:
+        mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
+    if CFG_HAS_MAGIC:
+        if mimetype in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
+            return normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[mimetype])
+        else:
+            return normalize_format(_mimes.guess_extension(mimetype))
+    return ""
+
+
 def guess_format_from_url(url):
     """
     Given a URL tries to guess it's extension.
@@ -423,20 +440,6 @@ def guess_format_from_url(url):
         recognize it.
     @rtype: string
     """
-    def guess_via_magic(local_path):
-        try:
-            if CFG_HAS_MAGIC == 1:
-                magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
-                mimetype = magic_cookie.file(local_path)
-            elif CFG_HAS_MAGIC == 2:
-                mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
-            if CFG_HAS_MAGIC:
-                if mimetype in CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING:
-                    return normalize_format(CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING[mimetype])
-                else:
-                    return normalize_format(_mimes.guess_extension(mimetype))
-        except Exception:
-            pass
 
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
