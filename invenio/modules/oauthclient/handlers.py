@@ -20,6 +20,8 @@
 """ Handlers for customizing oauthclient endpoints. """
 
 import six
+import urllib
+
 from functools import wraps, partial
 from werkzeug.utils import import_string
 from flask import session, redirect, flash, url_for, current_app, request, \
@@ -234,7 +236,8 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
     # Redirect to next
     if request.args.get('next', None):
-        return redirect(request.args.get('next'))
+        # The extra unquote might not be needed in the future
+        return redirect(urllib.unquote(request.args.get('next')))
     else:
         return redirect('/')
 
