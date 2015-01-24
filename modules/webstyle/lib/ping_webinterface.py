@@ -26,6 +26,7 @@ class WebInterfacePingPages(WebInterfaceDirectory):
     _exports = [""]
 
     def __call__(self, req, form):
+        req.status = 200
         return 'OK'
 
     index = __call__

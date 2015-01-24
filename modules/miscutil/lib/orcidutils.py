@@ -747,9 +747,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
                 try:
                     _stub_method()
                 except DoubledIds:
-                    register_exception(subject="The paper %s contains the same doi"
-                                       " %s twice." % (recid, encoded),
-                                       alert_admin=True)
+                    register_exception(subject="The paper %s contains the same doi %s twice." %
+                                       (recid, encoded), alert_admin=True)
             else:
                 external_ids.append(('doi', encoded))
     if isbn:
