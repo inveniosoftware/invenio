@@ -368,6 +368,20 @@ def submit_refextract_task(recids):
         task_low_level_submission('refextract', NAME, '-i', recids_str,
                                   '--overwrite')
 
+def fetch_records_with_arxiv_fulltext():
+    """
+    Returns all the record IDs for records that have an arXiv bibdocfile
+    attached.
+    """
+    return intbitset(run_sql("select id_bibrec from bibrec_bibdoc join bibdoc on id_bibdoc=id where bibrec_bibdoc.type='arXiv' or bibdoc.doctype='arXiv'"))
+
+def fetch_records_missing_arxiv_fulltext():
+    """
+    Returns all the record IDs for records which are supposed to have an arXiv
+    fulltext but do not have it.
+    """
+    return search_pattern(p='035__9:"arXiv" - 980:DELETED') - fetch_records_with_arxiv_fulltext()
+
 _RE_ARXIV_ID = re.compile(re.escape("<identifier>oai:arXiv.org:") + "(.+?)" + re.escape("</identifier>"), re.M)
 def fetch_updated_arxiv_records(date):
     """Fetch all the arxiv records modified since the last run"""
@@ -395,7 +409,7 @@ def task_run_core(name=NAME):
     else:
         start_date = datetime.now()
         dummy, last_date = fetch_last_updated(name)
-        recids = fetch_updated_arxiv_records(last_date)
+        recids = fetch_updated_arxiv_records(last_date) | fetch_records_missing_arxiv_fulltext()
 
     updated_recids = set()
 
