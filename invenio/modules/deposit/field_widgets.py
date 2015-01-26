@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -346,9 +346,11 @@ class DynamicItemWidget(ListItemWidget):
         # Field
         html.append(subfield())
         # Buttons
+        remove_button = self._remove_button() \
+            if subfield.id.split("-")[-1] != "0" else ""
         html.append("<div %s>%s</div>" % (
             html_params(class_='col-xs-2'),
-            self._sort_button() + self._remove_button()
+            self._sort_button() + remove_button
         ))
         html.append("</div>")
         return ''.join(html)
