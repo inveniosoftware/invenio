@@ -26,7 +26,7 @@ import re
 
 from invenio.config import CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
-
+from invenio.textutils import translate_to_ascii
 
 class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
 
@@ -38,7 +38,9 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
     'titles', both incidental and permanent, e.g., 'VIII', '(ed.)', 'Msc'
     """
 
-    def __init__(self, stemming_language=None, remove_stopwords=False, remove_html_markup=False, remove_latex_markup=False):
+    def __init__(self, stemming_language=None, remove_stopwords=False,
+                 remove_html_markup=False, remove_latex_markup=False,
+                 apply_asciification=False):
         BibIndexDefaultTokenizer.__init__(self, stemming_language,
                                           remove_stopwords,
                                           remove_html_markup,
@@ -50,6 +52,7 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
         # same function as the American hyphen, but using linguistic
         # constructs.
         self.lastname_stopwords = set(['y', 'of', 'and', 'de'])
+        self.apply_asciification = apply_asciification
 
     def scan_string_for_phrases(self, s):
         """Scan a name string and output an object representing its structure.
@@ -295,6 +298,8 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             It's for the compatibility.
             See: tokenize_for_fuzzy_authors
         """
+        if self.apply_asciification:
+            phrase = translate_to_ascii(phrase)[0]
         return self.tokenize_for_fuzzy_authors(phrase)
 
     def tokenize_for_words_default(self, phrase):
@@ -329,6 +334,8 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             If CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES is 1 we tokenize only for family names.
             In other case we perform standard tokenization for words.
         """
+        if self.apply_asciification:
+            phrase = translate_to_ascii(phrase)[0]
         if CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
             return self.get_author_family_name_words_from_phrase(phrase)
         else:
