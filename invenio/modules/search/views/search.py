@@ -217,7 +217,7 @@ def collection_breadcrumbs(collection, endpoint=None):
     if endpoint is None:
         endpoint = request.endpoint
     if collection.id > 1:
-        qargs = request.args.to_dict()
+        qargs = request.values.to_dict()
         k = 'cc' if 'cc' in qargs else 'c'
         del qargs[k]
         b = [(_('Home'), endpoint, qargs)] + collection.breadcrumbs(
@@ -369,7 +369,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     ctx = dict(
         facets=facets.get_facets_config(collection, qid),
         records=records,
-        qid=qid, rg=rg,
+        rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
         easy_search_form=EasySearchForm(csrf_enabled=False),
         ot=ot
@@ -423,57 +423,6 @@ def facet(name, qid):
         response = make_response('<html><body>%s</body></html>' % str(out))
         response.mimetype = 'text/html'
         return response
-
-
-@blueprint.route('/results/<qid>', methods=['GET', 'POST'])
-@wash_arguments({'p': (unicode, ''),
-                 'of': (unicode, 'hb'),
-                 'so': (unicode, None),
-                 'sf': (unicode, None),
-                 'sp': (unicode, None),
-                 'rm': (unicode, None)})
-def results(qid, p, of, so, sf, sp, rm):
-    """
-    Generate results for cached query using POSTed filter.
-
-    :param qid: query indentifier
-    """
-    try:
-        recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
-    except KeyError:
-        return 'KeyError'
-    except:
-        return _('Please reload the page')
-
-    try:
-        filter_data = json.loads(request.values.get('filter', '[]'))
-    except:
-        return _('Invalid filter data')
-
-    @check_collection(
-        name_getter=functools.partial(get_collection_name_from_cache, qid))
-    def make_results(collection):
-        recids = faceted_results_filter(recIDsHitSet,
-                                        filter_data,
-                                        facets)
-        jrec = request.values.get('jrec', 1, type=int)
-        rg = request.values.get('rg', 10, type=int)
-        recids = sort_and_rank_records(recids, so=so, rm=rm, sf=sf,
-                                       sp=sp, p=p)
-        records = len(recids)
-
-        if records > 0 and records < jrec:
-            args = request.values.to_dict()
-            args["jrec"] = 1
-            return redirect(url_for(request.endpoint, qid=qid, **args))
-
-        from invenio.legacy.search_engine import slice_records
-        return response_formated_records(
-            slice_records(recids, jrec, rg), collection, of,
-            create_nearest_terms_box=_create_neareset_term_box, qid=qid,
-            records=records)
-
-    return make_results()
 
 
 @blueprint.route('/list/<any(exactauthor, keyword, affiliation, reportnumber, '
