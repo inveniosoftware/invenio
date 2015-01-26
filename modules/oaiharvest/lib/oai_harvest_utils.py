@@ -118,60 +118,48 @@ def remove_duplicates(harvested_file_list):
     Usually happens when records are cross-listed across OAI sets.
 
     Saves a backup of original harvested file in: filename~
+
+    @param harvested_file_list: list of files to process and dedupe
     """
+    from copy import deepcopy
+    import lxml.etree as etree
+
     harvested_identifiers = []
     for harvested_file in harvested_file_list:
+
         # Firstly, rename original file to temporary name
         try:
             os.rename(harvested_file, "%s~" % (harvested_file,))
+        except OSError:
+            write_message("Error renaming harvested file '%s'. Skipping..." \
+                          % (harvested_file,))
+            continue
+
+        # Secondly, open target file for writing
+        try:
+            updated_harvested_file = open(harvested_file, 'w')
         except IOError:
-            write_message("Error renaming harvested file '%s': %s" % \
-                         (harvested_file, traceback.print_exc()))
-            continue
-        # Secondly, open files for writing and reading
-        original_harvested_file = None
-        try:
-            try:
-                original_harvested_file = open("%s~" % (harvested_file,))
-                data = original_harvested_file.read()
-            except IOError:
-                write_message("Error opening harvested file '%s': %s" % \
-                             (harvested_file, traceback.print_exc()))
-                continue
-        finally:
-            if original_harvested_file:
-                original_harvested_file.close()
-
-        if '<ListRecords>' not in data:
-            # We do not need to de-duplicate in non-ListRecords requests
+            write_message("Error opening harvested file '%s'. Skipping.."   \
+                          % (harvested_file,))
             continue
 
-        updated_file_content = []
-        # Get and write OAI-PMH XML header data to updated file
-        header_index_end = data.find("<ListRecords>") + len("<ListRecords>")
-        updated_file_content.append("%s" % (data[:header_index_end],))
+        # parse original file
+        tree = etree.parse("%s~" % (harvested_file,))
+        root = tree.getroot()
 
-        # By checking the OAI ID we write all records not written previously (in any file)
-        harvested_records = REGEXP_RECORD.findall(data)
-        for record in harvested_records:
-            oai_identifier = REGEXP_OAI_ID.search(record)
-            if oai_identifier != None and oai_identifier.group(1) not in harvested_identifiers:
-                updated_file_content.append("<record>%s</record>" % (record,))
-                harvested_identifiers.append(oai_identifier.group(1))
-        updated_file_content.append("</ListRecords>\n</OAI-PMH>")
-        updated_harvested_file = None
-        try:
-            try:
-                updated_harvested_file = open(harvested_file, 'w')
-                updated_harvested_file.write("\n".join(updated_file_content))
-            except IOError:
-                write_message("Error saving updated harvest-file '%s': %s" % \
-                             (harvested_file, traceback.print_exc()))
-                continue
-        finally:
-            if updated_harvested_file:
-                updated_harvested_file.close()
+        # build up new xml structure
+        newroot = etree.Element('OAI-PMH')
+        newListRecords = etree.SubElement(newroot, 'ListRecords')
 
+        for rec in root.xpath("//*[local-name() = 'record']"):
+            tmp = deepcopy(rec)
+            for i in tmp.xpath("//*[local-name() = 'identifier']"):
+                if not (i.text in harvested_identifiers):
+                    newListRecords.append(deepcopy(rec))
+                    harvested_identifiers.append(i.text)
+
+        updated_harvested_file.write(etree.tostring(newroot))
+        updated_harvested_file.close()
 
 def add_timestamp_and_timelag(timestamp,
                               timelag):
