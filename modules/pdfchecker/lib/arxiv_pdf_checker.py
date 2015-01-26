@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 ArXiv Pdf Checker Task
@@ -34,28 +34,28 @@ import socket
 from invenio.intbitset import intbitset
 from invenio.bibdocfilecli import bibupload_ffts
 from invenio.docextract_task import store_last_updated, \
-                                    fetch_last_updated
+    fetch_last_updated
 from invenio.shellutils import split_cli_ids_arg
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.refextract_api import record_has_fulltext, \
-                                   record_can_extract_refs
+    record_can_extract_refs
 from invenio.bibtask import task_init, \
-                            write_message, \
-                            task_update_progress, \
-                            task_get_option, \
-                            task_set_option, \
-                            task_sleep_now_if_required
+    write_message, \
+    task_update_progress, \
+    task_get_option, \
+    task_set_option, \
+    task_sleep_now_if_required
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.search_engine import search_pattern
 from invenio.config import CFG_VERSION, \
-                           CFG_TMPSHAREDDIR, \
-                           CFG_TMPDIR, \
-                           CFG_ARXIV_URL_PATTERN
+    CFG_TMPSHAREDDIR, \
+    CFG_TMPDIR, \
+    CFG_ARXIV_URL_PATTERN
 # Help message is the usage() print out of how to use Refextract
 from invenio.docextract_record import get_record
 from invenio.bibdocfile import BibRecDocs, \
-                               calculate_md5
+    calculate_md5
 from invenio.oai_harvest_dblayer import get_oai_src
 from invenio import oai_harvest_daemon
 from invenio.filedownloadutils import (download_external_url,
@@ -78,6 +78,7 @@ class FoundExistingPdf(Exception):
 
 
 class AlreadyHarvested(Exception):
+
     def __init__(self, status):
         Exception.__init__(self)
         self.status = status
@@ -228,12 +229,12 @@ def oai_harvest_query(arxiv_id=None, prefix='arXivRaw', verb='GetRecord',
         else:
             identifier = None
         return oai_harvest_daemon.oai_harvest_get(
-                                    prefix=prefix,
-                                    baseurl=repository['baseurl'],
-                                    harvestpath=harvestpath,
-                                    verb=verb,
-                                    identifier=identifier,
-                                    fro=fro)
+            prefix=prefix,
+            baseurl=repository['baseurl'],
+            harvestpath=harvestpath,
+            verb=verb,
+            identifier=identifier,
+            fro=fro)
 
     responses = None
     for retry_count in range(1, max_retries + 1):
@@ -257,6 +258,7 @@ def oai_harvest_query(arxiv_id=None, prefix='arXivRaw', verb='GetRecord',
         raise Exception('arXiv is down')
 
     return responses
+
 
 def fetch_arxiv_version(recid):
     """Query arxiv and extract the version of the pdf from the response"""
@@ -350,7 +352,7 @@ def submit_fixmarc_task(recids):
     """Submit a task that synchronizes the 8564 tags
 
     This should be done right after changing the files attached to a record"""
-    field = [{'doctype' : 'FIX-MARC'}]
+    field = [{'doctype': 'FIX-MARC'}]
     ffts = {}
     for recid in recids:
         ffts[recid] = field
@@ -368,12 +370,14 @@ def submit_refextract_task(recids):
         task_low_level_submission('refextract', NAME, '-i', recids_str,
                                   '--overwrite')
 
+
 def fetch_records_with_arxiv_fulltext():
     """
     Returns all the record IDs for records that have an arXiv bibdocfile
     attached.
     """
     return intbitset(run_sql("select id_bibrec from bibrec_bibdoc join bibdoc on id_bibdoc=id where bibrec_bibdoc.type='arXiv' or bibdoc.doctype='arXiv'"))
+
 
 def fetch_records_missing_arxiv_fulltext():
     """
@@ -382,7 +386,10 @@ def fetch_records_missing_arxiv_fulltext():
     """
     return search_pattern(p='035__9:"arXiv" - 980:DELETED') - fetch_records_with_arxiv_fulltext()
 
-_RE_ARXIV_ID = re.compile(re.escape("<identifier>oai:arXiv.org:") + "(.+?)" + re.escape("</identifier>"), re.M)
+_RE_ARXIV_ID = re.compile(re.escape(
+    "<identifier>oai:arXiv.org:") + "(.+?)" + re.escape("</identifier>"), re.M)
+
+
 def fetch_updated_arxiv_records(date):
     """Fetch all the arxiv records modified since the last run"""
 
@@ -409,7 +416,8 @@ def task_run_core(name=NAME):
     else:
         start_date = datetime.now()
         dummy, last_date = fetch_last_updated(name)
-        recids = fetch_updated_arxiv_records(last_date) | fetch_records_missing_arxiv_fulltext()
+        recids = fetch_updated_arxiv_records(
+            last_date) | fetch_records_missing_arxiv_fulltext()
 
     updated_recids = set()
 
@@ -468,10 +476,11 @@ def main():
     """Constructs the refextract bibtask."""
     # Build and submit the task
     task_init(authorization_action='runarxivpdfchecker',
-        authorization_msg="Arxiv Pdf Checker Task Submission",
-        description="""Daemon that checks if we have the latest version of arxiv PDFs""",
-        # get the global help_message variable imported from refextract.py
-        help_specific_usage="""
+              authorization_msg="Arxiv Pdf Checker Task Submission",
+              description="""Daemon that checks if we have the latest version of arxiv PDFs""",
+              # get the global help_message variable imported from
+              # refextract.py
+              help_specific_usage="""
   Scheduled (daemon) options:
   -i, --id       Record id to check.
 
@@ -480,7 +489,7 @@ def main():
       arxiv-pdf-checker
 
 """,
-        version="Invenio v%s" % CFG_VERSION,
-        specific_params=("i:", ["id="]),
-        task_submit_elaborate_specific_parameter_fnc=cb_parse_option,
-        task_run_fnc=task_run_core)
+              version="Invenio v%s" % CFG_VERSION,
+              specific_params=("i:", ["id="]),
+              task_submit_elaborate_specific_parameter_fnc=cb_parse_option,
+              task_run_fnc=task_run_core)
