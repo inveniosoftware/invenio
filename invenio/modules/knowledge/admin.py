@@ -49,7 +49,6 @@ class KnwKBRVALAdmin(ModelView):
 
     """Flask-Admin module to manage Knowledge Base Mappings."""
 
-    # form_columns = ('m_key', 'm_value', 'kb')
     form = KnwKBRVALForm
 
     column_list = ['id_knwKB', 'm_key', 'm_value']
@@ -80,6 +79,8 @@ class KnowledgeAdmin(ModelView):
 
     _can_create = True
     _can_edit = True
+    # TODO check if multiple deletes of taxonomy type, also delete the
+    # associated files.
     _can_delete = True
 
     acc_view_action = 'cfgbibknowledge'
@@ -106,12 +107,13 @@ class KnowledgeAdmin(ModelView):
         super(KnowledgeAdmin, self).after_model_change(form, model, is_created)
 
         if form.kbtype.data == KnwKB.KNWKB_TYPES['dynamic']:
-            id_collection = form.collection.raw_data or None
+            id_collection = form.id_collection.data or None
             collection = Collection.query.filter_by(
                 id=id_collection).one() if id_collection else None
+
             model.set_dyn_config(
-                field=form.output_tag.raw_data,
-                expression=form.search_expression.raw_data,
+                field=form.output_tag.data,
+                expression=form.search_expression.data,
                 collection=collection)
 
         if form.kbtype.data == KnwKB.KNWKB_TYPES['taxonomy']:
@@ -135,20 +137,21 @@ class KnowledgeAdmin(ModelView):
 
         form = self.form(obj=obj)
 
-        if kbtype == KnwKB.KNWKB_TYPES['dynamic']:
-            if obj.kbdefs:
-                form.collection.data = obj.kbdefs.collection.id \
-                    if obj.kbdefs.collection else 0
-                form.output_tag.data = obj.kbdefs.output_tag
-                form.search_expression.data = obj.kbdefs.search_expression
+        if not form.is_submitted():
+            # load extra data: obj => form
+            if kbtype == KnwKB.KNWKB_TYPES['dynamic']:
+                if obj.kbdefs:
+                    form.id_collection.data = obj.kbdefs.id_collection
+                    form.output_tag.data = obj.kbdefs.output_tag
+                    form.search_expression.data = obj.kbdefs.search_expression
 
-        if kbtype == KnwKB.KNWKB_TYPES['taxonomy']:
-            file_name = obj.get_filename()
-            if os.path.isfile(file_name):
-                form.tfile.label.text = form.tfile.label.text + " *"
-                # TODO add the possibility to download the file
-                form.tfile.description = _("Already uploaded %(name)s",
-                                           name=obj.get_filename())
+            if kbtype == KnwKB.KNWKB_TYPES['taxonomy']:
+                file_name = obj.get_filename()
+                if os.path.isfile(file_name):
+                    form.tfile.label.text = form.tfile.label.text + " *"
+                    # TODO add the possibility to download the file
+                    form.tfile.description = _("Already uploaded %(name)s",
+                                               name=obj.get_filename())
 
         form.kbtype.data = kbtype
 
@@ -171,7 +174,7 @@ class KnowledgeAdmin(ModelView):
         return form
 
     def get_query(self):
-        """docstring for get_query."""
+        """Get query."""
         return KnwKB.query
 
     def __init__(self, app, *args, **kwargs):

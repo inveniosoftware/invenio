@@ -67,7 +67,7 @@ class DynamicKnowledgeForm(KnowledgeForm):
 
     output_tag = TextField(label="Field")
     search_expression = TextField(label="Expression")
-    collection = SelectField(
+    id_collection = SelectField(
         'Collection',
         coerce=int,
         choices=LocalProxy(lambda:
