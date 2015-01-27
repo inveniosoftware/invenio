@@ -31,9 +31,10 @@ Links
 import os
 import sys
 
-from setuptools import setup, find_packages
-from setuptools.command.install_lib import install_lib
 from distutils.command.build import build
+
+from setuptools import find_packages, setup
+from setuptools.command.install_lib import install_lib
 
 
 class _build(build):
@@ -188,7 +189,9 @@ extras_require["docs"] += extras_require["sso"]
 extras_require["docs"] += extras_require["github"]
 
 tests_require = [
-    "httpretty>=0.8",
+    # FIXME remove limit after 0.8.4 is out and urllib3's requirements
+    # (urllib3==1.7.1) will be removed in HTTPretty
+    "httpretty<=0.8.0",
     "Flask-Testing>=0.4.1",
     "mock",
     "nose",
