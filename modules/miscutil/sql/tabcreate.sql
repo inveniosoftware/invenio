@@ -5044,5 +5044,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonva
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjson',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_31_next_collection_tree',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_13_hide_holdings',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_arguments_cfg_namechange',NOW());
 
 -- end of file
