@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,13 +19,15 @@
 
 """Implement custom field widgets."""
 
+import json
 import six
 
 from werkzeug import MultiDict
-import json
-from wtforms.widgets import html_params, HTMLString, RadioInput, HiddenInput, \
-    Input, TextInput
+from wtforms.widgets import HTMLString, HiddenInput, Input, RadioInput, \
+    TextInput, html_params
+
 from invenio.ext.template import render_template_to_string
+from invenio.ext.template.utils import render_macro_from_template
 
 
 def date_widget(field, **kwargs):
@@ -519,14 +521,13 @@ class DynamicListWidget(ExtendedListWidget):
         """Render add button."""
         label = getattr(field, 'add_label', None) or \
             "Add %s" % field.label.text
-        return u"""<div class="row"><div class="col-xs-12">
-                    <span class="pull-right">
-                        <a class="add-element">
-                            <i class="{className}"></i> {label}
-                        </a>
-                    </span>
-                    </div>
-                </div>""".format(className=self.icon_add, label=label)
+        ctx = {
+            "label": label,
+            "icon_add_class": self.icon_add
+        }
+        return render_macro_from_template(name="add_button",
+                                          template="deposit/macros.html",
+                                          ctx=ctx)
 
     def item_kwargs(self, field, subfield):
         """Return keyword arguments for a field."""
