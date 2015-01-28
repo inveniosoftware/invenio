@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -79,6 +79,7 @@ La(2-x)Ba(x)CuO(4) family of high-temperature superconductors.
 class TestTask(InvenioTestCase):
     def setUp(self, recid=RECID, arxiv_id=ARXIV_ID):
         self.recid = recid
+        self.original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,))
         self.arxiv_id = arxiv_id
         self.arxiv_version = 1
         self.bibupload_xml = """<record>
@@ -119,6 +120,7 @@ class TestTask(InvenioTestCase):
         bibupload.bibupload(recs[0], opt_mode='delete')
         oai_harvest_daemon.oai_harvest_get = self.oai_harvest_get
         oai_harvest_dblayer.get_oai_src = self.get_oai_src
+        run_sql("UPDATE bibrec SET modification_date=%s WHERE id=%s", (self.original_modification_date, self.recid,))
 
     def clean_bibtask(self):
         from invenio.arxiv_pdf_checker import NAME
