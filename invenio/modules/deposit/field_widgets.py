@@ -348,9 +348,11 @@ class DynamicItemWidget(ListItemWidget):
         # Field
         html.append(subfield())
         # Buttons
+        remove_button = self._remove_button() \
+            if subfield.id.split("-")[-1] != "0" else ""
         html.append("<div %s>%s</div>" % (
             html_params(class_='col-xs-2'),
-            self._sort_button() + self._remove_button()
+            self._sort_button() + remove_button
         ))
         html.append("</div>")
         return ''.join(html)
