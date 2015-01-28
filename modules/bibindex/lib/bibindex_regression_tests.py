@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -786,7 +786,8 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         index_name = 'author'
         table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
         reindex_for_type_with_bibsched(index_name)
-        run_sql("UPDATE bibrec SET modification_date = now() WHERE id = %s", (authRecID,))
+        original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (authRecID,))
+        run_sql("UPDATE bibrec SET modification_date = now() WHERE id=%s", (authRecID,))
         # run bibindex again
         task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
         filename = task_log_path(task_id, 'log')
@@ -796,6 +797,7 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         self.assertTrue(text.find(CFG_BIBINDEX_UPDATE_MESSAGE) >= 0)
         adding_records_text = CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR[:CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR.find("#")] % table
         self.assertTrue(text.find(adding_records_text) >= 0)
+        run_sql("UPDATE bibrec SET modification_date=%s WHERE id=%s", (original_modification_date, authRecID))
 
     def test_authority_record_enriched_index(self):
         """bibindex - test whether reverse index for bibliographic record
@@ -1849,5 +1851,3 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
-
