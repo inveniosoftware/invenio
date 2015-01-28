@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,24 +24,23 @@ people should be using; just check out its docstring.
 
 __revision__ = "$Id$"
 
+import os
+import re
 import sys
+from cStringIO import StringIO
 from time import sleep
+
 import smtplib
 import socket
-import re
-import os
-
-from email.Header import Header
-from email.MIMEText import MIMEText
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
 from email import Encoders
+from email.Header import Header
+from email.MIMEBase import MIMEBase
 from email.MIMEImage import MIMEImage
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 from email.Utils import formatdate
-from cStringIO import StringIO
 from formatter import DumbWriter, AbstractFormatter
 from invenio.access_control_config import CFG_TEMP_EMAIL_ADDRESS
-
 from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
@@ -53,6 +52,11 @@ from invenio.config import \
      CFG_MISCUTIL_SMTP_PORT, \
      CFG_VERSION, \
      CFG_DEVEL_SITE
+from invenio.errorlib import register_exception
+from invenio.messages import wash_language, gettext_set_language
+from invenio.miscutil_config import InvenioMiscUtilError
+from invenio.textutils import guess_minimum_encoding
+
 
 try:
     from invenio.config import \
@@ -64,10 +68,6 @@ except ImportError:
     CFG_MISCUTIL_SMTP_PASS = ''
     CFG_MISCUTIL_SMTP_TLS = False
 
-from invenio.messages import wash_language, gettext_set_language
-from invenio.textutils import guess_minimum_encoding
-from invenio.errorlib import register_exception
-from invenio.miscutil_config import InvenioMiscUtilError
 
 
 def scheduled_send_email(fromaddr,
@@ -556,7 +556,7 @@ def get_mail_header(value):
     Return a MIME-compliant header-string. Will join lists of strings
     into one string with comma (,) as separator.
     """
-    if type(value) is not str:
+    if not isinstance(value, basestring):
         value = ','.join(value)
     try:
         value = value.encode('ascii')
