@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,8 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Version information for Invenio.
+"""Version information for Invenio.
 
 This file is imported by ``invenio.__init__``, and parsed by ``setup.py``.
 """
@@ -30,12 +30,11 @@ This file is imported by ``invenio.__init__``, and parsed by ``setup.py``.
 # - revision can be set if you want to override the date coming from git.
 #
 # See the doctest below.
-version = (1, 9999, 4, 'dev')
+version = (1, 9999, 5, 'dev')
 
 
 def build_version(*args):
-    """
-    Build a PEP440 compatible version based on a list of arguments.
+    """Build a PEP440 compatible version based on a list of arguments.
 
     Inspired by Django's django.utils.version
 
