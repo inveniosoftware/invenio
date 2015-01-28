@@ -477,7 +477,7 @@ def _fill_dict_of_indexes_with_empty_sets():
     return index_dict
 
 
-def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=False):
+def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes=False):
     """
         Function checks which records need to be changed/reindexed
         for given index/indexes.
@@ -490,6 +490,11 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
                        [[range1_down, range1_up],[range2_down, range2_up]..]
         @param force_all_indexes: should we index all indexes?
     """
+
+    if indexes is None:
+        indexes = []
+    if recIDs is None:
+        recIDs = []
 
     tmp_dates = dict(get_last_updated_all_indexes())
     modification_dates = dict([(date, tmp_dates[date] or datetime(1000, 1, 1, 1, 1, 1))
@@ -520,9 +525,11 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
 
     min_last_updated = get_min_last_updated(indexes)[0][0] or \
                        datetime(1000, 1, 1, 1, 1, 1)
-    indexes_to_change = _fill_dict_of_indexes_with_empty_sets()
+
     recIDs_info = []
     for recIDs_range in recIDs:
+
+        # firstly, determine which records were updated since min_last_updated:
         query = """SELECT id_bibrec,job_date,affected_fields FROM hstRECORD
                    WHERE id_bibrec BETWEEN %s AND %s AND
                          job_date > '%s'""" % \
@@ -531,6 +538,18 @@ def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=Fal
         if res:
             recIDs_info.extend(res)
 
+        # secondly, there may be newly inserted records which were
+        # uploaded with old timestamp (via 005), so let us detect
+        # those too, using their "real" modification_date:
+        res = run_sql("""SELECT id,modification_date,''
+                         FROM bibrec, hstRECORD
+                         WHERE modification_date>%s
+                           AND id=id_bibrec
+                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=id)=1""", (min_last_updated,))
+        if res:
+            recIDs_info.extend(res)
+
+    indexes_to_change = _fill_dict_of_indexes_with_empty_sets()
     for recID_info in recIDs_info:
         recID, revision, affected_fields = recID_info
         affected_fields = affected_fields.split(",")
