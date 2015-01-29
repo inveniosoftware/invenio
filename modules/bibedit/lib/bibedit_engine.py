@@ -1321,8 +1321,10 @@ def perform_request_bibcatalog(request_type, uid, data):
         elif uid:
             bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
-                tickets_found = BIBCATALOG_SYSTEM.ticket_search(uid,
-                    status=['new', 'open'], recordid=data['recID'])
+                tickets_found = set(
+                    BIBCATALOG_SYSTEM.ticket_search(uid, status='new', recordid=data['recID'])) | set(
+                    BIBCATALOG_SYSTEM.ticket_search(uid, status='open', recordid=data['recID']))
+
                 tickets = []
                 for t_id in tickets_found:
                     ticket_info = BIBCATALOG_SYSTEM.ticket_get_info(

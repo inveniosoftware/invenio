@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012 CERN.
+# Copyright (C) 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,10 +23,11 @@
 from invenio.testutils import InvenioTestCase
 from invenio.testutils import make_test_suite, run_test_suite
 
-from invenio import bibcatalog_system_rt 
+from invenio import bibcatalog_system_rt
 
 
 class BibCatalogSystemRTTest(InvenioTestCase):
+
     """Testing of BibCatalog."""
 
     def setUp(self):
@@ -37,24 +38,6 @@ class BibCatalogSystemRTTest(InvenioTestCase):
 
     def tearDown(self):
         pass
-
-    def test_rt_run_command_fails_with_bum_environment(self):
-        """bibcatalog_system_rt - _run_rt_command gives None for bad environment"""
-        # A special kind of test requires a very weird environment
-        bibcatalog_system_rt.CFG_BIBCATALOG_SYSTEM_RT_URL = None
-        testobj = bibcatalog_system_rt.BibCatalogSystemRT()
-        stdout = testobj._run_rt_command('/bin/ls /')
-        bibcatalog_system_rt.CFG_BIBCATALOG_SYSTEM_RT_URL = 'http://testingdomainbadbad.invenio-software.org'
-        self.assertEquals(stdout, None)
-
-    def test_rt_run_command(self):
-        """bibcatalog_system_rt - running simple command."""
-        stdout = self.rt._run_rt_command('/bin/ls /')
-        self.assertTrue(len(stdout) > 0)
-
-    def test_rt_run_command_exception_bad_cmd(self):
-        """bibcatalog_system_rt - bad command execution raises exception"""
-        self.assertRaises(ValueError, self.rt._run_rt_command, '/etc/hosts')
 
 
 TEST_SUITE = make_test_suite(BibCatalogSystemRTTest)
