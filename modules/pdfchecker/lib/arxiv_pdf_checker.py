@@ -129,6 +129,8 @@ def cb_parse_option(key, value, opts, args):
             recids = set()
             task_set_option('recids', recids)
         recids.update(split_cli_ids_arg(value))
+    elif key in ('-m', '--missing'):
+        task_set_option('missing', True)
 
     return True
 
@@ -417,7 +419,9 @@ def task_run_core(name=NAME):
         start_date = datetime.now()
         dummy, last_date = fetch_last_updated(name)
         recids = fetch_updated_arxiv_records(
-            last_date) | fetch_records_missing_arxiv_fulltext()
+            last_date)
+        if task_get_option('missing'):
+            recids |= fetch_records_missing_arxiv_fulltext()
 
     updated_recids = set()
 
@@ -483,13 +487,13 @@ def main():
               help_specific_usage="""
   Scheduled (daemon) options:
   -i, --id       Record id to check.
-
+  -m, --missing  Run on all records which are missing an arXiv PDF (slow!)
   Examples:
    (run a daemon job)
       arxiv-pdf-checker
 
 """,
               version="Invenio v%s" % CFG_VERSION,
-              specific_params=("i:", ["id="]),
+              specific_params=("i:m", ["id=", "missing"]),
               task_submit_elaborate_specific_parameter_fnc=cb_parse_option,
               task_run_fnc=task_run_core)
