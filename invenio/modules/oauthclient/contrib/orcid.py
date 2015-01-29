@@ -127,17 +127,20 @@ def account_info(remote, resp):
 @session_manager
 def account_setup(remote, token):
     """Perform additional setup after user have been logged in."""
+    import json
+    import requests
+
+    from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+
     from invenio.modules.accounts.models import User, UserEXT
     from invenio.ext.sqlalchemy import db
     from ..handlers import token_session_key
 
-    from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-
-    import json
-    import requests
-
     orcid = session.get(token_session_key(remote.name) +
-                        "_account_info").get("external_id")
+                        "_account_info", {}).get("external_id")
+
+    if not orcid:
+        return
 
     extra_data = {
         "orcid": orcid
