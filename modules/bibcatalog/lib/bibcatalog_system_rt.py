@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Provide a "ticket" interface with a request tracker.
@@ -24,48 +24,164 @@ This is a subclass of BibCatalogSystem
 
 import os
 import re
+import rt
+from rt import AuthorizationError, UnexpectedResponse, requests, \
+    ConnectionError, NotAllowed, APISyntaxError, BadRequest
 import invenio.webuser
 from invenio.shellutils import run_shell_command, escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
 
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
-                           CFG_BIBCATALOG_SYSTEM_RT_CLI, \
-                           CFG_BIBCATALOG_SYSTEM_RT_URL, \
-                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
-                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD, \
-                           CFG_BIBEDIT_ADD_TICKET_RT_QUEUES
+    CFG_BIBCATALOG_SYSTEM_RT_URL, \
+    CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
+    CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD, \
+    CFG_BIBEDIT_ADD_TICKET_RT_QUEUES
 
+class PatchedRt(rt.Rt):
+    """
+    This differ in the get_attachments method which allows for spotting
+    attachement after the third line.
+    """
+
+    def get_attachments(self, ticket_id):
+        """ Get attachment list for a given ticket
+
+        :param ticket_id: ID of ticket
+        :returns: List of tuples for attachments belonging to given ticket.
+                  Tuple format: (id, name, content_type, size)
+                  Returns None if ticket does not exist.
+        """
+        msg = self.__request('ticket/%s/attachments' % (str(ticket_id),))
+        lines = msg.split('\n')
+        if (len(lines) > 2) and self.RE_PATTERNS['does_not_exist_pattern'].match(lines[2]):
+            return None
+        attachment_infos = []
+        if (self.__get_status_code(lines[0]) == 200) and (len(lines) >= 3):
+            for line in lines[3:]:
+                info = self.RE_PATTERNS['attachments_list_pattern'].match(line)
+                if info:
+                    attachment_infos.append(info.groups())
+        return attachment_infos
+
+    def __get_status_code(self, msg):
+        """ Select status code given message.
+
+        :keyword msg: Result message
+        :returns: Status code
+        :rtype: int
+        """
+        try:
+            return int(msg.split('\n')[0].split(' ')[1])
+        except:
+            return None
+
+    def __request(self, selector, get_params={}, post_data={}, files=[], without_login=False,
+                  text_response=True):
+        """ General request for :term:`API`.
+
+        :keyword selector: End part of URL which completes self.url parameter
+                           set during class inicialization.
+                           E.g.: ``ticket/123456/show``
+        :keyword post_data: Dictionary with POST method fields
+        :keyword files: List of pairs (filename, file-like object) describing
+                        files to attach as multipart/form-data
+                        (list is necessary to keep files ordered)
+        :keyword without_login: Turns off checking last login result
+                                (usually needed just for login itself)
+        :keyword text_response: If set to false the received message will be
+                                returned without decoding (useful for attachments)
+        :returns: Requested messsage including state line in form
+                  ``RT/3.8.7 200 Ok\\n``
+        :rtype: string or bytes if text_response is False
+        :raises AuthorizationError: In case that request is called without previous
+                                    login or login attempt failed.
+        :raises ConnectionError: In case of connection error.
+        """
+        try:
+            if (not self.login_result) and (not without_login):
+                raise AuthorizationError('First login by calling method `login`.')
+            url = str(os.path.join(self.url, selector))
+            if not files:
+                if post_data:
+                    response = self.session.post(url, data=post_data)
+                else:
+                    response = self.session.get(url, params=get_params)
+            else:
+                files_data = {}
+                for i, file_pair in enumerate(files):
+                    files_data['attachment_%d' % (i+1)] = file_pair
+                response = self.session.post(url, data=post_data, files=files_data)
+            if response.status_code == 401:
+                raise AuthorizationError('Server could not verify that you are authorized to access the requested document.')
+            if response.status_code != 200:
+                raise UnexpectedResponse('Received status code %d instead of 200.' % response.status_code)
+            try:
+                if response.encoding:
+                    result = response.content.decode(response.encoding.lower())
+                else:
+                    # try utf-8 if encoding is not filled
+                    result = response.content.decode('utf-8')
+            except LookupError:
+                raise UnexpectedResponse('Unknown response encoding: %s.' % response.encoding)
+            except UnicodeError:
+                if text_response:
+                    raise UnexpectedResponse('Unknown response encoding (UTF-8 does not work).')
+                else:
+                    # replace errors - we need decoded content just to check for error codes in __check_response
+                    result = response.content.decode('utf-8', 'replace')
+            self.__check_response(result)
+            if not text_response:
+                return response.content
+            return result
+        except requests.exceptions.ConnectionError as e:
+            raise ConnectionError("Connection error", e)
+
+    def __check_response(self, msg):
+        """ Search general errors in server response and raise exceptions when found.
+
+        :keyword msg: Result message
+        :raises NotAllowed: Exception raised when operation was called with
+                            insufficient privileges
+        :raises AuthorizationError: Credentials are invalid or missing
+        :raises APISyntaxError: Syntax error
+        """
+        if not isinstance(msg, list):
+            msg = msg.split("\n")
+        if (len(msg) > 2) and self.RE_PATTERNS['not_allowed_pattern'].match(msg[2]):
+            raise NotAllowed(msg[2][2:])
+        if self.RE_PATTERNS['credentials_required_pattern'].match(msg[0]):
+            raise AuthorizationError('Credentials required.')
+        if self.RE_PATTERNS['syntax_error_pattern'].match(msg[0]):
+            raise APISyntaxError(msg[2][2:] if len(msg) > 2 else 'Syntax error.')
+        if self.RE_PATTERNS['bad_request_pattern'].match(msg[0]):
+            raise BadRequest(msg[2][2:] if len(msg) > 2 else 'Bad request.')
 
 class BibCatalogSystemRT(BibCatalogSystem):
 
-    BIBCATALOG_RT_SERVER = "" # construct this by http://user:password@RT_URL
+    def _get_instance(self, uid=None):
+        """
+        Return a valid RT instance.
+        """
+        username, passwd = None, None
+        if uid:
+            username, passwd = get_bibcat_from_prefs(uid)
+        if username is None or not uid:
+            username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
+            passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
+        if not username or not passwd:
+            raise RuntimeError("No valid RT user login specified")
+        tracker = PatchedRt(
+            url=CFG_BIBCATALOG_SYSTEM_RT_URL + '/REST/1.0/',
+            default_login=username,
+            default_password=passwd,
+        )
+        tracker.login()
+        return tracker
 
     def check_system(self, uid=None):
         """return an error string if there are problems"""
-        if uid:
-            rtuid, rtpw = get_bibcat_from_prefs(uid)
-        else:
-            # Assume default RT user
-            rtuid = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
-            rtpw = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
-
-        if not rtuid and not rtpw:
-            return "No valid RT user login specified"
-
         if not CFG_BIBCATALOG_SYSTEM == 'RT':
             return "CFG_BIBCATALOG_SYSTEM is not RT though this is an RT module"
-        if not CFG_BIBCATALOG_SYSTEM_RT_CLI:
-            return "CFG_BIBCATALOG_SYSTEM_RT_CLI not defined or empty"
-        if not os.path.exists(CFG_BIBCATALOG_SYSTEM_RT_CLI):
-            return "CFG_BIBCATALOG_SYSTEM_RT_CLI " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " file does not exists"
-
-        # Check that you can execute the binary.. this is a safe call unless someone can fake CFG_BIBCATALOG_SYSTEM_RT_CLI (unlikely)
-        dummy, myout, myerr = run_shell_command(CFG_BIBCATALOG_SYSTEM_RT_CLI + " help")
-        helpfound = False
-        if myerr.count("help") > 0:
-            helpfound = True
-        if not helpfound:
-            return "Execution of CFG_BIBCATALOG_SYSTEM_RT_CLI " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " help did not produce output 'help'"
 
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return "CFG_BIBCATALOG_SYSTEM_RT_URL not defined or empty"
@@ -73,24 +189,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('http://') and \
            not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('https://'):
             return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://' or 'https://'"
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        # Assemble by http://user:password@RT_URL
-        bibcatalog_rt_server = httppart + "//" + rtuid + ":" + rtpw + "@" + siteandpath
 
-        #set as env var
-        os.environ["RTUSER"] = rtuid
-        os.environ["RTSERVER"] = bibcatalog_rt_server
-
-        #try to talk to RT server
-        #this is a safe call since rtpw is the only variable in it, and it is escaped
-        rtpw = escape_shell_arg(rtpw)
-        dummy, myout, myerr = run_shell_command("echo "+rtpw+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls \"Subject like 'F00'\"")
-        if len(myerr) > 0:
-            return "could not connect to " + bibcatalog_rt_server + " " + myerr
-        #finally, check that there is some sane output like tickets or 'No matching result'
-        saneoutput = (myout.count('matching') > 0) or (myout.count('1') > 0)
-        if not saneoutput:
-            return CFG_BIBCATALOG_SYSTEM_RT_CLI + " returned " + myout + " instead of 'matching' or '1'"
+        try:
+            self._get_instance(uid)
+        except Exception as err:
+            return "could not connect to %s: %s" % (CFG_BIBCATALOG_SYSTEM_RT_URL, err)
         return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="",
@@ -99,34 +202,35 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """returns a list of ticket ID's related to this record or by
            matching the subject, creator or owner of the ticket."""
 
-        search_atoms = [] # the search expression will be made by and'ing these
+        # the search expression will be made by and'ing these
+        search_atoms = {}
         if recordid > -1:
-            #search by recid
-            search_atoms.append("CF.{RecordID} = " + escape_shell_arg(str(recordid)))
+            # search by recid
+            search_atoms['CF_RecordID'] = str(recordid)
         if subject:
-            #search by subject
-            search_atoms.append("Subject like " + escape_shell_arg(str(subject)))
+            # search by subject
+            search_atoms['Subject__like'] = str(subject)
         if text:
-            search_atoms.append("Content like " + escape_shell_arg(str(text)))
+            search_atoms['Content__like'] = str(text)
         if str(creator):
-            #search for this person's bibcatalog_username in preferences
+            # search for this person's bibcatalog_username in preferences
             creatorprefs = invenio.webuser.get_user_preferences(creator)
             creator = "Nobody can Have This Kind of Name"
             if "bibcatalog_username" in creatorprefs:
                 creator = creatorprefs["bibcatalog_username"]
-            search_atoms.append("Creator = " + escape_shell_arg(str(creator)))
+            search_atoms['Creator'] = str(creator)
         if str(owner):
             ownerprefs = invenio.webuser.get_user_preferences(owner)
             owner = "Nobody can Have This Kind of Name"
             if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
-            search_atoms.append("Owner = " + escape_shell_arg(str(owner)))
+            search_atoms['Owner'] = str(owner)
         if date_from:
-            search_atoms.append("Created >= " + escape_shell_arg(str(date_from)))
+            search_atoms['Created__gt'] = str(date_from)
         if date_until:
-            search_atoms.append("Created <= " + escape_shell_arg(str(date_until)))
-        if str(status) and isinstance(status, type("this is a string")):
-            search_atoms.append("Status = " + escape_shell_arg(str(status)))
+            search_atoms['Created__lt'] = str(date_until)
+        if status:
+            search_atoms['Status'] = str(status)
         if str(priority):
             # Try to convert to int
             intpri = -1
@@ -135,200 +239,110 @@ class BibCatalogSystemRT(BibCatalogSystem):
             except ValueError:
                 pass
             if intpri > -1:
-                search_atoms.append("Priority = " + str(intpri))
+                search_atoms['Priority'] = str(intpri)
         if queue:
-            search_atoms.append("Queue = " + escape_shell_arg(queue))
-        searchexp = " and ".join(search_atoms)
+            search_atoms['Queue'] = str(queue)
+        else:
+            search_atoms['Queue'] = rt.ALL_QUEUES
         tickets = []
 
-        if len(searchexp) == 0:
+        if not search_atoms:
             return tickets
 
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\""
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return tickets
-
-        statuses = []
-        for line in command_out.split("\n"):
-            #if there are matching lines they will look like NUM:subj.. so pick num
-            if line.count('id: ticket/') > 0:
-                dummy, tnum = line.split('/') # get the ticket id
-                try:
-                    dummy = int(tnum)
-                except ValueError:
-                    pass
-                else:
-                    tickets.append(tnum)
-
-            if line.count('Status: ') > 0:
-                dummy, tstatus = line.split('Status: ')
-                statuses.append(tstatus)
-        if isinstance(status, list):
-            #take only those tickets whose status matches with one of the status list
-            alltickets = tickets
-            tickets = []
-            for i in range(len(alltickets)):
-                tstatus = statuses[i]
-                tnum = alltickets[i]
-                if status.count(tstatus) > 0: # match
-                    tickets.append(tnum)
-        return tickets
+        rt_instance = self._get_instance(uid)
+        tickets = rt_instance.search(**search_atoms)
+        return [int(ticket[u'id'].split('/')[1]) for ticket in tickets]
 
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="",
                       queue="", priority="", owner="", requestor=""):
-        comment = False
-        if "\n" in text:
-            # The RT client does not support newlines in the initial body
-            # We need to add the ticket then add a comment.
-            comment = True
-            res = self._ticket_submit(uid=uid, subject=subject,
-                                      queue=queue,
-                                      recordid=recordid,
-                                      owner=owner,
-                                      requestor=requestor)
-        else:
-            res = self._ticket_submit(uid=uid, subject=subject,
-                                      queue=queue,
-                                      text=text,
-                                      recordid=recordid,
-                                      owner=owner,
-                                      requestor=requestor)
-        try:
-            # The BibCatalog API returns int if successful or
-            # a string explaining the error if unsuccessful.
-            ticketid = int(res)
-        except (ValueError, TypeError), e:
-            # Not a number. Must be an error string
-            raise Exception("%s\n%s" % (res, str(e)))
-
-        if comment:
-            self.ticket_comment(uid=uid,
-                                ticketid=ticketid,
-                                comment=text)
-
-        return ticketid
-
-
-    def _ticket_submit(self, uid=None, subject="", recordid=-1, text="",
-                       queue="", priority="", owner="", requestor=""):
-        """creates a ticket. return ticket num on success, otherwise None"""
-        queueset = ""
-        textset = ""
-        priorityset = ""
-        ownerset = ""
-        subjectset = ""
-        requestorset = ""
+        atoms = {}
         if subject:
-            cleaned_subject = " ".join(str(subject).splitlines())
-            subjectset = " subject=" + escape_shell_arg(cleaned_subject)
-        recidset = " CF-RecordID=" + escape_shell_arg(str(recordid))
+            atoms['Subject'] = str(subject)
+        if recordid:
+            atoms['CF_RecordID'] = str(recordid)
         if priority:
-            priorityset = " priority=" + escape_shell_arg(str(priority))
+            atoms['Priority'] = str(priority)
         if queue:
-            queueset = " queue=" + escape_shell_arg(queue)
+            atoms['Queue'] = str(queue)
         if requestor:
-            requestorset = " requestor=" + escape_shell_arg(requestor)
+            atoms['Requestor'] = str(requestor)
         if owner:
-            #get the owner name from prefs
+            # get the owner name from prefs
             ownerprefs = invenio.webuser.get_user_preferences(owner)
             if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
-                ownerset = " owner=" + escape_shell_arg(owner)
+                atoms['Owner'] = str(owner)
         if text:
-            if '\n' in text:
-                # contains newlines (\n) return with error
-                raise Exception("Newlines are not allowed in text parameter. Use ticket_comment() instead.")
-            else:
-                textset = " text=" + escape_shell_arg(text)
-        # make a command.. note that all set 'set' parts have been escaped
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " create -t ticket set " + subjectset + recidset + \
-                  queueset + textset + priorityset + ownerset + requestorset
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return None
+            # From: http://requesttracker.wikia.com/wiki/REST
+            # If you want to have a multiline Text, prefix every line with a blank.
+            text = text.replace("\n", "\n ")
 
-        ticket_id = None
-        ticket_created_re = re.compile(r'Ticket (\d+) created')
-        for line in command_out.split("\n"):
-            matches = ticket_created_re.search(line)
-            if matches:
-                ticket_id = int(matches.groups()[0])
+            atoms['Text'] = str(text)
 
-        return ticket_id
+        rt_instance = self._get_instance(uid)
+        return rt_instance.create_ticket(**atoms)
 
     def ticket_comment(self, uid, ticketid, comment):
         """comment on a given ticket. Returns 1 on success, 0 on failure"""
-        command = '%s comment -m %s %s' % (CFG_BIBCATALOG_SYSTEM_RT_CLI,
-                                           escape_shell_arg(comment),
-                                           str(ticketid))
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return None
-        return 1
+
+        rt_instance = self._get_instance(uid)
+        return rt_instance.comment(ticketid, comment)
 
     def ticket_assign(self, uid, ticketid, to_user):
         """assign a ticket to an RT user. Returns 1 on success, 0 on failure"""
-        return self.ticket_set_attribute(uid, ticketid, 'owner', to_user)
+
+        return self.ticket_set_attribute(uid, ticketid, "owner", to_user)
 
     def ticket_steal(self, uid, ticketid):
-        """steal a ticket from an RT user. Returns 1 on success, 0 on failure"""
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " steal " + str(ticketid)
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return 0
-        return 1
+        """assign a ticket to uid"""
+        try:
+            return self.ticket_assign(uid, ticketid, uid)
+        except IndexError:
+            # Apparently to steal you own ticket make the RT wrapper to crash
+            if self.ticket_get_attribute(uid, ticketid, "owner") == uid:
+                return True
+        return False
 
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
         """change the ticket's attribute. Returns 1 on success, 0 on failure"""
-        #check that the attribute is accepted..
+        # check that the attribute is accepted..
         if attribute not in BibCatalogSystem.TICKET_ATTRIBUTES:
             return 0
-        #we cannot change read-only values.. including text that is an attachment. pity
+        # we cannot change read-only values.. including text that is an
+        # attachment. pity
         if attribute in ['creator', 'date', 'ticketid', 'url_close', 'url_display', 'recordid', 'text']:
             return 0
-        #check attribute
-        setme = ""
+        # check attribute
+        atom = {}
         if attribute == 'priority':
-            try:
-                dummy = int(new_value)
-            except ValueError:
+            if not str(new_value).isdigit():
                 return 0
-            setme = "set Priority=" + str(new_value)
+            atom['Priority'] = str(new_value)
+
         if attribute == 'subject':
-            subject = escape_shell_arg(new_value)
-            setme = "set Subject='" + subject + "'"
+            atom['Subject'] = str(new_value)
 
         if attribute == 'owner':
-            #convert from invenio to RT
+            # convert from invenio to RT
             ownerprefs = invenio.webuser.get_user_preferences(new_value)
             if "bibcatalog_username" not in ownerprefs:
                 return 0
-            else:
-                owner = escape_shell_arg(ownerprefs["bibcatalog_username"])
-            setme = " set owner='" + owner + "'"
+            atom['Owner'] = str(ownerprefs['bibcatalog_username'])
 
         if attribute == 'status':
-            setme = " set status='" + escape_shell_arg(new_value) + "'"
+            atom['Status'] = str(new_value)
 
         if attribute == 'queue':
-            setme = " set queue='" + escape_shell_arg(new_value) + "'"
+            atom['Queue'] = str(new_value)
 
-        #make sure ticketid is numeric
+        # make sure ticketid is numeric
         try:
             dummy = int(ticketid)
         except ValueError:
             return 0
 
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " edit ticket/" + str(ticketid) + setme
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return 0
-        mylines = command_out.split("\n")
-        for line in mylines:
-            if line.count('updated') > 0:
-                return 1
-        return 0
+        rt_instance = self._get_instance(uid)
+        return rt_instance.edit_ticket(ticketid, **atom)
 
     def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute of a ticket"""
@@ -349,142 +363,51 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if attributes is None:
             attributes = []
 
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid)
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return 0
-
+        rt_instance = self._get_instance(uid)
         tdict = {}
-        for line in command_out.splitlines():
-            if line.find(": ") > -1:
-                tattr, tvaluen = line.split(": ", 1)
-                tvalue = tvaluen.rstrip()
-                tdict[tattr] = tvalue
+        for key, value in rt_instance.get_ticket(ticketid).items():
+            if isinstance(value, list):
+                value = [elem.encode('utf8') for elem in value]
+            else:
+                value = value.encode('utf8')
+            key = key.lower().encode('utf8')
+            if key == 'cf.{recordid}':
+                key = 'recordid'
+            if key == 'id':
+                tdict[key] = int(value.split('/')[1])
+            tdict[key] = value
 
-        # Query again to get attachments -> Contents
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/"
-        command_out = self._run_rt_command(command, uid)
-        if command_out is None:
-            return 0
+        attachments = rt_instance.get_attachments_ids(ticketid)
 
-        attachments = []
+        text = [rt_instance.get_attachment_content(
+            ticketid, attachment) for attachment in attachments]
+        tdict['text'] = '\n'.join(text)
 
-        # attachment's format:
-        #     557408: (?:Name|\(Unnamed\))? (text/plain / 131b)
-        #  (Unnamed) is new in rt4, in rt3 no Name resulted in empty string,
-        #   hence 2 spaces
-        #
-        # example:
-        # id: ticket/443299/attachments
-        #
-        # Attachments: 1410963: (Unnamed) (multipart/alternative / 0b),
-        #              1410964: (Unnamed) (text/plain / 257b),
-        #              1410965: (Unnamed) (text/html / 2.9k),
-        #              1410966: (Unnamed) (text/plain / 534b)
+        tdict['url_display'] = CFG_BIBCATALOG_SYSTEM_RT_URL + \
+            "/Ticket/Display.html?id=" + str(ticketid)
+        tdict['url_close'] = CFG_BIBCATALOG_SYSTEM_RT_URL + \
+            "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id=" + \
+            str(ticketid)
+        tdict['url_modify'] = CFG_BIBCATALOG_SYSTEM_RT_URL + \
+            "/Ticket/ModifyAll.html?id=" + str(ticketid)
 
-        attregex = re.compile(r"(?P<attachmentid>\d+):\s{1,2}[(\w]")
-        for line in command_out.splitlines():
-            amatch = attregex.search(line)
-            if amatch:
-                attachments.append(amatch.group('attachmentid'))
-
-        # Query again for each attachment
-        for attid in attachments:
-            command = "%s show ticket/%s/attachments/%s" % (CFG_BIBCATALOG_SYSTEM_RT_CLI, ticketid, attid)
-            command_out = self._run_rt_command(command, uid)
-            if command_out is None:
-                return 0
-            # Get the contents line
-            for line in command_out.split("\n"):
-                if line.count("Content: ") > 0:
-                    cstuff = line.split("Content: ")
-                    tdict['Text'] = cstuff[1].rstrip()
-
-        if len(tdict) > 0:
-            # Iterate over TICKET_ATTRIBUTES to make a canonical ticket
-            candict = {}
-            for f in BibCatalogSystem.TICKET_ATTRIBUTES:
-                tcased = f.title()
-                if tcased in tdict:
-                    candict[f] = tdict[tcased]
-            if 'CF.{RecordID}' in tdict:
-                candict['recordid'] = tdict['CF.{RecordID}']
-            if 'id' in tdict:
-                candict['ticketid'] = tdict['id']
-            # Make specific URL attributes:
-            url_display = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Display.html?id=" + str(ticketid)
-            candict['url_display'] = url_display
-            url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id=" + str(ticketid)
-            candict['url_close'] = url_close
-            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/ModifyAll.html?id=" + str(ticketid)
-            candict['url_modify'] = url_modify
-            # Change the ticket owner into invenio UID
-            if 'owner' in tdict:
-                rt_owner = tdict["owner"]
-                uid = invenio.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
-                candict['owner'] = uid
-            if len(attributes) == 0: # return all fields
-                return candict
-            else: # return only the fields that were requested
-                tdict = {}
-                for myatt in attributes:
-                    if myatt in candict:
-                        tdict[myatt] = candict[myatt]
-                return tdict
-        else:
-            return None
+        tdict['owner'] = invenio.webuser.get_uid_based_on_pref(
+            "bibcatalog_username", tdict['owner'])
+        if tdict['owner'] is None:
+            tdict['owner'] = 'Nobody'
+        return tdict
 
     def get_queues(self, uid):
         """get all the queues from RT. Returns a list of queues"""
         # get all queues with id from 1-100 in order to get all the available queues.
-        # Then filters the queues keeping these selected in the configuration variable
-        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show -t queue -f name 1-100"
-        command_out = self._run_rt_command(command, uid)
-        spl = command_out.split("\n")
+        # Then filters the queues keeping these selected in the configuration
+        # variable
         queues = []
-        for i, line in enumerate(spl):
-            if 'id' in line:
-                _id = line.split("/")[1]
-                # name is on the next line after id
-                name = spl[i+1].split(": ")[1]
-                if name in CFG_BIBEDIT_ADD_TICKET_RT_QUEUES:
-                    queue = {'id': _id, 'name': name}
-                    queues.append(queue)
+
+        rt_instance = self._get_instance(uid)
+        for i in range(1, 100):
+            queue = rt_instance.get_queue(i)
+            if queue and queue[u'Disabled'] == u'0':
+                # Simulating expected behaviour
+                queues.append({'id': str(i), 'name': queue[u'Name'].encode('utf8')})
         return queues
-
-    def _run_rt_command(self, command, uid=None):
-        """
-        This function will run a RT CLI command as given user. If no user is specified
-        the default RT user will be used, if configured.
-
-        Should any of the configuration parameters be missing this function will return
-        None. Otherwise it will return the standard output from the CLI command.
-
-        @param command: RT CLI command to execute
-        @type command: string
-
-        @param uid: the Invenio user id to submit on behalf of. Optional.
-        @type uid: int
-
-        @return: standard output from the command given. None, if any errors.
-        @rtype: string
-        """
-        if not CFG_BIBCATALOG_SYSTEM_RT_URL:
-            return None
-        username, passwd = None, None
-        if uid:
-            username, passwd = get_bibcat_from_prefs(uid)
-        if username is None or not uid:
-            username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
-            passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
-        httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        bibcatalog_rt_server = httppart + "//" + username + ":" + passwd + "@" + siteandpath
-        #set as env var
-        os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = bibcatalog_rt_server
-        passwd = escape_shell_arg(passwd)
-        error_code, myout, error_output = run_shell_command("echo " + passwd + " | " + command)
-        if error_code > 0:
-            raise ValueError('Problem running "%s": %d - %s' %
-                             (command, error_code, error_output))
-        return myout
