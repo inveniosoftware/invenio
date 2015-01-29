@@ -1,0 +1,6 @@
+content_type: application/rss+xml
+default: Podcast.xsl
+description: Sample format suitable for multimedia feeds, such as podcasts
+name: Podcast
+rules: []
+visibility: 0
