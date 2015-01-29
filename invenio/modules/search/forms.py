@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2014 CERN.
+## Copyright (C) 2011, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,26 +20,30 @@
 """WebMessage Forms."""
 
 from flask import url_for
+
 from invenio.base.i18n import _
 from invenio.modules.knowledge.api import get_kb_mappings
-from invenio.utils.forms import InvenioBaseForm, AutocompleteField, \
+from invenio.utils.forms import AutocompleteField, InvenioBaseForm, \
     RowWidget
-from wtforms import TextField
-from wtforms import FormField, SelectField, SelectMultipleField
-from wtforms import Form as WTFormDefault
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+
+from werkzeug.local import LocalProxy
+
+from wtforms import Form as WTFormDefault, FormField, SelectField, \
+    SelectMultipleField, TextField
 
 
 class JournalForm(WTFormDefault):
 
     """Journal Form."""
 
-    name = QuerySelectField(
-        '',
-        get_pk=lambda i: i['key'],
-        get_label=lambda i: i['value'],
-        query_factory=lambda: [{'key': '', 'value': _('Any journal')}] +
-        get_kb_mappings('EJOURNALS'))
+    name = SelectField(
+        label='',
+        choices=LocalProxy(
+            lambda:
+            [('', _('Any journal'))] +
+            [(kb['key'], kb['value']) for kb in get_kb_mappings('EJOURNALS')]),
+        coerce=unicode,
+    )
     vol = TextField(_('Vol'))
     page = TextField(_('Pg'))
 
