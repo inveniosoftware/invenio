@@ -70,14 +70,13 @@ from invenio.modules.collections.models import \
     Collectiondetailedrecordpagetabs, \
     Collectionname, \
     Portalbox
-from invenio.modules.formatter.models import Format
 from invenio.modules.records.api import get_record
 from invenio.modules.oaiharvester.models import OaiREPOSITORY
 
 
 class Community(db.Model):
 
-    """Represents a Community.
+    """Represent a Community.
 
     A layer around Invenio's collections and portalboxes.
     """
@@ -498,19 +497,17 @@ class Community(db.Model):
 
     def save_collectionformat(self, collection, fmt_str):
         """Create or update CollectionFormat object."""
-        fmt = Format.query.filter_by(code=fmt_str).first()
-
         if collection.id:
             c_fmt = CollectionFormat.query.filter_by(
                 id_collection=collection.id
             ).first()
             if c_fmt:
-                update_changed_fields(c_fmt, dict(id_format=fmt.id, score=1))
+                update_changed_fields(c_fmt, dict(format=fmt_str, score=1))
                 return c_fmt
 
         c_fmt = CollectionFormat(
             collection=collection,
-            id_format=fmt.id,
+            format_code=fmt_str,
         )
         db.session.add(c_fmt)
         return c_fmt

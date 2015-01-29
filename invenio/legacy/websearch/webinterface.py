@@ -27,6 +27,7 @@ import sys
 from urllib import quote
 from invenio.utils import apache
 import threading
+from werkzeug.local import LocalProxy
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -85,6 +86,7 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 from invenio.modules.collections.cache import get_collection_reclist
+from invenio.modules.formatter import registry
 from invenio.modules.formatter.engine import get_output_formats
 from intbitset import intbitset
 from invenio.legacy.bibupload.engine import find_record_from_sysno
@@ -103,12 +105,8 @@ websearch_templates = invenio.legacy.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
-try:
-    output_formats = [output_format['attrs']['code'].lower() for output_format in \
-                      get_output_formats(with_attributes=True).values()]
-except KeyError:
-    output_formats = ['xd', 'xm', 'hd', 'hb', 'hs', 'hx']
-output_formats.extend(['hm', 't', 'h'])
+
+output_formats = LocalProxy(registry.output_formats.keys)
 
 
 def wash_search_urlargd(form):

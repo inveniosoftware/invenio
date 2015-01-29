@@ -66,7 +66,6 @@ from invenio.legacy.bibrecord import \
      record_empty
 from . import registry
 from .engines import xslt
-from .models import Format
 from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
@@ -580,7 +579,7 @@ def decide_format_template(bfo, of):
 
     output_format = get_output_format(of)
 
-    for rule in output_format['rules']:
+    for rule in output_format.get('rules', []):
         if rule['field'].startswith('00'):
             # Rule uses controlfield
             values = [bfo.control_field(rule['field']).strip()] #Remove spaces
@@ -596,7 +595,7 @@ def decide_format_template(bfo, of):
                 if match_obj is not None and \
                        match_obj.end() == len(value):
                     return rule['template']
-    template = output_format['default']
+    template = output_format.get('default', '')
     if template != '':
         return template
     else:
@@ -1586,203 +1585,20 @@ def get_format_element_attrs_from_table(element_name,
 
     return attrs
 
+
 def get_output_format(code, with_attributes=False, verbose=0):
-    """
-    Returns the structured content of the given output format
-
-    If 'with_attributes' is true, also returns the names and description of the output formats,
-    else 'attrs' is not returned in dict (it might, if it has already been loaded previously).
-
-    if output format corresponding to 'code' is not found return an empty structure.
-
-    See get_output_format_attrs() to learn more about the attributes::
-
-        {'rules': [ {'field': "980__a",
-                     'value': "PREPRINT",
-                     'template': "filename_a.bft",
-                    },
-                    {...}
-                  ],
-         'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
-                   'description': "a description"
-                   'code': "fnm1",
-                   'content_type': "application/ms-excel",
-                   'visibility': 1
-                  }
-         'default':"filename_b.bft"
-        }
-
-    :param code: the code of an output_format
-    :param with_attributes: if True, fetch the attributes (names and description) for format
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
-    @return: strucured content of output format
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-    output_format = {'rules': [], 'default': ""}
-    filename = resolve_output_format_filename(code, verbose)
-
-    if filename is None:
-        try:
-            raise InvenioBibFormatError(_('Output format with code %(code)s could not be found.', code=code))
-        except InvenioBibFormatError:
-            register_exception()
-
-        if with_attributes: #Create empty attrs if asked for attributes
-            output_format['attrs'] = get_output_format_attrs(code, verbose)
-        return output_format
-
-    # Get from cache whenever possible
-    if filename in format_outputs_cache:
-        # If was must return with attributes but cache has not
-        # attributes, then load attributes
-        if with_attributes and 'attrs' not in format_outputs_cache[filename]:
-            format_outputs_cache[filename]['attrs'] = get_output_format_attrs(code, verbose)
-
-        return format_outputs_cache[filename]
-
+    """Return the structured content of the given output format."""
     try:
-        if with_attributes:
-            output_format['attrs'] = get_output_format_attrs(code, verbose)
-
-        path = registry.output_formats_lookup[filename]
-        format_file = open(path)
-
-        current_tag = ''
-        for line in format_file:
-            line = line.strip()
-            if line == "":
-                # Ignore blank lines
-                continue
-            if line.endswith(":"):
-                # Retrieve tag
-
-                # Remove : spaces and eol at the end of line
-                clean_line = line.rstrip(": \n\r")
-                # The tag starts at second position
-                current_tag = "".join(clean_line.split()[1:]).strip()
-            elif line.find('---') != -1:
-                words = line.split('---')
-                template = words[-1].strip()
-                condition = ''.join(words[:-1])
-
-                output_format['rules'].append({'field': current_tag,
-                                               'value': condition,
-                                               'template': template,
-                                               })
-
-            elif line.find(':') != -1:
-                # Default case
-                default = line.split(':')[1].strip()
-                output_format['default'] = default
-
-    except:
-        register_exception()
-
-    # Cache and return
-    format_outputs_cache[filename] = output_format
-    return output_format
-
-
-def get_output_format_attrs(code, verbose=0):
-    """Return the attributes of an output format.
-
-    The attributes contain 'code', which is the short identifier of the output
-    format (to be given as parameter in format_record function to specify the
-    output format), 'description', a description of the output format,
-    'visibility' the visibility of the format in the output format list on
-    public pages and 'names', the localized names of the output format. If
-    'content_type' is specified then the search_engine will send a file with
-    this content type and with result of formatting as content to the user.
-    The 'names' dict always contais 'generic', 'ln' (for long name) and 'sn'
-    (for short names) keys. 'generic' is the default name for output format.
-    'ln' and 'sn' contain long and short localized names of the output format.
-    Only the languages for which a localization exist are used::
-
-        {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"},
-         'ln':{'en':"a long name"}}
-         'description': "a description"
-         'code': "fnm1",
-         'content_type': "application/ms-excel",
-         'visibility': 1
-        }
-
-    :param code: the short identifier of the format
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-        5: errors, 7: errors and warnings,
-        9: errors and warnings, stop if error (debug mode ))
-    :return: strucured content of output format attributes
-    """
-    if code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
-        code = code[:-(len(CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION) + 1)]
-    attrs = {'names': {'generic': "",
-                       'ln': {},
-                       'sn': {}},
-             'description': '',
-             'code': code.upper(),
-             'content_type': "",
-             'visibility': 1}
-
-    filename = resolve_output_format_filename(code, verbose)
-    if filename is None:
-        return attrs
-
-    try:
-        format_ = Format.query.filter_by(code=code).one()
-        attrs['names']['generic'] = format_.name
-        for name in format_.names:
-            attrs['names'][name.type][name.ln] = name.value
-        attrs['description'] = format_.description
-        attrs['content_type'] = format_.content_type
-        attrs['visibility'] = format_.visibility
-    except Exception:
-        current_app.logger.exception("Unknown code %s", code)
-    return attrs
+        return registry.output_formats[code.lower()]
+    except KeyError:
+        raise InvenioBibFormatError("Missing output format '{0}'".format(code))
 
 
 def get_output_formats(with_attributes=False):
-    """
-    Return all output format as a dictionary with their filename as key.
+    """Return all output format as a dictionary with their code as key."""
+    assert with_attributes == False
+    return dict(registry.output_formats)
 
-    If 'with_attributes' is true, also returns the names and description of the
-    output formats, else 'attrs' is not returned in dicts (it might, if it has
-    already been loaded previously).
-
-    See get_output_format_attrs() to learn more on the attributes::
-
-        {'filename_1.bfo': {'rules': [ {'field': "980__a",
-                                        'value': "PREPRINT",
-                                        'template': "filename_a.bft",
-                                       },
-                                       {...}
-                                     ],
-                            'attrs': {'names': {'generic':"a name", 'sn':{'en': "a name", 'fr':"un nom"}, 'ln':{'en':"a long name"}}
-                                      'description': "a description"
-                                      'code': "fnm1"
-                                     }
-                            'default':"filename_b.bft"
-                           },
-
-         'filename_2.bfo': {...},
-          ...
-        }
-    :param with_attributes: if returned output formats contain detailed info, or not
-    @type with_attributes: boolean
-    @return: the list of output formats
-    """
-    output_formats = {}
-
-    for filename in registry.output_formats_lookup.values():
-        filename = os.path.basename(filename)
-        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
-            code = "".join(filename.split(".")[:-1])
-            if filename in output_formats:
-                continue
-            output_formats[filename] = get_output_format(code, with_attributes)
-
-    return output_formats
 
 def resolve_format_element_filename(element_name):
     """
@@ -1825,116 +1641,6 @@ def resolve_format_element_filename(element_name):
     # element can be in database
     return None
 
-def resolve_output_format_filename(code, verbose=0):
-    """
-    Returns the filename of output corresponding to code
-
-    This is necessary since output formats names are not case sensitive
-    but most file systems are.
-
-    :param code: the code for an output format
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
-    @return: the corresponding filename, with right case, or None if not found
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-    #Remove non alphanumeric chars (except . and _)
-    code = re.sub(r"[^.0-9a-zA-Z_]", "", code)
-    if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
-        code = re.sub(r"\W", "", code)
-        code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-    code = code.upper()
-    for filename in registry.output_formats_lookup.keys():
-        if filename.upper() == code:
-            return filename
-
-    # No output format with that name found
-    raise InvenioBibFormatError(_('Could not find output format named %(x_code)s.', x_code=code))
-
-    if verbose >= 5:
-        sys.stderr.write(exc.message)
-        if verbose >= 9:
-            sys.exit(exc.message)
-    return None
-
-def get_fresh_format_template_filename(name):
-    """
-    Returns a new filename and name for template with given name.
-
-    Used when writing a new template to a file, so that the name
-    has no space, is unique in template directory
-
-    Returns (unique_filename, modified_name)
-
-    :param name: name for a format template
-    @return: the corresponding filename, and modified name if necessary
-    """
-    #name = re.sub(r"\W", "", name) #Remove non alphanumeric chars
-    name = name.replace(" ", "_")
-    filename = name
-    # Remove non alphanumeric chars (except .)
-    filename = re.sub(r"[^.0-9a-zA-Z]", "", filename)
-    index = 1
-
-    def _get_fullname(filename):
-        return filename + '.' + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION
-
-    while _get_fullname(filename) in registry.format_templates_lookup:
-        index += 1
-        filename = name + str(index)
-
-    if index > 1:
-        returned_name = (name + str(index)).replace("_", " ")
-    else:
-        returned_name = name.replace("_", " ")
-
-    return (_get_fullname(filename), returned_name)
-
-def get_fresh_output_format_filename(code):
-    """
-    Returns a new filename for output format with given code.
-
-    Used when writing a new output format to a file, so that the code
-    has no space, is unique in output format directory. The filename
-    also need to be at most 6 chars long, as the convention is that
-    filename == output format code (+ .extension)
-    We return an uppercase code
-    Returns (unique_filename, modified_code)
-
-    :param code: the code of an output format
-    @return: the corresponding filename, and modified code if necessary
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-    #code = re.sub(r"\W", "", code) #Remove non alphanumeric chars
-    code = code.upper().replace(" ", "_")
-    # Remove non alphanumeric chars (except . and _)
-    code = re.sub(r"[^.0-9a-zA-Z_]", "", code)
-    if len(code) > 6:
-        code = code[:6]
-
-    def _get_fullname(filename):
-        return filename + '.' + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
-
-    filename = code
-    index = 2
-    while _get_fullname(filename) in registry.output_formats_lookup:
-        filename = code + str(index)
-        if len(filename) > 6:
-            filename = code[:-(len(str(index)))]+str(index)
-        index += 1
-        # We should not try more than 99999... Well I don't see how we
-        # could get there.. Sanity check.
-        if index >= 99999:
-            try:
-                raise InvenioBibFormatError(_('Could not find a fresh name for output format %(x_code)s.', x_code=code))
-            except InvenioBibFormatError:
-                register_exception()
-
-            sys.exit("Output format cannot be named as %s" % code)
-
-    return (filename + "." + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, filename)
 
 def clear_caches():
     """
@@ -2018,6 +1724,7 @@ class BibFormatObject(object):
             self.xml_record = xml_record
             self.record = create_record(xml_record)[0]
             recID = record_get_field_value(self.record, "001") or None
+            recID = int(recID) if recID is not None else recID
 
         try:
             assert isinstance(recID, (int, long, type(None))), 'Argument of wrong type!'

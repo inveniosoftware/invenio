@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2007, 2008, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -181,12 +181,9 @@ def check_validity_input_formats(input_formats):
     :return: if there is any invalid input format it returns this value
     :rtype: string
     """
-    from invenio.modules.formatter.models import Format
+    from invenio.modules.formatter import registry
     tested_formats = set([aformat.lower() for aformat in input_formats])
-    valid_formats = set([fmt[0] for fmt in Format.query.filter(Format.code.in_(
-        tested_formats
-    )).values(Format.code)])
-    invalid_formats = tested_formats - valid_formats
+    invalid_formats = tested_formats - set(registry.output_formats.keys())
     return invalid_formats[0] if len(invalid_formats) else ''
 
 
