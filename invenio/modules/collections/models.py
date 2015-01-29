@@ -35,13 +35,11 @@ from invenio.base.i18n import _, gettext_set_language
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import (
     attribute_multi_dict_collection,
-    IntbitsetPickle,
-    IntbitsetCmp,
 )
+from invenio.modules.formatter.registry import output_formats
 
 # Create your models here.
 
-from invenio.modules.formatter.models import Format
 from invenio.modules.search.models import Field, Fieldvalue
 
 external_collection_mapper = attribute_multi_dict_collection(
@@ -633,14 +631,19 @@ class CollectionFormat(db.Model):
     __tablename__ = 'collection_format'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
-    id_format = db.Column(db.MediumInteger(9, unsigned=True),
-                          db.ForeignKey(Format.id), primary_key=True)
+    format_code = db.Column('format', db.String(10), primary_key=True)
     score = db.Column(db.TinyInteger(4, unsigned=True),
                       nullable=False, server_default='0')
-    collection = db.relationship(Collection, backref='formats',
-                                 order_by=db.desc(score))
-    format = db.relationship(Format, backref='collections',
-                             order_by=db.desc(score))
+
+    collection = db.relationship(
+        Collection, backref=db.backref(
+            'formats', order_by=db.desc(score)
+        ), order_by=db.desc(score))
+
+    @property
+    def format(self):
+        """Return output format definition."""
+        return output_formats[self.format_code]
 
 
 class CollectionFieldFieldvalue(db.Model):

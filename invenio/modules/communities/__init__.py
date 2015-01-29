@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,12 +17,4 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from .receivers import post_handler_database_create
-from invenio.base.scripts.database import create as database_create
-from invenio.base.scripts.database import recreate as database_recreate
-from invenio.base.scripts.demosite import populate as demosite_populate
-from invenio.base.signals import post_command
-
-post_command.connect(post_handler_database_create, sender=database_create)
-post_command.connect(post_handler_database_create, sender=database_recreate)
-post_command.connect(post_handler_database_create, sender=demosite_populate)
+"""Communities module."""

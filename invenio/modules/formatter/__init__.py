@@ -140,9 +140,8 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
     from invenio.base.i18n import wash_language
     from invenio.ext.template import render_template_to_string
     from invenio.utils.pagination import Pagination
-
+    from .registry import export_formats
     from .engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
-    from .models import Format
 
     of = of.lower()
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
@@ -163,7 +162,7 @@ def print_records(recIDs, of='hb', ln=None, verbose=0,
         recids=recIDs,
         pagination=Pagination(pages, rg, records),
         verbose=verbose,
-        export_formats=Format.get_export_formats(),
+        export_formats=export_formats,
         format_record=format_record,
         **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
     )
