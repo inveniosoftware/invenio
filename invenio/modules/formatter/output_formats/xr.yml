@@ -1,0 +1,6 @@
+content_type: text/xml
+default: RSS.xsl
+description: RSS.
+name: RSS
+rules: []
+visibility: 0

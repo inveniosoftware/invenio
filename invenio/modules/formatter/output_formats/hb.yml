@@ -1,0 +1,14 @@
+content_type: text/html
+default: Default_HTML_brief.tpl
+description: HTML brief output format, used for search results pages.
+name: HTML brief
+rules:
+- {field: 980.a, template: Picture_HTML_brief.tpl, value: 'PICTURE '}
+- {field: 980.a, template: Poetry_HTML_brief.tpl, value: 'POETRY '}
+- {field: 980.a, template: Institute_HTML_brief.bft, value: 'INSTITUTE '}
+- {field: 980.a, template: People_HTML_brief.bft, value: 'AUTHOR '}
+- {field: 980.a, template: Journal_HTML_brief.bft, value: 'JOURNAL '}
+- {field: 980.a, template: Subject_HTML_brief.bft, value: 'SUBJECT '}
+- {field: 773.t, template: Journal_HTML_brief.tpl, value: 'Atlantis Times '}
+- {field: 980.a, template: Video_HTML_brief.tpl, value: 'VIDEO '}
+visibility: 0

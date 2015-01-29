@@ -1,0 +1,6 @@
+content_type: text/plain
+default: Default_text_MARC.tpl
+description: Text MARC.
+name: Text MARC
+rules: []
+visibility: 0

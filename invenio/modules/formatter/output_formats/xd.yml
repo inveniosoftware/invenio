@@ -1,0 +1,6 @@
+content_type: text/xml
+default: DC.xsl
+description: XML Dublin Core.
+name: Dublin Core
+rules: []
+visibility: 0
