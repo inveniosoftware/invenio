@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -226,7 +226,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
     affected_tags = {}
     original_record = {}
     rec_old = {}
-    now = datetime.now() # will hold record creation/modification date
+    record_modification_date = datetime.now() # will hold record creation/modification date
     record_had_altered_bit = False
     is_opt_mode_delete = False
 
@@ -261,6 +261,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             write_message("   -Check if the xml marc file is already in the database: DONE" , verbose=2)
 
     record_deleted_p = False
+    record_creation_date = None
     if opt_mode == 'insert' or \
     (opt_mode == 'replace_or_insert') and rec_id is None:
         insert_mode_p = True
@@ -279,7 +280,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             error = None
 
         if '005' not in record:
-            error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+            error = record_add_field(record, '005', controlfield_value=record_modification_date.strftime("%Y%m%d%H%M%S.0"))
             if error is None:
                 msg = "   ERROR: during adding to 005 controlfield to record"
                 write_message(msg, verbose=1, stream=sys.stderr)
@@ -288,6 +289,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 error = None
         else:
             write_message("   Note: 005 already existing upon inserting of new record. Keeping it.", verbose=2)
+        record_creation_date = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(record['005'][0][3].split('.')[0], "%Y%m%d%H%M%S"))
 
     elif opt_mode != 'insert':
         insert_mode_p = False
@@ -426,13 +428,13 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             record_delete_field(record, '005')
             write_message("  Deleted the existing 005 tag.", verbose=2)
         last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))[0][0]
-        if last_revision and last_revision.strftime("%Y%m%d%H%M%S.0") == now.strftime("%Y%m%d%H%M%S.0"):
+        if last_revision and last_revision.strftime("%Y%m%d%H%M%S.0") == record_modification_date.strftime("%Y%m%d%H%M%S.0"):
             ## We are updating the same record within the same seconds! It's less than
             ## the minimal granularity. Let's pause for 1 more second to take a breath :-)
             time.sleep(1)
-            now = datetime.now()
+            record_modification_date = datetime.now()
 
-        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+        error = record_add_field(record, '005', controlfield_value=record_modification_date.strftime("%Y%m%d%H%M%S.0"))
         if error is None:
             write_message("   Failed: Error during adding to 005 controlfield to record", verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
@@ -623,9 +625,9 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         write_message("Stage 6: Start (Update bibrec table with current date).",
                     verbose=2)
         if opt_notimechange == 0 and (updates_exist or record_had_FFT):
-            bibrec_now = convert_datestruct_to_datetext(time.localtime())
+            record_modification_date = convert_datestruct_to_datetext(time.localtime())
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
+            update_bibrec_date(record_modification_date, rec_id, insert_mode_p, record_creation_date, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -2274,14 +2276,18 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
 ### Update functions
 
-def update_bibrec_date(now, bibrec_id, insert_mode_p, pretend=False):
-    """Update the date of the record in bibrec table """
+def update_bibrec_date(record_modification_date, bibrec_id, insert_mode_p, record_creation_date=None, pretend=False):
+    """
+    Update the date of the record in bibrec table.
+
+    Note: record_creation_date is mandatory if insert_mode_p=True.
+    """
     if insert_mode_p:
         query = """UPDATE bibrec SET creation_date=%s, modification_date=%s WHERE id=%s"""
-        params = (now, now, bibrec_id)
+        params = (record_creation_date, record_modification_date, bibrec_id)
     else:
         query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
-        params = (now, bibrec_id)
+        params = (record_modification_date, bibrec_id)
     if not pretend:
         run_sql(query, params)
     write_message("   -Update record creation/modification date: DONE" , verbose=2)
