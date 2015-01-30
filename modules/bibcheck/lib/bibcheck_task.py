@@ -132,12 +132,23 @@ class Tickets(object):
     def _generate_subject(self, issue_type, record_id, rule_name):
         """Generate a fitting subject based on what information is given."""
         assert any((i is not None for i in (issue_type, record_id, rule_name)))
+        if issue_type:
+            issue_type = ":" + issue_type
+        else:
+            issue_type = ""
+
+        if self.ticket_creation_policy in ("per-record", "per-rule-per-record"):
+            record_id = " [ID:" + record_id + "]"
+        else:
+            record_id = ""
+
+        if self.ticket_creation_policy in ("per-rule", "per-rule-per-record"):
+            rule_name = " [Rule:" + rule_name + "]"
+        else:
+            rule_name = ""
+
         return "[BibCheck{issue_type}]{record_id}{rule_name}".format(
-            issue_type=":" + issue_type if issue_type else "",
-            record_id=" [ID:" + record_id + "]" if self.ticket_creation_policy
-            in ("per-record", "per-rule-per-record") else "",
-            rule_name=" [Rule:" + rule_name + "]" if self.ticket_creation_policy
-            in ("per-rule", "per-rule-per-record") else "")
+            issue_type=issue_type, record_id=record_id, rule_name=rule_name)
 
     @staticmethod
     def _get_url(record):
