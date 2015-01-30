@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,30 +17,30 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Forms for module. """
-
-from wtforms import TextField
-from wtforms import validators
+"""Forms for module."""
 
 from invenio.base.i18n import _
-from invenio.utils.forms import InvenioBaseForm
-from invenio.modules.accounts.validators import validate_email
 from invenio.modules.accounts.models import User
+from invenio.modules.accounts.validators import validate_email
+from invenio.utils.forms import InvenioBaseForm
+
 from sqlalchemy.exc import SQLAlchemyError
+
+from wtforms import TextField, validators
 
 
 class EmailSignUpForm(InvenioBaseForm):
 
-    """ Form for requesting email address during sign up process. """
+    """Form for requesting email address during sign up process."""
 
     email = TextField(
         label=_("Email address"),
         description=_("Required."),
-        validators=[validators.Required()]
+        validators=[validators.DataRequired()]
     )
 
     def validate_email(self, field):
-        """ Validate email address.
+        """Validate email address.
 
         Ensures that the email address is not already registered.
         """

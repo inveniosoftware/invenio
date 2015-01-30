@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,18 +19,16 @@
 
 """Flask-Admin page to configure roles and authorizations."""
 
-from wtforms.fields import SelectField, IntegerField
-from wtforms.validators import ValidationError
-try:
-    from wtforms.validators import Required
-except ImportError:
-    from wtforms.validators import DataRequired as Required
-
 from flask.ext.admin.form.fields import DateTimeField
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
-from .models import AccROLE, UserAccROLE, AccAuthorization
+
+from wtforms.fields import IntegerField
+from wtforms.validators import DataRequired
+
+from .models import AccAuthorization, AccROLE, UserAccROLE
+
 
 class AccMixin(object):
 
@@ -58,7 +56,7 @@ class AccROLEAdmin(ModelView, AccMixin):
     form_args = {
         'name': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
         },
     }
@@ -75,12 +73,12 @@ class UserAccROLEAdmin(ModelView, AccMixin):
     form_args = {
         'user': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
         },
         'accROLE': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
         },
     }
@@ -103,12 +101,12 @@ class AccAuthorizationAdmin(ModelView, AccMixin):
     form_args = {
         'role': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
         },
         'action': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
         },
         'argumentlistid': {},

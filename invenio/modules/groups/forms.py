@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,14 +19,14 @@
 
 """Group Forms."""
 
-# from flask import url_for
-from wtforms import validators, widgets
-from wtforms.fields import BooleanField, HiddenField
-from wtforms_alchemy import model_form_factory
-
 from invenio.base.i18n import _
 from invenio.modules.accounts.models import Usergroup
 from invenio.utils.forms import InvenioBaseForm, RemoteAutocompleteField
+
+from wtforms import validators, widgets
+from wtforms.fields import BooleanField, HiddenField
+
+from wtforms_alchemy import model_form_factory
 
 ModelForm = model_form_factory(InvenioBaseForm)
 
@@ -44,7 +44,7 @@ class UsergroupForm(ModelForm):
         field_args = dict(
             name=dict(
                 label=_('Name'),
-                validators=[validators.Required()],
+                validators=[validators.DataRequired()],
                 widget=widgets.TextInput(),
             ),
             description=dict(label=_('Description')),

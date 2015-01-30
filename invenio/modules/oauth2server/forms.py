@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,13 +19,15 @@
 
 """Define forms for generating access tokens and clients."""
 
-from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
-    InvalidRedirectURIError
-from wtforms_alchemy import model_form_factory
-from wtforms import fields, validators, widgets
-
 from invenio.base.i18n import _
 from invenio.utils.forms import InvenioBaseForm
+
+from oauthlib.oauth2.rfc6749.errors import InsecureTransportError, \
+    InvalidRedirectURIError
+
+from wtforms import fields, validators, widgets
+
+from wtforms_alchemy import model_form_factory
 
 from .models import Client
 from .validators import validate_redirect_uri
@@ -75,6 +77,7 @@ class RedirectURIField(fields.TextAreaField):
     """Process redirect URI field data."""
 
     def process_formdata(self, valuelist):
+        """Process form data."""
         if valuelist:
             self.data = "\n".join([
                 x.strip() for x in
@@ -82,6 +85,7 @@ class RedirectURIField(fields.TextAreaField):
             ])
 
     def process_data(self, value):
+        """Process data."""
         self.data = "\n".join(value)
 
 
@@ -90,6 +94,7 @@ class RedirectURIValidator(object):
     """Validate if redirect URIs."""
 
     def __call__(self, form, field):
+        """Call function."""
         errors = []
         for v in field.data.splitlines():
             try:
@@ -109,6 +114,9 @@ class RedirectURIValidator(object):
 # Forms
 #
 class ClientFormBase(model_form_factory(InvenioBaseForm)):
+
+    """Base class for Client form."""
+
     class Meta:
         model = Client
         exclude = [
@@ -118,20 +126,23 @@ class ClientFormBase(model_form_factory(InvenioBaseForm)):
         strip_string_fields = True
         field_args = dict(
             website=dict(
-                validators=[validators.Required(), validators.URL()],
+                validators=[validators.DataRequired(), validators.URL()],
                 widget=widgets.TextInput(),
             ),
         )
 
 
 class ClientForm(ClientFormBase):
+
+    """Client form."""
+
     # Trick to make redirect_uris render in the bottom of the form.
     redirect_uris = RedirectURIField(
         label="Redirect URIs (one per line)",
         description="One redirect URI per line. This is your applications"
                     " authorization callback URLs. HTTPS must be used for all "
                     "hosts except localhost (for testing purposes).",
-        validators=[RedirectURIValidator(), validators.Required()],
+        validators=[RedirectURIValidator(), validators.DataRequired()],
         default='',
     )
 
@@ -150,9 +161,12 @@ class ClientForm(ClientFormBase):
 
 
 class TokenForm(InvenioBaseForm):
+
+    """Token form."""
+
     name = fields.TextField(
         description="Name of personal access token.",
-        validators=[validators.Required()],
+        validators=[validators.DataRequired()],
     )
     scopes = fields.SelectMultipleField(
         widget=scopes_multi_checkbox,

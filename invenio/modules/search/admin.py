@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,17 +19,13 @@
 
 """Flask-Admin page to configure facets sets per collection."""
 
-from wtforms.fields import SelectField, IntegerField
-from wtforms.validators import ValidationError
-try:
-    from wtforms.validators import Required
-except ImportError:
-    from wtforms.validators import DataRequired as Required
-
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
-from invenio.modules.search.models import FacetCollection, Collection
+from invenio.modules.search.models import Collection, FacetCollection
 from invenio.modules.search.registry import facets
+
+from wtforms.fields import IntegerField, SelectField
+from wtforms.validators import DataRequired, ValidationError
 
 
 def is_place_taken(form, field):
@@ -90,7 +86,7 @@ class FacetsAdmin(ModelView):
     form_args = {
         'collection': {
             'validators': [
-                Required(),
+                DataRequired(),
             ],
             'allow_blank': False,
             'query_factory':
@@ -99,14 +95,14 @@ class FacetsAdmin(ModelView):
         'order': {
             'validators': [
                 is_place_taken,
-                Required(),
+                DataRequired(),
             ],
         },
         'facet_name': {
             'validators': [
                 is_module_facet_module,
                 is_duplicated,
-                Required(),
+                DataRequired(),
             ],
         },
     }

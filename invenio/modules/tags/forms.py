@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,39 +17,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebTag Forms"""
+"""WebTag Forms."""
 
-from invenio.base.i18n import _
-from invenio.base.globals import cfg
-
-from invenio.utils.forms import InvenioBaseForm
 from flask.ext.login import current_user
 
-from wtforms import \
-    IntegerField, \
-    BooleanField, \
-    SelectField, \
-    HiddenField, \
-    TextField, \
-    SelectMultipleField, \
-    SelectField, \
-    validators
-
-#Models
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import UserUsergroup, Usergroup
 from invenio.modules.records.models import Record as Bibrec
-from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
+from invenio.utils.forms import InvenioBaseForm
+
+from wtforms import BooleanField, HiddenField, IntegerField, SelectField, \
+    SelectMultipleField, TextField, validators
 
 # Internal
-from invenio.ext.sqlalchemy import db
-from .models import \
-    WtgTAG, \
-    WtgTAGRecord, \
-    wash_tag_silent, \
-    wash_tag_blocking
+from .models import WtgTAG, WtgTAGRecord, wash_tag_blocking, wash_tag_silent
 
 
 def validate_tag_name(dummy_form, field):
-    """ Check validity of tag name """
+    """Check validity of tag name."""
     max_len = cfg['CFG_TAGS_NAME_MAX_LENGTH']
     max_char = cfg['CFG_TAGS_MAX_CHARACTER']
 
@@ -68,15 +55,16 @@ def validate_tag_name(dummy_form, field):
                 _('The name must contain valid characters.'))
 
         if len(suggested_silent) > max_len:
-            raise validators.ValidationError( _('The name cannot exeed ')
-                    + str(max_len) + _(' characters.'))
+            raise validators.ValidationError(
+                _('The name cannot exeed %(x_max_len)d characters.',
+                  x_max_len=max_len))
 
         if max(ord(letter) for letter in suggested_silent) > max_char:
-            raise validators.ValidationError( _('Forbidden character.'))
+            raise validators.ValidationError(_('Forbidden character.'))
 
 
 def validate_name_available(dummy_form, field):
-    """ Check if the user already has tag named this way """
+    """Check if the user already has tag named this way."""
     if field.data:
         uid = current_user.get_id()
         copy_count = db.session.query(WtgTAG).\
@@ -88,7 +76,7 @@ def validate_name_available(dummy_form, field):
 
 
 def validate_tag_exists(dummy_form, field):
-    """ Check if id_tag matches a tag in database """
+    """Check if id_tag matches a tag in database."""
     if field.data:
         try:
             field.data = int(field.data)
@@ -100,22 +88,23 @@ def validate_tag_exists(dummy_form, field):
 
 
 def validate_user_owns_tag(dummy_form, field):
-    """ Check if id_tag matches a tag in database """
+    """Check if id_tag matches a tag in database."""
     if field.data:
         tag = db.session.query(WtgTAG).get(field.data)
 
         if tag and tag.id_user != current_user.get_id():
             raise validators.ValidationError(
-                  _('You are not the owner of this tag.'))
+                _('You are not the owner of this tag.'))
 
 
 def validate_bibrec_exists(dummy_form, field):
-    """ Check if id_bibrec matches a bibrec in database """
+    """Check if id_bibrec matches a bibrec in database."""
     if field.data:
         try:
             field.data = int(field.data)
         except ValueError:
-            raise validators.ValidationError(_('Bibrec ID must be an integer.'))
+            raise validators.ValidationError(
+                _('Bibrec ID must be an integer.'))
 
         record = db.session.query(Bibrec).get(field.data)
 
@@ -133,7 +122,7 @@ def validate_bibrec_exists(dummy_form, field):
 
 
 def validate_user_can_see_bibrec(dummy_form, field):
-    """ Check if user has rights to view bibrec """
+    """Check if user has rights to view bibrec."""
     if field.data:
         from invenio.legacy.search_engine import check_user_can_view_record
 
@@ -141,11 +130,11 @@ def validate_user_can_see_bibrec(dummy_form, field):
 
         if auth_code > 0:
             raise validators.ValidationError(
-                  _('Unauthorized to view record: ')+msg)
+                _('Unauthorized to view record: ') + msg)
 
 
 def validate_not_already_attached(form, dummy_field):
-    """ Check if the pair (tag, bibrec) is already connected """
+    """Check if the pair (tag, bibrec) is already connected."""
     if form:
         if ('id_tag' in form.data) and ('id_bibrec' in form.data):
             tag_record = db.session.query(WtgTAGRecord)\
@@ -156,7 +145,7 @@ def validate_not_already_attached(form, dummy_field):
 
 
 def validate_already_attached(form, dummy_field):
-    """ Check if the pair (tag, bibrec) is already connected """
+    """Check if the pair (tag, bibrec) is already connected."""
     if form:
         if ('id_tag' in form.data) and ('id_bibrec' in form.data):
             tag_record = db.session.query(WtgTAGRecord)\
@@ -167,8 +156,10 @@ def validate_already_attached(form, dummy_field):
 
 
 class CreateTagForm(InvenioBaseForm):
+
     """Defines form for creating a new tag."""
-    name = TextField(_('Name'), [validators.Required(),
+
+    name = TextField(_('Name'), [validators.DataRequired(),
                                  validate_tag_name,
                                  validate_name_available])
 
@@ -181,63 +172,76 @@ class CreateTagForm(InvenioBaseForm):
 
 
 class DeleteTagForm(InvenioBaseForm):
+
     """Defines form for deleting a tag."""
+
     id_tag = SelectMultipleField('Tag ID',
-                              [validators.Required(),
-                               validate_tag_exists,
-                               validate_user_owns_tag])
+                                 [validators.DataRequired(),
+                                  validate_tag_exists,
+                                  validate_user_owns_tag])
 
 
 class AttachTagForm(InvenioBaseForm):
-    """Defines a form validating attaching a tag to record"""
+
+    """Defines a form validating attaching a tag to record."""
+
     # Ajax requests only:
     id_tag = IntegerField('Tag ID',
-             [validators.Required(),
-              validate_tag_exists,
-              validate_not_already_attached,
-              validate_user_owns_tag])
+                          [validators.DataRequired(),
+                           validate_tag_exists,
+                           validate_not_already_attached,
+                           validate_user_owns_tag])
 
     # validate user rights on tag
 
     id_bibrec = IntegerField('Record ID',
-                [validate_bibrec_exists,
-                 validate_user_can_see_bibrec])
+                             [validate_bibrec_exists,
+                              validate_user_can_see_bibrec])
 
 
 class DetachTagForm(InvenioBaseForm):
-    """Defines a form validating detaching a tag from record"""
+
+    """Defines a form validating detaching a tag from record."""
+
     # Ajax requests only:
     id_tag = IntegerField('Tag ID',
-             [validators.Required(),
-              validate_tag_exists,
-              validate_already_attached,
-              validate_user_owns_tag])
+                          [validators.DataRequired(),
+                           validate_tag_exists,
+                           validate_already_attached,
+                           validate_user_owns_tag])
     # validate user rights on tag
 
     id_bibrec = IntegerField('Record ID',
-                [validators.Required(),
-                 validate_bibrec_exists,
-                 validate_user_can_see_bibrec])
+                             [validators.DataRequired(),
+                              validate_bibrec_exists,
+                              validate_user_can_see_bibrec])
 
 
 class TagAnnotationForm(InvenioBaseForm):
-    """Defines a form validating attaching a tag to record"""
+
+    """Defines a form validating attaching a tag to record."""
+
     # Ajax requests only:
     id_tag = IntegerField('Tag ID',
-             [validators.Required(),
-              validate_tag_exists,
-              validate_already_attached,
-              validate_user_owns_tag])
+                          [validators.DataRequired(),
+                           validate_tag_exists,
+                           validate_already_attached,
+                           validate_user_owns_tag])
 
     # validate user rights on tag
     id_bibrec = IntegerField('Record ID',
-                [validate_bibrec_exists,
-                 validate_user_can_see_bibrec])
+                             [validate_bibrec_exists,
+                              validate_user_can_see_bibrec])
 
     annotation_value = TextField('Annotation')
 
+
 class GetGroupOptions(object):
+
+    """Get group options."""
+
     def __iter__(self):
+        """Iter function."""
         id_user = current_user.get_id()
 
         options = [('0', _('Private'))]
@@ -250,9 +254,12 @@ class GetGroupOptions(object):
         for (gid, name) in options:
             yield (str(gid), name)
 
+
 class EditTagForm(InvenioBaseForm):
+
     """Defines form for editing an existing tag."""
-    name = TextField(_('Name'), [validators.Required(),
+
+    name = TextField(_('Name'), [validators.DataRequired(),
                                  validate_tag_name])
 
     id_usergroup = SelectField(
@@ -263,12 +270,14 @@ class EditTagForm(InvenioBaseForm):
         _('Group access rights'),
         choices=[
             (str(WtgTAG.ACCESS_LEVELS['View']), 'View'),
-            (str(WtgTAG.ACCESS_LEVELS['Add and remove']), 'Attach to documents')
-            ])
+            (str(WtgTAG.ACCESS_LEVELS['Add and remove']),
+             'Attach to documents')
+        ])
 
 
 class WebTagUserSettingsForm(InvenioBaseForm):
-    """User's personal settings influencing WebTag module"""
+
+    """User's personal settings influencing WebTag module."""
 
     display_tags = BooleanField(_('Display tags with records'))
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,22 +21,25 @@
 
 from __future__ import absolute_import
 
-import six
-
 from flask import current_app
 from flask.ext.login import current_user
+
+from invenio.base.i18n import _
+from invenio.config import SECRET_KEY as secret_key
+from invenio.ext.login.legacy_user import UserInfo
+from invenio.ext.sqlalchemy import db
+
+import six
+
 from sqlalchemy_utils import URLType
-from sqlalchemy_utils.types.encrypted import EncryptedType, AesEngine
+from sqlalchemy_utils.types.encrypted import AesEngine, EncryptedType
+
 from werkzeug.security import gen_salt
+
 from wtforms import validators
 
-from invenio.config import SECRET_KEY as secret_key
-from invenio.base.i18n import _
-from invenio.ext.sqlalchemy import db
-from invenio.ext.login.legacy_user import UserInfo
-
-from .validators import validate_redirect_uri, validate_scopes
 from .errors import ScopeDoesNotExists
+from .validators import validate_redirect_uri, validate_scopes
 
 
 class NoneAesEngine(AesEngine):
@@ -56,6 +59,8 @@ class NoneAesEngine(AesEngine):
 
 class String255EncryptedType(EncryptedType):
 
+    """String encrypted type."""
+
     impl = db.String(255)
 
 
@@ -72,9 +77,11 @@ class OAuthUserProxy(object):
         return getattr(self._user, name)
 
     def __getstate__(self):
+        """Return the id."""
         return self.id
 
     def __setstate__(self, state):
+        """Set user info."""
         self._user = UserInfo(state)
 
     @property
@@ -134,7 +141,7 @@ class Client(db.Model):
         info=dict(
             label=_('Name'),
             description=_('Name of application (displayed to users).'),
-            validators=[validators.Required()]
+            validators=[validators.DataRequired()]
         )
     )
     """Human readable name of the application."""
@@ -191,10 +198,12 @@ class Client(db.Model):
 
     @property
     def allowed_grant_types(self):
+        """Return allowed grant types."""
         return current_app.config['OAUTH2_ALLOWED_GRANT_TYPES']
 
     @property
     def allowed_response_types(self):
+        """Return allowed response types."""
         return current_app.config['OAUTH2_ALLOWED_RESPONSE_TYPES']
 
     # def validate_scopes(self, scopes):
@@ -202,12 +211,14 @@ class Client(db.Model):
 
     @property
     def client_type(self):
+        """Return client type."""
         if self.is_confidential:
             return 'confidential'
         return 'public'
 
     @property
     def redirect_uris(self):
+        """Return redirect uris."""
         if self._redirect_uris:
             return self._redirect_uris.splitlines()
         return []
@@ -227,6 +238,7 @@ class Client(db.Model):
 
     @property
     def default_redirect_uri(self):
+        """Return default redirect uri."""
         try:
             return self.redirect_uris[0]
         except IndexError:
@@ -254,15 +266,18 @@ class Client(db.Model):
             return False
 
     def gen_salt(self):
+        """Generate salt."""
         self.reset_client_id()
         self.reset_client_secret()
 
     def reset_client_id(self):
+        """Reset client id."""
         self.client_id = gen_salt(
             current_app.config.get('OAUTH2_CLIENT_ID_SALT_LEN')
         )
 
     def reset_client_secret(self):
+        """Reset client secret."""
         self.client_secret = gen_salt(
             current_app.config.get('OAUTH2_CLIENT_SECRET_SALT_LEN')
         )
@@ -322,12 +337,14 @@ class Token(db.Model):
 
     @property
     def scopes(self):
+        """Return all scopes."""
         if self._scopes:
             return self._scopes.split()
         return []
 
     @scopes.setter
     def scopes(self, scopes):
+        """Set scopes."""
         validate_scopes(scopes)
         self._scopes = " ".join(set(scopes)) if scopes else ""
 
