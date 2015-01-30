@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,20 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Client blueprint used to handle OAuth callbacks. """
+"""Client blueprint used to handle OAuth callbacks."""
 
 from __future__ import absolute_import
 
-from flask import Blueprint, abort, current_app, url_for, request
-
+from flask import Blueprint, abort, current_app, request, session, url_for
 from flask.ext.login import user_logged_out
+from itsdangerous import TimedJSONWebSignatureSerializer, BadData
+from werkzeug.local import LocalProxy
 
 from invenio.base.globals import cfg
 from invenio.ext.sslify import ssl_required
+from invenio.utils.url import get_safe_redirect_target
 
 from ..client import oauth, handlers, disconnect_handlers, signup_handlers
 from ..handlers import authorized_default_handler, make_token_getter, \
-    make_handler, disconnect_handler, oauth_logout_handler
+    make_handler, disconnect_handler, oauth_logout_handler, \
+    set_session_next_url
 
 
 blueprint = Blueprint(
@@ -42,9 +45,17 @@ blueprint = Blueprint(
 )
 
 
+serializer = LocalProxy(
+    lambda: TimedJSONWebSignatureSerializer(
+        cfg['SECRET_KEY'],
+        expires_in=cfg['OAUTHCLIENT_STATE_EXPIRES'],
+    )
+)
+
+
 @blueprint.before_app_first_request
 def setup_app():
-    """ Setup OAuth clients. """
+    """Setup OAuth clients."""
     # Connect signal to remove access tokens on logout
     user_logged_out.connect(oauth_logout_handler)
 
@@ -116,33 +127,64 @@ def setup_app():
 @blueprint.route('/login/<remote_app>/')
 @ssl_required
 def login(remote_app):
-    """ Send user to remote application for authentication. """
+    """Send user to remote application for authentication."""
     if remote_app not in oauth.remote_apps:
         return abort(404)
 
+    # Get redirect target in safe manner.
+    next_param = get_safe_redirect_target(arg='next')
+
+    # Redirect URI - must be registered in the remote service.
     callback_url = url_for(
         '.authorized',
         remote_app=remote_app,
-        next=request.args.get('next') or request.referrer or None,
         _external=True,
     )
 
-    return oauth.remote_apps[remote_app].authorize(callback=callback_url)
+    # Create a JSON Web Token that expires after OAUTHCLIENT_STATE_EXPIRES
+    # seconds.
+    state_token = serializer.dumps({
+        'app': remote_app,
+        'next': next_param,
+        'sid': session.sid,
+    })
+
+    return oauth.remote_apps[remote_app].authorize(
+        callback=callback_url,
+        state=state_token,
+    )
 
 
 @blueprint.route('/authorized/<remote_app>/')
 @ssl_required
 def authorized(remote_app=None):
-    """ Authorized handler callback. """
+    """Authorized handler callback."""
     if remote_app not in handlers:
         return abort(404)
+
+    state_token = request.args.get('state')
+
+    # Verify state parameter
+    try:
+        assert state_token
+        # Checks authenticity and integrity of state and decodes the value.
+        state = serializer.loads(state_token)
+        # Verify that state is for this session, app and that next parameter
+        # have not been modified.
+        assert state['sid'] == session.sid
+        assert state['app'] == remote_app
+        # Store next URL
+        set_session_next_url(remote_app, state['next'])
+    except (AssertionError, BadData):
+        abort(403)
+
     return handlers[remote_app]()
 
 
 @blueprint.route('/signup/<remote_app>/', methods=['GET', 'POST'])
 @ssl_required
 def signup(remote_app):
-    """ Extra signup step. """
+    """Extra signup step."""
     if remote_app not in signup_handlers:
         return abort(404)
     res = signup_handlers[remote_app]['view']()
@@ -152,7 +194,7 @@ def signup(remote_app):
 @blueprint.route('/disconnect/<remote_app>/')
 @ssl_required
 def disconnect(remote_app):
-    """ Disconnect user from remote application.
+    """Disconnect user from remote application.
 
     Removes application as well as associated information.
     """

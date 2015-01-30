@@ -95,12 +95,13 @@ REMOTE_APP = dict(
         view="invenio.modules.oauthclient.handlers:signup_handler",
     ),
     params=dict(
-        request_token_params={'scope': '/authenticate'},
+        request_token_params={'scope': '/authenticate',
+                              'show_login': 'true'},
         base_url='https://pub.orcid.com/',
         request_token_url=None,
         access_token_url="https://pub.orcid.org/oauth/token",
         access_token_method='POST',
-        authorize_url="https://orcid.org/oauth/authorize#show_login",
+        authorize_url="https://orcid.org/oauth/authorize",
         app_key="ORCID_APP_CREDENTIALS",
         content_type="application/json",
     )

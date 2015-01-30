@@ -40,6 +40,17 @@ from .utils import oauth_authenticate, oauth_get_user, oauth_register
 #
 # Token handling
 #
+def get_session_next_url(remote_app):
+    return session.get(
+        "%s_%s" % (token_session_key(remote_app), "next_url")
+    )
+
+
+def set_session_next_url(remote_app, url):
+    session["%s_%s" % (token_session_key(remote_app), "next_url")] = \
+        url
+
+
 def token_session_key(remote_app):
     """Generate a session key used to store the token for a remote app."""
     return '%s_%s' % (cfg['OAUTHCLIENT_SESSION_KEY_PREFIX'], remote_app)
@@ -213,7 +224,6 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
                 return redirect(url_for(
                     ".signup",
                     remote_app=remote.name,
-                    next=request.args.get('next', '/')
                 ))
 
         # Authenticate user
@@ -236,8 +246,9 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         handlers['setup'](token)
 
     # Redirect to next
-    if request.args.get('next', None):
-        return redirect(request.args.get('next'))
+    next_url = get_session_next_url(remote.name)
+    if next_url:
+        return redirect(next_url)
     else:
         return redirect('/')
 
@@ -314,8 +325,9 @@ def signup_handler(remote, *args, **kwargs):
         session.pop(token_session_key(remote.name) + '_account_info', None)
 
         # Redirect to next
-        if request.args.get('next', None):
-            return redirect(request.args.get('next'))
+        next_url = get_session_next_url(remote.name)
+        if next_url:
+            return redirect(next_url)
         else:
             return redirect('/')
 

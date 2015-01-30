@@ -17,13 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Configuration variables for defining remote applications.
+"""Configuration variables for defining remote applications.
 
 ================================ ==============================================
 `OAUTHCLIENT_REMOTE_APPS`        Dictionary of remote applications. See example
                                  below. **Default:** ``{}``.
 `OAUTHCLIENT_SESSION_KEY_PREFIX` Prefix for the session key used to store the
                                  an access token. **Default:** ``oauth_token``.
+`OAUTHCLIENT_STATE_EXPIRES`      Number of seconds after which the state token
+                                 expires. Defaults to 300 seconds.
 ================================ ==============================================
 
 Each remote application must be defined in the ``OAUTHCLIENT_REMOTE_APPS``
@@ -178,3 +180,6 @@ OAUTHCLIENT_REMOTE_APPS = {}
 
 OAUTHCLIENT_SESSION_KEY_PREFIX = "oauth_token"
 """Session key prefix used when storing the access token for a remote app."""
+
+OAUTHCLIENT_STATE_EXPIRES = 300
+"""Number of seconds after which the state token expires."""

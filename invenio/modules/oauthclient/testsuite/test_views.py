@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,12 +19,14 @@
 
 from __future__ import absolute_import
 
-from mock import MagicMock, patch
-from six.moves.urllib_parse import quote_plus
+import time
 from flask import url_for, session
-from invenio.testsuite import make_test_suite, run_test_suite
+from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
-
+from invenio.testsuite import make_test_suite, run_test_suite
+from itsdangerous import TimedJSONWebSignatureSerializer
+from mock import MagicMock, patch
+from six.moves.urllib_parse import parse_qs, urlparse
 from .helpers import OAuth2ClientTestCase
 
 
@@ -105,17 +107,59 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             }
         )
 
+    def test_redirect_uri(self):
+        from invenio.modules.oauthclient.views.client import serializer
+
+        # Test redirect
+        resp = self.client.get(
+            url_for("oauthclient.login", remote_app='test',
+                    next='http://invenio-software.org')
+        )
+        self.assertStatus(resp, 302)
+
+        # Verify parameters
+        params = parse_qs(urlparse(resp.location).query)
+        self.assertEqual(params['response_type'], ['code'])
+        self.assertEqual(params['client_id'], ['testid'])
+        assert params['redirect_uri']
+        assert params['state']
+
+        # Verify next parameter in state token does not allow blanco redirects
+        state = serializer.loads(params['state'][0])
+        self.assertIsNone(state['next'])
+
+        # Assert redirect uri does not have any parameters.
+        params = parse_qs(urlparse(params['redirect_uri'][0]).query)
+        self.assertEqual(params, {})
+
+        # Assert that local redirects are allowed
+        test_urls = [
+            '/search',
+            url_for('oauthclient.disconnect', remote_app='test',
+                    _external=True)
+        ]
+        for url in test_urls:
+            resp = self.client.get(
+                url_for("oauthclient.login", remote_app='test', next=url)
+            )
+            self.assertStatus(resp, 302)
+            state = serializer.loads(
+                parse_qs(urlparse(resp.location).query)['state'][0]
+            )
+            self.assertEqual(url, state['next'])
+
     def test_login(self):
         # Test redirect
-        resp = self.client.get(url_for("oauthclient.login", remote_app='test'))
-        self.assertStatus(resp, 302)
-        self.assertEqual(
-            resp.location,
-            "https://foo.bar/oauth/authorize?response_type=code&"
-            "client_id=testid&redirect_uri=%s" % quote_plus(url_for(
-                "oauthclient.authorized", remote_app='test', _external=True
-            ))
+        resp = self.client.get(
+            url_for("oauthclient.login", remote_app='test', next='/')
         )
+        self.assertStatus(resp, 302)
+
+        params = parse_qs(urlparse(resp.location).query)
+        self.assertEqual(params['response_type'], ['code'])
+        self.assertEqual(params['client_id'], ['testid'])
+        assert params['redirect_uri']
+        assert params['state']
 
         # Invalid remote
         resp = self.client.get(
@@ -132,11 +176,20 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             self.mock_response(app='test')
             self.mock_response(app='test_invalid')
 
+            from invenio.modules.oauthclient.views.client import serializer
+
+            state = serializer.dumps({
+                'app': 'test',
+                'sid': session.sid,
+                'next': None,
+            })
+
             resp = c.get(
                 url_for(
                     "oauthclient.authorized",
                     remote_app='test',
                     code='test',
+                    state=state
                 )
             )
             assert resp.data == "TEST"
@@ -145,15 +198,72 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
             assert not self.handled_kwargs
             assert self.handled_resp['access_token'] == 'test_access_token'
 
-            resp = self.assertRaises(
+            state = serializer.dumps({
+                'app': 'test_invalid',
+                'sid': session.sid,
+                'next': None,
+            })
+
+            self.assertRaises(
                 TypeError,
                 c.get,
                 url_for(
                     "oauthclient.authorized",
                     remote_app='test_invalid',
                     code='test',
+                    state=state,
                 )
             )
+
+    @patch('invenio.modules.oauthclient.views.client.session')
+    def test_state_token(self, session):
+        from invenio.modules.oauthclient.views.client import serializer
+
+        # Mock session id
+        session.sid = '1234'
+
+        with self.app.test_client() as c:
+            # Ensure remote apps have been loaded (due to before first
+            # request)
+            c.get(url_for("oauthclient.login", remote_app='test'))
+            self.mock_response(app='test')
+
+            # Good state token
+            state = serializer.dumps(
+                {'app': 'test', 'sid': '1234',  'next': None, }
+            )
+            resp = c.get(
+                url_for("oauthclient.authorized", remote_app='test',
+                        code='test', state=state)
+            )
+            self.assert200(resp)
+
+            outdated_serializer = TimedJSONWebSignatureSerializer(
+                cfg['SECRET_KEY'],
+                expires_in=0,
+            )
+
+            # Bad state - timeout
+            state1 = outdated_serializer.dumps(
+                {'app': 'test', 'sid': '1234',  'next': None, }
+            )
+            # Bad state - app
+            state2 = serializer.dumps(
+                # State for another existing app (test_invalid exists)
+                {'app': 'test_invalid', 'sid': '1234',  'next': None, }
+            )
+            # Bad state - sid
+            state3 = serializer.dumps(
+                # State for another existing app (test_invalid exists)
+                {'app': 'test', 'sid': 'bad',  'next': None, }
+            )
+            time.sleep(1)
+            for s in [state1, state2, state3]:
+                resp = c.get(
+                    url_for("oauthclient.authorized", remote_app='test',
+                            code='test', state=s)
+                )
+                self.assert403(resp)
 
     def test_no_remote_app(self):
         self.assert404(self.client.get(
@@ -165,14 +275,20 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         ))
 
     @patch('invenio.ext.session.interface.SessionInterface.save_session')
-    def test_token_getter_setter(self, save_session):
+    @patch('invenio.modules.oauthclient.views.client.session')
+    def test_token_getter_setter(self, session, save_session):
         from invenio.modules.oauthclient.models import RemoteToken
         from invenio.modules.oauthclient.handlers import token_getter
         from invenio.modules.oauthclient.client import oauth
 
+        # Mock user
         user = MagicMock()
         user.get_id = MagicMock(return_value=1)
         user.is_authenticated = MagicMock(return_value=True)
+
+        # Mock session id
+        session.sid = '1234'
+
         with patch('flask.ext.login._get_user', return_value=user):
             with self.app.test_client() as c:
                 # First call login to be redirected
@@ -181,6 +297,8 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 assert res.location.startswith(
                     oauth.remote_apps['full'].authorize_url
                 )
+                state = parse_qs(urlparse(res.location).query)['state'][0]
+
                 # Mock resposen class
                 self.mock_response(app='full')
 
@@ -188,16 +306,20 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 # application.
                 c.get(url_for(
                     "oauthclient.authorized", remote_app='full', code='test',
+                    state=state,
                 ))
 
-                # Assert if every is as it should be.
-                assert session['oauth_token_full'] == ('test_access_token', '')
+                # Assert if everything is as it should be.
+                from flask import session as flask_session
+                assert flask_session['oauth_token_full'] == \
+                    ('test_access_token', '')
 
                 t = RemoteToken.get(1, "fullid")
                 assert t.remote_account.client_id == 'fullid'
                 assert t.access_token == 'test_access_token'
                 assert RemoteToken.query.count() == 1
 
+                # Mock a new authorized request
                 self.mock_response(app='full', data={
                     "access_token": "new_access_token",
                     "scope": "",
@@ -206,6 +328,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
 
                 c.get(url_for(
                     "oauthclient.authorized", remote_app='full', code='test',
+                    state=state
                 ))
 
                 t = RemoteToken.get(1, "fullid")
@@ -228,12 +351,18 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 assert t is None
 
     @patch('invenio.ext.session.interface.SessionInterface.save_session')
-    def test_rejected(self, save_session):
+    @patch('invenio.modules.oauthclient.views.client.session')
+    def test_rejected(self, session, save_session):
         from invenio.modules.oauthclient.client import oauth
 
+        # Mock user id
         user = MagicMock()
         user.get_id = MagicMock(return_value=1)
         user.is_authenticated = MagicMock(return_value=True)
+
+        # Mock session id
+        session.sid = '1234'
+
         with patch('flask.ext.login._get_user', return_value=user):
             with self.app.test_client() as c:
                 # First call login to be redirected
@@ -256,8 +385,14 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 # Imitate that the user authorized our request in the remote
                 # application (however, the remote app will son reply with an
                 # error)
+                from invenio.modules.oauthclient.views.client import serializer
+                state = serializer.dumps({
+                    'app': 'full', 'sid': '1234',  'next': None,
+                })
+
                 res = c.get(url_for(
                     "oauthclient.authorized", remote_app='full', code='test',
+                    state=state
                 ))
                 assert res.status_code == 302
 

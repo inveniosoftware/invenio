@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -105,6 +105,27 @@ def wash_url_argument(var, new_type):
         else:
             out = {0: var}
     return out
+
+
+from urlparse import urlparse, urljoin
+from flask import request, url_for
+
+def is_local_url(target):
+    """Determine if URL is a local."""
+    ref_url = urlparse(cfg.get('CFG_SITE_SECURE_URL'))
+    test_url = urlparse(urljoin(cfg.get('CFG_SITE_SECURE_URL'), target))
+    return test_url.scheme in ('http', 'https') and \
+           ref_url.netloc == test_url.netloc
+
+
+def get_safe_redirect_target(arg='next'):
+    """Get URL to redirect to and ensure that it is local."""
+    for target in request.args.get(arg), request.referrer:
+        if not target:
+            continue
+        if is_local_url(target):
+            return target
+    return None
 
 
 def redirect_to_url(req, url, redirection_type=None, norobot=False):
