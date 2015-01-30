@@ -35,7 +35,7 @@ class FormTestCase(InvenioTestCase):
         # Mock query
         obj = MagicMock()
         obj.one = MagicMock(side_effect=SQLAlchemyError())
-        user.query.filter = Mock(return_value=obj)
+        User.query.filter = Mock(return_value=obj)
         self.assertTrue(
             EmailSignUpForm(email='good@invenio-software.org').validate()
         )
