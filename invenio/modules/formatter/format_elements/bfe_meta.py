@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013, 2014 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import cgi
 import re
-import time
+from invenio.utils.date import strftime, strptime
 import string
 from datetime import datetime
 from invenio.modules.formatter.format_elements.bfe_server_info import format_element as server_info
@@ -213,7 +213,7 @@ def parse_date_for_googlescholar(datetime_string):
     parsed_datetime = None
     for dateformat in CFG_POSSIBLE_DATE_FORMATS:
         try:
-            parsed_datetime = time.strptime(datetime_string.strip(), dateformat)
+            parsed_datetime = strptime(datetime_string.strip(), dateformat)
             break
         except:
             pass
@@ -223,13 +223,13 @@ def parse_date_for_googlescholar(datetime_string):
         translated_datetime_string = CFG_MONTHS_I18N_PATTERN_RE.sub(replace_month, datetime_string)
         for dateformat in CFG_POSSIBLE_DATE_FORMATS:
             try:
-                parsed_datetime = time.strptime(translated_datetime_string.strip(), dateformat)
+                parsed_datetime = strptime(translated_datetime_string.strip(), dateformat)
                 break
             except:
                 pass
 
     if parsed_datetime:
-        return datetime(*(parsed_datetime[0:6])).strftime('%Y/%m/%d')
+        return strftime('%Y/%m/%d', parsed_datetime)
     else:
         # Look for a year inside the string:
         try:

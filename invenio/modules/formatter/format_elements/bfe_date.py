@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,8 +20,7 @@
 """
 __revision__ = "$Id$"
 
-import time
-from invenio.utils.date import guess_datetime
+from invenio.utils.date import strftime, strptime, guess_datetime
 
 def format_element(bfo, date_format='%d %B %Y', source_formats='%Y-%m-%d', source_fields="260__c",
                    guess_source_format="no", ignore_date_format_for_year_only="yes"):
@@ -91,7 +90,7 @@ def format_element(bfo, date_format='%d %B %Y', source_formats='%Y-%m-%d', sourc
             else:
                 for source_format in source_formats:
                     try:
-                        parsed_datetime_value = time.strptime(date_value, source_format)
+                        parsed_datetime_value = strptime(date_value, source_format)
                         break
                     except:
                         pass
@@ -100,6 +99,6 @@ def format_element(bfo, date_format='%d %B %Y', source_formats='%Y-%m-%d', sourc
                 break
 
     if parsed_datetime_value:
-        return time.strftime(date_format, parsed_datetime_value)
+        return strftime(date_format, parsed_datetime_value)
     else:
         return first_matched_raw_date

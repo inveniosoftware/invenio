@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-import time
+from invenio.utils.date import strftime, strptime
 
 def format_element(bfo, place_label, publisher_label, date_label,
            separator=', ', date_format=""):
@@ -55,8 +55,8 @@ def format_element(bfo, place_label, publisher_label, date_label,
     if len(date) > 0:
         if date_format != '':
             try:
-                date_time = time.strptime(date, "%Y-%m-%d")
-                out += date_label + " " + time.strftime(date_format, date_time)
+                date_time = strptime(date, "%Y-%m-%d")
+                out += date_label + " " + strftime(date_format, date_time)
             except ValueError:
                 out += date_label + ' ' + date
         else:
