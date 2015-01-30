@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -262,6 +262,8 @@ def task_parse_options(key, val, *_):
         task_set_option("no_tickets", True)
     elif key in ("--config", "-c"):
         task_set_option("config", val)
+    elif key in ("--notimechange", ):
+        task_set_option("notimechange", True)
     else:
         raise StandardError("Error: Unrecognised argument '%s'." % key)
     return True
@@ -427,7 +429,12 @@ def upload_amendments(records, holdingpen):
         flag = "-o"
     else:
         flag = "-r"
-    task = task_low_level_submission('bibupload', 'bibcheck', flag, tmp_file)
+    if task_get_option("notimechange"):
+        task = task_low_level_submission('bibupload', 'bibcheck', flag,
+                                         tmp_file, "--notimechange")
+    else:
+        task = task_low_level_submission('bibupload', 'bibcheck', flag,
+                                         tmp_file)
     write_message("Submitted bibupload task %s" % task)
 
 def check_record(rule, record):
@@ -788,6 +795,8 @@ def main():
   -n, --dry-run            Like --no-tickets and --no-upload
   -c, --config             By default bibcheck reads the file rules.cfg. This
                            allows to specify a different config file
+      --notimechange       schedules bibuploads with the option --notimechange
+                           (useful not to trigger reindexing)
 
   If any of the options --id, --no-tickets, --no-upload or --dry-run is enabled,
     bibcheck won't update the last-run-time of a task in the database.
@@ -827,7 +836,8 @@ def main():
               version="Invenio v%s" % CFG_VERSION,
               specific_params=("hvtbnV:e:a:i:q:c:", ["help", "version",
                   "verbose=", "enable-rules=", "all=", "id=", "queue=",
-                  "no-tickets", "no-upload", "dry-run", "config"]),
+                  "no-tickets", "no-upload", "dry-run", "config",
+                  "notimechange"]),
               task_submit_elaborate_specific_parameter_fnc=task_parse_options,
               task_run_fnc=task_run_core)
 
