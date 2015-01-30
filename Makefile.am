@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 # current MathJax version and packages
 
 MJV = 1.0.1a
-MATHJAX = MathJax-v$(MJV).zip
+MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 
 # current FCKeditor version
 FCKV = 2.6.6
@@ -92,8 +92,8 @@ install-mathjax-plugin:
 	rm -rf /tmp/invenio-mathjax-plugin
 	mkdir /tmp/invenio-mathjax-plugin
 	(cd /tmp/invenio-mathjax-plugin && \
-	wget 'http://www.mathjax.org/dl/$(MATHJAX)' && \
-	unzip -q -u -d ${prefix}/var/www $(MATHJAX))
+	wget -O mathjax.zip '$(MATHJAX)' && \
+	unzip -q -u -d ${prefix}/var/www mathjax.zip)
 	rm -fr /tmp/invenio-mathjax-plugin
 	@echo "* Installing Invenio-specific MathJax config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
