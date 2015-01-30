@@ -27,7 +27,7 @@ from sqlalchemy.exc import SQLAlchemyError
 class FormTestCase(InvenioTestCase):
 
     @patch('invenio.modules.oauthclient.forms.User')
-    def test_validate_email(self, user):
+    def test_validate_email(self, User):
         from invenio.modules.oauthclient.forms import EmailSignUpForm
 
         self.assertFalse(EmailSignUpForm(email='invalidemail').validate())
@@ -40,7 +40,7 @@ class FormTestCase(InvenioTestCase):
             EmailSignUpForm(email='good@invenio-software.org').validate()
         )
 
-        user.query.filter = MagicMock()
+        User.query.filter = MagicMock()
         self.assertFalse(
             EmailSignUpForm(email='bad@invenio-software.org').validate()
         )

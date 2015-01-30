@@ -41,12 +41,14 @@ from .utils import oauth_authenticate, oauth_get_user, oauth_register
 # Token handling
 #
 def get_session_next_url(remote_app):
+    """Return redirect url stored in session."""
     return session.get(
         "%s_%s" % (token_session_key(remote_app), "next_url")
     )
 
 
 def set_session_next_url(remote_app, url):
+    """Store redirect url in session for security reasons."""
     session["%s_%s" % (token_session_key(remote_app), "next_url")] = \
         url
 
