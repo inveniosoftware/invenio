@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,22 +17,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Initialize and configure *Flask-Script* extension."""
+"""Initialize and configure Flask-Script extension."""
 
 from __future__ import print_function
 
-import re
 import functools
 
-from flask import flash, current_app
-from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
-from flask.ext.script import Manager as FlaskExtManager
-from flask.ext.script.commands import Shell, Server, ShowUrls, Clean
-from six.moves import urllib
-from types import FunctionType
-from werkzeug.utils import import_string, find_modules
+import re
 
-from invenio.base.signals import pre_command, post_command
+from types import FunctionType
+
+from flask import current_app, flash
+from flask.ext.registry import ModuleAutoDiscoveryRegistry, RegistryProxy
+from flask.ext.script import Manager as FlaskExtManager
+from flask.ext.script.commands import Clean, Server, Shell, ShowUrls
+
+from invenio.base.signals import post_command, pre_command
+
+from six.moves import urllib
+
+from werkzeug.utils import find_modules, import_string
 
 
 def change_command_name(method=None, new_name=None):
@@ -76,8 +80,10 @@ def check_for_software_updates(flash_message=False):
         find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
                           ' is released')
 
-        webFile = urllib.urlopen("http://invenio-software.org/repo"
-                                 "/invenio/tree/RELEASE-NOTES")
+        release_notes = 'https://raw.githubusercontent.com/' \
+            'inveniosoftware/invenio/master/RELEASE-NOTES'
+
+        webFile = urllib.request.urlopen(release_notes)
 
         temp = ""
         version = ""
@@ -88,7 +94,7 @@ def check_for_software_updates(flash_message=False):
             try:
                 version = match1.group()
                 break
-            except:
+            except Exception:
                 pass
             if not temp:
                 break
@@ -108,17 +114,17 @@ def check_for_software_updates(flash_message=False):
                 web_version[2] > local_version[2]):
             if flash_message:
                 flash(_('A newer version of Invenio is available for '
-                        'download. You may want to visit %s') %
-                      ('<a href=\"http://invenio-software.org/wiki'
-                       '/Installation/Download\">http://invenio-software.org'
-                       '/wiki/Installation/Download</a>'), 'warning')
+                        'download. You may want to visit '
+                        '<a href="%(wiki)s">%()s</a>',
+                        wiki='<a href=\"http://invenio-software.org/wiki/'
+                             '/Installation/Download'), 'warning')
 
             return False
     except Exception as e:
         print(e)
         if flash_message:
-            flash(_('Cannot download or parse release notes from http://'
-                    'invenio-software.org/repo/invenio/tree/RELEASE-NOTES'),
+            flash(_('Cannot download or parse release notes '
+                    'from %(release_notes)s', release_notes=release_notes),
                   'error')
         return None
     return True
