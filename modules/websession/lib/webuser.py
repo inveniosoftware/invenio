@@ -162,6 +162,9 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
         title = CFG_WEBACCESS_MSGS[6]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
+    else:
+        title = CFG_WEBACCESS_MSGS[7]
+        body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
 
     return page(title=title,
                 language=ln,
