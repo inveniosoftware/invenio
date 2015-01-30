@@ -956,10 +956,10 @@ def main():
               description="",
               help_specific_usage=usage,
               version="Invenio v%s" % CFG_VERSION,
-              specific_params=("hvtbnV:e:a:i:q:c:", ["help", "version",
+              specific_params=("hvtbnV:e:a:i:q:c:p:", ["help", "version",
                   "verbose=", "enable-rules=", "all=", "id=", "queue=",
                   "no-tickets", "no-upload", "dry-run", "config",
-                  "notimechange"]),
+                  "notimechange", "ticket-creation-policy="]),
               task_submit_elaborate_specific_parameter_fnc=task_parse_options,
               task_run_fnc=task_run_core)
 
