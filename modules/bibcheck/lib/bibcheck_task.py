@@ -85,7 +85,7 @@ class Tickets(object):
         self.policy_method = None
         self.ticket_creation_policy = \
             task_get_option('ticket_creation_policy', 'per-record')
-        
+
     def resolve_ticket_creation_policy(self):
         """Resolve the policy for creating tickets."""
 
@@ -505,8 +505,9 @@ def task_run_core():
             if not record.valid:
                 records_to_submit_tickets.append(record)
 
-        Tickets(records_to_submit_tickets).submit()
-
+        if len(records_to_submit_tickets) >= CFG_BATCH_SIZE:
+            Tickets(records_to_submit_tickets).submit()
+            records_to_submit_tickets = []
         if len(records_to_upload_holdingpen) >= CFG_BATCH_SIZE:
             upload_amendments(records_to_upload_holdingpen, True)
             records_to_upload_holdingpen = []
@@ -515,10 +516,13 @@ def task_run_core():
             records_to_upload_replace = []
 
     ## In case there are still some remaining amended records
+    if records_to_submit_tickets:
+        records_to_submit_tickets(records_to_submit_tickets).submit()
     if records_to_upload_holdingpen:
         upload_amendments(records_to_upload_holdingpen, True)
     if records_to_upload_replace:
         upload_amendments(records_to_upload_replace, False)
+
 
     # Update the database with the last time each rule was ran
     if update_database:
