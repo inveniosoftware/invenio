@@ -504,7 +504,7 @@ def task_run_core():
             if not record.valid:
                 records_to_submit_tickets.append(record)
 
-        Tickets(records).submit()
+        Tickets(records_to_submit_tickets).submit()
 
         if len(records_to_upload_holdingpen) >= CFG_BATCH_SIZE:
             upload_amendments(records_to_upload_holdingpen, True)
