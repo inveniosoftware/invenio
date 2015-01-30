@@ -892,7 +892,14 @@ def main():
                                separated), ignoring all other filters
   -q, --queue=queue        Create tickets in the specified RT Queue (Default
                                Bibcheck)
-  -t, --no-tickets         Don't create any ticket in RT. Useful for debugging
+  -t, --no-tickets         Don't create any ticket in RT. Useful for debugging.
+                           To be deprecated by --ticket-creation-policy.
+  -p, --ticket-creation-policy Policy for ticket creation in RT. May be
+                               'per-rule', to create one ticket for each rule,
+                               'per-record' to create a ticket for each record,
+                               `per-rule-per-record` to create a separate ticket
+                               for every issue, or `no-tickets` to disable
+                               ticket creation.
   -b, --no-upload          Don't upload changes to the database
   -n, --dry-run            Like --no-tickets and --no-upload
   -c, --config             By default bibcheck reads the file rules.cfg. This
