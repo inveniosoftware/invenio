@@ -310,17 +310,20 @@ class AmendableRecord(dict):
         tag, localpos, subfieldpos = position
         tag = tag.replace("_", " ")
 
-        old_value = self._queryval(position)
-        if new_value != old_value:
-            if position[2] is None:
-                fields = self[tag[0:3]]
-                fields[localpos] = fields[localpos][0:3] + (new_value,)
-            else:
-                self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
-            if message == '':
-                message = u"Changed field %s from '%s' to '%s'" % (position[0],
-                        old_value.decode('utf-8'), new_value.decode('utf-8'))
-            self.set_amended(message)
+        try:
+            old_value = self._queryval(position)
+            if new_value != old_value:
+                if position[2] is None:
+                    fields = self[tag[0:3]]
+                    fields[localpos] = fields[localpos][0:3] + (new_value,)
+                else:
+                    self._query(position[:2] + (None,))[0][subfieldpos] = (tag[5], new_value)
+                if message == '':
+                    message = u"Changed field %s from '%s' to '%s'" % (position[0],
+                            old_value.decode('utf-8'), new_value.decode('utf-8'))
+                self.set_amended(message)
+        except Exception as err:
+            self.set_invalid("Error when trying to amend the record at position %s: %s. Maybe there is an empty subfield code?" % (position, err))
 
     def delete_field(self, position, message=""):
         """
