@@ -83,29 +83,30 @@ class Tickets(object):
     def __init__(self, records):
         self.records = records
         self.policy_method = None
-
+        self.ticket_creation_policy = \
+            task_get_option('ticket_creation_policy', 'per-record')
+        
     def resolve_ticket_creation_policy(self):
         """Resolve the policy for creating tickets."""
-        ticket_creation_policy = \
-            task_get_option('ticket_creation_policy', 'per-record')
+
 
         known_policies = ('per-rule',
                           'per-record',
                           'per-rule-per-record',
                           'no-tickets')
-        if ticket_creation_policy not in known_policies:
+        if self.ticket_creation_policy not in known_policies:
             raise Exception("Invalid ticket_creation_policy in config '{0}'".
-                            format(ticket_creation_policy))
+                            format(self.ticket_creation_policy))
 
         if task_get_option('no_tickets', False):
-            ticket_creation_policy = 'no-tickets'
+            self.ticket_creation_policy = 'no-tickets'
 
         policy_translator = {
             'per-rule': self.tickets_per_rule,
             'per-record': self.tickets_per_record,
             'per-rule-per-record': self.tickets_per_rule_per_record
         }
-        self.policy_method = policy_translator[ticket_creation_policy]
+        self.policy_method = policy_translator[self.ticket_creation_policy]
 
     @staticmethod
     def submit_ticket(msg_subject, msg, record_id):
