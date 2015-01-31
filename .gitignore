@@ -85,3 +85,5 @@ configure.lineno
 .project
 .settings
 .pydevproject
+supervisord.log
+supervisord.pid

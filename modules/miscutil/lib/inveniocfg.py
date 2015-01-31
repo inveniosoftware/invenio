@@ -758,15 +758,19 @@ def cli_cmd_run_web_tests(conf):
     from invenio.testutils import build_and_run_web_test_suite
     build_and_run_web_test_suite()
 
-def _detect_ip_address():
+def _detect_ip_address(conf):
     """Detect IP address of this computer.  Useful for creating Apache
-    vhost conf snippet on RHEL like machines.
+    vhost conf snippet on RHEL like machines.  However, if wanted site
+    is 0.0.0.0, then use that, since we are running inside Docker.
 
     @return: IP address, or '*' if cannot detect
     @rtype: string
     @note: creates socket for real in order to detect real IP address,
         not the loopback one.
+
     """
+    if '0.0.0.0' in conf.get('Invenio', 'CFG_SITE_URL'):
+        return '0.0.0.0'
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('invenio-software.org', 0))
@@ -926,7 +930,7 @@ WSGIRestrictStdout Off
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
-       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
+       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address(conf) or '*',
        'listen_directive': listen_directive_needed and 'Listen 80' or '#Listen 80',
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
@@ -987,7 +991,7 @@ WSGIRestrictStdout Off
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
-       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
+       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address(conf) or '*',
        'listen_directive' : listen_directive_needed and 'Listen 443' or '#Listen 443',
        'ssl_pem_directive': ssl_pem_directive_needed and \
                             'SSLCertificateFile %s' % ssl_pem_path or \
