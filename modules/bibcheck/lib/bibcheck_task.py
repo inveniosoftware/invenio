@@ -517,7 +517,7 @@ def task_run_core():
 
     ## In case there are still some remaining amended records
     if records_to_submit_tickets:
-        records_to_submit_tickets(records_to_submit_tickets).submit()
+        Tickets(records_to_submit_tickets).submit()
     if records_to_upload_holdingpen:
         upload_amendments(records_to_upload_holdingpen, True)
     if records_to_upload_replace:
