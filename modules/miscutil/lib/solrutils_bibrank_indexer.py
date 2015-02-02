@@ -178,6 +178,12 @@ def word_index(run): # pylint: disable=W0613
         if id_ranges:
             solr_add_ranges([(id_range[0], id_range[1]) for id_range in id_ranges])
             run_sql('UPDATE rnkMETHOD SET last_updated=%s WHERE name="wrd"', (starting_time, ))
+            # If solr is used both in bibindex and bibrank, than there is no
+            # need to also run fulltext bibindex
+            from invenio.bibindex_engine_utils import get_idx_indexer
+            from invenio.bibindex_engine import update_index_last_updated
+            if get_idx_indexer("fulltext").lower() == 'solr':
+                update_index_last_updated(["fulltext"], starting_time)
         else:
             write_message("No new records. Solr index is up to date")
 
