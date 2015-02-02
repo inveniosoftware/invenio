@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -167,50 +167,26 @@ install-jquery-plugins:
 	mkdir -p $(prefix)/var/www/css
 	mkdir -p $(prefix)/var/www/img
 	(cd ${prefix}/var/www/js && \
-	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
-	mv jquery-1.7.1.min.js jquery.min.js && \
-	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-    wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
-	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
-	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
+	wget -O jquery.min.js http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
+	wget -N http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
+	wget -O jquery.jeditable.mini.js http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js && \
+	wget -N https://raw.githubusercontent.com/malsup/form/3.51/jquery.form.js --no-check-certificate && \
+	wget -N http://jquery-multifile-plugin.googlecode.com/svn-history/r54/trunk/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
-	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
-	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
-	rm -rf /tmp/invenio-dt-bootstrap && \
-	mkdir /tmp/invenio-dt-bootstrap && \
-	(cd /tmp/invenio-dt-bootstrap && \
-	 git clone 'https://github.com/DataTables/Plugins.git' && \
-	 cp Plugins/integration/bootstrap/2/dataTables.bootstrap.css ${prefix}/var/www/css/dataTables.bootstrap.css && \
-	 cp Plugins/integration/bootstrap/2/dataTables.bootstrap.js ${prefix}/var/www/js/dataTables.bootstrap.js && \
-	 cp Plugins/integration/bootstrap/images/*.png ${prefix}/var/www/img/ && \
-	 ln -s ${prefix}/var/www/img/ ${prefix}/var/www/images) && \
-	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
-	mkdir /tmp/invenio-dt-bootstrap/plugins && \
-	(cd /tmp/invenio-dt-bootstrap/plugins && \
-	 git clone 'https://github.com/DataTables/ColVis' && \
-	 cp ColVis/media/css/ColVis.css ${prefix}/var/www/css/ColVis.css && \
-	 cp ColVis/media/js/ColVis.js ${prefix}/var/www/js/ColVis.js && \
-	 cp ColVis/media/images/*.png ${prefix}/var/www/img/) && \
-	cd ${prefix}/var/www/js && \
-	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
-	mkdir /tmp/invenio-dt-bootstrap/plugins && \
-	(cd /tmp/invenio-dt-bootstrap/plugins && \
-	 git clone 'https://github.com/LeaVerou/prism' && \
-	 cp prism/themes/prism.css ${prefix}/var/www/css/prism.css && \
-	 cp prism/prism.js ${prefix}/var/www/js/prism.js) && \
-	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
-	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
-	unzip jquery.tablesorter.zip -d tablesorter && \
-	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
-	unzip jquery.fileTree-1.01.zip && \
+	wget -O uploadify.zip http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip && \
+	wget -N http://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
+	unzip -u jquery.tablesorter.zip -d tablesorter && \
+	wget -N http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
+	unzip -u jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
-	wget http://invenio-software.org/download/jquery/ColVis.min.js && \
+	wget -N http://invenio-software.org/download/jquery/ColVis.min.js && \
 	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
-	wget http://invenio-software.org/download/jquery/flot-0.6.zip && \
-	wget http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
+	wget -N http://invenio-software.org/download/jquery/flot-0.6.zip && \
+	wget -N http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
 	rm -rf jquery-lightbox && \
 	unzip -u jquery-lightbox-0.5.zip -d jquery-lightbox && \
 	sed -i 's/images\//\/js\/jquery-lightbox\/images\//g' jquery-lightbox/js/jquery.lightbox-0.5.js && \
@@ -223,21 +199,21 @@ install-jquery-plugins:
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.4.min.js ./jquery.uploadify.min.js && \
 	rm uploadify.zip && rm -r uploadify && \
-	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
-	wget http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js -O jquery.hotkeys.js && \
-	wget http://invenio-software.org/download/jquery/jquery.treeview.zip && \
-	unzip jquery.treeview.zip -d jquery-treeview && \
+	wget -N https://github.com/douglascrockford/JSON-js/raw/master/json2.js --no-check-certificate && \
+	wget -O jquery.hotkeys.js http://invenio-software.org/download/jquery/jquery.hotkeys-0.8.js && \
+	wget -N http://invenio-software.org/download/jquery/jquery.treeview.zip && \
+	unzip -u jquery.treeview.zip -d jquery-treeview && \
 	rm jquery.treeview.zip && \
-	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
-	unzip jquery.bookmark.package-1.4.0.zip && \
+	wget -N http://invenio-software.org/download/jquery/v1.5/js/jquery.ajaxPager.js && \
+	unzip -u jquery.bookmark.package-1.4.0.zip && \
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
-	wget --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
-	wget --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
-	wget --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.omniwindow.js && \
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/jquery.blockUI.js && \
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/sly.min.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/parsley.js &&\
+	wget -N --no-check-certificate http://invenio-software.org/download/jquery/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
@@ -245,8 +221,8 @@ install-jquery-plugins:
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/smoothness/ && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/ && \
 	wget --no-check-certificate -O datatables_jquery-ui.css https://raw.githubusercontent.com/DataTables/DataTables/1.10.0/media/css/demo_table_jui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
+	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/jquery-ui.css && \
+	wget -N http://jquery-ui.googlecode.com/svn/tags/1.8.17/demos/images/calendar.gif && \
 	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.8.17/themes/redmond/images/)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
@@ -270,17 +246,29 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
-		rm -f jquery.dataTables.ColVis.min.js && \
-        rm -f jquery.hotkeys.js && \
-        rm -f jquery.tablesorter.min.js && \
-        rm -f jquery-ui-1.7.3.custom.min.js && \
-        rm -f jquery.metadata.js && \
-        rm -f jquery-latest.js && \
-        rm -f jquery-ui.min.js)
+	rm -f jquery.dataTables.ColVis.min.js && \
+	rm -f jquery.hotkeys.js && \
+	rm -f jquery.tablesorter.min.js && \
+	rm -f jquery-ui-1.7.3.custom.min.js && \
+	rm -f jquery.metadata.js && \
+	rm -f jquery-latest.js && \
+	rm -f jquery-ui.min.js && \
+	rm -rf jquery-lightbox && \
+	rm -f jquery-ui-timepicker-addon.js && \
+	rm -rf jqueryFileTree && \
+	rm -f swfobject.js && \
+	rm -f jquery.blockUI.js && \
+	rm -f sly.min.js && \
+	rm -f parsley.js && \
+	rm -f spin.min.js && \
+	rm -f jquery.omniwindow.js)
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
 	rm -f datatables_jquery-ui.css \
-	rm -f bookmarks.png) && \
+	rm -f bookmarks.png \
+	rm -f demo_table_jui.css \
+	rm -f calendar.gif \
+	rm -rf jquery-ui/themes) && \
 	(cd ${prefix}/var/www/css && \
 	rm -f jquery.bookmark.css)
 	@echo "***********************************************************"

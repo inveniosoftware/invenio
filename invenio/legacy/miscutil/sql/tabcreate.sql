@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -5042,5 +5042,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_12_format_code_v
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_13_tag_recjsonvalue',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjson',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_31_next_collection_tree',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_13_hide_holdings',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_arguments_cfg_namechange',NOW());
 
 -- end of file

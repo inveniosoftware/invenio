@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,27 +24,31 @@ people should be using; just check out its docstring.
 
 __revision__ = "$Id$"
 
-from time import sleep
-import re
 import os
+import re
 import sys
 
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
 from email import Encoders
+from email.Header import Header
+from email.MIMEBase import MIMEBase
 from email.MIMEImage import MIMEImage
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 from email.Utils import formatdate
 from flask import g
-from formatter import DumbWriter, AbstractFormatter
 from flask.ext.email.message import EmailMultiAlternatives, EmailMessage
+from formatter import DumbWriter, AbstractFormatter
 from six import iteritems, StringIO
+from time import sleep
 
 from invenio.base.globals import cfg
-default_ln = lambda ln: cfg.get('CFG_SITE_LANG') if ln is None else ln
+from invenio.base.helpers import unicodifier
+from invenio.ext.template import render_template_to_string
 
 from .errors import EmailError
-from invenio.ext.template import render_template_to_string
-from invenio.base.helpers import unicodifier
+
+default_ln = lambda ln: cfg.get('CFG_SITE_LANG') if ln is None else ln
 
 
 def setup_app(app):
@@ -485,7 +489,7 @@ def get_mail_header(value):
     Return a MIME-compliant header-string. Will join lists of strings
     into one string with comma (,) as separator.
     """
-    if type(value) is not str:
+    if not isinstance(value, basestring):
         value = ','.join(value)
     try:
         value = value.encode('ascii')

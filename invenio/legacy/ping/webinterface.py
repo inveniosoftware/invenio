@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,6 +26,7 @@ class WebInterfacePingPages(WebInterfaceDirectory):
     _exports = [""]
 
     def __call__(self, req, form):
+        req.status = 200
         return 'OK'
 
     index = __call__

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -55,45 +55,49 @@ from six import iteritems, string_types
 ## import Invenio stuff:
 from invenio.base.globals import cfg
 from invenio.config import \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+     CFG_BASE_URL, \
+     CFG_BIBFORMAT_HIDDEN_TAGS, \
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
+     CFG_BIBSORT_BUCKETS, \
+     CFG_BIBSORT_ENABLED, \
+     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
+     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
-     CFG_SCOAP3_SITE, \
+     CFG_LOGDIR, \
      CFG_OAI_ID_FIELD, \
+     CFG_SCOAP3_SITE, \
+     CFG_SITE_LANG, \
+     CFG_SITE_NAME, \
+     CFG_SITE_RECORD, \
+     CFG_SITE_URL, \
+     CFG_SOLR_URL, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
      CFG_WEBSEARCH_CREATE_SIMILARLY_NAMED_AUTHORS_LINK_BOX, \
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_WEBSEARCH_DETAILED_META_FORMAT, \
+     CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS, \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
+     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
+     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
+     CFG_WEBSEARCH_MAX_RECORDS_CITEDBY, \
+     CFG_WEBSEARCH_MAX_RECORDS_REFERSTO, \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
+     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
-     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
-     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
-     CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
-     CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT, \
-     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
-     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
-     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
-     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
-     CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      CFG_WEBSEARCH_SYNONYM_KBRS, \
-     CFG_SITE_LANG, \
-     CFG_SITE_NAME, \
-     CFG_LOGDIR, \
-     CFG_SITE_URL, \
-     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_SOLR_URL, \
-     CFG_WEBSEARCH_DETAILED_META_FORMAT, \
-     CFG_SITE_RECORD, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
+     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
-     CFG_BIBSORT_BUCKETS, \
-     CFG_BIBSORT_ENABLED, \
-     CFG_XAPIAN_ENABLED, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BASE_URL, \
-     CFG_BIBFORMAT_HIDDEN_TAGS
+     CFG_WEBSEARCH_WILDCARD_LIMIT, \
+     CFG_XAPIAN_ENABLED
 
 try:
     from invenio.config import CFG_BIBSORT_DEFAULT_FIELD, \
@@ -104,7 +108,9 @@ except ImportError:
 
 from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
-     InvenioWebSearchWildcardLimitError
+     InvenioWebSearchWildcardLimitError, \
+     InvenioWebSearchReferstoLimitError, \
+     InvenioWebSearchCitedbyLimitError
 from invenio.legacy.bibrecord import (get_fieldvalues,
                                       get_fieldvalues_alephseq_like)
 from .utils import record_exists
@@ -2153,6 +2159,15 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
                 write_warning(_("Search term too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchReferstoLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after reference operator too generic, displaying only partial results..."), req=req)
+        except InvenioWebSearchCitedbyLimitError, excp:
+            basic_search_unit_hitset = excp.res
+            if of.startswith("h"):
+                write_warning(_("Search term after citedby operator too generic, displaying only partial results..."), req=req)
+
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
             write_warning(_("No phrase index available for fulltext yet, looking for word combination..."), req=req)
@@ -2962,7 +2977,11 @@ def search_unit_refersto(query):
     """
     if query:
         ahitset = search_pattern(p=query)
-        return get_refersto_hitset(ahitset)
+        res = get_refersto_hitset(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(res)
+        return res
     else:
         return intbitset([])
 
@@ -2974,11 +2993,14 @@ def search_unit_refersto_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citers = intbitset()
-        citations = get_cited_by_list(ahitset)
-        selfcitations = get_self_cited_by_list(ahitset)
+        citations = get_cited_by_list(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
+        selfcitations = get_self_cited_by_list(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_REFERSTO)
         for cites, selfcites in zip(citations, selfcitations):
             # cites is in the form [(citee, citers), ...]
             citers += cites[1] - selfcites[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_REFERSTO:
+            raise InvenioWebSearchReferstoLimitError(citers)
         return citers
     else:
         return intbitset([])
@@ -3025,7 +3047,11 @@ def search_unit_citedby(query):
     if query:
         ahitset = search_pattern(p=query)
         if ahitset:
-            return get_citedby_hitset(ahitset)
+            res = get_citedby_hitset(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+
+            if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+                raise InvenioWebSearchCitedbyLimitError(res)
+            return res
         else:
             return intbitset([])
     else:
@@ -3054,11 +3080,14 @@ def search_unit_citedby_excluding_selfcites(query):
     if query:
         ahitset = search_pattern(p=query)
         citees = intbitset()
-        references = get_refers_to_list(ahitset)
-        selfreferences = get_self_refers_to_list(ahitset)
+        references = get_refers_to_list(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
+        selfreferences = get_self_refers_to_list(ahitset, record_limit=CFG_WEBSEARCH_MAX_RECORDS_CITEDBY)
         for refs, selfrefs in zip(references, selfreferences):
             # refs is in the form [(citer, citees), ...]
             citees += refs[1] - selfrefs[1]
+
+        if len(ahitset) >= CFG_WEBSEARCH_MAX_RECORDS_CITEDBY:
+            raise InvenioWebSearchCitedbyLimitError(citees)
         return citees
     else:
         return intbitset([])

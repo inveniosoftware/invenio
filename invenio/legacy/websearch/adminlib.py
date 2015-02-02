@@ -3478,11 +3478,6 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         if disable_files_tab_p:
             tabs['files']['enabled'] = False
 
-        #Disable holdings tab if collection != Books
-        collection = run_sql("""select name from collection where id=%s""", (colID, ))
-        if collection[0][0] != 'Books':
-            tabs['holdings']['enabled'] = False
-
         # Disable Plots tab if no docfile of doctype Plot found
         brd =  BibRecDocs(recID)
         if len(brd.list_bibdocs('Plot')) == 0:
