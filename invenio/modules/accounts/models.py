@@ -369,6 +369,16 @@ class Usergroup(db.Model):
             UserUsergroup.id_user == id_user
         )
 
+    @classmethod
+    def query_list_usergroups(cls, id_user):
+        """Return query to have a list of groups of the user.
+
+        :param id_user: user's id
+        :return: query to read list
+        """
+        return cls.query.join(UserUsergroup).filter(
+            UserUsergroup.id_user.like(id_user))
+
     def is_part_of(self, id_user):
         """Return True if the user is an admin or member of the group."""
         return db.session.query(
@@ -523,6 +533,16 @@ class UserUsergroup(db.Model):
     def is_part_of(self):
         """Return True if user is member or admin."""
         return self.is_admin() or self.is_member()
+
+    @classmethod
+    def query_list(cls, id_user):
+        """Return query to have a list of UserUsergroups of the user.
+
+        :param id_user: user's id
+        :return: query to read list
+        """
+        return cls.query.filter(
+            cls.id_user.like(id_user))
 
 
 # define query to get admins

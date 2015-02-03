@@ -41,7 +41,7 @@ from invenio.modules.accounts.models import User, UserUsergroup, Usergroup, \
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from . import api
+from .api import GroupsAPI
 from .config import GROUPS_AUTOCOMPLETE_LIMIT
 from .forms import JoinUsergroupForm, UserJoinGroupForm, UsergroupForm
 
@@ -65,14 +65,13 @@ default_breadcrumb_root(blueprint, '.settings.groups')
 def index():
     """List all user groups."""
     uid = current_user.get_id()
-    current_user.reload()
+    # current_user.reload()
     form = JoinUsergroupForm()
     form.id_usergroup.set_remote(
-        url_for('webgroup.search_groups', id_user=uid) +
-        "?query=%QUERY")
-    user = User.query.get(uid)
-    uugs = dict(map(lambda uug: (uug.usergroup.name, uug),
-                    user.usergroups))
+        url_for('webgroup.search_groups', id_user=uid)
+        + "?query=%QUERY")
+    ouugs = GroupsAPI.query_list_userusergroups(uid).all()
+    uugs = dict(map(lambda uug: (uug.usergroup.name, uug), ouugs))
 
     return render_template(
         'groups/index.html',
@@ -94,7 +93,7 @@ def new():
         id_user = current_user.get_id()
         form.populate_obj(ug)
         try:
-            api.create_group(uid=id_user, group=ug, curr_uid=id_user)
+            ug = GroupsAPI.create_group(uid=id_user, group=ug)
         except (IntegrityError, AccountSecurityError,
                 IntegrityUsergroupError, IntegrityError) as e:
             db.session.rollback()
@@ -132,20 +131,19 @@ def approve(id_usergroup, id_user=None):
     curr_uid = current_user.get_id()
     id_user2approve = id_user or curr_uid
     user2approve = User.query.get_or_404(id_user2approve)
-    group = Usergroup.query.get_or_404(id_usergroup)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     try:
-        api.approve_user_in_group(id_usergroup=id_usergroup,
-                                  id_user=id_user2approve,
-                                  curr_uid=curr_uid)
+        gapi.approve_user_in_group(id_user=id_user2approve)
     except AccountSecurityError, e:
         flash(str(e), 'error')
         # redirect
         return redirect(url_for('.members', id_usergroup=id_usergroup))
 
+    # after user update
     current_user.reload()
     flash(_('%(user)s successfully approved in the group "%(name)s".',
             user='User "'+user2approve.nickname+'"' if id_user else "You",
-            name=group.name), 'success')
+            name=gapi.user_group.name), 'success')
     return redirect(url_for('.members', id_usergroup=id_usergroup))
 
 
@@ -162,12 +160,10 @@ def leave(id_usergroup, id_user=None):
     curr_uid = current_user.get_id()
     id_user2remove = id_user or curr_uid
     user2remove = User.query.get_or_404(id_user2remove)
-    group = Usergroup.query.get_or_404(id_usergroup)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     # user leave the group
     try:
-        api.remove_user_from_group(id_usergroup=id_usergroup,
-                                   id_user=id_user2remove,
-                                   curr_uid=curr_uid)
+        gapi.remove_user_from_group(id_user=id_user2remove)
     except (AccountSecurityError, IntegrityUsergroupError) as e:
         # catch security errors
         flash(str(e), "error")
@@ -177,8 +173,8 @@ def leave(id_usergroup, id_user=None):
     current_user.reload()
     flash(_('%(user)s left the group "%(name)s".',
             user='User "'+user2remove.nickname+'"' if id_user else "You",
-            name=group.name), 'success')
-    if id_user and id_user != current_user.get_id():
+            name=gapi.user_group.name), 'success')
+    if id_user and id_user != curr_uid:
         return redirect(url_for('.members', id_usergroup=id_usergroup))
     else:
         return redirect(url_for('.index'))
@@ -193,22 +189,20 @@ def leave(id_usergroup, id_user=None):
 def join(id_usergroup, id_user=None, status=None):
     """Join group."""
     # load data
-    group = Usergroup.query.get_or_404(id_usergroup)
     curr_uid = current_user.get_id()
     id_user2join = id_user or curr_uid
     user2join = User.query.get_or_404(id_user2join)
     form = UserJoinGroupForm()
     user_status = None
-    # read from the form
+    # read status from the form (checkbox)
     if form.user_status and form.user_status.data:
         user_status = UserUsergroup.USER_STATUS['ADMIN']
     else:
         user_status = UserUsergroup.USER_STATUS['MEMBER']
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     # user join the group
     try:
-        api.add_user_to_group(id_usergroup=group.id, id_user=user2join.id,
-                              status=user_status, curr_uid=curr_uid)
-        # group.join(user2join, status=user_status, curr_uid=curr_uid)
+        gapi.add_user_to_group(id_user=user2join.id, status=user_status)
     except (AccountSecurityError, SQLAlchemyError) as e:
         # catch security errors
         flash(str(e), "error")
@@ -222,7 +216,7 @@ def join(id_usergroup, id_user=None, status=None):
     current_user.reload()
     flash(_('%(user)s join the group "%(name)s".',
             user='User "'+user2join.nickname+'"' if id_user else "You",
-            name=group.name), 'success')
+            name=gapi.user_group.name), 'success')
 
     redirect_url = form.redirect_url.data or url_for('.index')
     return redirect(redirect_url)
@@ -234,21 +228,20 @@ def join(id_usergroup, id_user=None, status=None):
 @permission_required('usegroups')
 def manage(id_usergroup):
     """Manage user group."""
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     # load data
-    ug = Usergroup.query.filter_by(id=id_usergroup).first_or_404()
-    form = UsergroupForm(request.form, obj=ug)
+    form = UsergroupForm(request.form, obj=gapi.user_group)
 
     if form.validate_on_submit():
         # get form data
         ug2form = Usergroup()
         form.populate_obj(ug2form)
         # save old group's name
-        oldname = ug.name
+        oldname = gapi.user_group.name
 
         # update in db
         try:
-            api.update_group(id_usergroup=id_usergroup, group=ug2form,
-                             curr_uid=current_user.get_id())
+            gapi.update_group(group=ug2form)
         except (AccountSecurityError, IntegrityError, SQLAlchemyError) as e:
             db.session.rollback()
             flash(str(e), 'error')
@@ -269,7 +262,7 @@ def manage(id_usergroup):
         "groups/new.html",
         form=form,
         action=_('Update'),
-        subtitle=ug.name,
+        subtitle=gapi.user_group.name,
     )
 
 
@@ -280,18 +273,18 @@ def manage(id_usergroup):
 def delete(id_usergroup):
     """Delete a group."""
     # load data
-    group = Usergroup.query.get_or_404(id_usergroup)
-    curr_uid = current_user.get_id()
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    group_name = gapi.user_group.name
     # delete group
     try:
-        api.delete_group(id_usergroup=group.id, curr_uid=curr_uid)
+        gapi.delete_group()
     except AccountSecurityError, e:
         flash(str(e), "error")
         return redirect(url_for(".index"))
 
     # return successful message
-    flash(_('Successfully removed the group "{0}"').format(
-        group.name), 'success')
+    flash(_('Successfully removed the group "%(group_name)s"',
+            group_name=group_name), 'success')
     return redirect(url_for(".index"))
 
 
@@ -302,16 +295,13 @@ def delete(id_usergroup):
 def members(id_usergroup):
     """List user group members."""
     # load data
-    curr_uid = current_user.get_id()
     try:
-        group = api.get_group(id_usergroup=id_usergroup, curr_uid=curr_uid)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     except AccountSecurityError, e:
         flash(str(e), 'error')
         return redirect(url_for('.index'))
 
-    current_uug = UserUsergroup.query.filter(
-        UserUsergroup.id_user == curr_uid,
-        UserUsergroup.id_usergroup == group.id).first_or_404()
+    current_uug = gapi.get_info_about_user_in_group()
 
     unitg = UserJoinGroupForm(request.form)
     unitg.id_user.set_remote(
@@ -323,7 +313,7 @@ def members(id_usergroup):
 
     return render_template(
         "groups/members.html",
-        group=group,
+        group=gapi.user_group,
         current_uug=current_uug,
         form=unitg,
     )
@@ -335,6 +325,9 @@ def members(id_usergroup):
 @permission_required('usegroups')
 def search(query, term):
     """Search user groups."""
+    # FIXME user can access to all users name?
+    # e.g. is better to return only users name that are at least in one group
+    # together?
     if query == 'users' and len(term) >= 3:
         res = db.session.query(User.nickname).filter(
             User.nickname.like("%s%%" % term)).limit(10).all()
@@ -354,9 +347,10 @@ def search(query, term):
 @permission_required('usegroups')
 def search_users(id_usergroup, query):
     """Search user not in a specific group."""
-    group = Usergroup.query.get_or_404(id_usergroup)
-    users = group.get_users_not_in_this_group(nickname="%%%s%%" % query) \
-        .limit(10).all()
+    # group = Usergroup.query.get_or_404(id_usergroup)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    users = gapi.query_users_not_in_this_group(query="%%%s%%" % query) \
+        .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(results=[{'id': user.id, 'nickname': user.nickname}
                             for user in users])
 
@@ -368,7 +362,8 @@ def search_users(id_usergroup, query):
 @permission_required('usegroups')
 def search_groups(id_user, query):
     """Search groups that user not joined."""
-    groups = api.query_groups_user_not_joined(id_user, "%%%s%%" % query) \
+    groups = GroupsAPI.query_groups_user_not_joined(
+        id_user=id_user, group_name="%%%s%%" % query) \
         .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(results=[{'id': group.id, 'name': group.name}
                             for group in groups])
@@ -380,6 +375,7 @@ def search_groups(id_user, query):
 @permission_required('usegroups')
 def tokenize(q):
     """FIXME."""
+    # FIXME can we deprecate this function?
     res = Usergroup.query.filter(
         Usergroup.name.like("%s%%" % q)).limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(data=map(dict, res))
