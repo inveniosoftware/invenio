@@ -65,7 +65,6 @@ default_breadcrumb_root(blueprint, '.settings.groups')
 def index():
     """List all user groups."""
     uid = current_user.get_id()
-    # current_user.reload()
     form = JoinUsergroupForm()
     form.id_usergroup.set_remote(
         url_for('webgroup.search_groups', id_user=uid)
@@ -93,7 +92,7 @@ def new():
         id_user = current_user.get_id()
         form.populate_obj(ug)
         try:
-            ug = GroupsAPI.create_group(uid=id_user, group=ug)
+            ug = GroupsAPI.create(uid=id_user, group=ug)
         except (IntegrityError, AccountSecurityError,
                 IntegrityUsergroupError, IntegrityError) as e:
             db.session.rollback()
@@ -105,8 +104,6 @@ def new():
                 action=_('Create'),
                 subtitle=_("New group"),
             )
-        # update user info
-        current_user.reload()
         # redirect to see the group's list
         flash(_('Group "%(name)s" successfully created',
                 name=ug.name), 'success')
@@ -133,14 +130,12 @@ def approve(id_usergroup, id_user=None):
     user2approve = User.query.get_or_404(id_user2approve)
     gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     try:
-        gapi.approve_user_in_group(id_user=id_user2approve)
+        gapi.approve_user(id_user=id_user2approve)
     except AccountSecurityError, e:
         flash(str(e), 'error')
         # redirect
         return redirect(url_for('.members', id_usergroup=id_usergroup))
 
-    # after user update
-    current_user.reload()
     flash(_('%(user)s successfully approved in the group "%(name)s".',
             user='User "'+user2approve.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
@@ -163,14 +158,13 @@ def leave(id_usergroup, id_user=None):
     gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     # user leave the group
     try:
-        gapi.remove_user_from_group(id_user=id_user2remove)
+        gapi.remove(id_user=id_user2remove)
     except (AccountSecurityError, IntegrityUsergroupError) as e:
         # catch security errors
         flash(str(e), "error")
         return redirect(url_for('.index'))
 
     # return successful message
-    current_user.reload()
     flash(_('%(user)s left the group "%(name)s".',
             user='User "'+user2remove.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
@@ -202,7 +196,7 @@ def join(id_usergroup, id_user=None, status=None):
     gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
     # user join the group
     try:
-        gapi.add_user_to_group(id_user=user2join.id, status=user_status)
+        gapi.add(id_user=user2join.id, status=user_status)
     except (AccountSecurityError, SQLAlchemyError) as e:
         # catch security errors
         flash(str(e), "error")
@@ -213,7 +207,6 @@ def join(id_usergroup, id_user=None, status=None):
             return redirect(url_for('.index'))
 
     # return successful message
-    current_user.reload()
     flash(_('%(user)s join the group "%(name)s".',
             user='User "'+user2join.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
@@ -229,6 +222,11 @@ def join(id_usergroup, id_user=None, status=None):
 def manage(id_usergroup):
     """Manage user group."""
     gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    try:
+        gapi.check_access()
+    except AccountSecurityError, e:
+        flash(str(e), "error")
+        return redirect(url_for(".index"))
     # load data
     form = UsergroupForm(request.form, obj=gapi.user_group)
 
@@ -241,7 +239,7 @@ def manage(id_usergroup):
 
         # update in db
         try:
-            gapi.update_group(group=ug2form)
+            gapi.update(group=ug2form)
         except (AccountSecurityError, IntegrityError, SQLAlchemyError) as e:
             db.session.rollback()
             flash(str(e), 'error')
@@ -254,7 +252,6 @@ def manage(id_usergroup):
             )
 
         # return successful message
-        current_user.reload()
         return redirect(url_for(".index"))
 
     # load form
@@ -274,14 +271,15 @@ def delete(id_usergroup):
     """Delete a group."""
     # load data
     gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
-    group_name = gapi.user_group.name
-    # delete group
     try:
-        gapi.delete_group()
+        gapi.check_access()
+        # delete group
+        gapi.delete()
     except AccountSecurityError, e:
         flash(str(e), "error")
         return redirect(url_for(".index"))
 
+    group_name = gapi.user_group.name
     # return successful message
     flash(_('Successfully removed the group "%(group_name)s"',
             group_name=group_name), 'success')
@@ -297,11 +295,12 @@ def members(id_usergroup):
     # load data
     try:
         gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi.check_access()
     except AccountSecurityError, e:
         flash(str(e), 'error')
         return redirect(url_for('.index'))
 
-    current_uug = gapi.get_info_about_user_in_group()
+    current_uug = gapi.get_info()
 
     unitg = UserJoinGroupForm(request.form)
     unitg.id_user.set_remote(

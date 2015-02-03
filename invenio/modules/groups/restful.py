@@ -32,7 +32,7 @@ from invenio.modules.accounts.errors import(
     AccountSecurityError, IntegrityUsergroupError
 )
 from invenio.modules.accounts.models import UserUsergroup, Usergroup
-from invenio.modules.groups import api as groups_api
+from invenio.modules.groups.api import GroupsAPI
 
 from .errors import GroupValidationError
 
@@ -77,11 +77,13 @@ def error_handler(f):
             abort(e.code, message=e.message,
                   status=e.code, errors=e.error_list)
         except AccountSecurityError as e:
-            abort(401, message=e.args[0], status=401)
+            abort(401, message=e.args[0].encode('utf-8'))
+            # abort(405, message="hello")
         except IntegrityUsergroupError as e:
-            abort(400, message=e.args[0], status=400)
+            abort(400, message=e.args[0].encode('utf-8'), status=400)
         except InvalidPageError as e:
-            abort(e.status_code, message=e.error_msg, status=e.status_code)
+            abort(e.status_code, message=e.error_msg,
+                  status=e.status_code)
     return inner
 
 
@@ -138,7 +140,7 @@ class GroupsResource(Resource):
         per_page = args['per_page']
 
         return pagination.RestfulSQLAlchemyPagination(
-            groups_api.query_list_usergroups(
+            GroupsAPI.query_list_usergroups(
                 id_user=id_user),
             page=page or 1, per_page=per_page or 10).items
 
@@ -162,7 +164,7 @@ class GroupsResource(Resource):
         )
         curr_uid = current_user.get_id()
 
-        return groups_api.create_group(
+        return GroupsAPI.create(
             uid=curr_uid,
             group=usergroup,
         )
@@ -200,7 +202,7 @@ class GroupResource(Resource):
 
         :param id_usergroup: the identifier of a group
         """
-        return groups_api.get_group(id_usergroup=id_usergroup)
+        return GroupsAPI.get_group(id_usergroup=id_usergroup)
 
     def head(self, id_usergroup):
         """HTTP Head not supported."""
@@ -228,13 +230,9 @@ class GroupResource(Resource):
             if 'login_method' in json_data and
             json_data['login_method'] in Usergroup.LOGIN_METHODS else None,
         )
-        curr_uid = current_user.get_id()
-
-        return groups_api.update_group(
-            id_usergroup=id_usergroup,
-            group=usergroup,
-            curr_uid=curr_uid,
-        )
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi.check_access()
+        return gapi.update(group=usergroup)
 
     def post(self, i_dont_know, id_usergroup):
         """HTTP Post not supported."""
@@ -247,7 +245,8 @@ class GroupResource(Resource):
 
         :param id_usergroup: the identifier of a group
         """
-        groups_api.delete_group(id_usergroup=id_usergroup)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi.delete()
         return "", 204
 
 
@@ -279,8 +278,10 @@ class UsersResource(Resource):
         page = args['page']
         per_page = args['per_page']
 
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+
         return pagination.RestfulSQLAlchemyPagination(
-            groups_api.query_members(id_usergroup),
+            gapi.query_members(),
             page=page or 1, per_page=per_page or 10
         ).items
 
@@ -302,8 +303,8 @@ class UserResource(Resource):
         :param id_usergroup: the identifier of a group
         :param id_user: the identifier of a user
         """
-        return groups_api.get_info_about_user_in_group(
-            id_usergroup, id_user)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        return gapi.get_info(id_user=id_user)
 
     @marshal_with(UserUserUsergroupObject)
     @require_oauth_scopes('groups:write')
@@ -315,9 +316,9 @@ class UserResource(Resource):
             if 'user_status' in json_data \
             and json_data['user_status'] in UserUsergroup.USER_STATUS else None
 
-        return groups_api.add_user_to_group(
-            id_usergroup=id_usergroup,
-            id_user=id_user, status=user_status)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+
+        return gapi.add(id_user=id_user, status=user_status)
 
     @marshal_with(UserUserUsergroupObject)
     @require_oauth_scopes('groups:write')
@@ -328,9 +329,9 @@ class UserResource(Resource):
         user_status = json_data['user_status'] if 'user_status' \
             in json_data else None
 
-        return groups_api.update_user_status(
-            id_usergroup=id_usergroup,
-            id_user=id_user, status=user_status)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+
+        return gapi.update_user_status(id_user=id_user, status=user_status)
 
     @require_oauth_scopes('groups:write')
     def delete(self, id_usergroup, id_user):
@@ -339,8 +340,8 @@ class UserResource(Resource):
         :param id_usergroup: the identifier of a group
         :param id_user: the identifier of the user
         """
-        groups_api.remove_user_from_group(
-            id_usergroup=id_usergroup, id_user=id_user)
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi.remove(id_user=id_user)
         return "", 204
 
 

@@ -349,14 +349,11 @@ class Usergroup(db.Model):
 
         :param user: User to approve into the group.
         """
-        # approve user
-        uug = UserUsergroup.query.filter(
-            UserUsergroup.id_user.like(user.id),
-            UserUsergroup.id_usergroup.like(self.id),
-        ).one()
-        if uug.user_status == UserUsergroup.USER_STATUS['PENDING']:
-            uug.user_status = UserUsergroup.USER_STATUS['MEMBER']
-            db.session.merge(uug)
+        UserUsergroup.query.filter(
+            UserUsergroup.id_user == user.id,
+            UserUsergroup.id_usergroup == self.id,
+            UserUsergroup.user_status == UserUsergroup.USER_STATUS['PENDING']
+        ).update(dict(user_status=UserUsergroup.USER_STATUS['MEMBER']))
 
     def query_userusergroup(self, id_user):
         """Return query to filter UserUsergroup.
