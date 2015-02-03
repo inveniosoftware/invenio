@@ -280,7 +280,7 @@ class UsersResource(Resource):
         per_page = args['per_page']
 
         return pagination.RestfulSQLAlchemyPagination(
-            groups_api.query_members_of_group(id_usergroup),
+            groups_api.query_members(id_usergroup),
             page=page or 1, per_page=per_page or 10
         ).items
 
@@ -328,7 +328,7 @@ class UserResource(Resource):
         user_status = json_data['user_status'] if 'user_status' \
             in json_data else None
 
-        return groups_api.update_userusergroup(
+        return groups_api.update_user_status(
             id_usergroup=id_usergroup,
             id_user=id_user, status=user_status)
 
