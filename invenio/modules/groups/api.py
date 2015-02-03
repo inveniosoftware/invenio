@@ -44,35 +44,9 @@ class GroupsAPI:
         self.user_group = user_group
         # GroupsAPI.get_group(id_usergroup)
 
-    def query_members(self):
-        """List all members of a group.
-
-        :param id_usergroup: the identifier of a group
-        """
-        # check permissions
-        if not self.user_group.is_part_of(self.curr_uid):
-            # if false, not permitted
-            raise AccountSecurityError(
-                "You don't have the right to see the list of "
-                "users in the group {0}".format(
-                    self.user_group.name
-                )
-            )
-        # return list of users
-        return UserUsergroup.query.filter_by(id_usergroup=self.user_group.id)
-
-    def query_users_not_in_this_group(self, query=''):
-        """Return query to check a list of user not in this group.
-
-        :param query: query to filter users
-        :return: query object
-        """
-        return self.user_group.get_users_not_in_this_group(
-            nickname="%%%s%%" % query)
-
-    @session_manager
     @staticmethod
-    def create_group(uid, group):
+    @session_manager
+    def create(uid, group):
         """Create a new user group.
 
         :param uid: the identifier of the user that tries to create a group
@@ -82,8 +56,11 @@ class GroupsAPI:
         if not uid:
             uid = current_user.get_id()
         # try to create the group
-        return Usergroup.create(
+        result = Usergroup.create(
             id_user_admin=uid, group=group)
+        # update user info
+        current_user.reload()
+        return result
 
     @staticmethod
     def get_group(id_usergroup):
@@ -92,29 +69,30 @@ class GroupsAPI:
         :param id_usergroup: group's id
         :return: the Usergroup object
         """
-        curr_uid = current_user.get_id()
-        group = Usergroup.query.get_or_404(id_usergroup)
+        return Usergroup.query.get_or_404(id_usergroup)
+
+    def check_access(self):
+        """Check access permission."""
         # check permissions
-        if not group.is_part_of(curr_uid):
-            user = User.query.get_or_404(curr_uid)
+        if not self.user_group.is_part_of(self.curr_uid):
+            user = User.query.get_or_404(self.curr_uid)
             # check if user is pending
-            if group.is_pending(user.id):
+            if self.user_group.is_pending(user.id):
                 # not permitted
                 raise AccountSecurityError(_(
-                    'User "%(nickname)s" needs approval to see the'
-                    ' members of the group "%(group_name)s"').format(
-                        nickname=user.nickname, group_name=group.name
-                    ))
+                    'User "%(nickname)s" needs approval to access to this '
+                    'group "%(group_name)s"',
+                    nickname=user.nickname, group_name=self.user_group.name
+                ))
             # not permitted
             raise AccountSecurityError(_(
-                'User "%(nickname)s" don\'t have the right to see the'
-                ' members of the group "%(group_name)s"').format(
-                    nickname=user.nickname, group_name=group.name)
-            )
-        return group
+                'User "%(nickname)s" don\'t have the right to access to this '
+                'group "%(group_name)s"',
+                nickname=user.nickname, group_name=self.user_group.name))
+        return
 
     @session_manager
-    def update_group(self, group):
+    def update(self, group):
         """Update a group.
 
         :param group: group's object with the new informations
@@ -140,10 +118,12 @@ class GroupsAPI:
         self.user_group.join_policy = group.join_policy
         self.user_group.login_method = group.login_method
         db.session.merge(self.user_group)
+        # update user info
+        current_user.reload()
         return self.user_group
 
     @session_manager
-    def delete_group(self):
+    def delete(self):
         """Delete user group."""
         # check if current user is administrator of the group
         if not self.user_group.is_admin(self.curr_uid):
@@ -157,8 +137,10 @@ class GroupsAPI:
                   ))
         # delete group
         db.session.delete(self.user_group)
+        # update user info
+        current_user.reload()
 
-    def get_info_about_user_in_group(self, id_user=None):
+    def get_info(self, id_user=None):
         """Get information about a user in a group.
 
         :param id_user: user's id
@@ -178,7 +160,7 @@ class GroupsAPI:
             ))
         return self.user_group.query_userusergroup(id_user).first_or_404()
 
-    def add_user_to_group(self, id_user, status=None):
+    def add(self, id_user, status=None):
         """Add user to a group.
 
         :param id_user: the identifier of a user
@@ -189,7 +171,10 @@ class GroupsAPI:
         user_to_add = User.query.get_or_404(id_user)
         # get new status
         status = self.new_user_status(user=user_to_add, status=status)
-        return self.user_group.join(user=user_to_add, status=status)
+        result = self.user_group.join(user=user_to_add, status=status)
+        # update user info
+        current_user.reload()
+        return result
 
     @session_manager
     def update_user_status(self, id_user, status=None):
@@ -199,12 +184,14 @@ class GroupsAPI:
         :param status: the role of the user
         :return: UserUsergroup object
         """
-        uug = self.get_info_about_user_in_group(id_user=id_user)
+        uug = self.get_info(id_user=id_user)
         uug.user_status = self.new_user_status(user=uug.user, status=status)
         db.session.merge(uug)
+        # update user info
+        current_user.reload()
         return uug
 
-    def approve_user_in_group(self, id_user=None):
+    def approve_user(self, id_user=None):
         """Approve the user into the group.
 
         :param id_user: user's id
@@ -224,8 +211,10 @@ class GroupsAPI:
                   group_name=self.user_group.name))
 
         self.user_group.approve(user2approve)
+        # update user info
+        current_user.reload()
 
-    def remove_user_from_group(self, id_user=None):
+    def remove(self, id_user=None):
         """Remove a user from a group.
 
         :param id_user: the identifier of a user
@@ -247,6 +236,8 @@ class GroupsAPI:
 
         # remove user from the group
         self.user_group.leave(user=user2remove)
+        # update user info
+        current_user.reload()
 
     def new_user_status(self, user, status=None):
         """Return user status for new user.
@@ -356,3 +347,29 @@ class GroupsAPI:
         return models_get_groups_user_not_joined(
             id_user=id_user,
             group_name="%%%s%%" % group_name)
+
+    def query_members(self):
+        """List all members of a group.
+
+        :param id_usergroup: the identifier of a group
+        """
+        # check permissions
+        if not self.user_group.is_part_of(self.curr_uid):
+            # if false, not permitted
+            raise AccountSecurityError(
+                "You don't have the right to see the list of "
+                "users in the group {0}".format(
+                    self.user_group.name
+                )
+            )
+        # return list of users
+        return UserUsergroup.query.filter_by(id_usergroup=self.user_group.id)
+
+    def query_users_not_in_this_group(self, query=''):
+        """Return query to check a list of user not in this group.
+
+        :param query: query to filter users
+        :return: query object
+        """
+        return self.user_group.get_users_not_in_this_group(
+            nickname="%%%s%%" % query)
