@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,24 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import FormField, FieldList, Field, Form
+"""Deposit forms."""
+
+from wtforms import Field, FieldList, Form, FormField
 
 CFG_GROUPS_META = {
     'classes': None,
     'indication': None,
     'description': None
 }
-"""
-Default group metadata.
-"""
+"""Default group metadata."""
 
 CFG_FIELD_FLAGS = [
     'hidden',
     'disabled',
     'touched',
 ]
-"""
-List of WTForm field flags to be saved in draft.
+"""List of WTForm field flags to be saved in draft.
 
 See more about WTForm field flags on:
 http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.flags
@@ -42,13 +41,10 @@ http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.flags
 
 
 def filter_flags(field):
-    """
-    Return a list of flags (from CFG_FIELD_FLAGS) set on a field.
-    """
+    """Return a list of flags (from CFG_FIELD_FLAGS) set on a field."""
     return filter(lambda flag: getattr(field.flags, flag), CFG_FIELD_FLAGS)
 
-"""
-Form customization
+"""Form customization.
 
 you can customize the following for the form
 
@@ -60,9 +56,11 @@ _drafting: bool, show or hide the drafts at the right of the form
 
 
 class WebDepositForm(Form):
-    """ Generic WebDeposit Form class """
+
+    """Generic WebDeposit Form class."""
 
     def __init__(self, *args, **kwargs):
+        """Init."""
         super(WebDepositForm, self).__init__(*args, **kwargs)
         if not hasattr(self, 'template'):
             self.template = 'deposit/run.html'
@@ -86,8 +84,7 @@ class WebDepositForm(Form):
             field.reset_field_data(exclude=exclude)
 
     def get_groups(self):
-        """
-        Get a list of the (group metadata, list of fields)-tuples
+        """Get a list of the (group metadata, list of fields)-tuples.
 
         The last element of the list has no group metadata (i.e. None),
         and contains the list of fields not assigned to any group.
@@ -129,17 +126,17 @@ class WebDepositForm(Form):
         return field_groups
 
     def get_template(self):
-        """
-        Get template to render this form.
+        """Get template to render this form.
+
         Define a data member `template` to customize which template to use.
 
         By default, it will render the template `deposit/run.html`
-
         """
         return [self.template]
 
     def post_process(self, form=None, formfields=[], submit=False):
-        """
+        """Run form post-processing.
+
         Run form post-processing by calling `post_process` on each field,
         passing any extra `Form.post_process_<fieldname>` processors to the
         field.
@@ -212,9 +209,7 @@ class WebDepositForm(Form):
         return None
 
     def get_flags(self, filter_func=filter_flags):
-        """
-        Return dictionary of fields and their set flags
-        """
+        """Return dictionary of fields and their set flags."""
         flags = {}
 
         for f in self._fields.values():
@@ -226,8 +221,7 @@ class WebDepositForm(Form):
         return flags
 
     def set_flags(self, flags):
-        """
-        Set flags on fields
+        """Set flags on fields.
 
         @param flags: Dictionary of fields and their set flags (same structure
                       as returned by get_flags).
@@ -237,7 +231,8 @@ class WebDepositForm(Form):
 
     @property
     def json_data(self):
-        """
+        """Return form data in a format suitable for the standard JSON encoder.
+
         Return form data in a format suitable for the standard JSON encoder, by
         calling Field.json_data() on each field if it exists, otherwise is uses
         the value of Field.data.
@@ -249,9 +244,7 @@ class WebDepositForm(Form):
 
     @property
     def messages(self):
-        """
-        Return a dictionary of form messages.
-        """
+        """Return a dictionary of form messages."""
         _messages = {}
 
         for f in self._fields.values():
@@ -269,11 +262,14 @@ class WebDepositForm(Form):
 
 
 class FormVisitor(object):
+
+    """Generic form visitor to iterate over all fields in a form.
+
+    See DataExporter for example how to export all data.
     """
-    Generic form visitor to iterate over all fields in a form. See DataExporter
-    for example how to export all data.
-    """
+
     def visit(self, form_or_field):
+        """Visit."""
         if isinstance(form_or_field, FormField):
             self.visit_formfield(form_or_field)
         elif isinstance(form_or_field, FieldList):
@@ -284,22 +280,28 @@ class FormVisitor(object):
             self.visit_field(form_or_field)
 
     def visit_form(self, form):
+        """Visit form."""
         for field in form:
             self.visit(field)
 
     def visit_field(self, field):
+        """Visit field."""
         pass
 
     def visit_fieldlist(self, fieldlist):
+        """Visit field list."""
         for field in fieldlist.get_entries():
             self.visit(field)
 
     def visit_formfield(self, formfield):
+        """Visit form field."""
         self.visit(formfield.form)
 
 
 class DataExporter(FormVisitor):
-    """
+
+    """Visitor to export form data into dictionary.
+
     Visitor to export form data into dictionary supporting filtering and key
     renaming.
 
@@ -311,7 +313,7 @@ class DataExporter(FormVisitor):
     Given e.g. the following form::
 
         class MyForm(WebDepositForm):
-            title = TextField(export_key='my_title')
+            title = StringField(export_key='my_title')
             notes = TextAreaField()
             authors = FieldList(FormField(AuthorForm))
 
@@ -319,7 +321,9 @@ class DataExporter(FormVisitor):
 
         {'my_title': ..., 'notes': ..., authors: [{...}, ...], }
     """
+
     def __init__(self, filter_func=None):
+        """Init."""
         self.data = {}
         self.data_stack = [self.data]
 
@@ -329,7 +333,7 @@ class DataExporter(FormVisitor):
             self.filter_func = lambda f: True
 
     def _export_name(self, field):
-        """ Get dictionary key - defaults to field name """
+        """Get dictionary key - defaults to field name."""
         return field.export_key if getattr(field, 'export_key', None) \
             else field.short_name
 
@@ -356,6 +360,7 @@ class DataExporter(FormVisitor):
     # Visit methods
     #
     def visit_field(self, field):
+        """Visit field."""
         if (self.filter_func)(field):
             data = self._top_stack_element()
             if isinstance(data, list):
@@ -364,12 +369,14 @@ class DataExporter(FormVisitor):
                 data[self._export_name(field)] = field.data
 
     def visit_formfield(self, formfield):
+        """Visit form field."""
         if (self.filter_func)(formfield):
             self._push_stack(formfield, {})
             super(DataExporter, self).visit_formfield(formfield)
             self._pop_stack()
 
     def visit_fieldlist(self, fieldlist):
+        """Visit field list."""
         if (self.filter_func)(fieldlist):
             self._push_stack(fieldlist, [])
             super(DataExporter, self).visit_fieldlist(fieldlist)

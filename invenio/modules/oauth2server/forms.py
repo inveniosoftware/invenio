@@ -164,7 +164,7 @@ class TokenForm(InvenioBaseForm):
 
     """Token form."""
 
-    name = fields.TextField(
+    name = fields.StringField(
         description="Name of personal access token.",
         validators=[validators.DataRequired()],
     )

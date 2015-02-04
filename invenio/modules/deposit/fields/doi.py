@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,11 +19,13 @@
 
 """DOI field."""
 
-from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from ..validation_utils import DOISyntaxValidator
+
+from wtforms import StringField
+
 from ..filter_utils import strip_prefixes, strip_string
 from ..processor_utils import datacite_lookup
+from ..validation_utils import DOISyntaxValidator
 
 __all__ = ['DOIField']
 
@@ -39,11 +41,12 @@ def missing_doi_warning(dummy_form, field, submit=False, fields=None):
         raise StopIteration()
 
 
-class DOIField(WebDepositField, TextField):
+class DOIField(WebDepositField, StringField):
 
     """DOIField."""
 
     def __init__(self, **kwargs):
+        """Init."""
         defaults = dict(
             icon='barcode',
             validators=[

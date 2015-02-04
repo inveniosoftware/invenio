@@ -20,7 +20,8 @@
 """Unit tests for the WebDeposit Form """
 
 import copy
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class WebDepositFormTest(InvenioTestCase):
@@ -46,26 +47,26 @@ class WebDepositFormTest(InvenioTestCase):
             return []
 
         class IdentifierTestForm(WebDepositForm):
-            scheme = fields.TextField(
+            scheme = fields.StringField(
                 processors=[reset_processor],
                 autocomplete_fn=dummy_autocomplete,
             )
-            identifier = fields.TextField()
+            identifier = fields.StringField()
 
             def post_process_identifier(self, form, field, submit=False,
                                         fields=None):
                 form.scheme.data = field.data
 
         class TestForm(WebDepositForm):
-            title = fields.TextField(
+            title = fields.StringField(
                 processors=[reset_processor],
                 autocomplete_fn=dummy_autocomplete,
             )
-            subtitle = fields.TextField()
+            subtitle = fields.StringField()
             related_identifier = fields.DynamicFieldList(
                 fields.FormField(IdentifierTestForm)
             )
-            keywords = fields.DynamicFieldList(fields.TextField())
+            keywords = fields.DynamicFieldList(fields.StringField())
 
         self.form_class = TestForm
 
@@ -374,10 +375,10 @@ class WebDepositFormTest(InvenioTestCase):
         from invenio.modules.deposit.form import WebDepositForm
 
         class NestedNestedForm(WebDepositForm):
-            id = fields.TextField()
+            id = fields.StringField()
 
         class NestedForm(WebDepositForm):
-            id = fields.TextField()
+            id = fields.StringField()
             fieldlist = fields.DynamicFieldList(
                 fields.FormField(NestedNestedForm, separator=':')
             )
@@ -386,7 +387,7 @@ class WebDepositFormTest(InvenioTestCase):
             formfield = fields.FormField(NestedForm, separator=';')
             fieldlist = fields.DynamicFieldList(
                 fields.DynamicFieldList(
-                    fields.TextField()
+                    fields.StringField()
                 )
             )
 

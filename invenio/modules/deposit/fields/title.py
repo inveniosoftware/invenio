@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,13 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import TextField, ValidationError
+"""Deprecated."""
+
 from invenio.modules.deposit.field_base import WebDepositField
+
+from wtforms import StringField, ValidationError
 
 __all__ = ['TitleField']
 
 
 def validate_title(form, field):
+    """Deprecated."""
     import warnings
     warnings.warn("Validator has been deprecated", PendingDeprecationWarning)
 
@@ -35,15 +39,19 @@ def validate_title(form, field):
         raise ValidationError("This field must have at least 4 characters")
 
 
-class TitleField(WebDepositField, TextField):
+class TitleField(WebDepositField, StringField):
+
+    """Deprecated."""
+
     def __init__(self, **kwargs):
+        """Deprecated."""
         import warnings
         warnings.warn("Field has been deprecated", PendingDeprecationWarning)
         defaults = dict(
             icon='book',
             export_key='title.title',
             widget_classes="form-control"
-            #FIXMEvalidators=[validate_title]
+            # FIXMEvalidators=[validate_title]
         )
         defaults.update(kwargs)
         super(TitleField, self).__init__(**defaults)

@@ -30,7 +30,7 @@ from invenio.utils.forms import InvenioBaseForm
 from sqlalchemy.exc import SQLAlchemyError
 
 from wtforms.fields import BooleanField, HiddenField, PasswordField, \
-    SubmitField, TextField
+    StringField, SubmitField
 from wtforms.validators import DataRequired
 
 from .models import User
@@ -42,7 +42,7 @@ class LoginForm(Form):
 
     """Login Form."""
 
-    nickname = TextField(
+    nickname = StringField(
         _("Nickname"),
         validators=[DataRequired(message=_("Nickname not provided")),
                     validate_nickname_or_email])
@@ -61,7 +61,7 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
 
     """Form to change user email settings."""
 
-    email = TextField(_("New email"))
+    email = StringField(_("New email"))
 
     def validate_email(self, field):
         """Validate email."""
@@ -98,7 +98,7 @@ class LostPasswordForm(InvenioBaseForm):
 
     """Form to recover lost password."""
 
-    email = TextField(_("Email address"))
+    email = StringField(_("Email address"))
 
     def validate_email(self, field):
         """Validate email."""
@@ -156,11 +156,11 @@ class RegisterForm(Form):
 
     """User registration form."""
 
-    email = TextField(
+    email = StringField(
         _("Email address"),
         validators=[DataRequired(message=_("Email not provided"))],
         description=_("Example") + ": john.doe@example.com")
-    nickname = TextField(
+    nickname = StringField(
         _("Nickname"),
         validators=[DataRequired(message=_("Nickname not provided"))],
         description=_("Example") + ": johnd")

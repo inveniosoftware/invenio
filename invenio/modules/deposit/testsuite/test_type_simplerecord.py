@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,19 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Testsuite type simple record."""
+
 from __future__ import absolute_import, print_function
 
 from datetime import date
+
+from flask import url_for
+
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.testsuite import make_test_suite, run_test_suite
-from flask import url_for
 
 from .helpers import DepositionTestCase
 
 
 class SimpleRecordTest(DepositionTestCase):
+
+    """Simple record test."""
+
     def setUp(self):
+        """Setup."""
         self.clear('simple')
         from invenio.modules.deposit.form import WebDepositForm
         from invenio.modules.deposit import fields
@@ -38,7 +46,7 @@ class SimpleRecordTest(DepositionTestCase):
 
         class SimpleRecordTestForm(WebDepositForm):
             keywords = fields.DynamicFieldList(
-                fields.TextField(
+                fields.StringField(
                     widget_classes='form-control',
                     widget=field_widgets.ColumnInput(class_="col-xs-10"),
                 ),
@@ -74,12 +82,15 @@ class SimpleRecordTest(DepositionTestCase):
         self.register(simple)
 
     def tearDown(self):
+        """Teardown."""
         self.unregister()
 
     def assert_process_metadata(self, deposition, metadata):
+        """Assert process metadata."""
         pass
 
     def test_registration(self):
+        """Test registration."""
         self.assert401(self.client.get(url_for('webdeposit.index'),
                                        follow_redirects=True,
                                        base_url=cfg['CFG_SITE_SECURE_URL']))
@@ -96,6 +107,7 @@ class SimpleRecordTest(DepositionTestCase):
         )))
 
     def test_create_delete(self):
+        """Test create delete."""
         self.login("admin", "")
         dep_id = self.create('simple')
 

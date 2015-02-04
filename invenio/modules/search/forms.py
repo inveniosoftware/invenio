@@ -29,7 +29,7 @@ from invenio.utils.forms import AutocompleteField, InvenioBaseForm, \
 from werkzeug.local import LocalProxy
 
 from wtforms import Form as WTFormDefault, FormField, SelectField, \
-    SelectMultipleField, TextField
+    SelectMultipleField, StringField
 
 
 class JournalForm(WTFormDefault):
@@ -44,8 +44,8 @@ class JournalForm(WTFormDefault):
             [(kb['key'], kb['value']) for kb in get_kb_mappings('EJOURNALS')]),
         coerce=unicode,
     )
-    vol = TextField(_('Vol'))
-    page = TextField(_('Pg'))
+    vol = StringField(_('Vol'))
+    page = StringField(_('Pg'))
 
 
 class EasySearchForm(InvenioBaseForm):
@@ -56,7 +56,7 @@ class EasySearchForm(InvenioBaseForm):
                                data_source=lambda:
                                url_for('search.autocomplete',
                                        field='exactauthor'))
-    title = TextField(_('Title'))
+    title = StringField(_('Title'))
     rn = AutocompleteField(_('Report number'), data_provide="typeahead-url",
                            data_source=lambda: url_for('search.autocomplete',
                                                        field='reportnumber'))

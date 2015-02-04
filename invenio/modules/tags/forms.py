@@ -29,7 +29,7 @@ from invenio.modules.records.models import Record as Bibrec
 from invenio.utils.forms import InvenioBaseForm
 
 from wtforms import BooleanField, HiddenField, IntegerField, SelectField, \
-    SelectMultipleField, TextField, validators
+    SelectMultipleField, StringField, validators
 
 # Internal
 from .models import WtgTAG, WtgTAGRecord, wash_tag_blocking, wash_tag_silent
@@ -159,9 +159,9 @@ class CreateTagForm(InvenioBaseForm):
 
     """Defines form for creating a new tag."""
 
-    name = TextField(_('Name'), [validators.DataRequired(),
-                                 validate_tag_name,
-                                 validate_name_available])
+    name = StringField(_('Name'), [validators.DataRequired(),
+                                   validate_tag_name,
+                                   validate_name_available])
 
     # Ajax requests only:
     # Send a record ID if the tag should be attached to the record
@@ -233,7 +233,7 @@ class TagAnnotationForm(InvenioBaseForm):
                              [validate_bibrec_exists,
                               validate_user_can_see_bibrec])
 
-    annotation_value = TextField('Annotation')
+    annotation_value = StringField('Annotation')
 
 
 class GetGroupOptions(object):
@@ -259,8 +259,8 @@ class EditTagForm(InvenioBaseForm):
 
     """Defines form for editing an existing tag."""
 
-    name = TextField(_('Name'), [validators.DataRequired(),
-                                 validate_tag_name])
+    name = StringField(_('Name'), [validators.DataRequired(),
+                                   validate_tag_name])
 
     id_usergroup = SelectField(
         _('Group sharing options'),

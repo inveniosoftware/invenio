@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,8 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Extended WTForms field.
+"""Extended WTForms field.
 
 Classes TimeField, DatePickerWidget, DateTimePickerWidget and TimePickerWidget
 are taken from `flask-admin` extension.
@@ -28,15 +27,17 @@ are taken from `flask-admin` extension.
 :source: https://raw.github.com/wilsaj/flask-admin/master/flask_admin/wtforms.py
 """
 import datetime
+
 import time
 
-from flask import session, current_app
-from wtforms.form import Form as WTForm
-from wtforms.widgets import TextInput, HTMLString, html_params
-from wtforms.fields import Field, StringField, HiddenField, FileField
+from flask import current_app, session
 from flask.ext.wtf import Form
-from wtforms.ext.csrf.session import SessionSecureForm
+
 from wtforms.compat import text_type
+from wtforms.ext.csrf.session import SessionSecureForm
+from wtforms.fields import Field, FileField, HiddenField, StringField
+from wtforms.form import Form as WTForm
+from wtforms.widgets import HTMLString, TextInput, html_params
 
 
 class RowWidget(object):
@@ -320,9 +321,9 @@ def has_file_field(form):
     return False
 
 
-class FilterTextField(StringField):
+class FilterStringField(StringField):
 
-    """Define a FilterTextField."""
+    """Define a FilterStringField."""
 
     alias = None
 
@@ -331,7 +332,7 @@ class FilterTextField(StringField):
         self.alias = kwargs.get('alias')
         if 'alias' in kwargs:
             del kwargs['alias']
-        super(FilterTextField, self).__init__(*args, **kwargs)
+        super(FilterStringField, self).__init__(*args, **kwargs)
         if not self.raw_data:
             self.raw_data = []
 

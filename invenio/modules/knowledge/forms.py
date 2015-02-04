@@ -26,7 +26,7 @@ from invenio.utils.forms import InvenioBaseForm
 from werkzeug.local import LocalProxy
 
 from wtforms import FileField, Form, HiddenField, \
-    SelectField, TextAreaField, TextField
+    SelectField, StringField, TextAreaField
 
 from .api import query_get_kb_by_type
 
@@ -35,8 +35,8 @@ class KnwKBRVALForm(Form):
 
     """KnwKBRVAL Form."""
 
-    m_key = TextField(label="Map From")
-    m_value = TextField(label="To")
+    m_key = StringField(label="Map From")
+    m_value = StringField(label="To")
     id_knwKB = SelectField(
         label=_('Knowledge'),
         choices=LocalProxy(lambda: [
@@ -51,7 +51,7 @@ class KnowledgeForm(InvenioBaseForm):
 
     """Knowledge form."""
 
-    name = TextField()
+    name = StringField()
     description = TextAreaField()
     kbtype = HiddenField()
 
@@ -65,8 +65,8 @@ class DynamicKnowledgeForm(KnowledgeForm):
 
     """Dynamic Knowledge form."""
 
-    output_tag = TextField(label="Field")
-    search_expression = TextField(label="Expression")
+    output_tag = StringField(label="Field")
+    search_expression = StringField(label="Expression")
     id_collection = SelectField(
         'Collection',
         coerce=int,

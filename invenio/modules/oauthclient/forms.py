@@ -26,14 +26,14 @@ from invenio.utils.forms import InvenioBaseForm
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from wtforms import TextField, validators
+from wtforms import StringField, validators
 
 
 class EmailSignUpForm(InvenioBaseForm):
 
     """Form for requesting email address during sign up process."""
 
-    email = TextField(
+    email = StringField(
         label=_("Email address"),
         description=_("Required."),
         validators=[validators.DataRequired()]
