@@ -240,7 +240,7 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     ## Add the record's submitter(s) into the list of recipients:
     ## Get the email address(es) of the record submitter(s)/owner(s) from
     ## the record itself:
-    record_owners = print_record(sysno, 'tm', \
+    record_owners = print_record(int(sysno), 'tm', \
                                  [CFG_WEBSUBMIT_RECORD_OWNER_EMAIL]).strip()
     if record_owners != "":
         record_owners_list = record_owners.split("\n")
