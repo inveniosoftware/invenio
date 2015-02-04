@@ -138,7 +138,7 @@ extras_require = {
     ],
     "img": [
         "qrcode",
-        "Pillow"
+        "Pillow>=2.7.0"
     ],
     "mongo": [
         "pymongo"
