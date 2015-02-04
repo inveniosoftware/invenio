@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -186,9 +186,9 @@ class BibrecBibxxxMixin(utils.TableFromCamelNameMixin):
 models = []
 
 for idx in range(100):
-    Bibxxx = "Bib{:02d}x".format(idx)
+    Bibxxx = "Bib{0:02d}x".format(idx)
     globals()[Bibxxx] = type(Bibxxx, (db.Model, BibxxxMixin), {})
-    BibrecBibxxx = "BibrecBib{:02d}x".format(idx)
+    BibrecBibxxx = "BibrecBib{0:02d}x".format(idx)
     globals()[BibrecBibxxx] = type(BibrecBibxxx,
                                    (db.Model, BibrecBibxxxMixin), {})
 
