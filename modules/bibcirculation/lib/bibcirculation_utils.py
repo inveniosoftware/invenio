@@ -596,6 +596,9 @@ def get_item_info_for_search_result(recid):
 
     book_copies = '  '.join(get_fieldvalues(recid, "964__a"))
 
+    if not book_copies:
+        book_copies = db.get_number_copies(recid)
+
     book_infos = (book_author, book_editor, book_copies)
 
     return book_infos

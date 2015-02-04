@@ -140,7 +140,7 @@ class Template:
         'sf': (str, ""),
         'so': (str, "d"),
         'sp': (str, ""),
-        'rm': (str, ""),
+        'rm': (str, "wrd"),
         'of': (str, "hb"),
         'ot': (list, []),
         'em': (str,""),

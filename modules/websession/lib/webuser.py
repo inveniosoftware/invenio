@@ -122,6 +122,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
     """
 
     from invenio.webpage import page
+    from invenio.urlutils import redirect_to_url
 
     _ = gettext_set_language(ln)
 
@@ -132,6 +133,13 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         title = CFG_WEBACCESS_MSGS[5]
         if not uid:
             uid = getUid(req)
+
+        # If user is not logged in, redirect to login and return
+        if uid == -1:
+            url = "/youraccount/login?ln=%s&referer=%s" % (ln, referer)
+            redirect_to_url(req, url)
+            return None
+
         try:
             res = run_sql("SELECT email FROM user WHERE id=%s AND note=1", (uid,))
 
