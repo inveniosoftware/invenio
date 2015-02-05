@@ -786,7 +786,7 @@ class BibIndexAuthorityRecordTest(InvenioTestCase):
         index_name = 'author'
         table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
         reindex_for_type_with_bibsched(index_name)
-        original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (authRecID,))
+        original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (authRecID,))[0][0]
         run_sql("UPDATE bibrec SET modification_date = now() WHERE id=%s", (authRecID,))
         # run bibindex again
         task_id = reindex_for_type_with_bibsched(index_name, force_all=True)

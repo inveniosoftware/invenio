@@ -79,7 +79,7 @@ La(2-x)Ba(x)CuO(4) family of high-temperature superconductors.
 class TestTask(InvenioTestCase):
     def setUp(self, recid=RECID, arxiv_id=ARXIV_ID):
         self.recid = recid
-        self.original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,))
+        self.original_modification_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,))[0][0]
         self.arxiv_id = arxiv_id
         self.arxiv_version = 1
         self.bibupload_xml = """<record>
