@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,6 +21,8 @@
 
 from __future__ import print_function
 
+import warnings
+
 from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
 from sqlalchemy.dialects import mysql
@@ -35,17 +37,20 @@ def info():
 
 def do_upgrade():
     """Add the table with facets configuration."""
-    op.create_table(
-        'facet_collection',
-        db.Column('id', mysql.INTEGER(), nullable=False),
-        db.Column('id_collection', mysql.INTEGER(), nullable=False),
-        db.Column('order', mysql.INTEGER(), nullable=False),
-        db.Column('facet_name', db.String(length=80), nullable=False),
-        db.ForeignKeyConstraint(['id_collection'], ['collection.id'], ),
-        db.PrimaryKeyConstraint('id'),
-        mysql_charset='utf8',
-        mysql_engine='MyISAM'
-    )
+    if not op.has_table('facet_collection'):
+        op.create_table(
+            'facet_collection',
+            db.Column('id', mysql.INTEGER(), nullable=False),
+            db.Column('id_collection', mysql.INTEGER(), nullable=False),
+            db.Column('order', mysql.INTEGER(), nullable=False),
+            db.Column('facet_name', db.String(length=80), nullable=False),
+            db.ForeignKeyConstraint(['id_collection'], ['collection.id'], ),
+            db.PrimaryKeyConstraint('id'),
+            mysql_charset='utf8',
+            mysql_engine='MyISAM'
+        )
+    else:
+        warnings.warn("*** Creation of table 'facet_collection' skipped!")
 
 
 def post_upgrade():
