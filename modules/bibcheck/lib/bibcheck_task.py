@@ -665,11 +665,9 @@ def update_rule_last_run(rule_name, next_starting_date):
     next_starting_date_str = datetime.strftime(next_starting_date,
                                                "%Y-%m-%d %H:%M:%S")
 
-    updated = run_sql("UPDATE bibcheck_rules SET last_run=%s WHERE name=%s;",
-                      (next_starting_date_str, rule_name,))
-    if not updated: # rule not in the database, insert it
-        run_sql("INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)",
-                (rule_name, next_starting_date_str))
+    run_sql("""INSERT INTO bibcheck_rules(name, last_run) VALUES (%s, %s)
+        ON DUPLICATE KEY UPDATE last_run=%s""",
+                (rule_name, next_starting_date_str, next_starting_date_str))
 
 def reset_rule_last_run(rule_name):
     """
