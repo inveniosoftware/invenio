@@ -37,7 +37,7 @@ import invenio.bibauthorid_dbinterface as db
 import invenio.bibauthorid_config as bconfig
 from invenio.bibauthorid_webapi import get_hepnames, add_cname_to_hepname_record
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
-from invenio.bibtask import write_message
+from invenio.bibtask import write_message, task_sleep_now_if_required
 from invenio.bibauthorid_hoover_exceptions import *
 
 
@@ -57,7 +57,7 @@ class HooverStats(object):
         log = ("Tickets raised: {0} "
                "New identifiers found: {1} "
                "Connections to hepnames performed: {2} "
-               "Signatures attempted to move: {3}").format(cls.tickets_raised, 
+               "Signatures attempted to move: {3}").format(cls.tickets_raised,
                        cls.new_ids_found, cls.connections_to_hepnames, cls.move_signature_calls)
         write_message(log, verbose=4)
         return (cls.tickets_raised, cls.new_ids_found, cls.connections_to_hepnames, cls.move_signature_calls)
@@ -329,7 +329,7 @@ class Vacuumer(object):
                 new_pid = get_free_author_id()
                 write_message(
                     ("Moving  conflicting signature {0} from pid {1}"
-                    " to pid {2}".format(duplicated_signatures[0], 
+                    " to pid {2}".format(duplicated_signatures[0],
                         self.pid,new_pid)),
                     verbose=3)
                 HooverStats.move_signature_calls += 1
@@ -382,7 +382,7 @@ def get_records_with_tag(tag):
              ))
 
 
-def get_inspireID_from_claimed_papers(pid, intersection_set=None):
+def get_inspireID_from_claimed_papers(pid, intersection_set=None, queue='Test'):
     """returns the inspireID found inside the claimed papers of the author.
     This happens only in case all the inspireIDs are the same,
     if there is  a conflict in the inspireIDs of the papers the
@@ -406,7 +406,8 @@ def get_inspireID_from_claimed_papers(pid, intersection_set=None):
         if inspireid:
             if len(inspireid) > 1:
                 open_rt_ticket(ConflictingIdsOnRecordException(
-                    'Conflicting ids found', pid, 'INSPIREID', inspireid, sig))
+                    'Conflicting ids found', pid, 'INSPIREID', inspireid, sig),
+                    queue=queue)
                 return None
 
             inspireid_list.append(inspireid[0])
@@ -425,7 +426,7 @@ def get_inspireID_from_claimed_papers(pid, intersection_set=None):
             inspireid_list)
 
 
-def get_inspireID_from_unclaimed_papers(pid, intersection_set=None):
+def get_inspireID_from_unclaimed_papers(pid, intersection_set=None, queue='Test'):
     """returns the inspireID found inside the unclaimed papers of the author.
     This happens only in case all the inspireIDs are the same,
     if there is  a conflict in the inspireIDs of the papers the
@@ -450,7 +451,8 @@ def get_inspireID_from_unclaimed_papers(pid, intersection_set=None):
         if inspireid:
             if len(inspireid) > 1:
                 open_rt_ticket(ConflictingIdsOnRecordException(
-                    'Conflicting ids found', pid, 'INSPIREID', inspireid, sig))
+                    'Conflicting ids found', pid, 'INSPIREID', inspireid, sig),
+                    queue=queue)
                 return None
 
             inspireid_list.append(inspireid[0])
@@ -494,13 +496,18 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
     write_message("Initializing hoover", verbose=1)
     write_message("Selecting records with identifiers...", verbose=1)
     recs = get_records_with_tag('100__i')
+    task_sleep_now_if_required(can_stop_too=True)
     recs += get_records_with_tag('100__j')
+    task_sleep_now_if_required(can_stop_too=True)
     recs += get_records_with_tag('700__i')
+    task_sleep_now_if_required(can_stop_too=True)
     recs += get_records_with_tag('700__j')
+    task_sleep_now_if_required(can_stop_too=True)
     write_message("Found {0} records".format(len(set(recs))), verbose=2)
     recs = set(recs) & set(
         run_sql("select DISTINCT(bibrec) from aidPERSONIDPAPERS"))
     write_message("   out of which {0} are in BibAuthorID".format(len(recs)), verbose=2)
+    task_sleep_now_if_required(can_stop_too=True)
 
     records_with_id = set(rec[0] for rec in recs)
 
@@ -510,9 +517,11 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
     if rt_ticket_report:
         global ticket_hashes
         write_message("Ticketing system rt is used", verbose=9)
-        write_message("Building hash cache for tickets", verbose=9)
-        ticket_ids = BIBCATALOG_SYSTEM.ticket_search(None, subject='[Hoover]')
+        write_message("Building hash cache for tickets for queue %s" % queue, verbose=9)
+        ticket_ids = BIBCATALOG_SYSTEM.ticket_search(None, subject='[Hoover]', queue=queue)
+        write_message("Found %s existing tickets" % len(ticket_ids), verbose=9)
         for ticket_id in ticket_ids:
+            task_sleep_now_if_required(can_stop_too=True)
             try:
                 ticket_data = BIBCATALOG_SYSTEM.ticket_get_info(
                     None, ticket_id)
@@ -522,15 +531,16 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
                 write_message("Problem in subject of ticket {0}".format(ticket_id), verbose=5)
         write_message("Found {0} tickets".format(len(ticket_hashes)), verbose=2)
 
+    task_sleep_now_if_required(can_stop_too=True)
     fdict_id_getters = {
         "INSPIREID": {
             'reliable': [get_inspire_id_of_author,
                          get_inspireID_from_hepnames,
                          lambda pid: get_inspireID_from_claimed_papers(
-                             pid, intersection_set=records_with_id)],
+                             pid, intersection_set=records_with_id, queue=queue)],
 
             'unreliable': [lambda pid: get_inspireID_from_unclaimed_papers(
-                           pid, intersection_set=records_with_id)],
+                           pid, intersection_set=records_with_id, queue=queue)],
             'signatures_getter': get_signatures_with_inspireID,
             'connection': dict_entry_for_hepnames_connector,
             'data_dicts': {
@@ -570,6 +580,7 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
         packet_size=packet_size, dry_hepnames_run=dry_hepnames_run)
 
     for index, pid in enumerate(authors):
+        task_sleep_now_if_required(can_stop_too=True)
         write_message("Searching for reliable ids of person {0}".format(pid), verbose=2)
         for identifier_type, functions in fdict_id_getters.iteritems():
             write_message("    Type: {0}".format(identifier_type,), verbose=9)
@@ -620,6 +631,7 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
     write_message("Vacuuming reliable ids...", verbose=2)
 
     for identifier_type, data in fdict_id_getters.iteritems():
+        task_sleep_now_if_required(can_stop_too=True)
         hep_connector.produce_connection_entry = fdict_id_getters[
             identifier_type]['connection']
         for pid, identifiers in data['data_dicts']['pid_mapping'].iteritems():
@@ -675,6 +687,7 @@ def hoover(authors=None, check_db_consistency=False, dry_run=False,
     write_message("Vacuuming unreliable ids...", verbose=2)
 
     for identifier_type, functions in fdict_id_getters.iteritems():
+        task_sleep_now_if_required(can_stop_too=True)
         hep_connector.produce_connection_entry = fdict_id_getters[
             identifier_type]['connection']
         for index, pid in enumerate(unclaimed_authors[identifier_type]):

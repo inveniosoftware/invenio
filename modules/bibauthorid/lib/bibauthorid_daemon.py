@@ -216,7 +216,7 @@ def _task_run_core():
 
     if bibtask.task_get_option("disambiguate"):
         last_names = bibtask.task_get_option('last-names')
-        from_scratch = True   # TODO Pay attention to this after we are sure we want aid_tables disambiguation. 
+        from_scratch = True   # TODO Pay attention to this after we are sure we want aid_tables disambiguation.
         single_threaded = bool(bibtask.task_get_option("single-threaded"))
         if single_threaded and not last_names:
             bibtask.write_message("""--single-threaded will not be considered
@@ -425,7 +425,7 @@ def run_rabbit(paperslist, all_records=False):
 
 def run_hoover(authors=None, check_db_consistency=False, dry_run=False, packet_size=1000, dry_hepnames_run=False, open_tickets=False, queue='test'):
     from invenio.bibauthorid_hoover import hoover
-    hoover(authors, check_db_consistency, dry_run, packet_size, dry_hepnames_run, open_tickets)
+    hoover(authors, check_db_consistency, dry_run, packet_size, dry_hepnames_run, open_tickets, queue=queue)
 
 def run_tortoise(from_scratch, last_names_thresholds=None,
                  single_threaded=False):
