@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.dbquery import run_sql
+from invenio.modules.upgrader.api import op
 
 
 depends_on = [u'oauth2server_2014_02_17_initial']
@@ -31,7 +32,9 @@ def do_upgrade():
     """Implement your upgrades here."""
     from invenio.config import SECRET_KEY
     from sqlalchemy_utils.types.encrypted import AesEngine
-    engine = AesEngine(SECRET_KEY)
+    engine = AesEngine()
+    engine._update_key(SECRET_KEY)
+
     for row in run_sql(
             "SELECT id, access_token, refresh_token FROM oauth2TOKEN"):
         run_sql(
@@ -44,6 +47,8 @@ def do_upgrade():
 
 def estimate():
     """Estimate running time of upgrade in seconds (optional)."""
-    return run_sql(
-        "SELECT COUNT(id) AS ids FROM oauth2TOKEN"
-    )[0][0]
+    if op.has_table('oauth2TOKEN'):
+        return run_sql(
+            "SELECT COUNT(id) AS ids FROM oauth2TOKEN"
+        )[0][0]
+    return 1
