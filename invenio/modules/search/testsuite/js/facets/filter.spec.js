@@ -146,7 +146,7 @@ define([
 
       beforeEach(function() {
         listRequest = jasmine.Ajax.requests.mostRecent();
-        listRequest.response(mocks.getResponse(200, mocks.collectionResponseMock));
+        listRequest.respondWith(mocks.getResponse(200, mocks.collectionResponseMock));
       });
 
       describe('after the state is loaded', function() {
@@ -206,7 +206,7 @@ define([
             }
           });
           articlesPreprintsRequest = jasmine.Ajax.requests.mostRecent();
-          articlesPreprintsRequest.response(mocks.getResponse(200, {
+          articlesPreprintsRequest.respondWith(mocks.getResponse(200, {
             facet: [
               {
                 id: "some next level",
@@ -223,7 +223,7 @@ define([
             ]
           }));
           nextLevelRequest = jasmine.Ajax.requests.mostRecent();
-          nextLevelRequest.response(mocks.getResponse(200, {
+          nextLevelRequest.respondWith(mocks.getResponse(200, {
             facet: [
               {
                 id: "Articles",

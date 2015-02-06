@@ -292,7 +292,7 @@ define([
         this.facetOption.activate('+');
         this.facetOption.expand();
         expandRequest = jasmine.Ajax.requests.mostRecent();
-        expandRequest.response(mocks.getResponse(200, articlesResponseMock));
+        expandRequest.respondWith(mocks.getResponse(200, articlesResponseMock));
         articles = getOption(this.facetOption.$element, 'Articles');
         preprints = getOption(this.facetOption.$element, 'Preprints');
       });

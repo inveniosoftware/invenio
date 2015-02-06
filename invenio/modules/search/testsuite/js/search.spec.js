@@ -55,8 +55,8 @@ define([
   function initFacets() {
     collectionRequest = jasmine.Ajax.requests.filter('/facet/collection/mock').pop();
     yearRequest = jasmine.Ajax.requests.filter('/facet/year/mock').pop();
-    yearRequest.response(mocks.listEntriesQueryMock.success);
-    collectionRequest.response(mocks.getResponse(200, mocks.collectionResponseMock));
+    yearRequest.respondWith(mocks.listEntriesQueryMock.success);
+    collectionRequest.respondWith(mocks.getResponse(200, mocks.collectionResponseMock));
     $filters = page.facet_engine.$element.children().filter('.facet-filter');
     collectionFilter = $($filters[1]).data('facet-filter');
     yearFilter = $($filters[0]).data('facet-filter');

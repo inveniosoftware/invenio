@@ -121,7 +121,7 @@ define([
         var visibleSelector = "[style!='display: none;']";
 
         beforeEach(function() {
-          request.response(mocks.listEntriesQueryMock.success);
+          request.respondWith(mocks.listEntriesQueryMock.success);
         });
 
         it('has all options loaded', function() {
@@ -187,7 +187,7 @@ define([
         expect(request.data()).toEqual({});
 
         expect(spyLoadedEvent).not.toHaveBeenTriggered();
-        request.response(mocks.listEntriesQueryMock.success);
+        request.respondWith(mocks.listEntriesQueryMock.success);
         expect(spyLoadedEvent).toHaveBeenTriggered();
       });
 
