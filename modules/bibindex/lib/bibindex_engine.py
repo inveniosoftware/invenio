@@ -541,11 +541,11 @@ def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes
         # secondly, there may be newly inserted records which were
         # uploaded with old timestamp (via 005), so let us detect
         # those too, using their "real" modification_date:
-        res = run_sql("""SELECT id,modification_date,''
+        res = run_sql("""SELECT bibrec.id,modification_date,''
                          FROM bibrec, hstRECORD
                          WHERE modification_date>%s
-                           AND id=id_bibrec
-                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=id)=1""", (min_last_updated,))
+                           AND bibrec.id=id_bibrec
+                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=bibrec.id)=1""", (min_last_updated,))
         if res:
             recIDs_info.extend(res)
 
