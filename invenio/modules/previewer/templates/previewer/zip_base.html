@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -36,17 +36,22 @@
     border-color: #fff;
     border: 0;
 }
+#fullScreenMode:hover {
+  background-color: rgba(0,0,200,0.5);
+  border-radius: 3px;
+}
 </style>
 <div class="panel panel-default">
   <div class="panel-heading">
     <div class="panel-title">
       <i class="fa fa-file-zip-o"></i> {{ f.name + f.superformat }}
+      <div id="fullScreenMode" title="{{ _("Full Screen") }}" class="pull-right"><i class="fa fa-fw fa-arrows-alt"></i></div>
     </div>
   </div>
   <div class="panel-body">
     <ul class="tree list-unstyled">
       {%- for t in tree recursive %}
-      {%- set folder_identifier = range(loop.depth)|join('_') ~ '_' ~ loop.index %}
+      {%- set folder_identifier = t.id %}
       <li>
         {% if t.type != 'folder' %}
           <span><i class="fa fa-file-o"></i> {{ t.name }}</span>
@@ -58,7 +63,7 @@
         {% endif %}
         {%- if t.children -%}
         <ul id="tree_{{ folder_identifier }}"
-          class="collapse{{ " in" if loop.depth < 2}}">
+          class="collapse in">
           {{ loop(t.children) }}
         </ul>
         {%- endif %}
@@ -67,4 +72,6 @@
     </ul>
   </div>
 </div> <!-- panel panel-default close -->
+
+<script src="{{url_for('static', filename='js/previewer/pdfjs/fullscreen.js') }}"></script>
 {% endblock %}

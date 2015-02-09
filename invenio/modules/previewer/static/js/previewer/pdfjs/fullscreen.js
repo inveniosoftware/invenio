@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -59,12 +59,12 @@ if (previewIframe) {
 
   var fullScreenButton = previewIframe.contentDocument.getElementById('fullScreenMode');
   var secfullScreenButton = previewIframe.contentDocument.getElementById('secondaryFullScreenMode');
-  fullScreenButton.addEventListener('click', handleFullScreenClick);
-  secfullScreenButton.addEventListener('click', handleFullScreenClick);
+  if (fullScreenButton) fullScreenButton.addEventListener('click', handleFullScreenClick);
+  if (secfullScreenButton) secfullScreenButton.addEventListener('click', handleFullScreenClick);
 } else {
   var fullScreenButton = document.getElementById('fullScreenMode');
   var secfullScreenButton = document.getElementById('secondaryFullScreenMode');
 
-  fullScreenButton.remove();
-  secfullScreenButton.remove();
+  if (fullScreenButton) fullScreenButton.remove();
+  if (secfullScreenButton) secfullScreenButton.remove();
 }
