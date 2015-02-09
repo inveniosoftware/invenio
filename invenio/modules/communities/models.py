@@ -121,10 +121,10 @@ class Community(db.Model):
     """ Long description of community, displayed on an individual page. """
 
     curation_policy = db.Column(db.Text(), nullable=False, default='')
-    """ """
+    """ Curation policy """
 
-    has_logo = db.Column(db.Boolean(), nullable=False, default=False)
-    """ """
+    logo_ext = db.Column(db.String(length=5))
+    """Logo extension."""
 
     created = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     """ Creation datetime """
@@ -173,9 +173,10 @@ class Community(db.Model):
     @property
     def logo_url(self):
         """Get URL to collection logo."""
-        # FIXME
-        if self.has_logo:
-            raise NotImplementedError
+        if self.logo_ext:
+            return url_for(
+                'static',
+                filename='user' + '/' + self.id + self.logo_ext)
         else:
             return None
 
