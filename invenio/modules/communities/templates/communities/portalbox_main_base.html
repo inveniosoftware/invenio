@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,22 +17,27 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-<small class="text-muted">Community collection</small>
-<h4>{{community.title}}</h4>
+<small class="text-muted">{{ _("Community collection") }}</small>
+{% if community.logo_ext %}
+<div>
+  <br>
+  <img src="{{ community.logo_url }}" style="display: block; margin: auto; max-width: 100%; max-height: 200px;">
+  <br>
+</div>
+{% endif %}
 <hr>
-{% if community.has_logo %}<img src="{{community.logo_url}}" class="pull-right" style="padding: 2px;">{% endif %}
-
+<h4>{{ community.title }}</h4>
 {%- if community.description %}
-{{community.description|safe}}
+  {{ community.description|safe }}
 {%- endif %}
-{% if community.page and not detail %}<a href="{{url_for('communities.detail', community_id=community.id)}}" class="pull-right">Read more</a><br>{% endif %}
-
-<hr>
-
+{% if community.page and not detail %}
+  <a href="{{ url_for('communities.detail', community_id=community.id) }}" class="pull-right">{{ _("Read more") }}</a>
+  <br>
+{% endif %}
 <dl>
-    <dt>Title:</dt><dd>{{community.title}}</dd>
-    <dt>Curated by:</dt><dd><a href="{{url_for('yourmessages.write', sent_to_user_nicks=community.owner.nickname)}}">{{community.owner.nickname}}</a></dd>
-    <dt>Curation policy:</dt><dd>{% if community.curation_policy %}{{community.curation_policy}}{% else %}Not specified{% endif %}</dd>
-    <dt>Created:</dt><dd>{{community.created.strftime('%Y-%m-%d')}}</dd>
-    <dt>Harvesting API:</dt><dd><a href="{{community.oai_url}}">OAI-PMH Interface</a></dd>
+    <dt>{{ _("Title:") }}</dt><dd>{{community.title}}</dd>
+    <dt>{{ _("Curated by:") }}</dt><dd><a href="{{ url_for('yourmessages.write', sent_to_user_nicks=community.owner.nickname) }}">{{community.owner.nickname}}</a></dd>
+    <dt>{{ _("Curation policy:") }}</dt><dd>{% if community.curation_policy %}{{ community.curation_policy }}{% else %}{{ _("Not specified") }}{% endif %}</dd>
+    <dt>{{ _("Created:") }}</dt><dd>{{ community.created.strftime('%Y-%m-%d') }}</dd>
+    <dt>{{ _("Harvesting API:") }}</dt><dd><a href="{{ community.oai_url }}">OAI-PMH Interface</a></dd>
 </dl>
