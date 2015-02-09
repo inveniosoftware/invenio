@@ -32,7 +32,8 @@ CFG_WEBSESSION_GROUP_JOIN_POLICY = {'VISIBLEOPEN': 'VO',
 
 CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'MEMBER':'M',
-                                   'PENDING':'P'
+                                   'PENDING':'P',
+                                   'MODERATOR':'O'
                                    }
 
 CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created a new group.',
@@ -43,7 +44,9 @@ CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created 
                                 "MEMBER_ADDED": 'You have successfully added a new member.',
                                 "MEMBER_REJECTED": 'You have successfully removed a waiting member from the list.',
                                 "JOIN_REQUEST": 'The group administrator has been notified of your request.',
-                                "LEAVE_GROUP": 'You have successfully left a group.'
+                                "LEAVE_GROUP": 'You have successfully left a group.',
+                                "MODERATOR_ADDED": 'You have successfully added a moderator.',
+                                "MODERATOR_DELETED": 'You have successfully remove a moderator. This user is still a member of group.'
 
 }
 

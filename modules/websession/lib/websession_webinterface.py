@@ -1758,10 +1758,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         """member(): interface for managing members of a group
         @param grpID: : group ID
         @param add_member: button add_member pressed
+        @param add_moderator: button add_moderator pressed
         @param remove_member: button remove_member pressed
         @param reject_member: button reject__member pressed
         @param delete: button delete group pressed
         @param member_id: : ID of the existing member selected
+        @param moderator_member_id: : ID of the moderator member selected
         @param pending_member_id: : ID of the pending member selected
         @param cancel: button cancel pressed
         @param info: : info about last user action
@@ -1773,7 +1775,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                    'add_member': (str, ""),
                                    'remove_member': (str, ""),
                                    'reject_member': (str, ""),
+                                   'add_moderator': (str, ""),
+                                   'remove_moderator': (str, ""),
                                    'member_id': (int, 0),
+                                   'moderator_member_id': (int, 0),
                                    'pending_member_id': (int, 0)
                                    })
         uid = webuser.getUid(req)
@@ -1803,11 +1808,21 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                           grpID=argd['grpID'],
                                                           user_id=argd['pending_member_id'],
                                                           ln=argd['ln'])
-
         elif argd['add_member']:
             body = webgroup.perform_request_add_member(uid=uid,
+                                                          grpID=argd['grpID'],
+                                                          user_id=argd['pending_member_id'],
+                                                          ln=argd['ln'])
+        elif argd['remove_moderator']:
+            body = webgroup.perform_request_remove_moderator(uid=uid,
                                                        grpID=argd['grpID'],
-                                                       user_id=argd['pending_member_id'],
+                                                       member_id=argd['moderator_member_id'],
+                                                       ln=argd['ln'])
+
+	elif argd['add_moderator']:
+            body = webgroup.perform_request_add_moderator(uid=uid,
+                                                       grpID=argd['grpID'],
+                                                       user_id=argd['member_id'],
                                                        ln=argd['ln'])
 
         else:

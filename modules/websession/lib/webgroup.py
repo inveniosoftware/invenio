@@ -58,10 +58,12 @@ def perform_request_groups_display(uid, infos=[], warnings = [], \
     body_admin = display_admin_groups(uid, ln)
     body_member = display_member_groups(uid, ln)
     body_external = display_external_groups(uid, ln)
+    body_moderator = display_moderator_groups(uid, ln)
 
     body = websession_templates.tmpl_display_all_groups(infos=infos,
         admin_group_html=body_admin,
         member_group_html=body_member,
+        moderator_group_html=body_moderator,
         external_group_html=body_external,
         warnings=warnings,
         ln=ln)
@@ -109,6 +111,20 @@ def display_external_groups(uid, ln=CFG_SITE_LANG):
                                                                  ln=ln)
     else:
         body = None
+    return body
+
+def display_moderator_groups(uid, ln=CFG_SITE_LANG):
+    """Display groups the user is moderator of.
+    @param uid: user id
+    @param ln: language
+    @return: body
+    body : html groups representation the user is moderator of
+    """
+    body = ""
+    records = db.get_groups_by_user_status(uid,
+        user_status=CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"] )
+    body = websession_templates.tmpl_display_moderator_groups(groups=records,
+                                                           ln=ln)
     return body
 
 def perform_request_input_create_group(group_name,
@@ -557,7 +573,7 @@ def perform_request_manage_member(uid,
             register_exception()
             body = websession_templates.tmpl_error(exc.message, ln)
             return body
-    elif user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']:
+    elif (user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['ADMIN']) & (user_status[0][0] != CFG_WEBSESSION_USERGROUP_STATUS['MODERATOR']):
         try:
             raise InvenioWebSessionError(_('Sorry, you do not have sufficient rights on this group.'))
         except InvenioWebSessionError, exc:
@@ -576,11 +592,15 @@ def perform_request_manage_member(uid,
         CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
     pending_members = db.get_users_by_status(grpID,
         CFG_WEBSESSION_USERGROUP_STATUS["PENDING"])
+    moderator_members = db.get_users_by_status(grpID,
+        CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
 
     body = websession_templates.tmpl_display_manage_member(grpID=grpID,
         group_name=group_infos[0][1],
+        user_status=user_status[0][0],
         members=members,
         pending_members=pending_members,
+        moderator_members=moderator_members,
         warnings=warnings,
         infos=infos,
         ln=ln)
@@ -759,6 +779,111 @@ def perform_request_reject_member(uid,
                                                  infos=infos,
                                                  warnings=warnings,
                                                  ln=ln)
+    return body
+
+def perform_request_add_moderator(uid, grpID, user_id, ln=CFG_SITE_LANG):
+    """Add waiting member to a group.
+    @param uid: user ID
+    @param grpID: ID of the group
+    @param user_id: selected member ID
+    @param ln: language
+    @return: body with warnings
+    """
+    body = ''
+    warnings = []
+    infos = []
+    _ = gettext_set_language(ln)
+    user_status = db.get_user_status(uid, grpID)
+    if not len(user_status):
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
+    if user_id == -1:
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a user from the list if you want him to be added as moderator of this group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             warnings=warnings,
+                                             ln=ln)
+    else :
+        # test if user is already moderator or pending
+        status = db.get_user_status(user_id, grpID)
+        if status and status[0][0] == 'O':
+            try:
+                raise InvenioWebSessionWarning(_('The user is already moderator of the group.'))
+            except InvenioWebSessionWarning, exc:
+                register_exception(stream='warning')
+                warnings.append(exc.message)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
+        else:
+            db.add_moderator_member(grpID,
+                user_id,
+                CFG_WEBSESSION_USERGROUP_STATUS["MODERATOR"])
+            infos.append(CFG_WEBSESSION_INFO_MESSAGES["MODERATOR_ADDED"])
+            group_infos = db.get_group_infos(grpID)
+            group_name = group_infos[0][1]
+            user = get_user_info(user_id, ln)[2]
+            msg_subjet, msg_body = websession_templates.tmpl_moderator_msg(
+                group_name=group_name,ln=ln)
+            (body, dummy, dummy) = perform_request_send(
+                uid, msg_to_user=user, msg_to_group="", msg_subject=msg_subjet,
+                msg_body=msg_body, ln=ln)
+            body = perform_request_manage_member(uid,
+                                                 grpID,
+                                                 infos=infos,
+                                                 warnings=warnings,
+                                                 ln=ln)
+    return body
+
+
+def perform_request_remove_moderator(uid, grpID, member_id, ln=CFG_SITE_LANG):
+    """Remove moderator from a group.
+    @param uid: user ID
+    @param grpID: ID of the group
+    @param member_id: selected moderator member ID
+    @param ln: language
+    @return: body with warnings
+    """
+    body = ''
+    warnings = []
+    infos = []
+    _ = gettext_set_language(ln)
+    user_status = db.get_user_status(uid, grpID)
+    if not len(user_status):
+        try:
+            raise InvenioWebSessionError(_('Sorry, there was an error with the database.'))
+        except InvenioWebSessionError, exc:
+            register_exception()
+            body = websession_templates.tmpl_error(exc.message, ln)
+            return body
+    if member_id == -1:
+        try:
+            raise InvenioWebSessionWarning(_('Please choose a moderator if you want to remove him from the group.'))
+        except InvenioWebSessionWarning, exc:
+            register_exception(stream='warning')
+            warnings.append(exc.message)
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             warnings=warnings,
+                                             ln=ln)
+    else:
+        db.delete_moderator_member(grpID, member_id,CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])
+        infos.append(CFG_WEBSESSION_INFO_MESSAGES["MODERATOR_DELETED"])
+        body = perform_request_manage_member(uid,
+                                             grpID,
+                                             infos=infos,
+                                             warnings=warnings,
+                                             ln=ln)
     return body
 
 def account_group(uid, ln=CFG_SITE_LANG):

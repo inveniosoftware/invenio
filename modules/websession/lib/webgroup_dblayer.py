@@ -348,6 +348,27 @@ def add_pending_member(grpID, member_id, user_status):
                   (user_status, date, grpID, member_id))
     return res
 
+def add_moderator_member(grpID, member_id, user_status):
+    """Change user status:
+    normal member becomes moderator member"""
+    date = convert_datestruct_to_datetext(localtime())
+    res = run_sql("""UPDATE user_usergroup
+                        SET user_status = %s, user_status_date = %s
+                        WHERE id_usergroup = %s
+                        AND id_user = %s""",
+                  (user_status, date, grpID, member_id))
+    return res
+
+def delete_moderator_member(grpID, member_id, user_status):
+    """Delete moderator :Change user status,
+    moderator member becomes normal member"""
+    date = convert_datestruct_to_datetext(localtime())
+    res = run_sql("""UPDATE user_usergroup
+                        SET user_status = %s, user_status_date = %s
+                        WHERE id_usergroup = %s
+                        AND id_user = %s""",
+                  (user_status, date, grpID, member_id))
+    return res
 
 def leave_group(grpID, uid):
     """Remove user from the group member list."""
