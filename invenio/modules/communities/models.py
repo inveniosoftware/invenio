@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -45,37 +45,29 @@ After call to save_collection() you must do the following:
 """
 
 from datetime import datetime
+
 from flask import url_for
 
-from sqlalchemy import or_
-from sqlalchemy.orm import joinedload_all
 from invenio.base.globals import cfg
 from invenio.config import CFG_SITE_LANG
 from invenio.ext.sqlalchemy import db
 from invenio.ext.template import render_template_to_string
 from invenio.legacy.bibrecord import record_add_field
 from invenio.modules.access.models import \
-    AccACTION, \
-    AccROLE, \
-    AccARGUMENT, \
-    AccAuthorization, \
-    UserAccROLE
+    AccACTION, AccARGUMENT, \
+    AccAuthorization, AccROLE, UserAccROLE
 from invenio.modules.accounts.models import User
-from invenio.modules.communities.signals import before_save_collection, \
-    after_save_collection, before_save_collections, after_save_collections, \
-    before_delete_collection, after_delete_collection, \
-    before_delete_collections, after_delete_collections, \
-    pre_curation, post_curation
-from invenio.modules.search.models import \
-    Collection, \
-    Collectionname, \
-    Collectiondetailedrecordpagetabs, \
-    CollectionCollection, \
-    Portalbox, \
-    CollectionPortalbox, \
-    Format, \
-    CollectionFormat
+from invenio.modules.communities.signals import \
+    after_delete_collection, after_delete_collections, \
+    after_save_collection, after_save_collections, \
+    before_delete_collection, before_delete_collections, \
+    before_save_collection, before_save_collections, post_curation, \
+    pre_curation
 from invenio.modules.oaiharvester.models import OaiREPOSITORY
+from invenio.modules.search.models import \
+    Collection, CollectionCollection, \
+    CollectionFormat, CollectionPortalbox, \
+    Collectiondetailedrecordpagetabs, Collectionname, Format, Portalbox
 
 
 class Community(db.Model):
@@ -225,7 +217,7 @@ class Community(db.Model):
                 code, val = c[0][0]
                 if code == 'a' and val.startswith(prefix):
                     val = val[len(prefix):]
-                    u = Community.query.filter_by(id=val).first()
+                    u = cls.query.filter_by(id=val).first()
                     if u:
                         usercomm.append(u)
             except IndexError:
@@ -244,17 +236,18 @@ class Community(db.Model):
         slice of them for the current page. If page == 0 function will return
         all communities that match the pattern.
         """
-        query = Community.query
+        query = cls.query
         if p:
-            query = query.filter(or_(
-                Community.title.like("%" + p + "%"),
-                Community.description.like("%" + p + "%"),
+            query = query.filter(db.or_(
+                cls.id.like("%" + p + "%"),
+                cls.title.like("%" + p + "%"),
+                cls.description.like("%" + p + "%"),
             ))
         if so in cfg['COMMUNITIES_SORTING_OPTIONS']:
             order = so == 'title' and db.asc or db.desc
-            query = query.order_by(order(getattr(Community, so)))
+            query = query.order_by(order(getattr(cls, so)))
         else:
-            query = query.order_by(db.desc(Community.ranking))
+            query = query.order_by(db.desc(cls.ranking))
         return query
 
     #
@@ -839,7 +832,7 @@ class FeaturedCommunity(db.Model):
         """Get the latest featured community."""
         start_date = start_date or datetime.now()
 
-        return cls.query.options(joinedload_all(
+        return cls.query.options(db.joinedload_all(
             'community.collection')).filter(
             cls.start_date <= start_date).order_by(
             cls.start_date.desc()).first()
