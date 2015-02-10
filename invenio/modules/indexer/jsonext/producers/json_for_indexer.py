@@ -37,17 +37,28 @@ def produce(self, fields=None):
                      keywords=fields)
 
     for field, values in iteritems(out):
+        with open("/root/test.txt", "a") as myfile:
+            myfile.write("\n\n")
+            myfile.write("field: "+field+"\n")
         if field.startswith('__'):
             continue
         json_id = self.meta_metadata[field]['json_id']
+        production_rules = get_producer_rules(json_id, 'json_for_indexer',
+                                              self.additional_info['namespace']
+                                             )
+        with open("/root/test.txt", "a") as myfile:
+            myfile.write("production_rules: "+str(production_rules)+"\n")
         tmp_dict = dict()
+        new_val = None
         if not isinstance(values, (list, tuple)):
             values = (values, )
         for value in values:
+            with open("/root/test.txt", "a") as myfile:
+                myfile.write("value: "+str(value)+"\n")
             try:
-                for rule in get_producer_rules(
-                        json_id, 'json_for_indexer',
-                        self.additional_info['namespace']):
+                for rule in production_rules:
+                    with open("/root/test.txt", "a") as myfile:
+                        myfile.write("rule: "+str(rule)+"\n")
                     # FIXME add support of indexer names.
                     # indexer_names = rule[0] if isinstance(rule[0], tuple) \
                     #     else (rule[0], )
@@ -56,12 +67,40 @@ def produce(self, fields=None):
                     #         for m in indexer_names])
                     #     # Not match, continue to next rule
                     #     continue
-                    for subfield, value_or_function in iteritems(rule[1]):
+
+                    # rule should not always return a dict
+                    if isinstance(rule[1], dict):
+                        for subfield, value_or_function in iteritems(rule[1]):
+                            with open("/root/test.txt", "a") as myfile:
+                                myfile.write("subfield: "+str(subfield)+" "+"val_or_fun: "+str(value_or_function)+ "\n")
+                            try:
+                                # Evaluate only non keyword values.
+                                if value_or_function in __builtins__:
+                                    raise ImportError
+                                tmp_dict[subfield] = try_to_eval(
+                                    value_or_function,
+                                    functions(
+                                        self.additional_info.namespace
+                                    ),
+                                    value=value,
+                                    self=self)
+                            except ImportError:
+                                raise
+                                pass
+                            except Exception as e:
+                                self.continuable_errors.append(
+                                    "Producer CError - Unable to produce "
+                                    "'%s'.\n %s" % (field, str(e)))
+                        with open("/root/test.txt", "a") as myfile:
+                            myfile.write("tmp_dict: "+str(tmp_dict)+"\n")
+                        new_val = tmp_dict
+                    else:
+                        value_or_function = rule[1]
                         try:
                             # Evaluate only non keyword values.
                             if value_or_function in __builtins__:
                                 raise ImportError
-                            tmp_dict[subfield] = try_to_eval(
+                            new_val = try_to_eval(
                                 value_or_function,
                                 functions(
                                     self.additional_info.namespace
@@ -69,18 +108,16 @@ def produce(self, fields=None):
                                 value=value,
                                 self=self)
                         except ImportError:
+                            raise
                             pass
                         except Exception as e:
                             self.continuable_errors.append(
                                 "Producer CError - Unable to produce "
                                 "'%s'.\n %s" % (field, str(e)))
-                if tmp_dict:
-                    if value is None:
-                        value = tmp_dict
-                    elif isinstance(value, dict):
-                        value.update(tmp_dict)
-                    else:
-                        raise RuntimeError("Invalid field structure.")
+
+                # substitute the old val with the new one
+                if new_val:
+                    out[field] = new_val
             except Exception as e:
                 self.continuable_errors.append(
                     "Producer CError - Unable to produce '%s'.\n %s"
