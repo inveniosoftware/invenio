@@ -21,33 +21,45 @@
 
 from __future__ import absolute_import
 
+import base64
 import sys
 import traceback
-import base64
 
 from uuid import uuid1 as new_uuid
-from six import iteritems, reraise
-from six.moves import cPickle
-from workflow.engine import (GenericWorkflowEngine, ContinueNextToken,
-                             HaltProcessing, StopProcessing, JumpTokenBack,
-                             JumpTokenForward, WorkflowError)
 
 from invenio.ext.sqlalchemy import db
 
-from .errors import (
-    WorkflowError as WorkflowErrorClient,
-    WorkflowDefinitionError,
-    AbortProcessing,
-    SkipToken
+from six import iteritems, reraise
+from six.moves import cPickle
+
+from workflow.engine import (
+    ContinueNextToken,
+    GenericWorkflowEngine,
+    HaltProcessing,
+    JumpTokenBack,
+    JumpTokenForward,
+    StopProcessing,
+    WorkflowError
 )
-from .models import (Workflow, BibWorkflowObject, BibWorkflowEngineLog,
-                     ObjectVersion)
-from .utils import dictproperty
-from .logger import get_logger, BibWorkflowLogHandler
-from .errors import WorkflowHalt
+
+from .errors import (
+    AbortProcessing,
+    SkipToken,
+    WorkflowDefinitionError,
+    WorkflowError as WorkflowErrorClient,
+    WorkflowHalt,
+)
+from .logger import BibWorkflowLogHandler, get_logger
+from .models import (
+    BibWorkflowEngineLog,
+    BibWorkflowObject,
+    ObjectVersion,
+    Workflow,
+)
 from .signals import (workflow_finished,
                       workflow_halted,
                       workflow_started)
+from .utils import dictproperty
 
 
 class WorkflowStatus(object):

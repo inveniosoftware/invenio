@@ -19,9 +19,10 @@
 
 """Various utility functions for use across the workflows module."""
 
+from invenio.ext.cache import cache
+
 import msgpack
 
-from invenio.ext.cache import cache
 from .registry import workflows
 
 
@@ -159,7 +160,7 @@ def _sort_from_cache(name):
             results = cache.get("workflows_holdingpen_{0}".format(item.id))
             if results:
                 return msgpack.loads(results)[name]
-        except:
+        except Exception:
             from flask import current_app
             current_app.logger.exception(
                 "Invalid format for object {0}: {1}".format(

@@ -19,11 +19,12 @@
 
 """Set of function for harvesting."""
 
-import os
 import glob
+import os
 import traceback
 
 from functools import wraps
+
 from six import callable
 
 

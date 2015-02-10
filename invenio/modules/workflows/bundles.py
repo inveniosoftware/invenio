@@ -19,8 +19,8 @@
 
 """Workflows bundles."""
 
-from invenio.ext.assets import Bundle, RequireJSFilter, CleanCSSFilter
-from invenio.base.bundles import jquery as _j, invenio as _i
+from invenio.base.bundles import invenio as _i, jquery as _j
+from invenio.ext.assets import Bundle, CleanCSSFilter, RequireJSFilter
 
 
 js = Bundle(

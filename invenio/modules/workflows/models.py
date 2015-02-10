@@ -18,22 +18,26 @@
 
 """Models for BibWorkflow Objects."""
 
-import os
-import tempfile
 import base64
 import logging
-from six.moves import cPickle
-from six import iteritems, callable
+import os
+import tempfile
+
 from datetime import datetime
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
-from invenio.ext.sqlalchemy import db
-from invenio.ext.sqlalchemy.utils import session_manager
+
 from invenio.base.globals import cfg
 from invenio.base.utils import classproperty
 from invenio.ext.logging import deprecated
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
 
-from .logger import get_logger, BibWorkflowLogHandler
+from six import callable, iteritems
+from six.moves import cPickle
+
+from sqlalchemy import desc
+from sqlalchemy.orm.exc import NoResultFound
+
+from .logger import BibWorkflowLogHandler, get_logger
 
 
 class ObjectVersion(object):

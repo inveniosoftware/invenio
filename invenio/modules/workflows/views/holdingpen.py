@@ -26,15 +26,21 @@ with halted workflows.
 For example, accepting submissions or other tasks.
 """
 
-import os
 import json
+import os
 
-from six import text_type
-
-from flask import (render_template, Blueprint, request, jsonify,
-                   url_for, flash, session, send_from_directory)
-from flask.ext.login import login_required
+from flask import (
+    Blueprint,
+    flash,
+    jsonify,
+    render_template,
+    request,
+    send_from_directory,
+    session,
+    url_for,
+)
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask.ext.login import login_required
 from flask.ext.menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
@@ -42,15 +48,18 @@ from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio.utils.date import pretty_date
 
-from ..models import BibWorkflowObject, Workflow, ObjectVersion
+from six import text_type
+
+from ..acl import viewholdingpen
+from ..api import continue_oid_delayed, start_delayed
+from ..models import BibWorkflowObject, ObjectVersion, Workflow
 from ..registry import actions, workflows
-from ..utils import (sort_bwolist, extract_data, get_action_list,
+from ..utils import (extract_data, get_action_list,
                      get_formatted_holdingpen_object,
                      get_holdingpen_objects,
+                     get_previous_next_objects,
                      get_rendered_task_results,
-                     get_previous_next_objects)
-from ..api import continue_oid_delayed, start_delayed
-from ..acl import viewholdingpen
+                     sort_bwolist)
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       template_folder='../templates',

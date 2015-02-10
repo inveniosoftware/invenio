@@ -21,16 +21,17 @@
 
 from invenio.modules.workflows.definitions import RecordWorkflow
 from invenio.modules.workflows.tasks.logic_tasks import (
-    workflow_if,
     workflow_else,
+    workflow_if,
 )
-from invenio.modules.workflows.tasks.workflows_tasks import log_info
 from invenio.modules.workflows.tasks.marcxml_tasks import (
+    approve_record,
     convert_record_to_bibfield,
     quick_match_record,
-    approve_record,
     was_approved
 )
+from invenio.modules.workflows.tasks.workflows_tasks import log_info
+
 from ..tasks.postprocess import (
     convert_record_with_repository,
     upload_step

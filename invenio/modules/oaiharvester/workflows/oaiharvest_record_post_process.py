@@ -24,15 +24,15 @@ from invenio.modules.workflows.tasks.marcxml_tasks import (
     convert_record_to_bibfield,
 )
 from ..tasks.postprocess import (
-    convert_record_with_repository,
-    post_process_selected,
     arxiv_fulltext_download,
-    plot_extract,
-    refextract,
     author_list,
+    check_record,
+    convert_record_with_repository,
     filter_step,
+    plot_extract,
+    post_process_selected,
+    refextract,
     upload_step,
-    check_record
 )
 
 

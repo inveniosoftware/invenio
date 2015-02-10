@@ -18,12 +18,13 @@
 
 """Set of function for sub workflows management."""
 
-from six import callable, string_types
-
-from time import sleep
 from functools import wraps
+from time import sleep
+
 from invenio.modules.workflows.errors import WorkflowError
 from invenio.modules.workflows.models import BibWorkflowEngineLog
+
+from six import callable, string_types
 
 
 def interrupt_workflow(obj, eng):
