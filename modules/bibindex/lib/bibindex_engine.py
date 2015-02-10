@@ -403,20 +403,10 @@ def create_range_list(res):
 
 def beautify_range_list(range_list):
     """Returns a non overlapping, maximal range list"""
-    ret_list = []
-    for new in range_list:
-        found = 0
-        for old in ret_list:
-            if new[0] <= old[0] <= new[1] + 1 or new[0] - 1 <= old[1] <= new[1]:
-                old[0] = min(old[0], new[0])
-                old[1] = max(old[1], new[1])
-                found = 1
-                break
-
-        if not found:
-            ret_list.append(new)
-
-    return ret_list
+    tmp_list = intbitset()
+    for range in range_list:
+        tmp_list |= intbitset(xrange(range[0], range[1]+1))
+    return create_range_list(tmp_list)
 
 
 def truncate_index_table(index_name):
