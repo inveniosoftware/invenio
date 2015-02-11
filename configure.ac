@@ -811,6 +811,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/etc/ckeditor_scientificchar/lang/Makefile \
      modules/miscutil/lib/Makefile \
      modules/miscutil/lib/upgrades/Makefile \
+     modules/miscutil/lib/pid_providers/Makefile \
      modules/miscutil/sql/Makefile \
      modules/miscutil/web/Makefile \
      modules/webaccess/Makefile \
