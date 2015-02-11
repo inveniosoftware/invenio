@@ -32,6 +32,7 @@ following this tutorial. **Note:** the recommended Python version is 2.7.5+
     $ sudo apt-get install build-essential git redis-server \
                            libmysqlclient-dev libxml2-dev libxslt-dev \
                            libjpeg-dev libfreetype6-dev libtiff-dev \
+                           libffi-dev libssl-dev \
                            software-properties-common python-dev \
                            virtualenvwrapper subversion
     $ sudo pip install -U virtualenvwrapper pip
