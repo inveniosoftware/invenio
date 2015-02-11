@@ -17,8 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Implementation of validators, post-processors and auto-complete functions.
+"""Implementation of validators, post-processors and auto-complete functions.
 
 Validators
 ----------
@@ -99,6 +98,7 @@ Auto-complete
 import warnings
 
 from wtforms import Field
+
 from .form import CFG_FIELD_FLAGS
 
 __all__ = ('WebDepositField', )
@@ -169,6 +169,13 @@ class WebDepositField(Field):
             if value:
                 setattr(self.flags, flag, True)
 
+        if callable(self.autocomplete):
+            warnings.warn("Autocomplete functions use now "
+                          "'autocomplete_fn' attribute",
+                          DeprecationWarning)
+            self.autocomplete_fn = self.autocomplete
+            self.autocomplete = None
+
     def __call__(self, *args, **kwargs):
         """Set custom keyword arguments when rendering field."""
         if 'placeholder' not in kwargs and self.placeholder:
@@ -180,13 +187,7 @@ class WebDepositField(Field):
         elif self.widget_classes:
             kwargs['class_'] = self.widget_classes
         if self.autocomplete:
-            if callable(self.autocomplete):
-                warnings.warn("Autocomplete functions use now "
-                              "'autocomplete_fn' attribute",
-                              DeprecationWarning)
-            else:
-                # set default for basic typeahead
-                kwargs['data-autocomplete'] = self.autocomplete
+            kwargs['data-autocomplete'] = self.autocomplete
             kwargs['data-autocomplete-limit'] = self.autocomplete_limit
         elif self.autocomplete_fn:
             kwargs['data-autocomplete'] = "default"
