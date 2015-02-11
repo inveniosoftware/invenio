@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,25 +19,25 @@
 
 """Groups Flask Blueprint."""
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-
-from flask import (Blueprint, render_template, request, jsonify, flash,
-                   url_for, redirect)
+from flask import Blueprint, flash, jsonify, redirect, render_template, \
+    request, url_for
 from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask.ext.login import current_user, login_required
 from flask.ext.menu import register_menu
+
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.errors import AccountSecurityError, \
     IntegrityUsergroupError
-from invenio.modules.accounts.models import User, Usergroup, UserUsergroup, \
-    get_groups_user_not_joined
+from invenio.modules.accounts.models import User, UserUsergroup, Usergroup
 
-from forms import JoinUsergroupForm, UsergroupForm, UserJoinGroupForm
-from config import GROUPS_AUTOCOMPLETE_LIMIT
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
+from .api import GroupsAPI
+from .config import GROUPS_AUTOCOMPLETE_LIMIT
+from .forms import JoinUsergroupForm, UserJoinGroupForm, UsergroupForm
 
 blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
                       template_folder='templates', static_folder='static')
@@ -59,14 +59,12 @@ default_breadcrumb_root(blueprint, '.settings.groups')
 def index():
     """List all user groups."""
     uid = current_user.get_id()
-    current_user.reload()
     form = JoinUsergroupForm()
     form.id_usergroup.set_remote(
         url_for('webgroup.search_groups', id_user=uid)
         + "?query=%QUERY")
-    user = User.query.get(uid)
-    uugs = dict(map(lambda uug: (uug.usergroup.name, uug),
-                    user.usergroups))
+    ouugs = GroupsAPI.query_list_userusergroups(uid).all()
+    uugs = dict(map(lambda uug: (uug.usergroup.name, uug), ouugs))
 
     return render_template(
         'groups/index.html',
@@ -86,17 +84,13 @@ def new():
     if form.validate_on_submit():
         ug = Usergroup()
         id_user = current_user.get_id()
-        user2join = User.query.get_or_404(id_user)
         form.populate_obj(ug)
-        ug.join(status=UserUsergroup.USER_STATUS['ADMIN'],
-                user=user2join)
-        db.session.add(ug)
         try:
-            db.session.commit()
-        except IntegrityError:
-            # catch integrity error
+            ug = GroupsAPI.create(uid=id_user, group=ug)
+        except (IntegrityError, AccountSecurityError,
+                IntegrityUsergroupError, IntegrityError) as e:
             db.session.rollback()
-            flash(_('Group properies error'), 'error')
+            flash(str(e), 'error')
             # reload form with old values
             return render_template(
                 "groups/new.html",
@@ -104,22 +98,42 @@ def new():
                 action=_('Create'),
                 subtitle=_("New group"),
             )
-        except:
-            # catch unknown error
-            db.session.rollback()
-            raise
-        # group finally created
-        current_user.reload()
+        # redirect to see the group's list
         flash(_('Group "%(name)s" successfully created',
                 name=ug.name), 'success')
         return redirect(url_for(".index"))
 
+    # open the form to create new group
     return render_template(
         "groups/new.html",
         form=form,
         action=_('Create'),
         subtitle=_("New group"),
     )
+
+
+@blueprint.route('/approve/<int:id_usergroup>')
+@blueprint.route('/approve/<int:id_usergroup>/user/<int:id_user>')
+@login_required
+@permission_required('usegroups')
+def approve(id_usergroup, id_user=None):
+    """Approve a user."""
+    # load data
+    curr_uid = current_user.get_id()
+    id_user2approve = id_user or curr_uid
+    user2approve = User.query.get_or_404(id_user2approve)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    try:
+        gapi.approve_user(id_user=id_user2approve)
+    except AccountSecurityError, e:
+        flash(str(e), 'error')
+        # redirect
+        return redirect(url_for('.members', id_usergroup=id_usergroup))
+
+    flash(_('%(user)s successfully approved in the group "%(name)s".',
+            user='User "'+user2approve.nickname+'"' if id_user else "You",
+            name=gapi.user_group.name), 'success')
+    return redirect(url_for('.members', id_usergroup=id_usergroup))
 
 
 @blueprint.route('/leave/<int:id_usergroup>')
@@ -131,37 +145,24 @@ def leave(id_usergroup, id_user=None):
 
     :param id_usergroup: Identifier of user group.
     """
-    group = Usergroup.query.get_or_404(id_usergroup)
-    id_user2remove = id_user or current_user.get_id()
+    # load data
+    curr_uid = current_user.get_id()
+    id_user2remove = id_user or curr_uid
     user2remove = User.query.get_or_404(id_user2remove)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    # user leave the group
     try:
-        group.leave(user2remove)
-    except AccountSecurityError:
-        flash(_(
-            'You have not enough right to '
-            'remove user "%(x_nickname)s" from group "%(x_groupname)s"',
-            x_nickname=user2remove.nickname, x_groupname=group.name), "error")
-        return redirect(url_for('.index'))
-    except IntegrityUsergroupError:
-        flash(_(
-            'Sorry, user "%(x_nickname)s" can leave the group '
-            '"%(x_groupname)s" without admins, please delete the '
-            'group if you want to leave.',
-            x_nickname=user2remove.nickname, x_groupname=group.name), "error")
+        gapi.remove(id_user=id_user2remove)
+    except (AccountSecurityError, IntegrityUsergroupError) as e:
+        # catch security errors
+        flash(str(e), "error")
         return redirect(url_for('.index'))
 
-    try:
-        db.session.merge(group)
-        db.session.commit()
-    except SQLAlchemyError:
-        db.session.rollback()
-        raise
-
-    current_user.reload()
+    # return successful message
     flash(_('%(user)s left the group "%(name)s".',
             user='User "'+user2remove.nickname+'"' if id_user else "You",
-            name=group.name), 'success')
-    if id_user and id_user != current_user.get_id():
+            name=gapi.user_group.name), 'success')
+    if id_user and id_user != curr_uid:
         return redirect(url_for('.members', id_usergroup=id_usergroup))
     else:
         return redirect(url_for('.index'))
@@ -175,34 +176,34 @@ def leave(id_usergroup, id_user=None):
 @permission_required('usegroups')
 def join(id_usergroup, id_user=None, status=None):
     """Join group."""
-    group = Usergroup.query.get_or_404(id_usergroup)
-    id_user2join = id_user or current_user.get_id()
+    # load data
+    curr_uid = current_user.get_id()
+    id_user2join = id_user or curr_uid
     user2join = User.query.get_or_404(id_user2join)
     form = UserJoinGroupForm()
     user_status = None
+    # read status from the form (checkbox)
     if form.user_status and form.user_status.data:
-            user_status = UserUsergroup.USER_STATUS['ADMIN']
-
+        user_status = UserUsergroup.USER_STATUS['ADMIN']
+    else:
+        user_status = UserUsergroup.USER_STATUS['MEMBER']
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    # user join the group
     try:
-        group.join(user2join, status=user_status)
-    except AccountSecurityError:
-        flash(_(
-            'You have not enough right to '
-            'add user "%(x_nickname)s" to the group "%(x_groupname)s"',
-            x_nickname=user2join.nickname, x_groupname=group.name), "error")
+        gapi.add(id_user=user2join.id, status=user_status)
+    except (AccountSecurityError, SQLAlchemyError) as e:
+        # catch security errors
+        flash(str(e), "error")
         return redirect(url_for('.index'))
-    except SQLAlchemyError:
-        flash(_('User "%(x_nickname)s" can\'t join the group "%(x_groupname)s"',
-                x_nickname=user2join.nickname, x_groupname=group.name), "error")
         if id_user:
             return redirect(url_for('.members', id_usergroup=id_usergroup))
         else:
             return redirect(url_for('.index'))
 
-    current_user.reload()
+    # return successful message
     flash(_('%(user)s join the group "%(name)s".',
             user='User "'+user2join.nickname+'"' if id_user else "You",
-            name=group.name), 'success')
+            name=gapi.user_group.name), 'success')
 
     redirect_url = form.redirect_url.data or url_for('.index')
     return redirect(redirect_url)
@@ -214,33 +215,28 @@ def join(id_usergroup, id_user=None, status=None):
 @permission_required('usegroups')
 def manage(id_usergroup):
     """Manage user group."""
-    ug = Usergroup.query.filter_by(id=id_usergroup).one()
-    form = UsergroupForm(request.form, obj=ug)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    try:
+        gapi.check_access()
+    except AccountSecurityError, e:
+        flash(str(e), "error")
+        return redirect(url_for(".index"))
+    # load data
+    form = UsergroupForm(request.form, obj=gapi.user_group)
 
     if form.validate_on_submit():
-        if not ug.is_admin(current_user.get_id()):
-            # not enough right to modify group
-            flash(_('Sorry, you don\'t have enough right to be able '
-                    'to manage the group "%(name)s"', name=ug.name), 'error')
-            return redirect(url_for(".index"))
-
         # get form data
         ug2form = Usergroup()
         form.populate_obj(ug2form)
-        # update group
-        oldname = ug.name
-        ug.name = ug2form.name
-        ug.description = ug2form.description
-        ug.join_policy = ug2form.join_policy
-        ug.login_method = ug2form.login_method
+        # save old group's name
+        oldname = gapi.user_group.name
 
         # update in db
         try:
-            db.session.merge(ug)
-            db.session.commit()
-        except IntegrityError:
+            gapi.update(group=ug2form)
+        except (AccountSecurityError, IntegrityError, SQLAlchemyError) as e:
             db.session.rollback()
-            flash(_('Group properies error'), 'error')
+            flash(str(e), 'error')
             # reload form with old values
             return render_template(
                 "groups/new.html",
@@ -248,18 +244,16 @@ def manage(id_usergroup):
                 action=_('Update'),
                 subtitle=oldname,
             )
-        except SQLAlchemyError:
-            db.session.rollback()
-            raise
 
-        current_user.reload()
+        # return successful message
         return redirect(url_for(".index"))
 
+    # load form
     return render_template(
         "groups/new.html",
         form=form,
         action=_('Update'),
-        subtitle=ug.name,
+        subtitle=gapi.user_group.name,
     )
 
 
@@ -269,16 +263,20 @@ def manage(id_usergroup):
 @permission_required('usegroups')
 def delete(id_usergroup):
     """Delete a group."""
-    group = Usergroup.query.get_or_404(id_usergroup)
-    id_user = current_user.get_id()
-    if group.is_admin(id_user):
-        db.session.delete(group)
-        db.session.commit()
-        current_user.reload()
-    else:
-        flash(_('Sorry, but you are not an admin of the group "%(name)s".',
-                name=group.name), "error")
+    # load data
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    try:
+        gapi.check_access()
+        # delete group
+        gapi.delete()
+    except AccountSecurityError, e:
+        flash(str(e), "error")
+        return redirect(url_for(".index"))
 
+    group_name = gapi.user_group.name
+    # return successful message
+    flash(_('Successfully removed the group "%(group_name)s"',
+            group_name=group_name), 'success')
     return redirect(url_for(".index"))
 
 
@@ -288,23 +286,29 @@ def delete(id_usergroup):
 @permission_required('usegroups')
 def members(id_usergroup):
     """List user group members."""
-    group = Usergroup.query.get_or_404(id_usergroup)
-    current_uug = UserUsergroup.query.filter(
-        UserUsergroup.id_user == current_user.get_id(),
-        UserUsergroup.id_usergroup == group.id).one()
-    users_not_in_this_group = UserJoinGroupForm(request.form)
-    users_not_in_this_group.id_user.set_remote(
+    # load data
+    try:
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi.check_access()
+    except AccountSecurityError, e:
+        flash(str(e), 'error')
+        return redirect(url_for('.index'))
+
+    current_uug = gapi.get_info()
+
+    unitg = UserJoinGroupForm(request.form)
+    unitg.id_user.set_remote(
         url_for('webgroup.search_users', id_usergroup=id_usergroup)
         + "?query=%QUERY")
-    users_not_in_this_group.id_usergroup.data = id_usergroup
-    users_not_in_this_group.redirect_url.data = url_for(
+    unitg.id_usergroup.data = id_usergroup
+    unitg.redirect_url.data = url_for(
         ".members", id_usergroup=id_usergroup)
 
     return render_template(
         "groups/members.html",
-        group=group,
+        group=gapi.user_group,
         current_uug=current_uug,
-        form=users_not_in_this_group,
+        form=unitg,
     )
 
 
@@ -314,6 +318,9 @@ def members(id_usergroup):
 @permission_required('usegroups')
 def search(query, term):
     """Search user groups."""
+    # FIXME user can access to all users name?
+    # e.g. is better to return only users name that are at least in one group
+    # together?
     if query == 'users' and len(term) >= 3:
         res = db.session.query(User.nickname).filter(
             User.nickname.like("%s%%" % term)).limit(10).all()
@@ -333,9 +340,10 @@ def search(query, term):
 @permission_required('usegroups')
 def search_users(id_usergroup, query):
     """Search user not in a specific group."""
-    group = Usergroup.query.get_or_404(id_usergroup)
-    users = group.get_users_not_in_this_group(nickname="%%%s%%" % query) \
-        .limit(10).all()
+    # group = Usergroup.query.get_or_404(id_usergroup)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    users = gapi.query_users_not_in_this_group(query="%%%s%%" % query) \
+        .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(results=[{'id': user.id, 'nickname': user.nickname}
                             for user in users])
 
@@ -347,7 +355,8 @@ def search_users(id_usergroup, query):
 @permission_required('usegroups')
 def search_groups(id_user, query):
     """Search groups that user not joined."""
-    groups = get_groups_user_not_joined(id_user, "%%%s%%" % query) \
+    groups = GroupsAPI.query_groups_user_not_joined(
+        id_user=id_user, group_name="%%%s%%" % query) \
         .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(results=[{'id': group.id, 'name': group.name}
                             for group in groups])
@@ -359,6 +368,7 @@ def search_groups(id_user, query):
 @permission_required('usegroups')
 def tokenize(q):
     """FIXME."""
+    # FIXME can we deprecate this function?
     res = Usergroup.query.filter(
         Usergroup.name.like("%s%%" % q)).limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
     return jsonify(data=map(dict, res))
