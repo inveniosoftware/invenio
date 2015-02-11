@@ -15,7 +15,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = upgrades
+SUBDIRS = upgrades pid_providers
 
 pylibdir = $(libdir)/python/invenio
 
@@ -65,6 +65,8 @@ pylib_DATA = __init__.py \
              pluginutils.py \
              pluginutils_unit_tests.py \
              redisutils.py \
+             pid_provider.py \
+             pid_store.py \
              plotextractor.py \
              plotextractor_converter.py \
              plotextractor_getter.py \

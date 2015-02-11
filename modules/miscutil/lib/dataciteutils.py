@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012 CERN.
+# Copyright (C) 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,7 +31,11 @@ CFG_DATACITE_URL
 
 Example of usage:
     doc = '''
-    <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
+    <resource
+        xmlns="http://datacite.org/schema/kernel-2.2"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://datacite.org/schema/kernel-2.2
+        http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
     <identifier identifierType="DOI">10.5072/invenio.test.1</identifier>
     <creators>
         <creator>
@@ -78,8 +82,12 @@ except ImportError:
 
 if not HAS_SSL:
     from warnings import warn
-    warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.", RuntimeWarning)
+    warn("Module ssl not installed. Please install with e.g. "
+         "'pip install ssl'. Required for HTTPS connections to DataCite.",
+         RuntimeWarning)
 
+import re
+from invenio.xmlDict import XmlDictConfig, ElementTree
 
 # Uncomment to enable debugging of HTTP connection and uncomment line in
 # DataCiteRequest.request()
@@ -93,15 +101,18 @@ if HAS_SSL:
     # OpenSSL 1.0.0 has a reported bug with SSLv3/TLS handshake.
     # Python libs affected are httplib2 and urllib2. Eg:
     # httplib2.SSLHandshakeError: [Errno 1] _ssl.c:497:
-    # error:14077438:SSL routines:SSL23_GET_SERVER_HELLO:tlsv1 alert internal error
-    # custom HTTPS opener, banner's oracle 10g server supports SSLv3 only
+    # error:14077438:SSL routines:SSL23_GET_SERVER_HELLO:tlsv1 alert internal
+    # error custom HTTPS opener, banner's oracle 10g server supports SSLv3 only
     class HTTPSConnectionV3(httplib.HTTPSConnection):
         def __init__(self, *args, **kwargs):
             httplib.HTTPSConnection.__init__(self, *args, **kwargs)
 
         def connect(self):
             try:
-                sock = socket.create_connection((self.host, self.port), self.timeout)
+                sock = socket.create_connection(
+                    (self.host, self.port),
+                    self.timeout
+                )
             except AttributeError:
                 # Python 2.4 compatibility (does not deal with IPv6)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -116,9 +127,15 @@ if HAS_SSL:
                 pass
 
             try:
-                self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=ssl.PROTOCOL_SSLv3)
+                self.sock = ssl.wrap_socket(
+                    sock, self.key_file, self.cert_file,
+                    ssl_version=ssl.PROTOCOL_TLSv1
+                )
             except ssl.SSLError:
-                self.sock = ssl.wrap_socket(sock, self.key_file, self.cert_file, ssl_version=ssl.PROTOCOL_SSLv23)
+                self.sock = ssl.wrap_socket(
+                    sock, self.key_file, self.cert_file,
+                    ssl_version=ssl.PROTOCOL_SSLv23
+                )
 
     class HTTPSHandlerV3(urllib2.HTTPSHandler):
         def https_open(self, req):
@@ -176,7 +193,10 @@ class DataCiteRequestError(DataCiteError):
 
 
 class DataCiteNoContentError(DataCiteRequestError):
-    """ DOI is known to MDS, but is not resolvable (might be due to handle's latency) """
+    """
+    DOI is known to MDS, but is not resolvable (might be due to handle's
+    latency)
+    """
     pass
 
 
@@ -235,7 +255,8 @@ class DataCiteRequest(object):
                            query string on all requests.
     @type  default_params: dict
     """
-    def __init__(self, base_url=None, username=None, password=None, default_params={}):
+    def __init__(self, base_url=None, username=None, password=None,
+                 default_params={}):
         self.base_url = base_url
         self.username = username
         self.password = password
@@ -265,7 +286,8 @@ class DataCiteRequest(object):
         self.data = None
         self.code = None
 
-        headers['Authorization'] = 'Basic ' + base64.encodestring(self.username + ':' + self.password)
+        headers['Authorization'] = 'Basic ' + \
+            base64.encodestring(self.username + ':' + self.password)
         if headers['Authorization'][-1] == '\n':
             headers['Authorization'] = headers['Authorization'][:-1]
 
@@ -284,7 +306,8 @@ class DataCiteRequest(object):
                 # HTTP client requests must end with double newline (not added
                 # by urllib2)
                 body += '\r\n\r\n'
-                body = body.encode('utf-8')
+                if isinstance(body, unicode):
+                    body = body.encode('utf-8')
         else:
             if params:
                 url = "%s?%s" % (url, urlencode(params))
@@ -301,10 +324,10 @@ class DataCiteRequest(object):
             res = opener.open(request)
             self.code = res.code
             self.data = res.read()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
             self.code = e.code
             self.data = e.msg
-        except urllib2.URLError, e:
+        except urllib2.URLError as e:
             raise HttpError(e)
 
     def get(self, url, params={}, headers={}):
@@ -313,11 +336,13 @@ class DataCiteRequest(object):
 
     def post(self, url, body=None, params={}, headers={}):
         """ Make a POST request """
-        return self.request(url, method='POST', body=body, params=params, headers=headers)
+        return self.request(url, method='POST', body=body, params=params,
+                            headers=headers)
 
     def delete(self, url, params={}, headers={}):
         """ Make a DELETE request """
-        return self.request(url, method="DELETE", params=params, headers=headers)
+        return self.request(url, method="DELETE", params=params,
+                            headers=headers)
 
 
 class DataCite(object):
@@ -325,10 +350,11 @@ class DataCite(object):
     DataCite API wrapper
     """
 
-    def __init__(self, username=None, password=None, url=None, prefix=None, test_mode=None, api_ver="2"):
+    def __init__(self, username=None, password=None, url=None, prefix=None,
+                 test_mode=None, api_ver="2"):
         """
-        Initialize DataCite API. In case parameters are not specified via keyword
-        arguments, they will be read from the Invenio configuration.
+        Initialize DataCite API. In case parameters are not specified via
+        keyword arguments, they will be read from the Invenio configuration.
 
         @param username: DataCite username (or CFG_DATACITE_USERNAME)
         @type  username: str
@@ -336,27 +362,37 @@ class DataCite(object):
         @param password: DataCite password (or CFG_DATACITE_PASSWORD)
         @type  password: str
 
-        @param url: DataCite API base URL (or CFG_DATACITE_URL). Defaults to https://mds.datacite.org/.
+        @param url: DataCite API base URL (or CFG_DATACITE_URL). Defaults to
+            https://mds.datacite.org/.
         @type  url: str
 
-        @param prefix: DOI prefix (or CFG_DATACITE_DOI_PREFIX). Defaults to 10.5072 (DataCite test prefix).
+        @param prefix: DOI prefix (or CFG_DATACITE_DOI_PREFIX). Defaults to
+            10.5072 (DataCite test prefix).
         @type  prefix: str
 
-        @param test_mode: Set to True to enable test mode (or CFG_DATACITE_TESTMODE). Defaults to False.
+        @param test_mode: Set to True to enable test mode (or
+            CFG_DATACITE_TESTMODE). Defaults to False.
         @type  test_mode: boolean
 
-        @param api_ver: DataCite API version. Currently has no effect. Default to 2.
+        @param api_ver: DataCite API version. Currently has no effect.
+            Default to 2.
         @type  api_ver: str
         """
         if not HAS_SSL:
-            warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.")
+            warn("Module ssl not installed. Please install with e.g. "
+                 "'pip install ssl'. Required for HTTPS connections to "
+                 "DataCite.")
 
-        self.username = username or getattr(config, 'CFG_DATACITE_USERNAME', '')
-        self.password = password or getattr(config, 'CFG_DATACITE_PASSWORD', '')
-        self.prefix = prefix or getattr(config, 'CFG_DATACITE_DOI_PREFIX', '10.5072')
+        self.username = username or getattr(config, 'CFG_DATACITE_USERNAME',
+                                            '')
+        self.password = password or getattr(config, 'CFG_DATACITE_PASSWORD',
+                                            '')
+        self.prefix = prefix or getattr(config, 'CFG_DATACITE_DOI_PREFIX',
+                                        '10.5072')
         self.api_ver = api_ver  # Currently not used
 
-        self.api_url = url or getattr(config, 'CFG_DATACITE_URL', 'https://mds.datacite.org/')
+        self.api_url = url or getattr(config, 'CFG_DATACITE_URL',
+                                      'https://mds.datacite.org/')
         if self.api_url[-1] != '/':
             self.api_url = self.api_url + "/"
 
@@ -535,3 +571,86 @@ class DataCite(object):
             return r.data
         else:
             raise DataCiteError.factory(r.code)
+
+
+class DataciteMetadata(object):
+
+    def __init__(self, doi):
+
+        self.url = "http://data.datacite.org/application/x-datacite+xml/"
+        self.error = False
+        try:
+            data = urllib2.urlopen(self.url + doi).read()
+        except urllib2.HTTPError:
+            self.error = True
+
+        if not self.error:
+            # Clean the xml for parsing
+            data = re.sub('<\?xml.*\?>', '', data, count=1)
+
+            # Remove the resource tags
+            data = re.sub('<resource .*xsd">', '', data)
+            self.data = '<?xml version="1.0"?><datacite>' + \
+                data[0:len(data) - 11] + '</datacite>'
+            self.root = ElementTree.XML(self.data)
+            self.xml = XmlDictConfig(self.root)
+
+    def get_creators(self, attribute='creatorName'):
+        if 'creators' in self.xml:
+            if isinstance(self.xml['creators']['creator'], list):
+                return [c[attribute] for c in self.xml['creators']['creator']]
+            else:
+                return self.xml['creators']['creator'][attribute]
+
+        return None
+
+    def get_titles(self):
+        if 'titles' in self.xml:
+            return self.xml['titles']['title']
+        return None
+
+    def get_publisher(self):
+        if 'publisher' in self.xml:
+            return self.xml['publisher']
+        return None
+
+    def get_dates(self):
+        if 'dates' in self.xml:
+            if isinstance(self.xml['dates']['date'], dict):
+                return self.xml['dates']['date'].values()[0]
+            return self.xml['dates']['date']
+        return None
+
+    def get_publication_year(self):
+        if 'publicationYear' in self.xml:
+            return self.xml['publicationYear']
+        return None
+
+    def get_language(self):
+        if 'language' in self.xml:
+            return self.xml['language']
+        return None
+
+    def get_related_identifiers(self):
+        pass
+
+    def get_description(self, description_type='Abstract'):
+        if 'descriptions' in self.xml:
+            if isinstance(self.xml['descriptions']['description'], list):
+                for description in self.xml['descriptions']['description']:
+                    if description_type in description:
+                        return description[description_type]
+            elif isinstance(self.xml['descriptions']['description'], dict):
+                description = self.xml['descriptions']['description']
+                if description_type in description:
+                    return description[description_type]
+                elif len(description) == 1:
+                    # return the only description
+                    return description.values()[0]
+
+        return None
+
+    def get_rights(self):
+        if 'titles' in self.xml:
+            return self.xml['rights']
+        return None
