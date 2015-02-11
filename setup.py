@@ -183,6 +183,9 @@ extras_require = {
         # Any other versions are not supported.
         "pyRXP==1.16-daily-unix"
     ],
+    "rabbitmq": [
+        "amqp>=1.4.5",
+    ],
     "github": [
         "github3.py>=0.9"
     ],
