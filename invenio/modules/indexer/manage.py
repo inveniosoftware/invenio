@@ -21,20 +21,32 @@
 
 from __future__ import print_function
 
+import sys
+
 from invenio.ext.script import Manager
+
+from .indexerext.config import ElasticSearchIndexFactory, NativeIndexFactory
+from .indexerext.importer.json_importer import \
+    JsonIndexerConfigurationImporter
+
 
 manager = Manager(usage=__doc__)
 
 option_yes_i_know = manager.option('--yes-i-know', action='store_true',
                                    dest='yes_i_know', help='use with care!')
-option_quiet = manager.option('--quiet', action='store_true',
+option_quiet = manager.option('-q', '--quiet', action='store_true',
                               dest='quiet', help='show less output')
+
+option_load_from_file = manager.option(
+    '-f', '--filename', dest="filename",
+    help='Specify a configuration\'s file (json format)')
+
 option_namespace = manager.option(
     '-n', '--namespace', dest='namespace', action='append',
     help='Specify the namespace (e.g. -n records or -n documents')
 
 option_fields = manager.option(
-    '-f', '--fields', dest='fields', action='append',
+    '-i', '--fields', dest='indexer_fields', action='append',
     help='Specify the fields (e.g. -f title,author to choice title and '
     'author from all namespaces or -f records.title to specify title of '
     'namespace records')
@@ -48,60 +60,139 @@ option_range = manager.option(
     help='Specify a range of ids')
 
 
+class IndexerManager(object):
+
+    """Utility to manage indexer."""
+
+    def __init__(self, indexer_name, filename):
+        """Init manager.
+
+        :param indexer_name: indexer name (e.g. native or elasticsearch)
+        :param filename: file name
+        """
+        self.factory = self._load_factory(indexer_name=indexer_name)
+        self.data = self._load_config(filename=filename)
+        self.config = self._load_configuration()
+        self.engine = self._load_engine()
+
+    def _load_config(self, filename=None):
+        """Load the configuration.
+
+        :param filename: file name
+        :return: raw configuration data
+        """
+        if filename:
+            # load from file
+            with open(filename, 'r') as cfile:
+                data = cfile.read()
+        else:
+            # load from stdin
+            data = ''
+            for line in sys.stdin:
+                data += line
+
+        return data
+
+    def _load_factory(self, indexer_name):
+        """Load factory.
+
+        :param indexer_name: indexer name (e.g. native or elasticsearch)
+        """
+        if indexer_name == 'elasticsearch':
+            return ElasticSearchIndexFactory()
+        else:
+            return NativeIndexFactory()
+
+    def _load_configuration(self):
+        """Load configuration."""
+        importer = JsonIndexerConfigurationImporter(
+            json_text=self.data,
+            factory=self.factory
+        )
+        # TODO give the possibility to choice the importer
+        return importer.load()
+
+    def _load_engine(self):
+        """Return a initialized engine."""
+        engine = self.factory.get_engine()
+        return engine(index_configuration=self.config)
+
+
 @manager.command
 @option_namespace
 @option_fields
 @option_exclude_fields
+@option_load_from_file
 @option_yes_i_know
-def create(namespace=None, fields=None, exclude_fields=None, yes_i_know=False):
+def create(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+           filename=None, yes_i_know=False):
     """Create indices."""
-    return NotImplemented
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.create()
 
 
 @manager.command
 @option_namespace
 @option_fields
 @option_exclude_fields
+@option_load_from_file
 @option_yes_i_know
-def drop(namespace=None, fields=None, exclude_fields=None, yes_i_know=False):
+def drop(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+         filename=None, yes_i_know=False):
     """Drop indices."""
-    print("drop")
-    return NotImplemented
+    # TODO implement "yes-i-know!'
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.drop()
 
 
 @manager.command
 @option_namespace
 @option_fields
 @option_exclude_fields
+@option_load_from_file
 @option_yes_i_know
-def recreate(namespace=None, fields=None, exclude_fields=None, yes_i_know=False):
+def recreate(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+             filename=None, yes_i_know=False):
     """Recreate indices."""
-    create(namespace=namespace, fields=fields,
-           exclude_fields=exclude_fields, yes_i_know=yes_i_know)
-    drop(namespace=namespace, fields=fields,
-         exclude_fields=exclude_fields, yes_i_know=yes_i_know)
-    return NotImplemented
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.drop()
+    manager.engine.create()
 
 
 @manager.command
-def index(label):
+@option_namespace
+@option_fields
+@option_exclude_fields
+@option_load_from_file
+def index(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+          filename=None, yes_i_know=False):
     """Index indices."""
-    print("index")
-    return NotImplemented
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.index()
 
 
 @manager.command
-def reindex():
+@option_namespace
+@option_fields
+@option_exclude_fields
+@option_load_from_file
+def reindex(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+            filename=None, yes_i_know=False):
     """Re-index indices."""
-    print("reindex")
-    return NotImplemented
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.reindex()
 
 
 @manager.command
-def clear():
+@option_namespace
+@option_fields
+@option_exclude_fields
+@option_load_from_file
+def clear(indexer, namespace=None, indexer_fields=None, exclude_fields=None,
+          filename=None, yes_i_know=False):
     """Clear indices."""
-    print("clear")
-    return NotImplemented
+    manager = IndexerManager(indexer_name=indexer, filename=filename)
+    manager.engine.clear()
 
 
 def main():

@@ -19,6 +19,8 @@
 
 """Indexer configuration module."""
 
+from abc import abstractmethod
+
 from invenio.base.i18n import _
 from invenio.modules.knowledge.models import KnwKB
 from invenio.modules.search.models import Field
@@ -32,9 +34,21 @@ class IndexFactory(object):
 
     """Abstract class for index factory."""
 
+    @abstractmethod
     def get_index(self):
-        """Return a factory for generic index."""
-        return Index
+        """Return a index.
+
+        :return: specific index class
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_engine(self):
+        """Return a engine.
+
+        :return: specific engine class
+        """
+        raise NotImplementedError()
 
 
 class NativeIndexFactory(IndexFactory):
@@ -42,8 +56,18 @@ class NativeIndexFactory(IndexFactory):
     """Configuration selector for native indexer."""
 
     def get_index(self):
-        """Return a native index."""
+        """Return a index.
+
+        :return: specific index class
+        """
         return NativeIndex
+
+    def get_engine(self):
+        """Return a engine.
+
+        :return: specific engine class
+        """
+        return NativeIndexerConfigurationEngine
 
 
 class ElasticSearchIndexFactory(IndexFactory):
@@ -51,8 +75,18 @@ class ElasticSearchIndexFactory(IndexFactory):
     """Configuration selector for Elastic Search indexer."""
 
     def get_index(self):
-        """Return a elastic search index."""
+        """Return a index.
+
+        :return: specific index class
+        """
         return ElasticSearchIndex
+
+    def get_engine(self):
+        """Return a engine.
+
+        :return: specific engine class
+        """
+        return ElasticSearchIndexerConfigurationEngine
 
 
 class Index(object):
@@ -225,7 +259,7 @@ class VirtualIndex(object):
         self._indices = value or {}
 
 
-class IndexerConfiguration:
+class IndexerConfiguration(object):
 
     """Describe a indexer configuration."""
 
@@ -264,3 +298,55 @@ class IndexerConfiguration:
         return filter(
             lambda vi: vi.namespace in namespace,
             self.virtual_indices) if namespace else self.virtual_indices
+
+
+class IndexerConfigurationEngine(object):
+
+    """Abstract Engine for indexing configuration."""
+
+    def __init__(self, index_configuration):
+        """Initialize engine.
+
+        :param index_configuration: index configuration object
+        """
+        self.index_configuration = index_configuration
+
+    @abstractmethod
+    def create():
+        """Execute actions to create indices on a specific indexer."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def drop():
+        """Execute actions to drop indices on a specific indexer."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def recreate():
+        """Execute actions to recreate indices on a specific indexer."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def clear():
+        """Execute actions to clear indices on a specific indexer."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def index():
+        """Execute actions to start indexing on a specific indexer."""
+        raise NotImplementedError()
+
+    @abstractmethod
+    def reindex():
+        """Execute actions to start reindexing on a specific indexer."""
+        raise NotImplementedError()
+
+
+class NativeIndexerConfigurationEngine(IndexerConfigurationEngine):
+
+    """Engine for native configuration."""
+
+
+class ElasticSearchIndexerConfigurationEngine(IndexerConfigurationEngine):
+
+    """Engine for Elastic Search configuration."""
