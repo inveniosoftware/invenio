@@ -49,6 +49,7 @@ etc_DATA = Default_HTML_captions.bft \
            Default_HTML_meta.bft \
            WebAuthorProfile_affiliations_helper.bft \
            DataCite.xsl \
+           DataCite3.xsl \
            Default_Mobile_brief.bft \
            Default_Mobile_detailed.bft \
            Authority_HTML_brief.bft \
