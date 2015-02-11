@@ -55,6 +55,8 @@ class _install_lib(install_lib):
 
 install_requires = [
     "alembic>=0.6.6",
+    "amqp>=1.4.5,<2.0",
+    "anyjson>=0.3.3",
     "Babel>=1.3",
     "bagit>=1.5.1",
     "BeautifulSoup>=3.2.1",
