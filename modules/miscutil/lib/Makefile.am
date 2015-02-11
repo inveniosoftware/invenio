@@ -84,6 +84,7 @@ pylib_DATA = __init__.py \
              xapianutils_bibrank_indexer.py \
              xapianutils_bibrank_searcher.py \
              xapianutils_config.py \
+             xmlDict.py \
              remote_debugger.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \
