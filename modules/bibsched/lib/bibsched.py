@@ -202,6 +202,7 @@ def spawn_task(command, wait=False):
                     stderr=devnull, stdout=devnull)
     if wait:
         process.wait()
+    return process
 
 
 def bibsched_get_host(task_id):
@@ -657,7 +658,7 @@ class BibSched(object):
                     if self.tie_task_to_host(task.id):
                         Log("Task #%d (%s) started" % (task.id, task.proc))
                         ### Relief the lock for the BibTask, it is safe now to do so
-                        spawn_task(command, wait=is_monotask(task.proc))
+                        process = spawn_task(command, wait=is_monotask(task.proc))
                         count = 10
                         while run_sql("""SELECT status FROM schTASK
                                          WHERE id=%s AND status='SCHEDULED'""",
@@ -665,8 +666,11 @@ class BibSched(object):
                             ## Polling to wait for the task to really start,
                             ## in order to avoid race conditions.
                             if count <= 0:
-                                Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (task.proc, task.id))
-                                bibsched_set_status(task.id, "ERROR", "SCHEDULED")
+                                if process.poll() is None:
+                                    Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status. However it seems to be alive, so I will continue anyway." % (task.proc, task.id))
+                                else:
+                                    Log("Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (task.proc, task.id))
+                                    bibsched_set_status(task.id, "ERROR", "SCHEDULED")
                                 return True
                             time.sleep(CFG_BIBSCHED_REFRESHTIME)
                             count -= 1
