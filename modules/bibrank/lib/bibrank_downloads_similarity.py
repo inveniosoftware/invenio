@@ -23,7 +23,8 @@ __revision__ = \
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_CERN_SITE, \
-     CFG_ELASTICSEARCH_LOGGING
+     CFG_ELASTICSEARCH_LOGGING, \
+     CFG_ELASTICSEARCH_BOT_AGENT_STRINGS
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
@@ -52,7 +53,7 @@ def record_exists(recID):
 
 ### INTERFACE
 
-def register_page_view_event(recid, uid, client_ip_address):
+def register_page_view_event(recid, uid, client_ip_address, user_agent):
     """Register Detailed record page view event for record RECID
        consulted by user UID from machine CLIENT_HOST_IP.
        To be called by the search engine.
@@ -65,8 +66,14 @@ def register_page_view_event(recid, uid, client_ip_address):
         log_event = {
             'id_bibrec': recid,
             'id_user': uid,
-            'client_host': client_ip_address
+            'client_host': client_ip_address,
+            'user_agent': user_agent
         }
+        if user_agent is not None:
+            for bot in CFG_ELASTICSEARCH_BOT_AGENT_STRINGS:
+                if bot in user_agent:
+                    log_event['bot'] = True
+                    break
         _PAGEVIEW_LOG.info(log_event)
     else:
         return run_sql("INSERT INTO rnkPAGEVIEWS " \

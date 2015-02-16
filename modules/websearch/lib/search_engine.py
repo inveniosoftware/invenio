@@ -5872,7 +5872,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
                           so=so, sp=sp, rm=rm, em=em, nb_found=len(range(recid, recidb)))
         if req and of.startswith("h"): # register detailed record page view event
             client_ip_address = str(req.remote_ip)
-            register_page_view_event(recid, uid, client_ip_address)
+            register_page_view_event(recid, uid, client_ip_address,
+                                     req.get_headers_in().get('User-Agent'))
     else: # record does not exist
         if of == "id":
             return []

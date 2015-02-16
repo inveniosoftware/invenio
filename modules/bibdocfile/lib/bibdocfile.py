@@ -121,7 +121,8 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM, \
-    CFG_ELASTICSEARCH_LOGGING
+    CFG_ELASTICSEARCH_LOGGING, \
+    CFG_ELASTICSEARCH_BOT_AGENT_STRINGS
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
@@ -2853,7 +2854,8 @@ class BibDoc(object):
         """Return the total number of files."""
         return len(self.docfiles)
 
-    def register_download(self, ip_address, version, docformat, userid=0, recid=0):
+    def register_download(self, ip_address, version, docformat, user_agent,
+                          userid=0, recid=0):
         """Register the information about a download of a particular file."""
 
         docformat = normalize_format(docformat)
@@ -2869,8 +2871,14 @@ class BibDoc(object):
                 'file_version': version,
                 'file_format': docformat,
                 'id_user': userid,
-                'client_host': ip_address
+                'client_host': ip_address,
+                'user_agent': user_agent
             }
+            if user_agent is not None:
+                for bot in CFG_ELASTICSEARCH_BOT_AGENT_STRINGS:
+                    if bot in user_agent:
+                        log_entry['bot'] = True
+                        break
             _DOWNLOAD_LOG.info(log_entry)
         else:
             return run_sql("INSERT INTO rnkDOWNLOADS "
