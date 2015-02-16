@@ -2853,7 +2853,8 @@ class BibDoc(object):
         """Return the total number of files."""
         return len(self.docfiles)
 
-    def register_download(self, ip_address, version, docformat, userid=0, recid=0):
+    def register_download(self, ip_address, version, docformat, user_agent,
+                          userid=0, recid=0):
         """Register the information about a download of a particular file."""
 
         docformat = normalize_format(docformat)
@@ -2869,8 +2870,16 @@ class BibDoc(object):
                 'file_version': version,
                 'file_format': docformat,
                 'id_user': userid,
-                'client_host': ip_address
+                'client_host': ip_address,
+                'user_agent': user_agent
             }
+            # TODO: Move to CFG_ variables
+            BOTS = ['Googlebot', 'bingbot']
+            BOT_TTL = '30d'
+            for bot in BOTS:
+                if user_agent.find(bot) != -1:
+                    log_entry['_ttl'] = BOT_TTL
+                    break
             _DOWNLOAD_LOG.info(log_entry)
         else:
             return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "

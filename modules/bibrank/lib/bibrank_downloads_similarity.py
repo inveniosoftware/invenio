@@ -52,7 +52,7 @@ def record_exists(recID):
 
 ### INTERFACE
 
-def register_page_view_event(recid, uid, client_ip_address):
+def register_page_view_event(recid, uid, client_ip_address, user_agent):
     """Register Detailed record page view event for record RECID
        consulted by user UID from machine CLIENT_HOST_IP.
        To be called by the search engine.
@@ -65,8 +65,16 @@ def register_page_view_event(recid, uid, client_ip_address):
         log_event = {
             'id_bibrec': recid,
             'id_user': uid,
-            'client_host': client_ip_address
+            'client_host': client_ip_address,
+            'user_agent': user_agent
         }
+        # TODO: Move to CFG_ variables
+        BOTS = ['Googlebot', 'bingbot']
+        BOT_TTL = '30d'
+        for bot in BOTS:
+            if user_agent.find(bot) != -1:
+                log_event['_ttl'] = BOT_TTL
+                break
         _PAGEVIEW_LOG.info(log_event)
     else:
         return run_sql("INSERT DELAYED INTO rnkPAGEVIEWS " \
