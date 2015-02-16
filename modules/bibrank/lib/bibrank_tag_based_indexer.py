@@ -194,7 +194,8 @@ def get_lastupdated(rank_method_code):
     if res:
         return res[0][0]
     else:
-        raise Exception("Is this the first run? Please do a complete update.")
+        # raise Exception("Is this the first run? Please do a complete update.")
+        return "0000-00-00 00:00:00"
 
 def intoDB(dic, date, rank_method_code):
     """Insert the rank method data into the database"""
@@ -209,6 +210,8 @@ def intoDB(dic, date, rank_method_code):
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    if not id:
+        return {}
     res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
     if res:
         return deserialize_via_marshal(res[0][0])
@@ -394,10 +397,7 @@ def add_recIDs_by_date(rank_method_code, dates=""):
        the ranking method RANK_METHOD_CODE.
     """
     if not dates:
-        try:
-            dates = (get_lastupdated(rank_method_code), '')
-        except Exception:
-            dates = ("0000-00-00 00:00:00", '')
+        dates = (get_lastupdated(rank_method_code), '')
     if dates[0] is None:
         dates = ("0000-00-00 00:00:00", '')
     query = """SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s"""
