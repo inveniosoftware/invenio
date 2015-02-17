@@ -37,8 +37,8 @@ from invenio.config import \
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO, CFG_WEB_API_KEY_STATUS, \
         CFG_OPENID_PROVIDERS, CFG_OAUTH2_PROVIDERS, \
-        CFG_OAUTH1_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
-        CFG_OAUTH2_AUTHENTICATION, CFG_OAUTH1_AUTHENTICATION
+        CFG_OPENID_AUTHENTICATION, \
+        CFG_OAUTH2_AUTHENTICATION
 
 from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
 from invenio.htmlutils import escape_html, nmtoken_from_string
@@ -1022,12 +1022,12 @@ class Template:
         out += """<form method="post" action="%(CFG_SITE_SECURE_URL)s/youraccount/login">
                   <table>
                """ % {'CFG_SITE_SECURE_URL': CFG_SITE_SECURE_URL}
-        if len(methods) - CFG_OPENID_AUTHENTICATION - CFG_OAUTH2_AUTHENTICATION - CFG_OAUTH1_AUTHENTICATION > 1:
+        if len(methods) - CFG_OPENID_AUTHENTICATION - CFG_OAUTH2_AUTHENTICATION  > 1:
             # more than one method, must make a select
             login_select = """<select name="login_method" id="login_method">"""
             for method in methods:
                 # OpenID/OAuth shouldn't be shown in this list.
-                if not method in ['openid', 'oauth1', 'oauth2']:
+                if not method in ['openid', 'oauth2']:
                     login_select += """<option value="%(method)s" %(selected)s>%(method)s</option>""" % {
                                   'method' : cgi.escape(method, True),
                                   'selected' : (method == selected_method and 'selected="selected"' or "")
@@ -1086,8 +1086,7 @@ class Template:
         out += "</div>"
 
         if CFG_OPENID_AUTHENTICATION or \
-                CFG_OAUTH2_AUTHENTICATION or \
-                CFG_OAUTH1_AUTHENTICATION:
+                CFG_OAUTH2_AUTHENTICATION:
             # If OpenID or OAuth authentication is enabled, we put the login
             # forms of providers.
             out += self.tmpl_external_login_panel(ln, referer)
@@ -2693,8 +2692,6 @@ Best regards.
             login_url += 'openid'
         elif provider in CFG_OAUTH2_PROVIDERS:
             login_url += 'oauth2'
-        elif provider in CFG_OAUTH1_PROVIDERS:
-            login_url += 'oauth1'
 
         login_url += '?'
 
@@ -2752,8 +2749,6 @@ provider=%(provider)s">
             login_url += 'openid'
         elif provider in CFG_OAUTH2_PROVIDERS:
             login_url += 'oauth2'
-        elif provider in CFG_OAUTH1_PROVIDERS:
-            login_url += 'oauth1'
 
         label %= {'provider': provider}
 
@@ -2836,7 +2831,6 @@ type="text" name="identifier" value="" >
                                                classes = button_class)
 
         activated_providers = CFG_OPENID_PROVIDERS * CFG_OPENID_AUTHENTICATION \
-                            + CFG_OAUTH1_PROVIDERS * CFG_OAUTH1_AUTHENTICATION \
                             + CFG_OAUTH2_PROVIDERS * CFG_OAUTH2_AUTHENTICATION
 
         if not len(activated_providers):

@@ -66,9 +66,8 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
     CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH, \
     CFG_OPENID_CONFIGURATIONS, CFG_OAUTH2_CONFIGURATIONS, \
-    CFG_OAUTH1_CONFIGURATIONS, CFG_OAUTH2_PROVIDERS, CFG_OAUTH1_PROVIDERS, \
-    CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
-    CFG_OAUTH1_AUTHENTICATION, CFG_OAUTH2_AUTHENTICATION
+    CFG_OAUTH2_PROVIDERS, CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
+    CFG_OAUTH2_AUTHENTICATION
 from invenio.session import get_session
 
 from invenio import web_api_key
@@ -86,7 +85,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword',
                 'robotlogin', 'robotlogout', 'apikey', 'openid',
-                'oauth1', 'oauth2']
+                'oauth2']
     _force_https = True
 
     def index(self, req, form):
@@ -909,7 +908,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             except InvenioWebAccessMailCookieError:
                 pass
         if not CFG_EXTERNAL_AUTH_USING_SSO:
-            if (args['p_un'] is None or not args['login_method']) and (not args['login_method'] in ['openid', 'oauth1', 'oauth2']):
+            if (args['p_un'] is None or not args['login_method']) and (not args['login_method'] in ['openid', 'oauth2']):
                 return page(title=_("Login"),
                             body=webaccount.create_login_page_box(args['referer'], args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
@@ -1314,125 +1313,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         redirect_to_url(req, url)
 
-    def oauth1(self, req, form):
-        args = wash_urlargd(form, {'provider': (str, '')})
-        # If either provider isn't activated or OAuth1 authentication is
-        # disabled, redirect to login page.
-        if not (args['provider'] in CFG_OAUTH1_PROVIDERS and
-                                                    CFG_OAUTH1_AUTHENTICATION):
-            redirect_to_url(req, CFG_SITE_SECURE_URL + "/youraccount/login")
-
-        # Load the right message language
-        _ = gettext_set_language(args['ln'])
-
-        try:
-            from rauth.service import OAuth1Service
-        except:
-            # Return login page with 'Need to install rauth' error
-            return page(title = _("Login"),
-                        body = webaccount.create_login_page_box(
-                        '%s/youraccount/login?error=oauth-rauth' % \
-                                                            CFG_SITE_SECURE_URL,
-                        args['ln']
-                        ),
-                        navtrail = """
-<a class="navtrail" href="%s/youraccount/display?ln=%s">
-""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                        description = "%s Personalize, Main page" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords = "%s , personalize" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        uid = 0,
-                        req = req,
-                        secure_page_p = 1,
-                        language = args['ln'],
-                        lastupdated = __lastupdated__,
-                        navmenuid = 'youraccount')
-
-        # Load the configurations of the OAuth1 provider
-        config = CFG_OAUTH1_CONFIGURATIONS[args['provider']]
-
-        try:
-            if not (config['consumer_key'] and config['consumer_secret']):
-                raise Exception
-
-            provider = OAuth1Service(
-                                name = args['provider'],
-                                consumer_key = config['consumer_key'],
-                                consumer_secret = config['consumer_secret'],
-                                request_token_url = config['request_token_url'],
-                                access_token_url = config['access_token_url'],
-                                authorize_url = config['authorize_url'],
-                                header_auth = True
-                                )
-        except:
-            # Return login page with 'OAuth service isn't configurated' error
-            return page(title = _("Login"),
-                        body = webaccount.create_login_page_box(
-                        '%s/youraccount/login?error=oauth-config' % \
-                                                            CFG_SITE_SECURE_URL,
-                        args['ln']
-                        ),
-                        navtrail = """
-<a class="navtrail" href="%s/youraccount/display?ln=%s">
-""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                        description = "%s Personalize, Main page" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords = "%s , personalize" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        uid = 0,
-                        req = req,
-                        secure_page_p = 1,
-                        language = args['ln'],
-                        lastupdated = __lastupdated__,
-                        navmenuid = 'youraccount')
-        try:
-            # Obtain request token and its secret.
-            request_token, request_token_secret = \
-                provider.get_request_token(
-                    method = 'GET',
-                    data = {
-                    'oauth_callback': \
-                        "%s/youraccount/login?login_method=oauth1&provider=%s" % (
-                            CFG_SITE_SECURE_URL,
-                            args['provider']
-                        )
-                    }
-                )
-        except:
-            # Return login page with 'Cannot connect the provider' error
-            return page(title = _("Login"),
-                        body = webaccount.create_login_page_box(
-                        '%s/youraccount/login?error=connection-error' % \
-                                                            CFG_SITE_SECURE_URL,
-                        args['ln']
-                        ),
-                        navtrail = """
-<a class="navtrail" href="%s/youraccount/display?ln=%s">
-""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
-                        description = "%s Personalize, Main page" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        keywords = "%s , personalize" % \
-                        CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
-                        uid = 0,
-                        req = req,
-                        secure_page_p = 1,
-                        language = args['ln'],
-                        lastupdated = __lastupdated__,
-                        navmenuid = 'youraccount')
-
-        # Construct the authorization url.
-        authorize_parameters = config.get('authorize_parameters', {})
-        authorize_url = provider.get_authorize_url(request_token,
-                                                    **authorize_parameters)
-
-        # Save request token into database since it will be used in
-        # authentication
-        query = """INSERT INTO oauth1_storage VALUES(%s, %s, NOW())"""
-        params = (request_token, request_token_secret)
-        run_sql(query, params)
-
-        redirect_to_url(req, authorize_url)
 
 class WebInterfaceYourTicketsPages(WebInterfaceDirectory):
     #support for /yourtickets url

@@ -136,7 +136,6 @@ else:
 CFG_TEMP_EMAIL_ADDRESS = "%s@NOEMAIL"
 
 # CFG_OPENID_PROVIDERS
-# CFG_OAUTH1_PROVIDERS
 # CFG_OAUTH2_PROVIDERS
 # Choose which providers you want to use. Some providers don't supply e mail
 # address, if you choose them, the users will be registered with an temporary
@@ -156,12 +155,6 @@ CFG_OPENID_PROVIDERS = [
     'myspace',
     'livejournal',
     'blogger'
-]
-
-CFG_OAUTH1_PROVIDERS = [
-    'twitter',
-    'linkedin',
-    'flickr'
 ]
 
 CFG_OAUTH2_PROVIDERS = [
@@ -218,99 +211,6 @@ CFG_OPENID_CONFIGURATIONS = {
     }
 }
 
-# CFG_OAUTH1_CONFIGURATIONS
-#
-# !!IMPORTANT!!
-# While creating an app in the provider site, the callback uri (redirect uri)
-# must be in the form of :
-# CFG_SITE_SECURE_URL/youraccount/login?login_method=oauth1&provider=PROVIDERNAME
-#
-# consumer_key: required
-#   Consumer key taken from provider.
-#
-# consumer_secret: required
-#   Consumer secret taken from provider.
-#
-# authorize_url: required
-#   The url to redirect the user for authorization
-#
-# authorize_parameters: optional
-#   Additional parameters for authorize_url (ie. scope)
-#
-# request_token_url: required
-#   The url to get request token
-#
-# access_token_url: required
-#   The url to exchange the request token with the access token
-#
-# request_url: optional
-#   The url to gather the user information
-#
-# request_parameters: optional
-#   Additional parameters for request_url
-#
-# email, nickname: optional
-# id: required
-#   The location where these properties in the response returned from the
-#   provider.
-#   example:
-#       if the response is:
-#                        {
-#                            'user': {
-#                                'user_name': 'ABC',
-#                                'contact': [
-#                                    {
-#                                        'email': 'abc@def.com'
-#                                    }
-#                                ]
-#                            },
-#                           'user_id': 'XXX',
-#                        }
-#       then:
-#       email must be : ['user', 'contact', 0, 'email']
-#       id must be: ['user_id']
-#       nickname must be: ['user', 'user_name']
-#
-# debug: optional
-#	When debug key is set to 1, after login process, the json object
-#	returned from provider is displayed on the screen. It may be used
-#	for finding where the id, email or nickname is.
-CFG_OAUTH1_CONFIGURATIONS = {
-    'twitter': {
-        'consumer_key' : '',
-        'consumer_secret' : '',
-        'request_token_url' : 'https://api.twitter.com/oauth/request_token',
-        'access_token_url' : 'https://api.twitter.com/oauth/access_token',
-        'authorize_url' : 'https://api.twitter.com/oauth/authorize',
-        'id': ['user_id'],
-        'nickname': ['screen_name']
-    },
-    'flickr': {
-        'consumer_key' : '',
-        'consumer_secret' : '',
-        'request_token_url' : 'http://www.flickr.com/services/oauth/request_token',
-        'access_token_url' : 'http://www.flickr.com/services/oauth/access_token',
-        'authorize_url' : 'http://www.flickr.com/services/oauth/authorize',
-        'authorize_parameters': {
-            'perms': 'read'
-        },
-        'nickname': ['username'],
-        'id': ['user_nsid']
-    },
-    'linkedin': {
-        'consumer_key' : '',
-        'consumer_secret' : '',
-        'request_token_url' : 'https://api.linkedin.com/uas/oauth/requestToken',
-        'access_token_url' : 'https://api.linkedin.com/uas/oauth/accessToken',
-        'authorize_url' : 'https://www.linkedin.com/uas/oauth/authorize',
-        'request_url': 'http://api.linkedin.com/v1/people/~:(id)',
-        'request_parameters': {
-            'format': 'json'
-        },
-        'id': ['id']
-    }
-}
-
 # CFG_OAUTH2_CONFIGURATIONS
 #
 # !!IMPORTANT!!
@@ -341,7 +241,23 @@ CFG_OAUTH1_CONFIGURATIONS = {
 # id: required
 #   The location where these properties in the response returned from the
 #   provider.
-#       !! See the example in CFG_OAUTH1_CONFIGURATIONS !!
+#   example:
+#       if the response is:
+#                        {
+#                            'user': {
+#                                'user_name': 'ABC',
+#                                'contact': [
+#                                    {
+#                                        'email': 'abc@def.com'
+#                                    }
+#                                ]
+#                            },
+#                           'user_id': 'XXX',
+#                        }
+#       then:
+#       email must be : ['user', 'contact', 0, 'email']
+#       id must be: ['user_id']
+#       nickname must be: ['user', 'user_name']
 #
 # debug: optional
 #	When debug key is set to 1, after login process, the json object
@@ -418,9 +334,8 @@ CFG_OAUTH2_CONFIGURATIONS =  {
     }
 }
 
-## Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
+## Let's override OpenID/OAuth2 configuration from invenio(-local).conf
 CFG_OPENID_PROVIDERS = config.CFG_OPENID_PROVIDERS
-CFG_OAUTH1_PROVIDERS = config.CFG_OAUTH1_PROVIDERS
 CFG_OAUTH2_PROVIDERS = config.CFG_OAUTH2_PROVIDERS
 if config.CFG_OPENID_CONFIGURATIONS:
     for provider, configuration in config.CFG_OPENID_CONFIGURATIONS.items():
@@ -428,12 +343,6 @@ if config.CFG_OPENID_CONFIGURATIONS:
             CFG_OPENID_CONFIGURATIONS[provider].update(configuration)
         else:
             CFG_OPENID_CONFIGURATIONS[provider] = configuration
-if config.CFG_OAUTH1_CONFIGURATIONS:
-    for provider, configuration in config.CFG_OAUTH1_CONFIGURATIONS.items():
-        if provider in CFG_OAUTH1_CONFIGURATIONS:
-            CFG_OAUTH1_CONFIGURATIONS[provider].update(configuration)
-        else:
-            CFG_OAUTH1_CONFIGURATIONS[provider] = configuration
 if config.CFG_OAUTH2_CONFIGURATIONS:
     for provider, configuration in config.CFG_OAUTH2_CONFIGURATIONS.items():
         if provider in CFG_OAUTH2_CONFIGURATIONS:
@@ -446,12 +355,6 @@ CFG_OPENID_AUTHENTICATION = bool(CFG_OPENID_PROVIDERS)
 if CFG_OPENID_AUTHENTICATION:
     from invenio.external_authentication_openid import ExternalOpenID
     CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
-
-# If OAuth1 authentication is enabled, add 'oauth1' to login methods.
-CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
-if CFG_OAUTH1_AUTHENTICATION:
-    from invenio.external_authentication_oauth1 import ExternalOAuth1
-    CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
 
 # If OAuth2 authentication is enabled, add 'oauth2' to login methods.
 CFG_OAUTH2_AUTHENTICATION = bool(CFG_OAUTH2_PROVIDERS)

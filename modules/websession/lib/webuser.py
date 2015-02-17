@@ -584,9 +584,9 @@ def loginUser(req, p_un, p_pw, login_method):
     if CFG_EXTERNAL_AUTHENTICATION[login_method]: # External Authentication
         try:
             result = CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_email, p_pw, req)
-            if (result == (None, None) or result is None) and not login_method in ['oauth1', 'oauth2', 'openid']:
+            if (result == (None, None) or result is None) and not login_method in ['oauth2', 'openid']:
                 # There is no need to call auth_user with username for
-                # OAuth1, OAuth2 and OpenID authentication
+                # OAuth2 and OpenID authentication
                 result = CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_un, p_pw, req) ## We try to login with either the email of the nickname
             if isinstance(result, (tuple, list)) and len(result) == 2:
                 p_email, p_extid = result

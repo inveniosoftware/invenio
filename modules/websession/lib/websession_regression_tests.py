@@ -113,7 +113,7 @@ class WebSessionExternalLoginTest(InvenioTestCase):
     """Test external login functionality."""
 
     def test_no_external_login(self):
-        """websession - openid, oauth1 or oauth2 external login option in log in page"""
+        """websession - openid or oauth2 external login option in log in page"""
         base_url = CFG_SITE_SECURE_URL + '/youraccount'
         login_url = base_url + '/login'
         browser = Browser()

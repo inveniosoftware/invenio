@@ -108,6 +108,6 @@ class ExternalAuth:
     @staticmethod
     def get_msg(req):
         """
-        Return a given authentication message (needed e.g. when using OpenID/OAUTH1/OAUTH2)
+        Return a given authentication message (needed e.g. when using OpenID/OAUTH2)
         """
         raise NotImplementedError()
