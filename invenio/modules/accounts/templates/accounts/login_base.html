@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2014 CERN.
+## Copyright (C) 2012, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 #}
 {%- from "_formhelpers.html" import render_field with context %}
 {%- extends "page.html" %}
-{%- set title = None %}
+{%- set title = title|default(None) %}
 {%- set activated_providers = config.CFG_OPENID_PROVIDERS * config.CFG_OPENID_AUTHENTICATION
                            + config.CFG_OAUTH1_PROVIDERS * config.CFG_OAUTH1_AUTHENTICATION
                            + config.CFG_OAUTH2_PROVIDERS * config.CFG_OAUTH2_AUTHENTICATION %}
