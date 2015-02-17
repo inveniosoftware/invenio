@@ -24,3 +24,7 @@ as well as the source code snippets themselves.
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
+
+## Because we use getLogger calls to do logging, handlers aren't initialised
+## unless we explicitly call/import this code somewhere.
+import elasticsearch_logging

@@ -22,10 +22,16 @@ __revision__ = \
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_ELASTICSEARCH_LOGGING
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.search_engine_utils import get_fieldvalues
+
+if CFG_ELASTICSEARCH_LOGGING:
+    import logging
+
+    _PAGEVIEW_LOG = logging.getLogger('events.pageviews')
 
 def record_exists(recID):
     """Return 1 if record RECID exists.
@@ -46,7 +52,7 @@ def record_exists(recID):
 
 ### INTERFACE
 
-def register_page_view_event(recid, uid, client_ip_address):
+def register_page_view_event(recid, uid, client_ip_address, user_agent):
     """Register Detailed record page view event for record RECID
        consulted by user UID from machine CLIENT_HOST_IP.
        To be called by the search engine.
@@ -55,10 +61,26 @@ def register_page_view_event(recid, uid, client_ip_address):
         # do not register access if we are in read-only access control
         # site mode:
         return []
-    return run_sql("INSERT INTO rnkPAGEVIEWS " \
-                   " (id_bibrec,id_user,client_host,view_time) " \
-                   " VALUES (%s,%s,INET_ATON(%s),NOW())", \
-                   (recid, uid, client_ip_address))
+    if CFG_ELASTICSEARCH_LOGGING:
+        log_event = {
+            'id_bibrec': recid,
+            'id_user': uid,
+            'client_host': client_ip_address,
+            'user_agent': user_agent
+        }
+        # TODO: Move to CFG_ variables
+        BOTS = ['Googlebot', 'bingbot']
+        BOT_TTL = '30d'
+        for bot in BOTS:
+            if user_agent.find(bot) != -1:
+                log_event['_ttl'] = BOT_TTL
+                break
+        _PAGEVIEW_LOG.info(log_event)
+    else:
+        return run_sql("INSERT DELAYED INTO rnkPAGEVIEWS " \
+                       " (id_bibrec,id_user,client_host,view_time) " \
+                       " VALUES (%s,%s,INET_ATON(%s),NOW())", \
+                       (recid, uid, client_ip_address))
 
 def calculate_reading_similarity_list(recid, type="pageviews"):
     """Calculate reading similarity data to use in reading similarity

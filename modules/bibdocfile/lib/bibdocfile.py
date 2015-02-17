@@ -120,13 +120,19 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
-    CFG_BIBCATALOG_SYSTEM
+    CFG_BIBCATALOG_SYSTEM, \
+    CFG_ELASTICSEARCH_LOGGING
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
 
 import invenio.template
+
+if CFG_ELASTICSEARCH_LOGGING:
+    import logging
+
+    _DOWNLOAD_LOG = logging.getLogger('events.downloads')
 
 def _plugin_bldr(dummy, plugin_code):
     """Preparing the plugin dictionary structure"""
@@ -2847,7 +2853,8 @@ class BibDoc(object):
         """Return the total number of files."""
         return len(self.docfiles)
 
-    def register_download(self, ip_address, version, docformat, userid=0, recid=0):
+    def register_download(self, ip_address, version, docformat, user_agent,
+                          userid=0, recid=0):
         """Register the information about a download of a particular file."""
 
         docformat = normalize_format(docformat)
@@ -2856,12 +2863,31 @@ class BibDoc(object):
         docformat = docformat.upper()
         if not version:
             version = self.get_latest_version()
-        return run_sql("INSERT INTO rnkDOWNLOADS "
-            "(id_bibrec,id_bibdoc,file_version,file_format,"
-            "id_user,client_host,download_time) VALUES "
-            "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
-            (recid, self.id, version, docformat,
-            userid, ip_address,))
+        if CFG_ELASTICSEARCH_LOGGING:
+            log_entry = {
+                'id_bibrec': recid,
+                'id_bibdoc': self.id,
+                'file_version': version,
+                'file_format': docformat,
+                'id_user': userid,
+                'client_host': ip_address,
+                'user_agent': user_agent
+            }
+            # TODO: Move to CFG_ variables
+            BOTS = ['Googlebot', 'bingbot']
+            BOT_TTL = '30d'
+            for bot in BOTS:
+                if user_agent.find(bot) != -1:
+                    log_entry['_ttl'] = BOT_TTL
+                    break
+            _DOWNLOAD_LOG.info(log_entry)
+        else:
+            return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
+                "(id_bibrec,id_bibdoc,file_version,file_format,"
+                "id_user,client_host,download_time) VALUES "
+                "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
+                (recid, self.id, version, docformat,
+                userid, ip_address,))
 
     def get_incoming_relations(self, rel_type=None):
         """Return all relations in which this BibDoc appears on target position
