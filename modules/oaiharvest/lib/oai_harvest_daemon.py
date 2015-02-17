@@ -379,11 +379,11 @@ def harvest_step(repository, harvestpath, identifiers, dates, current_progress):
         write_message("source %s was successfully harvested" % \
                       (repository["name"],))
 
-    elif not dates and repository["lastrun"] is None and repository["frequency"] != 0:
+    elif not dates and not repository["lastrun"] and repository["frequency"] != 0:
         # First time we harvest from this repository
         write_message("source %s was never harvested before - harvesting whole repository" % \
                       (repository["name"],))
-        harvested_files_list, error_code = harvest_by_dates(repository, harvestpath, current_progress)
+        harvested_files_list, error_code = harvest_by_dates(repository, harvestpath, progress=current_progress)
         if error_code:
             return [], error_code
         write_message("source %s was successfully harvested" % \
