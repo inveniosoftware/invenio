@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,6 +20,7 @@
 from __future__ import absolute_import, print_function
 
 import logging
+
 from .wrappers import get_pretty_traceback
 
 
@@ -48,7 +49,7 @@ class InvenioExceptionFormatter(logging.Formatter):
 
             if output:
                 if prefix:
-                    output = prefix + '\n', + output
+                    output = prefix + '\n' + output
                 if suffix:
                     output = output + suffix
 
