@@ -1106,16 +1106,16 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=p&as=1',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=p",
-                                               expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=a+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=p",
+                                               expected_link_label='a simple functional form for proton-nucleus total reaction cross sections'))
 
     def test_nearest_terms_box_in_unsuccessful_exact_phrase_advanced_query(self):
         """ websearch - nearest terms box for unsuccessful exact phrase advanced search query """
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=e&as=1',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=e",
-                                               expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=a+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=e",
+                                               expected_link_label='a simple functional form for proton-nucleus total reaction cross sections'))
 
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
         """ websearch - nearest terms box for unsuccessful boolean query """
