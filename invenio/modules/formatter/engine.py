@@ -2018,7 +2018,7 @@ class BibFormatObject(object):
             # If record is given as parameter
             self.xml_record = xml_record
             self.record = create_record(xml_record)[0]
-            recID = int(record_get_field_value(self.record, "001")) or None
+            recID = record_get_field_value(self.record, "001") or None
 
         try:
             assert isinstance(recID, (int, long, type(None))), 'Argument of wrong type!'

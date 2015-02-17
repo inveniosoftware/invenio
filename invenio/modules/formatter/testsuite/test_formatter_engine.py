@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -753,6 +753,15 @@ class FormatTest(InvenioTestCase):
         <record>
         <controlfield tag="001">555</controlfield>
         </record>'''
+
+        self.no_001_record_xml = '''
+        <record>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>'''
         self.app.extensions['registry']['output_formats'] = output_formats_registry()
         self.app.extensions['registry']['format_elements'] = format_elements_registry()
         self.app.extensions['registry']['format_templates'] = format_templates_registry()
@@ -929,6 +938,12 @@ class FormatTest(InvenioTestCase):
             '<dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">'
             'Doe2, John</dc:creator>\n  <pubDate/>\n  <guid/>\n</item>\n'
         )
+
+    def test_format_record_no_recid(self):
+        from invenio.modules.formatter import format_record
+        result = format_record(recID=None, of="test6",
+                               xml_record=self.no_001_record_xml)
+        self.assertEqual(result, "helloworld\n")
 
 
 class MarcFilteringTest(InvenioTestCase):
