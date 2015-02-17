@@ -599,7 +599,12 @@ def create_file_upload_interface(recid,
                 os.unlink(uploaded_filepath)
                 body += '<script>alert("%s");</script>' % \
                        _("You have already reached the maximum number of files for this type of document").replace('"', '\\"')
-
+            elif '/' in filename or "%" in filename or "\\" in filename:
+                # We forbid usage of a few characters, for the good of
+                # everybody...
+                os.unlink(uploaded_filepath)
+                body += '<script>alert("%s");</script>' % \
+                        _("You are not allowed to use dot slash '/', percent '%' or backslash '\\\\' in file names. Please, rename the file and upload it again.").replace('"', '\\"')
             else:
                 # Prepare to move file to
                 # working_dir/files/updated/doctype/bibdocname/
@@ -645,13 +650,13 @@ def create_file_upload_interface(recid,
                     body += '<script>alert("%s");</script>' % \
                            (_("A file with format '%s' already exists. Please upload another format.") % \
                             extension).replace('"', '\\"')
-                elif '.' in file_rename  or '/' in file_rename or "\\" in file_rename or \
+                elif '.' in file_rename  or '/' in file_rename or "%" in file_rename or "\\" in file_rename or \
                          not os.path.abspath(new_uploaded_filepath).startswith(os.path.join(working_dir, 'files', 'updated')):
                     # We forbid usage of a few characters, for the good of
                     # everybody...
                     os.unlink(uploaded_filepath)
                     body += '<script>alert("%s");</script>' % \
-                           _("You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
+                           _("You are not allowed to use dot '.', slash '/', percent '%' or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
                 else:
                     # No conflict with file name
 
@@ -747,11 +752,11 @@ def create_file_upload_interface(recid,
                        (_("A file named %s already exists. Please choose another name.") % \
                         file_rename).replace('"', '\\"')
             elif file_rename != file_target and \
-                     ('.' in file_rename or '/' in file_rename or "\\" in file_rename):
+                     ('.' in file_rename or '/' in file_rename or '%' in file_rename or "\\" in file_rename):
                     # We forbid usage of a few characters, for the good of
                     # everybody...
                 body += '<script>alert("%s");</script>' % \
-                        _("You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
+                        _("You are not allowed to use dot '.', slash '/', percent '%' or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
             else:
                 # Log
                 log_action(working_dir, file_action, file_target,
