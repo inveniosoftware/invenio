@@ -132,6 +132,7 @@ extras_require = {
     ],
     "development": [
         "Flask-DebugToolbar==0.9.0",
+        "watchdog==0.8.3",
     ],
     "elasticsearch": [
         "pyelasticsearch>=0.6.1"
