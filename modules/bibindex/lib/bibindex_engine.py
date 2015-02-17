@@ -89,7 +89,8 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_records_range_for_index, \
     make_prefix, \
     list_union, \
-    recognize_marc_tag
+    recognize_marc_tag, \
+    is_index_using_unicode_520
 from invenio.bibindex_termcollectors import \
     TermCollector, \
     NonmarcTermCollector
@@ -622,6 +623,9 @@ class AbstractIndexTable(object):
                                                 ("%02d" % self.index_id) + "F")
         self.table_prefix = table_prefix
 
+        self.unicode_520 = (is_index_using_unicode_520(self.index_id) and
+                            "COLLATE 'utf8_unicode_520_ci'" or "")
+
         self.value = {} # cache
         self.recIDs_in_mem = []
 
@@ -712,7 +716,7 @@ class AbstractIndexTable(object):
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" %  \
                               word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s %s" % (wash_table_column_name(self.table_name), self.unicode_520), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % \
@@ -726,7 +730,7 @@ class AbstractIndexTable(object):
                 register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
 
         if not set: # never store empty words
-            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
+            run_sql("DELETE FROM %s WHERE term=%%s %s" % (wash_table_column_name(self.table_name), self.unicode_520), (word,)) # kwalitee: disable=sql
 
     def put(self, recID, word, sign):
         """Keeps track of changes done during indexing
@@ -754,7 +758,7 @@ class AbstractIndexTable(object):
 
     def load_old_recIDs(self, word):
         """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.table_name
+        query = "SELECT hitlist FROM %s WHERE term=%%s %s" % (self.table_name, self.unicode_520)
         res = run_sql(query, (word, ))
         if res:
             return intbitset(res[0][0])

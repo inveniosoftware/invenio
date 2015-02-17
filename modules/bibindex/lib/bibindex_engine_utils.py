@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -553,3 +553,14 @@ def get_values_recursively(subfield, phrases):
             get_values_recursively(s, phrases)
     elif subfield is not None:
         phrases.append(str(subfield))
+
+
+def is_index_using_unicode_520(index_id, cache={}):
+    """
+    Return True if the given index has been configured to use the
+    utf8_unicode_520_ci.
+    """
+    if index_id not in cache:
+        cache[index_id] = "COLLATE=utf8_unicode_520_ci" in run_sql(
+            "SHOW CREATE TABLE idxWORD%02dF" % index_id)[0][1]
+    return cache[index_id]

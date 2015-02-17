@@ -162,7 +162,8 @@ class BibIndexDefaultTokenizer(BibIndexStringTokenizer):
            punctuation characters definition present in the config file.
         """
         phrase = wash_for_utf8(phrase)
-        return [phrase]
+        phrase = lower_index_term(phrase)
+        return [strip_accents(phrase)]
 
     def get_nonmarc_tokenizing_function(self, table_type):
         """

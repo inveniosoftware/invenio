@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -114,7 +115,7 @@ from invenio.bibindex_engine_utils import author_name_requires_phrase_search, \
     get_field_tags
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.bibindex_engine_utils import get_idx_indexer
+from invenio.bibindex_engine_utils import get_idx_indexer, is_index_using_unicode_520
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 from invenio.bibknowledge import get_kbr_values
@@ -227,6 +228,7 @@ EM_REPOSITORY={"body" : "B",
                "lt_portalbox" : "Plt",
                "rt_portalbox" : "Prt",
                "search_services": "SER"};
+
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -2513,6 +2515,9 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
     else:
         return intbitset() # word index f does not exist
 
+    unicode_520 = (is_index_using_unicode_520(index_id) and
+                            "COLLATE 'utf8_unicode_520_ci'" or "")
+
     # wash 'word' argument and run query:
     if f.endswith('count') and word.endswith('+'):
         # field count query of the form N+ so transform N+ to N->99999:
@@ -2546,7 +2551,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
             except ValueError:
                 pass
         try:
-            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
+            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s %s" % (bibwordsX, unicode_520),
                           (word0_washed, word1_washed), wildcard_limit=wl)
         except InvenioDbQueryWildcardLimitError, excp:
             res = excp.res
@@ -2570,7 +2575,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
                 res = ()
             else:
                 try:
-                    res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
+                    res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term LIKE %%s %s" % (bibwordsX, unicode_520),
                                   (wash_index_term(word),), wildcard_limit = wl)
                 except InvenioDbQueryWildcardLimitError, excp:
                     res = excp.res
@@ -2604,6 +2609,10 @@ def search_unit_in_idxpairs(p, f, search_type, wl=0):
     index_id = get_index_id_from_field(f)
     if not index_id:
         return intbitset()
+
+    unicode_520 = (is_index_using_unicode_520(index_id) and
+                            "COLLATE 'utf8_unicode_520_ci'" or "")
+
     stemming_language = get_index_stemming_language(index_id)
     pairs_tokenizer = BibIndexDefaultTokenizer(stemming_language)
     idxpair_table_washed = wash_table_column_name("idxPAIR%02dF" % index_id)
@@ -2674,14 +2683,14 @@ def search_unit_in_idxpairs(p, f, search_type, wl=0):
         use_query_limit = query_var[2]
         if use_query_limit:
             try:
-                res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s"
-                                     % (idxpair_table_washed, query_addons), query_params, wildcard_limit=wl) #kwalitee:disable=sql
+                res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s %s"
+                                     % (idxpair_table_washed, query_addons, unicode_520), query_params, wildcard_limit=wl) #kwalitee:disable=sql
             except InvenioDbQueryWildcardLimitError, excp:
                 res = excp.res
                 limit_reached = 1 # set the limit reached flag to true
         else:
-            res = run_sql("SELECT term, hitlist FROM %s WHERE term %s"
-                      % (idxpair_table_washed, query_addons), query_params) #kwalitee:disable=sql
+            res = run_sql("SELECT term, hitlist FROM %s WHERE term %s %s"
+                      % (idxpair_table_washed, query_addons, unicode_520), query_params) #kwalitee:disable=sql
         if not res:
             return intbitset()
         for pair, hitlist in res:
@@ -2725,13 +2734,15 @@ def search_unit_in_idxphrases(p, f, search_type, wl=0):
     limit_reached = 0 # flag for knowing if the query limit has been reached
     use_query_limit = False # flag for knowing if to limit the query results or not
     # deduce in which idxPHRASE table we will search:
-    idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
-    if f:
-        index_id = get_index_id_from_field(f)
-        if index_id:
-            idxphraseX = "idxPHRASE%02dF" % index_id
-        else:
-            return intbitset() # phrase index f does not exist
+    index_id = get_index_id_from_field(f or "anyfield")
+    if index_id:
+        idxphraseX = "idxPHRASE%02dF" % index_id
+    else:
+        return intbitset() # phrase index f does not exist
+
+    unicode_520 = (is_index_using_unicode_520(index_id) and
+                            "COLLATE 'utf8_unicode_520_ci'" or "")
+
     # detect query type (exact phrase, partial phrase, regexp):
     if search_type == 'r':
         query_addons = "REGEXP %s"
@@ -2762,13 +2773,13 @@ def search_unit_in_idxphrases(p, f, search_type, wl=0):
     # perform search:
     if use_query_limit:
         try:
-            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
+            res = run_sql_with_limit("SELECT term,hitlist FROM %s WHERE term %s %s" % (idxphraseX, query_addons, unicode_520),
                       query_params, wildcard_limit=wl)
         except InvenioDbQueryWildcardLimitError, excp:
             res = excp.res
             limit_reached = 1 # set the limit reached flag to true
     else:
-        res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons), query_params)
+        res = run_sql("SELECT term,hitlist FROM %s WHERE term %s %s" % (idxphraseX, query_addons, unicode_520), query_params)
     # fill the result set:
     for dummy_word, hitlist in res:
         hitset_bibphrase = intbitset(hitlist)
