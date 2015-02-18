@@ -104,3 +104,5 @@ configure.lineno
 .settings
 .pydevproject
 org.eclipse.core.resources.prefs
+supervisord.log
+supervisord.pid
