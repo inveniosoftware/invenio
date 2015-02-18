@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2013, 2014, 2015  CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -72,7 +73,7 @@ try:
     from flask import session
 except ImportError:
     pass
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.serializers import serialize_via_marshal
 
 
@@ -84,6 +85,8 @@ from invenio.legacy.websession.dblayer import get_groups
 from invenio.modules.accounts.models import User
 
 from invenio.legacy.websession.webuser_config import CFG_WEBUSER_USER_TABLES
+
+from sqlalchemy.exc import OperationalError
 
 acc_get_role_id = lazy_import('invenio.modules.access.control:acc_get_role_id')
 acc_get_action_roles = lazy_import('invenio.modules.access.control:acc_get_action_roles')

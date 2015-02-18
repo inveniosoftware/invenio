@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,12 +28,13 @@ import invenio.legacy.oaiharvest.admin as oha
 from invenio.utils.json import json
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
-from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.oaiharvest.dblayer import get_holdingpen_day_size
 from invenio.legacy.oaiharvest.config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.ext.legacy.handler import wash_urlargd
+
+from sqlalchemy.exc import SQLAlchemyError as Error
 
 def index(req, ln=CFG_SITE_LANG):
     """Main OAI Harvest admin page"""

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ import time
 import tempfile
 import re
 
-from invenio.legacy.dbquery import run_sql, Error
+from invenio.legacy.dbquery import run_sql
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.webuser import collect_user_info, page_not_authorized
 from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
@@ -58,6 +58,8 @@ try:
     from six import StringIO
 except ImportError:
     from StringIO import StringIO
+
+from sqlalchemy.exc import SQLAlchemyError as Error
 
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
                    '--insert', '--replace', '--correct', '--append']

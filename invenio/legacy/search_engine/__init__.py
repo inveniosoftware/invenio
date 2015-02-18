@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -112,7 +113,8 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL, \
 
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from intbitset import intbitset
-from invenio.legacy.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
+from invenio.legacy.dbquery import InvenioDbQueryWildcardLimitError
+from invenio.utils.serializers import deserialize_via_marshal
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.logging import register_exception
 from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
@@ -141,6 +143,8 @@ from invenio.utils import apache
 
 from invenio.legacy.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+
+from sqlalchemy.exc import DatabaseError
 
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 

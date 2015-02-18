@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_LANG
-from invenio.legacy.dbquery import run_sql, OperationalError, ProgrammingError
+from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 
 from .config import CFG_EXTERNAL_COLLECTION_TIMEOUT
@@ -43,6 +43,8 @@ from .utils import get_collection_id, get_collection_descendants, \
     warning, get_verbose_print
 
 import invenio.legacy.template
+
+from sqlalchemy.exc import OperationalError, ProgrammingError
 
 # Global variables
 template = invenio.legacy.template.load('websearch_external_collections')

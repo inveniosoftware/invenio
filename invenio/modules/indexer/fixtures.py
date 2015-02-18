@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,11 +17,16 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Indexer fixtures."""
+
 from fixture import DataSet
+
 from invenio.modules.search.fixtures import FieldData
 
 
 class IdxINDEXData(DataSet):
+
+    """Indexer data."""
 
     class IdxINDEX_1:
         last_updated = None
@@ -364,6 +369,8 @@ class IdxINDEXData(DataSet):
 
 class IdxINDEXFieldData(DataSet):
 
+    """IdxINDEXField Data."""
+
     class IdxINDEXField_10_12:
         regexp_alphanumeric_separators = u''
         regexp_punctuation = u'[.,:;?!"]'
@@ -523,48 +530,50 @@ class IdxINDEXFieldData(DataSet):
 
 class IdxINDEXIdxINDEXData(DataSet):
 
+    """IdxINDEXIdxINDEX Data."""
+
     class IdxINDEXIdxINDEX_1_2:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_2.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_2
 
     class IdxINDEXIdxINDEX_1_3:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_3.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_3
 
     class IdxINDEXIdxINDEX_1_5:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_5.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_5
 
     class IdxINDEXIdxINDEX_1_7:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_7.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_7
 
     class IdxINDEXIdxINDEX_1_8:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_8.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_8
 
     class IdxINDEXIdxINDEX_1_10:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_10.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_10
 
     class IdxINDEXIdxINDEX_1_11:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_11.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_11
 
     class IdxINDEXIdxINDEX_1_12:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_12.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_12
 
     class IdxINDEXIdxINDEX_1_13:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_13.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_13
 
     class IdxINDEXIdxINDEX_1_19:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_19.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_19
 
     class IdxINDEXIdxINDEX_1_26:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_26.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_26
 
 __all__ = ('IdxINDEXData', 'IdxINDEXFieldData', 'IdxINDEXIdxINDEXData')

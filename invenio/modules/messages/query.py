@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 from time import localtime, mktime
 from datetime import datetime
 
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_STATUS_CODE, \
     CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
@@ -36,6 +36,9 @@ from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP
 from invenio.ext.sqlalchemy import db
 from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
 from invenio.modules.accounts.models import User
+
+from sqlalchemy.exc import OperationalError
+
 
 def filter_messages_from_user_with_status(uid, status):
     """

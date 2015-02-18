@@ -53,8 +53,7 @@ from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no,\
 from invenio.legacy.search_engine import perform_request_search, \
      get_synonym_terms, \
      search_pattern
-from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
-     deserialize_via_marshal, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.legacy.bibindex.engine_washer import wash_index_term
 from invenio.legacy.bibsched.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
@@ -95,6 +94,10 @@ from invenio.utils.memoise import Memoise
 from invenio.legacy.bibindex.termcollectors import \
     TermCollector, \
     NonmarcTermCollector
+from invenio.utils.serializers import serialize_via_marshal, \
+    deserialize_via_marshal
+
+from sqlalchemy.exc import DatabaseError
 
 from .engine_utils import get_index_id_from_index_name
 
@@ -310,7 +313,7 @@ def get_index_tokenizer(index_id):
     """Returns value of a tokenizer field from idxINDEX database table
        @param index_id: id of the index
     """
-    query = "SELECT tokenizer FROM idxINDEX WHERE id=%s" % index_id
+    query = """SELECT tokenizer FROM "idxINDEX" WHERE id=%s""" % index_id
     out = None
     try:
         res = run_sql(query)
@@ -348,7 +351,7 @@ def detect_tokenizer_type(tokenizer):
 
 def get_last_updated_all_indexes():
     """Returns last modification date for all defined indexes"""
-    query= """SELECT name, last_updated FROM idxINDEX"""
+    query= """SELECT name, last_updated FROM "idxINDEX" """
     res = run_sql(query)
     return res
 
@@ -443,7 +446,7 @@ def truncate_index_table(index_name):
     if index_id:
         write_message('Truncating %s index table in order to reindex.' % \
                       index_name, verbose=2)
-        run_sql("""UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00'
+        run_sql("""UPDATE "idxINDEX" SET last_updated='0000-00-00 00:00:00'
                    WHERE id=%s""", (index_id, ))
         run_sql("TRUNCATE idxWORD%02dF" % index_id) # kwalitee: disable=sql
         run_sql("TRUNCATE idxWORD%02dR" % index_id) # kwalitee: disable=sql
@@ -463,7 +466,7 @@ def update_index_last_updated(indexes, starting_time=None):
     for index_name in indexes:
         write_message("updating last_updated to %s...for %s index" % \
                       (starting_time, index_name), verbose=9)
-        run_sql("UPDATE idxINDEX SET last_updated=%s WHERE name=%s",
+        run_sql("""UPDATE "idxINDEX" SET last_updated=%s WHERE name=%s""",
                 (starting_time, index_name))
 
 
@@ -1886,7 +1889,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
     """
     index_id = get_index_id_from_index_name(index_name)
     if not dates:
-        query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
+        query = """SELECT last_updated FROM "idxINDEX" WHERE id=%s"""
         res = run_sql(query, (index_id,))
         if not res:
             return set([])
@@ -1955,7 +1958,7 @@ def get_recIDs_by_date_authority(dates, index_name, force_all=False):
     index_id = get_index_id_from_index_name(index_name)
     index_tags = get_index_tags(index_name)
     if not dates:
-        query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
+        query = """SELECT last_updated FROM "idxINDEX" WHERE id=%s"""
         res = run_sql(query, (index_id,))
         if not res:
             return set([])
@@ -2020,7 +2023,7 @@ def get_recIDs_from_cli(indexes=[]):
     # need to first update idxINDEX table to find proper recIDs for reindexing
     if task_get_option("reindex"):
         for index_name in indexes:
-            run_sql("""UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00'
+            run_sql("""UPDATE "idxINDEX" SET last_updated='0000-00-00 00:00:00'
                        WHERE name=%s""", (index_name,))
 
     if task_get_option("id"):
@@ -2079,7 +2082,7 @@ def remove_dependent_index(virtual_indexes, dependent_index):
             vit.remove_dependent_index(dependent_index)
             task_sleep_now_if_required()
 
-        query = """DELETE FROM idxINDEX_idxINDEX WHERE id_virtual=%s AND id_normal=%s"""
+        query = """DELETE FROM "idxINDEX_idxINDEX" WHERE id_virtual=%s AND id_normal=%s"""
         run_sql(query, (index_id, id_dependent))
 
 

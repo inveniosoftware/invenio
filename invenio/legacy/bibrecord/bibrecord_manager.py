@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,9 +35,9 @@ def reset(split_by=1000):
     """Reset bibrecord structure cache."""
     from invenio.modules.formatter.models import Bibfmt
     from invenio.base.scripts.cache import reset_rec_cache
-    from invenio.legacy.dbquery import serialize_via_marshal
     from invenio.legacy.search_engine import get_record
     from invenio.ext.sqlalchemy import db
+    from invenio.utils.serializers import serialize_via_marshal
 
     def get_recstruct_record(recid):
         value = serialize_via_marshal(get_record(recid))

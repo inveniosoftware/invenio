@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,11 +25,12 @@ from time import localtime
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.websession.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 
+from sqlalchemy.exc import OperationalError
 
 def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
     """Select all the groups the user is admin of.

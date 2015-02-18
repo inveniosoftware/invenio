@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -42,7 +43,6 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_USE_MATHJAX
 
-from invenio.legacy.dbquery import Error
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.webpage import page, error_page, warning_page
 from invenio.legacy.webuser import getUid, get_email, collect_user_info, isGuestUser, \
@@ -89,6 +89,9 @@ from invenio.legacy.websubmit.db_layer import \
 
 import invenio.legacy.template
 websubmit_templates = invenio.legacy.template.load('websubmit')
+
+from sqlalchemy.exc import SQLAlchemyError as Error
+
 
 def interface(req,
               c=CFG_SITE_NAME,

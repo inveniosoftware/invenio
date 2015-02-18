@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2007, 2008, 2010, 2011, 2105 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,9 +28,13 @@ import sys
 from intbitset import intbitset
 from invenio.utils.text import wrap_text_in_a_box
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
+
 from datetime import datetime
+
+from sqlalchemy.exc import OperationalError
+
 
 def retrieve_fulltext_recids():
     """Returns the list of all the recid number linked with at least a fulltext

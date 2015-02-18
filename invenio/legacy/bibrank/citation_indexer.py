@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,43 +18,54 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Citation indexer."""
+
 from __future__ import print_function
 
-__revision__ = "$Id$"
+import ConfigParser
+
+import os
 
 import re
-import time
-import os
+
 import sys
-import ConfigParser
+
+import time
+
 from datetime import datetime
-from itertools import islice
-from intbitset import intbitset
-from six import iteritems
 
 from intbitset import intbitset
+
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.ext.cache import cache
-from invenio.legacy.search_engine import search_pattern, \
-                                  search_unit, \
-                                  get_collection_reclist
-from invenio.modules.formatter.utils import parse_tag
-from invenio.modules.knowledge.api import get_kb_mappings
 from invenio.legacy.bibsched.bibtask import write_message, task_get_option, \
-                     task_update_progress, task_sleep_now_if_required, \
-                     task_get_task_param
+    task_update_progress, task_sleep_now_if_required, \
+    task_get_task_param
 from invenio.legacy.bibindex.engine_utils import get_field_tags
 from invenio.legacy.docextract.record import get_record
-from invenio.legacy.dbquery import serialize_via_marshal
+from invenio.legacy.search_engine import search_pattern, \
+    search_unit, \
+    get_collection_reclist
+from invenio.modules.formatter.utils import parse_tag
+from invenio.modules.knowledge.api import get_kb_mappings
+from invenio.utils.serializers import serialize_via_marshal
+
+from itertools import islice
+
+from six import iteritems
+
+
+__revision__ = "$Id$"
 
 re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK \
-                   = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
+    = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 
 def compute_weights():
+    """Compute weights."""
     sql = "SELECT citee, COUNT(citer) FROM rnkCITATIONDICT GROUP BY citee"
     weights = {}
     for citee, c in run_sql(sql):

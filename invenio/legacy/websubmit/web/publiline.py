@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -46,7 +47,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_RECORD
-from invenio.legacy.dbquery import run_sql, Error, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_get_role_users, acc_get_role_id
 from invenio.legacy.webpage import page, error_page
@@ -67,6 +68,8 @@ from invenio.legacy.webmessage.api import perform_request_send
 import invenio.legacy.webbasket.db_layer as basketdb
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import create_records, record_get_field_value, record_get_field_values
+
+from sqlalchemy.exc import SQLAlchemyError as Error, OperationalError
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % CFG_PYLIBDIR)
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,32 +26,37 @@ The main API functions are:
 but see the others as well.
 """
 
-__revision__ = "$Id$"
-
 # dbquery clients can import these from here:
 # pylint: disable=W0611
-from MySQLdb import Warning, Error, InterfaceError, DataError, \
-    DatabaseError, OperationalError, IntegrityError, \
-    InternalError, NotSupportedError, \
-    ProgrammingError
 import gc
-import os
-import string
-import time
-import re
-import sys
 
-from thread import get_ident
+import os
+
+import re
+
+import string
+
+import time
+
 from flask import current_app
-from werkzeug.utils import cached_property
+
 from invenio.base.globals import cfg
 from invenio.utils.datastructures import LazyDict
-from invenio.utils.serializers import serialize_via_marshal, \
-    deserialize_via_marshal
+
+from thread import get_ident
+
+from werkzeug.utils import cached_property
+
+
+__revision__ = "$Id$"
 
 
 class DBConnect(object):
+
+    """DBConnect."""
+
     def __call__(self, *args, **kwargs):
+        """Call."""
         return self._connect(*args, **kwargs)
 
     @cached_property
@@ -71,12 +76,13 @@ class DBConnect(object):
 
 
 def unlock_all(app):
+    """Unlock all."""
     for dbhost in _DB_CONN.keys():
         for db in _DB_CONN[dbhost].values():
             try:
                 cur = db.cur()
                 cur.execute("UNLOCK TABLES")
-            except:
+            except Exception:
                 pass
     return app
 
@@ -135,16 +141,16 @@ class InvenioDbQueryWildcardLimitError(Exception):
 
 def _db_login(dbhost=None, relogin=0):
     """Login to the database."""
-    ## Note: we are using "use_unicode=False", because we want to
-    ## receive strings from MySQL as Python UTF-8 binary string
-    ## objects, not as Python Unicode string objects, as of yet.
+    # Note: we are using "use_unicode=False", because we want to
+    # receive strings from MySQL as Python UTF-8 binary string
+    # objects, not as Python Unicode string objects, as of yet.
 
-    ## Note: "charset='utf8'" is needed for recent MySQLdb versions
-    ## (such as 1.2.1_p2 and above).  For older MySQLdb versions such
-    ## as 1.2.0, an explicit "init_command='SET NAMES utf8'" parameter
-    ## would constitute an equivalent.  But we are not bothering with
-    ## older MySQLdb versions here, since we are recommending to
-    ## upgrade to more recent versions anyway.
+    # Note: "charset='utf8'" is needed for recent MySQLdb versions
+    # (such as 1.2.1_p2 and above).  For older MySQLdb versions such
+    # as 1.2.0, an explicit "init_command='SET NAMES utf8'" parameter
+    # would constitute an equivalent.  But we are not bothering with
+    # older MySQLdb versions here, since we are recommending to
+    # upgrade to more recent versions anyway.
     if dbhost is None:
         dbhost = cfg['CFG_DATABASE_HOST']
 
@@ -246,7 +252,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         # do not connect to the database as the site is closed for maintenance:
         return []
     elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
-        ## Read only website
+        # Read only website
         if not sql.upper().startswith("SELECT") \
            and not sql.upper().startswith("SHOW"):
             return
@@ -264,6 +270,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
     try:
         db = connection or _db_login(dbhost)
         cur = db.cursor()
+        cur.execute("SET SESSION sql_mode = %s", ['ANSI_QUOTES'])
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
@@ -335,7 +342,7 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
         # do not connect to the database as the site is closed for maintenance:
         return []
     elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
-        ## Read only website
+        # Read only website
         if not query.upper().startswith("SELECT") \
            and not query.upper().startswith("SHOW"):
             return
@@ -346,7 +353,7 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
     i = 0
     r = None
     while i < len(params):
-        ## make partial query safely (mimicking procedure from run_sql())
+        # make partial query safely (mimicking procedure from run_sql())
         try:
             db = _db_login(dbhost)
             cur = db.cursor()
@@ -362,7 +369,7 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
                 gc.enable()
             except (OperationalError, InterfaceError):
                 raise
-        ## collect its result:
+        # collect its result:
         if r is None:
             r = rc
         else:
@@ -432,7 +439,7 @@ def log_sql_query(dbhost, sql, param=None):
     message += '-----------------------------\n\n'
     try:
         current_app.logger.info(message)
-    except:
+    except Exception:
         pass
 
 
@@ -534,4 +541,3 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
-

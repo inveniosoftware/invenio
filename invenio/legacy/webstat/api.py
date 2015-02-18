@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ from invenio.legacy.bibindex.engine_utils import get_all_indexes
 from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
 from invenio.legacy.search_engine import get_coll_i18nname, \
     wash_index_term
-from invenio.legacy.dbquery import run_sql, wash_table_column_name, ProgrammingError
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.legacy.bibsched.cli import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
@@ -113,6 +113,8 @@ from invenio.legacy.webstat.engine import create_graph_trend, \
 from invenio.legacy.webstat.engine import export_to_python, \
     export_to_csv, \
     export_to_file
+
+from sqlalchemy.exc import ProgrammingError
 
 TEMPLATES = template.load('webstat')
 

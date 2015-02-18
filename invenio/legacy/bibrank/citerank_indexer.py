@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -43,9 +43,11 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.legacy.dbquery import run_sql, serialize_via_marshal
+
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import write_message
 from invenio.modules.ranker.registry import configuration
+from invenio.utils.serializers import serialize_via_marshal
 
 
 def get_citations_from_file(filename):

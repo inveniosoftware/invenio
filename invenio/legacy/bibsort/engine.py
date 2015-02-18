@@ -26,11 +26,15 @@ import time
 from intbitset import intbitset
 
 from invenio.config import CFG_BIBSORT_BUCKETS, CFG_CERN_SITE
+from invenio.utils.serializers import serialize_via_marshal, \
+    deserialize_via_marshal
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
 from invenio.legacy.bibsort.washer import BibSortWasher, InvenioBibSortWasherNotImplementedError
-from invenio.legacy.dbquery import deserialize_via_marshal, serialize_via_marshal, run_sql, Error
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.search_engine import get_field_tags, search_pattern
 from invenio.utils.date import datetime, strftime
+
+from sqlalchemy.exc import SQLAlchemyError as Error
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')

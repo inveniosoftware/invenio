@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,12 +25,14 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SECURE_URL
-from invenio.legacy.dbquery import run_sql, Error
+from invenio.legacy.dbquery import run_sql
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_find_possible_roles
 from invenio.legacy.webpage import page, error_page
 from invenio.legacy.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.base.i18n import gettext_set_language, wash_language
+
+from sqlalchemy.exc import SQLAlchemyError as Error
 
 import invenio.legacy.template
 websubmit_templates = invenio.legacy.template.load('websubmit')

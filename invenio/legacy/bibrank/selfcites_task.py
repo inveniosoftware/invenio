@@ -37,28 +37,32 @@ It is run on modified records so that it can update the tables used for
 displaying info in the citesummary format
 """
 
-import sys
 import ConfigParser
+
+import sys
+
 import time
+
 from datetime import datetime
 
-from invenio.ext.cache import cache
-from invenio.legacy.dbquery import serialize_via_marshal
 from intbitset import intbitset
-from invenio.config import CFG_ETCDIR
+
+from invenio.ext.cache import cache
 from invenio.legacy.bibsched.bibtask import \
     task_get_option, write_message, \
     task_sleep_now_if_required, \
     task_update_progress
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.bibrank.selfcites_indexer import update_self_cites_tables, \
-                                              compute_friends_self_citations, \
-                                              compute_simple_self_citations, \
-                                              get_authors_tags
-from invenio.legacy.bibrank.citation_searcher import get_refers_to
+from invenio.legacy.bibrank.selfcites_indexer import \
+    compute_friends_self_citations, \
+    compute_simple_self_citations, \
+    get_authors_tags, \
+    update_self_cites_tables
 from invenio.legacy.bibrank.citation_indexer import get_bibrankmethod_lastupdate
+from invenio.legacy.bibrank.citation_searcher import get_refers_to
 from invenio.legacy.bibrank.tag_based_indexer import intoDB, fromDB
 from invenio.modules.ranker.registry import configuration
+from invenio.utils.serializers import serialize_via_marshal
 
 
 def compute_and_store_self_citations(recid, tags, citations_fun, selfcites_dic,

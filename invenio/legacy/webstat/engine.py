@@ -1375,7 +1375,7 @@ def get_last_updates():
     """
     try:
         last_index = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
-                    (str(run_sql('SELECT last_updated FROM idxINDEX WHERE \
+                    (str(run_sql('SELECT last_updated FROM "idxINDEX" WHERE \
                     name="global"')[0][0])))
         last_rank = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
                     (str(run_sql('SELECT last_updated FROM rnkMETHOD ORDER BY \
@@ -1417,7 +1417,7 @@ def get_list_link(process, category=None):
     if process == "index":
         list_registers = run_sql('SELECT id FROM bibrec WHERE \
                             modification_date > (SELECT last_updated FROM \
-                            idxINDEX WHERE name=%s)', (category,))
+                            "idxINDEX" WHERE name=%s)', (category,))
     elif process == "rank":
         list_registers = run_sql('SELECT id FROM bibrec WHERE \
                             modification_date > (SELECT last_updated FROM \
@@ -1504,7 +1504,7 @@ def get_record_ingestion_status(record_id):
     counter = 0
     counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
                         id=%s AND modification_date > (SELECT last_updated FROM \
-                        idxINDEX WHERE name="global")', (record_id, ))[0][0]
+                        "idxINDEX" WHERE name="global")', (record_id, ))[0][0]
 
     counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
                         id=%s AND modification_date > (SELECT last_updated FROM \
@@ -1557,9 +1557,9 @@ def get_specific_ingestion_status(record_id, process, method=None):
     if process == "index":
         list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
                                 id=%s AND modification_date > (SELECT \
-                                last_updated FROM idxINDEX WHERE name=%s)',
+                                last_updated FROM "idxINDEX" WHERE name=%s)',
                                 (record_id, method,))
-        last_time = run_sql ('SELECT last_updated FROM idxINDEX WHERE \
+        last_time = run_sql ('SELECT last_updated FROM "idxINDEX" WHERE \
                             name=%s', (method,))[0][0]
     elif process == "rank":
         list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
@@ -1629,7 +1629,7 @@ def get_general_status():
     """
     return run_sql('SELECT COUNT(*) FROM bibrec WHERE \
                     modification_date > (SELECT last_updated FROM \
-                    idxINDEX WHERE name="global")')[0][0]
+                    "idxINDEX" WHERE name="global")')[0][0]
 
 
 

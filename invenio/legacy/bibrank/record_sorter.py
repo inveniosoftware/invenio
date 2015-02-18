@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -33,13 +34,12 @@ from invenio.config import \
      CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD, \
      CFG_ETCDIR, \
      CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD
-from invenio.legacy.dbquery import run_sql, \
-                                   deserialize_via_marshal, \
-                                   wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.legacy.bibrank.citation_searcher import get_cited_by, \
                                                      get_cited_by_weight
+from invenio.utils.serializers import deserialize_via_marshal
 from intbitset import intbitset
 from invenio.legacy.bibrank.word_searcher import find_similar
 # Do not remove these lines

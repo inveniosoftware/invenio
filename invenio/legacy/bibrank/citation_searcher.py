@@ -21,12 +21,15 @@ __revision__ = "$Id$"
 
 import re
 
-from invenio.legacy.dbquery import run_sql
 from intbitset import intbitset
-from invenio.legacy.miscutil.data_cacher import DataCacher
+
 from invenio.ext.cache import cache
-from invenio.legacy.dbquery import deserialize_via_marshal
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.miscutil.data_cacher import DataCacher
+from invenio.utils.serializers import deserialize_via_marshal
+
 from operator import itemgetter
+
 from six import iteritems
 
 

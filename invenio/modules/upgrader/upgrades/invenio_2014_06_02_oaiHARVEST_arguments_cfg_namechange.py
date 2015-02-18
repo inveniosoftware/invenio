@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,19 +17,24 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.legacy.dbquery import (run_sql,
-                             serialize_via_marshal,
-                             deserialize_via_marshal)
+"""Upgrade recipe."""
+
+from invenio.legacy.dbquery import run_sql
+from invenio.utils.serializers import deserialize_via_marshal, \
+    serialize_via_marshal
 
 depends_on = ['invenio_release_1_1_0']
 
 
 def info():
+    """info."""
     return "Change of oaiHARVEST.arguments c_cfg-file to c_stylesheet"
 
 
 def do_upgrade():
-    rows_to_change = run_sql("SELECT id, arguments FROM oaiHARVEST", with_dict=True)
+    """do upgrade."""
+    rows_to_change = run_sql(
+        "SELECT id, arguments FROM oaiHARVEST", with_dict=True)
     # Move away from old columns
     for row in rows_to_change:
         if row['arguments']:
@@ -42,14 +47,16 @@ def do_upgrade():
 
 
 def estimate():
-    """  Estimate running time of upgrade in seconds (optional). """
+    """Estimate running time of upgrade in seconds (optional)."""
     count_rows = run_sql("SELECT COUNT(*) FROM oaiHARVEST")[0][0]
     return count_rows / 20
 
 
 def pre_upgrade():
+    """pre upgade."""
     pass
 
 
 def post_upgrade():
+    """post upgrade."""
     pass

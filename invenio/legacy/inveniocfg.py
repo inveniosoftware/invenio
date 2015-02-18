@@ -452,13 +452,13 @@ def cli_cmd_reset_sitename(conf):
     CFG_SITE_NAME_INTL* read from conf files.
     """
     print(">>> Going to reset CFG_SITE_NAME and CFG_SITE_NAME_INTL...")
-    from invenio.legacy.dbquery import run_sql, IntegrityError
+    from invenio.legacy.dbquery import run_sql
     # reset CFG_SITE_NAME:
     sitename = conf.get("Invenio", "CFG_SITE_NAME")
     try:
         run_sql("""INSERT INTO collection (id, name, dbquery, reclist) VALUES
                                           (1,%s,NULL,NULL)""", (sitename,))
-    except IntegrityError:
+    except exc.IntegrityError:
         run_sql("""UPDATE collection SET name=%s WHERE id=1""", (sitename,))
     # reset CFG_SITE_NAME_INTL:
     for lang in conf.get("Invenio", "CFG_SITE_LANGS"):
@@ -466,7 +466,7 @@ def cli_cmd_reset_sitename(conf):
         try:
             run_sql("""INSERT INTO collectionname (id_collection, ln, type, value) VALUES
                          (%s,%s,%s,%s)""", (1, lang, 'ln', sitename_lang))
-        except IntegrityError:
+        except exc.IntegrityError:
             run_sql("""UPDATE collectionname SET value=%s
                         WHERE ln=%s AND id_collection=1 AND type='ln'""",
                     (sitename_lang, lang))
@@ -479,9 +479,10 @@ def cli_cmd_reset_recstruct_cache(conf):
     will adapt the database to either store or not store the recstruct
     format."""
     from intbitset import intbitset
-    from invenio.legacy.dbquery import run_sql, serialize_via_marshal
+    from invenio.legacy.dbquery import run_sql
     from invenio.legacy.search_engine import get_record, print_record
     from invenio.legacy.bibsched.cli import server_pid, pidfile
+    from invenio.utils.serializers import serialize_via_marshal
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
     pid = server_pid(ping_the_process=False)
@@ -561,7 +562,7 @@ def cli_cmd_reset_fieldnames(conf):
     """
     print(">>> Going to reset I18N field names...")
     from invenio.base.i18n import gettext_set_language, language_list_long
-    from invenio.legacy.dbquery import run_sql, IntegrityError
+    from invenio.legacy.dbquery import run_sql
 
     ## get field id and name list:
     field_id_name_list = run_sql("SELECT id, name FROM field")
@@ -594,7 +595,7 @@ def cli_cmd_reset_fieldnames(conf):
                     run_sql("""INSERT INTO fieldname (id_field,ln,type,value) VALUES
                                 (%s,%s,%s,%s)""", (field_id, lang, 'ln',
                                                 field_name_names[field_name]))
-                except IntegrityError:
+                except exc.IntegrityError:
                     run_sql("""UPDATE fieldname SET value=%s
                                 WHERE id_field=%s AND ln=%s AND type=%s""",
                             (field_name_names[field_name], field_id, lang, 'ln',))
@@ -611,7 +612,7 @@ def cli_cmd_reset_fieldnames(conf):
                     run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
                                 (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
                                                    rankmethod_name_names[rankmethod_name]))
-                except IntegrityError:
+                except exc.IntegrityError:
                     run_sql("""UPDATE rnkMETHODNAME SET value=%s
                                 WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
                             (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))

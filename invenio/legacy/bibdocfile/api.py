@@ -93,7 +93,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.utils.shell import escape_shell_arg, run_shell_command
-from invenio.legacy.dbquery import run_sql, DatabaseError
+from invenio.legacy.dbquery import run_sql
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
@@ -127,6 +127,7 @@ from invenio.legacy.bibdocfile.registry import plugins
 
 import invenio.legacy.template
 
+from sqlalchemy.exc import DatabaseError
 
 def _plugin_bldr(plugin_code):
     """Preparing the plugin dictionary structure."""

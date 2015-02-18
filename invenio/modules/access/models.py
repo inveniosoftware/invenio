@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2014 CERN.
+# Copyright (C) 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,27 +21,27 @@
 
 # General imports.
 from cPickle import dumps, loads
+
 from datetime import datetime, timedelta
-from random import random
-from sqlalchemy import bindparam
-from sqlalchemy.orm import validates, column_property, undefer
 
 from invenio.base.wrappers import lazy_import
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
+from invenio.modules.accounts.models import User
 from invenio.utils.hash import md5
 
-from .errors import (
-    InvenioWebAccessMailCookieError, InvenioWebAccessMailCookieDeletedError)
+from random import random
+
+from sqlalchemy import bindparam
+from sqlalchemy.orm import validates
+
+from .errors import \
+    InvenioWebAccessMailCookieDeletedError, InvenioWebAccessMailCookieError
 
 SUPERADMINROLE = lazy_import(
     'invenio.modules.access.local_config.SUPERADMINROLE')
 CFG_ACC_ACTIVITIES_URLS = lazy_import(
     'invenio.modules.access.local_config.CFG_ACC_ACTIVITIES_URLS')
-
-# Create your models here.
-
-from invenio.modules.accounts.models import User
 
 
 class AccACTION(db.Model):
@@ -58,6 +58,7 @@ class AccACTION(db.Model):
                          server_default='no')
 
     def __repr__(self):
+        """Repr."""
         return "{0.name}".format(self)
 
 
@@ -73,6 +74,7 @@ class AccARGUMENT(db.Model):
                       db.Model.__table_args__)
 
     def __repr__(self):
+        """Repr."""
         return "{0.keyword}={0.value}".format(self)
 
 
@@ -142,6 +144,7 @@ class AccMAILCOOKIE(db.Model):
             kind=kind,
             onetime=int(onetime),
         )
+        # FIXME aes_encrypt exists?
         cookie._data = db.func.aes_encrypt(dumps(data), password)
         db.session.add(cookie)
         db.session.commit()
@@ -152,7 +155,7 @@ class AccMAILCOOKIE(db.Model):
     @session_manager
     def gc(cls):
         """Remove expired items."""
-        return cls.query.filter(cls.expiration<db.func.now()).delete()
+        return cls.query.filter(cls.expiration < db.func.now()).delete()
 
 
 class AccROLE(db.Model):
@@ -168,6 +171,7 @@ class AccROLE(db.Model):
     firerole_def_src = db.Column(db.Text, nullable=True)
 
     def __repr__(self):
+        """Repr."""
         return "{0.name} - {0.description}".format(self)
 
 
@@ -176,21 +180,31 @@ class AccAuthorization(db.Model):
     """Represent an authorization."""
 
     __tablename__ = 'accROLE_accACTION_accARGUMENT'
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                   autoincrement=True)
     id_accROLE = db.Column(db.Integer(15, unsigned=True),
                            db.ForeignKey(AccROLE.id), nullable=True,
-                           autoincrement=False, primary_key=True, index=True)
+                           index=True)
     id_accACTION = db.Column(db.Integer(15, unsigned=True),
                              db.ForeignKey(AccACTION.id), nullable=True,
-                             autoincrement=False, primary_key=True, index=True)
-    id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
-                               nullable=True, primary_key=True,
-                               autoincrement=False, index=True)
-    argumentlistid = db.Column(db.MediumInteger(8), nullable=True,
-                               autoincrement=False, primary_key=True)
+                             index=True)
+    _id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
+                                nullable=True, name="id_accARGUMENT")
+    argumentlistid = db.Column(db.MediumInteger(8), nullable=True)
 
     role = db.relationship(AccROLE, backref='authorizations')
     action = db.relationship(AccACTION, backref='authorizations')
     argument = db.relationship(AccARGUMENT, backref='authorizations')
+
+    @db.hybrid_property
+    def id_accARGUMENT(self):
+        """get id_accARGUMENT."""
+        return self.id_accARGUMENT
+
+    @id_accARGUMENT.setter
+    def id_accARGUMENT(self, value):
+        """set id_accARGUMENT."""
+        self._id_accARGUMENT = value or None
 
 
 class UserAccROLE(db.Model):
@@ -218,9 +232,10 @@ User.active_roles = db.relationship(
     )
 )
 
-User.has_admin_role = property(lambda self:
+User.has_admin_role = property(
+    lambda self:
     self.has_super_admin_role or db.object_session(self).query(
-        db.func.count(User.id)>0
+        db.func.count(User.id) > 0
     ).join(
         User.active_roles,
         UserAccROLE.role,
@@ -235,8 +250,9 @@ User.has_admin_role = property(lambda self:
     ).scalar()
 )
 
-User.has_super_admin_role = property(lambda self:
-    db.object_session(self).query(db.func.count(User.id)>0).join(
+User.has_super_admin_role = property(
+    lambda self:
+    db.object_session(self).query(db.func.count(User.id) > 0).join(
         User.active_roles,
         UserAccROLE.role
     ).filter(

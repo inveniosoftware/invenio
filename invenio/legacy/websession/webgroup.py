@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,7 +32,6 @@ from invenio.legacy.webuser import nickname_valid_p, get_user_info
 from invenio.legacy.webmessage.api import perform_request_send
 from invenio.ext.logging import register_exception
 import invenio.legacy.websession.dblayer as db
-from invenio.legacy.dbquery import IntegrityError
 try:
     import invenio.legacy.template
     websession_templates = invenio.legacy.template.load('websession')
@@ -43,6 +42,9 @@ if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set
     # pylint: enable=W0622
+
+from sqlalchemy.exc import IntegrityError
+
 
 def perform_request_groups_display(uid, infos=[], warnings = [], \
         ln=CFG_SITE_LANG):

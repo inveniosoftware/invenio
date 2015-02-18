@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011 CERN.
+# Copyright (C) 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,13 +29,15 @@ from datetime import datetime
 
 from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 from invenio.legacy.bibsched.bibtask import check_running_process_user
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibdocfile.api import BibDoc
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.legacy.bibdocfile.cli import cli_fix_marc
 from invenio.ext.logging import register_exception
 from intbitset import intbitset
 from invenio.legacy.search_engine import record_exists
+
+from sqlalchemy.exc import OperationalError
 
 
 def retrieve_bibdoc_bibdoc():

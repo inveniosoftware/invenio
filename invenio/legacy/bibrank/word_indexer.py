@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,27 +17,37 @@
 
 __revision__ = "$Id$"
 
-import sys
-import time
-import urllib
-import math
-import re
 import ConfigParser
+
+import math
+
+import re
+
+import sys
+
+import time
+
+import urllib
 
 from six import iteritems
 
-from invenio.legacy.search_engine import perform_request_search, wash_index_term
-from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
-from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
-from invenio.legacy.bibindex.engine_stopwords import is_stopword
+from intbitset import intbitset
+
+from invenio.ext.logging import register_exception
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibindex.engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
+from invenio.legacy.bibindex.engine_stemmer import is_stemmer_available_for_language, stem
+from invenio.legacy.bibindex.engine_stopwords import is_stopword
 from invenio.legacy.bibsched.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
-from intbitset import intbitset
-from invenio.ext.logging import register_exception
-from invenio.utils.text import strip_accents
+from invenio.legacy.search_engine import perform_request_search, wash_index_term
 from invenio.modules.ranker.registry import configuration
+from invenio.utils.serializers import serialize_via_marshal, deserialize_via_marshal
+from invenio.utils.text import strip_accents
+
+from sqlalchemy.exc import DatabaseError
+
 
 options = {} # global variable to hold task options
 

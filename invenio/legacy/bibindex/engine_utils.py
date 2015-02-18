@@ -27,8 +27,7 @@ import sys
 
 from invenio.base.helpers import utf8ifier
 
-from invenio.legacy.dbquery import run_sql, \
-    DatabaseError
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import write_message
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.config import \
@@ -36,6 +35,8 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 from invenio.utils.memoise import memoize
+
+from sqlalchemy.exc import DatabaseError
 
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -72,7 +73,7 @@ def get_all_index_names_and_column_values(column_name):
        the column name does not exist.
        Example: output=[('global', something), ('title', something)]."""
     out = []
-    query = """SELECT name, %s FROM idxINDEX""" % column_name
+    query = """SELECT name, %s FROM "idxINDEX" """ % column_name
     try:
         res = run_sql(query)
         for row in res:
@@ -104,7 +105,7 @@ def get_index_remove_stopwords(index_id):
        @param index_id: id of the index
     """
     try:
-        result = run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql("""SELECT remove_stopwords FROM "idxINDEX"  WHERE ID=%s""", (index_id, ))[0][0]
     except:
         return False
     if result == 'No' or result == '':
@@ -117,7 +118,7 @@ def get_index_remove_html_markup(index_id):
         changes it  to True, False.
         Just for consistency with WordTable."""
     try:
-        result = run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql("""SELECT remove_html_markup FROM "idxINDEX"  WHERE ID=%s""", (index_id, ))[0][0]
     except:
         return False
     if result == 'Yes':
@@ -130,7 +131,7 @@ def get_index_remove_latex_markup(index_id):
         changes it  to True, False.
         Just for consistency with WordTable."""
     try:
-        result = run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+        result = run_sql("""SELECT remove_latex_markup FROM "idxINDEX"  WHERE ID=%s""", (index_id, ))[0][0]
     except:
         return False
     if result == 'Yes':
@@ -196,10 +197,10 @@ def get_all_indexes(virtual=True, with_ids=False):
        Example: output=['global', 'author']."""
     out = []
     if virtual:
-        query = """SELECT %s name FROM idxINDEX"""
+        query = """SELECT %s name FROM "idxINDEX" """
         query = query % (with_ids and "id," or "")
     else:
-        query = """SELECT %s w.name FROM idxINDEX AS w
+        query = """SELECT %s w.name FROM "idxINDEX"  AS w
                    WHERE w.id NOT IN (SELECT DISTINCT id_virtual FROM idxINDEX_idxINDEX)"""
         query = query % (with_ids and "w.id," or "")
     res = run_sql(query)
@@ -213,7 +214,7 @@ def get_all_indexes(virtual=True, with_ids=False):
 def get_all_virtual_indexes():
     """ Returns all defined 'virtual' indexes. """
     query = """SELECT DISTINCT v.id_virtual, w.name FROM idxINDEX_idxINDEX AS v,
-                                                         idxINDEX AS w
+                                                         "idxINDEX"  AS w
                WHERE v.id_virtual=w.id"""
     res = run_sql(query)
     return res
@@ -223,7 +224,7 @@ def get_index_virtual_indexes(index_id):
     """Returns 'virtual' indexes that should be indexed together with
        given index."""
     query = """SELECT v.id_virtual, w.name  FROM idxINDEX_idxINDEX AS v,
-                                                 idxINDEX AS w
+                                                 "idxINDEX"  AS w
                WHERE v.id_virtual=w.id AND
                      v.id_normal=%s"""
     res = run_sql(query, (index_id,))
@@ -259,7 +260,7 @@ def get_virtual_index_building_blocks(index_id):
        empty tuple.
        """
     query = """SELECT v.id_normal, w.name FROM idxINDEX_idxINDEX AS v,
-                                               idxINDEX AS w
+                                               "idxINDEX"  AS w
                WHERE v.id_normal=w.id AND
                      v.id_virtual=%s"""
     res = run_sql(query, (index_id,))
@@ -271,7 +272,7 @@ def get_index_id_from_index_name(index_name):
        Returns empty string in case there is no words table for this index.
        Example: field='author', output=4."""
     out = 0
-    query = """SELECT w.id FROM idxINDEX AS w
+    query = """SELECT w.id FROM "idxINDEX"  AS w
                 WHERE w.name=%s LIMIT 1"""
     res = run_sql(query, (index_name,), 1)
     if res:
@@ -283,7 +284,7 @@ def get_index_name_from_index_id(index_id):
     """Returns the words/phrase index name for INDEXID.
        Returns '' in case there is no words table for this indexid.
        Example: field=9, output='fulltext'."""
-    res = run_sql("SELECT name FROM idxINDEX WHERE id=%s", (index_id,))
+    res = run_sql("""SELECT name FROM "idxINDEX"  WHERE id=%s""", (index_id,))
     if res:
         return res[0][0]
     return ''
@@ -309,8 +310,8 @@ def get_marc_tag_indexes(tag, virtual=True):
        @param virtual: if True function will also return virtual indexes"""
     tag2 = tag[0:2] + "%" #for tags in the form: 10%
     tag3 = tag[:-1] + "%" #for tags in the form: 100__%
-    query = """SELECT DISTINCT w.id,w.name FROM idxINDEX AS w,
-                                                idxINDEX_field AS wf,
+    query = """SELECT DISTINCT w.id,w.name FROM "idxINDEX"  AS w,
+                                                "idxINDEX_field" AS wf,
                                                 field_tag AS ft,
                                                 tag as t
                WHERE (t.value=%%s OR
@@ -318,7 +319,7 @@ def get_marc_tag_indexes(tag, virtual=True):
                       %s) AND
                      t.id=ft.id_tag AND
                      ft.id_field=wf.id_field AND
-                     wf.id_idxINDEX=w.id"""
+                     wf."id_idxINDEX"=w.id"""
     if tag[-1] == "%":
         missing_piece = "t.value LIKE %s"
     elif tag[-1] != "%" and len(tag) == 3:
@@ -333,7 +334,7 @@ def get_marc_tag_indexes(tag, virtual=True):
             response = list(res)
             index_ids = map(str, zip(*res)[0])
             query = """SELECT DISTINCT v.id_virtual,w.name FROM idxINDEX_idxINDEX AS v,
-                                                                idxINDEX as w
+                                                                "idxINDEX"  as w
                        WHERE v.id_virtual=w.id AND
                              v.id_normal IN ("""
             query = query + ", ".join(index_ids) + ")"
@@ -348,8 +349,8 @@ def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
        (nonmarc tag can be also called 'bibfield field').
        If param 'virtual' is set to True function will also return
        virtual indexes"""
-    query = """SELECT DISTINCT w.id, w.name FROM idxINDEX AS w,
-                                                 idxINDEX_field AS wf,
+    query = """SELECT DISTINCT w.id, w.name FROM "idxINDEX"  AS w,
+                                                 "idxINDEX_field" AS wf,
                                                  field_tag AS ft,
                                                  tag as t
                WHERE (t.recjson_value LIKE %s OR
@@ -358,7 +359,7 @@ def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
                       t.recjson_value=%s) AND
                      t.id=ft.id_tag AND
                      ft.id_field=wf.id_field AND
-                     wf.id_idxINDEX=w.id"""
+                     wf."id_idxINDEX"=w.id"""
 
     at_the_begining = nonmarc_tag + ',%%'
     in_the_middle = '%%,' + nonmarc_tag + ',%%'
@@ -370,7 +371,7 @@ def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
             response = list(res)
             index_ids = map(str, zip(*res)[0])
             query = """SELECT DISTINCT v.id_virtual,w.name FROM idxINDEX_idxINDEX AS v,
-                                                                idxINDEX as w
+                                                                "idxINDEX"  as w
                        WHERE v.id_virtual=w.id AND
                              v.id_normal IN ("""
             query = query + ", ".join(index_ids) + ")"
@@ -390,11 +391,11 @@ def get_index_tags(indexname, virtual=True, tagtype="marc"):
             is "marc" for backward compatibility
     """
     out = []
-    query = """SELECT f.code FROM idxINDEX AS w,
-                                  idxINDEX_field AS wf,
+    query = """SELECT f.code FROM "idxINDEX"  AS w,
+                                  "idxINDEX_field" AS wf,
                                   field AS f
                WHERE w.name=%s AND
-                     w.id=wf.id_idxINDEX AND
+                     w.id=wf."id_idxINDEX" AND
                      f.id=wf.id_field"""
     res = run_sql(query, (indexname,))
     for row in res:
@@ -406,8 +407,8 @@ def get_index_tags(indexname, virtual=True, tagtype="marc"):
         except IndexError:
             return out
         tags = set()
-        query = """SELECT DISTINCT f.code FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
-                   WHERE w.id=wf.id_idxINDEX AND
+        query = """SELECT DISTINCT f.code FROM "idxINDEX"  AS w, "idxINDEX_field" AS wf, field AS f
+                   WHERE w.id=wf."id_idxINDEX" AND
                          f.id=wf.id_field AND
                          w.id IN ("""
         query = query + ", ".join(dependent_indexes) + ")"
@@ -424,7 +425,7 @@ def get_min_last_updated(indexes):
        min(last_updated)
        @param indexes: list of indexes
     """
-    query= """SELECT min(last_updated) FROM idxINDEX WHERE name IN ("""
+    query= """SELECT min(last_updated) FROM "idxINDEX"  WHERE name IN ("""
     for index in indexes:
         query += "%s,"
     query = query[:-1] + ")"
@@ -488,10 +489,10 @@ def get_index_fields(index_id):
        index_id.
     """
     query = """SELECT f.id, f.name FROM field as f,
-                                        idxINDEX as w,
-                                        idxINDEX_field as wf
+                                        "idxINDEX"  as w,
+                                        "idxINDEX_field" as wf
                WHERE f.id=wf.id_field AND
-                     wf.id_idxINDEX=w.id AND
+                     wf."id_idxINDEX"=w.id AND
                      w.id=%s
             """
     index_fields = run_sql(query, (index_id, ) )

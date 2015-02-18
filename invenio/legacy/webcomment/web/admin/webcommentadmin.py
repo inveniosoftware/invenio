@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,11 +27,13 @@ from invenio.legacy.webcomment.adminlib import *
 from invenio.legacy.bibrank.adminlib import check_user
 from invenio.legacy.webpage import page, create_error_box
 from invenio.config import CFG_SITE_SECURE_URL,CFG_SITE_LANG,CFG_SITE_NAME
-from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.utils.url import wash_url_argument, redirect_to_url
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.modules.access.engine import acc_authorize_action
+
+from sqlalchemy.exc import SQLAlchemyError as Error
+
 
 def index(req, ln=CFG_SITE_LANG):
     """

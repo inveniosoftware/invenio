@@ -50,7 +50,7 @@ from invenio.legacy.bibrank.adminlib import addadminbox, tupletotable, \
 from invenio.modules.access.firerole import compile_role_definition, \
     serialize
 from invenio.base.i18n import gettext_set_language
-from invenio.legacy.dbquery import run_sql, OperationalError, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.legacy.webuser import email_valid_p, get_user_preferences, \
@@ -63,6 +63,9 @@ from invenio.modules.access.local_config import \
     MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT
 from invenio.modules.access.errors import InvenioWebAccessFireroleError
 from cgi import escape
+
+from sqlalchemy.exc import OperationalError
+
 
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
     """main function to show pages for webaccessadmin.

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,10 +32,11 @@ from invenio.config import \
 from invenio.legacy.search_engine import perform_request_search
 from invenio.legacy.bibrank.citation_indexer import get_citation_weight, print_missing
 from invenio.legacy.bibrank.downloads_indexer import *
-from invenio.legacy.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal, \
-     wash_table_column_name, get_table_update_time
+from invenio.legacy.dbquery import run_sql, wash_table_column_name, get_table_update_time
 from invenio.legacy.bibsched.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.legacy.bibindex.engine import create_range_list
+from invenio.utils.serializers import serialize_via_marshal, \
+        deserialize_via_marshal
 from intbitset import intbitset
 from invenio.modules.ranker.registry import configuration
 

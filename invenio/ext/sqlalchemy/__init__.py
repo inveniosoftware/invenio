@@ -19,11 +19,11 @@
 
 """Initialization and configuration for `flask_sqlalchemy`."""
 
+import sqlalchemy
+
 from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 
 from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
-
-import sqlalchemy
 
 from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyInteger, \
     LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
@@ -100,6 +100,7 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MutableDict = MutableDict
 
 
+# TODO check if we can comment this without problems
 # @compiles(types.Text, 'postgresql')
 # @compiles(sqlalchemy.dialects.postgresql.TEXT, 'postgresql')
 # def compile_text(element, compiler, **kw):
@@ -141,7 +142,8 @@ class SQLAlchemy(FlaskSQLAlchemy):
             mysql_parameters = {'keep_existing': True,
                                 'extend_existing': False,
                                 'mysql_engine': 'MyISAM',
-                                'mysql_charset': 'utf8'}
+                                'mysql_charset': 'utf8',
+                                'sql_mode': 'ansi_quotes'}
 
             original_table = self.Table
 

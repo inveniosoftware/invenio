@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,9 +24,10 @@ import re
 from operator import itemgetter
 from six import iteritems
 
-from invenio.legacy.dbquery import run_sql, deserialize_via_marshal
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibindex.engine_stemmer import stem
 from invenio.legacy.bibindex.engine_stopwords import is_stopword
+from invenio.utils.serializers import deserialize_via_marshal
 
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose, methods):

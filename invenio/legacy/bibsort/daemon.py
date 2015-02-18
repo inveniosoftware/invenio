@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2012 CERN.
+# Copyright (C) 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -57,13 +57,15 @@ import pkg_resources
 import time
 import ConfigParser
 from invenio.utils.date import strftime
-from invenio.legacy.dbquery import run_sql, Error
+from invenio.legacy.dbquery import run_sql
 from invenio.base.globals import cfg
 from invenio.config import CFG_ETCDIR
 from invenio.legacy.bibsort.engine import run_bibsort_update, \
                             run_bibsort_rebalance
 from invenio.legacy.bibsched.bibtask import task_init, write_message, \
     task_set_option, task_get_option
+
+from sqlalchemy.exc import SQLAlchemyError as Error
 
 
 def load_configuration():

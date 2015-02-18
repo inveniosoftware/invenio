@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -94,7 +95,7 @@ def report_definitions_of_indexes():
     print("### 3 - INDEX DEFINITIONS")
     print()
     print("# index (stemming): associated logical fields", end=' ')
-    res = run_sql("""SELECT id,name,stemming_language FROM idxINDEX
+    res = run_sql("""SELECT id,name,stemming_language FROM "idxINDEX"
                      ORDER BY name""")
     for row in res:
         (indexid, indexname, indexstem) = row
@@ -102,8 +103,8 @@ def report_definitions_of_indexes():
             indexname += ' (%s)' % indexstem
         print()
         print("%s:" % (indexname,), end=' ')
-        res2 = run_sql("""SELECT code FROM field, idxINDEX_field
-                           WHERE id_idxINDEX=%s AND id_field=id
+        res2 = run_sql("""SELECT code FROM field, "idxINDEX_field"
+                           WHERE "id_idxINDEX"=%s AND id_field=id
                        """, (indexid,))
         for row2 in res2:
             code = row2[0]

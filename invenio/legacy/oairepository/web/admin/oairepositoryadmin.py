@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,8 +24,10 @@ __lastupdated__ = """$Date$"""
 import invenio.legacy.oairepository.admin as ora
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
-from invenio.legacy.dbquery import Error
 from invenio.legacy.webuser import getUid, page_not_authorized
+
+from sqlalchemy.exc import SQLAlchemyError as Error
+
 
 def index(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = ora.getnavtrail(ln=ln)

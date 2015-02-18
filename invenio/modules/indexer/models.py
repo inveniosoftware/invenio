@@ -150,6 +150,18 @@ class IdxINDEXIdxINDEX(db.Model):
                           db.ForeignKey(IdxINDEX.id), nullable=False,
                           server_default='0', primary_key=True)
 
+    virtual = db.relationship(
+        IdxINDEX,
+        backref=db.backref('normal'),
+        primaryjoin="and_(IdxINDEXIdxINDEX.id_virtual==IdxINDEX.id)"
+    )
+
+    normal = db.relationship(
+        IdxINDEX,
+        backref=db.backref('virtual'),
+        primaryjoin="and_(IdxINDEXIdxINDEX.id_normal==IdxINDEX.id)"
+    )
+
     @staticmethod
     def is_virtual(id_virtual):
         """Check if index is virtual."""
