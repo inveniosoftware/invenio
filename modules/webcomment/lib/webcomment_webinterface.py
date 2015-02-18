@@ -710,7 +710,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         success = subscribe_user_to_discussion(self.recid, uid)
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
                       (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(success), argd['ln'])
-        redirect_to_url(req, display_url)
+        return redirect_to_url(req, display_url)
 
     def unsubscribe(self, req, form):
         """
@@ -731,7 +731,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         success = unsubscribe_user_from_discussion(self.recid, uid)
         display_url = "%s/%s/%s/comments/display?subscribed=%s&ln=%s" % \
                       (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, str(-success), argd['ln'])
-        redirect_to_url(req, display_url)
+        return redirect_to_url(req, display_url)
 
     def toggle(self, req, form):
         """

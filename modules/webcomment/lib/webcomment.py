@@ -64,9 +64,7 @@ from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
-     InvenioWebCommentError, \
-     InvenioWebCommentWarning
+from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
@@ -163,38 +161,14 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     #if page <= 0 or page.lower() != 'all':
     if page < 0:
         page = 1
-        try:
-            raise InvenioWebCommentWarning(_('Bad page number --> showing first page.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, ''))
-        #warnings.append(('WRN_WEBCOMMENT_INVALID_PAGE_NB',))
     if nb_per_page < 0:
         nb_per_page = 100
-        try:
-            raise InvenioWebCommentWarning(_('Bad number of results per page --> showing 10 results per page.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, ''))
-        #warnings.append(('WRN_WEBCOMMENT_INVALID_NB_RESULTS_PER_PAGE',))
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and reviews:
         if display_order not in ['od', 'nd', 'hh', 'lh', 'hs', 'ls']:
             display_order = 'hh'
-            try:
-                raise InvenioWebCommentWarning(_('Bad display order --> showing most helpful first.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, ''))
-            #warnings.append(('WRN_WEBCOMMENT_INVALID_REVIEW_DISPLAY_ORDER',))
     else:
         if display_order not in ['od', 'nd']:
             display_order = 'od'
-            try:
-                raise InvenioWebCommentWarning(_('Bad display order --> showing oldest first.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, ''))
-            #warnings.append(('WRN_WEBCOMMENT_INVALID_DISPLAY_ORDER',))
 
     if not display_comment_rounds:
         display_comment_rounds = []
@@ -207,12 +181,6 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
             last_page = 1
         if page > last_page:
             page = 1
-            try:
-                raise InvenioWebCommentWarning(_('Bad page number --> showing first page.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, ''))
-            #warnings.append(("WRN_WEBCOMMENT_INVALID_PAGE_NB",))
         if nb_res > nb_per_page: # if more than one page of results
             if  page < last_page:
                 res = res[(page-1)*(nb_per_page) : (page*nb_per_page)]
@@ -232,65 +200,38 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
 
     # Send to template
     avg_score = 0.0
-    if not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS: # comments not allowed by admin
-        try:
-            raise InvenioWebCommentError(_('Comments on records have been disallowed by the administrator.'))
-        except InvenioWebCommentError, exc:
-            register_exception(req=req)
-            body = webcomment_templates.tmpl_error(exc.message, ln)
-            return body
-       # errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
+    # comments not allowed by admin
+    if not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS:
+        body = webcomment_templates.tmpl_error(
+            _('Comments on records have been disallowed by the'
+              ' administrator.'), ln)
+        return body
     if reported > 0:
-        try:
-            raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, 'green'))
-        #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
+        warnings.append((_('Your feedback has been recorded, many thanks.'),
+                         'green'))
     elif reported == 0:
-        try:
-            raise InvenioWebCommentWarning(_('You have already reported an abuse for this comment.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, ''))
-        #warnings.append(('WRN_WEBCOMMENT_ALREADY_REPORTED',))
+        warnings.append((_('You have already reported an abuse for this'
+                           ' comment.'), ''))
     elif reported == -2:
-        try:
-            raise InvenioWebCommentWarning(_('The comment you have reported no longer exists.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, ''))
-        #warnings.append(('WRN_WEBCOMMENT_INVALID_REPORT',))
+        warnings.append((_('The comment you have reported no longer '
+                           'exists.'), ''))
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and reviews:
         avg_score = calculate_avg_score(res)
         if voted > 0:
-            try:
-                raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, 'green'))
-            #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
+            warnings.append((_('Your feedback has been recorded, many'
+                               ' thanks.'), 'green'))
         elif voted == 0:
-            try:
-                raise InvenioWebCommentWarning(_('Sorry, you have already voted. This vote has not been recorded.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, ''))
-            #warnings.append(('WRN_WEBCOMMENT_ALREADY_VOTED',))
+            warnings.append((_('Sorry, you have already voted. This vote has '
+                               'not been recorded.'), ''))
     if subscribed == 1:
-        try:
-            raise InvenioWebCommentWarning(_('You have been subscribed to this discussion. From now on, you will receive an email whenever a new comment is posted.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, 'green'))
-        #warnings.append(('WRN_WEBCOMMENT_SUBSCRIBED',))
+        warnings.append(
+            (_('You have been subscribed to this discussion. From now on, you'
+               ' will receive an email whenever a new comment is posted.'),
+             'green')
+        )
     elif subscribed == -1:
-        try:
-            raise InvenioWebCommentWarning(_('You have been unsubscribed from this discussion.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, 'green'))
-        #warnings.append(('WRN_WEBCOMMENT_UNSUBSCRIBED',))
+        warnings.append((_('You have been unsubscribed from this discussion.'),
+                         'green'))
 
     grouped_comments = group_comments_by_round(res, reviews)
 
@@ -1419,53 +1360,35 @@ def get_first_comments_or_remarks(recID=-1,
                 first_res_comments = res_comments[:nb_comments]
             else:
                 first_res_comments = res_comments
-    else: #error
-        try:
-            raise InvenioWebCommentError(_('%s is an invalid record ID') % recID)
-        except InvenioWebCommentError, exc:
-            register_exception()
-            body = webcomment_templates.tmpl_error(exc.message, ln)
-            return body
-        #errors.append(('ERR_WEBCOMMENT_RECID_INVALID', recID)) #!FIXME dont return error anywhere since search page
+    else:
+        body = webcomment_templates.tmpl_error(
+            _('%s is an invalid record ID') % recID, ln)
+        return body
 
     # comment
     if recID >= 1:
         comments = reviews = ""
         if reported > 0:
-            try:
-                raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning')
-                warnings.append((exc.message, 'green'))
-            #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
+            warnings.append((_('Your feedback has been recorded, many '
+                               'thanks.'), 'green'))
         elif reported == 0:
-            try:
-                raise InvenioWebCommentWarning(_('Your feedback could not be recorded, please try again.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning')
-                warnings.append((exc.message, ''))
-            #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-        if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
+            warnings.append((_('Your feedback could not be recorded, please'
+                               ' try again.'), ''))
+        # normal comments
+        if CFG_WEBCOMMENT_ALLOW_COMMENTS:
             grouped_comments = group_comments_by_round(first_res_comments, ranking=0)
             comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, grouped_comments, nb_res_comments, warnings)
         if show_reviews:
-            if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
-                #calculate average score
+            # ranked comments
+            if CFG_WEBCOMMENT_ALLOW_REVIEWS:
+                # calculate average score
                 avg_score = calculate_avg_score(res_reviews)
                 if voted > 0:
-                    try:
-                        raise InvenioWebCommentWarning(_('Your feedback has been recorded, many thanks.'))
-                    except InvenioWebCommentWarning, exc:
-                        register_exception(stream='warning')
-                        warnings.append((exc.message, 'green'))
-                    #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
+                    warnings.append((_('Your feedback has been recorded, '
+                                       'many thanks.'), 'green'))
                 elif voted == 0:
-                    try:
-                        raise InvenioWebCommentWarning(_('Your feedback could not be recorded, please try again.'))
-                    except InvenioWebCommentWarning, exc:
-                        register_exception(stream='warning')
-                        warnings.append((exc.message, ''))
-                    #warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
+                    warnings.append((_('Your feedback could not be recorded, '
+                                       'please try again.'), ''))
                 grouped_reviews = group_comments_by_round(first_res_reviews, ranking=0)
                 reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, grouped_reviews, nb_res_reviews, avg_score, warnings)
         return (comments, reviews)
@@ -1568,14 +1491,9 @@ def perform_request_add_comment_or_remark(recID=0,
     ## check arguments
     check_recID_is_in_range(recID, warnings, ln)
     if uid <= 0:
-        try:
-            raise InvenioWebCommentError(_('%s is an invalid user ID.') % uid)
-        except InvenioWebCommentError, exc:
-            register_exception()
-            body = webcomment_templates.tmpl_error(exc.message, ln)
-            return body
-        #errors.append(('ERR_WEBCOMMENT_UID_INVALID', uid))
-        return ''
+        body = webcomment_templates.tmpl_error(
+            _('%s is an invalid user ID.') % uid, ln)
+        return body
 
     if attached_files is None:
         attached_files = {}
@@ -1592,24 +1510,16 @@ def perform_request_add_comment_or_remark(recID=0,
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             return webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, can_attach_files=can_attach_files)
         else:
-            try:
-                raise InvenioWebCommentError(_('Comments on records have been disallowed by the administrator.'))
-            except InvenioWebCommentError, exc:
-                register_exception(req=req)
-                body = webcomment_templates.tmpl_error(exc.message, ln)
-                return body
-            #errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
+            body = webcomment_templates.tmpl_error(
+                _('Comments on records have been disallowed by the '
+                  'administrator.'), ln)
+            return body
 
     elif action == 'REPLY':
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            try:
-                raise InvenioWebCommentError(_('Cannot reply to a review.'))
-            except InvenioWebCommentError, exc:
-                register_exception(req=req)
-                body = webcomment_templates.tmpl_error(exc.message, ln)
-                return body
-            #errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
-            return webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files)
+            body = webcomment_templates.tmpl_error(
+                _('Cannot reply to a review.'), ln)
+            return body
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             textual_msg = msg
             if comID > 0:
@@ -1645,38 +1555,20 @@ def perform_request_add_comment_or_remark(recID=0,
                         textual_msg = email_quote_txt(text=textual_msg)
             return webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg, can_attach_files=can_attach_files, reply_to=comID)
         else:
-            try:
-                raise InvenioWebCommentError(_('Comments on records have been disallowed by the administrator.'))
-            except InvenioWebCommentError, exc:
-                register_exception(req=req)
-                body = webcomment_templates.tmpl_error(exc.message, ln)
-                return body
-            #errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
+            body = webcomment_templates.tmpl_error(
+                _('Comments on records have been disallowed by the '
+                  'administrator.'), ln)
+            return body
 
     # check before submitting form
     elif action == 'SUBMIT':
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             if note.strip() in ["", "None"] and not CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
-                try:
-                    raise InvenioWebCommentWarning(_('You must enter a title.'))
-                except InvenioWebCommentWarning, exc:
-                    register_exception(stream='warning', req=req)
-                    warnings.append((exc.message, ''))
-                #warnings.append(('WRN_WEBCOMMENT_ADD_NO_TITLE',))
+                warnings.append((_('You must enter a title.'), ''))
             if score == 0 or score > 5:
-                try:
-                    raise InvenioWebCommentWarning(_('You must choose a score.'))
-                except InvenioWebCommentWarning, exc:
-                    register_exception(stream='warning', req=req)
-                    warnings.append((exc.message, ''))
-                #warnings.append(("WRN_WEBCOMMENT_ADD_NO_SCORE",))
+                warnings.append((_('You must choose a score.'), ''))
         if msg.strip() in ["", "None"] and not CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
-            try:
-                raise InvenioWebCommentWarning(_('You must enter a text.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning', req=req)
-                warnings.append((exc.message, ''))
-            #warnings.append(('WRN_WEBCOMMENT_ADD_NO_BODY',))
+            warnings.append((_('You must enter a text.'), ''))
         # if no warnings, submit
         if len(warnings) == 0:
             if reviews:
@@ -1688,12 +1580,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           req=req,
                                                           reply_to=comID)
                 else:
-                    try:
-                        raise InvenioWebCommentWarning(_('You already wrote a review for this record.'))
-                    except InvenioWebCommentWarning, exc:
-                        register_exception(stream='warning', req=req)
-                        warnings.append((exc.message, ''))
-                    #warnings.append('WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE')
+                    warnings.append((_('You already wrote a review for '
+                                       'this record.'), ''))
                     success = 1
             else:
                 if check_user_can_comment(recID, client_ip_address, uid):
@@ -1707,25 +1595,19 @@ def perform_request_add_comment_or_remark(recID=0,
                     if success > 0 and subscribe:
                         subscribe_user_to_discussion(recID, uid)
                 else:
-                    try:
-                        raise InvenioWebCommentWarning(_('You already posted a comment short ago. Please retry later.'))
-                    except InvenioWebCommentWarning, exc:
-                        register_exception(stream='warning', req=req)
-                        warnings.append((exc.message, ''))
-                    #warnings.append('WRN_WEBCOMMENT_TIMELIMIT')
+                    warnings.append((_('You already posted a comment '
+                                       'short ago. Please retry later.'), ''))
                     success = 1
             if success > 0:
                 if CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL > 0:
                     notify_admin_of_new_comment(comID=success)
                 return webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews, warnings, success)
             else:
-                try:
-                    raise InvenioWebCommentError(_('Failed to insert your comment to the database. Please try again.'))
-                except InvenioWebCommentError, exc:
-                    register_exception(req=req)
-                    body = webcomment_templates.tmpl_error(exc.message, ln)
-                    return body
-                #errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
+                register_exception(req=req)
+                body = webcomment_templates.tmpl_error(
+                    _('Failed to insert your comment to the database.'
+                        ' Please try again.'), ln)
+                return body
         # if are warnings or if inserting comment failed, show user where warnings are
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             return webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files)
@@ -1733,12 +1615,8 @@ def perform_request_add_comment_or_remark(recID=0,
             return webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, can_attach_files=can_attach_files)
     # unknown action send to display
     else:
-        try:
-            raise InvenioWebCommentWarning(_('Unknown action --> showing you the default add comment form.'))
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning', req=req)
-            warnings.append((exc.message, ''))
-        #warnings.append(('WRN_WEBCOMMENT_ADD_UNKNOWN_ACTION',))
+        warnings.append((_('Unknown action --> showing you the default '
+                           'add comment form.'), ''))
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             return webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, ln, msg, score, note, warnings, can_attach_files=can_attach_files)
         else:
@@ -1853,48 +1731,34 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
             from invenio.search_engine import record_exists
             success = record_exists(recID)
             if success == 1:
-                return (1,"")
+                return (1, "")
             else:
-                try:
-                    if success == -1:
-                        status = 'deleted'
-                        raise InvenioWebCommentWarning(_('The record has been deleted.'))
-                    else:
-                        status = 'inexistant'
-                        raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
-                except InvenioWebCommentWarning, exc:
-                    register_exception(stream='warning')
-                    warnings.append((exc.message, ''))
-                #warnings.append(('ERR_WEBCOMMENT_RECID_INEXISTANT', recID))
-                return (0, webcomment_templates.tmpl_record_not_found(status=status, recID=recID, ln=ln))
+                if success == -1:
+                    status = 'deleted'
+                    warning_message = _('The record has been deleted.')
+                else:
+                    status = 'inexistant'
+                    warning_message = _(
+                        'Record ID %s does not exist in the database.') % recID
+                warnings.append((warning_message, ''))
+                return (0, webcomment_templates.tmpl_record_not_found(
+                    status=status, recID=recID, ln=ln))
         elif recID == 0:
-            try:
-                raise InvenioWebCommentWarning(_('No record ID was given.'))
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning')
-                warnings.append((exc.message, ''))
-            #warnings.append(('ERR_WEBCOMMENT_RECID_MISSING',))
-            return (0, webcomment_templates.tmpl_record_not_found(status='missing', recID=recID, ln=ln))
+            warnings.append((_('No record ID was given.'), ''))
+            return (0, webcomment_templates.tmpl_record_not_found(
+                status='missing', recID=recID, ln=ln))
         else:
-            try:
-                raise InvenioWebCommentWarning(_('Record ID %s is an invalid ID.') % recID)
-            except InvenioWebCommentWarning, exc:
-                register_exception(stream='warning')
-                warnings.append((exc.message, ''))
-            #warnings.append(('ERR_WEBCOMMENT_RECID_INVALID', recID))
-            return (0, webcomment_templates.tmpl_record_not_found(status='invalid', recID=recID, ln=ln))
+            warnings.append((_('Record ID %s is an invalid ID.') % recID, ''))
+            return (0, webcomment_templates.tmpl_record_not_found(
+                status='invalid', recID=recID, ln=ln))
     else:
-        try:
-            raise InvenioWebCommentWarning(_('Record ID %s is not a number.') % recID)
-        except InvenioWebCommentWarning, exc:
-            register_exception(stream='warning')
-            warnings.append((exc.message, ''))
-        #warnings.append(('ERR_WEBCOMMENT_RECID_NAN', recID))
-        return (0, webcomment_templates.tmpl_record_not_found(status='nan', recID=recID, ln=ln))
+        warnings.append((_('Record ID %s is not a number.') % recID, ''))
+        return (0, webcomment_templates.tmpl_record_not_found(
+            status='nan', recID=recID, ln=ln))
 
 def check_int_arg_is_in_range(value, name, gte_value, lte_value=None):
     """
-    Check that variable with name 'name' >= gte_value and optionally <= lte_value
+    Check that variable with name 'name' >= gte_value & optionally <= lte_value
     @param value: variable value
     @param name: variable name
     @param errors: list of error tuples (error_id, value)
@@ -1904,34 +1768,17 @@ def check_int_arg_is_in_range(value, name, gte_value, lte_value=None):
     """
 
     if type(value) is not int:
-        try:
-            raise InvenioWebCommentError('%s is not a number.' % value)
-        except InvenioWebCommentError, exc:
-            register_exception()
-            body = webcomment_templates.tmpl_error(exc.message)
-            return body
-        #errors.append(('ERR_WEBCOMMENT_ARGUMENT_NAN', value))
-        return 0
+        body = webcomment_templates.tmpl_error('%s is not a number.' % value)
+        return body
 
     if value < gte_value:
-        try:
-            raise InvenioWebCommentError('%s invalid argument.' % value)
-        except InvenioWebCommentError, exc:
-            register_exception()
-            body = webcomment_templates.tmpl_error(exc.message)
-            return body
-        #errors.append(('ERR_WEBCOMMENT_ARGUMENT_INVALID', value))
-        return 0
+        body = webcomment_templates.tmpl_error('%s invalid argument.' % value)
+        return body
     if lte_value:
         if value > lte_value:
-            try:
-                raise InvenioWebCommentError('%s invalid argument.' % value)
-            except InvenioWebCommentError, exc:
-                register_exception()
-                body = webcomment_templates.tmpl_error(exc.message)
-                return body
-            #errors.append(('ERR_WEBCOMMENT_ARGUMENT_INVALID', value))
-            return 0
+            body = webcomment_templates.tmpl_error(
+                '%s invalid argument.' % value)
+            return body
     return 1
 
 def get_mini_reviews(recid, ln=CFG_SITE_LANG):
