@@ -36,7 +36,7 @@ def format_element(bfo, style):
     out = ""
 
     user_info = bfo.user_info
-    if user_can_edit_record_collection(user_info, bfo.recID):
+    if user_can_edit_record_collection(user_info, int(bfo.recID)):
         linkattrd = {}
         if style != '':
             linkattrd['style'] = style
