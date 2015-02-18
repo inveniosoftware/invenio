@@ -72,7 +72,7 @@ try:
     from flask import session
 except ImportError:
     pass
-from invenio.legacy.dbquery import run_sql, OperationalError
+from invenio.legacy.dbquery import run_sql, OperationalError, aes_encrypt
 from invenio.utils.serializers import serialize_via_marshal
 
 
@@ -532,7 +532,7 @@ def updateDataUser(uid, email, nickname):
 def updatePasswordUser(uid, password):
     """Update the password of a user."""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-        run_sql("update user set password=AES_ENCRYPT(email,%s) where id=%s", (password, uid))
+        run_sql("update user set password="+aes_encrypt("email","%s")+" where id=%s", (password, uid))
     return 1
 
 def merge_usera_into_userb(id_usera, id_userb):
@@ -757,7 +757,7 @@ def loginUser(req, p_un, p_pw, login_method):
     else: # Internal Authenthication
         if not p_pw:
             p_pw = ''
-        query_result = run_sql("SELECT id,email,note from user where email=%s and password=AES_ENCRYPT(email,%s)", (p_email, p_pw,))
+        query_result = run_sql("SELECT id,email,note from user where email=%s and password="+aes_encrypt("email","%s"), (p_email, p_pw,))
         if query_result:
             #FIXME drop external groups and settings
             note = query_result[0][2]

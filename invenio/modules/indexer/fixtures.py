@@ -524,47 +524,47 @@ class IdxINDEXFieldData(DataSet):
 class IdxINDEXIdxINDEXData(DataSet):
 
     class IdxINDEXIdxINDEX_1_2:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_2.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_2
 
     class IdxINDEXIdxINDEX_1_3:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_3.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_3
 
     class IdxINDEXIdxINDEX_1_5:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_5.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_5
 
     class IdxINDEXIdxINDEX_1_7:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_7.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_7
 
     class IdxINDEXIdxINDEX_1_8:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_8.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_8
 
     class IdxINDEXIdxINDEX_1_10:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_10.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_10
 
     class IdxINDEXIdxINDEX_1_11:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_11.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_11
 
     class IdxINDEXIdxINDEX_1_12:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_12.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_12
 
     class IdxINDEXIdxINDEX_1_13:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_13.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_13
 
     class IdxINDEXIdxINDEX_1_19:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_19.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_19
 
     class IdxINDEXIdxINDEX_1_26:
-        id_virtual = IdxINDEXData.IdxINDEX_1.ref('id')
-        id_normal = IdxINDEXData.IdxINDEX_26.ref('id')
+        virtual = IdxINDEXData.IdxINDEX_1
+        normal = IdxINDEXData.IdxINDEX_26
 
 __all__ = ('IdxINDEXData', 'IdxINDEXFieldData', 'IdxINDEXIdxINDEXData')

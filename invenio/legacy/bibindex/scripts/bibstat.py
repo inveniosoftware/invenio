@@ -94,7 +94,7 @@ def report_definitions_of_indexes():
     print("### 3 - INDEX DEFINITIONS")
     print()
     print("# index (stemming): associated logical fields", end=' ')
-    res = run_sql("""SELECT id,name,stemming_language FROM idxINDEX
+    res = run_sql("""SELECT id,name,stemming_language FROM "idxINDEX"
                      ORDER BY name""")
     for row in res:
         (indexid, indexname, indexstem) = row
@@ -102,8 +102,8 @@ def report_definitions_of_indexes():
             indexname += ' (%s)' % indexstem
         print()
         print("%s:" % (indexname,), end=' ')
-        res2 = run_sql("""SELECT code FROM field, idxINDEX_field
-                           WHERE id_idxINDEX=%s AND id_field=id
+        res2 = run_sql("""SELECT code FROM field, "idxINDEX_field"
+                           WHERE "id_idxINDEX"=%s AND id_field=id
                        """, (indexid,))
         for row2 in res2:
             code = row2[0]

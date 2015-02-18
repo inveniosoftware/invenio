@@ -116,7 +116,7 @@ def compile_text(element, compiler, **kw):
 
 
 @compiles(types.VARBINARY, 'postgresql')
-def compile_text(element, compiler, **kw):
+def compile_varbinary(element, compiler, **kw):
     """Redefine VARBINARY filed type for PostgreSQL."""
     return 'BYTEA'
 
@@ -167,7 +167,8 @@ class SQLAlchemy(FlaskSQLAlchemy):
             mysql_parameters = {'keep_existing': True,
                                 'extend_existing': False,
                                 'mysql_engine': 'MyISAM',
-                                'mysql_charset': 'utf8'}
+                                'mysql_charset': 'utf8',
+                                'sql_mode': 'ansi_quotes'}
 
             original_table = self.Table
 

@@ -36,7 +36,7 @@ from invenio.config import \
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.local_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, aes_encrypt
 from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
 from invenio.modules.access.control import acc_find_user_role_actions
@@ -201,7 +201,7 @@ def superuser_account_warnings():
     #Check if the admin password is empty
     res = run_sql("SELECT password, email from user where nickname = 'admin'")
     if res:
-        res1 = run_sql("SELECT email from user where nickname = 'admin' and password = AES_ENCRYPT(%s,'')", (res[0][1], ))
+        res1 = run_sql("SELECT email from user where nickname = 'admin' and password = "+aes_encrypt("%s","''"), (res[0][1], ))
     else:
         # no account nick-named `admin' exists; keep on going
         res1 = []

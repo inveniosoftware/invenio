@@ -122,9 +122,10 @@ def repair_role_definitions():
     """ Try to rebuild compiled serialized definitions from their respectives
     sources. This is needed in case Python break back compatibility.
     """
-    definitions = run_sql("SELECT id, firerole_def_src FROM accROLE")
+    definitions = run_sql("""SELECT id, firerole_def_src FROM "accROLE" """)
     for role_id, firerole_def_src in definitions:
-        run_sql("UPDATE accROLE SET firerole_def_ser=%s WHERE id=%s", (serialize(compile_role_definition(firerole_def_src)), role_id))
+        serialized = serialize(compile_role_definition(firerole_def_src))
+        run_sql("""UPDATE "accROLE" SET firerole_def_ser=%s WHERE id=%s""", (bytearray(serialized) if serialized else None, role_id))
 
 def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     """ Store a compiled serialized definition and its source in the database
@@ -133,7 +134,7 @@ def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     @param firerole_def_ser: the serialized compiled definition
     @param firerole_def_src: the sources from which the definition was taken
     """
-    run_sql("UPDATE accROLE SET firerole_def_ser=%s, firerole_def_src=%s WHERE id=%s", (firerole_def_ser, firerole_def_src, role_id))
+    run_sql("""UPDATE "accROLE" SET firerole_def_ser=%s, firerole_def_src=%s WHERE id=%s""", (firerole_def_ser, firerole_def_src, role_id))
 
 def load_role_definition(role_id):
     """ Load the definition corresponding to a role. If the compiled definition
@@ -142,14 +143,14 @@ def load_role_definition(role_id):
     @param role_id:
     @return: a deserialized compiled role definition
     """
-    res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1, run_on_slave=True)
+    res = run_sql("""SELECT firerole_def_ser FROM "accROLE" WHERE id=%s""", (role_id, ), 1, run_on_slave=True)
     if res:
         try:
             return deserialize(res[0][0])
         except Exception:
             ## Something bad might have happened? (Update of Python?)
             repair_role_definitions()
-            res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1, run_on_slave=True)
+            res = run_sql("""SELECT firerole_def_ser FROM "accROLE" WHERE id=%s""", (role_id, ), 1, run_on_slave=True)
             if res:
                 return deserialize(res[0][0])
     return CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ

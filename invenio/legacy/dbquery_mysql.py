@@ -264,6 +264,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
     try:
         db = connection or _db_login(dbhost)
         cur = db.cursor()
+        cur.execute("SET SESSION sql_mode = %s", ['ANSI_QUOTES'])
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
@@ -535,3 +536,28 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
 
+
+def aes_encrypt(field, password):
+    """Legacy encryption.
+
+    :param field: field to encrypt
+    :param password: password
+    :return sql code to encrypt
+    """
+    return ("AES_ENCRYPT(%(field)s, " +
+            "%(password)s)") % {
+                'field': field,
+                'password': password}
+
+
+def aes_decrypt(field, password):
+    """Legacy decryption.
+
+    :param field: field to decrypt
+    :param password: password
+    :return sql code to decrypt
+    """
+    return ("DECRYPT(%(field)s), " +
+            "%(password)s)") % {
+                'field': field,
+                'password': password}
