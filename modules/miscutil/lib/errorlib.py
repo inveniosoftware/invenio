@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ import datetime
 import re
 import inspect
 import json
+import logging
 
 from cStringIO import StringIO
 
@@ -426,7 +427,9 @@ def register_exception(stream='error',
                 client.extra_context(user_info)
             filename = _get_filename_and_line(sys.exc_info())[0]
             client.tags_context({'filename': filename, 'version': CFG_VERSION})
-            client.captureException()
+            client.captureException(
+                level=_guess_exception_level(sys.exc_info())
+            )
         except Exception:
             # Exception management of exception management
             try:
@@ -607,15 +610,37 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % {
     from invenio.mailutils import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)
 
+
+def _guess_exception_level(exc_info):
+    """Set the logging level depending on the exception name."""
+    try:
+        if hasattr(exc_info[1], 'level'):
+            return exc_info[1].level
+
+        if 'warning' in exc_info[0].__name__.lower():
+            return logging.WARN
+        if 'info' in exc_info[0].__name__.lower():
+            return logging.INFO
+        if 'error' in exc_info[0].__name__.lower():
+            return logging.ERROR
+    except AttributeError:
+        pass
+
+    return logging.ERROR
+
+
 def _get_filename_and_line(exc_info):
     """
     Return the filename, the line and the function_name where the exception happened.
     """
     tb = exc_info[2]
-    exception_info = traceback.extract_tb(tb)[-1]
-    filename = os.path.basename(exception_info[0])
-    line_no = exception_info[1]
-    function_name = exception_info[2]
+    try:
+        exception_info = traceback.extract_tb(tb)[-1]
+        filename = os.path.basename(exception_info[0])
+        line_no = exception_info[1]
+        function_name = exception_info[2]
+    except IndexError:
+        return '', '', ''
     return filename, line_no, function_name
 
 def _truncate_dynamic_string(val, maxlength=500):
