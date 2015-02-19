@@ -136,6 +136,53 @@ class PatchedRt(rt.Rt):
         except requests.exceptions.ConnectionError as e:
             raise ConnectionError("Connection error", e)
 
+    def steal_ticket(self, ticket_id, Owner):
+        """ Edit ticket values.
+
+        :param ticket_id: ID of ticket to edit
+        :param Owner: the new owner
+        :returns: ``True``
+                      Operation was successful
+                  ``False``
+                      Ticket with given ID does not exist or unknown parameter
+                      was set (in this case all other valid fields are changed)
+        """
+        post_data = 'Owner: %s\n' % Owner
+        msg = self.__request('ticket/%s/steal' % (str(ticket_id)), post_data={'content':post_data})
+        state = msg.split('\n')
+        return len(state) <= 2 or self.RE_PATTERNS['update_pattern'].match(state[2]) is not None
+
+    def edit_ticket(self, ticket_id, **kwargs):
+        """ Edit ticket values.
+
+        :param ticket_id: ID of ticket to edit
+        :keyword kwargs: Other arguments possible to set:
+
+                         Requestors, Subject, Cc, AdminCc, Owner, Status,
+                         Priority, InitialPriority, FinalPriority,
+                         TimeEstimated, Starts, Due, Text,... (according to RT
+                         fields)
+
+                         Custom fields CF.{<CustomFieldName>} could be set
+                         with keywords CF_CustomFieldName.
+        :returns: ``True``
+                      Operation was successful
+                  ``False``
+                      Ticket with given ID does not exist or unknown parameter
+                      was set (in this case all other valid fields are changed)
+        """
+        post_data = ''
+        for key, value in kwargs.iteritems():
+            if isinstance(value, (list, tuple)):
+                value = ", ".join(value)
+            if key[:3] != 'CF_':
+                post_data += "%s: %s\n"%(key, value)
+            else:
+                post_data += "CF.{%s}: %s\n" % (key[3:], value)
+        msg = self.__request('ticket/%s/edit' % (str(ticket_id)), post_data={'content':post_data})
+        state = msg.split('\n')
+        return len(state) <= 2 or self.RE_PATTERNS['update_pattern'].match(state[2]) is not None
+
     def __check_response(self, msg):
         """ Search general errors in server response and raise exceptions when found.
 
@@ -295,12 +342,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
     def ticket_steal(self, uid, ticketid):
         """assign a ticket to uid"""
-        try:
-            return self.ticket_assign(uid, ticketid, uid)
-        except IndexError:
-            # Apparently to steal you own ticket make the RT wrapper to crash
-            if self.ticket_get_attribute(uid, ticketid, "owner") == uid:
-                return True
+        rt_instance = self._get_instance(uid)
+        ownerprefs = invenio.webuser.get_user_preferences(uid)
+        if "bibcatalog_username" in ownerprefs:
+            owner = ownerprefs["bibcatalog_username"]
+            return rt_instance.steal_ticket(ticketid, Owner=owner)
         return False
 
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
