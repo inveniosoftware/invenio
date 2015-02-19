@@ -25,6 +25,7 @@ import cgi
 import gc
 import inspect
 import socket
+import logging
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
 
@@ -212,6 +213,7 @@ class SimulatedModPythonRequest(object):
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
                     ## Let's just log this exception without alerting the admin:
+                    err.level=logging.INFO
                     register_exception(req=self)
                     self.__write_error = True ## This flag is there just
                         ## to not report later other errors to the admin.
