@@ -302,8 +302,8 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
         'file_stamper_options' members.
        @param dirname: (string) - the path to the directory in which the
         files are to be stamped.
-       @param filenames: (list) - the names of each file in dirname. An
-        attempt will be made to stamp each of these files.
+       @param filenames: (list) - the names of each file and subdirectory in
+        dirname. An attempt will be made to stamp each of the files.
        @Exceptions Raised:
          + InvenioWebSubmitFunctionWarning;
          + InvenioWebSubmitFunctionError;
@@ -344,6 +344,10 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
         ## dictionary of options that will be passed to stamp_file:
         path_to_subject_file = "%s/%s" % (dirname, file_to_stamp)
         file_stamper_options['input-file'] = path_to_subject_file
+
+        if not os.path.isfile(path_to_subject_file):
+            # If it's not a file, we can't stamp it. Continue with next file
+            continue
 
         ## Just before attempting to stamp the file, log the dictionary of
         ## options (file_stamper_options) that will be passed to websubmit-
