@@ -7,7 +7,7 @@
 """
 
 from werkzeug.utils import cached_property
-from pyelasticsearch import ElasticSearch as PyElasticSearch
+from elasticsearch import Elasticsearch
 from record_enhancer import Enhancer
 import json
 
@@ -73,7 +73,7 @@ class ElasticSearchWrapper(object):
     @cached_property
     def connection(self):
         """Return a pyelasticsearch connection object."""
-        return PyElasticSearch(self.app.config['ELASTICSEARCH_URL'])
+        return Elasticsearch(self.app.config['ELASTICSEARCH_URL'])
 
 
     @property
@@ -83,7 +83,7 @@ class ElasticSearchWrapper(object):
           ok including replication, yellow means replication not active, red
           means partial results.
         """
-        return self.connection.health().get("status")
+        return self.connection.cluster.health().get("status")
 
     def index_exists(self, index=None):
         """Check if the index exists in the cluster.
@@ -94,9 +94,7 @@ class ElasticSearchWrapper(object):
         """
         if index is None:
             index = self.app.config['ELASTICSEARCH_INDEX']
-        if self.connection.status().get("indices").get(index):
-            return True
-        return False
+        return self.connection.indices.exists(index)
 
     def delete_index(self, index=None):
         """Delete the given index.
@@ -108,7 +106,7 @@ class ElasticSearchWrapper(object):
         if index is None:
             index = self.app.config['ELASTICSEARCH_INDEX']
         try:
-            self.connection.delete_index(index=index)
+            self.connection.indices.delete(index=index)
             return True
         except:
             return False
@@ -140,7 +138,8 @@ class ElasticSearchWrapper(object):
                 index_settings["analysis"] = \
                     self.app.config['ELASTICSEARCH_ANALYSIS']
 
-            self.connection.create_index(index=index, settings=index_settings)
+            body = {"settings": index_settings}
+            self.connection.indices.create(index=index, body=body)
 
             # create mappings for each type
 
@@ -156,8 +155,8 @@ class ElasticSearchWrapper(object):
         from invenio.ext.elasticsearch.config import es_config
         mapping_cfg = es_config.get_records_fields_config()
         try:
-            self.connection.put_mapping(index=index, doc_type=doc_type,
-                                        mapping=mapping_cfg)
+            self.connection.indices.put_mapping(index=index, doc_type=doc_type,
+                                                body=mapping_cfg)
         except:
             return False
         return True
