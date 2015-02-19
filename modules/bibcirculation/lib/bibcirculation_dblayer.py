@@ -580,7 +580,7 @@ def get_pdf_request_data(status):
                             it.id_bibrec=lr.id_bibrec AND
                             lib.id = it.id_crcLIBRARY AND
                             lr.status=%s;
-                  """, (status,))
+                  """, (status, ))
     return res
 
 
@@ -1049,6 +1049,14 @@ def get_loan_period(barcode):
         return res[0][0]
     else:
         return None
+
+def get_modified_items_physical_locations():
+    """Get the physical locations of modified items."""
+    res = run_sql("""SELECT id_bibrec, status, location, collection
+                     FROM crcITEM
+                     WHERE modification_date >= SUBDATE(NOW(),1)
+                     AND modification_date <= NOW()""")
+    return res if res else None
 
 def update_item_info(barcode, library_id, collection, location, description,
                  loan_period, status, expected_arrival_date):
@@ -1558,21 +1566,13 @@ def get_borrower_details(borrower_id):
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
-    res = run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
-                  FROM crcBORROWER WHERE id=%s""", (borrower_id, ))
+    res =  run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
+                      FROM crcBORROWER
+                      WHERE id=%s""", (borrower_id, ))
     if res:
-        return clean_data(res[0])
+        return res[0]
     else:
         return None
-
-
-def clean_data(data):
-    final_res = list(data)
-    for i in range(0, len(final_res)):
-        if isinstance(final_res[i], str):
-            final_res[i] = final_res[i].replace(",", " ")
-    return final_res
-
 
 def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
     """
@@ -1607,7 +1607,7 @@ def get_borrower_data(borrower_id):
                   (borrower_id, ))
 
     if res:
-        return clean_data(res[0])
+        return res[0]
     else:
         return None
 
@@ -1622,7 +1622,7 @@ def get_borrower_data_by_id(borrower_id):
                       WHERE id=%s""", (borrower_id, ))
 
     if res:
-        return clean_data(res[0])
+        return res[0]
     else:
         return None
 
@@ -1702,7 +1702,7 @@ def get_borrower_address(email):
                      WHERE email=%s""", (email, ))
 
     if len(res[0][0]) > 0:
-        return res[0][0].replace(",", " ")
+        return res[0][0]
     else:
         return 0
 
@@ -1921,6 +1921,27 @@ def get_borrower_proposals(borrower_id):
                          status=%s""",
                   (borrower_id, CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED))
     return res
+
+def get_borrower_ills(borrower_id):
+    """Get the ills of a borrower.
+
+    :param borrower_id: identify the borrower. All the ills associated to this
+        borrower will be retrieved. It is also the primary key of the
+        `crcBORROWER` table.
+    """
+
+    res = run_sql("""
+                  SELECT item_info,
+                         DATE_FORMAT(request_date,'%%Y-%%m-%%d'),
+                         status,
+                         DATE_FORMAT(due_date,'%%Y-%%m-%%d')
+                  FROM   crcILLREQUEST
+                  WHERE  id_crcBORROWER=%s and request_type='book' and
+                         (status=%s or status=%s)""",
+                  (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED,
+                   CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN))
+    return res
+
 
 def bor_loans_historical_overview(borrower_id):
     """
