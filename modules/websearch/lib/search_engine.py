@@ -4159,7 +4159,7 @@ def get_tags_from_sort_fields(sort_fields):
     return tags, ''
 
 
-def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field='', sorting_methods=SORTING_METHODS):
+def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field='', sorting_methods=SORTING_METHODS, kwargs={}):
     """Initial entry point for ranking records, acts like a dispatcher.
        (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
        (ii)rank_method_code is not in bsrMETHOD, use bibrank;
@@ -4193,7 +4193,8 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
                              field=field,
                              related_to=related_to,
                              rg=rg,
-                             jrec=jrec)
+                             jrec=jrec,
+                             kwargs=kwargs)
 
     # Solution recs can be None, in case of error or other cases
     # which should be all be changed to return an empty list.
@@ -6254,9 +6255,28 @@ def prs_simple_search(results_in_any_collection, kwargs=None, req=None, of=None,
             # recommendations when there are results only in the hosted collections. Also added the if clause to avoid
             # searching in case we know we only have actual or potential hosted collections results
             if not only_hosted_colls_actual_or_potential_results_p:
-                results_in_any_collection.union_update(search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln,
+                # Full-text by default in add to search
+                if kwargs['aas'] == 2 and f=='fulltext':
+                    # Displays nearest terms box only for the latter part to avoid display of box for metadata in case
+                    # there are only results in the fulltext
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p, '', ap=ap, of=of, verbose=verbose, ln=ln,
+                                                                                        display_nearest_terms_box=False,
+                                                                                        wl=wl))
+                    # Change pattern to get results from fulltext per term
+                    p_no_fields = re.sub('[a-z]*:', '', p)
+                    p_no_fields = p_no_fields.replace('+', '|')
+                    p_no_fields = p_no_fields.replace('AND', 'OR')
+                    if verbose:
+                        write_warning('Search stage 3: p is "%s"' % p, req=req)
+                        write_warning('Search stage 3: p without fields for fulltext by default search is "%s"' % p_no_fields, req=req)
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p_no_fields, 'fulltext', ap=ap, of=of, verbose=verbose, ln=ln,
+                                                                                        display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p,
+                                                                                        wl=wl))
+                else:
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln,
                                                                                     display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p,
                                                                                     wl=wl))
+
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
@@ -6479,7 +6499,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
                                                           string.split(p) + string.split(p1) +
-                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec, kwargs['f'])
+                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec, kwargs['f'], kwargs=kwargs)
                 if of.startswith("h"):
                     write_warning(results_final_comments, req=req)
                 if results_final_recIDs_ranked:
@@ -6804,7 +6824,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             if rm: # do we have to rank?
                 results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                                p.split() + p1.split() +
-                                                                               p2.split() + p3.split(), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'])
+                                                                               p2.split() + p3.split(), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'], kwargs=kwargs)
                 if results_final_for_all_colls_rank_records_output[0]:
                     recIDs = results_final_for_all_colls_rank_records_output[0]
             elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?
@@ -6859,7 +6879,7 @@ def prs_rank_results(kwargs=None, results_final=None, req=None, colls_to_search=
     if rm: # do we have to rank?
         results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                        p.split() + p1.split() +
-                                                                       p2.split() + p3.split(), verbose, so, of, field=kwargs['f'])
+                                                                       p2.split() + p3.split(), verbose, so, of, field=kwargs['f'], kwargs=kwargs)
         if results_final_for_all_colls_rank_records_output[0]:
             recIDs = results_final_for_all_colls_rank_records_output[0]
     elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS): # do we have to sort?

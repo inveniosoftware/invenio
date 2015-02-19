@@ -25,6 +25,7 @@ Solr utilities.
 import itertools
 
 
+from math import ceil
 from invenio.config import CFG_SOLR_URL
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
@@ -106,7 +107,11 @@ def get_normalized_ranking_scores(response, hitset_filter = None, recids = []):
         if (not hitset_filter and hitset_filter != []) or recid in hitset_filter or recid in recids:
             normalised_score = 0
             if max_score > 0:
-                normalised_score = int(100.0 / max_score * float(hit['score']))
+                # Ceil score, in particular beneficial for scores in (0,1) and (99,100) to take 1 and 100
+                normalised_score = int(ceil(100.0 / max_score * float(hit['score'])))
+                # Correct possible rounding error
+                if normalised_score > 100:
+                    normalised_score = 100
             ranked_result.append((recid, normalised_score))
             matched_recs.add(recid)
 
@@ -115,7 +120,7 @@ def get_normalized_ranking_scores(response, hitset_filter = None, recids = []):
     return (ranked_result, matched_recs)
 
 
-def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranked_result_amount):
+def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranked_result_amount, kwargs={}):
     """
     Ranking a records containing specified words and returns a sorted list.
     input:
@@ -138,6 +143,9 @@ def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranke
     if pattern:
         pattern = " ".join(map(str, pattern))
         from invenio.search_engine import create_basic_search_units
+        # Rank global index for fulltext by default in add to search
+        if kwargs.get('aas', 0) == 2 and explicit_field == 'fulltext':
+            explicit_field = ''
         search_units = create_basic_search_units(None, pattern, explicit_field)
     else:
         return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)
