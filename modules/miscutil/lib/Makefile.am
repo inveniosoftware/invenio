@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = upgrades
+SUBDIRS = upgrades pid_providers
 
 pylibdir = $(libdir)/python/invenio
 
@@ -65,6 +65,8 @@ pylib_DATA = __init__.py \
              pluginutils.py \
              pluginutils_unit_tests.py \
              redisutils.py \
+             pid_provider.py \
+             pid_store.py \
              plotextractor.py \
              plotextractor_converter.py \
              plotextractor_getter.py \
@@ -84,6 +86,7 @@ pylib_DATA = __init__.py \
              xapianutils_bibrank_indexer.py \
              xapianutils_bibrank_searcher.py \
              xapianutils_config.py \
+             xmlDict.py \
              remote_debugger.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \

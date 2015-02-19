@@ -378,3 +378,5 @@ TRUNCATE lnkADMINURLLOG;
 TRUNCATE wapCACHE;
 TRUNCATE goto;
 TRUNCATE bibcheck_rules;
+TRUNCATE pidstore;
+TRUNCATE pidlog;

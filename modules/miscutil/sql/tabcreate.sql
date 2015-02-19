@@ -4979,6 +4979,35 @@ CREATE TABLE IF NOT EXISTS upgrade (
   PRIMARY KEY (upgrade)
 ) ENGINE=MyISAM;
 
+-- tables for pidstore
+CREATE TABLE `pidSTORE` (
+  `id` int(15) unsigned NOT NULL AUTO_INCREMENT,
+  `pid_type` varchar(6) NOT NULL,
+  `pid_value` varchar(255) NOT NULL,
+  `pid_provider` varchar(255) NOT NULL,
+  `status` char(1) NOT NULL,
+  `object_type` varchar(3) DEFAULT NULL,
+  `object_value` varchar(255) DEFAULT NULL,
+  `created` datetime NOT NULL,
+  `last_modified` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uidx_type_pid` (`pid_type`,`pid_value`),
+  KEY `idx_object` (`object_type`,`object_value`),
+  KEY `idx_status` (`status`)
+) ENGINE=MyISAM;
+
+CREATE TABLE `pidLOG` (
+  `id` int(15) unsigned NOT NULL AUTO_INCREMENT,
+  `id_pid` int(15) unsigned DEFAULT NULL,
+  `timestamp` datetime NOT NULL,
+  `action` varchar(10) NOT NULL,
+  `message` text NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_pid` (`id_pid`),
+  KEY `idx_action` (`action`),
+  CONSTRAINT `pidlog_ibfk_1` FOREIGN KEY (`id_pid`) REFERENCES `pidSTORE` (`id`)
+) ENGINE=MYISAM;
+
 -- maint-1.1 upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
@@ -5045,5 +5074,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_11_04_format_recjso
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_08_31_next_collection_tree',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_13_hide_holdings',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_arguments_cfg_namechange',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_15_pidstore_initial',NOW());
 
 -- end of file
