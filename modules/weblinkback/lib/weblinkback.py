@@ -157,20 +157,25 @@ def send_pending_linkbacks_notification(linkback_type):
     Send notification emails to all linkback moderators for all pending linkbacks
     @param linkback_type: of CFG_WEBLINKBACK_LIST_TYPE
     """
-    pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+    pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'],
+                                          status=CFG_WEBLINKBACK_STATUS['PENDING'],
+                                          limit=CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL)
 
     if pending_linkbacks:
-        pending_count = len(pending_linkbacks)
+        pending_count = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'],
+                                          status=CFG_WEBLINKBACK_STATUS['PENDING'],
+                                          full_count_only=True)
+
         cutoff_text = ''
         if pending_count > CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL:
-            cutoff_text = ' (Printing only the first %s requests)' % CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
+            cutoff_text = '(Printing only the first %s requests)' % CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
 
-        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject%(cutoff)s:
+        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject %(cutoff)s:
                   """ % {'count': pending_count,
                          'linkback_type': linkback_type,
                          'cutoff': cutoff_text}
 
-        for pending_linkback in pending_linkbacks[0:CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL]:
+        for pending_linkback in pending_linkbacks:
             content += """
                        For %(recordURL)s from %(origin_url)s.
                        """ % {'recordURL': generate_redirect_url(pending_linkback[2]),
@@ -180,15 +185,14 @@ def send_pending_linkbacks_notification(linkback_type):
             send_email(CFG_SITE_ADMIN_EMAIL, email, 'Pending ' + linkback_type + ' requests', content)
 
 
-def infix_exists_for_url_in_list(url, list_type):
+def infix_exists_for_url_in_list(url, url_list):
     """
     Check if an infix of a url exists in a list
     @param url
-    @param list_type, of CFG_WEBLINKBACK_LIST_TYPE
+    @param url_list
     @return True, False
     """
-    urls = get_url_list(list_type)
-    for current_url in urls:
+    for current_url in url_list:
         if current_url in url:
             return True
     return False
@@ -257,8 +261,8 @@ def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, s
                              <message>%s</message>
                          """
 
-    blacklist_match = infix_exists_for_url_in_list(url, CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'])
-    whitelist_match = infix_exists_for_url_in_list(url, CFG_WEBLINKBACK_LIST_TYPE['WHITELIST'])
+    blacklist_match = infix_exists_for_url_in_list(url, get_url_list(CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST']))
+    whitelist_match = infix_exists_for_url_in_list(url, get_url_list(CFG_WEBLINKBACK_LIST_TYPE['WHITELIST']))
 
     # faulty request, url argument not set
     if url in (CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME, None, ''):
@@ -336,6 +340,7 @@ def delete_linkbacks_on_blacklist():
     linkbacks.extend(list(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['REJECTED'])))
     linkbacks.extend(list(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['BROKEN'])))
 
+    blacklist = get_url_list(CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'])
     for linkback in linkbacks:
-        if infix_exists_for_url_in_list(linkback[1], CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST']):
+        if infix_exists_for_url_in_list(linkback[1], blacklist):
             remove_linkback(linkback[0])
