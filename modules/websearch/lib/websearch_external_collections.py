@@ -189,6 +189,8 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines, pr
     vprint(3, 'beginning external search')
     engines_list = []
 
+    search_engines = search_engines or list()
+
     for engine in search_engines:
         url = engine.build_search_url(basic_search_units, req.args, lang)
         user_url = engine.build_user_search_url(basic_search_units, req.args, lang)
