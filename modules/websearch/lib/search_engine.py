@@ -920,6 +920,12 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     if of.startswith("h"):
                         write_warning("Ignoring empty <em>%s</em> search term." % fi, "Warning", req=req)
                 del opfts[i]
+            # Handles phrases that lack ending double quote
+            if (pi.startswith('"') and not pi.endswith('"')) or (not pi.startswith('"') and pi.endswith('"')):
+                oi, pi, fi, m = opfts[i]
+                opfts[i] = [oi, pi.replace('"', ''), fi, m]
+                if of.startswith("h"):
+                    write_warning("Ignoring incorrect phrase double quotation marks.", "Warning", req=req)
         except:
             pass
 
