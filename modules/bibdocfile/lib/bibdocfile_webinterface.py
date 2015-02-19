@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_RECORD, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_WEBSEARCH_OBELIX_REDIS
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
@@ -163,6 +164,13 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     docformat += ';%s' % args['subformat']
             else:
                 docname = args['docname']
+
+            if CFG_WEBSEARCH_OBELIX_REDIS:
+                try:
+                    from invenio.search_engine_obelix import log_download_after_search
+                    log_download_after_search(user_info, self.recid)
+                except:
+                    register_exception(alert_admin=True)
 
             if not docformat:
                 docformat = args['format']

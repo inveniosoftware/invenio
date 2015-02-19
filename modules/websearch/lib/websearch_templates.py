@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -66,7 +66,8 @@ from invenio.config import \
      CFG_HEPDATA_PLOTSIZE, \
      CFG_BASE_URL, \
      CFG_SITE_URL, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
+     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS, \
+     CFG_WEBSEARCH_OBELIX_REDIS
 
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 from invenio.websearch_services import \
