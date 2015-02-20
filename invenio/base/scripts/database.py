@@ -175,6 +175,7 @@ def create(default_data=True, quiet=False):
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
+    # FIXME StorageEngine?
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
     test_sqla_connection()

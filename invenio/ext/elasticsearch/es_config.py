@@ -45,7 +45,7 @@ def get_documents_fields_config():
 
 def get_records_fields_config():
     """Mapping for records."""
-    from invenio.modules.jsonalchemy.parser import FieldParser
+    from jsonalchemy.parser import FieldParser
     fields = FieldParser.field_definitions('recordext')
     mapping = {}
     for name, value in fields.iteritems():
@@ -65,7 +65,7 @@ HIGHLIGHTS_BASE_CONFIG = {
 
 def get_records_highlights_config():
     """Get hilights config for records."""
-    from invenio.modules.jsonalchemy.parser import FieldParser
+    from jsonalchemy.parser import FieldParser
     fields = FieldParser.field_definitions('recordext')
     highlights = {}
     for name, value in fields.iteritems():
@@ -92,7 +92,7 @@ def get_documents_highlights_config():
 
 def get_records_facets_config():
     """Get facets config for records."""
-    from invenio.modules.jsonalchemy.parser import FieldParser
+    from jsonalchemy.parser import FieldParser
     fields = FieldParser.field_definitions('recordext')
     facets = {}
     for name, value in fields.iteritems():

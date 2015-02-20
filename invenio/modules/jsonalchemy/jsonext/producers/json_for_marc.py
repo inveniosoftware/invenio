@@ -102,7 +102,7 @@ def produce(self, fields=None):
     from invenio.base.utils import try_to_eval
 
     from invenio.modules.jsonalchemy.parser import get_producer_rules
-    from invenio.modules.jsonalchemy.registry import functions
+    from invenio.ext.jsonalchemy.registry import functions
 
     if not fields:
         fields = self.keys()

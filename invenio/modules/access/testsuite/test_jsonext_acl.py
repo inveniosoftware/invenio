@@ -19,12 +19,12 @@
 
 """Unit tests for the Acl JSONAlchemy extension."""
 
-from invenio.base.wrappers import lazy_import
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
+
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
+from jsonalchemy.parser import ModelParser as Model_parser
 
 TEST_PACKAGE = 'invenio.modules.access.testsuite'
 
@@ -52,14 +52,15 @@ class TestAclExtension(InvenioTestCase):
     def test_restriction(self):
         """JSONAlchemy - restriction"""
         from flask.ext.login import login_user, logout_user
+        from invenio.ext.jsonalchemy.registry import metadata
         from invenio.ext.login.legacy_user import UserInfo
-        from invenio.modules.jsonalchemy.reader import Reader
-        from invenio.modules.jsonalchemy.wrappers import SmartJson
+        from jsonalchemy.reader import translate
+        from jsonalchemy.wrappers import SmartJson
 
         blob = {'_id': 1}
 
-        json = Reader.translate(blob, SmartJson, model='test_access_base',
-                                master_format='json', namespace='testsuite')
+        json = translate(blob, SmartJson, metadata=metadata['test_access_base'],
+                         master_format='json')
         self.assertIsNotNone(json)
         self.assertTrue('restriction' in json)
         self.assertTrue('email' in json['restriction'])

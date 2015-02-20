@@ -23,9 +23,9 @@ from pyparsing import Keyword, Suppress, Word, Optional, Each, \
     OneOrMore, alphanums, restOfLine
 
 from invenio.base.utils import try_to_eval
-from invenio.modules.jsonalchemy.parser import FieldBaseExtensionParser, \
+from jsonalchemy.parser import FieldBaseExtensionParser, \
     indentedBlock, DICT_DEF
-from invenio.modules.jsonalchemy.registry import functions
+from invenio.ext.jsonalchemy.registry import functions
 
 
 class ElasticSearchParser(FieldBaseExtensionParser):

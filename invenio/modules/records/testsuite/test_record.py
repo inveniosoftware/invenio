@@ -37,8 +37,8 @@ from mock import patch
 Record = lazy_import('invenio.modules.records.api:Record')
 Document = lazy_import('invenio.modules.documents.api:Document')
 
-Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
-Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
+Field_parser = lazy_import('jsonalchemy.parser:FieldParser')
+Model_parser = lazy_import('jsonalchemy.parser:ModelParser')
 
 TEST_PACKAGE = 'invenio.modules.records.testsuite'
 
@@ -96,6 +96,7 @@ class TestRecord(InvenioTestCase):
 
     def test_accented_unicode_letterst_test(self):
         """Record - accented Unicode letters."""
+        from invenio.ext.jsonalchemy.registry import metadata
         xml = '''<record>
           <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
@@ -108,13 +109,14 @@ class TestRecord(InvenioTestCase):
           </datafield>
         </record>
         '''
-        rec = Record.create(xml, master_format='marc', namespace='testsuite')
+        rec = Record.create(xml, master_format='marc', metadata=metadata['testsuite'])
         self.assertEquals(rec['authors[0].full_name'], 'Döè1, John')
         self.assertEquals(rec['title.title'], 'Пушкин')
 
     def test_create_empty_record(self):
         """Record - Create empty record."""
-        rec = Record(master_format='marc', namespace='testsuite')
+        from invenio.ext.jsonalchemy.registry import metadata
+        rec = Record(master_format='marc', metadata=metadata['testsuite'])
         self.assertTrue('__meta_metadata__' in rec)
         self.assertEquals(list(rec.keys()), ['__meta_metadata__'])
         rec['title'] = {'title': 'My title'}
@@ -125,7 +127,8 @@ class TestRecord(InvenioTestCase):
 
     def test_validate(self):
         """Record - Validate record."""
-        rec = Record(master_format='marc', namespace='testsuite')
+        from invenio.ext.jsonalchemy.registry import metadata
+        rec = Record(master_format='marc', metadata=metadata['testsuite'])
         self.assertTrue('__meta_metadata__' in rec)
         self.assertTrue('recid' in rec.validate())
         rec['recid'] = '1'
@@ -177,7 +180,7 @@ class TestLegacyExport(InvenioTestCase):
               </datafield>
             </record>
         '''
-        rec = Record.create(blob, master_format='marc', namespace='testsuite')
+        rec = Record.create(blob, master_format='marc', metadata=['testsuite'])
         recstruct, _, _ = create_record(blob)
         json_recstruct, _, _ = create_record(rec.legacy_export_as_marc())
         self.assertTrue(records_identical(json_recstruct, recstruct,
@@ -206,7 +209,7 @@ class TestLegacyExport(InvenioTestCase):
               </datafield>
             </record>
         '''
-        rec = Record.create(blob, master_format='marc', namespace='testsuite')
+        rec = Record.create(blob, master_format='marc', metadata=['testsuite'])
         json_recstruct = rec.legacy_create_recstruct()
         recstruct, _, _ = create_record(blob)
         self.assertTrue(records_identical(json_recstruct, recstruct,
@@ -556,7 +559,8 @@ class TestMarcRecordCreation(InvenioTestCase):
                 </datafield>
             </record>
         """
-        r = Record.create(xml, master_format='marc', namespace='testsuite', schema='xml')
+        from invenio.ext.jsonalchemy.registry import metadata
+        r = Record.create(xml, master_format='marc', metadata=metadata['testsuite'], schema='xml')
 
         self.assertEquals(r.additional_info.master_format, 'marc')
         self.assertTrue('authors' in r)
@@ -571,7 +575,7 @@ class TestMarcRecordCreation(InvenioTestCase):
 
     def test_error_catching(self):
         """ Record - catch any record conversion issues """
-        from invenio.modules.jsonalchemy.errors import ReaderException
+        from jsonalchemy.errors import ReaderException
         from invenio.legacy.bibrecord import _select_parser
         blob = """<?xml version="1.0" encoding="UTF-8"?>
         <collection>
@@ -588,7 +592,7 @@ class TestMarcRecordCreation(InvenioTestCase):
         if _select_parser() != 'lxml':
             with self.assertRaises(ReaderException):
                 Record.create(blob, master_format='marc',
-                              namespace='testsuite', schema='xml')
+                              metadata=['testsuite'], schema='xml')
 
 
 class TestRecordDocuments(InvenioTestCase):
@@ -597,7 +601,7 @@ class TestRecordDocuments(InvenioTestCase):
 
     def setUp(self):
         self.app.config['DOCUMENTS_ENGINE'] = \
-            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+            "jsonalchemy.jsonext.engines.memory:MemoryStorage"
 
     @patch('invenio.legacy.search_engine.check_user_can_view_record')
     def test_restricted_record_non_restricted_document(

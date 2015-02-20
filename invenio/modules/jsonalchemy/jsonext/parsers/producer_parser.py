@@ -54,7 +54,7 @@ class ProducerParser(FieldBaseExtensionParser):
     To view the list of possible producer, check the `producer` folder inside
     jsonext or simply::
 
-        >>> from invenio.modules.jsonalchemy.registry import producers
+        >>> from invenio.ext.jsonalchemy.registry import producers
         >>> dict(producers)
 
     """

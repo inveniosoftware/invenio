@@ -34,7 +34,9 @@ from __future__ import print_function
 from celery import chord
 
 from invenio.base.globals import cfg
-from invenio.modules.jsonalchemy.reader import split_blob
+from invenio.ext.jsonalchemy.registry import metadata
+
+from jsonalchemy.reader import split_blob
 
 from . import signals
 from .tasks import translate, run_workflow
@@ -65,6 +67,7 @@ def run(name, input_file, master_format='marc', reader_info={}, **kwargs):
                                   **kwargs)
     for chunk in split_blob(input_file, master_format,
                             cfg['UPLOADER_NUMBER_RECORD_PER_WORKER'],
+                            metadata=metadata['recordext'],
                             **reader_info):
         chord(translate.starmap(
             [(blob, master_format, reader_info) for blob in chunk])

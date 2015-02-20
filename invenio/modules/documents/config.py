@@ -25,7 +25,7 @@
 """
 from invenio.base import config
 
-DOCUMENTS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
+DOCUMENTS_ENGINE = ('jsonalchemy.jsonext.engines.sqlalchemy'
                     ':SQLAlchemyStorage')
 
 DOCUMENTS_SQLALCHEMYSTORAGE = {

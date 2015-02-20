@@ -34,8 +34,9 @@ from pyparsing import ParseException, FollowedBy, Suppress, OneOrMore, Word, \
     empty, col, restOfLine, delimitedList, Each, Keyword, commaSeparatedList, \
     Group
 
+from invenio.ext.jsonalchemy.registry import fields_definitions, models_definitions, parsers
+
 from .errors import FieldParserException, ModelParserException
-from .registry import fields_definitions, models_definitions, parsers
 
 ParseException.defaultWhitespaceChars = (' \r\t')
 

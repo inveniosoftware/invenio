@@ -19,7 +19,7 @@
 
 from invenio.base import config
 
-ANNOTATIONS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.'
+ANNOTATIONS_ENGINE = ('jsonalchemy.jsonext.engines.'
                       'mongodb_pymongo:MongoDBStorage')
 
 

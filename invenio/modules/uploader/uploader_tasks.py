@@ -83,7 +83,7 @@ def validate(step):
     `UPLOADER_VALIDATION_MODE`.
 
     For the validation the `schema` information from the field definition
-    is used, see `invenio.modules.jsonalchemy.jsonext.parsers.schema_parser`.
+    is used, see `jsonalchemy.jsonext.parsers.schema_parser`.
     """
     def _validate(obj, eng):
         record = obj[1]

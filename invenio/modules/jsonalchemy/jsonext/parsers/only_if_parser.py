@@ -57,7 +57,7 @@ class OnlyIfParser(DecoratorBeforeEvalBaseExtensionParser):
         This is a special case where the real evaluation of the decorator
         is happening before the evaluation.
         """
-        from invenio.modules.jsonalchemy.registry import functions
+        from invenio.ext.jsonalchemy.registry import functions
         evaluated = try_to_eval(
             args, functions(reader._json.additional_info.namespace),
             self=reader._json)

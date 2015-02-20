@@ -26,9 +26,11 @@ from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from werkzeug.utils import cached_property
 
-from invenio.modules.jsonalchemy.reader import Reader
-from invenio.modules.jsonalchemy.wrappers import SmartJson
-from invenio.modules.jsonalchemy.errors import ReaderException
+from invenio.ext.jsonalchemy.registry import metadata
+
+from jsonalchemy.reader import translate
+from jsonalchemy.wrappers import SmartJson
+from jsonalchemy.errors import ReaderException
 
 from .models import Record as RecordModel
 
@@ -42,15 +44,17 @@ class Record(SmartJson):
     def __init__(self, json=None, **kwargs):
         """Create a Record instance."""
         if not json or '__meta_metadata__' not in json:
-            kwargs['namespace'] = kwargs.get('namespace', 'recordext')
             kwargs['master_format'] = kwargs.get('master_format', 'json')
+            kwargs['metadata'] = metadata['recordext']
         super(Record, self).__init__(json, **kwargs)
         self.get_blob = lambda: self.blob
 
     @classmethod
     def create(cls, blob, master_format, **kwargs):
         """Create a new record from the blob using the right reader."""
-        return Reader.translate(blob, Record, master_format, **kwargs)
+        if 'metadata' not in kwargs:
+            kwargs['metadata'] = metadata['recordext']
+        return translate(blob, Record, master_format, **kwargs)
 
     @classmethod
     def create_many(cls, blobs, master_format, **kwargs):

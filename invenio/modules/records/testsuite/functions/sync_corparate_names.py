@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.modules.jsonalchemy.jsonext.functions.util_merge_fields_info_list \
+from jsonalchemy.jsonext.functions.util_merge_fields_info_list \
     import util_merge_fields_info_list
 
 

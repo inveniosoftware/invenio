@@ -1,2 +1,3 @@
 # requires numpy before it can be installed
 #-e svn://svn.code.sf.net/p/gnuplot-py/code/trunk#egg=gnuplot-py
+-e git+https://github.com/inveniosoftware/jsonalchemy.git@master#egg=JSONAlchemy

@@ -62,7 +62,7 @@ class OnlyIfMasterValueParser(DecoratorOnEvalBaseExtensionParser):
 
         :returns: a boolean depending on evaluated ``value``.
         """
-        from invenio.modules.jsonalchemy.registry import functions
+        from invenio.ext.jsonalchemy.registry import functions
         evaluated = try_to_eval(args, functions(namespace), value=value)
         if not isinstance(evaluated, (list, tuple)):
             return evaluated

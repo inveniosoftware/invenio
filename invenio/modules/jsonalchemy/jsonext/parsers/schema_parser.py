@@ -21,7 +21,7 @@ from pyparsing import Keyword
 
 from invenio.base.utils import try_to_eval
 
-from invenio.modules.jsonalchemy.registry import functions
+from invenio.ext.jsonalchemy.registry import functions
 from invenio.modules.jsonalchemy.parser import FieldBaseExtensionParser, \
     DICT_DEF, indentedBlock
 

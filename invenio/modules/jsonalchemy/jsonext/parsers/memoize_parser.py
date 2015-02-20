@@ -28,7 +28,7 @@ from invenio.base.utils import try_to_eval
 
 from invenio.modules.jsonalchemy.parser import FieldParser, \
     DecoratorAfterEvalBaseExtensionParser
-from invenio.modules.jsonalchemy.registry import functions
+from invenio.ext.jsonalchemy.registry import functions
 
 
 class MemoizeParser(DecoratorAfterEvalBaseExtensionParser):

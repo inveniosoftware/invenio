@@ -19,9 +19,10 @@
 
 """Various utility functions for use across the workflows module."""
 
-from invenio.ext.cache import cache
-
 import msgpack
+
+from invenio.ext.cache import cache
+from invenio.ext.jsonalchemy.registry import metadata
 
 from .registry import workflows
 
@@ -37,19 +38,18 @@ def convert_marcxml_to_bibfield(marcxml, model=None):
 
     :return: SmartJson object.
     """
-    from invenio.modules.jsonalchemy.reader import Reader
-    from invenio.modules.jsonalchemy.wrappers import SmartJson
+    from jsonalchemy.reader import translate
+    from jsonalchemy.wrappers import SmartJson
 
     if not model:
         model = ["__default__"]
 
     if isinstance(marcxml, unicode):
         marcxml = marcxml.encode(errors='ignore')
-    return Reader.translate(marcxml,
-                            SmartJson,
-                            master_format='marc',
-                            namespace='recordext',
-                            model=model)
+        return translate(marcxml,
+                         SmartJson,
+                         master_format='marc',
+                         metadata=metadata['recordext'])
 
 
 class BibWorkflowObjectIdContainer(object):

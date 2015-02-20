@@ -36,7 +36,7 @@ class AnnotationTestCase(InvenioTestCase):
 
     def setUp(self):
         self.app.config['ANNOTATIONS_ENGINE'] = \
-            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+            "jsonalchemy.jsonext.engines.memory:MemoryStorage"
 
 
 class TestAnnotation(AnnotationTestCase):
