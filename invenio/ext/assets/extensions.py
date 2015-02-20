@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -134,7 +135,6 @@ class BundleExtension(Extension):
                     bundle.extra.update(static_url_path=static_url_path)
                     if bundle.has_filter("less"):
                         if less_debug:
-                            bundle.filters = None
                             bundle.extra.update(rel="stylesheet/less")
                         else:
                             bundle.extra.update(static_url_path="")
