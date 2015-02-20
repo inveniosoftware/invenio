@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,8 @@ import datetime
 import collections
 import re
 import six
+
+from copy import copy
 
 from cerberus import Validator as ValidatorBase
 from cerberus import ValidationError, SchemaError
@@ -113,8 +115,22 @@ class Validator(ValidatorBase):
                 if not self.allow_unknown:
                     self._error(field, errors.ERROR_UNKNOWN_FIELD)
 
+        # Remove special rules, as they can cause error in Cerberus validation.
+        schema = self.schema
+        self.schema = copy(self.schema)
+        for rule in special_rules:
+            if rule in self.schema:
+                if (isinstance(self.schema[rule], six.string_types) or
+                        isinstance(self.schema[rule], bool)):
+                    # Don't delete subfields named with keywords.
+                    del self.schema[rule]
+
+        # Validate using Cerberus
         if not self.update:
             self._validate_required_fields()
+
+        # Restore the schema with special rules included.
+        self.schema = schema
 
         return len(self._errors) == 0
 
