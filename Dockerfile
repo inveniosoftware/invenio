@@ -34,15 +34,19 @@ RUN yum update -y && \
                    ipython \
                    libpng-devel \
                    libxslt-devel \
+                   libreoffice \
+                   libreoffice-headless \
+                   libreoffice-pyuno \
                    mod_ssl \
                    mod_wsgi \
                    mysql-devel \
                    mysql-server \
                    poppler-utils \
-                   postfix \
                    python-devel \
                    python-magic \
                    python-pip \
+                   redis \
+                   sendmail \
                    sudo \
                    texlive \
                    unzip \
@@ -85,12 +89,11 @@ RUN /sbin/service mysqld start && \
 RUN echo "[supervisord]" > /etc/supervisord.conf && \
     echo "nodaemon=true" >> /etc/supervisord.conf && \
     echo "" >> /etc/supervisord.conf && \
-    echo "[program:postfix]" >> /etc/supervisord.conf && \
-    echo "process_name=master" >> /etc/supervisord.conf && \
-    echo "directory=/etc/postfix" >> /etc/supervisord.conf && \
-    echo "command=/usr/sbin/postfix -c /etc/postfix start" >> /etc/supervisord.conf && \
-    echo "startsecs=0" >> /etc/supervisord.conf && \
-    echo "autorestart=false" >> /etc/supervisord.conf && \
+    echo "[program:sendmail]" >> /etc/supervisord.conf && \
+    echo "command=/etc/init.d/sendmail start" >> /etc/supervisord.conf && \
+    echo "" >> /etc/supervisord.conf && \
+    echo "[program:redis-server]" >> /etc/supervisord.conf && \
+    echo "command=/usr/sbin/redis-server /etc/redis.conf" >> /etc/supervisord.conf && \
     echo "" >> /etc/supervisord.conf && \
     echo "[program:mysqld]" >> /etc/supervisord.conf && \
     echo "command=/usr/bin/mysqld_safe" >> /etc/supervisord.conf && \
@@ -110,6 +113,7 @@ RUN chown -R apache /code
 # Installing Invenio:
 USER apache
 RUN sudo /sbin/service mysqld restart && \
+    sudo /sbin/service redis restart && \
     rm -rf autom4te.cache/ && \
     aclocal && \
     automake -a && \
@@ -129,7 +133,6 @@ RUN sudo /sbin/service mysqld restart && \
     echo "[Invenio]" > /opt/invenio/etc/invenio-local.conf && \
     echo "CFG_SITE_URL = http://0.0.0.0" >> /opt/invenio/etc/invenio-local.conf && \
     echo "CFG_SITE_SECURE_URL = https://0.0.0.0" >> /opt/invenio/etc/invenio-local.conf && \
-    echo "CFG_REDIS_HOSTS = {'default': [{'db': 0, 'host': 'redis', 'port': 6379}]}" >> /opt/invenio/etc/invenio-local.conf && \
     echo "CFG_DATABASE_PASS = my123pass" >> /opt/invenio/etc/invenio-local.conf && \
     chown -R apache /opt/invenio && \
     /opt/invenio/bin/inveniocfg --update-all && \
