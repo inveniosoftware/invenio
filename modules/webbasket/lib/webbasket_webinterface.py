@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,7 +27,6 @@ import cgi
 import urllib
 from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
-                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
                            CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
@@ -305,14 +304,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/display",
                                        navmenuid = 'yourbaskets')
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/display%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/display%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -391,14 +389,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/search",
                                        navmenuid = 'yourbaskets')
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/search%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/search%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -456,14 +453,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/write_note%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/write_note%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -524,14 +520,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/save_note%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/save_note%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -602,14 +597,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/delete_note%s" % (
+            return redirect_to_url(req, "%s/youraccount/delete_note%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/display%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/display%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -691,14 +685,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/add%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/add%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -770,14 +763,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/delete%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/delete%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -858,14 +850,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/modify%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/modify%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -963,14 +954,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/edit%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/edit%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
         user_info = collect_user_info(req)
@@ -1083,14 +1073,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/edit_topic%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/edit_topic%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
         user_info = collect_user_info(req)
@@ -1182,14 +1171,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/create_basket%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/create_basket%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         _ = gettext_set_language(argd['ln'])
@@ -1415,14 +1403,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/subscribe%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/subscribe%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -1475,14 +1462,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/unsubscribe%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/unsubscribe%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -1537,14 +1523,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/write_public_note%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/write_public_note%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -1599,14 +1584,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                    make_canonical_urlargd({
+                'referer' : "%s/yourbaskets/save_public_note%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/save_public_note%s" % (
-                        CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    make_canonical_urlargd(argd, {})),
+                "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:

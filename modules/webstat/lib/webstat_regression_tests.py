@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011 CERN.
+# Copyright (C) 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,8 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.testutils import InvenioTestCase
 
-from invenio.config import CFG_SITE_URL, \
-     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages
 
@@ -41,9 +40,6 @@ class WebStatWebPagesAvailabilityTest(InvenioTestCase):
                     'search_type_distribution', 'download_frequency']
 
         error_messages = []
-        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-            for url in [baseurl + page for page in _exports]:
-                error_messages.extend(test_web_page_content(url))
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url, username='admin'))
         if error_messages:
