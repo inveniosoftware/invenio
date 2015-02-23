@@ -104,6 +104,12 @@ except:
     WebInterfaceRSSFeedServicePages = WebInterfaceDumbPages
 
 try:
+    from invenio.websearch_webinterface import WebInterfaceSRUServicePages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceSRUServicePages = WebInterfaceDumpPages
+
+try:
     from invenio.websearch_webinterface import WebInterfaceUnAPIPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -352,6 +358,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    ('getfile.py', 'getfile'),
                    'submit',
                    'rss',
+                   'sru',
                    'stats',
                    'journal',
                    'help',
@@ -392,6 +399,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         error = WebInterfaceErrorPages()
         oai2d = WebInterfaceDisabledPages()
         rss = WebInterfaceRSSFeedServicePages()
+        sru = WebInterfaceDisabledPages()
         stats = WebInterfaceDisabledPages()
         journal = WebInterfaceDisabledPages()
         help = WebInterfaceDocumentationPages()
@@ -424,6 +432,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         error = WebInterfaceErrorPages()
         oai2d = WebInterfaceOAIProviderPages()
         rss = WebInterfaceRSSFeedServicePages()
+        sru = WebInterfaceSRUServicePages()
         stats = WebInterfaceStatsPages()
         journal = WebInterfaceJournalPages()
         help = WebInterfaceDocumentationPages()
