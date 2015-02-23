@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ for and the characters that should be used to replace them.
 replace in plain-text.
 """
 
+import os
 import re
 import subprocess
 
@@ -475,6 +476,9 @@ def convert_PDF_to_plaintext(fpath, keep_layout=False):
     @return: (list) of unicode strings (contents of the PDF file translated
     into plaintext; each string is a line in the document.)
     """
+    if not os.path.isfile(CFG_PATH_PDFTOTEXT):
+        raise Exception('Missing pdftotext executable')
+
     if keep_layout:
         layout_option = "-layout"
     else:

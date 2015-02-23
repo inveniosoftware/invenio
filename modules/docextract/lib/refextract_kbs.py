@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -306,7 +306,7 @@ def build_reportnum_kb(fpath):
             for classification in preprint_classifications:
                 search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])([\[\(]?(?P<categ>' \
                                      + classification[0].strip() + u')' \
-                                     + numeration_regexp + u'[\]\)]?)'
+                                     + numeration_regexp + ur'[\]\)]?)'
 
                 re_search_pattern = re.compile(search_pattern_str,
                                                  re.UNICODE)

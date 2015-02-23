@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -37,7 +37,8 @@ if CFG_INSPIRE_SITE:
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">2</subfield>
     <subfield code="h">C. L. Sarazin, X-Ray Emission</subfield>
-    <subfield code="m">from Clusters of Galaxies (Cambridge University Press, Cambridge 1988)</subfield>
+    <subfield code="m">from Clusters of Galaxies (Cambridge University Press, Cambridge)</subfield>
+    <subfield code="y">1988</subfield>
   </datafield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">3</subfield>
@@ -100,7 +101,8 @@ else:
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">2</subfield>
       <subfield code="h">C. L. Sarazin, X-Ray Emission</subfield>
-      <subfield code="m">from Clusters of Galaxies (Cambridge University Press, Cambridge 1988)</subfield>
+      <subfield code="m">from Clusters of Galaxies (Cambridge University Press, Cambridge)</subfield>
+      <subfield code="y">1988</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">3</subfield>
