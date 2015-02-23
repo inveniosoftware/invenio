@@ -353,7 +353,11 @@ def task_run_core():
         if task_has_option("last"):
             recids += outdated_caches(fmt, last_updated)
 
-        if task_has_option('ignore_without'):
+        if task_has_option('ignore_without') or \
+                task_has_option('collection') or \
+                task_has_option('field') or \
+                task_has_option('pattern') or \
+                task_has_option('recids'):
             without_fmt = intbitset()
         else:
             without_fmt = missing_caches(fmt)
