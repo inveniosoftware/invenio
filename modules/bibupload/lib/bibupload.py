@@ -650,6 +650,13 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
                     if extoaisrc is None:
                         write_message('WARNING: Found recid %s for extoaiid="%s" that specify a provenance (%s), while input record does not have a provenance.' % (id_bibrec, extoaiid, this_extoaisrc), stream=sys.stderr)
 
+        if len(ret) == 0:
+            # no oaiid in CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG. Check if we have one
+            # in the locally used CFG_OAI_ID_FIELD that matches. This can happen
+            # if oai harvesting is used to duplicate records.
+            recid = find_record_from_oaiid(extoaiid)
+            if recid is not None:
+                ret.add(recid)
         return ret
     except Error, error:
         write_message("   Error during find_records_from_extoaiid(): %s "
@@ -674,7 +681,35 @@ def find_record_from_oaiid(oaiid):
         write_message("   Error during find_record_from_oaiid(): %s " % error,
                       verbose=1, stream=sys.stderr)
     if res:
-        return res[0][0]
+        if len(res) == 1:
+            return res[0][0]
+        else:
+            # Principle dupes detected.
+            # If the dupes are resolved only one record should have survived,
+            # and all others are deleted. => get non-deleted record(s)
+            lst = []
+            for r in res:
+                lst.append('recid:"%s"' % str(r[0]))
+            candidates = search_pattern(p=' or '.join(lst))
+            deleted    = search_pattern(p='980:"DELETED"')
+            recs = candidates.difference(deleted)
+            if len(recs) == 1:
+                # all dupes are resolved, use the not deleted record downstream
+                return recs[0]
+            else:
+                # Dupes persist. This should be a pathological case.
+                # Throw an error
+                error = "Supposed unique id not unique: %s in %s" % \
+                         (oaiid, str(recs.tolist()))
+                write_message("   Error during find_record_from_oaiid(): %s " % \
+                              error, verbose=1, stream=sys.stderr)
+
+                # TODO Is return none correct here? Is returning one id better?
+                # should we really fail, given that we just detected a
+                # multiplet? Note however that this function origially returned
+                # a scalar all the time so all calling functions suspect either
+                # one value or None.
+                return recs[0]
     else:
         return None
 
@@ -2268,7 +2303,7 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db, pretend=False):
-    if oai_rec_id != "" and oai_rec_id != None:
+    if oai_rec_id != "" and oai_rec_id is not None:
         query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         try:
             if not pretend:
