@@ -824,18 +824,23 @@ def cli_cmd_run_flask_tests(conf):
 
 def _detect_ip_address():
     """Detect IP address of this computer.  Useful for creating Apache
-    vhost conf snippet on RHEL like machines.
+    vhost conf snippet on RHEL like machines.  However, if wanted site
+    is 0.0.0.0, then use that, since we are running inside Docker.
 
     @return: IP address, or '*' if cannot detect
     @rtype: string
     @note: creates socket for real in order to detect real IP address,
         not the loopback one.
+
     """
+    from invenio.base.globals import cfg
+    if '0.0.0.0' in cfg.get('CFG_SITE_URL'):
+        return '0.0.0.0'
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('invenio-software.org', 0))
         return s.getsockname()[0]
-    except:
+    except Exception:
         return '*'
 
 
