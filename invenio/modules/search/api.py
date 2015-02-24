@@ -20,10 +20,12 @@
 """Search engine API."""
 
 import pypeg2
+import six
 
 from flask_login import current_user
-from invenio_query_parser.parser import Main
-from werkzeug.utils import cached_property
+from werkzeug.utils import cached_property, import_string
+
+from invenio.base.globals import cfg
 
 from .walkers.terms import Terms
 from .walkers.match_unit import MatchUnit
@@ -38,12 +40,21 @@ class SearchEngine(object):
         self._query = query
 
     @cached_property
+    def parser(self):
+        query_parser = cfg['SEARCH_QUERY_PARSER']
+        if isinstance(query_parser, six.string_types):
+            query_parser = import_string(query_parser)
+        return query_parser
+
+    @cached_property
     def query(self):
         """Parse query string using given grammar."""
-        from invenio_query_parser.walkers.pypeg_to_ast import \
-            PypegConverter
-        tree = pypeg2.parse(self._query, Main, whitespace="")
-        return tree.accept(PypegConverter())
+        tree = pypeg2.parse(self._query, self.parser, whitespace="")
+        for walker in cfg['SEARCH_QUERY_WALKERS']:
+            if isinstance(walker, six.string_types):
+                walker = import_string(walker)
+            tree = tree.accept(walker())
+        return tree
 
     def search(self, user_info=None, collection=None):
         """Search records."""
