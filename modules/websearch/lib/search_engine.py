@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
-## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=C0301,W0703
 
@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
-## import general modules:
+# import general modules:
 import cgi
 import cStringIO
 import copy
@@ -50,7 +50,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-## import Invenio stuff:
+# import Invenio stuff:
 from invenio.config import \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
@@ -185,11 +185,11 @@ from invenio.bibauthorid_config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT
 websearch_templates = invenio.template.load('websearch')
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
 
-## global vars:
+# global vars:
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
 
-## precompile some often-used regexp for speed reasons:
+# precompile some often-used regexp for speed reasons:
 re_word = re.compile(r'[\s]')
 re_quotes = re.compile('[\'\"]')
 re_doublequote = re.compile('\"')
@@ -209,7 +209,7 @@ re_pattern_today = re.compile(r"\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
 re_punctuation_followed_by_space = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + r'\s')
 
-## em possible values
+# em possible values
 EM_REPOSITORY={"body" : "B",
                "header" : "H",
                "footer" : "F",

@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __lastupdated__ = """$Date$"""
 
@@ -998,29 +998,29 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     __call__ = index
 
 
-## def retrieve_most_recent_attached_file(file_path):
-##     """
-##     Retrieve the latest file that has been uploaded with the
-##     CKEditor. This is the only way to retrieve files that the
-##     CKEditor has renamed after the upload.
+# def retrieve_most_recent_attached_file(file_path):
+#     """
+#     Retrieve the latest file that has been uploaded with the
+#     CKEditor. This is the only way to retrieve files that the
+#     CKEditor has renamed after the upload.
 
-##     Eg: 'prefix/image.jpg' was uploaded but did already
-##     exist. CKEditor silently renamed it to 'prefix/image(1).jpg':
-##     >>> retrieve_most_recent_attached_file('prefix/image.jpg')
-##     'prefix/image(1).jpg'
-##     """
-##     (base_path, filename) = os.path.split(file_path)
-##     base_name = os.path.splitext(filename)[0]
-##     file_ext = os.path.splitext(filename)[1][1:]
-##     most_recent_filename = filename
-##     i = 0
-##     while True:
-##         i += 1
-##         possible_filename = "%s(%d).%s" % \
-##                             (base_name, i, file_ext)
-##         if os.path.exists(base_path + os.sep + possible_filename):
-##             most_recent_filename = possible_filename
-##         else:
-##             break
+#     Eg: 'prefix/image.jpg' was uploaded but did already
+#     exist. CKEditor silently renamed it to 'prefix/image(1).jpg':
+#     >>> retrieve_most_recent_attached_file('prefix/image.jpg')
+#     'prefix/image(1).jpg'
+#     """
+#     (base_path, filename) = os.path.split(file_path)
+#     base_name = os.path.splitext(filename)[0]
+#     file_ext = os.path.splitext(filename)[1][1:]
+#     most_recent_filename = filename
+#     i = 0
+#     while True:
+#         i += 1
+#         possible_filename = "%s(%d).%s" % \
+#                             (base_name, i, file_ext)
+#         if os.path.exists(base_path + os.sep + possible_filename):
+#             most_recent_filename = possible_filename
+#         else:
+#             break
 
-##     return os.path.join(base_path, most_recent_filename)
+#     return os.path.join(base_path, most_recent_filename)

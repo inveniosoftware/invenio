@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.import re
+#
+# This file is part of Invenio.
+# Copyright (C) 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.import re
 """
 WebSearch services - provides the infrastructure to load/query search
 services
@@ -72,9 +72,9 @@ When do we consider that a service is not relevant enough to be displayed
 
 CFG_WEBSEARCH_SERVICE_MAX_NB_SERVICE_DISPLAY = 2 # Max number of answers/services to display to the user
 
-## Maximum number of matching collections names to be displayed on the
-## search results page. All the rest of the collections will be hidden
-## by a "See more collections" link.
+# Maximum number of matching collections names to be displayed on the
+# search results page. All the rest of the collections will be hidden
+# by a "See more collections" link.
 CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT = 4
 
 CFG_SEARCH_SERVICES_PATH =  os.path.join(CFG_PYLIBDIR, 'invenio', 'search_services')

@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Twitter fetcher
@@ -27,7 +27,7 @@ $ sudo -u www-data /opt/invenio/bin/bibtasklet -T bst_twitter_fetcher -uadmin -s
 
 """
 
-## Here we import the Twitter APIs
+# Here we import the Twitter APIs
 import twitter
 import re
 import os
@@ -36,20 +36,20 @@ import tempfile
 import time
 import sys
 
-## Here are some good Invenio APIs
+# Here are some good Invenio APIs
 
 from invenio.config import CFG_TMPDIR
 
-## BibRecord -> to create MARCXML records
+# BibRecord -> to create MARCXML records
 from invenio.bibrecord import record_add_field, record_xml_output
 
-## BibTask -> to manipulate Bibliographic Tasks
+# BibTask -> to manipulate Bibliographic Tasks
 from invenio.bibtask import task_low_level_submission, write_message, task_update_progress
 
-## BibDocFile to manipulate documents
+# BibDocFile to manipulate documents
 from invenio.bibdocfile import check_valid_url
 
-## WebSearch to search for previous tweets
+# WebSearch to search for previous tweets
 from invenio.search_engine import perform_request_search, get_fieldvalues
 
 _TWITTER_API = twitter.Api()

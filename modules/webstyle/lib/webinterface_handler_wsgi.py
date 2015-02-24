@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2009, 2010, 2011, 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """mod_python->WSGI Framework"""
 
@@ -50,23 +50,23 @@ from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception, get_pretty_traceback
 
-## Static files are usually handled directly by the webserver (e.g. Apache)
-## However in case WSGI is required to handle static files too (such
-## as when running wsgiref simple server), then this flag can be
-## turned on (it is done automatically by wsgi_handler_test).
+# Static files are usually handled directly by the webserver (e.g. Apache)
+# However in case WSGI is required to handle static files too (such
+# as when running wsgiref simple server), then this flag can be
+# turned on (it is done automatically by wsgi_handler_test).
 CFG_WSGI_SERVE_STATIC_FILES = False
 
 
-## Magic regexp to search for usage of CFG_SITE_URL within src/href or
-## any src usage of an external website
+# Magic regexp to search for usage of CFG_SITE_URL within src/href or
+# any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
 
-## Regexp to verify that the IP starts with a number (filter cases where 'unknown')
-## It is faster to verify only the start (585 ns) compared with verifying
-## the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
+# Regexp to verify that the IP starts with a number (filter cases where 'unknown')
+# It is faster to verify only the start (585 ns) compared with verifying
+# the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
 _RE_IPADDRESS_START = re.compile(r"^\d+\.")
 
-## Regexp to match IE User-Agent
+# Regexp to match IE User-Agent
 _RE_BAD_MSIE = re.compile(r"MSIE\s+(\d+\.\d+)")
 
 

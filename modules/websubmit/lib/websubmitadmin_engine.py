@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
 
@@ -41,7 +41,7 @@ except:
     pass
 
 
-## utility functions:
+# utility functions:
 
 def is_adminuser(req, role):
     """check if user is a registered administrator. """
@@ -291,9 +291,9 @@ def wash_single_urlarg(urlarg, argreqdtype, argdefault, maxstrlen=None, minstrle
     return result
 
 
-## Internal Business-Logic functions
+# Internal Business-Logic functions
 
-## Functions for managing collection order, etc:
+# Functions for managing collection order, etc:
 
 def build_submission_collection_tree(collection_id, has_brother_above=0, has_brother_below=0):
     ## get the name of this collection:
@@ -622,7 +622,7 @@ def perform_request_organise_submission_page(doctype="",
 
 
 
-## Functions for adding new catalgue to DB:
+# Functions for adding new catalgue to DB:
 def _add_new_action(actid,actname,working_dir,status_text):
     """Insert the details of a new action into the websubmit system database.
        @param actid: unique action id (sactname)
@@ -1545,7 +1545,7 @@ def _functionedit_update_description(funcname, funcdescr):
         user_msg.append("""'%s' Function Description Updated""" % (funcname,))
     else:
         ## Could not update function description
-## TODO : ERROR LIBS
+# TODO : ERROR LIBS
         user_msg.append("""Could Not Update Description for Function '%s'""" % (funcname,))
     ## Display function details
     (title, body) = _functionedit_display_function_details(funcname=funcname, user_msg=user_msg)
@@ -1568,7 +1568,7 @@ def _functionedit_delete_parameter(funcname, deleteparam):
         user_msg.append("""'%s' Parameter Deleted from '%s' Function""" % (deleteparam, funcname))
     else:
         ## could not delete param - it does not exist for this function
-## TODO : ERROR LIBS
+# TODO : ERROR LIBS
         user_msg.append("""'%s' Parameter Does not Seem to Exist for Function '%s' - Could not Delete""" \
                    % (deleteparam, funcname))
     ## Display function details
@@ -1592,7 +1592,7 @@ def _functionedit_add_parameter(funcname, funceditaddparam="", funceditaddparamf
     user_msg = []
     if funceditaddparam in ("", None, "NO_VALUE") and funceditaddparamfree in ("", None):
         ## no parameter chosen
-## TODO : ERROR LIBS
+# TODO : ERROR LIBS
         user_msg.append("""Unable to Find the Parameter to be Added to Function '%s' - Could not Add""" % (funcname,))
     else:
         add_parameter = ""
@@ -1612,7 +1612,7 @@ def _functionedit_add_parameter(funcname, funceditaddparam="", funceditaddparamf
             user_msg.append("""'%s' Parameter Added to '%s' Function""" % (add_parameter, funcname))
         else:
             ## could not add param - perhaps it already exists for this function
-## TODO : ERROR LIBS
+# TODO : ERROR LIBS
             user_msg.append("""Could not Add '%s' Parameter to Function '%s' - It Already Exists for this Function""" \
                        % (add_parameter, funcname))
     ## Display function details
@@ -2902,7 +2902,7 @@ def _create_configure_doctype_submission_functions_list_parameters_form(doctype,
         params = get_function_parameter_vals_doctype(doctype=doctype, paramlist=paramslist)
     else:
         params = ()
-##    params = get_parameters_name_and_value_for_function_of_doctype(doctype=doctype, function=functionname)
+#    params = get_parameters_name_and_value_for_function_of_doctype(doctype=doctype, function=functionname)
     body = websubmitadmin_templates.tmpl_configuredoctype_list_functionparameters(doctype=doctype,
                                                                                   action=action,
                                                                                   function=functionname,

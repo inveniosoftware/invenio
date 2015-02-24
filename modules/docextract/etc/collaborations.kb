@@ -1,8 +1,8 @@
-## This file holds text which must be recognised alongside authors, and hence included in the $h subfields.
-## Matches using this data do not affect how references are split.
-## (Just simply appends to the most recent $h subfield for the datafield, or makes a new one).
-## Do not append an 's' to the end.
-## Insert only the Upper cased version.
+# This file holds text which must be recognised alongside authors, and hence included in the $h subfields.
+# Matches using this data do not affect how references are split.
+# (Just simply appends to the most recent $h subfield for the datafield, or makes a new one).
+# Do not append an 's' to the end.
+# Insert only the Upper cased version.
 CMS Collaboration---CMS Collaboration
 ATLAS Collaboration---ATLAS Collaboration
 ALICE Collaboration---ALICE Collaboration

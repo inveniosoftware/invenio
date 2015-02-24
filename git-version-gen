@@ -2,9 +2,9 @@
 # Print a version string.
 scriptversion=2010-12-21.16; # UTC
 
-## Note by Tibor Simko: This is `git-version-gen' script taken from
-## gnulib 20100704+stable-1, with added support for vX.Y.Z-rcN style
-## of tags in Invenio.  Look for lines with the string Tibor.
+# Note by Tibor Simko: This is `git-version-gen' script taken from
+# gnulib 20100704+stable-1, with added support for vX.Y.Z-rcN style
+# of tags in Invenio.  Look for lines with the string Tibor.
 
 # Copyright (C) 2007-2010 Free Software Foundation, Inc.
 #

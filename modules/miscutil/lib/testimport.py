@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Test importing the Invenio module.  The program expects the prefix
@@ -51,7 +51,7 @@ except IndexError:
     print "Usage: %s <prefix>" % sys.argv[0]
     sys.exit(1)
 
-## Firstly, check importing invenio:
+# Firstly, check importing invenio:
 try:
     import invenio
     DUMMY = invenio # to make checkers happy
@@ -80,8 +80,8 @@ except ImportError, e:
     """
     sys.exit(1)
 
-## Secondly, check nested symlink problem that people sometimes do on
-## some OS-es when they overdo the symbolic linking:
+# Secondly, check nested symlink problem that people sometimes do on
+# some OS-es when they overdo the symbolic linking:
 if os.path.exists(PREFIX + '/lib/python/invenio/invenio'):
     print """
     ******************************************************

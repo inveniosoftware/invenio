@@ -1,24 +1,24 @@
 #!/bin/sh
-## -*- mode: script; coding: utf-8; -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# -*- mode: script; coding: utf-8; -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## fill config variables:
+# fill config variables:
 VERSION='0.1'
 LISPIMAGEDIR=@prefix@/lib/lisp/invenio
 CONFIGDIR=@prefix@/etc/webstat
@@ -34,7 +34,7 @@ searchstringmonth="^\(>> \)*"`date +%Y-%m-`
 searchstringday="$searchstringmonth"`date +%d`
 numberoferrors=100
 
-## usage helper function:
+# usage helper function:
 usage () {
     echo "Usage:" $0 "[options] <httpd-log-file>"
     echo "General options:"
@@ -155,32 +155,32 @@ apacheErrorRanking(){
     echo "$errorsbyclient"
 }
 
-## looking for version number?
+# looking for version number?
 if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo $VERSION
     exit 0
 fi
 
-## looking for help?
+# looking for help?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     usage
     exit 0
 fi
 
-## looking for error log analyzer mode?
+# looking for error log analyzer mode?
 if [ "$1" = "-e" ] || [ "$1" = "--error-log" ]; then
     errorLogMode $*
     exit 0
 fi
 
-## do we have enough arguments?
+# do we have enough arguments?
 if [ ! -n "$1" ]; then
     echo "Error: Not enough arguments."
     usage
     exit 1
 fi
 
-## are input files okay?
+# are input files okay?
 FILECFG=${CONFIGDIR}/webstat.cfg
 FILELOG=$1
 if [ ! -f $FILECFG ]; then
@@ -192,7 +192,7 @@ if [ ! -f $FILELOG ]; then
     exit 1
 fi
 
-## check which Common Lisp implementation to use?
+# check which Common Lisp implementation to use?
 if [ "$LISP" == "" ]; then
     LISP=cmucl
     if [ ! -s ${LISPIMAGEDIR}/webstat.$LISP.core ]; then
@@ -207,7 +207,7 @@ if [ "$LISP" == "" ]; then
     fi
 fi
 
-## okay, try to run the process:
+# okay, try to run the process:
 if [ "$LISP" == "cmucl" ]; then
     $CMUCL -core ${LISPIMAGEDIR}/webstat.$LISP.core -quiet -batch \
            -eval "(progn (analyze-httpd-log-file \"$FILECFG\" \"$FILELOG\")(quit))"

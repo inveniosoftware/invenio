@@ -86,10 +86,10 @@ cdef tuple median(float e10,float e11, float e20, float e21, int verts1, int ver
 #
 #    result = numpy.ndarray(shape=(size, 2), dtype=float, order='C')
 #    gc.disable()
-##    for i in xrange(size):
-##        result[i] = median(out_edges1[i], out_edges2[i])
-##        assert (result[i][0] >= 0 and result[i][0] <= 1) or result[i][0] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: value %s' % result[i]
-##        assert (result[i][1] >= 0 and result[i][1] <= 1) or result[i][1] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: compat %s' % result[i]
+#    for i in xrange(size):
+#        result[i] = median(out_edges1[i], out_edges2[i])
+#        assert (result[i][0] >= 0 and result[i][0] <= 1) or result[i][0] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: value %s' % result[i]
+#        assert (result[i][1] >= 0 and result[i][1] <= 1) or result[i][1] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: compat %s' % result[i]
 #    result = [median(x,y) for x,y in izip(out_edges1, out_edges2)]
 #    gc.enable()
 #    return (result, vsum)

@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Test the suitability of Python core and the availability of various
@@ -22,12 +22,12 @@ eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
 running from configure.ac.
 """
 
-## minimally recommended/required versions:
+# minimally recommended/required versions:
 cfg_min_python_version = "2.6"
 cfg_max_python_version = "2.9.9999"
 cfg_min_mysqldb_version = "1.2.1_p2"
 
-## 0) import modules needed for this testing:
+# 0) import modules needed for this testing:
 import string
 import sys
 import getpass
@@ -48,7 +48,7 @@ def wait_for_user(msg):
         print " (continuing in batch mode)"
         return
 
-## 1) check Python version:
+# 1) check Python version:
 if sys.version < cfg_min_python_version:
     error_messages.append(
     """
@@ -88,7 +88,7 @@ if sys.version > cfg_max_python_version:
     """ % (string.replace(sys.version, "\n", ""), cfg_max_python_version)
     )
 
-## 2) check for required modules:
+# 2) check for required modules:
 try:
     import MySQLdb
     import base64
@@ -128,7 +128,7 @@ except ImportError, msg:
     """ % msg
     )
 
-## 3) check for recommended modules:
+# 3) check for recommended modules:
 try:
     import rdflib
 except ImportError, msg:
@@ -367,7 +367,7 @@ except ImportError, msg:
     """ % msg
     )
 
-## 4) check for versions of some important modules:
+# 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
     error_messages.append(
     """
@@ -404,7 +404,7 @@ try:
 except ImportError:
     pass # no prob, Stemmer is optional
 
-## 5) check for Python.h (needed for intbitset):
+# 5) check for Python.h (needed for intbitset):
 try:
     from distutils.sysconfig import get_python_inc
     path_to_python_h = get_python_inc() + os.sep + 'Python.h'
@@ -426,7 +426,7 @@ except StandardError, msg:
     """ % (msg)
     )
 
-## 6) Check if ffmpeg is installed and if so, with the minimum configuration for bibencode
+# 6) Check if ffmpeg is installed and if so, with the minimum configuration for bibencode
 try:
     try:
         process = subprocess.Popen('ffprobe', stderr=subprocess.PIPE, stdout=subprocess.PIPE)

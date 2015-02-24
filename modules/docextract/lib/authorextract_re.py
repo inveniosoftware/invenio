@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 # pylint: disable=C0103
 
 import re
@@ -336,11 +336,11 @@ def make_auth_regex_str(etal, initial_surname_author=None, surname_initial_autho
            's_i_author' : surname_initial_author,
            'ed'         : re_ed_notation}
 
-## Standard et al ('and others') pattern for author recognition
+# Standard et al ('and others') pattern for author recognition
 re_etal = ur"""[Ee][Tt](?:(?:(?:,|\.)\s*)|(?:(?:,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?"""
 
-## Finding an et. al, before author names indicates a bad match!!!
-## I.e. could be a title match... ignore it
+# Finding an et. al, before author names indicates a bad match!!!
+# I.e. could be a title match... ignore it
 etal_matches = (
     u' et al.,',
     u' et. al.,',
@@ -362,21 +362,21 @@ re_ed_notation = ur"""
     )""" % {'text': re_ed_text}
 
 
-## Used as a weak mechanism to classify possible authors above identified affiliations
-## (start) Firstname SurnamePrefix Surname (end)
+# Used as a weak mechanism to classify possible authors above identified affiliations
+# (start) Firstname SurnamePrefix Surname (end)
 re_ambig_auth = re.compile(ur"^\s*[A-Z][^\s_<>0-9]+\s+([^\s_<>0-9]{1,3}\.?\s+)?[A-Z][^\s_<>0-9]+\s*$",
                            re.UNICODE)
 
-## Obtain the compiled expression which includes the proper author numeration
-## (The pattern used to identify authors of papers)
-## This pattern will match groups of authors, from the start of the line
+# Obtain the compiled expression which includes the proper author numeration
+# (The pattern used to identify authors of papers)
+# This pattern will match groups of authors, from the start of the line
 # re_auth_with_number = re.compile(make_auth_regex_str(
 #         re_etal,
 #         get_initial_surname_author_pattern(incl_numeration=True),
 #         get_surname_initial_author_pattern(incl_numeration=True)
 #     ), re.VERBOSE | re.UNICODE)
 
-## Used to obtain authors chained by connectives across multiple lines
+# Used to obtain authors chained by connectives across multiple lines
 re_comma_or_and_at_start = re.compile(ur"^(,|((,\s*)?[Aa][Nn][Dd]|&))\s", re.UNICODE)
 
 
@@ -445,7 +445,7 @@ def get_single_author_pattern():
            "|" + get_surname_initial_author_pattern(incl_numeration=True) + ")"
 
 
-## Targets single author names
+# Targets single author names
 # re_single_author_pattern = re.compile(get_single_author_pattern(), re.VERBOSE)
 
 
