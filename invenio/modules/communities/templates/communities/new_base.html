@@ -26,20 +26,24 @@
 {% block body %}
 {% if not is_new %}
 <div id="deletemodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletemodal_label" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="deletemodal_label">Delete community?</h3>
-  </div>
-  <div class="modal-body">
-    <div class="alert alert-danger"><h5>Warning</h5><ul><li>You will loose all connections to records currently attached to this community and you will not be able to recover them.</li><li>Any external repository harvesting your community collection will stop working.</li></ul></div>
-  </div>
-  <div class="modal-footer">
-    <form action="{{url_for('.delete', community_id=community.id)}}" method="POST">
-        {%- for field in deleteform %}{{ field }}{% endfor %}
-        <button class="btn btn-large" data-dismiss="modal" aria-hidden="true">No, thanks</button>
-        <button type="submit" href="{{ url_for('.delete', community_id=community.id) }}" class="btn btn-danger"><i class="icon-trash  icon-white"></i> Yes, delete</button>
-    </form>
-  </div>
+    <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="deletemodal_label">Delete community?</h3>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger"><h5>Warning</h5><ul><li>You will loose all connections to records currently attached to this community and you will not be able to recover them.</li><li>Any external repository harvesting your community collection will stop working.</li></ul></div>
+      </div>
+      <div class="modal-footer">
+        <form action="{{url_for('.delete', community_id=community.id)}}" method="POST">
+            {%- for field in deleteform %}{{ field }}{% endfor %}
+            <button class="btn btn-large" data-dismiss="modal" aria-hidden="true">No, thanks</button>
+            <button type="submit" href="{{ url_for('.delete', community_id=community.id) }}" class="btn btn-danger"><i class="icon-trash  icon-white"></i> Yes, delete</button>
+        </form>
+      </div>
+      </div>
+    </div>
 </div>
 {% endif %}
 <div class="row">
@@ -165,7 +169,7 @@
         {%- endfor %}
         </div>
         <div class="well clearfix" style="margin-top: 10px;">
-            <a role="button" data-toggle="modal" class="btn btn-danger pull-left{% if is_new %} hide{% endif %}" href="#deletemodal"><i class="icon-trash  icon-white"></i> Delete</a>
+            <button type="button" role="button" data-toggle="modal" class="btn btn-danger pull-left{% if is_new %} hide{% endif %}" data-target="#deletemodal"><i class="icon-trash  icon-white"></i> Delete</button>
             <span class="pull-right">
                 <span class="loader"><img src="{{ url_for('static', filename='img/ajax-loader.gif' ) }}" /></span>
                 <button type="submit" class="btn btn-primary edit-form-submit"><i class="icon-ok  icon-white"></i> {% if is_new %}Create{% else %}Save{% endif %}</a>
