@@ -176,7 +176,7 @@ class Community(db.Model):
         if self.logo_ext:
             return url_for(
                 'static',
-                filename='user' + '/' + self.id + self.logo_ext)
+                filename='media/communities' + '/' + self.id + self.logo_ext)
         else:
             return None
 

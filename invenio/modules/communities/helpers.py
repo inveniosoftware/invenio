@@ -26,7 +26,8 @@ from invenio.base.globals import cfg
 
 def save_and_validate_logo(logo, filename, prev_ext=None):
     """Validate if communities logo is in limit size and save it."""
-    base_path = os.path.join(cfg['COLLECT_STATIC_ROOT'], 'user')
+    base_path = os.path.join(cfg['COLLECT_STATIC_ROOT'], 'media',
+                             'communities')
     ext = os.path.splitext(logo.filename)[1]
     new_logo_path = os.path.join(base_path, filename + ext)
     prev_logo_path = None
@@ -37,7 +38,7 @@ def save_and_validate_logo(logo, filename, prev_ext=None):
     if ext in cfg['COMMUNITIES_LOGO_EXTENSIONS']:
 
         if not os.path.exists(base_path):
-            os.mkdir(base_path, 0755)
+            os.makedirs(base_path, 0755)
 
         if prev_ext:
             prev_logo_path = os.path.join(base_path, filename + prev_ext)
