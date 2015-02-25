@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@
 </div>
 <div class="row">
     <div id="file_container" class="col-md-8">
-        <form action="." method="POST" id="edit_form" class="form-horizontal" role="form">
+        <form action="." method="POST" id="edit_form" class="form-horizontal" enctype="multipart/form-data" role="form">
         <div class="panel-group">
         {% if not is_new %}
             <div class="panel panel-default">
@@ -133,6 +133,12 @@
                                     {{ field.label.text }}
                                 </label>
                                 <div class="controls col-md-9">
+                                    {%- if field.type == "FileField" and community.logo_url %}
+                                      <div>
+                                        <img src="{{ community.logo_url }}" style="display: block; margin: auto; max-width: 100%; max-height: 200px;">
+                                        <br>
+                                      </div>
+                                    {%- endif %}
                                     {% if form.has_autocomplete(field) %}
                                     <div id="{{f}}_values" class="col-md-5 tag-values"><ul class="unstyled">{% if f == "funding_source" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}</ul></div>
                                     {% endif %}
@@ -214,5 +220,74 @@ function init_ckeditor(selector, type) {
 
 init_ckeditor("page", 'advanced');
 init_ckeditor("description", 'simple');
+
+/**
+ * Module validating FileField
+ * @module FileFieldValidator
+ */
+(function () {
+    "use strict";
+    /** @constant {number}
+     *  @default 1.5MB
+     */
+    var MAX_SIZE = 1.5e+6;
+    /** @constant {string[]} */
+    var COMMUNITIES_LOGO_EXTENSIONS = {{ config.COMMUNITIES_LOGO_EXTENSIONS|tojson }};
+    /**
+     * Validate if given file name is supported.
+     * @param {string} filename - Name of the file to be validated.
+     * @param {string[]} exts - Array of supported extensions.
+     * @returns {boolean} isValid - Flag showing if the file has valid extension.
+     */
+    var hasValidExt = function hasValidExt(filename, exts) {
+        var isValid = false;
+        if (filename.split(".").length >= 2) {
+            var ext = "." + filename.split(".").pop();
+            if (exts.indexOf(ext) >= 0) {
+                isValid = true;
+            }
+        }
+        return isValid;
+    }
+    /**
+     * Convert bytes to human-readable
+     * @param {number} bytes - Size in bytes.
+     * @returns {string} - Specially formatted result.
+     */
+     var bytesToSize =  function bytesToSize( bytes ) {
+       if ( bytes == 0 ) return '0 Byte';
+       var k = 1000;
+       var sizes = ['Bytes', 'KB', 'MB', 'GB'];
+       var i = Math.floor( Math.log(bytes) / Math.log(k) );
+       return ( bytes / Math.pow(k, i) ).toPrecision(2) + ' ' + sizes[i];
+    }
+
+    var logo = document.getElementById('logo');
+    var error_logo = document.getElementById('error-logo');
+    if ( logo ) {
+        logo.addEventListener('change', function () {
+            if ( this.files[0].size > MAX_SIZE ) {
+                // maximum file size exceeded
+                if ( error_logo ) {
+                    error_logo.style.display = "inline";
+                    error_logo.innerHTML = "File size exceeded. Maximum file size is: " + bytesToSize(MAX_SIZE);
+                }
+                logo.value = "";
+            } else if (!hasValidExt(this.files[0].name, COMMUNITIES_LOGO_EXTENSIONS)) {
+                // wrong file extension
+                if ( error_logo ) {
+                    error_logo.style.display = "inline";
+                    error_logo.innerHTML = "Wrong file extension. Should be one of: " + COMMUNITIES_LOGO_EXTENSIONS.join(", ");
+                }
+                logo.value = "";
+            } else {
+                // standard file size
+                if ( error_logo ) {
+                    error_logo.style.display = "none";
+                }
+            }
+        });
+    }
+}());
 </script>
 {% endblock %}

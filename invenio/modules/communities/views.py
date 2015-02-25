@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,26 +21,28 @@
 
 from __future__ import absolute_import
 
-from flask import render_template, abort, request, flash, \
-    redirect, url_for, jsonify, Blueprint
+from flask import Blueprint, abort, flash, jsonify, redirect, \
+    render_template, request, url_for
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user, login_required
 from flask.ext.menu import register_menu
 
+
 from invenio.base.decorators import wash_arguments
+from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.cache import cache
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
-from invenio.utils.pagination import Pagination
 from invenio.modules.formatter import format_record
+from invenio.utils.pagination import Pagination
 
-from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm, SearchForm
+from .forms import CommunityForm, DeleteCommunityForm, \
+    EditCommunityForm, SearchForm
+from .helpers import save_and_validate_logo
 from .models import Community, FeaturedCommunity
 from .signals import curate_record
-from invenio.base.globals import cfg
-
 
 blueprint = Blueprint(
     'communities',
@@ -94,8 +96,12 @@ def communities(bfo, is_owner=False, provisional=False, public=True,
     for cid in bfo.fields('980__a'):
         if exclude is not None and cid in exclude:
             continue
-        if provisional and cid.startswith(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):
-            colls.append(cid[len(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):])
+        if (
+            provisional and
+            cid.startswith(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-")
+        ):
+            colls.append(
+                cid[len(cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + "-"):])
         elif public and cid.startswith(cfg['COMMUNITIES_ID_PREFIX'] + "-"):
             colls.append(cid[len(cfg['COMMUNITIES_ID_PREFIX'] + "-"):])
 
@@ -112,7 +118,8 @@ def community_state(bfo, ucoll_id=None):
 
     :param coll: Collection object
     """
-    coll_id_reject = cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + ("-%s" % ucoll_id)
+    coll_id_reject = cfg['COMMUNITIES_ID_PREFIX_PROVISIONAL'] + \
+        ("-%s" % ucoll_id)
     coll_id_accept = cfg['COMMUNITIES_ID_PREFIX'] + ("-%s" % ucoll_id)
     for cid in bfo.fields('980__a'):
         if cid == coll_id_accept:
@@ -127,7 +134,8 @@ def mycommunities_ctx():
     """Helper method for return ctx used by many views."""
     return {
         'mycommunities': Community.query.filter_by(
-            id_user=current_user.get_id()).order_by(db.asc(Community.title)).all()
+            id_user=current_user.get_id()
+            ).order_by(db.asc(Community.title)).all()
     }
 
 
@@ -226,7 +234,8 @@ def curate():
             if email != current_user['email']:
                 abort(403)
             # inform interested parties of removing collection/community
-            curate_record.send(u, action=action, recid=recid, user=current_user)
+            curate_record.send(u, action=action,
+                               recid=recid, user=current_user)
         except (IndexError, KeyError):
             abort(403)
 
@@ -273,12 +282,28 @@ def new():
         data = form.data
         data['id'] = data['identifier']
         del data['identifier']
-        c = Community(id_user=uid, **data)
-        db.session.add(c)
-        db.session.commit()
-        c.save_collections()
-        flash("Community was successfully created.", category='success')
-        return redirect(url_for('.index'))
+        del data['logo']
+        logo_ext = None
+        file = request.files.get('logo', None)
+        if file:
+            logo_ext = save_and_validate_logo(file, data['id'])
+            if not logo_ext:
+                form.logo.errors.append(
+                    _(
+                        'Cannot add this file as a logo.'
+                        ' Supported formats: png and jpg.'
+                        ' Max file size: 1.5MB'
+                    )
+                )
+            else:
+                data['logo_ext'] = logo_ext
+        if not file or (file and logo_ext):
+            c = Community(id_user=uid, **data)
+            db.session.add(c)
+            db.session.commit()
+            c.save_collections()
+            flash("Community was successfully created.", category='success')
+            return redirect(url_for('.index'))
 
     return render_template(
         "communities/new.html",
@@ -312,12 +337,28 @@ def edit(community_id):
     })
 
     if request.method == 'POST' and form.validate():
-        for field, val in form.data.items():
-            setattr(u, field, val)
-        db.session.commit()
-        u.save_collections()
-        flash("Community successfully edited.", category='success')
-        return redirect(url_for('.edit', community_id=u.id))
+        file = request.files.get('logo', None)
+        if file:
+            logo_ext = save_and_validate_logo(file, u.id, u.logo_ext)
+            if not logo_ext:
+                form.logo.errors.append(
+                    _(
+                        'Cannot add this file as a logo.'
+                        ' Supported formats: png and jpg.'
+                        ' Max file size: 1.5MB'
+                    )
+                )
+            else:
+                setattr(u, 'logo_ext', logo_ext)
+        if not file or (file and logo_ext):
+            for field, val in form.data.items():
+                if field == "logo":
+                    continue
+                setattr(u, field, val)
+            db.session.commit()
+            u.save_collections()
+            flash("Community successfully edited.", category='success')
+            return redirect(url_for('.edit', community_id=u.id))
 
     return render_template(
         "communities/new.html",

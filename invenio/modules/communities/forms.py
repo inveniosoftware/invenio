@@ -24,7 +24,8 @@ from __future__ import absolute_import
 from invenio.base.i18n import _
 from invenio.utils.forms import InvenioBaseForm, InvenioForm as Form
 
-from wtforms import HiddenField, StringField, TextAreaField, validators
+from wtforms import FileField, HiddenField, \
+    StringField, TextAreaField, validators
 
 from .models import Community
 
@@ -45,7 +46,7 @@ class CommunityForm(Form):
     field_sets = [
         ('Information', [
             'identifier', 'title', 'description', 'curation_policy',
-            'page'
+            'page', 'logo'
         ], {'classes': 'in'}),
     ]
 
@@ -116,6 +117,14 @@ class CommunityForm(Form):
         description=_(
             'Optional. A short description of the community collection,'
             ' which will be displayed on the index page of the community.'),
+    )
+
+    logo = FileField(
+        label=_('Logo'),
+        description=_(
+            "Optional. Image file used to aid and promote instant public"
+            " recognition. Supported formats: png and jpg."
+            " Max file size: 1.5MB")
     )
 
     curation_policy = TextAreaField(
