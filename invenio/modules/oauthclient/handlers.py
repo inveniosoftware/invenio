@@ -99,7 +99,7 @@ def oauth2_token_setter(remote, resp, token_type='', extra_data=None):
         resp['access_token'],
         secret='',
         token_type=token_type,
-        extra_data={'refresh_token': resp.get('refresh_token')},
+        extra_data=extra_data,
     )
 
 
