@@ -308,7 +308,6 @@ setup(
             ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
-            'webcoll = invenio.legacy.websearch.scripts.webcoll:main',
             'webmessageadmin = '
             ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
             'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',

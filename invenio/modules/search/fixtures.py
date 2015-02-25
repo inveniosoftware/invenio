@@ -315,8 +315,8 @@ class TagData(DataSet):
 
     class Tag_11:
         id = 11
-        value = u'980__%'
-        recjson_value = u'collection'
+        value = u''
+        recjson_value = u'_collections'
         name = u'collection identifier'
 
     class Tag_12:
@@ -946,7 +946,7 @@ class TagData(DataSet):
     class Tag_116:
         id = 116
         value = u'909C0e'
-        recjson_value = u'experiment'
+        recjson_value = u'accelerator_experiment.experiment'
         name = u'experiment'
 
     class Tag_117:

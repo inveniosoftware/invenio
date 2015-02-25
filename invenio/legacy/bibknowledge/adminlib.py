@@ -107,7 +107,7 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to",
     dyn_config = None
     collections = None
     if kb_type == 'd':
-        from invenio.modules.search.models import Collection
+        from invenio.modules.collections.models import Collection
         collections = [
             c[0] for c in Collection.query.order_by('name').values('name')
         ]

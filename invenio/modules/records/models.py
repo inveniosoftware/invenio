@@ -103,13 +103,13 @@ class Record(db.Model):
     @cached_property
     def is_restricted(self):
         """Return True is record is restricted."""
-        from invenio.modules.search.cache import get_all_restricted_recids
+        from invenio.modules.collections.cache import get_all_restricted_recids
         return self.id in get_all_restricted_recids() or self.is_processed
 
     @cached_property
     def is_processed(self):
         """Return True is recods is processed (not in any collection)."""
-        from invenio.modules.search.cache import is_record_in_any_collection
+        from invenio.modules.collections.cache import is_record_in_any_collection
         return not is_record_in_any_collection(self.id,
                                                recreate_cache_if_needed=False)
 

@@ -30,7 +30,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.utils.serializers import deserialize_via_marshal
 
 # Create your models here.
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 
 class BsrMETHOD(db.Model):

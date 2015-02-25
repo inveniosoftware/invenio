@@ -19,20 +19,17 @@
 
 """Utility functions for search engine."""
 
-from six import string_types, iteritems
+import numpy
 
-from .cache import (
+from six import string_types, iteritems
+from intbitset import intbitset
+
+from invenio.base.globals import cfg
+from invenio.modules.collections.cache import (
     get_collection_allchildren,
     get_collection_reclist,
     restricted_collection_cache,
 )
-
-try:
-    # import optional module:
-    import numpy
-    CFG_NUMPY_IMPORTABLE = True
-except ImportError:
-    CFG_NUMPY_IMPORTABLE = False
 
 
 def get_most_popular_field_values(recids, tags, exclude_values=None,
@@ -65,18 +62,6 @@ def get_most_popular_field_values(recids, tags, exclude_values=None,
     :return: list of tuples containing tag and its frequency
     """
     from invenio.legacy.bibrecord import get_fieldvalues
-
-    def _get_most_popular_field_values_helper_sorter(val1, val2):
-        """Compare VAL1 and VAL2.
-
-        First, compare by frequencies, then alphabetically.
-        """
-        compared_via_frequencies = cmp(valuefreqdict[val2],
-                                       valuefreqdict[val1])
-        if compared_via_frequencies == 0:
-            return cmp(val1.lower(), val2.lower())
-        else:
-            return compared_via_frequencies
 
     valuefreqdict = {}
     # sanity check:
@@ -115,42 +100,25 @@ def get_most_popular_field_values(recids, tags, exclude_values=None,
             else:
                 valuefreqdict[val] = 1
     # sort by descending frequency of values:
-    if not CFG_NUMPY_IMPORTABLE:
-        # original version
-        out = []
-        vals = valuefreqdict.keys()
-        vals.sort(_get_most_popular_field_values_helper_sorter)
-        for val in vals:
-            tmpdisplv = ''
-            if val in displaytmp:
-                tmpdisplv = displaytmp[val]
-            else:
-                tmpdisplv = val
-            out.append((tmpdisplv, valuefreqdict[val]))
-        return out
-    else:
-        f = []   # frequencies
-        n = []   # original names
-        ln = []  # lowercased names
-        # build lists within one iteration
-        for (val, freq) in iteritems(valuefreqdict):
-            f.append(-1 * freq)
-            if val in displaytmp:
-                n.append(displaytmp[val])
-            else:
-                n.append(val)
-            ln.append(val.lower())
-        # sort by frequency (desc) and then by lowercased name.
-        return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
+    f = []   # frequencies
+    n = []   # original names
+    ln = []  # lowercased names
+    # build lists within one iteration
+    for (val, freq) in iteritems(valuefreqdict):
+        f.append(-1 * freq)
+        if val in displaytmp:
+            n.append(displaytmp[val])
+        else:
+            n.append(val)
+        ln.append(val.lower())
+    # sort by frequency (desc) and then by lowercased name.
+    return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
 
 
 def get_records_that_can_be_displayed(permitted_restricted_collections,
                                       hitset_in_any_collection,
                                       current_coll=None, colls=None):
     """Return records that can be displayed."""
-    from intbitset import intbitset
-    from invenio.base.globals import cfg
-
     current_coll = current_coll or cfg['CFG_SITE_NAME']
     records_that_can_be_displayed = intbitset()
 
@@ -201,6 +169,7 @@ def get_records_that_can_be_displayed(permitted_restricted_collections,
         records_that_can_be_displayed = intbitset()
         for coll in colls_to_be_displayed:
             records_that_can_be_displayed |= get_collection_reclist(coll)
+        records_that_can_be_displayed -= notpermitted_recids
 
     return records_that_can_be_displayed
 

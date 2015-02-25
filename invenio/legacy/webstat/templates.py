@@ -312,7 +312,7 @@ class Template:
         """
         out = """<h3>Collections stats</h3>
                  <ul>"""
-        from invenio.modules.search.models import Collection
+        from invenio.modules.collections.models import Collection
         for collection in Collection.query.filter_by(
                 name=CFG_SITE_NAME).one().collection_children_r:
             coll = collection.name

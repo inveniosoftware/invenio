@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,25 +19,27 @@
 
 """Facet utility functions."""
 
-from operator import itemgetter
-from itertools import groupby
-from six import iteritems
 from flask import g, url_for, request
 from flask.ext.login import current_user
+from intbitset import intbitset
+from itertools import groupby
+from operator import itemgetter
+from six import iteritems
+
+from invenio.base.globals import cfg
+from invenio.modules.collections.cache import get_collection_reclist
+from invenio.modules.collections.models import Collection
 
 from .cache import (
     get_search_results_cache_key_from_qid,
     search_results_cache,
 )
 from .engine import search_unit
-from .models import Collection, Field
+from .models import Field
 from .utils import (
     get_most_popular_field_values,
     get_records_that_can_be_displayed,
 )
-
-from invenio.base.globals import cfg
-from intbitset import intbitset
 
 
 def get_current_user_records_that_can_be_displayed(qid):
@@ -187,7 +189,9 @@ class CollectionFacetBuilder(FacetBuilder):
                 collection = Collection.query.get(1)
         facet = []
         for c in collection.collection_children_r:
-            num_records = len(c.reclist.intersection(recIDsHitSet))
+            num_records = len(get_collection_reclist(
+                c.name, recreate_cache_if_needed=False
+            ).intersection(recIDsHitSet))
             if num_records:
                 facet.append((c.name, num_records, c.name_ln))
         return sorted(facet, key=lambda x: x[1], reverse=True)[0:limit]

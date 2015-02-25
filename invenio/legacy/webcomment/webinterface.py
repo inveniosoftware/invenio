@@ -91,7 +91,7 @@ from invenio.legacy.bibdocfile.api import \
      stream_file, \
      decompose_file, \
      propose_next_docname
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""

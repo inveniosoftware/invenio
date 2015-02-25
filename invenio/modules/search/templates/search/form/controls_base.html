@@ -25,7 +25,7 @@
        type="text"
        tabindex="1"
        value="{{ request.args.get('p', '') }}"
-       {%- if request.endpoint == 'search.index' %}
+       {%- if request.endpoint == 'collections.index' %}
        autofocus
        {%- endif -%}/>
 {%- endblock -%}

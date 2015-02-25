@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2010, 2011, 2014 CERN.
+# Copyright (C) 2008, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -39,7 +39,6 @@ from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
     CFG_SITE_RECORD, CFG_SITE_LANGS, CFG_TMPSHAREDDIR
 from intbitset import intbitset
-from invenio.legacy.websearch.webcoll import Collection
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
 from invenio.utils.text import encode_for_xml
 from invenio.utils.url import get_canonical_and_alternates_urls
@@ -115,19 +114,19 @@ def get_all_public_collections(base_collections):
         return max(minimum_timestamp, last_mod)
 
     output = []
-    for coll_name in base_collections:
-        mother_collection = Collection(coll_name)
-        if not mother_collection.restricted_p():
-            last_mod = get_collection_last_modification(mother_collection)
-            output.append((coll_name, last_mod))
-            for descendant in mother_collection.get_descendants(type='r'):
-                if not descendant.restricted_p():
-                    last_mod = get_collection_last_modification(descendant)
-                    output.append((descendant.name, last_mod))
-            for descendant in mother_collection.get_descendants(type='v'):
-                if not descendant.restricted_p():
-                    last_mod = get_collection_last_modification(descendant)
-                    output.append((descendant.name, last_mod))
+    # for coll_name in base_collections:
+    #     mother_collection = Collection(coll_name)
+    #     if not mother_collection.restricted_p():
+    #         last_mod = get_collection_last_modification(mother_collection)
+    #         output.append((coll_name, last_mod))
+    #         for descendant in mother_collection.get_descendants(type='r'):
+    #             if not descendant.restricted_p():
+    #                 last_mod = get_collection_last_modification(descendant)
+    #                 output.append((descendant.name, last_mod))
+    #         for descendant in mother_collection.get_descendants(type='v'):
+    #             if not descendant.restricted_p():
+    #                 last_mod = get_collection_last_modification(descendant)
+    #                 output.append((descendant.name, last_mod))
     return output
 
 def filter_fulltexts(recids, fulltext_type=None):

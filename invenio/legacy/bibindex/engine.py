@@ -1435,7 +1435,7 @@ class WordTable(AbstractIndexTable):
                                           wlist[recID])
 
         marc, nonmarc = self.find_nonmarc_records(recID1, recID2)
-        if marc:
+        if marc and len(self.tags):
             collector = TermCollector(self.tokenizer,
                                       self.tokenizer_type,
                                       self.table_type,
@@ -1443,14 +1443,15 @@ class WordTable(AbstractIndexTable):
                                       [recID1, recID2])
             collector.set_special_tags(self.special_tags)
             wlist = collector.collect(marc, wlist)
-        if nonmarc:
+        if nonmarc or (not len(self.tags) and len(self.nonmarc_tags)):
             collector = NonmarcTermCollector(self.tokenizer,
                                              self.tokenizer_type,
                                              self.table_type,
                                              self.nonmarc_tags,
                                              [recID1, recID2])
             collector.set_special_tags(self.special_tags)
-            wlist = collector.collect(nonmarc, wlist)
+            toindex = nonmarc if len(self.tags) else marc
+            wlist = collector.collect(toindex, wlist)
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()

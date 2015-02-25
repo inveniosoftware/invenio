@@ -70,11 +70,11 @@ class TestSearchUnitFunction(InvenioTestCase):
 
         self.assertEqual(
             search_engine.search_unit('Preprints', 'collection'),
-            search_engine.search_unit('PREPRINT', 'collection'))
+            search_engine.search_unit('PREPRINT', '980'))
 
         self.assertEqual(
             search_engine.search_unit('Books', 'collection'),
-            search_engine.search_unit('BOOK', 'collection'))
+            search_engine.search_unit('BOOK', '980'))
 
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
