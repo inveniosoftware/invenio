@@ -229,7 +229,7 @@ class Community(db.Model):
     def filter_communities(cls, p, so):
         """Search for communities.
 
-        Hellper function which takes from database only those communities which
+        Helper function which takes from database only those communities which
         match search criteria. Uses parameter 'so' to set communities in the
         correct order.
 
