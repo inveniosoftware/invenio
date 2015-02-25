@@ -3108,7 +3108,13 @@ def get_records_that_can_be_displayed(user_info,
 
     # let's get the restricted collections the user has rights to view
     if permitted_restricted_collections is None:
-        permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
+        if user_info['guest'] == '1':
+            ## For guest users that are actually authorized to some restricted
+            ## collection (by virtue of the IP address in a FireRole rule)
+            ## we explicitly build the list of permitted_restricted_collections
+            permitted_restricted_collections = get_permitted_restricted_collections(user_info)
+        else:
+            permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
 
     policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
 
