@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,33 +17,30 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebSearch Admin Flask Blueprint."""
-
-from __future__ import print_function
+"""Admin interface for collections."""
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
     url_for, abort
 from flask.ext.breadcrumbs import register_breadcrumb
-from invenio.ext.sqlalchemy import db
-from ..models import Collection, CollectionCollection, \
-    Collectionname, CollectionPortalbox, Portalbox
-from invenio.base.i18n import _
-from invenio.base.decorators import templated
 from flask.ext.login import current_user, login_required
-from invenio.ext.principal import permission_required
-from invenio.base.i18n import language_list_long
 
-# imports the necessary forms
-from ..admin_forms import CollectionForm, TranslationsForm
+from invenio.base.decorators import templated
+from invenio.base.i18n import _, language_list_long
+from invenio.ext.principal import permission_required
+from invenio.ext.sqlalchemy import db
+
+from ..forms import CollectionForm, TranslationsForm
+from ..models import (
+    Collection, CollectionCollection,
+    Collectionname, CollectionPortalbox, Portalbox
+)
 
 not_guest = lambda: not current_user.is_guest
 
-blueprint = Blueprint('websearch_admin', __name__,
-                      url_prefix="/admin/websearch",
+blueprint = Blueprint('collections_admin', __name__,
+                      url_prefix="/admin/collections",
                       template_folder='../templates'
                       )
-
-#breadcrumbs=[(_('Configure WebSearch'), 'websearch_admin.index')])
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -51,7 +48,7 @@ blueprint = Blueprint('websearch_admin', __name__,
 @login_required
 @permission_required('cfgwebsearch')
 @templated('search/admin_index.html')
-@register_breadcrumb(blueprint, 'admin.websearch_admin', _('WebSearch'))
+@register_breadcrumb(blueprint, 'admin.collections_admin', _('WebSearch'))
 def index():
     """WebSearch admin interface with editable collection tree."""
     collection = Collection.query.get_or_404(1)
@@ -70,17 +67,13 @@ def index():
 @login_required
 @permission_required('cfgwebsearch')
 def modifycollectiontree():
-    """
-    Handler of the tree changing operations triggered by the drag and drop operation.
-    """
+    """Handler for the tree changing operations triggered by the drag&drop."""
     # Get the requests parameters
     id_son = request.form.get('id_son', 0, type=int)
     id_dad = request.form.get('id_dad', 0, type=int)
     id_new_dad = request.form.get('id_new_dad', 0, type=int)
     score = request.form.get('score', 0, type=int)
-    #if id_dad == id_new_dad:
-    #    score = score + 1
-    type = request.form.get('type', 'r')
+    type_ = request.form.get('type', 'r')
 
     # Check if collection exits.
     Collection.query.get_or_404(id_son)
@@ -99,7 +92,7 @@ def modifycollectiontree():
         cc = CollectionCollection(
             id_dad=id_new_dad,
             id_son=id_son,
-            type=type)
+            type=type_)
         db.session.add(cc)
 
     if id_new_dad == 0:
@@ -110,18 +103,16 @@ def modifycollectiontree():
         try:
             descendants = Collection.query.get(id_son).descendants_ids
             ancestors = new_dad.ancestors_ids
-            print(descendants, ancestors)
             if descendants & ancestors:
                 raise
-        except:
-            ## Cycle has been detected.
+        except Exception:
+            # Cycle has been detected.
             db.session.rollback()
             abort(406)
         new_dad._collection_children.reorder()
         new_dad._collection_children.insert(score, cc)
 
-    #FIXME add dbrecs rebuild for modified trees.
-
+    # FIXME add dbrecs rebuild for modified trees.
     db.session.commit()
     return 'done'
 
@@ -144,7 +135,9 @@ def managecollectiontree():
 @login_required
 @permission_required('cfgwebsearch')
 def manage_collection(name):
-    collection = Collection.query.filter(Collection.name == name).first_or_404()
+    """Manage collection."""
+    collection = Collection.query.filter(
+        Collection.name == name).first_or_404()
     form = CollectionForm(request.form, obj=collection)
 
     # gets the collections translations
@@ -154,23 +147,19 @@ def manage_collection(name):
     TranslationsFormFilled = TranslationsForm(language_list_long(),
                                               translations)
     translation_form = TranslationsFormFilled(request.form)
-    #for x in  collection.collection_names:
-    #    translation_form[x.ln](default = x.value)
-
-    #translation_form.populate_obj(translations)
 
     return render_template('search/admin_collection.html',
                            collection=collection, form=form,
                            translation_form=translation_form)
 
 
-@blueprint.route('/collection/update/<id>', methods=['POST'])
+@blueprint.route('/collection/update/<id_collection>', methods=['POST'])
 @login_required
 @permission_required('cfgwebsearch')
-def update(id):
+def update(id_collection):
     form = CollectionForm(request.form)
     if request.method == 'POST':  # and form.validate():
-        collection = Collection.query.filter(Collection.id == id).first_or_404()
+        collection = Collection.query.get_or_404(id_collection)
         form.populate_obj(collection)
         db.session.commit()
         flash(_('Collection was updated'), "info")
@@ -179,7 +168,8 @@ def update(id):
 
 @blueprint.route('/collection/new', methods=['GET', 'POST'])
 @blueprint.route('/collection/add', methods=['GET', 'POST'])
-#@login_required
+@login_required
+@permission_required('cfgwebsearch')
 @templated('search/admin_collection.html')
 def create_collection():
     form = CollectionForm()
@@ -189,16 +179,16 @@ def create_collection():
 @blueprint.route('/collection/update_translations<id>', methods=['POST'])
 @login_required
 @permission_required('cfgwebsearch')
-#@login_required
 def update_translations(id):
     """Update translations if the value is altered or not void."""
     collection = Collection.query.filter(Collection.id == id).first_or_404()
 
     for (lang, lang_long) in language_list_long():
-
-        collection_name = Collectionname.query.filter(
-            db.and_(Collectionname.id_collection == id,
-                    Collectionname.ln == lang, Collectionname.type == 'ln')).first()
+        collection_name = Collectionname.query.filter(db.and_(
+            Collectionname.id_collection == id,
+            Collectionname.ln == lang,
+            Collectionname.type == 'ln'
+        )).first()
 
         if collection_name:
             if collection_name.value != request.form.get(lang):
@@ -215,30 +205,32 @@ def update_translations(id):
     return redirect(url_for('.manage_collection', name=collection.name))
 
 
-@blueprint.route('/collection/manage_portalboxes_order', methods=['GET', 'POST'])
-#@login_required
+@blueprint.route('/collection/manage_portalboxes_order',
+                 methods=['GET', 'POST'])
+@login_required
+@permission_required('cfgwebsearch')
 def manage_portalboxes_order():
+    """Manage order of portalboxes."""
     id_p = request.args.get('id', 0, type=int)
-    collection_id = request.args.get('id_collection', 0, type=int)
+    id_collection = request.args.get('id_collection', 0, type=int)
     order = request.args.get('score', 0, type=int)
 
-    collection = Collection.query.filter(Collection.id == collection_id).first_or_404()
+    collection = Collection.query.filter(
+        Collection.id == id_collection).first_or_404()
 
     portalbox = \
         CollectionPortalbox.query.filter(db.and_(
             CollectionPortalbox.id_portalbox == id_p,
-            CollectionPortalbox.id_collection == collection_id)).first_or_404()
+            CollectionPortalbox.id_collection == id_collection)).first_or_404()
 
     position = portalbox.position
     p_order = portalbox.score
 
     db.session.delete(portalbox)
-
-    #p = portalboxes.pop(portalbox)
-    collection.portal_boxes_ln.set(CollectionPortalbox(collection_id,
-                                                       id_p,
-                                                       g.ln, position,
-                                                       p_order), order)
+    collection.portal_boxes_ln.set(
+        CollectionPortalbox(id_collection, id_p, g.ln, position, p_order),
+        order
+    )
     db.session.commit()
 
     return ''

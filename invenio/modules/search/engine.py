@@ -109,7 +109,7 @@ def search_unit(p, f=None, m='a', wl=0, ignore_synonyms=None):
     if f in units:
         hitset = units[f](p, f, m, wl)
     elif m == 'a' or m == 'r' or f == 'subject' or (
-            len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit()):
+            f and len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit()):
         # we are doing either phrase search or regexp search
         index_id = IdxINDEX.get_index_id_from_field(f)
         if index_id != 0:

@@ -54,7 +54,7 @@ CFG_EXTERNAL_COLLECTION_TIMEOUT, \
 CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
 from invenio.legacy.websearch_external_collections.getter import HTTPAsyncPageGetter, async_download
 from invenio.legacy.websearch_external_collections.utils import get_collection_id
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')

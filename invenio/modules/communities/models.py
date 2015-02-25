@@ -62,16 +62,16 @@ from invenio.modules.communities.signals import before_save_collection, \
     before_delete_collection, after_delete_collection, \
     before_delete_collections, after_delete_collections, \
     pre_curation, post_curation
-from invenio.modules.records.api import get_record
-from invenio.modules.search.models import \
+from invenio.modules.collections.models import \
     Collection, \
     CollectionCollection, \
     CollectionFormat, \
     CollectionPortalbox, \
     Collectiondetailedrecordpagetabs, \
     Collectionname, \
-    Format, \
     Portalbox
+from invenio.modules.formatter.models import Format
+from invenio.modules.records.api import get_record
 from invenio.modules.oaiharvester.models import OaiREPOSITORY
 
 

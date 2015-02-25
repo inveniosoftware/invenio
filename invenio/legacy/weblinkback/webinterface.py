@@ -45,7 +45,7 @@ from invenio.legacy.search_engine import guess_primary_collection_of_a_record, \
 from invenio.legacy.webpage import pageheaderonly, pagefooteronly
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 import invenio.legacy.template
 webstyle_templates = invenio.legacy.template.load('webstyle')

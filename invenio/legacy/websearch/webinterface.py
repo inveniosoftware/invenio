@@ -78,16 +78,15 @@ from invenio.legacy.search_engine import check_user_can_view_record, \
     perform_request_search, \
     restricted_collection_cache, \
     EM_REPOSITORY
-from invenio.modules.search.models import Collection
-from invenio.legacy.websearch.webcoll import perform_display_collection
+from invenio.modules.collections.models import Collection
 from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
+from invenio.modules.collections.cache import get_collection_reclist
 from invenio.modules.formatter import format_records
 from invenio.modules.formatter.engine import get_output_formats
-from invenio.legacy.websearch.webcoll import get_collection
 from intbitset import intbitset
 from invenio.legacy.bibupload.engine import find_record_from_sysno
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
@@ -447,7 +446,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 for collname in restricted_collection_cache.cache:
                     (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
                     if auth_code and user_info['email'] == 'guest':
-                        coll_recids = get_collection(collname).reclist
+                        coll_recids = get_collection_reclist(collname)
                         if coll_recids & recids:
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -827,82 +826,8 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     req=req,
                     navmenuid='search')
 
-    if normalised_name != c:
-        redirect_to_url(req, normalised_name, apache.HTTP_MOVED_PERMANENTLY)
-
-    # start display:
-    req.content_type = "text/html"
-    req.send_http_header()
-
-    c_body, c_navtrail, c_portalbox_lt, c_portalbox_rt, c_portalbox_tp, c_portalbox_te, \
-        c_last_updated = perform_display_collection(colID, c, aas, ln, em,
-                                            user_preferences.get('websearch_helpbox', 1))
-
-    if em == "" or EM_REPOSITORY["body"] in em:
-        try:
-            title = get_coll_i18nname(c, ln)
-        except:
-            title = ""
-    else:
-        title = ""
-    show_title_p = True
-    body_css_classes = []
-    if c == CFG_SITE_NAME:
-        # Do not display title on home collection
-        show_title_p = False
-        body_css_classes.append('home')
-
-    if len(collection_reclist_cache.cache.keys()) == 1:
-        # if there is only one collection defined, do not print its
-        # title on the page as it would be displayed repetitively.
-        show_title_p = False
-
-    if aas == -1:
-        show_title_p = False
-
-    if CFG_INSPIRE_SITE == 1:
-        # INSPIRE should never show title, but instead use css to
-        # style collections
-        show_title_p = False
-        body_css_classes.append(nmtoken_from_string(c))
-
-    # RSS:
-    rssurl = CFG_SITE_URL + '/rss'
-    rssurl_params = []
-    if c != CFG_SITE_NAME:
-        rssurl_params.append('cc=' + quote(c))
-    if ln != CFG_SITE_LANG and \
-           c in CFG_WEBSEARCH_RSS_I18N_COLLECTIONS:
-        rssurl_params.append('ln=' + ln)
-
-    if rssurl_params:
-        rssurl += '?' + '&amp;'.join(rssurl_params)
-
-    if 'hb' in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-        metaheaderadd = get_mathjax_header(req.is_https())
-    else:
-        metaheaderadd = ''
-
-    return page(title=title,
-                body=c_body,
-                navtrail=c_navtrail,
-                description="%s - %s" % (CFG_SITE_NAME, c),
-                keywords="%s, %s" % (CFG_SITE_NAME, c),
-                metaheaderadd=metaheaderadd,
-                uid=uid,
-                language=ln,
-                req=req,
-                cdspageboxlefttopadd=c_portalbox_lt,
-                cdspageboxrighttopadd=c_portalbox_rt,
-                titleprologue=c_portalbox_tp,
-                titleepilogue=c_portalbox_te,
-                lastupdated=c_last_updated,
-                navmenuid='search',
-                rssurl=rssurl,
-                body_css_classes=body_css_classes,
-                show_title_p=show_title_p,
-                show_header=em == "" or EM_REPOSITORY["header"] in em,
-                show_footer=em == "" or EM_REPOSITORY["footer"] in em)
+    from flask import redirect, url_for
+    return redirect(url_for('collections.collection', name=collection.name))
 
 
 def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):

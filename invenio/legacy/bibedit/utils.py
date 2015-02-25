@@ -87,7 +87,7 @@ from invenio.modules.editor.registry import field_templates, record_templates, \
 
 from invenio.base.globals import cfg
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 try:
     from cPickle import loads

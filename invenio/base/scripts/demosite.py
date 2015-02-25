@@ -31,6 +31,8 @@ import os
 import pkg_resources
 import sys
 
+from itertools import count
+
 from invenio.ext.script import Manager
 
 manager = Manager(usage=__doc__)
@@ -102,23 +104,22 @@ def populate(packages=[], default_data=True, files=None,
                 print("ERROR: failed execution of", cmd)
                 sys.exit(1)
 
+    i = count(1).next
     for cmd in ["bin/bibdocfile --textify --with-ocr --recid 97",
                 "bin/bibdocfile --textify --all",
                 "bin/bibindex -u admin",
-                "bin/bibindex %d" % (job_id + 1,),
+                "bin/bibindex %d" % (job_id + i(),),
                 "bin/bibindex -u admin -w global",
-                "bin/bibindex %d" % (job_id + 2,),
+                "bin/bibindex %d" % (job_id + i(),),
                 "bin/bibreformat -u admin -o HB",
-                "bin/bibreformat %d" % (job_id + 3,),
-                "bin/webcoll -u admin",
-                "bin/webcoll %d" % (job_id + 4,),
+                "bin/bibreformat %d" % (job_id + i(),),
                 "bin/bibrank -u admin",
-                "bin/bibrank %d" % (job_id + 5,),
+                "bin/bibrank %d" % (job_id + i(),),
                 "bin/bibsort -u admin -R",
-                "bin/bibsort %d" % (job_id + 6,),
+                "bin/bibsort %d" % (job_id + i(),),
                 "bin/oairepositoryupdater -u admin",
-                "bin/oairepositoryupdater %d" % (job_id + 7,),
-                "bin/bibupload %d" % (job_id + 8,)]:
+                "bin/oairepositoryupdater %d" % (job_id + i(),),
+                "bin/bibupload %d" % (job_id + i(),)]:
         cmd = os.path.join(CFG_PREFIX, cmd)
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)

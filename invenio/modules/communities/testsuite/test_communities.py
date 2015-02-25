@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,10 +21,11 @@
 
 import os
 import shutil
+
 from datetime import datetime, timedelta
+from mock import PropertyMock, patch
 
 from invenio.base.wrappers import lazy_import
-from flask import url_for, current_app
 from six import iteritems
 from invenio.testsuite import InvenioTestCase, \
     make_test_suite, \
@@ -38,8 +39,10 @@ from invenio.modules.communities.config import COMMUNITIES_ID_PREFIX, \
     COMMUNITIES_OUTPUTFORMAT_PROVISIONAL
 
 Community = lazy_import('invenio.modules.communities.models:Community')
-Collection = lazy_import('invenio.modules.search.models:Collection')
-calculate_rank_for_community = lazy_import('invenio.modules.communities.tasks:calculate_rank_for_community')
+Collection = lazy_import('invenio.modules.collections.models:Collection')
+calculate_rank_for_community = lazy_import(
+    'invenio.modules.communities.tasks:calculate_rank_for_community')
+
 
 class CommunityModelTest(InvenioTestCase):
 
@@ -75,15 +78,16 @@ class CommunityModelTest(InvenioTestCase):
         c = self._find_community_info()
         self.assertTrue(COMMUNITIES_ID_PREFIX + "-" + self.test_name,
                         c.collection.name)
-        self.assertTrue(COMMUNITIES_ID_PREFIX_PROVISIONAL + "-" + self.test_name,
+        self.assertTrue(COMMUNITIES_ID_PREFIX_PROVISIONAL + "-" +
+                        self.test_name,
                         c.collection_provisional.name)
 
     def test_3_community_collections_formats(self):
         """communities - checks if formats were created for community"""
         c = self._find_community_info()
-        self.assertEqual(c.collection.formats[0].format.code,
+        self.assertEqual(c.collection.formats[0].format_code,
                          COMMUNITIES_OUTPUTFORMAT)
-        self.assertEqual(c.collection_provisional.formats[0].format.code,
+        self.assertEqual(c.collection_provisional.formats[0].format_code,
                          COMMUNITIES_OUTPUTFORMAT_PROVISIONAL)
 
     def test_4_community_protalboxes(self):
@@ -123,7 +127,6 @@ class CommunityRankerTest(InvenioTestCase):
             setattr(c, key, value)
         # add a collection with "one" record
         coll = Collection()
-        coll.nbrecs = 1
         setattr(c, "collection", coll)
         return c
 
@@ -133,7 +136,10 @@ class CommunityRankerTest(InvenioTestCase):
                                    'id_user': 1,
                                    'last_record_accepted': datetime.now()-timedelta(days=100),
                                    'fixed_points': 0})
-        self.assertEqual(calculate_rank_for_community(c, 2), 5)
+        with patch('invenio.modules.collections.models.Collection.nbrecs',
+                   new_callable=PropertyMock) as mock_nbrecs:
+            mock_nbrecs.return_value = 1
+            self.assertEqual(calculate_rank_for_community(c, 2), 5)
 
     def test_rank_community_last_accepted(self):
         """communities - test community rank new record accepted"""
@@ -141,7 +147,10 @@ class CommunityRankerTest(InvenioTestCase):
                                    'id_user': 1,
                                    'last_record_accepted': datetime.now(),
                                    'fixed_points': 20})
-        self.assertEqual(calculate_rank_for_community(c, 2), 29)
+        with patch('invenio.modules.collections.models.Collection.nbrecs',
+                   new_callable=PropertyMock) as mock_nbrecs:
+            mock_nbrecs.return_value = 1
+            self.assertEqual(calculate_rank_for_community(c, 2), 29)
 
 
 TEST_SUITE = make_test_suite(CommunityModelTest,

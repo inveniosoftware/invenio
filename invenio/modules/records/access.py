@@ -21,7 +21,7 @@
 
 from invenio.base.globals import cfg
 
-from invenio.modules.search.cache import (
+from invenio.modules.collections.cache import (
     collection_reclist_cache,
     get_collection_reclist,
     restricted_collection_cache,
@@ -115,7 +115,7 @@ def check_user_can_view_record(user_info, recid):
     """
     from invenio.modules.access.engine import acc_authorize_action
     from invenio.modules.access.local_config import VIEWRESTRCOLL
-    from invenio.modules.search.cache import is_record_in_any_collection
+    from invenio.modules.collections.cache import is_record_in_any_collection
     from invenio.legacy.search_engine import record_public_p, record_exists
 
     policy = cfg['CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY'].strip().upper()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,11 +24,11 @@ import os
 import sys
 
 # Import the remote debugger as a first thing, if allowed
-#FIXME enable remote_debugger when invenio.config is ready
-#try:
-#    from invenio.utils import remote_debugger
-#except:
-#    remote_debugger = None
+# FIXME enable remote_debugger when invenio.config is ready
+# try:
+#     from invenio.utils import remote_debugger
+# except:
+#     remote_debugger = None
 
 from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
@@ -57,10 +57,8 @@ def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     # cli_cmd_reset_fieldnames(conf)
 
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
-                "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 1" % CFG_PREFIX,
                 "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
-                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
+                "%s/bin/bibsort 1" % CFG_PREFIX, ]:
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)
             sys.exit(1)

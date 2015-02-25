@@ -52,14 +52,14 @@ from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, record_exists, \
-     create_navtrail_links, check_user_can_view_record, \
-     is_user_owner_of_record
+     create_navtrail_links, check_user_can_view_record
+from invenio.modules.records.access import is_user_owner_of_record
 from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')

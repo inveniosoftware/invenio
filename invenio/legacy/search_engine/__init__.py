@@ -161,17 +161,17 @@ EM_REPOSITORY={"body" : "B",
                "rt_portalbox" : "Prt",
                "search_services": "SER"};
 
-from invenio.modules.search.cache import collection_reclist_cache
-from invenio.modules.search.cache import collection_restricted_p
-from invenio.modules.search.cache import restricted_collection_cache
+from invenio.modules.collections.cache import collection_reclist_cache
+from invenio.modules.collections.cache import collection_restricted_p
+from invenio.modules.collections.cache import restricted_collection_cache
 from invenio.modules.search.utils import get_permitted_restricted_collections
-from invenio.modules.search.cache import get_all_restricted_recids
+from invenio.modules.collections.cache import get_all_restricted_recids
 
 
 from invenio.modules.records.access import check_user_can_view_record
 
-from invenio.modules.search.cache import get_collection_reclist
-from invenio.modules.search.cache import get_coll_i18nname
+from invenio.modules.collections.cache import get_collection_reclist
+from invenio.modules.collections.cache import get_coll_i18nname
 from invenio.modules.search.cache import get_field_i18nname
 
 from invenio.modules.indexer.models import IdxINDEX
@@ -223,7 +223,7 @@ def get_coll_ancestors(coll):
     return coll_ancestors
 
 
-from invenio.modules.search.cache import get_collection_allchildren
+from invenio.modules.collections.cache import get_collection_allchildren
 
 
 def browse_pattern_phrases(req, colls, p, f, rg, ln=CFG_SITE_LANG):

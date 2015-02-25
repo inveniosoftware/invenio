@@ -35,6 +35,7 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
+from invenio.utils.memoise import memoize
 
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -288,6 +289,7 @@ def get_index_name_from_index_id(index_id):
     return ''
 
 
+@memoize
 def get_field_tags(field, tagtype="marc"):
     """Returns a list of tags for the field code 'field'. Works
        for both MARC and nonMARC tags.
@@ -378,6 +380,7 @@ def get_nonmarc_tag_indexes(nonmarc_tag, virtual=True):
     return ()
 
 
+@memoize
 def get_index_tags(indexname, virtual=True, tagtype="marc"):
     """Returns the list of tags that are indexed inside INDEXNAME.
        Returns empty list in case there are no tags indexed in this index.

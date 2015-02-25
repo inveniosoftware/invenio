@@ -21,7 +21,7 @@
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
-from invenio.modules.search.models import Collection, FacetCollection
+from invenio.modules.collections.models import Collection, FacetCollection
 from invenio.modules.search.registry import facets
 
 from wtforms.fields import IntegerField, SelectField

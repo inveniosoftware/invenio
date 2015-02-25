@@ -71,7 +71,7 @@ from invenio.legacy.bibcirculation.config import CFG_BIBCIRCULATION_ILLS_EMAIL, 
                                           CFG_BIBCIRCULATION_ACQ_STATUS_NEW, \
                                           AMZ_ACQUISITION_IDENTIFIER_TAG
 
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 get_colID = lambda name: Collection.query.filter_by(name=name).value('id')
 
 

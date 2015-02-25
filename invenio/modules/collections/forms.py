@@ -17,13 +17,13 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebMessage Forms."""
+"""Collection form implementation."""
+
+from wtforms import TextField, HiddenField, SelectField, StringField
 
 from invenio.base.i18n import _
-from invenio.modules.search.models import get_pbx_pos
+from invenio.modules.collections.models import get_pbx_pos
 from invenio.utils.forms import InvenioBaseForm
-
-from wtforms import HiddenField, SelectField, StringField
 
 
 class CollectionForm(InvenioBaseForm):

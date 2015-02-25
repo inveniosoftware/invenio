@@ -196,7 +196,7 @@ def create(default_data=True, quiet=False):
         run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
         #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
 
-    from invenio.modules.search.models import CollectionFieldFieldvalue
+    from invenio.modules.collections.models import CollectionFieldFieldvalue
     event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
 
     tables = db.metadata.sorted_tables

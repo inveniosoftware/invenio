@@ -488,8 +488,8 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        from invenio.modules.search.cache import get_all_restricted_recids
-        from invenio.modules.search.cache import is_record_in_any_collection
+        from invenio.modules.collections.cache import get_all_restricted_recids
+        from invenio.modules.collections.cache import is_record_in_any_collection
 
         # load the right message language
         _ = gettext_set_language(ln)
