@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """BibEncode helper functions.
 
@@ -45,14 +45,14 @@ from .config import (
                     )
 from invenio.config import CFG_PATH_FFPROBE
 
-## The timestamp for the process. Used to identify Logfiles.
+# The timestamp for the process. Used to identify Logfiles.
 def generate_timestamp():
     """ Generates a timestamp for the logfile to make it unique
     """
     return "%s-%s" % (time.strftime("%Y%m%d%H%M%S", time.gmtime()), str(uuid4()))
 
-## The following functions are for ffmpeg specific timecodes
-## The format is HH:MM:SS.ss
+# The following functions are for ffmpeg specific timecodes
+# The format is HH:MM:SS.ss
 def timecode_to_seconds(timecode):
     """ Converts a timecode to a total duration in seconds
     """
@@ -112,8 +112,8 @@ def is_seconds(value):
     else:
         return False
 
-## Try to parse anything to unicode
-## http://www.codigomanso.com/en/2010/05/una-de-python-force_unicode/
+# Try to parse anything to unicode
+# http://www.codigomanso.com/en/2010/05/una-de-python-force_unicode/
 def force_unicode(seq, encoding='utf-8', errors='ignore'):
     """
     Returns a unicode object representing 'seq'. Treats bytestrings using the
@@ -207,7 +207,7 @@ def get_lines_from_probe_log(input_file):
     else:
         return None
 
-## Simple function to receive ffprobe results
+# Simple function to receive ffprobe results
 def probe(input_file, parsable=False):
     """ Probes the file using FFprobe and returns the output as a string
     """

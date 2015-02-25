@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
-## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """ Comments and reviews for records """
 
@@ -771,44 +771,44 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
             return comments_list
     return ()
 
-## def get_comment_children(comID):
-##     """
-##     Returns the list of children (i.e. direct descendants) ordered by time of addition.
+# def get_comment_children(comID):
+#     """
+#     Returns the list of children (i.e. direct descendants) ordered by time of addition.
 
-##     @param comID: the ID of the comment for which we want to retrieve children
-##     @type comID: int
-##     @return the list of children
-##     @rtype: list
-##     """
-##     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
-##     return [row[0] for row in res]
+#     @param comID: the ID of the comment for which we want to retrieve children
+#     @type comID: int
+#     @return the list of children
+#     @rtype: list
+#     """
+#     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
+#     return [row[0] for row in res]
 
-## def get_comment_descendants(comID, depth=None):
-##     """
-##     Returns the list of descendants of the given comment, orderd from
-##     oldest to newest ("top-down"), down to depth specified as parameter.
+# def get_comment_descendants(comID, depth=None):
+#     """
+#     Returns the list of descendants of the given comment, orderd from
+#     oldest to newest ("top-down"), down to depth specified as parameter.
 
-##     @param comID: the ID of the comment for which we want to retrieve descendant
-##     @type comID: int
-##     @param depth: the max depth down to which we want to retrieve
-##                   descendants. Specify None for no limit, 1 for direct
-##                   children only, etc.
-##     @return the list of ancestors
-##     @rtype: list(tuple(comment ID, descendants comments IDs))
-##     """
-##     if depth == 0:
-##         return (comID, [])
+#     @param comID: the ID of the comment for which we want to retrieve descendant
+#     @type comID: int
+#     @param depth: the max depth down to which we want to retrieve
+#                   descendants. Specify None for no limit, 1 for direct
+#                   children only, etc.
+#     @return the list of ancestors
+#     @rtype: list(tuple(comment ID, descendants comments IDs))
+#     """
+#     if depth == 0:
+#         return (comID, [])
 
-##     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
-##     if res:
-##         children_comID = [row[0] for row in res]
-##         children_descendants = []
-##         if depth:
-##             depth -= 1
-##         children_descendants = [get_comment_descendants(child_comID, depth) for child_comID in children_comID]
-##         return (comID, children_descendants)
-##     else:
-##         return (comID, [])
+#     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
+#     if res:
+#         children_comID = [row[0] for row in res]
+#         children_descendants = []
+#         if depth:
+#             depth -= 1
+#         children_descendants = [get_comment_descendants(child_comID, depth) for child_comID in children_comID]
+#         return (comID, children_descendants)
+#     else:
+#         return (comID, [])
 
 def get_comment_ancestors(comID, depth=None):
     """

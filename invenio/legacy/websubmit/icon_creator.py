@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """This is websubmit_icon_creator.py
    This tool is used to create an icon of a picture file.
@@ -25,19 +25,19 @@
 
    + CLI API:
 
-##     $ python ~invenio/lib/python/invenio/websubmit_icon_creator.py \\
-##               --icon-scale=200 \\
-##               --icon-name=test-icon \\
-##               --icon-file-format=jpg \\
-##               test-image.jpg
+#     $ python ~invenio/lib/python/invenio/websubmit_icon_creator.py \\
+#               --icon-scale=200 \\
+#               --icon-name=test-icon \\
+#               --icon-file-format=jpg \\
+#               test-image.jpg
 
-##     $ python ~invenio/lib/python/invenio/websubmit_icon_creator.py \\
-##               --icon-scale=200 \\
-##               --icon-name=test-icon2 \\
-##               --icon-file-format=gif \\
-##               --multipage-icon \\
-##               --multipage-icon-delay=50 \\
-##               test-image2.pdf
+#     $ python ~invenio/lib/python/invenio/websubmit_icon_creator.py \\
+#               --icon-scale=200 \\
+#               --icon-name=test-icon2 \\
+#               --icon-file-format=gif \\
+#               --multipage-icon \\
+#               --multipage-icon-delay=50 \\
+#               test-image2.pdf
 """
 
 __revision__ = "$Id$"
@@ -57,7 +57,7 @@ CFG_ALLOWED_FILE_EXTENSIONS = ["pdf", "gif", "jpg", \
                                "tiff", "tif"]
 
 
-## ***** Functions related to the icon creation process: *****
+# ***** Functions related to the icon creation process: *****
 
 # Accepted format for the ImageMagick 'scale' parameter:
 re_imagemagic_scale_parameter_format = re.compile(r'x?\d+(x\d*)?(^|!|>|<|@|%)?$')
@@ -498,7 +498,7 @@ def create_icon(options):
 
 
 
-## ***** Functions Specific to CLI calling of the program: *****
+# ***** Functions Specific to CLI calling of the program: *****
 
 def usage(wmsg="", err_code=0):
     """Print a "usage" message (along with an optional additional warning/error
@@ -769,6 +769,6 @@ def create_icon_cli():
 
 
 
-## Start proceedings for CLI calls:
+# Start proceedings for CLI calls:
 if __name__ == "__main__":
     create_icon_cli()

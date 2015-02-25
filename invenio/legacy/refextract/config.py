@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """RefExtract configuration"""
 
@@ -46,7 +46,7 @@ CFG_REFEXTRACT_KBS = {
 # Prefix for temp files
 CFG_REFEXTRACT_FILENAME = "refextract"
 
-## MARC Fields and subfields used by refextract:
+# MARC Fields and subfields used by refextract:
 
 # Reference fields:
 CFG_REFEXTRACT_FIELDS = {
@@ -70,14 +70,14 @@ CFG_REFEXTRACT_TAG_ID_REFERENCE          = "999"  # ref field tag
 CFG_REFEXTRACT_IND1_REFERENCE            = "C"    # ref field ind1
 CFG_REFEXTRACT_IND2_REFERENCE            = "5"    # ref field ind2
 
-## refextract statistics fields:
+# refextract statistics fields:
 CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS     = "999C6" # ref-stats tag
 
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_STATS   = "a"   # ref-stats subfield
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_TIME    = "t"   # ref-stats time subfield
 CFG_REFEXTRACT_SUBFIELD_EXTRACTION_VERSION = "v"   # ref-stats version subfield
-## Internal tags are used by refextract to mark-up recognised citation
-## information.
+# Internal tags are used by refextract to mark-up recognised citation
+# information.
 CFG_REFEXTRACT_MARKER_OPENING_REPORT_NUM    = r"<cds.REPORTNUMBER>"
 CFG_REFEXTRACT_MARKER_OPENING_TITLE         = r"<cds.JOURNAL>"
 CFG_REFEXTRACT_MARKER_OPENING_TITLE_IBID    = r"<cds.JOURNALibid>"
@@ -103,25 +103,25 @@ CFG_REFEXTRACT_MARKER_CLOSING_ISBN          = r"</cds.ISBN>"
 CFG_REFEXTRACT_MARKER_CLOSING_PUBLISHER     = r"</cds.PUBLISHER>"
 CFG_REFEXTRACT_MARKER_CLOSING_COLLABORATION = r"</cds.COLLABORATION>"
 
-## Of the form '</cds.AUTHxxxx>' only
+# Of the form '</cds.AUTHxxxx>' only
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND = r"</cds.AUTHstnd>"
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL = r"</cds.AUTHetal>"
 CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL = r"</cds.AUTHincl>"
 
-## The minimum length of a reference's misc text to be deemed insignificant.
-## when comparing misc text with semi-colon defined sub-references.
-## Values higher than this value reflect meaningful misc text.
-## Hence, upon finding a correct semi-colon, but having current misc text
-## length less than this value (without other meaningful reference objects:
-## report numbers, titles...) then no split will occur.
-## (A higher value will increase splitting strictness. i.e. Fewer splits)
+# The minimum length of a reference's misc text to be deemed insignificant.
+# when comparing misc text with semi-colon defined sub-references.
+# Values higher than this value reflect meaningful misc text.
+# Hence, upon finding a correct semi-colon, but having current misc text
+# length less than this value (without other meaningful reference objects:
+# report numbers, titles...) then no split will occur.
+# (A higher value will increase splitting strictness. i.e. Fewer splits)
 CGF_REFEXTRACT_SEMI_COLON_MISC_TEXT_SENSITIVITY = 60
 
-## The length of misc text between two adjacent authors which is
-## deemed as insignificant. As such, when misc text of a length less
-## than this value is found, then the latter author group is dumped into misc.
-## (A higher value will increase splitting strictness. i.e. Fewer splits)
+# The length of misc text between two adjacent authors which is
+# deemed as insignificant. As such, when misc text of a length less
+# than this value is found, then the latter author group is dumped into misc.
+# (A higher value will increase splitting strictness. i.e. Fewer splits)
 CGF_REFEXTRACT_ADJACENT_AUTH_MISC_SEPARATION = 10
 
-## Maximum number of lines for a citation before it is considered invalid
+# Maximum number of lines for a citation before it is considered invalid
 CFG_REFEXTRACT_MAX_LINES = 25

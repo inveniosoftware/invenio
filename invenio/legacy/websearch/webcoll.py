@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -70,7 +70,7 @@ from invenio.legacy.websearch_external_collections.config import CFG_HOSTED_COLL
 from invenio.base.signals import webcoll_after_webpage_cache_update, \
     webcoll_after_reclist_cache_update
 
-## global vars
+# global vars
 COLLECTION_HOUSE = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 
 # CFG_CACHE_LAST_UPDATED_TIMESTAMP_TOLERANCE -- cache timestamp
@@ -98,7 +98,7 @@ def get_collection(colname):
         COLLECTION_HOUSE[colname] = colobject
     return COLLECTION_HOUSE[colname]
 
-## auxiliary functions:
+# auxiliary functions:
 def is_selected(var, fld):
     "Checks if the two are equal, and if yes, returns ' selected'.  Useful for select boxes."
     if var == fld:
@@ -1110,28 +1110,28 @@ def task_submit_check_options():
 
 def task_run_core():
     """ Reimplement to add the body of the task."""
-##
-## ------->--->time--->------>
-##  (-1)  |   ( 0)    |  ( 1)
-##        |     |     |
-## [T.db] |  [T.fc]   | [T.db]
-##        |     |     |
-##        |<-tol|tol->|
-##
-## the above is the compare_timestamps_with_tolerance result "diagram"
-## [T.db] stands fore the database timestamp and [T.fc] for the file cache timestamp
-## ( -1, 0, 1) stand for the returned value
-## tol stands for the tolerance in seconds
-##
-## When a record has been added or deleted from one of the collections the T.db becomes greater that the T.fc
-## and when webcoll runs it is fully ran. It recalculates the reclists and nbrecs, and since it updates the
-## collections db table it also updates the T.db. The T.fc is set as the moment the task started running thus
-## slightly before the T.db (practically the time distance between the start of the task and the last call of
-## update_reclist). Therefore when webcoll runs again, and even if no database changes have taken place in the
-## meanwhile, it fully runs (because compare_timestamps_with_tolerance returns 0). This time though, and if
-## no databases changes have taken place, the T.db remains the same while T.fc is updated and as a result if
-## webcoll runs again it will not be fully ran
-##
+#
+# ------->--->time--->------>
+#  (-1)  |   ( 0)    |  ( 1)
+#        |     |     |
+# [T.db] |  [T.fc]   | [T.db]
+#        |     |     |
+#        |<-tol|tol->|
+#
+# the above is the compare_timestamps_with_tolerance result "diagram"
+# [T.db] stands fore the database timestamp and [T.fc] for the file cache timestamp
+# ( -1, 0, 1) stand for the returned value
+# tol stands for the tolerance in seconds
+#
+# When a record has been added or deleted from one of the collections the T.db becomes greater that the T.fc
+# and when webcoll runs it is fully ran. It recalculates the reclists and nbrecs, and since it updates the
+# collections db table it also updates the T.db. The T.fc is set as the moment the task started running thus
+# slightly before the T.db (practically the time distance between the start of the task and the last call of
+# update_reclist). Therefore when webcoll runs again, and even if no database changes have taken place in the
+# meanwhile, it fully runs (because compare_timestamps_with_tolerance returns 0). This time though, and if
+# no databases changes have taken place, the T.db remains the same while T.fc is updated and as a result if
+# webcoll runs again it will not be fully ran
+#
     task_run_start_timestamp = get_current_time_timestamp()
     colls = []
     params = {}

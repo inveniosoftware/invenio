@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
-##
-## $Id$
-##
-## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# $Id$
+#
+# This file is part of Invenio.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -471,16 +471,16 @@ def test():
     assert(format_element(bfo13, auto_link_to_CERN_license='yes')  == '<a href="%s">&copy; CERN</a>' % CFG_CERN_LICENSE_URL)
 
 
-##     xml14 = '''
-## <record>
-##     <datafield tag="269" ind1=" " ind2=" ">
-##         <subfield code="b">CERN</subfield>
-##         <subfield code="c">2010</subfield>
-##     </datafield>
-## </record>'''
+#     xml14 = '''
+# <record>
+#     <datafield tag="269" ind1=" " ind2=" ">
+#         <subfield code="b">CERN</subfield>
+#         <subfield code="c">2010</subfield>
+#     </datafield>
+# </record>'''
 
-##     bfo14 = BibFormatObject(0, xml_record=xml14)
-##     assert(format_element(bfo14, auto_link_to_CERN_license='yes')  == 'CERN')
+#     bfo14 = BibFormatObject(0, xml_record=xml14)
+#     assert(format_element(bfo14, auto_link_to_CERN_license='yes')  == 'CERN')
 
 
     xml15 = '''

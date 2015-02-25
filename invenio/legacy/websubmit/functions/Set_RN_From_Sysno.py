@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebSubmit function - Set the global variable 'rn' to the report
                         number of the record identified by sysno
@@ -24,8 +24,8 @@ from invenio.legacy.search_engine import get_fieldvalues, record_exists
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 from invenio.legacy.websubmit.functions.Get_Recid import is_record_matching_pattern
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when a record does not exist or has been deleted.
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when a record does not exist or has been deleted.
 CFG_ALERT_DOCUMENT_NOT_FOUND = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
@@ -37,8 +37,8 @@ alert('The document with record ID [%s] cannot be found in our """ \
 document.forms[0].submit();
 </script>"""
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when it seems that we try to access an invalid path.
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when it seems that we try to access an invalid path.
 CFG_ALERT_INVALID_EDSRN_PATH = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
@@ -48,9 +48,9 @@ alert('It is not possible to access path [%s]. Please contact %s');\n
 document.forms[0].submit();
 </script>"""
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when the recid found doesn't match the type of document that should be
-## handled by this submission
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when the recid found doesn't match the type of document that should be
+# handled by this submission
 CFG_ALERT_WRONG_RECORD_FOR_THIS_SUBMISSION = """
 <script type="text/javascript">
 document.forms[0].action="/submit";
@@ -63,8 +63,8 @@ alert('This document can not be handled using this submission interface.\\n""" \
 document.forms[0].submit();
 </script>"""
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when the recid found is not an integer
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when the recid found is not an integer
 CFG_ALERT_RECORD_ID_MUST_BE_INT = """
 <script type="text/javascript">
 document.forms[0].action="/submit";

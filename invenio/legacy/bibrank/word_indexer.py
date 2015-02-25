@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
 
@@ -41,12 +41,12 @@ from invenio.modules.ranker.registry import configuration
 
 options = {} # global variable to hold task options
 
-## safety parameters concerning DB thread-multiplication problem:
+# safety parameters concerning DB thread-multiplication problem:
 CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem?
 CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we consider as still safe
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping for more than X seconds
 
-## override urllib's default password-asking behaviour:
+# override urllib's default password-asking behaviour:
 class MyFancyURLopener(urllib.FancyURLopener):
     def prompt_user_passwd(self, host, realm):
         # supply some dummy credentials by default
@@ -63,7 +63,7 @@ nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
 
-## Dictionary merging functions
+# Dictionary merging functions
 def dict_union(list1, list2):
     "Returns union of the two dictionaries."
     union_dict = {}

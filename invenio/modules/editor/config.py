@@ -1,91 +1,91 @@
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """BibEdit Configuration."""
 
-## CFG_BIBEDIT_FILENAME - default filename for BibEdit files.
+# CFG_BIBEDIT_FILENAME - default filename for BibEdit files.
 CFG_BIBEDIT_FILENAME = "bibedit_record"
 
-## The CFG_BIBEDIT_JS_* constants are passed on and used by the BibEdit
-## Javascript engine.
+# The CFG_BIBEDIT_JS_* constants are passed on and used by the BibEdit
+# Javascript engine.
 
-## CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL - interval (in ms) between checking if
-## hash has changed.
+# CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL - interval (in ms) between checking if
+# hash has changed.
 CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL = 250
 
-## CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL - interval (in ms) between menu
-## repositioning.
+# CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL - interval (in ms) between menu
+# repositioning.
 CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL = 250
 
-## CFG_BIBEDIT_JS_STATUS_INFO_TIME - display status info messages for how long
-## (in ms).
+# CFG_BIBEDIT_JS_STATUS_INFO_TIME - display status info messages for how long
+# (in ms).
 CFG_BIBEDIT_JS_STATUS_INFO_TIME = 1000
 
-## CFG_BIBEDIT_JS_STATUS_ERROR_TIME - display status error messages for how long
-## (in ms).
+# CFG_BIBEDIT_JS_STATUS_ERROR_TIME - display status error messages for how long
+# (in ms).
 CFG_BIBEDIT_JS_STATUS_ERROR_TIME = 2000
 
-## CFG_BIBEDIT_JS_CLONED_RECORD_COLOR - Color of cloned record ID highlighting.
+# CFG_BIBEDIT_JS_CLONED_RECORD_COLOR - Color of cloned record ID highlighting.
 CFG_BIBEDIT_JS_CLONED_RECORD_COLOR = 'yellow'
 
-## CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION - Duration (in ms) for the
-## fading of cloned record ID highlighting.
+# CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION - Duration (in ms) for the
+# fading of cloned record ID highlighting.
 CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION = 5000
 
-## CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR - Color of new field forms'
-## highlighting.
+# CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR - Color of new field forms'
+# highlighting.
 CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR = 'lightblue'
 
-## CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION - Duration (in ms) for
-## the fading of new field forms' highlighting.
+# CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION - Duration (in ms) for
+# the fading of new field forms' highlighting.
 CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION = 2000
 
-## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR - Color of new fields' highlighting
+# CFG_BIBEDIT_JS_NEW_FIELDS_COLOR - Color of new fields' highlighting
 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR = 'lightgreen'
 
-## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION - Duration (in ms) for the
-## fading of new fields' highlighting.
+# CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION - Duration (in ms) for the
+# fading of new fields' highlighting.
 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION = 2000
 
-## CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY - Duration (in ms) before
-## highlighting newly modified content.
-## WARNING: If set to low, the Jeditable plugin won't have time to update the
-## cell with the new content (recommended: >50).
+# CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY - Duration (in ms) before
+# highlighting newly modified content.
+# WARNING: If set to low, the Jeditable plugin won't have time to update the
+# cell with the new content (recommended: >50).
 CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY = 50
 
-## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR - Color of new fields' highlighting
+# CFG_BIBEDIT_JS_NEW_FIELDS_COLOR - Color of new fields' highlighting
 CFG_BIBEDIT_JS_NEW_CONTENT_COLOR = 'lightgreen'
 
-## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION - Duration (in ms) for the
-## fading of new fields' highlighting.
+# CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION - Duration (in ms) for the
+# fading of new fields' highlighting.
 CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION = 2000
 
-## CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY - Duration (in ms) before refreshing
-## a record's tickets after the user clicks on the link to create a new one.
-## WARNING: If set to low, the request for RT to generate the ticket won't have
-## time to finish (recommended: >2000).
+# CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY - Duration (in ms) before refreshing
+# a record's tickets after the user clicks on the link to create a new one.
+# WARNING: If set to low, the request for RT to generate the ticket won't have
+# time to finish (recommended: >2000).
 CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
 
-## CFG_BIBEDIT_REQUESTS_UNTIL_SAVE - number of requests until changes in the
-## editor will be saved
+# CFG_BIBEDIT_REQUESTS_UNTIL_SAVE - number of requests until changes in the
+# editor will be saved
 CFG_BIBEDIT_REQUESTS_UNTIL_SAVE = 3
 
-## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
-## by the Ajax engine.
+# CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
+# by the Ajax engine.
 
 CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     #TODO: all the result codes should be accessible through the constants rather than
@@ -169,15 +169,15 @@ CFG_BIBEDIT_MSG = {
     "not_authorised" : "You are not authorised to submit a record into the given \
                         collection. Please, review the collection tags."
 }
-## CFG_BIBEDIT_MAX_SEARCH_RESULTS
+# CFG_BIBEDIT_MAX_SEARCH_RESULTS
 CFG_BIBEDIT_MAX_SEARCH_RESULTS = 99
 
-## CFG_BIBEDIT_TAG_FORMAT - default format to use when displaying MARC tags.
+# CFG_BIBEDIT_TAG_FORMAT - default format to use when displaying MARC tags.
 CFG_BIBEDIT_TAG_FORMAT = 'MARC'
 
-## CFG_BIBEDIT_TO_MERGE_SUFFIX - default filename suffix for XML file to be
-## merged. Filename will then be constructed like this:
-## <CFG_BIBEDIT_FILENAME>_<RECID>_<UID>_<CFG_BIBEDIT_TO_MERGE_SUFFIX>.xml
+# CFG_BIBEDIT_TO_MERGE_SUFFIX - default filename suffix for XML file to be
+# merged. Filename will then be constructed like this:
+# <CFG_BIBEDIT_FILENAME>_<RECID>_<UID>_<CFG_BIBEDIT_TO_MERGE_SUFFIX>.xml
 CFG_BIBEDIT_TO_MERGE_SUFFIX = 'merge'
 
 # CFG_BIBEDIT_AUTOSUGGEST_TAGS - for which tags the editor should try to autosuggest values
@@ -222,9 +222,9 @@ CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS = ['035', '041', '520', '540', '595', '650', '6
 # they will be hidden by default
 CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD = 200
 
-## CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS -- whether to show or not
-## the fields and subfields that are removed in holding pen records.
-## 0 for false, 1 for true.
+# CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS -- whether to show or not
+# the fields and subfields that are removed in holding pen records.
+# 0 for false, 1 for true.
 CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS = 0
 
 # CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL - if DOIs owned/managed by

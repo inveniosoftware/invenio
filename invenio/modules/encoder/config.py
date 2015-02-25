@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Bibencode configuration submodule"""
 
@@ -31,35 +31,35 @@ from six import iteritems
 # General Configuration #
 #-----------------------#
 
-## The command for probing with FFMPEG
+# The command for probing with FFMPEG
 CFG_BIBENCODE_FFMPEG_PROBE_COMMAND = invenio.config.CFG_PATH_FFPROBE + " %s -loglevel verbose -show_format -show_streams"
 
-## The command for probing with MEDIAINFO
+# The command for probing with MEDIAINFO
 CFG_BIBENCODE_MEDIAINFO_COMMAND = invenio.config.CFG_PATH_MEDIAINFO + " %s -f --Output=XML"
 
-## Image extraction base command
+# Image extraction base command
 CFG_BIBENCODE_FFMPEG_EXTRACT_COMMAND = invenio.config.CFG_PATH_FFMPEG + " -ss %.2f -i %s -r 1 -vframes 1 -f image2 -s %s %s"
 
-## Commands for multipass encoding
-## In the first pass, you can dump the output to /dev/null and ignore audio
-## CFG_BIBENCODE_FFMPEG_COMMAND_PASS_1 = "ffmpeg -i %s -y -loglevel verbose -vcodec %s -pass 1 -passlogfile %s -an -f rawvideo -b %s -s %s %s /dev/null"
-## CFG_BIBENCODE_FFMPEG_COMMAND_PASS_2 = "ffmpeg -i %s -y -loglevel verbose -vcodec %s -pass 2 -passlogfile %s -acodec %s -b %s -ab %s -s %s %s %s"
+# Commands for multipass encoding
+# In the first pass, you can dump the output to /dev/null and ignore audio
+# CFG_BIBENCODE_FFMPEG_COMMAND_PASS_1 = "ffmpeg -i %s -y -loglevel verbose -vcodec %s -pass 1 -passlogfile %s -an -f rawvideo -b %s -s %s %s /dev/null"
+# CFG_BIBENCODE_FFMPEG_COMMAND_PASS_2 = "ffmpeg -i %s -y -loglevel verbose -vcodec %s -pass 2 -passlogfile %s -acodec %s -b %s -ab %s -s %s %s %s"
 CFG_BIBENCODE_FFMPEG_PASSLOGFILE_PREFIX = invenio.config.CFG_LOGDIR + "/bibencode2pass-%s-%s"
 
-## Path to the encoding logfiles
-## Filenames will later be substituted with process specific information
+# Path to the encoding logfiles
+# Filenames will later be substituted with process specific information
 CFG_BIBENCODE_FFMPEG_ENCODING_LOG = invenio.config.CFG_LOGDIR + "/bibencode_%s.log"
 
-## Path to probing logiles
+# Path to probing logiles
 CFG_BIBENCODE_FFMPEG_PROBE_LOG = invenio.config.CFG_LOGDIR + "/bibencode_probe_%s.log"
 
-## The pattern for the encoding status specific string in the FFmpeg output
+# The pattern for the encoding status specific string in the FFmpeg output
 CFG_BIBENCODE_FFMPEG_ENCODE_TIME = re.compile("^.+time=(\d\d:\d\d:\d\d.\d\d).+$")
 
-## The pattern for the configuration string with information about compiling options
+# The pattern for the configuration string with information about compiling options
 CFD_BIBENCODE_FFMPEG_OUT_RE_CONFIGURATION = re.compile("(--enable-[a-z0-9\-]*)")
 
-## The minimum ffmpeg compile options for BibEncode to work correctly
+# The minimum ffmpeg compile options for BibEncode to work correctly
 CFG_BIBENCODE_FFMPEG_CONFIGURATION_REQUIRED = (
                 '--enable-gpl',
                 '--enable-version3',
@@ -73,22 +73,22 @@ CFG_BIBENCODE_FFMPEG_CONFIGURATION_REQUIRED = (
                 ## '--enable-funky'
                 )
 
-## Path to the directory for transcoded files
+# Path to the directory for transcoded files
 CFG_BIBENCODE_TARGET_DIRECTORY = invenio.config.CFG_TMPDIR + "/"
 
 #------------------------#
 # Metadata Configuration #
 #------------------------#
 
-## Template for key-value pairs that can be used with FFMPEG to set metadata.
-## Not all keys are represented in every video container format.
-## FFMPEG will try to write any given key-value pairs. If the container
-## format does not support some pairs there wont be an error.
-## You might like to verify that the attributes were really written
-## by using FFPROBE.
+# Template for key-value pairs that can be used with FFMPEG to set metadata.
+# Not all keys are represented in every video container format.
+# FFMPEG will try to write any given key-value pairs. If the container
+# format does not support some pairs there wont be an error.
+# You might like to verify that the attributes were really written
+# by using FFPROBE.
 
-## The FFMPEG argument structure is:
-## -metadata key1="value1" -metadata key2="value2 ...
+# The FFMPEG argument structure is:
+# -metadata key1="value1" -metadata key2="value2 ...
 CFG_BIBENCODE_FFMPEG_METADATA_TEMPLATE = {
                    'title': None,
                    'author': None,
@@ -123,23 +123,23 @@ CFG_BIBENCODE_FFMPEG_RE_VIDEOINFO_VSTREAM = re.compile("^\s*Stream #(\d+.\d+)\(?
 #                                                                    number    language         codec              samplerate   channels      bit-depth   bitrate
 CFG_BIBENCODE_FFMPEG_RE_VIDEOINFO_ASTREAM = re.compile("^\s*Stream #(\d+.\d+)\(?(\w+)?\)?: Audio: ([a-zA-Z0-9\(\) ]*), (\d+) Hz, ([a-zA-Z0-9 ]+), (\w+), (\d+) kb\/s$")
 
-## FFMPEG command for setting metadata
-## This will create a copy of the master and write the metadata there
+# FFMPEG command for setting metadata
+# This will create a copy of the master and write the metadata there
 CFG_BIBENCODE_FFMPEG_METADATA_SET_COMMAND = "ffmpeg -y -i %s -acodec copy -vcodec copy %s"
 
-## FFMPEG metadata argument template
-## had to remove '-metadata ' in front because of issues with command splitting
+# FFMPEG metadata argument template
+# had to remove '-metadata ' in front because of issues with command splitting
 CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT = "%s=\"%s\""
 
-## File containing mappings from ffprobe and mediainfo to pbcore
+# File containing mappings from ffprobe and mediainfo to pbcore
 CFG_BIBENCODE_PBCORE_MAPPINGS = pkg_resources.resource_filename('invenio.modules.encoder','pbcore_mappings.json')
 
-## XSLT Template from PBCORE to MARCXML
+# XSLT Template from PBCORE to MARCXML
 CFG_BIBENCODE_PBCORE_MARC_XSLT = pkg_resources.resource_filename('invenio.modules.encoder','pbcore_to_marc_nons.xsl')
 
 CFG_BIBENCODE_ASPECT_RATIO_MARC_FIELD  = "951__x"
 
-## Metadata Patterns for parsing
+# Metadata Patterns for parsing
 def create_metadata_re_dict():
     """ Creates a dictionary with Regex patterns from the metadata template dictionary
     """

@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -61,7 +61,7 @@ CFG_WEBSTYLE_DEPRECATED_FUNCTIONS = {'webstyle': \
 # Eg. {'webstyle': {'get_page':{'header': "replaced by 'title'"}}}
 CFG_WEBSTYLE_DEPRECATED_PARAMETERS = {}
 
-## Thanks to Python CookBook for this!
+# Thanks to Python CookBook for this!
 def enhance_method(module, klass, method_name, replacement):
     old_method = getattr(klass, method_name)
     try:
@@ -126,7 +126,7 @@ def load(module='', prefix=''):
 
 # Functions to check that customized templates functions conform to
 # the default templates functions
-##
+#
 
 def check(default_base_dir=None, custom_base_dir=None):
     """
@@ -285,7 +285,7 @@ def check(default_base_dir=None, custom_base_dir=None):
     return messages
 
 # Utility functions
-##
+#
 
 def get_default_templates(base_dir=None):
     """

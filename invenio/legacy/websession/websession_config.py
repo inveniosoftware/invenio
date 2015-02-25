@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=C0301
 
@@ -78,16 +78,16 @@ CFG_WEBSESSION_COOKIE_NAME = "INVENIOSESSION"
 CFG_WEBSESSION_ONE_DAY = 86400 #: how many seconds are there in one day
 CFG_WEBSESSION_CLEANUP_CHANCE = 10000 #: cleanups have 1 in CLEANUP_CHANCE chance
 
-## FIXME: Session locking is currently disabled because, since it's
-## implementing the mod_python technique of using Apache mutexes, these
-## are by default a very limited resources (according to
-## <http://www.modpython.org/live/current/doc-html/inst-apacheconfig.html#l2h-21>)
-## only 8 mutexes are available by default)
-## Since the session would be locked at constructor time and unlocked at
-## destructor time, and since we cache the session for the whole request
-## handling time, enabling locking would mean that at most only 8 requests
-## could been handled at the same time. This is quite limited and, anyway
-## there's already local locking available thanks to our MySQL backend.
+# FIXME: Session locking is currently disabled because, since it's
+# implementing the mod_python technique of using Apache mutexes, these
+# are by default a very limited resources (according to
+# <http://www.modpython.org/live/current/doc-html/inst-apacheconfig.html#l2h-21>)
+# only 8 mutexes are available by default)
+# Since the session would be locked at constructor time and unlocked at
+# destructor time, and since we cache the session for the whole request
+# handling time, enabling locking would mean that at most only 8 requests
+# could been handled at the same time. This is quite limited and, anyway
+# there's already local locking available thanks to our MySQL backend.
 CFG_WEBSESSION_ENABLE_LOCKING = False
 
 # Exceptions: errors

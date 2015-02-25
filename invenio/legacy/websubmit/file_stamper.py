@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -58,7 +58,7 @@ from invenio.utils.shell import escape_shell_arg
 from invenio.legacy.websubmit.config import InvenioWebSubmitFileStamperError
 
 
-## ***** Functions related to the creation of the PDF Stamp file: *****
+# ***** Functions related to the creation of the PDF Stamp file: *****
 re_latex_includegraphics = re.compile('\\includegraphics\[.*?\]\{(?P<image>.*?)\}')
 def copy_template_files_to_stampdir(path_workingdir, latex_template):
     """In order to stamp a PDF fulltext file, LaTeX is used to create a
@@ -550,7 +550,7 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     return pdf_stamp_name
 
 
-## ***** Functions related to the actual stamping of the file: *****
+# ***** Functions related to the actual stamping of the file: *****
 
 def apply_stamp_cover_page(path_workingdir, \
                            stamp_file_name, \
@@ -1210,7 +1210,7 @@ def create_working_directory():
     return path_workingdir
 
 
-## ***** Functions Specific to CLI calling of the program: *****
+# ***** Functions Specific to CLI calling of the program: *****
 
 def usage(wmsg="", err_code=0):
     """Print a "usage" message (along with an optional additional warning/error
@@ -1693,6 +1693,6 @@ def stamp_file_cli():
         sys.stderr.flush()
 
 
-## Start proceedings for CLI calls:
+# Start proceedings for CLI calls:
 if __name__ == "__main__":
     stamp_file_cli()

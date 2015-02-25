@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
 from datetime import datetime
@@ -502,36 +502,36 @@ re_correct_numeration_2nd_try_ptn4 = re.compile(
   u')', re.UNICODE|re.VERBOSE)
 
 
-## precompile some regexps used to search for and standardize
-## numeration patterns in a line for the first time:
+# precompile some regexps used to search for and standardize
+# numeration patterns in a line for the first time:
 
-## Delete the colon and expressions such as Serie, vol, V. inside the pattern
-## <serie : volume> E.g. Replace the string """Series A, Vol 4""" with """A 4"""
+# Delete the colon and expressions such as Serie, vol, V. inside the pattern
+# <serie : volume> E.g. Replace the string """Series A, Vol 4""" with """A 4"""
 re_strip_series_and_volume_labels = (re.compile(
     ur'(Serie\s|\bS\.?\s)?([A-H])\s?[:,]\s?(\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)', re.UNICODE),
                       ur'\g<2> \g<4>')
 
 
-## This pattern is not compiled, but rather included in
-## the other numeration paterns:
+# This pattern is not compiled, but rather included in
+# the other numeration paterns:
 re_nucphysb_subtitle = \
     ur'(?:[\(\[]\s*(?:[Ff][Ss]|[Pp][Mm])\s*\d{0,4}\s*[\)\]])'
 re_nucphysb_subtitle_opt = \
     u'(?:' + re_sep + re_nucphysb_subtitle + u')?'
 
 
-## the 4 main numeration patterns:
+# the 4 main numeration patterns:
 
-## Pattern 1: <vol, page, year>
+# Pattern 1: <vol, page, year>
 
-## <v, p, y>
+# <v, p, y>
 re_numeration_vol_page_yr = re.compile(
   re_start +
   re_volume + re_volume_sub_number_opt + re_sep +
   re_page + re_sep_or_parentesis +
   re_year, re.UNICODE|re.VERBOSE)
 
-## <v, [FS], p, y>
+# <v, [FS], p, y>
 re_numeration_vol_nucphys_page_yr = re.compile(
   re_start +
   re_volume + re_volume_sub_number_opt + re_sep +
@@ -539,7 +539,7 @@ re_numeration_vol_nucphys_page_yr = re.compile(
   re_page + re_sep_or_parentesis +
   re_year, re.UNICODE|re.VERBOSE)
 
-## <[FS], v, p, y>
+# <[FS], v, p, y>
 re_numeration_nucphys_vol_page_yr = re.compile(
   re_start +
   re_nucphysb_subtitle + re_sep +
@@ -547,16 +547,16 @@ re_numeration_nucphys_vol_page_yr = re.compile(
   re_page + re_sep_or_parentesis +
   re_year, re.UNICODE|re.VERBOSE)
 
-## Pattern 2: <vol, year, page>
+# Pattern 2: <vol, year, page>
 
-## <v, y, p>
+# <v, y, p>
 re_numeration_vol_yr_page = re.compile(
   re_start +
   re_volume + re_sep_or_parentesis +
   re_year + re_sep_or_after_parentesis +
   re_page, re.UNICODE|re.VERBOSE)
 
-## <v, sv, [FS]?, y, p>
+# <v, sv, [FS]?, y, p>
 re_numeration_vol_subvol_nucphys_yr_page = re.compile(
   re_start +
   re_volume + re_volume_sub_number_opt +
@@ -564,7 +564,7 @@ re_numeration_vol_subvol_nucphys_yr_page = re.compile(
   re_year + re_sep_or_after_parentesis +
   re_page, re.UNICODE|re.VERBOSE)
 
-## <v, [FS]?, y, sv, p>
+# <v, [FS]?, y, sv, p>
 re_numeration_vol_nucphys_yr_subvol_page = re.compile(
   re_start +
   re_volume + re_nucphysb_subtitle_opt +
@@ -572,7 +572,7 @@ re_numeration_vol_nucphys_yr_subvol_page = re.compile(
   re_year + re_volume_sub_number_opt + re_sep +
   re_page, re.UNICODE|re.VERBOSE)
 
-## <[FS]?, v, y, p>
+# <[FS]?, v, y, p>
 re_numeration_nucphys_vol_yr_page = re.compile(
   re_start +
   re_nucphysb_subtitle + re_sep +
@@ -580,9 +580,9 @@ re_numeration_nucphys_vol_yr_page = re.compile(
   re_year + re_sep_or_after_parentesis +    # Year
   re_page, re.UNICODE|re.VERBOSE)
 
-## Pattern 3: <vol, serie, year, page>
+# Pattern 3: <vol, serie, year, page>
 
-## <v, s, [FS]?, y, p>
+# <v, s, [FS]?, y, p>
 # re_numeration_vol_series_nucphys_yr_page = (re.compile(
 #   re_volume + re_sep +
 #   re_series + re_sep +
@@ -593,7 +593,7 @@ re_numeration_nucphys_vol_yr_page = re.compile(
 #                                       ur'<cds.YR>(\g<year>)</cds.YR> ' \
 #                                       ur'<cds.PG>\g<page></cds.PG> ')
 
-## <v, [FS]?, s, y, p
+# <v, [FS]?, s, y, p
 re_numeration_vol_nucphys_series_yr_page = re.compile(
   re_start +
   re_volume + re_nucphysb_subtitle_opt + re_sep +
@@ -601,8 +601,8 @@ re_numeration_vol_nucphys_series_yr_page = re.compile(
   re_year + re_sep_or_after_parentesis +
   re_page, re.UNICODE|re.VERBOSE)
 
-## Pattern 4: <vol, serie, page, year>
-## <v, s, [FS]?, p, y>
+# Pattern 4: <vol, serie, page, year>
+# <v, s, [FS]?, p, y>
 re_numeration_vol_series_nucphys_page_yr = re.compile(
   re_start +
   re_volume + re_sep +
@@ -610,7 +610,7 @@ re_numeration_vol_series_nucphys_page_yr = re.compile(
   re_page + re_sep +
   re_year, re.UNICODE|re.VERBOSE)
 
-## <v, [FS]?, s, p, y>
+# <v, [FS]?, s, p, y>
 re_numeration_vol_nucphys_series_page_yr = re.compile(
   re_start +
   re_volume + re_nucphysb_subtitle_opt + re_sep +
@@ -618,7 +618,7 @@ re_numeration_vol_nucphys_series_page_yr = re.compile(
   re_page + re_sep +
   re_year, re.UNICODE|re.VERBOSE)
 
-## Pattern 5: <year, vol, page>
+# Pattern 5: <year, vol, page>
 re_numeration_yr_vol_page = re.compile(
   re_start +
   re_year + re_sep_or_after_parentesis +
@@ -626,8 +626,8 @@ re_numeration_yr_vol_page = re.compile(
   re_page, re.UNICODE|re.VERBOSE)
 
 
-## Pattern used to locate references of a doi inside a citation
-## This pattern matches both url (http) and 'doi:' or 'DOI' formats
+# Pattern used to locate references of a doi inside a citation
+# This pattern matches both url (http) and 'doi:' or 'DOI' formats
 re_doi = (re.compile(ur"""
     ((\(?[Dd][Oo][Ii](\s)*\)?:?(\s)*)       # 'doi:' or 'doi' or '(doi)' (upper or lower case)
     |(https?://dx\.doi\.org\/))?            # or 'http://dx.doi.org/'    (neither has to be present)

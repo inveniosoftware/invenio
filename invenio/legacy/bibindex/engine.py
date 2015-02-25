@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
-##               2010, 2011, 2012, 2013, 2014, 2015 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009,
+#               2010, 2011, 2012, 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from __future__ import print_function
 
@@ -105,7 +105,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 
-## precompile some often-used regexp for speed reasons:
+# precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
 re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 re_prefix = re.compile('__[a-zA-Z1-9]*__')
@@ -127,7 +127,7 @@ def list_unique(_list):
     return _dict.keys()
 
 
-## safety function for killing slow DB threads:
+# safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS,
                               thread_timeout=CFG_MYSQL_THREAD_TIMEOUT):
     """Check the number of DB threads and if there are more than

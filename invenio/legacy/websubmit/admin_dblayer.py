@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
 
@@ -23,7 +23,7 @@ from invenio.legacy.dbquery import run_sql
 from invenio.legacy.websubmit.admin_config import *
 from random import randint
 
-## Functions related to the organisation of catalogues:
+# Functions related to the organisation of catalogues:
 
 def insert_submission_collection(collection_name):
     qstr = """INSERT INTO sbmCOLLECTION (name) VALUES (%s)"""
@@ -450,7 +450,7 @@ def normalize_scores_of_collection_children_of_collection(collection_id):
     return
 
 
-## Functions relating to WebSubmit ACTIONS, their addition, and their modification:
+# Functions relating to WebSubmit ACTIONS, their addition, and their modification:
 
 def update_action_details(actid, actname, working_dir, status_text):
     """Update the details of an action in the websubmit database IF there was only one action
@@ -516,8 +516,8 @@ def insert_action_details(actid, actname, working_dir, status_text):
         return 1 # Everything not OK: rows may already exist for action with 'actid'
 
 
-## Functions relating to WebSubmit Form Element JavaScript CHECKING FUNCTIONS, their addition, and their
-## modification:
+# Functions relating to WebSubmit Form Element JavaScript CHECKING FUNCTIONS, their addition, and their
+# modification:
 
 def get_number_jschecks_with_chname(chname):
     """Return the number of Checks found for a given check name/id.
@@ -585,7 +585,7 @@ def update_jscheck_details(chname, chdesc):
         return 1 # Everything not OK: Either no rows or more than one row for check "chname"
 
 
-## Functions relating to WebSubmit FUNCTIONS, their addition, and their modification:
+# Functions relating to WebSubmit FUNCTIONS, their addition, and their modification:
 
 def get_function_description(function):
     """Get and return a tuple containing the function description (description) for
@@ -1255,7 +1255,7 @@ def add_function_parameter(function, parameter_name):
     else:
         return 1 ## Everything NOT OK: parameter already exists for function
 
-## Functions relating to WebSubmit ELEMENTS, their addition, and their modification:
+# Functions relating to WebSubmit ELEMENTS, their addition, and their modification:
 
 def get_number_elements_with_elname(elname):
     """Return the number of Elements found for a given element name/id.
@@ -1976,7 +1976,7 @@ def delete_function_doctypesubmission_step_score(doctype, action, function, step
             return 1
 
 def delete_the_function_at_step_and_score_from_a_submission(doctype, action, function, step, score):
-## THIS SHOULD REPLACE "delete_function_doctypesubmission_step_score(doctype, action, function, step, score)"
+# THIS SHOULD REPLACE "delete_function_doctypesubmission_step_score(doctype, action, function, step, score)"
     """Delete a given function at a particular step/score for a given submission"""
     q = """DELETE FROM sbmFUNCTIONS WHERE doctype=%s AND action=%s AND function=%s AND step=%s AND score=%s"""
     run_sql(q, (doctype, action, function, step, score))

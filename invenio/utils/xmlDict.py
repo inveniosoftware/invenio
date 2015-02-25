@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-## The following code is authored by Duncan McGreggor and is licensed
-## under PSF license.  It was taken from
-## <http://code.activestate.com/recipes/410469/>.
+# The following code is authored by Duncan McGreggor and is licensed
+# under PSF license.  It was taken from
+# <http://code.activestate.com/recipes/410469/>.
 
 import six
 import xml.etree.ElementTree as ElementTree

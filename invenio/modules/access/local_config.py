@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Invenio Access Control Config. """
 
@@ -415,7 +415,7 @@ CFG_OAUTH2_CONFIGURATIONS =  {
     }
 }
 
-## Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
+# Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
 CFG_OPENID_PROVIDERS = config['CFG_OPENID_PROVIDERS']
 CFG_OAUTH1_PROVIDERS = config['CFG_OAUTH1_PROVIDERS']
 CFG_OAUTH2_PROVIDERS = config['CFG_OAUTH2_PROVIDERS']
@@ -457,8 +457,8 @@ if CFG_OAUTH2_AUTHENTICATION:
     CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
 
 
-## If using SSO, this is the number of seconds after which the keep-alive
-## SSO handler is pinged again to provide fresh SSO information.
+# If using SSO, this is the number of seconds after which the keep-alive
+# SSO handler is pinged again to provide fresh SSO information.
 CFG_EXTERNAL_AUTH_SSO_REFRESH = 600
 
 # default data for the add_default_settings function

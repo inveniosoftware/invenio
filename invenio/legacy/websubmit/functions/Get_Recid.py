@@ -1,19 +1,19 @@
-## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Get the recid of a record with a given report-number (from the global 'rn'),
    and store it into the global 'sysno'.
@@ -32,8 +32,8 @@ from invenio.legacy.websubmit.config import \
      InvenioWebSubmitFunctionError
 
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when a document recid for the given report-number cannot be found:
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when a document recid for the given report-number cannot be found:
 CFG_ALERT_DOCUMENT_NOT_FOUND = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
@@ -45,8 +45,8 @@ alert('The document with report-number [%s] cannot be found in our """ \
 document.forms[0].submit();
 </script>"""
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when multiple document recids for the given report-number are found found:
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when multiple document recids for the given report-number are found found:
 CFG_ALERT_MULTIPLE_DOCUMENTS_FOUND = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
@@ -58,9 +58,9 @@ alert('Multiple documents with the report number [%s] have been found.\\n""" \
 document.forms[0].submit();
 </script>"""
 
-## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
-## when the recid found doesn't match the type of document that should be
-## handled by this submission
+# JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
+# when the recid found doesn't match the type of document that should be
+# handled by this submission
 CFG_ALERT_WRONG_RECORD_FOR_THIS_SUBMISSION = """
 <script type="text/javascript">
 document.forms[0].action="/submit";

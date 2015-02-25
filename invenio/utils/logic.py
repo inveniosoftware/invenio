@@ -320,7 +320,7 @@ def variables(s):
             lvars = lvars.union(variables(lit))
         return lvars
 
-## Useful constant Exprs used in examples and code:
+# Useful constant Exprs used in examples and code:
 TRUE, FALSE, ZERO, ONE, TWO = map(Expr, ['TRUE', 'FALSE', 0, 1, 2])
 
 #______________________________________________________________________________
@@ -386,7 +386,7 @@ def pl_true(exp, model={}):
 
 #______________________________________________________________________________
 
-## Convert to Conjunctive Normal Form (CNF)
+# Convert to Conjunctive Normal Form (CNF)
 
 def to_cnf(s):
     """Convert a propositional logical sentence s to conjunctive normal form.
