@@ -24,6 +24,7 @@ def produce_json_for_marc(self, fields=None):
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
+    from invenio.importutils import try_to_eval
     from invenio.bibfield_config_engine import get_producer_rules
     if not fields:
         fields = self.keys()
@@ -50,14 +51,16 @@ def produce_json_for_marc(self, fields=None):
                                 tmp_dict[key] = f
                             else:
                                 try:
-                                    tmp_dict[key] = f[subfield]
+                                    tmp_dict[key] = f.get(subfield)
                                 except:
                                     try:
-                                        tmp_dict[key] = self._try_to_eval(subfield, value=f)
+                                        tmp_dict[key] = try_to_eval(subfield, self=self, value=f)
                                     except Exception as e:
-                                        self['__error_messages.cerror[n]'] = 'Producer CError - Unable to produce %s - %s' % (field, str(e))
+                                        self.continuable_errors.append(
+                                            'Producer CError - Unable to produce %s - %s' % (field, str(e)))
                         if tmp_dict:
                             out.append(tmp_dict)
         except KeyError:
-            self['__error_messages.cerror[n]'] = 'Producer CError - No producer rule for field %s' % field
+            self.continuable_errors.append(
+                'Producer CError - No producer rule for field %s' % field)
     return out

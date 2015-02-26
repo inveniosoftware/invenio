@@ -529,13 +529,13 @@ class BibFieldCheckRecord(InvenioTestCase):
         reader = MarcReader(blob=xml, schema="xml")
         r = Record(reader.translate())
 
-        r.check_record(reset = True)
+        r.check_record(reset=True)
         self.assertTrue('title' in r)
         self.assertEquals(len(r['title']), 2)
         self.assertEquals(len(r.fatal_errors), 1)
 
         r['title'] = r['title'][0]
-        r.check_record(reset = True)
+        r.check_record(reset=True)
         self.assertEquals(len(r.fatal_errors), 0)
 
 TEST_SUITE = make_test_suite(BibFieldMarcReaderMarcXML,
