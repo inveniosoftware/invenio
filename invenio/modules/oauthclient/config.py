@@ -183,3 +183,6 @@ OAUTHCLIENT_SESSION_KEY_PREFIX = "oauth_token"
 
 OAUTHCLIENT_STATE_EXPIRES = 300
 """Number of seconds after which the state token expires."""
+
+OAUTHCLIENT_STATE_ENABLED = True
+"""Internal variable used to disable state validation during tests."""

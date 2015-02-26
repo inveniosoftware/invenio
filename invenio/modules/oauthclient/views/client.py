@@ -176,7 +176,9 @@ def authorized(remote_app=None):
         # Store next URL
         set_session_next_url(remote_app, state['next'])
     except (AssertionError, BadData):
-        abort(403)
+        if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
+           not(current_app.debug or current_app.testing)):
+            abort(403)
 
     return handlers[remote_app]()
 
