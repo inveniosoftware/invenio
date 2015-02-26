@@ -689,7 +689,7 @@ def find_record_from_oaiid(oaiid):
             for r in res:
                 lst.append('recid:"%s"' % str(r[0]))
             candidates = search_pattern(p=' or '.join(lst))
-            deleted    = search_pattern(p='980__c:"DELETED"')
+            deleted    = search_pattern(p='980:"DELETED"')
             recs = candidates.difference(deleted)
             if len(recs) == 1:
                 # all dupes are resolved, use the not deleted record downstream
