@@ -654,7 +654,9 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
             # no oaiid in CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG. Check if we have one
             # in the locally used CFG_OAI_ID_FIELD that matches. This can happen
             # if oai harvesting is used to duplicate records.
-            ret.add(find_record_from_oaiid(extoaiid))
+            recid = find_record_from_oaiid(extoaiid)
+            if recid != None:
+                ret.add(recid)
         return ret
     except Error, error:
         write_message("   Error during find_records_from_extoaiid(): %s "
