@@ -23,17 +23,16 @@ from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, session, url_for
 from flask.ext.login import user_logged_out
-from itsdangerous import TimedJSONWebSignatureSerializer, BadData
+from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 
 from invenio.base.globals import cfg
 from invenio.ext.sslify import ssl_required
 from invenio.utils.url import get_safe_redirect_target
 
-from ..client import oauth, handlers, disconnect_handlers, signup_handlers
-from ..handlers import authorized_default_handler, make_token_getter, \
-    make_handler, disconnect_handler, oauth_logout_handler, \
-    set_session_next_url
+from ..client import disconnect_handlers, handlers, oauth, signup_handlers
+from ..handlers import authorized_default_handler, disconnect_handler, \
+    make_handler, make_token_getter, oauth_logout_handler, set_session_next_url
 
 
 blueprint = Blueprint(
@@ -176,7 +175,9 @@ def authorized(remote_app=None):
         # Store next URL
         set_session_next_url(remote_app, state['next'])
     except (AssertionError, BadData):
-        abort(403)
+        if current_app.config.get('OAUTHCLIENT_STATE_ENABLED', True) or (
+           not(current_app.debug or current_app.testing)):
+            abort(403)
 
     return handlers[remote_app]()
 

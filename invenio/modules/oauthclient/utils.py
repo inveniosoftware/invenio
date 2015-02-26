@@ -17,21 +17,29 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Utility methods to help find, authenticate or register a remote user. """
+"""Utility methods to help find, authenticate or register a remote user."""
 
 from flask import current_app
 from flask.ext.login import logout_user
+
 from invenio.ext.login import authenticate, UserInfo
 from invenio.ext.sqlalchemy import db
 from invenio.ext.script import generate_secret_key
 from invenio.modules.accounts.models import User, UserEXT
 
-from .models import RemoteToken, RemoteAccount
+from .models import RemoteAccount, RemoteToken
+
+
+def _get_external_id(account_info):
+    """Get external id from account info."""
+    if all(k in account_info for k in ("external_id", "external_method")):
+        return dict(id=account_info['external_id'],
+                    method=account_info['external_method'])
+    return None
 
 
 def oauth_get_user(client_id, account_info=None, access_token=None):
-    """
-    Retrieve user object for the given request.
+    """Retrieve user object for the given request.
 
     Uses either the access token or extracted account information to retrieve
     the user object.
@@ -42,13 +50,14 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
             return UserInfo(token.remote_account.user_id)
 
     if account_info:
-        if all(k in account_info for k in ("external_id", "external_method")):
-            u = UserEXT.query.filter_by(id=account_info['external_id'],
-                                        method=account_info['external_method']
+        external_id = _get_external_id(account_info)
+        if external_id:
+            u = UserEXT.query.filter_by(id=external_id['id'],
+                                        method=external_id['method']
                                         ).first()
             if u:
                 return UserInfo(u.id_user)
-        elif account_info.get('email'):
+        if account_info.get('email'):
             u = User.query.filter_by(email=account_info['email']).first()
             if u:
                 return UserInfo(u.id)
@@ -57,7 +66,7 @@ def oauth_get_user(client_id, account_info=None, access_token=None):
 
 def oauth_authenticate(client_id, userinfo, require_existing_link=False,
                        remember=False):
-    """ Authenticate an oauth authorized callback. """
+    """Authenticate an oauth authorized callback."""
     # Authenticate via the access token (access token used to get user_id)
     if userinfo and authenticate(userinfo['email'], remember=remember):
         if require_existing_link:
@@ -70,7 +79,7 @@ def oauth_authenticate(client_id, userinfo, require_existing_link=False,
 
 
 def oauth_register(account_info, form_data=None):
-    """ Register user if possible. """
+    """Register user if possible."""
     from invenio.modules.accounts.models import User
 
     email = account_info.get("email")
@@ -89,17 +98,24 @@ def oauth_register(account_info, form_data=None):
             )
 
             try:
-                if all(k in account_info for k in ("external_id",
-                                                   "external_method")):
-                    u.external_identifiers.append(UserEXT(
-                        id=account_info.get('external_id'),
-                        method=account_info.get('external_method'),
-                        id_user=u.id
-                    ))
-
                 db.session.add(u)
                 db.session.commit()
                 return UserInfo(u.id)
             except Exception:
                 current_app.logger.exception("Cannot create user")
     return None
+
+
+def oauth_link_external_id(user, external_id=None):
+    """Link a user to an external id."""
+    oauth_unlink_external_id(external_id)
+    db.session.add(UserEXT(
+        id=external_id['id'], method=external_id['method'], id_user=user.id
+    ))
+
+
+def oauth_unlink_external_id(external_id):
+    """Unlink a user from an external id."""
+    UserEXT.query.filter_by(id=external_id['id'],
+                            method=external_id['method']).delete()
+    db.session.commit()

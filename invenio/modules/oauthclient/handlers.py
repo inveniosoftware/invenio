@@ -19,12 +19,14 @@
 
 """Handlers for customizing oauthclient endpoints."""
 
-import six
+import warnings
+
+from functools import partial, wraps
 
 from flask import current_app, flash, redirect, render_template, \
     request, session, url_for
 from flask.ext.login import current_user
-from functools import partial, wraps
+import six
 from werkzeug.utils import import_string
 
 from invenio.base.globals import cfg
@@ -178,7 +180,7 @@ def oauth_error_handler(f):
                 e.remote, e.response, e.code, e.uri, e.description
             )
         except OAuthRejectedRequestError:
-            flash("You rejected the authentication request.")
+            flash("You rejected the authentication request.", category='info')
             return redirect('/')
     return inner
 
@@ -229,6 +231,8 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
                     token_session_key(remote.name) + '_autoregister'] = True
                 session[token_session_key(remote.name) +
                         "_account_info"] = account_info
+                session[token_session_key(remote.name) +
+                        "_response"] = resp
                 return redirect(url_for(
                     ".signup",
                     remote_app=remote.name,
@@ -249,9 +253,15 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
 
     # Setup account
     # -------------
-    if not token.remote_account.extra_data and \
-       remote.name in signup_handlers:
-        handlers['setup'](token)
+    if not token.remote_account.extra_data:
+        try:
+            handlers['setup'](token, resp)
+        except TypeError:
+            warnings.warn('Method signature of setup signup handler is '
+                          'deprecated. It must take three arguments (remote,'
+                          ' token, response).',
+                          DeprecationWarning)
+            handlers['setup'](token)
 
     # Redirect to next
     next_url = get_session_next_url(remote.name)
@@ -261,7 +271,6 @@ def authorized_signup_handler(resp, remote, *args, **kwargs):
         return redirect('/')
 
 
-@oauth_error_handler
 def disconnect_handler(remote, *args, **kwargs):
     """Handle unlinking of remote account.
 
@@ -293,16 +302,19 @@ def signup_handler(remote, *args, **kwargs):
     if not oauth_token:
         return redirect("/")
 
+    session_prefix = token_session_key(remote.name)
+
     # Test to see if this is coming from on authorized request
-    if not session.get(token_session_key(remote.name) + '_autoregister',
+    if not session.get(session_prefix + '_autoregister',
                        False):
         return redirect(url_for(".login", remote_app=remote.name))
 
     form = EmailSignUpForm(request.form)
 
     if form.validate_on_submit():
-        account_info = session.get(token_session_key(remote.name) +
-                                   "_account_info")
+        account_info = session.get(session_prefix + "_account_info")
+        response = session.get(session_prefix + "_response")
+
         # Register user
         user = oauth_register(account_info, form.data)
 
@@ -310,7 +322,7 @@ def signup_handler(remote, *args, **kwargs):
             raise OAuthError("Could not create user.", remote)
 
         # Remove session key
-        session.pop(token_session_key(remote.name) + '_autoregister', None)
+        session.pop(session_prefix + '_autoregister', None)
 
         # Authenticate the user
         if not oauth_authenticate(remote.consumer_key, user,
@@ -327,10 +339,18 @@ def signup_handler(remote, *args, **kwargs):
             raise OAuthError("Could not create token for user.", remote)
 
         if not token.remote_account.extra_data:
-            handlers['setup'](token)
+            try:
+                handlers['setup'](token, response)
+            except TypeError:
+                warnings.warn('Method signature of setup signup handler is '
+                              'deprecated. It must take three arguments'
+                              ' (remote, token, response).',
+                              DeprecationWarning)
+                handlers['setup'](token)
 
         # Remove account info from session
-        session.pop(token_session_key(remote.name) + '_account_info', None)
+        session.pop(session_prefix + '_account_info', None)
+        session.pop(session_prefix + '_response', None)
 
         # Redirect to next
         next_url = get_session_next_url(remote.name)
@@ -365,7 +385,7 @@ def make_handler(f, remote, with_response=True):
 
     :param f: Callable or an import path to a callable
     """
-    if isinstance(f, six.text_type):
+    if isinstance(f, six.string_types):
         f = import_string(f)
 
     @wraps(f)
