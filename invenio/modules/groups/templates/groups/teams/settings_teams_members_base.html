@@ -1,0 +1,86 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- extends "accounts/settings/index.html" %}
+
+{% bundles "communities.css" %}
+
+{% macro user_status(status) -%}
+  {% if status == "A" %}
+    Admin
+  {% elif status == "M" %}
+    Member
+  {% elif status == "P" %}
+    Pending
+  {% endif %}
+{%- endmacro %}
+
+{% block settings_body %}
+{{helpers.panel_start(
+    breadcrumbs[-2]["text"] + ' Team Members',
+    with_body=False,
+    icon="fa fa-users fa-fw"
+)}}
+<!-- right panel -->
+<!-- description -->
+<div class="panel-body">
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+</div>
+<!-- description -->
+<!-- search bar --><!--TODO -->
+<ul class="list-group">
+  <div class="nav list-group-item">
+      <div class="input-group">
+        <input class="form-control" type="text" value="">
+        <span class="input-group-btn">
+          <button name="action_search" type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
+            <i class="glyphicon glyphicon-search"></i><span>&nbsp;Search</span>
+          </button>
+        </span>
+      </div>
+  </div>
+</ul>
+<!-- search bar -->
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th class="col-md-8">Email</th>
+      <th class="col-md-2">Status<i class="fa fa-fw fa-sort"></i></th>
+      <th class="col-md-2"></th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for member in team.users %}
+    <tr>
+      <td>{{ member.user.email }}</td>
+      <td>{{ user_status(member.user_status) }}</td>
+      <td>
+        <a class="btn btn-xs btn-danger pull-right" href="{{ url_for('settings_teams.remove', team_id=team.id, user_id=member.user.id) }}">
+          <i class="fa fa-chain-broken"></i> Remove
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<!-- right panel -->
+{{helpers.panel_end(with_body=False)}}
+{% endblock %}
+

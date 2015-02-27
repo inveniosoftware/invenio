@@ -1,0 +1,131 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+{% block body %}
+<div class="row">
+  <div class="row">
+    <!-- left panel -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ community.title }}</strong>
+        </div>
+        <div class="list-group">
+          <a href="{{ url_for('community_settings.edit', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-cog fa-fw"></i>
+            Settings
+          </a>
+          <a href="{{ url_for('community_teams.teams', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-users fa-fw"></i>
+            Teams
+          </a>
+          <a href="{{ url_for('community_people.people', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-user fa-fw"></i>
+            People
+          </a>
+          <a href="{{ url_for('community_guides.guides', community_id=community.id) }}" class="list-group-item active">
+            <i class="fa fa-external-link fw"></i>
+            Guides
+          </a>
+        </div>
+      </div>
+      <div style="margin-left: 40px; margin-top: 20px;">
+        <a href="{{ community.community_url }}" class="btn btn-default">
+          <i class="icon-file"></i> View
+        </a>
+        <a href="{{ community.community_provisional_url }}" class="btn btn-default">
+          <i class="icon-file"></i> Curate
+        </a>
+        <a href="{{ url_for('settings_communities.index') }}" class="btn btn-primary">My Communities</a>
+      </div>
+    </div>
+    <!-- left panel -->
+    <!-- right panel -->
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-external-link fa-fw"></i>
+          <strong>Guides</strong>
+        </div>
+        <div class="panel-body">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+        </div>
+        <div class="list-group">
+            <div class="list-group-item">
+              <fieldset>
+                  <div class="form-group">
+                      <label class="control-label col-md-3">
+                        <i class="icon-share"></i>
+                        Collection URL:
+                      </label>
+                      <div class="controls col-md-9">
+                        <a href="">somelink</a>
+                        <p class="text-muted field-desc">
+                          <small>Above address links directly to your community collection.</small>
+                        </p>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <label class="control-label col-md-3">
+                        <i class="icon-share"></i>
+                        Upload URL:
+                      </label>
+                      <div class="controls col-md-9">
+                        <a href="">some address</a>
+                        <p class="text-muted field-desc">
+                          <small>Above address will automatically ensure people who use it will have their record added to your community collection.</small>
+                        </p>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <label class="control-label col-md-3">
+                        <i class="icon-share"></i>
+                        Curation URL:
+                      </label>
+                      <div class="controls col-md-9">
+                        <a href="">Some address</a>
+                        <p class="text-muted field-desc">
+                          <small>Above address links to your private curation URL. You will find all uploads pending your curation.</small>
+                        </p>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <label class="control-label col-md-3">
+                        <i class="icon-share"></i>
+                        Harvesting URL:
+                      </label>
+                      <div class="controls col-md-9">
+                        <a href="">some address</a>
+                        <p class="text-muted field-desc">
+                          <small>Above address links to a OAI-PMH feed, which can be used by other digital repositories to harvest this community collection.</small>
+                        </p>
+                      </div>
+                  </div>
+              </fieldset>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!-- right panel -->
+  </div>
+</div>
+
+{% endblock %}

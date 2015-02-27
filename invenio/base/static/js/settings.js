@@ -51,6 +51,8 @@ require.config({
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
+    "ckeditor-core": "vendors/ckeditor/ckeditor",
+    "ckeditor-jquery": "vendors/ckeditor/adapters/jquery"
   },
   shim: {
     jquery: {
@@ -148,5 +150,8 @@ require.config({
     "jasmine-initialization": {
       deps: ["jasmine-boot"],
     },
+    "ckeditor-jquery": {
+      deps: ["jquery", "ckeditor-core"]
+    }
   }
 });

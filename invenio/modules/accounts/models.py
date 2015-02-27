@@ -19,16 +19,18 @@
 
 """Account database models."""
 
-# General imports.
 from datetime import datetime
-from flask.ext.login import current_user
+
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
+
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.exc import NoResultFound
+
 from sqlalchemy_utils.types.choice import ChoiceType
 
-# Invenio import
-from invenio.ext.sqlalchemy import db
-
-from .errors import AccountSecurityError, IntegrityUsergroupError
+from .errors import IntegrityUsergroupError
 
 # Create your models here.
 
@@ -118,7 +120,12 @@ class User(db.Model):
 
 
 def get_groups_user_not_joined(id_user, group_name=None):
-    """Return the list of group that user not joined."""
+    """Return the list of group that user not joined.
+
+    :param id_user: id of the user
+    :param group_name: filter groups list
+    :return: query to obtain the list
+    """
     query = Usergroup.query.outerjoin(
         Usergroup.users).filter(
             Usergroup.id.notin_(
@@ -139,18 +146,10 @@ class Usergroup(db.Model):
 
     __tablename__ = 'usergroup'
 
-    JOIN_POLICIES = {
-        'VISIBLEOPEN': 'VO',
-        'VISIBLEMAIL': 'VM',
-        'INVISIBLEOPEN': 'IO',
-        'INVISIBLEMAIL': 'IM',
-        'VISIBLEEXTERNAL': 'VE',
-    }
-
-    LOGIN_METHODS = {
-        'INTERNAL': 'INTERNAL',
-        'EXTERNAL': 'EXTERNAL',
-    }
+    JOIN_POLICIES = [
+        (u'VISIBLE', u'Visible'),
+        (u'INVISIBLE', u'Invisible'),
+    ]
 
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                    primary_key=True, autoincrement=True)
@@ -159,90 +158,124 @@ class Usergroup(db.Model):
     description = db.Column(db.Text, nullable=True)
     join_policy = db.Column(
         ChoiceType(
-            map(lambda (k, v): (v, k), JOIN_POLICIES.items()),
-            impl=db.CHAR(2)
-        ), nullable=False, server_default='')
-    login_method = db.Column(
-        ChoiceType(map(lambda (k, v): (v, k), LOGIN_METHODS.items())),
-        nullable=False, server_default='INTERNAL')
-
-    # FIXME Unique(login_method(70), name)
-    __table_args__ = (db.Index('login_method_name', login_method, name,
-                               mysql_length=[60, None]),
-                      db.Model.__table_args__)
-
-    @classmethod
-    def filter_visible(cls):
-        """Return query object with filtered out invisible groups."""
-        visible = filter(lambda k: k[0] == 0,
-                         cls.JOIN_POLICIES.values())
-        assert len(visible) > 1  # if implementation chage use == instead of in
-        return cls.query.filter(cls.join_policy.in_(visible))
+            JOIN_POLICIES,
+        ), nullable=False,
+        server_default=dict(JOIN_POLICIES)['VISIBLE'], name="join_policy"
+    )
 
     @property
-    def login_method_is_external(self):
-        """Return True if the group is external."""
-        return self.login_method == Usergroup.LOGIN_METHODS['EXTERNAL']
+    def is_visible(self):
+        """Indicate if group is visible."""
+        if self.join_policy == 'INVISIBLE':
+            return True
+        else:
+            return False
 
+    @session_manager
     def join(self, user, status=None):
         """Join user to group.
 
         :param user: User to add into the group.
         :param status: status of user
+        :return: the UserUsergroup object
         """
-        # if I want to join another user from the group
-        if(user.id != current_user.get_id()
-           # I need to be an admin of the group
-           and not self.is_admin(current_user.get_id())):
-            raise AccountSecurityError(
-                'Not enough right to '
-                'add user "{0}" from group "{1}"'
-                .format(user.nickname, self.name))
+        user_id = user.id
+        new_status = status or Usergroup.new_user_status
 
-        # join group
-        self.users.append(
-            UserUsergroup(
-                id_user=user.id,
-                user_status=status or self.new_user_status,
+        # check if user exists in group
+        uug = UserUsergroup.query.filter(
+            UserUsergroup.id_user == user_id,
+            UserUsergroup.id_usergroup == self.id
+        ).first()
+        if not uug:
+            # add user to group
+            uug = UserUsergroup(
+                id_user=user_id, id_usergroup=self.id,
+                user_status=new_status
             )
-        )
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            raise
+            db.session.add(uug)
+        else:
+            # user exists, update his status
+            uug.user_status = new_status
+            db.session.merge(uug)
+        return uug
 
+    @session_manager
     def leave(self, user):
         """Remove user from group.
 
         :param user: User to remove from the group.
         """
-        # if I want to remove another user from the group
-        if(user.id != current_user.get_id()
-           # I need to be an admin of the group
-           and not self.is_admin(current_user.get_id())):
-            raise AccountSecurityError(
-                'Not enough right to '
-                'remove user "{0}" from group "{1}"'
-                .format(user.nickname, self.name))
-
         # check that I'm not the last admin before leaving the group.
         if self.is_admin(user.id) and self.admins.count() == 1:
             raise IntegrityUsergroupError(
-                'User can leave the group '
-                'without admins, please delete the '
-                'group if you want to leave.')
+                _('User can leave the group '
+                  'without admins, please delete the '
+                  'group if you want to leave.'))
 
         # leave the group
         UserUsergroup.query.filter_by(
             id_usergroup=self.id,
             id_user=user.id,
         ).delete()
-        try:
-            db.session.commit()
-        except:
-            db.session.rollback()
-            raise
+
+    @session_manager
+    def approve(self, user):
+        """Approve user from group.
+
+        :param user: User to approve into the group.
+        """
+        UserUsergroup.query.filter(
+            UserUsergroup.id_user == user.id,
+            UserUsergroup.id_usergroup == self.id,
+            UserUsergroup.user_status == 'PENDING'
+        ).update(dict(user_status='MEMBER'))
+
+    def query_userusergroup(self, id_user):
+        """Return query to filter UserUsergroup.
+
+        :param id_user: user's id
+        :return: query object
+        """
+        return UserUsergroup.query.filter(
+            UserUsergroup.id_usergroup == self.id,
+            UserUsergroup.id_user == id_user
+        )
+
+    @classmethod
+    def query_list_usergroups(cls, id_user, p=None):
+        """Return query to have a list of groups of the user.
+
+        :param id_user: user's id
+        :param q: search phrase
+        :return: query to read list
+        """
+        query = cls.query.join(UserUsergroup).filter(
+            UserUsergroup.id_user.like(id_user))
+        if p:
+            query = query.filter(
+                db.or_(
+                    cls.name.like("%" + p + "%"),
+                    cls.description.like("%" + p + "%"),
+                )
+            )
+        return query
+
+    def is_part_of(self, id_user):
+        """Return True if the user is an admin or member of the group."""
+        return db.session.query(
+            UserUsergroup.query.filter(
+                UserUsergroup.user_status.in_([
+                    UserUsergroup.USER_STATUS['ADMIN'],
+                    UserUsergroup.USER_STATUS['MEMBER'],
+                ]),
+                UserUsergroup.id_user.like(id_user),
+                UserUsergroup.id_usergroup.like(self.id)
+            ).exists()).scalar()
+
+    def is_pending(self, id_user):
+        """Return True if user is pending."""
+        return not self.is_part_of(id_user)
 
     def is_admin(self, id_user):
         """Return True if the user is an admin of the group."""
@@ -269,9 +302,55 @@ class Usergroup(db.Model):
     @property
     def new_user_status(self):
         """Return user status for new user."""
-        if not self.join_policy.code.endswith('O'):
-            return UserUsergroup.USER_STATUS['PENDING']
-        return UserUsergroup.USER_STATUS['MEMBER']
+        # returns default status
+        return 'PENDING'
+
+    @staticmethod
+    def exists(name):
+        """Return True if already exists a group with this name.
+
+        :param name: group name
+        :return: True, if exists
+        """
+        return db.session.query(Usergroup.query.filter(
+            Usergroup.name.like(name)).exists()).scalar()
+
+    @staticmethod
+    def create(id_user_admin, group):
+        """Create a new group.
+
+        It creates a new group with the specified features
+        and as admin the user specified.
+
+        :param id_user_admin: user id of the admin
+        :param group: group object
+        :param curr_uid: user id that create the group
+        :return: the new group
+        """
+        # default values
+        try:
+            user = User.query.filter_by(id=id_user_admin).one()
+        except NoResultFound:
+            raise IntegrityUsergroupError(
+                'User with id "{0}" not exists').format(id_user_admin)
+        group.join_policy = group.join_policy or 'VISIBLE'
+        group.description = group.description or ''
+        # create the new group
+        db.session.add(group)
+        # join group as admin
+        group.join(user=user, status='ADMIN')
+
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # check if name exists in groups
+            if Usergroup.exists(group.name):
+                raise IntegrityUsergroupError(
+                    'Group {} already exists'.format(group.name)
+                )
+            raise
+        return group
 
 
 class UserUsergroup(db.Model):
@@ -279,9 +358,9 @@ class UserUsergroup(db.Model):
     """Represent a UserUsergroup record."""
 
     USER_STATUS = {
-        'ADMIN': 'A',
-        'MEMBER': 'M',
-        'PENDING': 'P',
+        'ADMIN': 'Admin',
+        'MEMBER': 'Member',
+        'PENDING': 'Pending',
     }
 
     def __str__(self):
@@ -298,20 +377,55 @@ class UserUsergroup(db.Model):
                              db.ForeignKey(Usergroup.id),
                              nullable=False, server_default='0',
                              primary_key=True)
-    user_status = db.Column(db.CHAR(1), nullable=False, server_default='')
+    user_status = db.Column(
+        ChoiceType(
+            USER_STATUS,
+        ), nullable=False, server_default=''
+    )
+
     user_status_date = db.Column(db.DateTime, nullable=False,
                                  default=datetime.now,
                                  onupdate=datetime.now)
     user = db.relationship(
         User,
-        backref=db.backref('usergroups'))
+        backref=db.backref(
+            'usergroups',
+        )
+    )
     usergroup = db.relationship(
         Usergroup,
-        backref=db.backref('users', cascade="all, delete-orphan"))
+        backref=db.backref(
+            'users',
+            cascade="all, delete-orphan",
+        )
+    )
 
     def is_admin(self):
         """Return True if user is a admin."""
-        return self.user_status == self.USER_STATUS['ADMIN']
+        return self.user_status == 'ADMIN'
+
+    def is_pending(self):
+        """Return True if user is pending."""
+        return self.user_status == 'PENDING'
+
+    def is_member(self):
+        """Return True if user is member."""
+        return self.user_status == 'MEMBER'
+
+    def is_part_of(self):
+        """Return True if user is member or admin."""
+        return self.is_admin() or self.is_member()
+
+    @classmethod
+    def query_list(cls, id_user):
+        """Return query to have a list of UserUsergroups of the user.
+
+        :param id_user: user's id
+        :return: query to read list
+        """
+        return cls.query.filter(
+            cls.id_user.like(id_user))
+
 
 # define query to get admins
 Usergroup.admins = db.relationship(
@@ -319,7 +433,7 @@ Usergroup.admins = db.relationship(
     lazy="dynamic",
     primaryjoin=db.and_(
         Usergroup.id == UserUsergroup.id_usergroup,
-        UserUsergroup.user_status == UserUsergroup.USER_STATUS['ADMIN']))
+        UserUsergroup.user_status == 'ADMIN'))
 
 
 class UserEXT(db.Model):

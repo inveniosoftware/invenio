@@ -1,0 +1,178 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013, 2014, 2015 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+{% bundles "communities_people.js", "communities_people.css" %}
+
+{% block body %}
+<div class="row">
+  <div class="row">
+    <!-- left panel -->
+    <div class="col-md-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <strong>{{ community.title }}</strong>
+        </div>
+        <div class="list-group">
+          <a href="{{ url_for('community_settings.edit', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-cog fa-fw"></i>
+            Settings
+          </a>
+          <a href="{{ url_for('community_teams.teams', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-users fa-fw"></i>
+            Teams
+          </a>
+          <a href="{{ url_for('community_people.people', community_id=community.id) }}" class="list-group-item active">
+            <i class="fa fa-user fa-fw"></i>
+            People
+          </a>
+          <a href="{{ url_for('community_guides.guides', community_id=community.id) }}" class="list-group-item">
+            <i class="fa fa-external-link fw"></i>
+            Guides
+          </a>
+        </div>
+      </div>
+      <div style="margin-left: 40px; margin-top: 20px;">
+        <a href="{{ community.community_url }}" class="btn btn-default">
+          <i class="icon-file"></i> View
+        </a>
+        <a href="{{ community.community_provisional_url }}" class="btn btn-default">
+          <i class="icon-file"></i> Curate
+        </a>
+        <a href="{{ url_for('settings_communities.index') }}" class="btn btn-primary">My Communities</a>
+      </div>
+    </div>
+    <!-- left panel -->
+    <!-- right panel -->
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <i class="fa fa-user fa-fw"></i>
+          <strong>People</strong>
+          <div id="invite" class="pull-right">
+            <a id="invite-act" class="pull-right btn btn-xs btn-default">
+              <i class="fa fa-plus"></i>
+              Invite new person
+            </a><!--possibility to choose more then one person  - textarea-->
+            <select id="invite-teams" class="form-control">
+                <option selected="selected" value="Curators">Curators</option>
+                <option value="Members">Members</option>
+            </select>
+            <input id="invite-email" type="text" class="form-control" placeholder="Enter email...">
+          </div>
+        </div>
+        <div class="panel-body">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores. Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia.
+          dipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit
+        </div>
+        <!-- people list -->
+        <table id="list" class="table table-striped">
+          <thead>
+            <tr>
+              <th id="search">
+                <button id="search-act" class="btn btn-xs btn-primary">
+                  <i class="fa fa-search fa-fw"></i>
+                  <span>&nbsp;Search</span>
+                </button>
+                <input id="search-val" type="text" class="form-control" placeholder="Search person...">
+                <span>Email</span>
+              </th>
+              <th>Teams</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="searchable">
+              <tr>
+                <td>Test User 1</td>
+                <td>2</td>
+                <td><a data-rm-val="Test User 1" class="fa fa-times rmlink"></a></td>
+              </tr>
+              <tr>
+                <td>Test User 2</td>
+                <td>1</td>
+                <td><a data-rm-val="Test User 2" class="fa fa-times rmlink"></a></td>
+              </tr>
+              <tr>
+                <td>Test User 3</td>
+                <td>2</td>
+                <td><a data-rm-val="Test User 3" class="fa fa-times rmlink"></a></td>
+              </tr>
+          </tbody>
+        </table>
+        <!-- people list -->
+        <!--pagination -->
+        <nav class="text-center">
+          <ul class="pagination pagination-sm">
+              <li>
+                <a href="">
+                  <span aria-hidden="true">&laquo;</span><span class="sr-only">Previous</span>
+                </a>
+              </li>
+                <li class="active">
+                  <a href="">
+                    1
+                  </a>
+                </li>
+              <li>
+                <a href="">
+                  <span aria-hidden="true">&raquo;</span><span class="sr-only">Next</span>
+                </a>
+              </li>
+          </ul>
+        </nav>
+        <!--pagination -->
+      </div>
+    </div>
+    <!-- right panel -->
+  </div>
+</div>
+<!-- modal -->
+<div id="remove-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Delete user</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          You are about to delete user <b><span data-user></span></b>
+          from all teams in <b><span>ZENODO</span></b> Community.
+        </p>
+        <p>User belongs to the following groups:</p>
+        <ul>
+          <li>Curators</li>
+          <li>Owners</li>
+        </ul>
+        <small>If you want to delete user from the particular group go to teams view.</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" data-remove>Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- modal -->
+{% endblock %}
+
+<!-- TODO flash message new people invited -->

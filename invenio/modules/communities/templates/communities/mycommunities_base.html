@@ -35,7 +35,7 @@
           <ul class="dropdown-menu">
             <li><a href="{{obj.community_url}}"><i class="icon-eye-open"></i> View</a></li>
             <li><a href="{{obj.community_provisional_url}}"><i class="icon-check"></i> Curate</a></li>
-            <li><a href="{{url_for('.edit', community_id=obj.id)}}"><i class="icon-pencil"></i> Edit</a></li>
+            <li><a href="{{url_for('community_settings.edit', community_id=obj.id)}}"><i class="icon-pencil"></i> Edit</a></li>
           </ul>
         </div>
     </td>

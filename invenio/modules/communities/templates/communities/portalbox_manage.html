@@ -1,0 +1,11 @@
+<div style="margin-left: auto;width: 89%;margin-right: auto;">
+<a href="{{ community.community_provisional_url }}" class="btn btn-default">
+  <i class="icon-file"></i> Curate
+</a>
+<a href="{{ url_for('community_settings.edit', community_id=community.id) }}" class="btn btn-default">
+  <i class="icon-file"></i> Manage
+</a>
+<a href="{{ url_for('settings_communities.index') }}" class="btn btn-primary">
+  <i class="icon-file"></i> My Communities
+</a>
+</div>
