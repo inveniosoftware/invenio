@@ -359,7 +359,7 @@ def is_user_viewer_of_record(user_info, recid):
             return True
     return False
 
-def check_user_can_view_record(user_info, recid):
+def check_user_can_view_record(user_info, recid, ln=CFG_SITE_LANG):
     """
     Check if the user is authorized to view the given recid. The function
     grants access in two cases: either user has author rights on this
@@ -374,6 +374,7 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
+    _ = gettext_set_language(ln)
     policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
     if isinstance(recid, str):
         recid = int(recid)
@@ -415,11 +416,11 @@ def check_user_can_view_record(user_info, recid):
             return (0, '')
         else:
             ## Too bad. Let's print a nice message:
-            return (1, """The record you are trying to access has just been
+            return (2, _("""The record you are trying to access has just been
 submitted to the system and needs to be assigned to the
 proper collections. It is currently restricted for security reasons
 until the assignment will be fully completed. Please come back later to
-properly access this record.""")
+properly access this record."""))
     else:
         ## The record either does not exists or has been deleted.
         ## Let's handle these situations outside of this code.
@@ -2223,6 +2224,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     if of.startswith('h') and display_nearest_terms_box:
                         if req:
                             if bsu_f == "recid":
+                                req.status = apache.HTTP_NOT_FOUND
                                 write_warning(_("Requested record does not seem to exist."), req=req)
                             else:
                                 write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
@@ -2232,6 +2234,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 if of.startswith('h') and display_nearest_terms_box:
                     if req:
                         if bsu_f == "recid":
+                            req.status = apache.HTTP_NOT_FOUND
                             write_warning(_("Requested record does not seem to exist."), req=req)
                         else:
                             write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
@@ -5906,7 +5909,9 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             if req.header_only:
                 raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
+                req.status = apache.HTTP_NOT_FOUND
                 write_warning(_("Requested record does not seem to exist."), req=req)
+
 
 
 def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=None, _=None, p=None,
@@ -5968,6 +5973,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
             if req.header_only:
                 raise apache.SERVER_RETURN(apache.HTTP_NOT_FOUND)
             else:
+                req.status = apache.HTTP_NOT_FOUND
                 write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
@@ -6059,6 +6065,7 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
     if record_exists(recID) != 1:
         # record does not exist
         if of.startswith("h"):
+            req.status = apache.HTTP_NOT_FOUND
             write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []

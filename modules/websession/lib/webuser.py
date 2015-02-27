@@ -83,6 +83,8 @@ from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT, \
     CFG_TEMP_EMAIL_ADDRESS
 from invenio.webuser_config import CFG_WEBUSER_USER_TABLES
+from invenio.webinterface_handler_config import HTTP_FORBIDDEN, \
+    HTTP_INTERNAL_SERVER_ERROR, HTTP_SERVICE_UNAVAILABLE
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -128,6 +130,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         referer = req.unparsed_uri
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
+        req.status = HTTP_FORBIDDEN
         title = CFG_WEBACCESS_MSGS[5]
         if not uid:
             uid = getUid(req)
@@ -150,14 +153,17 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                         body = CFG_WEBACCESS_WARNING_MSGS[4] + CFG_WEBACCESS_MSGS[2]
 
         except OperationalError, e:
+            req.status = HTTP_INTERNAL_SERVER_ERROR
             body = _("Database problem") + ': ' + str(e)
 
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 1:
+        req.status = HTTP_SERVICE_UNAVAILABLE
         title = CFG_WEBACCESS_MSGS[8]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[7], CFG_WEBACCESS_MSGS[2])
 
     elif CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        req.status = HTTP_SERVICE_UNAVAILABLE
         title = CFG_WEBACCESS_MSGS[6]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
     else:
