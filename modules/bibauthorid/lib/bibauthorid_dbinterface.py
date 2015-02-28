@@ -422,6 +422,8 @@ def reset_papers_of_author(pid, sigs_str):  # reset_papers_flag
                     'bibref_value',
                     'bibrec',
                     'flag'],
+            table=table,
+            ref=ref,
             pid=pid,
             rec=rec)
 
