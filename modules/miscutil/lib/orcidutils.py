@@ -62,6 +62,7 @@ ORCID_JSON_TO_XML_EXT_ID = {
 
 ORCID_SINGLE_REQUEST_WORKS = 50
 MAX_COAUTHORS = 25
+MAX_DESCRIPTION_LENGTH = 2499
 
 ############################### PULLING ########################################
 
@@ -502,6 +503,18 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
     @type personid: int
     '''
 
+    def _description_weight(description):
+        '''Punish for exceeding length limit and using mathml.
+
+        The bigger the result is, the better description corresponds to it.
+        '''
+        # Assumption: MAX_DESCRIPTION_LENGTH >> 200
+        mathml_punishment = MAX_DESCRIPTION_LENGTH - 200 if "mml:math" \
+            in description else 0
+        length = len(description)
+        length_score = 0 if length > MAX_DESCRIPTION_LENGTH else length
+        return length_score - mathml_punishment
+
     orcid_list = []
 
     for rec in papers:
@@ -530,15 +543,17 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
             encode_for_jinja_and_xml(record_get_field_value(recstruct,
                                      '245', '', '', 'a'))
 
-        short_description = \
-            record_get_field_value(recstruct, '520', '', '', 'a')
-        if short_description:
-            work_dict['short_description'] = \
-                encode_for_jinja_and_xml(short_description)
+        short_descriptions = \
+            record_get_field_values(recstruct, '520', '', '', 'a')
+        if short_descriptions:
+            work_dict['short_description'] = max([encode_for_jinja_and_xml(sd)
+                                                 for sd in short_descriptions],
+                                                 key=_description_weight)
 
         journal_title = record_get_field_value(recstruct, '773', '', '', 'p')
         if journal_title:
-            work_dict['journal-title'] = encode_for_jinja_and_xml(journal_title)
+            work_dict['journal-title'] = \
+                encode_for_jinja_and_xml(journal_title)
 
         citation = _get_citation(recid)
         if citation:
@@ -599,7 +614,8 @@ def _get_date_from_field_number(recstruct, field, subfield):
 
     result = {}
 
-    publication_date = record_get_field_value(recstruct, field, '', '', subfield)
+    publication_date = \
+        record_get_field_value(recstruct, field, '', '', subfield)
     publication_array = convert_simple_date_to_array(publication_date)
     if len(publication_array) > 0 and \
             re.match(r'[12]\d{3}$', publication_array[0]):
@@ -640,7 +656,7 @@ def _get_publication_date(recstruct):
 
     publication_year = record_get_field_value(recstruct, '773', '', '', 'y')
     if publication_year and re.match(r'[12]\d{3}$', publication_year):
-        return {'year' : publication_year}
+        return {'year': publication_year}
 
     return {}
 
@@ -702,8 +718,8 @@ def _get_citation(recid):
     '''
 
     tex_str = bibformat_record(recid, 'hx')
-    bibtex_content = encode_for_jinja_and_xml(tex_str[tex_str.find('@') : \
-            tex_str.rfind('}')+1])
+    bibtex_content = encode_for_jinja_and_xml(tex_str[tex_str.find('@'):
+                                              tex_str.rfind('}')+1])
 
     return ('bibtex', bibtex_content)
 
@@ -777,7 +793,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
                     _stub_method()
                 except DoubledIds:
                     register_exception(subject="The paper %s contains the"
-                                       "same ArXiv id %s twice." % (recid, encoded),
+                                       "same ArXiv id %s twice." % (recid,
+                                                                    encoded),
                                        alert_admin=True)
             else:
                 external_ids.append(('arxiv', encoded))
