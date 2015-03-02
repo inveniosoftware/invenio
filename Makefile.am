@@ -21,7 +21,7 @@ confignice_SCRIPTS=config.nice
 SUBDIRS = po config modules
 
 EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
-             config.rpath
+             config.rpath CONTRIBUTING.rst Dockerfile docker-compose.yml
 
 
 # current MathJax version and packages

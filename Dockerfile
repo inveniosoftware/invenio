@@ -102,8 +102,6 @@ RUN sudo /sbin/service mysqld restart && \
     ./configure && \
     make -s clean && \
     make -s && \
-    ls -ld /opt/invenio && \
-    ls -l /opt/invenio && \
     make -s install && \
     make -s install-jquery-plugins && \
     make -s install-mathjax-plugin && \
