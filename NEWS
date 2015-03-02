@@ -6,6 +6,16 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.8 -- released 2015-03-02
+-------------------------------------
+
+ *) docker: initial release (#2736)
+
+ *) docs: initial release of CONTRIBUTING guide (#2163)
+
+ *) installation: MathJax distribution location update (#2732);
+    disable SSLv2/SSLv3 in Apache config (#2515)
+
 Invenio v1.0.7 -- released 2014-08-31
 -------------------------------------
 

@@ -21,7 +21,7 @@ confignice_SCRIPTS=config.nice
 SUBDIRS = po config modules
 
 EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
-             config.rpath
+             config.rpath CONTRIBUTING.rst Dockerfile docker-compose.yml
 
 
 # current MathJax version and packages
@@ -544,5 +544,8 @@ update-v1.0.5-tables: # from v1.0.5 to v1.0.6
 
 update-v1.0.6-tables: # from v1.0.6 to v1.0.7
 	@echo "Nothing to do; table structure did not change between v1.0.6 and v1.0.7."
+
+update-v1.0.7-tables: # from v1.0.7 to v1.0.8
+	@echo "Nothing to do; table structure did not change between v1.0.7 and v1.0.8."
 
 CLEANFILES = *~ *.pyc *.tmp

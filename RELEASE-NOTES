@@ -1,35 +1,30 @@
 --------------------------------------------------------------------
-Invenio v1.0.7 is released
-August 31, 2014
+Invenio v1.0.8 is released
+March 2, 2015
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.7 was released on August 31, 2014.
+Invenio v1.0.8 was released on March 2, 2015.
 
-This is a bugfix release update for Invenio v1.0 release series.  It
-is recommended to all Invenio sites using v1.0.6 or previous releases.
+This old stable release update is recommended to all Invenio sites
+using v1.0.7 or previous releases.
 
 What's new:
 -----------
 
- *) BibDocFile: FFT comment/description documentation (#635);
-    duplicate docname fix (#1930)
+ *) docker: initial release (#2736)
 
- *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
+ *) docs: initial release of CONTRIBUTING guide (#2163)
 
- *) WebSession: CSRF tokens in account settings forms (#1855)
-
- *) installation: GnuPG key server location update; location of
-    jquery.treeview
-
- *) I18N: fix gender problem in a French translation (#2089)
+ *) installation: MathJax distribution location update (#2732);
+    disable SSLv2/SSLv3 in Apache config (#2515)
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.7.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.7.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.7.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.8.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.8.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.8.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -39,33 +34,24 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.6, then:
+If you are upgrading from Invenio v1.0.7, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.7.tar.gz
-     $ cd invenio-1.0.7
+     $ tar xvfz invenio-1.0.8.tar.gz
+     $ cd invenio-1.0.8
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ make check-custom-templates # (1)
-     $ make update-v1.0.6-tables
+     $ make check-custom-templates
+     $ make update-v1.0.7-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
          /opt/invenio/etc/
-
-    Notes:
-
-    (1) If you have customised your session templates
-        (`websession_templates.py`) in your site-specific overlay,
-        then you will need to add a new `csrf_token` parameter to
-        several of your templates (e.g. `tmpl_user_preferences()`).
-        Running `make check-custom-templates` will warn you about this
-        necessity, should it be applicable.
 
  c) Restart your Apache server and your bibsched queue.
 
