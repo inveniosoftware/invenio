@@ -6,6 +6,24 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.1.5 -- released 2015-03-02
+-------------------------------------
+
+ *) BibCirculation: get_book_cover quick fix (#2578 #2653); fix for
+    wrong non-borrower message (#2597)
+
+ *) OAIHarvest: remove_duplicates and regexp fixes (#2300 #2608)
+
+ *) WebBasket: better formatting of deletion message (#2449)
+
+ *) docker: initial release (#2736)
+
+ *) docs: initial release of CONTRIBUTING guide (#2163)
+
+ *) installation: MathJax distribution location update (#2732);
+    explicit jQuery plugin versions (#11 #2655); disable SSLv2/SSLv3
+    in Apache config (#2515)
+
 Invenio v1.0.8 -- released 2015-03-02
 -------------------------------------
 
