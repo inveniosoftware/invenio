@@ -556,7 +556,7 @@ def get_mail_header(value):
     Return a MIME-compliant header-string. Will join lists of strings
     into one string with comma (,) as separator.
     """
-    if type(value) is not str:
+    if not isinstance(value, (str, unicode)):
         value = ','.join(value)
     try:
         value = value.encode('ascii')
