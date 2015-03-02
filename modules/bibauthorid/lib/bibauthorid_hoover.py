@@ -74,7 +74,7 @@ def open_rt_ticket(e, debug_log=False, queue='Test'):
     subject = e.get_message_subject() + ' ' + ticket_hash
     body = e.get_message_body()
     if debug_log:
-        debug = e.__repr__() + '\n' + \
+        debug = "\n Debugging information: \n" + e.__repr__() + '\n' + \
             '\n'.join([
                 str(key) + " " +
                 str(value) for key, value in vars(e).iteritems()])
@@ -86,8 +86,6 @@ def open_rt_ticket(e, debug_log=False, queue='Test'):
                                                         subject=subject,
                                                         recordid=e.recid,
                                                         text=body +
-                                                        '\n Debugging\
-                                                        information: \n' +
                                                         debug,
                                                         queue=queue,
                                                         priority="",
@@ -182,7 +180,6 @@ def get_inspireID_from_hepnames(pid):
     author_canonical_name = get_canonical_name_of_author(pid)
     hepnames_recids = get_all_recids_in_hepnames()
     try:
-        #recid = perform_request_search(p="035:" + author_canonical_name[0][0], cc="HepNames")
         recid = set(search_unit_in_bibxxx(
             p=author_canonical_name[0][0], f='035__', type='='))
         recid = list(recid & hepnames_recids)
@@ -286,8 +283,8 @@ def dict_entry_for_hepnames_connector(pid, inspireid):
             raise MultipleHepnamesRecordsWithSameIdException(
                 "More than one hepnames record found with the same inspire id",
                 recid,
-                'INSPIREID')
-        write_message("Connecting pid {0} canonical_name %s inspireID {1}".format(pid, author_canonical_name, inspireid), verbose=3)
+                'INSPIREID {0}'.format(inspireid))
+        write_message("Connecting pid {0} canonical_name {1} inspireID {2}".format(pid, author_canonical_name, inspireid), verbose=3)
         return {author_canonical_name[0][0]: recid[0]}
 
 
@@ -401,7 +398,6 @@ def get_inspireID_from_claimed_papers(pid, intersection_set=None):
     if intersection_set:
         claimed_papers = filter(
             lambda x: x[3] in intersection_set, claimed_papers)
-        # claimed_papers = [x for x in claimed_paper_signatures if x[3] in intersection_set]
     claimed_paper_signatures = (x[1:4] for x in claimed_papers)
 
     inspireid_list = []

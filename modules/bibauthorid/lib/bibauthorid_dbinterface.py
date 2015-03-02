@@ -2303,7 +2303,6 @@ def get_inspire_id_of_author(pid):   ### get_inspire_ids_by_pids
     @rtype: tuple ((str),)
     '''
     result =  _select_from_aidpersoniddata_where(select=['data'], pid=pid, tag='extid:INSPIREID')
-    ##WRONG exception here
     if result:
         if len(result) > 1:
             from invenio.bibauthorid_hoover_exceptions import MultipleIdsOnSingleAuthorException
