@@ -5047,5 +5047,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_01_13_hide_holdings
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_06_02_oaiHARVEST_arguments_cfg_namechange',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_09_09_tag_recjsonvalue_not_null',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2015_03_03_tag_value',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_2_0',NOW());
 
 -- end of file
