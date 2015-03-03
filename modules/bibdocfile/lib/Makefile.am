@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2012 CERN.
+# Copyright (C) 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -32,6 +32,6 @@ pylib_DATA = bibdocfile_config.py file.py \
 
 noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA) $(noinst_DATA) $(bibdocfileplugins)
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA) $(bibdocfileplugins_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
