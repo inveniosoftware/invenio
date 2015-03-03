@@ -23,6 +23,7 @@ etc_DATA = HB.bfo \
            HP.bfo \
            HX.bfo \
            XM.bfo \
+           XMF.bfo \
            EXCEL.bfo \
            XP.bfo \
 	   XN.bfo \

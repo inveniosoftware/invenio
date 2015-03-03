@@ -4547,7 +4547,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
             if print_records_prologue_p:
                 print_records_prologue(req, format)
 
-            if ot:
+            if ot and not format.startswith('xmf'):
                 # asked to print some filtered fields only, so call print_record() on the fly:
                 for recid in recIDs:
                     x = print_record(recid,
@@ -4571,7 +4571,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                search_pattern=search_pattern,
                                record_separator="\n",
                                user_info=user_info,
-                               req=req)
+                               req=req,
+                               ot=ot)
 
             # print footer if needed
             if print_records_epilogue_p:

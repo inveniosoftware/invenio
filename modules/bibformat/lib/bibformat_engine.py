@@ -197,7 +197,7 @@ pattern_format_element_seealso = re.compile(r'''@see:\s*(?P<see>.*)''',
 
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
-                  search_pattern=None, xml_record=None, user_info=None):
+                  search_pattern=None, xml_record=None, user_info=None, ot=''):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -224,6 +224,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     @param search_pattern: list of strings representing the user request in web interface
     @param xml_record: an xml string representing the record to format
     @param user_info: the information of the user who will view the formatted page
+    @param ot: output only these MARC tags (e.g. "100,700,909C0b"), only supported for 'xmf' format
+    @type ot: string
     @return: formatted record
     """
     if search_pattern is None:
@@ -239,7 +241,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     # But if format not found for new BibFormat, then call old BibFormat
 
     #Create a BibFormat Object to pass that contain record and context
-    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
+    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of, ot)
 
     if of.lower() != 'xm' and (not bfo.get_record()
                                             or record_empty(bfo.get_record())):
@@ -290,7 +292,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                            search_pattern=None, xml_record=None,
                            user_info=None, on_the_fly=False,
-                           save_missing=True):
+                           save_missing=True, ot=''):
     """
     Format a record in given output format.
 
@@ -362,7 +364,7 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                 out += """\n<br/><span class="quicknote">
                 Found preformatted output for record %i (cache updated on %s).
                 </span><br/>""" % (recID, last_updated)
-            if of.lower() == 'xm':
+            if of.lower() in ('xm', 'xmf'):
                 res = filter_hidden_fields(res, user_info)
             # try to replace language links in pre-cached res, if applicable:
             if ln != CFG_SITE_LANG and of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS:
@@ -396,10 +398,11 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                              verbose=verbose,
                                              search_pattern=search_pattern,
                                              xml_record=xml_record,
-                                             user_info=user_info)
+                                             user_info=user_info,
+                                             ot=ot)
         out += out_
 
-        if of.lower() in ('xm', 'xoaimarc'):
+        if of.lower() in ('xm', 'xoaimarc', 'xmf'):
             out = filter_hidden_fields(out, user_info, force_filtering=of.lower()=='xoaimarc')
 
         # We have spent time computing this format
@@ -443,9 +446,9 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
 def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
                            search_pattern=None, xml_record=None,
-                           user_info=None, of=None, verbose=0):
+                           user_info=None, of=None, verbose=0, ot=''):
     # Create light bfo object
-    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
+    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of, ot)
     # Translations
     template = translate_template(template, ln)
     # Format template
@@ -1825,7 +1828,7 @@ class BibFormatObject(object):
     req = None # DEPRECATED: use bfo.user_info instead. Used by WebJournal.
 
     def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=None,
-                 xml_record=None, user_info=None, output_format=''):
+                 xml_record=None, user_info=None, output_format='', ot=''):
         """
         Creates a new bibformat object, with given record.
 
@@ -1855,6 +1858,8 @@ class BibFormatObject(object):
         @param xml_record: a xml string of the record to format
         @param user_info: the information of the user who will view the formatted page
         @param output_format: the output_format used for formatting this record
+        @param ot: output only these MARC tags (e.g. ['100', '999']), only supported for 'xmf' format
+        @type ot: list
         """
         self.xml_record = None # *Must* remain empty if recid is given
         if xml_record is not None:
@@ -1872,6 +1877,7 @@ class BibFormatObject(object):
         self.user_info = user_info
         if self.user_info is None:
             self.user_info = collect_user_info(None)
+        self.ot = ot
 
     def get_record(self):
         """
