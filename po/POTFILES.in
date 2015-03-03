@@ -20,7 +20,6 @@
 modules/bibauthorid/lib/bibauthorid_templates.py
 modules/bibauthorid/lib/bibauthorid_webinterface.py
 modules/bibcatalog/lib/bibcatalog_templates.py
-modules/bibcheck/web/admin/bibcheckadmin.py
 modules/bibcirculation/lib/bibcirculation.py
 modules/bibcirculation/lib/bibcirculation_templates.py
 modules/bibcirculation/lib/bibcirculation_utils.py
@@ -57,16 +56,22 @@ modules/bibformat/lib/bibformat_engine_unit_tests.py
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_aid_authors.py
+modules/bibformat/lib/elements/bfe_arxiv_link.py
 modules/bibformat/lib/elements/bfe_authority_author.py
+modules/bibformat/lib/elements/bfe_authority_author_publications.py
 modules/bibformat/lib/elements/bfe_authority_control_no.py
 modules/bibformat/lib/elements/bfe_authority_institute.py
 modules/bibformat/lib/elements/bfe_authority_journal.py
+modules/bibformat/lib/elements/bfe_authority_links.py
+modules/bibformat/lib/elements/bfe_authority_publications.py
 modules/bibformat/lib/elements/bfe_authority_subject.py
 modules/bibformat/lib/elements/bfe_authors.py
+modules/bibformat/lib/elements/bfe_authors_parent.py
 modules/bibformat/lib/elements/bfe_edit_files.py
 modules/bibformat/lib/elements/bfe_edit_record.py
 modules/bibformat/lib/elements/bfe_fulltext.py
 modules/bibformat/lib/elements/bfe_fulltext_mini.py
+modules/bibformat/lib/elements/bfe_plots.py
 modules/bibformat/lib/elements/bfe_sciencewise.py
 modules/bibformat/web/admin/bibformatadmin.py
 modules/bibindex/bin/bibindex.in
@@ -135,6 +140,7 @@ modules/elmsubmit/lib/myhtmlentitydefs.py
 modules/miscutil/bin/dbexec.in
 modules/miscutil/lib/__init__.py
 modules/miscutil/lib/dateutils.py
+modules/miscutil/lib/dateutils_unit_tests.py
 modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_unit_tests.py
 modules/miscutil/lib/errorlib_webinterface.py
@@ -163,6 +169,7 @@ modules/webalert/lib/htmlparser.py
 modules/webalert/lib/webalert.py
 modules/webalert/lib/webalert_templates.py
 modules/webalert/lib/webalert_webinterface.py
+modules/webauthorlist/lib/authorlist_webinterface.py
 modules/webauthorprofile/lib/webauthorprofile_templates.py
 modules/webbasket/doc/admin/webbasket-admin-guide.webdoc
 modules/webbasket/lib/webbasket.py
@@ -214,6 +221,7 @@ modules/websearch/lib/search_engine_config.py
 modules/websearch/lib/search_engine_unit_tests.py
 modules/websearch/lib/services/CollectionNameSearchService.py
 modules/websearch/lib/services/FAQKBService.py
+modules/websearch/lib/services/JournalHintService.py
 modules/websearch/lib/services/SubmissionNameSearchService.py
 modules/websearch/lib/services/WeatherService.py
 modules/websearch/lib/websearch_external_collections.py
@@ -239,6 +247,7 @@ modules/webstyle/doc/admin/webstyle-admin-guide.webdoc
 modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc
 modules/webstyle/lib/template.py
 modules/webstyle/lib/webdoc.py
+modules/webstyle/lib/webdoc_info_webinterface.py
 modules/webstyle/lib/webdoc_unit_tests.py
 modules/webstyle/lib/webdoc_webinterface.py
 modules/webstyle/lib/webpage.py
