@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,6 @@ from __future__ import print_function
 
 import os
 import sys
-import shutil
 import datetime
 
 from pipes import quote
@@ -104,7 +103,6 @@ def drop(yes_i_know=False, quiet=False):
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
-    from invenio.legacy.bibdocfile.api import _make_base_dir
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
     ## Step 0: confirm deletion
@@ -129,21 +127,6 @@ def drop(yes_i_know=False, quiet=False):
             print(msg)
     except:
         print("ERROR: Could not destroy customevents.")
-
-    ## FIXME: move to bibedit_model
-    def bibdoc_before_drop(target, connection_dummy, **kw_dummy):
-        print
-        print(">>> Going to remove records data...")
-        for (docid,) in db.session.query(target.c.id).all():
-            directory = _make_base_dir(docid)
-            if os.path.isdir(directory):
-                print('    >>> Removing files for docid =', docid)
-                shutil.rmtree(directory)
-        db.session.commit()
-        print(">>> Data has been removed.")
-
-    from invenio.modules.editor.models import Bibdoc
-    event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
     tables = list(reversed(db.metadata.sorted_tables))
 
@@ -173,12 +156,12 @@ def drop(yes_i_know=False, quiet=False):
             print("ERROR: not all items were properly dropped.")
             print(">>> Dropped", dropped, 'out of', N)
 
-    _dropper(tables, '>>> Dropping {0} tables ...',
-             lambda table: table.drop(bind=db.engine))
-
     _dropper(StorageEngine.__storage_engine_registry__,
              '>>> Dropping {0} storage engines ...',
              lambda api: api.storage_engine.drop())
+
+    _dropper(tables, '>>> Dropping {0} tables ...',
+             lambda table: table.drop(bind=db.engine, checkfirst=True))
 
 
 @option_default_data
