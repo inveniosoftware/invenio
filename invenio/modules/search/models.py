@@ -19,27 +19,26 @@
 
 """Database models for search engine."""
 
-# General imports.
 import datetime
+
 import re
 
-from flask import g, url_for
-from intbitset import intbitset
 from operator import itemgetter
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.orm.collections import InstrumentedList
-from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy.orm.collections import collection
+
+from flask import g, url_for
+
+from intbitset import intbitset
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _, gettext_set_language
 from invenio.ext.sqlalchemy import db
-
-# Create your models here.
-
 from invenio.modules.accounts.models import User
 from invenio.modules.formatter.models import Format
+
+from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.orderinglist import ordering_list
+from sqlalchemy.orm.collections import InstrumentedList, \
+    attribute_mapped_collection, collection
 
 
 class IntbitsetPickle(object):
@@ -52,7 +51,7 @@ class IntbitsetPickle(object):
     def loads(self, obj):
         try:
             return intbitset(obj)
-        except:
+        except Exception:
             return intbitset()
 
 
@@ -144,14 +143,17 @@ class Collection(db.Model):
     """Represent a Collection record."""
 
     def __repr__(self):
+        """Repr."""
         return 'Collection <id: {0.id}, name: {0.name}, dbquery: {0.query}, ' \
                'nbrecs: {0.nbrecs}>'.format(self)
 
     def __unicode__(self):
+        """Unicode."""
         suffix = ' ({0})'.format(_('default')) if self.id == 1 else ''
         return u"{0.id}. {0.name}{1}".format(self, suffix)
 
     def __str__(self):
+        """Str."""
         return unicode(self).encode('utf-8')
 
     __tablename__ = 'collection'
@@ -191,6 +193,7 @@ class Collection(db.Model):
 
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def formatoptions(self):
+        """Format options."""
         if len(self._formatoptions):
             return [dict(f) for f in self._formatoptions]
         else:
@@ -205,10 +208,12 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def examples(self):
+        """Example."""
         return list(self._examples_example)
 
     @property
     def name_ln(self):
+        """Name ln."""
         from invenio.legacy.search_engine import get_coll_i18nname
         return get_coll_i18nname(self.name, g.ln)
         # Another possible implementation with cache memoize
@@ -217,12 +222,13 @@ class Collection(db.Model):
         #    return db.object_session(self).query(Collectionname).\
         #        with_parent(self).filter(db.and_(Collectionname.ln==g.ln,
         #            Collectionname.type=='ln')).first().value
-        # except:
+        # except Exception:
         #    return self.name
 
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def portalboxes_ln(self):
+        """Portal boxes."""
         return db.object_session(self).query(CollectionPortalbox).\
             with_parent(self).\
             options(db.joinedload_all(CollectionPortalbox.portalbox)).\
@@ -231,6 +237,7 @@ class Collection(db.Model):
 
     @property
     def most_specific_dad(self):
+        """Most specific dad."""
         return db.object_session(self).query(Collection).\
             join(Collection.sons).\
             filter(CollectionCollection.id_son == self.id).\
@@ -240,11 +247,13 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def is_restricted(self):
+        """Check if is restricted."""
         from invenio.legacy.search_engine import collection_restricted_p
         return collection_restricted_p(self.name)
 
     @property
     def type(self):
+        """Get type."""
         p = re.compile("\d+:.*")
         if self.dbquery is not None and \
                 p.match(self.dbquery.lower()):
@@ -317,12 +326,13 @@ class Collection(db.Model):
     )
 
     # Search options
-    _make_field_fieldvalue = lambda type: db.relationship(
-        lambda: CollectionFieldFieldvalue,
-        primaryjoin=lambda: db.and_(
-            Collection.id == CollectionFieldFieldvalue.id_collection,
-            CollectionFieldFieldvalue.type == type),
-        order_by=lambda: CollectionFieldFieldvalue.score)
+    def _make_field_fieldvalue(type):
+        return db.relationship(
+            lambda: CollectionFieldFieldvalue,
+            primaryjoin=lambda: db.and_(
+                Collection.id == CollectionFieldFieldvalue.id_collection,
+                CollectionFieldFieldvalue.type == type),
+            order_by=lambda: CollectionFieldFieldvalue.score)
 
     _search_within = _make_field_fieldvalue('sew')
     _search_options = _make_field_fieldvalue('seo')
@@ -330,9 +340,7 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def search_within(self):
-        """
-        Collect search within options.
-        """
+        """Collect search within options."""
         default = [('', g._('any field'))]
         found = [(o.field.code, o.field.name_ln) for o in self._search_within]
         if not found:
@@ -344,6 +352,7 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def search_options(self):
+        """Search options."""
         return self._search_options
 
     @property
@@ -385,7 +394,7 @@ class Collection(db.Model):
                     Collectionname.ln == lang,
                     Collectionname.type == 'ln'
                 )).first().value
-        except:
+        except Exception:
             return ""
 
     @property
@@ -402,8 +411,6 @@ class Collection(db.Model):
         from invenio.modules.sorter.models import BsrMETHOD, \
             Collection_bsrMETHOD
 
-        get_method = lambda obj: obj.bsrMETHOD
-
         for coll_id in (self.id, 1):
             methods = Collection_bsrMETHOD.query.filter_by(
                 id_collection=coll_id
@@ -414,7 +421,7 @@ class Collection(db.Model):
             ).all()
 
             if len(methods) > 0:
-                return map(get_method, methods)
+                return map(lambda obj: obj.bsrMETHOD, methods)
 
         return BsrMETHOD.query.order_by(BsrMETHOD.name).all()
 
@@ -442,13 +449,13 @@ class Collection(db.Model):
                 Collectionboxname.ln == ln,
                 Collectionboxname.type == box_type,
             )).one()
-        except:
+        except Exception:
             try:
                 collectionboxname = collectionboxnamequery.filter(db.and_(
                     Collectionboxname.ln == ln,
                     Collectionboxname.type == box_type,
                 )).one()
-            except:
+            except Exception:
                 collectionboxname = None
 
         if collectionboxname is None:
@@ -489,6 +496,7 @@ class Collection(db.Model):
 class Collectionname(db.Model):
 
     """Represent a Collectionname record."""
+
     __tablename__ = 'collectionname'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id),
@@ -501,10 +509,12 @@ class Collectionname(db.Model):
 
     @db.hybrid_property
     def ln_type(self):
+        """Ln type."""
         return (self.ln, self.type)
 
     @ln_type.setter
     def set_ln_type(self, value):
+        """Set ln type."""
         (self.ln, self.type) = value
 
 
@@ -541,6 +551,7 @@ class Collectionboxname(db.Model):
 class Collectiondetailedrecordpagetabs(db.Model):
 
     """Represent a Collectiondetailedrecordpagetabs record."""
+
     __tablename__ = 'collectiondetailedrecordpagetabs'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id),
@@ -554,6 +565,7 @@ class Collectiondetailedrecordpagetabs(db.Model):
 class CollectionCollection(db.Model):
 
     """Represent a CollectionCollection record."""
+
     __tablename__ = 'collection_collection'
     id_dad = db.Column(db.MediumInteger(9, unsigned=True),
                        db.ForeignKey(Collection.id), primary_key=True)
@@ -575,6 +587,7 @@ class CollectionCollection(db.Model):
 class Example(db.Model):
 
     """Represent a Example record."""
+
     __tablename__ = 'example'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                    autoincrement=True)
@@ -585,6 +598,7 @@ class Example(db.Model):
 class CollectionExample(db.Model):
 
     """Represent a CollectionExample record."""
+
     __tablename__ = 'collection_example'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
@@ -600,6 +614,7 @@ class CollectionExample(db.Model):
 class Portalbox(db.Model):
 
     """Represent a Portalbox record."""
+
     __tablename__ = 'portalbox'
     id = db.Column(db.MediumInteger(9, unsigned=True), autoincrement=True,
                    primary_key=True)
@@ -608,8 +623,7 @@ class Portalbox(db.Model):
 
 
 def get_pbx_pos():
-    """Returns a list of all the positions for a portalbox"""
-
+    """Return a list of all the positions for a portalbox."""
     position = {}
     position["rt"] = "Right Top"
     position["lt"] = "Left Top"
@@ -623,6 +637,7 @@ def get_pbx_pos():
 class CollectionPortalbox(db.Model):
 
     """Represent a CollectionPortalbox record."""
+
     __tablename__ = 'collection_portalbox'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
@@ -644,6 +659,7 @@ class CollectionPortalbox(db.Model):
 class Externalcollection(db.Model):
 
     """Represent a Externalcollection record."""
+
     __tablename__ = 'externalcollection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True)
@@ -652,6 +668,7 @@ class Externalcollection(db.Model):
 
     @property
     def engine(self):
+        """Get engine."""
         from invenio.legacy.websearch_external_collections.searcher import (
             external_collections_dictionary
         )
@@ -662,6 +679,7 @@ class Externalcollection(db.Model):
 class CollectionExternalcollection(db.Model):
 
     """Represent a CollectionExternalcollection record."""
+
     __tablename__ = 'collection_externalcollection'
     id_collection = db.Column(db.MediumInteger(9,
                                                unsigned=True),
@@ -694,6 +712,7 @@ class CollectionExternalcollection(db.Model):
 class CollectionFormat(db.Model):
 
     """Represent a CollectionFormat record."""
+
     __tablename__ = 'collection_format'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
@@ -712,6 +731,7 @@ class Field(db.Model):
     """Represent a Field record."""
 
     def __repr__(self):
+        """Get repr."""
         return "%s(%s)" % (self.__class__.__name__, self.id)
 
     __tablename__ = 'field'
@@ -723,13 +743,14 @@ class Field(db.Model):
 
     @property
     def name_ln(self):
+        """Get name ln."""
         from invenio.legacy.search_engine import get_field_i18nname
         return get_field_i18nname(self.name, g.ln)
         # try:
         #    return db.object_session(self).query(Fieldname).\
         #        with_parent(self).filter(db.and_(Fieldname.ln==g.ln,
         #            Fieldname.type=='ln')).first().value
-        # except:
+        # except Exception:
         #    return self.name
 
 
@@ -738,6 +759,7 @@ class Fieldvalue(db.Model):
     """Represent a Fieldvalue record."""
 
     def __init__(self):
+        """Init."""
         pass
     __tablename__ = 'fieldvalue'
     id = db.Column(db.MediumInteger(9, unsigned=True),
@@ -750,6 +772,7 @@ class Fieldvalue(db.Model):
 class Fieldname(db.Model):
 
     """Represent a Fieldname record."""
+
     __tablename__ = 'fieldname'
     id_field = db.Column(db.MediumInteger(9, unsigned=True),
                          db.ForeignKey(Field.id), primary_key=True)
@@ -762,6 +785,7 @@ class Fieldname(db.Model):
 class Tag(db.Model):
 
     """Represent a Tag record."""
+
     __tablename__ = 'tag'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
@@ -769,6 +793,7 @@ class Tag(db.Model):
     recjson_value = db.Column(db.Text, nullable=False)
 
     def __init__(self, tup=None, *args, **kwargs):
+        """Init."""
         if tup is not None and isinstance(tup, tuple):
             self.name, self.value = tup
             super(Tag, self).__init__(*args, **kwargs)
@@ -780,13 +805,14 @@ class Tag(db.Model):
 
     @property
     def as_tag(self):
-        """Returns tupple with name and value."""
+        """Return tupple with name and value."""
         return self.name, self.value
 
 
 class FieldTag(db.Model):
 
     """Represent a FieldTag record."""
+
     __tablename__ = 'field_tag'
     id_field = db.Column(db.MediumInteger(9, unsigned=True),
                          db.ForeignKey('field.id'), nullable=False,
@@ -800,6 +826,7 @@ class FieldTag(db.Model):
     field = db.relationship(Field, backref='tags', order_by=score)
 
     def __init__(self, score=None, tup=None, *args, **kwargs):
+        """Init."""
         if score is not None:
             self.score = score
         if tup is not None:
@@ -808,13 +835,14 @@ class FieldTag(db.Model):
 
     @property
     def as_tag(self):
-        """ Returns Tag record directly."""
+        """Return Tag record directly."""
         return self.tag
 
 
 class WebQuery(db.Model):
 
     """Represent a WebQuery record."""
+
     __tablename__ = 'query'
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
                    autoincrement=True)
@@ -857,7 +885,8 @@ class CollectionFieldFieldvalue(db.Model):
                          nullable=False)
     _id_fieldvalue = db.Column(db.MediumInteger(9, unsigned=True),
                                db.ForeignKey(Fieldvalue.id),
-                               nullable=True, default=None, name="id_fieldvalue")
+                               nullable=True, default=None,
+                               name="id_fieldvalue")
     type = db.Column(db.Char(3), nullable=False,
                      server_default='src')
     score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
@@ -897,6 +926,7 @@ class FacetCollection(db.Model):
     collection = db.relationship(Collection, backref='facets')
 
     def __repr__(self):
+        """Get repr."""
         return ('FacetCollection <id: {0.id}, id_collection: '
                 '{0.id_collection}, order: {0.order}, '
                 'facet_name: {0.facet_name}>'.format(self))

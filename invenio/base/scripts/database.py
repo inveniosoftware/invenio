@@ -175,7 +175,6 @@ def create(default_data=True, quiet=False):
     """Create database tables from sqlalchemy models."""
     print(">>> Going to create tables...")
 
-    from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
