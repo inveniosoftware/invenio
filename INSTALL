@@ -36,6 +36,7 @@ Contents
               python-4suite-xml python-simplejson python-xml \
               gnuplot poppler-utils \
               gs-common clisp gettext libapache2-mod-wsgi unzip \
+              pkg-config \
               python-dateutil python-rdflib python-pyparsing \
               python-gnuplot python-magic pdftk html2text giflib-tools \
               pstotext netpbm python-pypdf python-chardet python-lxml \
