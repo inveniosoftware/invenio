@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012 CERN.
+# Copyright (C) 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -102,12 +102,39 @@ class SbmCOLLECTION(db.Model):
 class SbmCOLLECTIONSbmCOLLECTION(db.Model):
     """Represents a SbmCOLLECTIONSbmCOLLECTION record."""
     __tablename__ = 'sbmCOLLECTION_sbmCOLLECTION'
-    id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
-                nullable=False, server_default='0', primary_key=True)
+
+    id = db.Column(db.Integer(11), nullable=False, autoincrement=True,
+                   primary_key=True)
+    _id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
+                nullable=True, name='id_father')
     id_son = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
-                nullable=False, server_default='0', primary_key=True)
+                nullable=False)
     catalogue_order = db.Column(db.Integer(11), nullable=False,
                 server_default='0')
+
+    son = db.relationship(
+        SbmCOLLECTION,
+        backref=db.backref('father', uselist=False),
+        single_parent=True,
+        primaryjoin="and_(SbmCOLLECTIONSbmCOLLECTION.id_son==SbmCOLLECTION.id) "
+    )
+    father = db.relationship(
+        SbmCOLLECTION,
+        backref=db.backref('son', uselist=False),
+        single_parent=True,
+        primaryjoin="and_(SbmCOLLECTIONSbmCOLLECTION.id_father==SbmCOLLECTION.id) "
+    )
+
+    @db.hybrid_property
+    def id_father(self):
+        """Get id_father."""
+        return self._id_father
+
+    @id_father.setter
+    def id_father(self, value):
+        """Set id_father."""
+        self._id_father = value or None
+
 
 class SbmDOCTYPE(db.Model):
     """Represents a SbmDOCTYPE record."""
@@ -123,12 +150,30 @@ class SbmDOCTYPE(db.Model):
 class SbmCOLLECTIONSbmDOCTYPE(db.Model):
     """Represents a SbmCOLLECTIONSbmDOCTYPE record."""
     __tablename__ = 'sbmCOLLECTION_sbmDOCTYPE'
-    id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
-                nullable=False, server_default='0', primary_key=True)
+    id = db.Column(db.Integer(11), nullable=False, autoincrement=True,
+                   primary_key=True)
+    _id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
+                nullable=True, name="id_father")
     id_son = db.Column(db.Char(10), db.ForeignKey(SbmDOCTYPE.sdocname),
-                nullable=False, server_default='0', primary_key=True)
+                nullable=False)
     catalogue_order = db.Column(db.Integer(11), nullable=False,
                 server_default='0')
+
+    father = db.relationship(
+        SbmCOLLECTION,
+        backref=db.backref('sonDoctype', uselist=False),
+    )
+
+    @db.hybrid_property
+    def id_father(self):
+        """Get id_father."""
+        return self._id_father
+
+    @id_father.setter
+    def id_father(self, value):
+        """Set id_father."""
+        self._id_father = value or None
+
 
 class SbmCOOKIES(db.Model):
     """Represents a SbmCOOKIES record."""
