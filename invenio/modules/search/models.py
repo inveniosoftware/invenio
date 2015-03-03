@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -846,15 +846,18 @@ class CollectionFieldFieldvalue(db.Model):
     """Represent a CollectionFieldFieldvalue record."""
 
     __tablename__ = 'collection_field_fieldvalue'
+
+    id = db.Column(db.MediumInteger(9, unsigned=True), autoincrement=True,
+                   primary_key=True, nullable=False)
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id),
-                              primary_key=True, nullable=False)
+                              nullable=False)
     id_field = db.Column(db.MediumInteger(9, unsigned=True),
-                         db.ForeignKey(Field.id), primary_key=True,
+                         db.ForeignKey(Field.id),
                          nullable=False)
-    id_fieldvalue = db.Column(db.MediumInteger(9, unsigned=True),
-                              db.ForeignKey(Fieldvalue.id), primary_key=True,
-                              nullable=True)
+    _id_fieldvalue = db.Column(db.MediumInteger(9, unsigned=True),
+                               db.ForeignKey(Fieldvalue.id),
+                               nullable=True, default=None, name="id_fieldvalue")
     type = db.Column(db.Char(3), nullable=False,
                      server_default='src')
     score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
@@ -868,6 +871,16 @@ class CollectionFieldFieldvalue(db.Model):
                             lazy='joined')
     fieldvalue = db.relationship(Fieldvalue, backref='collection_fields',
                                  lazy='joined')
+
+    @db.hybrid_property
+    def id_fieldvalue(self):
+        """Get id_fieldvalue."""
+        return self._id_fieldvalue
+
+    @id_fieldvalue.setter
+    def id_fieldvalue(self, value):
+        """Set id_fieldvalue."""
+        self._id_fieldvalue = value or None
 
 
 class FacetCollection(db.Model):

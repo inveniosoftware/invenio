@@ -187,18 +187,6 @@ def create(default_data=True, quiet=False):
 
     list(models)
 
-    def cfv_after_create(target, connection, **kw):
-        print
-        print(">>> Modifing table structure...")
-        from invenio.legacy.dbquery import run_sql
-        run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
-        run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
-        run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
-        #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
-
-    from invenio.modules.search.models import CollectionFieldFieldvalue
-    event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
-
     tables = db.metadata.sorted_tables
 
     def _creator(items, prefix, creator):
