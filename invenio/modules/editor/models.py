@@ -24,6 +24,7 @@ from invenio.modules.records.models import Record as Bibrec
 
 from sqlalchemy import event
 
+
 class BibHOLDINGPEN(db.Model):
 
     """Represent a BibHOLDINGPEN record."""
@@ -46,6 +47,7 @@ class BibHOLDINGPEN(db.Model):
 class Bibdoc(db.Model):
 
     """Represent a Bibdoc record."""
+
     __tablename__ = 'bibdoc'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                    nullable=False, autoincrement=True)
@@ -65,6 +67,7 @@ class Bibdoc(db.Model):
 class BibdocBibdoc(db.Model):
 
     """Represent a BibdocBibdoc record."""
+
     __tablename__ = 'bibdoc_bibdoc'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                    nullable=False, autoincrement=True)

@@ -21,14 +21,19 @@
 
 from __future__ import print_function
 
-import os
-import sys
 import datetime
 
+import os
+
+import sys
+
 from pipes import quote
+
 from flask import current_app
-from six import iteritems
+
 from invenio.ext.script import Manager, change_command_name, print_progress
+
+from six import iteritems
 
 manager = Manager(usage="Perform database operations")
 
@@ -52,15 +57,15 @@ def init(user='root', password='', yes_i_know=False):
     from invenio.ext.sqlalchemy import db
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
-    ## Step 0: confirm deletion
+    # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
         "WARNING: You are going to destroy your database tables! Run first"
         " `inveniomanage database drop`."
     ))
 
-    ## Step 1: drop database and recreate it
+    # Step 1: drop database and recreate it
     if db.engine.name == 'mysql':
-        #FIXME improve escaping
+        # FIXME improve escaping
         args = dict((k, str(v).replace('$', '\$'))
                     for (k, v) in iteritems(current_app.config)
                     if k.startswith('CFG_DATABASE'))
@@ -98,34 +103,34 @@ def drop(yes_i_know=False, quiet=False):
     """Drop database tables."""
     print(">>> Going to drop tables and related data on filesystem ...")
 
-    from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
+    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+        test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
-    ## Step 0: confirm deletion
+    # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
         "WARNING: You are going to destroy your database tables and related "
         "data on filesystem!"))
 
-    ## Step 1: test database connection
+    # Step 1: test database connection
     test_sqla_connection()
     test_sqla_utf8_chain()
     list(models)
 
-    ## Step 2: disable foreign key checks
+    # Step 2: disable foreign key checks
     if db.engine.name == 'mysql':
         db.engine.execute('SET FOREIGN_KEY_CHECKS=0;')
 
-    ## Step 3: destroy associated data
+    # Step 3: destroy associated data
     try:
         from invenio.legacy.webstat.api import destroy_customevents
         msg = destroy_customevents()
         if msg:
             print(msg)
-    except:
+    except Exception:
         print("ERROR: Could not destroy customevents.")
 
     tables = list(reversed(db.metadata.sorted_tables))
@@ -146,7 +151,7 @@ def drop(yes_i_know=False, quiet=False):
                         suffix=str(datetime.timedelta(seconds=e()[0])))
                 dropper(table)
                 dropped += 1
-            except:
+            except Exception:
                 print('\r', '>>> problem with dropping ', table)
                 current_app.logger.exception(table)
 
@@ -172,7 +177,8 @@ def create(default_data=True, quiet=False):
 
     from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
-    from invenio.ext.sqlalchemy.utils import test_sqla_connection, test_sqla_utf8_chain
+    from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
+        test_sqla_utf8_chain
     from invenio.ext.sqlalchemy import db, models
     from invenio.modules.jsonalchemy.wrappers import StorageEngine
 
@@ -211,7 +217,7 @@ def create(default_data=True, quiet=False):
                         suffix=str(datetime.timedelta(seconds=e()[0])))
                 creator(table)
                 created += 1
-            except:
+            except Exception:
                 print('\r', '>>> problem with creating ', table)
                 current_app.logger.exception(table)
 
@@ -267,11 +273,11 @@ def uri():
 
 
 def version():
-    """ Get running version of database driver."""
+    """Get running version of database driver."""
     from invenio.ext.sqlalchemy import db
     try:
         return db.engine.dialect.dbapi.__version__
-    except:
+    except Exception:
         import MySQLdb
         return MySQLdb.__version__
 
@@ -280,12 +286,12 @@ def version():
                 help='Display more details (driver version).')
 @change_command_name
 def driver_info(verbose=False):
-    """ Get name of running database driver."""
+    """Get name of running database driver."""
     from invenio.ext.sqlalchemy import db
     try:
         return db.engine.dialect.dbapi.__name__ + (('==' + version())
                                                    if verbose else '')
-    except:
+    except Exception:
         import MySQLdb
         return MySQLdb.__name__ + (('==' + version()) if verbose else '')
 
