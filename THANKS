@@ -1,11 +1,7 @@
 Invenio THANKS
 ==============
 
-Several people besides the core Invenio Development Team
-contributed to the project:
-
-  - Thierry Thomas <thierry@FreeBSD.org>
-    Patches for compiling old CDSware 0.3.x sources on FreeBSD.
+Several people contributed language translations:
 
   - Guido Pelzer <guido.pelzer@web.de>
     Contributions to the German translation.  German stopword list.
@@ -34,17 +30,8 @@ contributed to the project:
   - Eric Grand <eric.grand@rero.ch>
     Contributions to the French translation.
 
-  - Theodoropoulos Theodoros <theod@lib.auth.gr>
-    Contributions to the Greek translation, Greek stopword list,
-    XML RefWorks output format, Google Analytics documentation update,
-    BibConvert target/source CLI flag description fix.
-
   - Vasyl Ostrovskyi <vo@imath.kiev.ua>
     Contributions to the Ukrainian translation.
-
-  - Ferran Jorba <Ferran.Jorba@uab.cat>
-    Contributions to the Catalan and Spanish translations.  Cleanup of
-    the old PHP-based BibFormat Admin Guide.  Several minor patches.
 
   - Beatriu Piera <Beatriz.Piera@uab.es>
     Translation of the Search Guide into Catalan and Spanish.
@@ -70,9 +57,6 @@ contributed to the project:
   - Toru Tsuboyama <toru.tsuboyama@kek.jp>
     Contributions to the Japanese translation.
 
-  - Mike Marino <mmarino@gmail.com>
-    Several minor patches and suggestions.
-
   - Zbigniew Szklarz <zszklarz@student.agh.edu.pl>
     Contributions to the Polish translation.
 
@@ -94,39 +78,14 @@ contributed to the project:
   - Nino Jejelava <nino.jejelava@gmail.com>
     Contributions to the Georgian translation.
 
-  - Cristian Bacchi <cristian.bacchi@gmail.com>
-    Improvements to the browse interface.
-
   - Genis Musulmanbekov <genis@jinr.ru>
     Contributions to the Russian translation.
 
   - Andrey Tremba <metandrey@gmail.com>
     Contributions to the Russian translation.
 
-  - Cornelia Plott <c.plott@fz-juelich.de>
-    Contributions to the German translation.
-
-  - Johnny Mariéthoz <johnny.mariethoz@rero.ch>
-    Patch to improve BibRecDocs argument checking.
-
-  - Alexander Wagner <a.wagner@fz-juelich.de>
-    Contributions to the German translation.
-
-  - Miguel Martín <miguelm@unizar.es>
-    Patch to fix traceback in get_collection_reclist() occurring for
-    misspelled collection names in access control rules.
-
-  - Stefan Hesselbach <s.hesselbach@gsi.de>
-    Patch for OAI harvesting via HTTP proxy.
-
   - Bessem Amira <bessem.amira@cnudst.rnrt.tn>
     Contributions to the Arabic translation.
-
-  - Kevin M. Flannery <flannery@fnal.gov>
-    Patch for WebSubmit's Move_Photos_to_Storage.
-
-  - Thomas McCauley <thomas.mccauley@cern.ch>
-    Improvements to Invenio Connector.
 
   - Mehdi Zahedi <mehdizahedin@gmail.com>
     Contributions to the Persian (Farsi) translation.

@@ -2,386 +2,155 @@ Invenio AUTHORS
 ===============
 
 Invenio is being co-developed by an international collaboration
-comprising institutes such as CERN, CfA, DESY, EPFL, FNAL, SLAC.
-
-The CERN development team currently consists of:
-
- - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
-     CERN Digital Library Services team leader.
-
- - Tibor Simko <tibor.simko@cern.ch>
-     CERN Digital Library Technology team leader.  Head Developer of
-     Invenio.  General system architecture, release management.
-     WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
-     WebHelp, and more.
-
- - Samuele Kaplun <samuele.kaplun@cern.ch>
-     Authentication and user preferences rewrite and improvements.
-     Firewall-like access control RBAC system.  Fulltext file
-     management rewrite and upload feature.  Intbitset Python C
-     extension for the indexer.  Improvents to the task scheduler and
-     session hander.  Improvements to numerous modules.
-
- - Ludmila Marian <ludmila.marian@gmail.com>
-     Citerank family of ranking methods.  Fixes to numerous modules.
-
- - Flavio Costa <flavio.costa@cern.ch>
-     Contributions to the Italian translation.
-
- - Jiri Kuncar <jiri.kuncar@cern.ch>
-     Fix for demo site installation.  Contributions to the Czech
-     translation.
-
- - Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
-     Initial release of WebApiKey, enhancements for WebSubmit.
-
- - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
-     Initial release of Invenio Upgrader and jsonutils; patches for
-     pluginutils.
-
- - Patrick Glauner <patrick.oliver.glauner@cern.ch>
-     Cleanup of SQL queries for several modules.
-
- - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
-     Errorlib refactoring, improvements to search UI, discussion tab,
-     merged record redirect, adaptation to new web test framework.
-
- - Grzegorz Szpura <grzegorz.szpura@cern.ch>
-     Better browsing of fuzzy indexes.
-
- - Thorsten Schwander <thorsten.schwander@gmail.com>
-     Improvements to dbdump.
-
- - Jan Aage Lavik <jan.age.lavik@cern.ch>
-     Improvements to BibMatch with remote matching capabilities,
-     improvements to plot extractor, improvements to harvesting and
-     other small fixes.
-
- - Samuele Carli <samuele.carli@cern.ch>
-     Initial implementation of BibAuthorID module, with Henning
-     Weiler.  Fixes for basket export facility and adding external
-     items to baskets.
-
- - Alessio Deiana <alessio.deiana@cern.ch>
-     Fix for BibFormat element initialisation.  Improvements to data
-     cacher and cite summary.
-
- - Wojciech Ziolek <wojciech.ziolek@cern.ch>
-     Fixes for OAI holding pen facility, Strftime improvements for
-     dateutils.
-
- - Sebastian Witowski <sebastian.witowski@cern.ch>
-     Improvements to multi-record editor.
-
- - Laura Rueda <laura.rueda@cern.ch>
-     Mechanize compatibility for Invenio Connector.
-
- - Annette Holtkamp <annette.holtkamp@cern.ch>
-     Updates to `Howto MARC' guide.
-
- - Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
-     Updates to `Howto MARC' guide.
-
-The EPFL development team currently consists of:
-
- - Gregory Favre <gregory.favre@cern.ch>
-     Rewrite of WebBasket.  WebMessage.  Improvements to WebComment.
-     Other contributions and improvements.
-
-The SLAC development team currently consists of:
-
- - Mike Sullivan <sul@slac.stanford.edu>
-     Improvements to author pages.
-
- - Eduardo Benavidez <eduardo.benavidez@gmail.com>
-     Improvements to BibCatalog.
-
-The Harvard-Smithsonian Center for Astrophysics development team
-currently consists of:
-
- - Alberto Accomazzi <aaccomazzi@cfa.harvard.edu>
-     Team leader.
-
- - Jay Luker <lbjay@reallywow.com>
-     Improvements to the emergency notification sending facility.
-
- - Roman Chyla <roman.chyla@cern.ch>
-     WSGI handler accepts UTF-8 strings.
-
-Many former team members (mostly CERN staff and fellows, technical
-students, diploma students, summer students) contributed to the
-project since 2002.  In an approximately decreasing chronological
-order:
-
- - Jerome Caffaro <jerome.caffaro@cern.ch>
-     BibFormat, redesign and rewrite in Python.  BibConvert
-     XML-oriented mode.  OAI harvester improvements.  Improvements to
-     BibEdit.  WebDoc tool.  WebJournal refactoring and rewrite.
-     WebComment rounds and threads.  WebSubmit asynchronous upload
-     support.  Improvements to numerous modules.
-
- - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
-     Improvements to the BibCirculation module.
-
- - Piotr Praczyk <piotr.praczyk@gmail.com>
-     OAI harvesting from arXiv.  Test harvesting interface, for
-     BibHarvest.  Record comparison library functions, for BibRecord.
-     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
-     undo/redo.
-
- - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
-     Recognition of /record/sysno URLs, ADS formatting.
-
- - Daniel Stanculescu <daniel.stanculescu@cern.ch>
-     Improvements to Unicode treatment for textutils.
-
- - Vasanth Venkatraman <vasanth.venkatraman@cern.ch>
-     Improvements to BibUpload version treatment, monotask and
-     sequence tasks for BibSched.
-
- - Peter Halliday <phalliday@cornell.edu>
-     Configurable /record URL name space, improvements to dbquery.
-
- - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photo management.
-
- - Joe Blaylock <jrbl@slac.stanford.edu>
-     Rewrite of SPIRES query syntax parser, support for nested
-     parenthesis for WebSearch, fuzzy author name tokenizer,
-     enrichment of author pages with h-index.
-
- - Benoit Thiell <bthiell@cfa.harvard.edu>
-     Fixes for BibRecord library, detailed record links, improvements
-     to code kwalitee in numerous modules.  Improvements to
-     BibClassify.
-
- - Nikola Yolov <nikola.yolov@cern.ch>
-     Improvements and refactoring of BibAuthorID, fixes for
-     WebAuthorProfile.
-
- - Lewis Barnes <lewis.barnes@cern.ch>
-     Amendments for INSPIRE linking style.
-
- - Olivier Canévet <olivier.canevet@cern.ch>
-     Fixes for WebComment report abuse facility.
-
- - Belinda Chan <belinda.chan@cern.ch>
-     User documentation for personal features like alerts and baskets.
-
- - Carmen Alvarez Perez <carmen.alvarez.perez@cern.ch>
-     Improvements to WebStat.
-
- - Henning Weiler <henning.weiler@cern.ch>
-     Initial implementation of BibAuthorID module, with Samuele Carli.
-
- - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
-     Fix taxonomy regression test, for BibKnowledge.
-
- - Stamen Todorov Peev <stamen.peev@cern.ch>
-     Enrichment of Dublin Core XSL stylesheet.
-
- - Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
-     Full-text snippet feature for full-text search.
-
- - Björn Oltmanns <bjoern.oltmanns@gmail.com>
-     Initial release of BibEncode, multi-node support for BibSched,
-     style refactoring for WebComment.
-
- - Christopher Dickinson <christopher.dickinson@cern.ch>
-     Patch for auto-suggest facility.
-
- - Christopher Hayward <christopher.james.hayward@cern.ch>
-     Improvements to the reference extraction tool.
-
- - Travis Brooks <travis@slac.stanford.edu>
-     Support for SPIRES search syntax and other improvements.
-
- - Juliusz Sompolski <julsomp@gmail.com>
-     Reimplementation of pdf2hocr2pdf.
-
- - Jurga Girdzijauskaite <jurga.gird@gmail.com>
-     Contributions to the Lithuanian translation.
-
- - Tony Ohls <tony.ohls@cern.ch>
-     Fixes for regexp treatment in BibConvert.
-
- - Marko Niinimaki <manzikki@gmail.com>
-     Contributions to the BibRank citation module and WebSearch
-     summary output formats.  Initial implementation of BibCatalog and
-     BibKnowledge.
-
- - Mathieu Barras <mbarras@gmail.com>
-     Initial implementation of SWORD client application.
-
- - Fabio Souto <fsoutomoure@gmail.com>
-     Initial implementation of the invenio config dumper/loader.
-
- - Pablo Vázquez Caderno <pcaderno@cern.ch>
-     Prevent loop in collection trees, for WebSearch.
-
- - Victor Engmark <victor.engmark@cern.ch>
-     Bash completion for inveniocfg, patche for dist-packages.
-
- - Javier Martin <javier.martin.montull@cern.ch>
-     Moderation tools for WebComment, improvements to BibEdit, initial
-     implementation of the batch uploader.
-
- - Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>
-     Hosted collections for WebSearch, rewrite of WebBasket UI,
-     improvements to WebAlert.
-
- - Valkyrie Savage <vasavage@gmail.com>
-     Initial implementation of the plot extractor library.
-
- - Miguel Martinez Pedreira <miguel.martinez.pedreira@cern.ch>
-     Tool for manipulated embedded metadata in full-text files.
-
- - Jorge Aranda Sumarroca <jorge.aranda.sumarroca@cern.ch>
-     Support for FCKeditor-uploaded files for WebSubmit.
-
- - Glenn Gard <glenng4@aol.com>
-     Implemented many unit, regression and web tests for WebAlert,
-     WebJournal, WebSubmit, WebComment, WebMessage, WebSession
-     modules.
-
- - Christopher Parker <chris.parker.za@gmail.com>
-     Improvements to the submission approval workflow.
-
- - Martin Vesely <martin.vesely@cern.ch>
-     OAIHarvest, OAIRepository, OAI daemon and admin
-     interface. BibConvert text-oriented mode. BibMatch.
-
- - Tony Osborne <tony.osborne@cern.ch>
-     Improvements to the reference extractor.
-
- - Radoslav Ivanov <radoslav.ivanov@cern.ch>
-     Contributions to the WebBasket module test suite.  Support for
-     parentheses and SPIRES search syntax in WebSearch.  Initial
-     implementation of the multi-record editor.  Initial
-     implementation of BibExport.
-
- - Joaquim Rodrigues Silvestre <joaquim.rodrigues.silvestre@cern.ch>
-     Initial implementation of the BibCirculation module to handle
-     physical item copies.
-
- - Kyriakos Liakopoulos <kyriakos.liakopoulos@cern.ch>
-     Initial implementation of BibMerge.  Improvements to BibEdit.
-
- - Lars Christian Raae <lars.christian.raae@cern.ch>
-     Record locking, per-collection curating authentication, reverting
-     older record versions, for the BibEdit.  Rewrite of BibEdit in
-     Ajax.
-
- - Ruben Pollan <ruben.pollan@cern.ch>
-     Contributions to the WebStat module.
-
- - Nicholas Robinson <nicholas.robinson@cern.ch>
-     WebSubmit.  Reference extraction for the BibEdit module.
-
- - Gabriel Hase <gabriel.hase@konnektiv.ch>
-     WebJournal module.
-
- - Diane Berkovits <diane.berkovits@cern.ch>
-     Ranking by downloads, for the BibRank and WebSubmit
-     modules.  Group management for WebSession.
-
- - Joël Vogt <joel.vogt@unifr.ch>
-     Contributions to the BibClassify module.
-
- - Marcus Johansson <marcus.johansson@cern.ch>
-     Contributions to the WebStat module.
-
- - Jan Brice Krause <jan.brice.krause@cern.ch>
-     Original implementation of the fulltext file transfer mode for
-     BibUpload.
-
- - Axel Voitier <axel.voitier@gmail.com>
-     Complex approval and refereeing subsystem, for WebSubmit.
-
- - Alberto Pepe <alberto.pepe@cern.ch>
-     BibClassify, OAIHarvest Admin.
-
- - Øyvind Østlund <oyvind.ostlund@cern.ch>
-     Sample BibTeX to MARCXML conversion, for BibConvert.
-
- - Nikolay Dyankov <ndyankov@gmail.com>
-     XML-based BFX formatting engine, for BibFormat.
-
- - Olivier Serres <olivier.serres@gmail.com>
-     External collections searching, for WebSearch.
-
- - Eric Stahl <eric.stahl@utbm.fr>
-     Rewrite of BibUpload in Python.
-
- - Frederic Gobry <frederic.gobry@gmail.com>
-     Contributions to the templating system, the URL handler, the
-     gettext infrastructure, the regression test suite infrastructure,
-     numerous patches for many modules.
-
- - Krzysztof Jedrzejek <krzysztof.jedrzejek@gmail.com>
-     Improvements to ElmSubmit.
-
- - Yohann Paris <paris.yohann@gmail.com>
-     BibEdit Admin.
-
- - Paulo Cabral <cabralp@gmail.com>
-     WebComment, error library, design of collaborative features.
-
- - Thomas Baron <thomas.baron@cern.ch>
-     WebSubmit and BibUpload.  Improvements to BibSched.
-
- - Maja Gracco <maja.gracco@cern.ch>
-     System librarian, MARC21 expertise.
-
- - Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
-     Patches for the WebSubmit engine and the admin interface.
-     Templatizing codebase.
-
- - Anna Afshar <anna.afshar@novell.com>
-     Ranking by citations, for the BibRank module.
-
- - Trond Aksel Myklebust <tamyk@online.no>
-     Ranking engine, the BibRank module.  Stemming and stopwords for
-     the BibIndex module.  Site access policies and external
-     authentication methods, for the WebAccess module and its clients.
-     Administration interfaces to WebSearch, BibIndex, BibRank, and
-     additions to WebAccess.
-
- - Hector Sanchez <hector.sanchez.sanmartin@gmail.com>
-     Metadata output formatter, the BibFormat module.  Session
-     management, for the WebSession module.
-
- - Richard Owen <ro@tes.la>
-     Electronic mail submission system, the ElmSubmit module.
-
- - Alexandra Silva <xana@correio.ci.uminho.pt>
-     Rewriting and enhancing BibRecord XML MARC and record handling
-     library, for the BibEdit module.
-
- - Arturo Montejo Raez <amontejo@ujaen.es>
-     Automatic text classification and keyword indexing. (upcoming)
-
- - Mikael Vik <mikael.vik@cern.ch>
-     Role-based access control engine and its admin interface,
-     the WebAccess module.  Guest user sessions garbage collector,
-     for the WebSession module.
-
- - Erik Simon <erik.simon@unine.ch>, Eric Simon <eric.simon@unine.ch>
-     Alert engine, for the WebAlert module.
-
- - Roberta Faggian <roberta.faggian@cern.ch>
-     Rewrite of the alert and basket user interfaces, for the WebAlert
-     and the WebBasket modules.
-
- - Julio Pernia Aznar <jpernia@altransdb.com>
-     Parts of user and session management, for the WebSession module.
-
- - Franck Grenier <franckgrenier@wanadoo.fr>
-     Parts of web design and graphics, for the WebStyle module.
-
- - Eduardo Margallo
-     Enhancements to the indexing engine, for the BibWords module.
-     Initial implementation of the task scheduler, for the BibSched
-     module.
+comprising institutes such as CERN, DESY, EPFL, FNAL, SLAC.
+
+You can contact us at <info@invenio-software.org>.
+
+Active contributors:
+
+* Alexander Wagner <alexander.wagner@desy.de>
+* Annette Holtkamp <annette.holtkamp@cern.ch>
+* Cornelia Plott <c.plott@fz-juelich.de>
+* Cristian Bacchi <cristian.bacchi@gmail.com>
+* Daniel Lovasko <daniel.lovasko@cern.ch>
+* Dimitrios Semitsoglou-Tsiapos <dsemitso@cern.ch>
+* Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
+* Ferran Jorba <Ferran.Jorba@uab.cat>
+* Flavio Costa <flavio.costa@cern.ch>
+* Guillaume Lastecoueres <PX9e@gmx.fr>
+* Harris Tzovanakis <me@drjova.com>
+* Jan Aage Lavik <jan.age.lavik@cern.ch>
+* Javier Martin <javier.martin.montull@cern.ch>
+* Jiri Kuncar <jiri.kuncar@cern.ch>
+* Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
+* Johnny Mariéthoz <johnny.mariethoz@rero.ch>
+* Kirsten Sachs <kirsten.sachs@desy.de>
+* Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+* Laura Rueda <laura.rueda@cern.ch>
+* Ludmila Marian <ludmila.marian@gmail.com>
+* Miguel Martín <miguelm@unizar.es>
+* Mike Sullivan <sul@slac.stanford.edu>
+* Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>
+* Øystein Blixhavn <oystein@blixhavn.no>
+* Pedro Gaudencio <pmgaudencio@gmail.com>
+* Petros Ioannidis <petros.ioannidis@cern.ch>
+* Roman Chyla <roman.chyla@cern.ch>
+* Samuele Kaplun <samuele.kaplun@cern.ch>
+* Sebastian Witowski <sebastian.witowski@cern.ch>
+* Stefan Hesselbach <s.hesselbach@gsi.de>
+* Theodoropoulos Theodoros <theod@lib.auth.gr>
+* Tibor Simko <tibor.simko@cern.ch>
+* Thorsten Schwander <thorsten.schwander@gmail.com>
+* Wojciech Ziolek <wojciech.ziolek@cern.ch>
+
+Past contributors:
+
+* Alberto Pepe <alberto.pepe@cern.ch>
+* Alessio Deiana <alessio.deiana@cern.ch>
+* Alexandra Silva <xana@correio.ci.uminho.pt>
+* Alper Cinar <alper@srdc.com.tr>
+* Anna Afshar <anna.afsharghasemlouy@epfl.ch>
+* Avraam Tsantekidis <avraam.tsantekidis@cern.ch>
+* Axel Voitier <axel.voitier@gmail.com>
+* Benoit Thiell <benoit.thiell@cern.ch>
+* Björn Oltmanns <bjoern.oltmanns@gmail.com>
+* Carmen Alvarez Perez <carmen.alvarez.perez@cern.ch>
+* Christopher Dickinson <christopher.dickinson@cern.ch>
+* Christopher Hayward <christopher.james.hayward@cern.ch>
+* Christopher Parker <chris.parker.za@gmail.com>
+* Daniel Stanculescu <daniel.stanculescu@cern.ch>
+* David Bengoa <david.bengoa.rocandio@cern.ch>
+* Diane Berkovits <diane.berkovits@cern.ch>
+* Eduardo Margallo <eduardo.margallo@cern.ch>
+* Eirini Psallida <eirini.psallida@cern.ch>
+* Erik Simon <erik.simon@unine.ch>
+* Eric Stahl <eric.stahl@utbm.fr>
+* Fabio Souto <fsoutomoure@gmail.com>
+* Federico Poli <federico.poli@cern.ch>
+* Franck Grenier <franckgrenier@wanadoo.fr>
+* Frederic Gobry <frederic.gobry@epfl.ch>
+* Fredrik Nygård Carlsen <me@frecar.no>
+* Gabriel Hase <gabriel.hase@cern.ch>
+* Georgios Papoutsakis <georgios.papoutsakis@cern.ch>
+* Gerrit Rindermann <Gerrit.Rindermann@cern.ch>
+* Giovanni Di Milia <gdimilia@cfa.harvard.edu>
+* Glenn Gard <glenng4@aol.com>
+* Graham R. Armstrong <graham.richard.armstrong@cern.ch>
+* Gregory Favre <gregory.favre@cern.ch>
+* Grzegorz Szpura <grzegorz.szpura@cern.ch>
+* Eduardo Benavidez <eduardo.benavidez@gmail.com>
+* Hector Sanchez <hector.sanchez@cern.ch>
+* Henning Weiler <henning.weiler@cern.ch>
+* Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
+* Jan Brice Krause <jan.brice.krause@cern.ch>
+* Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
+* Jay Luker <lbjay@reallywow.com>
+* Jerome Caffaro <jerome.caffaro@cern.ch>
+* Joaquim Rodrigues Silvestre <joaquim.rodrigues.silvestre@cern.ch>
+* Joe Blaylock <jrbl@slac.stanford.edu>
+* Joël Vogt <joel.vogt@unifr.ch>
+* Johann C. Rocholl <johann@browsershots.org>
+* Jorge Aranda Sumarroca <jorge.aranda.sumarroca@cern.ch>
+* Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
+* Julio Pernia Aznar <jpernia@altransdb.com>
+* Juliusz Sompolski <julsomp@gmail.com>
+* Jurga Girdzijauskaite <jurga.gird@gmail.com>
+* Kevin M. Flannery <flannery@fnal.gov>
+* Konstantinos Ntemagkos <konstantinos.ntemagkos@cern.ch>
+* Krzysztof Jedrzejek <krzysztof.jedrzejek@cern.ch>
+* Krzysztof Lis <krzysztof.lis@cern.ch>
+* Kyriakos Liakopoulos <kyriakos.liakopoulos@cern.ch>
+* Lars Christian Raae <lars.christian.raae@cern.ch>
+* Lewis Barnes <lewis.barnes@cern.ch>
+* Luke Andrew Smith <smithey_72@hotmail.com>
+* Maja Gracco <maja.gracco@cern.ch>
+* Markus Goetz <murxman@gmail.com>
+* Marcus Johansson <marcus.johansson@cern.ch>
+* Marko Niinimaki <manzikki@gmail.com>
+* Martin Vesely <martin.vesely@cern.ch>
+* Mathieu Barras <mbarras@gmail.com>
+* Miguel Martinez Pedreira <miguel.martinez.pedreira@cern.ch>
+* Mikael Vik <mikael.vik@cern.ch>
+* Mike Marino <mmarino@gmail.com>
+* Minn Soe <minn.soe@cern.ch>
+* Nicholas Robinson <nicholas.robinson@cern.ch>
+* Nikola Yolov <nikola.yolov@cern.ch>
+* Nikolaos Kalodimas <nikolaos.kalodimas@cern.ch>
+* Nikolay Dyankov <ndyankov@gmail.com>
+* Nino Jejelava <nino.jejelava@gmail.com>
+* Olivier Canévet <olivier.canevet@cern.ch>
+* Olivier Serres <olivier.serres@gmail.com>
+* Øyvind Østlund <oyvind.ostlund@cern.ch>
+* Pablo Vázquez Caderno <pcaderno@cern.ch>
+* Patrick Glauner <patrick.oliver.glauner@cern.ch>
+* Paulo Cabral <paulo.cabral@cern.ch>
+* Peter Halliday <phalliday@cornell.edu>
+* Piotr Praczyk <piotr.praczyk@piotr.praczyk@gmail.com>
+* Radoslav Ivanov <radoslav.ivanov@cern.ch>
+* Raja Sripada <raja.sripada@cern.ch>
+* Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
+* Richard Owen <ro@tes.la>
+* Roberta Faggian <roberta.faggian@cern.ch>
+* Ruben Pollan <ruben.pollan@cern.ch>
+* Samuele Carli <samuele.carli@cern.ch>
+* Stamen Todorov Peev <stamen.peev@cern.ch>
+* Thierry Thomas <thierry@FreeBSD.org>
+* Thomas Baron <thomas.baron@cern.ch>
+* Thomas Karampelas <thomas.karampelas@cern.ch>
+* Thomas McCauley <thomas.mccauley@cern.ch>
+* Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
+* Tony Ohls <tony.ohls@cern.ch>
+* Tony Osborne <tony.osborne@cern.ch>
+* Travis Brooks <travis@slac.stanford.edu>
+* Trond Aksel Myklebust <trond.aksel.myklebust@cern.ch>
+* Valkyrie Savage <vasavage@gmail.com>
+* Vasanth Venkatraman <vasanth.venkatraman@cern.ch>
+* Vasyl Ostrovskyi <vo@imath.kiev.ua>
+* Victor Engmark <victor.engmark@cern.ch>
+* Yannick Tapparel <yannick.tapparel@cern.ch>
+* Yoan Blanc <yoan.blanc@cern.ch>
+* Yohann Paris <yohann.paris@cern.ch>
+
+See also THANKS file.
 
 - end of file -
