@@ -40,8 +40,8 @@ class Template:
         return """
     <script type="text/javascript" src="%s/js/jquery.min.js"></script>
     <script type="text/javascript" src="%s/js/ui.core.js"></script>
-    <script type="text/javascript" src="%s/js/oai_harvest_admin.js"> </script>
-    <link rel="stylesheet" href="%s/img/oai_harvest_admin.css" />
+    <script type="text/javascript" src="%s/js/oaiharvester/admin.js"> </script>
+    <link rel="stylesheet" href="%s/css/oaiharvester/admin.css" />
 """ % tuple([CFG_SITE_URL] * 4)
 
     def tmpl_getnavtrail(self, previous="", ln=CFG_SITE_LANG):
@@ -719,8 +719,8 @@ class Template:
     <script type="text/javascript">
         var serverAddress = '%(baseurl)s';
     </script>
-    <script type="text/javascript" src="%(baseurl)s/js/oai_harvest_admin.js"> </script>
-    <script type="text/javascript" src="%(baseurl)s/js/oai_harvest_admin_hp.js"> </script>
+    <script type="text/javascript" src="%(baseurl)s/js/oaiharvester/admin.js"> </script>
+    <script type="text/javascript" src="%(baseurl)s/js/oaiharvester/admin_hp.js"> </script>
 """ % {
             "baseurl" : CFG_SITE_URL,
             "scriptsstring" : jquery_scripts_string
