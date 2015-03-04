@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,17 +19,7 @@
 
 """WebSearch services unit tests."""
 
-__revision__ = "$Id$"
-
-import os
-
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
-from invenio.pluginutils import PluginContainer
-from invenio.websearch_services import (
-    CFG_SEARCH_SERVICES_PATH,
-    __required_plugin_API_version__,
-    SearchService
-)
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class WebSearchServicesJournalHintService(InvenioTestCase):
@@ -38,12 +28,9 @@ class WebSearchServicesJournalHintService(InvenioTestCase):
 
     def setUp(self):
         """Load plugin."""
-        search_service_plugins = PluginContainer(
-            os.path.join(CFG_SEARCH_SERVICES_PATH, '*Service.py'),
-            api_version=__required_plugin_API_version__,
-            plugin_signature=SearchService
-        )
-        self.plugin = search_service_plugins.get('JournalHintService')()
+        from invenio.modules.search.searchext.services.JournalHintService import \
+            JournalHintService
+        self.plugin = JournalHintService()
 
     def test_seems_a_journal_reference(self):
         """Check function JournalHintService.seems_a_journal_reference."""
