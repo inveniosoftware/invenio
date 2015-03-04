@@ -77,17 +77,25 @@ def init(user='root', password='', yes_i_know=False):
         cmd_admin_prefix = prefix.format(cmd='mysqladmin', user=user,
                                          password=password,
                                          **args)
+
+        # we can't wrap all keys in quotes since the table name for instance is not quotable'
+        keys_to_wrap =['CFG_DATABASE_PASS', 'CFG_DATABASE_USER']
+        for key in keys_to_wrap:
+            if args[key].find('\'') != 0:
+                args[key] = "'" + args[key] + "'"
+
         cmds = [
             cmd_prefix + '-e "DROP DATABASE IF EXISTS {CFG_DATABASE_NAME}"',
             (cmd_prefix + '-e "CREATE DATABASE IF NOT EXISTS '
-             '{CFG_DATABASE_NAME} DEFAULT CHARACTER SET utf8 '
-             'COLLATE utf8_general_ci"'),
+                          '{CFG_DATABASE_NAME} DEFAULT CHARACTER SET utf8 '
+                          'COLLATE utf8_general_ci"'),
             # Create user and grant access to database.
             (cmd_prefix + '-e "GRANT ALL PRIVILEGES ON '
-             '{CFG_DATABASE_NAME}.* TO {CFG_DATABASE_USER}@localhost '
-             'IDENTIFIED BY \'{CFG_DATABASE_PASS}\'"'),
+                          '{CFG_DATABASE_NAME}.* TO {CFG_DATABASE_USER}@localhost '
+                          'IDENTIFIED BY {CFG_DATABASE_PASS}"'),
             cmd_admin_prefix + 'flush-privileges'
         ]
+
         for cmd in cmds:
             cmd = cmd.format(**args)
             print(cmd)
@@ -127,6 +135,7 @@ def drop(yes_i_know=False, quiet=False):
     # Step 3: destroy associated data
     try:
         from invenio.legacy.webstat.api import destroy_customevents
+
         msg = destroy_customevents()
         if msg:
             print(msg)
@@ -147,7 +156,7 @@ def drop(yes_i_know=False, quiet=False):
             try:
                 if not quiet:
                     print_progress(
-                        1.0 * (i+1) / N, prefix=prefix,
+                        1.0 * (i + 1) / N, prefix=prefix,
                         suffix=str(datetime.timedelta(seconds=e()[0])))
                 dropper(table)
                 dropped += 1
@@ -191,12 +200,14 @@ def create(default_data=True, quiet=False):
         print
         print(">>> Modifing table structure...")
         from invenio.legacy.dbquery import run_sql
+
         run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
         run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
         run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
-        #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
+        # print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
 
     from invenio.modules.search.models import CollectionFieldFieldvalue
+
     event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
 
     tables = db.metadata.sorted_tables
@@ -213,7 +224,7 @@ def create(default_data=True, quiet=False):
             try:
                 if not quiet:
                     print_progress(
-                        1.0 * (i+1) / N, prefix=prefix,
+                        1.0 * (i + 1) / N, prefix=prefix,
                         suffix=str(datetime.timedelta(seconds=e()[0])))
                 creator(table)
                 created += 1
@@ -253,6 +264,7 @@ def diff():
         return
 
     from invenio.ext.sqlalchemy import db
+
     print(db.schemadiff())
 
 
@@ -269,16 +281,19 @@ def recreate(yes_i_know=False, default_data=True, quiet=False):
 def uri():
     """Print SQLAlchemy database uri."""
     from flask import current_app
+
     print(current_app.config['SQLALCHEMY_DATABASE_URI'])
 
 
 def version():
     """Get running version of database driver."""
     from invenio.ext.sqlalchemy import db
+
     try:
         return db.engine.dialect.dbapi.__version__
     except Exception:
         import MySQLdb
+
         return MySQLdb.__version__
 
 
@@ -288,11 +303,13 @@ def version():
 def driver_info(verbose=False):
     """Get name of running database driver."""
     from invenio.ext.sqlalchemy import db
+
     try:
         return db.engine.dialect.dbapi.__name__ + (('==' + version())
                                                    if verbose else '')
     except Exception:
         import MySQLdb
+
         return MySQLdb.__name__ + (('==' + version()) if verbose else '')
 
 
@@ -305,10 +322,12 @@ def mysql_info(separator=None, line_format=None):
     Useful for debugging problems on various OS.
     """
     from invenio.ext.sqlalchemy import db
+
     if db.engine.name != 'mysql':
         raise Exception('Database engine is not mysql.')
 
     from invenio.legacy.dbquery import run_sql
+
     out = []
     for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
             run_sql("SHOW VARIABLES LIKE 'charact%'") + \
@@ -338,9 +357,11 @@ def mysql_info(separator=None, line_format=None):
 def main():
     """Main."""
     from invenio.base.factory import create_app
+
     app = create_app()
     manager.app = app
     manager.run()
+
 
 if __name__ == '__main__':
     main()
