@@ -59,6 +59,7 @@ import binascii
 import cgi
 import sys
 import copy
+import tarfile
 
 if sys.hexversion < 0x2060000:
     from md5 import md5
@@ -102,6 +103,7 @@ from invenio.bibrecord import record_get_field_instances, \
     encode_for_xml
 from invenio.urlutils import create_url, make_user_agent_string
 from invenio.textutils import nice_size
+from invenio.webuser import collect_user_info
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
 from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
@@ -123,7 +125,7 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBCATALOG_SYSTEM
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
-    CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+    CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT, CFG_BIBDOCFILE_SUBFORMATS_TRANSLATIONS
 from invenio.pluginutils import PluginContainer
 
 import invenio.template
@@ -797,17 +799,22 @@ class BibRecDocs(object):
 
         return out
 
-    def get_total_size_latest_version(self):
+    def get_total_size_latest_version(self, user_info=None, subformat=None):
         """
         Returns the total size used on disk by all the files belonging
         to this record and corresponding to the latest version.
 
+        @param user_info: the user_info dictionary, used to check restrictions
+        @type: dict
+        @param subformat: if subformat is specified, it limits files
+            only to those from that specific subformat
+        @type subformat: string
         @return: the total size.
         @rtype: integer
         """
         size = 0
         for (bibdoc, _) in self.bibdocs.values():
-            size += bibdoc.get_total_size_latest_version()
+            size += bibdoc.get_total_size_latest_version(user_info, subformat)
         return size
 
     def get_total_size(self):
@@ -1564,6 +1571,34 @@ class BibRecDocs(object):
 
         return " ".join(texts)
 
+    def stream_archive_of_latest_files(self, req, format=''):
+        """
+        Streams the tar archive with all files of a certain format (that are
+        not restricted) to the user.
+        Formats should be strings that can be compared with the output of
+        BibDocFile.get_subformat() function.
+
+        @param req: Apache Request Object
+        @type req: Apache Request Object
+        @param format: format of the files. Empty string means the original format.
+        @type format: string
+        """
+        # Get the internal size from the user-friendly format name
+        internal_format = [f[1] for f in CFG_BIBDOCFILE_SUBFORMATS_TRANSLATIONS if f[0] == format]
+        if len(internal_format) < 1:
+            # Incorrect format
+            return
+        internal_format = internal_format[0]
+        tarname = str(self.id) + "_" + format + '.tar'
+        # select only those files that user can download
+        user_info = collect_user_info(req)
+        req.content_type = "application/x-tar"
+        req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % tarname
+        tar = tarfile.open(fileobj=req, mode='w|')
+        for f in self.list_latest_files():
+            if f.get_subformat() == internal_format and f.is_restricted(user_info)[0] == 0:
+                tar.add(f.get_path(), arcname=f.get_full_name(), recursive=False)
+        tar.close()
 
 class BibDoc(object):
     """
@@ -2801,12 +2836,26 @@ class BibDoc(object):
                 cur_doc = BibDoc.create_instance(docid=docid, human_readable=self.human_readable)
                 self.related_files[doctype].append(cur_doc)
 
-    def get_total_size_latest_version(self):
+    def get_total_size_latest_version(self, user_info=None, subformat=None):
         """Return the total size used on disk of all the files belonging
-        to this bibdoc and corresponding to the latest version."""
+        to this bibdoc and corresponding to the latest version. Restricted
+        files are not counted.
+        @param user_info: the user_info dictionary, used to check restrictions
+        @type: dict
+        @param subformat: if subformat is specified, it limits files
+            only to those from that specific subformat
+        @type subformat: string
+        """
         ret = 0
+        all_files = False
+        # If we are calling this function without user_info, then we want to
+        # see all the files
+        if not user_info:
+            all_files = True
         for bibdocfile in self.list_latest_files():
-            ret += bibdocfile.get_size()
+            if (all_files or bibdocfile.is_restricted(user_info)[0] == 0) and \
+               (subformat is None or bibdocfile.get_subformat() == subformat):
+                ret += bibdocfile.get_size()
         return ret
 
     def get_total_size(self):

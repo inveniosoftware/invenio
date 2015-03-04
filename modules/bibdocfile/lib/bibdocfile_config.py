@@ -69,3 +69,12 @@ CFG_BIBDOCFILE_ICON_SUBFORMAT_RE = re.compile(r"icon.*")
 # CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT -- this is the default subformat used
 # when creating new icons.
 CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT = "icon"
+
+# CFG_BIBDOCFILE_SUBFORMATS_TRANSLATIONS -- a list (not dictionary, because
+# we want to preserve the order) that connects the different format sizes
+# (like 'small', 'medium', etc.) with internal format sizes (like 'icon-180', 'icon-640', etc.)
+CFG_BIBDOCFILE_SUBFORMATS_TRANSLATIONS = [
+    ('small', 'icon-180'),
+    ('medium', 'icon-640'),
+    ('large', 'icon-1440'),
+    ('original', '')]
