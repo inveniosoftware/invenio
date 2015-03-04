@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "less": "1.7.5",
+    "clean-css": "~2.2",
+    "requirejs": "*",
+    "uglify-js": "*"
+  }
+}
