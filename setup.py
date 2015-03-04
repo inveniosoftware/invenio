@@ -228,13 +228,13 @@ packages = find_packages(exclude=['docs'])
 packages.append('invenio_docs')
 
 setup(
-    name='Invenio',
+    name='invenio',
     version=version,
     url='https://github.com/inveniosoftware/invenio',
     license='GPLv2',
     author='CERN',
     author_email='info@invenio-software.org',
-    description='Digital library software',
+    description='Invenio digital library framework',
     long_description=__doc__,
     packages=packages,
     package_dir={'invenio_docs': 'docs'},
@@ -304,7 +304,8 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GPLv2 License',
+        'License :: OSI Approved :: GNU General Public License v2'
+        ' or later (GPLv2+)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
