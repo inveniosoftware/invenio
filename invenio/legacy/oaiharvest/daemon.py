@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -291,21 +291,19 @@ def get_repository_names(repositories):
 
 
 def get_identifier_names(identifier):
-    """ Return processed identifier list."""
+    """Return list of identifiers from a comma-separated string."""
     if identifier:
         # Let's see if the user had a comma-separated list of OAI ids.
         stripped_idents = []
         for ident in identifier.split(","):
+            ident = ident.strip()
             if not ident.startswith("oai:arXiv.org"):
                 if "oai:arxiv.org" in ident.lower():
                     ident = ident.replace("oai:arxiv.org", "oai:arXiv.org")
                 elif "arXiv" in ident:
                     # New style arXiv ID
                     ident = ident.replace("arXiv", "oai:arXiv.org")
-                elif "/" in ident:
-                    # Old style arXiv ID?
-                    ident = "%s%s" % ("oai:arXiv.org:", ident)
-            stripped_idents.append(ident.strip())
+            stripped_idents.append(ident)
         return stripped_idents
 
 

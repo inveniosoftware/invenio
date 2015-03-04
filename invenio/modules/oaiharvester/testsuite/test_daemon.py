@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,11 +19,7 @@
 
 """Unit tests for the OAI harvester."""
 
-from invenio.testutils import (
-    InvenioTestCase,
-    make_test_suite,
-    run_test_suite,
-)
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class TestOAIUtils(InvenioTestCase):
@@ -32,7 +28,7 @@ class TestOAIUtils(InvenioTestCase):
 
     def test_identifier_filter(self):
         """oaiharvest - testing identifier filter."""
-        from invenio.oai_harvest_daemon import get_identifier_names
+        from invenio.legacy.oaiharvest.daemon import get_identifier_names
         self.assertEqual(get_identifier_names("oai:mysite.com:1234"),
                          ["oai:mysite.com:1234"])
         self.assertEqual(get_identifier_names("oai:mysite.com:1234, oai:example.com:2134"),
@@ -42,7 +38,7 @@ class TestOAIUtils(InvenioTestCase):
 
     def test_identifier_filter_special_arXiv(self):
         """oaiharvest - testing identifier filter for arXiv."""
-        from invenio.oai_harvest_daemon import get_identifier_names
+        from invenio.legacy.oaiharvest.daemon import get_identifier_names
         self.assertEqual(get_identifier_names("oai:arxiv.org:1234.1245"),
                          ["oai:arXiv.org:1234.1245"])
         self.assertEqual(get_identifier_names("oai:arXiv.org:1234.1245, arXiv:1234.1245"),
