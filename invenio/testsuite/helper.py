@@ -31,14 +31,12 @@ import time
 import unittest
 import cgi
 import subprocess
-import difflib
 
 from warnings import warn
 from functools import wraps
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
 from itertools import chain, repeat
-from xml.dom.minidom import parseString
 
 try:
     from selenium import webdriver
@@ -992,20 +990,6 @@ class InvenioWebTestCaseException(Exception):
     def __str__(self):
         """String representation."""
         return repr(self.message)
-
-
-class InvenioXmlTestCase(InvenioTestCase):
-    def assertXmlEqual(self, got, want):
-        xml_lines = parseString(got).toprettyxml(encoding='utf-8').split('\n')
-        xml = '\n'.join(line for line in xml_lines if line.strip())
-        xml2_lines = parseString(want).toprettyxml(encoding='utf-8').split('\n')
-        xml2 = '\n'.join(line for line in xml2_lines if line.strip())
-        try:
-            self.assertEqual(xml, xml2)
-        except AssertionError:
-            for line in difflib.unified_diff(xml.split('\n'), xml2.split('\n')):
-                print line.strip('\n')
-            raise
 
 
 def failfast(method):

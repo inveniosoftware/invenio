@@ -70,7 +70,10 @@ def run(command_line, manager_run, capture_stderr=False):
     if capture_stderr:
         sys.stderr = StringIO.StringIO()
 
-    sys.argv = command_line.split()
+    if isinstance(command_line, list):
+        sys.argv = command_line
+    else:
+        sys.argv = command_line.split()
     exit_code = None
     try:
         manager_run()

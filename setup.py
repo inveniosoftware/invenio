@@ -271,6 +271,7 @@ setup(
             'bibtasklet = invenio.legacy.bibsched.scripts.bibtasklet:main',
             'bibtex = invenio.modules.sequencegenerator.scripts.bibtex:main',
             'bibupload = invenio.legacy.bibupload.scripts.bibupload:main',
+            'convert_journals = invenio.legacy.docextract.scripts.convert_journals:main',
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
             'docextract = invenio.legacy.docextract.scripts.docextract:main',

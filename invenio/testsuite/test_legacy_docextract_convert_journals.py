@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,21 +22,22 @@ import os
 import subprocess
 from tempfile import NamedTemporaryFile, mkstemp
 
-from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.legacy.docextract.record import BibRecord
-from invenio.refextract_kbs import get_kbs
-from invenio.config import CFG_BINDIR, CFG_TMPDIR
 from invenio.testsuite import InvenioXmlTestCase
-from invenio.docextract_convert_journals import USAGE_MESSAGE, convert_journals
+from invenio.testsuite import make_test_suite, run_test_suite
+from invenio.testsuite.test_manage import run
 
 
 class ConverterTests(InvenioXmlTestCase):
+
     def setUp(self):
+        from invenio.legacy.refextract.kbs import get_kbs
         kb = [("TEST JOURNAL NAME", "Converted")]
         kbs_files = {'journals': kb}
         self.kb = get_kbs(custom_kbs_files=kbs_files)['journals']
 
     def test_simple(self):
+        from invenio.legacy.docextract.record import BibRecord
+        from invenio.legacy.docextract.convert_journals import convert_journals
         record = BibRecord()
         record.add_subfield('100__a', 'Test Journal Name')
         record.add_subfield('773__p', 'Test Journal Name')
@@ -52,17 +53,17 @@ class ConverterTests(InvenioXmlTestCase):
 
 
 class ScriptTests(InvenioXmlTestCase):
-    def setUp(self):
-        self.bin_path = os.path.join(CFG_BINDIR, 'convert_journals')
 
     def test_usage(self):
-        process = subprocess.Popen([self.bin_path, '-h'],
-                                   stderr=subprocess.PIPE,
-                                   stdout=subprocess.PIPE)
-        process.wait()
-        self.assert_(USAGE_MESSAGE in process.stderr.read())
+        from invenio.legacy.docextract.convert_journals import USAGE_MESSAGE
+        from invenio.legacy.docextract.scripts.convert_journals import main
+
+        out = run(["convert_journals", "-h"], main, capture_stderr=True)[0]
+        self.assert_(USAGE_MESSAGE in out)
 
     def test_main(self):
+        from invenio.config import CFG_TMPDIR
+        from invenio.legacy.docextract.scripts.convert_journals import main
         xml = """<record>
             <datafield tag="999" ind1="C" ind2="5">
                 <subfield code="s">Test Journal Name,100,10</subfield>
@@ -80,13 +81,9 @@ class ScriptTests(InvenioXmlTestCase):
         dest_temp_fd, dest_temp_path = mkstemp(dir=CFG_TMPDIR)
         try:
             os.close(dest_temp_fd)
-
-            process = subprocess.Popen([self.bin_path, xml_temp_file.name,
-                                       '--kb', kb_temp_file.name,
-                                       '-o', dest_temp_path],
-                                       stderr=subprocess.PIPE,
-                                       stdout=subprocess.PIPE)
-            process.wait()
+            run(['convert_journals', xml_temp_file.name,
+                 '--kb', kb_temp_file.name,
+                 '-o', dest_temp_path], main)
 
             transformed_xml = open(dest_temp_path).read()
             self.assertXmlEqual(transformed_xml, """<?xml version="1.0" encoding="UTF-8"?>

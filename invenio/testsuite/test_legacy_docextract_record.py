@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,15 +17,17 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.legacy.docextract.record import (BibRecord,
-                                       get_record,
-                                       create_record,
-                                       create_records,
-                                       BibRecordSubField,
-                                       BibRecordField,
-                                       BibRecordControlField)
+from invenio.base.wrappers import lazy_import
 from invenio.testsuite import InvenioXmlTestCase
 from invenio.testsuite import make_test_suite, run_test_suite
+
+BibRecord = lazy_import('invenio.legacy.docextract.record:BibRecord')
+BibRecordControlField = lazy_import('invenio.legacy.docextract.record:'
+                                    'BibRecordControlField')
+BibRecordField = lazy_import('invenio.legacy.docextract.record:BibRecordField')
+BibRecordSubField = lazy_import('invenio.legacy.docextract.record:'
+                                'BibRecordSubField')
+create_record = lazy_import('invenio.legacy.docextract.record:create_record')
 
 
 class BibRecordTest(InvenioXmlTestCase):
