@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import invenio.bibrankadminlib as brc
+import invenio.legacy.bibrank.adminlib as brc
 #reload(brc)
 from invenio.legacy.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
