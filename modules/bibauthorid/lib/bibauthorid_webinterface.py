@@ -1037,7 +1037,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 bibrefrecs = argd['selection']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without any bibrefrec")
+                                        "Fatal: cannot create ticket without any papers selected. " + \
+                                        "Please go back and select which papers would you like to claim.")
             if argd['pid'] > -1:
                 pid = argd['pid']
             else:
@@ -1072,7 +1073,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 bibrefrecs = argd['selection']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without any bibrefrec")
+                                        "Fatal: cannot create ticket without any papers selected. " + \
+                                        "Please go back and select which papers would you like to claim.")
 
             return self._ticket_open_assign_to_other_person(req, bibrefrecs, form)
 
