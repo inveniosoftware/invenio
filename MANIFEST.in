@@ -3,12 +3,16 @@ include *.py
 include *.rst
 include *.txt
 include *.yml
+include .bowerrc
+include .dockerignore
+include ABOUT-NLS
 include AUTHORS
 include COPYING
 include ChangeLog
 include Dockerfile
 include NEWS
 include Procfile*
+include RELEASE-NOTES
 include THANKS
 include TODO
 include UNINSTALL
@@ -22,14 +26,28 @@ recursive-exclude docs/_build *
 recursive-include invenio *.bfo
 recursive-include invenio *.bft
 recursive-include invenio *.cfg
+recursive-include invenio *.dat
+recursive-include invenio *.dia
+recursive-include invenio *.dtd
+recursive-include invenio *.edited
 recursive-include invenio *.html
+recursive-include invenio *.in
+recursive-include invenio *.java
+recursive-include invenio *.jpeg
 recursive-include invenio *.js
-recursive-include invenio *.kb
 recursive-include invenio *.json
+recursive-include invenio *.kb
+recursive-include invenio *.lisp
+recursive-include invenio *.lua
+recursive-include invenio *.png
+recursive-include invenio *.ps
 recursive-include invenio *.py
+recursive-include invenio *.sql
+recursive-include invenio *.tex
 recursive-include invenio *.txt
 recursive-include invenio *.wsgi
 recursive-include invenio *.xml
+recursive-include invenio *.xsd
 recursive-include invenio *.xsl
 recursive-include invenio *.yml
 
@@ -38,6 +56,7 @@ recursive-include invenio/base/templates *
 recursive-include invenio/base/translations *.mo *.po *.pot
 
 recursive-include invenio/legacy *.webdoc
+recursive-include invenio/legacy/miscutil/solrutils *.java
 
 recursive-include invenio/modules/*/static *
 recursive-include invenio/modules/*/templates *
