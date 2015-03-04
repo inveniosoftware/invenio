@@ -1,8 +1,7 @@
-#!@PYTHON@
-# -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,12 +20,10 @@
 """
 """
 
-from invenio.legacy.bibcatalog.task import main as daemon_main
+from invenio.base.factory import with_app_context
 
 
-if __name__ == '__main__':
-    try:
-        daemon_main()
-    except KeyboardInterrupt:
-        # Exit cleanly
-        print 'Interrupted'
+@with_app_context()
+def main():
+    from invenio.legacy.bibcatalog.task import main as daemon_main
+    return daemon_main()
