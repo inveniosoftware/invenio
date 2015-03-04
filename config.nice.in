@@ -1,9 +1,0 @@
-#!/bin/sh
-# Automatically created during the building process.  Do not edit.
-./configure --prefix=@prefix@ \
-            --with-python=@PYTHON@ \
-            --with-mysql=@MYSQL@ \
-            --with-clisp=@CLISP@ \
-            --with-cmucl=@CMUCL@ \
-            --with-sbcl=@SBCL@ \
-            --with-openoffice-python=@OPENOFFICE_PYTHON@
