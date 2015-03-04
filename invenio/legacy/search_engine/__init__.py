@@ -50,7 +50,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from six import iteritems, string_types
+from six import iteritems, string_types, text_type
 
 ## import Invenio stuff:
 from invenio.base.globals import cfg
@@ -97,6 +97,7 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
+     CFG_WEBSEARCH_PUBLIC_RECORD_EXTRA_CHECK, \
      CFG_XAPIAN_ENABLED
 
 try:
@@ -137,7 +138,9 @@ from invenio.legacy.websearch_external_collections import print_external_results
 from invenio.modules.access.control import acc_get_action_id
 from invenio.modules.access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
-    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS, \
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS, \
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from intbitset import intbitset
 from invenio.legacy.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
@@ -312,10 +315,54 @@ def get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True):
         collection_reclist_cache.recreate_cache_if_needed()
     return [collection for collection in restricted_collection_cache.cache if recid in get_collection_reclist(collection, recreate_cache_if_needed=False)]
 
+
+def check_email_or_group(user_info, email_or_group):
+    """Check user email or group matches."""
+    if email_or_group in user_info['group']:
+        return True
+    email = email_or_group.strip().lower()
+    if user_info['email'].strip().lower() == email:
+        return True
+    if CFG_CERN_SITE:
+        #  the egroup might be in the form egroup@cern.ch
+        if email_or_group.replace('@cern.ch', ' [CERN]') in user_info['group']:
+            return True
+
+
+def check_uid(user_info, uid):
+    """Check user id matches."""
+    return text_type(user_info['id']) == uid
+
+
+def check_authorized_tags(recid, tags, test_func):
+    """Check if tags in record matches a given test."""
+    authorized_values = []
+    for tag in tags:
+        authorized_values.extend(get_fieldvalues(recid, tag))
+
+    for value in authorized_values:
+        if test_func(value):
+            return True
+    return False
+
+
+def is_user_in_tags(recid, user_info, user_id_tags, email_or_group_tags):
+    """Check if user id or email is found in a records tags."""
+    if check_authorized_tags(recid, user_id_tags,
+                             lambda uid: check_uid(user_info, uid)):
+        return True
+
+    return check_authorized_tags(
+        recid, email_or_group_tags,
+        lambda val: check_email_or_group(user_info, val)
+    )
+
+
 def is_user_owner_of_record(user_info, recid):
-    """
-    Check if the user is owner of the record, i.e. he is the submitter
-    and/or belongs to a owner-like group authorized to 'see' the record.
+    """Check if the user is owner of the record.
+
+    I.e. she/he is the submitter and/or belongs to a owner-like group
+    authorized to 'see' the record.
 
     @param user_info: the user_info dictionary that describe the user.
     @type user_info: user_info dictionary
@@ -324,26 +371,21 @@ def is_user_owner_of_record(user_info, recid):
     @return: True if the user is 'owner' of the record; False otherwise
     @rtype: bool
     """
-    authorized_emails_or_group = []
-    for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
-        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
-    for email_or_group in authorized_emails_or_group:
-        if email_or_group in user_info['group']:
-            return True
-        email = email_or_group.strip().lower()
-        if user_info['email'].strip().lower() == email:
-            return True
-        if CFG_CERN_SITE:
-            #the egroup might be in the form egroup@cern.ch
-            if email_or_group.replace('@cern.ch', ' [CERN]') in user_info['group']:
-                return True
-    return False
 
-###FIXME: This method needs to be refactorized
+    uid_tags = cfg.get('CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS',
+                   CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS)
+
+    email_tags = cfg.get('CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS',
+                   CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS)
+
+    return is_user_in_tags(recid, user_info, uid_tags, email_tags)
+
+
+###FIXME: This method needs to be refactored
 def is_user_viewer_of_record(user_info, recid):
-    """
-    Check if the user is allow to view the record based in the marc tags
-    inside CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
+    """Check if the user is allow to view the record based in the marc tags.
+
+    Checks inside CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
     i.e. his email is inside the 506__m tag or he is inside an e-group listed
     in the 506__m tag
 
@@ -354,17 +396,14 @@ def is_user_viewer_of_record(user_info, recid):
     @return: True if the user is 'allow to view' the record; False otherwise
     @rtype: bool
     """
+    uid_tags = cfg.get('CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS',
+                       CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS)
 
-    authorized_emails_or_group = []
-    for tag in CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS:
-        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
-    for email_or_group in authorized_emails_or_group:
-        if email_or_group in user_info['group']:
-            return True
-        email = email_or_group.strip().lower()
-        if user_info['email'].strip().lower() == email:
-            return True
-    return False
+    email_tags = cfg.get('CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS',
+                         CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS)
+
+    return is_user_in_tags(recid, user_info, uid_tags, email_tags)
+
 
 def check_user_can_view_record(user_info, recid):
     """
@@ -394,7 +433,7 @@ def check_user_can_view_record(user_info, recid):
         ## Perfect! It's authorized then!
         return (0, '')
 
-    restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
+    restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True)
     if not restricted_collections and record_public_p(recid):
         ## The record is public and not part of any restricted collection
         return (0, '')
@@ -3958,7 +3997,18 @@ def record_public_p(recID, recreate_cache_if_needed=True):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
        Return 0 otherwise.
     """
-    return recID in get_collection_reclist(CFG_SITE_NAME, recreate_cache_if_needed=recreate_cache_if_needed)
+    if recID in get_collection_reclist(CFG_SITE_NAME, recreate_cache_if_needed=recreate_cache_if_needed):
+        return True
+
+    if cfg.get('CFG_WEBSEARCH_PUBLIC_RECORD_EXTRA_CHECK', False):
+        # Perhaps webcoll didn't run yet.
+        from invenio.modules.search.models import Collection
+        root = Collection.query.filter_by(id=1).one()
+        if root.dbquery:
+            return recID in search_pattern_parenthesised(
+                None, root.dbquery + ' -980__:"DELETED"', ap=-9
+                ) #ap=-9 allow queries containing hidden tags
+    return False
 
 def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."

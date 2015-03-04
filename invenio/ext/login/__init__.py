@@ -151,11 +151,11 @@ def setup_app(app):
         if not urllib.unquote(secure_url).startswith(request.base_url):
             return redirect(secure_url)
         if current_user.is_guest:
-            flash(g._("Please sign in to continue."), 'info')
+            if not session.get('_flashes'):
+                flash(g._("Please sign in to continue."), 'info')
             from invenio.modules.accounts.views.accounts import login
             return login(referer=request.url), 401
         else:
-            flash(g._("Authorization failure."), 'danger')
             from flask import render_template
             return render_template("401.html"), 401
 
