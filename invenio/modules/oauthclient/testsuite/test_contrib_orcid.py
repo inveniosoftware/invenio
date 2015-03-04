@@ -58,7 +58,11 @@ class OrcidTestCase(OAuth2ClientTestCase):
             WTF_CSRF_ENABLED=False,
             OAUTHCLIENT_STATE_ENABLED=False,
             CACHE_TYPE='simple',
-            OAUTHCLIENT_REMOTE_APPS=dict(orcid=REMOTE_APP)
+            OAUTHCLIENT_REMOTE_APPS=dict(orcid=REMOTE_APP),
+            ORCID_APP_CREDENTIALS=dict(
+                consumer_key='changeme',
+                consumer_secret='changeme',
+            ),
         ))
         return app
 
