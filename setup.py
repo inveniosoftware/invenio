@@ -156,7 +156,6 @@ extras_require = {
     "misc": [  # was requirements-extras
         "gnuplot-py==1.8",
         "flake8",  # extra=kwalitee?
-        "pep8",  # extra=kwalitee?
         "pychecker==0.8.19",  # extra=kwalitee?
         "pylint",  # extra=kwalitee?
         "nosexcover",  # test?

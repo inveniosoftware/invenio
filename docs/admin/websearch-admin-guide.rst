@@ -228,16 +228,6 @@ In order to restrict access to a collection you just have to create at
 least an authorization for the action ``viewrestrcoll`` specifying the
 name of the collection as the parameter
 
-If you have just upgraded your installation from *CDS Invenio-0.92.1*
-you probably have run ``collection_restrictions_migration_kit.py`` tool
-in order to migrate to the new framework. For every Apache Group with
-access to a restricted collection a *role* will be created, with proper
-authorization to access the restricted collections. Each role will have
-a *FireRole* definition that specifies to allow for the given Apache
-group. Trough the WebAccess admin interface you will then be able to
-change these definition in order to softly migrate your restriction to
-whatever is your need.
-
 3.3 Modify translations
 ~~~~~~~~~~~~~~~~~~~~~~~
 
