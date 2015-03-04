@@ -23,7 +23,7 @@ BibCheck API
 This API lets other modules interact with bibcheck.
 """
 
-from invenio import bibcheck_task
+from invenio.legacy.bibcheck import task as bibcheck_task
 
 def check_record(record, enabled_rules=None):
     """

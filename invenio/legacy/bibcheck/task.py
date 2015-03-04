@@ -57,7 +57,6 @@ from invenio.legacy.search_engine import \
     search_pattern
 from invenio.legacy.bibedit.utils import get_bibrecord
 from invenio.legacy.bibrecord import record_xml_output, record_add_field
-from invenio.pluginutils import PluginContainer
 from intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
@@ -512,6 +511,7 @@ def load_plugins():
     plugin_dir = os.path.join(CFG_PYLIBDIR, "invenio/bibcheck_plugins/*.py")
 
     # Load plugins
+    from invenio.pluginutils import PluginContainer
     plugins = PluginContainer(plugin_dir,
                               plugin_builder=_bibcheck_plugin_builder)
 
