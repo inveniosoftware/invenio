@@ -85,7 +85,7 @@ def init(user='root', password='', yes_i_know=False):
             # Create user and grant access to database.
             (cmd_prefix + '-e "GRANT ALL PRIVILEGES ON '
              '{CFG_DATABASE_NAME}.* TO {CFG_DATABASE_USER}@localhost '
-             'IDENTIFIED BY {CFG_DATABASE_PASS}"'),
+             'IDENTIFIED BY \'{CFG_DATABASE_PASS}\'"'),
             cmd_admin_prefix + 'flush-privileges'
         ]
         for cmd in cmds:
