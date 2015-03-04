@@ -20,63 +20,19 @@
 """JSONAlchemy wrappers."""
 
 import copy
-import six
 
-from flask import current_app
-from werkzeug.utils import import_string
+from invenio.modules.relationships.api import Node
 
-from invenio.utils.memoise import memoize
 from invenio.utils.datastructures import DotableDict, SmartDict
+
+import six
 
 from .parser import FieldParser, ModelParser
 from .reader import Reader
 from .registry import contexts, producers
 
 
-class StorageEngine(type):
-
-    """Storage metaclass for parsing application config."""
-
-    __storage_engine_registry__ = []
-
-    def __init__(cls, name, bases, dct):
-        """Register cls to type registry."""
-        if hasattr(cls, '__storagename__'):
-            cls.__storage_engine_registry__.append(cls)
-        super(StorageEngine, cls).__init__(name, bases, dct)
-
-    @property
-    def storage_engine(cls):
-        """Return an instance of storage engine defined in application config.
-
-        It looks for key "ENGINE' prefixed by ``__storagename__.upper()`` for
-        example::
-
-            class Dummy(SmartJson):
-                __storagename__ = 'dummy'
-
-        will look for key "DUMMY_ENGINE" and
-        "DUMMY_`DUMMY_ENGINE.__name__.upper()`" should contain dictionary with
-        keyword arguments of the engine defined in "DUMMY_ENGINE".
-        """
-        storagename = cls.__storagename__.lower()
-        return cls._engine(storagename)
-
-    @staticmethod
-    @memoize
-    def _engine(storagename):
-        prefix = storagename.upper()
-        engine = current_app.config['{0}_ENGINE'.format(prefix)]
-        if isinstance(engine, six.string_types):
-            engine = import_string(engine)
-
-        key = engine.__name__.upper()
-        kwargs = current_app.config.get('{0}_{1}'.format(prefix, key), {})
-        return engine(**kwargs)
-
-
-@six.add_metaclass(StorageEngine)
-class SmartJson(SmartDict):
+class SmartJson(SmartDict, Node):
 
     """Base class for Json structures."""
 
@@ -142,6 +98,9 @@ class SmartJson(SmartDict):
 
         if set_default_values:
             self.set_default_values()
+
+        if '_id' in self._dict:
+            super(Node, self).__init__(self['_id'], self.__storagename__)
 
     @property
     def additional_info(self):

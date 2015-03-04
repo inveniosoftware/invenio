@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ class Record(SmartJson):
         if not json or '__meta_metadata__' not in json:
             kwargs['namespace'] = kwargs.get('namespace', 'recordext')
             kwargs['master_format'] = kwargs.get('master_format', 'json')
-        super(Record, self).__init__(json, **kwargs)
+        SmartJson.__init__(self, json, **kwargs)
         self.get_blob = lambda: self.blob
 
     @classmethod
@@ -92,9 +92,14 @@ class Record(SmartJson):
         return record
 
     @classmethod
+    def get_entity(cls, id):
+        """Get the record. Implements ``Node`` interface function."""
+        return cls.get_record(id)
+
+    @classmethod
     def get_blob(cls, recid):
         """Get the blob from where the record was created."""
-        #FIXME: start using bibarchive or bibingest for this
+        # FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
         try:
