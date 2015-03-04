@@ -268,6 +268,7 @@ setup(
             'bibstat = invenio.legacy.bibindex.scripts.bibstat:main',
             'bibtaskex = invenio.legacy.bibsched.scripts.bibtaskex:main',
             'bibtasklet = invenio.legacy.bibsched.scripts.bibtasklet:main',
+            'bibtex = invenio.modules.sequencegenerator.scripts.bibtex:main',
             'bibupload = invenio.legacy.bibupload.scripts.bibupload:main',
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',

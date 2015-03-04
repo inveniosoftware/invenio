@@ -20,7 +20,7 @@
 """ Bibcheck plugin to add tex keys """
 
 from invenio.legacy.bibrecord import record_add_field
-from invenio.sequtils_texkey import TexkeySeq, TexkeyNoAuthorError
+from invenio.modules.sequencegenerator.texkey import TexkeySeq, TexkeyNoAuthorError
 
 def check_record(record, texkey_field="035__a", extra_subfields=()):
     """

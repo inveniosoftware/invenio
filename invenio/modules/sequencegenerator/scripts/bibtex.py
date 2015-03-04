@@ -1,8 +1,7 @@
-#!@PYTHON@
-# -*- mode: python; coding: utf-8; -*-
+# -*- python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,11 +21,10 @@
 Texkey: Look for records without a texkey and generate one
 """
 
-try:
-    from invenio.sequtils_texkey import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-main()
+
+@with_app_context()
+def main():
+    from invenio.modules.sequencegenerator.texkey import main as texkey_main
+    return texkey_main()
