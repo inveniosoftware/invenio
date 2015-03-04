@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ def do_upgrade():
     column_exists = run_sql("SHOW COLUMNS FROM `aidPERSONIDDATA` LIKE 'datablob'")
     if not column_exists:
         run_sql("""ALTER TABLE aidPERSONIDDATA
-                   ADD COLUMN datablob LONGBLOB NULL DEFAULT NULL""")
+                   ADD COLUMN datablob LONGBLOB NULL DEFAULT NULL AFTER data;""")
 
     run_sql("""ALTER TABLE aidPERSONIDDATA MODIFY data VARCHAR( 256 ) NULL DEFAULT NULL""")
 

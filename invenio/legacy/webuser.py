@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015  CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -62,7 +62,6 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
-     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
@@ -220,17 +219,12 @@ def getUid(req):
     uid = session.uid
     if not session.need_https:
         if uid == -1: # first time, so create a guest user
-            if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                uid = session['uid'] = createGuestUser()
+            if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+                session['uid'] = 0
                 session.set_remember_me(False)
-                guest = 1
+                return 0
             else:
-                if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-                    session['uid'] = 0
-                    session.set_remember_me(False)
-                    return 0
-                else:
-                    return -1
+                return -1
         else:
             if not hasattr(req, '_user_info') and 'user_info' in session:
                 req._user_info = session['user_info']

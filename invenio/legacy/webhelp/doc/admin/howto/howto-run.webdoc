@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -272,20 +272,6 @@ The rebalancing might be run weekly or even daily.
 <p>The tool <code>inveniogc</code> provides a garbage collector for
 the database, temporary files, and the like.</p>
 
-<p>If you choose to differentiate between guest users
-(see <code>CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS</code>
-in <code>invenio.conf</code>), then guest users can create a lot of
-entries in Invenio tables that are related to their web sessions,
-their search history, personal baskets, etc.  This data has to be
-garbage-collected periodically.  You can run this, say every Sunday
-between 01:00 and 05:00, via:
-
-<blockquote>
-<pre>
-$ inveniogc -s 7d -L 'Sunday 01:00-05:00'
-</pre>
-</blockquote>
-</p>
 
 <p>Different temporary log and err files are created
 in <code>/opt/invenio/var/log</code>

@@ -135,21 +135,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
     def _create_guest(self):
         data = {'settings': {}}
-
-        if current_app.config.get(
-                'CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS', False):
-            from invenio.ext.sqlalchemy import db
-            from invenio.modules.accounts.models import User
-            note = '1' if current_app.config.get(
-                'CFG_ACCESS_CONTROL_LEVEL_GUESTS', 0) == 0 else '0'
-            u = User(email='', note=note, password='guest')
-            db.session.add(u)
-            db.session.commit()
-            data.update(u.__dict__)
-        else:
-            # Minimal information about user.
-            data['id'] = data['uid'] = 0
-
+        # Minimal information about user.
+        data['id'] = data['uid'] = 0
         return data
 
     def _login(self, uid, force=False):

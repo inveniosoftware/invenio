@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio
+# This file is part of Invenio.
 # Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
@@ -10,30 +10,30 @@
 #
 # Invenio is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation,
-# Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-"""Upgrade for 'format'."""
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.legacy.dbquery import run_sql
 
-depends_on = ['invenio_release_1_1_0']
+depends_on = ['invenio_2014_08_13_tag_recjsonvalue']
 
 
 def info():
-    """Upgrader info."""
-    return "Larger values allowed for format.code."
+    """Upgrade recipe information."""
+    return "tag.recjson_value NOT NULL"
 
 
 def do_upgrade():
-    """Perform upgrade."""
-    run_sql("ALTER TABLE format MODIFY COLUMN code varchar(20) NOT NULL;")
+    """Upgrade recipe procedure."""
+    run_sql("UPDATE tag SET recjson_value='' WHERE recjson_value IS NULL")
+    run_sql("""ALTER TABLE tag CHANGE COLUMN recjson_value
+               recjson_value text NOT NULL""")
 
 
 def estimate():
-    """  Estimate running time of upgrade in seconds (optional). """
+    """Upgrade recipe time estimate."""
     return 1
