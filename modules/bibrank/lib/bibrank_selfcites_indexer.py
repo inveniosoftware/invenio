@@ -102,11 +102,21 @@ def get_authors_from_record(recID, tags,
     if use_bibauthorid:
         authors = get_personids_from_record(recID)
     else:
-        authors_list = chain(
-             get_fieldvalues(recID, tags['first_author']),
-             get_fieldvalues(recID, tags['additional_author']),
-             get_fieldvalues(recID, tags['alternative_author_name']))
-        authors = set(hash(author) for author in list(authors_list)[:21])
+        def get_id(table, author):
+            """Get id from bibxxx tables"""
+            return run_sql("SELECT id FROM bib%s WHERE value = %%s" % table,
+                           (author, ))
+
+        authors = set()
+        def add_ids(table, authors_list):
+            for author in authors_list:
+                if len(authors) == 21:
+                    break
+                authors.add(get_id(table, author))
+
+        add_ids('10x', get_fieldvalues(recID, tags['first_author']))
+        add_ids('70x', get_fieldvalues(recID, tags['additional_author']))
+        add_ids('72x', get_fieldvalues(recID, tags['alternative_author_name']))
 
     return authors
 
