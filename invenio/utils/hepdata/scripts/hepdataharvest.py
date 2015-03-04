@@ -1,8 +1,7 @@
-#!@PYTHON@
-# -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,11 +22,10 @@ HepDataHarvest: Retrieve all the content of HEPData and injest it into
 		the Invenio repository
 """
 
-try:
-    from invenio.utils.hepdata import hepdata_harvest_main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-hepdata_harvest_main()
+
+@with_app_context()
+def main():
+    from invenio.utils.hepdata.api import hepdata_harvest_main
+    return hepdata_harvest_main()

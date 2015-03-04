@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,10 +23,12 @@ __revision__ = "$Id$"
 import os
 import cPickle
 
+from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.utils import hepdata as hepdatautils
-from invenio.utils.hepdata import Dataset
-from invenio.legacy import bibrecord
+
+hepdatautils = lazy_import('invenio.utils.hepdata.api')
+Dataset = lazy_import('invenio.utils.hepdata.api:Dataset')
+bibrecord = lazy_import('invenio.legacy.bibrecord')
 
 
 class TestParsingSystematics(InvenioTestCase):
@@ -253,7 +255,7 @@ class TestDatasetPaperLogic(InvenioTestCase):
         ... this might be the case for example with
         http://hepdata.cedar.ac.uk/view/ins215359"""
         # Trying to generate columns on an empty dataset
-        dataset = cPickle.loads("ccopy_reg\n_reconstructor\np1\n(cinvenio.hepdatautils\nDataset\np2\nc__builtin__\nobject\np3\nNtRp4\n(dp5\nS'name'\np6\nS'Table 7'\np7\nsS'column_titles'\np8\n(lp9\nsS'additional_files'\np10\n(lp11\n(lp12\nS'ins1720/d7/plain.txt'\np13\naS'plain text'\np14\naa(lp15\nS'ins1720/d7/aida'\np16\naS'AIDA'\np17\naa(lp18\nS'ins1720/d7/pyroot.py'\np19\naS'PYROOT'\np20\naa(lp21\nS'ins1720/d7/yoda'\np22\naS'YODA'\np23\naa(lp24\nS'ins1720/d7/root'\np25\naS'ROOT'\np26\naa(lp27\nS'ins1720/d7/mpl'\np28\naS'mpl'\np29\naa(lp30\nS'ins1720/d7/jhepwork.py'\np31\naS'jhepwork'\np32\naasS'comments'\np33\nS'<br >Location: F 20<br >Additional systematic error: (RES-DEF(RES=DEL(1232P33)++,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER)//RES-DEF(RES=N(1470P11)+,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER, C=FITTED MASS//RES-DEF(RES=N(1520D13)+,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER, C=FITTED MASS//RES-DEF(RES=N(1688F15)+,BACK=CORRECTED,C=F-WAVE BREIT-WIGNER, C=FITTED MASS)'\np34\nsS'data_qualifiers'\np35\n(lp36\nsS'location'\np37\nS''\nsS'num_columns'\np38\nI2\nsS'position'\np39\nI0\nsS'column_headers'\np40\n(lp41\n(dp42\nS'content'\np43\nS''\nsS'colspan'\np44\nI1\nsa(dp45\ng43\nS'No data is encoded for this table'\np46\nsg44\nI1\nsasS'data'\np47\n(lp48\nsS'additional_data_links'\np49\n(lp50\nsb.")
+        dataset = cPickle.loads("ccopy_reg\n_reconstructor\np1\n(cinvenio.utils.hepdata.api\nDataset\np2\nc__builtin__\nobject\np3\nNtRp4\n(dp5\nS'name'\np6\nS'Table 7'\np7\nsS'column_titles'\np8\n(lp9\nsS'additional_files'\np10\n(lp11\n(lp12\nS'ins1720/d7/plain.txt'\np13\naS'plain text'\np14\naa(lp15\nS'ins1720/d7/aida'\np16\naS'AIDA'\np17\naa(lp18\nS'ins1720/d7/pyroot.py'\np19\naS'PYROOT'\np20\naa(lp21\nS'ins1720/d7/yoda'\np22\naS'YODA'\np23\naa(lp24\nS'ins1720/d7/root'\np25\naS'ROOT'\np26\naa(lp27\nS'ins1720/d7/mpl'\np28\naS'mpl'\np29\naa(lp30\nS'ins1720/d7/jhepwork.py'\np31\naS'jhepwork'\np32\naasS'comments'\np33\nS'<br >Location: F 20<br >Additional systematic error: (RES-DEF(RES=DEL(1232P33)++,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER)//RES-DEF(RES=N(1470P11)+,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER, C=FITTED MASS//RES-DEF(RES=N(1520D13)+,BACK=CORRECTED,C=P-WAVE BREIT-WIGNER, C=FITTED MASS//RES-DEF(RES=N(1688F15)+,BACK=CORRECTED,C=F-WAVE BREIT-WIGNER, C=FITTED MASS)'\np34\nsS'data_qualifiers'\np35\n(lp36\nsS'location'\np37\nS''\nsS'num_columns'\np38\nI2\nsS'position'\np39\nI0\nsS'column_headers'\np40\n(lp41\n(dp42\nS'content'\np43\nS''\nsS'colspan'\np44\nI1\nsa(dp45\ng43\nS'No data is encoded for this table'\np46\nsg44\nI1\nsasS'data'\np47\n(lp48\nsS'additional_data_links'\np49\n(lp50\nsb.")
         dataset.generate_columns()
 
 

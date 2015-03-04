@@ -89,9 +89,6 @@ from invenio.legacy.websearch_external_collections import external_collection_ge
 from invenio.legacy.websearch_external_collections.utils import get_collection_id
 from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.legacy.bibrecord import get_fieldvalues
-from invenio.modules.formatter import format_record
-
-from invenio.utils.hepdata import display as hepdatadisplayutils
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -3988,7 +3985,7 @@ class Template:
     def tmpl_record_hepdata(self, data, recid, isLong=True):
         """ Generate a page for HepData records
         """
-        from invenio.utils import hepdata as hepdatautils
+        from invenio.utils.hepdata import api as hepdatautils
         from invenio.legacy.search_engine import get_fieldvalues
 
         c = []
@@ -4000,7 +3997,7 @@ class Template:
             try:
                 publisher = get_fieldvalues(dataset.recid, '520__9')[0]
             except IndexError:
-                from invenio.utils.hepdata import create_hepdata_ticket
+                from invenio.utils.hepdata.api import create_hepdata_ticket
                 create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
                 continue
             if publisher == "HEPDATA" and flag_hepdata == 0:
@@ -4043,7 +4040,7 @@ class Template:
             try:
                 publisher = get_fieldvalues(dataset.recid, '520__9')[0]
             except IndexError:
-                from invenio.utils.hepdata import create_hepdata_ticket
+                from invenio.utils.hepdata.api import create_hepdata_ticket
                 create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
                 continue
             if publisher == "HEPDATA":
