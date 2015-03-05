@@ -855,3 +855,17 @@ def get_relative_url(url):
         return baseurl[:-1]
     else:
         return baseurl
+
+def url_safe_escape(url):
+    """Escape the url from unsafe characters.
+
+    :param str url: the url to be cleaned
+    :return: the cleaned url
+    :rtype: str
+    """
+    clean_url = url
+    try:
+        clean_url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
+    except:
+        pass
+    return clean_url
