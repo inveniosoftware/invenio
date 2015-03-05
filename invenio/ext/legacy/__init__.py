@@ -56,11 +56,11 @@ def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     cli_cmd_reset_siteadminemail(conf)
     # cli_cmd_reset_fieldnames(conf)
 
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
-                "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 1" % CFG_PREFIX,
-                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
-                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
+    for cmd in ("webaccessadmin -u admin -c -a -D",
+                "webcoll -u admin",
+                "webcoll 1",
+                "bibsort -u admin --load-config",
+                "bibsort 2", ):
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)
             sys.exit(1)
@@ -79,7 +79,7 @@ def setup_app(app):
     app.debug = app.config['DEBUG']
 
     ## Legacy directory that must exist
-    for cfg_dir in ['CFG_BATCHUPLOADER_DAEMON_DIR',
+    for cfg_dir in ('CFG_BATCHUPLOADER_DAEMON_DIR',
                     'CFG_BIBDOCFILE_FILEDIR',
                     'CFG_BIBENCODE_DAEMON_DIR_NEWJOBS',
                     'CFG_BIBENCODE_DAEMON_DIR_OLDJOBS',
@@ -98,7 +98,7 @@ def setup_app(app):
                     'CFG_WEBDIR',
                     'CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR',
                     'CFG_WEBSUBMIT_COUNTERSDIR',
-                    'CFG_WEBSUBMIT_STORAGEDIR']:
+                    'CFG_WEBSUBMIT_STORAGEDIR'):
         path = app.config.get(cfg_dir)
         if path:
             try:
