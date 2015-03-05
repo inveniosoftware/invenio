@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+min_reviewers: 2
+
+components:
+- access
+- accounts
+- admin
+- alerts
+- annotations
+- apikeys
+- archiver
+- arxiv
+- assets
+- authorlist
+- authorprofiles
+- authors
+- babel
+- baskets
+- bulletin
+- cache
+- checker
+- circulation
+- classifier
+- cloudconnector
+- collect
+- comments
+- communities
+- config
+- converter
+- crossref
+- dashboard
+- debug_toolbar
+- deposit
+- documentation
+- documents
+- editor
+- elasticsearch
+- email
+- encoder
+- exporter
+- fixtures
+- formatter
+- fs
+- global
+- gravatar
+- groups
+- i18n
+- indexer
+- installation
+- jasmine
+- jsonalchemy
+- knowledge
+- kwalitee
+- legacy
+- linkbacks
+- logging
+- login
+- matcher
+- menu
+- merger
+- messages
+- mixer
+- multimedia
+- oaiharvester
+- oairepository
+- oauth2server
+- oauthclient
+- pages
+- pdfchecker
+- pidstore
+- previewer
+- principal
+- ranker
+- records
+- redirector
+- refextract
+- registry
+- restful
+- scheduler
+- script
+- search
+- sequencegenerator
+- session
+- sorter
+- sqlalchemy
+- sslify
+- sso
+- statistics
+- submit
+- sword
+- tags
+- template
+- textminer
+- tickets
+- upgrader
+- uploader
+- version
+- webhooks
+- workflows
