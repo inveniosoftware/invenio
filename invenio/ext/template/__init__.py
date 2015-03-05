@@ -170,6 +170,12 @@ def setup_app(app):
         """Return first `limit` number of sentences ending by `separator`."""
         return separator.join(value.split(separator)[:limit])
 
+    @app.template_filter('characters')
+    def _characters(value, limit, extension=' [...]'):
+        """Return first `limit` characters of input, rounded up to nearest space."""
+        nearest_space = value[limit:].find(' ')
+        return value[:limit+nearest_space] + extension
+
     @app.template_filter('path_join')
     def _os_path_join(d):
         """Shortcut for `os.path.join`."""
