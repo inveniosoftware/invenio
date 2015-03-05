@@ -79,10 +79,10 @@ class CitationDictsDataCacher(DataCacher):
 
         def timestamp_verifier():
             citation_lastupdate = get_lastupdated('citation')
-            if citation_lastupdate:
+            try:
                 return citation_lastupdate.strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                return "0000-00-00 00:00:00"
+            except AttributeError:
+                return citation_lastupdate
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
