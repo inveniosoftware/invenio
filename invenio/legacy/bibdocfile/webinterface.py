@@ -233,6 +233,10 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         except InvenioBibDocFileError as msg:
                             register_exception(req=req, alert_admin=True)
 
+            # Prevent leaking of restricted file names
+            from flask import abort
+            abort(apache.HTTP_NOT_FOUND)
+
             if docname and docformat and not warn:
                 req.status = apache.HTTP_NOT_FOUND
                 warn += write_warning(_("Requested file does not seem to exist."))
