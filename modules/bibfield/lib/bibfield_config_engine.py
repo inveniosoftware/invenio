@@ -147,10 +147,12 @@ def _create_field_parser():
     inherit_from = (Suppress("@inherit_from") + \
             originalTextFor(nestedExpr("(", ")")))\
             .setResultsName("inherit_from")
-    override = (Suppress("@") + "override")\
-            .setResultsName("override")
-    extend = (Suppress("@") + "extend")\
-            .setResultsName("extend")
+    override = Suppress("@override") \
+            .setResultsName("override") \
+            .setParseAction(lambda toks: True)
+    extend = Suppress("@extend") \
+            .setResultsName("extend") \
+            .setParseAction(lambda toks: True)
     master_format = (Suppress("@master_format") + \
             originalTextFor(nestedExpr("(", ")")))\
             .setResultsName("master_format") \
@@ -298,9 +300,13 @@ class BibFieldParser(object):
         to fill up config_rules
         """
         parser = _create_field_parser()
-        main_rules = parser \
-                     .parseFile(self.base_dir + '/' + self.main_config_file,
-                                parseAll=True)
+        try:
+            main_rules = parser \
+                .parseFile(self.base_dir + '/' + self.main_config_file,
+                           parseAll=True)
+        except ParseException as e:
+            raise BibFieldParserException(
+                "Cannot parse file '%s',\n%s" % (self.main_config_file, str(e)))
         rules = main_rules.rules
         includes = main_rules.includes
         already_includes = [self.main_config_file]
@@ -310,20 +316,23 @@ class BibFieldParser(object):
             if include[0] in already_includes:
                 continue
             already_includes.append(include[0])
-            if os.path.exists(include[0]):
-                tmp = parser.parseFile(include[0], parseAll=True)
-            else:
-                #CHECK: This will raise an IOError if the file doesn't exist
-                tmp = parser.parseFile(self.base_dir + '/' + include[0],
-                                       parseAll=True)
+            try:
+                if os.path.exists(include[0]):
+                    tmp = parser.parseFile(include[0], parseAll=True)
+                else:
+                    #CHECK: This will raise an IOError if the file doesn't exist
+                    tmp = parser.parseFile(self.base_dir + '/' + include[0],
+                                           parseAll=True)
+            except ParseException as e:
+                raise BibFieldParserException(
+                    "Cannot parse file '%s',\n%s" % (include[0], str(e)))
             if rules and tmp.rules:
                 rules += tmp.rules
             else:
                 rules = tmp.rules
-            if includes and tmp.includes:
+
+            if tmp.includes:
                 includes += tmp.includes
-            else:
-                includes = tmp.includes
 
         #Create config rules
         for rule in rules:
@@ -378,14 +387,14 @@ class BibFieldParser(object):
                                     % (rule.json_id[0],))
         if not json_id in self.__class__._field_definitions and (override or extend):
             raise BibFieldParserException("Name error: '%s' field name not defined"
-                                    % (rule.json_id[0],))
+                                        % (rule.json_id[0],))
 
         #Workaround to keep clean doctype files
         #Just creates a dict entry with the main json field name and points it to
         #the full one i.e.: 'authors' : ['authors[0]', 'authors[n]']
-        if '[0]' in json_id or '[n]' in json_id:
+        if ('[0]' in json_id or '[n]' in json_id) and not (extend or override):
             main_json_id = re.sub('(\[n\]|\[0\])', '', json_id)
-            if not main_json_id in self.__class__._field_definitions:
+            if main_json_id not in self.__class__._field_definitions:
                 self.__class__._field_definitions[main_json_id] = []
             self.__class__._field_definitions[main_json_id].append(json_id)
 
@@ -526,7 +535,8 @@ class BibFieldParser(object):
 
     def __create_producer(self, rule):
         json_id = rule.json_id[0]
-        producers = dict()
+        producers = dict() if not rule.extend else \
+            self.__class__._field_definitions[json_id].get('producer', {})
         for producer in rule.producer_rule:
             if producer.producer_code[0][0] not in producers:
                 producers[producer.producer_code[0][0]] = []
@@ -535,8 +545,12 @@ class BibFieldParser(object):
         self.__class__._field_definitions[json_id]['producer'] = producers
 
     def __create_schema(self, rule):
+        from invenio.bibfield_utils import CFG_BIBFIELD_FUNCTIONS
         json_id = rule.json_id[0]
-        self.__class__._field_definitions[json_id]['schema'] = rule.schema if rule.schema else {}
+        self.__class__._field_definitions[json_id]['schema'] = \
+            try_to_eval(rule.schema.strip(), CFG_BIBFIELD_FUNCTIONS) \
+            if rule.schema \
+            else self.__class__._field_definitions[json_id].get('schema', {})
 
     def __create_json_extra(self, rule):
         from invenio.bibfield_utils import CFG_BIBFIELD_FUNCTIONS
