@@ -1,0 +1,6 @@
+content_type: text/xml
+default: EndNote.xsl
+description: XML EndNote (8-X).
+name: EndNote (8-X)
+rules: []
+visibility: 0

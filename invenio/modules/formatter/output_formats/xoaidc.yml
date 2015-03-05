@@ -1,0 +1,6 @@
+content_type: text/xml
+default: OAI_DC.xsl
+description: OAI DC.
+name: OAI DC
+rules: []
+visibility: 0

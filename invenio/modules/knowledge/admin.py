@@ -26,7 +26,7 @@ from flask import request
 from invenio.base.i18n import _
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 from .forms import DynamicKnowledgeForm, KnowledgeForm, KnwKBRVALForm, \
     TaxonomyKnowledgeForm, WrittenAsKnowledgeForm

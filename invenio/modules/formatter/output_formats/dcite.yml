@@ -1,0 +1,6 @@
+content_type: text/xml
+default: DataCite.xsl
+description: DataCite XML format.
+name: DataCite
+rules: []
+visibility: 0

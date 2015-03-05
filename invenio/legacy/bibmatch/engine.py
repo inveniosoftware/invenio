@@ -51,11 +51,10 @@ from invenio.legacy.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
     record_has_field, record_add_field
 from invenio.legacy.bibconvert import api as bibconvert
-from invenio.legacy.search_engine import get_fieldcodes, \
+from invenio.legacy.search_engine import \
     re_pattern_single_quotes, \
     re_pattern_double_quotes, \
-    re_pattern_regexp_quotes, \
-    re_pattern_spaces_after_colon
+    re_pattern_regexp_quotes
 from invenio.legacy.search_engine.query_parser import SearchQueryParenthesisedParser
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibrecord.textmarc2xmlmarc import transform_file
@@ -69,6 +68,8 @@ except ImportError:
     from StringIO import StringIO
 
 re_querystring = re.compile("\s?([^\s$]*)\[(.+?)\]([^\s$]*).*?", re.DOTALL)
+re_pattern_spaces_after_colon = re.compile(r'(:\s+)')
+
 
 def usage():
     """Print help"""
@@ -1236,7 +1237,8 @@ def main():
         if opt in ["-v", "--verbose"]:
             verbose = int(opt_value)
         if opt in ["-f", "--field"]:
-            if opt_value in get_fieldcodes():
+            from invenio.modules.search.models import Field
+            if Field.query.filter_by(code=opt_value).value('code'):
                 field = opt_value
         if opt in ["-q", "--query-string"]:
             try:

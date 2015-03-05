@@ -78,13 +78,13 @@ class TemplateArgsTest(InvenioTestCase):
     def setup_app(cls, app):
         """Custom setup function."""
         from invenio.ext.template.context_processor import template_args
-        from invenio.modules.search.views.search import index
+        from invenio.modules.collections.views.collections import index
 
         @template_args(index)
         def foo():
             return {'foo': 'foo', 'baz': 'baz'}
 
-        @template_args('search.index', app=app)
+        @template_args('collections.index', app=app)
         def bar():
             return {'bar': 'bar', 'baz': 'BAZ'}
 
@@ -97,7 +97,7 @@ class TemplateArgsTest(InvenioTestCase):
         return cfg
 
     def test_template_args_loading(self):
-        self.client.get(url_for('search.index'))
+        self.client.get(url_for('collections.index'))
         self.assertEqual(self.get_context_variable('foo'), 'foo')
         self.assertEqual(self.get_context_variable('bar'), 'bar')
         self.assertEqual(self.get_context_variable('baz'), 'BAZ')
@@ -114,7 +114,7 @@ class TemplateArgsLoadingTest(unittest.TestCase):
             return {'foo': 'foo'}
 
         self.assertRaises(Exception,
-                          lambda: template_args('search.index')(foo))
+                          lambda: template_args('collections.index')(foo))
 
 
 TEST_SUITE = make_test_suite(TemplateTest, TemplateLoaderCase,

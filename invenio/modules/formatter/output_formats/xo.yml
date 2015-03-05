@@ -1,0 +1,6 @@
+content_type: application/xml
+default: MODS.xsl
+description: Metadata Object Description Schema
+name: MODS
+rules: []
+visibility: 0

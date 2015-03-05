@@ -26,7 +26,6 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
-from invenio.modules.formatter import format_records
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')
@@ -36,6 +35,9 @@ def cvify_records(recids, of, req=None, so='d'):
        Write a CV for records RECIDS in the format OF in language LN.
        REQ is the Apache/mod_python request object.
     """
+    #FIXME use Jinja2 template
+    from invenio.modules.formatter import print_records
+
     # intbitsets don't support indexing, so we need a list from our hitset first
     recids = [hit for hit in recids]
     if so == 'd':

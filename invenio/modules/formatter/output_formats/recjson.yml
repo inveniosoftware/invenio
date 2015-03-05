@@ -1,0 +1,7 @@
+content_type: application/json
+default: Default_RECJSON.tpl
+description: Recjson format.
+mime_type: application/json
+name: Recjson Format
+rules: []
+visibility: 0

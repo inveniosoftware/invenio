@@ -1,0 +1,7 @@
+content_type: text/html
+default: Default_HTML_BibTeX.tpl
+description: BibTeX.
+mime_type: application/x-bibtex
+name: BibTeX
+rules: []
+visibility: 0

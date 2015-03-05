@@ -28,7 +28,8 @@ from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Tag
 from invenio.utils.date import convert_datetime_to_utc_string, strftime
 
-from .models import Format, Formatname, Bibfmt
+from . import registry
+from .models import Bibfmt
 
 
 def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
@@ -162,12 +163,7 @@ def get_format_by_code(code):
     f_code = code
     if len(code) > 6:
         f_code = code[:6]
-
-    try:
-        return Format.query.filter(Format.code == f_code.lower()).one()
-
-    except SQLAlchemyError:
-        return None
+    return registry.output_formats.get(f_code.lower(), {})
 
 
 def get_format_property(code, property_name, default_value=None):
@@ -181,90 +177,7 @@ def get_format_property(code, property_name, default_value=None):
     :param default_value: value to be returned if format not found
     :return: output format property value
     """
-    return getattr(get_format_by_code(code), property_name, default_value)
-
-
-def set_format_property(code, property_name, value):
-    """
-    Sets the property of an output format, given by its code
-
-    If 'code' does not exist, create format
-
-    :param code: the code of the output format to update
-    :param property_name: name of property to set
-    :param value: value to assign
-    """
-    format = get_format_by_code(code)
-    if format is None:
-        format = Format()
-
-    setattr(format, property_name, value)
-
-    if(property == 'name'):
-        format.set_name(value)
-
-    db.session.add(format)
-    db.session.commit()
-
-
-def get_output_format_id(code):
-    """
-    Returns the id of output format given by code in the database.
-
-    Output formats are located inside 'format' table
-
-    :param code: the code of an output format
-    :return: the id in the database of the output format. None if not found
-    """
-    return get_format_property(code, 'id', None)
-
-
-def add_output_format(code, name="", description="",
-                      content_type="text/html", visibility=1):
-    """
-    Add output format into format table.
-
-    If format with given code already exists, do nothing
-
-    :param code: the code of the new format
-    :param name: a new for the new format
-    :param description: a description for the new format
-    :param content_type: the content_type (if applicable)
-        of the new output format
-    :param visibility: if the output format is shown to users (1) or not (0)
-    :return: None
-    """
-    format = get_format_by_code(code)
-
-    if format is None:
-        format = Format()
-        format.code = code.lower()
-        format.description = description
-        format.content_type = content_type
-        format.visibility = visibility
-        format.set_name(name)
-
-        db.session.add(format)
-        db.session.commit()
-
-
-def remove_output_format(code):
-    """
-    Removes the output format with 'code'
-
-    If code does not exist in database, do nothing
-    The function also removes all localized names in formatname table
-
-    :param code: the code of the output format to remove
-    :return: None
-    """
-    format = get_format_by_code(code)
-
-    if format is not None:
-        db.session.query(Formatname)\
-            .filter(Formatname.id_format == format.id).delete()
-        db.session.delete(format)
-        db.session.commit()
+    return get_format_by_code(code).get(property_name, default_value)
 
 
 def get_output_format_description(code):
@@ -277,19 +190,6 @@ def get_output_format_description(code):
     :return: output format description
     """
     return get_format_property(code, 'description', '')
-
-
-def set_output_format_description(code, description):
-    """
-    Sets the description of an output format, given by its code
-
-    If 'code' does not exist, create format
-
-    :param code: the code of the output format to update
-    :param description: the new description
-    :return: None
-    """
-    set_format_property(code, 'description', description)
 
 
 def get_output_format_visibility(code):
@@ -309,20 +209,6 @@ def get_output_format_visibility(code):
         return 0
 
 
-def set_output_format_visibility(code, visibility):
-    """
-    Sets the visibility of an output format, given by its code
-
-    If 'code' does not exist, create format
-
-    :param code: the code of the output format to update
-    :param visibility: the new visibility (0: not visible, 1:visible)
-    :return: None
-    """
-    set_format_property(code, 'visibility', visibility)
-
-
-
 def get_output_format_content_type(code):
     """
     Returns the content_type of the output format given by code
@@ -333,61 +219,6 @@ def get_output_format_content_type(code):
     :return: output format content_type
     """
     return get_format_property(code, 'content_type', '') or ''
-
-
-def set_output_format_content_type(code, content_type):
-    """
-    Sets the content_type of an output format, given by its code
-
-    If 'code' does not exist, create format
-
-    :param code: the code of the output format to update
-    :param content_type: the content type for the format
-    :return: None
-    """
-    set_format_property(code, 'content_type', content_type)
-
-
-
-def set_output_format_name(code, name, lang="generic", type='ln'):
-    """
-    Sets the name of an output format given by code.
-
-    if 'type' different from 'ln' or 'sn', do nothing
-    if 'name' exceeds 256 chars, 'name' is truncated to first 256 chars.
-    if 'code' does not correspond to exisiting output format,
-    create format if "generic" is given as lang
-
-    The localized names of output formats are located in formatname table.
-
-    :param code: the code of an ouput format
-    :param type: either 'ln' (for long name) and 'sn' (for short name)
-    :param lang: the language in which the name is given
-    :param name: the name to give to the output format
-    :return: None
-    """
-    if type.lower() != "sn" and type.lower() != "ln":
-        return
-
-    format = get_format_by_code(code)
-    if format is None and lang == "generic" and type.lower() == "ln":
-        # Create output format inside table if it did not exist
-        # Happens when the output format was added not through web interface
-        format = Format()
-
-    if format is not None:
-        format.set_name(name, lang, type)
-
-
-def change_output_format_code(old_code, new_code):
-    """
-    Change the code of an output format
-
-    :param old_code: the code of the output format to change
-    :param new_code: the new code
-    :return: None
-    """
-    set_format_property(old_code, 'code', new_code.lower())
 
 
 def get_preformatted_record(recID, of, decompress=zlib.decompress):
@@ -413,11 +244,6 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
 
     except SQLAlchemyError:
         return None
-    # Decide whether to use DB slave:
-    # if of in ('xm', 'recstruct'):
-    #     run_on_slave = False # for master formats, use DB master
-    # else:
-    #     run_on_slave = True # for other formats, we can use DB slave
 
 
 def get_preformatted_record_date(recID, of):

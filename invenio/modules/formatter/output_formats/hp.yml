@@ -1,0 +1,6 @@
+content_type: text/html
+default: Default_HTML_portfolio.bft
+description: HTML portfolio-style output format for photos.
+name: portfolio
+rules: []
+visibility: 0

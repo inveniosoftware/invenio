@@ -30,7 +30,7 @@
       : {{ collection.name|e }}
       {%- endif -%}
     </title>
-    <link>{{ config.CFG_SITE_URL if is_root_collection else url_for('search.collection', name=collection.name, _external=True) }}</link>
+    <link>{{ config.CFG_SITE_URL if is_root_collection else url_for('collections.collection', name=collection.name, _external=True) }}</link>
     <description>{{ config.CFG_SITE_NAME|e }}{{ _('latest documents') }}
       {%- if not is_root_collection -%}
       {{ ' ' }}in {{ collection.name|e }}
