@@ -320,24 +320,24 @@ def reject_papers_from_author(pid, sigs_str, user_level=0):  # reject_papers_fro
     @return: confirmation status and message key for each signature [(status, message_key),]
     @rtype: list [(bool, str),]
     '''
-
-    matchable_name = get_matchable_name_of_author(pid)
-    matched_authors_pids = get_authors_by_name(matchable_name,
-                                               use_matchable_name=True)
-
-    # We will choose a new author from the matched_authors_pids list.
-    # We need to ensure that the current author's pid is no longer in the list.
-    try:
-        matched_authors_pids.remove(pid)
-    except ValueError:
-        # Happens when the signature name differs from current author's name.
-        pass
-
     pids_to_update = set([pid])
     statuses = list()
 
     for s in sigs_str:
         sig = _split_signature_string(s)
+
+        name = get_name_by_bibref(sig[:2])
+        matchable_name = create_matchable_name(name)
+        matched_authors_pids = get_authors_by_name(matchable_name,
+                                                   use_matchable_name=True)
+
+        # We will choose a new author from the matched_authors_pids list.
+        # We need to ensure that the current author's pid is no longer in the list.
+        try:
+            matched_authors_pids.remove(pid)
+        except ValueError:
+            # Happens when the signature name differs from current author's name.
+            pass
 
         new_pid = None
         for potential_pid in matched_authors_pids:
@@ -2858,19 +2858,19 @@ def get_papers_affected_since(date_from, date_to=None):  # personid_get_recids_a
     """
     Gets the records whose bibauthorid informations changed between
     date_from and date_to (inclusive).
-    
+
     If date_to is None, gets the records whose bibauthorid informations
     changed after date_to (inclusive).
-    
+
     @param date_from: the date after which this function will look for
         affected records.
     @type date_from: datetime.datetime
-    
+
     @param date_to: the date before which this function will look for
         affected records. Currently this is not supported and is
         ignored. Should be supported in the future.
     @type date_to: datetime.datetime or None
-    
+
     @return: affected record ids
     @return type: intbitset
     """
