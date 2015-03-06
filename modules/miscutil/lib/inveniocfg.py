@@ -983,72 +983,42 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
-    if guess_apache_24():
-        directory_www_directive = """
-        # Uncomment the following on Apache < 2.4
-        # <Directory %(webdir)s>
-        #    Options FollowSymLinks MultiViews
-        #    AllowOverride None
-        #    Order allow,deny
-        #    Allow from all
-        # </Directory>
-        # Comment the following on Apache < 2.4
-        <Directory %(webdir)s>
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Require all granted
-        </Directory>""" % {'webdir': conf.get('Invenio', 'CFG_WEBDIR')}
-        directory_wsgi_directive = """
-        # Uncomment the following on Apache < 2.4
-        # <Directory %(wsgidir)s>
-        #    WSGIProcessGroup invenio
-        #    WSGIApplicationGroup %%{GLOBAL}
-        #    Options FollowSymLinks MultiViews
-        #    AllowOverride None
-        #    Order allow,deny
-        #    Allow from all
-        # </Directory>
-        # Comment the following on Apache < 2.4
-        <Directory %(wsgidir)s>
-           WSGIProcessGroup invenio
-           WSGIApplicationGroup %%{GLOBAL}
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Require all granted
-        </Directory>""" % {'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi')}
-    else:
-        directory_www_directive = """
-        # Comment the following on Apache >= 2.4
-        <Directory %(webdir)s>
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
-        # Uncomment the following on Apache >= 2.4
-        # <Directory %(webdir)s>
-        #    Options FollowSymLinks MultiViews
-        #    AllowOverride None
-        #    Require all granted
-        # </Directory>""" % {'webdir': conf.get('Invenio', 'CFG_WEBDIR')}
-        directory_wsgi_directive = """
-        # Comment the following on Apache >= 2.4
-        <Directory %(wsgidir)s>
-           WSGIProcessGroup invenio
-           WSGIApplicationGroup %%{GLOBAL}
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
-        # Uncomment the following on Apache >= 2.4
-        # <Directory %(wsgidir)s>
-        #    WSGIProcessGroup invenio
-        #    WSGIApplicationGroup %%{GLOBAL}
-        #    Options FollowSymLinks MultiViews
-        #    AllowOverride None
-        #    Require all granted
-        # </Directory>""" % {'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi')}
+    directory_www_directive = """
+        <IfVersion < 2.4>
+                <Directory %(webdir)s>
+                        Options FollowSymLinks MultiViews
+                        AllowOverride None
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+        </IfVersion>
+        <IfVersion >= 2.4>
+                <Directory %(webdir)s>
+                        Options FollowSymLinks MultiViews
+                        AllowOverride None
+                        Require all granted
+                </Directory>
+        </IfVersion>""" % {'webdir': conf.get('Invenio', 'CFG_WEBDIR')}
+    directory_wsgi_directive = """
+        <IfVersion < 2.4>
+                <Directory %(wsgidir)s>
+                        WSGIProcessGroup invenio
+                        WSGIApplicationGroup %%{GLOBAL}
+                        Options FollowSymLinks MultiViews
+                        AllowOverride None
+                        Order allow,deny
+                        Allow from all
+                </Directory>
+        </IfVersion>
+        <IfVersion >= 2.4>
+                <Directory %(wsgidir)s>
+                        WSGIProcessGroup invenio
+                        WSGIApplicationGroup %%{GLOBAL}
+                        Options FollowSymLinks MultiViews
+                        AllowOverride None
+                        Require all granted
+                </Directory>
+        </IfVersion>""" % {'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi')}
 
     ## Preparation of XSendFile directive
     xsendfile_directive_needed = int(conf.get("Invenio", 'CFG_BIBDOCFILE_USE_XSENDFILE')) != 0
@@ -1162,6 +1132,8 @@ def cli_cmd_create_apache_conf(conf):
                             'invenio-apache-vhost.conf'
     apache_vhost_ssl_file = apache_conf_dir + os.sep + \
                              'invenio-apache-vhost-ssl.conf'
+    virtual_env = os.environ.get('VIRTUAL_ENV')
+    python_path = 'python-path={0}'.format(sys.path[-1]) if virtual_env else ''
     apache_vhost_body = """\
 AddDefaultCharset UTF-8
 ServerSignature Off
@@ -1200,7 +1172,7 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
-        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000 %(python_path)s
         WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
@@ -1225,6 +1197,7 @@ WSGIRestrictStdout Off
        'directory_www_directive': directory_www_directive,
        'directory_wsgi_directive': directory_wsgi_directive,
        'deflate_directive': deflate_directive,
+       'python_path': python_path
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -1396,24 +1369,6 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
                     # the longest the better
                     exec_version = cmd2_out_line
     return exec_version
-
-_RE_APACHE_MAJOR_VERSION = re.compile(r"Apache/(\d+\.\d+)")
-def guess_apache_24(apache_versions=None):
-    """
-    Returns True if it looks like the system is running Apache 2.4 or later.
-    """
-    if apache_versions is None:
-        apache_versions = detect_apache_version()
-    for apache_version in apache_versions:
-        g = _RE_APACHE_MAJOR_VERSION.search(apache_version)
-        if g:
-            try:
-                version = float(g.group(1))
-            except ValueError:
-                continue
-            if version >= 2.4:
-                return True
-    return False
 
 
 def detect_apache_version():
