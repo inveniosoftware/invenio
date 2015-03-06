@@ -120,11 +120,7 @@ def drop(yes_i_know=False, quiet=False):
     test_sqla_utf8_chain()
     list(models)
 
-    # Step 2: disable foreign key checks
-    if db.engine.name == 'mysql':
-        db.engine.execute('SET FOREIGN_KEY_CHECKS=0;')
-
-    # Step 3: destroy associated data
+    # Step 2: destroy associated data
     try:
         from invenio.legacy.webstat.api import destroy_customevents
         msg = destroy_customevents()
@@ -262,11 +258,7 @@ def uri():
 def version():
     """Get running version of database driver."""
     from invenio.ext.sqlalchemy import db
-    try:
-        return db.engine.dialect.dbapi.__version__
-    except Exception:
-        import MySQLdb
-        return MySQLdb.__version__
+    return db.engine.dialect.dbapi.__version__
 
 
 @manager.option('-v', '--verbose', action='store_true', dest='verbose',
@@ -275,12 +267,8 @@ def version():
 def driver_info(verbose=False):
     """Get name of running database driver."""
     from invenio.ext.sqlalchemy import db
-    try:
-        return db.engine.dialect.dbapi.__name__ + (('==' + version())
-                                                   if verbose else '')
-    except Exception:
-        import MySQLdb
-        return MySQLdb.__name__ + (('==' + version()) if verbose else '')
+    return db.engine.dialect.dbapi.__name__ + (('==' + version())
+                                               if verbose else '')
 
 
 @manager.option('-l', '--line-format', dest='line_format', default="%s: %s")
