@@ -42,7 +42,8 @@ try:
         CFG_INSPIRE_SITE, \
         CFG_ADS_SITE, \
         CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS, \
-        CFG_SITE_NAME
+        CFG_SITE_NAME, \
+        CFG_SITE_URL
 
 except ImportError:
     GLOBAL_CONFIG = False
@@ -249,7 +250,7 @@ PROFILE_IDENTIFIER_WHITELIST = {
 # Identifiers will be placed where {0} is found in the mapping.
 # e.g. { "orcid": "https://orcid.org/{0}"}
 PROFILE_IDENTIFIER_URL_MAPPING = {
-    "bai": "http://inspirehep.net/author/profile/{0}",
+    "bai": "%s/author/profile/{0}" % CFG_SITE_URL,
     "orcid": "https://orcid.org/{0}"
 }
 
