@@ -29,11 +29,12 @@ from werkzeug.utils import cached_property
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.errors import ReaderException
+from invenio.modules.relationships.api import Node
 
 from .models import Record as RecordModel
 
 
-class Record(SmartJson):
+class Record(Node, SmartJson):
 
     """Default/Base record class."""
 
