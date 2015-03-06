@@ -23,7 +23,7 @@
   {% set label_size = fieldkwargs.get('label_size') %}
   {% set field_size = fieldkwargs.get('field_size') %}
   {% set with_label = fieldkwargs.pop('with_label', True) %}
-  {%- if field.name == "csrf_token" or field.type == 'HiddenField' -%}
+  {%- if field.widget.input_type == 'hidden' -%}
   {{ field(**fieldkwargs)|safe }}
   {%- else -%}
   <div class="form-group {% if show_error_list and field.errors %} has-error{% endif %}">

@@ -32,7 +32,8 @@ from invenio.ext.sslify import ssl_required
 from invenio.ext.login import reset_password
 
 
-from ..forms import ChangePasswordForm, LostPasswordForm
+from ..forms import ChangePasswordForm, LostPasswordForm, ProfileForm, \
+    VerificationForm
 from ..models import User
 
 
@@ -72,15 +73,42 @@ def index():
 @register_breadcrumb(blueprint, 'breadcrumbs.settings.profile', _('Profile'))
 def profile():
     """Change password form for authenticated users."""
-    form = ChangePasswordForm(request.form)
-    if form.validate_on_submit():
-        u = User.query.filter_by(id=current_user.get_id()).first()
-        u.password = form.data['password']
-        flash("Password changed.", category="success")
+    u = User.query.filter_by(id=current_user.get_id()).first()
+
+    profile_form = ProfileForm(formdata=None, obj=u, prefix="profile")
+    verification_form = VerificationForm(formdata=None, prefix="verification")
+    password_form = ChangePasswordForm(formdata=None, prefix="password")
+
+    form = request.form.get('submit', None)
+    if form == 'password':
+        password_form.process(formdata=request.form)
+        if password_form.validate_on_submit():
+            u.password = password_form.data['password']
+            flash(_("Password changed."), category="success")
+    elif form == 'profile':
+        profile_form.process(formdata=request.form)
+        if profile_form.validate_on_submit():
+            changed_attrs = u.update_profile(profile_form.data)
+            if 'email' in changed_attrs:
+                flash(_("Profile updated. We have sent a verification email to"
+                        " %(email)s. Please check it.", email=u.email),
+                      category="success")
+            elif changed_attrs:
+                flash(_("Profile updated."), category="success")
+            else:
+                flash(_("No changes to profile."), category="success")
+    elif form == 'verification':
+        verification_form.process(formdata=request.form)
+        if verification_form.validate_on_submit():
+            if u.verify_email():
+                flash(_("Verification email sent."), category="success")
 
     return render_template(
         "accounts/settings/profile.html",
-        form=form,
+        password_form=password_form,
+        profile_form=profile_form,
+        verification_form=verification_form,
+        user=u,
     )
 
 

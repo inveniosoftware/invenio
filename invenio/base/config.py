@@ -30,6 +30,7 @@ from invenio.utils.shell import which
 EXTENSIONS = [
     'invenio.ext.confighacks',
     'invenio.ext.jinja2hacks',
+    'invenio.ext.passlib:Passlib',
     'invenio.ext.debug_toolbar',
     'invenio.ext.babel',
     'invenio.ext.sqlalchemy',

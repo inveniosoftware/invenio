@@ -35,7 +35,7 @@ from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from flask.ext.breadcrumbs import register_breadcrumb
 from invenio.ext.login import login_user, logout_user, authenticate, \
-    reset_password, login_redirect
+    reset_password, login_redirect, UserInfo
 from flask.ext.menu import register_menu
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
@@ -312,18 +312,27 @@ def lost():
 def access():
     try:
         mail = mail_cookie_check_mail_activation(request.values['mailcookie'])
-        User.query.filter(User.email == mail).one().note = 1
+
+        u = User.query.filter(User.email == mail).one()
+        u.note = 1
         try:
             db.session.commit()
         except:
             db.session.rollback()
             flash(_('Authorization failled.'), 'error')
-        flash(
-            _('Your email address has been validated, and you can now proceed '
-              'to  sign-in.'),
-            'success'
-        )
-    except:
+            redirect('/')
+
+        if current_user.is_authenticated():
+            current_user.reload()
+            flash(_('Your email address has been validated'), 'success')
+        else:
+            UserInfo(u.id).reload()
+            flash(
+                _('Your email address has been validated, and you can '
+                  'now proceed to sign-in.'),
+                'success'
+            )
+    except Exception:
         current_app.logger.exception("Authorization failed.")
         flash(_('The authorization token is invalid.'), 'error')
     return redirect('/')
