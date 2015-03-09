@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,6 +19,7 @@
 
 """Custom `Jinja2` extensions."""
 
+import copy
 import os
 import six
 from flask import current_app, _request_ctx_stack
@@ -127,23 +129,28 @@ class BundleExtension(Extension):
                     bundles.append((bundle.weight, bundle))
 
             for _, bundle in sorted(bundles):
-                # A little bit of madness to readd the "/" at the
+                # A little bit of madness to read the "/" at the
                 # beginning of the assets in ran in debug mode as well as
                 # killing the filters if they are not wanted in debug mode.
                 if env.debug:
-                    bundle.extra.update(static_url_path=static_url_path)
+                    # Create a deep copy to avoid filter removal from
+                    # being cached
+                    bundle_copy = copy.deepcopy(bundle)
+                    bundle_copy.extra.update(static_url_path=static_url_path)
                     if bundle.has_filter("less"):
                         if less_debug:
-                            bundle.filters = None
-                            bundle.extra.update(rel="stylesheet/less")
+                            bundle_copy.filters = None
+                            bundle_copy.extra.update(rel="stylesheet/less")
                         else:
-                            bundle.extra.update(static_url_path="")
+                            bundle_copy.extra.update(static_url_path="")
                     if bundle.has_filter("requirejs"):
                         if requirejs_debug:
-                            bundle.filters = None
+                            bundle_copy.filters = None
                         else:
-                            bundle.extra.update(static_url_path="")
-                yield bundle
+                            bundle_copy.extra.update(static_url_path="")
+                    yield bundle_copy
+                else:
+                    yield bundle
 
         return dict(get_bundle=get_bundle)
 
