@@ -110,6 +110,7 @@ components:
 - template
 - textminer
 - tickets
+- travis
 - upgrader
 - uploader
 - version
