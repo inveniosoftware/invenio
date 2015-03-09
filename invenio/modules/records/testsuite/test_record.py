@@ -136,6 +136,13 @@ class TestRecord(InvenioTestCase):
 class TestLegacyExport(InvenioTestCase):
     """Record - Legacy methods test."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Invalidate any previous field definition"""
+        Field_parser._field_definitions = {}
+        Field_parser._legacy_field_matchings = {}
+        Model_parser._model_definitions = {}
+
     def setUp(self):
         """Initialize stuff"""
         self.app.extensions['registry']['testsuite.fields'] = field_definitions()
@@ -627,9 +634,12 @@ class TestRecordDocuments(InvenioTestCase):
         self.assertEquals(d.is_authorized(user_info)[0], 0)
 
 
-TEST_SUITE = make_test_suite(TestRecord,
-                             TestMarcRecordCreation,
-                             TestRecordDocuments)
+TEST_SUITE = make_test_suite(
+    TestLegacyExport,
+    TestMarcRecordCreation,
+    TestRecord,
+    TestRecordDocuments,
+)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
