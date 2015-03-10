@@ -168,6 +168,9 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         req.status = HTTP_SERVICE_UNAVAILABLE
         title = CFG_WEBACCESS_MSGS[6]
         body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
+    else:
+        title = CFG_WEBACCESS_MSGS[7]
+        body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
 
     return page(title=title,
                 language=ln,
