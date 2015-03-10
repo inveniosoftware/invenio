@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,6 +20,15 @@
 """
 Helper functions for building and running test suites.
 """
+
+# switch off SSL verification (useful on Python-2.7.9) since our local
+# development sites usually do not run valid SSL certificates:
+try:
+    import ssl
+    if hasattr(ssl, '_create_unverified_context'):
+        ssl._create_default_https_context = ssl._create_unverified_context
+except ImportError:
+    pass  # useful on Python-2.4 that does not have `ssl`
 
 __revision__ = "$Id$"
 
