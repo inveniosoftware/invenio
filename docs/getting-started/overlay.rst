@@ -196,6 +196,7 @@ Put the required configuration into ``config.py``.
     PACKAGES = [
         "myoverlay.base",
         "invenio.modules.*",
+        "invenio.base",
     ]
 
     try:
