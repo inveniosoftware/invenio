@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,17 +17,22 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Test Record API."""
+
 import os
 import pkg_resources
 
-from mock import patch
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
-    ImportPathRegistry, RegistryProxy
+from flask.ext.registry import (
+    ImportPathRegistry, PkgResourcesDirDiscoveryRegistry, RegistryProxy
+)
 
 from invenio.base.wrappers import lazy_import
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from invenio.testsuite import make_test_suite, run_test_suite, \
-    InvenioTestCase, nottest
+from invenio.testsuite import (
+    InvenioTestCase, make_test_suite, nottest, run_test_suite
+)
+
+from mock import patch
 
 Record = lazy_import('invenio.modules.records.api:Record')
 Document = lazy_import('invenio.modules.documents.api:Document')
@@ -40,12 +45,23 @@ TEST_PACKAGE = 'invenio.modules.records.testsuite'
 test_registry = RegistryProxy('testsuite', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
 
-field_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
-    'fields', registry_namespace=test_registry)
-model_definitions = lambda: PkgResourcesDirDiscoveryRegistry(
-    'models', registry_namespace=test_registry)
-function_proxy = lambda: ModuleAutoDiscoverySubRegistry(
-    'functions', registry_namespace=test_registry)
+
+def field_definitions():
+    """Load field definitions."""
+    return PkgResourcesDirDiscoveryRegistry(
+        'fields', registry_namespace=test_registry)
+
+
+def model_definitions():
+    """Load model definitions."""
+    return PkgResourcesDirDiscoveryRegistry(
+        'models', registry_namespace=test_registry)
+
+
+def function_proxy():
+    """Load functions."""
+    return ModuleAutoDiscoverySubRegistry(
+        'functions', registry_namespace=test_registry)
 
 
 class TestRecord(InvenioTestCase):
@@ -583,7 +599,7 @@ class TestRecordDocuments(InvenioTestCase):
         d = Document.create({'title': 'Document 1',
                              'description': 'Testing 1',
                              'restriction': {'email': 'user@invenio.org'},
-                             'recids': [1,2,3],
+                             'recids': [1, 2, 3],
                              },
                             model='record_document_base')
         user_info = {'email': 'user@invenio.org',
@@ -596,7 +612,7 @@ class TestRecordDocuments(InvenioTestCase):
         self.assertEquals(d.is_authorized(user_info)[0], 1)
 
         check_user_can_view_record_patch.side_effect = \
-                lambda user_info, recid: (recid%2, '')
+            lambda user_info, recid: (recid % 2, '')
 
         # At least one record must be authorized
         self.assertEquals(d.is_authorized(user_info)[0], 0)
@@ -609,9 +625,6 @@ class TestRecordDocuments(InvenioTestCase):
         check_user_can_view_record_patch.return_value = (0, '')
 
         self.assertEquals(d.is_authorized(user_info)[0], 0)
-
-
-
 
 
 TEST_SUITE = make_test_suite(TestRecord,
