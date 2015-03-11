@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -197,8 +197,8 @@ def collection(name=None):
     template (collection.html)
     """
     if name is None:
-        return redirect('.collection',
-                        name=current_app.config['CFG_SITE_NAME'])
+        return redirect(url_for('.collection',
+                                name=current_app.config['CFG_SITE_NAME']))
     collection = Collection.query.filter(Collection.name == name) \
                                  .first_or_404()
 
