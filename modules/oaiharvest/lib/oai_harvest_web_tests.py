@@ -37,7 +37,7 @@ class InvenioOaiHarvestWebTest(InvenioWebTestCase):
         self.browser.get(CFG_SITE_SECURE_URL + "/admin/oaiharvest/oaiharvestadmin.py")
         self.find_element_by_link_text_with_timeout("add new OAI source")
         self.browser.find_element_by_link_text("add new OAI source").click()
-        self.fill_textbox(textbox_name="oai_src_baseurl", text="invenio-demo.cern.ch/oai2d")
+        self.fill_textbox(textbox_name="oai_src_baseurl", text="demo.invenio-software.org/oai2d")
         self.find_element_by_xpath_with_timeout("//input[@value='Validate']")
         self.browser.find_element_by_xpath("//input[@value='Validate']").click()
         self.fill_textbox(textbox_name="oai_src_name", text="AtlantisOAI")
