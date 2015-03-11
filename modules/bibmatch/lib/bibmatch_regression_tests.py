@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002-2010 CERN.
+## Copyright (C) 2002-2010, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -774,14 +774,14 @@ class BibMatchTest(unittest.TestCase):
     def test_check_remote(self):
         """bibmatch - check remote match (Invenio demo site)"""
         records = create_records(self.recxml1)
-        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://demo.invenio-software.org")
         self.assertEqual(1,len(matchedrecs))
 
     def test_check_textmarc(self):
         """bibmatch - check textmarc as input"""
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
-        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://demo.invenio-software.org")
         self.assertEqual(2,len(matchedrecs))
 
     def test_check_altered(self):
