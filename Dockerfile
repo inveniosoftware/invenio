@@ -56,11 +56,9 @@ RUN yum update -y && \
 
 # Installing Python prerequisites:
 ADD requirements.txt /tmp/requirements.txt
-ADD requirements-extras.txt /tmp/requirements-extras.txt
 RUN pip install --upgrade distribute && \
     pip install supervisor && \
-    pip install -r /tmp/requirements.txt && \
-    pip install -r /tmp/requirements-extras.txt
+    pip install -r /tmp/requirements.txt
 
 # Run container as `apache` user, with forced UID of 1000, which
 # should match current host user in most situations:
