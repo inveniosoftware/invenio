@@ -7,7 +7,7 @@ To learn more about Invenio software, please go to U{Invenio software
 distribution site <http://invenio-software.org/>}.
 
 To learn more about Invenio modules and programming, please go to
-U{Hacking Invenio <http://invenio-demo.cern.ch/help/hacking/>} web pages.
+U{Hacking Invenio <http://demo.invenio-software.org/help/hacking/>} web pages.
 
 To browse Invenio source code repository, inspect commits,
 revisions and the like, please go to U{Invenio git web repository

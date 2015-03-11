@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,10 +41,10 @@ class InvenioConnectorTest(unittest.TestCase):
 
     def test_remote_search(self):
         """InvenioConnector - remote search"""
-        server = InvenioConnector("http://invenio-demo.cern.ch")
+        server = InvenioConnector("http://demo.invenio-software.org")
         result = server.search(p='ellis', of='id')
         self.assertTrue(len(result) > 0, \
-                        'did not get remote search results from http://invenio-demo.cern.ch')
+                        'did not get remote search results from http://demo.invenio-software.org')
 
     def test_search_collections(self):
         """InvenioConnector - collection search"""
@@ -66,11 +66,11 @@ class InvenioConnectorTest(unittest.TestCase):
 
     def test_search_remote_restricted_collections(self):
         """InvenioConnector - remote restricted collection search"""
-        server = InvenioConnector("http://invenio-demo.cern.ch")
+        server = InvenioConnector("http://demo.invenio-software.org")
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
 
-        server = InvenioConnector("https://invenio-demo.cern.ch", user='jekyll', password='j123ekyll')
+        server = InvenioConnector("https://demo.invenio-software.org", user='jekyll', password='j123ekyll')
         result = server.search(p='LBL-28106', c=['Theses'], of='id')
         self.assertTrue(len(result) > 0, \
                         'did not get restricted collection search results.')

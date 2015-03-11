@@ -750,7 +750,7 @@ Contents
           This step is recommended to test your local Invenio
           installation.  It should give you our "Atlantis Institute of
           Science" demo installation, exactly as you see it at
-          <http://invenio-demo.cern.ch/>.
+          <http://demo.invenio-software.org/>.
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-demo-records
 

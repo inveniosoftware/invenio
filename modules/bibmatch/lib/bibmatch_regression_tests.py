@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -145,7 +145,7 @@ class BibMatchTest(unittest.TestCase):
     <subfield code="a">ARTICLE</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">http://invenio-demo.cern.ch/record/95/files/9809057.pdf</subfield>
+    <subfield code="u">http://demo.invenio-software.org/record/95/files/9809057.pdf</subfield>
   </datafield>
 </record>
 </collection>
@@ -591,7 +591,7 @@ class BibMatchTest(unittest.TestCase):
         """bibmatch - check remote match (Invenio demo site)"""
         records = create_records(self.recxml6)
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \
-                                                              server_url="http://invenio-demo.cern.ch", \
+                                                              server_url="http://demo.invenio-software.org", \
                                                               verbose=0)
         self.assertEqual(1, len(matchedrecs))
 
@@ -661,7 +661,7 @@ class BibMatchTest(unittest.TestCase):
         [dummy1, matchedrecs, dummy2, dummy3] = match_records(records, \
                                                               qrystrs=[("", "[088__a]")], \
                                                               collections=["Theses"], \
-                                                              server_url="https://invenio-demo.cern.ch", \
+                                                              server_url="https://demo.invenio-software.org", \
                                                               user  ="jekyll", \
                                                               password="j123ekyll",
                                                               verbose=0)
@@ -670,7 +670,7 @@ class BibMatchTest(unittest.TestCase):
         [nomatchrecs, dummy1, dummy2, dummy3] = match_records(records, \
                                                               qrystrs=[("", "[088__a]")], \
                                                               collections=["Theses"], \
-                                                              server_url="https://invenio-demo.cern.ch", \
+                                                              server_url="https://demo.invenio-software.org", \
                                                               user="hyde", \
                                                               password="h123yde",
                                                               verbose=0)
