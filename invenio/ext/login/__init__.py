@@ -126,6 +126,10 @@ def authenticate(nickname_or_email=None, password=None,
     if user.note == '2':  # account is not confirmed
         flash(_("You have not yet verified your email address."), 'warning')
 
+    if user.note == '0':  # account is blocked
+        logout_user()
+        return False
+
     if remember:
         session.permanent = True
     return login_user(user.id, remember=remember)
