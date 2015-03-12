@@ -525,7 +525,10 @@ def updateDataUser(uid, email, nickname):
 def updatePasswordUser(uid, password):
     """Update the password of a user."""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-        run_sql("update user set password=AES_ENCRYPT(email,%s) where id=%s", (password, uid))
+        u = User.query.filter_by(id=uid).first()
+        if u:
+            u.password = password
+        db.session.commit()
     return 1
 
 def merge_usera_into_userb(id_usera, id_userb):
@@ -750,20 +753,22 @@ def loginUser(req, p_un, p_pw, login_method):
     else: # Internal Authenthication
         if not p_pw:
             p_pw = ''
-        query_result = run_sql("SELECT id,email,note from user where email=%s and password=AES_ENCRYPT(email,%s)", (p_email, p_pw,))
-        if query_result:
-            #FIXME drop external groups and settings
-            note = query_result[0][2]
-            id_user = query_result[0][0]
-            if note == '1': # Good account
-                preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
-                p_email = query_result[0][1].lower()
+
+        u = User.query.filter_by(email=p_email).first()
+        if u and u.verify_password(p_pw):
+            # FIXME drop external groups and settings
+            note = u.note
+            id_user = u.id
+            if note == '1':  # Good account
+                preferred_login_method = \
+                    get_user_preferences(id_user)['login_method']
+                p_email = u.email.lower()
                 if login_method != preferred_login_method:
                     if preferred_login_method in CFG_EXTERNAL_AUTHENTICATION:
                         return (None, p_email, p_pw, 11)
-            elif note == '2': # Email address need to be confirmed by user
+            elif note == '2':  # Email address need to be confirmed by user
                 return (None, p_email, p_pw, 17)
-            elif note == '0': # Account need to be confirmed by administrator
+            elif note == '0':  # Account need to be confirmed by administrator
                 return (None, p_email, p_pw, 18)
         else:
             return (None, p_email, p_pw, 14)

@@ -199,7 +199,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 lastupdated=__lastupdated__,
                 navmenuid='youraccount')
 
-        run_sql('UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE email=%s', (args['password'], email))
+        from invenio.modules.accounts.models import User
+        from invenio.ext.sqlalchemy import db
+        u = User.query.filter_by(email=email).first()
+        if u:
+            u.password = args['password']
+            db.session.commit()
 
         mail_cookie_delete_cookie(reset_key)
 
@@ -514,10 +519,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
                 mess += '<p>' + _("Users cannot edit passwords on this site.")
             else:
-                res = run_sql("SELECT id FROM user "
-                    "WHERE AES_ENCRYPT(email,%s)=password AND id=%s",
-                    (args['old_password'], uid))
-                if res:
+                from invenio.modules.accounts.models import User
+                u = User.query.filter_by(id=uid).first()
+                if u and u.verify_password(args['old_password']):
                     if args['password'] == args['password2']:
                         webuser.updatePasswordUser(uid, args['password'])
                         mess += '<p>' + _("Password successfully edited.")
