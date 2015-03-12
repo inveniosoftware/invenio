@@ -173,7 +173,7 @@ class User(db.Model):
 
     def is_confirmed(self):
         """Return true if accounts has been confirmed."""
-        return self.note == 1
+        return self.note == "1"
 
     def is_guest(self):
         """Return if the user is a guest."""
@@ -185,7 +185,7 @@ class User(db.Model):
 
     def is_active(self):
         """Return True if use is active."""
-        return True
+        return self.note != "0"
 
 
 def get_groups_user_not_joined(id_user, group_name=None):
