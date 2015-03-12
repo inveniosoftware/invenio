@@ -197,11 +197,13 @@ def superuser_account_warnings():
     except:
         pass
 
-    #Check if the admin password is empty
-    res = run_sql("SELECT password, email from user where nickname = 'admin'")
-    if res:
-        res1 = run_sql("SELECT email from user where nickname = 'admin' and password = AES_ENCRYPT(%s,'')", (res[0][1], ))
-    else:
+    # Check if the admin password is empty
+    from invenio.modules.accounts.models import User
+    try:
+        u = User.query.filter_by(nickname='admin').one()
+        res1 = [u.email, ] if u.verify_password("") else []
+
+    except Exception:
         # no account nick-named `admin' exists; keep on going
         res1 = []
 

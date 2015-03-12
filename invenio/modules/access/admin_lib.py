@@ -794,7 +794,13 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     if confirm in [1, "1"] and email and email_valid_p(email):
         res = run_sql("SELECT email FROM user WHERE email=%s", (email,))
         if not res:
-            res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
+            from invenio.modules.accounts.models import User
+            from invenio.ext.sqlalchemy import db
+            User.query.filter_by(id=1).delete()
+            u = User(email=email, password=password, note=1)
+            db.session.add(u)
+            db.session.commit()
+
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
                 emailsent = send_new_user_account_warning(email, email, password) == 0
             if password:
@@ -980,7 +986,12 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
             else:
                 res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
                 if password:
-                    res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
+                    from invenio.modules.accounts.models import User
+                    from invenio.ext.sqlalchemy import db
+                    u = User.query.filter_by(id=userID).first()
+                    if u:
+                        u.password = password
+                        db.session.commit()
                 else:
                     output += '<b><span class="info">Password not modified.</span></b> '
                 res = run_sql("UPDATE user SET nickname=%s WHERE id=%s", (nickname, userID))

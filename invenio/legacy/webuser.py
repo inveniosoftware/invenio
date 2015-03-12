@@ -518,7 +518,10 @@ def updateDataUser(uid, email, nickname):
 def updatePasswordUser(uid, password):
     """Update the password of a user."""
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-        run_sql("update user set password=AES_ENCRYPT(email,%s) where id=%s", (password, uid))
+        u = User.query.filter_by(id=uid).first()
+        if u:
+            u.password = password
+        db.session.commit()
     return 1
 
 def merge_usera_into_userb(id_usera, id_userb):

@@ -63,6 +63,7 @@ from intbitset import intbitset
 from socket import gethostname
 
 from invenio.legacy.dbquery import run_sql, _db_login
+from invenio.modules.accounts.models import User
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import (
     CFG_PREFIX,
@@ -953,11 +954,12 @@ def authenticate(user, authorization_action, authorization_msg=""):
         login_method = get_user_preferences(uid)['login_method']
         if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
             #Local authentication, let's see if we want passwords.
-            res = run_sql("select id from user where id=%s "
-                    "and password=AES_ENCRYPT(email,'')",
-            (uid,), 1)
-            if res:
-                ok = True
+            try:
+                u = User.query.filter_by(id=uid).one()
+                if u.verify_password('', migrate=False):
+                    ok = True
+            except Exception:
+                pass
         if not ok:
             try:
                 password_entered = getpass.getpass()
@@ -968,11 +970,12 @@ def authenticate(user, authorization_action, authorization_msg=""):
                 sys.stderr.write("\n")
                 sys.exit(1)
             if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
-                res = run_sql("select id from user where id=%s "
-                        "and password=AES_ENCRYPT(email, %s)",
-                (uid, password_entered), 1)
-                if res:
-                    ok = True
+                try:
+                    u = User.query.filter_by(id=uid).one()
+                    if u.verify_password(password_entered, migrate=Tru):
+                        ok = True
+                except Exception:
+                    pass
             else:
                 if CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(get_email(uid), password_entered):
                     ok = True
