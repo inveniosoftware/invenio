@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@
 
 """Search bundles."""
 
+from invenio.base.bundles import invenio as _i, jquery as _j
 from invenio.ext.assets import Bundle, RequireJSFilter
-from invenio.base.bundles import jquery as _j, invenio as _i
 
 js = Bundle(
     'js/search/init.js',
@@ -32,6 +32,7 @@ js = Bundle(
 styles = Bundle(
     'css/search/search.css',
     'css/search/searchbar.css',
+    'js/search/facets/configuration/tree/style.css',
     filters="cleancss",
     output="search.css",
     weight=60

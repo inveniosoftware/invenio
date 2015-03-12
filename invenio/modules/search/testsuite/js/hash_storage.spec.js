@@ -17,20 +17,33 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-require(
-    [
-        'jquery',
-        "js/search/search",
-        "js/search/facets/configuration/tree/main",
-        "js/search/form",
-        "js/search/search_parser",
-        "js/search/typeahead",
-    ],
-    function() {
-        // This file is simply here to make sure the above dependencies are
-        // properly loaded and ready to be used by inline scripts.
-        //
-        // Without it, we have to rely on non-anonymous modules.
-        console.info("js/search/init is loaded")
-    }
-);
+define([
+  'js/search/hash_storage',
+  'jasmine-boot',
+], function(HashStorage) {
+
+  describe('Hash storage', function() {
+
+    afterEach(function () {
+      HashStorage.clean();
+    });
+
+    it('does not corrupt state stored in the hash', function() {
+
+      var sampleObj = {
+        state: {
+          a: 'b_?',
+          '+': 'r',
+        },
+        array: ['$$$', 'a']
+      };
+
+      HashStorage.update(sampleObj);
+      expect(HashStorage.getContent()).toEqual(sampleObj);
+    });
+
+    it('returns `null` on empty state', function() {
+      expect(HashStorage.getContent()).toBe(null);
+    });
+  });
+});
