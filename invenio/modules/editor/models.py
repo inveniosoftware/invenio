@@ -19,6 +19,11 @@
 
 """Editor database models."""
 
+from __future__ import print_function
+
+import os
+import shutil
+
 from invenio.ext.sqlalchemy import db
 from invenio.modules.records.models import Record as Bibrec
 
@@ -168,15 +173,13 @@ class BibEDITCACHE(db.Model):
 
 
 def bibdoc_before_drop(target, connection_dummy, **kw_dummy):
-    import os
-    import shutil
     from invenio.legacy.bibdocfile.api import _make_base_dir
-    print
+
     print(">>> Going to remove records data...")
     for (docid,) in db.session.query(target.c.id).all():
         directory = _make_base_dir(docid)
         if os.path.isdir(directory):
-            print('    >>> Removing files for docid =', docid)
+            print('    >>> Removing files for docid = {0}'.format(docid))
             shutil.rmtree(directory)
     db.session.commit()
     print(">>> Data has been removed.")
