@@ -23,17 +23,9 @@ from __future__ import print_function
 
 import datetime
 
-import os
-
-import sys
-
-from pipes import quote
-
 from flask import current_app
 
 from invenio.ext.script import Manager, change_command_name, print_progress
-
-from six import iteritems
 
 manager = Manager(usage="Perform database operations")
 
@@ -49,13 +41,47 @@ option_default_data = manager.option(
 )
 
 
+def _init_database_user(db, dbname, user):
+    """Grant user's privileges.
+
+    :param dbname: database name
+    :param user: the username that you want to init
+    """
+    if db.engine.name == 'mysql':
+        # grant privileges for user
+        db.engine.execute((
+            """GRANT ALL PRIVILEGES ON %(dbname)s.* """
+            """TO %(user)s@localhost""") % {
+                'dbname': dbname,
+                'user': user
+            })
+    elif db.engine.name == 'postgresql':
+        # grant privileges for user
+        db.engine.execute((
+            """grant all privileges on database """
+            """%(dbname)s to %(user)s""") % {
+                'dbname': dbname,
+                'user': user
+            })
+    else:
+        raise Exception(
+            """Database engine %(engine)s not supported""" % {
+                'engine': db.engine.name
+            })
+
+
 @manager.option('-u', '--user', dest='user', default="root")
 @manager.option('-p', '--password', dest='password', default="")
 @option_yes_i_know
 def init(user='root', password='', yes_i_know=False):
     """Initialize database and user."""
-    from invenio.ext.sqlalchemy import db
+    from flask import current_app
+
+    from invenio.ext.sqlalchemy import db, setup_app
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
+
+    from sqlalchemy_utils.functions import database_exists, create_database, \
+        drop_database
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -63,38 +89,25 @@ def init(user='root', password='', yes_i_know=False):
         " `inveniomanage database drop`."
     ))
 
-    # Step 1: drop database and recreate it
-    if db.engine.name == 'mysql':
-        # FIXME improve escaping
-        args = dict((k, str(v).replace('$', '\$'))
-                    for (k, v) in iteritems(current_app.config)
-                    if k.startswith('CFG_DATABASE'))
-        args = dict(zip(args, map(quote, args.values())))
-        prefix = ('{cmd} -u {user} --password={password} '
-                  '-h {CFG_DATABASE_HOST} -P {CFG_DATABASE_PORT} ')
-        cmd_prefix = prefix.format(cmd='mysql', user=user, password=password,
-                                   **args)
-        cmd_admin_prefix = prefix.format(cmd='mysqladmin', user=user,
-                                         password=password,
-                                         **args)
-        cmds = [
-            cmd_prefix + '-e "DROP DATABASE IF EXISTS {CFG_DATABASE_NAME}"',
-            (cmd_prefix + '-e "CREATE DATABASE IF NOT EXISTS '
-             '{CFG_DATABASE_NAME} DEFAULT CHARACTER SET utf8 '
-             'COLLATE utf8_general_ci"'),
-            # Create user and grant access to database.
-            (cmd_prefix + '-e "GRANT ALL PRIVILEGES ON '
-             '{CFG_DATABASE_NAME}.* TO {CFG_DATABASE_USER}@localhost '
-             'IDENTIFIED BY {CFG_DATABASE_PASS}"'),
-            cmd_admin_prefix + 'flush-privileges'
-        ]
-        for cmd in cmds:
-            cmd = cmd.format(**args)
-            print(cmd)
-            if os.system(cmd):
-                print("ERROR: failed execution of", cmd, file=sys.stderr)
-                sys.exit(1)
-        print('>>> Database has been installed.')
+    # Step 1: setup connection with special user
+    backup_user = current_app.config['CFG_DATABASE_USER']
+    current_app.config['CFG_DATABASE_USER'] = user
+    current_app.config['CFG_DATABASE_PASS'] = password
+    del current_app.config['SQLALCHEMY_DATABASE_URI']
+
+    current_app = setup_app(current_app)
+
+    # Step 2: drop the database if already exists
+    if database_exists(db.engine.url):
+        drop_database(db.engine.url)
+
+    # Step 3: create the database
+    create_database(db.engine.url, encoding='utf8')
+
+    # Step 4: grant privilege for the user
+    dbname = current_app.config['CFG_DATABASE_NAME']
+    _init_database_user(db, dbname, backup_user)
+    print('>>> Database has been installed.')
 
 
 @option_yes_i_know
@@ -192,12 +205,15 @@ def create(default_data=True, quiet=False):
         print(">>> Modifing table structure...")
         from invenio.legacy.dbquery import run_sql
         run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
-        run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
-        run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
-        #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
+        run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX '
+                'id_collection(id_collection)')
+        run_sql('ALTER TABLE collection_field_fieldvalue CHANGE '
+                'id_fieldvalue id_fieldvalue mediumint(9) unsigned')
+        # print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
 
     from invenio.modules.search.models import CollectionFieldFieldvalue
-    event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
+    event.listen(CollectionFieldFieldvalue.__table__, "after_create",
+                 cfv_after_create)
 
     tables = db.metadata.sorted_tables
 
