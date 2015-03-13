@@ -41,7 +41,6 @@ class WorkflowOthers(WorkflowTasksTestCase):
 
     def test_result_abstraction(self):
         """Test abastraction layer for celery worker."""
-        from invenio.ext.sqlalchemy import db
         from ..utils import BibWorkflowObjectIdContainer
         from invenio.modules.workflows.models import DbWorkflowObject
         from ..worker_result import AsynchronousResultWrapper

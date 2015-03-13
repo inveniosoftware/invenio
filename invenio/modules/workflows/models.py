@@ -616,8 +616,6 @@ class DbWorkflowObject(db.Model):
         """
         self.extra_data["_action"] = action
         self.extra_data["_message"] = message
-        # FIXME?
-        # self.set_extra_data(self.extra_data)
 
     def get_action(self):
         """Retrieve the currently assigned action, if any.
@@ -652,9 +650,6 @@ class DbWorkflowObject(db.Model):
     def set_error_message(self, msg):
         """Set an error message."""
         self.extra_data["_error_msg"] = msg
-        # FIXME?
-        # self.save()
-        # self.set_extra_data(extra_data)
 
     def get_error_message(self):
         """Retrieve the error message, if any."""
@@ -820,7 +815,7 @@ class DbWorkflowObject(db.Model):
     def copy(self, other):
         """Copy data and metadata except id and id_workflow."""
         for attr in ('version', 'id_parent', 'created',
-                     'modified', 'status', 'data_type', 'uri'):
+                     'modified', 'status', 'data_type', 'uri'):  # XXX: Is this really complete?
             setattr(self, attr, getattr(other, attr))
         setattr(self, 'data', other.data)
         setattr(self, 'extra_data', other.extra_data)
@@ -835,8 +830,11 @@ class DbWorkflowObject(db.Model):
             else:
                 self.log.debug("Saving task counter: %s" % (task_counter,))
                 self.extra_data["_task_counter"] = task_counter  # Used by admins
-        self._data = _encode(self.data)
-        self._extra_data = _encode(self.extra_data)
+        self._data = DbWorkflowObject._encode(self.data)
+        self._extra_data = DbWorkflowObject._encode(self.extra_data)
+        # Force __getattr__ to load from the database next time:
+        del self.data
+        del self.extra_data
 
         if version is not None:
             if version != self.version:
