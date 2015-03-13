@@ -4427,7 +4427,7 @@ def get_orcid_id_of_signature(sig):
     for ext_id in ext_ids:
         if ext_id.startswith('ORCID:'):
             try:
-                return re.search(r"(\d{4}\-){3}\d{4}", ext_id).group()
+                return [re.search(r"(\d{4}\-){3}\d{4}", ext_id).group()]
             except AttributeError:
                 pass
 
