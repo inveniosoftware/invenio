@@ -16,7 +16,16 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Models for BibWorkflow Objects."""
+"""Models for DbWorkflow Objects.
+
+.. note::
+
+    The reason why base64 is used throughout this class is due to a bug in
+    CPython pickle streams which sometimes contain non-ASCII characters. Because
+    of this it is impossible to correctly use json on such data without base64
+    encoding it first.
+
+"""
 
 import base64
 

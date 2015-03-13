@@ -57,7 +57,8 @@ from .storage import DepositionStorage, Storage
 from invenio.base.helpers import unicodifier
 from invenio.ext.restful import UTCISODateTime
 from invenio.ext.sqlalchemy import db
-from invenio.modules.workflows.models import DbWorkflowObject, Workflow, ObjectStatus
+from invenio.modules.workflows.models import DbWorkflowObject, Workflow, \
+    ObjectStatus
 
 
 #

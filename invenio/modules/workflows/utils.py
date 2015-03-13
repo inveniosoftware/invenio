@@ -219,7 +219,7 @@ def get_holdingpen_objects(ptags=None):
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
     if ptags is None:
-        ptags = ObjectStatus.name_from_version(ObjectStatus.HALTED)
+        ptags = ObjectStatus.name(ObjectStatus.HALTED)
 
     tags_copy = ptags[:]
     version_showing = []

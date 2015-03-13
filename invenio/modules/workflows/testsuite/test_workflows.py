@@ -30,7 +30,7 @@ import time
 from flask_registry import ImportPathRegistry
 
 from invenio.modules.workflows.models import ObjectStatus
-
+from workflow.engine_db import WorkflowStatus
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.base.wrappers import lazy_import
 
@@ -603,9 +603,13 @@ distances from it.
         initial_data.set_data(1)
         initial_data.save()
 
-        with self.assertRaises(WorkflowError):
-            start(workflow_name="test_workflow_error", data=[initial_data],
-                  module_name="unit_tests")
+        self.assertRaises(
+            WorkflowError,
+            start,
+            workflow_name="test_workflow_error",
+            data=[initial_data],
+            module_name="unit_tests"
+        )
         self.assertEqual(initial_data.version, ObjectStatus.ERROR)
 
         restarted_workflow = start_by_oids("test_workflow",
