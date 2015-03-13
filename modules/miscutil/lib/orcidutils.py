@@ -416,7 +416,8 @@ def _orcid_fetch_works(pid):
     '''
 
     doid, existing_papers = _get_ext_orcids_using_pid(pid)
-    papers_recs = get_papers_of_author(pid, claimed_only=True)
+    papers_recs = [x[3] for x in get_papers_of_author(pid, 
+                                                      include_unclaimed=False)]
 
     # chunks the works from orcid_list
 

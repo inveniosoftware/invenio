@@ -28,7 +28,7 @@ class Marc100700CacheTestCase(BibAuthorIDRabbitTestCase):  # TODO Refactor, crea
     def setUp(self):
         super(Marc100700CacheTestCase, self).setUp()
         marc_xml_record = get_new_marc_for_test("Test", author_name=self.author_name,
-                                                ext_id=None,
+                                                identifiers=None,
                                                 co_authors_names=self.co_authors_names)
         self.bibrec_to_test = get_bibrec_for_record(marc_xml_record,
                                                     opt_mode='insert')

@@ -518,14 +518,12 @@ def multiprocessing_precompute_cache_for_person(person_ids=None, all_persons=Fal
     p = Pool()
     p.map(_compute_cache_for_person, pids)
 
-
 def _get_pubs_bai(person_id):
     '''
     Person's publication list.
     @param person_id: int person id
     '''
-    pubs = get_papers_of_author(person_id)
-    pubs = [int(row[0]) for row in pubs]
+    pubs = [x[3] for x in get_papers_of_author(person_id)]
     return pubs
 
 def _get_self_pubs_bai(person_id):
