@@ -54,32 +54,25 @@ class WorkflowOthers(WorkflowTasksTestCase):
         self.assertEqual(bwoic2.get_object().id, test_object.id)
         result = bwoic2.to_dict()
         self.assertEqual(bwoic2.from_dict(result).id, test_object.id)
-        db.session.delete(test_object)
-        try:
+        with self.assertRaises(TypeError):
             AsynchronousResultWrapper(None)
-        except Exception as e:
-            self.assertTrue(isinstance(e, TypeError))
 
     def test_acces_to_undefineworkflow(self):
         """Test of access to undefined workflow."""
         from invenio.modules.workflows.api import start
-        try:
+        from workflow.errors import WorkflowDefinitionError
+        with self.assertRaises(WorkflowDefinitionError):
             start("@thisisnotatrueworkflow@", ["my_false_data"],
                   random_kay_args="value")
-        except Exception as e:
-            from workflow.errors import WorkflowDefinitionError
-            self.assertTrue(isinstance(e, WorkflowDefinitionError))
 
     def test_workflows_exceptions(self):
         """Test for workflows exception."""
         from workflow.errors import WorkflowError
         from invenio.modules.workflows.api import start
 
-        try:
+        with self.assertRaises(WorkflowError) as e:
             start("test_workflow_error", [2],
                   module_name="unit_tests")
-        except Exception as e:
-            self.assertTrue(isinstance(e, WorkflowError))
             self.assertTrue("ZeroDivisionError" in e.message)
             self.assertTrue("call_a()" in e.message)
             self.assertTrue("call_b()" in e.message)
