@@ -79,6 +79,7 @@ def login(nickname=None, password=None, login_method=None, action='',
                             if referer else {'login_method': 'Local'}),
          request.values]), csrf_enabled=False)
 
+    status_code = 200
     if request.method == "POST":
         try:
             if login_method == 'Local' and form.validate_on_submit() and \
@@ -89,15 +90,18 @@ def login(nickname=None, password=None, login_method=None, action='',
                     "success"
                 )
                 return login_redirect(referer)
+
             else:
                 flash(_("Invalid credentials."), "error")
+                status_code = 401
         except Exception as e:
             current_app.logger.error(
                 'Exception during login process: %s', str(e)
             )
             flash(_("Problem with login."), "error")
+            status_code = 401
 
-    return render_template('accounts/login.html', form=form)
+    return render_template('accounts/login.html', form=form), status_code
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
