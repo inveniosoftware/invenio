@@ -149,6 +149,7 @@ if CFG_CERN_SITE == 1:
                     'We will process your order of the document immediately and will contact you as soon as it is delivered.\n\n'\
                     'Best regards,\nCERN Library team\n',
 
+
     'PURCHASE_RECEIVED_TID': 'Dear colleague,\n\n'\
                     'The document you requested has been received. '\
                     'The price is %s'\
@@ -221,7 +222,6 @@ if CFG_CERN_SITE == 1:
                'Thank you in advance for your cooperation, CERN Library Staff',
     'EMPTY': 'Please choose one template'
     }
-
 else:
     CFG_BIBCIRCULATION_TEMPLATES = {
         'OVERDUE': 'Overdue letter template (write some text)',
@@ -374,6 +374,18 @@ else:
                'Thank you in advance for your cooperation, Library Staff',
         'EMPTY': 'Please choose one template'
         }
+
+ill_conf = ('Dear colleague,\n\n'
+            'We have received your interlibrary loan request\n'
+            '\tTitle: {0}\n\n'
+            'We will process your order of the document immediately and will '
+            'contact you as soon as it is delivered.\n\n'
+            'If you have any questions about your request, please contact '
+            '{1}\n\n'
+            'Best regards,\n'
+            'CERN Library team')
+
+CFG_BIBCIRCULATION_TEMPLATES['ILL_CONFIRMATION'] = ill_conf
 
 if CFG_CERN_SITE == 1:
     CFG_BIBCIRCULATION_ILLS_EMAIL = 'CERN External loans<external.loans@cern.ch>'

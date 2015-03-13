@@ -481,6 +481,19 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                         str(ill_request_notes), only_edition,
                                         'book', budget_code)
 
+        borrower_email = db.get_invenio_user_email(uid)
+        ill_conf_msg = load_template('ill_confirmation')
+        ill_conf_msg = ill_conf_msg.format(title,
+                                           CFG_BIBCIRCULATION_ILLS_EMAIL)
+        send_email(fromaddr=CFG_BIBCIRCULATION_ILLS_EMAIL,
+                   toaddr=borrower_email,
+                   subject=_("Your inter library loan request"),
+                   header='',
+                   footer='',
+                   content=ill_conf_msg,
+                   attempt_times=1,
+                   attempt_sleeptime=10)
+
         infos = []
         infos.append('Interlibrary loan request done.')
         body = bc_templates.tmpl_infobox(infos, ln)
@@ -597,6 +610,19 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                     CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                     str(ill_request_notes), 'No', 'article',
                                     argd['budget_code'])
+
+            borrower_email = db.get_invenio_user_email(uid)
+            ill_conf_msg = load_template('ill_confirmation')
+            ill_conf_msg = ill_conf_msg.format(argd['article_title'],
+                                               CFG_BIBCIRCULATION_ILLS_EMAIL)
+            send_email(fromaddr=CFG_BIBCIRCULATION_ILLS_EMAIL,
+                       toaddr=borrower_email,
+                       subject=_("Your inter library loan request"),
+                       header='',
+                       footer = '',
+                       content=ill_conf_msg,
+                       attempt_times=1,
+                       attempt_sleeptime=10)
 
             infos = []
             infos.append('Interlibrary loan request done.')

@@ -151,6 +151,9 @@ def load_template(template):
     elif template == "ill_recall3":
         output = CFG_BIBCIRCULATION_TEMPLATES['ILL_RECALL3']
 
+    elif template == "ill_confirmation":
+        output = CFG_BIBCIRCULATION_TEMPLATES['ILL_CONFIRMATION']
+
     elif template == "claim_return":
         output = CFG_BIBCIRCULATION_TEMPLATES['SEND_RECALL']
 
@@ -4306,6 +4309,20 @@ def register_ill_request_with_no_recid_step4(req, book_info, borrower_id,
                                     str(ill_request_notes),
                                     only_edition, 'book', budget_code)
 
+        uid = getUid(req)
+        borrower_email = db.get_invenio_user_email(uid)
+        ill_conf_msg = load_template('ill_confirmation')
+        ill_conf_msg = ill_conf_msg.format(title,
+                                           CFG_BIBCIRCULATION_ILLS_EMAIL)
+        send_email(fromaddr=CFG_BIBCIRCULATION_ILLS_EMAIL,
+                   toaddr=borrower_email,
+                   subject=_("Your inter library loan request"),
+                   header='',
+                   footer='',
+                   content=ill_conf_msg,
+                   attempt_times=1,
+                   attempt_sleeptime=10)
+
     return list_ill_request(req, CFG_BIBCIRCULATION_ILL_STATUS_NEW, ln)
 
 
@@ -4547,6 +4564,8 @@ def register_ill_article_request_step3(req, periodical_title, title, authors,
                                        page_number, year, issn, user_info,
                                        request_details, ln=CFG_SITE_LANG):
 
+    _ = gettext_set_language(ln)
+
     #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
@@ -4588,6 +4607,20 @@ def register_ill_article_request_step3(req, periodical_title, title, authors,
                                         CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                         str(ill_request_notes),
                                         only_edition, 'article', budget_code)
+
+        uid = getUid(req)
+        borrower_email = db.get_invenio_user_email(uid)
+        ill_conf_msg = load_template('ill_confirmation')
+        ill_conf_msg = ill_conf_msg.format(title,
+                                           CFG_BIBCIRCULATION_ILLS_EMAIL)
+        send_email(fromaddr=CFG_BIBCIRCULATION_ILLS_EMAIL,
+                   toaddr=borrower_email,
+                   subject=_("Your inter library loan request"),
+                   header='',
+                   footer='',
+                   content=ill_conf_msg,
+                   attempt_times=1,
+                   attempt_sleeptime=10)
 
 
         return list_ill_request(req, CFG_BIBCIRCULATION_ILL_STATUS_NEW, ln)
