@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
 # Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
