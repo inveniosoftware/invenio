@@ -62,10 +62,11 @@ def generate_secret_key():
 def print_progress(p, L=40, prefix='', suffix=''):
     """Print textual progress bar."""
     bricks = int(p * L)
-    print('\r', prefix, end=' ')
-    print('[{0}{1}] {2}%'.format('#' * bricks, ' ' * (L - bricks),
-                                 int(p * 100)), end=' ')
-    print(suffix, end=' ')
+    print('\r{prefix} [{bricks}{spaces}] {progress}% {suffix}'.format(
+        prefix=prefix, suffix=suffix,
+        bricks='#' * bricks, spaces=' ' * (L - bricks),
+        progress=int(p * 100),
+    ), end=' ')
 
 
 def check_for_software_updates(flash_message=False):

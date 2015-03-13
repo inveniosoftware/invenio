@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -38,14 +38,12 @@ import sqlalchemy
 import sys
 
 from intbitset import intbitset
+
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import class_mapper, properties
-from sqlalchemy.orm.collections import (
-    InstrumentedList,
-    attribute_mapped_collection,
-    collection,
-)
+from sqlalchemy.orm.collections import InstrumentedList, collection
+
 
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
@@ -100,7 +98,7 @@ def get_model_type(ModelBase):
         def convert_datetime(value):
             try:
                 return value.strftime("%Y-%m-%d %H:%M:%S")
-            except:
+            except Exception:
                 return ''
 
         for c in self.__table__.columns:
@@ -127,7 +125,7 @@ def get_model_type(ModelBase):
         #    name = str(c).split('.')[1]
         #    try:
         #        d = args[name]
-        #    except:
+        #    except Exception:
         #        continue
         #
         #    setattr(self, c.name, d)
@@ -173,7 +171,7 @@ def session_manager(orig_func):
             resp = orig_func(self, *a, **k)
             db.session.commit()
             return resp
-        except:
+        except Exception:
             db.session.rollback()
             raise
 
@@ -296,6 +294,7 @@ class OrderedList(InstrumentedList):
     """Implemented ordered instrumented list."""
 
     def append(self, item):
+        """Append item."""
         if self:
             s = sorted(self, key=lambda obj: obj.score)
             item.score = s[-1].score + 1
@@ -304,6 +303,7 @@ class OrderedList(InstrumentedList):
         InstrumentedList.append(self, item)
 
     def set(self, item, index=0):
+        """Set item."""
         if self:
             s = sorted(self, key=lambda obj: obj.score)
             if index >= len(s):
@@ -322,6 +322,7 @@ class OrderedList(InstrumentedList):
         InstrumentedList.append(self, item)
 
     def pop(self, item):
+        """Pop item."""
         # FIXME
         if self:
             obj_list = sorted(self, key=lambda obj: obj.score)
@@ -362,3 +363,53 @@ def attribute_multi_dict_collection(creator, key_attr, val_attr):
             return '%s(%r)' % (type(self).__name__, self._data)
 
     return MultiMappedCollection
+
+
+def initialize_database_user(engine, database_name, database_user,
+                             database_pass):
+    """Grant user's privileges.
+
+    :param engine: engine to use to execute queries
+    :param database_name: database name
+    :param database_user: the username that you want to init
+    :param database_pass: password for the user
+    """
+    if engine.name == 'mysql':
+        from MySQLdb import escape_string
+        # create user and grant privileges
+        engine.execute((
+            """GRANT ALL PRIVILEGES ON {0}.* """
+            """TO {1}@'%%' IDENTIFIED BY "{2}" """)
+            .format(
+                database_name,
+                database_user,
+                escape_string(database_pass)
+            ))
+    elif engine.name == 'postgresql':
+        # check if already exists
+        res = engine.execute(
+            """SELECT 1 FROM pg_roles WHERE rolname='{0}' """
+            .format(database_user))
+        # if already don't exists, create user
+        if not res.first():
+            from psycopg2.extensions import AsIs, adapt
+            engine.execute(
+                """CREATE USER %s WITH PASSWORD %s """,
+                (AsIs(database_user), adapt(database_pass)))
+        # grant privileges for user
+        engine.execute(
+            """grant all privileges on database """
+            """ {0} to {1} """
+            .format(
+                database_name,
+                database_user
+            ))
+    else:
+        raise Exception((
+            """Database engine %(engine)s not supported. """
+            """You need to manually adds privileges to %(database_user)s """
+            """in order to access to the database %(database_name)s.""") % {
+                'engine': engine.name,
+                'database_user': database_user,
+                'database_name': database_name
+            })
