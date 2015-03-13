@@ -48,7 +48,7 @@ class WorkflowOthers(WorkflowTasksTestCase):
         bwoic = BibWorkflowObjectIdContainer(None)
         self.assertEqual(None, bwoic.get_object())
         test_object = DbWorkflowObject()
-        test_object.set_data(45)
+        test_object.data = 45
         test_object.save()
         bwoic2 = BibWorkflowObjectIdContainer(test_object)
         self.assertEqual(bwoic2.get_object().id, test_object.id)

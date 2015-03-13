@@ -100,9 +100,7 @@ def set_obj_extra_data_key(key, value):
         if callable(my_key):
             while callable(my_key):
                 my_key = my_key(obj, eng)
-        extra_data = obj.extra_data
-        extra_data[str(my_key)] = my_value
-        obj.set_extra_data(extra_data)
+        obj.extra_data[str(my_key)] = my_value
 
     return _set_obj_extra_data_key
 

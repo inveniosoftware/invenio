@@ -832,19 +832,17 @@ class DbWorkflowObject(db.Model):
                 self.extra_data["_task_counter"] = task_counter  # Used by admins
         self._data = DbWorkflowObject._encode(self.data)
         self._extra_data = DbWorkflowObject._encode(self.extra_data)
-        # Force __getattr__ to load from the database next time:
-        del self.data
-        del self.extra_data
 
+        self.modified = datetime.now()
         if version is not None:
-            if version != self.version:
-                self.modified = datetime.now()
             self.version = version
         if id_workflow is not None:
             self.id_workflow = id_workflow
         db.session.add(self)
         if self.id is not None:
-            self.log.debug("Saving object: %s" % (self.id or "new",))
+            # Because the logger will save to the DB so it NEEDS self.id to be
+            # not None
+            self.log.debug("Saved object: %s" % (self.id or "new",))
 
     @classmethod
     def get(cls, *criteria, **filters):

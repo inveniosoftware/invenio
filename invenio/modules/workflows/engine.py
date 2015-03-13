@@ -265,7 +265,6 @@ BibWorkflowEngine
         self.db_obj.extra_data.update(kwargs)
 
 
-
 class InvActionMapper(ActionMapper):
 
     @staticmethod
