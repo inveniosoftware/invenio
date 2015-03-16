@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,7 +24,7 @@ import re
 from invenio.legacy.dbquery import run_sql
 from intbitset import intbitset
 from invenio.legacy.miscutil.data_cacher import DataCacher
-from invenio.utils.redis import get_redis
+from invenio.ext.cache import cache
 from invenio.legacy.dbquery import deserialize_via_marshal
 from operator import itemgetter
 from six import iteritems
@@ -40,8 +40,7 @@ class CitationDictsDataCacher(DataCacher):
         def fill():
             alldicts = {}
             from invenio.legacy.bibrank.tag_based_indexer import fromDB
-            redis = get_redis()
-            serialized_weights = redis.get('citations_weights')
+            serialized_weights = cache.get('citations_weights')
             if serialized_weights:
                 weights = deserialize_via_marshal(serialized_weights)
             else:
@@ -57,7 +56,7 @@ class CitationDictsDataCacher(DataCacher):
             alldicts['citations_counts'].sort(key=itemgetter(1), reverse=True)
 
             # Self-cites
-            serialized_weights = redis.get('selfcites_weights')
+            serialized_weights = cache.get('selfcites_weights')
             if serialized_weights:
                 selfcites = deserialize_via_marshal(serialized_weights)
             else:
