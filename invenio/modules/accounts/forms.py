@@ -24,7 +24,6 @@ from flask.ext.wtf import Form, validators
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.legacy.webuser import email_valid_p
 from invenio.utils.forms import InvenioBaseForm
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -56,6 +55,11 @@ def email_validator(form, field):
     """Validate email."""
     field.data = field.data.lower()
     validate_email(field.data)
+
+
+def user_email_validator(form, field):
+    """Validate email and check it is not known."""
+    email_validator(form, field)
 
     # is email already taken?
     try:
@@ -179,7 +183,7 @@ class ProfileForm(InvenioBaseForm):
         _("Email address"),
         filters=[lambda x: x.lower(), ],
         validators=[DataRequired(), current_user_validator('email'),
-                    email_validator]
+                    user_email_validator]
     )
     repeat_email = StringField(
         _("Re-enter email address"),
@@ -226,7 +230,7 @@ class RegisterForm(Form):
     email = StringField(
         _("Email address"),
         validators=[DataRequired(message=_("Email not provided")),
-                    email_validator],
+                    user_email_validator],
         description=_("Example") + ": john.doe@example.com")
     nickname = StringField(
         _("Nickname"),
