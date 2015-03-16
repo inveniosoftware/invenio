@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
 # Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
@@ -210,6 +211,16 @@ def create_app(instance_path=None, **kwargs_config):
 
     # Ensure SECRET_KEY has a value in the application configuration
     register_secret_key(app)
+
+    # Update config with specified environment variables.
+    for cfg_name in app.config.get('INVENIO_APP_CONFIG_ENVS',
+                                   os.getenv('INVENIO_APP_CONFIG_ENVS',
+                                             '').split(',')):
+        cfg_name = cfg_name.strip().upper()
+        cfg_value = app.config.get(cfg_name)
+        cfg_value = os.getenv(cfg_name, cfg_value)
+        app.config[cfg_name] = cfg_value
+        app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
 
     # ====================
     # Application assembly
