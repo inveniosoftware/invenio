@@ -159,7 +159,7 @@ def setup_app(app):
             if not session.get('_flashes'):
                 flash(g._("Please sign in to continue."), 'info')
             from invenio.modules.accounts.views.accounts import login
-            return login(referer=request.url), 401
+            return login(referer=request.url)
         else:
             from flask import render_template
             return render_template("401.html"), 401
