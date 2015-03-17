@@ -770,9 +770,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         """
         Store the visibility of a comment for current user
         """
-        argd = wash_urlargd(form, {'comid': (int, -1),
+        argd = wash_urlargd(form, {'comid': (str, ""),
                                    'referer': (str, None),
-                                   'collapse': (int, 1)})
+                                   'collapse': (int, 1),
+                                   'force': (int, 0)})
 
         uid = getUid(req)
 
@@ -780,11 +781,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             # We do not store information for guests
             return ''
 
-        toggle_comment_visibility(uid, argd['comid'], argd['collapse'], self.recid)
+        toggle_comment_visibility(uid, argd['comid'], argd['collapse'], self.recid, argd.get('force'))
         if argd['referer']:
             return redirect_to_url(req, CFG_SITE_SECURE_URL + \
                                    (not argd['referer'].startswith('/') and '/' or '') + \
                                    argd['referer'] + '#' + str(argd['comid']))
+        return "ok"
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle <strike>upload and </strike> access to files for comments.

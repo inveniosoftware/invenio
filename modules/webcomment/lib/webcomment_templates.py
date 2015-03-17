@@ -896,45 +896,106 @@ class Template:
                 comments_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}+ "</a><br/>"
             comments_rows += '<div id="cmtSubRound%s" class="cmtsubround" style="%s">' % (comment_round_name,
                                                                                           comment_round_style)
-            comments_rows += '''
-            <script type='text/javascript'>//<![CDATA[
-            function toggle_visibility(this_link, comid, duration) {
-                if (duration == null) duration = 0;
-                var isVisible = $('#collapsible_content_' + comid).is(':visible');
-                $('#collapsible_content_' + comid).toggle(duration);
-                $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_down');
-                $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_right');
-                if (isVisible){
-                    $('#collapsible_ctr_' + comid).attr('title', '%(open_label)s');
-                    $('#collapsible_ctr_' + comid + ' > span').html('%(open_label)s');
-                } else {
-                    $('#collapsible_ctr_' + comid).attr('title', '%(close_label)s');
-                    $('#collapsible_ctr_' + comid + ' > span').html('%(close_label)s');
-                }
-                $.ajax({
-                    type: 'POST',
-                    url: '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/toggle',
-                    data: {'comid': comid, 'ln': '%(ln)s', 'collapse': isVisible && 1 || 0}
+            if not reviews and not isGuestUser(uid):
+                comments_rows += '''
+                <a href="javascript:void(0)" data-toggle="collapse" data-collapse>%(collapse_text)s</a> | <a href="javacript:void(0)" data-toggle="uncollapse" data-collapse>%(expand_text)s</a>
+                <script type="text/javascript">
+                    $(document).ready(function(){
+                        $('[data-collapse]').on('click', function(){
+                            var $that = $(this);
+                            var collapse = $that.data('toggle');
+                            $.when(
+                                find_opposite_ids(collapse)
+                            ).done(function(ids){
+                                toggle_visibility($(this), ids, 0, collapse, 1);
+                            });
+                        });
+                        /* If type == collapse we need to find only
+                            * the expanded comment and the vice versa.
+                        */
+                        function find_opposite_ids(type){
+                            var $prom = $.Deferred();
+                            var ids = [];
+                            $.when(
+                                $('.webcomment_toggle_visibility > a').each(function(){
+                                    var that = $(this);
+                                    var comid = that.attr('id').split('_')[2];
+                                    var isVisible = $('#collapsible_content_' + comid).is(':visible');
+                                    if(type == "collapse"){
+                                        if(isVisible){
+                                            ids.push(comid);
+                                        }
+                                    }else{
+                                        if(!isVisible){
+                                            ids.push(comid);
+                                        }
+                                    }
+                                })
+                            ).done(function(){
+                                return $prom.resolve(ids);
+                            })
+                            return $prom.promise();
+                        }
                     });
-                /* Replace our link with a jump to the adequate, in case needed
-                   (default link is for non-Javascript user) */
-                this_link.href = "#C" + comid
-                /* Find out if after closing comment we shall scroll a bit to the top,
-                   i.e. go back to main anchor of the comment that we have just set */
-                var top = $(window).scrollTop();
-                if ($(window).scrollTop() >= $("#C" + comid).offset().top) {
-                    // Our comment is now above the window: scroll to it
-                    return true;
+                </script>
+                <script type='text/javascript'>//<![CDATA[
+                function toggle_visibility(this_link, comid, duration, type, force) {
+                    force = (force === undefined ) ? 0 : 1;
+                    type = (type === undefined) ? 0 : type;
+                    duration = (duration === undefined) ? 0 : duration;
+                    if(force){
+                        $.each(comid, function(index, id){
+                            var isVisible = $('#collapsible_content_' + id).is(':visible');
+                            toggle_divs(id, duration, isVisible);
+                        });
+                        comid = comid.join(',');
+                        var isVisible = (type == "collapse") ? 1 : 0;
+                    }else{
+                        var isVisible = $('#collapsible_content_' + comid).is(':visible');
+                        toggle_divs(comid, duration, isVisible);
+                    }
+                    $.ajax({
+                        type: 'POST',
+                        url: '%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/comments/toggle',
+                        data: {'comid': comid, 'ln': '%(ln)s', 'collapse': isVisible && 1 || 0, 'force': force}
+                    });
+                    /* Replace our link with a jump to the adequate, in case needed
+                    (default link is for non-Javascript user) */
+                    if(!force){
+                        this_link.href = "#C" + comid
+                        /* Find out if after closing comment we shall scroll a bit to the top,
+                        i.e. go back to main anchor of the comment that we have just set */
+                        var top = $(window).scrollTop();
+                        if ($(window).scrollTop() >= $("#C" + comid).offset().top) {
+                            // Our comment is now above the window: scroll to it
+                            return true;
+                        }
+                        return false;
+                    }
                 }
-                return false;
-            }
-            //]]></script>
-            ''' % {'siteurl': CFG_SITE_URL,
-                   'recID': recID,
-                   'ln': ln,
-                   'CFG_SITE_RECORD': CFG_SITE_RECORD,
-                   'open_label': _("Open"),
-                   'close_label': _("Close")}
+                function toggle_divs(comid, duration, isVisible){
+                    $('#collapsible_content_' + comid).toggle(duration);
+                    $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_down');
+                    $('#collapsible_ctr_' + comid).toggleClass('webcomment_collapse_ctr_right');
+                    if (isVisible){
+                        $('#collapsible_ctr_' + comid).attr('title', '%(open_label)s');
+                        $('#collapsible_ctr_' + comid + ' > span').html('%(open_label)s');
+                    } else {
+                        $('#collapsible_ctr_' + comid).attr('title', '%(close_label)s');
+                        $('#collapsible_ctr_' + comid + ' > span').html('%(close_label)s');
+                    }
+                }
+                //]]></script>
+                ''' % {'siteurl': CFG_SITE_URL,
+                    'recID': recID,
+                    'ln': ln,
+                    'CFG_SITE_RECORD': CFG_SITE_RECORD,
+                    'open_label': _("Open"),
+                    'close_label': _("Close"),
+                    'expand_text': _("Expand all"),
+                    'collapse_text': _("Collapse all"),
+                    'error_expand_or_collapse_all': _("An error occured please try again later")
+                    }
             thread_history = [0]
             previous_depth = 0
             for comment in comments_list:

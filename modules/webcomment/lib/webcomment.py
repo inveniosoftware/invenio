@@ -2336,7 +2336,7 @@ def check_user_can_attach_file_to_comments(user_info, recid):
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     return acc_authorize_action(user_info, 'attachcommentfile', authorized_if_no_roles=False, collection=record_primary_collection)
 
-def toggle_comment_visibility(uid, comid, collapse, recid):
+def toggle_comment_visibility(uid, comid, collapse, recid, force=False):
     """
     Toggle the visibility of the given comment (collapse) for the
     given user.  Return the new visibility
@@ -2345,6 +2345,7 @@ def toggle_comment_visibility(uid, comid, collapse, recid):
     @param comid: the comment id to close/open
     @param collapse: if the comment is to be closed (1) or opened (0)
     @param recid: the record id to which the comment belongs
+    @param force: if we need to delete previous comment state
     @return: if the comment is visible or not after the update
     """
     # We rely on the client to tell if comment should be collapsed or
@@ -2360,24 +2361,33 @@ def toggle_comment_visibility(uid, comid, collapse, recid):
     # when deleting an entry, as in the worst case no line would be
     # removed. For optimized retrieval of row to delete, the id_bibrec
     # column is used, though not strictly necessary.
-    if collapse:
-        query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
-        params = (comid,)
-        res = run_sql(query, params)
-        if res:
-            query = """INSERT IGNORE INTO cmtCOLLAPSED (id_bibrec, id_cmtRECORDCOMMENT, id_user)
-                              VALUES (%s, %s, %s)"""
-            params = (res[0][0], comid, uid)
+
+    # Split all comment ids
+    splited_comment_ids = comid.split(',')
+    # `False` if the comment is hidden else `True` if the comment is visible
+    comment_state = False
+    if collapse and force or not collapse:
+        for comment_id in splited_comment_ids:
+            query = """DELETE FROM cmtCOLLAPSED WHERE
+                        id_cmtRECORDCOMMENT=%s and
+                        id_user=%s and
+                        id_bibrec=%s"""
+            params = (comment_id, uid, recid)
             run_sql(query, params)
-        return True
-    else:
-        query = """DELETE FROM cmtCOLLAPSED WHERE
-                      id_cmtRECORDCOMMENT=%s and
-                      id_user=%s and
-                      id_bibrec=%s"""
-        params = (comid, uid, recid)
-        run_sql(query, params)
-        return False
+
+    if collapse:
+        for comment_id in splited_comment_ids:
+            query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
+            params = (comment_id,)
+            res = run_sql(query, params)
+            if res:
+                query = """INSERT IGNORE INTO cmtCOLLAPSED (id_bibrec, id_cmtRECORDCOMMENT, id_user)
+                                VALUES (%s, %s, %s)"""
+                params = (res[0][0], comment_id, uid)
+                run_sql(query, params)
+                comment_state = True
+    return comment_state
+
 
 def get_user_collapsed_comments_for_record(uid, recid):
     """
