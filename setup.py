@@ -58,8 +58,8 @@ class _install_lib(install_lib):  # noqa
 
     def run(self):
         """Compile catalog before running installation command."""
-        self.run_command('compile_catalog')
         install_lib.run(self)
+        self.run_command('compile_catalog')
 
 
 install_requires = [
