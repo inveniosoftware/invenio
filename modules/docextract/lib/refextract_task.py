@@ -154,6 +154,13 @@ def _create_ticket(recid, bibcatalog_system, queue):
                     write_message("arXiv paper", verbose=1)
                     return
 
+        # Do not create tickets for user submissions
+        for source_field in record_get_field_instances(record, "541"):
+            for source in field_get_subfield_values(source_field, "c"):
+                if source == "submission":
+                    write_message("User submitted paper", verbose=1)
+                    return
+
         # Only create tickets for CORE papers
         if not in_core:
             write_message("not in core papers", verbose=1)
