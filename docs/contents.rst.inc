@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -60,6 +60,14 @@ method, this part of the documentation is for you.
    :maxdepth: 2
 
    api
+
+Community
+=========
+
+.. toctree::
+   :maxdepth: 2
+
+   community/index
 
 .. _additional-notes:
 
