@@ -730,7 +730,7 @@ def build_journals_kb(knowledgebase):
     for seek_phrase, repl in knowledgebase:
         # We match on a simplified line, thus dots are replaced
         # with spaces
-        seek_phrase = seek_phrase.replace('.', ' ').upper()
+        seek_phrase = seek_phrase.replace('.', ' ').decode('utf-8').upper()
 
         # good KB line
         # Add the 'replacement term' into the dictionary of
