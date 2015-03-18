@@ -62,7 +62,7 @@ from flask import current_app
 from intbitset import intbitset
 from socket import gethostname
 
-from invenio.legacy.dbquery import run_sql, _db_login
+from invenio.legacy.dbquery import run_sql, _db_login, aes_encrypt
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import (
     CFG_PREFIX,
@@ -309,7 +309,7 @@ def task_low_level_submission(name, user, *argv):
         verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
 
         ## submit task:
-        task_id = run_sql("""INSERT INTO schTASK (proc,host,user,
+        task_id = run_sql("""INSERT INTO "schTASK" (proc,host,user,
             runtime,sleeptime,status,progress,arguments,priority,sequenceid)
             VALUES (%s,%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
             (name, host, user, runtime, sleeptime, verbose_argv,
@@ -318,7 +318,7 @@ def task_low_level_submission(name, user, *argv):
     except Exception:
         register_exception(alert_admin=True)
         if task_id:
-            run_sql("""DELETE FROM schTASK WHERE id=%s""", (task_id, ))
+            run_sql("""DELETE FROM "schTASK" WHERE id=%s""", (task_id, ))
         raise
     return task_id
 
@@ -787,19 +787,19 @@ def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     write_message("Updating task progress to %s." % msg, verbose=9)
     if "task_id" in _TASK_PARAMS:
-        return run_sql("UPDATE schTASK SET progress=%s where id=%s",
+        return run_sql("""UPDATE "schTASK" SET progress=%s where id=%s""",
             (msg[:255], _TASK_PARAMS["task_id"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
     write_message("Updating task status to %s." % val, verbose=9)
     if "task_id" in _TASK_PARAMS:
-        return run_sql("UPDATE schTASK SET status=%s where id=%s",
+        return run_sql("""UPDATE "schTASK" SET status=%s where id=%s""",
             (val, _TASK_PARAMS["task_id"]))
 
 def task_read_status():
     """Read status information in the BibSched task table."""
-    res = run_sql("SELECT status FROM schTASK where id=%s",
+    res = run_sql("""SELECT status FROM "schTASK" where id=%s""",
         (_TASK_PARAMS['task_id'],), 1)
     try:
         out = res[0][0]
@@ -942,8 +942,8 @@ def authenticate(user, authorization_action, authorization_msg=""):
         print("\rUsername:", user, file=sys.stdout)
     ## first check user:
     # p_un passed may be an email or a nickname:
-    res = run_sql("select id from user where email=%s", (user,), 1) + \
-        run_sql("select id from user where nickname=%s", (user,), 1)
+    res = run_sql("""select id from "user" where email=%s""", (user,), 1) + \
+        run_sql("""select id from "user" where nickname=%s""", (user,), 1)
     if not res:
         print("Sorry, %s does not exist." % user)
         sys.exit(1)
@@ -953,8 +953,8 @@ def authenticate(user, authorization_action, authorization_msg=""):
         login_method = get_user_preferences(uid)['login_method']
         if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
             #Local authentication, let's see if we want passwords.
-            res = run_sql("select id from user where id=%s "
-                    "and password=AES_ENCRYPT(email,'')",
+            res = run_sql("""select id from "user" where id=%s """
+                    "and password="+aes_encrypt("email","''"),
             (uid,), 1)
             if res:
                 ok = True
@@ -968,8 +968,8 @@ def authenticate(user, authorization_action, authorization_msg=""):
                 sys.stderr.write("\n")
                 sys.exit(1)
             if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
-                res = run_sql("select id from user where id=%s "
-                        "and password=AES_ENCRYPT(email, %s)",
+                res = run_sql("""select id from "user" where id=%s """
+                        "and password="+aes_encrypt("email", "%s"),
                 (uid, password_entered), 1)
                 if res:
                     ok = True
@@ -1006,7 +1006,7 @@ def _task_submit(argv, authorization_action, authorization_msg):
         task_name = _TASK_PARAMS['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
     verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
-    _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
+    _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO "schTASK" (proc,"user",
                                            runtime,sleeptime,status,progress,arguments,priority,sequenceid,host)
                                          VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s,%s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
@@ -1023,7 +1023,7 @@ def task_get_options(task_id, task_name):
     """Returns options for the task 'id' read from the BibSched task
     queue table."""
     out = {}
-    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc LIKE %s",
+    res = run_sql("""SELECT arguments FROM "schTASK" WHERE id=%s AND proc LIKE %s""",
         (task_id, task_name+'%'))
     try:
         out = marshal.loads(res[0][0])
@@ -1090,7 +1090,7 @@ def get_task_old_runtime(task_params):
     """
     if task_params['fixed_time'] or \
                         task_params['task_name'] in CFG_BIBTASK_FIXEDTIMETASKS:
-        sql = "SELECT runtime FROM schTASK WHERE id=%s"
+        sql = """SELECT runtime FROM "schTASK" WHERE id=%s"""
         old_runtime = run_sql(sql, (task_params['task_id'], ))[0][0]
     else:
         old_runtime = None
@@ -1145,7 +1145,7 @@ def _task_run(task_run_fnc):
                 new_runtime = _TASK_PARAMS['runtime_limit'][0][0].strftime("%Y-%m-%d %H:%M:%S")
             else:
                 new_runtime = _TASK_PARAMS['runtime_limit'][1][0].strftime("%Y-%m-%d %H:%M:%S")
-            progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))
+            progress = run_sql("""SELECT progress FROM "schTASK" WHERE id=%s""", (_TASK_PARAMS['task_id'], ))
             if progress:
                 progress = progress[0][0]
             else:
@@ -1157,8 +1157,8 @@ def _task_run(task_run_fnc):
                 postponed_times = 0
             if _TASK_PARAMS['sequence-id']:
                 ## Also postponing other dependent tasks.
-                run_sql("UPDATE schTASK SET runtime=%s, progress=%s WHERE sequenceid=%s AND status='WAITING'", (new_runtime, 'Postponed as task %s' % _TASK_PARAMS['task_id'], _TASK_PARAMS['sequence-id'])) # kwalitee: disable=sql
-            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id'])) # kwalitee: disable=sql
+                run_sql("""UPDATE "schTASK" SET runtime=%s, progress=%s WHERE sequenceid=%s AND status='WAITING'""", (new_runtime, 'Postponed as task %s' % _TASK_PARAMS['task_id'], _TASK_PARAMS['sequence-id'])) # kwalitee: disable=sql
+            run_sql("""UPDATE "schTASK" SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s""", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id'])) # kwalitee: disable=sql
             write_message("Task #%d postponed because outside of runtime limit" % _TASK_PARAMS['task_id'])
             return True
 
@@ -1208,16 +1208,16 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=%s WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['host'], _TASK_PARAMS['task_id']))
+                run_sql("""UPDATE "schTASK" SET runtime=%s, status='WAITING', progress=%s, host=%s WHERE id=%s""", (new_runtime, verbose_argv, _TASK_PARAMS['host'], _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host='' WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))
+                run_sql("""UPDATE "schTASK" SET status='WAITING', progress=%s, host='' WHERE id=%s""", (verbose_argv, _TASK_PARAMS['task_id'], ))
                 write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
-                #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_TASK_PARAMS['task_id'], ))
+                #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM "schTASK" WHERE id=%s', (_TASK_PARAMS['task_id'], ))
                 #proc, user, sleeptime, arguments, priority = res[0]
-                #run_sql("""INSERT INTO schTASK (proc,user,
+                #run_sql("""INSERT INTO "schTASK" (proc,user,
                             #runtime,sleeptime,status,arguments,priority)
                             #VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
                             #(proc, user, new_runtime, sleeptime, arguments, priority))

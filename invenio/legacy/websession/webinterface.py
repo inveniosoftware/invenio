@@ -45,7 +45,7 @@ from invenio.legacy.webpage import page
 from invenio.legacy.websession import webaccount
 from invenio.legacy.webbasket import api as webbasket
 from invenio.legacy.webalert import api as webalert
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, aes_encrypt
 from invenio.legacy.webmessage.api import account_new_mail
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
@@ -199,7 +199,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 lastupdated=__lastupdated__,
                 navmenuid='youraccount')
 
-        run_sql('UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE email=%s', (args['password'], email))
+        run_sql('UPDATE user SET password='+aes_encrypt("email", "%s")+' WHERE email=%s', (args['password'], email))
 
         mail_cookie_delete_cookie(reset_key)
 
@@ -515,7 +515,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 mess += '<p>' + _("Users cannot edit passwords on this site.")
             else:
                 res = run_sql("SELECT id FROM user "
-                    "WHERE AES_ENCRYPT(email,%s)=password AND id=%s",
+                    "WHERE "+aes_encrypt("email","%s")+"=password AND id=%s",
                     (args['old_password'], uid))
                 if res:
                     if args['password'] == args['password2']:

@@ -1017,7 +1017,7 @@ def perform_deletefield(fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         fldID = int(fldID)
         if confirm in ["0", 0]:
             check = run_sql(
-                "SELECT id_field from idxINDEX_field where id_field=%s", (fldID, ))
+                """SELECT id_field from "idxINDEX_field" where id_field=%s""", (fldID, ))
             text = ""
             if check:
                 text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br />"""
@@ -2337,7 +2337,7 @@ def get_col_fld(colID=-1, type='', id_field=''):
 
 
 def get_idx(idxID=''):
-    sql = "SELECT id,name,description,last_updated,stemming_language, synonym_kbrs,remove_stopwords,remove_html_markup,remove_latex_markup,tokenizer FROM idxINDEX"
+    sql = """SELECT id,name,description,last_updated,stemming_language, synonym_kbrs,remove_stopwords,remove_html_markup,remove_latex_markup,tokenizer FROM "idxINDEX" """
     params = []
     try:
         if idxID:
@@ -2354,7 +2354,7 @@ def get_idx_synonym_kb(idxID):
     """Returns a synonym knowledge base field value"""
 
     try:
-        return run_sql("SELECT synonym_kbrs FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+        return run_sql("""SELECT synonym_kbrs FROM "idxINDEX" WHERE ID=%s""", (idxID, ))[0][0]
     except StandardError as e:
         return e.__str__()
 
@@ -2363,7 +2363,7 @@ def get_idx_remove_stopwords(idxID):
     """Returns a stopwords field value"""
 
     try:
-        return run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+        return run_sql("""SELECT remove_stopwords FROM "idxINDEX" WHERE ID=%s""", (idxID, ))[0][0]
     except StandardError as e:
         return (0, e)
 
@@ -2372,7 +2372,7 @@ def get_idx_remove_html_markup(idxID):
     """Returns a remove html field value"""
 
     try:
-        return run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+        return run_sql("""SELECT remove_html_markup FROM "idxINDEX" WHERE ID=%s""", (idxID, ))[0][0]
     except StandardError as e:
         return (0, e)
 
@@ -2381,7 +2381,7 @@ def get_idx_remove_latex_markup(idxID):
     """Returns a remove latex field value"""
 
     try:
-        return run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+        return run_sql("""SELECT remove_latex_markup FROM "idxINDEX" WHERE ID=%s""", (idxID, ))[0][0]
     except StandardError as e:
         return (0, e)
 
@@ -2390,7 +2390,7 @@ def get_idx_tokenizer(idxID):
     """Returns a tokenizer field value"""
 
     try:
-        return run_sql("SELECT tokenizer FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+        return run_sql("""SELECT tokenizer FROM "idxINDEX" WHERE ID=%s""", (idxID, ))[0][0]
     except StandardError as e:
         return (0, e)
 
@@ -2479,12 +2479,12 @@ def get_fld_value(fldvID=''):
 def get_idx_fld(idxID=''):
     """Return a list of fields associated with one or all indexes."""
     try:
-        sql = "SELECT id_idxINDEX, idxINDEX.name, id_field, field.name, regexp_punctuation, regexp_alphanumeric_separators FROM idxINDEX, field, idxINDEX_field WHERE idxINDEX.id = idxINDEX_field.id_idxINDEX AND field.id = idxINDEX_field.id_field"
+        sql = """SELECT "id_idxINDEX", "idxINDEX".name, id_field, field.name, regexp_punctuation, regexp_alphanumeric_separators FROM "idxINDEX", field, "idxINDEX_field" WHERE "idxINDEX".id = "idxINDEX_field"."id_idxINDEX" AND field.id = "idxINDEX_field".id_field """
         params = []
         if idxID:
-            sql += " AND id_idxINDEX=%s"
+            sql += """ AND "id_idxINDEX"=%s"""
             params.append(idxID)
-        sql += " ORDER BY id_idxINDEX asc"
+        sql += """ ORDER BY "id_idxINDEX" asc"""
         res = run_sql(sql, tuple(params))
         return res
     except StandardError:
@@ -2548,7 +2548,7 @@ def remove_idxfld(idxID, fldID):
     fldID - field id from field table"""
 
     try:
-        sql = "DELETE FROM idxINDEX_field WHERE id_field=%s and id_idxINDEX=%s"
+        sql = """DELETE FROM "idxINDEX_field" WHERE id_field=%s and "id_idxINDEX"=%s"""
         run_sql(sql, (fldID, idxID))
         return (1, "")
     except StandardError as e:
@@ -2588,15 +2588,15 @@ def delete_idx(idxID):
     """
     try:
         idxID = int(idxID)
-        run_sql("DELETE FROM idxINDEX WHERE id=%s", (idxID, ))
-        run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s", (idxID, ))
-        run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s", (idxID, ))
-        run_sql("DROP TABLE idxWORD%02dF" % idxID)  # kwalitee: disable=sql
-        run_sql("DROP TABLE idxWORD%02dR" % idxID)  # kwalitee: disable=sql
-        run_sql("DROP TABLE idxPAIR%02dF" % idxID)  # kwalitee: disable=sql
-        run_sql("DROP TABLE idxPAIR%02dR" % idxID)  # kwalitee: disable=sql
-        run_sql("DROP TABLE idxPHRASE%02dF" % idxID)  # kwalitee: disable=sql
-        run_sql("DROP TABLE idxPHRASE%02dR" % idxID)  # kwalitee: disable=sql
+        run_sql("""DELETE FROM "idxINDEX" WHERE id=%s""", (idxID, ))
+        run_sql("""DELETE FROM "idxINDEXNAME" WHERE "id_idxINDEX"=%s""", (idxID, ))
+        run_sql("""DELETE FROM "idxINDEX_field" WHERE "id_idxINDEX"=%s""", (idxID, ))
+        run_sql("""DROP TABLE "idxWORD%02dF""" % idxID)  # kwalitee: disable=sql
+        run_sql("""DROP TABLE "idxWORD%02dR" """ % idxID)  # kwalitee: disable=sql
+        run_sql("""DROP TABLE "idxPAIR%02dF" """ % idxID)  # kwalitee: disable=sql
+        run_sql("""DROP TABLE "idxPAIR%02dR" """ % idxID)  # kwalitee: disable=sql
+        run_sql("""DROP TABLE "idxPHRASE%02dF" """ % idxID)  # kwalitee: disable=sql
+        run_sql("""DROP TABLE "idxPHRASE%02dR" """ % idxID)  # kwalitee: disable=sql
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2611,9 +2611,9 @@ def delete_virtual_idx(idxID):
        @param idxID -id of the virtual index to delete/change into normal idx
     """
     try:
-        run_sql("""UPDATE idxINDEX SET indexer='native'
+        run_sql("""UPDATE "idxINDEX" SET indexer='native'
                    WHERE id=%s""", (idxID, ))
-        run_sql("""DELETE FROM idxINDEX_idxINDEX
+        run_sql("""DELETE FROM "idxINDEX_idxINDEX"
                    WHERE id_virtual=%s""", (idxID, ))
         drop_queue_tables(idxID)
         return (1, "")
@@ -2629,11 +2629,11 @@ def delete_fld(fldID):
             field and this id
     """
     try:
-        run_sql("DELETE FROM collection_field_fieldvalue WHERE id_field=%s",
+        run_sql("""DELETE FROM collection_field_fieldvalue WHERE id_field=%s""",
                 (fldID, ))
-        run_sql("DELETE FROM field_tag WHERE id_field=%s", (fldID, ))
-        run_sql("DELETE FROM idxINDEX_field WHERE id_field=%s", (fldID, ))
-        run_sql("DELETE FROM field WHERE id=%s", (fldID, ))
+        run_sql("""DELETE FROM field_tag WHERE id_field=%s""", (fldID, ))
+        run_sql("""DELETE FROM "idxINDEX_field" WHERE id_field=%s""", (fldID, ))
+        run_sql("""DELETE FROM field WHERE id=%s""", (fldID, ))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2648,12 +2648,12 @@ def add_idx(idxNAME):
               of the format."""
     try:
         idxID = 0
-        res = run_sql("SELECT id from idxINDEX WHERE name=%s", (idxNAME,))
+        res = run_sql("""SELECT id from "idxINDEX" WHERE name=%s""", (idxNAME,))
         if res:
             return (0, (0, "A index with the given name already exists."))
 
         for i in xrange(1, 100):
-            res = run_sql("SELECT id from idxINDEX WHERE id=%s", (i, ))
+            res = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (i, ))
             res2 = get_table_status_info("idxWORD%02d%%" % i)
             if not res and not res2:
                 idxID = i
@@ -2665,12 +2665,12 @@ def add_idx(idxNAME):
                      delete an index and try again."))
 
         res = run_sql(
-            "INSERT INTO idxINDEX (id, name) VALUES (%s,%s)", (idxID, idxNAME))
+            """INSERT INTO "idxINDEX" (id, name) VALUES (%s,%s)""", (idxID, idxNAME))
         type = get_idx_nametypes()[0][0]
-        res = run_sql("INSERT INTO idxINDEXNAME (id_idxINDEX, ln, type, value) VALUES (%s,%s,%s,%s)",
+        res = run_sql("""INSERT INTO "idxINDEXNAME" ("id_idxINDEX", ln, type, value) VALUES (%s,%s,%s,%s)""",
                       (idxID, CFG_SITE_LANG, type, idxNAME))
 
-        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dF (
+        res = run_sql("""CREATE TABLE IF NOT EXISTS "idxWORD%02dF" (
                             id mediumint(9) unsigned NOT NULL auto_increment,
                             term varchar(50) default NULL,
                             hitlist longblob,
@@ -2678,7 +2678,7 @@ def add_idx(idxNAME):
                             UNIQUE KEY term (term)
                             ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dR (
+        res = run_sql("""CREATE TABLE IF NOT EXISTS "idxWORD%02dR" (
                             id_bibrec mediumint(9) unsigned NOT NULL,
                             termlist longblob,
                             type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -2686,7 +2686,7 @@ def add_idx(idxNAME):
                             KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dF (
+        res = run_sql("""CREATE TABLE IF NOT EXISTS "idxPAIR%02dF" (
                             id mediumint(9) unsigned NOT NULL auto_increment,
                             term varchar(100) default NULL,
                             hitlist longblob,
@@ -2718,7 +2718,7 @@ def add_idx(idxNAME):
                             KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("SELECT id from idxINDEX WHERE id=%s", (idxID, ))
+        res = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (idxID, ))
         res2 = get_table_status_info("idxWORD%02dF" % idxID)
         res3 = get_table_status_info("idxWORD%02dR" % idxID)
         if res and res2 and res3:
@@ -2775,7 +2775,7 @@ def add_virtual_idx(id_virtual, id_normal):
        query in both cases is the same.
     """
     try:
-        run_sql("""UPDATE idxINDEX SET indexer='virtual'
+        run_sql("""UPDATE "idxINDEX" SET indexer='virtual'
                    WHERE id=%s""", (id_virtual, ))
         create_queue_tables(id_virtual)
         return add_dependent_index(id_virtual, id_normal)
@@ -2803,7 +2803,7 @@ def modify_dependent_indexes(idxID, indexes_to_add=[]):
 def add_dependent_index(id_virtual, id_normal):
     """Adds dependent index to specific virtual index"""
     try:
-        query = """INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal)
+        query = """INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal)
                    VALUES (%s, %s)""" % (id_virtual, id_normal)
         run_sql(query)
         return (1, "")
@@ -2870,11 +2870,11 @@ def add_idx_fld(idxID, fldID):
     """Add a field to an index"""
 
     try:
-        sql = "SELECT id_idxINDEX FROM idxINDEX_field WHERE id_idxINDEX=%s and id_field=%s"
+        sql = """SELECT "id_idxINDEX" FROM "idxINDEX_field" WHERE "id_idxINDEX"=%s and id_field=%s"""
         res = run_sql(sql, (idxID, fldID))
         if res:
             return (0, (0, "The field selected already exists for this index"))
-        sql = "INSERT INTO idxINDEX_field(id_idxINDEX, id_field) values (%s, %s)"
+        sql = """INSERT INTO "idxINDEX_field"("id_idxINDEX", id_field) values (%s, %s)"""
         res = run_sql(sql, (idxID, fldID))
         return (1, "")
     except StandardError as e:
@@ -2909,9 +2909,9 @@ def modify_idx(idxID, idxNAME, idxDESC):
         try:
             update_all_queue_tables_with_new_name(idxID, idxNAME, idxNAME_old)
             res = run_sql(
-                "UPDATE idxINDEX SET name=%s WHERE id=%s", (idxNAME, idxID))
+                """UPDATE "idxINDEX" SET name=%s WHERE id=%s""", (idxNAME, idxID))
             res = run_sql(
-                "UPDATE idxINDEX SET description=%s WHERE ID=%s", (idxDESC, idxID))
+                """UPDATE "idxINDEX" SET description=%s WHERE ID=%s""", (idxDESC, idxID))
             return (1, "")
         except StandardError as e:
             return (0, e)
@@ -2924,7 +2924,7 @@ def modify_idx_stemming(idxID, idxSTEM):
 
     try:
         run_sql(
-            "UPDATE idxINDEX SET stemming_language=%s WHERE ID=%s", (idxSTEM, idxID))
+            """UPDATE "idxINDEX" SET stemming_language=%s WHERE ID=%s""", (idxSTEM, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2933,7 +2933,7 @@ def modify_idx_stemming(idxID, idxSTEM):
 def modify_idx_indexer(idxID, indexer):
     """Modify an indexer type in idxINDEX table"""
     try:
-        run_sql("UPDATE idxINDEX SET indexer=%s WHERE ID=%s", (indexer, idxID))
+        run_sql("""UPDATE "idxINDEX" SET indexer=%s WHERE ID=%s""", (indexer, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2951,7 +2951,7 @@ def modify_idx_synonym_kb(idxID, idxKB, idxMATCH):
             field_value = idxKB + \
                 CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR + idxMATCH
         run_sql(
-            "UPDATE idxINDEX SET synonym_kbrs=%s WHERE ID=%s", (field_value, idxID))
+            """UPDATE "idxINDEX" SET synonym_kbrs=%s WHERE id=%s""", (field_value, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2964,7 +2964,7 @@ def modify_idx_stopwords(idxID, idxSTOPWORDS):
     """
 
     try:
-        run_sql("UPDATE idxINDEX SET remove_stopwords=%s WHERE ID=%s",
+        run_sql("""UPDATE "idxINDEX" SET remove_stopwords=%s WHERE ID=%s""",
                 (idxSTOPWORDS, idxID))
         return (1, "")
     except StandardError as e:
@@ -2976,7 +2976,7 @@ def modify_idx_html_markup(idxID, idxHTML):
 
     try:
         run_sql(
-            "UPDATE idxINDEX SET remove_html_markup=%s WHERE ID=%s", (idxHTML, idxID))
+            """UPDATE "idxINDEX" SET remove_html_markup=%s WHERE ID=%s""", (idxHTML, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2987,7 +2987,7 @@ def modify_idx_latex_markup(idxID, idxLATEX):
 
     try:
         run_sql(
-            "UPDATE idxINDEX SET remove_latex_markup=%s WHERE ID=%s", (idxLATEX, idxID))
+            """UPDATE "idxINDEX" SET remove_latex_markup=%s WHERE ID=%s""", (idxLATEX, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)
@@ -2998,7 +2998,7 @@ def modify_idx_tokenizer(idxID, idxTOK):
 
     try:
         run_sql(
-            "UPDATE idxINDEX SET tokenizer=%s WHERE ID=%s", (idxTOK, idxID))
+            """UPDATE "idxINDEX" SET tokenizer=%s WHERE ID=%s""", (idxTOK, idxID))
         return (1, "")
     except StandardError as e:
         return (0, e)

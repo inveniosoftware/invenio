@@ -542,11 +542,11 @@ def cli_cmd_reset_siteadminemail(conf):
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
     """
     print(">>> Going to reset CFG_SITE_ADMIN_EMAIL...")
-    from invenio.legacy.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql, aes_encrypt
     siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
-    run_sql("DELETE FROM user WHERE id=1")
-    run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
-                        (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
+    run_sql('DELETE FROM "user" WHERE id=1')
+    run_sql("""INSERT INTO "user" (id, email, password, note, nickname) VALUES
+                        (1, %s, """+aes_encrypt("'"+siteadminemail+"'", "''")+""", 1, 'admin')""",
             (siteadminemail,))
     print("You may want to restart Apache now.")
     print(">>> CFG_SITE_ADMIN_EMAIL reset successfully.")

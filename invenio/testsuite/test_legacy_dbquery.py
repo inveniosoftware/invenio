@@ -40,16 +40,16 @@ class TableUpdateTimesTest(InvenioTestCase):
         if mysql_server_version.startswith("5."):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
-                        WHERE table_name='%s' AND table_schema='%s'""" \
+                        WHERE table_name="%s" AND table_schema="%s" """ \
                         % (tablename, cfg['CFG_DATABASE_NAME'])
             tablename_update_time = str(dbquery.run_sql(query)[0][0])
         elif mysql_server_version.startswith("4.1"):
             # MySQL-4.1 has it on 12th position:
-            query = """SHOW TABLE STATUS LIKE '%s'""" % tablename
+            query = """SHOW TABLE STATUS LIKE "%s" """ % tablename
             tablename_update_time = str(dbquery.run_sql(query)[0][12])
         elif mysql_server_version.startswith("4.0"):
             # MySQL-4.0 has it on 11th position:
-            query = """SHOW TABLE STATUS LIKE '%s'""" % tablename
+            query = """SHOW TABLE STATUS LIKE "%s" """ % tablename
             tablename_update_time = str(dbquery.run_sql(query)[0][11])
         else:
             tablename_update_time = "MYSQL SERVER VERSION NOT DETECTED"

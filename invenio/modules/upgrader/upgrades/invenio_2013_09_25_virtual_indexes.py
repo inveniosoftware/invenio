@@ -28,7 +28,7 @@ def info():
     return "BibIndex virtual indexes"
 
 def do_upgrade():
-    run_sql("""CREATE TABLE IF NOT EXISTS idxINDEX_idxINDEX (
+    run_sql("""CREATE TABLE IF NOT EXISTS "idxINDEX_idxINDEX" (
                  id_virtual mediumint(9) unsigned NOT NULL,
                  id_normal mediumint(9) unsigned NOT NULL,
                  PRIMARY KEY (id_virtual,id_normal)
@@ -80,13 +80,13 @@ def do_upgrade_atlantis():
                ) ENGINE=MyISAM""" % misc_index)
 
     #2nd step: add 'miscellaneous' index to idxINDEX table
-    run_sql("""INSERT INTO idxINDEX VALUES (%s,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer')""" % misc_index)
+    run_sql("""INSERT INTO "idxINDEX"  VALUES (%s,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer')""" % misc_index)
 
     #3rd step: add 'miscellaneous' field
     run_sql("""INSERT INTO field VALUES (%s,'miscellaneous', 'miscellaneous')""" % misc_field)
 
     #4th step: add idxINDEX_field map
-    run_sql("""INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (%s,%s)""" % (misc_index, misc_field))
+    run_sql("""INSERT INTO "idxINDEX_field" ("id_idxINDEX", id_field) VALUES (%s,%s)""" % (misc_index, misc_field))
 
     #5th step: add tags
     run_sql("""INSERT INTO tag VALUES (157,'031x','031%')""")
@@ -324,19 +324,19 @@ def do_upgrade_atlantis():
     run_sql("""DELETE FROM field_tag WHERE id_field=1""")
 
     #8th step: add mapping between indexes for global index
-    query = """SELECT name, id FROM idxINDEX"""
+    query = """SELECT name, id FROM "idxINDEX" """
     ids = dict(run_sql(query))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['abstract']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['reportnumber']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['title']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['year']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['journal']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collaboration']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['affiliation']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['exacttitle']))
-    run_sql("""INSERT INTO idxINDEX_idxINDEX (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['miscellaneous']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['abstract']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collection']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['reportnumber']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['title']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['year']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['journal']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['collaboration']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['affiliation']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['exacttitle']))
+    run_sql("""INSERT INTO "idxINDEX_idxINDEX" (id_virtual, id_normal) VALUES (%s, %s)""" % (ids['global'], ids['miscellaneous']))
 
 
 def estimate():

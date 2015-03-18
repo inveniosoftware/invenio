@@ -142,6 +142,7 @@ class AccMAILCOOKIE(db.Model):
             kind=kind,
             onetime=int(onetime),
         )
+        # FIXME aes_encrypt exists?
         cookie._data = db.func.aes_encrypt(dumps(data), password)
         db.session.add(cookie)
         db.session.commit()
@@ -176,22 +177,31 @@ class AccAuthorization(db.Model):
     """Represent an authorization."""
 
     __tablename__ = 'accROLE_accACTION_accARGUMENT'
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                   autoincrement=True)
     id_accROLE = db.Column(db.Integer(15, unsigned=True),
                            db.ForeignKey(AccROLE.id), nullable=True,
-                           autoincrement=False, primary_key=True, index=True)
+                           index=True)
     id_accACTION = db.Column(db.Integer(15, unsigned=True),
                              db.ForeignKey(AccACTION.id), nullable=True,
-                             autoincrement=False, primary_key=True, index=True)
-    id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
-                               nullable=True, primary_key=True,
-                               autoincrement=False, index=True)
-    argumentlistid = db.Column(db.MediumInteger(8), nullable=True,
-                               autoincrement=False, primary_key=True)
+                             index=True)
+    _id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
+                               nullable=True, name="id_accARGUMENT")
+    argumentlistid = db.Column(db.MediumInteger(8), nullable=True)
 
     role = db.relationship(AccROLE, backref='authorizations')
     action = db.relationship(AccACTION, backref='authorizations')
     argument = db.relationship(AccARGUMENT, backref='authorizations')
 
+    @db.hybrid_property
+    def id_accARGUMENT(self):
+        """get id_accARGUMENT."""
+        return self.id_accARGUMENT
+
+    @id_accARGUMENT.setter
+    def id_accARGUMENT(self, value):
+        """set id_accARGUMENT."""
+        self._id_accARGUMENT = value or None
 
 class UserAccROLE(db.Model):
 

@@ -497,23 +497,23 @@ def guest_user_garbage_collector():
         result = []
     write_message(result, verbose=9)
     write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskEXTFMT WHERE id_bskEXTREC = 'TRAVERSE LAST RESULT' \n""", verbose=9)
+    write_message("""  DELETE FROM bskEXTFMT WHERE "id_bskEXTREC" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket,) in result:
-        delcount['bskEXTREC'] += run_sql("""DELETE FROM bskEXTREC WHERE id=%s""", (id_basket,))
-        delcount['bskEXTFMT'] += run_sql("""DELETE FROM bskEXTFMT WHERE id_bskEXTREC=%s""", (id_basket,))
+        delcount['bskEXTREC'] += run_sql("""DELETE FROM "bskEXTREC" WHERE id=%s""", (id_basket,))
+        delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE id_bskEXTREC=%s""", (id_basket,))
 
     # 4 - DELETE ALERTS NOT OWNED BY ANY USER
     write_message('- deleting alerts not owned by any user')
 
     # select user ids in uqb that reference non-existent users
-    write_message("""SELECT DISTINCT uqb.id_user FROM user_query_basket AS uqb LEFT JOIN user AS u ON uqb.id_user = u.id WHERE u.id IS NULL""", verbose=9)
-    result = run_sql("""SELECT DISTINCT uqb.id_user FROM user_query_basket AS uqb LEFT JOIN user AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
+    write_message("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""", verbose=9)
+    result = run_sql("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
     write_message(result, verbose=9)
 
     # delete all these entries
     for (id_user,) in result:
-        write_message("""DELETE FROM user_query_basket WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
-        delcount['user_query_basket'] += run_sql("""DELETE FROM user_query_basket WHERE id_user = %s """, (id_user,))
+        write_message("""DELETE FROM "user_query_basket" WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
+        delcount['user_query_basket'] += run_sql("""DELETE FROM "user_query_basket" WHERE id_user = %s """, (id_user,))
 
     # 5 - delete expired mailcookies
     write_message("""mail_cookie_gc()""", verbose=9)
@@ -521,11 +521,11 @@ def guest_user_garbage_collector():
 
     ## 5b - delete expired not confirmed email address
     write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
-    delcount['email_addresses'] = run_sql("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""", (CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS,))
+    delcount['email_addresses'] = run_sql("""DELETE FROM "user" WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""", (CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS,))
 
     # 6 - delete expired roles memberships
-    write_message("""DELETE FROM user_accROLE WHERE expiration<NOW()""", verbose=9)
-    delcount['role_membership'] = run_sql("""DELETE FROM user_accROLE WHERE expiration<NOW()""")
+    write_message("""DELETE FROM "user_accROLE" WHERE expiration<NOW()""", verbose=9)
+    delcount['role_membership'] = run_sql("""DELETE FROM "user_accROLE" WHERE expiration<NOW()""")
 
     # print STATISTICS
     write_message("""- statistics about deleted data: """)

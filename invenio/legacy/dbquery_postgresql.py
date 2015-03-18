@@ -225,30 +225,9 @@ def get_table_update_time(tablename, run_on_slave=False):
        wildcard `%' in which case we return the maximum update time
        value.
     """
-    # Note: in order to work with all of MySQL 4.0, 4.1, 5.0, this
-    # function uses SHOW TABLE STATUS technique with a dirty column
-    # position lookup to return the correct value.  (Making use of
-    # Index_Length column that is either of type long (when there are
-    # some indexes defined) or of type None (when there are no indexes
-    # defined, e.g. table is empty).  When we shall use solely
-    # MySQL-5.0, we can employ a much cleaner technique of using
-    # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
-    # table_name='collection'.
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
-                  run_on_slave=run_on_slave)
-    update_times = [] # store all update times
-    for row in res:
-        if type(row[10]) is long or \
-           row[10] is None:
-            # MySQL-4.1 and 5.0 have creation_time in 11th position,
-            # so return next column:
-            update_times.append(str(row[12]))
-        else:
-            # MySQL-4.0 has creation_time in 10th position, which is
-            # of type datetime.datetime or str (depending on the
-            # version of MySQLdb), so return next column:
-            update_times.append(str(row[11]))
-    return max(update_times)
+    # FIXME how can I implement it with PostgreSQL???
+    import datetime
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def get_table_status_info(tablename, run_on_slave=False):
     """Return table status information on TABLENAME.  Returned is a
@@ -256,7 +235,7 @@ def get_table_status_info(tablename, run_on_slave=False):
        etc.  If TABLENAME does not exist, return empty dict.
     """
     # Note: again a hack so that it works on all MySQL 4.0, 4.1, 5.0
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
+    res = run_sql("""SHOW TABLE STATUS LIKE "%s" """, (tablename,),
                   run_on_slave=run_on_slave)
     table_status_info = {} # store all update times
     for row in res:
@@ -313,3 +292,53 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     escaped_string = connection_object.escape(unescaped_string)
     return escaped_string
 
+
+def run_sql_with_limit(query, param=None, n=0, with_desc=False,
+                       wildcard_limit=0, run_on_slave=False):
+    """Run SQL with limit.
+
+    This function should be used in some cases, instead of run_sql function, in
+    order to protect the db from queries that might take a log time to respond
+    Ex: search queries like [a-z]+ ; cern*; a->z;
+    The parameters are exactly the ones for run_sql function.
+    In case the query limit is reached, an InvenioDbQueryWildcardLimitError
+    will be raised.
+    """
+    try:
+        int(wildcard_limit)
+    except ValueError:
+        raise
+
+    if wildcard_limit < 1:  # no limit on the wildcard queries
+        return run_sql(query, param, n, with_desc, run_on_slave=run_on_slave)
+    safe_query = query + " limit %s" % wildcard_limit
+    res = run_sql(safe_query, param, n, with_desc, run_on_slave=run_on_slave)
+    if len(res) == wildcard_limit:
+        raise InvenioDbQueryWildcardLimitError(res)
+    return res
+
+
+def aes_encrypt(field, password):
+    """Legacy encryption.
+
+    :param field: field to encrypt
+    :param password: password
+    :return sql code to encrypt
+    """
+    return ("encrypt(cast(%(field)s as bytea), " +
+            "%(password)s, 'aes')") % {
+                'field': field,
+                'password': password}
+
+
+def aes_decrypt(field, password):
+    """Legacy decryption.
+
+    :param field: field to decrypt
+    :param password: password
+    :return sql code to decrypt
+    """
+    return ("decrypt(%(field)s), " +
+            "%(password)s, 'aes')") % {
+                'field': field,
+                'password': password}

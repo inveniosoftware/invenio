@@ -50,7 +50,7 @@ from invenio.legacy.bibrank.adminlib import addadminbox, tupletotable, \
 from invenio.modules.access.firerole import compile_role_definition, \
     serialize
 from invenio.base.i18n import gettext_set_language
-from invenio.legacy.dbquery import run_sql, OperationalError, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, OperationalError, wash_table_column_name, aes_encrypt
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.legacy.webuser import email_valid_p, get_user_preferences, \
@@ -983,7 +983,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     if confirm in [1, "1"] and email and email_valid_p(email):
         res = run_sql("SELECT email FROM user WHERE email=%s", (email,))
         if not res:
-            res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
+            res = run_sql("INSERT INTO user (email,password, note) values(%s,"+aes_encrypt("email","%s")+", '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
                 emailsent = send_new_user_account_warning(email, email, password) == 0
             if password:
@@ -1169,7 +1169,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
             else:
                 res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
                 if password:
-                    res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
+                    res = run_sql("UPDATE user SET password="+aes_encrypt("email","%s")+" WHERE id=%s", (password, userID))
                 else:
                     output += '<b><span class="info">Password not modified.</span></b> '
                 res = run_sql("UPDATE user SET nickname=%s WHERE id=%s", (nickname, userID))
