@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -686,20 +686,6 @@ class Template:
                 _body = '<div class="webcomment_review_pending_approval_message">This review is pending approval due to user reports.</div>'
                 links = ''
         related_file_element = ''
-        try:
-            related_file = related_files[com_id]
-            related_file_element = """
-             <div class="cmt_file_relation" doc_code="%(id_bibdoc)s:%(version)s" style="float:right">
-              This comment is related with file %(docname)s, version %(version)s
-             </div>
-            """ % {
-                'docname': related_file['docname'],
-                'version': related_file['version'],
-                'id_bibdoc': related_file['id_bibdoc']
-            }
-        except (TypeError, KeyError):
-            pass
-
 
         out += '''
 <div class="webcomment_review_box">
@@ -1278,7 +1264,7 @@ class Template:
                 filter_file=filter_for_file,
                 page=page,
                 nb_per_page=nb_per_page,
-                nb_pages=nb_pages),
+                nb_pages=nb_pages) if not reviews else '',
             'deadline_text': deadline_text,
         }
 

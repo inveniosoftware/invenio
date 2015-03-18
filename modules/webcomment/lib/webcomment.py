@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -266,7 +266,7 @@ def perform_request_display_comments_or_remarks(
     if reviews:
         res = [row[:] + (row[10] in user_collapsed_comments,) for row in res]
     else:
-        res = [row[:] + (row[6] in user_collapsed_comments,) for row in res]
+        res = [row[:] + (row[7] in user_collapsed_comments,) for row in res]
 
     # Send to template
     avg_score = 0.0
