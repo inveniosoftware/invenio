@@ -518,9 +518,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
 
     orcid_list = []
 
-    for rec in papers:
-
-        recid = rec[0]
+    for recid in papers:
 
         work_dict = {
             'work_title': {}
