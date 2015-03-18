@@ -20,13 +20,14 @@
 """Implement AST vistor."""
 
 from intbitset import intbitset
+
 from invenio_query_parser.ast import (
-    AndOp, KeywordOp, OrOp,
-    NotOp, Keyword, Value,
+    AndOp, DoubleQuotedValue, EmptyQuery,
+    GreaterOp, Keyword,
+    KeywordOp, NotOp, OrOp,
+    RangeOp, RegexValue,
     SingleQuotedValue,
-    DoubleQuotedValue,
-    RegexValue, RangeOp,
-    ValueQuery, EmptyQuery
+    Value, ValueQuery,
 )
 from invenio_query_parser.visitor import make_visitor
 
@@ -64,6 +65,11 @@ class SearchUnit(object):
     @visitor(ValueQuery)
     def visit(self, node, op):
         return search_unit(**op)
+
+    @visitor(GreaterOp)
+    def visit(self, node, op):
+        op["p"] = "{0}->".format(op["p"])
+        return op
 
     @visitor(Keyword)
     def visit(self, node):
