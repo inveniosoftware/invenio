@@ -2111,6 +2111,32 @@ def task_run_core():
         _last_word_table = None
         return True
 
+    # check tables consistency
+    if task_get_option("cmd") == "repair":
+        for index_name in indexes:
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                  wash_index_terms=50)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
+                                  wash_index_terms=100)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+
+            wordTable = WordTable(index_name=index_name,
+                                  table_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
+                                  wash_index_terms=0)
+            _last_word_table = wordTable
+            wordTable.repair(task_get_option("flush"))
+            task_sleep_now_if_required(can_stop_too=True)
+        _last_word_table = None
+        return True
+
     # virtual index: remove dependent index
     if task_get_option("remove-dependent-index"):
         remove_dependent_index(indexes,
@@ -2169,9 +2195,6 @@ def task_run_core():
                 final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
-                task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
                     wordTable.table_name
@@ -2207,9 +2230,6 @@ def task_run_core():
             elif task_get_option("cmd") == "add":
                 final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
-                task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
@@ -2248,9 +2268,6 @@ def task_run_core():
                 wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
                 if not task_get_option("id") and not task_get_option("collection"):
                     update_index_last_updated([index_name], task_get_task_param('task_starting_time'))
-                task_sleep_now_if_required(can_stop_too=True)
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
                 error_message = "Invalid command found processing %s" % \
