@@ -18,45 +18,117 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Tests for Node class."""
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+
+from flask.ext.registry import (
+    ImportPathRegistry, PkgResourcesDirDiscoveryRegistry, RegistryProxy
+)
+
+from invenio.base.wrappers import lazy_import
+from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
+from invenio.testsuite import (
+    InvenioTestCase, make_test_suite, nottest, run_test_suite
+)
+
+Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
+Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
+
+TEST_PACKAGE = ('invenio.modules.records.testsuite',
+                'invenio.modules.relationships.testsuite')
+
+test_registry = RegistryProxy('testsuite', ImportPathRegistry,
+                              initial=TEST_PACKAGE)
+
+
+def field_definitions():
+    """Load field definitions."""
+    return PkgResourcesDirDiscoveryRegistry(
+        'fields', registry_namespace=test_registry)
+
+
+def model_definitions():
+    """Load model definitions."""
+    return PkgResourcesDirDiscoveryRegistry(
+        'models', registry_namespace=test_registry)
+
+
+def function_proxy():
+    """Load functions."""
+    return ModuleAutoDiscoverySubRegistry(
+        'functions', registry_namespace=test_registry)
 
 
 class RelationshipsNodeTestCase(InvenioTestCase):
 
     """Test mehods of ``Node`` class."""
 
+    @classmethod
+    def setupClass(cls):
+        Field_parser._field_definitions = {}
+        Field_parser._legacy_field_matchings = {}
+        Model_parser._model_definitions = {}
+
     def setUp(self):
         """TODO"""
         self._importContext()
-        self._empty_record = self.Document.create({'title': 'Document 1',
-                                                   'description': 'Testing 1'})
+
+        self.app.extensions['registry']['testsuite.fields'] = field_definitions()
+        self.app.extensions['registry']['testsuite.models'] = model_definitions()
+        self.app.extensions['registry']['testsuite.functions'] = function_proxy()
+
+        self._document = self.Document.create({'title': 'Document',
+                                               'description': 'Testing'})
+        self._record = self.Record(master_format='marc',
+                                   namespace='testsuite')
+        self._record['recid'] = 1
+
         self.db.session.commit()
-        self._id = self._empty_record['_id']
-        self._dummy_record = self.Document.get_document(self._id)
+
+        self._record_id = self._record['_id']
+        self._document_id = self._document['_id']
 
     def _importContext(self):
         from invenio.ext.sqlalchemy import db
         from invenio.modules.documents.api import Document
+        from invenio.modules.records.api import Record
         from invenio.modules.documents.models import Document as DocumentModel
+        from invenio.modules.records.models import Record as RecordModel
         from ..api import Node
 
         self.db = db
         self.Node = Node
         self.Document = Document
+        self.Record = Record
+        self.RecordModel = RecordModel
         self.DocumentModel = DocumentModel
 
     def tearDown(self):
         """TODO"""
-        docs = self.DocumentModel.query.filter_by(id=self._id).all()
-        for doc in docs:
-            self.db.session.delete(doc)
+        nodes = []
+        nodes.extend(self.DocumentModel.query.filter_by(id=self._document_id).all())
+        nodes.extend(self.RecordModel.query.filter_by(id=self._record_id).all())
+
+        for node in nodes:
+            self.db.session.delete(node)
         self.db.session.commit()
 
-    def test_sanity(self):
-        self.assertEqual(True, True)
+        del self.app.extensions['registry']['testsuite.fields']
+        del self.app.extensions['registry']['testsuite.models']
+        del self.app.extensions['registry']['testsuite.functions']
+
+    @nottest
+    def test_annotations(self):
+        # FIXME: implement and test annotations.
+        self.assertTrue(hasattr(self._annotation, '_edges'))
+
+    def test_documents(self):
+        self.assertTrue(hasattr(self._document, '_edges'))
+
+    def test_records(self):
+        self.assertTrue(hasattr(self._record, '_edges'))
 
 
 TEST_SUITE = make_test_suite(RelationshipsNodeTestCase)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
