@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@
     invenio.ext.sslify
     ------------------
      This module provides initialization and configuration for
-     `flask.ext.sslify` module.
+     `flask_sslify` module.
 """
 
 from flask import session, request, current_app

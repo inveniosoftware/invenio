@@ -21,7 +21,7 @@
 
 from functools import wraps
 
-from flask.ext.restful import Resource, abort, fields, marshal_with, reqparse
+from flask_restful import Resource, abort, fields, marshal_with, reqparse
 
 from invenio.ext.restful import pagination
 

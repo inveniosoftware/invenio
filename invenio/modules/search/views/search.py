@@ -48,7 +48,7 @@ from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort, session, Blueprint, \
     render_template
-from flask.ext.login import current_user
+from flask_login import current_user
 from six import iteritems
 from werkzeug.local import LocalProxy
 
@@ -59,13 +59,13 @@ from ..facet_builders import get_current_user_records_that_can_be_displayed, \
 from ..forms import EasySearchForm
 from ..models import Collection
 from ..washers import wash_search_urlargd
-from flask.ext.menu import register_menu
+from flask_menu import register_menu
 from invenio.base.signals import websearch_before_browse
 from invenio.modules.indexer import models as BibIndex
 from invenio.modules.formatter import format_record
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
-from flask.ext.breadcrumbs import \
+from flask_breadcrumbs import \
     register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
 from invenio.ext.template.context_processor import \
     register_template_context_processor

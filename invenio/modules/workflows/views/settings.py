@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,9 +31,9 @@ from __future__ import absolute_import
 
 from flask import Blueprint, render_template, request
 #from flask import redirect, url_for
-from flask.ext.login import login_required
-from flask.ext.breadcrumbs import register_breadcrumb
-from flask.ext.menu import register_menu
+from flask_login import login_required
+from flask_breadcrumbs import register_breadcrumb
+from flask_menu import register_menu
 from invenio.base.i18n import _
 from .holdingpen import get_holdingpen_objects, get_action_list
 

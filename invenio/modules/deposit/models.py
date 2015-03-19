@@ -34,8 +34,8 @@ from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
 from flask import redirect, render_template, flash, url_for, request, \
     session, current_app
-from flask.ext.login import current_user
-from flask.ext.restful import fields, marshal
+from flask_login import current_user
+from flask_restful import fields, marshal
 from invenio.ext.restful import UTCISODateTime
 from invenio.base.helpers import unicodifier
 

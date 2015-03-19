@@ -22,7 +22,7 @@
 import os
 import pkg_resources
 
-from flask.ext.registry import (
+from flask_registry import (
     ImportPathRegistry, PkgResourcesDirDiscoveryRegistry, RegistryProxy
 )
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
 from flask import (request, g, current_app, render_template, abort,
                    send_from_directory, url_for)
-from flask.ext.admin.menu import MenuLink
+from flask_admin.menu import MenuLink
 
 from invenio.base import signals
 from invenio.base.scripts.database import create, recreate

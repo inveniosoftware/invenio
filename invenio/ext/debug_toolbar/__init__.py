@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ def setup_app(app):
     # Enable Flask Debug Toolbar early to also catch HTTPS redirects
     if app.debug and app.config.get('DEBUG_TB_ENABLED', app.debug):
         try:
-            from flask.ext.debugtoolbar import module, DebugToolbarExtension
+            from flask_debugtoolbar import module, DebugToolbarExtension
             module.static_folder = 'static'
             DebugToolbarExtension(app)
         except ImportError:

@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ from .control import acc_find_possible_roles, acc_is_user_in_any_role, acc_get_r
 from .local_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio.legacy.webuser import collect_user_info
 from invenio.modules.access.firerole import load_role_definition, acc_firerole_extract_emails
-from flask.ext.login import current_user
+from flask_login import current_user
 
 
 def acc_authorize_action(req, name_action, authorized_if_no_roles=False, batch_args=False, **arguments):

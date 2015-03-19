@@ -19,8 +19,8 @@
 
 """WebAccount Forms."""
 
-from flask.ext.login import current_user
-from flask.ext.wtf import Form, validators
+from flask_login import current_user
+from flask_wtf import Form, validators
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _

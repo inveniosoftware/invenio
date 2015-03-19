@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from flask import url_for, request
-from flask.ext.restful import Resource
+from flask_restful import Resource
 
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.ext.restful import require_api_auth, require_oauth_scopes, \
@@ -351,7 +351,7 @@ class RestfulPaginationTestCase(InvenioTestCase):
 class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
 
     def setUp(self):
-        from flask.ext.restful import Resource, fields, marshal
+        from flask_restful import Resource, fields, marshal
         from invenio.modules.accounts.models import User
         from invenio.modules.oauth2server.models import Token
 

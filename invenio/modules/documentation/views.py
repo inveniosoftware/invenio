@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,10 +30,10 @@ from sphinx.websupport.errors import DocumentNotFoundError
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from flask.ext.breadcrumbs import (default_breadcrumb_root,
+from flask_breadcrumbs import (default_breadcrumb_root,
                                    register_breadcrumb,
                                    current_breadcrumbs)
-from flask.ext.menu import register_menu
+from flask_menu import register_menu
 
 
 class DocsBlueprint(Blueprint):

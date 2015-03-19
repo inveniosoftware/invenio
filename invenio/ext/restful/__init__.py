@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,8 +28,8 @@ from dateutil import parser
 from dateutil.tz import tzlocal, tzutc
 from flask import request, session
 from flask.ext import restful
-from flask.ext.restful import fields
-from flask.ext.registry import ModuleAutoDiscoveryRegistry
+from flask_restful import fields
+from flask_registry import ModuleAutoDiscoveryRegistry
 from functools import wraps
 from cerberus import Validator
 

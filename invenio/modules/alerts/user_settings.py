@@ -22,7 +22,7 @@
 from invenio.base.i18n import _
 from invenio.ext.template import render_template_to_string
 from invenio.modules.alerts.models import UserQueryBasket
-from flask.ext.login import current_user
+from flask_login import current_user
 from invenio.modules.dashboard.settings import Settings, UserSettingsStorage
 
 class WebAlertSettings(Settings):

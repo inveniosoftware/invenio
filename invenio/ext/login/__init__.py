@@ -17,14 +17,14 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Provide initialization and configuration for `flask.ext.login` module."""
+"""Provide initialization and configuration for `flask_login` module."""
 
 import urllib
 
 from datetime import datetime
 
 from flask import flash, g, redirect, request, session, url_for
-from flask.ext.login import (
+from flask_login import (
     LoginManager,
     current_user,
     login_user as flask_login_user,

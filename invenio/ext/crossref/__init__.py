@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -52,7 +52,7 @@ import requests
 from urlparse import urljoin
 
 from flask import current_app, request, jsonify
-from flask.ext.login import login_required
+from flask_login import login_required
 
 response_code = {'success': 200,
                  'notfound': 404,

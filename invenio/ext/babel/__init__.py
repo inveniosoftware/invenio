@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ import six
 from babel import support
 from contextlib import contextmanager
 from flask import g, _request_ctx_stack, current_app
-from flask.ext.babel import Babel, gettext
+from flask_babel import Babel, gettext
 
 from invenio.utils.datastructures import LaziestDict
 from .selectors import get_locale, get_timezone
@@ -95,10 +95,10 @@ def set_translations():
 def setup_app(app):
     """Setup Babel extension.
 
-    Replaces implementation of ``get_translations`` in ``flask.ext.babel``.
+    Replaces implementation of ``get_translations`` in ``flask_babel``.
     """
-    import flask.ext.babel
-    flask.ext.babel.get_translations = get_translations
+    import flask_babel
+    flask_babel.get_translations = get_translations
 
     babel.init_app(app)
     babel.localeselector(get_locale)

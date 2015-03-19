@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@
 """Initialize and configure *Flask-Principal* extension."""
 
 from flask import current_app
-from flask.ext.login import user_logged_in, user_logged_out
-from flask.ext.principal import Principal, Identity, AnonymousIdentity, \
+from flask_login import user_logged_in, user_logged_out
+from flask_principal import Principal, Identity, AnonymousIdentity, \
     identity_changed, Permission
 from six import iteritems
 

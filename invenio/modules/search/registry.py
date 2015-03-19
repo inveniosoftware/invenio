@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@
 
 """Registries for search module."""
 
-from flask.ext.registry import RegistryError, ModuleAutoDiscoveryRegistry, \
+from flask_registry import RegistryError, ModuleAutoDiscoveryRegistry, \
     RegistryProxy
 from werkzeug.utils import cached_property
 

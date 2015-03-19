@@ -20,7 +20,7 @@
 """Unit tests for the JSONAlchemy bases."""
 
 from datetime import datetime
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 
 from invenio.base.wrappers import lazy_import

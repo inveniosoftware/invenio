@@ -53,7 +53,7 @@ EXTENSIONS = [
     'invenio.ext.restful',
     'invenio.ext.menu',
     'invenio.ext.jasmine',  # after assets
-    'flask.ext.breadcrumbs:Breadcrumbs',
+    'flask_breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
 ]
 
@@ -457,7 +457,7 @@ CFG_CROSSREF_USERNAME = ""
 CFG_DEVEL_SITE = 0
 CFG_DEVEL_TEST_DATABASE_ENGINES = {}
 CFG_DEVEL_TOOLS = []
-CFG_EMAIL_BACKEND = "flask.ext.email.backends.smtp.Mail"
+CFG_EMAIL_BACKEND = "flask_email.backends.smtp.Mail"
 CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER = 14400
 CFG_FLASK_DISABLED_BLUEPRINTS = []
 CFG_HEPDATA_FIELD = "hepdataparent"

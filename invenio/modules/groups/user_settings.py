@@ -23,7 +23,7 @@ from flask import url_for
 from invenio.base.i18n import _
 
 from invenio.ext.template import render_template_to_string
-from flask.ext.login import current_user
+from flask_login import current_user
 from invenio.modules.account.models import UserUsergroup
 from invenio.modules.dashboard.settings import Settings
 

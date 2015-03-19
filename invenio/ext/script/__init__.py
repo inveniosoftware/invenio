@@ -28,9 +28,9 @@ import re
 from types import FunctionType
 
 from flask import current_app, flash
-from flask.ext.registry import ModuleAutoDiscoveryRegistry, RegistryProxy
-from flask.ext.script import Manager as FlaskExtManager
-from flask.ext.script.commands import Clean, Server, Shell, ShowUrls
+from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
+from flask_script import Manager as FlaskExtManager
+from flask_script.commands import Clean, Server, Shell, ShowUrls
 
 from invenio.base.signals import post_command, pre_command
 

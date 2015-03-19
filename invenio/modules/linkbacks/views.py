@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@
 """WebSearch Flask Blueprint."""
 
 from flask import Blueprint, render_template, Response, request
-from flask.ext.login import current_user
-from flask.ext.menu import register_menu
+from flask_login import current_user
+from flask_menu import register_menu
 
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _

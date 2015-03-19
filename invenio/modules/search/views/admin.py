@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,13 +23,13 @@ from __future__ import print_function
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
     url_for, abort
-from flask.ext.breadcrumbs import register_breadcrumb
+from flask_breadcrumbs import register_breadcrumb
 from invenio.ext.sqlalchemy import db
 from ..models import Collection, CollectionCollection, \
     Collectionname, CollectionPortalbox, Portalbox
 from invenio.base.i18n import _
 from invenio.base.decorators import templated
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 from invenio.ext.principal import permission_required
 from invenio.base.i18n import language_list_long
 

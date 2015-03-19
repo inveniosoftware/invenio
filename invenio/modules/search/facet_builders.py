@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ from operator import itemgetter
 from itertools import groupby
 from six import iteritems
 from flask import g, url_for, request
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from .cache import search_results_cache, \
     get_search_results_cache_key_from_qid

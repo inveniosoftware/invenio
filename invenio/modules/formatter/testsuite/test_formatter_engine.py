@@ -32,7 +32,7 @@ from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
     ImportPathRegistry
 
 bibformat = lazy_import('invenio.modules.formatter')

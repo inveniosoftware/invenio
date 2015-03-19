@@ -25,7 +25,7 @@ from functools import partial, wraps
 
 from flask import current_app, flash, redirect, render_template, \
     request, session, url_for
-from flask.ext.login import current_user
+from flask_login import current_user
 import six
 from werkzeug.utils import import_string
 

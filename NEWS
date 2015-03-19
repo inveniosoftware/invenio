@@ -598,7 +598,7 @@ Invenio v2.0.0 -- released 2015-03-04
     documentation; Tokeninput download from GitHub; release control
     fix; hogan.js template engine addition; mysql default date value
     fix; jinja2utils and requirements upgrade (#1476); `apache create-
-    config` renaming; test presence of flask.ext.admin; secret key
+    config` renaming; test presence of flask_admin; secret key
     creation fix; replace libxslt with lxml; demosite fixtures
     addition; fix for BibWorkflow table dropping (#1283); use concrete
     SHA1 for workflow; fix for removed invenio.conf values; database
@@ -856,7 +856,7 @@ Invenio v2.0.0 -- released 2015-03-04
 
  *) registry: keygetter value fix; fix package exclude for sub
     registry; missing function addition; dict-style auto discover
-    registry; imports from `flask.ext.registry`; move to separate
+    registry; imports from `flask_registry`; move to separate
     package Flask-Registry; initial release
 
  *) requirements: pymongo addition; qrcode removal; better separation;

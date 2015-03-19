@@ -445,7 +445,7 @@ the following commands.
 
 .. code-block:: console
 
-    (invenio)$ inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail
+    (invenio)$ inveniomanage config set CFG_EMAIL_BACKEND flask_email.backends.console.Mail
     (invenio)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
     (invenio)$ inveniomanage config set CFG_DATABASE_NAME $BRANCH
     (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
@@ -473,7 +473,7 @@ the original files. As a developer you may want to have symbolic links instead.
 .. code-block:: console
 
     # Developer only
-    (invenio)$ inveniomanage config set COLLECT_STORAGE flask.ext.collect.storage.link
+    (invenio)$ inveniomanage config set COLLECT_STORAGE flask_collect.storage.link
 
 
     (invenio)$ inveniomanage collect

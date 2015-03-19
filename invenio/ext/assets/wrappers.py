@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,8 +22,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 from flask import current_app
-from flask.ext.assets import Bundle as BundleBase
-from flask.ext.registry import ModuleAutoDiscoveryRegistry
+from flask_assets import Bundle as BundleBase
+from flask_registry import ModuleAutoDiscoveryRegistry
 from werkzeug.utils import import_string
 from webassets.filter.requirejs import RequireJSFilter as RequireJSFilterBase
 from webassets.filter import ExternalTool

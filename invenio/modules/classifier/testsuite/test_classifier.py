@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ import time
 import stat
 import shutil
 
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
     InvenioTestCase

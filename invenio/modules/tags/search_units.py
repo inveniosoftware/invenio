@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 """WebTag Plugin for search_engine"""
 
 from intbitset import intbitset
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from .models import \
     WtgTAG, \

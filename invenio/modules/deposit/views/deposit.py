@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,9 +35,9 @@ from flask import current_app, Blueprint, \
     make_response
 from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
-from flask.ext.login import current_user, login_required
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from flask.ext.menu import register_menu
+from flask_login import current_user, login_required
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask_menu import register_menu
 
 from invenio.base.i18n import _
 from ..signals import template_context_created

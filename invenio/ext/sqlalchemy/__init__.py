@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,13 +21,13 @@
     invenio.ext.sqlalchemy.
 
     This module provides initialization and configuration for
-    `flask.ext.sqlalchemy` module.
+    `flask_sqlalchemy` module.
 """
 
 import sqlalchemy
 
-from flask.ext.registry import RegistryProxy, ModuleAutoDiscoveryRegistry
-from flask.ext.sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
+from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
+from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 from sqlalchemy import event
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from sqlalchemy.pool import Pool

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@
 
 """Administration menu."""
 
-from flask.ext.menu import Menu
-from flask.ext.login import current_user
+from flask_menu import Menu
+from flask_login import current_user
 from invenio.base.i18n import _
 
 menu = Menu()

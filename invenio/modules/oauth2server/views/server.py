@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,8 +27,8 @@ from functools import wraps
 from flask import Blueprint, current_app, request, render_template, jsonify, \
     abort, redirect
 from flask_oauthlib.contrib.oauth2 import bind_cache_grant, bind_sqlalchemy
-from flask.ext.login import login_required
-from flask.ext.breadcrumbs import register_breadcrumb
+from flask_login import login_required
+from flask_breadcrumbs import register_breadcrumb
 from oauthlib.oauth2.rfc6749.errors import OAuth2Error
 from werkzeug.urls import url_encode
 

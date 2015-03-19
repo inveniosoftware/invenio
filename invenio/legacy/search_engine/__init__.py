@@ -6696,7 +6696,7 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
     # FIXME move query logging to signal receiver
     # log query:
     try:
-        from flask.ext.login import current_user
+        from flask_login import current_user
         if req:
             from flask import request
             req = request

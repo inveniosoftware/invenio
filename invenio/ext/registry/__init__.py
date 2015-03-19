@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,8 +20,8 @@
 """Addtional registries for Flask-Registry."""
 
 from werkzeug.utils import import_string, find_modules
-from flask.ext.registry import ModuleAutoDiscoveryRegistry
-from flask.ext.registry import RegistryError
+from flask_registry import ModuleAutoDiscoveryRegistry
+from flask_registry import RegistryError
 
 
 class ModuleAutoDiscoverySubRegistry(ModuleAutoDiscoveryRegistry):

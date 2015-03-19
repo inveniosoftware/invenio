@@ -20,7 +20,7 @@
 """Provide support for legacy UserInfo object."""
 
 from flask import session, request, has_request_context, current_app
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
 from invenio.ext.cache import cache

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ import sys
 import urllib
 import warnings
 
-from flask.ext.registry import Registry, ExtensionRegistry, \
+from flask_registry import Registry, ExtensionRegistry, \
     PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
 from pkg_resources import iter_entry_points
 from six.moves.urllib.parse import urlparse

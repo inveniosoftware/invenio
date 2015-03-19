@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,7 +30,7 @@ from flask import render_template, request, flash, redirect, url_for, \
     jsonify, Blueprint
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 from invenio.base.globals import cfg
 
 # External imports
@@ -38,8 +38,8 @@ from invenio.modules.accounts.models import User
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.search.models import Collection
 from invenio.modules.search.views.search import response_formated_records
-from flask.ext.menu import register_menu
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask_menu import register_menu
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.sqlalchemy import db
 
 # Internal imports

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -61,8 +61,8 @@ Usage example - create a file called <module>_admin.py::
 
 from __future__ import absolute_import
 
-from flask.ext.admin import Admin
-from flask.ext.registry import ModuleAutoDiscoveryRegistry
+from flask_admin import Admin
+from flask_registry import ModuleAutoDiscoveryRegistry
 
 from .views import AdminIndexView
 

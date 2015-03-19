@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ So for example if you plan to add support for an extension named
 
 Alternatively, if the extension only reads configuration from
 ``current_app.config``, you can just list in ``EXTENSIONS`` option
-as ``flask.ext.something:Something``, where ``Something`` has to accept
+as ``flask_something:Something``, where ``Something`` has to accept
 an application object as first argument::
 
     class Something(object):
@@ -96,7 +96,7 @@ Here's the contents of the most important files:
 
 .. code-block:: python
 
-    from flask.ext.login import UserMixin
+    from flask_login import UserMixin
     from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
     class UserInfo(CombinedMultiDict, UserMixin):

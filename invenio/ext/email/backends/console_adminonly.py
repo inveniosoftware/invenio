@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ CFG_SITE_ADMIN_EMAIL.
 __revision__ = "$Id$"
 
 from . import adminonly_class
-from flask.ext.email.backends.console import Mail as Console
+from flask_email.backends.console import Mail as Console
 
 Mail = adminonly_class(Console)
 

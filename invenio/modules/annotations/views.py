@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,7 +21,7 @@ from urlparse import urlsplit
 
 from flask import current_app, Blueprint, render_template, request, redirect, \
     flash, jsonify, url_for, g, abort
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from sqlalchemy.event import listen
 
 from invenio.base.globals import cfg
@@ -90,7 +90,7 @@ def add():
                        where=form.url.data,
                        what=form.body.data,
                        perm=permission_builder(form.public.data))
-        from flask.ext.babel import gettext  # "unlazy" translation hack
+        from flask_babel import gettext  # "unlazy" translation hack
         flash(gettext("Annotation saved."), "info")
         if not request.is_xhr:
             return redirect(request.referrer)

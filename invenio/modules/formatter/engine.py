@@ -666,7 +666,7 @@ def format_with_format_template(format_template_filename, bfo,
         from invenio.modules.records.api import \
             create_record as new_create_record, \
             get_record as new_get_record
-        from flask.ext.login import current_user
+        from flask_login import current_user
         from invenio.base.helpers import unicodifier
 
         def _format_record(recid, of='hb', user_info=current_user, *args, **kwargs):
