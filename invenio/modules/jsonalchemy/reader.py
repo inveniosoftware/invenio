@@ -318,10 +318,10 @@ class Reader(object):  # pylint: disable=R0921
 
         self._parsed.append((json_id, field_name))
 
-        # In this two method calls the decorators are never apply because of
-        # default types, i.e. when keywords are evaluated the first keyword
+        # In these two method calls the decorators are never applied because of
+        # the default types, i.e. when keywords are evaluated the first keyword
         # which is parsed creates a string not a list, therefore all the
-        # extensions and decorator that are expecting a list will fail.
+        # extensions and decorators that are expecting a list will fail.
         self._apply_rules(json_id, field_name, rule)
         self._apply_virtual_rules(json_id, field_name, rule)
 
@@ -425,8 +425,11 @@ class Reader(object):  # pylint: disable=R0921
                 self._json.__setitem__(field_name, value, extend=False,
                                        exclude=['decorators', 'extensions'])
             else:
-                old_value = self._json.__getitem__(
-                    field_name, exclude=['decorators', 'extensions'])
+                try:
+                    old_value = self._json.__getitem__(
+                        field_name, exclude=['decorators', 'extensions'])
+                except KeyError:
+                    old_value = value
                 self._json.__setitem__(field_name, value, extend=False,
                                        exclude=['decorators', 'extensions'])
                 # FIXME: Find a better way to set the default values
