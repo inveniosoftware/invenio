@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,8 @@
 
 """Messages bundles."""
 
+from invenio.base.bundles import invenio as _i, jquery as _j, styles as _styles
 from invenio.ext.assets import Bundle, RequireJSFilter
-
-from invenio.base.bundles import styles as _styles, jquery as _j, invenio as _i
 
 _styles.contents.append(
     "vendors/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css"
@@ -34,6 +33,6 @@ js = Bundle(
     filters=RequireJSFilter(exclude=[_j, _i]),
     bower={
         "jquery-ui": "~1.11",
-        "jqueryui-timepicker-addon": "latest"
+        "jqueryui-timepicker-addon": "1.5.2"
     }
 )
