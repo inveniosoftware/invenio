@@ -2147,6 +2147,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
+        # TEMPORARY HACK untile unicode indexes are completed
+        if bsu_f == 'author' and re.match("\w+\.\w+\.\d+", bsu_p):
+            # Searching for BAIs in author is currently broken.
+            # Let's search in exactauthor
+            bsu_f = 'exactauthor'
         if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
                 write_warning(_("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)), req=req)
