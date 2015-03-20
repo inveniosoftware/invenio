@@ -538,17 +538,17 @@ class Template:
 
         title_element = ""
         if cmt_title:
-            title_element = """<div> %s </div>""" % (cmt_title)
+            title_element = "<span class='extra-info'>{0}</span>".format(
+                cmt_title)
 
         out += """
 <div class="webcomment_comment_box">
     %(toggle_visibility_block)s
     <div class="webcomment_comment_avatar"><img class="webcomment_comment_avatar_default" src="%(site_url)s/img/user-icon-1-24x24.gif" alt="avatar" /></div>
-    %(title_element)s
     <div class="webcomment_comment_content">
         <div class="webcomment_comment_title">
             %(title)s
-            <div class="webcomment_comment_date">%(date)s</div>
+            <div class="webcomment_comment_date">%(date)s</div> %(title_element)s
             <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)s">¶</a>
             %(related_file_element)s
         </div>
@@ -861,6 +861,7 @@ class Template:
             req = None
         ## comments table
         comments_rows = ''
+        toggle_script = ''
         last_comment_round_name = None
         comment_round_names = [comment[0] for comment in comments]
         if comment_round_names:
@@ -897,8 +898,7 @@ class Template:
             comments_rows += '<div id="cmtSubRound%s" class="cmtsubround" style="%s">' % (comment_round_name,
                                                                                           comment_round_style)
             if not reviews and not isGuestUser(uid):
-                comments_rows += '''
-                <a href="javascript:void(0)" data-toggle="collapse" data-collapse>%(collapse_text)s</a> | <a href="javacript:void(0)" data-toggle="uncollapse" data-collapse>%(expand_text)s</a>
+                toggle_script = '''
                 <script type="text/javascript">
                     $(document).ready(function(){
                         $('[data-collapse]').on('click', function(){
@@ -986,6 +986,13 @@ class Template:
                     }
                 }
                 //]]></script>
+                <div id="action-area">
+                    <ul>
+                        <li><a href="javascript:void(0)" data-toggle="collapse" data-collapse>%(collapse_text)s</a></li>
+                        <li>|</li>
+                        <li> <a href="javascript:void(0)" data-toggle="uncollapse" data-collapse>%(expand_text)s</a></li>
+                    </ul>
+                </div>
                 ''' % {'siteurl': CFG_SITE_URL,
                     'recID': recID,
                     'ln': ln,
@@ -1223,7 +1230,7 @@ class Template:
                         link_label=_('Subscribe')) + \
                     '</strong>' + \
                     ' to this discussion. You will then receive all new comments by email.' + \
-                    '</p>'
+                    '</p> <div class="clear"></div> '
             elif user_can_unsubscribe_from_discussion:
                 subscription_link = \
                     '<p class="comment-subscribe">' + \
@@ -1241,52 +1248,62 @@ class Template:
                         link_label=_('Unsubscribe')) + \
                     '</strong>' + \
                     ' from this discussion. You will no longer receive emails about new comments.' + \
-                    '</p>'
+                    '</p> <div class="clear"></div>'
 
         deadline_text = ""
-        for (matching_value, (matching_key, deadline_key, deadline_value_format)) in CFG_WEBCOMMENT_DEADLINE_CONFIGURATION.items():
-            if matching_value in get_fieldvalues(recID, matching_key):
-                deadline_value = get_fieldvalues(recID, deadline_key)
-                if deadline_value:
-                    try:
-                        deadline_object = datetime.strptime(deadline_value[0], deadline_value_format)
-                    except ValueError:
-                        break
-                    datetime_left = deadline_object - datetime.now()
-                    # People can still submit comments on the day of the
-                    # deadline, so make sure to add a day here.
-                    days_left = datetime_left.days + 1
-                    deadline_struct_time = date.timetuple(deadline_object)
-                    deadline_dategui = convert_datestruct_to_dategui(deadline_struct_time, ln).split(",")[0]
-                    if days_left > 0:
-                        deadline_text = _("Please submit your comments within %i days, by %s." % (days_left, deadline_dategui))
-                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
-                    elif days_left == 0:
-                        deadline_text = _("Please submit your comments by today.")
-                        deadline_text = "<span class=\"warninggreen\">" + deadline_text + "</span><br />"
-                    else:
-                        deadline_text = _("The deadline to submit comments expired %i days ago, on %s." % (abs(days_left), deadline_dategui))
-                        deadline_text = "<span class=\"warningred\">" + deadline_text + "</span><br />"
-                # If at least one matching value is found, then there is no
-                # need to look for more.
-                break
+        if not reviews:
+            for (matching_value, (matching_key, deadline_key, deadline_value_format)) in CFG_WEBCOMMENT_DEADLINE_CONFIGURATION.items():
+                if matching_value in get_fieldvalues(recID, matching_key):
+                    deadline_value = get_fieldvalues(recID, deadline_key)
+                    if deadline_value:
+                        try:
+                            deadline_object = datetime.strptime(deadline_value[0], deadline_value_format)
+                        except ValueError:
+                            break
+                        datetime_left = deadline_object - datetime.now()
+                        # People can still submit comments on the day of the
+                        # deadline, so make sure to add a day here.
+                        days_left = datetime_left.days + 1
+                        deadline_struct_time = date.timetuple(deadline_object)
+                        deadline_dategui = convert_datestruct_to_dategui(deadline_struct_time, ln).split(",")[0]
+                        if days_left > 0:
+                            deadline_text = _("Please submit your comments within %i days, by %s." % (days_left, deadline_dategui))
+                            deadline_text = "<span class=\"deadline-warnings deadline-warnings-green\">" + deadline_text + "</span>"
+                        elif days_left == 0:
+                            deadline_text = _("Please submit your comments by today.")
+                            deadline_text = "<span class=\"deadline-warnings deadline-warnings-green\">" + deadline_text + "</span>"
+                        else:
+                            deadline_text = _("The deadline to submit comments expired %i days ago, on %s." % (abs(days_left), deadline_dategui))
+                            deadline_text = "<span class=\"deadline-warnings deadline-warnings-red \">" + deadline_text + "</span>"
+                    # If at least one matching value is found, then there is no
+                    # need to look for more.
+                    break
 
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
-%(comments_and_review_tabs)s
-%(subscription_link_before)s
-%(deadline_text)s
-%(filtering_script)s
-<div style="clear:both"></div>
-<br />
-<!-- start comments table -->
-<div class="webcomment_comment_table">
-  %(comments_rows)s
-</div>
-<!-- end comments table -->
-%(review_or_comment_first)s
-%(subscription_link_after)s
-''' % {
+            %(comments_and_review_tabs)s
+            %(subscription_link_before)s
+            <div class="clear"></div>
+            <div id="deadline-wrapper">
+                %(deadline_text)s
+            </div>
+            <div class="clear"></div>
+            <div id="tools-and-filtering-wrapper">
+                %(toggle_script)s
+                %(filtering_script)s
+            </div>
+            <div class="clear"></div>
+            <!-- start comments table -->
+            <div class="webcomment_comment_table">
+                %(comments_rows)s
+            </div>
+            <!-- end comments table -->
+            <div class="clear"></div>
+            %(review_or_comment_first)s
+            <div class="clear"></div>
+            %(subscription_link_after)s
+            <div class="clear"></div>
+        ''' % {
             'record_label': _("Record"),
             'back_label': _("Back to search results"),
             'total_label': total_label,
@@ -1327,6 +1344,7 @@ class Template:
                 nb_per_page=nb_per_page,
                 nb_pages=nb_pages) if not reviews else '',
             'deadline_text': deadline_text,
+            'toggle_script': toggle_script
         }
 
         # form is not currently used. reserved for an eventual purpose
@@ -1590,11 +1608,11 @@ class Template:
             note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") % \
                 {'x_url_open': link,
                  'x_url_close': '</a>',
-                 'x_nickname': ' <br /><i>' + display + '</i>'}
-
+                 'x_nickname': ' <i>' + display + '</i>'}
+        note = "<p>{0}</p>".format(note)
         if not CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR:
             if CFG_WEBCOMMENT_ENABLE_MARKDOWN_TEXT_RENDERING:
-                note += '<br />' + '&nbsp;'*10 + cgi.escape('You can use Markdown syntax to write your comment.')
+                note += "<p>{0}</p>".format(_("You can use Markdown syntax to write your comment."))
             else:
                 # NOTE: Currently we escape all HTML tags before displaying plain text. Should we go back to this approach?
                 #       To go back to this approach we probably simply have to run email_quoted_text2html with wash_p=True
@@ -1610,15 +1628,15 @@ class Template:
         file_upload_url = None
         simple_attach_file_interface = ''
         if isGuestUser(uid):
-            simple_attach_file_interface = "<small><em>%s</em></small><br/>" % _("Once logged in, authorized users can also attach files.")
+            simple_attach_file_interface = "<label><em>%s</em></label>" % _("Once logged in, authorized users can also attach files.")
         if can_attach_files:
             # Note that files can be uploaded only when user is logged in
             #file_upload_url = '%s/%s/%i/comments/attachments/put' % \
             #                  (CFG_SITE_URL, CFG_SITE_RECORD, recID)
             simple_attach_file_interface = '''
             <div id="uploadcommentattachmentsinterface">
-            <small>%(attach_msg)s: <em>(%(nb_files_limit_msg)s. %(file_size_limit_msg)s)</em></small><br />
-            <input class="multi max-%(CFG_WEBCOMMENT_MAX_ATTACHED_FILES)s" type="file" name="commentattachment[]"/><br />
+            <label>%(attach_msg)s: <small><em>(%(nb_files_limit_msg)s. %(file_size_limit_msg)s)</em></small></label><br />
+            <input class="multi max-%(CFG_WEBCOMMENT_MAX_ATTACHED_FILES)s" type="file" name="commentattachment[]"/>
             <noscript>
             <input type="file" name="commentattachment[]" /><br />
             </noscript>
@@ -1669,7 +1687,7 @@ class Template:
         subscribe_to_discussion = ''
         if not user_is_subscribed_to_discussion:
             # Offer to subscribe to discussion
-            subscribe_to_discussion = '<small><input type="checkbox" name="subscribe" id="subscribe"/><label for="subscribe">%s</label></small>' % _("Send me an email when a new comment is posted")
+            subscribe_to_discussion = '<label for="subscribe"><input type="checkbox" name="subscribe" id="subscribe"/> %s</label>' % _("Send me an email when a new comment is posted")
 
         relate_file_element = ""
         relate_file_selector = self.tmpl_bibdocfile_selector_element(
@@ -1684,18 +1702,17 @@ class Template:
                 "Relate this comment to an existing file revision"
             )
             relate_file_element = (
-                "<div id='relate_file'><small>{0}</small>"
-                "{1}</div>").format(relate_file_title, relate_file_selector)
+                "<label>{0}</label><br />{1}").format(
+                    relate_file_title, relate_file_selector)
 
         form = """<div id="comment-write"><h2>%(add_comment)s</h2>
                     %(editor)s
-                    %(relate_file_element)s
-                    %(extra_checkbox)s
-                    %(simple_attach_file_interface)s
+                    <div class="comment-submit-area-note">%(note)s</div>
+                    <p class='comment-submit-area-option'>%(relate_file_element)s</p>
+                    <p class='comment-submit-area-option'>%(simple_attach_file_interface)s</p>
+                    <p class='comment-submit-area-option'>%(extra_checkbox)s</p>
+                    <p class='comment-submit-area-option'>%(subscribe_to_discussion)s</p>
                     <div class="submit-area">
-                      <br />
-                      <span class="reportabuse">%(note)s</span> <br /> <br />
-                      %(subscribe_to_discussion)s<br /><br />
                       <input class="adminbutton" type="submit" value="Add comment" onclick="user_must_confirm_before_leaving_page = false;return true;"/>
                       %(reply_to)s
                     </div>
@@ -3306,7 +3323,7 @@ class Template:
                 var matching_comments_number = $("#matching_comments_number");
 
                 var filter_input = $("#filter_input");
-                var filter_area = $("#filter_area");
+                var filter_area = $("#filter-area");
                 var no_matches_class = 'filter-no-matches';
                 var selectize_input = $('#selectize_input');
 
@@ -3459,7 +3476,7 @@ class Template:
             });
         </script>
 
-        <div id="filter_area">
+        <div id="filter-area">
             <p class="filter-area-count"><label id="matching_comments_number"></p>
             <input id="filter_input" placeholder="%(filter_placeholder)s" value="" />
             %(select_element_with_files)s
