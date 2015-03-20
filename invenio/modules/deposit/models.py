@@ -23,87 +23,114 @@ Classes for wrapping BibWorkflowObject and friends to make it easier to
 work with the data attributes.
 """
 
-from uuid import uuid4
 import json
 import os
 from datetime import datetime
+
+from uuid import uuid4
+
 from dateutil.tz import tzutc
 
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.datastructures import MultiDict
-from werkzeug.utils import secure_filename
-from flask import redirect, render_template, flash, url_for, request, \
-    session, current_app
+from flask import current_app, flash, redirect, render_template, request, \
+    session, url_for
 from flask_login import current_user
 from flask_restful import fields, marshal
-from invenio.ext.restful import UTCISODateTime
+
 from invenio.base.helpers import unicodifier
+from invenio.ext.restful import UTCISODateTime
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.workflows.models import BibWorkflowObject, Workflow, \
-    ObjectVersion
 from invenio.modules.workflows.engine import WorkflowStatus
+from invenio.modules.workflows.models import BibWorkflowObject, ObjectVersion, \
+    Workflow
+
+from sqlalchemy.orm.exc import NoResultFound
+
+from werkzeug.datastructures import MultiDict
+from werkzeug.utils import secure_filename
 
 from .form import CFG_FIELD_FLAGS, DataExporter
 from .signals import file_uploaded
-from .storage import Storage, DepositionStorage
+from .storage import DepositionStorage, Storage
 
 
 #
 # Exceptions
 #
 class DepositionError(Exception):
+
     """Base class for deposition errors."""
+
     pass
 
 
 class InvalidDepositionType(DepositionError):
+
     """Raise when a deposition type cannot be found."""
+
     pass
 
 
 class InvalidDepositionAction(DepositionError):
+
     """Raise when deposition is in an invalid state for action."""
+
     pass
 
 
 class DepositionDoesNotExists(DepositionError):
+
     """Raise when a deposition does not exists."""
+
     pass
 
 
 class DraftDoesNotExists(DepositionError):
+
     """Raise when a draft does not exists."""
+
     pass
 
 
 class FormDoesNotExists(DepositionError):
+
     """Raise when a draft does not exists."""
+
     pass
 
 
 class FileDoesNotExists(DepositionError):
+
     """Raise when a draft does not exists."""
+
     pass
 
 
 class DepositionNotDeletable(DepositionError):
+
     """Raise when a deposition cannot be deleted."""
+
     pass
 
 
 class FilenameAlreadyExists(DepositionError):
+
     """Raise when an identical filename is already present in a deposition."""
+
     pass
 
 
 class ForbiddenAction(DepositionError):
+
     """Raise when action on a deposition, draft or file is not authorized."""
+
     pass
 
 
 class InvalidApiAction(DepositionError):
+
     """Raise when an invalid API action is requested."""
+
     pass
 
 
@@ -111,7 +138,9 @@ class InvalidApiAction(DepositionError):
 # Helpers
 #
 class FactoryMixin(object):
+
     """Mix-in class to help create objects from persisted object state."""
+
     @classmethod
     def factory(cls, state, *args, **kwargs):
         obj = cls(*args, **kwargs)
@@ -123,6 +152,7 @@ class FactoryMixin(object):
 # Primary classes
 #
 class DepositionType(object):
+
     """
     A base class for the deposition types to ensure certain
     properties are defined on each type.
@@ -133,6 +163,7 @@ class DepositionType(object):
     you can override the render_error(), render_step() and render_completed()
     methods.
     """
+
     workflow = []
     """ Workflow definition """
 
@@ -521,8 +552,22 @@ class DepositionType(object):
         """ Return a name for this class """
         return self.get_identifier()
 
+    @classmethod
+    def all_authorized(cls, user_info=None):
+        """
+        Return a dict of deposit types that the current user
+        is allowed to view.
+        """
+        user_info = user_info or current_user
+
+        all_types = cls.all()
+        auth_types = user_info.get('precached_allowed_deposition_types', set())
+
+        return {key: all_types[key] for key in auth_types if key in all_types}
+
 
 class DepositionFile(FactoryMixin):
+
     """
     Represents an uploaded file
 
@@ -565,6 +610,7 @@ class DepositionFile(FactoryMixin):
         d.delete()
 
     """
+
     def __init__(self, uuid=None, backend=None):
         self.uuid = uuid or str(uuid4())
         self._backend = backend

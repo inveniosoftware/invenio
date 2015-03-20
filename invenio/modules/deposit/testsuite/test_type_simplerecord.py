@@ -39,9 +39,10 @@ class SimpleRecordTest(DepositionTestCase):
     def setUp(self):
         """Setup."""
         self.clear('simple')
-        from invenio.modules.deposit.form import WebDepositForm
-        from invenio.modules.deposit import fields
+        from invenio.ext.login import UserInfo
         from invenio.modules.deposit import field_widgets
+        from invenio.modules.deposit import fields
+        from invenio.modules.deposit.form import WebDepositForm
         from invenio.modules.deposit.types import SimpleRecordDeposition
 
         class SimpleRecordTestForm(WebDepositForm):
@@ -80,6 +81,7 @@ class SimpleRecordTest(DepositionTestCase):
                 self.assert_process_metadata(deposition, metadata)
 
         self.register(simple)
+        UserInfo(1, force=True)
 
     def tearDown(self):
         """Teardown."""

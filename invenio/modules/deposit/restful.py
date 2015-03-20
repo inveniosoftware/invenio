@@ -19,14 +19,17 @@
 
 """Deposit REST API."""
 
-from flask import request
-from flask_restful import Resource, abort, reqparse
-from flask_login import current_user
 from functools import wraps
+
+from cerberus import Validator
+from flask import request
+from flask_login import current_user
+from flask_restful import Resource, abort, reqparse
 from werkzeug.utils import secure_filename
 
 from invenio.ext.restful import require_api_auth, error_codes, \
     require_oauth_scopes, require_header
+from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.deposit.models import Deposition, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
@@ -35,7 +38,8 @@ from invenio.modules.deposit.models import Deposition, \
 from invenio.modules.deposit.storage import \
     DepositionStorage, UploadError
 
-from cerberus import Validator
+
+from .registry import deposit_default_type
 
 
 class APIValidator(Validator):
@@ -151,6 +155,14 @@ def filter_validation_errors(errors):
     return error_messages
 
 
+def can_access_deposit_type(type_):
+    """Return True if current user can access given deposition type."""
+    if type_ is None:
+        default_type = deposit_default_type.get()
+        type_ = default_type and default_type.get_identifier() or None
+    return type_ in current_user.get('precached_allowed_deposition_types', [])
+
+
 # =========
 # Mix-ins
 # =========
@@ -246,6 +258,8 @@ class DepositionListResource(Resource, InputProcessorMixin):
     @require_oauth_scopes('deposit:write')
     def post(self):
         """Create a new deposition."""
+        if not can_access_deposit_type(request.json.get('type', None)):
+            raise ForbiddenAction('deposit_create_with_type')
         # Create deposition (uses default deposition type unless type is given)
         d = Deposition.create(current_user, request.json.get('type', None))
         # Validate input data according to schema
