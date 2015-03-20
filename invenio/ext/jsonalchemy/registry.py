@@ -20,11 +20,27 @@
 from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
     ModuleAutoDiscoveryRegistry, RegistryProxy
 
+# from invenio.utils.datastructures import LaziestDict
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from invenio.utils.datastructures import LazyDict
+from invenio.utils.datastructures import LazyDict, LaziestDict
+
+from jsonalchemy.registry import MetaData
+
 
 jsonext = lambda namespace: RegistryProxy(
     namespace, ModuleAutoDiscoveryRegistry, namespace)
+
+
+def get_metadata(namespace):
+    """Return metadata object.
+
+    :param namespace: namespace name
+    :return: JSONAlchemy MetaData object
+    """
+    lambda namespace: MetaData(packages=list(jsonext(namespace)) + ['jsonalchemy.jsonext'])
+
+
+metadata = LaziestDict(get_metadata)
 
 
 fields_proxy = lambda namespace: RegistryProxy(
@@ -55,7 +71,7 @@ function_proxy = lambda namespace: RegistryProxy(
     namespace + '.functions', ModuleAutoDiscoverySubRegistry, 'functions',
     registry_namespace=jsonext(namespace))
 
-
+# FIXME namespace ????
 def functions(namespace=None):
     funcs = dict((module.__name__.split('.')[-1],
                  getattr(module, module.__name__.split('.')[-1]))

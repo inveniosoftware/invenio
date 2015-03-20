@@ -32,10 +32,10 @@ import datetime
 import six
 
 from invenio.base.utils import try_to_eval
+from invenio.ext.jsonalchemy.registry import functions, readers
 
 from .errors import ReaderException
 from .parser import FieldParser, ModelParser
-from .registry import functions, readers
 
 
 def split_blob(blob, master_format, slice_size=0, **kwargs):

@@ -23,9 +23,11 @@ from workflow.engine import GenericWorkflowEngine as WorkflowEngine
 
 from invenio.base.globals import cfg
 from invenio.celery import celery
-from invenio.modules.jsonalchemy.reader import Reader
+from invenio.ext.jsonalchemy.registry import metadata
 from invenio.modules.records.api import Record
 from invenio.modules.workflows.registry import workflows
+
+from jsonalchemy.reader import translate as jsona_translate
 
 from . import signals
 from .errors import UploaderException
@@ -38,16 +40,17 @@ def translate(blob, master_format, kwargs=None):
     :param blob: String contain the input file.
     :param master_format: Format of the blob, it will used to decide which
         reader to use.
-    :param kwargs: Arguments to be used by the reader.
-        See :class:`invenio.modules.jsonalchemy.reader.Reader`
+    :param kwargs: Arguments to be used by the translate function.
+        See :class:`jsonalchemy.reader.translate`
 
     :returns: The blob and the `JSON` representation of the input file created
         by the reader.
 
     """
     return (blob,
-            Reader.translate(blob, Record, master_format,
-                             **(kwargs or dict())).dumps())
+            jsona_translate(blob, Record, master_format,
+                            metadata=metadata['recordext'],
+                            **(kwargs or dict())).dumps())
 
 
 @celery.task

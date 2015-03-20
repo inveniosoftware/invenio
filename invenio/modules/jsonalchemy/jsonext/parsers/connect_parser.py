@@ -114,7 +114,7 @@ class ConnectParser(DecoratorAfterEvalBaseExtensionParser):
         if action == 'get':
             return
 
-        from invenio.modules.jsonalchemy.registry import functions
+        from invenio.ext.jsonalchemy.registry import functions
         for info in args:
             if info['update_function'] is None:
                 json.__setitem__(info['connected_field'],

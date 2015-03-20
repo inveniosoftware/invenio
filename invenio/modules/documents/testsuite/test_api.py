@@ -31,7 +31,7 @@ class TestDocumentsApi(InvenioTestCase):
     def setUp(self):
         from .. import api
         self.app.config['DOCUMENTS_ENGINE'] = \
-            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+            "jsonalchemy.jsonext.engines.memory:MemoryStorage"
 
         self.Document = api.Document
         self.path = tempfile.mkdtemp()

@@ -25,12 +25,12 @@ import six
 from flask import current_app
 from werkzeug.utils import import_string
 
+from invenio.ext.jsonalchemy.registry import contexts, producers
 from invenio.utils.memoise import memoize
 from invenio.utils.datastructures import DotableDict, SmartDict
 
 from .parser import FieldParser, ModelParser
 from .reader import Reader
-from .registry import contexts, producers
 
 
 class StorageEngine(type):

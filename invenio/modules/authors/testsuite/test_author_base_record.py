@@ -44,7 +44,9 @@ class AuthorBaseRecordTestCase(InvenioTestCase):
         :param json_dict: The dictionary in JSON from with author content
         :return: an author base record
         """
-        return self.Record.create(json_dict, 'json', model='author_base')
+        from invenio.ext.jsonalchemy.registry import metadata
+        return self.Record.create(json_dict, 'json',
+                                  metadata=metadata['author_base'])
 
     def create_record_from_marc(self, xml_string):
         """Return record created from MARCxml string.
@@ -52,7 +54,7 @@ class AuthorBaseRecordTestCase(InvenioTestCase):
         :param xml_string: The string representing MARCxml of an author
         :return: an author base record
         """
-        return self.Record.create(xml_string, 'marc', model='author_base')
+        return self.Record.create(xml_string, 'marc', schema='author_base')
 
 
 class AuthorBaseRecordRequiredFieldsTestCase(AuthorBaseRecordTestCase):

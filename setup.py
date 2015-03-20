@@ -62,6 +62,10 @@ class _install_lib(install_lib):  # noqa
         self.run_command('compile_catalog')
 
 
+dependency_links = [
+    "git+https://github.com/inveniosoftware/jsonalchemy.git@master#egg=JSONAlchemy"
+]
+
 install_requires = [
     "alembic>=0.6.6",
     "Babel>=1.3",
@@ -100,6 +104,7 @@ install_requires = [
     "invenio-query-parser>=0.2",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
+    "JSONAlchemy",
     "libmagic>=1.0",
     "lxml>=3.3",
     "mechanize>=0.2.5",

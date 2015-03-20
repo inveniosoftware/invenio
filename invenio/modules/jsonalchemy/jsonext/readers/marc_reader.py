@@ -35,7 +35,7 @@ from invenio.base.utils import try_to_eval
 
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.errors import ReaderException
-from invenio.modules.jsonalchemy.registry import functions
+from invenio.ext.jsonalchemy.registry import functions
 
 
 class MarcReader(Reader):

@@ -31,9 +31,9 @@
         >>> ctx = app.test_request_context()
         >>> ctx.push()
         >>> from invenio.modules.documents import api
-        >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
+        >>> from jsonalchemy.jsonext.engines import memory
         >>> app.config['DOCUMENTS_ENGINE'] = \
-        "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+        "jsonalchemy.jsonext.engines.memory:MemoryStorage"
         >>> d = api.Document.create({'title': 'Title 1'})
         >>> d['title']
         'Title 1'
@@ -52,8 +52,10 @@ import six
 from datetime import datetime
 from fs.opener import opener
 
-from invenio.modules.jsonalchemy.wrappers import SmartJson
-from invenio.modules.jsonalchemy.reader import Reader
+from invenio.ext.jsonalchemy.registry import metadata
+
+from jsonalchemy.reader import translate
+from jsonalchemy.wrappers import SmartJson
 
 from . import signals, errors
 
@@ -66,9 +68,9 @@ class Document(SmartJson):
     @classmethod
     def create(cls, data, model='document_base', master_format='json',
                **kwargs):
-        document = Reader.translate(data, cls, master_format=master_format,
-                                    model=model, namespace='documentext',
-                                    **kwargs)
+        document = translate(data, cls, master_format=master_format,
+                             metadata=metadata['documentext'],
+                             **kwargs)
         cls.storage_engine.save_one(document.dumps())
         signals.document_created.send(document)
         return document
@@ -85,9 +87,9 @@ class Document(SmartJson):
             >>> ctx = app.test_request_context()
             >>> ctx.push()
             >>> from invenio.modules.documents import api
-            >>> from invenio.modules.jsonalchemy.jsonext.engines import memory
+            >>> from jsonalchemy.jsonext.engines import memory
             >>> app.config['DOCUMENTS_ENGINE'] = \
-            "invenio.modules.jsonalchemy.jsonext.engines.memory:MemoryStorage"
+            "jsonalchemy.jsonext.engines.memory:MemoryStorage"
             >>> d = api.Document.create({'title': 'Title 1'})
             >>> e = api.Document.get_document(d['_id'])
 

@@ -25,7 +25,7 @@ from .models import RecordMetadata as RecordMetadataModel
 RECORDS_BREADCRUMB_TITLE_KEY = 'title.title'
 """Key used to extract the breadcrumb title from the record."""
 
-RECORDS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
+RECORDS_ENGINE = ('jsonalchemy.jsonext.engines.sqlalchemy'
                   ':SQLAlchemyStorage')
 
 RECORDS_SQLALCHEMYSTORAGE = {
