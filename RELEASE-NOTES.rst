@@ -60,6 +60,7 @@ Bug fixes
 Installation
 ------------
 
+   $ pip install babel
    $ pip install invenio
 
 Documentation

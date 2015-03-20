@@ -367,6 +367,7 @@ Installing Invenio.
 .. code-block:: console
 
     (invenio)$ cdvirtualenv src/invenio
+    (invenio)$ pip install babel
     (invenio)$ pip install --process-dependency-links -e .[development]
 
 Some modules may require specific dependencies listed as ``extras``. Pick the
