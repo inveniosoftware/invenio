@@ -44,6 +44,7 @@ CFG_USER_DEFAULT_INFO = {
     'guest': '1',
     'session': None,
     'precached_permitted_restricted_collections': [],
+    'precached_allowed_deposition_types': [],
     'precached_usebaskets': False,
     'precached_useloans': False,
     'precached_usegroups': False,
@@ -97,12 +98,12 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return key
 
     def get_acc_key(self):
-        """Generate key for caching autorizations."""
+        """Generate key for caching authorizations."""
         remote_ip = str(request.remote_addr) if has_request_context() else '0'
         return 'current_user::' + str(self.uid) + '::' + remote_ip
 
     def save(self):
-        """Save modified data pernamently for logged users."""
+        """Save modified data permanently for logged users."""
         if not self.is_guest and self.modified:
             timeout = current_app.config.get(
                 'CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT', 0)*3600
@@ -135,10 +136,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return data
 
     def _create_guest(self):
-        data = {'settings': {}}
         # Minimal information about user.
-        data['id'] = data['uid'] = 0
-        return data
+        return {'settings': {}, 'id': 0, 'uid': 0}
 
     def _login(self, uid, force=False):
         """Get account information about currently logged user from database.
@@ -172,13 +171,13 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return data
 
     def _precache(self, info, force=False):
-        """Calculate prermitions for user actions.
+        """Calculate permissions for user actions.
 
         FIXME: compatibility layer only !!!
         """
         CFG_BIBAUTHORID_ENABLED = current_app.config.get(
             'CFG_BIBAUTHORID_ENABLED', False)
-        # get autorization key
+        # get authorization key
         acc_key = self.get_acc_key()
         acc = cache.get(acc_key)
         if not force and acc_key is not None and acc is not None:
@@ -195,10 +194,14 @@ class UserInfo(CombinedMultiDict, UserMixin):
             acc_is_user_in_role
         from invenio.modules.search.utils import \
             get_permitted_restricted_collections
+        from invenio.modules.deposit.cache import \
+            get_authorized_deposition_types
 
         data = {}
         data['precached_permitted_restricted_collections'] = \
             get_permitted_restricted_collections(user_info)
+        data['precached_allowed_deposition_types'] = \
+            get_authorized_deposition_types(user_info)
         data['precached_usebaskets'] = acc_authorize_action(
             user_info, 'usebaskets')[0] == 0
         data['precached_useloans'] = acc_authorize_action(
