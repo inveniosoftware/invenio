@@ -174,14 +174,14 @@ def get_associated_subfield_value(recID, tag, value, associated_subfield_code):
     return out
 
 
-def get_author_canonical_ids_for_recid(recID):
+def get_author_canonical_ids_for_recid_range(recID1, recID2):
     """
-    Return list of author canonical IDs (e.g. `J.Ellis.1') for the
-    given record.  Done by consulting BibAuthorID module.
+    Return list of tuples (recid, author canonical IDs (e.g. `J.Ellis.1')) for
+    the given range of records.  Done by consulting BibAuthorID module.
     """
-    return [word[0] for word in run_sql("""SELECT data FROM aidPERSONIDDATA
-        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec=%s AND
-        tag='canonical_name' AND flag>-2""", (recID, ))]
+    return run_sql("""SELECT bibrec, data FROM aidPERSONIDDATA
+        JOIN aidPERSONIDPAPERS USING (personid) WHERE bibrec BETWEEN %s AND %s
+        AND tag='canonical_name' AND flag>-2""", (recID1, recID2))
 
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
@@ -1388,11 +1388,12 @@ class WordTable(AbstractIndexTable):
         # special case of author indexes where we also add author
         # canonical IDs:
         if 'author' in self.index_name:
-            for recID in range(recID1, recID2 + 1):
+            for recID, term in get_author_canonical_ids_for_recid_range(recID1, recID2):
                 if not wlist.has_key(recID):
-                    wlist[recID] = []
-                wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
-                                          wlist[recID])
+                    wlist[recID] = set()
+                wlist[recID].add(term)
+            for recID, terms in wlist.items():
+                wlist[recID] = list(terms)
 
         marc, nonmarc = self.find_nonmarc_records(recID1, recID2)
         if marc:
