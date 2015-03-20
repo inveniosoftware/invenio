@@ -1387,7 +1387,7 @@ class WordTable(AbstractIndexTable):
         self.recIDs_in_mem.append([recID1, recID2])
         # special case of author indexes where we also add author
         # canonical IDs:
-        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+        if 'author' in self.index_name:
             for recID in range(recID1, recID2 + 1):
                 if not wlist.has_key(recID):
                     wlist[recID] = []
@@ -1887,7 +1887,7 @@ def get_recIDs_by_date_bibliographic(dates, index_name, force_all=False):
                                         (dates[0], dates[1],)))
     # special case of author indexes where we need to re-index
     # those records that were affected by changed BibAuthorID attributions:
-    if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+    if 'author' in index_name:
         from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
         # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
         rec_list_author = get_recids_affected_since(dates[0], dates[1])
