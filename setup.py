@@ -218,6 +218,10 @@ tests_require = [
     "unittest2>=0.5",
 ]
 
+setup_requires = [
+    'Babel>=1.3',
+]
+
 # Add `tests` dependencies to `extras_require` so that developers
 # could install test dependencies also with pip:
 extras_require["tests"] = tests_require
@@ -321,6 +325,7 @@ setup(
             "inveniomanage = invenio.base.setuptools:InvenioManageCommand",
         ]
     },
+    setup_requires=setup_requires,
     install_requires=install_requires,
     extras_require=extras_require,
     classifiers=[
