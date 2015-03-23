@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@
 
 import six
 
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from .engine import acc_authorize_action
 from .control import acc_is_user_in_role, acc_get_role_id
@@ -63,7 +63,7 @@ def AclFactory(obj=''):
 
             :param user_info: an instance of
                 :class:`~invenio.ext.login.legacy_user.UserInfo`
-                (default: :class:`flask.ext.login.current_user`)
+                (default: :class:`flask_login.current_user`)
             :return: a tuple, of the form `(auth_code, auth_message)` where
                 `auth_code` is 0 if the authorization is granted and greater
                 than 0 otherwise.

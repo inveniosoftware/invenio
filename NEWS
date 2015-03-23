@@ -6,6 +6,56 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v2.0.1 -- released 2015-03-20
+-------------------------------------
+
+New features:
+~~~~~~~~~~~~~
+
++ global:
+
+  - Deprecation policy comes with new deprecation warnings wrappers.
+    (#2875)
+
+Bug fixes:
+~~~~~~~~~~
+
++ assets:
+
+  - Avoids bundle changes to persist between requests in DEBUG mode,
+    which is not desired.  (#2777)
+
++ docs:
+
+  - Adds missing `invenio.base` package to the `config.py` file for a
+    custom overlay in the docs.
+
++ global:
+
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ installation:
+
+  - Reorders 'compile_catalog' and 'install' commands to fix
+    installation process from PyPI.
+
+  - Adds apache2 xsendfile package to installation script.  (#2857)
+
++ messages:
+
+  - Defines a path for jquery.ui required by jQuery-Timepicker-Addon
+    and sets an exact version for the plugin instead of latest.
+    (#2910)
+
++ records:
+
+  - Changes creation_date field definition in tests.  (#2214)
+
++ search:
+
+  - Generates correct url for `/collection` redirect.
+
 Invenio v2.0.0 -- released 2015-03-04
 -------------------------------------
 
@@ -548,7 +598,7 @@ Invenio v2.0.0 -- released 2015-03-04
     documentation; Tokeninput download from GitHub; release control
     fix; hogan.js template engine addition; mysql default date value
     fix; jinja2utils and requirements upgrade (#1476); `apache create-
-    config` renaming; test presence of flask.ext.admin; secret key
+    config` renaming; test presence of flask_admin; secret key
     creation fix; replace libxslt with lxml; demosite fixtures
     addition; fix for BibWorkflow table dropping (#1283); use concrete
     SHA1 for workflow; fix for removed invenio.conf values; database
@@ -806,7 +856,7 @@ Invenio v2.0.0 -- released 2015-03-04
 
  *) registry: keygetter value fix; fix package exclude for sub
     registry; missing function addition; dict-style auto discover
-    registry; imports from `flask.ext.registry`; move to separate
+    registry; imports from `flask_registry`; move to separate
     package Flask-Registry; initial release
 
  *) requirements: pymongo addition; qrcode removal; better separation;

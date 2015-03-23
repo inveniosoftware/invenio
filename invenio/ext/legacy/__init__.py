@@ -34,7 +34,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.wrappers import BaseResponse
 from flask import (request, g, current_app, render_template, abort,
                    send_from_directory, url_for)
-from flask.ext.admin.menu import MenuLink
+from flask_admin.menu import MenuLink
 
 from invenio.base import signals
 from invenio.base.scripts.database import create, recreate

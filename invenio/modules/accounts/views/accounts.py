@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from werkzeug import CombinedMultiDict, ImmutableMultiDict
 from flask import render_template, request, flash, redirect, url_for, \
     g, abort, current_app, Blueprint
-from flask.ext.login import current_user, login_required
+from flask_login import current_user, login_required
 
 #from invenio import websession_config
 from invenio.legacy import webuser
@@ -33,10 +33,10 @@ from ..validators import wash_login_method
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from flask.ext.breadcrumbs import register_breadcrumb
+from flask_breadcrumbs import register_breadcrumb
 from invenio.ext.login import login_user, logout_user, authenticate, \
     reset_password, login_redirect
-from flask.ext.menu import register_menu
+from flask_menu import register_menu
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@
 import re
 from flask import current_app
 from sqlalchemy.exc import SQLAlchemyError
-from flask.ext.wtf import validators
+from flask_wtf import validators
 
 from invenio.base.i18n import _
 

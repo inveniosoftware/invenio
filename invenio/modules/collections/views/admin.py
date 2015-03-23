@@ -21,8 +21,8 @@
 
 from flask import Blueprint, g, render_template, request, flash, redirect, \
     url_for, abort
-from flask.ext.breadcrumbs import register_breadcrumb
-from flask.ext.login import current_user, login_required
+from flask_breadcrumbs import register_breadcrumb
+from flask_login import current_user, login_required
 
 from invenio.base.decorators import templated
 from invenio.base.i18n import _, language_list_long

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,10 +18,10 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from flask import current_app, abort
-from flask.ext.admin import BaseView as FlaskBaseView, \
+from flask_admin import BaseView as FlaskBaseView, \
     AdminIndexView as FlaskAdminIndexView
-from flask.ext.admin.contrib.sqla import ModelView as FlaskModelView
-from flask.ext.login import current_user
+from flask_admin.contrib.sqla import ModelView as FlaskModelView
+from flask_login import current_user
 
 from invenio.ext.sslify import ssl_required
 from invenio.ext.principal import permission_required

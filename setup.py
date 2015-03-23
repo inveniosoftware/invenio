@@ -83,7 +83,7 @@ install_requires = [
     "Flask-Cache>=0.12",
     "Flask-Collect>=1.1.1",
     "Flask-Email>=1.4.4",
-    "Flask-Gravatar>=0.4",
+    "Flask-Gravatar>=0.4.2",
     "Flask-Login>=0.2.7",
     "Flask-Menu>=0.2",
     "Flask-OAuthlib>=0.6.0,<0.7",  # quick fix for issue #2158
@@ -220,6 +220,10 @@ tests_require = [
     "unittest2>=0.5",
 ]
 
+setup_requires = [
+    'Babel>=1.3',
+]
+
 # Add `tests` dependencies to `extras_require` so that developers
 # could install test dependencies also with pip:
 extras_require["tests"] = tests_require
@@ -322,6 +326,7 @@ setup(
             "inveniomanage = invenio.base.setuptools:InvenioManageCommand",
         ]
     },
+    setup_requires=setup_requires,
     install_requires=install_requires,
     extras_require=extras_require,
     classifiers=[

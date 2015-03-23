@@ -289,7 +289,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         # Mock session id
         session.sid = '1234'
 
-        with patch('flask.ext.login._get_user', return_value=user):
+        with patch('flask_login._get_user', return_value=user):
             with self.app.test_client() as c:
                 # First call login to be redirected
                 res = c.get(url_for("oauthclient.login", remote_app='full'))
@@ -363,7 +363,7 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
         # Mock session id
         session.sid = '1234'
 
-        with patch('flask.ext.login._get_user', return_value=user):
+        with patch('flask_login._get_user', return_value=user):
             with self.app.test_client() as c:
                 # First call login to be redirected
                 res = c.get(url_for("oauthclient.login", remote_app='full'))

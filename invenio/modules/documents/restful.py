@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,8 +24,8 @@ import os
 from cerberus import Validator
 from fs.opener import opener
 from flask import request, current_app
-from flask.ext.login import current_user
-from flask.ext.restful import Resource, abort
+from flask_login import current_user
+from flask_restful import Resource, abort
 from functools import wraps
 from werkzeug.utils import secure_filename
 from werkzeug.http import parse_options_header

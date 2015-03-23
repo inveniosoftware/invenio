@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,7 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from flask import request
-from flask.ext.restful import abort, Resource
+from flask_restful import abort, Resource
 
 from invenio.modules.annotations.api import get_annotations, get_jsonld_multiple
 from invenio.modules.deposit.restful import require_header

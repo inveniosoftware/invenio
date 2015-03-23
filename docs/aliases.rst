@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -57,7 +57,7 @@ Flask-Login
 
 .. py:class:: flask_login.UserMixin
 
-   Sorry not valid intersphinx were found for: ``flask.ext.login.UserMixin``.
+   Sorry not valid intersphinx were found for: ``flask_login.UserMixin``.
 
 Flask-Script
 ============

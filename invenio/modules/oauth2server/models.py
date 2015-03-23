@@ -22,7 +22,7 @@
 from __future__ import absolute_import
 
 from flask import current_app
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from invenio.base.i18n import _
 from invenio.config import SECRET_KEY as secret_key

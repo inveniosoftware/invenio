@@ -78,7 +78,7 @@ In templates you can add a sign in/up link:
 import copy
 
 from flask import current_app, redirect, url_for
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from invenio.ext.sqlalchemy.utils import session_manager
 

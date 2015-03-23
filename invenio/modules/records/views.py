@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,9 +24,9 @@ import cStringIO
 from functools import wraps
 from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint, send_file
-from flask.ext.breadcrumbs import default_breadcrumb_root
-from flask.ext.login import current_user
-from flask.ext.menu import register_menu
+from flask_breadcrumbs import default_breadcrumb_root
+from flask_login import current_user
+from flask_menu import register_menu
 
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg

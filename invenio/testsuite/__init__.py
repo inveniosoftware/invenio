@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -131,10 +131,10 @@ def make_test_suite(*test_cases):
                                for case in test_cases])
 
 from invenio.base.factory import create_app
-# pyparsing needed to import here before flask.ext.testing in order to avoid
+# pyparsing needed to import here before flask_testing in order to avoid
 # pyparsing troubles due to twill
 import pyparsing  # pylint: disable=W0611
-from flask.ext.testing import TestCase
+from flask_testing import TestCase
 
 
 class InvenioFixture(object):
@@ -1251,7 +1251,7 @@ def build_and_run_flask_test_suite():
 def iter_suites(packages=None):
     """Yield all testsuites."""
     from werkzeug.utils import import_string, find_modules
-    from flask.ext.registry import ModuleAutoDiscoveryRegistry, \
+    from flask_registry import ModuleAutoDiscoveryRegistry, \
         ImportPathRegistry
 
     app = create_app()

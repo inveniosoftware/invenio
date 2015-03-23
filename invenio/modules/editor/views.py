@@ -22,8 +22,8 @@
 import json
 
 from flask import Blueprint, jsonify, render_template, request
-from flask.ext.breadcrumbs import register_breadcrumb
-from flask.ext.login import login_required
+from flask_breadcrumbs import register_breadcrumb
+from flask_login import login_required
 
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg

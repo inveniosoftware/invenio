@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,8 +27,8 @@ attached to a record
 """
 
 from functools import wraps
-from flask.ext.login import current_user
-from flask.ext.restful import abort, Resource, fields, marshal
+from flask_login import current_user
+from flask_restful import abort, Resource, fields, marshal
 from flask import request
 from invenio.ext.restful import (
     require_api_auth, require_header,

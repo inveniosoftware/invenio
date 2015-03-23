@@ -31,7 +31,7 @@ from invenio.testsuite import InvenioTestCase, \
     make_test_suite, \
     run_test_suite
 from invenio.ext.sqlalchemy import db
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from invenio.modules.communities.config import COMMUNITIES_ID_PREFIX, \
     COMMUNITIES_ID_PREFIX_PROVISIONAL, \

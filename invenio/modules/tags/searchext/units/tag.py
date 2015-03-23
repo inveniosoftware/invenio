@@ -20,7 +20,7 @@
 """Tag plugin for search unit."""
 
 from intbitset import intbitset
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from invenio.ext.sqlalchemy import db
 

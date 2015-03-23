@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 """Unit tests for the Acl JSONAlchemy extension."""
 
 from invenio.base.wrappers import lazy_import
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
@@ -51,7 +51,7 @@ class TestAclExtension(InvenioTestCase):
 
     def test_restriction(self):
         """JSONAlchemy - restriction"""
-        from flask.ext.login import login_user, logout_user
+        from flask_login import login_user, logout_user
         from invenio.ext.login.legacy_user import UserInfo
         from invenio.modules.jsonalchemy.reader import Reader
         from invenio.modules.jsonalchemy.wrappers import SmartJson

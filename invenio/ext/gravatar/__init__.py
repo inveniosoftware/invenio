@@ -22,13 +22,13 @@
     --------------------
 
     This module provides initialization and configuration for
-    `flask.ext.gravatar` module.
+    `flask_gravatar` module.
 """
 
 
 def setup_app(app):
     """Initialize Gravatar extension."""
-    from flask.ext.gravatar import Gravatar
+    from flask_gravatar import Gravatar
     gravatar = Gravatar(app,
                         size=app.config.get('GRAVATAR_SIZE', 100),
                         rating=app.config.get('GRAVATAR_RATING', 'g'),

@@ -48,9 +48,9 @@ import string
 from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort, session, Blueprint, \
     render_template
-from flask.ext.breadcrumbs import \
+from flask_breadcrumbs import \
     register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
-from flask.ext.login import current_user
+from flask_login import current_user
 from math import ceil
 from six import iteritems
 from werkzeug.local import LocalProxy

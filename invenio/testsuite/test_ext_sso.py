@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Flask-SSO
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Flask-SSO is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ else:
 
 from contextlib import contextmanager
 from flask import request_started, request
-from flask.ext.login import current_user
+from flask_login import current_user
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 try:

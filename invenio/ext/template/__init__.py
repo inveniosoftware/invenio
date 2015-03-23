@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -72,7 +72,7 @@ def inject_utils():
     from werkzeug.routing import BuildError
 
     from invenio.base.i18n import is_language_rtl
-    from flask.ext.login import current_user
+    from flask_login import current_user
     from invenio.utils.url import create_url, get_canonical_and_alternates_urls
 
     def invenio_url_for(endpoint, **values):

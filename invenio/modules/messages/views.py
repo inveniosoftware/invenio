@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2013, 2014 CERN.
+# Copyright (C) 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,9 +21,9 @@
 
 from datetime import datetime
 from flask import render_template, request, flash, redirect, url_for, Blueprint
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from flask.ext.login import current_user, login_required
-from flask.ext.menu import register_menu
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask_login import current_user, login_required
+from flask_menu import register_menu
 from sqlalchemy.sql import operators
 
 from invenio.base.decorators import (wash_arguments, templated, sorted_by,

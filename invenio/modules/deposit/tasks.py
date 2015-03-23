@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ import dateutil.parser
 from tempfile import mkstemp
 from functools import partial
 from flask import current_app, abort, request
-from flask.ext.login import current_user
+from flask_login import current_user
 from functools import wraps
 
 from invenio.modules.records.api import get_record

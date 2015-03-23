@@ -23,7 +23,7 @@ import copy
 import os
 import six
 from flask import current_app, _request_ctx_stack
-from flask.ext.assets import Environment, FlaskResolver
+from flask_assets import Environment, FlaskResolver
 from jinja2 import nodes
 from jinja2.ext import Extension
 from webassets.bundle import is_url

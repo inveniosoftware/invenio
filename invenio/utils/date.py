@@ -3,7 +3,7 @@
 # Some functions about dates
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ from datetime import (date as real_date,
                       datetime as real_datetime,
                       time as real_time,
                       timedelta)
-from flask.ext.babel import format_datetime as babel_format_datetime
+from flask_babel import format_datetime as babel_format_datetime
 from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language, _
 from invenio.ext.babel import set_locale

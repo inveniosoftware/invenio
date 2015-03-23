@@ -70,7 +70,7 @@ def get_output_format(filename):
 def run(output):
     """Convert *bfo* to *yml*."""
     from invenio.legacy.dbquery import run_sql
-    from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
+    from flask_registry import PkgResourcesDirDiscoveryRegistry, \
         ModuleAutoDiscoveryRegistry, RegistryProxy
     from invenio.utils.datastructures import LazyDict
 

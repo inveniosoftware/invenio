@@ -22,9 +22,9 @@ import warnings
 
 from flask import (Blueprint, request, redirect, url_for, render_template,
                    current_app, g)
-from flask.ext.breadcrumbs import \
+from flask_breadcrumbs import \
     register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
-from flask.ext.menu import register_menu
+from flask_menu import register_menu
 
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated

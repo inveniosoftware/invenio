@@ -22,7 +22,7 @@
 from __future__ import absolute_import
 
 from flask import Blueprint, abort, current_app, request, session, url_for
-from flask.ext.login import user_logged_out
+from flask_login import user_logged_out
 from itsdangerous import BadData, TimedJSONWebSignatureSerializer
 from werkzeug.local import LocalProxy
 

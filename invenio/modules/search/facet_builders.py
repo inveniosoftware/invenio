@@ -20,7 +20,7 @@
 """Facet utility functions."""
 
 from flask import g, url_for, request
-from flask.ext.login import current_user
+from flask_login import current_user
 from intbitset import intbitset
 from itertools import groupby
 from operator import itemgetter

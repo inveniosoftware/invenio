@@ -20,7 +20,7 @@
 """Knowledge Flask Blueprint."""
 
 from flask import Blueprint
-from flask.ext.breadcrumbs import default_breadcrumb_root
+from flask_breadcrumbs import default_breadcrumb_root
 
 
 blueprint = Blueprint('knowledge', __name__, url_prefix="/kb",

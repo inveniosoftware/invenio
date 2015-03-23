@@ -37,7 +37,7 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Utils import formatdate
 from flask import g
-from flask.ext.email.message import EmailMultiAlternatives, EmailMessage
+from flask_email.message import EmailMultiAlternatives, EmailMessage
 from formatter import DumbWriter, AbstractFormatter
 from six import iteritems, StringIO
 from time import sleep
@@ -60,7 +60,7 @@ def setup_app(app):
     cfg = app.config
 
     app.config.setdefault('EMAIL_BACKEND', cfg.get(
-        'CFG_EMAIL_BACKEND', 'flask.ext.email.backends.smtp.Mail'))
+        'CFG_EMAIL_BACKEND', 'flask_email.backends.smtp.Mail'))
     app.config.setdefault('DEFAULT_FROM_EMAIL', cfg['CFG_SITE_SUPPORT_EMAIL'])
     app.config.setdefault('SERVER_EMAIL', cfg['CFG_SITE_ADMIN_EMAIL'])
     app.config.setdefault('ADMINS', (('', cfg['CFG_SITE_ADMIN_EMAIL']),))

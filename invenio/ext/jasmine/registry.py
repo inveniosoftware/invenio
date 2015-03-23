@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 import os
 import re
 from werkzeug.utils import import_string
-from flask.ext.registry import RegistryProxy
+from flask_registry import RegistryProxy
 from invenio.ext.registry import DictModuleAutoDiscoverySubRegistry
 
 

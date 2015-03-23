@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,8 +24,8 @@ import pkg_resources
 import warnings
 
 from flask import current_app, json
-from flask.ext.assets import ManageAssets
-from flask.ext.script import Command, Option
+from flask_assets import ManageAssets
+from flask_script import Command, Option
 
 from .registry import bundles
 

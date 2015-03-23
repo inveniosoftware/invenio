@@ -19,7 +19,7 @@
 
 """Flask-Admin page to configure roles and authorizations."""
 
-from flask.ext.admin.form.fields import DateTimeField
+from flask_admin.form.fields import DateTimeField
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db

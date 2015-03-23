@@ -19,7 +19,7 @@
 
 """WebTag Forms."""
 
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _

@@ -39,9 +39,9 @@ from flask import (
     session,
     url_for,
 )
-from flask.ext.breadcrumbs import default_breadcrumb_root, register_breadcrumb
-from flask.ext.login import login_required
-from flask.ext.menu import register_menu
+from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+from flask_login import login_required
+from flask_menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _

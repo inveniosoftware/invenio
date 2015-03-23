@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ __revision__ = \
     "$Id$"
 
 from invenio.base.wrappers import lazy_import
-from flask.ext.registry import PkgResourcesDirDiscoveryRegistry, \
+from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 
 """API for the tags."""
 
-from flask.ext.login import current_user
+from flask_login import current_user
 from sqlalchemy.exc import DBAPIError
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import Usergroup

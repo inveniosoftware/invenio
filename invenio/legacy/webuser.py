@@ -1010,7 +1010,7 @@ def collect_user_info(req, login_time=False, refresh=False):
     is saved into req._user_info (for caching purpouses)
     setApacheUser & setUid will properly reset it.
     """
-    from flask.ext.login import current_user
+    from flask_login import current_user
     from invenio.ext.login import UserInfo
 
     if (type(req) in [long, int] and current_user.get_id() != req) \

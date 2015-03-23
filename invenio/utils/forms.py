@@ -31,7 +31,7 @@ import datetime
 import time
 
 from flask import current_app, session
-from flask.ext.wtf import Form
+from flask_wtf import Form
 
 from wtforms.compat import text_type
 from wtforms.ext.csrf.session import SessionSecureForm

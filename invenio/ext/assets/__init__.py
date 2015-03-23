@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Additional extensions and functions for the `flask.ext.assets` module.
+Additional extensions and functions for the `flask_assets` module.
 
 .. py:data:: command
 
@@ -28,7 +28,7 @@ Additional extensions and functions for the `flask.ext.assets` module.
     .. code-block:: python
 
         # How to install it
-        from flask.ext.script import Manager
+        from flask_script import Manager
         manager = Manager()
         manager.add_command("assets", command)
 

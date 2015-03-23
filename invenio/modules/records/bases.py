@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -42,7 +42,7 @@ class DocumentsHooks(object):
 
         :param user_info: an instance of
             :class:`~invenio.ext.login.legacy_user.UserInfo`
-            (default: :class:`flask.ext.login.current_user`)
+            (default: :class:`flask_login.current_user`)
         :param action: partial name of the action to be performed, for example
             `viewrestr`
         :param is_authorized: Current authorization value.
