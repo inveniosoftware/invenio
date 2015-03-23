@@ -21,7 +21,7 @@ suffix='</div><hr/>'/>
 
 <BFE_ABSTRACT
 prefix_en="<small><strong>Abstract: </strong>"
-prefix_fr="<small><strong>Résumé</strong>"
+prefix_fr="<small><strong>R&eacute;sum&eacute;</strong>"
 suffix_en="</small><br />"
 suffix_fr="</small><br />"
 />

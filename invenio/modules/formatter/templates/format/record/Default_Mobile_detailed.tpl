@@ -34,7 +34,7 @@
 </p>
 
 
-{{ bfe_abstract(bfo, prefix_en="<small><strong>Abstract: </strong>", prefix_fr="<small><strong>Résumé</strong>", suffix_en="</small><br />", suffix_fr="</small><br />") }}
+{{ bfe_abstract(bfo, prefix_en="<small><strong>Abstract: </strong>", prefix_fr="<small><strong>R&eacute;sum&eacute;</strong>", suffix_en="</small><br />", suffix_fr="</small><br />") }}
 
 {{ bfe_keywords(bfo, prefix="<br /><small><strong>Keyword(s): </strong></small>", keyword_prefix="<small>", keyword_suffix="</small>") }}
 

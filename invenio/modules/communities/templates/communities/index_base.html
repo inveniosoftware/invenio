@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -145,7 +145,7 @@
             <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
               {%- set new_args = args.copy() -%}
               {%- do new_args.update({'page': 1}) -%}
-              <a title="first" href="{{ url_for('communities.index', **new_args) }}">«</a>
+              <a title="first" href="{{ url_for('communities.index', **new_args) }}">&laquo;</a>
             </li>
             <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
               {%- do args.update({'page': pagination.page-1 }) -%}
@@ -170,7 +170,7 @@
             <li{{ ' class="disabled"'|safe if not pagination.has_next }}>
               {%- set new_args = args.copy() -%}
               {%- do new_args.update({'page': pagination.pages }) -%}
-              <a title="last" href="{{ url_for('communities.index', **new_args) }}">»</a>
+              <a title="last" href="{{ url_for('communities.index', **new_args) }}">&raquo;</a>
             </li>
           </ul>
         </div>

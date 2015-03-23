@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-# Comments and reviews for records.
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -472,7 +471,7 @@ class Template:
         <div class="webcomment_comment_title">
             %(title)s
             <div class="webcomment_comment_date">%(date)s</div>
-            <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)s">¶</a>
+            <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)s">&para;</a>
         </div>
         <div class="collapsible_content" id="collapsible_content_%(comid)s" style="%(collapsible_content_style)s">
             <blockquote>
@@ -2541,7 +2540,7 @@ class Template:
                 <div class="webcomment_comment_title">
                     %(title)s
                     <div class="webcomment_comment_date">%(date)s</div>
-                    <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
+                    <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">&para;</a>
                 </div>
                 <div class="collapsible_content">
                     <blockquote>

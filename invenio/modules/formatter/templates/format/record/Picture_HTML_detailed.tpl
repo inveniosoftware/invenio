@@ -43,7 +43,7 @@
 
 {{ bfe_abstract(bfo, prefix_en='<p><span class="blocknote">
  Caption</span><br /> <small>', suffix_en='</small></p>', prefix_fr='<p><span class="blocknote">
- Légende</span><br /><small>', suffix_fr='</small></p>') }}
+ L&eacute;gende</span><br /><small>', suffix_fr='</small></p>') }}
 
 {{ bfe_external_publications(bfo, prefix='<p><span class="blocknote">See also:</span><br /><small>', suffix="</small></p>") }}
 
@@ -56,7 +56,7 @@
 </tr>
 
 <tr><td colspan="2">
- <strong>© CERN Geneva: </strong>
+ <strong>&copy; CERN Geneva: </strong>
 <small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>).
 The words CERN Photo must be quoted for each use. </small>
 </td>

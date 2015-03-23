@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
     {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'danger', 'error', 'warning', 'success']) %}
     {% set category = 'danger' if category == 'error' else category %}
       <div class="alert alert-{{ category }}">
-        <a class="close" data-dismiss="alert" href="#">×</a>
+        <a class="close" data-dismiss="alert" href="#">&times;</a>
         {{ msg|safe }}
       </div>
     {% endfor %}
