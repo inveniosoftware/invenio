@@ -1059,6 +1059,7 @@ ServerTokens Prod
 NameVirtualHost %(vhost_ip_address)s:%(vhost_site_url_port)s
 %(listen_directive)s
 %(wsgi_socket_directive)s
+WSGIPythonHome %(wsgi_python_home)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -1109,6 +1110,7 @@ WSGIRestrictStdout Off
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address(conf) or '*',
        'listen_directive': listen_directive_needed and 'Listen ' + vhost_site_url_port or \
                            '#Listen ' + vhost_site_url_port,
+       'wsgi_python_home': sys.prefix,
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
