@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,12 +17,15 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 """Unit tests for the inveniomanage script."""
 
+from __future__ import print_function
+
 import sys
+
 import StringIO
+import shlex
+
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
@@ -65,6 +68,7 @@ def run(command_line, manager_run, capture_stderr=False):
 
     sys_stderr_orig = sys.stderr
     sys_stdout_orig = sys.stdout
+    sys_argv_orig = sys.argv
     sys.stdout = StringIO.StringIO()
 
     if capture_stderr:
@@ -73,7 +77,12 @@ def run(command_line, manager_run, capture_stderr=False):
     if isinstance(command_line, list):
         sys.argv = command_line
     else:
-        sys.argv = command_line.split()
+        if sys.version_info < (2, 7, 3):
+            # Work around non-unicode-capable versions of shlex.split
+            sys.argv =  map(lambda s: s.decode('utf8'),
+                            shlex.split(command_line.encode('utf8')))
+        else:
+            sys.argv = shlex.split(command_line)
     exit_code = None
     try:
         manager_run()
@@ -88,6 +97,7 @@ def run(command_line, manager_run, capture_stderr=False):
             out += sys.stderr.getvalue()
         sys.stderr = sys_stderr_orig
         sys.stdout = sys_stdout_orig
+        sys.argv = sys_argv_orig
 
     return out, exit_code
 
