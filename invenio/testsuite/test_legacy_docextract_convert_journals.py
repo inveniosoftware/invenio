@@ -24,7 +24,7 @@ from tempfile import NamedTemporaryFile, mkstemp
 
 from invenio.testsuite import InvenioXmlTestCase
 from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.testsuite.test_manage import run
+from invenio.base.utils import run_py_func
 
 
 class ConverterTests(InvenioXmlTestCase):
@@ -58,8 +58,8 @@ class ScriptTests(InvenioXmlTestCase):
         from invenio.legacy.docextract.convert_journals import USAGE_MESSAGE
         from invenio.legacy.docextract.scripts.convert_journals import main
 
-        out = run(["convert_journals", "-h"], main, capture_stderr=True)[0]
-        self.assert_(USAGE_MESSAGE in out)
+        err = run_py_func(main, ["convert_journals", "-h"]).err
+        self.assert_(USAGE_MESSAGE in err)
 
     def test_main(self):
         from invenio.config import CFG_TMPDIR
@@ -81,9 +81,9 @@ class ScriptTests(InvenioXmlTestCase):
         dest_temp_fd, dest_temp_path = mkstemp(dir=CFG_TMPDIR)
         try:
             os.close(dest_temp_fd)
-            run(['convert_journals', xml_temp_file.name,
-                 '--kb', kb_temp_file.name,
-                 '-o', dest_temp_path], main)
+            run_py_func(main, ['convert_journals', xml_temp_file.name,
+                               '--kb', kb_temp_file.name,
+                               '-o', dest_temp_path])
 
             transformed_xml = open(dest_temp_path).read()
             self.assertXmlEqual(transformed_xml, """<?xml version="1.0" encoding="UTF-8"?>

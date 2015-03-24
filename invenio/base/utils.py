@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,9 +23,17 @@ Utilities that could potentially exist in separate packages should be placed in
 this file.
 """
 
+import sys
+import warnings
+
+from collections import namedtuple
+import StringIO
+import logging
+import shlex
+import six
 from flask import has_app_context, current_app
-from werkzeug.utils import import_string, find_modules
 from functools import partial
+from werkzeug.utils import import_string, find_modules
 
 
 def import_module_from_packages(name, app=None, packages=None, silent=False):
@@ -128,13 +136,9 @@ def try_to_eval(string, context={}, **general_context):
         return res
 
 
-#
 # Python 2.6 implementation of logging.captureWarnings introduced in Python 2.7
 # Copy/pasted from logging/__init__.py. Can be removed as soon as dependency on
 # Python 2.6 is removed.
-import logging
-import warnings
-import sys
 
 
 class NullHandler(logging.Handler):
@@ -237,3 +241,82 @@ class classproperty(object):
 
     def __get__(self, instance, owner):
         return self._function(owner)
+
+
+def run_py_func(manager_run, command_line, passthrough=False):
+    """Runs a function of a python function with given sys.argv.
+
+    Typically used to run the `main` function of an executable that provides no
+    pythonic API.
+
+    :param command_line: arguments to inject to sys.argv
+    :type command_line: str (parsed with shlex) or iterable (passed verbatim)
+
+    :param manager_run: function to run
+    :type manager_run: function
+
+    :param passthrough: allow stdout and and stderr to be printed to the terminal
+    :type passthrough: bool
+
+    :return: namedtuple(out, err, exit_code)
+    """
+    sys_stderr_orig = sys.stderr
+    sys_stdout_orig = sys.stdout
+    sys.stdout = StringIO.StringIO()
+    sys.stderr = StringIO.StringIO()
+    sys_argv_orig = sys.argv
+
+    formatter = logging.Formatter('%(message)s', '')
+
+    # Log to StringIO
+    log_to_new_stdout = logging.getLogger('run_py_func_new_stdout')
+    log_handler_stdout = logging.StreamHandler(sys.stdout)
+    log_handler_stdout.setFormatter(formatter)
+    log_to_new_stdout.addHandler(log_handler_stdout)
+
+    log_to_new_stderr = logging.getLogger('run_py_func_new_stderr')
+    long_handler_new_stderr = logging.StreamHandler(sys.stderr)
+    long_handler_new_stderr.setFormatter(formatter)
+    log_to_new_stderr.addHandler(long_handler_new_stderr)
+
+    # Also log to original stdout and stderr
+    if passthrough:
+        log_to_stderr_orig = logging.getLogger('run_py_func_stderr_orig')
+        log_handler_stdout_orig = logging.StreamHandler(sys_stdout_orig)
+        log_handler_stdout_orig.setFormatter(formatter)
+        log_to_stderr_orig.addHandler(log_handler_stdout_orig)
+
+        log_to_stderr_orig = logging.getLogger('run_py_func_stderr_orig')
+        log_handler_stderr_orig = logging.StreamHandler(sys_stderr_orig)
+        log_handler_stderr_orig.setFormatter(formatter)
+        log_to_stderr_orig.addHandler(log_handler_stderr_orig)
+
+    # Figure out how to handle `command_line`
+    if isinstance(command_line, six.string_types):
+        if sys.version_info < (2, 7, 3):
+            # Work around non-unicode-capable versions of shlex.split
+            sys.argv =  map(lambda s: s.decode('utf8'),
+                            shlex.split(command_line.encode('utf8')))
+        else:
+            sys.argv = shlex.split(command_line)
+    else:
+        sys.argv = command_line
+
+    exit_code = None
+    try:
+        manager_run()
+    except SystemExit as e:
+        exit_code = e.code
+    finally:
+        out = sys.stdout.getvalue()
+        err = sys.stderr.getvalue()
+        # clear the standard output buffer
+        sys.stdout.truncate(0)
+        assert len(sys.stdout.getvalue()) == 0
+        sys.stderr.truncate(0)
+        assert len(sys.stderr.getvalue()) == 0
+        sys.stderr = sys_stderr_orig
+        sys.stdout = sys_stdout_orig
+        sys.argv = sys_argv_orig
+
+    return namedtuple('Res', ('out', 'err', 'exit_code'))(out, err, exit_code)

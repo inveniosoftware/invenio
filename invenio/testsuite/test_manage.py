@@ -23,9 +23,7 @@ from __future__ import print_function
 
 import sys
 
-import StringIO
-import shlex
-
+from invenio.base.utils import run_py_func
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
@@ -63,65 +61,25 @@ class Catcher(object):
         return self.__stdout.truncate(pos)
 
 
-def run(command_line, manager_run, capture_stderr=False):
-    """Returns tuple of standard output and exit code."""
-
-    sys_stderr_orig = sys.stderr
-    sys_stdout_orig = sys.stdout
-    sys_argv_orig = sys.argv
-    sys.stdout = StringIO.StringIO()
-
-    if capture_stderr:
-        sys.stderr = StringIO.StringIO()
-
-    if isinstance(command_line, list):
-        sys.argv = command_line
-    else:
-        if sys.version_info < (2, 7, 3):
-            # Work around non-unicode-capable versions of shlex.split
-            sys.argv =  map(lambda s: s.decode('utf8'),
-                            shlex.split(command_line.encode('utf8')))
-        else:
-            sys.argv = shlex.split(command_line)
-    exit_code = None
-    try:
-        manager_run()
-    except SystemExit as e:
-        exit_code = e.code
-    finally:
-        out = sys.stdout.getvalue()
-        # clear the standard output buffer
-        sys.stdout.truncate(0)
-        assert len(sys.stdout.getvalue()) == 0
-        if capture_stderr:
-            out += sys.stderr.getvalue()
-        sys.stderr = sys_stderr_orig
-        sys.stdout = sys_stdout_orig
-        sys.argv = sys_argv_orig
-
-    return out, exit_code
-
-
 class InveniomanageTest(InvenioTestCase):
 
     def test_upgrade_show_applied_cmd(self):
         """ Test `upgrade show applied` command. """
         from invenio.modules.upgrader.manage import main
-        out, dummy_exit_code = run('upgrader show applied', main)
+        out = run_py_func(main, 'upgrader show applied').out
 
-        expected = ['>>> Following upgrade(s) have been applied:',
-                    '>>> No upgrades have been applied.']
-        self.assertTrue(expected[0] in out.split('\n'),
+        expected = '>>> Following upgrade(s) have been applied:'
+        self.assertTrue(expected in out.split('\n'),
                         "%s was not found in output %s" % (expected, out))
 
     def test_upgrade_show_pending_cmd(self):
         """ Test `upgrade show pending` command. """
         from invenio.modules.upgrader.manage import main
-        out, dummy_exit_code = run('upgrader show pending', main)
+        out = run_py_func(main, 'upgrader show pending').out
 
         lines = out.split('\n')
-        expected = ['>>> Following upgrade(s) are ready to be applied:',
-                    '>>> All upgrades have been applied.']
+        expected = ('>>> Following upgrade(s) are ready to be applied:',
+                    '>>> All upgrades have been applied.')
         self.assertTrue(expected[0] in lines or expected[1] in lines,
                         "%s was not found in output %s" % (expected, lines))
 
@@ -153,29 +111,29 @@ class InveniomanageTest(InvenioTestCase):
         pre_command.connect(post_handler_general_test)
 
         # Expect both version and general handlers.
-        out, dummy_exit_code = run('inveniomanage version', main)
+        out = run_py_func(main, 'inveniomanage version').out
 
         lines = out.split('\n')
-        expected = ['>>> pre_handler_version',
+        expected = ('>>> pre_handler_version',
                     '>>> post_handler_version',
                     '>>> pre_handler_general',
-                    '>>> post_handler_general']
+                    '>>> post_handler_general')
         for line in expected:
             self.assertTrue(line in lines,
                             "%s was not found in output %s" % (line, lines))
 
         # Expect only general handlers.
-        out, dummy_exit_code = run('database uri', db_main)
+        out = run_py_func(db_main, 'database uri').out
 
         lines = out.split('\n')
-        expected = ['>>> pre_handler_general',
-                    '>>> post_handler_general']
+        expected = ('>>> pre_handler_general',
+                    '>>> post_handler_general')
         for line in expected:
             self.assertTrue(line in lines,
                             "%s was not found in output %s" % (line, lines))
 
-        notexpected = ['>>> pre_handler_version',
-                       '>>> post_handler_version']
+        notexpected = ('>>> pre_handler_version',
+                       '>>> post_handler_version')
         for line in notexpected:
             self.assertFalse(line in lines,
                              "%s was not expected in output %s" % (line, lines))
