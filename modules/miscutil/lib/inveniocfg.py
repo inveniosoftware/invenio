@@ -1091,7 +1091,7 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
-        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000 %(wsgiuser)s
         WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
@@ -1107,6 +1107,8 @@ WSGIRestrictStdout Off
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
+       'wsgiuser': conf.get('Invenio', 'CFG_BIBSCHED_PROCESS_USER') and
+                   'user='+conf.get('Invenio', 'CFG_BIBSCHED_PROCESS_USER'),
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address(conf) or '*',
        'listen_directive': listen_directive_needed and 'Listen ' + vhost_site_url_port or \
                            '#Listen ' + vhost_site_url_port,
