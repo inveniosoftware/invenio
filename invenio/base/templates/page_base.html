@@ -124,6 +124,14 @@
           </div>
         {% endif %}
       {% endblock title %}
+      {% block noscript %}
+      <noscript>
+        <div class="alert alert-warning">
+          <strong>{{ _("Warning") }}</strong> {{ _('This page requires to have JavaScript enabled.') }}
+          {{ _('Please enable JavaScript on your browser.') }}
+        </div>
+      </noscript>
+      {% endblock %}
       {{ flashed_messages() }}
       {%- block body %}
         {{ body }}
