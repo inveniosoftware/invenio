@@ -26,6 +26,8 @@ import re
 
 from invenio.config import CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.textutils import wash_for_utf8, strip_accents
+from invenio.bibindex_engine_washer import lower_index_term
 
 
 
@@ -291,7 +293,9 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             It's for the compatibility.
             See: tokenize_for_fuzzy_authors
         """
-        return self.tokenize_for_fuzzy_authors(phrase)
+        phrase = wash_for_utf8(phrase)
+        phrase = lower_index_term(phrase)
+        return self.tokenize_for_fuzzy_authors(strip_accents(phrase))
 
 
     def tokenize_for_words_default(self, phrase):
@@ -328,6 +332,9 @@ class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
             If CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES is 1 we tokenize only for family names.
             In other case we perform standard tokenization for words.
         """
+        phrase = wash_for_utf8(phrase)
+        phrase = lower_index_term(phrase)
+        phrase = strip_accents(phrase)
         if CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
             return self.get_author_family_name_words_from_phrase(phrase)
         else:
