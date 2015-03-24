@@ -670,10 +670,10 @@ class AbstractIndexTable(object):
 
     def put_word_into_db(self, word):
         """Flush a single word to the database and delete it from memory"""
-        set = self.load_old_recIDs(word)
+        set, old_word = self.load_old_recIDs(word)
         if set is not None: # merge the word recIDs found in memory:
             hitlist_was_changed = self.merge_with_old_recIDs(word, set)
-            if not hitlist_was_changed:
+            if not hitlist_was_changed and word == old_word:
                 # nothing to update:
                 write_message("......... unchanged hitlist for ``%s''" % \
                               word, verbose=9)
@@ -681,7 +681,7 @@ class AbstractIndexTable(object):
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" %  \
                               word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s %s" % (wash_table_column_name(self.table_name), self.unicode_520), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("UPDATE %s SET hitlist=%%s, term=%%s WHERE term=%%s %s" % (wash_table_column_name(self.table_name), self.unicode_520), (set.fastdump(), word, old_word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % \
@@ -724,13 +724,16 @@ class AbstractIndexTable(object):
             )
 
     def load_old_recIDs(self, word):
-        """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE term=%%s %s" % (self.table_name, self.unicode_520)
+        """Load existing hitlist for the word from the database index files.
+        Additionally returns the original stored word, useful in case
+        it has changed due to some collation.
+        """
+        query = "SELECT hitlist, term FROM %s WHERE term=%%s %s" % (self.table_name, self.unicode_520)
         res = run_sql(query, (word, ))
         if res:
-            return intbitset(res[0][0])
+            return intbitset(res[0][0]), res[0][1]
         else:
-            return None
+            return None, None
 
     def merge_with_old_recIDs(self, word, set):
         """Merge the system numbers stored in memory
