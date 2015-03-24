@@ -56,7 +56,9 @@ install:
   - "sudo a2enmod version || echo ':('"
   - "sudo a2enmod rewrite"
   - "sudo mkdir /etc/apache2/ssl"
-  - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
+  - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil"
+  - "sudo ln -s /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/apache2/ssl/apache.pem"
+  - "sudo ln -s /etc/ssl/private/ssl-cert-snakeoil.key /etc/apache2/ssl/apache.key"
   - "travis_retry pip install unittest2"
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
   - "travis_retry pip install -e .[$REXTRAS] --quiet --process-dependency-links"
@@ -69,8 +71,7 @@ install:
 
 before_script:
   - "inveniomanage apache create-config"
-  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
-  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
+  - "sudo ln -s var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
   - "sudo /usr/sbin/a2dissite *default* || echo ':('"
   - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
@@ -81,4 +82,4 @@ before_script:
 script:
   - "sphinx-build -qnNW docs docs/_build/html"
   - "python setup.py test"
-#  - "wget -O /dev/null http://localhost"
+  - "wget --no-check-certificate -O /dev/null https://localhost:4040"
