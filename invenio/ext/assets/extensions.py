@@ -133,6 +133,16 @@ class BundleExtension(Extension):
                         bundle.extra.update(rel="stylesheet")
                     bundles.append((bundle.weight, bundle))
 
+            from webassets.filter import option
+
+            def option__deepcopy__(value, memo):
+                """Custom deepcopy implementation for ``option`` class."""
+                return option(copy.deepcopy(value[0]),
+                              copy.deepcopy(value[1]),
+                              copy.deepcopy(value[2]))
+
+            option.__deepcopy__ = option__deepcopy__
+
             for _, bundle in sorted(bundles):
                 # A little bit of madness to read the "/" at the
                 # beginning of the assets in ran in debug mode as well as
