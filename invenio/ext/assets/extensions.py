@@ -21,10 +21,13 @@
 
 import copy
 import os
+import warnings
 
 from flask import _request_ctx_stack, current_app
 
 from flask_assets import Environment, FlaskResolver
+
+from invenio.utils.deprecation import RemovedInInvenio21Warning
 
 from jinja2 import nodes
 from jinja2.ext import Extension
@@ -121,6 +124,11 @@ class BundleExtension(Extension):
             # disable the compilation in debug mode iff asked.
             less_debug = env.debug and \
                 not current_app.config.get("LESS_RUN_IN_DEBUG")
+
+            if less_debug:
+                warnings.warn("LESS_RUN_IN_DEBUG has been deprecated",
+                              RemovedInInvenio21Warning)
+
             requirejs_debug = env.debug and \
                 not current_app.config.get("REQUIREJS_RUN_IN_DEBUG")
 
