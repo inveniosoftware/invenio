@@ -21,11 +21,16 @@
 
 import copy
 import os
-import six
-from flask import current_app, _request_ctx_stack
+
+from flask import _request_ctx_stack, current_app
+
 from flask_assets import Environment, FlaskResolver
+
 from jinja2 import nodes
 from jinja2.ext import Extension
+
+import six
+
 from webassets.bundle import is_url
 
 from . import registry
@@ -232,7 +237,7 @@ class InvenioResolver(FlaskResolver):
             else:
                 abspath = super(InvenioResolver, self) \
                     .search_env_directory(ctx, item)
-        except:  # FIXME do not catch all!
+        except Exception:  # FIXME do not catch all!
             # If a file is missing in production (non-debug mode), we want
             # to not break and will use /dev/null instead. The exception
             # is caught and logged.
