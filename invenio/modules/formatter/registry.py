@@ -20,12 +20,17 @@
 """Implement registries for formatter."""
 
 import os
-import yaml
 
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
-    ModuleAutoDiscoveryRegistry, RegistryProxy
+from flask_registry import (
+    ModuleAutoDiscoveryRegistry,
+    PkgResourcesDirDiscoveryRegistry,
+    RegistryProxy,
+)
+
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from invenio.utils.datastructures import LazyDict
+
+import yaml
 
 format_elements = RegistryProxy(
     'format_elements',
@@ -93,7 +98,7 @@ def create_output_formats_lookup():
 
     for f in output_formats_files:
         of = os.path.basename(f).lower()
-        data = {}
+        data = {'names': {}}
         if of.endswith('.yml'):
             of = of[:-4]
             with open(f, 'r') as f:
