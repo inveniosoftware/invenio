@@ -144,3 +144,7 @@ CFG_WEBSEARCH_MAX_RECORDS_REFERSTO = 50000
 # (all the records referenced/cited by the specified records) will be limited
 # to this number. This does not limit the number of records in the result.
 CFG_WEBSEARCH_MAX_RECORDS_CITEDBY = 50000
+
+# SEARCH_ELASTIC_KEYWORD_MAPPING -- this variable holds a dictionary to map
+# invenio keywords to elasticsearch fields
+SEARCH_ELASTIC_KEYWORD_MAPPING = None
