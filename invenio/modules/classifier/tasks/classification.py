@@ -42,11 +42,11 @@ def classify_paper(obj, eng, callback, data,
         obj.log.error(e)
     else:
         result["fast_mode"] = fast_mode
-        if fast_mode:
-            suffix = "fast"
-        else:
-            suffix = "full"
-        name = "classification_{0}".format(suffix)
+        # Check if it is not empty output before adding
+        output = result.get("dict", {}).get("complete_output", {}).values()
+        if not [x for x in output if x]:
+            result["dict"] = {}
+        name = "classification"
         obj.update_task_results(
             name,
             [{
@@ -70,7 +70,8 @@ def classify_paper_with_oaiharvester(taxonomy, rebuild_cache=False, no_cache=Fal
 
     def _classify_paper_with_oaiharvester(obj, eng):
         data = None
-        if not fast_mode:
+        is_fast_mode = fast_mode
+        if not is_fast_mode:
             if "_result" in obj.extra_data and "pdf" in obj.extra_data["_result"]:
                 data = obj.extra_data["_result"]["pdf"]
                 callback = bibclassify_exhaustive_call
@@ -80,12 +81,13 @@ def classify_paper_with_oaiharvester(taxonomy, rebuild_cache=False, no_cache=Fal
             data = [obj.data.get("title", {}).get("title", ""),
                     obj.data.get("abstract", {}).get("summary", "")]
             callback = bibclassify_exhaustive_call_text
+            is_fast_mode = True
 
         classify_paper(obj, eng, callback, data,
                        taxonomy, rebuild_cache,
                        no_cache, output_mode, output_limit,
                        spires, match_mode, with_author_keywords,
-                       extract_acronyms, only_core_tags, fast_mode)
+                       extract_acronyms, only_core_tags, is_fast_mode)
 
     return _classify_paper_with_oaiharvester
 
