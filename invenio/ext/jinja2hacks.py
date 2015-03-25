@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,13 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.ext.jinja2hacks
-    -----------------------
 
-    This module fixes problems with passing legacy Invenio str objects to
-    Jinja2 templates.
-"""
+"""Support passing legacy Invenio str objects to Jinja2 templates."""
+
+import warnings
 
 try:
     from markupsafe import Markup as jinja2_Markup, escape as jinja2_escape
@@ -29,13 +26,21 @@ except ImportError:
     from jinja2._markupsafe import Markup as jinja2_Markup, \
         escape as jinja2_escape
 
+from invenio.utils.deprecation import RemovedInInvenio22Warning
+
+warnings.warn(
+    "Jinja2Hacks will be disabled in 2.1 and removed in 2.2. "
+    "Please convert all strings in Jinja2 templates to unicode.",
+    RemovedInInvenio22Warning
+)
+
 
 def setup_app(app):
-    """
-    Jinja2 requires all strings to be unicode objects. Invenio however operates
-    with UTF8 encoded str objects. Jinja2 will automatically convert
-    non-unicode objects into unicode objects, but via the ascii codec. This
-    function replaces the escape function and Markup class in
+    """Jinja2 require all strings to be unicode objects.
+
+    Invenio however operates with UTF8 encoded str objects. Jinja2 will
+    automatically convert non-unicode objects into unicode objects, but via the
+    ascii codec. This function replaces the escape function and Markup class in
     Jinja2/MarkupSafe, to use the utf8 codec when converting 8-bit str objects
     into unicode objects.
 
@@ -67,7 +72,7 @@ def setup_app(app):
     # Escape function replacement in Jinja2 library
     try:
         jinja2._markupsafe.escape = utf8escape
-    except:
+    except AttributeError:
         pass
     jinja2.runtime.escape = utf8escape
     jinja2.utils.escape = utf8escape
@@ -78,7 +83,7 @@ def setup_app(app):
     # Markup class replacement in Jinja2 library
     try:
         jinja2._markupsafe.Markup = Markup
-    except:
+    except AttributeError:
         pass
     jinja2.runtime.Markup = Markup
     jinja2.utils.Markup = Markup
@@ -90,25 +95,25 @@ def setup_app(app):
     jinja2.environment.Markup = Markup
 
     # Escape/Markup replacement in MarkupSafe library.
-    ## FIXME causes recursive calls in `Markup.__new__` and `escape`
-    #try:
+    # FIXME causes recursive calls in `Markup.__new__` and `escape`
+    # try:
     #    import markupsafe
     #    markupsafe.escape = utf8escape
     #    #markupsafe.Markup = Markup
-    #except ImportError:
+    # except ImportError:
     #    pass
 
     return app
 
 
 def utf8escape(s):
-    """
-    UTF8-8-bit-string-friendly replacement function for MarkupSafe/Jinja2
-    escape function.
+    """UTF8-8-bit-string-friendly replacement for MarkupSafe escape function.
 
     WARNING: Do not use this method. Use jinja2.escape() instead.
     """
     if isinstance(s, str):
+        warnings.warn("Convert string '{0}' in template to unicode.".format(s),
+                      RuntimeWarning, stacklevel=3)
         return jinja2_escape(s.decode('utf8'))
     return jinja2_escape(s)
 # Ensure function name is identical to replaced function.
@@ -116,16 +121,21 @@ utf8escape.__name__ = jinja2_escape.__name__
 
 
 class Markup(jinja2_Markup):
-    """
-    Markup replacement class
+
+    """Markup replacement class.
 
     Forces the use of utf8 codec for decoding 8-bit strings, in case no
     encoding is specified.
 
     WARNING: Do not use this class. Use jinja2.Markup instead.
     """
+
     def __new__(cls, base=u'', encoding=None, errors='strict'):
+        """Add encoding for base of type str."""
         if encoding is None and isinstance(base, str):
             encoding = 'utf8'
+            warnings.warn(
+                "Convert string '{0}' in template to unicode.".format(base),
+                RuntimeWarning, stacklevel=3)
         return jinja2_Markup.__new__(cls, base=base, encoding=encoding,
                                      errors=errors)
