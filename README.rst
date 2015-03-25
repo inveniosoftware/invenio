@@ -2,7 +2,7 @@
  Invenio README
 ================
 
-.. image:: https://travis-ci.org/inveniosoftware/invenio.png?branch=master
+.. image:: https://travis-ci.org/inveniosoftware/invenio.svg?branch=master
     :target: https://travis-ci.org/inveniosoftware/invenio
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
