@@ -152,6 +152,12 @@ def setup_app(app):
     def test_not_empty(v):
         return v is not None and v != ''
 
+    @app.template_filter('u')
+    def tounicode(value):
+        if isinstance(value, str):
+            return value.decode('utf8')
+        return value
+
     @app.template_filter('prefix')
     def _prefix(value, prefix=''):
         return prefix + value if test_not_empty(value) else ''
