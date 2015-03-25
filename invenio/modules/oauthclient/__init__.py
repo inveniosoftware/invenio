@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -70,7 +70,7 @@ flow with ORCID:
    .. code-block:: http
 
       HTTP/1.1 302 FOUND
-      Location: https://orcid.org/oauth/authorize?response_type=code&client_id=<CLIENT KEY>&redirect_uri=https://localhost/oauth/authorized/orcid/&scope=/authenticate
+      Location: https://orcid.org/oauth/authorize?response_type=code&client_id=<CLIENT KEY>&redirect_uri=https://localhost/oauth/authorized/orcid/&scope=/authenticate&state=...
 
   Note, following query parameters in the authorize URL:
 
@@ -83,6 +83,9 @@ flow with ORCID:
      URL must be provided when registering the client application with the
      resource server.
    - ``scope`` - Defines the level of access (defined by the resource server)
+   - ``state`` - A token to mitigate against cross-site request forgery (CRSF).
+     In Invenio this state is a JSON Web Signature (JWS) that by default
+     expires after 5 minutes.
 
 2. The *resource server* asks the user to sign-in (if not already signed in).
 
@@ -96,10 +99,11 @@ flow with ORCID:
    .. code-block:: http
 
        HTTP/1.1 302 FOUND
-       Location: https://localhost/oauth/authorized/orcid/?code=<CODE>
+       Location: https://localhost/oauth/authorized/orcid/?code=<CODE>&state=...
 
    Included in the redirect is a one-time *auth code* which is typically only
-   valid for short time (seconds).
+   valid for short time (seconds), as well as the ``state`` token initially
+   provided.
 
 5. The client now exchanges the one time *auth code* for an *access token*
    using the resource server's *access token URL*:
