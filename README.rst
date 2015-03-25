@@ -5,6 +5,9 @@
 .. image:: https://travis-ci.org/inveniosoftware/invenio.png?branch=master
     :target: https://travis-ci.org/inveniosoftware/invenio
 
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+    :target: https://gitter.im/inveniosoftware/invenio?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
+
 Invenio is a free software suite enabling you to run your own digital
 library or document repository on the web.  The technology offered by
 the software covers all aspects of digital library management, from
