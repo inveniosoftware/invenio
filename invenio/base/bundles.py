@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -127,6 +127,13 @@ invenio = Bundle(
     output="invenio.js",
     filters=RequireJSFilter(exclude=[jquery]),
     weight=90
+)
+
+admin = Bundle(
+    "js/admin.js",
+    output="admin.js",
+    filters=RequireJSFilter(exclude=[jquery]),
+    weight=50
 )
 
 # less.js is only used when the following configuration is set:
