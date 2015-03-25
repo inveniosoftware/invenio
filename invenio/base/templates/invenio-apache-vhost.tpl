@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -100,6 +100,9 @@ WSGIPythonHome {{pythonhome}}
         RewriteEngine on
         RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-f
         RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-d
+        {#- Temporary manual handling of /admin, to work around the presence of
+            a folder admin/ in root #}
+        RewriteRule ^admin$ {{ script_alias}}/admin/ [PT,L]
         RewriteRule ^(.*)$ {{ script_alias }}$1 [PT,L]
     {% endblock wsgi -%}
     {%- block xsendfile_directive %}
