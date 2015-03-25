@@ -20,21 +20,26 @@
 """Additional extensions and filters for jinja2 module."""
 
 import re
-import six
+
+from flask import _request_ctx_stack, g, request, url_for
+
+from flask_login import current_user
+
+from jinja2 import ChoiceLoader
+
+from six import iteritems, string_types
+
+from werkzeug.routing import BuildError
 
 from .bccache import BytecodeCacheWithConfig
 from .context_processor import setup_app as context_processor_setup_app
 from .loader import OrderAwareDispatchingJinjaLoader
-from flask import g, request, _request_ctx_stack, url_for
-from jinja2 import ChoiceLoader
-from six import iteritems
 
 ENV_PREFIX = '_collected_'
 
 
 def render_template_to_string(input, _from_string=False, **context):
-    """
-    Render a template from the template folder with the given context.
+    """Render a template from the template folder with the given context.
 
     Code based on
     `<https://github.com/mitsuhiko/flask/blob/master/flask/templating.py>`_
@@ -57,8 +62,7 @@ def render_template_to_string(input, _from_string=False, **context):
 
 
 def inject_utils():
-    """
-    Inject variables and functions to jinja execution context.
+    """Inject variables and functions to jinja execution context.
 
     In particular it will add:
 
@@ -69,10 +73,8 @@ def inject_utils():
     - ``is_language_rtl``: True if the chosen language should be read right to
       left.
     """
-    from werkzeug.routing import BuildError
-
     from invenio.base.i18n import is_language_rtl
-    from flask_login import current_user
+    from invenio.modules.records.api import get_record
     from invenio.utils.url import create_url, get_canonical_and_alternates_urls
 
     def invenio_url_for(endpoint, **values):
@@ -91,11 +93,6 @@ def inject_utils():
         request.path)
     alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                           for ln, alternate_url in iteritems(alternate_urls))
-    try:
-        # should not be global due to bibfield_config
-        from invenio.modules.records.api import get_record
-    except:
-        get_record = lambda *args, **kwargs: None
     return dict(
         current_user=user,
         is_language_rtl=is_language_rtl,
@@ -137,8 +134,8 @@ def setup_app(app):
             cache_size=app.config.get('JINJA2_BCCACHE_SIZE', -1),
             bytecode_cache=BytecodeCacheWithConfig(app))
 
-    ## Let's customize the template loader to look into packages
-    ## and application templates folders.
+    # Let's customize the template loader to look into packages
+    # and application templates folders.
     jinja_loader = ChoiceLoader([
         OrderAwareDispatchingJinjaLoader(app),
         app.jinja_loader,
@@ -148,10 +145,12 @@ def setup_app(app):
     for ext in app.config.get('JINJA2_EXTENSIONS', []):
         try:
             app.jinja_env.add_extension(ext)
-        except:
-            app.logger.error('Problem with loading extension: "%s"' % (ext, ))
+        except Exception:
+            app.logger.exception(
+                'Problem with loading extension: "{0}"'.format(ext))
 
-    test_not_empty = lambda v: v is not None and v != ''
+    def test_not_empty(v):
+        return v is not None and v != ''
 
     @app.template_filter('prefix')
     def _prefix(value, prefix=''):
@@ -202,7 +201,7 @@ def setup_app(app):
 
         It uses :py:func:`invenio.utils.date.pretty_date`
         """
-        if isinstance(date, datetime) or isinstance(date, six.string_types):
+        if isinstance(date, datetime) or isinstance(date, string_types):
             return pretty_date(
                 date, ln=getattr(g, 'ln', app.config['CFG_SITE_LANG']))
         return date
