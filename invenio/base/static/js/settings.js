@@ -52,6 +52,7 @@ require.config({
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
+    "select2": "vendor/select2/select2.min",
   },
   shim: {
     jquery: {
@@ -148,6 +149,10 @@ require.config({
     },
     "jasmine-initialization": {
       deps: ["jasmine-boot"],
+    },
+    select2: {
+      deps: ["jquery"],
+      exports: "select2"
     },
   }
 });
