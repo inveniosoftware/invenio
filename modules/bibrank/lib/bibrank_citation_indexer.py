@@ -75,7 +75,7 @@ def deleted_recids_cache(cache={}):
     return cache['deleted_records']
 
 
-def get_recids_matching_query(p, f, config, m='e'):
+def get_recids_matching_query(p, f, config, m='e', ap=1):
     """Return set of recIDs matching query for pattern p in field f.
 
     @param p: pattern to search for
@@ -86,15 +86,23 @@ def get_recids_matching_query(p, f, config, m='e'):
     @type recID: dict
     @param m: type of matching (usually 'e' for exact or 'r' for regexp)
     @type recID: string
+    @param ap: The 'ap' argument governs whether an alternative patterns are to
+               be used in case there is no direct hit for (p,f,m).  For
+               example, whether to replace non-alphanumeric characters by
+               spaces if it would give some hits.  See the Search Internals
+               document for detailed description.  (ap=0 forbits the
+               alternative pattern usage, ap=1 permits it.)
+    @type ap: int
     """
+
     p = p.encode('utf-8')
     f = f.encode('utf-8')
     function = config.get("rank_method", "function")
     collections = config.get(function, 'collections')
     if collections:
-        ret = search_pattern(p=p, f=f, m=m) & recids_cache(collections)
+        ret = search_pattern(p=p, f=f, m=m, ap=ap) & recids_cache(collections)
     else:
-        ret = search_pattern(p=p, f=f, m=m) - deleted_recids_cache()
+        ret = search_pattern(p=p, f=f, m=m, ap=ap) - deleted_recids_cache()
     return ret
 
 
