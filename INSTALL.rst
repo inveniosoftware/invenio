@@ -320,14 +320,14 @@ setup.
 ~~~~~~~~~~~~~~~~~
 
 The first step of the installation is to download the development version of
-Invenio and the Invenio Demosite. This development is done in the ``pu``
+Invenio and the Invenio Demosite. This development is done in the ``master``
 branch.
 
 .. code-block:: console
 
     $ mkdir -p $HOME/src
     $ cd $HOME/src/
-    $ export BRANCH=pu
+    $ export BRANCH=master
     $ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio.git
     $ git clone --branch $BRANCH git://github.com/inveniosoftware/invenio-demosite.git
 
