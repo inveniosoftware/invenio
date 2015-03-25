@@ -19,10 +19,67 @@
 
 """Utilities for working with DataCite metadata."""
 
+from __future__ import absolute_import
+
 import re
 import urllib2
+import warnings
 
+from datacite import DataCiteMDSClient
+from datacite.errors import DataCiteBadRequestError, \
+    DataCiteForbiddenError, \
+    DataCiteGoneError, \
+    DataCiteNoContentError, \
+    DataCiteNotFoundError, \
+    DataCitePreconditionError, \
+    DataCiteRequestError, \
+    DataCiteServerError, \
+    DataCiteUnauthorizedError
+from datacite.request import DataCiteRequest
+
+from invenio.base.globals import cfg
+from invenio.utils.deprecation import RemovedInInvenio22Warning
 from invenio.utils.xmlDict import ElementTree, XmlDictConfig
+
+
+__all__ = (
+    'DataCite', 'DataciteMetadata', 'DataCiteRequest',
+    'DataCiteServerError', 'DataCiteRequestError', 'DataCiteNoContentError',
+    'DataCiteBadRequestError', 'DataCiteUnauthorizedError',
+    'DataCiteForbiddenError', 'DataCiteNotFoundError', 'DataCiteGoneError',
+    'DataCitePreconditionError'
+)
+
+
+class DataCite(DataCiteMDSClient):
+
+    """DataCite API wrapper.
+
+    .. deprecated:: 2.0.2
+       Use http://datacite.readthedocs.org/en/latest/ instead.
+    """
+
+    def __init__(self, username=None, password=None, url=None, prefix=None,
+                 test_mode=None, api_ver="2"):
+        """Initialize API client.
+
+        Compatibility layer on top of external DataCite API client.
+        """
+        warnings.warn("Use of invenio.utils.datacite:DataCite is "
+                      "deprecated in favor of "
+                      "http://datacite.readthedocs.org/en/latest/.",
+                      RemovedInInvenio22Warning)
+
+        super(DataCite, self).__init__(
+            username=username or cfg.get('CFG_DATACITE_USERNAME', ''),
+            password=password or cfg.get('CFG_DATACITE_PASSWORD', ''),
+            url=url or cfg.get('CFG_DATACITE_URL',
+                               'https://mds.datacite.org/'),
+            prefix=prefix or cfg.get('CFG_DATACITE_DOI_PREFIX', '10.5072'),
+            test_mode=test_mode if test_mode is not None else cfg.get(
+                'CFG_DATACITE_TESTMODE', False),
+            api_ver=api_ver or "2"
+        )
 
 
 class DataciteMetadata(object):
@@ -30,6 +87,7 @@ class DataciteMetadata(object):
     """Helper class for working with DataCite metadata."""
 
     def __init__(self, doi):
+        """Initialize object."""
         self.url = "http://data.datacite.org/application/x-datacite+xml/"
         self.error = False
         try:
@@ -49,6 +107,7 @@ class DataciteMetadata(object):
             self.xml = XmlDictConfig(self.root)
 
     def get_creators(self, attribute='creatorName'):
+        """Get DataCite creators."""
         if 'creators' in self.xml:
             if isinstance(self.xml['creators']['creator'], list):
                 return [c[attribute] for c in self.xml['creators']['creator']]
@@ -58,16 +117,19 @@ class DataciteMetadata(object):
         return None
 
     def get_titles(self):
+        """Get DataCite titles."""
         if 'titles' in self.xml:
             return self.xml['titles']['title']
         return None
 
     def get_publisher(self):
+        """Get DataCite publisher."""
         if 'publisher' in self.xml:
             return self.xml['publisher']
         return None
 
     def get_dates(self):
+        """Get DataCite dates."""
         if 'dates' in self.xml:
             if isinstance(self.xml['dates']['date'], dict):
                 return self.xml['dates']['date'].values()[0]
@@ -75,19 +137,23 @@ class DataciteMetadata(object):
         return None
 
     def get_publication_year(self):
+        """Get DataCite publication year."""
         if 'publicationYear' in self.xml:
             return self.xml['publicationYear']
         return None
 
     def get_language(self):
+        """Get DataCite language."""
         if 'language' in self.xml:
             return self.xml['language']
         return None
 
     def get_related_identifiers(self):
+        """Get DataCite related identifiers."""
         pass
 
     def get_description(self, description_type='Abstract'):
+        """Get DataCite description."""
         if 'descriptions' in self.xml:
             if isinstance(self.xml['descriptions']['description'], list):
                 for description in self.xml['descriptions']['description']:
@@ -104,6 +170,7 @@ class DataciteMetadata(object):
         return None
 
     def get_rights(self):
+        """Get DataCite rights."""
         if 'titles' in self.xml:
             return self.xml['rights']
         return None
