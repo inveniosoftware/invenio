@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011 CERN.
+# Copyright (C) 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,7 +24,6 @@ import getopt
 import sys
 import datetime
 import time
-import StringIO
 from tempfile import NamedTemporaryFile
 from invenio.legacy.bibsword.config import CFG_SUBMISSION_STATUS_SUBMITTED, \
                                     CFG_SUBMISSION_STATUS_REMOVED, \
@@ -61,7 +60,6 @@ from invenio.legacy.bibsword.client_dblayer import get_all_remote_server, \
                                             insert_into_swr_clientdata, \
                                             count_nb_submitted_record, \
                                             select_remote_server_infos
-from invenio.modules.formatter import record_get_xml
 from invenio.legacy.bibsword.client_templates import BibSwordTemplate
 from invenio.config import CFG_TMPDIR, CFG_SITE_ADMIN_EMAIL
 
@@ -207,8 +205,8 @@ def get_marcxml_from_record(recid):
         @param recid: id of the record to be retreive on the database
         @return: string containing the marcxml file of the record
     '''
-
-    return record_get_xml(recid)
+    from invenio.modules.record.api import get_record
+    return get_record(recid).legacy_export_as_marc()
 
 
 def get_media_list(recid, selected_medias=None):

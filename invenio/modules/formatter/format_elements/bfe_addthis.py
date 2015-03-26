@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011 CERN.
+# Copyright (C) 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,30 +16,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - wraps the Add This service:
-    <http://www.addthis.com/>
-"""
+
+"""BibFormat element - wrap the Add This service: <http://www.addthis.com/>."""
 
 try:
     from invenio.config import CFG_BIBFORMAT_ADDTHIS_ID
 except ImportError:
     CFG_BIBFORMAT_ADDTHIS_ID = None
 
-from invenio.legacy.search_engine import record_public_p
-def format_element(bfo, only_public_records=1, addthis_id=CFG_BIBFORMAT_ADDTHIS_ID):
-    """
-    Prints the AddThis box from the <http://www.addthis.com/> service.
+from invenio.legacy.search_engine import get_all_restricted_recids
 
-    @param only_public_records: if set to 1 (the default), prints the box only
-        if the record is public (i.e. if it belongs to the root colletion and is
-        accessible to the world).
-    @param addthis_id: the pubid API parameter as provided by the service
+
+def format_element(bfo, only_public_records=1,
+                   addthis_id=CFG_BIBFORMAT_ADDTHIS_ID):
+    """Print the AddThis box from the <http://www.addthis.com/> service.
+
+    :param only_public_records: if set to 1 (the default), prints the box only
+        if the record is public (i.e. if it belongs to the root colletion and
+        is accessible to the world).
+    :param addthis_id: the pubid API parameter as provided by the service
         (e.g. ra-4ff80aae118f4dad). This can be set at the repository level
         in the variable CFG_BIBFORMAT_ADDTHIS_ID in invenio(-local).conf
     """
     if not addthis_id:
         return ""
-    if int(only_public_records) and not record_public_p(bfo.recID):
+    if int(only_public_records) and \
+            bfo.recID not in get_all_restricted_recids():
         return ""
     return """\
 <!-- AddThis Button BEGIN -->
@@ -56,9 +58,7 @@ def format_element(bfo, only_public_records=1, addthis_id=CFG_BIBFORMAT_ADDTHIS_
 <!-- AddThis Button END -->
 """ % {'addthis_id': addthis_id}
 
+
 def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
+    """Check if output of this element should be escaped."""
     return 0

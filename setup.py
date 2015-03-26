@@ -97,6 +97,7 @@ install_requires = [
     "fs>=0.4",
     "intbitset>=2.0",
     "invenio-client>=0.1.0",
+    "invenio-query-parser>=0.2",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
     "libmagic>=1.0",
@@ -131,7 +132,8 @@ install_requires = [
     "unidecode",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
-    "wtforms-alchemy>=0.12.6"
+    "wtforms-alchemy>=0.12.6",
+    "pyyaml",
 ]
 
 
@@ -311,7 +313,6 @@ setup(
             ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
-            'webcoll = invenio.legacy.websearch.scripts.webcoll:main',
             'webmessageadmin = '
             ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
             'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',

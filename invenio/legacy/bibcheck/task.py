@@ -650,9 +650,9 @@ def get_recids_for_rules(rules):
             last_run = get_rule_lastrun(rule_name)
             modified_recids = get_modified_records_since(last_run)
             if not "consider_deleted_records" in rule:
-                modified_recids -= search_unit_in_bibxxx(p='DELETED', f='980__%', type='e')
+                modified_recids -= search_unit_in_bibxxx(p='DELETED', f='980__%', m='e')
                 if CFG_CERN_SITE:
-                    modified_recids -= search_unit_in_bibxxx(p='DUMMY', f='980__%', type='e')
+                    modified_recids -= search_unit_in_bibxxx(p='DUMMY', f='980__%', m='e')
             result.intersection_update(modified_recids)
         recids[rule_name] = result
 

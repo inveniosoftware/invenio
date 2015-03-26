@@ -64,8 +64,7 @@ from invenio.config import \
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.legacy.search_engine import create_navtrail_links, \
-     guess_primary_collection_of_a_record, \
-     get_colID
+     guess_primary_collection_of_a_record
 from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.utils.html import get_mathjax_header
@@ -92,6 +91,7 @@ from invenio.legacy.bibdocfile.api import \
      stream_file, \
      decompose_file, \
      propose_next_docname
+from invenio.modules.collections.models import Collection
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
@@ -182,9 +182,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             user_is_subscribed_to_discussion = False
             user_can_unsubscribe_from_discussion = False
 
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
+        col_id = Collection.query.filter_by(
+            name=guess_primary_collection_of_a_record(self.recid)).value('id')
+        unordered_tabs = get_detailed_page_tabs(col_id, self.recid,
+                                                ln=argd['ln'])
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''

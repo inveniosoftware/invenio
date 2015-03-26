@@ -1,0 +1,7 @@
+content_type: text/html
+default: Default_HTML_MARC.tpl
+description: HTML MARC.
+mime_type: application/marc
+name: MARC
+rules: []
+visibility: 0

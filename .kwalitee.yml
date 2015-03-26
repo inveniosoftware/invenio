@@ -41,6 +41,7 @@ components:
 - classifier
 - cloudconnector
 - collect
+- collections
 - comments
 - communities
 - config

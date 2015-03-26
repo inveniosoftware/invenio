@@ -1,0 +1,6 @@
+content_type: text/html
+default: Default_HTML_references.bft
+description: Display record references in References tab.
+name: References tab
+rules: []
+visibility: 0

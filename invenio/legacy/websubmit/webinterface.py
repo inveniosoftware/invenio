@@ -47,7 +47,7 @@ from invenio.modules.access.control import acc_is_role
 from invenio.legacy.webpage import warning_page
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
-from invenio.legacy.search_engine import is_user_owner_of_record
+from invenio.modules.records.access import is_user_owner_of_record
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language

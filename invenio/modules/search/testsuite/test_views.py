@@ -29,11 +29,11 @@ class SearchViewTest(InvenioTestCase):
     """ Test search view functions. """
 
     def test_home_collection_page_availability(self):
-        response = self.client.get(url_for('search.index'))
+        response = self.client.get(url_for('collections.index'))
         self.assert200(response)
 
         response = self.client.get(url_for(
-            'search.collection', name=current_app.config['CFG_SITE_NAME']))
+            'collections.collection', name=current_app.config['CFG_SITE_NAME']))
         self.assert200(response)
 
     def test_search_page_availability(self):

@@ -38,13 +38,12 @@ from .api import get_record
 
 def get_unique_record_json(param):
     """API to query records from the database."""
-    from invenio.legacy.search_engine import perform_request_search
+    from invenio.modules.search.api import SearchEngine
     data, query = {}, {}
     data['status'] = 'notfound'
-
-    recid = perform_request_search(p=param)
+    recid = SearchEngine(param).search()
     if len(recid) == 1:
-        query = get_record(recid).dumps(clean=True)
+        query = get_record(recid[0]).dumps(clean=True)
         data['status'] = 'success'
     elif len(recid) > 1:
         data['status'] = 'multiplefound'
@@ -109,12 +108,12 @@ def references_nb_counts():
         return
 
     from invenio.legacy.bibrecord import record_get_field_instances
-    from invenio.legacy.search_engine import get_field_tags
+    from invenio.modules.search.models import Field
     from invenio.modules.records.api import get_record
 
     if not CFG_CERN_SITE:
         reftag = ""
-        reftags = get_field_tags("reference")
+        reftags = list(Field.get_field_tags("reference"))
         if reftags:
             reftag = reftags[0]
         tmprec = get_record(recid)

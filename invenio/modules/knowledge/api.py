@@ -28,7 +28,7 @@ from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 from invenio.utils.memoise import Memoise
 
 from sqlalchemy.exc import IntegrityError
@@ -136,7 +136,8 @@ def get_kb_mappings(kb_name="", key="", value="", match_type="s", sortby="to",
     :param sortby: the sorting criteria ('from' or 'to')
     :param key: return only entries where key matches this
     :param value: return only entries where value matches this
-    :limit return only X number of entries
+    :param limit: return only X number of entries
+    :return: list of knowledge converted in dictionary
     """
     # query
     query = db.session.query(models.KnwKBRVAL).join(models.KnwKB)
@@ -409,19 +410,23 @@ def delete_kb(kb_name):
 
 
 def get_elements_that_use_kb(name):
-    # FIXME remove the obsolete function
     """Return a list of elements that call given kb.
 
     WARNING: this routine is obsolete.
 
-    [ {'filename':"filename_1.py"
-       'name': "a name"
-      },
-      ...
-    ]
+    .. code-block:: python
+
+        [
+         {
+          'filename':"filename_1.py",
+          'name': "a name"
+         },
+         ..
+        ]
 
     :return: elements sorted by name
     """
+    # FIXME remove the obsolete function
     warnings.warn("The method 'get_elements_that_use_kb(name) is obsolete!'",
                   DeprecationWarning)
 
@@ -459,7 +464,7 @@ def get_elements_that_use_kb(name):
     keys.sort()
     return map(format_elements.get, keys)
 
-### kb functions for export
+# kb functions for export
 
 
 def get_kbs_info(kbtype="", searchkbname=""):
@@ -557,7 +562,7 @@ def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     :param searchkey: search using this key
     :param searchvalue: search using this value
     :param searchtype: s = substring, e=exact
-    :return a list of dictionaries [{'key'=>x, 'value'=>y},..]
+    :return: a list of dictionaries [{'key'=>x, 'value'=>y},..]
     """
     kb = get_kb_by_name(kb_name)
     return kb.get_kbr_items(searchkey, searchvalue, searchtype)

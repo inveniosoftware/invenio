@@ -1,0 +1,7 @@
+content_type: text/xml
+default: MARCXML.bft
+description: XML MARC.
+mime_type: application/marcxml+xml
+name: MARCXML
+rules: []
+visibility: 0

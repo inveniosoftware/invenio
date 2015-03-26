@@ -1,0 +1,6 @@
+content_type: text/html
+default: Default_HTML_similarity.bft
+description: Very short HTML output for similarity box (<i>people also viewed..</i>).
+name: HTML similarity
+rules: []
+visibility: 0

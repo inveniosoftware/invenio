@@ -51,7 +51,7 @@ from invenio.legacy.bibcirculation.utils import book_title_from_MARC, \
     book_information_from_MARC
 from invenio.legacy.bibcirculation.db_layer import get_id_bibrec, \
     get_borrower_data
-from invenio.legacy.websearch.webcoll import CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE
+CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE = None
 from invenio.utils.date import convert_datetext_to_datestruct, convert_datestruct_to_dategui
 from invenio.legacy.bibsched.bibtask import get_modified_records_since
 

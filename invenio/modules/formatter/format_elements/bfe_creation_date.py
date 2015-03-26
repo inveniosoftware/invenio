@@ -18,7 +18,11 @@
 """
 __revision__ = "$Id$"
 
-from invenio.legacy.search_engine import get_creation_date
+import datetime
+
+from invenio.modules.records.recordext.functions.get_creation_date import \
+    get_creation_date
+
 
 def format_element(bfo, format='%Y-%m-%d', date_format='%Y-%m-%d'):
     '''
@@ -28,9 +32,9 @@ def format_element(bfo, format='%Y-%m-%d', date_format='%Y-%m-%d'):
     @param date_format: The date format in MySQL syntax
     '''
     recID = bfo.recID
+    creation_date = get_creation_date(recID) or datetime.now()
 
     # Let's be gentle and backward compatible while "format" is here:
     if date_format == '%Y-%m-%d' and format != '%Y-%m-%d':
         date_format = format
-    out = get_creation_date(recID, date_format)
-    return out
+    return datetime.strptime(creation_date, date_format)

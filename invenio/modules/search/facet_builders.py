@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
 # Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
@@ -19,18 +19,26 @@
 
 """Facet utility functions."""
 
-from operator import itemgetter
-from itertools import groupby
-from six import iteritems
 from flask import g, url_for, request
 from flask_login import current_user
-
-from .cache import search_results_cache, \
-    get_search_results_cache_key_from_qid
-from .models import Collection
+from intbitset import intbitset
+from itertools import groupby
+from operator import itemgetter
+from six import iteritems
 
 from invenio.base.globals import cfg
-from intbitset import intbitset
+from invenio.modules.collections.cache import get_collection_reclist
+from invenio.modules.collections.models import Collection
+
+from .cache import (
+    get_search_results_cache_key_from_qid,
+    search_results_cache,
+)
+from .models import Field
+from .utils import (
+    get_most_popular_field_values,
+    get_records_that_can_be_displayed,
+)
 
 
 def get_current_user_records_that_can_be_displayed(qid):
@@ -45,16 +53,14 @@ def get_current_user_records_that_can_be_displayed(qid):
 
     @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     def get_records_for_user(qid, uid):
-        from invenio.legacy.search_engine import \
-            get_records_that_can_be_displayed
         key = get_search_results_cache_key_from_qid(qid)
         data = search_results_cache.get(key)
         if data is None:
             return intbitset([])
         cc = search_results_cache.get(key + '::cc')
-        return get_records_that_can_be_displayed(current_user,
-                                                 intbitset().fastload(data),
-                                                 cc)
+        return get_records_that_can_be_displayed(
+            current_user.get('precached_permitted_restricted_collections', []),
+            intbitset().fastload(data), cc)
     # Simplifies API
     return get_records_for_user(qid, current_user.get_id())
 
@@ -137,19 +143,16 @@ class FacetBuilder(object):
 
     def get_facets_for_query(self, qid, limit=20, parent=None):
         """Return facet data."""
-        from invenio.legacy.search_engine import get_most_popular_field_values,\
-            get_field_tags
-        return get_most_popular_field_values(self.get_recids(qid),
-                                             get_field_tags(self.name)
-                                             )[0:limit]
+        return get_most_popular_field_values(
+            self.get_recids(qid), Field.get_field_tags(self.name)
+        )[0:limit]
 
     def get_value_recids(self, value):
         """Return record ids in intbitset for given field value."""
-        from invenio.legacy.search_engine import search_pattern
+        from .searchext.engines.native import search_unit
         if isinstance(value, unicode):
             value = value.encode('utf8')
-        p = '"' + str(value) + '"'
-        return search_pattern(p=p, f=self.name)
+        return search_unit(p=value, f=self.name, m='e')
 
     def get_facet_recids(self, values):
         """Return record ids in intbitset for all field values."""
@@ -186,7 +189,9 @@ class CollectionFacetBuilder(FacetBuilder):
                 collection = Collection.query.get(1)
         facet = []
         for c in collection.collection_children_r:
-            num_records = len(c.reclist.intersection(recIDsHitSet))
+            num_records = len(get_collection_reclist(
+                c.name, recreate_cache_if_needed=False
+            ).intersection(recIDsHitSet))
             if num_records:
                 facet.append((c.name, num_records, c.name_ln))
         return sorted(facet, key=lambda x: x[1], reverse=True)[0:limit]

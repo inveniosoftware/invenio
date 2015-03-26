@@ -19,8 +19,11 @@
 
 """Utility functions."""
 
+import re
+
 from invenio.ext.cache import cache
 from invenio.ext.sqlalchemy import db
+from invenio.modules.knowledge.api import get_kbr_values
 from invenio.utils.datastructures import LazyDict
 
 from .models import IdxINDEX, IdxINDEXField
@@ -42,3 +45,45 @@ def load_tokenizers():
     return dict((module.__name__.split('.')[-1],
                  getattr(module, module.__name__.split('.')[-1], ''))
                 for module in tokenizers)
+
+
+def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
+    """Return list of synonyms for TERM by looking in KBR_NAME.
+
+    :param term: search-time term or index-time term
+    :param kbr_name: knowledge base name
+    :param match_type: specifies how the term matches against the KBR
+        before doing the lookup.  Could be `exact' (default),
+        'leading_to_comma', `leading_to_number'.
+    :param use_memoise: can we memoise while doing lookups?
+    :return: list of term synonyms
+    """
+    dterms = {}
+    # exact match is default:
+    term_for_lookup = term
+    term_remainder = ''
+    from invenio.legacy.bibindex.engine_config import \
+        CFG_BIBINDEX_SYNONYM_MATCH_TYPE as MATCH_TYPES
+    # but maybe match different term:
+    if match_type == MATCH_TYPES['leading_to_comma']:
+        mmm = re.match(r'^(.*?)(\s*,.*)$', term)
+        if mmm:
+            term_for_lookup = mmm.group(1)
+            term_remainder = mmm.group(2)
+    elif match_type == MATCH_TYPES['leading_to_number']:
+        mmm = re.match(r'^(.*?)(\s*\d.*)$', term)
+        if mmm:
+            term_for_lookup = mmm.group(1)
+            term_remainder = mmm.group(2)
+    # FIXME: workaround: escaping SQL wild-card signs, since KBR's
+    # exact search is doing LIKE query, so would match everything:
+    term_for_lookup = term_for_lookup.replace('%', '\\%')
+    # OK, now find synonyms:
+    for kbr_values in get_kbr_values(kbr_name,
+                                     searchkey=term_for_lookup,
+                                     searchtype='e',
+                                     use_memoise=use_memoise):
+        for kbr_value in kbr_values:
+            dterms[kbr_value + term_remainder] = 1
+    # return list of term synonyms:
+    return dterms.keys()

@@ -21,7 +21,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 from invenio.ext.sqlalchemy import db
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 from celery.task.base import PeriodicTask
 
 from .models import Community

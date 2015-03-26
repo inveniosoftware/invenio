@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ import sys
 from urllib import quote
 from invenio.utils import apache
 import threading
+from werkzeug.local import LocalProxy
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -53,7 +54,6 @@ from invenio.config import \
     CFG_WEBDIR, \
     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-    CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
     CFG_INSPIRE_SITE, \
     CFG_WEBSEARCH_WILDCARD_LIMIT, \
@@ -73,29 +73,21 @@ from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import check_user_can_view_record, \
     collection_reclist_cache, \
     collection_restricted_p, \
-    create_similarly_named_authors_link_box, \
-    get_colID, \
     get_coll_i18nname, \
     get_most_popular_field_values, \
-    get_mysql_recid_from_aleph_sysno, \
     guess_primary_collection_of_a_record, \
-    page_end, \
-    page_start, \
-    perform_request_cache, \
-    perform_request_log, \
     perform_request_search, \
     restricted_collection_cache, \
-    get_coll_normalised_name, \
     EM_REPOSITORY
-from invenio.legacy.websearch.webcoll import perform_display_collection
+from invenio.modules.collections.models import Collection
 from invenio.legacy.bibrecord import get_fieldvalues, \
      get_fieldvalues_alephseq_like
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
-from invenio.modules.formatter import format_records
+from invenio.modules.collections.cache import get_collection_reclist
+from invenio.modules.formatter import registry
 from invenio.modules.formatter.engine import get_output_formats
-from invenio.legacy.websearch.webcoll import get_collection
 from intbitset import intbitset
 from invenio.legacy.bibupload.engine import find_record_from_sysno
 from invenio.legacy.bibrank.citation_searcher import get_cited_by_list
@@ -113,12 +105,8 @@ websearch_templates = invenio.legacy.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
-try:
-    output_formats = [output_format['attrs']['code'].lower() for output_format in \
-                      get_output_formats(with_attributes=True).values()]
-except KeyError:
-    output_formats = ['xd', 'xm', 'hd', 'hb', 'hs', 'hx']
-output_formats.extend(['hm', 't', 'h'])
+
+output_formats = LocalProxy(registry.output_formats.keys)
 
 
 def wash_search_urlargd(form):
@@ -398,7 +386,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     """ Handling of the /search URL and its sub-pages. """
 
-    _exports = ['', 'authenticate', 'cache', 'log']
+    _exports = ['', 'authenticate', 'cache']
 
     def __call__(self, req, form):
         """ Perform a search. """
@@ -455,7 +443,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 for collname in restricted_collection_cache.cache:
                     (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
                     if auth_code and user_info['email'] == 'guest':
-                        coll_recids = get_collection(collname).reclist
+                        coll_recids = get_collection_reclist(collname)
                         if coll_recids & recids:
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -506,16 +494,6 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             return str(out)
         else:
             return out
-
-    def cache(self, req, form):
-        """Search cache page."""
-        argd = wash_urlargd(form, {'action': (str, 'show')})
-        return perform_request_cache(req, action=argd['action'])
-
-    def log(self, req, form):
-        """Search log page."""
-        argd = wash_urlargd(form, {'date': (str, '')})
-        return perform_request_log(req, date=argd['date'])
 
     def authenticate(self, req, form):
         """Restricted search results pages."""
@@ -676,19 +654,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         elif component == CFG_SITE_RECORD or component == 'record-restricted':
             try:
-                if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
-                    # let us try to recognize /<CFG_SITE_RECORD>/<SYSNO> style of URLs:
-                    # check for SYSNOs with an embedded slash; needed for [ARXIVINV-15]
-                    if len(path) > 1 and get_mysql_recid_from_aleph_sysno(path[0] + "/" + path[1]):
-                        path[0] = path[0] + "/" + path[1]
-                        del path[1]
-                    x = get_mysql_recid_from_aleph_sysno(path[0])
-                    if x:
-                        recid = x
-                    else:
-                        recid = int(path[0])
-                else:
-                    recid = int(path[0])
+                recid = int(path[0])
             except IndexError:
                 # display record #1 for URL /CFG_SITE_RECORD without a number
                 recid = 1
@@ -840,8 +806,9 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     navmenuid='search')
 
     # deduce collection id:
-    normalised_name = get_coll_normalised_name(c)
-    colID = get_colID(normalised_name)
+    collection = Collection.query.filter_by(name=c).first()
+    colID = collection.id if collection else None
+    normalised_name = collection.name if collection else c
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %(x_colname)s does not seem to exist.", x_colname='<strong>' + str(c) + '</strong>',)) + '</p>'
         page_body = '<p>' + (_("You may want to start browsing from %(x_sitehref)s.", x_sitehref='<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
@@ -856,82 +823,8 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                     req=req,
                     navmenuid='search')
 
-    if normalised_name != c:
-        redirect_to_url(req, normalised_name, apache.HTTP_MOVED_PERMANENTLY)
-
-    # start display:
-    req.content_type = "text/html"
-    req.send_http_header()
-
-    c_body, c_navtrail, c_portalbox_lt, c_portalbox_rt, c_portalbox_tp, c_portalbox_te, \
-        c_last_updated = perform_display_collection(colID, c, aas, ln, em,
-                                            user_preferences.get('websearch_helpbox', 1))
-
-    if em == "" or EM_REPOSITORY["body"] in em:
-        try:
-            title = get_coll_i18nname(c, ln)
-        except:
-            title = ""
-    else:
-        title = ""
-    show_title_p = True
-    body_css_classes = []
-    if c == CFG_SITE_NAME:
-        # Do not display title on home collection
-        show_title_p = False
-        body_css_classes.append('home')
-
-    if len(collection_reclist_cache.cache.keys()) == 1:
-        # if there is only one collection defined, do not print its
-        # title on the page as it would be displayed repetitively.
-        show_title_p = False
-
-    if aas == -1:
-        show_title_p = False
-
-    if CFG_INSPIRE_SITE == 1:
-        # INSPIRE should never show title, but instead use css to
-        # style collections
-        show_title_p = False
-        body_css_classes.append(nmtoken_from_string(c))
-
-    # RSS:
-    rssurl = CFG_SITE_URL + '/rss'
-    rssurl_params = []
-    if c != CFG_SITE_NAME:
-        rssurl_params.append('cc=' + quote(c))
-    if ln != CFG_SITE_LANG and \
-           c in CFG_WEBSEARCH_RSS_I18N_COLLECTIONS:
-        rssurl_params.append('ln=' + ln)
-
-    if rssurl_params:
-        rssurl += '?' + '&amp;'.join(rssurl_params)
-
-    if 'hb' in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
-        metaheaderadd = get_mathjax_header(req.is_https())
-    else:
-        metaheaderadd = ''
-
-    return page(title=title,
-                body=c_body,
-                navtrail=c_navtrail,
-                description="%s - %s" % (CFG_SITE_NAME, c),
-                keywords="%s, %s" % (CFG_SITE_NAME, c),
-                metaheaderadd=metaheaderadd,
-                uid=uid,
-                language=ln,
-                req=req,
-                cdspageboxlefttopadd=c_portalbox_lt,
-                cdspageboxrighttopadd=c_portalbox_rt,
-                titleprologue=c_portalbox_tp,
-                titleepilogue=c_portalbox_te,
-                lastupdated=c_last_updated,
-                navmenuid='search',
-                rssurl=rssurl,
-                body_css_classes=body_css_classes,
-                show_title_p=show_title_p,
-                show_header=em == "" or EM_REPOSITORY["header"] in em,
-                show_footer=em == "" or EM_REPOSITORY["footer"] in em)
+    from flask import redirect, url_for
+    return redirect(url_for('collections.collection', name=collection.name))
 
 
 def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
@@ -997,129 +890,9 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """RSS 2.0 feed service."""
-
-        # Keep only interesting parameters for the search
-        default_params = websearch_templates.rss_default_urlargd
-        # We need to keep 'jrec' and 'rg' here in order to have
-        # 'multi-page' RSS. These parameters are not kept be default
-        # as we don't want to consider them when building RSS links
-        # from search and browse pages.
-        default_params.update({'jrec':(int, 1),
-                               'rg': (int, CFG_WEBSEARCH_INSTANT_BROWSE_RSS)})
-        argd = wash_urlargd(form, default_params)
-        user_info = collect_user_info(req)
-
-        for coll in argd['c'] + [argd['cc']]:
-            if collection_restricted_p(coll):
-                (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest':
-                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
-                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_SECURE_URL + req.unparsed_uri}, {})
-                    return redirect_to_url(req, target, norobot=True)
-                elif auth_code:
-                    return page_not_authorized(req, "../", \
-                        text=auth_msg, \
-                        navmenuid='search')
-
-        # Create a standard filename with these parameters
-        current_url = websearch_templates.build_rss_url(argd)
-        cache_filename = current_url.split('/')[-1]
-
-        # In the same way as previously, add 'jrec' & 'rg'
-
-        req.content_type = "application/rss+xml"
-        req.send_http_header()
-        try:
-            # Try to read from cache
-            path = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            # Check if cache needs refresh
-            filedesc = open(path, "r")
-            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
-            assert(datetime.datetime.now() < last_update_time + datetime.timedelta(minutes=CFG_WEBSEARCH_RSS_TTL))
-            c_rss = filedesc.read()
-            filedesc.close()
-            req.write(c_rss)
-            return
-        except Exception as e:
-            # do it live and cache
-
-            previous_url = None
-            if argd['jrec'] > 1:
-                prev_jrec = argd['jrec'] - argd['rg']
-                if prev_jrec < 1:
-                    prev_jrec = 1
-                previous_url = websearch_templates.build_rss_url(argd,
-                                                                 jrec=prev_jrec)
-
-            #check if the user has rights to set a high wildcard limit
-            #if not, reduce the limit set by user, with the default one
-            if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
-                if acc_authorize_action(req, 'runbibedit')[0] != 0:
-                    argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
-
-            req.argd = argd
-            recIDs = perform_request_search(req, of="id",
-                                                          c=argd['c'], cc=argd['cc'],
-                                                          p=argd['p'], f=argd['f'],
-                                                          p1=argd['p1'], f1=argd['f1'],
-                                                          m1=argd['m1'], op1=argd['op1'],
-                                                          p2=argd['p2'], f2=argd['f2'],
-                                                          m2=argd['m2'], op2=argd['op2'],
-                                                          p3=argd['p3'], f3=argd['f3'],
-                                                          m3=argd['m3'], wl=argd['wl'])
-            nb_found = len(recIDs)
-            next_url = None
-            if len(recIDs) >= argd['jrec'] + argd['rg']:
-                next_url = websearch_templates.build_rss_url(argd,
-                                                             jrec=(argd['jrec'] + argd['rg']))
-
-            first_url = websearch_templates.build_rss_url(argd, jrec=1)
-            last_url = websearch_templates.build_rss_url(argd, jrec=nb_found - argd['rg'] + 1)
-
-            recIDs = recIDs[-argd['jrec']:(-argd['rg'] - argd['jrec']):-1]
-
-            rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
-            websearch_templates.tmpl_xml_rss_prologue(current_url=current_url,
-                                                      previous_url=previous_url,
-                                                      next_url=next_url,
-                                                      first_url=first_url, last_url=last_url,
-                                                      nb_found=nb_found,
-                                                      jrec=argd['jrec'], rg=argd['rg'],
-                                                      cc=argd['cc']) + '\n'
-            req.write(rss_prologue)
-            rss_body = format_records(recIDs,
-                                      of='xr',
-                                      ln=argd['ln'],
-                                      user_info=user_info,
-                                      record_separator="\n",
-                                      req=req, epilogue="\n")
-            rss_epilogue = websearch_templates.tmpl_xml_rss_epilogue() + '\n'
-            req.write(rss_epilogue)
-
-            # update cache
-            dirname = "%s/rss" % (CFG_CACHEDIR)
-            mymkdir(dirname)
-            fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
-            try:
-                # Remove the file just in case it already existed
-                # so that a bit of space is created
-                os.remove(fullfilename)
-            except OSError:
-                pass
-
-            # Check if there's enough space to cache the request.
-            if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
-                try:
-                    os.umask(022)
-                    with open(fullfilename, "w") as fd:
-                        fd.write(rss_prologue + rss_body + rss_epilogue)
-                except IOError as v:
-                    if v[0] == 36:
-                        # URL was too long. Never mind, don't cache
-                        pass
-                    else:
-                        raise
+        import warnings
+        warnings.warn("Legacy RSS handler has been deprecated.",
+                      DeprecationWarning)
 
     index = __call__
 

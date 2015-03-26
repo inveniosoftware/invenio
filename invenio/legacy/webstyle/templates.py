@@ -488,16 +488,15 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        from invenio.legacy.search_engine import \
-             get_restricted_collections_for_recid, \
-             is_record_in_any_collection
+        from invenio.modules.collections.cache import get_all_restricted_recids
+        from invenio.modules.collections.cache import is_record_in_any_collection
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         # Prepare restriction flag
         restriction_flag = ''
-        if get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
+        if recid in get_all_restricted_recids():
             restriction_flag = '<div class="restrictedflag"><span>%s</span></div>' % _("Restricted")
         elif not is_record_in_any_collection(recid, recreate_cache_if_needed=False):
             restriction_flag = '<div class="restrictedflag restrictedflag-pending"><span>%s</span></div>' % _("Restricted (Processing Record)")
