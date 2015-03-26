@@ -27,7 +27,7 @@ import sys
 import warnings
 
 from collections import namedtuple
-import StringIO
+from six import StringIO
 import logging
 import shlex
 import six
@@ -262,8 +262,8 @@ def run_py_func(manager_run, command_line, passthrough=False):
     """
     sys_stderr_orig = sys.stderr
     sys_stdout_orig = sys.stdout
-    sys.stdout = StringIO.StringIO()
-    sys.stderr = StringIO.StringIO()
+    sys.stdout = StringIO()
+    sys.stderr = StringIO()
     sys_argv_orig = sys.argv
 
     formatter = logging.Formatter('%(message)s', '')
