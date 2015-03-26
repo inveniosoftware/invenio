@@ -200,7 +200,6 @@ def details(objectid):
         obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.version]["class"]
         obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.version]["message"]
     results = get_rendered_task_results(bwobject)
-
     workflow_definition = get_workflow_info(extracted_data['workflow_func'])
     task_history = bwobject.get_extra_data().get('_task_history', [])
     return render_template('workflows/details.html',

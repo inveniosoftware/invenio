@@ -319,7 +319,7 @@
 
         {% block hp_task_results %}
           {% if task_results %}
-            {% for template in task_results %}
+            {% for template in task_results.values() %}
               {{ template|safe }}
             {% endfor %}
           {% endif %}

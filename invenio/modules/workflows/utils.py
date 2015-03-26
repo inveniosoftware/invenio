@@ -422,14 +422,14 @@ def get_rendered_task_results(obj):
     """Return a list of rendered results from BibWorkflowObject task results."""
     from flask import render_template
 
-    results = []
-    for res in obj.get_tasks_results().values():
+    results = {}
+    for name, res in obj.get_tasks_results().items():
         for result in res:
-            results.append(render_template(
+            results[name] = render_template(
                 result.get("template", "workflows/results/default.html"),
                 results=result,
                 obj=obj
-            ))
+            )
     return results
 
 
