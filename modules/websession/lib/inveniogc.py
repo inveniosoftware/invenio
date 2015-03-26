@@ -31,7 +31,7 @@ from invenio.dbquery import run_sql, wash_table_column_name
 from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
         CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
-        CFG_INSPIRE_SITE
+        CFG_INSPIRE_SITE, CFG_CERN_SITE
 from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
 from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
@@ -61,6 +61,8 @@ CFG_MAX_ATIME_ZIP_FMT = 7
 CFG_MAX_ATIME_RM_OAI = 14
 # After how many days to zip obsolete oaiharvest fmt xml files
 CFG_MAX_ATIME_ZIP_OAI = 3
+# After how many days to remove obsolete oairepository xml files
+CFG_MAX_ATIME_RM_OAIREPOSITORY = 14
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
 # After how many day to remove old cached webjournal files
@@ -81,6 +83,9 @@ CFG_MAX_ATIME_RM_ICON = 7
 # After how many days to remove obsolete WebSubmit-created temporary
 # stamp files
 CFG_MAX_ATIME_RM_STAMP = 7
+# After how many days to remove obsolete websubmit_upload_interface_config
+# directories created by Document File Manager
+CFG_MAX_ATIME_RM_WEBSUBMIT_UPLOAD_INTERFACE = 30
 # After how many days to remove obsolete WebJournal-created update XML
 CFG_MAX_ATIME_RM_WEBJOURNAL_XML = 7
 # After how many days to remove obsolete temporary files attached with
@@ -91,6 +96,14 @@ CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE = 28
 CFG_MAX_ATIME_BIBEDIT_TMP = 3
 # After how many days to remove submitted XML files related to BibEdit
 CFG_MAX_ATIME_BIBEDIT_XML = 3
+# After how many days to remove submitted XML files related to MultiEdit
+CFG_MAX_ATIME_MULTIEDIT_XML = 3
+# After how many days to remove obsolete batchupload xml files
+CFG_MAX_ATIME_BATCHUPLOAD = 7
+# After how many days to remove obsolete webupload-created xml files
+CFG_MAX_ATIME_WEBUPLOAD = 7
+# After how many days to remove obsolete mediaarchive xml files
+CFG_MAX_ATIME_MEDIAARCHIVE = 7
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -140,6 +153,9 @@ def clean_tempfiles():
         ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
+    gc_exec_command('find %s -name "oairepository_*"'
+        ' -mtime +%s -exec rm %s -rf {} \;' \
+            % (CFG_TMPSHAREDDIR, CFG_MAX_ATIME_RM_OAIREPOSITORY, vstr))
 
     if not CFG_INSPIRE_SITE:
         write_message("- deleting/gzipping temporary old "
@@ -172,16 +188,23 @@ def clean_tempfiles():
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_BIBDOC, vstr))
 
-    write_message("- deleting old temporary WebSubmit icons")
+    write_message("- deleting old temporary WebSubmit icons folders")
     gc_exec_command('find %s %s -name "websubmit_icon_creator_*"'
-        ' -atime +%s -exec rm %s -f {} \;' \
+        ' -atime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_ICON, vstr))
 
+    # Using -r here to remove directories
+    write_message("- deleting old websubmit_upload_interface_config files")
+    gc_exec_command('find %s -name "websubmit_upload_interface_config_*"'
+        ' -atime +%s -exec rm %s -rf {} \;' \
+            % (CFG_TMPSHAREDDIR, \
+               CFG_MAX_ATIME_RM_WEBSUBMIT_UPLOAD_INTERFACE, vstr))
+
     if not CFG_INSPIRE_SITE:
-        write_message("- deleting old temporary WebSubmit stamps")
+        write_message("- deleting old temporary WebSubmit stamps folders")
         gc_exec_command('find %s %s -name "websubmit_file_stamper_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
+            ' -atime +%s -exec rm %s -rf {} \;' \
                 % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                 CFG_MAX_ATIME_RM_STAMP, vstr))
 
@@ -202,6 +225,31 @@ def clean_tempfiles():
         ' -atime +%s -exec rm %s -f {} \;' \
             % (CFG_TMPSHAREDDIR + '/bibedit-cache/', CFG_MAX_ATIME_BIBEDIT_XML,
                vstr))
+
+    write_message("- deleting old XML files submitted via MultiEdit")
+    gc_exec_command('find %s -name "multiedit_*.xml"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPSHAREDDIR, CFG_MAX_ATIME_MULTIEDIT_XML, vstr))
+
+    write_message("- deleting old XML files submitted via Batchupload")
+    gc_exec_command('find %s -name "batchupload_*.xml"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPSHAREDDIR, CFG_MAX_ATIME_BATCHUPLOAD, vstr))
+
+    if CFG_CERN_SITE:
+        # Remove some CDS-related temporary files
+        write_message("- deleting webupload files")
+        gc_exec_command('find %s -name "webupload_*"'
+            ' -atime +%s -exec rm %s -f {} \;' \
+                % (CFG_TMPSHAREDDIR, CFG_MAX_ATIME_WEBUPLOAD,
+                   vstr))
+
+        write_message("- deleting mediaarchive files")
+        gc_exec_command('find %s/mediaarchive/ -name "mediaarchive_*.xml"'
+            ' -atime +%s -exec rm %s -f {} \;' \
+                % (CFG_TMPSHAREDDIR, CFG_MAX_ATIME_MEDIAARCHIVE,
+                   vstr))
+
 
     write_message("""CLEANING OF TMP FILES FINISHED""")
 
