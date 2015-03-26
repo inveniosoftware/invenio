@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2011, 2013 CERN.
+# Copyright (C) 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,6 +21,13 @@ the Apache webserver (or any other webserver). This is a utility module
 that makes remote debugging possible and easy.
 """
 
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio21Warning
+
+warnings.warn("Remote debugger is going to be removed. "
+              "Please use native Werkzeug debugger.",
+              RemovedInInvenio21Warning)
 
 
 # Debug mode is activated by passing debug=[debugger_id] in the url, when
