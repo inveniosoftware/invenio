@@ -23,21 +23,15 @@ from __future__ import print_function
 import os
 import sys
 
-# Import the remote debugger as a first thing, if allowed
-# FIXME enable remote_debugger when invenio.config is ready
-# try:
-#     from invenio.utils import remote_debugger
-# except:
-#     remote_debugger = None
-
-from werkzeug.exceptions import HTTPException
-from werkzeug.wrappers import BaseResponse
-from flask import (request, g, current_app, render_template, abort,
+from flask import (abort, current_app, g, render_template, request,
                    send_from_directory, url_for)
 from flask_admin.menu import MenuLink
 
 from invenio.base import signals
 from invenio.base.scripts.database import create, recreate
+
+from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers import BaseResponse
 
 from .request_class import LegacyRequest
 
@@ -69,14 +63,14 @@ signals.post_command.connect(cli_cmd_reset, sender=recreate)
 
 def setup_app(app):
     """Setup up the app."""
-    ## Legacy config support
-    USE_X_SENDFILE = app.config.get('CFG_BIBDOCFILE_USE_XSENDFILE')
-    DEBUG = app.config.get('CFG_DEVEL_SITE', 0) > 0
-    app.config.setdefault('USE_X_SENDFILE', USE_X_SENDFILE)
-    app.config.setdefault('DEBUG', DEBUG)
+    # Legacy config support
+    _use_x_sendfile = app.config.get('CFG_BIBDOCFILE_USE_XSENDFILE')
+    _debug = app.config.get('CFG_DEVEL_SITE', 0) > 0
+    app.config.setdefault('USE_X_SENDFILE', _use_x_sendfile)
+    app.config.setdefault('DEBUG', _debug)
     app.debug = app.config['DEBUG']
 
-    ## Legacy directory that must exist
+    # Legacy directory that must exist
     for cfg_dir in ['CFG_BATCHUPLOADER_DAEMON_DIR',
                     'CFG_BIBDOCFILE_FILEDIR',
                     'CFG_BIBENCODE_DAEMON_DIR_NEWJOBS',
@@ -112,10 +106,7 @@ def setup_app(app):
             self.app = app
 
         def __call__(self, environ, start_response):
-            #FIXME
-            #if remote_debugger:
-            #    remote_debugger.start()
-
+            """Wrapper for legacy calls."""
             with self.app.request_context(environ):
                 g.start_response = start_response
                 try:
@@ -127,7 +118,7 @@ def setup_app(app):
 
                 return response(environ, start_response)
 
-    ## Set custom request class.
+    # Set custom request class.
     app.request_class = LegacyRequest
     app.wsgi_app = LegacyAppMiddleware(app)
 
@@ -159,8 +150,10 @@ def setup_app(app):
         possible_module, possible_handler = is_mp_legacy_publisher_path(
             request.environ['PATH_INFO'])
         if possible_module is not None:
-            legacy_publisher = lambda req: \
-                mp_legacy_publisher(req, possible_module, possible_handler)
+
+            def legacy_publisher(req):
+                return mp_legacy_publisher(req, possible_module,
+                                           possible_handler)
             return legacy_application(request.environ, g.start_response,
                                       handler=legacy_publisher)
         return render_template('404.html'), 404

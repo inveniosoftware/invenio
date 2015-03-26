@@ -245,16 +245,6 @@ def create_wsgi_app(*args, **kwargs):
     """Create WSGI application."""
     app = create_app(*args, **kwargs)
 
-    # Start remote debugger if appropriate:
-    if app.config.get('CFG_REMOTE_DEBUGGER_ENABLED'):
-        try:
-            from invenio.utils import remote_debugger
-            remote_debugger.start_file_changes_monitor()
-            if app.config.get('CFG_REMOTE_DEBUGGER_WSGI_LOADING'):
-                remote_debugger.start()
-        except Exception as e:
-            app.logger.error('Remote debugger is not working', e)
-
     @app.before_first_request
     def pre_load():
         """Pre-load citation dictionaries upon WSGI application start-up.

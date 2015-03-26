@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,42 +17,34 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Apache request handler mechanism.
+"""Apache request handler mechanism.
 
 It gives the tools to map url to functions, handles the legacy url
 scheme (/search.py queries), HTTP/HTTPS switching, language
 specification,...
 """
 
-__revision__ = "$Id$"
-
-# Import the remote debugger as a first thing, if allowed
-try:
-    import invenio.utils.remote_debugger as remote_debugger
-except:
-    remote_debugger = None
-
-import urlparse
 import cgi
-import sys
-import re
 import os
-import gc
+import re
+import urlparse
 import warnings
 
 from flask import session
-from invenio.utils import apache
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
-    CFG_SITE_RECORD, CFG_ACCESS_CONTROL_LEVEL_SITE
+
 from invenio.base.i18n import wash_language
-from invenio.utils.url import redirect_to_url
-from invenio.ext.login import current_user, login_user
+from invenio.config import (
+    CFG_ACCESS_CONTROL_LEVEL_SITE,
+    CFG_SITE_RECORD,
+    CFG_SITE_SECURE_URL,
+    CFG_SITE_URL,
+)
 from invenio.ext.logging import register_exception
+from invenio.ext.login import current_user, login_user
 from invenio.legacy.wsgi.utils import StringField
 from invenio.modules import apikeys as web_api_key
-from invenio.legacy.wsgi.utils import StringField
-from invenio.modules.access.engine import acc_authorize_action
+from invenio.utils import apache
+from invenio.utils.url import redirect_to_url
 
 
 # The following variable is True if the installation make any difference
@@ -349,12 +341,6 @@ def create_handler(root):
             raise
         except Exception:
             # send the error message, much more convenient than log hunting
-            if remote_debugger:
-                args = {}
-                if req.args:
-                    args = cgi.parse_qs(req.args)
-                    if 'debug' in args:
-                        remote_debugger.error_msg(args['debug'])
             register_exception(req=req, alert_admin=True)
             raise
 
