@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,7 +17,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
 
 define(
   [
@@ -25,6 +24,8 @@ define(
   ],
   function(
     ApprovalAction) {
+
+    "use strict";
 
     function initialize(context) {
       ApprovalAction.attachTo(context.attach_action_to, {

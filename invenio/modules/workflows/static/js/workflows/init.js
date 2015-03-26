@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -25,11 +25,15 @@ require(
     "datatables-tabletools",
     "bootstrap-tagsinput",
     "prism",
+    "js/workflows/common",
     "js/workflows/maintable",
     "js/workflows/holdingpen",
     "js/workflows/tags",
     "js/workflows/tags_menu",
     "js/workflows/details",
+    "js/workflows/details_actions",
+    "js/workflows/details_actions_buttons",
+    "js/workflows/details_preview",
     "js/workflows/details_preview_menu",
     "js/workflows/actions/init"
   ],

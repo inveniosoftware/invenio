@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013, 2014 CERN.
+ * Copyright (C) 2013, 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,8 +17,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
-
 define(
   [
     'jquery',
@@ -27,6 +25,8 @@ define(
   function(
     $,
     defineComponent) {
+
+    "use strict";
 
     return defineComponent(ApprovalAction);
 
@@ -57,16 +57,18 @@ define(
         return {
           "value": elem.data("value"),
           "objectid": elem.data("objectid"),
-        }
+        };
       };
 
       this.post_request = function(data, element) {
-        console.log(data.message);
+        this.trigger(document, "updateAlertMessage", {
+          category: data.category,
+          message: data.message
+        });
         var parent = element.parents(".approval-action");
         if (typeof parent !== 'undefined') {
           parent.fadeOut();
         }
-        $(document).trigger("");
       };
 
       this.onActionClick = function (ev, data) {
@@ -74,7 +76,7 @@ define(
         var payload = this.get_action_values(element);
         var $this = this;
 
-        jQuery.ajax({
+        $.ajax({
           type: "POST",
           url: $this.attr.action_url,
           data: payload,

@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,23 +17,36 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-"use strict"
-
 define(
   [
+     "js/workflows/common",
+     "js/workflows/details_actions",
+     "js/workflows/details_actions_buttons",
      "js/workflows/details_preview",
      "js/workflows/details_preview_menu",
   ],
   function(
+    HoldingPenCommon,
+    DetailsActions,
+    DetailsActionsButtons,
     DetailsPreview,
     DetailsPreviewMenu) {
 
+    "use strict";
+
     function initialize(context) {
+      HoldingPenCommon.attachTo(document);
       DetailsPreview.attachTo(document, {
         preview_url: context.preview_url,
         id_object: context.id_object,
       });
       DetailsPreviewMenu.attachTo("#object-preview");
+      DetailsActions.attachTo(document, {
+        restart_url: context.restart_url,
+        delete_url: context.delete_url,
+        id_object: context.id_object,
+      });
+      DetailsActionsButtons.attachTo(document);
     }
 
     return initialize;

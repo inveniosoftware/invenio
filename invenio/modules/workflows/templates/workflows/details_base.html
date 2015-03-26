@@ -37,10 +37,12 @@
                      initialize_actions) {
       var context = {
         preview_url: "{{ url_for('holdingpen.entry_data_preview')|safe }}",
+        restart_url: "{{ url_for('holdingpen.restart_record_prev')|safe }}",
+        delete_url: "{{ url_for('holdingpen.delete_from_db')|safe }}",
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
         id_object: "{{ bwobject.id }}",
         attach_action_to: document,
-      }
+      };
       initialize(context);
       initialize_actions(context);
     });
@@ -60,6 +62,17 @@
       {% endblock %}
       {% block top_right %}
         <div class="navbar-form navbar-right">
+          <a class="btn btn-danger details-action"
+             role="button"
+             data-action="delete">
+            <span class="glyphicon glyphicon-trash"></span> {{ _('Delete') }}
+          </a>
+          <a class="btn btn-warning details-action"
+             role="button"
+             data-action="restart">
+            <span class="glyphicon glyphicon-repeat"></span> {{ _('Restart') }}
+          </a>
+
           <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
              class="btn btn-default"
              {% if previous_object == None %}disabled="disabled"{% endif %}>
@@ -152,11 +165,11 @@
 
                 <div class="row">
                   <div class="col-md-12">
-                    <a href="{{ url_for('holdingpen.restart_record_prev', objectid=bwobject.id)}}"
-                       class="btn btn-warning"
+                    <a class="btn btn-warning details-action"
+                       data-action="restart"
                        {% if bwobject.version == 1 %}disabled="disabled"{% endif %}>
                       <span class="glyphicon glyphicon-repeat"></span>
-                      <strong>{{ _('Restart current task') }}</strong>
+                      <strong>{{ _('Restart task') }}</strong>
                     </a>
                   </div>
                 </div>

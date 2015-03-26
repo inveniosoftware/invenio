@@ -19,6 +19,8 @@
 
 """Various utility functions for use across the workflows module."""
 
+from functools import wraps
+
 from invenio.ext.cache import cache
 
 import msgpack
@@ -490,3 +492,19 @@ def get_workflow_info(func_list):
         else:
             funcs.append(get_func_info(item))
     return funcs
+
+
+def alert_response_wrapper(func):
+    """Wrap given function with wrapper to return JSON for alerts."""
+    @wraps(func)
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as error:
+            from flask import current_app, jsonify
+            current_app.logger.exception(error)
+            return jsonify({
+                "category": "danger",
+                "message": "Error: {0}".format(error)
+            })
+    return inner
