@@ -19,9 +19,13 @@
 
 """Upgrade Submit models."""
 
+import warnings
+
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql
 from invenio.modules.upgrader.api import op
+
+from sqlalchemy.exc import OperationalError
 
 depends_on = ['invenio_release_1_1_0']
 
@@ -41,16 +45,23 @@ def do_upgrade():
                   db.Column('id', db.Integer(11), nullable=False))
 
     # set all new ids
-    records = run_sql("""SELECT id_father, id_son FROM sbmCOLLECTION_sbmCOLLECTION AS ssc
-                      ORDER BY ssc.id_father, ssc.id_son""")
+    records = run_sql("""SELECT id_father, id_son FROM """
+                      """sbmCOLLECTION_sbmCOLLECTION AS ssc """
+                      """ORDER BY ssc.id_father, ssc.id_son""")
     for index, rec in enumerate(records):
         run_sql("""UPDATE sbmCOLLECTION_sbmCOLLECTION
                 SET id = %s WHERE id_father = %s AND id_son = %s """,
                 (index + 1, rec[0], rec[1]))
 
     # drop primary keys
-    op.drop_constraint(None, 'sbmCOLLECTION_sbmCOLLECTION',
-                       type_='primary')
+    try:
+        op.drop_constraint(None, 'sbmCOLLECTION_sbmCOLLECTION',
+                           type_='primary')
+    except OperationalError:
+        # the primary key is already dropped
+        warnings.warn("""Primary key of sbmCOLLECTION_sbmCOLLECTION """
+                      """table has been already dropped.""")
+
     # create new primary key with id
     op.create_primary_key('pk_sbmCOLLECTION_sbmCOLLECTION_id',
                           'sbmCOLLECTION_sbmCOLLECTION', ['id'])
