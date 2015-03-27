@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,14 +25,11 @@ it has to host client specific code, when each client can instead
 derive from the base class and add specific bits.
 """
 
-import sys
-
 from datetime import datetime, timedelta
 
 from invenio.ext.sqlalchemy import db
 
-from .errors import (
-    InvenioWebAccessMailCookieError, InvenioWebAccessMailCookieDeletedError)
+from .errors import InvenioWebAccessMailCookieError
 from .models import AccMAILCOOKIE, User
 
 _datetime_format = "%Y-%m-%d %H:%M:%S"
@@ -46,7 +43,7 @@ def mail_cookie_create_common(kind, params, cookie_timeout=timedelta(days=1),
         (e.g. 'pw_reset', 'mail_activation', 'role')
     :param params: whatever parameters are needed
     :param cookie_timeout: for how long the url will be valid
-    :param onetime: whetever to remove the cookie after it has used.
+    :param onetime: whether to remove the cookie after it has used.
     """
     return AccMAILCOOKIE.create(kind, params, cookie_timeout, onetime)
 
@@ -113,7 +110,7 @@ def mail_cookie_check_common(cookie, delete=False):
 def mail_cookie_check_role(cookie, uid):
     """Check a given role cookie for a valid authorization.
 
-    Temporaly add the given uid to the role specified.
+    Temporarily add the given uid to the role specified.
     """
     from .control import acc_get_role_id, acc_add_user_role
     try:
@@ -126,7 +123,7 @@ def mail_cookie_check_role(cookie, uid):
     except (TypeError, AssertionError, StandardError):
         raise InvenioWebAccessMailCookieError
     expiration = (datetime.today()+role_timeout).strftime(_datetime_format)
-    acc_add_user_role(uid, role_id, expiration)
+    acc_add_user_role(uid, role_id, expiration=expiration)
     return (role_name, expiration)
 
 
