@@ -21,8 +21,8 @@
 
 import numpy
 
-from six import string_types, iteritems
 from intbitset import intbitset
+from six import iteritems, string_types
 
 from invenio.base.globals import cfg
 from invenio.modules.collections.cache import (
@@ -134,12 +134,17 @@ def get_records_that_can_be_displayed(permitted_restricted_collections,
     # under the current collection do not use set here, in order to maintain a
     # specific order: children of 'cc' (real, virtual, restricted), rest of 'c'
     # that are  not cc's children
-    colls_to_be_displayed = [
+    colls_to_be_displayed = set([
         coll for coll in current_coll_children
         if coll in colls or coll in permitted_restricted_collections
-    ]
-    colls_to_be_displayed.extend([coll for coll in colls
+    ])
+    colls_to_be_displayed |= set([coll for coll in colls
                                   if coll not in colls_to_be_displayed])
+
+    # Get all records in applicable collections
+    records_that_can_be_displayed = intbitset()
+    for coll in colls_to_be_displayed:
+        records_that_can_be_displayed |= get_collection_reclist(coll)
 
     if policy == 'ANY':
         # User needs to have access to at least one collection that restricts
@@ -160,16 +165,12 @@ def get_records_that_can_be_displayed(permitted_restricted_collections,
             if collection not in permitted_restricted_collections:
                 notpermitted_recids |= get_collection_reclist(collection)
 
-    records_that_can_be_displayed = (
-        hitset_in_any_collection - notpermitted_recids
-    )
+    # Remove records that can not be seen by user
+    records_that_can_be_displayed -= notpermitted_recids
 
-    if records_that_can_be_displayed.is_infinite():
-        # We should not return infinite results for user.
-        records_that_can_be_displayed = intbitset()
-        for coll in colls_to_be_displayed:
-            records_that_can_be_displayed |= get_collection_reclist(coll)
-        records_that_can_be_displayed -= notpermitted_recids
+    # Intersect only if there are some matched records
+    if not hitset_in_any_collection.is_infinite():
+        records_that_can_be_displayed &= hitset_in_any_collection
 
     return records_that_can_be_displayed
 
