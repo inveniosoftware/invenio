@@ -132,6 +132,11 @@ class IdxINDEX(db.Model):
         """Return correct word index."""
         return globals().get('IdxWORD{:02d}F'.format(self.id))
 
+    @property
+    def pairf(self):
+        """Return correct pair index."""
+        return globals().get('IdxPAIR{:02d}F'.format(self.id))
+
 
 class IdxINDEXIdxINDEX(db.Model):
 

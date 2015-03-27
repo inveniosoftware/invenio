@@ -24,6 +24,7 @@ import re
 import zlib
 
 from flask import current_app, flash, request
+
 from intbitset import intbitset
 
 from invenio.base.globals import cfg
@@ -133,10 +134,23 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     current_app.logger.debug("search_unit: f={f}, p={p}, m={m}".format(
         f=f, p=p, m=m))
     # look up hits:
-    if f in units:
-        hitset = units[f](p, f, m or 'a', wl)
-    elif m == 'a' or m == 'r' or f in ['subject', 'author'] or (
-            f and len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit()):
+    callback = units.get(f, default_search_unit)
+    hitset = callback(p, f, m, wl)
+
+    # merge synonym results and return total:
+    hitset |= hitset_synonyms
+    hitset |= hitset_cjk
+    return hitset
+
+
+def is_marc_tag(f):
+    """Return True if the field a MARC tag, e.g. ``980__a``."""
+    return f and len(f) >= 2 and str(f[0]).isdigit() and str(f[1]).isdigit()
+
+
+def default_search_unit(p, f, m, wl):
+    """Query correct index type and return hitset."""
+    if m == 'a' or m == 'r' or is_marc_tag(f):
         # we are doing either phrase search or regexp search
         index_id = IdxINDEX.get_index_id_from_field(f)
         if index_id != 0:
@@ -151,10 +165,6 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     else:
         # we are doing bibwords search by default
         hitset = search_unit_in_bibwords(p, f, wl=wl)
-
-    # merge synonym results and return total:
-    hitset |= hitset_synonyms
-    hitset |= hitset_cjk
     return hitset
 
 
@@ -253,8 +263,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
 
 
 def search_unit_in_idxpairs(p, f, m, wl=0):
-    """Searches for pair 'p' inside idxPAIR table for field 'f' and
-    returns hitset of recIDs found."""
+    """Search for pair 'p' inside idxPAIR table for field 'f' and return hitset."""
     from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import (
         BibIndexDefaultTokenizer
     )
