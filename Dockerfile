@@ -17,12 +17,10 @@
 
 FROM python:2.7
 
-#RUN add-apt-repository -y ppa:chris-lea/node.js & apt-get update & \
 RUN apt-get update && \
     apt-get -qy install ssl-cert poppler-utils git subversion --fix-missing
 
-# Adding current directory as `/code`; assuming people have `master` branch checked out:
-# (note: this invalidates cache, but most of hard yum install is done by now)
+# Adding current directory as `/code`.
 ADD . /code
 WORKDIR /code
 
