@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -754,14 +754,30 @@ Invenio git commit log messages are usually formatted in the following
 way:
 
 * commit message headline providing short summary (maximum 50 chars)
-  formatted in the style of ``ModuleName: short description``. (using mostly
-  nouns, no verbs);
+  formatted in the style of ``component: short description``. (using
+  mostly nouns, no verbs);
 
 * empty line;
 
-* commit message body with a detailed description of what this patch
-  does, formatted as a bulletted list, with one empty line between
-  items (using present tense).
+* commit message body with a detailed description of what this patch does,
+  formatted as a bulletted list, with one empty line between items (using
+  present tense). If a given element in the list should appear in the release
+  notes (to describe changes to Invenio admins and developers) it must be
+  prefixed with one of the following labels:
+
+============== ===========================================================
+label          meaning
+============== ===========================================================
+NEW            commit adds a new feature
+SECURITY       commit fixes a security issue
+FIX            commit fixes a bug
+BETTER         commit improves an existing feature
+AMENDS         commit invalidates message from different commit identified
+               by its SHA1
+INCOMPATIBLE   compatibility remarks, removing features and dependencies
+NOTE           any general note (if needed)
+============== ===========================================================
+
 
 Here is an example: https://github.com/inveniosoftware/invenio/commit/71df9665bf5fcdd020b67e4cbcedfaddfd6cadaa.
 
