@@ -50,6 +50,7 @@ components:
 - dashboard
 - debug_toolbar
 - deposit
+- docker
 - docs
 - documentation
 - documents

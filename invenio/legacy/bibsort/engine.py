@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2012 CERN.
+# Copyright (C) 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,16 +21,15 @@
 
 import sys
 import time
-from invenio.utils.date import datetime, strftime
-from invenio.legacy.dbquery import deserialize_via_marshal, \
-serialize_via_marshal, run_sql, Error
-from invenio.legacy.search_engine import get_field_tags, search_pattern
+
 from intbitset import intbitset
-from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, \
-task_sleep_now_if_required
+
 from invenio.config import CFG_BIBSORT_BUCKETS, CFG_CERN_SITE
-from invenio.legacy.bibsort.washer import BibSortWasher, \
-InvenioBibSortWasherNotImplementedError
+from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
+from invenio.legacy.bibsort.washer import BibSortWasher, InvenioBibSortWasherNotImplementedError
+from invenio.legacy.dbquery import deserialize_via_marshal, serialize_via_marshal, run_sql, Error
+from invenio.legacy.search_engine import get_field_tags, search_pattern
+from invenio.utils.date import datetime, strftime
 
 import invenio.legacy.template
 websearch_templates = invenio.legacy.template.load('websearch')
@@ -404,13 +403,12 @@ def sort_dict(dictionary, spacing=1, run_sorting_for_rnk=False, sorting_locale=N
                 locale.setlocale(locale.LC_ALL, sorting_locale + '.UTF8')
             except locale.Error:
                 write_message("Setting locale to %s is not working.. ignoring locale")
-
-        def key_func(value):
-            item = dictionary.__getitem__(value)
-            return ' '.join(item) if isinstance(item, list) else item
-
-        sorted_records_list = sorted(dictionary, key=key_func, cmp=locale.strcoll, reverse=False)
-        locale.setlocale(locale.LC_ALL, orig_locale)
+        try:
+            dictionary = {key: ' '.join(value) for key, value in six.iteritems(dictionary)}
+            sorted_records_list = sorted(dictionary, key=dictionary.__getitem__,
+                                         cmp=locale.strcoll, reverse=False)
+        finally:
+            locale.setlocale(locale.LC_ALL, orig_locale)
     else:
         sorted_records_list = sorted(dictionary, key=dictionary.__getitem__, reverse=False)
 
