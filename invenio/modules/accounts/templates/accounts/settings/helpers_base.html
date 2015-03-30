@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@
 {%- block panel_start scoped %}
 <div class="panel-group panel-bot-margin"{% if id %} id="{{id}}"{% endif %}>
     <div class="panel panel-default">
+        {%- block panel_heading scoped %}
         <div class="panel-heading">
             <strong>{%if icon %}<i class="{{icon}}"></i>{% endif %} {{title}}</strong>
             {%- if btn and (btn_href or btn_text) -%}
@@ -39,6 +40,7 @@
             </div>
             {%- endif -%}
         </div>
+        {%- endblock %}
         {%- if with_body %}
         <div class="panel-body">
         {%- endif %}
