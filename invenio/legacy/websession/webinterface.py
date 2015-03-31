@@ -26,20 +26,18 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from datetime import timedelta
-import os
 import re
 
 from invenio.config import \
-     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-     CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL, \
-     CFG_SITE_URL, \
-     CFG_CERN_SITE, \
-     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE, \
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+    CFG_SITE_NAME, \
+    CFG_SITE_NAME_INTL, \
+    CFG_SITE_SUPPORT_EMAIL, \
+    CFG_SITE_SECURE_URL, \
+    CFG_SITE_URL, \
+    CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio.legacy import webuser
 from invenio.legacy.webpage import page
 from invenio.legacy.websession import webaccount
@@ -59,11 +57,13 @@ from invenio.ext.logging import register_exception
 from invenio.modules.access.mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
-    mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
-    InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
+    mail_cookie_check_mail_activation, \
+    mail_cookie_check_authorize_action
+from invenio.modules.access.errors import \
+    InvenioWebAccessMailCookieDeletedError, InvenioWebAccessMailCookieError
 from invenio.modules.access.local_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
-    CFG_EXTERNAL_AUTHENTICATION, CFG_EXTERNAL_AUTH_SSO_REFRESH, \
+    CFG_EXTERNAL_AUTHENTICATION, \
     CFG_OPENID_CONFIGURATIONS, CFG_OAUTH2_CONFIGURATIONS, \
     CFG_OAUTH1_CONFIGURATIONS, CFG_OAUTH2_PROVIDERS, CFG_OAUTH1_PROVIDERS, \
     CFG_OPENID_PROVIDERS, CFG_OPENID_AUTHENTICATION, \

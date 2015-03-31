@@ -68,7 +68,7 @@ WSGIPythonHome {{pythonhome}}
         DocumentRoot {{ config.COLLECT_STATIC_ROOT }}
         <Directory {{ config.COLLECT_STATIC_ROOT }}>
            DirectorySlash Off
-           Options FollowSymLinks MultiViews
+           Options FollowSymLinks MultiViews -Indexes
            AllowOverride None
            <IfVersion >= 2.4>
            Require all granted
@@ -99,10 +99,6 @@ WSGIPythonHome {{pythonhome}}
 
         RewriteEngine on
         RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-f
-        RewriteCond {{ config.COLLECT_STATIC_ROOT }}%{REQUEST_FILENAME} !-d
-        {#- Temporary manual handling of /admin, to work around the presence of
-            a folder admin/ in root #}
-        RewriteRule ^admin$ {{ script_alias}}/admin/ [PT,L]
         RewriteRule ^(.*)$ {{ script_alias }}$1 [PT,L]
     {% endblock wsgi -%}
     {%- block xsendfile_directive %}
