@@ -29,71 +29,75 @@ import cgi
 from six import iteritems
 
 from invenio.modules.comments.api import check_recID_is_in_range, \
-                               perform_request_display_comments_or_remarks, \
-                               perform_request_add_comment_or_remark, \
-                               perform_request_vote, \
-                               perform_request_report, \
-                               subscribe_user_to_discussion, \
-                               unsubscribe_user_from_discussion, \
-                               get_user_subscription_to_discussion, \
-                               check_user_can_attach_file_to_comments, \
-                               check_user_can_view_comments, \
-                               check_user_can_send_comments, \
-                               check_user_can_view_comment, \
-                               query_get_comment, \
-                               toggle_comment_visibility, \
-                               check_comment_belongs_to_record, \
-                               is_comment_deleted, \
-                               perform_display_your_comments
+    perform_request_display_comments_or_remarks, \
+    perform_request_add_comment_or_remark, \
+    perform_request_vote, \
+    perform_request_report, \
+    subscribe_user_to_discussion, \
+    unsubscribe_user_from_discussion, \
+    get_user_subscription_to_discussion, \
+    check_user_can_attach_file_to_comments, \
+    check_user_can_view_comments, \
+    check_user_can_send_comments, \
+    check_user_can_view_comment, \
+    query_get_comment, \
+    toggle_comment_visibility, \
+    check_comment_belongs_to_record, \
+    is_comment_deleted, \
+    perform_display_your_comments
 
 from invenio.config import \
-     CFG_TMPSHAREDDIR, \
-     CFG_SITE_LANG, \
-     CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, \
-     CFG_PREFIX, \
-     CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
-     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
-     CFG_SITE_RECORD, \
-     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-     CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
+    CFG_TMPSHAREDDIR, \
+    CFG_SITE_LANG, \
+    CFG_SITE_URL, \
+    CFG_SITE_SECURE_URL, \
+    CFG_PREFIX, \
+    CFG_SITE_NAME, \
+    CFG_SITE_NAME_INTL, \
+    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+    CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+    CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
+    CFG_SITE_RECORD, \
+    CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+    CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, \
+    collect_user_info
 from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.legacy.search_engine import create_navtrail_links, \
-     guess_primary_collection_of_a_record, \
-     get_colID
+    guess_primary_collection_of_a_record, \
+    get_colID
 from invenio.utils.url import redirect_to_url, \
-                             make_canonical_urlargd
+    make_canonical_urlargd
 from invenio.utils.html import get_mathjax_header
 from invenio.ext.logging import register_exception
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
+from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, \
+    get_detailed_page_tabs_counts
 from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import \
-     mail_cookie_create_authorize_action, \
-     mail_cookie_create_common, \
-     mail_cookie_check_common, \
-     InvenioWebAccessMailCookieDeletedError, \
-     InvenioWebAccessMailCookieError
+    mail_cookie_create_authorize_action, \
+    mail_cookie_create_common, \
+    mail_cookie_check_common
+from invenio.modules.access.errors import \
+    InvenioWebAccessMailCookieDeletedError, \
+    InvenioWebAccessMailCookieError
 from invenio.modules.comments.config import \
-     InvenioWebCommentError, \
-     InvenioWebCommentWarning
+    InvenioWebCommentWarning
 import invenio.legacy.template
 webstyle_templates = invenio.legacy.template.load('webstyle')
 websearch_templates = invenio.legacy.template.load('websearch')
 import os
 from invenio.utils import apache
 from invenio.legacy.bibdocfile.api import \
-     stream_file, \
-     decompose_file, \
-     propose_next_docname
+    stream_file, \
+    decompose_file, \
+    propose_next_docname
+
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
+
     """Defines the set of /comments pages."""
 
     _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments',
@@ -398,14 +402,15 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         except:
                             register_exception(req=req, alert_admin=True)
 
-                    ## Before saving the file to disc, wash the filename (in particular
-                    ## washing away UNIX and Windows (e.g. DFS) paths):
+                    ## Before saving the file to disc, wash the filename
+                    ## (in particular washing away UNIX and Windows
+                    ## (e.g. DFS) paths):
                     filename = os.path.basename(filename.split('\\')[-1])
                     filename = filename.strip()
                     if filename != "":
                         # Check that file does not already exist
-                        n = 1
-                        while os.path.exists(os.path.join(dir_to_open, filename)):
+                        while os.path.exists(os.path.join(dir_to_open,
+                                                          filename)):
                             basedir, name, extension = decompose_file(filename)
                             new_name = propose_next_docname(name)
                             filename = new_name + extension
@@ -418,7 +423,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         fp.write(formfield.file.read())
                         fp.close()
                         # Isn't this file too big?
-                        file_size = os.path.getsize(os.path.join(dir_to_open, filename))
+                        file_size = os.path.getsize(os.path.join(dir_to_open,
+                                                                 filename))
                         if CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and \
                                file_size > CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE:
                             os.remove(os.path.join(dir_to_open, filename))
@@ -476,11 +482,11 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                     delete=True)
 
                     argd.update(cookie_argd)
-                except InvenioWebAccessMailCookieDeletedError as e:
+                except InvenioWebAccessMailCookieDeletedError:
                     return redirect_to_url(req, CFG_SITE_SECURE_URL + '/'+ CFG_SITE_RECORD +'/' + \
                                            str(self.recid) + (self.discussion==1 and \
                                                               '/reviews' or '/comments'))
-                except InvenioWebAccessMailCookieError as e:
+                except InvenioWebAccessMailCookieError:
                     # Invalid or empty cookie: continue
                     pass
 
@@ -535,8 +541,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         navmenuid='search')
 
     def vote(self, req, form):
-        """
-        Vote positively or negatively for a comment/review.
+        """Vote positively or negatively for a comment/review.
+
         @param comid: comment/review id
         @param com_value:   +1 to vote positively
                             -1 to vote negatively
