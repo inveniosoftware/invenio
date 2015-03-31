@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -41,7 +41,6 @@ from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
 from invenio.modules.access.control import acc_find_user_role_actions
 from invenio.base.i18n import gettext_set_language
-from invenio.legacy.external_authentication import InvenioWebAccessExternalAuthError
 
 import invenio.legacy.template
 websession_templates = invenio.legacy.template.load('websession')
@@ -304,36 +303,6 @@ def perform_set(email, ln, can_config_bibcatalog=False,
              nickname = nickname,
              csrf_token = csrf_token
            )
-    if len(CFG_EXTERNAL_AUTHENTICATION) > 1:
-        try:
-            uid = run_sql("SELECT id FROM user where email=%s", (email,))
-            uid = uid[0][0]
-        except IndexError:
-            uid = 0
-        current_login_method = prefs['login_method']
-        methods = CFG_EXTERNAL_AUTHENTICATION.keys()
-
-        # Filtering out methods that don't provide user_exists to check if
-        # a user exists in the external auth method before letting him/her
-        # to switch.
-
-        for method in methods:
-            if CFG_EXTERNAL_AUTHENTICATION[method] is not None:
-                try:
-                    if not CFG_EXTERNAL_AUTHENTICATION[method].user_exists(email):
-                        methods.remove(method)
-                except (AttributeError, InvenioWebAccessExternalAuthError, NotImplementedError):
-                    methods.remove(method)
-        methods.sort()
-
-        if len(methods) > 1:
-            out += websession_templates.tmpl_user_external_auth(
-                    ln = ln,
-                    methods = methods,
-                    current = current_login_method,
-                    method_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4),
-                    csrf_token = csrf_token,
-                )
 
     current_group_records = prefs.get('websearch_group_records', 10)
     show_latestbox = prefs.get('websearch_latestbox', True)

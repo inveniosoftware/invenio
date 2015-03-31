@@ -73,9 +73,6 @@ def index():
         dict(url=url_for('.delegate_startarea'),
              title=_('Delegate Rights - With Restrictions'),
              description=_('Delegate your rights for some roles.')),
-        dict(url=url_for('.managerobotlogin'),
-             title=_('Manage Robot Login'),
-             description=_('Manage robot login keys and test URLs.')),
     ]
     return dict(actions=actions)
 
@@ -147,10 +144,3 @@ def delegate_startarea():
     """Delegate start area."""
     # FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/delegate_startarea')
-
-
-@blueprint.route('/managerobotlogin', methods=['GET', 'POST'])
-def managerobotlogin():
-    """Manage robot login."""
-    # FIXME reimplement this function
-    return redirect('/admin/webaccess/webaccessadmin.py/managerobotlogin')

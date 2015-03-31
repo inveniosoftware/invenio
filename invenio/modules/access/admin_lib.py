@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -110,10 +110,6 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
             '/listgroups>List Groups</a> ' % (CFG_SITE_SECURE_URL, )
-        elif adminarea == 9:
-            navtrail_previous_links += '&gt; ' \
-            '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
-            '/managerobotlogin>Manage Robot Login</a> ' % (CFG_SITE_SECURE_URL, )
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -147,191 +143,6 @@ def is_adminuser(req):
 
     return acce.acc_authorize_action(req, WEBACCESSACTION)
 
-def perform_managerobotlogin(req, robot_name='', new_pwd1='', new_pwd2='', login_method='', timeout='', referer='', ip='', action='', confirm=0, email='', groups='', nickname='', json_assertion='', url_only=0):
-    robot_name = wash_url_argument(robot_name, 'str')
-    new_pwd1 = wash_url_argument(new_pwd1, 'str')
-    new_pwd2 = wash_url_argument(new_pwd2, 'str')
-    login_method = wash_url_argument(login_method, 'str')
-    timeout = wash_url_argument(timeout, 'int')
-    referer = wash_url_argument(referer, 'str')
-    ip = wash_url_argument(ip, 'str')
-    action = wash_url_argument(action, 'str')
-    confirm = wash_url_argument(confirm, 'int')
-    email = wash_url_argument(email, 'str')
-    groups = wash_url_argument(groups, 'str')
-    nickname = wash_url_argument(nickname, 'str')
-    url_only = wash_url_argument(url_only, 'int')
-    json_assertion = wash_url_argument(json_assertion, 'str')
-    from invenio.legacy.external_authentication.robot import update_robot_key, load_robot_keys, json
-    (auth_code, auth_message) = acce.acc_authorize_action(req, 'cfgrobotkeys', login_method='*', robot='*')
-    if auth_code != 0: return mustloginpage(req, auth_message)
-
-    available_robot_login_methods = [name for (name, method) in iteritems(CFG_EXTERNAL_AUTHENTICATION) if method and method.robot_login_method_p()]
-
-    errors = []
-    warnings = []
-    messages = []
-    if not available_robot_login_methods:
-        errors.append("""
-You should enable at least on robot based login method in <tt>access_control_config.py</tt> in the variable <tt>CFG_EXTERNAL_AUTHENTICATION</tt>.
-""")
-        forms = ""
-    else:
-        robot_keys = load_robot_keys()
-        if not login_method:
-            login_method = available_robot_login_methods[0]
-        if not timeout:
-            timeout = 60 * 60
-        if not ip:
-            ip = req.remote_ip
-        user_info = collect_user_info(req)
-        if not email:
-            email = user_info['email']
-        if not nickname:
-            nickname = user_info['nickname']
-        if not robot_name:
-            if login_method in robot_keys and robot_keys[login_method]:
-                robot_name = robot_keys[login_method].keys()[0]
-        if not referer:
-            referer = CFG_SITE_SECURE_URL
-        if action == 'changepwd':
-            if acce.acc_authorize_action(user_info, 'cfgrobotkeys', login_method=login_method, robot=robot_name)[0]:
-                errors.append("""You don't have proper authorization to modify robot %s for login_method %s.""" % (escape(robot_name), escape(login_method)))
-            if login_method not in available_robot_login_methods:
-                errors.append("""The login method must be one among the available_robot_login_methods (%s).""" % escape(', '.join(available_robot_login_methods)))
-            if new_pwd1 != new_pwd2:
-                errors.append("""The two passwords are not equal.""")
-                new_pwd1 = ''
-                new_pwd2 = ''
-            if not robot_name:
-                errors.append("""The robot name must be specified.""")
-            if int(confirm) == 1:
-                if not errors:
-                    update_robot_key(login_method, robot_name, new_pwd1)
-                    robot_keys = load_robot_keys()
-                    if new_pwd1:
-                        messages.append("""The password for robot %s has been successfully updated.""" % escape(robot_name))
-                    else:
-                        messages.append("""The password for robot %s has been erased, and hence the robot %s does not exist anymore.""" % (escape(robot_name), escape(robot_name)))
-                action = ''
-                confirm = 0
-                robot_name = ''
-                new_pwd1 = ''
-                new_pwd2 = ''
-
-            else:
-                if not new_pwd1:
-                    warnings.append("""By setting an empty password you will actually erase the robot %s""" % escape(robot_name))
-        elif action == 'createurl':
-            if acce.acc_authorize_action(user_info, 'cfgrobotkeys', login_method=login_method, robot=robot_name)[0]:
-                errors.append("""You don't have proper authorization to create a URL for robot %s for login_method %s.""" % (escape(robot_name), escape(login_method)))
-            if login_method not in available_robot_login_methods:
-                errors.append("""The login method must be one among the available_robot_login_methods (%s).""" % escape(', '.join(available_robot_login_methods)))
-            if robot_name not in robot_keys.get(login_method, {}):
-                errors.append("""The robot name does not correspond to a valid robot name (for %s these are: %s).""" % (escape(login_method), escape(', '.join(robot_keys.get(login_method, {}).keys()))))
-            if json_assertion.strip():
-                try:
-                    assertion = json.loads(json_assertion)
-                    assert(isinstance(assertion, dict))
-                except Exception as err:
-                    errors.append("""The assertion is not a valid json serializable mapping: %s""" % (err))
-            else:
-                assertion = None
-            if not email:
-                errors.append("""The email is mandatory.""")
-            if not ip:
-                errors.append("""The IP address is mandatory.""")
-            if not errors:
-                url = CFG_EXTERNAL_AUTHENTICATION[login_method].test_create_example_url(email, login_method=login_method, robot=robot_name, ip=ip, timeout=time.time() + timeout, referer=referer, groups=groups.splitlines(), nickname=nickname, assertion=assertion)
-                if url_only:
-                    req.content_type = 'text/plain'
-                    return url
-                messages.append("""The corresponding URL is: <a href="%(url_escape)s" target="_blank"><strong>%(url)s</strong></a>""" % {
-                    'url_escape': escape(url, True),
-                    'url': escape(url)
-                })
-                action = ''
-        forms = """<p class="info">Existing login_method: <ul>%s</ul></p>""" % ''.join(["<li><a href=\"%s/admin/webaccess/webaccessadmin.py/managerobotlogin?login_method=%s\">%s (robots: %s)</a></li>" % (CFG_SITE_SECURE_URL, method, method, ', '.join(robot_keys.get(method, {}))) for method in available_robot_login_methods])
-        forms += """<p class="info">Existing robot names (for login_method %s): <ul>%s</ul></p>""" % (escape(login_method), ''.join(["<li>%s</li>" % name for name in robot_keys.get(login_method, {})]))
-        confirm_field = """<input type="hidden" name="confirm" value="0" />"""
-        if action == 'changepwd':
-            confirm_field = """<input type="hidden" name="confirm" value="1" />
-                <span class="warning">Please confirm once more you want to change this password.</span>"""
-        login_method_boxes = ""
-        for login_method_name in available_robot_login_methods:
-            if login_method_name == login_method:
-                login_method_boxes += """<input type="radio" value="%(name)s" name="login_method" checked="checked" id="login_method_%(name)s" /><label for="login_method_%(name)s">%(name)s</label><br />""" % {'name': escape(login_method_name, True)}
-            else:
-                login_method_boxes += """<input type="radio" value="%(name)s" name="login_method" id="login_method_%(name)s" /><label for="login_method_%(name)s">%(name)s</label><br />""" % {'name': escape(login_method_name, True)}
-
-        forms += """<table><tbody><tr valign="top"><td><form method="POST">
-            <input type="hidden" name="action" value="changepwd" />
-            <table><tbody>
-            <tr valign="top"><td align="right"><strong>Login method:</strong></td><td align="left">%(login_method_boxes)s</td></tr>
-            <tr valign="top"><td align="right"><label for="robot_name"><strong>Robot name:</strong> </label></td><td align="left"><input type="text" name="robot_name" value="%(robot_name)s" id="robot_name" /></td></tr>
-            <tr valign="top"><td align="right"><label for="new_pwd1"><strong>New password:</strong> </label></td><td align="left"><input type="password" name="new_pwd1" value="%(new_pwd1)s" id="new_pwd1" /></td></tr>
-            <tr valign="top"><td align="right"><label for="new_pwd2"><strong>Repeat new password:</strong> </label></td><td align="left"><input type="password" name="new_pwd2" value="%(new_pwd2)s" id="new_pwd2" /></td></tr>
-            <tr valign="top"><td align="right">%(confirm_field)s</td><td align="left"><input type="submit" value="Change password"></td></tr>
-            </tobdy></table>
-            </form></td>
-            """ % {
-                'login_method': escape(login_method, True),
-                'robot_name': escape(robot_name, True),
-                'new_pwd1': escape(new_pwd1, True),
-                'new_pwd2': escape(new_pwd2, True),
-                'confirm_field': confirm_field,
-                'login_method_boxes': login_method_boxes,
-            }
-        forms += """<td><form method="POST">
-            <input type="hidden" name="action" value="createurl" />
-            <table><tbody>
-            <tr valign="top"><td align="right"><strong>Login method:</strong> </td><td align="left">%(login_method_boxes)s</td></tr>
-            <tr valign="top"><td align="right"><label for="robot_name"><strong>Robot name:</strong> </label></td><td align="left"><input type="text" name="robot_name" value="%(robot_name)s" id="robot_name" /></td></tr>
-            <tr valign="top"><td align="right"><label for="timeout"><strong>Timeout (in seconds):</strong> </label></td><td align="left"><input type="text" name="timeout" value="%(timeout)s" id="timeout" /></td></tr>
-            <tr valign="top"><td align="right"><label for="referer"><strong>Referer (where to go after login):</strong> </label></td><td align="left"><input type="text" name="referer" value="%(referer)s" id="referer" /></td></tr>
-            <tr valign="top"><td align="right"><label for="ip"><strong>Ip (of the requester):</strong> </label></td><td align="left"><input type="text" name="ip" value="%(ip)s" id="ip" /></td></tr>
-            <tr valign="top"><td align="right"><label for="email"><strong>Email:</strong> </label></td><td align="left"><input type="text" name="email" value="%(email)s" id="email" /></td></tr>
-            <tr valign="top"><td align="right"><label for="nickname"><strong>Nickname (optional):</strong> </label></td><td align="left"><input type="text" name="nickname" value="%(nickname)s" id="nickname" /></td></tr>
-            <tr valign="top"><td align="right"><label for="timeout"><strong>Timeout (in seconds):</strong> </label></td><td align="left"><input type="text" name="timeout" value="%(timeout)s" id="timeout" /></td></tr>
-            <tr valign="top"><td align="right"><label for="groups"><strong>Groups (one per line):</strong> </label></td><td align="left"><textarea name="groups" id="groups">%(groups)s</textarea></td></tr>
-            <tr valign="top"><td align="right"><label for="json_assertion"><strong>Assertion (json serializable mapping):</strong> </label></td><td align="left"><textarea name="json_assertion" id="json_assertion">%(json_assertion)s</textarea></td></tr>
-            <tr valign="top"><td align="right"><label for="url_only"><strong>Create just the URL:</strong> </label></td><td align="left"><input type="checkbox" id="url_only" name="url_only" value="1" /></td></tr>
-            <tr valign="top"><td align="right"></td><td align="left"><input type="submit" value="Create URL" /></td></tr>
-            </tbody></table>
-            </form></td></tr></tbody></table>""" % {
-                'login_method_boxes': login_method_boxes,
-                'robot_name': escape(robot_name, True),
-                'timeout': escape(str(timeout), True),
-                'referer': escape(referer, True),
-                'ip': escape(ip, True),
-                'email': escape(email, True),
-                'nickname': escape(nickname, True),
-                'groups': escape(groups),
-                'json_assertion': escape(json_assertion)
-            }
-    out = ""
-    if errors:
-        out += "<h5>ERRORS</h5><ul>"
-        for error in errors:
-            out += '<li class="warning">%s</li>' % error
-        out += "</ul>"
-    if warnings:
-        out += "<h5>WARNINGS</h5><ul>"
-        for warning in warnings:
-            out += '<li class="warning">%s</li>' % warning
-        out += "</ul>"
-    if messages:
-        out += "<h5>INFORMATION</h5><ul>"
-        for message in messages:
-            out += '<li class="note">%s</li>' % message
-        out += "</ul>"
-
-    out += forms
-    return index(req=req,
-            title='Manage Robot Login',
-            subtitle='Are to manage robot-based authentiation',
-            body=out,
-            adminarea=2)
 
 def perform_listgroups(req):
     """List all the existing groups."""
@@ -3501,8 +3312,6 @@ def startpage():
     <dd>manage user accounts.</dd>
     <dt><a href="webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a></dt>
     <dd>delegate your rights for some roles.</dd>
-    <dt><a href="webaccessadmin.py/managerobotlogin">Manage Robot Login</a></dt>
-    <dd>Manage robot login keys and test URLs</dd>
     </dl>
 </td>
 </tr>
