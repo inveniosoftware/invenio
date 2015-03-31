@@ -66,16 +66,20 @@ re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
 
 def lower_index_term(term):
-    """
-    Return safely lowered index term TERM.  This is done by converting
-    to UTF-8 first, because standard Python lower() function is not
-    UTF-8 safe.  To be called by both the search engine and the
-    indexer when appropriate (e.g. before stemming).
+    """Return safely lowered index term TERM.
+
+    This is done by converting to unicode string, if not already,
+    and use it's lower() function. Standard Python lower() function is not
+    UTF-8 safe.
 
     In case of problems with UTF-8 compliance, this function raises
     UnicodeDecodeError, so the client code may want to catch it.
     """
-    return unicode(term, 'utf-8').lower().encode('utf-8')
+    try:
+        return unicode(term, 'utf-8').lower()
+    except TypeError:
+        # term is already Unicode
+        return term.lower()
 
 latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
 def remove_latex_markup(phrase):

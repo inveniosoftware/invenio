@@ -96,12 +96,11 @@ class BibIndexCJKTokenizer(BibIndexDefaultTokenizer):
             #remove special CJK punctuation
             phrase = special_CJK_punctuation.sub("", phrase)
             #first, we split our phrase with default word tokenizer to make it easier later
-            pre_tokenized = self.tokenize_for_words_default(phrase)
+            words = self.tokenize_for_words_default(phrase)
             #list for keeping CJK chars and non-CJK words
             chars = []
             #every CJK word splits into a set of single characters
             #for example: "春眠暁覚" into ['春','眠','暁','覚']
-            words = [ word.decode("utf8") for word in pre_tokenized]
             for word in words:
                 if is_from_CJK_set_full_match(word):
                     chars.extend(word)
