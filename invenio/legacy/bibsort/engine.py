@@ -19,6 +19,7 @@
 
 """BibSort Engine"""
 
+import six
 import sys
 import time
 
