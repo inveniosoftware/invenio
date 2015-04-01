@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,12 +24,12 @@ This module binds together Invenio's modules and maps them to
 their corresponding URLs (ie, /search to the websearch modules,...)
 """
 
+from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_DEVEL_SITE
+from invenio.ext.legacy.handler import WebInterfaceDirectory
 from invenio.ext.legacy.handler import create_handler
 from invenio.ext.logging import register_exception
-from invenio.ext.legacy.handler import WebInterfaceDirectory
+from invenio.legacy.registry import webinterfaces
 from invenio.utils import apache
-from invenio.config import CFG_DEVEL_SITE, CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.legacy.registry import webinterface_proxy, webinterfaces
 
 
 class WebInterfaceDeprecatedPages(WebInterfaceDirectory):
@@ -56,7 +56,7 @@ class WebInterfaceDeprecatedPages(WebInterfaceDirectory):
             pass
         try:
             return page('Service disabled', msg, req=req)
-        except:
+        except Exception:
             return msg
 
     def _lookup(self, component, path):
@@ -134,12 +134,6 @@ except:
     bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
 try:
-    from invenio.legacy.websearch.webinterface import WebInterfaceSearchInterfacePages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
-
-try:
     from invenio.legacy.bibcirculation.admin_webinterface import \
          WebInterfaceBibCirculationAdminPages
 except:
@@ -168,12 +162,11 @@ class WebInterfaceAdminPages(WebInterfaceDirectory):
 
     bibsched = WebInterfaceBibSchedPages()
 
-class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
+class WebInterfaceInvenio(WebInterfaceDirectory):
     """ The global URL layout is composed of the search API plus all
     the other modules."""
 
-    _exports = WebInterfaceSearchInterfacePages._exports + \
-               [
+    _exports = [
                    'youraccount',
                    'youralerts',
                    'yourbaskets',
@@ -192,7 +185,6 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'stats',
                    'journal',
                    'help',
-                   'unapi',
                    'exporter',
                    'kb',
                    'batchuploader',
@@ -230,7 +222,6 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         journal='WebInterfaceJournalPages',
         help='WebInterfaceDocumentationPages',
         info='WebInterfaceInfoPages',
-        unapi='WebInterfaceUnAPIPages',
         exporter='WebInterfaceFieldExporterPages',
         kb='WebInterfaceBibKnowledgePages',
         admin2='WebInterfaceAdminPages',
