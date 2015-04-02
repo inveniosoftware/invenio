@@ -97,7 +97,7 @@ class ElasticSearchDSL(object):
     def visit(self, node):
         return lambda keyword: {
             'multi_match': {
-                'query': node.value.value,
+                'query': node.value,
                 'type': 'phrase',
                 'fields': keyword
             }
@@ -108,10 +108,10 @@ class ElasticSearchDSL(object):
         def _f(keyword):
             if (len(keyword) > 1):
                 return {"bool":
-                        {"should": [{"term": {k: str(node.value.value)}}
+                        {"should": [{"term": {k: str(node.value)}}
                                     for k in keyword]}}
             else:
-                return {'term': {keyword[0]: node.value.value}}
+                return {'term': {keyword[0]: node.value}}
         return _f
 
     @visitor(RegexValue)

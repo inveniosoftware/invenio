@@ -53,7 +53,7 @@ class TestElasticSearchWalker(InvenioTestCase):
             })
 
     def test_single_quoted_value(self):
-        tree = ValueQuery(SingleQuotedValue(Value("bar")))
+        tree = ValueQuery(SingleQuotedValue("bar"))
         self.assertEqual(tree.accept(self.converter), {
             "multi_match": {
                 "fields": ["_all"],
@@ -63,7 +63,7 @@ class TestElasticSearchWalker(InvenioTestCase):
         })
 
     def test_double_quoted_value(self):
-        tree = ValueQuery(DoubleQuotedValue(Value("bar")))
+        tree = ValueQuery(DoubleQuotedValue("bar"))
         self.assertEqual(tree.accept(self.converter), {
             "term": {"_all": "bar"}
         })
@@ -84,7 +84,7 @@ class TestElasticSearchWalker(InvenioTestCase):
         })
 
     def test_key_val_single_quote(self):
-        tree = KeywordOp(Keyword('foo'), SingleQuotedValue(Value('bar')))
+        tree = KeywordOp(Keyword('foo'), SingleQuotedValue('bar'))
         self.assertEqual(tree.accept(self.converter), {
             "multi_match": {
                 "fields": ["test1", "test2"],
@@ -94,7 +94,7 @@ class TestElasticSearchWalker(InvenioTestCase):
         })
 
     def test_key_val_double_quote(self):
-        tree = KeywordOp(Keyword('foo'), DoubleQuotedValue(Value('bar')))
+        tree = KeywordOp(Keyword('foo'), DoubleQuotedValue('bar'))
         self.assertEqual(tree.accept(self.converter), {
             "bool": {
                 "should": [
