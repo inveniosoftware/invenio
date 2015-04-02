@@ -1,0 +1,6 @@
+content_type: text/html
+default: Default_HTML_actions.bft
+description: Used to display actions in mini-panel of detailed record pages.
+name: Actions mini-panel
+rules: []
+visibility: 0

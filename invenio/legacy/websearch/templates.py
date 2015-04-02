@@ -555,31 +555,6 @@ class Template:
         return (title, description, keywords)
 
 
-    def tmpl_exact_author_browse_help_link(self, p, p1, p2, p3, f, f1, f2, f3, rm, cc, ln, jrec, rg, aas, action, link_name):
-        """
-        Creates the 'exact author' help link for browsing.
-
-        """
-        _ = gettext_set_language(ln)
-        url = create_html_link(self.build_search_url(p=p,
-                                                     p1=p1,
-                                                     p2=p2,
-                                                     p3=p3,
-                                                     f=f,
-                                                     f1=f1,
-                                                     f2=f2,
-                                                     f3=f3,
-                                                     rm=rm,
-                                                     cc=cc,
-                                                     ln=ln,
-                                                     jrec=jrec,
-                                                     rg=rg,
-                                                     aas=aas,
-                                                     action=action),
-                               {}, _(link_name), {'class': 'nearestterms'})
-        return "Did you mean to browse in %s index?" % url
-
-
     def tmpl_navtrail_links(self, aas, ln, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)

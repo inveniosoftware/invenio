@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2014 CERN.
+# Copyright (C) 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,41 +16,43 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - bookmark toolbar using:
 
-    <http://keith-wood.name/bookmark.html>
+"""BibFormat element - bookmark toolbar.
 
+See <http://keith-wood.name/bookmark.html>.
 """
 
-import cgi
-
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
-from invenio.legacy.search_engine import record_public_p
+from invenio.legacy.search_engine import get_all_restricted_recids
 from invenio.utils.html import escape_javascript_string
 from invenio.modules.formatter.format_elements.bfe_sciencewise import create_sciencewise_url, \
     get_arxiv_reportnumber
 from invenio.legacy.webjournal.utils import \
-     parse_url_string, \
-     make_journal_url, \
-     get_journals_ids_and_names
+    parse_url_string, \
+    make_journal_url, \
+    get_journals_ids_and_names
 
-def format_element(bfo, only_public_records=1, sites="linkedin,twitter,facebook,google,delicious,sciencewise"):
-    """
-    Return a snippet of JavaScript needed for displaying a bookmark toolbar
 
-    @param only_public_records: if set to 1 (the default), prints the box only
-        if the record is public (i.e. if it belongs to the root colletion and is
-        accessible to the world).
+def format_element(
+        bfo, only_public_records=1,
+        sites="linkedin,twitter,facebook,google,delicious,sciencewise"):
+    """Return a snippet of JavaScript needed for displaying a bookmark toolbar.
 
-    @param sites: which sites to enable (default is 'linkedin,twitter,facebook,google,delicious,sciencewise'). This should be a
-        comma separated list of strings.
+    :param only_public_records: if set to 1 (the default), prints the box only
+        if the record is public (i.e. if it belongs to the root colletion and
+        is accessible to the world).
+
+    :param sites: which sites to enable (default is
+        'linkedin,twitter,facebook,google,delicious,sciencewise').
+        This should be a comma separated list of strings.
         Valid values are available on:
             <http://keith-wood.name/bookmark.html#sites>
         Note that 'sciencewise' is an ad-hoc service that will be displayed
         only in case the record has an arXiv reportnumber and will always
         be displayed last.
     """
-    if int(only_public_records) and not record_public_p(bfo.recID):
+    if int(only_public_records) and \
+            bfo.recID not in get_all_restricted_recids():
         return ""
 
     sitelist = sites.split(',')
@@ -131,9 +133,7 @@ $('#bookmark_sciencewise').bookmark({sites: ['sciencewise']});
         'url': url,
     }
 
+
 def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
+    """Check if output of this element should be escaped."""
     return 0

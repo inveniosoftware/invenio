@@ -1,0 +1,6 @@
+rules:
+- {field: 980.a, template: Picture_HTML_detailed.bft, value: 'PICTURE '}
+- {field: 980.a, template: Article.bft, value: 'ARTICLE'}
+- {field: 980__a, template: Thesis_detailed.bft, value: 'THESIS '}
+- {field: 980__a, template: Pub.bft, value: 'PUBLICATION '}
+default: Default_HTML_detailed.bft

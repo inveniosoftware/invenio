@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,12 +19,11 @@
 
 """Invenio Search Engine config parameters."""
 
-__revision__ = \
-    "$Id$"
+SEARCH_QUERY_PARSER = 'invenio_query_parser.parser:Main'
 
-# Note: many interesting search engine config variables are defined
-# in the global config.py.  This file should define locally
-# interesting variables only.
+SEARCH_QUERY_WALKERS = [
+    'invenio_query_parser.walkers.pypeg_to_ast:PypegConverter',
+]
 
 # do we want experimental features? (0=no, 1=yes)
 CFG_EXPERIMENTAL_FEATURES = 0
@@ -145,3 +144,7 @@ CFG_WEBSEARCH_MAX_RECORDS_REFERSTO = 50000
 # (all the records referenced/cited by the specified records) will be limited
 # to this number. This does not limit the number of records in the result.
 CFG_WEBSEARCH_MAX_RECORDS_CITEDBY = 50000
+
+# SEARCH_ELASTIC_KEYWORD_MAPPING -- this variable holds a dictionary to map
+# invenio keywords to elasticsearch fields
+SEARCH_ELASTIC_KEYWORD_MAPPING = None

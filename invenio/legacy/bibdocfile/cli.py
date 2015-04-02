@@ -433,10 +433,11 @@ def cli_get_stats(dummy):
             for row in table:
                 print("\t".join(str(elem) for elem in row))
 
-    for collection, reclist in run_sql("SELECT name, reclist FROM collection ORDER BY name"):
+    from invenio.modules.collections.cache import get_collection_reclist
+    for collection, in run_sql("SELECT name FROM collection ORDER BY name"):
         print("-" * 79)
         print("Statistic for: %s " % collection)
-        reclist = intbitset(reclist)
+        reclist = get_collection_reclist(collection)
         if reclist:
             sqlreclist = "(" + ','.join(str(elem) for elem in reclist) + ')'
             print_table("Formats", run_sql("SELECT COUNT(format) as c, format FROM bibrec_bibdoc AS bb JOIN bibdocfsinfo AS fs ON bb.id_bibdoc=fs.id_bibdoc WHERE id_bibrec in %s AND last_version=true GROUP BY format ORDER BY c DESC" % sqlreclist)) # kwalitee: disable=sql

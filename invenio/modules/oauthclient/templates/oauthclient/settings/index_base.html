@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,11 +28,14 @@
     icon="fa fa-link fa-fw"
 )}}
 <div class="panel-body">
+    {% block oauth_body_text %}
     <p>Tired of entering password for {{config.CFG_SITE_NAME}} every time you sign in? Setup single sign-on with one or more of the services below:</p>
+    {% endblock oauth_body_text %}
 </div>
 <ul class="list-group">
     {%- for s in services %}
     <li class="list-group-item">
+    {% block oauth_controls scoped %}
     <div class="pull-right">
         {%- if s.account -%}
         <a href="{{url_for('oauthclient.disconnect', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-times-circle"></i> Disconnect</a>
@@ -40,6 +43,7 @@
         <a href="{{url_for('oauthclient.login', remote_app=s.appid)}}" class="btn btn-default btn-xs"><i class="fa fa-link"></i> Connect</a>
         {%- endif -%}
     </div>
+    {% endblock oauth_controls %}
     {% if s.icon %}<i class="{{s.icon}}"></i> {% endif %}{{s.title}}{% if s.account %} <i class="fa fa-check" style="color: #5cb85c;"></i>{% endif %}<br/><small class="text-muted">{{s.description}}</small>
     </li>
     {%- endfor %}

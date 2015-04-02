@@ -21,10 +21,16 @@
 
 import os
 
+from flask_registry import (
+    ModuleAutoDiscoveryRegistry,
+    PkgResourcesDirDiscoveryRegistry,
+    RegistryProxy,
+)
+
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
-    ModuleAutoDiscoveryRegistry, RegistryProxy
 from invenio.utils.datastructures import LazyDict
+
+import yaml
 
 format_elements = RegistryProxy(
     'format_elements',
@@ -50,8 +56,8 @@ output_formats_directories = RegistryProxy(
     'output_formats'
 )
 
-output_formats = RegistryProxy(
-    'output_formats',
+output_formats_files = RegistryProxy(
+    'output_formats_files',
     PkgResourcesDirDiscoveryRegistry,
     '.', registry_namespace=output_formats_directories
 )
@@ -90,11 +96,24 @@ def create_output_formats_lookup():
     """Create output formats."""
     out = {}
 
-    for f in output_formats:
-        of = os.path.basename(f)
+    for f in output_formats_files:
+        of = os.path.basename(f).lower()
+        data = {'names': {}}
+        if of.endswith('.yml'):
+            of = of[:-4]
+            with open(f, 'r') as f:
+                data.update(yaml.load(f) or {})
+                data['code'] = of
+        else:
+            continue  # unknown filetype
         if of in out:
             continue
-        out[of] = f
+        out[of] = data
     return out
 
-output_formats_lookup = LazyDict(create_output_formats_lookup)
+output_formats = LazyDict(create_output_formats_lookup)
+
+export_formats = LazyDict(lambda: dict(
+    (code, of) for code, of in output_formats.items()
+    if of.get('content_type', '') != 'text/html' and of.get('visibility', 0)
+))

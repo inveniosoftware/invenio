@@ -1,0 +1,6 @@
+content_type: text/html
+default: Default_HTML_captions.bft
+description: HTML caption-only output format for photos.
+name: photo captions only
+rules: []
+visibility: 0

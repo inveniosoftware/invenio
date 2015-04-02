@@ -183,30 +183,6 @@ The APIs of bibformat.py consists in these functions:
      """
 
 
- def record_get_xml(recID, format='xm', decompress=zlib.decompress):
-     """
-     Returns an XML string of the record given by recID.
-
-     The function builds the XML directly from the database,
-     without using the standard formatting process.
-
-     'format' allows to define the flavour of XML:
-        - 'xm' for standard XML
-        - 'marcxml' for MARC XML
-        - 'oai_dc' for OAI Dublin Core
-        - 'xd' for XML Dublin Core
-
-     If record does not exist, returns empty string.
-
-     The function takes the following parameters:
-
-          recID - the id of the record to retrieve
-
-         format - the XML flavor in which we want to get the record
-
-     decompress _ a function used to decompress the record from the database
-    """
-
 The API of the BibFormat Object ('bfo') given as a parameter to
 format function of format elements consist in the following
 functions. This API is to be used only inside format elements.

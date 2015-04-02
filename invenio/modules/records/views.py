@@ -35,7 +35,7 @@ from invenio.base.signals import pre_template_render
 from invenio.config import CFG_SITE_RECORD
 from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 from invenio.modules.search.signals import record_viewed
 from invenio.utils import apache
 from .api import get_record
