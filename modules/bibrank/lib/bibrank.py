@@ -21,50 +21,31 @@
 BibRank ranking daemon.
 
 Usage: bibrank [options]
-     Ranking examples:
-       bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
-       bibrank -wjif -d --modified='2002-10-27 13:57:26'
-       bibrank -wwrd --rebalance --collection=Articles
-       bibrank -wwrd -a -i 234-250,293,300-500 -u admin
 
- Ranking options:
- -w, --run=r1[,r2]         runs each rank method in the order given
-
- -c, --collection=c1[,c2]  select according to collection
- -i, --id=low[-high]       select according to doc recID
- -m, --modified=from[,to]  select according to modification date
- -l, --lastupdate          select according to last update
-
- -a, --add                 add or update words for selected records
- -d, --del                 delete words for selected records
- -S, --stat                show statistics for a method
-
- -R, --recalculate         recalculate weigth data, used by word frequency
-                           and citation methods, should be used if ca 1%
-                           of the document has been changed since last
-                           time -R was used
-
- -E, --extcites=NUM        print the top entries of the external cites table.
-                           These are entries that should be entered in
-                           your collection, since they have been cited
-                           by NUM or more other records present in the
-                           system.  Useful for cataloguers to input
-                           external papers manually.
-
- Repairing options:
- -k,  --check              check consistency for all records in the table(s)
-                           check if update of ranking data is necessary
- -r, --repair              try to repair all records in the table(s)
- Scheduling options:
- -u, --user=USER           user name to store task, password needed
- -s, --sleeptime=SLEEP     time after which to repeat tasks (no)
-                            e.g.: 1s, 30m, 24h, 7d
- -t, --time=TIME           moment for the task to be active (now)
-                            e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
- General options:
- -h, --help                print this help and exit
- -V, --version             print version and exit
- -v, --verbose=LEVEL       verbose level (from 0 to 9, default 1)
+Ranking options:
+-w, --run=r1[,r2]         runs each rank method in the order given
+-c, --collection=c1[,c2]  select according to collection
+-i, --id=low[-high]       select according to doc recID
+-m, --modified=from[,to]  select according to modification date
+-l, --lastupdate          select according to last update
+-q, --query               select according to search query
+-a, --add                 add or update words for selected records
+-d, --del                 delete words for selected records
+-S, --stat                show statistics for a method
+-R, --recalculate         recalculate weight data, used by word frequency
+                          and citation methods, should be used if ca 1%
+                          of the document has been changed since last
+                          time -R was used
+-E, --extcites=NUM        print the top entries of the external cites table.
+                          These are entries that should be entered in
+                          your collection, since they have been cited
+                          by NUM or more other records present in the
+                          system.  Useful for catalogers to input
+                          external papers manually.
+Repairing options:
+-k,  --check              check consistency for all records in the table(s)
+                          check if update of ranking data is necessary
+-r, --repair              try to repair all records in the table(s)
 """
 
 import sys
@@ -168,52 +149,17 @@ def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibrank',
               authorization_msg="BibRank Task Submission",
-              description="""Ranking examples:
-       bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
-       bibrank -wjif -d --modified='2002-10-27 13:57:26'
-       bibrank -wjif --rebalance --collection=Articles
-       bibrank -wsbr -a -i 234-250,293,300-500 -u admin
-       bibrank -u admin -w citation -E 10
-       bibrank -u admin -w citation -A
+              description=""" Ranking examples:
+  bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
+  bibrank -wjif -d --modified='2002-10-27 13:57:26'
+  bibrank -wjif --rebalance --collection=Articles
+  bibrank -wsbr -a -i 234-250,293,300-500 -u admin
+  bibrank -u admin -w citation -E 10
+  bibrank -u admin -w citation -A
 """,
-            help_specific_usage="""Ranking options:
- -w, --run=r1[,r2]         runs each rank method in the order given
-
- -c, --collection=c1[,c2]  select according to collection
- -i, --id=low[-high]       select according to doc recID
- -m, --modified=from[,to]  select according to modification date
-                           (ignored by citation or selfcites methods)
- -l, --lastupdate          select according to last update
-                           (ignored by citation or selfcites methods)
- -a, --add                 add or update words for selected records
- -d, --del                 delete words for selected records
- -S, --stat                show statistics for a method
-
- -R, --recalculate         recalculate weight data, used by word frequency
-                           and citation methods, should be used if ca 1%
-                           of the documents have been changed since last
-                           time -R was used.  NOTE: This will replace the
-                           entire set of weights, regardless of date/id
-                           selection.
-
- -E, --extcites=NUM        print the top entries of the external cites table.
-                           These are entries that should be entered in
-                           your collection, since they have been cited
-                           by NUM or more other records present in the
-                           system.  Useful for cataloguers to input
-                           external papers manually.
-
- --disable-citation-losses-check  Disable checks that prevent more than n
-                           citations to be removed in one single run
-                           (n is defined in citation.cfg)
-
- Repairing options:
- -k,  --check              check consistency for all records in the table(s)
-                           check if update of ranking data is necessary
- -r, --repair              try to repair all records in the table(s)
-""",
+            help_specific_usage=__doc__,
             version=CFG_VERSION,
-            specific_params=("AE:ladSi:m:c:kUrRM:f:w:", [
+            specific_params=("AE:ladSi:m:c:kUrRM:f:w:q:", [
                 "author-citations",
                 "print-extcites=",
                 "lastupdate",
@@ -230,7 +176,8 @@ def main():
                 "modified=",
                 "update",
                 "disable-citation-losses-check",
-                "run="]),
+                "run=",
+                "query="]),
             task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -282,6 +229,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
         task_set_option("last_updated", "last_updated")
     elif key in ("--disable-citation-losses-check", ):
         task_set_option("disable_citation_losses_check", True)
+    elif key in ("-q", "--query"):
+        task_set_option("query", value)
     else:
         return False
     return True

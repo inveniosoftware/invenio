@@ -348,7 +348,14 @@ def bibrank_engine(run):
         cfg_name = getName(cfg_short)
         options["validset"] = get_valid_range(rank_method_code)
 
-        if task_get_option("collection"):
+        if task_get_option("query") is not None:
+            params = {"of": "id"}
+            if task_get_option("collection"):
+                params["c"] = task_get_option("collection").split(",")
+            params["p"] = task_get_option("query")
+            recIDs = perform_request_search(**params)
+            options["recid_range"] = [(recID, recID) for recID in recIDs]
+        elif task_get_option("collection"):
             l_of_colls = task_get_option("collection").split(",")
             recIDs = perform_request_search(c=l_of_colls)
             options["recid_range"] = [(recID, recID) for recID in recIDs]
