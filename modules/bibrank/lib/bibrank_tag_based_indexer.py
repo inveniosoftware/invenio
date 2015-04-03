@@ -33,6 +33,7 @@ from invenio.dbquery import (run_sql,
                              wash_table_column_name,
                              get_table_update_time)
 from invenio.bibtask import (task_get_option,
+                             task_set_option,
                              write_message,
                              task_sleep_now_if_required)
 from invenio.bibindex_engine import create_range_list
@@ -354,7 +355,9 @@ def bibrank_engine(run):
                 params["c"] = task_get_option("collection").split(",")
             params["p"] = task_get_option("query")
             recIDs = perform_request_search(**params)
-            options["recid_range"] = [(recID, recID) for recID in recIDs]
+            ranges = [(recID, recID) for recID in recIDs]
+            task_set_option("id", task_get_option("id", []) + ranges)
+            options["recid_range"] = ranges
         elif task_get_option("collection"):
             l_of_colls = task_get_option("collection").split(",")
             recIDs = perform_request_search(c=l_of_colls)
