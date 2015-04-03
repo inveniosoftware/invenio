@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 Holding Pen is a web interface overlay for all BibWorkflowObject's.
 
@@ -149,8 +150,9 @@ def maintable():
                 tags=json.dumps(tags_to_print))
 
 
+@blueprint.route('/<int:objectid>', methods=['GET', 'POST'])
 @blueprint.route('/details/<int:objectid>', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.details', _("Record Details"))
+@register_breadcrumb(blueprint, '.details', _("Object Details"))
 @login_required
 @permission_required(viewholdingpen.name)
 def details(objectid):
