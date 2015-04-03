@@ -847,7 +847,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 store_citation_warning('multiple-matches', refnumber)
                 msg = "Whoops: record '%d' report number value '%s' " \
                       "matches many records; taking only the first one. %s" % \
-                      (thisrecid, refnumber, repr(recids))
+                      (thisrecid, refnumber, repr(recids[:50]))
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -895,7 +895,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' reference value '%s' " \
                       "matches many records; taking only the first one. %s" % \
-                      (thisrecid, p, repr(recids))
+                      (thisrecid, p, repr(recids[:50]))
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -934,7 +934,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' DOI value '%s' " \
                       "matches many records; taking only the first one. %s" % \
-                      (thisrecid, p, repr(recids))
+                      (thisrecid, p, repr(recids[:50]))
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -973,7 +973,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' HDL value '%s' " \
                       "matches many records; taking only the first one. %s" % \
-                      (thisrecid, p, repr(recids))
+                      (thisrecid, p, repr(recids[:50]))
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -1033,7 +1033,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' ISBN value '%s' " \
                       "matches many records; taking only the first one. %s" % \
-                      (thisrecid, p, repr(recids))
+                      (thisrecid, p, repr(recids[:50]))
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
