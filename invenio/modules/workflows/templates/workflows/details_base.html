@@ -62,17 +62,6 @@
       {% endblock %}
       {% block top_right %}
         <div class="navbar-form navbar-right">
-          <a class="btn btn-danger details-action"
-             role="button"
-             data-action="delete">
-            <span class="glyphicon glyphicon-trash"></span> {{ _('Delete') }}
-          </a>
-          <a class="btn btn-warning details-action"
-             role="button"
-             data-action="restart">
-            <span class="glyphicon glyphicon-repeat"></span> {{ _('Restart') }}
-          </a>
-
           <a href="{{ url_for('holdingpen.details', objectid=previous_object)}}"
              class="btn btn-default"
              {% if previous_object == None %}disabled="disabled"{% endif %}>
@@ -106,12 +95,34 @@
           {% endblock %}
 
           {% block workflow_history %}
+            {% set current_task = bwobject.get_current_task_info() %}
+            {% if current_task %}
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 class="panel-title">{{ _('Current task') }}</h3>
+                </div>
+                <div class="panel-body">
+                  <p>
+                    {{ utils.display_task(current_task.get("nicename"), current_task.get("doc"), current_task.get("parameters"), current_task.get("name"), id|length, true) }}
+                  </p>
+                  <p>
+                    <a class="btn btn-warning details-action"
+                       role="button"
+                       data-action="restart">
+                      <span class="glyphicon glyphicon-repeat"></span> {{ _('Restart this task') }}
+                    </a>
+                  </p>
+                </div>
+              </div>
+            {% endif %}
             <div class="panel panel-info">
               <div class="panel-heading">
-                <h3 class="panel-title">{{ _('Workflow status') }}</h3>
+                <h3 class="panel-title">{{ _('Workflow') }}</h3>
               </div>
               <div class="panel-body">
-                <p data-toggle="tooltip" data-placement="top" title="{{ workflow.name }}">{{ workflow.name|truncate(25, True) }}</p>
+
+                <p class="lead" data-toggle="tooltip" data-placement="top" title="{{ workflow.name|u }}">{{ workflow.name|truncate(25, True)|u }}</p>
+
                 {% if task_history %}
                 <h6 class="pull-left">
                   <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#completed-tasks">
@@ -134,7 +145,7 @@
                     <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
                     <div class="list-group">
                       {% for item in task_history %}
-                        {{ utils.display_task_history(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length) }}
+                        {{ utils.display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length, true) }}
                         {% do id.append(1) %}
                       {% endfor %}
                     </div>
@@ -163,17 +174,6 @@
                   </h6>
                 </div>
 
-                <div class="row">
-                  <div class="col-md-12">
-                    <a class="btn btn-warning details-action"
-                       data-action="restart"
-                       {% if bwobject.version == 1 %}disabled="disabled"{% endif %}>
-                      <span class="glyphicon glyphicon-repeat"></span>
-                      <strong>{{ _('Restart task') }}</strong>
-                    </a>
-                  </div>
-                </div>
-
                 <div class="modal fade" id="error_details_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -194,40 +194,6 @@
               </div>
             </div>
             {% endif %}
-          {% endblock %}
-
-          {% block workflow_information %}
-            <div class="panel panel-info">
-              <div class="panel-heading">
-                <h3 class="panel-title">{{ _('Other information') }}</h3>
-              </div>
-              <div class="panel-body">
-                <h6 class="pull-right">
-                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
-                  {{ _('More') }}
-                  <span class="caret"></span>
-                </a>
-                </h6>
-                {# This row is needed to avoid a weird collapsing effect. #}
-                <div class="row"></div>
-                <div id="record-metadata-table" class="collapse">
-                  <table class="table table-striped">
-                    <tr>
-                      <td><strong>{{ _("status") }}</strong></td>
-                      <td>
-                        <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
-                      </td>
-                    </tr>
-                    {% for key, value in info.items() %}
-                      <tr>
-                        <td><strong>{{ key }}</strong></td>
-                        <td>{{ value }}</td>
-                      </tr>
-                    {% endfor %}
-                  </table>
-                </div>
-              </div>
-            </div>
           {% endblock %}
 
           {% block object_history %}
@@ -262,10 +228,49 @@
                       {% endfor %}
                     </table>
                   </div>
+                  <a class="btn btn-danger details-action"
+                   role="button"
+                   data-action="delete">
+                  <span class="glyphicon glyphicon-trash"></span> {{ _('Delete this object') }}
+                </a>
                 </div>
               </div>
             {% endif %}
           {% endblock %}
+          {% block workflow_information %}
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title">{{ _('Other information') }}</h3>
+              </div>
+              <div class="panel-body">
+                <h6 class="pull-right">
+                <a role="button" style="cursor: pointer" data-toggle="collapse" data-target="#record-metadata-table">
+                  {{ _('More') }}
+                  <span class="caret"></span>
+                </a>
+                </h6>
+                {# This row is needed to avoid a weird collapsing effect. #}
+                <div class="row"></div>
+                <div id="record-metadata-table" class="collapse">
+                  <table class="table table-striped">
+                    <tr>
+                      <td><strong>{{ _("status") }}</strong></td>
+                      <td>
+                        <span class="label label-{{ bwobject._class}}">{{ bwobject.message }}</span>
+                      </td>
+                    </tr>
+                    {% for key, value in info.items() %}
+                      <tr>
+                        <td><strong>{{ key }}</strong></td>
+                        <td>{{ value }}</td>
+                      </tr>
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+            </div>
+          {% endblock %}
+
         {% endblock %}
       </div>
 
@@ -292,6 +297,11 @@
           {% if bwobject.version == 1 %}
             <div id="successmessage" class="alert alert-success">
               {{ _('Workflow completed with success') }}
+              <a class="close" data-dismiss="alert">&times;</a>
+            </div>
+          {% elif bwobject.version == 3 %}
+            <div class="alert alert-warning">
+              {{ _('Object is currently processing') }}
               <a class="close" data-dismiss="alert">&times;</a>
             </div>
           {% endif %}

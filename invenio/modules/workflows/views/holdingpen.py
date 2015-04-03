@@ -27,6 +27,8 @@ with halted workflows.
 For example, accepting submissions or other tasks.
 """
 
+from __future__ import unicode_literals
+
 import json
 import os
 
@@ -263,10 +265,10 @@ def restart_record(objectid, start_point='continue_next'):
         Workflow.uuid == bwobject.id_workflow).first()
 
     start_delayed(workflow.name, [bwobject.get_data()])
-    return jsonify({
-        "category": "success",
-        "message": unicode(_("Object restarted successfully."))
-    })
+    return jsonify(dict(
+        category="success",
+        message=_("Object restarted successfully.")
+    ))
 
 
 @blueprint.route('/continue_record', methods=['GET', 'POST'])
@@ -277,10 +279,10 @@ def restart_record(objectid, start_point='continue_next'):
 def continue_record(objectid):
     """Continue workflow for current object."""
     continue_oid_delayed(oid=objectid, start_point='continue_next')
-    return jsonify({
-        "category": "success",
-        "message": unicode(_("Object continued with next task successfully."))
-    })
+    return jsonify(dict(
+        category="success",
+        message=_("Object continued with next task successfully.")
+    ))
 
 
 @blueprint.route('/restart_record_prev', methods=['GET', 'POST'])
@@ -291,10 +293,10 @@ def continue_record(objectid):
 def restart_record_prev(objectid):
     """Restart the last task for current object."""
     continue_oid_delayed(oid=objectid, start_point="restart_task")
-    return jsonify({
-        "category": "success",
-        "message": unicode(_("Object restarted task successfully."))
-    })
+    return jsonify(dict(
+        category="success",
+        message=_("Object restarted task successfully.")
+    ))
 
 
 @blueprint.route('/delete', methods=['GET', 'POST'])
@@ -305,10 +307,10 @@ def restart_record_prev(objectid):
 def delete_from_db(objectid):
     """Delete the object from the db."""
     BibWorkflowObject.delete(objectid)
-    return jsonify({
-        "category": "success",
-        "message": unicode(_("Object deleted successfully."))
-    })
+    return jsonify(dict(
+        category="success",
+        message=_("Object deleted successfully.")
+    ))
 
 
 @blueprint.route('/delete_multi', methods=['GET', 'POST'])
@@ -322,10 +324,10 @@ def delete_multi(bwolist):
     bwolist = parse_bwids(bwolist)
     for objectid in bwolist:
         delete_from_db(objectid)
-    return jsonify({
-        "category": "success",
-        "message": unicode(_("Objects deleted successfully."))
-    })
+    return jsonify(dict(
+        category="success",
+        message=_("Objects deleted successfully.")
+    ))
 
 
 @blueprint.route('/resolve', methods=['GET', 'POST'])

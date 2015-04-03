@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,22 +17,22 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro display_task_history(nicename, doc, parameters, name, id) -%}
+{% macro display_task(nicename, doc, parameters, name, id, completed) -%}
 
-  <a class="list-group-item list-group-item-success"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
-    <span class="glyphicon glyphicon-ok-sign"></span>
-    {{ nicename }}
+  <a class="list-group-item list-group-item-{% if completed %}success{% else %}info{% endif %}"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
+    <span class="glyphicon glyphicon-{% if completed %}ok-sign{% else %}question-sign{% endif %}"></span>
+    {{ nicename|u }}
   </a>
   <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="myModalLabel">{{ name }}</h4>
+          <h4 class="modal-title" id="myModalLabel">{{ name|u }}</h4>
         </div>
         <div class="modal-body">
           {% if doc %}
-            {{ doc }}
+            {{ doc|u }}
           {% else %}
             {{ _("Documentation unavailable") }}
           {% endif %}
@@ -41,7 +41,7 @@
             <h5>{{ _("Parameters") }}:</h5>
             <ul class='list-unstyled'>
               {% for name, value in parameters %}
-                <li><strong>{{ name }}:</strong> {{ value }}</li>
+                <li><strong>{{ name|u }}:</strong> {{ value|u }}</li>
               {% endfor %}
             </ul>
           {% endif %}
@@ -59,7 +59,7 @@
   <div class="list-group">
     {% for item in workflow_definition %}
       {% if item is mapping %}
-        {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length)  }}
+        {{  display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length, false)  }}
         {% do id.append(1) %}
       {% else %}
         </div>
@@ -72,44 +72,6 @@
     {% endfor %}
   </div>
 {%- endmacro %}
-
-{% macro display_task(nicename, doc, parameters, name, id) -%}
-
-  <a class="list-group-item list-group-item-info"  href="#" data-toggle="modal" data-target="#infoModal{{id}}">
-      <span class="glyphicon glyphicon-question-sign"></span>
-      {{ nicename }}
-  </a>
-
-  <div class="modal fade" id="infoModal{{id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h4 class="modal-title" id="myModalLabel">{{  name }}</h4>
-        </div>
-        <div class="modal-body">
-          {{ parameteres }}
-          {% if doc %}
-            {{ doc }}
-          {% else %}
-            {{ _("Documentation unavailable") }}
-          {% endif %}
-          {% if parameters %}
-            <h5>{{ _("Parameters") }}:</h5>
-            <ul class='list-unstyled'>
-              {% for name, value in parameters %}
-                <li><strong>{{ name }}:</strong> {{ value }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">{{ _('Close') }}</button>
-        </div>
-      </div>{# /.modal-content #}
-    </div>{#/.modal-dialog #}
-  </div>{# /.modal #}
-{% endmacro %}
 
 {% macro render_field(field) %}
   <div class="form-group">

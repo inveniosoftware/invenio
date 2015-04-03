@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@
         <h5>{{ _(title) }}:</h5>
         <ul class="list-unstyled">
           {% for keyword, data in result.items() %}
-            <li>{{keyword}}: {{data["numbers"]}}, {{data["details"]}}</li>
+            <li>{{keyword|u}}: {{data["numbers"]|u}}, {{data["details"]|u}}</li>
           {% endfor %}
         </ul>
       </div>
@@ -43,9 +43,9 @@
           <h5>{{ _(title) }}:</h5>
           <ul class="list-unstyled">
             {% for keyword, times in result.items() %}
-              <li>{{keyword}}: {{times}}
+              <li>{{keyword|u}}: {{times|u}}
                 {% if keyword in categories %}
-                  ({{categories[keyword]}})
+                  ({{categories[keyword]|u}})
                 {% endif %}
               </li>
             {% endfor %}
@@ -59,7 +59,7 @@
 {% block results_body %}
   <div class="panel panel-default">
     <div class="panel-heading">
-      {{ results["name"] }}
+      {{ results["name"]|u }}
     </div>
     <div class="panel-body">
       <div class="row">

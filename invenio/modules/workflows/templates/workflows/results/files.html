@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,9 +21,9 @@
 
 {% block results_body %}
   <div class="panel-body">
-    <a href="{{ url_for('holdingpen.get_file_from_task_result', object_id=obj.id, filename=results.result.filename) }}">
+    <a href="{{ url_for('holdingpen.get_file_from_task_result', object_id=obj.id, filename=results.result.filename)|u }}">
       <button type="button" class="btn btn-default btn-lg">
-        <span class="glyphicon glyphicon-file"></span> {{results.name}}
+        <span class="glyphicon glyphicon-file"></span> {{results.name|u}}
       </button>
     </a>
   </div>
