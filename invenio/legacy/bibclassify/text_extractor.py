@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,8 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-BibClassify text extractor.
+"""BibClassify text extractor.
 
 This module provides method to extract the fulltext from local or remote
 documents. Currently 2 formats of documents are supported: PDF and text
@@ -35,8 +34,7 @@ This module is STANDALONE safe
 
 import os
 import re
-import tempfile
-import urllib2
+
 from invenio.legacy.bibclassify import config as bconfig
 
 if bconfig.STANDALONE:
@@ -52,7 +50,7 @@ _ONE_WORD = re.compile("[A-Za-z]{2,}")
 
 
 def is_pdf(document):
-    """Checks if a document is a PDF file. Returns True if is is."""
+    """Check if a document is a PDF file and returns True if is is."""
     if not executable_exists('pdftotext'):
         log.warning("GNU file was not found on the system. "
                     "Switching to a weak file extension test.")
@@ -64,25 +62,25 @@ def is_pdf(document):
     # version 4.10.
     file_output = os.popen('file ' + re.escape(document)).read()
     try:
-        filetype = file_output.split(":")[1]
+        filetype = file_output.split(":")[-1]
     except IndexError:
         log.error("Your version of the 'file' utility seems to "
-                  "be unsupported. Please report this to cds.support@cern.ch.")
+                  "be unsupported.")
         raise Exception('Incompatible pdftotext')
 
     pdf = filetype.find("PDF") > -1
     # This is how it should be done however this is incompatible with
     # file version 4.10.
-    #os.popen('file -bi ' + document).read().find("application/pdf")
+    # os.popen('file -bi ' + document).read().find("application/pdf")
     return pdf
 
 
 def text_lines_from_local_file(document, remote=False):
-    """Returns the fulltext of the local file.
+    """Return the fulltext of the local file.
+
     @var document: fullpath to the file that should be read
     @var remote: boolean, if True does not count lines (gosh!)
     @return: list of lines if st was read or an empty list"""
-
     try:
         if is_pdf(document):
             if not executable_exists("pdftotext"):
@@ -99,85 +97,13 @@ def text_lines_from_local_file(document, remote=False):
     lines = [line.decode("utf-8", 'replace') for line in filestream]
     filestream.close()
 
-    if not _is_english_text('\n'.join(lines)):
-        log.warning("It seems the file '%s' is unvalid and doesn't "
-                    "contain text. Please communicate this file to the Invenio "
-                    "team." % document)
-
-    line_nb = len(lines)
-    word_nb = 0
-    for line in lines:
-        word_nb += len(re.findall("\S+", line))
-
     # Discard lines that do not contain at least one word.
-    lines = [line for line in lines if _ONE_WORD.search(line) is not None]
-
-    if not remote:
-        log.info("Local file has %d lines and %d words." % (line_nb, word_nb))
-
-    return lines
-
-
-def _is_english_text(text):
-    """
-    Checks if a text is correct english.
-    Computes the number of words in the text and compares it to the
-    expected number of words (based on an average size of words of 5.1
-    letters).
-
-    @param text_lines: the text to analyze
-    @type text_lines:  string
-    @return:           True if the text is English, False otherwise
-    @rtype:            Boolean
-    """
-    # Consider one word and one space.
-    avg_word_length = 2.55 + 1
-    expected_word_number = float(len(text)) / avg_word_length
-
-    words = [word
-             for word in re.split('\W', text)
-             if word.isalpha()]
-
-    word_number = len(words)
-
-    return word_number > expected_word_number
-
-
-def text_lines_from_url(url, user_agent=""):
-    """Returns the fulltext of the file found at the URL."""
-    request = urllib2.Request(url)
-    if user_agent:
-        request.add_header("User-Agent", user_agent)
-    try:
-        distant_stream = urlopen(request)
-        # Write the URL content to a temporary file.
-        local_file = tempfile.mkstemp(prefix="bibclassify.")[1]
-        local_stream = open(local_file, "w")
-        local_stream.write(distant_stream.read())
-        local_stream.close()
-    except:
-        log.error("Unable to read from URL %s." % url)
-        return None
-    else:
-        # Read lines from the temporary file.
-        lines = text_lines_from_local_file(local_file, remote=True)
-        os.remove(local_file)
-
-        line_nb = len(lines)
-        word_nb = 0
-        for line in lines:
-            word_nb += len(re.findall("\S+", line))
-
-        log.info("Remote file has %d lines and %d words." % (line_nb, word_nb))
-
-        return lines
+    return [line for line in lines if _ONE_WORD.search(line) is not None]
 
 
 def executable_exists(executable):
-    """Tests if an executable is available on the system."""
+    """Test if an executable is available on the system."""
     for directory in os.getenv("PATH").split(":"):
         if os.path.exists(os.path.join(directory, executable)):
             return True
     return False
-
-
