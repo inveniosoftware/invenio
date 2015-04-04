@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -61,6 +61,8 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
                                 rebuild_cache=False, only_core_tags=False, extract_acronyms=False,
                                 api=False, **kwargs):
     """Output the keywords for each source in sources."""
+    from invenio.legacy.refextract.engine import get_plaintext_document_body
+
     # Inner function which does the job and it would be too much work to
     # refactor the call (and it must be outside the loop, before it did
     # not process multiple files)
@@ -105,19 +107,19 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
                     continue
                 filename = os.path.join(entry, filename)
                 if os.path.isfile(filename):
-                    text_lines = extractor.text_lines_from_local_file(filename)
+                    text_lines, dummy = get_plaintext_document_body(filename)
                     if text_lines:
                         source = filename
                         process_lines()
         elif os.path.isfile(entry):
-            text_lines = extractor.text_lines_from_local_file(entry)
+            text_lines, dummy = get_plaintext_document_body(entry)
             if text_lines:
                 source = os.path.basename(entry)
                 process_lines()
         else:
             # Treat as a URL.
             local_file = download_url(entry)
-            text_lines = extractor.text_lines_from_local_file(local_file)
+            text_lines, dummy = get_plaintext_document_body(local_file)
             if text_lines:
                 source = entry.split("/")[-1]
                 process_lines()

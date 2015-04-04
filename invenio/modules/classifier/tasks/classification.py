@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -44,7 +44,7 @@ def classify_paper(obj, eng, callback, data,
         result["fast_mode"] = fast_mode
         # Check if it is not empty output before adding
         output = result.get("dict", {}).get("complete_output", {}).values()
-        if not [x for x in output if x]:
+        if not any(output):
             result["dict"] = {}
         name = "classification"
         obj.update_task_results(

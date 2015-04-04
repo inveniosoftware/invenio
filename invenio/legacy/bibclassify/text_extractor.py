@@ -50,7 +50,7 @@ _ONE_WORD = re.compile("[A-Za-z]{2,}")
 
 
 def is_pdf(document):
-    """Check if a document is a PDF file and returns True if is is."""
+    """Check if a document is a PDF file and return True if is is."""
     if not executable_exists('pdftotext'):
         log.warning("GNU file was not found on the system. "
                     "Switching to a weak file extension test.")
