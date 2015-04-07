@@ -58,6 +58,13 @@ class SearchEngine(object):
 
     def search(self, user_info=None, collection=None):
         """Search records."""
+        # Enhance query first
+        self.enhanced_query = self.query
+        for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
+            if isinstance(enhancer, six.string_types):
+                enhancer = import_string(enhancer)
+                self.enhanced_query = enhancer(self, user_info, collection)
+
         user_info = user_info or current_user
         from .searchext.engines.native import search
         return search(self, user_info=user_info, collection=collection)
