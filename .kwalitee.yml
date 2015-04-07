@@ -114,6 +114,7 @@ components:
 - textminer
 - tickets
 - travis
+- unapi
 - upgrader
 - uploader
 - version
