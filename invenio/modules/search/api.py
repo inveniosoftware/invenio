@@ -22,13 +22,26 @@
 import pypeg2
 import six
 
+from flask import g
 from flask_login import current_user
+from invenio.base.globals import cfg
 from werkzeug.utils import cached_property, import_string
 
-from invenio.base.globals import cfg
-
-from .walkers.terms import Terms
 from .walkers.match_unit import MatchUnit
+from .walkers.terms import Terms
+
+
+def query_enhancers():
+    """Return list of query enhancers."""
+    functions = getattr(g, 'search_query_enhancers', None)
+    if functions is None:
+        functions = []
+        for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
+            if isinstance(enhancer, six.string_types):
+                enhancer = import_string(enhancer)
+                functions.append(enhancer)
+        setattr(g, 'search_query_enhancers', functions)
+    return functions
 
 
 class SearchEngine(object):
@@ -59,8 +72,14 @@ class SearchEngine(object):
     def search(self, user_info=None, collection=None):
         """Search records."""
         user_info = user_info or current_user
-        from .searchext.engines.native import search
-        return search(self, user_info=user_info, collection=collection)
+        # Enhance query first
+        query = self.query
+        for enhancer in query_enhancers():
+            query = enhancer(query, user_info=user_info,
+                             collection=collection)
+
+        from invenio.modules.search.walkers.search_unit import SearchUnit
+        return query.accept(SearchUnit())
 
     def match(self, record, user_info=None):
         """Return True if record match the query."""

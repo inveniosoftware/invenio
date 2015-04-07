@@ -19,53 +19,24 @@
 
 """Search engine implementation."""
 
-import json
 import re
 import zlib
 
-from flask import current_app, flash, request
+from flask import current_app
 
 from intbitset import intbitset
 
 from invenio.base.globals import cfg
-from invenio.base.i18n import _
 from invenio.modules.indexer.models import IdxINDEX
 from invenio.modules.indexer.utils import field_tokenizer_cache
 from invenio.modules.records import models
 from invenio.modules.records.models import Record
-from invenio.modules.search.cache import get_results_cache, set_results_cache
 from invenio.modules.search.errors import InvenioWebSearchWildcardLimitError
 from invenio.modules.search.models import Field
 from invenio.modules.search.registry import units
 from invenio.utils.serializers import deserialize_via_marshal
 
 re_word = re.compile(r'[\s]')
-
-
-def search(self, user_info=None, collection=None):
-    """FIXME new API."""
-    from invenio.modules.search.utils import get_records_that_can_be_displayed
-    from invenio.modules.search.walkers.search_unit import SearchUnit
-    results = get_results_cache(self._query, collection)
-    if results is None:
-        results = self.query.accept(SearchUnit())
-        set_results_cache(results, self._query, collection)
-
-    if 'filter' in request.values:
-        from invenio.modules.search.facet_builders import \
-            faceted_results_filter
-        from invenio.modules.search.registry import facets
-        try:
-            filter_data = json.loads(request.values.get('filter', '[]'))
-            results = faceted_results_filter(results, filter_data, facets)
-        except Exception:
-            flash(_('Invalid filter data'), 'error')
-
-    return get_records_that_can_be_displayed(
-        user_info.get('precached_permitted_restricted_collections', []),
-        hitset_in_any_collection=results,
-        current_coll=collection
-    )
 
 
 def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
@@ -263,7 +234,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress, wl=0):
 
 
 def search_unit_in_idxpairs(p, f, m, wl=0):
-    """Search for pair 'p' inside idxPAIR table for field 'f' and return hitset."""
+    """Search for pair 'p' in idxPAIR table for field 'f' and return hitset."""
     from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import (
         BibIndexDefaultTokenizer
     )
