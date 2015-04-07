@@ -573,6 +573,7 @@ def get_kbd_values(kbname, searchwith=""):
 
     :param kbname:     name of the knowledge base
     :param searchwith: a term to search with
+    :return: list of values
     """
     kb = get_kb_by_name(kbname)
     kbid = kb.id
@@ -590,8 +591,9 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     """Return a list of values by searching a dynamic kb.
 
     :param confdict: dictionary with keys "field", "expression"
-    and "collection" name
+        and "collection" name
     :param searchwith: a term to search with
+    :return: list of values
     """
     from invenio.legacy import search_engine
 
