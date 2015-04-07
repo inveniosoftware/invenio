@@ -71,5 +71,6 @@ Design notes, legal information and changelog are here for the interested.
 .. toctree::
    :maxdepth: 1
 
+   deprecationpolicy
    upgrading
    license
