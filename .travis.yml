@@ -55,25 +55,11 @@ install:
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
   - "travis_retry pip install -e .[docs] --quiet --process-dependency-links"
   - "python setup.py compile_catalog"
-  - "inveniomanage config create secret-key"
-  - "inveniomanage config set CFG_EMAIL_BACKEND flask_email.backends.console.Mail"
-  - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
-  - "inveniomanage config set PACKAGES_EXCLUDE []"  # test all packages
-  - "inveniomanage config set CFG_TMPDIR /tmp"
   - "sudo su -c \"npm update\""
   - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
   # All the step below this points are solely for test purposes, don't use them
   # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
-  - "inveniomanage bower -i bower-base.json > bower.json"
-  - "bower install --silent"
-  - "inveniomanage config set COLLECT_STORAGE flask_collect.storage.link"
-  - "inveniomanage collect > /dev/null"
-  - "inveniomanage assets build"
-  - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
-  - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
-  - "inveniomanage config set REQUIREJS_BIN false"
-  - "inveniomanage config set UGLIFYJS_BIN false"
-  - "inveniomanage config set ASSETS_AUTO_BUILD False"
+  - "./scripts/setup_devmode.sh"
 
 before_script:
   - "inveniomanage apache create-config"
