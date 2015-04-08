@@ -1,4 +1,5 @@
 -e git+git://github.com/mitsuhiko/werkzeug.git#egg=Werkzeug
+-e git+git://github.com/gorakhargosh/watchdog.git#egg=watchdog
 -e git+git://github.com/mitsuhiko/jinja2.git#egg=Jinja2
 -e git+git://github.com/mitsuhiko/itsdangerous.git#egg=itsdangerous
 -e git+git://github.com/jek/blinker.git#egg=blinker
