@@ -516,9 +516,9 @@ CFG_OAI_LICENSE_TERMS_SUBFIELD = "a"
 CFG_OAI_LICENSE_URI_SUBFIELD = "u"
 CFG_OAI_LOAD = 500
 CFG_OAI_METADATA_FORMATS = {
-    'oai_dc': ('XOAIMARC', 'http://www.openarchives.org/OAI/1.1/dc.xsd',
+    'oai_dc': ('XOAIDC', 'http://www.openarchives.org/OAI/1.1/dc.xsd',
                            'http://purl.org/dc/elements/1.1/'),
-    'marcxml': ('XOAIDC',
+    'marcxml': ('XOAIMARC',
                 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
                 'http://www.loc.gov/MARC21/slim'),
 }

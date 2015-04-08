@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,31 +17,34 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.pid_store.providers.data_cite_pid_provider
-    ----------------------------------------------------------
-
-    DataCite PID provider
-"""
+"""DataCite PID provider."""
 
 from __future__ import absolute_import
 
+from datacite import DataCiteMDSClient
+from datacite.errors import DataCiteError, DataCiteGoneError, \
+    DataCiteNoContentError, DataCiteNotFoundError, HttpError
+
 from invenio.base.globals import cfg
-from invenio.utils.datacite import DataCite as DataCiteUtil, HttpError, \
-    DataCiteError, DataCiteGoneError, DataCiteNoContentError, \
-    DataCiteNotFoundError
 
 from ..provider import PidProvider
 
 
 class DataCite(PidProvider):
-    """
-    DOI provider using DataCite API.
-    """
+
+    """DOI provider using DataCite API."""
+
     pid_type = 'doi'
 
     def __init__(self):
-        self.api = DataCiteUtil()
+        """Initialize provider."""
+        self.api = DataCiteMDSClient(
+            username=cfg.get('CFG_DATACITE_USERNAME'),
+            password=cfg.get('CFG_DATACITE_PASSWORD'),
+            prefix=cfg.get('CFG_DATACITE_DOI_PREFIX'),
+            test_mode=cfg.get('CFG_DATACITE_TESTMODE', False),
+            url=cfg.get('CFG_DATACITE_URL')
+        )
 
     def _get_url(self, kwargs):
         try:
@@ -56,7 +59,7 @@ class DataCite(PidProvider):
             raise Exception("doc keyword argument must be specified.")
 
     def reserve(self, pid, *args, **kwargs):
-        """ Reserve a DOI (amounts to upload metadata, but not to mint) """
+        """Reserve a DOI (amounts to upload metadata, but not to mint)."""
         # Only registered PIDs can be updated.
         doc = self._get_doc(kwargs)
 
@@ -73,7 +76,7 @@ class DataCite(PidProvider):
         return True
 
     def register(self, pid, *args, **kwargs):
-        """ Register a DOI via the DataCite API """
+        """Register a DOI via the DataCite API."""
         url = self._get_url(kwargs)
         doc = self._get_doc(kwargs)
 
@@ -93,11 +96,9 @@ class DataCite(PidProvider):
         return True
 
     def update(self, pid, *args, **kwargs):
-        """
-        Update metadata associated with a DOI.
+        """Update metadata associated with a DOI.
 
-        This can be called before/after a DOI is registered
-
+        This can be called before/after a DOI is registered.
         """
         url = self._get_url(kwargs)
         doc = self._get_doc(kwargs)
@@ -126,7 +127,7 @@ class DataCite(PidProvider):
         return True
 
     def delete(self, pid, *args, **kwargs):
-        """ Delete a registered DOI """
+        """Delete a registered DOI."""
         try:
             self.api.metadata_delete(pid.pid_value)
         except DataCiteError as e:
@@ -140,7 +141,7 @@ class DataCite(PidProvider):
         return True
 
     def sync_status(self, pid, *args, **kwargs):
-        """ Synchronize DOI status DataCite MDS """
+        """Synchronize DOI status DataCite MDS."""
         status = None
 
         try:
@@ -189,8 +190,7 @@ class DataCite(PidProvider):
 
     @classmethod
     def is_provider_for_pid(cls, pid_str):
-        """
-        Check if DataCite is the provider for this DOI
+        """Check if DataCite is the provider for this DOI.
 
         Note: If you e.g. changed DataCite account and received a new prefix,
         then this provider can only update and register DOIs for the new
