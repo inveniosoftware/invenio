@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,12 +22,15 @@
 from __future__ import print_function
 
 import ast
-import imp
-import sys
 import errno
+import imp
+import re
+import sys
 
 from pprint import pformat
+
 from flask import current_app
+
 from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
 
@@ -117,6 +120,24 @@ def set_(name, value, filename='invenio.cfg'):
 
 set_.__name__ = 'set'
 manager.command(set_)
+
+
+@manager.command
+def set_from_file(filepath, filename='invenio.cfg'):
+    """
+    Set multiple instance variables from one file.
+
+    The file must contain one file per variable matching the pattern
+    `name value`. The effect equals mulitiple calls of
+    `inveniomanage config set`.
+    """
+    with open(filepath) as inputfile:
+        for line in inputfile:
+            splitted = re.split('\s+', line.strip(), maxsplit=1)
+            if len(splitted) != 2:
+                print("ERROR: malformed line '%s'" % (line, ))
+                continue
+            set_(splitted[0], splitted[1], filename)
 
 
 def list_():
