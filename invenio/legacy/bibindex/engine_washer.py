@@ -121,6 +121,7 @@ def remove_stopwords(word, stopwords_kb=None):
             return ""
     return word
 
+
 def length_check(word):
     """Returns word after length check.
 
@@ -131,12 +132,12 @@ def length_check(word):
         return ""
     return word
 
+
 def wash_index_term(term, max_char_length=50, lower_term=True):
-    """
-    Return washed form of the index term TERM that would be suitable
-    for storing into idxWORD* tables.  I.e., lower the TERM if
-    LOWER_TERM is True, and truncate it safely to MAX_CHAR_LENGTH
-    UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
+    """Return washed form of the index term TERM for storing into idxWORD* tables.
+
+    I.e., lower the TERM if LOWER_TERM is True, and truncate it safely to
+    MAX_CHAR_LENGTH UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
 
     The function works by an internal conversion of TERM, when needed,
     from its input Python UTF-8 binary string format into Python
@@ -149,9 +150,11 @@ def wash_index_term(term, max_char_length=50, lower_term=True):
     column in idxINDEX* tables.
     """
     if lower_term:
-        washed_term = unicode(term, 'utf-8').lower()
-    else:
+        washed_term = lower_index_term(term)
+    elif not isinstance(term, unicode):
         washed_term = unicode(term, 'utf-8')
+    else:
+        washed_term = term
     if len(washed_term) <= max_char_length:
         # no need to truncate the term, because it will fit
         # nicely even if it uses four-byte UTF-8 characters
@@ -159,6 +162,7 @@ def wash_index_term(term, max_char_length=50, lower_term=True):
     else:
         # truncate the term in a safe position:
         return washed_term[:max_char_length].encode('utf-8')
+
 
 def wash_author_name(p):
     """
