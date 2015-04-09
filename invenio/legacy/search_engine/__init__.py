@@ -516,9 +516,9 @@ def sort_or_rank_records(req, recIDs, rm, sf, so, sp, p, verbose=0, of='hb',
     Entry point for deciding to either sort or rank records.
     """
     if rm:
-        ranking_result = rank_records(req, rm, 0, recIDs, p, verbose, so,
+        ranking_result = rank_records(rm, 0, recIDs, p, verbose, so,
                                       of, ln, rg, jrec, field,
-                                      sorting_methods=sorting_methods)
+                                      sorting_methods)
         if ranking_result[0]:
             return ranking_result[0]  # ranked recids
     elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS):
