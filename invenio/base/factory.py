@@ -26,13 +26,21 @@ import sys
 import urllib
 import warnings
 
-from flask_registry import Registry, ExtensionRegistry, \
-    PackageRegistry, ConfigurationRegistry, BlueprintAutoDiscoveryRegistry
+from flask_registry import (
+    BlueprintAutoDiscoveryRegistry,
+    ConfigurationRegistry,
+    ExtensionRegistry,
+    PackageRegistry,
+    Registry
+)
+
 from pkg_resources import iter_entry_points
+
 from six.moves.urllib.parse import urlparse
+
 from werkzeug.local import LocalProxy
 
-from .helpers import with_app_context, unicodifier
+from .helpers import unicodifier, with_app_context
 from .utils import captureWarnings
 from .wrappers import Flask
 
@@ -217,10 +225,11 @@ def create_app(instance_path=None, **kwargs_config):
                                    os.getenv('INVENIO_APP_CONFIG_ENVS',
                                              '').split(',')):
         cfg_name = cfg_name.strip().upper()
-        cfg_value = app.config.get(cfg_name)
-        cfg_value = os.getenv(cfg_name, cfg_value)
-        app.config[cfg_name] = cfg_value
-        app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
+        if cfg_name:
+            cfg_value = app.config.get(cfg_name)
+            cfg_value = os.getenv(cfg_name, cfg_value)
+            app.config[cfg_name] = cfg_value
+            app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
 
     # ====================
     # Application assembly
@@ -281,7 +290,7 @@ def create_wsgi_app(*args, **kwargs):
                 get_refersto_hitset
             get_citedby_hitset(None)
             get_refersto_hitset(None)
-        except:
+        except Exception:
             pass
 
     if app.debug:
