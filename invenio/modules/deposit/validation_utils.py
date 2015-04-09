@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,11 +19,15 @@
 
 """Validation functions."""
 
-import six
 import re
-from wtforms.validators import ValidationError, StopValidation
-from invenio.utils import persistentid as pidutils
+
 from flask import current_app
+
+from invenio.utils import persistentid as pidutils
+
+import six
+
+from wtforms.validators import StopValidation, ValidationError
 
 
 #
@@ -251,6 +255,8 @@ class MintedDOIValidator(object):
                 raise ValidationError(self.message)
             else:
                 raise StopValidation()
+        else:
+            raise ValidationError(self.message)
 
 
 class PreReservedDOI(object):

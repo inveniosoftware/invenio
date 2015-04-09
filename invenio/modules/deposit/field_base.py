@@ -148,6 +148,7 @@ class WebDepositField(Field):
         self.export_key = kwargs.pop('export_key', None)
         self.widget_classes = kwargs.pop('widget_classes', None)
         self.autocomplete_limit = kwargs.pop('autocomplete_limit', 20)
+        self.readonly = kwargs.pop('readonly', None)
 
         # Initialize empty message variables, which are usually modified
         # during the post-processing phases.
@@ -191,6 +192,8 @@ class WebDepositField(Field):
             kwargs['data-autocomplete-limit'] = self.autocomplete_limit
         elif self.autocomplete_fn:
             kwargs['data-autocomplete'] = "default"
+        if self.readonly:
+            kwargs['readonly'] = self.readonly
         return super(WebDepositField, self).__call__(*args, **kwargs)
 
     def reset_field_data(self, exclude=[]):
