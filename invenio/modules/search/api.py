@@ -63,7 +63,8 @@ class SearchEngine(object):
         for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
             if isinstance(enhancer, six.string_types):
                 enhancer = import_string(enhancer)
-                self.enhanced_query = enhancer(self, user_info, collection)
+                self.enhanced_query = enhancer(self, user_info=user_info,
+                                               collection=collection)
 
         user_info = user_info or current_user
         from .searchext.engines.native import search
