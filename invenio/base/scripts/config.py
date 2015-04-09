@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,12 +22,15 @@
 from __future__ import print_function
 
 import ast
-import imp
-import sys
 import errno
+import imp
+import os.path
+import sys
 
 from pprint import pformat
+
 from flask import current_app
+
 from invenio.ext.script import Manager, change_command_name, \
     generate_secret_key
 
@@ -117,6 +120,17 @@ def set_(name, value, filename='invenio.cfg'):
 
 set_.__name__ = 'set'
 manager.command(set_)
+
+
+@manager.command
+def locate(filename='invenio.cfg'):
+    """Print the location of the configuration file."""
+    try:
+        with current_app.open_instance_resource(filename, 'r') as config_file:
+            print(os.path.abspath(config_file.name))
+    except IOError:
+        print("ERROR: configuration file does not exist.", file=sys.stderr)
+        return 1
 
 
 def list_():
