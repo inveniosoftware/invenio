@@ -1,0 +1,40 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-#}
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>{{ config.CFG_SITE_NAME_INTL.get(g.ln, config.CFG_SITE_NAME)[:16] }}</ShortName>
+  <LongName>{{ config.CFG_SITE_NAME_INTL.get(g.ln, config.CFG_SITE_NAME) }}</LongName>
+  <Description>{{ _("Search on %(x_CFG_SITE_NAME_INTL)s",
+    x_CFG_SITE_NAME_INTL=config.CFG_SITE_NAME_INTL.get(
+      g.ln, config.CFG_SITE_NAME
+    ))[:1024] }}</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <OutputEncoding>UTF-8</OutputEncoding>
+  <Language>*</Language>
+  <Contact>{{ config.CFG_SITE_ADMIN_EMAIL }}</Contact>
+  <Query role="example" searchTerms="a" />
+  <Developer>Powered by Invenio</Developer>
+  <Url type="text/html" indexOffset="1" rel="results" template="{{ url_for(
+    'search.search', p='{searchTerms}', jrec='{startIndex}', rg='{count}', ln='{language}'
+  ) | replace('%7B', '{') | replace('%7D', '}') }}" />
+  <Url type="application/rss+xml" indexOffset="1" rel="results" template="{{ url_for(
+    'search.rss', p='{searchTerms}', jrec='{startIndex}', rg='{count}', ln='{language}'
+  ) | replace('%7B', '{') | replace('%7D', '}') }}" />
+  <Url type="application/opensearchdescription+xml" rel="self" template="{{ url_for('search.opensearchdescription', _external=True) }}" />
+</OpenSearchDescription>

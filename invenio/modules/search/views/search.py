@@ -489,3 +489,12 @@ def export(collection, of, ot):
     # Get list of integers with record IDs.
     recids = request.values.getlist('recid', type=int)
     return response_formated_records(recids, collection, of, ot=ot)
+
+
+@blueprint.route('/opensearchdescription')
+def opensearchdescription():
+    """Render OpenSearch description file."""
+    response = make_response(render_template(
+        'search/opensearchdescription.xml'))
+    response.headers['Content-Type'] = 'application/opensearchdescription+xml'
+    return response
