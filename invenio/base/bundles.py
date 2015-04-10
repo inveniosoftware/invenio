@@ -60,6 +60,8 @@
     asynchronously the module that must be bundles using ``r.js``.
 """
 
+from __future__ import unicode_literals
+
 import mimetypes
 
 from invenio.ext.assets import Bundle, RequireJSFilter

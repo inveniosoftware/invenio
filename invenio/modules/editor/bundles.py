@@ -19,6 +19,8 @@
 
 """Editor bundles."""
 
+from __future__ import unicode_literals
+
 from invenio.ext.assets import Bundle
 
 js = Bundle(
