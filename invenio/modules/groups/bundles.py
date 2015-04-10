@@ -30,3 +30,10 @@ js = Bundle(
     output="groups.js",
     weight=50
 )
+
+styles = Bundle(
+    "css/groups/groups.less",
+    filters="less,cleancss",
+    output="groups.css",
+    weight=50
+)
