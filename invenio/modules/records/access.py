@@ -20,12 +20,47 @@
 """Define authorization actions and checks."""
 
 from invenio.base.globals import cfg
+from invenio.legacy.bibrecord import get_fieldvalues
+from invenio.modules.collections.cache import collection_reclist_cache, \
+    get_collection_reclist, restricted_collection_cache
 
-from invenio.modules.collections.cache import (
-    collection_reclist_cache,
-    get_collection_reclist,
-    restricted_collection_cache,
-)
+
+def check_email_or_group(user_info, email_or_group):
+    """Check user email or group matches."""
+    if email_or_group in user_info['group']:
+        return True
+    email = email_or_group.strip().lower()
+    if user_info['email'].strip().lower() == email:
+        return True
+
+
+def check_uid(user_info, uid):
+    """Check user id matches."""
+    return unicode(user_info['id']) == uid
+
+
+def check_authorized_tags(recid, tags, test_func):
+    """Check if tags in record matches a given test."""
+    authorized_values = []
+    for tag in tags:
+        authorized_values.extend(get_fieldvalues(recid, tag))
+
+    for value in authorized_values:
+        if test_func(value):
+            return True
+    return False
+
+
+def is_user_in_tags(recid, user_info, user_id_tags, email_or_group_tags):
+    """Check if user id or email is found in a records tags."""
+    if check_authorized_tags(recid, user_id_tags,
+                             lambda uid: check_uid(user_info, uid)):
+        return True
+
+    return check_authorized_tags(
+        recid, email_or_group_tags,
+        lambda val: check_email_or_group(user_info, val)
+    )
 
 
 def is_user_owner_of_record(user_info, recid):
@@ -40,29 +75,24 @@ def is_user_owner_of_record(user_info, recid):
     :type recid: positive integer
     :return: True if the user is 'owner' of the record; False otherwise
     """
-    authorized_emails_or_group = []
-    for tag in cfg.get('CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS', []):
-        from invenio.legacy.bibrecord import get_fieldvalues
-        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
-    for email_or_group in authorized_emails_or_group:
-        if email_or_group in user_info['group']:
-            return True
-        email = email_or_group.strip().lower()
-        if user_info['email'].strip().lower() == email:
-            return True
-        if cfg['CFG_CERN_SITE']:
-            # the egroup might be in the form egroup@cern.ch
-            if email_or_group.replace('@cern.ch', ' [CERN]') in \
-                    user_info['group']:
-                return True
-    return False
+    from invenio.modules.access.local_config import \
+        CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
+        CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS
+
+    uid_tags = cfg.get('CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS',
+                       CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS)
+
+    email_tags = cfg.get('CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS',
+                         CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_USERIDS_IN_TAGS)
+
+    return is_user_in_tags(recid, user_info, uid_tags, email_tags)
 
 
-# FIXME: This method needs to be refactorized
+# FIXME: This method needs to be refactored
 def is_user_viewer_of_record(user_info, recid):
-    """
-    Check if the user is allow to view the record based in the marc tags
-    inside CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
+    """Check if the user is allow to view the record based in the marc tags.
+
+    Checks inside CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
     i.e. his email is inside the 506__m tag or he is inside an e-group listed
     in the 506__m tag
 
@@ -73,24 +103,21 @@ def is_user_viewer_of_record(user_info, recid):
     @return: True if the user is 'allow to view' the record; False otherwise
     @rtype: bool
     """
+    from invenio.modules.access.local_config import \
+        CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS, \
+        CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS
 
-    authorized_emails_or_group = []
-    for tag in cfg.get('CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS', []):
-        from invenio.legacy.bibrecord import get_fieldvalues
-        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
-    for email_or_group in authorized_emails_or_group:
-        if email_or_group in user_info['group']:
-            return True
-        email = email_or_group.strip().lower()
-        if user_info['email'].strip().lower() == email:
-            return True
-    return False
+    uid_tags = cfg.get('CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS',
+                       CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS)
+
+    email_tags = cfg.get('CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS',
+                         CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS)
+
+    return is_user_in_tags(recid, user_info, uid_tags, email_tags)
 
 
 def get_restricted_collections_for_recid(recid, recreate_cache_if_needed=True):
-    """
-    Return the list of restricted collection names to which recid belongs.
-    """
+    """Return the list of restricted collections to which recid belongs."""
     if recreate_cache_if_needed:
         restricted_collection_cache.recreate_cache_if_needed()
         collection_reclist_cache.recreate_cache_if_needed()

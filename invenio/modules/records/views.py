@@ -22,7 +22,6 @@
 from __future__ import unicode_literals
 
 import cStringIO
-
 from functools import wraps
 
 from flask import Blueprint, abort, current_app, flash, g, redirect, \
@@ -61,14 +60,18 @@ def request_record(f):
     """Perform standard operation to check record availability for user."""
     @wraps(f)
     def decorated(recid, *args, **kwargs):
-        from invenio.modules.access.mailcookie import \
-            mail_cookie_create_authorize_action
-        from invenio.modules.access.local_config import VIEWRESTRCOLL
         from invenio.legacy.search_engine import \
             guess_primary_collection_of_a_record, \
             check_user_can_view_record
+
         # ensure recid to be integer
         recid = int(recid)
+        g.bibrec = Bibrec.query.get(recid)
+
+        record = get_record(recid)
+        if record is None:
+            return render_template('404.html')
+
         g.collection = collection = Collection.query.filter(
             Collection.name == guess_primary_collection_of_a_record(recid)).\
             one()
@@ -80,13 +83,7 @@ def request_record(f):
         if not current_user.is_super_admin and 'verbose' in kwargs:
             kwargs['verbose'] = 0
 
-        if auth_code and current_user.is_guest:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
-                'collection': g.collection.name})
-            url_args = {'action': cookie, 'ln': g.ln, 'referer': request.url}
-            flash(_("Authorization failure"), 'error')
-            return redirect(url_for('webaccount.login', **url_args))
-        elif auth_code:
+        if auth_code:
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
@@ -101,12 +98,6 @@ def request_record(f):
             return redirect(url_for('record.metadata', recid=merged_recid))
         elif record_status == -1:
             abort(apache.HTTP_GONE)  # The record is gone!
-
-        g.bibrec = Bibrec.query.get(recid)
-        record = get_record(recid)
-
-        if record is None:
-            return render_template('404.html')
 
         title = record.get(cfg.get('RECORDS_BREADCRUMB_TITLE_KEY'), '')
         tabs = []
