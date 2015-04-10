@@ -24,12 +24,14 @@ from __future__ import unicode_literals
 import distutils.sysconfig
 from os.path import join
 
-from invenio.version import __version__
 from invenio.utils.shell import which
+from invenio.version import __version__
+
 
 EXTENSIONS = [
     'invenio.ext.confighacks',
     'invenio.ext.jinja2hacks',
+    'invenio.ext.passlib:Passlib',
     'invenio.ext.debug_toolbar',
     'invenio.ext.babel',
     'invenio.ext.sqlalchemy',
@@ -517,7 +519,7 @@ CFG_OAI_LICENSE_URI_SUBFIELD = "u"
 CFG_OAI_LOAD = 500
 CFG_OAI_METADATA_FORMATS = {
     'oai_dc': ('XOAIDC', 'http://www.openarchives.org/OAI/1.1/dc.xsd',
-                           'http://purl.org/dc/elements/1.1/'),
+                         'http://purl.org/dc/elements/1.1/'),
     'marcxml': ('XOAIMARC',
                 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
                 'http://www.loc.gov/MARC21/slim'),

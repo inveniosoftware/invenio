@@ -19,23 +19,105 @@
 
 """WebAccount Forms."""
 
+from flask import current_app
+
 from flask_login import current_user
+
 from flask_wtf import Form, validators
 
-from invenio.base.globals import cfg
-from invenio.base.i18n import _
-from invenio.legacy.webuser import email_valid_p
-from invenio.utils.forms import InvenioBaseForm
-
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from wtforms.fields import BooleanField, HiddenField, PasswordField, \
     StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, StopValidation, ValidationError
+
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.utils.forms import InvenioBaseForm
 
 from .models import User
 from .validators import validate_email, validate_nickname, \
     validate_nickname_or_email, wash_login_method
+
+
+def nickname_validator(form, field):
+    """Validate nickname."""
+    validate_nickname(field.data)
+    # is nickname already taken?
+    try:
+        User.query.filter(User.nickname == field.data).one()
+        raise validators.ValidationError(
+            _("Desired nickname %(nick)s already exists in the database.",
+              nick=field.data)
+        )
+    except (NoResultFound, MultipleResultsFound):
+        pass
+    except SQLAlchemyError:
+        current_app.logger.exception("User nickname query problem.")
+
+
+def email_validator(form, field):
+    """Validate email."""
+    field.data = field.data.lower()
+    validate_email(field.data)
+
+
+def user_email_validator(form, field):
+    """Validate email and check it is not known."""
+    email_validator(form, field)
+
+    # is email already taken?
+    try:
+        User.query.filter(User.email == field.data).one()
+        raise validators.ValidationError(
+            _("Supplied email address %(email)s already exists.",
+              email=field.data)
+        )
+    except (NoResultFound, MultipleResultsFound):
+        pass
+    except SQLAlchemyError:
+        current_app.logger.exception("User email query problem.")
+
+
+def repeat_email_validator(form, field):
+    """Validate repeat email field."""
+    if form.email.short_name in form.errors or \
+       (form.email.data == current_user['email'] and field.data == ""):
+        raise StopValidation()
+
+    if field.data != form.email.data:
+        raise ValidationError(_("Email addresses does not match."))
+
+
+def password_validator(form, field):
+    """Validate password."""
+    min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
+    if len(field.data) < min_length:
+        raise validators.ValidationError(
+            _("Password must be at least %(x_pass)d characters long.",
+              x_pass=min_length))
+
+
+def password2_validator(form, field):
+    """Validate password2."""
+    if field.data != form.password.data:
+        raise validators.ValidationError(_("Both passwords must match."))
+
+
+def current_user_validator(attr):
+    """Validator to check if value is same as current_user."""
+    def _validator(form, field):
+        if current_user[attr] == field.data:
+            raise StopValidation()
+    return _validator
+
+
+class VerificationForm(InvenioBaseForm):
+
+    """Form to render a button to request email confirmation."""
+
+    send_verification_email = SubmitField(_("Send verification email"))
 
 
 class LoginForm(Form):
@@ -94,29 +176,39 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
                 link=url_for('webaccount.lost')), 'warning')
 
 
+class ProfileForm(InvenioBaseForm):
+
+    """Profile form."""
+
+    nickname = StringField(
+        _("Username"),
+        validators=[DataRequired(), current_user_validator('nickname'),
+                    nickname_validator]
+    )
+    family_name = StringField(_("Family name"))
+    given_names = StringField(_("Given names"))
+    email = StringField(
+        _("Email address"),
+        filters=[lambda x: x.lower(), ],
+        validators=[DataRequired(), current_user_validator('email'),
+                    user_email_validator]
+    )
+    repeat_email = StringField(
+        _("Re-enter email address"),
+        description=_("Please re-enter your email address."),
+        filters=[lambda x: x.lower() if x else x, ],
+        validators=[repeat_email_validator]
+    )
+
+
 class LostPasswordForm(InvenioBaseForm):
 
     """Form to recover lost password."""
 
-    email = StringField(_("Email address"))
-
-    def validate_email(self, field):
-        """Validate email."""
-        field.data = field.data.lower()
-        if email_valid_p(field.data) != 1:
-            raise validators.ValidationError(
-                _("Supplied email address %(email)s is invalid.",
-                  email=field.data)
-            )
-
-        # is email registered?
-        try:
-            User.query.filter(User.email == field.data).one()
-        except SQLAlchemyError:
-            raise validators.ValidationError(
-                _("Supplied email address %(email)s is not registered.",
-                  email=field.data)
-            )
+    email = StringField(
+        _("Email address"),
+        validators=[DataRequired(), email_validator]
+    )
 
 
 class ChangePasswordForm(InvenioBaseForm):
@@ -138,19 +230,6 @@ class ChangePasswordForm(InvenioBaseForm):
             raise validators.ValidationError(
                 _("Password mismatch."))
 
-    def validate_password(self, field):
-        """Validate password."""
-        min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
-        if len(field.data) < min_length:
-            raise validators.ValidationError(
-                _("Password must be at least %(x_pass)d characters long.",
-                  x_pass=min_length))
-
-    def validate_password2(self, field):
-        """Validate password2."""
-        if field.data != self.password.data:
-            raise validators.ValidationError(_("Both passwords must match."))
-
 
 class RegisterForm(Form):
 
@@ -158,59 +237,25 @@ class RegisterForm(Form):
 
     email = StringField(
         _("Email address"),
-        validators=[DataRequired(message=_("Email not provided"))],
+        validators=[DataRequired(message=_("Email not provided")),
+                    user_email_validator],
         description=_("Example") + ": john.doe@example.com")
     nickname = StringField(
         _("Nickname"),
-        validators=[DataRequired(message=_("Nickname not provided"))],
+        validators=[DataRequired(message=_("Nickname not provided")),
+                    nickname_validator],
         description=_("Example") + ": johnd")
     password = PasswordField(
         _("Password"),
         description=_(
             "The password phrase may contain punctuation, spaces, etc."
-        )
+        ),
+        validators=[password_validator],
     )
-    password2 = PasswordField(_("Confirm password"),)
+    password2 = PasswordField(
+        _("Confirm password"),
+        validators=[password2_validator]
+    )
     referer = HiddenField()
     action = HiddenField(default='login')
     submit = SubmitField(_("Register"))
-
-    def validate_nickname(self, field):
-        """Validate nickname."""
-        validate_nickname(field.data)
-        # is nickname already taken?
-        try:
-            User.query.filter(User.nickname == field.data).one()
-            raise validators.ValidationError(
-                _("Desired nickname %(nick)s already exists in the database.",
-                  nick=field.data)
-            )
-        except SQLAlchemyError:
-            pass
-
-    def validate_email(self, field):
-        """Validate email."""
-        field.data = field.data.lower()
-        validate_email(field.data.lower())
-        # is email already taken?
-        try:
-            User.query.filter(User.email == field.data).one()
-            raise validators.ValidationError(
-                _("Supplied email address %(addr)s already exists in the"
-                  " database.", addr=field.data)
-            )
-        except SQLAlchemyError:
-            pass
-
-    def validate_password(self, field):
-        """Validate password."""
-        min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
-        if len(field.data) < min_length:
-            raise validators.ValidationError(
-                _("Password must be at least %(x_pass)d characters long.",
-                  x_pass=min_length))
-
-    def validate_password2(self, field):
-        """Validate password2."""
-        if field.data != self.password.data:
-            raise validators.ValidationError(_("Both passwords must match."))

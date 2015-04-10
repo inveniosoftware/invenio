@@ -40,8 +40,9 @@ class TestTagsRestfulAPI(APITestCase):
         """Run before each test."""
         from invenio.modules.accounts.models import User
 
-        self.user_a = User(email='user_a@example.com', _password='iamusera',
-                           nickname='user_a')
+        self.user_a = User(email='user_a@example.com', nickname='user_a')
+        self.user_a.password = "iamusera"
+
         try:
             db.session.add(self.user_a)
             db.session.commit()

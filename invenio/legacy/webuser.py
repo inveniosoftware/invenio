@@ -40,7 +40,7 @@ import re
 import random
 import datetime
 
-from flask import Request
+from flask import Request, current_app
 from six import iteritems
 from socket import gaierror
 import os
@@ -476,35 +476,22 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
             activated = 0 # Administrator confirmation required
 
-        if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
-            address_activation_key = mail_cookie_create_mail_activation(
-                email,
-                cookie_timeout=datetime.timedelta(
-                    days=CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
-                )
-            )
-            try:
-                ip_address = req.remote_host or req.remote_ip
-            except:
-                ip_address = None
-            try:
-                if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %(sitename)s", sitename=CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
-                                  tmpl.tmpl_account_address_activation_email_body(
-                                      email, address_activation_key,
-                                      ip_address, ln)):
-                    return 1
-            except (smtplib.SMTPException, socket.error):
-                return 6
 
     # okay, go on and register the user: FIXME
     user = User(nickname=nickname,
                 email=email,
                 password=passw,
-                note=activated)
+                note=activated,
+                last_login=datetime.datetime.now())
+
+    if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
+        user.verify_email()
+
     try:
         db.session.add(user)
         db.session.commit()
-    except:
+    except Exception:
+        current_app.logger.exception("Could not store user.")
         db.session.rollback()
         return 7
     if activated == 1: # Ok we consider the user as logged in :-)

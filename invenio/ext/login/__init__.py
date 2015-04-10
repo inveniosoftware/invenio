@@ -22,7 +22,7 @@
 import urllib
 from datetime import datetime
 
-from flask import flash, g, redirect, request, session, url_for
+from flask import current_app, flash, g, redirect, request, session, url_for
 
 from flask_login import LoginManager, current_user, \
     login_user as flask_login_user, logout_user, user_logged_in
@@ -106,13 +106,16 @@ def authenticate(nickname_or_email=None, password=None,
 
     where = [db.or_(User.nickname == nickname_or_email,
                     User.email == nickname_or_email)]
-    if login_method == 'Local' and password is not None:
-        where.append(User.password == password)
+
     try:
         user = User.query.filter(*where).one()
+        if login_method == 'Local' and password is not None:
+            if not user.verify_password(password, migrate=True):
+                return False
     except NoResultFound:
         return None
     except Exception:
+        current_app.logger.exception("Problem checking password.")
         return False
 
     if user.settings['login_method'] != login_method:
@@ -121,10 +124,8 @@ def authenticate(nickname_or_email=None, password=None,
         return False
 
     if user.note == '2':  # account is not confirmed
-        logout_user()
-        flash(_("You have not yet confirmed the email address for the \
-            '%(login_method)s' authentication method.",
-              login_method=login_method), 'warning')
+        flash(_("You have not yet verified your email address."), 'warning')
+
     if remember:
         session.permanent = True
     return login_user(user.id, remember=remember)
@@ -149,7 +150,7 @@ def setup_app(app):
             if not session.get('_flashes'):
                 flash(g._("Please sign in to continue."), 'info')
             from invenio.modules.accounts.views.accounts import login
-            return login(referer=request.url), 401
+            return login(referer=request.url)
         else:
             from flask import render_template
             return render_template("401.html"), 401

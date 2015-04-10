@@ -19,14 +19,15 @@
 
 """Provide support for legacy UserInfo object."""
 
-from flask import session, request, has_request_context, current_app
+from flask import current_app, has_request_context, request, session
+
 from flask_login import UserMixin
+
 from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
 from invenio.ext.cache import cache
 
-
-__all__ = ['UserInfo']
+__all__ = ('UserInfo', )
 
 CFG_USER_DEFAULT_INFO = {
     'remote_ip': '',
@@ -61,8 +62,8 @@ CFG_USER_DEFAULT_INFO = {
 
 
 class UserInfo(CombinedMultiDict, UserMixin):
-    """
-    Provide legacy implementation.
+
+    """Provide legacy implementation.
 
     Methods that Flask-Login and Invenio 1.x expect user objects to have.
     """
@@ -165,7 +166,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest))  # '1' or '0'
             self.modified = True
-        except:
+        except Exception:
             data = self._create_guest()
 
         return data
@@ -212,7 +213,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
             user_info, 'runwebstatadmin')[0] == 0
         try:
             data['precached_viewsubmissions'] = isUserSubmitter(user_info)
-        except:
+        except Exception:
             data['precached_viewsubmissions'] = None
         data['precached_useapprove'] = isUserReferee(user_info)
         data['precached_useadmin'] = isUserAdmin(user_info)
@@ -237,8 +238,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
         except (KeyError, TypeError):
             pass
 
-        if (current_app.config.get('CFG_BIBAUTHORID_ENABLED')
-                and usepaperattribution and viewlink):
+        if (current_app.config.get('CFG_BIBAUTHORID_ENABLED') and
+           usepaperattribution and viewlink):
             viewclaimlink = True
 
 #       if (CFG_BIBAUTHORID_ENABLED
@@ -269,6 +270,10 @@ class UserInfo(CombinedMultiDict, UserMixin):
     def is_active(self):
         """Check if user is active."""
         return not self.is_guest
+
+    def is_confirmed(self):
+        """Return true if accounts has been confirmed."""
+        return self['note'] == "1"
 
     @property
     def is_guest(self):
