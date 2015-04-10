@@ -19,6 +19,8 @@
 
 """Flask-Admin page to configure roles and authorizations."""
 
+from __future__ import unicode_literals
+
 from flask_admin.form.fields import DateTimeField
 
 from invenio.ext.admin.views import ModelView

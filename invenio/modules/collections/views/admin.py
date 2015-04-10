@@ -19,9 +19,13 @@
 
 """Admin interface for collections."""
 
-from flask import Blueprint, g, render_template, request, flash, redirect, \
-    url_for, abort
+from __future__ import unicode_literals
+
+from flask import Blueprint, abort, flash, g, redirect, render_template, \
+    request, url_for
+
 from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import current_user, login_required
 
 from invenio.base.decorators import templated
@@ -31,11 +35,14 @@ from invenio.ext.sqlalchemy import db
 
 from ..forms import CollectionForm, TranslationsForm
 from ..models import (
-    Collection, CollectionCollection,
-    Collectionname, CollectionPortalbox, Portalbox
+    Collection, CollectionCollection, CollectionPortalbox, Collectionname,
+    Portalbox
 )
 
-not_guest = lambda: not current_user.is_guest
+
+def not_guest():
+    """Not guest."""
+    return not current_user.is_guest
 
 blueprint = Blueprint('collections_admin', __name__,
                       url_prefix="/admin/collections",
@@ -157,6 +164,7 @@ def manage_collection(name):
 @login_required
 @permission_required('cfgwebsearch')
 def update(id_collection):
+    """Update page."""
     form = CollectionForm(request.form)
     if request.method == 'POST':  # and form.validate():
         collection = Collection.query.get_or_404(id_collection)
@@ -172,6 +180,7 @@ def update(id_collection):
 @permission_required('cfgwebsearch')
 @templated('search/admin_collection.html')
 def create_collection():
+    """Create collection page."""
     form = CollectionForm()
     return dict(form=form)
 
@@ -240,5 +249,6 @@ def manage_portalboxes_order():
 @login_required
 @permission_required('cfgwebsearch')
 def edit_portalbox():
+    """Edit portal box."""
     portalbox = Portalbox.query.get(request.args.get_or_404('id', 0, type=int))
     return dict(portalbox=portalbox)

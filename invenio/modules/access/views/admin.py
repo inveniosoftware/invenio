@@ -19,16 +19,23 @@
 
 """WebAccess Admin Flask Blueprint."""
 
-from flask import redirect, url_for, Blueprint
+from __future__ import unicode_literals
+
+from flask import Blueprint, redirect, url_for
+
+from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import login_required
+
+from invenio.base.decorators import sorted_by, templated
+from invenio.base.i18n import _
+from invenio.ext.principal import permission_required
 from invenio.modules.access.models import AccACTION, AccROLE
 from invenio.modules.accounts.models import User
-from invenio.base.i18n import _
-from invenio.base.decorators import templated, sorted_by
-from flask_breadcrumbs import register_breadcrumb
-from invenio.ext.principal import permission_required
-#from invenio.modules.access.local_config import \
-#FIXME
+
+
+# from invenio.modules.access.local_config import \
+# FIXME
 WEBACCESSACTION = 'cfgwebaccess'
 
 blueprint = Blueprint('webaccess_admin', __name__,
@@ -43,16 +50,20 @@ blueprint = Blueprint('webaccess_admin', __name__,
 @templated('access/admin/index.html')
 @register_breadcrumb(blueprint, 'admin.webaccess_admin', _('WebAccess'))
 def index():
+    """Index."""
     actions = [
         dict(url=url_for('.rolearea'),
              title=_('Role Area'),
-             description=_('Main area to configure administration rights and authorization rules.')),
+             description=_('Main area to configure administration rights '
+                           'and authorization rules.')),
         dict(url=url_for('.actionarea'),
              title=_('Action Area'),
-             description=_('Configure administration rights with the actions as starting point.')),
+             description=_('Configure administration rights with the '
+                           'actions as starting point.')),
         dict(url=url_for('.userarea'),
              title=_('User Area'),
-             description=_('Configure administration rights with the users as starting point.')),
+             description=_('Configure administration rights with the '
+                           'users as starting point.')),
         dict(url=url_for('.resetarea'),
              title=_('Reset Area'),
              description=_('Reset roles, actions and authorizations.')),
@@ -75,6 +86,7 @@ def index():
 @sorted_by(AccACTION)
 @templated('access/admin/actionarea.html')
 def actionarea(sort=False, filter=None):
+    """Action area."""
     if sort is False:
         sort = AccACTION.name
     actions = AccACTION.query.order_by(sort).filter(filter).all()
@@ -87,6 +99,7 @@ def actionarea(sort=False, filter=None):
 @sorted_by(AccROLE)
 @templated('access/admin/rolearea.html')
 def rolearea(sort=False, filter=None):
+    """Role area."""
     if sort is False:
         sort = AccROLE.name
     roles = AccROLE.query.order_by(sort).filter(filter).all()
@@ -98,6 +111,7 @@ def rolearea(sort=False, filter=None):
 @permission_required(WEBACCESSACTION)
 @templated('access/admin/showroledetails.html')
 def showroledetails(id_role):
+    """Show role details."""
     return dict(role=AccROLE.query.get_or_404(id_role))
 
 
@@ -107,6 +121,7 @@ def showroledetails(id_role):
 @sorted_by(User)
 @templated('access/admin/userarea.html')
 def userarea(sort=False, filter=None):
+    """User area."""
     if sort is False:
         sort = User.nickname
     users = User.query.order_by(sort).filter(filter).all()
@@ -115,23 +130,27 @@ def userarea(sort=False, filter=None):
 
 @blueprint.route('/resetarea', methods=['GET', 'POST'])
 def resetarea():
-    #FIXME reimplement this function
+    """Reset area."""
+    # FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/resetarea')
 
 
 @blueprint.route('/manageaccounts', methods=['GET', 'POST'])
 def manageaccounts():
-    #FIXME reimplement this function
+    """Manage accounts."""
+    # FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/manageaccounts')
 
 
 @blueprint.route('/delegate_startarea', methods=['GET', 'POST'])
 def delegate_startarea():
-    #FIXME reimplement this function
+    """Delegate start area."""
+    # FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/delegate_startarea')
 
 
 @blueprint.route('/managerobotlogin', methods=['GET', 'POST'])
 def managerobotlogin():
-    #FIXME reimplement this function
+    """Manage robot login."""
+    # FIXME reimplement this function
     return redirect('/admin/webaccess/webaccessadmin.py/managerobotlogin')

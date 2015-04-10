@@ -19,6 +19,8 @@
 
 """Flask-Admin page to configure facets sets per collection."""
 
+from __future__ import unicode_literals
+
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
 from invenio.modules.collections.models import Collection, FacetCollection

@@ -19,6 +19,8 @@
 
 """Indexer Flask Blueprint."""
 
+from __future__ import unicode_literals
+
 import itertools
 
 from invenio.base.i18n import _
@@ -78,8 +80,7 @@ class IdxINDEXAdmin(ModelView):
             label=_("Knowledge base name"),
             choices=LocalProxy(
                 lambda:
-                [('', _('-None-'))]
-                +
+                [('', _('-None-'))] +
                 [(k, k) for k in [(x[0]+','+x[1]) for x in itertools.product(
                     kapi.get_all_kb_names(),
                     ['exact', 'leading_to_comma', 'leading_to_number']
@@ -90,8 +91,7 @@ class IdxINDEXAdmin(ModelView):
             label=_("Stemming language"),
             choices=LocalProxy(
                 lambda:
-                [('', _('-None-'))]
-                +
+                [('', _('-None-'))] +
                 [(k, k) for k in get_stemming_language_map()]
             )
         ),

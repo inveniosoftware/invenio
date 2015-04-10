@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,17 +16,23 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from jinja2 import TemplateNotFound
+"""Pages admin interface."""
+
+from __future__ import unicode_literals
+
 from flask import current_app
-from wtforms.validators import ValidationError
 
 from invenio.ext.admin.views import ModelView
 from invenio.ext.sqlalchemy import db
 from invenio.modules.pages.models import Page
 
+from jinja2 import TemplateNotFound
+
+from wtforms.validators import ValidationError
+
 
 def template_exists(form, field):
-    """ Form validation: check that selected template exists """
+    """Form validation: check that selected template exists."""
     template_name = "pages/" + field.data
     try:
         current_app.jinja_env.get_template(template_name)
@@ -35,6 +41,9 @@ def template_exists(form, field):
 
 
 class PagesAdmin(ModelView):
+
+    """Page admin."""
+
     _can_create = True
     _can_edit = True
     _can_delete = True
@@ -54,7 +63,7 @@ class PagesAdmin(ModelView):
             validators=[template_exists]
         ))
 
-    #FIXME if we want to prevent users from modifying the dates
+    # FIXME if we want to prevent users from modifying the dates
     # form_widget_args = {
     #     'created': {
     #         'type': "hidden"
@@ -65,15 +74,14 @@ class PagesAdmin(ModelView):
     # }
 
     def __init__(self, model, session, **kwargs):
+        """Init."""
         super(PagesAdmin, self).__init__(
             model, session, **kwargs
         )
 
 
 def register_admin(app, admin):
-    """
-    Called on app initialization to register administration interface.
-    """
+    """Called on app init to register administration interface."""
     admin.add_view(PagesAdmin(
         Page, db.session,
         name='Pages', category="")
