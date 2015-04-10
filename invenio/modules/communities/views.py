@@ -19,27 +19,31 @@
 
 """Community Module Blueprint."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
-from flask import render_template, abort, request, flash, \
-    redirect, url_for, jsonify, Blueprint
+from flask import Blueprint, abort, flash, jsonify, redirect, \
+    render_template, request, url_for
+
 from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import current_user, login_required
+
 from flask_menu import register_menu
 
 from invenio.base.decorators import wash_arguments
+from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.cache import cache
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
-from invenio.utils.pagination import Pagination
 from invenio.modules.formatter import format_record
+from invenio.utils.pagination import Pagination
 
-from .forms import CommunityForm, EditCommunityForm, DeleteCommunityForm, SearchForm
+from .forms import CommunityForm, DeleteCommunityForm, EditCommunityForm, \
+    SearchForm
 from .models import Community, FeaturedCommunity
 from .signals import curate_record
-from invenio.base.globals import cfg
 
 
 blueprint = Blueprint(

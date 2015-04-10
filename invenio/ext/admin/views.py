@@ -17,20 +17,24 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import current_app, abort
-from flask_admin import BaseView as FlaskBaseView, \
-    AdminIndexView as FlaskAdminIndexView
+"""Admin."""
+
+from __future__ import unicode_literals
+
+from flask import abort, current_app
+
+from flask_admin import AdminIndexView as FlaskAdminIndexView, \
+    BaseView as FlaskBaseView
 from flask_admin.contrib.sqla import ModelView as FlaskModelView
+
 from flask_login import current_user
 
-from invenio.ext.sslify import ssl_required
 from invenio.ext.principal import permission_required
+from invenio.ext.sslify import ssl_required
 
 
 def can_acc_action(action):
-    """
-    Return getter/setter for can_<action> properties
-    """
+    """Return getter/setter for can_<action> properties."""
     def fget(self):
         return self.acc_authorize(action)
 
@@ -47,15 +51,15 @@ def can_acc_action(action):
 # Base classes
 #
 class BaseView(FlaskBaseView):
-    """
-    BaseView for administration interfaces
-    """
+
+    """BaseView for administration interfaces."""
+
     acc_view_action = None
 
     can_view = property(*can_acc_action('view'))
 
     def acc_authorize(self, action):
-        """ Check authorization for a given action """
+        """Check authorization for a given action."""
         # First check if _can_<action> is set.
         if not getattr(self, '_can_%s' % action, True):
             return False
@@ -68,9 +72,7 @@ class BaseView(FlaskBaseView):
             return current_user.is_super_admin
 
     def _handle_view(self, name, **kwargs):
-        """
-        This method will be executed before calling any view method.
-        """
+        """The method will be executed before calling any view method."""
         if not current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
 
@@ -78,17 +80,13 @@ class BaseView(FlaskBaseView):
             return abort(403)
 
     def is_accessible(self):
-        """
-        Check if admin interface is accessible by the current user
-        """
+        """Check if admin interface is accessible by the current user."""
         if not current_user.is_authenticated():
             return False
         return self.can_view
 
     def create_blueprint(self, admin):
-        """
-        Ensure admin is only available over SSL.
-        """
+        """Ensure admin is only available over SSL."""
         self.blueprint = ssl_required(
             super(BaseView, self).create_blueprint(admin)
         )
@@ -96,9 +94,9 @@ class BaseView(FlaskBaseView):
 
 
 class ModelView(FlaskModelView, BaseView):
-    """
-    Invenio Admin base view for SQL alchemy models
-    """
+
+    """Invenio Admin base view for SQL alchemy models."""
+
     acc_edit_action = None
     acc_delete_action = None
     acc_create_action = None
@@ -109,8 +107,8 @@ class ModelView(FlaskModelView, BaseView):
 
 
 class AdminIndexView(FlaskAdminIndexView, BaseView):
-    """
-    Invenio admin index view that ensures Blueprint is being used.
-    """
+
+    """Invenio admin index view that ensures Blueprint is being used."""
+
     # Ensures that templates and static files can be found
     import_name = 'flask_admin'

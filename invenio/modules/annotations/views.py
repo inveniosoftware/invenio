@@ -17,12 +17,14 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from urlparse import urlsplit
+"""Annotations module."""
 
-from flask import current_app, Blueprint, render_template, request, redirect, \
-    flash, jsonify, url_for, g, abort
-from flask_login import login_required, current_user
-from sqlalchemy.event import listen
+from __future__ import unicode_literals
+
+from flask import Blueprint, abort, current_app, flash, g, jsonify, redirect, \
+    render_template, request, url_for
+
+from flask_login import current_user, login_required
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
@@ -30,10 +32,14 @@ from invenio.modules.comments.models import CmtRECORDCOMMENT
 from invenio.modules.comments.views import blueprint as comments_blueprint
 from invenio.modules.records.views import request_record
 
+from sqlalchemy.event import listen
+
+from urlparse import urlsplit
+
 from .api import add_annotation, get_annotations, get_count
 from .forms import WebPageAnnotationForm, WebPageAnnotationFormAttachments
-from .noteutils import get_note_title, prepare_notes, note_is_collapsed, \
-    get_original_comment
+from .noteutils import get_note_title, get_original_comment, \
+    note_is_collapsed, prepare_notes
 from .receivers import extract_notes
 
 blueprint = Blueprint('annotations',
@@ -46,6 +52,7 @@ listen(CmtRECORDCOMMENT, 'after_insert', extract_notes)
 
 
 def permission_builder(public, groups=None):
+    """Permission builder."""
     d = {}
     if groups is None:
         groups = []
@@ -57,11 +64,13 @@ def permission_builder(public, groups=None):
 @blueprint.route('/ping/<string:message>', methods=['GET'])
 @blueprint.route('/ping/', methods=['GET'])
 def ping(message=""):
+    """Pong message."""
     return "PONG: " + message
 
 
 @blueprint.route('/menu', methods=['GET'])
 def menu():
+    """Menu page."""
     # we need the after-login referrer to be the main page, not the modal dialog
     original_referrer = request.referrer
     annos = get_count(current_user.get_id(), urlsplit(original_referrer)[2])
@@ -79,6 +88,7 @@ def menu():
 @blueprint.route('/add', methods=['GET', 'POST'])
 @login_required
 def add():
+    """Add page."""
     if cfg["ANNOTATIONS_ATTACHMENTS"]:
         form = WebPageAnnotationFormAttachments(request.form)
     else:
@@ -101,12 +111,14 @@ def add():
 
 @blueprint.route('/get_count', methods=['GET'])
 def get__anno_count():
+    """Get count page."""
     return jsonify(get_count(current_user.get_id(),
                              urlsplit(request.referrer)[2]))
 
 
 @blueprint.route('/view', methods=['GET', 'POST'])
 def view():
+    """View page."""
     return render_template('annotations/view.html',
                            public_annotations=get_annotations(
                                {"where": request.args.get("target"),
@@ -120,6 +132,7 @@ def view():
 @blueprint.route('/attach', methods=['POST'])
 @login_required
 def attach():
+    """Attach page."""
     # if not _id, create empty annotation, get id
     # send id back and autofill form
     # save Document
@@ -132,6 +145,7 @@ def attach():
 @blueprint.route('/detach', methods=['POST'])
 @login_required
 def detach():
+    """Detach page."""
     current_app.logger.info('Removal request: ' + request.values.get('file_id'))
     return jsonify()
 
@@ -139,6 +153,7 @@ def detach():
 @comments_blueprint.route('/<int:recid>/notes', methods=['GET'])
 @request_record
 def notes(recid):
+    """Note page."""
     """View for the record notes extracted from comments"""
 
     if not cfg['ANNOTATIONS_NOTES_ENABLED']:
@@ -198,7 +213,7 @@ def notes(recid):
 @login_required
 @request_record
 def notes_toggle(recid, path):
-    """Toggles notes collapsed/ expanded."""
+    """Toggle notes collapsed/ expanded."""
     from .noteutils import note_collapse, note_expand, note_is_collapsed
 
     if note_is_collapsed(recid, path):

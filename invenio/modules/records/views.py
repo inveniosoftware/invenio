@@ -19,13 +19,19 @@
 
 """WebSearch Flask Blueprint."""
 
+from __future__ import unicode_literals
+
 import cStringIO
 
 from functools import wraps
-from flask import g, render_template, request, flash, redirect, url_for, \
-    current_app, abort, Blueprint, send_file
+
+from flask import Blueprint, abort, current_app, flash, g, redirect, \
+    render_template, request, send_file, url_for
+
 from flask_breadcrumbs import default_breadcrumb_root
+
 from flask_login import current_user
+
 from flask_menu import register_menu
 
 from invenio.base.decorators import wash_arguments
@@ -38,9 +44,10 @@ from invenio.ext.template.context_processor import \
 from invenio.modules.collections.models import Collection
 from invenio.modules.search.signals import record_viewed
 from invenio.utils import apache
+
 from .api import get_record
 from .models import Record as Bibrec
-from .utils import references_nb_counts, citations_nb_counts, \
+from .utils import citations_nb_counts, references_nb_counts, \
     visible_collection_tabs
 
 blueprint = Blueprint('record', __name__, url_prefix="/" + CFG_SITE_RECORD,

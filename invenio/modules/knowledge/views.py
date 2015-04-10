@@ -19,7 +19,10 @@
 
 """Knowledge Flask Blueprint."""
 
+from __future__ import unicode_literals
+
 from flask import Blueprint
+
 from flask_breadcrumbs import default_breadcrumb_root
 
 

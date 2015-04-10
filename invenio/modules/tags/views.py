@@ -17,51 +17,39 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.tags.blueprint
-    ------------------------------
+"""Invenio.modules.tags.blueprint: Tagging interface."""
 
-    Tagging interface.
-"""
+from __future__ import unicode_literals
 
-# Flask
-from werkzeug import LocalProxy
-from flask import render_template, request, flash, redirect, url_for, \
-    jsonify, Blueprint
-from invenio.base.i18n import _
-from invenio.base.decorators import wash_arguments, templated
-from flask_login import current_user, login_required
-from invenio.base.globals import cfg
+from flask import Blueprint, flash, jsonify, redirect, render_template, \
+    request, url_for
 
-# External imports
-from invenio.modules.accounts.models import User
-from invenio.modules.records.models import Record as Bibrec
-from invenio.modules.collections.models import Collection
-from invenio.modules.search.views.search import response_formated_records
-from flask_menu import register_menu
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
+from flask_login import current_user, login_required
+
+from flask_menu import register_menu
+
+from invenio.base.decorators import templated, wash_arguments
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User
+from invenio.modules.collections.models import Collection
+from invenio.modules.records.models import Record as Bibrec
+from invenio.modules.search.views.search import response_formated_records
 
-# Internal imports
-from .models import \
-    WtgTAG, \
-    WtgTAGRecord, \
-    wash_tag
+from werkzeug import LocalProxy
 
-# Forms
-from .forms import \
-    CreateTagForm, \
-    AttachTagForm, \
-    DetachTagForm, \
-    EditTagForm, \
-    TagAnnotationForm, \
-    validate_tag_exists, \
-    validate_user_owns_tag, \
-    validators
+from .forms import AttachTagForm, CreateTagForm, DetachTagForm, EditTagForm, \
+    TagAnnotationForm, validate_tag_exists, validate_user_owns_tag, validators
+from .models import WtgTAG, WtgTAGRecord, wash_tag
 
 # Uset settings
-user_settings = LocalProxy(lambda:
-    current_user['settings'].get('webtag', cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
+user_settings = LocalProxy(
+    lambda:
+    current_user['settings'].get('webtag',
+                                 cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
 
 blueprint = Blueprint('webtag', __name__, url_prefix='/yourtags',
                       template_folder='templates', static_folder='static')
@@ -77,7 +65,7 @@ default_breadcrumb_root(blueprint, '.webaccount.tags')
 @register_menu(blueprint, 'personalize.tags', _('Your Tags'))
 @register_breadcrumb(blueprint, '.', _('Your Tags'))
 def display_cloud():
-    """ List of user's private/group/public tags """
+    """List of user's private/group/public tags."""
     user = User.query.get(current_user.get_id())
     tags = user.tags_query.order_by(WtgTAG.name).all()
 
@@ -100,8 +88,8 @@ def display_cloud():
 
     for tag in tags:
         size = min_size + \
-                   float(max_size - min_size) * \
-                   float(tag.record_count - min_count) / difference
+            float(max_size - min_size) * \
+            float(tag.record_count - min_count) / difference
 
         tag.css_size = str(size*100)
 
@@ -113,10 +101,10 @@ def display_cloud():
 @login_required
 @templated('tags/display_list.html')
 @wash_arguments({'sort_by': (unicode, 'name'),
-                                 'order': (unicode, '')})
+                 'order': (unicode, '')})
 @register_breadcrumb(blueprint, '.list', _('Display as List'))
 def display_list(sort_by, order):
-    """ List of user's private/group/public tags """
+    """List of user's private/group/public tags."""
     tags = User.query.get(current_user.get_id()).tags_query
 
     sort_by = str(sort_by)
@@ -140,8 +128,7 @@ def display_list(sort_by, order):
 @login_required
 @register_breadcrumb(blueprint, '.tags_details', _('Associated Records'))
 def tag_details(id_tag):
-    """ List of documents attached to this tag """
-
+    """List of documents attached to this tag."""
     if not id_tag:
         flash(_('Invalid tag id'), "error")
         return redirect(url_for('.display_cloud'))
@@ -161,8 +148,8 @@ def tag_details(id_tag):
         return redirect(url_for('.display_cloud'))
 
     return response_formated_records([bibrec.id for bibrec in tag.records],
-                              Collection.query.get(1),
-                              'hb')
+                                     Collection.query.get(1),
+                                     'hb')
 
 
 @blueprint.route('/tag/<int:id_tag>/edit', methods=['GET', 'POST'])
@@ -170,7 +157,7 @@ def tag_details(id_tag):
 @templated('tags/record_tags_test.html')  # FIXME: tag editor template missing?
 @register_breadcrumb(blueprint, '.tag_edit', _('Edit tag'))
 def tag_edit(id_tag):
-    """ List of documents attached to this tag """
+    """List of documents attached to this tag."""
     id_user = current_user.get_id()
     tag = WtgTAG.query.get(id_tag)
 
@@ -196,16 +183,17 @@ def tag_edit(id_tag):
             flash(_('Tag Successfully edited.'), 'success')
 
         else:
-            flash(_('Tag name') + ' <strong>' + tag.name + '</strong> ' + _('is already in use.'), 'error')
+            flash(_('Tag name') + ' <strong>' + tag.name + '</strong> ' +
+                  _('is already in use.'), 'error')
 
     return dict(tag=tag, form=form)
 
 
-@blueprint.route('/tag/<int:id_tag>/annotations/<int:id_bibrec>', methods=['GET', 'POST'])
+@blueprint.route('/tag/<int:id_tag>/annotations/<int:id_bibrec>',
+                 methods=['GET', 'POST'])
 @login_required
 def update_annotation(id_tag, id_bibrec):
-    """ Change the annotation on relationship between record and tag """
-
+    """Change the annotation on relationship between record and tag."""
     from werkzeug.datastructures import MultiDict
 
     values = MultiDict(request.values)
@@ -236,22 +224,20 @@ def update_annotation(id_tag, id_bibrec):
 @templated('tags/record_tags_test.html')
 @register_breadcrumb(blueprint, '.tags_details', _('Tag list'))
 def record_tags(id_bibrec):
-    """ List of documents attached to this tag """
-
+    """List of documents attached to this tag."""
     from .template_context_functions.tfn_webtag_record_tags \
         import template_context_function
 
-    from invenio.ext.template import render_template_to_string
-
     return dict(
-        tag_list = template_context_function(id_bibrec, current_user.get_id()))
+        tag_list=template_context_function(
+            id_bibrec, current_user.get_id()))
 
 
 @blueprint.route('/tokenize/<int:id_bibrec>', methods=['GET', 'POST'])
 @login_required
 @wash_arguments({'q': (unicode, '')})
 def tokenize(id_bibrec, q):
-    """ Data for tokeninput """
+    """Data for tokeninput."""
     id_user = current_user.get_id()
 
     # Output only tags unattached to this record
@@ -277,7 +263,7 @@ def tokenize(id_bibrec, q):
         if tag_json['name'] == new_name:
             add_new_name = False
 
-    #If the name was not found
+    # If the name was not found
     if add_new_name:
         # Check if a tag with this name is already attached
         already_attached = WtgTAG.query\
@@ -296,9 +282,10 @@ def tokenize(id_bibrec, q):
 @blueprint.route('/record/<int:id_bibrec>/edit', methods=['GET', 'POST'])
 @login_required
 def editor(id_bibrec):
-    """Edits your tags for `id_bibrec`.
+    """Edit your tags for `id_bibrec`.
 
-    :param id_bibrec: record identifier"""
+    :param id_bibrec: record identifier
+    """
     user = db.session.query(User).get(current_user.get_id())
     record = db.session.query(Bibrec).get(id_bibrec)
 
@@ -315,19 +302,23 @@ def editor(id_bibrec):
     # invenio_templated cannot be used,
     # because this view is requested using AJAX
     return render_template('tags/record_editor.html', id_bibrec=id_bibrec,
-                                                 record_tags=tags_json)
+                           record_tags=tags_json)
 
 
-#Temporary solution to call validators, we need a better one
+# Temporary solution to call validators, we need a better one
 class Field(object):
+
+    """Field class."""
+
     def __init__(self, attr, value):
+        """Init."""
         setattr(self, attr, value)
 
 
 @blueprint.route('/delete', methods=['GET', 'POST'])
 @login_required
 def delete():
-    """ Delete a tag """
+    """Delete a tag."""
     response = {}
     response['action'] = 'delete'
 
@@ -348,7 +339,7 @@ def delete():
 
     db.session.commit()
 
-    #WtgTAG.query\
+    # WtgTAG.query\
     #    .filter(WtgTAG.id.in_(id_tags))\
     #    .delete(synchronize_session=False)
 
@@ -375,7 +366,7 @@ def delete():
 @register_breadcrumb(blueprint, '.create', _('New tag'))
 @templated('tags/create.html')
 def create():
-    """ Create a new tag """
+    """Create a new tag."""
     response = {}
     response['action'] = 'create'
 
@@ -422,7 +413,7 @@ def create():
 @blueprint.route('/attach', methods=['GET', 'POST'])
 @login_required
 def attach():
-    """ Attach a tag to a record """
+    """Attach a tag to a record."""
     response = {}
     response['action'] = 'attach'
 
@@ -451,7 +442,7 @@ def attach():
 @blueprint.route('/detach', methods=['GET', 'POST'])
 @login_required
 def detach():
-    """ Detach a tag from a record """
+    """Detach a tag from a record."""
     response = {}
     response['action'] = 'detach'
 
@@ -459,9 +450,9 @@ def detach():
     form = DetachTagForm(request.values, csrf_enabled=False)
 
     if form.validate():
-        association = db.session.query(WtgTAGRecord)\
-                      .filter_by(id_tag = form.data['id_tag'],
-                                 id_bibrec = form.data['id_bibrec']).first()
+        association = db.session.query(WtgTAGRecord) \
+            .filter_by(id_tag=form.data['id_tag'],
+                       id_bibrec=form.data['id_bibrec']).first()
         if association:
             db.session.delete(association)
             db.session.commit()

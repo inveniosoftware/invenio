@@ -19,9 +19,12 @@
 
 """Implementation of Blueprint for previewers."""
 
+from __future__ import unicode_literals
+
 import itertools
 
-from flask import Blueprint, request, current_app
+from flask import Blueprint, current_app, request
+
 from flask_breadcrumbs import default_breadcrumb_root
 
 from invenio.base.globals import cfg

@@ -19,10 +19,14 @@
 
 """Record editor interface."""
 
+from __future__ import unicode_literals
+
 import json
 
 from flask import Blueprint, jsonify, render_template, request
+
 from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import login_required
 
 from invenio.base.decorators import wash_arguments
@@ -69,7 +73,8 @@ def index():
         'gRECORD_TEMPLATES': record_templates,
         'gTAG_NAMES': tag_names,
         'gPROTECTED_FIELDS': protected_fields,
-        'gINTERNAL_DOI_PROTECTION_LEVEL': CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL,
+        'gINTERNAL_DOI_PROTECTION_LEVEL':
+            CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL,
         'gSITE_URL': CFG_SITE_URL,
         'gSITE_RECORD': CFG_SITE_RECORD,
         'gCERN_SITE': cern_site,
@@ -86,7 +91,8 @@ def index():
             '"' + cfg['CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR'] + '"',
         'gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION':
             cfg['CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION'],
-        'gNEW_CONTENT_COLOR': '"' + cfg['CFG_BIBEDIT_JS_NEW_CONTENT_COLOR'] + '"',
+        'gNEW_CONTENT_COLOR': '"' +
+            cfg['CFG_BIBEDIT_JS_NEW_CONTENT_COLOR'] + '"',
         'gNEW_CONTENT_COLOR_FADE_DURATION':
             cfg['CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION'],
         'gNEW_CONTENT_HIGHLIGHT_DELAY':
@@ -110,7 +116,7 @@ def index():
     fieldTemplates = get_available_fields_templates()
 
     def convert(data):
-        """Return JS friendly strings. """
+        """Return JS friendly strings."""
         if isinstance(data, unicode):
             return str(data)
         else:
@@ -195,13 +201,14 @@ def compare_revisions(rev1, rev2, recid):
             create_record(xml1)[0], '', {"text-marc": 1, "aleph-marc": 0})
         marc2 = create_marc_record(
             create_record(xml2)[0], '', {"text-marc": 1, "aleph-marc": 0})
-        comparison = show_diff(marc1,
-                               marc2,
-                               prefix="<pre>", suffix="</pre>",
-                               prefix_removed='<strong class="diff_field_deleted">',
-                               suffix_removed='</strong>',
-                               prefix_added='<strong class="diff_field_added">',
-                               suffix_added='</strong>')
+        comparison = show_diff(
+            marc1,
+            marc2,
+            prefix="<pre>", suffix="</pre>",
+            prefix_removed='<strong class="diff_field_deleted">',
+            suffix_removed='</strong>',
+            prefix_added='<strong class="diff_field_added">',
+            suffix_added='</strong>')
         job_date1 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev1
                                                                   ).groups()
         job_date2 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev2
