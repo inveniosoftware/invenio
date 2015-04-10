@@ -37,3 +37,4 @@ Developer's Guide
    git-workflow
    kwalitee
    patterns
+   docker
