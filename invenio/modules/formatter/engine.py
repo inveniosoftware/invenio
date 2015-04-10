@@ -516,33 +516,12 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                                        needs_2nd_pass)
 
         return out, needs_2nd_pass
-    except Exception, e:
-        register_exception(prefix="An error occured while formatting record %s in %s" %
-                           (recID, of),
-                           alert_admin=True)
-        #Failsafe execution mode
-        import invenio.legacy.template
-        websearch_templates = invenio.legacy.template.load('websearch')
-        if verbose == 9:
-            out += """\n<br/><span class="quicknote">
-            An error occured while formatting record %s. (%s)
-            </span>""" % (recID, str(e))
-        if of.lower() == 'hd':
-            if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                Formatting record %i with websearch_templates.tmpl_print_record_detailed.
-                </span><br/>""" % recID
-                return out + websearch_templates.tmpl_print_record_detailed(
-                    ln=ln,
-                    recID=recID,
-                )
-        if verbose == 9:
-            out += """\n<br/><span class="quicknote">
-            Formatting record %i with websearch_templates.tmpl_print_record_brief.
-            </span><br/>""" % recID
-        return out + websearch_templates.tmpl_print_record_brief(ln=ln,
-                                                                 recID=recID,
-                                                                 ), False
+    except Exception:
+        current_app.logger.exception(
+            "An error occured while formatting record {recid} in {of}".format(
+                recid=recID, of=of
+            ))
+        raise
 
 
 def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
