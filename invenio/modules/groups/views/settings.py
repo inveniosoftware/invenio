@@ -17,7 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Groups Flask Blueprint."""
+"""Groups Settings Blueprint."""
 
 from __future__ import unicode_literals
 
@@ -41,12 +41,18 @@ from invenio.modules.accounts.models import User, UserUsergroup, Usergroup, \
 
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from .api import GroupsAPI
-from .config import GROUPS_AUTOCOMPLETE_LIMIT
-from .forms import JoinUsergroupForm, UserJoinGroupForm, UsergroupForm
+from ..api import GroupsAPI
+from ..forms import UsergroupForm, UsergroupNewMemberForm
 
-blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
-                      template_folder='templates', static_folder='static')
+
+# TODO `add` view
+
+
+blueprint = Blueprint(
+    'groups_settings', __name__,
+    url_prefix="/account/settings/groups",
+    template_folder='../templates',
+    static_folder='../static')
 
 default_breadcrumb_root(blueprint, '.settings.groups')
 
@@ -55,39 +61,56 @@ default_breadcrumb_root(blueprint, '.settings.groups')
 @blueprint.route('/index')
 @register_menu(
     blueprint, 'settings.groups',
-    _('%(icon)s Groups', icon='<i class="fa fa-group fa-fw"></i>'),
-    order=0,
-    active_when=lambda: request.endpoint.startswith("webgroup.")
+    _('%(icon)s My Groups', icon='<i class="fa fa-users fa-fw"></i>'),
+    order=13,  # FIXME which order to choose
+    active_when=lambda: request.endpoint.startswith("groups_settings.")
 )
 @register_breadcrumb(blueprint, '.', _('Groups'))
 @login_required
 @permission_required('usegroups')
-def index():
+@wash_arguments({
+    'page': (int, 1),
+    'per_page': (int, 5),
+    'p': (unicode, '')
+})
+def index(page, per_page, p):
     """List all user groups."""
+    # FIXME can check be done differently?
+    if page <= 0:
+        page = 1
+    if per_page <= 0:
+        per_page = 5
+
     uid = current_user.get_id()
-    form = JoinUsergroupForm()
-    form.id_usergroup.set_remote(
-        url_for('webgroup.search_groups', id_user=uid)
-        + "?query=%QUERY")
-    ouugs = GroupsAPI.query_list_userusergroups(uid).all()
-    uugs = dict(map(lambda uug: (uug.usergroup.name, uug), ouugs))
+    ugs = GroupsAPI.query_list_usergroups(
+        uid, p).paginate(page, per_page, error_out=False)
+    pending_ugs = GroupsAPI.query_pending_usergroups(uid).all()
+    members = dict(
+        (
+            ug.id, filter(lambda uug: uug.user_status != "PENDING", ug.users)
+        ) for ug in ugs.items
+    )
 
     return render_template(
-        'groups/index.html',
-        uugs=uugs,
-        form=form,
+        'groups/settings.html',
+        ugs=ugs,
+        pending_ugs=pending_ugs,
+        members=members,
+        page=page,
+        per_page=per_page,
+        p=p
     )
 
 
 @blueprint.route('/new', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.new', _('New Group'))
+@register_breadcrumb(blueprint, '.new', _('New'))
 @login_required
 @permission_required('usegroups')
 def new():
     """Create new user group."""
     form = UsergroupForm(request.form)
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate():
         ug = Usergroup()
         id_user = current_user.get_id()
         form.populate_obj(ug)
@@ -101,8 +124,6 @@ def new():
             return render_template(
                 "groups/new.html",
                 form=form,
-                action=_('Create'),
-                subtitle=_("New group"),
             )
         # redirect to see the group's list
         flash(_('Group "%(name)s" successfully created',
@@ -113,49 +134,70 @@ def new():
     return render_template(
         "groups/new.html",
         form=form,
-        action=_('Create'),
-        subtitle=_("New group"),
     )
 
 
-@blueprint.route('/approve/<int:id_usergroup>')
-@blueprint.route('/approve/<int:id_usergroup>/user/<int:id_user>')
+@blueprint.route('/<int:ug_id>/members/approve')
+@blueprint.route('/<int:ug_id>/members/<int:id_user>/approve')
 @login_required
 @permission_required('usegroups')
-def approve(id_usergroup, id_user=None):
+def approve(ug_id, id_user=None):
     """Approve a user."""
     # load data
-    curr_uid = current_user.get_id()
+    curr_uid = not current_user.get_id()
     id_user2approve = id_user or curr_uid
     user2approve = User.query.get_or_404(id_user2approve)
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
     try:
         gapi.approve_user(id_user=id_user2approve)
     except AccountSecurityError, e:
         flash(str(e), 'error')
         # redirect
-        return redirect(url_for('.members', id_usergroup=id_usergroup))
+        return redirect(url_for('.members', ug_id=ug_id))
 
     flash(_('%(user)s successfully approved in the group "%(name)s".',
             user='User "'+user2approve.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
-    return redirect(url_for('.members', id_usergroup=id_usergroup))
+    return redirect(url_for('.members', ug_id=ug_id))
 
 
-@blueprint.route('/leave/<int:id_usergroup>')
-@blueprint.route('/leave/<int:id_usergroup>/user/<int:id_user>')
+@blueprint.route('/<int:ug_id>/members/accept')
 @login_required
 @permission_required('usegroups')
-def leave(id_usergroup, id_user=None):
+def accept(ug_id):
+    """Approve a user."""
+    # load data
+    curr_uid = current_user.get_id()
+    user2approve = User.query.get_or_404(curr_uid)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
+    try:
+        gapi.approve_user(id_user=curr_uid)
+    except AccountSecurityError, e:
+        flash(str(e), 'error')
+        # redirect
+        return redirect(url_for('.members', ug_id=ug_id))
+
+    flash(_('%(user)s successfully approved in the group "%(name)s".',
+            user='User "'+user2approve.nickname+'"',
+            name=gapi.user_group.name), 'success')
+    return redirect(url_for('.members', ug_id=ug_id))
+
+
+@blueprint.route('/<int:ug_id>/members/<int:id_user>/remove')
+@blueprint.route('/<int:ug_id>/members/<int:id_user>/reject')
+@blueprint.route('/<int:ug_id>/leave')
+@login_required
+@permission_required('usegroups')
+def leave(ug_id, id_user=None):
     """Leave user group.
 
-    :param id_usergroup: Identifier of user group.
+    :param ug_id: Identifier of user group.
     """
     # load data
     curr_uid = current_user.get_id()
     id_user2remove = id_user or curr_uid
     user2remove = User.query.get_or_404(id_user2remove)
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
     # user leave the group
     try:
         gapi.remove(id_user=id_user2remove)
@@ -169,31 +211,53 @@ def leave(id_usergroup, id_user=None):
             user='User "'+user2remove.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
     if id_user and id_user != curr_uid:
-        return redirect(url_for('.members', id_usergroup=id_usergroup))
+        return redirect(url_for('.members', ug_id=ug_id))
     else:
         return redirect(url_for('.index'))
 
 
-@blueprint.route('/join', methods=['GET', 'POST'])
-@blueprint.route('/join/<int:id_usergroup>/users/<int:id_user>',
+@blueprint.route('/<int:ug_id>/members/reject')
+@login_required
+@permission_required('usegroups')
+def reject(ug_id):
+    """Leave user group.
+
+    :param ug_id: Identifier of user group.
+    """
+    # load data
+    curr_uid = current_user.get_id()
+    user2remove = User.query.get_or_404(curr_uid)
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
+    # user leave the group
+    try:
+        gapi.remove(id_user=curr_uid)
+    except (AccountSecurityError, IntegrityUsergroupError) as e:
+        # catch security errors
+        flash(str(e), "error")
+        return redirect(url_for('.index'))
+
+    # return successful message
+    flash(_('%(user)s left the group "%(name)s".',
+            user='User "'+user2remove.nickname+'"',
+            name=gapi.user_group.name), 'success')
+    return redirect(url_for('.index'))
+
+
+@blueprint.route('/<int:ug_id>/members/<int:id_user>/add',
                  methods=['GET', 'POST'])
 @login_required
-@wash_arguments({"id_usergroup": (int, 0), "id_user": (int, 0)})
+@wash_arguments({"ug_id": (int, 0), "id_user": (int, 0)})
 @permission_required('usegroups')
-def join(id_usergroup, id_user=None, status=None):
+def join(ug_id, id_user=None, status=None):
     """Join group."""
     # load data
     curr_uid = current_user.get_id()
     id_user2join = id_user or curr_uid
     user2join = User.query.get_or_404(id_user2join)
-    form = UserJoinGroupForm()
     user_status = None
     # read status from the form (checkbox)
-    if form.user_status and form.user_status.data:
-        user_status = UserUsergroup.USER_STATUS['ADMIN']
-    else:
-        user_status = UserUsergroup.USER_STATUS['MEMBER']
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    user_status = u'PENDING'
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
     # user join the group
     try:
         gapi.add(id_user=user2join.id, status=user_status)
@@ -202,7 +266,7 @@ def join(id_usergroup, id_user=None, status=None):
         flash(str(e), "error")
         return redirect(url_for('.index'))
         if id_user:
-            return redirect(url_for('.members', id_usergroup=id_usergroup))
+            return redirect(url_for('.members', ug_id=ug_id))
         else:
             return redirect(url_for('.index'))
 
@@ -211,17 +275,23 @@ def join(id_usergroup, id_user=None, status=None):
             user='User "'+user2join.nickname+'"' if id_user else "You",
             name=gapi.user_group.name), 'success')
 
-    redirect_url = form.redirect_url.data or url_for('.index')
+    redirect_url = url_for('.index')
     return redirect(redirect_url)
 
 
-@blueprint.route('/manage/<int:id_usergroup>', methods=['GET', 'POST'])
+@blueprint.route('/<int:ug_id>/manage', methods=['GET', 'POST'])
+@blueprint.route('/<int:ug_id>/', methods=['GET', 'POST'])
 @login_required
-@register_breadcrumb(blueprint, '.manage', _('Manage Group'))
+@register_breadcrumb(
+    blueprint, '.manage', _('Manage'),
+    dynamic_list_constructor=lambda:
+        [{'text': get_group_name(request.view_args['ug_id'])},
+         {'text': _('Manage')}]
+)
 @permission_required('usegroups')
-def manage(id_usergroup):
+def manage(ug_id):
     """Manage user group."""
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
     try:
         gapi.check_access()
     except AccountSecurityError, e:
@@ -230,7 +300,7 @@ def manage(id_usergroup):
     # load data
     form = UsergroupForm(request.form, obj=gapi.user_group)
 
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate():
         # get form data
         ug2form = Usergroup()
         form.populate_obj(ug2form)
@@ -247,8 +317,7 @@ def manage(id_usergroup):
             return render_template(
                 "groups/new.html",
                 form=form,
-                action=_('Update'),
-                subtitle=oldname,
+                group=gapi.user_group,
             )
 
         # return successful message
@@ -258,19 +327,18 @@ def manage(id_usergroup):
     return render_template(
         "groups/new.html",
         form=form,
-        action=_('Update'),
-        subtitle=gapi.user_group.name,
+        group=gapi.user_group,
     )
 
 
-@blueprint.route('/manage/<int:id_usergroup>/delete',
+@blueprint.route('/<int:ug_id>/delete',
                  methods=['GET', 'DELETE'])
 @login_required
 @permission_required('usegroups')
-def delete(id_usergroup):
+def delete(ug_id):
     """Delete a group."""
     # load data
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+    gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
     try:
         gapi.check_access()
         # delete group
@@ -286,95 +354,91 @@ def delete(id_usergroup):
     return redirect(url_for(".index"))
 
 
-@blueprint.route('/members/<int:id_usergroup>', methods=['GET', 'POST'])
+def get_group_name(ug_id):
+    try:
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
+        gapi.check_access()
+        return gapi.user_group.name
+    except AccountSecurityError:
+        return ''
+
+
+@blueprint.route('/<int:ug_id>/members', methods=['GET', 'POST'])
 @login_required
-@register_breadcrumb(blueprint, '.members', _('Members'))
+@register_breadcrumb(
+    blueprint, '.members', _('Members'),
+    dynamic_list_constructor=lambda:
+        [{'text': get_group_name(request.view_args['ug_id'])},
+         {'text': _('Members')}]
+)
 @permission_required('usegroups')
-def members(id_usergroup):
+@wash_arguments({
+    'page': (int, 1),
+    'per_page': (int, 5),
+    'p': (unicode, ''),
+    's': (unicode, ''),
+})
+def members(ug_id, page, per_page, p, s):
     """List user group members."""
+    # FIXME can check be done differently?
+    if page <= 0:
+        page = 1
+    if per_page <= 0:
+        per_page = 5
+
     # load data
     try:
-        gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
+        gapi.check_access()
+        if (
+            not gapi.user_group.is_admin(current_user.get_id()) and
+            gapi.user_group.members_visibility == "INVISIBLE"
+        ):
+            raise AccountSecurityError(_('Cannot see other members'))
+    except AccountSecurityError, e:
+        flash(str(e), 'error')
+        return redirect(url_for('.index'))
+
+    group = gapi.user_group
+    members = gapi.query_members(p, s).paginate(page, per_page, error_out=False)
+
+    return render_template(
+        "groups/members.html",
+        group=group,
+        members=members,
+        page=page,
+        per_page=per_page,
+        p=p,
+        s=s,
+    )
+
+
+@blueprint.route('/<int:ug_id>/members/new', methods=['GET', 'POST'])
+@login_required
+@register_breadcrumb(blueprint, '.members.new', _('New'))
+@permission_required('usegroups')
+def new_member(ug_id):
+    """List user group members."""
+    try:
+        gapi = GroupsAPI(user_group=GroupsAPI.get_group(ug_id))
         gapi.check_access()
     except AccountSecurityError, e:
         flash(str(e), 'error')
         return redirect(url_for('.index'))
 
-    current_uug = gapi.get_info()
+    form = UsergroupNewMemberForm(request.form)
 
-    unitg = UserJoinGroupForm(request.form)
-    unitg.id_user.set_remote(
-        url_for('webgroup.search_users', id_usergroup=id_usergroup)
-        + "?query=%QUERY")
-    unitg.id_usergroup.data = id_usergroup
-    unitg.redirect_url.data = url_for(
-        ".members", id_usergroup=id_usergroup)
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            gapi.invite(emails=data['emails'], status=data['user_status'])
+            url = url_for(".members", ug_id=gapi.user_group.id)
+            return jsonify(url=url)
+        except Exception:
+            pass
 
     return render_template(
-        "groups/members.html",
+        "groups/new_member.html",
         group=gapi.user_group,
-        current_uug=current_uug,
-        form=unitg,
+        form=form,
     )
-
-
-@blueprint.route("/search", methods=['GET', 'POST'])
-@login_required
-@wash_arguments({"query": (unicode, ""), "term": (unicode, "")})
-@permission_required('usegroups')
-def search(query, term):
-    """Search user groups."""
-    # FIXME user can access to all users name?
-    # e.g. is better to return only users name that are at least in one group
-    # together?
-    if query == 'users' and len(term) >= 3:
-        res = db.session.query(User.nickname).filter(
-            User.nickname.like("%s%%" % term)).limit(10).all()
-        return jsonify(nicknames=[elem for elem, in res])
-    elif query == 'groups' and len(term) >= 3:
-        res = db.session.query(db.func.distinct(Usergroup.name)).\
-            join(UserUsergroup).filter(
-                Usergroup.name.like("%s%%" % term)).limit(10).all()
-        return jsonify(groups=[elem for elem, in res])
-    return jsonify()
-
-
-@blueprint.route("/search/group/<int:id_usergroup>/users",
-                 methods=['GET', 'POST'])
-@login_required
-@wash_arguments({"query": (unicode, "")})
-@permission_required('usegroups')
-def search_users(id_usergroup, query):
-    """Search user not in a specific group."""
-    # group = Usergroup.query.get_or_404(id_usergroup)
-    gapi = GroupsAPI(user_group=GroupsAPI.get_group(id_usergroup))
-    users = gapi.query_users_not_in_this_group(query="%%%s%%" % query) \
-        .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
-    return jsonify(results=[{'id': user.id, 'nickname': user.nickname}
-                            for user in users])
-
-
-@blueprint.route("/search/user/<int:id_user>/groups",
-                 methods=['GET', 'POST'])
-@login_required
-@wash_arguments({"query": (unicode, "")})
-@permission_required('usegroups')
-def search_groups(id_user, query):
-    """Search groups that user not joined."""
-    groups = GroupsAPI.query_groups_user_not_joined(
-        id_user=id_user, group_name="%%%s%%" % query) \
-        .limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
-    return jsonify(results=[{'id': group.id, 'name': group.name}
-                            for group in groups])
-
-
-@blueprint.route("/tokenize", methods=['GET', 'POST'])
-@login_required
-@wash_arguments({"q": (unicode, "")})
-@permission_required('usegroups')
-def tokenize(q):
-    """FIXME."""
-    # FIXME can we deprecate this function?
-    res = Usergroup.query.filter(
-        Usergroup.name.like("%s%%" % q)).limit(GROUPS_AUTOCOMPLETE_LIMIT).all()
-    return jsonify(data=map(dict, res))
