@@ -19,27 +19,67 @@
 
 {%- import "accounts/settings/helpers.html" as helpers with context %}
 {%- from "_formhelpers.html" import render_field with context %}
+
 {%- extends "accounts/settings/index_base.html" %}
 
-{% block settings_body %}
-{{helpers.panel_start(
-    subtitle,
+{%- block settings_body %}
+{%- set header = (group.name + " <small class='text-muted'>Manage</small>") if group else "New group"-%}
+{{ helpers.panel_start(
+    _(header),
+    with_body=False,
     icon='fa fa-users fa-fw',
-)}}
-<form role="form" method="POST">
-{%- for field in form %}
-{{ render_field(field, show_description=True) }}
-{%- endfor %}
-<div class="form-group">
-    <div class="">
-      <a href="{{url_for('.index')}}" class="btn btn-default">
-        <i class="fa fa-times"></i> {{ _('Cancel') }}
-      </a>
-      <button type="submit" class="btn btn-primary">
-        <i class="fa fa-check"></i> {{ action }}
-      </button>
-    </div>
+   ) }}
+<div class="panel-body">
+  {%- block description %}
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero repellendus vero ex fugit dolorum necessitatibus inventore dolores.
+  Illo voluptatibus officia sequi dolor. Quod, provident maiores quo quia. dipsum dolor sit amet, consectetur adipisicing elit. Facere enim perferendis libero
+  repellendus vero ex fugit.
+  {%- endblock %}
+</div>
+<form role="form" method="POST" class="list-group-item">
+  {%- for field in form %}
+    {{ render_field(field, show_description=True) }}
+  {%- endfor %}
+  <div class="btn-toolbar">
+    <a href="{{ url_for('.index') }}" class="btn btn-default">
+      <i class="fa fa-times"></i> {{ _('Cancel') }}
+    </a>
+    {%- if group -%}
+    <a class="btn btn-danger" data-toggle="modal" data-target="#delete-group-modal">
+      <i class="fa fa-trash-o"></i> {{ _('Delete') }}
+    </a>
+    {%- endif %}
+    <button type="submit" class="btn btn-primary">
+      <i class="fa fa-check"></i> {{ _('Update') if group else _('Create') }}
+    </button>
   </div>
 </form>
-{{helpers.panel_end()}}
-{% endblock %}
+{{ helpers.panel_end() }}
+{%- if group %}
+<div id="delete-group-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{ _('Group deletion') }}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{{ _("You are about to ") }}
+          <strong class=text-danger>{{ _("delete") }}</strong>
+          <strong>{{ group.name }}</strong>
+        </p>
+        <p>{{ _("This action cannot be undone. Are you sure you want to proceed?") }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          <i class="fa fa-times"></i> {{ _("Cancel") }}
+        </button>
+        <a class="btn btn-danger" href="{{ url_for('.delete', ug_id=group.id) }}">
+          <i class="fa fa-trash-o"></i> {{ _("Delete") }}
+        </a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+{%- endif %}
+{%- endblock %}

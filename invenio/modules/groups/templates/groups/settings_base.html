@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,88 +17,142 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- bundles "groups.js" -%}
+{%- import "accounts/settings/helpers.html" as helpers with context -%}
+{%- from "groups/helpers.html" import searchbar with context -%}
+{%- from "groups/helpers.html" import emptyprompt with context -%}
+{%- from "groups/helpers.html" import emptysearch with context -%}
+{%- from "paginate.html" import paginate with context -%}
+{%- from "paginate.html" import list_status with context -%}
 
-{%- import "accounts/settings/helpers.html" as helpers with context %}
-{%- from "_formhelpers.html" import render_field with context %}
 {%- extends "accounts/settings/index_base.html" -%}
 
-{% block settings_body %}
-{{helpers.panel_start(
-    'Groups',
+{%- bundles "groups.css" -%}
+
+{%- block settings_body %}
+
+{%- block pending_groups %}
+{%- if pending_ugs|length > 0 %}
+{{ helpers.panel_start(
+    _('Pending invitations'),
+    with_body=False,
+    icon='fa fa-group fa-fw'
+   ) }}
+<div class="panel-body">
+  {%- block pending_groups_description %}
+    Invitations you received from communities admins. Click accept in order to become a member of the particular team
+    or reject to cancel a pending invitation.
+  {%- endblock pending_groups_description %}
+</div>
+{%- block pending_groups_list  %}
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th class="col-md-7">{{ _("Name") }}</th>
+      <th class="col-md-1">{{ _("Members") }}</th>
+      <th class="col-md-4"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for ug in pending_ugs %}
+    <tr>
+      <td>
+        <div>
+          <b>{{ ug.name }}</b>
+        </div>
+        <br>
+        <small>{{ ug.description|truncate(200, True)|safe }}</small>
+      </td>
+      <td class="text-center vcenter">{{ members|length }}</td>
+      <td class="text-center btn-toolbar vcenter">
+        <a class="btn btn-xs btn-danger pull-right" href="{{ url_for('.reject', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Reject") }}
+        </a>
+        <a class="btn btn-xs btn-success pull-right" href="{{ url_for('.accept',  ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-link"></i>{{ _("Accept") }}
+        </a>
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{%- endblock pending_groups_list %}
+{{ helpers.panel_end(with_body=False) }}
+{%- endif %}
+{%- endblock pending_groups %}
+
+{% block my_groups %}
+{{ helpers.panel_start(
+    _('My Groups'),
+    with_body=False,
     icon='fa fa-group fa-fw',
-    btn=_('New group'),
-    btn_icon='fa fa-plus',
-    btn_href=url_for('webgroup.new'),
-    with_body=False)}}
-  <div class="panel-body">
-    <p>{{ _("You are a member of the following groups:") }}</p>
-  </div>
-  <ul class="list-group">
-  {% for group in current_user['group'] %}
-    {%- set uug = uugs[group] -%}
-    {%- set usergroup = uug.usergroup if uug else None -%}
-    {%- set is_external = group not in uugs -%}
-    {% set is_admin = uug.is_admin() %}
-    {% set is_member = uug.is_member() %}
-    {% set is_part_of = uug.is_part_of() %}
-    <li class="list-group-item">
-      <div class="pull-right">
-      {% if not is_external %}
-        {% if is_part_of %}
-        <a class="btn btn-xs btn-default"
-           href="{{ url_for('webgroup.members',
-             id_usergroup=usergroup.id) }}">
-          <i class="fa fa-users"></i> {{ _('Members') }}
+    btn=_('New group') if ugs.items|length > 0 else "", btn_icon='fa fa-plus', btn_href=url_for('.new')
+   ) }}
+<div class="panel-body">
+  {%- block groups_description %}
+  List of teams your are currently member of. While being in particular teams you gain special privileges,
+  which enables you to get more involved in growth of the community.
+  {%- endblock groups_description %}
+</div>
+{%- if ugs.items|length == 0 and not request.args['p'] %}
+{{ emptyprompt(
+    btn=_('New group'), btn_icon='fa fa-fw fa-plus',
+    btn_href=url_for('.new'),
+    heading=_('Go ahead and create new group !'), footer=_('Sugar, spice and everything nice.')
+   ) }}
+{%- elif ugs.items|length == 0 and request.args['p'] %}
+{{ searchbar() }}
+{{ emptysearch(heading=_("No results found")) }}
+{%- else %}
+{{ searchbar() }}
+{%- block groups_list %}
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th class="col-md-7">{{ _("Name") }}</th>
+      <th class="col-md-1">{{ _("Members") }}</th>
+      <th class="col-md-4"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for ug in ugs.items %}
+    <tr>
+      <td>
+        <div>
+          <b>{{ ug.name }}</b>
+        </div>
+        <br>
+        <small>{{ ug.description|truncate(200, True)|safe }}</small>
+      </td>
+      <td class="text-center vcenter">{{ members[ug.id]|length }}</td>
+      <td class="text-center btn-toolbar vcenter">
+        {%- if ug.is_member(current_user.id) %}
+        <a class="btn btn-xs btn-danger pull-right" href="{{ url_for('.leave', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Leave") }}
+        </a>
+        {%- elif ug.is_admin(current_user.id) %}
+        <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.manage',  ug_id=ug.id) }}">
+          <i class="fa fa-fw fa fa-wrench"></i>{{ _("Manage") }}
         </a>
         {% endif %}
-        {% if is_admin %}
-        <a class="btn btn-xs btn-default"
-           href="{{ url_for('webgroup.manage',
-             id_usergroup=usergroup.id) }}">
-          <i class="fa fa-wrench"></i> {{ _('Manage') }}
+        {%- if ug.is_admin(current_user.id) or ug.members_visibility == "VISIBLE" %}
+        <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.members', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-users"></i>{{ _("Members") }}
         </a>
-        <a class="btn btn-xs btn-danger"
-           href="{{ url_for('webgroup.delete',
-             id_usergroup=usergroup.id) }}">
-          <i class="fa fa-times"></i> {{ _('Delete') }}
-        </a>
-        {% endif %}
-        <a class="btn btn-xs btn-danger"
-           href="{{ url_for('webgroup.leave',
-             id_usergroup=usergroup.id) }}">
-          <i class="fa fa-chain-broken"></i> {{ _('Leave') }}
-        </a>
-      {% endif %}
-      </div>
-      <h4 class="list-group-item-heading">
-        {% if is_admin %}
-        <i class="fa fa-group fa-fw text-danger"></i>
-        {% elif is_member %}
-        <i class="fa fa-group fa-fw"></i>
-        {% elif not is_part_of %}
-        <i class="fa fa-group fa-fw text-warning"></i>
-        {% endif %}
-          {{ group }}</h4>
-      <small class="list-group-item-text">
-        {{ usergroup.description
-           if not is_external else _('External') }}
-      </small>
-    </li>
-  {% endfor %}
-  </ul>
-  <div class="panel-footer">
-    <form class="form-inline" action="{{ url_for('webgroup.join') }}"
-          method="post" role="form">
-      <div class="form-group">
-        {%- for field in form %}
-          {{ render_field(field, with_label=False) }}
-        {%- endfor %}
-        <button type="submit" class="btn btn-default">
-          <i class="fa fa-chain"></i> {{ _('Join group') }}
-        </button>
-      </div>
-    </form>
-  </div>
-{{helpers.panel_end(with_body=False)}}
-{% endblock %}
+        {%- endif %}
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{%- endblock groups_list %}
+<ul class="list-group">
+  <li class="list-group-item text-center">
+    {{ list_status(ugs) }}
+    {{ paginate(ugs, small=True) if ugs.items|length }}
+  </li>
+</ul>
+{%- endif %}
+{{ helpers.panel_end(with_body=False) }}
+{%- endblock my_groups %}
+
+{%- endblock settings_body%}
