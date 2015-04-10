@@ -23,6 +23,8 @@
 
 {% block title %}{% endblock %}
 
+{% bundles "communities.js" %}
+
 {% block body %}
 {% if not is_new %}
 <div id="deletemodal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="deletemodal_label" aria-hidden="true">
@@ -175,48 +177,4 @@
         {% include "communities/mycommunities.html" %}
     </div>
 </div>
-{% endblock %}
-
-{% block javascript %}
-<script type="text/javascript" src="/vendors/ckeditor/ckeditor.js"></script>
-<script type="text/javascript">
-var CKEDITOR_BASEPATH = '/ckeditor/';
-
-function init_ckeditor(selector, type) {
-    if(type=="simple"){
-        CKEDITOR.replace( selector, {
-            toolbar: [
-                ['PasteText','PasteFromWord'],
-                ['Bold','Italic','Strike','-','Subscript','Superscript',],
-                ['NumberedList','BulletedList', 'Blockquote'],
-                ['Undo','Redo','-','Find','Replace','-', 'RemoveFormat'],
-                ['Mathjax', 'SpecialChar', 'ScientificChar'],
-                ['Source'], ['Maximize'],
-            ],
-            extraPlugins: 'scientificchar,mathjax,blockquote',
-            disableNativeSpellChecker: false,
-            removePlugins: 'elementspath',
-            removeButtons: ''
-        });
-    } else {
-        CKEDITOR.replace( selector, {
-            toolbar: [
-                ['PasteText','PasteFromWord'],
-                ['Bold','Italic','Strike','-','Subscript','Superscript',],
-                ['NumberedList','BulletedList', 'Blockquote', 'Table', '-', 'Link', 'Anchor'],
-                ['Undo','Redo','-','Find','Replace','-', 'RemoveFormat'],
-                ['Mathjax', 'SpecialChar', 'ScientificChar'],
-                ['Styles', 'Format'], ['Source'], ['Maximize'],
-            ],
-            extraPlugins: 'scientificchar,mathjax,blockquote',
-            disableNativeSpellChecker: false,
-            removePlugins: 'elementspath',
-            removeButtons: ''
-        });
-    }
-}
-
-init_ckeditor("page", 'advanced');
-init_ckeditor("description", 'simple');
-</script>
 {% endblock %}
