@@ -19,6 +19,9 @@
 """
 WebJournal exceptions classes
 """
+
+from __future__ import unicode_literals
+
 import cgi
 from invenio.config import \
      CFG_SITE_URL, \

@@ -29,6 +29,8 @@ local configuration file names 'bibclassify_config_local.py' that
 contains the changes to apply.
 """
 
+from __future__ import unicode_literals
+
 import re
 import logging
 import sys

@@ -21,6 +21,8 @@
 BibUpload Engine configuration.
 """
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',

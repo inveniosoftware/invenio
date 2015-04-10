@@ -19,7 +19,7 @@
 
 """Command line script to manage configuration operations."""
 
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import ast
 import errno
@@ -68,7 +68,7 @@ def get_conf():
     """Prepare configuration."""
     try:
         from invenio.config import CFG_ETCDIR
-    except:
+    except Exception:
         CFG_ETCDIR = None
     from invenio.legacy.inveniocfg import prepare_conf
 
@@ -118,7 +118,8 @@ def set_(name, value, filename='invenio.cfg'):
     with current_app.open_instance_resource(filename, 'a') as config_file:
         print(name, '=', pformat(value), file=config_file)
 
-set_.__name__ = 'set'
+# See http://bugs.python.org/issue7688
+set_.__name__ = str('set')
 manager.command(set_)
 
 
@@ -138,7 +139,8 @@ def list_():
     for key, value in current_app.config.items():
         print(key, '=', pformat(value))
 
-list_.__name__ = 'list'
+# See http://bugs.python.org/issue7688
+list_.__name__ = str('list')
 manager.command(list_)
 
 

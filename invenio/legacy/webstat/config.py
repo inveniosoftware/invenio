@@ -19,6 +19,8 @@
 
 """Invenio WebStat Configuration."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 import pkg_resources

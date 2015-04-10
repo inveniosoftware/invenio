@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,8 @@
 # 60 seconds * 60 (1 hour) * 24 (1 day) * 2 (2 days)
 
 """Multimedia configuration."""
+
+from __future__ import unicode_literals
 
 MULTIMEDIA_IMAGE_CACHE_TIME = 60 * 60 * 24 * 2
 

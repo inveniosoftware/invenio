@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013, 2015 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +20,8 @@
 
 """Invenio Search Engine config parameters."""
 
+from __future__ import unicode_literals
+
 SEARCH_QUERY_PARSER = 'invenio_query_parser.parser:Main'
 
 SEARCH_QUERY_WALKERS = [
@@ -31,7 +34,7 @@ CFG_EXPERIMENTAL_FEATURES = 0
 # CFG_WEBSEARCH_IDXPAIRS_FIELDS -- a comma separated list of index
 # fields. This list contains all the index fields on which exact
 # phrase search should use idxPairs tables.
-CFG_WEBSEARCH_IDXPAIRS_FIELDS = ['global','abstract','title','caption']
+CFG_WEBSEARCH_IDXPAIRS_FIELDS = ['global', 'abstract', 'title', 'caption']
 
 # CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH -- if true, it will eliminate
 # all the false positives when using the word pairs for search.
@@ -51,11 +54,11 @@ CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
 CFG_SEARCH_RESULTS_CACHE_PREFIX = "search_results::"
 
 # CERN Site hack
-#CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
-#                               'author',
-#                               'abstract',
-#                               'report number,
-#                               'year']
+# CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
+#                                'author',
+#                                'abstract',
+#                                'report number,
+#                                'year']
 
 CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
                                'author',
@@ -69,7 +72,7 @@ CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
 
 
 CFG_WEBSEACH_MATCHING_TYPES = [
-        {
+    {
         'code': 'a',
         'title': "all of the words",
         'order': 1,
@@ -83,8 +86,8 @@ CFG_WEBSEACH_MATCHING_TYPES = [
             }
             return result;
         """
-        },
-        {
+    },
+    {
         'code': 'o',
         'title': "any of the words",
         'order': 2,
@@ -98,32 +101,32 @@ CFG_WEBSEACH_MATCHING_TYPES = [
             }
             return result;
         """
-        },
-        {
+    },
+    {
         'code': 'e',
         'title': "exact phrase",
         'order': 3,
         'tokenize': """
             return f+'"'+val+'"';
         """
-        },
-        {
+    },
+    {
         'code': 'p',
         'title': "partial phrase",
         'order': 4,
         'tokenize': """
             return f+"'"+val+"'";
         """
-        },
-        {
+    },
+    {
         'code': 'r',
         'title': "regular expression",
         'order': 5,
         'tokenize': """
             return f+'/'+val+'/';
         """
-        }
-    ]
+    }
+]
 
 # CFG_WEBSEARCH_COLLECTION_NAMES_SEARCH -- decides whether search for
 # collection name is enabled (1), disabled (-1) or enabled only for

@@ -17,6 +17,8 @@
 
 """Invenio Submission Web Interface config file."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 import re

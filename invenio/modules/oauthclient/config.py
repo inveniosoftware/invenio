@@ -175,6 +175,8 @@ a given authorize request.
     )
 """
 
+from __future__ import unicode_literals
+
 OAUTHCLIENT_REMOTE_APPS = {}
 """Configuration of remote applications."""
 

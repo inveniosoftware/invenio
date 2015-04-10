@@ -20,6 +20,8 @@
 
 """Default configuration for Celery."""
 
+from __future__ import unicode_literals
+
 
 def default_config(config):
     """Default configuration."""
@@ -32,8 +34,8 @@ def default_config(config):
     # The Invenio Celery loader automatically takes care of loading tasks
     # defined in *_tasks.py files in 'invenio' package.
     config.setdefault("CELERY_INCLUDE", [
-        #"invenio.celery.tasks",
-        #"invenio.modules.workflows.workers.worker_celery",
+        # "invenio.celery.tasks",
+        # "invenio.modules.workflows.workers.worker_celery",
     ])
 
     # Result backend

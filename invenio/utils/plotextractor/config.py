@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011 CERN.
+# Copyright (C) 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +20,8 @@
 
 """Plotextractor configuration."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 # CFG_PLOTEXTRACTOR_DESY_BASE --
@@ -26,4 +29,3 @@ CFG_PLOTEXTRACTOR_DESY_BASE = 'http://www-library.desy.de/preparch/desy/'
 
 # CFG_PLOTEXTRACTOR_DESY_PIECE --
 CFG_PLOTEXTRACTOR_DESY_PIECE = '/desy'
-

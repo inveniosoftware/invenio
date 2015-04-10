@@ -21,6 +21,8 @@
 
 """External collection configuration file."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT, \

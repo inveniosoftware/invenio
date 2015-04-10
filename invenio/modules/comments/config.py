@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,6 +21,8 @@
 
 """WebComment configuration parameters."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 CFG_WEBCOMMENT_ACTION_CODE = {
@@ -30,22 +32,30 @@ CFG_WEBCOMMENT_ACTION_CODE = {
     'REPORT_ABUSE': 'A'
 }
 
+
 # Exceptions: errors
 class InvenioWebCommentError(Exception):
+
     """A generic error for WebComment."""
+
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)
 
+
 # Exceptions: warnings
 class InvenioWebCommentWarning(Exception):
+
     """A generic warning for WebComment."""
+
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)

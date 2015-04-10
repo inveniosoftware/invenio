@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,22 +21,29 @@
 
 """BibFormat configuration parameters."""
 
-__revision__ = "$Id$"
+from __future__ import unicode_literals
 
 import os
+
 import pkg_resources
 
 from invenio.config import CFG_ETCDIR
 
+__revision__ = "$Id$"
+
+
 # Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
-CFG_BIBFORMAT_TEMPLATES_PATH = pkg_resources.resource_filename('invenio.modules.formatter', CFG_BIBFORMAT_TEMPLATES_DIR)
-CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
-CFG_BIBFORMAT_OUTPUTS_PATH = pkg_resources.resource_filename('invenio.modules.formatter', 'output_formats')
+CFG_BIBFORMAT_TEMPLATES_PATH = pkg_resources.resource_filename(
+    'invenio.modules.formatter', CFG_BIBFORMAT_TEMPLATES_DIR)
+CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(
+    CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
+CFG_BIBFORMAT_OUTPUTS_PATH = pkg_resources.resource_filename(
+    'invenio.modules.formatter', 'output_formats')
 
 # CFG_BIBFORMAT_HIDDEN_TAGS -- list of MARC tags that
 # are not shown to users not having cataloging authorizations.
-CFG_BIBFORMAT_HIDDEN_TAGS = [595,]
+CFG_BIBFORMAT_HIDDEN_TAGS = [595, ]
 
 # File extensions of formats
 CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION = "bft"
@@ -48,8 +55,10 @@ CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION = "bfo"
 # of these in a db table
 CFG_BIBFORMAT_CACHED_FORMATS = []
 
-assert CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION != CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
-    "CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION and CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION must be different"
+assert CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION != \
+    CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
+    "CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION and " +\
+    "CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION must be different"
 
 assert len(CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) == 3, \
     "CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION must be 3 characters long"
@@ -64,6 +73,7 @@ assert len(CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION) == 3, \
 
 
 class InvenioBibFormatError(Exception):
+
     """A generic error for BibFormat."""
 
     def __init__(self, message):
@@ -79,6 +89,7 @@ class InvenioBibFormatError(Exception):
 
 
 class InvenioBibFormatWarning(Exception):
+
     """A generic warning for BibFormat."""
 
     def __init__(self, message):

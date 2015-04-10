@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of CDS Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # CDS Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,7 +16,9 @@
 # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Webtag module configuration. """
+"""Webtag module configuration."""
+
+from __future__ import unicode_literals
 
 # pylint: disable-msg=W0105
 

@@ -19,6 +19,8 @@
 Forward to ArXiv.org source code
 '''
 
+from __future__ import unicode_literals
+
 from invenio.modules.formatter.api import get_tag_from_name
 
 #Maximal time to keep the stored XML Service doucment before reloading it in sec
