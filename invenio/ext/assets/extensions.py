@@ -21,13 +21,10 @@
 
 import copy
 import os
-import warnings
 
 from flask import _request_ctx_stack, current_app
 
 from flask_assets import Environment, FlaskResolver
-
-from invenio.utils.deprecation import RemovedInInvenio21Warning
 
 from jinja2 import nodes
 from jinja2.ext import Extension
@@ -90,7 +87,6 @@ class BundleExtension(Extension):
 
         # The filters less and requirejs don't have the same behaviour by
         # default. Make sure we are respecting that.
-        app.config.setdefault("LESS_RUN_IN_DEBUG", True)
         app.config.setdefault("REQUIREJS_RUN_IN_DEBUG", False)
         # Fixing some paths as we forced the output directory with the
         # .directory
@@ -121,13 +117,6 @@ class BundleExtension(Extension):
                     _bundles[bundle.output] = bundle
 
             env = current_app.jinja_env.assets_environment
-            # disable the compilation in debug mode iff asked.
-            less_debug = env.debug and \
-                not current_app.config.get("LESS_RUN_IN_DEBUG")
-
-            if less_debug:
-                warnings.warn("LESS_RUN_IN_DEBUG has been deprecated",
-                              RemovedInInvenio21Warning)
 
             requirejs_debug = env.debug and \
                 not current_app.config.get("REQUIREJS_RUN_IN_DEBUG")
@@ -161,11 +150,7 @@ class BundleExtension(Extension):
                     bundle_copy = copy.deepcopy(bundle)
                     bundle_copy.extra.update(static_url_path=static_url_path)
                     if bundle.has_filter("less"):
-                        if less_debug:
-                            bundle_copy.filters = None
-                            bundle_copy.extra.update(rel="stylesheet/less")
-                        else:
-                            bundle_copy.extra.update(static_url_path="")
+                        bundle_copy.extra.update(static_url_path="")
                     if bundle.has_filter("requirejs"):
                         if requirejs_debug:
                             bundle_copy.filters = None

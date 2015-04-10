@@ -138,21 +138,6 @@ admin = Bundle(
     weight=50
 )
 
-# less.js is only used when the following configuration is set:
-#
-#  - ASSETS_DEBUG is True
-#  - LESS_RUN_IN_DEBUG is False
-#
-lessjs = Bundle(
-    "vendors/less/dist/less.js",
-    output="less.js",
-    filters="uglifyjs",
-    weight=0,
-    bower={
-        "less": "latest"
-    }
-)
-
 # require.js is only used when:
 #
 #  - ASSETS_DEBUG is True
