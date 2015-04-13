@@ -48,6 +48,19 @@
 
   {% endif %}
 
+  {% if related_objects %}
+    <h5>{{ _('Records in this workflow') }}:</h5>
+    <div class="list-group">
+      {% for id_object, title in related_objects %}
+        {% if not title %}
+          <a href="{{ url_for('holdingpen.details', objectid=id_object) }}" class="list-group-item"><span class="badge">{{id_object}}</span> {{ _('Record deleted') }}</a>
+        {% else %}
+          <a href="{{ url_for('holdingpen.details', objectid=id_object) }}" class="list-group-item"><span class="badge">{{id_object}}</span>{{title}}</a>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% if identifiers %}
     <h5>{{ _('Identifiers') }}:</h5>
     <ul class="list-unstyled">

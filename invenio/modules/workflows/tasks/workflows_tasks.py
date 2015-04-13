@@ -143,17 +143,22 @@ def start_async_workflow(workflow_to_run="",
             workflow = get_workflow_from(eng)
         else:
             workflow = workflow_to_run
-        workflow_id = start_delayed(workflow,
-                                    data=[record_object],
-                                    stop_on_error=True,
-                                    module_name=eng.module_name,
-                                    **kwargs)
+
+        workflow_id = start_delayed(
+            workflow,
+            data=[record_object],
+            stop_on_error=True,
+            module_name=eng.module_name,
+            **kwargs
+        )
 
         eng.log.debug("New workflow '{0}' launched".format(workflow_to_run))
         try:
             eng.extra_data["_workflow_ids"].append(workflow_id)
+            obj.extra_data["objects_spawned"].append(record_object.id)
         except KeyError:
             eng.extra_data["_workflow_ids"] = [workflow_id]
+            obj.extra_data["objects_spawned"] = [record_object.id]
 
         try:
             eng.extra_data["_nb_workflow"] += 1
