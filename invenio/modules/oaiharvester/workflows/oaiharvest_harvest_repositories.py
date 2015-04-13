@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,43 +19,43 @@
 
 """Main workflow iterating over selected repositories and downloaded files."""
 
+from invenio.legacy.bibsched.bibtask import (
+    task_update_progress,
+    write_message
+)
+
+from invenio.modules.workflows.definitions import RecordWorkflow
+
+from invenio.modules.workflows.tasks.logic_tasks import (
+    end_for,
+    foreach,
+    simple_for,
+    workflow_else,
+    workflow_if,
+)
+
 from invenio.modules.workflows.tasks.marcxml_tasks import (
     get_obj_extra_data_key,
     update_last_update,
 )
 
 from invenio.modules.workflows.tasks.workflows_tasks import (
-    start_async_workflow,
-    workflows_reviews,
-    wait_for_a_workflow_to_complete,
     get_nb_workflow_created,
+    get_workflow_from_engine_definition,
     get_workflows_progress,
-    write_something_generic,
     num_workflow_running_greater,
-    get_workflow_from_engine_definition
+    start_async_workflow,
+    wait_for_a_workflow_to_complete,
+    workflows_reviews,
+    write_something_generic,
 )
-
-from invenio.modules.workflows.tasks.logic_tasks import (
-    foreach,
-    end_for,
-    simple_for,
-    workflow_if,
-    workflow_else
-)
-
-from invenio.legacy.bibsched.bibtask import (
-    task_update_progress,
-    write_message
-)
-from invenio.modules.workflows.definitions import RecordWorkflow
-
 
 from ..tasks.harvesting import (
     filtering_oai_pmh_identifier,
-    init_harvesting,
     get_records_from_file,
     get_repositories_list,
     harvest_records,
+    init_harvesting,
 )
 
 
@@ -120,3 +122,77 @@ class oaiharvest_harvest_repositories(RecordWorkflow):
         workflows_reviews(stop_if_error=True),
         update_last_update(get_repositories_list())
     ]
+
+    @staticmethod
+    def get_description(bwo):
+        """Return description of object."""
+        from flask import render_template
+
+        identifiers = None
+
+        extra_data = bwo.get_extra_data()
+        if 'options' in extra_data and 'identifiers' in extra_data["options"]:
+            identifiers = extra_data["options"]["identifiers"]
+
+        results = bwo.get_tasks_results()
+
+        if 'review_workflow' in results:
+            result_progress = results['review_workflow'][0]['result']
+        else:
+            result_progress = {}
+
+        current_task = extra_data['_last_task_name']
+
+        return render_template("workflows/styles/harvesting_description.html",
+                               identifiers=identifiers,
+                               result_progress=result_progress,
+                               current_task=current_task)
+
+    @staticmethod
+    def get_title(bwo):
+        """Return title of object."""
+        return "Summary of OAI harvesting from: {0}".format(
+            bwo.get_extra_data()["repository"]["name"])
+
+    @staticmethod
+    def formatter(bwo):
+        """Return description of object."""
+        from flask import render_template
+        from invenio.modules.workflows.models import BibWorkflowObject
+        from invenio.modules.workflows.registry import workflows
+
+        identifiers = None
+
+        extra_data = bwo.get_extra_data()
+        if 'options' in extra_data and 'identifiers' in extra_data["options"]:
+            identifiers = extra_data["options"]["identifiers"]
+
+        results = bwo.get_tasks_results()
+
+        if 'review_workflow' in results:
+            result_progress = results['review_workflow'][0]['result']
+        else:
+            result_progress = {}
+
+        current_task = extra_data['_last_task_name']
+
+        related_objects = []
+        for id_object in extra_data.get("objects_spawned", list()):
+            spawned_object = BibWorkflowObject.query.get(id_object)
+            if spawned_object:
+                workflow = workflows.get(spawned_object.get_workflow_name())
+                related_objects.append(
+                    (spawned_object.id,
+                     workflow.get_title(spawned_object) or "No title")
+                )
+            else:
+                related_objects.append(
+                    (id_object,
+                     None)
+                )
+
+        return render_template("workflows/styles/harvesting_description.html",
+                               identifiers=identifiers,
+                               result_progress=result_progress,
+                               current_task=current_task,
+                               related_objects=related_objects)
