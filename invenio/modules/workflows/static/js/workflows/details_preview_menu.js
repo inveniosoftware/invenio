@@ -45,7 +45,7 @@ define(
 
       this.setPreviewByFormat = function(ev, data) {
         this.trigger(document, "setPreviewByFormat", {
-          format: data.el.name,
+          format: data.el.name
         });
       }
 

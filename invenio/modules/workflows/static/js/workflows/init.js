@@ -45,4 +45,4 @@ require(
     // Without it, we have to rely on non-anonymous modules.
     console.info("js/workflows/init is loaded");
   }
-)
+);

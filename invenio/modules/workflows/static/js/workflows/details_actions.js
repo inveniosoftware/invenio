@@ -45,7 +45,7 @@ define(
         restart_url: "",
 
         // BibWorkflowObject id
-        id_object: "",
+        id_object: ""
       });
 
       this.handleDetailsButton = function(ev, data) {

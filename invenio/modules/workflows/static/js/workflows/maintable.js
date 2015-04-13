@@ -26,7 +26,7 @@ define(
     "js/workflows/sort_menu",
     "js/workflows/tags",
     "js/workflows/tags_menu",
-    "js/workflows/selection",
+    "js/workflows/selection"
   ],
   function(
     HoldingPenCommon,
@@ -51,7 +51,7 @@ define(
       HoldingPenPerPage.attachTo("#perpage-menu");
       HoldingPenSort.attachTo("#sort-menu");
       HoldingPenTags.attachTo("#tags", {
-        tags: context.tags,
+        tags: context.tags
       });
       HoldingPenTagsMenu.attachTo("#tags-menu");
       HoldingPenSelection.attachTo("#maintable");

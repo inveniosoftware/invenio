@@ -45,7 +45,7 @@ define(
 
       this.triggerActionButton = function(ev, data) {
         this.trigger(document, "detailsButtonClick", {
-          action: $(data.el).data("action"),
+          action: $(data.el).data("action")
         });
       };
 

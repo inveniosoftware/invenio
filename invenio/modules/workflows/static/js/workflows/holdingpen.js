@@ -79,15 +79,49 @@ define(
         });
       };
 
+      this.holdingPenKeyCodes = function(event) {
+        var keyCodes = {
+          escKey: 27,
+          aKey: 65,
+          wKey: 87,
+          qKey: 81
+        };
+
+        if (event.keyCode == keyCodes.escKey) {
+          $.event.trigger("deselectAll", document);
+          event.preventDefault();
+        }
+        if (event.ctrlKey && event.keyCode == keyCodes.aKey) {
+          $.event.trigger("selectAll", document);
+          event.preventDefault();
+        }
+        if (event.keyCode == keyCodes.wKey) {
+          $.event.trigger("nextPage", document);
+          event.preventDefault();
+        }
+        if (event.keyCode == keyCodes.qKey) {
+          $.event.trigger("previousPage", document);
+          event.preventDefault();
+        }
+      };
+
+
+      // Select/Deselect row for batch action
+      // Need to use jquery directly as "this" (e.g. flight component) is
+      // not in the context of the TableTools selection.
       this.rowSelectionTrigger = function(data) {
-        // Need to use jquery directly as "this" (e.g. flight component) is
-        // not in the context of the TableTools selection.
-        $.event.trigger("rowSelected", data, document);
-      }
+        $.event.trigger("rowSelected", {"data":data});
+      };
+
+      this.rowDeselectionTrigger = function(data) {
+        $.event.trigger("rowDeselected", {"data":data});
+      };
+
 
       this.after('initialize', function() {
         this.on(document, "initHoldingPenTable", this.reloadTable);
         this.on(document, "reloadHoldingPenTable", this.reloadTable);
+        this.on(document, "keydown", this.holdingPenKeyCodes);
         console.log("HP init");
       });
     }

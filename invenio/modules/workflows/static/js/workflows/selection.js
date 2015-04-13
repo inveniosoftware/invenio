@@ -21,7 +21,7 @@
 define(
   [
     'jquery',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
@@ -41,25 +41,78 @@ define(
     */
     function HoldingPenSelection() {
 
+      this.attributes({
+          selectedIDs:[]
+      });
+
       this.selection = function (ev, data) {
-        console.log("Selected:");
+        for (var i = 0; i < data.data.length; i++) {
+          var selectedID = this.$node.dataTable().fnGetData(data.data[i])[1];
+          var selectedIDsArray = this.attr.selectedIDs;
 
-        // row selected
-        console.log(data);
+          if ($.inArray(selectedID, selectedIDsArray) == -1) {
+            selectedIDsArray.push(selectedID);
+          }
+        }
 
-        // current node this component is attached to
-        console.log(this.$node);
+        console.log("Array after sel. = " + this.attr.selectedIDs);
+      };
 
-        // using current node, get datatable instance and get data based on row
+      this.deselection = function (ev, data) {
+        for (var i = 0; i < data.data.length; i++) {
+          var deselectedID = this.$node.dataTable().fnGetData(data.data[i])[1];
+          var selectedIDsArray = this.attr.selectedIDs;
 
-        console.log(this.$node.dataTable().fnGetData(data));
+          if (selectedIDsArray.length > 0) {
+            var index = selectedIDsArray.indexOf(deselectedID);
+            if (index > -1) {
+              selectedIDsArray.splice(index, 1);
+            }
+          }
+        }
 
-        // should print the object id we can use further
-        console.log(this.$node.dataTable().fnGetData(data)[1]);
+        console.log("Array after desel. = " + this.attr.selectedIDs);
+      };
+
+
+      this.selectAll = function (ev) {
+        $("#ToolTables_maintable_0").click();
+      };
+
+      this.deselectAll = function (ev) {
+        $("#ToolTables_maintable_1").click();
+      };
+
+
+      this.batchHEPActions = function(ev, data) {
+        data.selectedIDs = this.attr.selectedIDs;
+
+        $.event.trigger("return_data_for_exec", data);
+        $.event.trigger("deselectAll", document);
+      };
+
+
+      this.nextPage = function(ev) {
+        $("#maintable_next").click();
+        $.event.trigger("deselectAll", document);
+      };
+
+      this.previousPage = function(ev) {
+        $("#maintable_previous").click();
+        $.event.trigger("deselectAll", document);
       };
 
       this.after('initialize', function() {
         this.on(document, "rowSelected", this.selection);
+        this.on(document, "rowDeselected", this.deselection);
+
+        this.on(document, "selectAll", this.selectAll);
+        this.on(document, "deselectAll", this.deselectAll);
+
+        this.on(document, "execute", this.batchHEPActions);
+
+        this.on(document, "nextPage", this.nextPage);
+        this.on(document, "previousPage", this.previousPage);
         console.log("Selection init");
       });
     }

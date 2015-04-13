@@ -49,7 +49,7 @@ define(
         preview_url: "",
 
         // BibWorkflowObject id
-        id_object: "",
+        id_object: ""
       });
 
       this.renderPreviewByFormat = function (ev, data) {
