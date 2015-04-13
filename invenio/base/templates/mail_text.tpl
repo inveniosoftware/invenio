@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,11 +24,9 @@
 {% endblock -%}
 {%- block mail_footer %}
 {% if footer %}{{ footer }}{% else %}
-
-
 {{ _("Best regards") }}
 --
 {{ config.CFG_SITE_NAME_INTL.get(g.ln, config.CFG_SITE_NAME) }} <{{ config.CFG_SITE_URL }}>
 {{ _("Need human intervention?  Contact") }} <{{ config.CFG_SITE_SUPPORT_EMAIL }}>
-{% endif %}
+{% endif -%}
 {% endblock -%}
