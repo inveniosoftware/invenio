@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,9 +23,10 @@
 
 def default_config(config):
     """Default configuration."""
-    ## Broker settings
-    ## ---------------
+    # Broker settings
+    # ---------------
     config.setdefault("BROKER_URL", "redis://localhost:6379/1")
+    config.setdefault("CELERY_ACCEPT_CONTENT", ['msgpack'])
 
     # Extra modules with tasks which should be loaded
     # The Invenio Celery loader automatically takes care of loading tasks
@@ -35,32 +36,32 @@ def default_config(config):
         #"invenio.modules.workflows.workers.worker_celery",
     ])
 
-    ## Result backend
-    ## --------------
+    # Result backend
+    # --------------
     config.setdefault("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
     config.setdefault("CELERY_RESULT_SERIALIZER", "msgpack")
 
-    ## Routing
-    ## -------
+    # Routing
+    # -------
     # ...
 
-    ## Logging
+    # Logging
     config.setdefault("CELERY_REDIRECT_STDOUTS", True)
     config.setdefault("CELERY_REDIRECT_STDOUTS_LEVEL", "INFO")
     config.setdefault("CELERYD_HIJACK_ROOT_LOGGER", True)
 
-    ## Task execution
-    ## --------------
+    # Task execution
+    # --------------
     config.setdefault("CELERY_ALWAYS_EAGER", False)
     config.setdefault("CELERY_IGNORE_RESULT", False)
     config.setdefault("CELERY_TASK_SERIALIZER", "msgpack")
 
-    ## Worker
-    ## ------
+    # Worker
+    # ------
     config.setdefault("CELERYD_MAX_TASKS_PER_CHILD", 1000)
 
-    ## Error emails
-    ## ------------
+    # Error emails
+    # ------------
     config.setdefault("CELERY_SEND_TASK_ERROR_EMAILS", False)
 
     # Note ADMINS is also set by invenio.ext.email
@@ -89,8 +90,8 @@ def default_config(config):
         "EMAIL_USE_TLS", config.get("CFG_MISCUTIL_SMTP_TLS", False)
     )
 
-    ## Scheduler
-    ## ---------
+    # Scheduler
+    # ---------
     config.setdefault("CELERYBEAT_SCHEDULE", {})
 
     return config
