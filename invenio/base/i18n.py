@@ -17,9 +17,11 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Invenio international messages functions, to be used by all
-I18N interfaces.  Typical usage in the caller code is:
+"""Invenio international messages functions.
+
+To be used by all I18N interfaces.  Typical usage in the caller code is:
+
+.. code-block:: python
 
    from messages import gettext_set_language
    [...]
@@ -34,37 +36,32 @@ the _() convention.
 For more information, see ABOUT-NLS file.
 """
 
+from __future__ import unicode_literals
+
 import babel
-import gettext
+
 from flask_babel import gettext, lazy_gettext
-from six import iteritems
 
 # Placemark for the i18n function
 _ = lazy_gettext
 
 
-def gettext_set_language(ln, use_unicode=False):
-    """Set the _ gettext function in every caller function
+def gettext_set_language(ln):
+    """Set the _ gettext function in every caller function.
 
     Usage::
         _ = gettext_set_language(ln)
     """
     from invenio.ext.babel import set_locale
     with set_locale(ln):
-        if not use_unicode:
-            def unicode_gettext_wrapper(text, **kwargs):
-                from invenio.base.helpers import unicodifier
-                from invenio.utils.text import wash_for_utf8
-                return wash_for_utf8(gettext(unicodifier(text),
-                                             **unicodifier(kwargs)))
-            return unicode_gettext_wrapper
         return gettext
 
 
 def wash_language(ln):
-    """Look at language LN and check if it is one of allowed languages
-       for the interface.  Return it in case of success, return the
-       default language otherwise."""
+    """Look at language LN and check if it's one of allowed languages.
+
+    Return it in case of success, return the default language otherwise.
+    """
     from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     if not ln:
         return CFG_SITE_LANG
@@ -80,9 +77,10 @@ def wash_language(ln):
 
 
 def wash_languages(lns):
-    """Look at list of languages LNS and check if there's at least one
-       of the allowed languages for the interface. Return it in case
-       of success, return the default language otherwise."""
+    """Check in the languages list if there's at least one of the allowed langs.
+
+    Return it in case of success, return the default language otherwise.
+    """
     from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     for ln in lns:
         if ln:
@@ -95,9 +93,9 @@ def wash_languages(lns):
 
 
 def language_list_long(enabled_langs_only=True):
-    """
-    Return list of [short name, long name] for all enabled languages,
-    in the same language order as they appear in CFG_SITE_LANG.
+    """Return list of [short name, long name] for all enabled languages.
+
+    Return in the same language order as they appear in CFG_SITE_LANG.
 
     If 'enabled_langs_only' is set to False, then return all possibly
     existing Invenio languages, even if they were not enabled on the
@@ -114,14 +112,12 @@ def language_list_long(enabled_langs_only=True):
 
 
 def is_language_rtl(ln):
-    """
-    Returns True or False depending on whether language is
-    right-to-left direction.
+    """Return True if the language is right-to-left direction.
 
-    @param ln: language
-    @type ln: str
-    @return: is language right-to-left direction?
-    @rtype: bool
+    :param ln: language
+    :type ln: str
+    :return: is language right-to-left direction?
+    :rtype: bool
     """
     if ln in ('ar', 'fa'):
         return True
