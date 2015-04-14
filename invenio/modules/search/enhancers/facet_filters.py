@@ -90,13 +90,14 @@ def format_facet_tree_nodes(facet_dict):
     return ret_val
 
 
-def apply_facet_filters(search_obj, *args, **kwargs):
+def apply_facet_filters(search_obj, *args, filter_data=None, **kwargs):
     if 'filter' in request.values:
         from invenio.modules.search.facet_builders import \
             faceted_results_filter
         from invenio.modules.search.registry import facets
         try:
-            filter_data = json.loads(request.values.get('filter', '[]'))
+            if not filter_data:
+                filter_data = json.loads(request.values.get('filter', '[]'))
             out = get_groupped_facets(filter_data, facets)
             new_nodes = format_facet_tree_nodes(out)
             if new_nodes:

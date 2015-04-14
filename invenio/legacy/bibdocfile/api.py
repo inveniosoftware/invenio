@@ -249,7 +249,8 @@ def _generate_extensions():
     extensions.sort()
     extensions.reverse()
     extensions = set([ext.lower() for ext in extensions])
-    extensions = '\\' + '$|\\'.join(extensions) + '$'
+    extensions = '\\' + '$|\\'.join(map(lambda x: x.decode('utf-8'),
+                                    extensions)) + '$'
     extensions = extensions.replace('+', '\\+')
     return re.compile(extensions, re.I)
 
