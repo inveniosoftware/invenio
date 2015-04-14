@@ -55,7 +55,7 @@ def estimate():
 def pre_upgrade():
     """Run pre-upgrade checks (optional)."""
     warnings.warn("Manually migrate custom *.bfo files using "
-                  "'python script/output_format_migration_kit.py run'.")
+                  "'python scripts/output_format_migration_kit.py run'.")
 
 
 def post_upgrade():
