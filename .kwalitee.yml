@@ -37,6 +37,7 @@ components:
 - bulletin
 - cache
 - checker
+- celery
 - circulation
 - classifier
 - cloudconnector
