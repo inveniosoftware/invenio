@@ -678,6 +678,8 @@ def format_with_format_template(format_template_filename, bfo,
             bfo=bfo, **ctx).encode('utf-8')
         needs_2nd_pass = False
     else:
+        from invenio.modules.records.api import get_record as new_get_record
+
         #.xsl
         if bfo.xml_record:
             # bfo was initialized with a custom MARCXML
