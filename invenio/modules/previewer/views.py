@@ -22,6 +22,7 @@
 from __future__ import unicode_literals
 
 import itertools
+import os
 
 from flask import Blueprint, current_app, request
 
@@ -50,12 +51,13 @@ def preview(recid):
     for f in itertools.chain(get_record_documents(recid, filename),
                              get_record_files(recid, filename)):
         if f.name + f.superformat == filename or filename is None:
+            extension = os.path.splitext(f.name + f.superformat)[1]
             ordered = previewers.keys()
             if "CFG_PREVIEW_PREFERENCE" in cfg and \
-               f.superformat in cfg["CFG_PREVIEW_PREFERENCE"]:
+               extension in cfg["CFG_PREVIEW_PREFERENCE"]:
                 from collections import OrderedDict
                 ordered = OrderedDict.fromkeys(
-                    cfg["CFG_PREVIEW_PREFERENCE"][f.superformat] +
+                    cfg["CFG_PREVIEW_PREFERENCE"][extension] +
                     ordered).keys()
 
             try:

@@ -31,13 +31,14 @@
 
   <div class="col-xs-12 col-sm-12 col-md-12">
     <nav class="navbar navbar-default" role="navigation">
-      <div class="collapse navbar-collapse">
+      <div class="navbar-collapse">
         <form action="." method="GET" id="search_form" class="navbar-form" role="form">
           <div class="input-group">
             {{ form.p(class_="form-control " + form.p.short_name, ) }}
             <span class="input-group-btn"  style="width: 1%;">
-              <button type="submit" class="btn btn-primary">
-                <i class="glyphicon glyphicon-search glyphicon-white"></i> {{ _("Search") }}
+              <button type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
+                <i class="glyphicon glyphicon-search glyphicon-white"></i>
+                <span>{{ _("Search") }}</span>
               </button>
             </span>
           </div>

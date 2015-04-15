@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,45 +30,48 @@ if sys.hexversion < 0x2050000:
     from glob import glob as iglob
 else:
     from glob import iglob
+from intbitset import intbitset
 from flask import url_for
+from flask_login import current_user
 from six import iteritems
 
 from invenio.config import \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_CACHEDIR, \
+     CFG_CERN_SITE, \
      CFG_OAI_DELETED_POLICY, \
      CFG_OAI_EXPIRE, \
+     CFG_OAI_FRIENDS, \
      CFG_OAI_IDENTIFY_DESCRIPTION, \
      CFG_OAI_ID_FIELD, \
+     CFG_OAI_ID_PREFIX, \
      CFG_OAI_LOAD, \
-     CFG_OAI_SET_FIELD, \
-     CFG_OAI_PREVIOUS_SET_FIELD, \
      CFG_OAI_METADATA_FORMATS, \
-     CFG_CACHEDIR, \
+     CFG_OAI_PREVIOUS_SET_FIELD, \
+     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD, \
+     CFG_OAI_PROVENANCE_BASEURL_SUBFIELD, \
+     CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD, \
+     CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD, \
+     CFG_OAI_SAMPLE_IDENTIFIER, \
+     CFG_OAI_SET_FIELD, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
-     CFG_WEBSTYLE_HTTP_USE_COMPRESSION, \
-     CFG_CERN_SITE, \
-     CFG_OAI_SAMPLE_IDENTIFIER, \
-     CFG_OAI_ID_PREFIX, \
-     CFG_OAI_FRIENDS, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-     CFG_OAI_PROVENANCE_BASEURL_SUBFIELD, \
-     CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD, \
-     CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD, \
-     CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD, \
-     CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
-     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
+     CFG_WEBSTYLE_HTTP_USE_COMPRESSION
 
-from intbitset import intbitset
-from invenio.utils.html import X, EscapedXMLString
-from invenio.legacy.dbquery import run_sql, wash_table_column_name
-from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, search_unit_in_bibxxx, get_record, search_pattern
-from invenio.modules.formatter import format_record
-from invenio.legacy.bibrecord import record_get_field_instances
-from invenio.ext.logging import register_exception
-from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
-from invenio.utils.date import localtime_to_utc, utc_to_localtime
 from invenio.base.globals import cfg
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibrecord import record_get_field_instances
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
+    search_unit_in_bibxxx, get_record, search_pattern
+from invenio.modules.formatter import format_record
+from invenio.modules.search.utils import get_records_that_can_be_displayed
+from invenio.utils.date import localtime_to_utc, utc_to_localtime
+from invenio.utils.html import X, EscapedXMLString
 
 CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -587,12 +590,13 @@ def oai_get_recid(identifier):
     if identifier:
         recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e', ap=-9)
         if recids:
-            restricted_recids = get_all_restricted_recids()
-            for recid in recids:
-                if record_exists(recid) > 0 and recid not in restricted_recids:
+            displayable_recids = get_records_that_can_be_displayed(
+                current_user.get('precached_permitted_restricted_collections', []),
+                recids
+            )
+            for recid in displayable_recids:
+                if record_exists(recid) > 0:
                     return recid
-            if recid not in restricted_recids:
-                return recid
     return None
 
 
