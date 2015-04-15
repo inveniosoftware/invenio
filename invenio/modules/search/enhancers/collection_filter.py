@@ -22,12 +22,21 @@ from invenio_query_parser.ast import (
         AndOp, OrOp, NotOp, KeywordOp, Keyword, Value
 )
 
+"""This enhancer enhancers the search query filtering the results based on the
+restricted collections, the policy is applied and the restricted collections
+the user has access to.
+"""
+
+
 def kw_formatter(val):
     return KeywordOp(Keyword("collection"), Value(val))
 
+
 def create_collection_query(restricted_cols, permitted_restricted_cols,
                             current_col, policy, format_vals=kw_formatter):
-    """
+    """Create the new AST nodes that should be added to the search query
+
+    EXPLANATION OF POLICIES:
     cc = current collection
     rp = permitted-restricted collections
     r = restrincted collections
@@ -38,29 +47,25 @@ def create_collection_query(restricted_cols, permitted_restricted_cols,
 
     Policy ELSE:
     cc AND NOT r'
+
+    :param restricted_cols: All the restricted collections
+    :param permitted_restricted_cols: The restricted collections the user can
+                                      access
+    :param current_col: The name of the current collection
+    :param policy: The policy applied ('ANY' or enything else)
+    :param format_val: A function to format the content of the bool operations
     """
 
-    r_prime = set(restricted_cols) - set(permitted_restricted_cols)
-
-    r_prime_list = list(r_prime)
-    r_prime_tree = None
-
     def _format_terms(term_list):
-        if len(term_list) > 1:
-            kw1 = format_vals(term_list[0])
-            kw2 = format_vals(term_list[1])
-            or_term = OrOp(kw1, kw2)
-            for val in term_list[2:]:
-                kw = format_vals(val)
-                or_term = OrOp(or_term, kw)
-            return or_term
-        elif len(term_list) == 1:
-            return term_list[0]
-        else:
-            return None
+        return reduce(OrOp, [format_vals(k) for k in term_list]) if term_list \
+               else None
 
     r_prime = set(restricted_cols) - set(permitted_restricted_cols)
     r_prime_list = list(r_prime)
+
+    if not r_prime_list:
+        return None
+
     r_prime_tree = _format_terms(r_prime_list)
 
     current_col_kw = format_vals(current_col)
@@ -82,7 +87,11 @@ def create_collection_query(restricted_cols, permitted_restricted_cols,
 
 
 def apply_collection_filters(search_obj, user_info=None, collection=None):
-
+    """Enhance the query restricting some collections
+    Get the permitted restricted collection for the current user from the
+    user_info object and all the restriced collections from the
+    restricted_collection_cache
+    """
     from invenio.modules.collections.cache import restricted_collection_cache
 
     policy = cfg['CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY'].strip().upper()
@@ -93,4 +102,6 @@ def apply_collection_filters(search_obj, user_info=None, collection=None):
     collection_tree = create_collection_query(restricted_cols,
                                               permitted_restricted_cols,
                                               current_col, policy)
-    return AndOp(search_obj.query, collection_tree)
+    if collection_tree:
+        return AndOp(search_obj.query, collection_tree)
+    return search_obj.query

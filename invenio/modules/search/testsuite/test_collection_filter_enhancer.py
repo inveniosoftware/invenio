@@ -27,6 +27,7 @@ from invenio_query_parser.ast import AndOp, OrOp, NotOp
 from invenio.modules.search.enhancers.collection_filter import \
         create_collection_query
 
+
 class MockedRecord(object):
 
     _all_records = []
@@ -63,8 +64,11 @@ class MockedRecord(object):
         elif class_name == "NotOp":
             return not self.belongs_to_c_expr(c_expr.op)
 
-class RecordsRegistry(object):
 
+class RecordsRegistry(object):
+    """This registry keeps track of all the records that are created and adds
+    their reference in a list
+    """
     def __init__(self):
         self.all_records = []
 
@@ -84,14 +88,16 @@ def create_query(restricted_collections, permitted_restricted_collections,
                                    current_col, policy,
                                    format_vals=lambda x: x)
 
+
 def get_records_to_show(restricted_collections,
                         permitted_restricted_colls, current_col,
                         record_registry, policy):
     collection_query = create_query(restricted_collections,
-                                               permitted_restricted_colls,
-                                               current_col, policy)
+                                    permitted_restricted_colls,
+                                    current_col, policy)
 
     return record_registry.filter_collections(collection_query)
+
 
 class TestCollectionsFilterEnhancher(InvenioTestCase):
 
@@ -115,6 +121,7 @@ class TestCollectionsFilterEnhancher(InvenioTestCase):
                          [self.r1, self.r2, self.r6, self.r7])
 
     def test_col_expr(self):
+        """Test record filtering"""
         self.assertEqual(self.r1.belongs_to_c_expr("a"), True)
         self.assertEqual(self.r1.belongs_to_c_expr("b"), False)
         self.assertEqual(self.r1.belongs_to_c_expr(AndOp("a", "b")), False)
@@ -131,11 +138,18 @@ class TestCollectionsFilterEnhancher(InvenioTestCase):
 
     def test_policy_any(self):
         s1 = get_records_to_show(["a", "b", "c", "d"], ["a"],
-                         "cc", self.record_reg, "ANY")
-        s2 =  [self.r1, self.r2, self.r6, self.r7, self.r11]
+                                 "cc", self.record_reg, "ANY")
+        s2 = [self.r1, self.r2, self.r6, self.r7, self.r11]
         self.assertEqual(get_records_to_show(["a", "b", "c", "d"], ["a"],
                          "cc", self.record_reg, "ANY"),
                          [self.r1, self.r2, self.r6, self.r7, self.r11])
+
+    def test_none(self):
+        self.assertEqual(create_query([], [], 'cc', 'ANY'), None)
+
+    def test_no_restrict(self):
+        self.assertEqual(create_query(['a','b'], ['a', 'b'], 'cc', 'ANY'),
+                         None)
 
 TEST_SUITE = make_test_suite(TestCollectionsFilterEnhancher)
 
