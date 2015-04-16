@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from flask import g, request
 from werkzeug.utils import cached_property, import_string
 
 from invenio.base.globals import cfg
-from invenio.config import (CFG_CERN_SITE, CFG_INSPIRE_SITE,
+from invenio.config import (CFG_INSPIRE_SITE,
                             CFG_BIBRANK_SHOW_CITATION_LINKS)
 from invenio.ext.cache import cache
 
@@ -108,19 +108,15 @@ def references_nb_counts():
     if recid is None:
         return
 
-    from invenio.legacy.bibrecord import record_get_field_instances
     from invenio.legacy.search_engine import get_field_tags
     from invenio.modules.records.api import get_record
-
-    if not CFG_CERN_SITE:
-        reftag = ""
-        reftags = get_field_tags("reference")
-        if reftags:
-            reftag = reftags[0]
-        tmprec = get_record(recid)
-        if reftag and len(reftag) > 4:
-            return len(record_get_field_instances(tmprec, reftag[0:3],
-                       reftag[3], reftag[4]))
+    reftag = ""
+    reftags = get_field_tags("reference")
+    if reftags:
+        reftag = reftags[0]
+    tmprec = get_record(recid)
+    if reftag and len(reftag) > 4:
+        return len(tmprec.get("reference", []))
     return 0
 
 
