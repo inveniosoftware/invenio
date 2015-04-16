@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -314,7 +314,7 @@ class Collection:
         # open file:
         dirname = "%s/collections" % (CFG_CACHEDIR)
         mymkdir(dirname)
-        fullfilename = dirname + "/%s.html" % filename
+        fullfilename = dirname + "/%s.html" % filename.replace('/', '___SLASH___')
         try:
             os.umask(0o022)
             f = open(fullfilename, "wb")
@@ -940,8 +940,9 @@ def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
     em - code to display just part of the page
     show_help_boxes - whether to show the help boxes or not"""
     # check and update cache if necessary
-    cachedfile = open("%s/collections/%s-ln=%s.html" %
-                      (CFG_CACHEDIR, colname, ln), "rb")
+    cachedfile = open(r"%s/collections/%s-ln=%s.html" %
+                      (CFG_CACHEDIR, colname.replace('/', '___SLASH___'), ln),
+                      "rb")
     try:
         data = cPickle.load(cachedfile)
     except ValueError:
