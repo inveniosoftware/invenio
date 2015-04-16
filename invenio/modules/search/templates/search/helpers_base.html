@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -141,10 +141,10 @@
 {% macro search_also(externalcollections) %}{% block search_also scoped %}
   {% if externalcollections %}
     <h4>{{ _("Search also:") }}</h4>
-    <ul>
+    <ul class="nav nav-list clearfix">
     {% for ex in externalcollections %}
-      <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">
-        <img src="{{ url_for("static", filename="img/external-icon-light-8x8.gif")}}" alt="{{ ex.engine.base_url }}"/>
+      <li><a href="{{ ex.engine.base_url}}">
+        {{ ex.name }} <img src="{{ url_for("static", filename="img/external-icon-light-8x8.gif")}}" alt="{{ ex.engine.base_url }}"/>
         </a></li>
     {% endfor %}
     </ul>
