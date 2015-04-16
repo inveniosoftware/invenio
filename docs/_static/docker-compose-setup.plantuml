@@ -1,0 +1,116 @@
+title Setup as described in `docker-compose-dev.yml`
+
+skinparam ranksep 150
+
+skinparam component {
+    arrowColor Black
+    arrowLineThickness 20
+    borderColor Black
+}
+
+skinparam database {
+    backgroundColor<<rw>> Cyan
+    backgroundColor<<ro>> Grey
+    borderColor Black
+}
+
+skinparam node {
+    backgroundColor<<image>> Grey
+
+    borderColor Black
+}
+
+cloud "public internet" as internet {
+}
+
+cloud "host storage" as host {
+    database "./docs" as host_docs <<rw>> {
+    }
+
+    database "./invenio" as host_invenio <<ro>> {
+    }
+
+    database "./scripts" as host_scripts <<ro>> {
+    }
+}
+
+cloud "shared storage" as shared {
+    database "/home/invenio" as volume_home {
+    }
+
+    database "/usr/local/var/invenio.base-instance" as volume_usr {
+    }
+
+    database "/tmp" as volume_tmp {
+    }
+}
+
+node "mysql:latest" as image_mysql <<image>> {
+}
+
+node "redis:latest" as image_redis <<image>> {
+}
+
+node "python:2.7" as image_python <<image>> {
+}
+
+node "invenio:latest" as image_invenio <<image>> {
+}
+
+node "invenio_overlay:latest" as image_overlay <<image>> {
+}
+
+node "mysql" as container_mysql {
+    [mysqld] as mysql
+}
+
+node "redis" as container_redis {
+    [redis-server] as redis
+}
+
+node "web" as container_web {
+    [inveniomanage runserver] as runserver
+}
+
+node "worker" as container_worker {
+    [celery worker] as worker
+}
+
+() "TTY via `docker exec`" as interface_tty
+() "webinterface at localhost:5000" as interface_web
+() "builded docs" as interface_docs
+() "live code and template updates" as interface_code
+() "mysql at localhost:3306" as interface_mysql
+() "redis + celery debug (e.g. via flower) at localhost:6379" as interface_redis
+
+container_mysql -up-|> image_mysql
+container_redis -up-|> image_redis
+
+image_invenio -up-|> image_python
+image_overlay -up-|> image_invenio
+
+container_web -up-|> image_overlay
+container_worker -up-|> image_overlay
+
+container_web -> host
+container_worker -> host
+
+container_web -> shared
+container_worker -> shared
+
+runserver .up.> mysql
+runserver .up.> redis
+
+worker .up.> mysql
+worker .up.> redis
+
+interface_web . container_web
+interface_tty . container_web
+interface_docs <-up-> host_docs
+interface_code -up-> host_invenio
+interface_code -up-> host_scripts
+interface_mysql . container_mysql
+interface_redis . container_redis
+
+container_web .> internet
+container_worker .> internet
