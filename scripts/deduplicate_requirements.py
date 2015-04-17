@@ -17,8 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-r"""
-Deduplicator for pip requiremts.
+r"""Deduplicator for pip requiremts.
 
 Use it as part of a pipe, e.g.
     cat requirements.txt requirements-dev.txt requirements-extra.txt \

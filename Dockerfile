@@ -53,9 +53,10 @@ RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 
 #ENV REQUIREMENTS lowest
 ENV REQUIREMENTS release
 #ENV REQUIREMENTS devel
+ENV REXTRAS development,docs
 
 # add requirement files
-COPY ./.travis-devel-requirements.txt ./requirements.txt ./requirements.py ./setup.cfg ./setup.py /code/
+COPY ./requirements-devel.txt ./requirements.py ./setup.cfg ./setup.py /code/
 COPY ./invenio/version.py /code/invenio/version.py
 WORKDIR /code
 
@@ -63,14 +64,10 @@ WORKDIR /code
 # the different levels get composed from different sources
 # higher levels include all requirements of lower levels
 COPY ./scripts/deduplicate_requirements.py /code/scripts/deduplicate_requirements.py
-RUN python requirements.py > requirements.py.txt && \
-    touch .travis-lowest-requirements.txt && \
-    touch .travis-release-requirements.txt && \
-    touch .travis-devel-requirements.txt && \
-    cat requirements.txt requirements.py.txt .travis-lowest-requirements.txt | scripts/deduplicate_requirements.py > requirements-lowest.txt && \
-    cat .travis-release-requirements.txt requirements-lowest.txt | scripts/deduplicate_requirements.py > requirements-release.txt && \
-    cat .travis-devel-requirements.txt requirements-release.txt | scripts/deduplicate_requirements.py > requirements-devel.txt && \
-    pip install -r requirements-$REQUIREMENTS.txt --allow-all-external --quiet
+RUN python requirements.py --extras=$REXTRAS --level=min > requirements.py.lowest.txt && \
+    python requirements.py --extras=$REXTRAS --level=pypi > requirements.py.release.txt && \
+    python requirements.py --extras=$REXTRAS --level=dev > requirements.py.devel.txt && \
+    pip install -r requirements.py.$REQUIREMENTS.txt --allow-all-external --quiet
 
 
 ###############################################################################
@@ -86,7 +83,7 @@ COPY . /code
 ###############################################################################
 
 # install invenio
-RUN pip install -e .[development,docs] --quiet
+RUN pip install -e .[$REXTRAS] --quiet
 
 # build translation catalog
 RUN python setup.py compile_catalog
