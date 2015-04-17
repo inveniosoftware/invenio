@@ -30,7 +30,7 @@ if sys.hexversion < 0x2050000:
     from glob import glob as iglob
 else:
     from glob import iglob
-from flask import url_for
+from flask import url_for, abort
 from six import iteritems
 
 from invenio.config import \
@@ -447,6 +447,8 @@ def oai_list_records_or_identifiers(req, argd):
         cache = {
             'argd': argd,
             'last_recid': recid,
+            # FIXME introduce IP check if you use fireroles for guests
+            'id_user': current_user.get_id(),
             'complete_list': complete_list.fastdump(),
         }
         oai_cache_dump(resumption_token, cache)
@@ -680,14 +682,19 @@ def oai_cache_dump(resumption_token, cache):
     """
     cPickle.dump(cache, open(os.path.join(CFG_CACHEDIR, 'RTdata', resumption_token), 'w'), -1)
 
+
 def oai_cache_load(resumption_token):
-    """
-    Restores the cache from the resumption_token.
-    """
+    """Restore the cache from the resumption_token."""
     fullpath = os.path.join(CFG_CACHEDIR, 'RTdata', resumption_token)
-    if os.path.dirname(os.path.abspath(fullpath)) != os.path.abspath(os.path.join(CFG_CACHEDIR, 'RTdata')):
+    if os.path.dirname(os.path.abspath(fullpath)) != os.path.abspath(
+            os.path.join(CFG_CACHEDIR, 'RTdata')):
         raise ValueError("Invalid path")
-    return cPickle.load(open(fullpath))
+    cache = cPickle.load(open(fullpath))
+
+    if cache.get('id_user', 0) == current_user.get_id():
+        return cache
+    abort(401)
+
 
 def oai_cache_gc():
     """
