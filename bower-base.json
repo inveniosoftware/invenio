@@ -5,6 +5,6 @@
 
     "resolutions": {
         "jquery": "~1.11",
-        "bootstrap": "~3.2"
+        "bootstrap": "~3.3"
     }
 }

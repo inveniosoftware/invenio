@@ -86,7 +86,7 @@ styles = Bundle(
     filters="less,cleancss",
     weight=50,
     bower={
-        "bootstrap": "3.2.0",
+        "bootstrap": "3.3.4",
         "font-awesome": "4.1.0",
         "typeahead.js-bootstrap3.less": "0.2.3",
     }
