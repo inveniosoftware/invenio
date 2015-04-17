@@ -1,3 +1,6 @@
--r requirements.txt
+# !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING!
+#      Do NOT delete this file, even when it seems to be useless!
+#      It used by read Read the Docs to build our documentation!
+# !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING! !WARNING!
 
 -e .[docs]
