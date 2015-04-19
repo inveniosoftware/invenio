@@ -175,29 +175,20 @@ def _sort_from_cache(name):
     return _sorter
 
 
-def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
-    """Sort a list of BibWorkflowObjects for DataTables."""
-    should_we_reverse = False
-    if sSortDir_0 == 'desc':
-        should_we_reverse = True
-    if iSortCol_0 == 0:
-        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    elif iSortCol_0 == 1:
-        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    elif iSortCol_0 == 2:
-        bwolist.sort(key=_sort_from_cache("title"), reverse=should_we_reverse)
-    elif iSortCol_0 == 3:
-        bwolist.sort(key=_sort_from_cache("description"), reverse=should_we_reverse)
-    elif iSortCol_0 == 4:
-        bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
-    elif iSortCol_0 == 5:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 6:
-        bwolist.sort(key=lambda x: x.data_type, reverse=should_we_reverse)
-    elif iSortCol_0 == 7:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 8:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
+def sort_bwolist(bwolist, filter_key):
+    """Sort a list of workflow objects for the list."""
+    if filter_key == "newest":
+        bwolist.sort(key=lambda x: x.created, reverse=True)
+    if filter_key == "oldest":
+        bwolist.sort(key=lambda x: x.created, reverse=False)
+    elif filter_key == "updated":
+        bwolist.sort(key=lambda x: x.modified, reverse=True)
+    elif filter_key == "least_updated":
+        bwolist.sort(key=lambda x: x.modified, reverse=False)
+    elif filter_key == "title":
+        bwolist.sort(key=_sort_from_cache("title"), reverse=False)
+    elif filter_key == "title_desc":
+        bwolist.sort(key=_sort_from_cache("title"), reverse=True)
     return bwolist
 
 

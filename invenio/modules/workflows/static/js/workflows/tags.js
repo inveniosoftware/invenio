@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -37,14 +37,12 @@ define(
     * bootstrap-tagsinput element.
     *
     * :param Array tags: list of tags to add from the beginning.
-    * :param string versionMenuItemSelector: selector for HoldingPenTagsMenu.
     *
     */
     function HoldingPenTags() {
       this.attributes({
         // URLs
-        tags: [],
-        versionMenuItemSelector: ".version-selection"
+        tags: []
       });
 
       this.init_tags = function() {
@@ -86,6 +84,7 @@ define(
         // ev.item is the freeinput text
         if (ev.item.length != 0){
           ev.item = {text: ev.item, value: ev.item};
+          // FIXME: whats this?
           ev.cancel = false;
         }
       }

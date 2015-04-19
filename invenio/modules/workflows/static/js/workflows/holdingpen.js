@@ -17,102 +17,77 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
-
 define(
   [
     'jquery',
     'flight/lib/component',
-    'datatables',
-    'datatables-plugins',
-    'datatables-tabletools'
   ],
   function(
     $,
     defineComponent) {
+
+    'use strict';
 
     return defineComponent(HoldingPen);
 
     /**
     * .. js:class:: HoldingPen()
     *
-    * Holding Pen table using DataTables (+ plugins)
+    * Holding Pen table rendering. Trigger "reloadTable" event to render table.
     *
     * :param string load_url: URL to asynchronously load table rows.
-    * :param object oSettings: configuration of DataTables.
     *
     */
     function HoldingPen() {
       this.attributes({
         // URLs
         load_url: "",
-        oSettings: {
-          dom: 'T<"clear">lfrtip',
-          bFilter: false,
-          bProcessing: true,
-          bServerSide: true,
-          bDestroy: true,
-          aoColumnDefs: [
-            {'bSortable': false, 'defaultContent': "", 'aTargets': [0]},
-            {'bSearchable': false, 'bVisible': false, 'aTargets': [1]},
-            {'sWidth': "25%", 'aTargets': [2]},
-            {'sWidth': "25%", 'aTargets': [3]}
-          ],
-          order: [[ 4, "desc" ]],  // Default sort by modified date "newest first"
-          tableTools: {
-            "sRowSelect": "multi",
-            "sRowSelector": 'td:first-child',
-            "aButtons": [
-              {
-                "sExtends": "select_all",
-                "sButtonClass": "btn btn-default"
-              },
-              {
-                "sExtends": "select_none",
-                "sButtonClass": "btn btn-danger"
-              }
-            ]
-          },
-          deferRender: true,
-        }
+        page: 1,
+        per_page: 10,
       });
 
-      this.init_datatables = function(ev, data) {
-        // DataTables ajax settings
-        this.attr.oSettings["sAjaxSource"] = this.attr.load_url;
-        this.$node.DataTable(this.attr.oSettings);
-        // Bootstrap TableTools
-        var tt = $.fn.dataTable.TableTools.fnGetInstance(this.$node.attr("id"));
-        $(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
-      }
+      this.preparePayload = function (data) {
+        var payload = data || {};
+
+        if (payload && payload.page) {
+          this.attr.page = payload.page;
+        } else {
+          payload.page = this.attr.page;
+        }
+        if (payload && payload.per_page) {
+          this.attr.per_page = payload.per_page;
+        } else {
+          payload.per_page = this.attr.per_page;
+        }
+        return payload;
+      };
 
       this.reloadTable = function (ev, data) {
+        // $node is the list element this component is attached to.
         var $node = this.$node;
+        var that = this;
+
         $.ajax({
-            type: "POST",
+            type: "GET",
             url: this.attr.load_url,
-            data: JSON.stringify(data),
-            contentType: "application/json;charset=UTF-8",
-            traditional: true,
+            data: this.preparePayload(data),
             success: function(result) {
-                $node.dataTable().fnDraw(false);
+                var table = $node.find("tbody");
+                table.html(result.rendered_rows);
+                that.trigger(document, "updatePagination", result.pagination);
             }
         });
       };
 
-      this.holdingPenKeyCodes = function(ev) {
-        var keycodes = {
-          escape: 27,
-        }
-
-        console.log(ev.keyCode);
-        console.log(keycodes.escape);
+      this.rowSelectionTrigger = function(data) {
+        // Need to use jquery directly as "this" (e.g. flight component) is
+        // not in the context of the TableTools selection.
+        $.event.trigger("rowSelected", data, document);
       }
 
       this.after('initialize', function() {
-        this.on(document, "initHoldingPenTable", this.init_datatables);
+        this.on(document, "initHoldingPenTable", this.reloadTable);
         this.on(document, "reloadHoldingPenTable", this.reloadTable);
-        this.on(document, "keyup", this.holdingPenKeyCodes);
         console.log("HP init");
       });
     }

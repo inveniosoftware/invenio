@@ -50,6 +50,7 @@ from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio.utils.date import pretty_date
+from invenio.utils.pagination import Pagination
 
 from six import text_type
 
@@ -118,6 +119,141 @@ def index():
     action_list = get_action_list(bwolist)
 
     return dict(tasks=action_list)
+
+
+@blueprint.route('/load', methods=['GET', 'POST'])
+@login_required
+@templated('workflows/list.html')
+@permission_required(viewholdingpen.name)
+@wash_arguments({
+    'page': (int, 1),
+    'per_page': (int, 10),
+    'filter_key': (unicode, "created"),
+})
+def load(page, per_page, filter_key):
+    """Load objects for the table."""
+    # FIXME: Load tags in this way until wash_arguments handles lists.
+    tags = request.args.getlist("tags[]")
+    if not tags:
+        tags = session.setdefault(
+            "holdingpen_tags",
+            [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+        )
+
+    filter_key = request.args.get(
+        'filter_key', session.get('holdingpen_filter_key', "created")
+    )
+    object_list = get_holdingpen_objects(tags)
+    object_list = sort_bwolist(object_list, filter_key)
+
+    page = max(page, 1)
+    pagination = Pagination(page, per_page, len(object_list))
+
+    # Make sure requested page is within limits.
+    if pagination.page > pagination.pages:
+        pagination.page = pagination.pages
+
+    pages_iteration = []
+    for iter_page in pagination.iter_pages():
+        res = {"page": iter_page}
+        if iter_page == pagination.page:
+            res["active"] = True
+        else:
+            res["active"] = False
+        pages_iteration.append(res)
+
+    table_data = {'rows': [],
+                  'pagination': {
+                    "page": pagination.page,
+                    "pages": pagination.pages,
+                    "iter_pages": pages_iteration,
+                    "per_page": pagination.per_page,
+                    "total_count": pagination.total_count
+                  }}
+
+    # Add current ids in table for use by previous/next
+    session['holdingpen_current_ids'] = [o.id for o in object_list]
+    session['holdingpen_filter_key'] = filter_key
+    session['holdingpen_tags'] = tags
+
+    display_start = max(pagination.per_page*(pagination.page-1), 0)
+    display_end = min(
+        pagination.per_page*pagination.page,
+        pagination.total_count
+    )
+    for bwo in object_list[display_start:display_end]:
+        action_name = bwo.get_action()
+        action_message = bwo.get_action_message()
+        if not action_message:
+            action_message = ""
+
+        preformatted = get_formatted_holdingpen_object(bwo)
+
+        action = actions.get(action_name, None)
+        mini_action = None
+        if action:
+            mini_action = getattr(action, "render_mini", None)
+
+        extra_data = bwo.get_extra_data()
+        record = bwo.get_data()
+
+        if not hasattr(record, "get"):
+            try:
+                record = dict(record)
+            except (ValueError, TypeError):
+                record = {}
+        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
+        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
+        row = render_template('workflows/list_row.html',
+                              title=preformatted["title"],
+                              object=bwo,
+                              record=record,
+                              extra_data=extra_data,
+                              description=preformatted["description"],
+                              action=action,
+                              mini_action=mini_action,
+                              action_message=action_message,
+                              pretty_date=pretty_date,
+                              version=ObjectVersion,
+                              )
+        table_data['rows'].append(row)
+    table_data["rendered_rows"] = "".join(table_data["rows"])
+    return jsonify(table_data)
+
+
+@blueprint.route('/list', methods=['GET', ])
+@register_breadcrumb(blueprint, '.records', _('Records'))
+@login_required
+@permission_required(viewholdingpen.name)
+def list_objects():
+    """Display main table interface of Holdingpen."""
+    tags = session.get(
+        "holdingpen_tags",
+        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+    )
+    object_list = get_holdingpen_objects(tags)
+    action_list = get_action_list(object_list)
+
+    if 'version' in request.args:
+        for key, value in ObjectVersion.MAPPING.items():
+            if value == int(request.args.get('version')):
+                if key not in tags:
+                    tags.append(key)
+
+    tags_to_print = []
+    for tag in tags:
+        if tag:
+            tags_to_print.append({
+                "text": str(_(tag)),
+                "value": tag,
+            })
+
+    return render_template(
+        'workflows/list.html',
+        action_list=action_list,
+        tags=json.dumps(tags_to_print),
+        object_list=object_list
+    )
 
 
 @blueprint.route('/maintable', methods=['GET', 'POST'])

@@ -21,26 +21,40 @@ define(
   [
     "js/workflows/common",
     "js/workflows/holdingpen",
+    "js/workflows/pagination",
+    "js/workflows/perpage_menu",
+    "js/workflows/sort_menu",
     "js/workflows/tags",
     "js/workflows/tags_menu",
+    "js/workflows/selection",
   ],
   function(
     HoldingPenCommon,
     HoldingPen,
+    HoldingPenPagination,
+    HoldingPenPerPage,
+    HoldingPenSort,
     HoldingPenTags,
-    HoldingPenTagsMenu) {
+    HoldingPenTagsMenu,
+    HoldingPenSelection) {
 
     "use strict";
 
     function initialize(context) {
       HoldingPenCommon.attachTo(document);
-      HoldingPen.attachTo("#maintable", {
+      HoldingPen.attachTo("#list", {
         load_url: context.load_table_url,
+        page: context.page,
+        per_page: context.per_page
       });
+      HoldingPenPagination.attachTo("#pagination");
+      HoldingPenPerPage.attachTo("#perpage-menu");
+      HoldingPenSort.attachTo("#sort-menu");
       HoldingPenTags.attachTo("#tags", {
         tags: context.tags,
       });
       HoldingPenTagsMenu.attachTo("#tags-menu");
+      HoldingPenSelection.attachTo("#maintable");
     }
 
     return initialize;
