@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,24 +17,23 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" WebTag database models. """
+"""WebTag database models."""
+
+import re
+
+from datetime import date, datetime
+
+from invenio.base.globals import cfg
+from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User, Usergroup
+from invenio.modules.records.models import Record as Bibrec
+from invenio.utils.text import wash_for_xml
 
 from six import iteritems
 
-# Database
-from invenio.ext.sqlalchemy import db
 from sqlalchemy.ext.associationproxy import association_proxy
 
-# Related models
-from invenio.modules.records.models import Record as Bibrec
-from invenio.modules.accounts.models import User, Usergroup
-
-# Functions
-from invenio.base.globals import cfg
 from werkzeug import cached_property
-from invenio.utils.text import wash_for_xml
-from datetime import datetime, date
-import re
 
 
 class Serializable(object):
@@ -181,7 +180,7 @@ class WtgTAG(db.Model, Serializable):
     # to "keyword" attribute
     records = association_proxy('records_association', 'bibrec')
 
-    #Calculated fields
+    # Calculated fields
     @db.hybrid_property
     def record_count(self):
         """TODO."""
@@ -257,7 +256,8 @@ class WtgTAGRecord(db.Model, Serializable):
         """TODO."""
         super(WtgTAGRecord, self).__init__(**kwargs)
 
-        self.bibrec = bibrec
+        if bibrec is not None:
+            self.bibrec = bibrec
 
 
 # Compiling once should improve regexp speed
