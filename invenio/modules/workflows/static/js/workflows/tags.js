@@ -84,7 +84,7 @@ define(
         // ev.item is the freeinput text
         if (ev.item.length != 0){
           ev.item = {text: ev.item, value: ev.item};
-          // FIXME: whats this?
+          // event.cancel: set to true to prevent the item getting added
           ev.cancel = false;
         }
       }

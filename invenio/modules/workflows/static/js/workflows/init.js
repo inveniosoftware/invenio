@@ -20,9 +20,6 @@
 require(
   [
     "jquery",
-    "datatables",
-    "datatables-plugins",
-    "datatables-tabletools",
     "bootstrap-tagsinput",
     "prism",
     "js/workflows/common",
@@ -46,6 +43,6 @@ require(
     // properly loaded and ready to be used by inline scripts.
     //
     // Without it, we have to rely on non-anonymous modules.
-    console.info("js/workflows/init is loaded")
+    console.info("js/workflows/init is loaded");
   }
 )
