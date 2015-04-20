@@ -18,23 +18,13 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """The workflow engine extension of GenericWorkflowEngine."""
-
 from __future__ import absolute_import
 
-from invenio.ext.sqlalchemy import db
-from workflow.engine_db import DbWorkflowEngine
-from workflow.errors import WorkflowDefinitionError
-
-from six.moves import cPickle
-import base64
-from six import iteritems
+from copy import deepcopy
 from uuid import uuid1 as new_uuid
+
 from workflow.engine import ActionMapper
-from workflow.engine_db import (
-    DbWorkflowEngine,
-    ObjectStatus,
-    DbProcessingFactory,
-)
+from workflow.engine_db import DbWorkflowEngine, ObjectStatus, DbProcessingFactory
 from workflow.errors import WorkflowDefinitionError
 from .logger import DbWorkflowLogHandler, get_logger
 
@@ -63,9 +53,33 @@ class BibWorkflowEngine(DbWorkflowEngine):
 
     def __init__(self, db_obj, **extra_data):
         """Special handling of instantiation of engine."""
+        # Super's __init__ clears extra_data, which we override to be
+        # db_obj.extra_data. We work around this by temporarily storing it
+        # elsewhere.
+        _extra_data = deepcopy(db_obj.extra_data)
         super(BibWorkflowEngine, self).__init__(db_obj)
-        self.set_extra_data_params(**extra_data)
+        self.extra_data = _extra_data
+
+        self.extra_data.update(extra_data)
         self.set_workflow_by_name(self.db_obj.name)
+
+    def __dir__(self):
+        """Restore auto-completion for names found via `__getattr__`."""
+        dir_ = dir(type(self)) + list(self.__dict__.keys())
+        dir_.extend(('extra_data',))
+        return sorted(dir_)
+
+    def __getattr__(self, name):
+        """Return `extra_data` user-facing storage representations."""
+        if name == 'extra_data':
+            return self.db_obj.extra_data
+        return self.__dict__[name]
+
+    def __setattr__(self, name, val):
+        """Set `extra_data` user-facing storage representations."""
+        if name == 'extra_data':
+            self.db_obj.extra_data = val
+        self.__dict__[name] = val
 
     @classmethod
     def with_name(cls, name, id_user=0, module_name="Unknown", **extra_data):
