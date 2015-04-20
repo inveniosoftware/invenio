@@ -30,65 +30,6 @@ search_also, with context -%}
 {%- endfor -%}
 
 {%- macro collection_records(collection) -%}{% block collection_records scoped %}
-{%- block extra_style -%}
-<style>
-.websearch .nav > li > ul > li {
-  float: left;
-}
-.websearch .nav > li a {
-  display: inline;
-}
-.websearch .nav > li > a {
-  white-space: nowrap;
-  padding: 0px;
-}
-.websearch .nav > li > a:hover {
-  background-color: inherit;
-}
-.websearch ul.nav > li > ul {
-  clear: both;
-}
-.websearch ul.nav > li > ul > li {
-  display: inline;
-}
-.websearch ul.nav > li > ul > li > a {
-  display: inline;
-}
-.websearch .badge {
-  font-size: 80%;
-}
-
-.collection ul.nav-list {
-  padding-left: 0px;
-}
-
-.collection ul.nav-list ul.nav-list {
-  font-size: 90%;
-}
-
-.collection ul ul li a {
-  color: #333;
-  opacity: 0.8;
-}
-
-.collection .badge {
-  opacity:0.6;
-  font-size:80%;
-}
-
-.collection ul ul .badge {
-  color: #333;
-  background-color: #EEE;
-  border: 1px solid #999;
-}
-
-.form-horizontal .form-group {
-  display: block;
-  margin-bottom: 15px;
-  vertical-align: middle;
-}
-</style>
-{%- endblock extra_style -%}
 
 {%- block index -%}
 <div class="row websearch clearfix"><!-- row 2 -->
@@ -96,9 +37,15 @@ search_also, with context -%}
 
   {%- block index_right -%}
   {% if collection.collection_children_r %}
-    <div class="col-md-{{ '4' if collection.collection_children_v else '8' }} collection clearfix">
-      <h4>{{ collection.get_collectionbox_name(box_type='r') }}</h4>
-      {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
+    <div class="col-md-{{ '4' if collection.collection_children_v else '8' }} clearfix">
+      <div class="panel collection">
+        <div class="panel-heading">
+          <h4 class="panel-title">{{ collection.get_collectionbox_name(box_type='r') }}</h4>
+        </div>
+        <div class="panel-body">
+        {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
+        </div>
+      </div>
     </div>
   {% else %}
       <div class="col-md-{{ '4' if collection.collection_children_v else '8' }}">
@@ -130,11 +77,17 @@ search_also, with context -%}
 
   {%- block index_left -%}
   {% if collection.collection_children_v %}
-    <div class="col-md-4 collection clearfix">
-      <h4>{{ collection.get_collectionbox_name(box_type='v') }}</h4>
-      {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list clearfix") }}
+    <div class="col-md-4 clearfix">
+      <div class="panel collection">
+        <div class="panel-heading">
+          <h4 class="panel-title">{{ collection.get_collectionbox_name(box_type='v') }}</h4>
+        </div>
+        <div class="panel-body">
+          {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list clearfix") }}
 
-      {{ search_also(collection.externalcollections_2) }}
+          {{ search_also(collection.externalcollections_2) }}
+        </div>
+      </div>
     </div>
   {% elif collection.externalcollections_2 %}
       <div class="col-md-2">

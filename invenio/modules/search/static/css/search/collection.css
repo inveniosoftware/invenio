@@ -1,0 +1,90 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2015 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+.websearch .nav > li > ul > li {
+  float: left;
+  margin-bottom: 0;
+  margin-right: 5px;
+}
+.websearch .nav > li {
+  margin-bottom: 10px;
+}
+.websearch .nav > li a {
+  display: inline;
+}
+.websearch .nav > li > a {
+  white-space: nowrap;
+  padding: 0px;
+}
+.websearch .nav > li > a:hover {
+  background-color: inherit;
+}
+.websearch ul.nav > li > ul {
+  clear: both;
+}
+.websearch ul.nav > li > ul > li {
+  display: inline;
+}
+.websearch ul.nav > li > ul > li > a {
+  display: inline;
+}
+.websearch .badge {
+  font-size: 80%;
+}
+.websearch .counter {
+  vertical-align: 5%;
+}
+
+.collection {
+  box-shadow: none !important;
+}
+
+.collection > div {
+  padding-top: 0 !important;
+}
+
+.collection ul.nav-list {
+  padding-left: 0px;
+}
+
+.collection ul.nav-list ul.nav-list {
+  font-size: 90%;
+}
+
+.collection ul ul li a {
+  color: #333;
+  opacity: 0.8;
+}
+
+.collection .badge {
+  opacity:0.6;
+  font-size:80%;
+}
+
+.collection ul ul .badge {
+  color: #333;
+  background-color: #EEE;
+  border: 1px solid #999;
+}
+
+.form-horizontal .form-group {
+  display: block;
+  margin-bottom: 15px;
+  vertical-align: middle;
+}

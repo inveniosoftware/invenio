@@ -107,9 +107,8 @@
     {% endif %}
     #}
     <a href="{{ url_for(".collection", name=collection.name, ln=g.ln, _external=True) }}">
-      {{ collection.name_ln }}
+      {{ collection.name_ln }} <small class="text-muted counter">({{ collection.nbrecs }})</small>&nbsp;
     </a>
-    <small class="text-muted">({{ collection.nbrecs }})</small>&nbsp;
   {% if collection.collection_children and idxs|length < limit %}
     {%- do idxs.append(loop.index) -%}
     <ul {{ macrokwargs|xmlattr }}>

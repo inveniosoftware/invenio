@@ -32,6 +32,7 @@ js = Bundle(
 )
 
 styles = Bundle(
+    'css/search/collection.css',
     'css/search/search.css',
     'css/search/searchbar.css',
     filters="cleancss",
