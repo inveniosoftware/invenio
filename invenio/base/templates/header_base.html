@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -52,7 +52,7 @@
                   </ul>
                 </li>
             {%- else -%}
-            <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            <li{% if (item.url|length > 1 and request.path.startswith(item.url)) or request.path == item.url %} class="active"{% endif %}><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
             {%- endif -%}
         {%- endfor -%}
         </ul>
