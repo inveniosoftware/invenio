@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -30,16 +30,7 @@
   <div class="row">
     <div class="col-md-6">
 {%- block footer_credits %}
-      {{ config["CFG_SITE_NAME_INTL"][g.ln] }}
-      &nbsp;::&nbsp;<a class="footer" href="{{ url_for('collections.index') }}">
-        {{- _("Search") -}}
-      </a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('webdeposit.index') }}">
-        {{- _("Deposit") -}}
-      </a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('accounts_settings.index') }}">
-        {{- _("Profile") -}}
-      </a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('documentation.index') }}">
-        {{- _("Help") -}}
-      </a><br/>
+      {{ config["CFG_SITE_NAME_INTL"][g.ln] }}<br/>
       {{ _("Powered by") }} <a class="footer" href="http://invenio-software.org/">Invenio</a>
       v{{ config.CFG_VERSION }}<br />
       {{ _("Maintained by") }} <a class="footer" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">
