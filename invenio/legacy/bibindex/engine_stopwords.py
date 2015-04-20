@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,8 @@ __revision__ = "$Id$"
 from invenio.base.globals import cfg
 from invenio.modules.ranker.registry import configuration
 from invenio.legacy.bibindex.engine_utils import get_all_index_names_and_column_values
+from invenio.utils.datastructures import LazyDict
+
 
 def create_stopwords(filename=None):
     """Create stopword dictionary out of FILENAME."""
@@ -54,7 +56,7 @@ def map_stopwords_names_to_stopwords_kb():
     return stopwords_kb_map
 
 
-stopwords_kb = map_stopwords_names_to_stopwords_kb()
+stopwords_kb = LazyDict(map_stopwords_names_to_stopwords_kb)
 
 def is_stopword(word, stopwords=None):
     """Return true if WORD is found among stopwords for given index, false otherwise.
