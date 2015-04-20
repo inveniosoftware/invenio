@@ -29,13 +29,17 @@
 }
 
 .row-action {
-  width: 30%;
+  width: 20%;
   text-align: right;
 }
 
 .row-checkbox {
   width: 2%;
   text-align: center;
+}
+
+.row-content h4 {
+  margin-top: 2px;
 }
 
 .row-icon {
@@ -45,6 +49,14 @@
 
 #list-header {
   margin-bottom: 0px;
+}
+
+*[data-href] {
+  cursor: pointer;
+}
+
+table tr:hover {
+  background-color: #ffa;
 }
 
 /* Add nice looking Font Awesome checkboxes in main table
@@ -64,32 +76,3 @@
 
 */
 
-/* Override default DataTables TableTools selection color */
-
-#maintable tr:hover {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.even td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.odd td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.even {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.odd {
-  background-color: #ffa;
-}

@@ -62,6 +62,7 @@ from ..utils import (
     alert_response_wrapper,
     extract_data,
     get_action_list,
+    get_data_types,
     get_formatted_holdingpen_object,
     get_holdingpen_objects,
     get_previous_next_objects,
@@ -115,7 +116,7 @@ def index():
     Acts as a hub for catalogers (may be removed)
     """
     # FIXME: Add user filtering
-    bwolist = get_holdingpen_objects()
+    bwolist = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.HALTED)])
     action_list = get_action_list(bwolist)
 
     return dict(tasks=action_list)
@@ -127,24 +128,19 @@ def index():
 @permission_required(viewholdingpen.name)
 @wash_arguments({
     'page': (int, 1),
-    'per_page': (int, 10),
-    'filter_key': (unicode, "created"),
+    'per_page': (int, 0),
+    'sort_key': (unicode, "created"),
 })
-def load(page, per_page, filter_key):
+def load(page, per_page, sort_key):
     """Load objects for the table."""
     # FIXME: Load tags in this way until wash_arguments handles lists.
-    tags = request.args.getlist("tags[]")
-    if not tags:
-        tags = session.setdefault(
-            "holdingpen_tags",
-            [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
-        )
-
-    filter_key = request.args.get(
-        'filter_key', session.get('holdingpen_filter_key', "created")
+    tags = request.args.getlist("tags[]") or []
+    sort_key = request.args.get(
+        'sort_key', session.get('holdingpen_sort_key', "created")
     )
+    per_page = per_page or session.get('holdingpen_per_page') or 10
     object_list = get_holdingpen_objects(tags)
-    object_list = sort_bwolist(object_list, filter_key)
+    object_list = sort_bwolist(object_list, sort_key)
 
     page = max(page, 1)
     pagination = Pagination(page, per_page, len(object_list))
@@ -173,7 +169,8 @@ def load(page, per_page, filter_key):
 
     # Add current ids in table for use by previous/next
     session['holdingpen_current_ids'] = [o.id for o in object_list]
-    session['holdingpen_filter_key'] = filter_key
+    session['holdingpen_sort_key'] = sort_key
+    session['holdingpen_per_page'] = per_page
     session['holdingpen_tags'] = tags
 
     display_start = max(pagination.per_page*(pagination.page-1), 0)
@@ -233,6 +230,7 @@ def list_objects():
     )
     object_list = get_holdingpen_objects(tags)
     action_list = get_action_list(object_list)
+    type_list = get_data_types()
 
     if 'version' in request.args:
         for key, value in ObjectVersion.MAPPING.items():
@@ -252,40 +250,10 @@ def list_objects():
         'workflows/list.html',
         action_list=action_list,
         tags=json.dumps(tags_to_print),
-        object_list=object_list
+        object_list=object_list,
+        type_list=type_list,
+        per_page=session.get('holdingpen_per_page')
     )
-
-
-@blueprint.route('/maintable', methods=['GET', 'POST'])
-@register_breadcrumb(blueprint, '.records', _('Records'))
-@login_required
-@permission_required(viewholdingpen.name)
-@templated('workflows/maintable.html')
-def maintable():
-    """Display main table interface of Holdingpen."""
-    bwolist = get_holdingpen_objects()
-    action_list = get_action_list(bwolist)
-    tags = session.get(
-        "holdingpen_tags",
-        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
-    )
-
-    if 'version' in request.args:
-        for key, value in ObjectVersion.MAPPING.items():
-            if value == int(request.args.get('version')):
-                if key not in tags:
-                    tags.append(key)
-
-    tags_to_print = []
-    for tag in tags:
-        if tag:
-            tags_to_print.append({
-                "text": str(_(tag)),
-                "value": tag,
-            })
-    return dict(bwolist=bwolist,
-                action_list=action_list,
-                tags=json.dumps(tags_to_print))
 
 
 @blueprint.route('/<int:objectid>', methods=['GET', 'POST'])
@@ -513,107 +481,3 @@ def get_context():
     }
 
     return jsonify(context)
-
-
-@blueprint.route('/load_table', methods=['GET', 'POST'])
-@login_required
-@permission_required(viewholdingpen.name)
-@templated('workflows/maintable.html')
-def load_table():
-    """Get JSON data for the Holdingpen table.
-
-    Function used for the passing of JSON data to DataTables:
-
-    1. First checks for what record version to show
-    2. Then the sorting direction.
-    3. Then if the user searched for something.
-
-    :return: JSON formatted str from dict of DataTables args.
-    """
-    tags = session.setdefault(
-        "holdingpen_tags",
-        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
-    )
-    if request.method == "POST":
-        if request.json and "tags" in request.json:
-            tags = request.json["tags"]
-            session["holdingpen_tags"] = tags
-        # This POST came from tags-input.
-        # We return here as DataTables will call a GET here after.
-        return None
-
-    i_sortcol_0 = int(
-        request.args.get('iSortCol_0', session.get('holdingpen_iSortCol_0', 4))
-    )
-    s_sortdir_0 = request.args.get('sSortDir_0',
-                                   session.get('holdingpen_sSortDir_0', "desc"))
-
-    session["holdingpen_iDisplayStart"] = int(request.args.get(
-        'iDisplayStart', session.get('iDisplayLength', 10))
-    )
-    session["holdingpen_iDisplayLength"] = int(
-        request.args.get('iDisplayLength', session.get('iDisplayLength', 0))
-    )
-    session["holdingpen_sEcho"] = int(
-        request.args.get('sEcho', session.get('sEcho', 0))
-    ) + 1
-
-    bwobject_list = get_holdingpen_objects(tags)
-    bwobject_list = sort_bwolist(bwobject_list, i_sortcol_0, s_sortdir_0)
-
-    session["holdingpen_iSortCol_0"] = i_sortcol_0
-    session["holdingpen_sSortDir_0"] = s_sortdir_0
-
-    table_data = {'aaData': [],
-                  'iTotalRecords': len(bwobject_list),
-                  'iTotalDisplayRecords': len(bwobject_list),
-                  'sEcho': session["holdingpen_sEcho"]}
-
-    # Add current ids in table for use by previous/next
-    record_ids = [o.id for o in bwobject_list]
-    session['holdingpen_current_ids'] = record_ids
-
-    records_showing = 0
-    display_start = session["holdingpen_iDisplayStart"]
-    display_end = display_start + session["holdingpen_iDisplayLength"]
-    for bwo in bwobject_list[display_start:display_end]:
-        records_showing += 1
-        action_name = bwo.get_action()
-        action_message = bwo.get_action_message()
-        if not action_message:
-            action_message = ""
-
-        preformatted = get_formatted_holdingpen_object(bwo)
-
-        action = actions.get(action_name, None)
-        mini_action = None
-        if action:
-            mini_action = getattr(action, "render_mini", None)
-
-        extra_data = bwo.get_extra_data()
-        record = bwo.get_data()
-
-        if not hasattr(record, "get"):
-            try:
-                record = dict(record)
-            except (ValueError, TypeError):
-                record = {}
-        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
-        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
-        row = render_template('workflows/row_formatter.html',
-                              title=preformatted["title"],
-                              object=bwo,
-                              record=record,
-                              extra_data=extra_data,
-                              description=preformatted["description"],
-                              action=action,
-                              mini_action=mini_action,
-                              action_message=action_message,
-                              pretty_date=pretty_date,
-                              version=ObjectVersion,
-                              )
-
-        row = row.split("<!--sep-->")
-
-        table_data['aaData'].append(row)
-    return jsonify(table_data)

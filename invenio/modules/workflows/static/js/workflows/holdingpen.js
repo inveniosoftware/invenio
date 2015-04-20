@@ -40,24 +40,22 @@ define(
     */
     function HoldingPen() {
       this.attributes({
+        // Selectors
+        totalSelector: "#total_found",
+
         // URLs
         load_url: "",
+
+        // Data
         page: 1,
-        per_page: 10,
+        sort_key: "",
       });
 
       this.preparePayload = function (data) {
-        var payload = data || {};
-
-        if (payload && payload.page) {
-          this.attr.page = payload.page;
-        } else {
-          payload.page = this.attr.page;
-        }
-        if (payload && payload.per_page) {
-          this.attr.per_page = payload.per_page;
-        } else {
-          payload.per_page = this.attr.per_page;
+        // We consider current attributes as default and then override.
+        var payload = this.attr;
+        for (var attrname in data || {}) {
+          payload[attrname] = data[attrname];
         }
         return payload;
       };
@@ -74,6 +72,7 @@ define(
             success: function(result) {
                 var table = $node.find("tbody");
                 table.html(result.rendered_rows);
+                $(that.attr.totalSelector).html(result.pagination.total_count);
                 that.trigger(document, "updatePagination", result.pagination);
             }
         });

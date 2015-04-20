@@ -55,28 +55,29 @@
 
   <div class="container">
     <div class="row">
+      {% block hotkey_help %}
+      <div class="pull-left">
+        <p class="text-muted">Ctrl+A: Select all, Esc: Deselect</p>
+      </div>
+      {% endblock %}
+    </div>
+    <div class="row">
       {% block navigation %}
       <nav id="list-header" class="navbar navbar-default" role="navigation">
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
             <li class="navbar-btn">
-                <input id="list-select-all" class="" type="checkbox" value="">
+                <input id="list-select-all" type="checkbox">
             </li>
-            <p class="navbar-text">
-              <strong>
-                <span id="total">{{object_list|count}}</span>
-              </strong>
-              {{ _('entries found') }}
-            </p>
             <p class="navbar-text">{{ _('Showing') }}:</p>
             <li class="navbar-btn">
               <select id="perpage-menu"
                       aria-controls="list"
                       class="form-control input-sm">
-                  <option value="10">10</option>
-                  <option value="25">25</option>
-                  <option value="100">100</option>
-                  <option value="500">500</option>
+                  <option{% if per_page == 10 %} selected{% endif %} value="10">10</option>
+                  <option{% if per_page == 25 %} selected{% endif %} value="25">25</option>
+                  <option{% if per_page == 100 %} selected{% endif %} value="100">100</option>
+                  <option{% if per_page == 500 %} selected{% endif %} value="500">500</option>
               </select>
             </li>
           </ul>
@@ -85,21 +86,27 @@
               <input id="tags" type="text" class="form-control" placeholder="{{ _("Add to search") }}">
             </div>
           </form>
+          <ul class="nav navbar-nav">
+            <p class="navbar-text">
+              <strong>
+                <span id="total_found">{{object_list|count}}</span>
+              </strong>
+              {{ _('entries found') }}
+            </p>
+          </ul>
           <ul class="nav navbar-nav navbar-right">
+            {% if type_list %}
             <li class="dropdown">
-              <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Actions') }}<b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                {% if action_list %}
-                  {% set i = 0 %}
-                  {% for task, object_count in action_list.items() %}
-                    <li><a id="task{{i}}" class="task-btn" tabindex="-1" name="{{task}}">{{ task }}: {{ object_count }}</a></li>
-                    {% set i = i + 1 %}
-                  {% endfor %}
-                {% else %}
-                  <li><a class="task-btn">{{ _('No actions') }}</a></li>
-                {% endif %}
+              <a class="dropdown-toggle dropdown-headline" data-toggle="dropdown" href="#">{{ _('Type') }}<b class="caret"></b></a>
+              <ul id="type-menu" class="dropdown-menu">
+                {% for type_name in type_list %}
+                  <li>
+                    <a class="task-btn" name="{{type_name}}">{{ type_name }}</a>
+                  </li>
+                {% endfor %}
               </ul>
             </li>
+            {% endif %}
             <li class="dropdown">
               <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
               <ul id="tags-menu" class="dropdown-menu" role="menu">

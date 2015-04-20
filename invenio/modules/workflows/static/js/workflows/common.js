@@ -48,7 +48,7 @@ define(
       });
 
       this.setAlertMessage = function (ev, data) {
-        $(this.attr.alertSelector).append(tpl_alert({
+        $(this.attr.alertSelector).html(tpl_alert({
           category: data.category,
           message: data.message
         }));

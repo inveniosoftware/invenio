@@ -45,8 +45,8 @@ define(
 
       this.changeSort = function(ev, data) {
         console.log($(data.el).attr("name"));
-        var filter_key = $(data.el).attr("name");
-        this.trigger(document, "reloadHoldingPenTable", {"filter_key": filter_key});
+        var sort_key = $(data.el).attr("name");
+        this.trigger(document, "reloadHoldingPenTable", {"sort_key": sort_key});
       };
 
       this.after('initialize', function() {

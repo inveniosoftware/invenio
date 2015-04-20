@@ -16,19 +16,25 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-<tr>
+<tr data-href="{{url_for('holdingpen.details', objectid=object.id)}}">
 <td class="row-checkbox">
     <input type="checkbox" value="{{object.id}}">
 </td>
 <td class="row-icon">
-    <i class="fa fa-download text-{{object._class}}"></i>
+    <i class="fa fa-info-circle text-{{object._class}}"></i>
 </td>
 <td class="row-content">
+<div>
+<h4>
 <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
   {{ title }}
 </a>
-
+<small>on
+<time datetime="{{object.modified.isoformat()}}" title="{{object.modified.isoformat()}}">{{object.created.strftime("%b %d %H:%m")}}</time></small>
+</h4>
 {{ description|safe }}
+</div>
+
 </td>
 
 <td class="row-action">
@@ -36,5 +42,6 @@
   {% set action = action() %}
   {{ action.render_mini(object)|safe }}
 {% endif %}
+
 </td>
 </tr>

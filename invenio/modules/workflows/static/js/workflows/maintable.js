@@ -53,8 +53,19 @@ define(
       HoldingPenTags.attachTo("#tags", {
         tags: context.tags
       });
-      HoldingPenTagsMenu.attachTo("#tags-menu");
-      HoldingPenSelection.attachTo("#maintable");
+      HoldingPenTagsMenu.attachTo("#tags-menu", {
+        menuitemSelector: "#tags-menu a",
+        valuePrefix: ""
+      });
+      HoldingPenTagsMenu.attachTo("#type-menu", {
+        menuitemSelector: "#type-menu a",
+        valuePrefix: "type:"
+      });
+      HoldingPenTagsMenu.attachTo("#filter-menu", {
+        menuitemSelector: "#filter-menu a",
+        valuePrefix: "f:"
+      });
+      HoldingPenSelection.attachTo(document);
     }
 
     return initialize;

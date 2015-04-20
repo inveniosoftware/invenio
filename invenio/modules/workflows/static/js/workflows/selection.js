@@ -42,7 +42,10 @@ define(
     function HoldingPenSelection() {
 
       this.attributes({
-          selectedIDs:[]
+          selectedIDs: [],
+          selectAllSelector: "#list-select-all",
+          checkboxSelector: ".row-checkbox input[type=checkbox]",
+          rowSelector: "*[data-href]"
       });
 
       this.selection = function (ev, data) {
@@ -75,8 +78,27 @@ define(
       };
 
 
-      this.selectAll = function (ev) {
-        $("#ToolTables_maintable_0").click();
+      this.selectAll = function (ev, data) {
+        console.log("Selected all");
+        var that = this;
+        $(this.attr.checkboxSelector).each(function() {
+          console.log($(this).val());
+          var selectedID = $(this).val();
+          if ($.inArray(selectedID, that.attr.selectedIDs) == -1) {
+            that.attr.selectedIDs.push(selectedID);
+          }
+          $(this).checked = true;
+        });
+        console.log("Array: " + this.attr.selectedIDs);
+      };
+
+      this.selectOne = function (ev, data) {
+        console.log("Selected one");
+        console.log($(data.el).val());
+      };
+
+      this.selectRow = function (ev, data) {
+        console.log("Selected row");
       };
 
       this.deselectAll = function (ev) {
@@ -113,6 +135,12 @@ define(
 
         this.on(document, "nextPage", this.nextPage);
         this.on(document, "previousPage", this.previousPage);
+
+        this.on("click", {
+          selectAllSelector: this.selectAll,
+          checkboxSelector: this.selectOne,
+          rowSelector: this.selectRow
+        });
         console.log("Selection init");
       });
     }

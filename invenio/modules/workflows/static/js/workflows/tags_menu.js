@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -33,27 +33,29 @@ define(
     /**
     * .. js:class:: HoldingPenTagsMenu()
     *
-    * UI Component for the dropdown menu for selecting specifially the
-    * version/status of an object.
+    * UI Component for a dropdown menu to add to the tagsinput.
     *
-    * :param string versionMenuItemSelector: DOM selector for each menu item.
+    * :param string menuitemSelector: DOM selector for each menu item.
     *
     */
     function HoldingPenTagsMenu() {
+
       this.attributes({
-        versionMenuItemSelector: ".version-selection"
+        menuitemSelector: "#menu a",
+        valuePrefix: ""
       });
 
-      this.addTagFromMenu = function(ev, data) {
+      this.triggerAddTagFromMenu = function(ev, data) {
+        var value = this.attr.valuePrefix + data.el.name;
         this.trigger(document, "addTagFromMenu", {
-          value: data.el.name,
-          text: data.el.text,
+          value: value,
+          text: value,
         });
-      }
+      };
 
       this.after('initialize', function() {
         this.on("click", {
-          versionMenuItemSelector: this.addTagFromMenu,
+          menuitemSelector: this.triggerAddTagFromMenu,
         });
         console.log("Tags menu init");
       });
