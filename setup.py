@@ -115,13 +115,13 @@ install_requires = [
     "pyparsing>=2.0.1,<2.0.2",
     "python-twitter>=2.0",
     "pyPDF>=1.13",
-    "pyPDF2",
+    "pyPDF2>=1.17",
     "PyLD>=0.5.2",
     "pyStemmer>=1.3",
     "python-dateutil>=1.5",
     "python-magic>=0.4.6",
-    "pytz",
-    "rauth",
+    "pytz>=2014.1",
+    "rauth>=0.7.0",
     "raven>=5.0.0",
     "rdflib>=4.1.2",
     "redis>=2.8.0",
@@ -129,20 +129,20 @@ install_requires = [
     "requests>=2.3,<2.4",
     "setuptools>=2.2",
     "six>=1.7.2",
-    "Sphinx",
-    "SQLAlchemy>=0.9.8,<1.0",
+    "Sphinx>=1.3",
+    "SQLAlchemy>=0.9.9,<1.0",
     "SQLAlchemy-Utils[encrypted]>=0.28.2,<0.30",
-    "unidecode",
+    "unidecode>=0.04.1",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
-    "wtforms-alchemy>=0.12.6",
-    "pyyaml",
+    "wtforms-alchemy>=0.12.6,<0.13.1",
+    "pyyaml>=3.11",
 ]
 
 
 extras_require = {
     "docs": [
-        "sphinx_rtd_theme"
+        "sphinx_rtd_theme>=0.1.7"
     ],
     "development": [
         "Flask-DebugToolbar==0.9.0",
@@ -156,31 +156,31 @@ extras_require = {
     ],
     "googledrive": [
         "google-api-python-client>=1.2",
-        "apiclient",
-        "oauth2client",
+        "apiclient>=1.0.0",
+        "oauth2client>=1.4.0",
         "urllib3>=1.8.3"
     ],
     "img": [
-        "qrcode",
+        "qrcode>=5.1",
         "Pillow>=2.7.0"
     ],
     "mongo": [
-        "pymongo"
+        "pymongo>=3.0"
     ],
     "misc": [  # was requirements-extras
         "gnuplot-py==1.8",
-        "flake8",  # extra=kwalitee?
+        "flake8>=2.0.0",  # extra=kwalitee?
         "pychecker==0.8.19",  # extra=kwalitee?
-        "pylint",  # extra=kwalitee?
-        "nosexcover",  # test?
-        "python-onedrive",  # extra=cloud?
-        "python-openid",  # extra=sso?
+        "pylint>=1.4.0",  # extra=kwalitee?
+        "nosexcover>=1.0.0",  # test?
+        "python-onedrive>=15.0.0",  # extra=cloud?
+        "python-openid>=2.2.0",  # extra=sso?
     ],
     "mixer": [
-        "mixer",
+        "mixer>=5.1.0",
     ],
     "sso": [
-        "Flask-SSO>=0.1"
+        "Flask-SSO>=0.2"
     ],
     "postgresql": [
         "psycopg2>=2.5",
@@ -213,13 +213,11 @@ extras_require["docs"] += extras_require["github"]
 # FIXME extras_require["docs"] += extras_require["googledrive"]
 
 tests_require = [
-    # FIXME remove limit after 0.8.4 is out and urllib3's requirements
-    # (urllib3==1.7.1) will be removed in HTTPretty
-    "httpretty<=0.8.0",
+    "httpretty>=0.8.4",
     "Flask-Testing>=0.4.1",
-    "mock",
-    "nose",
-    "selenium",
+    "mock>=1.0.0",
+    "nose>=1.3.0",
+    "selenium>=2.45.0",
     "unittest2>=0.5",
 ]
 
@@ -234,8 +232,8 @@ extras_require["tests"] = tests_require
 # Compatibility with Python 2.6
 if sys.version_info < (2, 7):
     install_requires += [
-        "argparse",
-        "importlib"
+        "argparse>=1.3.0",
+        "importlib>=1.0.0"
     ]
 
 
