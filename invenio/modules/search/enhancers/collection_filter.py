@@ -19,7 +19,7 @@
 
 from invenio.base.globals import cfg
 from invenio_query_parser.ast import (
-        AndOp, OrOp, NotOp, KeywordOp, Keyword, Value
+        AndOp, OrOp, NotOp, KeywordOp, Keyword, DoubleQuotedValue, Value
 )
 
 """This enhancer enhancers the search query filtering the results based on the
@@ -86,7 +86,7 @@ def create_collection_query(restricted_cols, permitted_restricted_cols,
     return result_tree
 
 
-def apply_collection_filters(search_obj, user_info=None, collection=None):
+def apply_collection_filters(query, user_info=None, collection=None):
     """Enhance the query restricting some collections
     Get the permitted restricted collection for the current user from the
     user_info object and all the restriced collections from the
@@ -103,5 +103,5 @@ def apply_collection_filters(search_obj, user_info=None, collection=None):
                                               permitted_restricted_cols,
                                               current_col, policy)
     if collection_tree:
-        return AndOp(search_obj.query, collection_tree)
-    return search_obj.query
+        return AndOp(query, collection_tree)
+    return query

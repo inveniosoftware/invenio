@@ -26,7 +26,7 @@ from itertools import groupby
 from six import iteritems
 
 from invenio_query_parser.ast import (
-        AndOp, OrOp, NotOp, KeywordOp, Keyword, Value
+        AndOp, OrOp, NotOp, KeywordOp, Keyword, DoubleQuotedValue, Value
 )
 
 """This enhancer enhancers the search query with the facet filters that are
@@ -88,7 +88,7 @@ def format_facet_tree_nodes(facet_dict, facets, format_vals=kw_formatter):
     return ret_val
 
 
-def apply_facet_filters(search_obj, *args, **kwargs):
+def apply_facet_filters(query, user_info=None, collection=None):
     """ Enhance the query AST with the facet filters
     First get the facet filter expression from the request values.
     Group the facets and create the new AST nodes to be added.
@@ -103,10 +103,10 @@ def apply_facet_filters(search_obj, *args, **kwargs):
             out = get_groupped_facets(filter_data)
             new_nodes = format_facet_tree_nodes(out, facets)
             if new_nodes:
-                ret_val = AndOp(search_obj.query, new_nodes)
+                ret_val = AndOp(query, new_nodes)
             else:
-                ret_val = search_obj.query
+                ret_val = query
             return ret_val
         except Exception:
             flash(_('Invalid filter data'), 'error')
-    return search_obj.query
+    return query

@@ -23,13 +23,26 @@ import pypeg2
 import six
 
 from flask_login import current_user
+from flask import g
 from werkzeug.utils import cached_property, import_string
 
 from invenio.base.globals import cfg
+from invenio.modules.search.cache import get_results_cache, set_results_cache
 
 from .walkers.terms import Terms
 from .walkers.match_unit import MatchUnit
 
+
+def query_enhancers():
+    functions = getattr(g, 'search_query_enhancers', None)
+    if functions is None:
+        functions = []
+        for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
+            if isinstance(enhancer, six.string_types):
+                enhancer = import_string(enhancer)
+                functions.append(enhancer)
+        setattr(g, 'search_query_enhancers', functions)
+    return functions
 
 class SearchEngine(object):
 
@@ -60,14 +73,18 @@ class SearchEngine(object):
         """Search records."""
         user_info = user_info or current_user
         # Enhance query first
-        self.enhanced_query = self.query
-        for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
-            if isinstance(enhancer, six.string_types):
-                enhancer = import_string(enhancer)
-                self.enhanced_query = enhancer(self, user_info=user_info,
-                                               collection=collection)
-        from .searchext.engines.native import search
-        return search(self, user_info=user_info, collection=collection)
+        query = self.query
+        for enhancer in query_enhancers():
+                query = enhancer(query, user_info=user_info,
+                                 collection=collection)
+
+        from invenio.modules.search.walkers.search_unit import SearchUnit
+        #results = get_results_cache(self._query, collection)
+        results = None
+        if results is None:
+            results = query.accept(SearchUnit())
+            # set_results_cache(results, self._query, collection)
+        return results
 
     def match(self, record, user_info=None):
         """Return True if record match the query."""

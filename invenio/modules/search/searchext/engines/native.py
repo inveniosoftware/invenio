@@ -48,7 +48,7 @@ def search(self, user_info=None, collection=None):
     from invenio.modules.search.walkers.search_unit import SearchUnit
     results = get_results_cache(self._query, collection)
     if results is None:
-        results = self.enhanced_query.accept(SearchUnit())
+        results = self.query.accept(SearchUnit())
         set_results_cache(results, self._query, collection)
 
     if 'filter' in request.values:
