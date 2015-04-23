@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -151,24 +151,17 @@ Warnings
 Warnings are useful to alert developers and system administrators about
 possible problems, e.g. usage of obsolete modules, deprecated APIs etc.
 
-Issue a deprecation warning (not silent):
-
->>> import warnings
->>> warnings.warn("Message to developer", DeprecationWarning)
-
-Issue a pending deprecation warning (silent by default):
-
->>> warnings.warn("Message to developer", PendingDeprecationWarning)
+Please follow Invenio :ref:`deprecationpolicy` section.
 """
 
 from __future__ import absolute_import
 
+import logging
 import warnings
 
-import logging
 from functools import wraps
 
-from .wrappers import register_exception, get_pretty_traceback
+from .wrappers import get_pretty_traceback, register_exception
 
 
 def setup_app(app):
