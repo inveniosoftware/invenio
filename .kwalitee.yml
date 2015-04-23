@@ -119,3 +119,6 @@ components:
 - version
 - webhooks
 - workflows
+
+excludes:
+- (.)+/legacy/(.)+
