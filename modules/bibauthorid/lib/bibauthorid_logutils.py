@@ -3,6 +3,7 @@
 import invenio.bibauthorid_config as bconfig
 import sys
 import os
+from invenio.config import CFG_LOGDIR
 from datetime import datetime
 from math import floor
 import multiprocessing as mp
@@ -16,7 +17,7 @@ class Logger(object):
     _pid = os.getpid
     _print_output = bconfig.LOG_VERBOSE
     _file_out = bconfig.LOG_TO_PIDFILE
-    _file_prefix = '/tmp/bibauthorid_log_pid_'
+    _file_prefix = CFG_LOGDIR + '/bibauthorid_log_pid_'
     _newline = bconfig.LOG_UPDATE_STATUS_THREAD_SAFE
     _update_status = bconfig.LOG_UPDATE_STATUS
 
