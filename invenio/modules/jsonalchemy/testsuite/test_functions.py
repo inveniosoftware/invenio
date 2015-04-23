@@ -24,11 +24,13 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from .test_bases import field_definitions, model_definitions, \
     clean_field_model_definitions
 from ..jsonext.functions.to_int import to_int
+from ..jsonext.functions.util_merge import util_merge
 
 
 class TestToInt(InvenioTestCase):
 
     """Tests for ``to_int`` function."""
+
     def setUp(self):
         """Prepare the JSONAlchemy input."""
         clean_field_model_definitions()
@@ -70,7 +72,9 @@ class TestToInt(InvenioTestCase):
                                       model="test_toint",
                                       namespace='testsuite')
 
-        self.assertEqual(len(simple_record.__dict__['_dict']['__meta_metadata__']['__errors__']), 0)
+        self.assertEqual(len(simple_record.__dict__['_dict'][
+                             '__meta_metadata__'][
+                             '__errors__']), 0)
 
         # Check if it works when the value is provided.
         xml = '<collection><record><datafield tag="999" ind1="" ind2= "">' \
@@ -82,6 +86,20 @@ class TestToInt(InvenioTestCase):
                                       model="test_toint",
                                       namespace='testsuite')
         self.assertEqual(simple_record['with_integers'][0]['some_int'], 9999)
+
+
+class TestUtilMerge(InvenioTestCase):
+
+    """Test fot ``util_merge`` function."""
+
+    def test_util_merge(self):
+        """Test the result of the function."""
+        self.assertEqual(util_merge(['Last name', 'First name'], ', '),
+                         'Last name, First name')
+        self.assertEqual(util_merge(['Last name', None], ', '),
+                         'Last name')
+        self.assertEqual(util_merge([None], ', '), '')
+
 
 TEST_SUITE = make_test_suite(TestToInt)
 
