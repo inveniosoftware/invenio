@@ -78,6 +78,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import warnings
 from distutils import dir_util
 from os import path
 from urlparse import urlparse
@@ -89,6 +90,7 @@ from werkzeug.utils import cached_property
 from invenio.base.utils import staticproperty, classproperty
 from invenio.ext.script import Manager, change_command_name
 from invenio.ext.template import render_template_to_string
+from invenio.utils.deprecation import RemovedInInvenio22Warning
 from invenio.utils.shell import which
 
 
@@ -172,8 +174,10 @@ def version(separator='\n', formatting='{version} [{executable}]'):
 
 
 @manager.command
+@manager.option('--no-ssl', dest='no_ssl', action='store_true')
+@manager.option('-f', '--force', dest='force', action='store_true')
 @change_command_name
-def create_config():
+def create_config(force=False, no_ssl=False):
     """Create Apache configuration files for this site.
 
     Keep previous files in a backup copy.
@@ -440,7 +444,7 @@ def create_config():
                 'attachfile': path.join(app_cfg['CFG_TMPDIR'], 'attachfile'),
                 'comments': path.join(app_cfg['CFG_DATADIR'], 'comments'),
                 'baskets': path.join(app_cfg['CFG_DATADIR'], 'baskets'),
-                'tmp': app_cfg['CFG_TMPDIR']  # XXX Should this be using the prefix?
+                'tmp': app_cfg['CFG_TMPDIR']
             })
             return xsfpdirs
 
@@ -495,14 +499,21 @@ def create_config():
             wsgi['script_fullpath'] = path.join(wsgi['dir'], 'invenio.wsgi')
             return wsgi
 
+    if force:
+        warnings.warn('Option --force has no effect and will be removed.',
+                      RemovedInInvenio22Warning)
+    if no_ssl:
+        warnings.warn('Option --no-ssl will be removed.',
+                      RemovedInInvenio22Warning)
+
     apache_cfg = Cfg()
 
     # Resolve requested schemes
-    if app_cfg['APACHE_SSL']:
+    if not no_ssl and app_cfg['APACHE_SSL']:
         schemes = ('http', 'https')
         if apache_cfg.vhosts['http'].port == apache_cfg.vhosts['https'].port:
             print("HTTP and HTTPS cannot be set to serve on the same port",
-                file=sys.stderr)
+                  file=sys.stderr)
             sys.exit(1)
     else:
         schemes = ('http',)
@@ -525,7 +536,7 @@ def create_config():
 
     print("""\
 Apache virtual host configuration file for your site was created.
-You may enable them by adding the following to your httpd.conf:\n
+You may enable them by adding the following to your httpd.conf:
 
 Include {}
 
@@ -534,6 +545,7 @@ Please see the INSTALL file for more details.
 
 
 def main():
+    """Generate apache configuration."""
     from invenio.base.factory import create_app
     app = create_app()
     manager.app = app

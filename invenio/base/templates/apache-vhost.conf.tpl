@@ -44,7 +44,6 @@ WSGIImportScript {{ cfg.wsgi.script_fullpath }} process-group={{ cfg.wsgi.proces
 
 {% if 'https' in schemes %}
 # SSL
-SSLEngine On
 <IfVersion >= 2.3.3>
      SSLStaplingCache shmcb:/var/run/ocsp(128000)
 </IfVersion>
@@ -67,6 +66,7 @@ SSLEngine On
     {% if cfg.ssl.pem %}SSLCertificateFile {{ cfg.ssl.pem }}{% endif %}
     {% if cfg.ssl.crt %}SSLCertificateFile {{ cfg.ssl.crt }}
     {% elif cfg.ssl.key %}SSLCertificateKeyFile {{ cfg.ssl.key }}{% endif %}
+    SSLEngine On
     SSLProtocol             all -SSLv2 -SSLv3
     SSLCipherSuite          HIGH:MEDIUM:!ADH:!RC4
     SSLHonorCipherOrder     On
@@ -83,7 +83,7 @@ SSLEngine On
     DocumentRoot {{ cfg.collect_static_root }}
     <Directory {{ cfg.collect_static_root }}>
         DirectorySlash Off
-        Options FollowSymLinks MultiViews
+        Options +FollowSymLinks +MultiViews -Indexes
         AllowOverride None
         <IfVersion >= 2.4>
             Require all granted
@@ -108,10 +108,6 @@ SSLEngine On
 
     RewriteEngine On
     RewriteCond {{ cfg.collect_static_root }}%{REQUEST_FILENAME} !-f
-    RewriteCond {{ cfg.collect_static_root }}%{REQUEST_FILENAME} !-d
-    {# Temporary manual handling of /admin, to work around the presence of
-    a folder admin/ in root #}
-    RewriteRule ^admin$ {{ cfg.wsgi.script_alias}}/admin/ [PT,L]
     RewriteRule ^(.*)$ {{ cfg.wsgi.script_alias }}$1 [PT,L]
 
     {%- if scheme == 'https' %} RedirectMatch /sslredirect/(.*) http://$1 {% endif %}
