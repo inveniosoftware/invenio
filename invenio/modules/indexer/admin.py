@@ -32,9 +32,10 @@ from invenio.utils.datastructures import LazyDict
 from werkzeug.local import LocalProxy
 
 from wtforms import HiddenField
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields import BooleanField
 from wtforms.fields import SelectField
+
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 
 from .models import IdxINDEX
 from .utils import load_tokenizers
@@ -78,8 +79,7 @@ class IdxINDEXAdmin(ModelView):
             label=_("Knowledge base name"),
             choices=LocalProxy(
                 lambda:
-                [('', _('-None-'))]
-                +
+                [('', _('-None-'))] +
                 [(k, k) for k in [(x[0]+','+x[1]) for x in itertools.product(
                     kapi.get_all_kb_names(),
                     ['exact', 'leading_to_comma', 'leading_to_number']
@@ -90,8 +90,7 @@ class IdxINDEXAdmin(ModelView):
             label=_("Stemming language"),
             choices=LocalProxy(
                 lambda:
-                [('', _('-None-'))]
-                +
+                [('', _('-None-'))] +
                 [(k, k) for k in get_stemming_language_map()]
             )
         ),
