@@ -30,7 +30,7 @@ from invenio.errorlib import register_exception
 from invenio.bibformat import format_record as bibformat_record
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
     record_get_field_instances
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_ORCIDUTILS_BLACKLIST_FILE
 from invenio.dateutils import convert_simple_date_to_array
 from invenio.errorlib import get_pretty_traceback
 from invenio.orcid_xml_exporter import OrcidXmlExporter
@@ -422,7 +422,7 @@ def _orcid_fetch_works(pid):
     # chunks the works from orcid_list
 
     for orcid_small_list in _get_orcid_dictionaries(papers_recs, pid,
-                                                    existing_papers):
+                                                    existing_papers, doid):
 
         xml_to_push = OrcidXmlExporter.export(orcid_small_list, 'works.xml')
         xml_to_push = RE_ALLOWED_XML_1_0_CHARS.sub('',
@@ -491,7 +491,7 @@ def _orcid_push_with_bibtask():
     return success
 
 
-def _get_orcid_dictionaries(papers, personid, old_external_ids):
+def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
 
     '''Returns list of dictionaries which can be used in ORCID library.
 
@@ -502,6 +502,8 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
     @param personid: personid of person who is requesting orcid dictionary of
         his works
     @type personid: int
+    @param orcid: orcid of the author
+    @type orcid: string
     '''
 
     def _description_weight(description):
@@ -530,7 +532,8 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids):
 
         try:
             external_ids = _get_external_ids(recid, url,
-                                             recstruct, old_external_ids)
+                                             recstruct, old_external_ids,
+                                             orcid)
         except OrcidRecordExisting:
             # We will not push this record, skip it.
             continue
@@ -723,7 +726,7 @@ def _get_citation(recid):
     return ('bibtex', bibtex_content)
 
 
-def _get_external_ids(recid, url, recstruct, old_external_ids):
+def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
 
     '''Get external identifiers used by ORCID.
 
@@ -738,6 +741,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
     @param old_external_ids: external_ids which are already inside
             ORCID database
     @type old_external_ids: dict
+    @param orcid: orcid of the currently processed author
+    @type orcid: string
 
     @return: external ids in form of pairs: name if id, value.
     @rtype: list
@@ -745,6 +750,13 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
 
     def _stub_method():
         raise DoubledIds()
+
+    blacklist = {}
+    try:
+        blacklist = json.loads(open(CFG_ORCIDUTILS_BLACKLIST_FILE, 'r').read())
+    except IOError:
+        # No such file
+        pass
 
     external_ids = []
     doi = _get_doi_for_paper(recid, recstruct)
@@ -754,7 +766,8 @@ def _get_external_ids(recid, url, recstruct, old_external_ids):
     record_ext_ids = record_get_field_instances(recstruct, '037')
     if doi:
         for single_doi in doi:
-            if single_doi in old_external_ids['DOI']:
+            if single_doi in old_external_ids['DOI'] or \
+                    single_doi in blacklist.get(orcid, []):
                 raise OrcidRecordExisting
             encoded = encode_for_jinja_and_xml(single_doi)
             # This is parsed firstly, so no check for id name done.
