@@ -45,101 +45,121 @@ define(
           selectedIDs: [],
           selectAllSelector: "#list-select-all",
           checkboxSelector: ".row-checkbox input[type=checkbox]",
-          rowSelector: "*[data-href]"
+          rowSelector: "*[data-href]",
+
+          // Batch Buttons
+          batchButtons: "#batch-action-buttons",
+          batchButtonSelector: ".batch-button"
       });
 
-      this.selection = function (ev, data) {
-        for (var i = 0; i < data.data.length; i++) {
-          var selectedID = this.$node.dataTable().fnGetData(data.data[i])[1];
-          var selectedIDsArray = this.attr.selectedIDs;
 
-          if ($.inArray(selectedID, selectedIDsArray) == -1) {
-            selectedIDsArray.push(selectedID);
-          }
+      // Batch Actions functions
+      this.batchCheck = function (ev) {
+
+        // if it was already checked then the selectedIDs array has elements
+        // that we need to remove AND uncheck
+        // ELSE
+        // the opposite (empty, so we need to add to the array)
+        if ($(this.attr.selectAllSelector).prop('checked') == false) {
+          this.deselectAll();
+        } else {
+          this.selectAll();
         }
-
-        console.log("Array after sel. = " + this.attr.selectedIDs);
       };
 
-      this.deselection = function (ev, data) {
-        for (var i = 0; i < data.data.length; i++) {
-          var deselectedID = this.$node.dataTable().fnGetData(data.data[i])[1];
-          var selectedIDsArray = this.attr.selectedIDs;
+      this.batchActions = function(ev, data) {
+        data.selectedIDs = this.attr.selectedIDs;
 
-          if (selectedIDsArray.length > 0) {
-            var index = selectedIDsArray.indexOf(deselectedID);
-            if (index > -1) {
-              selectedIDsArray.splice(index, 1);
-            }
-          }
-        }
+        this.trigger(document, "return_data_for_exec", data);
+        $.event.trigger("deselectAll", document);
+      };
 
-        console.log("Array after desel. = " + this.attr.selectedIDs);
+      this.batchActionButtons = function(ev, data) {
+        this.trigger(document, "execute", {"value": $(data.el).attr('data-value')});
       };
 
 
-      this.selectAll = function (ev, data) {
-        console.log("Selected all");
-        var that = this;
+      // Selection/Deselection
+      this.selectAll = function() {
+        var $this = this;
+
+        $(this.attr.selectAllSelector).prop('checked', true);
         $(this.attr.checkboxSelector).each(function() {
-          console.log($(this).val());
-          var selectedID = $(this).val();
-          if ($.inArray(selectedID, that.attr.selectedIDs) == -1) {
-            that.attr.selectedIDs.push(selectedID);
+          var id = $(this).val();
+          if ($.inArray(id, $this.attr.selectedIDs) == -1) {
+
+            // Add to the array
+            $this.attr.selectedIDs.push(id);
+            // Check the box
+            $("input[value=" + id +"]").prop('checked', true);
           }
           $(this).checked = true;
         });
+
         console.log("Array: " + this.attr.selectedIDs);
+        this.checkIfBatchActionButtonsAppear();
       };
 
-      this.selectOne = function (ev, data) {
-        console.log("Selected one");
-        console.log($(data.el).val());
+      this.deselectAll = function() {
+
+        // Uncheck every box...
+        $(this.attr.selectAllSelector).prop('checked', false);
+        this.attr.selectedIDs.forEach(function(id) {
+          $("input[value=" + id +"]").prop('checked', false);
+        });
+        // And empty the array
+        this.attr.selectedIDs = [];
+
+        console.log("Array: " + this.attr.selectedIDs);
+        this.checkIfBatchActionButtonsAppear();
       };
 
-      this.selectRow = function (ev, data) {
-        console.log("Selected row");
+      this.selectCheckbox = function (ev, data) {
+        var row = $(data.el);
+        if (row.prop('checked') == false) {
+          this.removeElementFromIDs(row.val());
+        } else {
+          this.attr.selectedIDs.push(row.val());
+        }
+
+        console.log("Array: " + this.attr.selectedIDs);
+        this.checkIfBatchActionButtonsAppear();
       };
 
-      this.deselectAll = function (ev) {
-        $("#ToolTables_maintable_1").click();
+      this.selectOrDeselectAll = function (ev) {
+        $(this.attr.selectAllSelector).click();
+        this.checkIfBatchActionButtonsAppear();
       };
 
-
-      this.batchHEPActions = function(ev, data) {
-        data.selectedIDs = this.attr.selectedIDs;
-
-        $.event.trigger("return_data_for_exec", data);
-        $.event.trigger("deselectAll", document);
+      // "Utility" functions
+      this.checkIfBatchActionButtonsAppear = function() {
+        if (this.attr.selectedIDs.length > 0) {
+          $(this.attr.batchButtons).removeClass("hidden");
+        } else {
+          $(this.attr.batchButtons).addClass("hidden");
+        }
       };
 
-
-      this.nextPage = function(ev) {
-        $("#maintable_next").click();
-        $.event.trigger("deselectAll", document);
+      this.removeElementFromIDs = function(id) {
+        var idArray = this.attr.selectedIDs;
+        if (idArray.length > 0) {
+          var index = idArray.indexOf(id);
+          idArray.splice(index, 1);
+        }
       };
 
-      this.previousPage = function(ev) {
-        $("#maintable_previous").click();
-        $.event.trigger("deselectAll", document);
-      };
 
       this.after('initialize', function() {
-        this.on(document, "rowSelected", this.selection);
-        this.on(document, "rowDeselected", this.deselection);
-
         this.on(document, "selectAll", this.selectAll);
         this.on(document, "deselectAll", this.deselectAll);
 
-        this.on(document, "execute", this.batchHEPActions);
-
-        this.on(document, "nextPage", this.nextPage);
-        this.on(document, "previousPage", this.previousPage);
+        this.on(document, "execute", this.batchActions);
+        this.on(document, "hotkeysPagination", this.deselectAll);
 
         this.on("click", {
-          selectAllSelector: this.selectAll,
-          checkboxSelector: this.selectOne,
-          rowSelector: this.selectRow
+          selectAllSelector: this.batchCheck,
+          checkboxSelector: this.selectCheckbox,
+          batchButtonSelector: this.batchActionButtons
         });
         console.log("Selection init");
       });

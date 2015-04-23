@@ -437,17 +437,27 @@ def delete_multi(bwolist):
 @blueprint.route('/resolve', methods=['GET', 'POST'])
 @login_required
 @permission_required(viewholdingpen.name)
-@wash_arguments({'objectid': (int, 0)})
-def resolve_action(objectid):
+def resolve_action():
     """Resolve the action taken.
 
     Will call the resolve() function of the specific action.
     """
-    bwobject = BibWorkflowObject.query.get_or_404(objectid)
-    action_name = bwobject.get_action()
-    action_form = actions[action_name]
-    res = action_form().resolve(bwobject)
-    return jsonify(res)
+    objectids = request.values.getlist('objectids[]') or []
+    ids_length = len(objectids)
+
+    for objectid in objectids:
+        bwobject = BibWorkflowObject.query.get_or_404(objectid)
+        action_name = bwobject.get_action()
+        action_form = actions[action_name]
+        res = action_form().resolve(bwobject)
+
+    if ids_length == 1:
+        return jsonify(res)
+    else:
+        return jsonify({
+            "message": "{0} number of records resolved.".format(ids_length),
+            "category": "info"
+        })
 
 
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])

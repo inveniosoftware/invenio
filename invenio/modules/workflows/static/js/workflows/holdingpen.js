@@ -20,7 +20,7 @@
 define(
   [
     'jquery',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
@@ -42,13 +42,15 @@ define(
       this.attributes({
         // Selectors
         totalSelector: "#total_found",
+        nextSelector: "a[aria-label='Next']",
+        previousSelector: "a[aria-label='Previous']",
 
         // URLs
         load_url: "",
 
         // Data
         page: 1,
-        sort_key: "",
+        sort_key: ""
       });
 
       this.preparePayload = function (data) {
@@ -66,15 +68,15 @@ define(
         var that = this;
 
         $.ajax({
-            type: "GET",
-            url: this.attr.load_url,
-            data: this.preparePayload(data),
-            success: function(result) {
-                var table = $node.find("tbody");
-                table.html(result.rendered_rows);
-                $(that.attr.totalSelector).html(result.pagination.total_count);
-                that.trigger(document, "updatePagination", result.pagination);
-            }
+          type: "GET",
+          url: this.attr.load_url,
+          data: this.preparePayload(data),
+          success: function(result) {
+            var table = $node.find("tbody");
+            table.html(result.rendered_rows);
+            $(that.attr.totalSelector).html(result.pagination.total_count);
+            that.trigger(document, "updatePagination", result.pagination);
+          }
         });
       };
 
@@ -86,36 +88,29 @@ define(
           qKey: 81
         };
 
-        if (event.keyCode == keyCodes.escKey) {
-          $.event.trigger("deselectAll", document);
-          event.preventDefault();
-        }
         if (event.ctrlKey && event.keyCode == keyCodes.aKey) {
-          $.event.trigger("selectAll", document);
+          this.trigger(document, "selectAll");
           event.preventDefault();
         }
-        if (event.keyCode == keyCodes.wKey) {
-          $.event.trigger("nextPage", document);
+        if (event.keyCode == keyCodes.escKey) {
+          this.trigger(document, "deselectAll");
           event.preventDefault();
         }
-        if (event.keyCode == keyCodes.qKey) {
-          $.event.trigger("previousPage", document);
+        if (event.altKey && event.keyCode == keyCodes.wKey) {
+          var data = {};
+          data.el = $(this.attr.nextSelector);
+
+          this.trigger(document,"hotkeysPagination", data);
+          event.preventDefault();
+        }
+        if (event.altKey && event.keyCode == keyCodes.qKey) {
+          var data = {};
+          data.el = $(this.attr.previousSelector);
+
+          this.trigger(document,"hotkeysPagination", data);
           event.preventDefault();
         }
       };
-
-
-      // Select/Deselect row for batch action
-      // Need to use jquery directly as "this" (e.g. flight component) is
-      // not in the context of the TableTools selection.
-      this.rowSelectionTrigger = function(data) {
-        $.event.trigger("rowSelected", {"data":data});
-      };
-
-      this.rowDeselectionTrigger = function(data) {
-        $.event.trigger("rowDeselected", {"data":data});
-      };
-
 
       this.after('initialize', function() {
         this.on(document, "initHoldingPenTable", this.reloadTable);

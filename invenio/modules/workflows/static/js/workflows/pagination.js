@@ -42,7 +42,7 @@ define(
     */
     function HoldingPenPagination() {
       this.attributes({
-        paginationButtonSelector: ".pagination a",
+        paginationButtonSelector: ".pagination a"
       });
 
       this.updatePagination = function(ev, data) {
@@ -70,9 +70,13 @@ define(
 
       this.after('initialize', function() {
         this.on("click", {
-          paginationButtonSelector: this.changePage,
+          paginationButtonSelector: this.changePage
         });
         this.on(document, "updatePagination", this.updatePagination);
+
+        // Hotkeys pagination
+        this.on(document, "hotkeysPagination", this.changePage);
+
         console.log("Pagination init");
       });
     }

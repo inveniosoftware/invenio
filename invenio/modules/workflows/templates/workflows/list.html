@@ -59,8 +59,15 @@
       <div class="pull-left">
         <p class="text-muted">Ctrl+A: Select all, Esc: Deselect</p>
       </div>
+      <div id="batch-action-buttons" class="pull-right hidden">
+        <span class="text-muted">Batch Actions: </span>
+        <button class="btn btn-success arxiv-approval-action-accept batch-button" role="button" data-value="accept_core">CORE</button>
+        <button class="btn btn-warning arxiv-approval-action-accept batch-button" role="button" data-value="accept">Accept</button>
+        <button class="btn btn-danger arxiv-approval-action-reject batch-button"  role="button" data-value="reject">Reject</button>
+      </div>
       {% endblock %}
     </div>
+    <br>
     <div class="row">
       {% block navigation %}
       <nav id="list-header" class="navbar navbar-default" role="navigation">
