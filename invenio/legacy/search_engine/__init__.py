@@ -577,8 +577,10 @@ def get_record(recid):
     warnings.warn('Deprecated get_record({}).'.format(str(recid)),
                   stacklevel=2)
     from invenio.modules.records import api
-    return api.get_record(recid).legacy_create_recstruct()
-
+    try:
+        return api.get_record(recid).legacy_create_recstruct()
+    except AttributeError:
+        return api.Record.create({'recid': recid}, 'json').legacy_create_recstruct()
 
 def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
                  search_pattern=None, user_info=None, verbose=0, sf='', so='d',
