@@ -34,9 +34,10 @@ from invenio.utils.datastructures import LazyDict
 from werkzeug.local import LocalProxy
 
 from wtforms import HiddenField
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields import BooleanField
 from wtforms.fields import SelectField
+
+from wtforms_sqlalchemy.fields import QuerySelectMultipleField
 
 from .models import IdxINDEX
 from .utils import load_tokenizers

@@ -136,6 +136,7 @@ install_requires = [
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
     "wtforms-alchemy>=0.12.6,<0.13.1",
+    "wtforms-sqlalchemy>=0.1",
     "pyyaml>=3.11",
 ]
 
