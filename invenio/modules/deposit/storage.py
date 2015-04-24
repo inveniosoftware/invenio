@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,17 +17,14 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Storage abstraction layer for WebDeposit.
-"""
+"""Storage abstraction layer for WebDeposit."""
 
-import uuid
 import hashlib
+import urllib2
+import uuid
 
 from fs import opener
 from fs import path
-import urllib2
-
 
 from invenio.base.globals import cfg
 
@@ -97,23 +94,24 @@ class Storage(object):
         return str(uuid.uuid4()) + "-" + filename
 
     def save(self, incoming_file, filename, unique_name=True,
-             with_checksum=True):
+             with_checksum=True, chunksize=65536):
         """ Store the incoming file """
         if unique_name:
             filename = self.unique_filename(filename)
 
         fs_file = self.storage.open(filename, 'wb')
-
         checksum = None
-        f_bytes = incoming_file.read()
-        fs_file.write(f_bytes)
+        m = hashlib.md5()
 
-        if with_checksum:
-            m = hashlib.md5()
-            m.update(f_bytes)
-            checksum = m.hexdigest()
+        f_bytes = incoming_file.read(chunksize)
+        while f_bytes:
+            fs_file.write(f_bytes)
+            if with_checksum:
+                m.update(f_bytes)
+            f_bytes = incoming_file.read(chunksize)
 
         fs_file.close()
+        checksum = m.hexdigest()
 
         # Create complete file path and return it
         return (
@@ -212,10 +210,15 @@ class ChunkedDepositionStorage(DepositionStorage):
 
         for c in file_chunks:
             fs_c = self.storage.open(c, 'rb')
-            f_bytes = fs_c.read()
-            fs_file.write(f_bytes)
+
+            f_bytes = fs_c.read(65536)
+            while f_bytes:
+                fs_file.write(f_bytes)
+                m.update(f_bytes)
+                f_bytes = fs_c.read(65536)
+
             fs_c.close()
-            m.update(f_bytes)
+
             # Remove each chunk right after appending to main file, to
             # minimize storage usage.
             self.storage.remove(c)
