@@ -29,11 +29,11 @@ from flask import _request_ctx_stack, current_app, g
 
 from flask_babel import Babel, gettext
 
+from invenio.utils.datastructures import LaziestDict
+
 import pkg_resources
 
 import six
-
-from invenio.utils.datastructures import LaziestDict
 
 from .errors import NoCompiledTranslationError
 from .filters import filter_format_date, filter_format_datetime, \
@@ -102,6 +102,20 @@ def set_translations():
     g._ = gettext
 
 
+def get_lazystring_encoder(app):
+    """Add a custom JSONEncoder that handles lazy strings from Babel."""
+    from speaklater import _LazyString
+
+    class JSONEncoder(app.json_encoder):
+        def default(self, o):
+            if isinstance(o, _LazyString):
+                return six.text_type(o)
+
+            return super(JSONEncoder, self).default(o)
+
+    return JSONEncoder
+
+
 def setup_app(app):
     """Setup Babel extension.
 
@@ -114,6 +128,7 @@ def setup_app(app):
     babel.localeselector(get_locale)
     babel.timezoneselector(get_timezone)
 
+    app.json_encoder = get_lazystring_encoder(app)
     app.before_request(set_translations)
 
     # Register template filters for date formatting
