@@ -61,9 +61,10 @@ solely required for development purposes.
     $ python --version
     Python 2.7.5+
     $ sudo apt-get update
-    $ sudo apt-get install build-essential redis-server \
+    $ sudo apt-get install build-essential git redis-server \
                            libmysqlclient-dev libxml2-dev libxslt-dev \
                            libjpeg-dev libfreetype6-dev libtiff-dev \
+                           libffi-dev libssl-dev \
                            software-properties-common python-dev \
                            virtualenvwrapper
     $ sudo pip install -U virtualenvwrapper pip
