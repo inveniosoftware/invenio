@@ -23,8 +23,8 @@ __lastupdated__ = """$Date$"""
 
 import datetime
 import urllib
-
 import invenio.legacy.oaiharvest.admin as oha
+
 from invenio.utils.json import json
 from invenio.legacy.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
@@ -76,16 +76,10 @@ def editsource(req, **kwargs):
                'confirm': (int, -1),
                'oai_src_sets': (list, None),
                'oai_src_workflow': (str, "")}
-    # Grab list of defined post-process arguments to select from POST-data. e.g. ('c_cfg-file', str)
-    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value']))
-                      for mode in CFG_OAI_POSSIBLE_POSTMODES
-                      for arg in mode[2]]
-    for argument_name, argument_type in post_arguments:
-        if argument_type == str:
-            content[argument_name] = (str, "")
-        elif argument_type == list:
-            content[argument_name] = (list, [])
 
+    # Grab list of defined post-process arguments to select from POST-data. e.g. ('c_cfg-file', str)
+    postmodes = _get_argd_postmodes()
+    content.update(postmodes)
     argd = wash_urlargd(form, content)
     oai_src_id = argd['oai_src_id']
     oai_src_name = argd['oai_src_name']
@@ -101,7 +95,7 @@ def editsource(req, **kwargs):
         oai_src_sets = []
 
     oai_src_args = {}
-    for argument_name, dummy in post_arguments:
+    for argument_name in postmodes:
         oai_src_args[argument_name] = argd[argument_name]
 
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
@@ -143,9 +137,6 @@ def editsource(req, **kwargs):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addsource(req, **kwargs):
-    post_arguments = [("%s_%s" % (mode[0], arg['name']), type(arg['value'])) \
-                       for mode in CFG_OAI_POSSIBLE_POSTMODES \
-                       for arg in mode[2]]
     form = dict(req.form)
     content = {'ln': (str, "en"),
                'oai_src_name': (str, ""),
@@ -157,12 +148,8 @@ def addsource(req, **kwargs):
                'confirm': (int, -1),
                'oai_src_sets': (list, None),
                'oai_src_workflow': (str, "")}
-    for argument_name, argument_type in post_arguments:
-        if argument_type == str:
-            content[argument_name] = (str, "")
-        elif argument_type == list:
-            content[argument_name] = (list, [])
-
+    postmodes = _get_argd_postmodes()
+    content.update(postmodes)
     argd = wash_urlargd(form, content)
     ln = argd['ln']
     oai_src_name = argd['oai_src_name']
@@ -180,7 +167,7 @@ def addsource(req, **kwargs):
         oai_src_post = []
 
     oai_src_args = {}
-    for argument_name, dummy in post_arguments:
+    for argument_name in postmodes:
         oai_src_args[argument_name] = argd[argument_name]
 
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
@@ -674,3 +661,19 @@ def viewholdingpen(req, filter_key = "", ln=CFG_SITE_LANG):
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def _get_argd_postmodes():
+    """Return post_arguments for argd."""
+    post_arguments = [
+        ("%s_%s" % (mode[0], arg['name']), type(arg['value']))
+         for mode in CFG_OAI_POSSIBLE_POSTMODES
+         for arg in mode[2]
+    ]
+    content = {}
+    for argument_name, argument_type in post_arguments:
+        if argument_type == list:
+            content[argument_name] = (list, [])
+        else:
+            content[argument_name] = (str, "")
+    return content
