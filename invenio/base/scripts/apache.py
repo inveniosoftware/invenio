@@ -36,9 +36,6 @@ This script relies on the following variables:
     # to this string automatically.
     APACHE_LOG_SUFFIX = "invenio"
 
-    # Whether to enable SSL in apache or not.
-    APACHE_SSL = 0
-
     # Internal WSGI process group that will be used by the webserver.
     APACHE_WSGI_PROCESS_GROUP = "invenio"
 
@@ -172,7 +169,6 @@ def version(separator='\n', formatting='{version} [{executable}]'):
         return out
     return separator.join(out)
 
-
 @manager.command
 @manager.option('--no-ssl', dest='no_ssl', action='store_true')
 @manager.option('-f', '--force', dest='force', action='store_true')
@@ -299,21 +295,36 @@ def create_config(force=False, no_ssl=False):
             vhost_site_secure.server_alias = \
                 app_cfg.get('APACHE_SERVER_HTTPS_ALIASES')
 
+            if vhost_site.scheme not in ('http', 'https'):
+                raise AssertionError("Scheme must be http or https, "
+                                        "not `{0}`".format(vhost_site.scheme))
+
             return {'http': vhost_site, 'https': vhost_site_secure}
 
-        @staticmethod
-        def listen_directive_needed(scheme):
+        def listen_directive_needed(self, scheme):
             """Whether apache `Listen` directive is required.
 
             :param scheme: 'http' or 'https'
             :type scheme: str
 
-            :returns: whether a listen directive needed should be added to config
+            :returns: whether a listen directive should be added to config
             :rtype: bool
             """
             assert scheme in ('http', 'https')
-            cfg_key = 'APACHE_LISTEN_DIRECTIVE_' + scheme.upper()
-            return bool(app_cfg[cfg_key])
+            if app_cfg.get('APACHE_GUESS_LISTEN_DIRECTIVE'):
+                needed = {
+                    Cfg.CANDIDATE_PATHS['apache']: True,
+                    Cfg.CANDIDATE_PATHS['apache2']: False,
+                    Cfg.CANDIDATE_PATHS['tls']: True
+                }[self._resolved_dir]
+                if (scheme == 'http' and self.vhosts[scheme].port == 80) or \
+                        (scheme == 'https' and self.vhosts[scheme].port == 443):
+                    return needed
+                else:
+                    return True
+            else:
+                cfg_key = 'APACHE_LISTEN_DIRECTIVE_' + scheme.upper()
+                return bool(app_cfg[cfg_key])
 
         # XXX: Unused
         @staticproperty
@@ -370,18 +381,8 @@ def create_config(force=False, no_ssl=False):
                 }
             :rtype: dict
             """
-            if app_cfg.get('APACHE_GUESS_CERT_PATHS', 0):
-                ssl_pem_directive_needed = {
-                    Cfg.CANDIDATE_PATHS['apache']: False,
-                    Cfg.CANDIDATE_PATHS['apache2']: True,
-                    Cfg.CANDIDATE_PATHS['tls']: False
-                }[self._resolved_dir]
-
-                if self._user_supplied_custom_files:
-                    pem_path = app_cfg.get('APACHE_CERTIFICATE_PEM_FILE')
-                    crt_path = app_cfg.get('APACHE_CERTIFICATE_CRT_FILE')
-                    key_path = app_cfg.get('APACHE_CERTIFICATE_KEY_FILE')
-                elif self._resolved_dir in (Cfg.CANDIDATE_PATHS['apache'],
+            if app_cfg.get('APACHE_GUESS_CERT_PATHS', False):
+                if self._resolved_dir in (Cfg.CANDIDATE_PATHS['apache'],
                                             Cfg.CANDIDATE_PATHS['apache2']):
                     pem_path = path.join(self._resolved_dir, 'server.pem')
                     crt_path = path.join(self._resolved_dir, 'server.crt')
@@ -396,21 +397,24 @@ def create_config(force=False, no_ssl=False):
                     'key': key_path,
                 }
                 # Drop files based on OS guesswork
+                ssl_pem_directive_needed = {
+                    Cfg.CANDIDATE_PATHS['apache']: False,
+                    Cfg.CANDIDATE_PATHS['apache2']: True,
+                    Cfg.CANDIDATE_PATHS['tls']: False
+                }[self._resolved_dir]
                 if not ssl_pem_directive_needed:
                     del ssl['pem']
                 else:
                     del ssl['crt']
-                    del ssl['key']
-            else:
+            elif self._user_supplied_custom_files:
                 ssl = {key: val for key, val in (
                     ('pem', app_cfg.get('APACHE_CERTIFICATE_PEM_FILE')),
                     ('crt', app_cfg.get('APACHE_CERTIFICATE_CRT_FILE')),
                     ('key', app_cfg.get('APACHE_CERTIFICATE_KEY_FILE')),
                 ) if val}
-
-            assert [i for i in ssl.values() if i], \
-                "Please provide at least one certificate file."
-
+            else:
+                raise AssertionError("Please provide at least one certificate file "
+                                    "or enable APACHE_GUESS_CERT_PATHS.")
             return ssl
 
         @cached_property
@@ -509,14 +513,22 @@ def create_config(force=False, no_ssl=False):
     apache_cfg = Cfg()
 
     # Resolve requested schemes
-    if not no_ssl and app_cfg['APACHE_SSL']:
-        schemes = ('http', 'https')
-        if apache_cfg.vhosts['http'].port == apache_cfg.vhosts['https'].port:
-            print("HTTP and HTTPS cannot be set to serve on the same port",
-                  file=sys.stderr)
-            sys.exit(1)
+    vhosts = apache_cfg.vhosts
+    if vhosts['http'].port == vhosts['https'].port and \
+            vhosts['http'].scheme == vhosts['https'].scheme:
+        schemes = {vhosts['http'].scheme}
+    elif vhosts['http'].port != vhosts['https'].port and \
+        vhosts['http'].scheme != vhosts['https'].scheme:
+        schemes = {vhosts['http'].scheme, vhosts['https'].scheme}
     else:
-        schemes = ('http',)
+        raise AssertionError("Different protocols with different ports (or "
+                             "different ports with the same protocol) are not "
+                             "allowed.")
+    if no_ssl:
+        schemes = schemes ^ {'https'}
+
+    if not schemes:
+        raise AssertionError("No vhost set (both http and https disabled)!")
 
     conf_file = 'apache-vhost.conf'
     # Create conf dir
@@ -530,8 +542,7 @@ def create_config(force=False, no_ssl=False):
     # Write new file
     with open(apache_vhost_file, 'w') as f:
         out = render_template_to_string("{}.tpl".format(conf_file),
-                                        cfg=apache_cfg,
-                                        schemes=schemes)
+                                        cfg=apache_cfg, schemes=schemes)
         print(out, file=f)
 
     print("""\
@@ -550,6 +561,7 @@ def main():
     app = create_app()
     manager.app = app
     manager.run()
+
 
 if __name__ == '__main__':
     main()
