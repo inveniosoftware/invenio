@@ -116,7 +116,7 @@ require(['jquery', 'js/search/search'], function($, search) {
   search({
     elem: '#facet_list',
     data: {{ facets | tojson | safe }},
-    searchResultsUrl: '{{ url_for('search.results', qid=qid) }}',
+    searchResultsUrl: '{{ url_for('search.search') }}',
     args: {{ request.args.to_dict() | tojson | safe }},
     labels: {
       action: '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-danger">exclude</em></abbr> selected term from results.') | safe }}',

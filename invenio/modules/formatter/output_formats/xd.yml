@@ -1,0 +1,7 @@
+content_type: text/xml
+default: DC.xsl
+description: XML Dublin Core.
+name: Dublin Core
+url: http://dublincore.org/schemas/
+rules: []
+visibility: 0

@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -37,10 +37,6 @@ def actionarea(req, grep='', ln=CFG_SITE_LANG):
     """create the role area menu page."""
 
     return wal.perform_actionarea(req=req, grep=grep)
-
-def managerobotlogin(req, robot_name='', new_pwd1='', new_pwd2='', login_method='', timeout='', referer='', ip='', action='', confirm=0, email='', groups='', nickname='', json_assertion='', url_only=0, ln=CFG_SITE_LANG):
-    """Manage robot login keys and test URL."""
-    return wal.perform_managerobotlogin(req=req, robot_name=robot_name, new_pwd1=new_pwd1, new_pwd2=new_pwd2, login_method=login_method, timeout=timeout, referer=referer, ip=ip, action=action, confirm=confirm, email=email, groups=groups, nickname=nickname, json_assertion=json_assertion, url_only=url_only)
 
 def userarea(req, email_user_pattern='', ln=CFG_SITE_LANG):
     """create the user area menu page. """

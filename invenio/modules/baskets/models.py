@@ -27,7 +27,7 @@ from invenio.ext.sqlalchemy import db
 # Create your models here.
 
 from invenio.modules.accounts.models import User, Usergroup
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 
 class BskBASKET(db.Model):
     """Represents a BskBASKET record."""

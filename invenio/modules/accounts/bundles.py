@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,10 @@
 
 """Accounts bundles."""
 
-from invenio.ext.assets import Bundle, RequireJSFilter
+from __future__ import unicode_literals
 
-from invenio.base.bundles import styles as _styles, jquery as _j, invenio as _i
+from invenio.base.bundles import invenio as _i, jquery as _j, styles as _styles
+from invenio.ext.assets import Bundle, RequireJSFilter
 
 # The underscore makes it "hidden" for the bundle collector.
 _styles.contents += ("css/accounts/login.css",)

@@ -1,6 +1,6 @@
 {#-
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,4 +17,4 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
 {#- Prints list of records' IDs. -#}
-{{ recids }}
+{{- recids|default([], true)|list|tojson -}}

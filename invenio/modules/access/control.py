@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,69 +17,58 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 """Invenio Access Control Admin."""
 
-__revision__ = "$Id$"
+from __future__ import print_function
 
-# check this: def acc_add_user_role(id_user, id_role=0, name_role=0):
-
-# import interesting modules:
-
-import sys
 import urlparse
 
-if sys.hexversion < 0x2040000:
-    # pylint: disable=W0622
-    from sets import Set as set
-    # pylint: enable=W0622
+from intbitset import intbitset
+
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
+from invenio.ext import principal
+from invenio.ext.sqlalchemy import db
+from invenio.legacy.dbquery import ProgrammingError, run_sql
+from invenio.modules.access.firerole import (
+    acc_firerole_check_user, compile_role_definition, deserialize,
+    load_role_definition, serialize
+)
+from invenio.modules.access.local_config import (
+    CFG_ACC_ACTIVITIES_URLS, CFG_ACC_EMPTY_ROLE_DEFINITION_SER,
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DEF_AUTHS, DEF_ROLES, DEF_USERS,
+    DELEGATEADDUSERROLE, SUPERADMINROLE
+)
+from invenio.modules.access.models import AccACTION, AccAuthorization, \
+    UserAccROLE
 
 from six import iteritems
 
-from invenio.base.i18n import gettext_set_language
-from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
-from invenio.modules.access.local_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
-    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
-    DEF_USERS, DEF_ROLES, DEF_AUTHS, CFG_ACC_ACTIVITIES_URLS
-from invenio.ext import principal
-from invenio.legacy.dbquery import run_sql, ProgrammingError
-from invenio.modules.access.firerole import compile_role_definition, \
-    acc_firerole_check_user, serialize, deserialize, load_role_definition
-from intbitset import intbitset
-from invenio.ext.sqlalchemy import db
-from invenio.modules.access.models import AccAuthorization, AccACTION, \
-                                    AccARGUMENT, UserAccROLE
-
 CFG_SUPERADMINROLE_ID = 0
 try:
-    id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s', (SUPERADMINROLE, ))
+    id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s',
+                     (SUPERADMINROLE, ))
     if id_tmp:
         CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
-except:
+except Exception:
     pass
 
 # ACTIONS
 
+
 def acc_add_action(name_action='', description='', optional='no',
-        *allowedkeywords):
-    """function to create new entry in accACTION for an action
+                   *allowedkeywords):
+    """Create new entry in accACTION for an action.
 
-    name_action     - name of the new action, must be unique
+    :param name_action: name of the new action, must be unique
+    :param allowedkeywords: a list of allowedkeywords
 
-    keyvalstr       - string with allowed keywords
-
-    allowedkeywords - a list of allowedkeywords
-
-    keyvalstr and allowedkeywordsdict can not be in use simultanously
-
-    success -> return id_action, name_action, description and allowedkeywords
-    failure -> return 0 """
-
+    :return: id_action, name_action, description and allowedkeywords or
+             0 in case of failure
+    """
     keystr = ''
     # action with this name all ready exists, return 0
     if db.session.query(db.exists()).filter(
-        AccACTION.name==name_action).scalar():
+            AccACTION.name == name_action).scalar():
         return 0
 
     # create keyword string
@@ -124,7 +115,7 @@ def acc_delete_action(id_action=0, name_action=0):
 
 
 def acc_verify_action(name_action='', description='', allowedkeywords='',
-        dummy=''):
+                      dummy=''):
     """check if all the values of a given action are the same as
     those in accACTION in the database. self explanatory parameters.
 
@@ -1418,9 +1409,11 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
     return res2
 
 
-def acc_find_possible_roles(name_action, always_add_superadmin=True, batch_args=False, **arguments):
-    """Find all the possible roles that are enabled to action_name with
-    given arguments. roles is a list of role_id
+def acc_find_possible_roles(name_action, always_add_superadmin=True,
+                            batch_args=False, **arguments):
+    """Find all the possible roles that are enabled to a given action.
+
+    :return: roles as a list of role_id
     """
     query_roles_without_args = \
         db.select([AccAuthorization.id_accROLE], db.and_(
@@ -1430,26 +1423,21 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True, batch_args=
     query_roles_with_args = \
         AccAuthorization.query.filter(db.and_(
             AccAuthorization.argumentlistid > 0,
-            AccAuthorization.id_accACTION == db.bindparam('id_action'))).\
-            join(AccAuthorization.argument)
+            AccAuthorization.id_accACTION == db.bindparam('id_action')
+        )).join(AccAuthorization.argument)
 
-    id_action = db.session.query(AccACTION.id).filter(AccACTION.name==name_action).scalar()
-    roles = intbitset(
-        db.engine.execute(query_roles_without_args.params(id_action=id_action)).\
-            fetchall())
+    id_action = db.session.query(AccACTION.id).filter(
+        AccACTION.name == name_action).scalar()
+    roles = intbitset(db.engine.execute(query_roles_without_args.params(
+        id_action=id_action)).fetchall())
 
     if always_add_superadmin:
         roles.add(CFG_SUPERADMINROLE_ID)
 
     # Unpack arguments
     if batch_args:
-        batch_arguments = []
-        args_len = len(arguments.values()[0])
-        for i in range(args_len):
-            elem = {}
-            for k in arguments.keys():
-                elem[k] = arguments[k][i]
-            batch_arguments.append(elem)
+        batch_arguments = [dict(zip(arguments.keys(), values))
+                           for values in zip(*arguments.values())]
     else:
         batch_arguments = [arguments]
 
@@ -1462,10 +1450,13 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True, batch_args=
         batch_roles = roles.copy()
         for auth in acc_authorizations:
             if auth.id_accROLE not in batch_roles:
-                if not ((auth.argument.value != arguments.get(auth.argument.keyword, '*') != '*') and auth.argument.value != '*'):
+                if not ((auth.argument.value != arguments.get(
+                            auth.argument.keyword, '*') != '*'
+                         ) and auth.argument.value != '*'):
                     batch_roles.add(auth.id_accROLE)
         result.append(batch_roles)
     return result if batch_args else result[0]
+
 
 def acc_find_possible_actions_user_from_user_info(user_info, id_action):
     """user based function to find all action combination for a given

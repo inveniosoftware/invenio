@@ -20,17 +20,26 @@
 """Custom hooks and hacks needed for Flask-Babel."""
 
 import sys
-import pkg_resources
-import six
+
+from contextlib import contextmanager
 
 from babel import support
-from contextlib import contextmanager
-from flask import g, _request_ctx_stack, current_app
+
+from flask import _request_ctx_stack, current_app, g
+
 from flask_babel import Babel, gettext
 
+import pkg_resources
+
+import six
+
 from invenio.utils.datastructures import LaziestDict
-from .selectors import get_locale, get_timezone
+
 from .errors import NoCompiledTranslationError
+from .filters import filter_format_date, filter_format_datetime, \
+    filter_format_time, filter_format_timedelta, filter_to_user_timezone, \
+    filter_to_utc
+from .selectors import get_locale, get_timezone
 
 babel = Babel()
 
@@ -57,7 +66,8 @@ def get_translation(locale):
             translations = support.Translations.load(dirname, [locale])
         else:
             try:
-                translations.merge(support.Translations.load(dirname, [locale]))
+                translations.merge(
+                    support.Translations.load(dirname, [locale]))
             except AttributeError:
                 # translations is probably support.NullTranslations
                 six.reraise(NoCompiledTranslationError,
@@ -87,7 +97,7 @@ def set_translations():
 
     Translations will be returned as unicode objects.
     """
-    ## Well, let's make it global now
+    # Well, let's make it global now
     g.ln = get_locale()
     g._ = gettext
 
@@ -103,5 +113,15 @@ def setup_app(app):
     babel.init_app(app)
     babel.localeselector(get_locale)
     babel.timezoneselector(get_timezone)
+
     app.before_request(set_translations)
+
+    # Register template filters for date formatting
+    app.add_template_filter(filter_format_date, name="formatdate")
+    app.add_template_filter(filter_format_datetime, name="formatdatetime")
+    app.add_template_filter(filter_format_time, name="formattime")
+    app.add_template_filter(filter_format_timedelta, name="formattimedelta")
+    app.add_template_filter(filter_to_utc, name="toutc")
+    app.add_template_filter(filter_to_user_timezone, name="tousertimezone")
+
     return app

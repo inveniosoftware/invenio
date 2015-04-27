@@ -31,7 +31,7 @@
     <div class="col-md-6">
 {%- block footer_credits %}
       {{ config["CFG_SITE_NAME_INTL"][g.ln] }}
-      &nbsp;::&nbsp;<a class="footer" href="{{ url_for('search.index') }}">
+      &nbsp;::&nbsp;<a class="footer" href="{{ url_for('collections.index') }}">
         {{- _("Search") -}}
       </a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('webdeposit.index') }}">
         {{- _("Deposit") -}}

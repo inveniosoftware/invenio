@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -36,7 +36,7 @@ from invenio.legacy.dbquery import run_sql
 from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-from invenio.utils.redis import get_redis
+from invenio.ext.cache import cache
 from invenio.legacy.search_engine import search_pattern, \
                                   search_unit, \
                                   get_collection_reclist
@@ -71,7 +71,8 @@ def recids_cache(collections, cache={}):
 
 def deleted_recids_cache(cache={}):
     if 'deleted_records' not in cache:
-        cache['deleted_records'] = search_unit(p='DELETED', f='980', m='a')
+        cache['deleted_records'] = search_unit(
+            p='DELETED', f='collection', m='a')
     return cache['deleted_records']
 
 
@@ -202,8 +203,7 @@ def process_and_store(recids, config, chunk_size):
 
 def store_weights_cache(weights):
     """Store into key/value store"""
-    redis = get_redis()
-    redis.set('citations_weights', serialize_via_marshal(weights))
+    cache.set('citations_weights', serialize_via_marshal(weights))
 
 
 def process_chunk(recids, config):

@@ -1,0 +1,7 @@
+content_type: text/xml
+default: RSS.xsl
+description: RSS.
+name: RSS
+url: http://www.rssboard.org/rss-2-0/
+rules: []
+visibility: 0

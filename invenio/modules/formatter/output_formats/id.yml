@@ -1,0 +1,6 @@
+content_type: application/json
+description: ID format.
+mime_type: application/json
+name: ID Format
+rules: []
+visibility: 0

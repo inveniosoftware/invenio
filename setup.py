@@ -95,9 +95,11 @@ install_requires = [
     # Development version is used, will switch to >=2.0 once released.
     "Flask-SQLAlchemy>=2.0",
     "Flask-WTF>=0.10.2",
+    "cryptography>=0.6",
     "fs>=0.4",
     "intbitset>=2.0",
     "invenio-client>=0.1.0",
+    "invenio-query-parser>=0.2",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
     "libmagic>=1.0",
@@ -109,6 +111,7 @@ install_requires = [
     "numpy>=1.7",
     "nydus>=0.10.8",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
+    "passlib>=1.6.2",
     "pyparsing>=2.0.1,<2.0.2",
     "python-twitter>=2.0",
     "pyPDF>=1.13",
@@ -133,7 +136,8 @@ install_requires = [
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
     "wtforms-alchemy>=0.12.6,<0.13.1",
-    "wtforms-sqlalchemy>=0.1"
+    "wtforms-sqlalchemy>=0.1",
+    "pyyaml>=3.11",
 ]
 
 
@@ -311,7 +315,6 @@ setup(
             ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
-            'webcoll = invenio.legacy.websearch.scripts.webcoll:main',
             'webmessageadmin = '
             ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
             'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',

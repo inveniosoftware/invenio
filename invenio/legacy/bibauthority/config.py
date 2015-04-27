@@ -15,6 +15,8 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from __future__ import unicode_literals
+
 # CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD
 # the authority record field containing the authority record control number
 CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD = '035__a'

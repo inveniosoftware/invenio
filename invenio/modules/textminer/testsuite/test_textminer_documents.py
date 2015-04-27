@@ -31,7 +31,7 @@ try:
     def has_request():
         try:
             return requests.get(
-                url_for('search.index', _external=True)).status_code == 200
+                url_for('collections.index', _external=True)).status_code == 200
         except:
             return False
     HAS_REQUESTS = LocalProxy(has_request)

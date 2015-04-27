@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -42,7 +42,7 @@ import ConfigParser
 import time
 from datetime import datetime
 
-from invenio.utils.redis import get_redis
+from invenio.ext.cache import cache
 from invenio.legacy.dbquery import serialize_via_marshal
 from intbitset import intbitset
 from invenio.config import CFG_ETCDIR
@@ -308,5 +308,4 @@ def fill_self_cites_tables(rank_method_code, config):
 
 def store_weights_cache(weights):
     """Store into key/value store"""
-    redis = get_redis()
-    redis.set('selfcites_weights', serialize_via_marshal(weights))
+    cache.set('selfcites_weights', serialize_via_marshal(weights))

@@ -19,24 +19,30 @@
 
 """Groups Flask Blueprint."""
 
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from __future__ import unicode_literals
 
-from flask import (Blueprint, render_template, request, jsonify, flash,
-                   url_for, redirect)
+from flask import Blueprint, flash, jsonify, redirect, render_template, \
+    request, url_for
+
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
 from flask_login import current_user, login_required
+
 from flask_menu import register_menu
+
 from invenio.base.decorators import wash_arguments
 from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.errors import AccountSecurityError, \
     IntegrityUsergroupError
-from invenio.modules.accounts.models import User, Usergroup, UserUsergroup, \
+from invenio.modules.accounts.models import User, UserUsergroup, Usergroup, \
     get_groups_user_not_joined
 
-from forms import JoinUsergroupForm, UsergroupForm, UserJoinGroupForm
-from config import GROUPS_AUTOCOMPLETE_LIMIT
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+from .config import GROUPS_AUTOCOMPLETE_LIMIT
+from .forms import JoinUsergroupForm, UserJoinGroupForm, UsergroupForm
 
 
 blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
@@ -62,8 +68,8 @@ def index():
     current_user.reload()
     form = JoinUsergroupForm()
     form.id_usergroup.set_remote(
-        url_for('webgroup.search_groups', id_user=uid)
-        + "?query=%QUERY")
+        url_for('webgroup.search_groups', id_user=uid) +
+        "?query=%QUERY")
     user = User.query.get(uid)
     uugs = dict(map(lambda uug: (uug.usergroup.name, uug),
                     user.usergroups))
@@ -104,7 +110,7 @@ def new():
                 action=_('Create'),
                 subtitle=_("New group"),
             )
-        except:
+        except Exception:
             # catch unknown error
             db.session.rollback()
             raise
@@ -294,8 +300,8 @@ def members(id_usergroup):
         UserUsergroup.id_usergroup == group.id).one()
     users_not_in_this_group = UserJoinGroupForm(request.form)
     users_not_in_this_group.id_user.set_remote(
-        url_for('webgroup.search_users', id_usergroup=id_usergroup)
-        + "?query=%QUERY")
+        url_for('webgroup.search_users', id_usergroup=id_usergroup) +
+        "?query=%QUERY")
     users_not_in_this_group.id_usergroup.data = id_usergroup
     users_not_in_this_group.redirect_url.data = url_for(
         ".members", id_usergroup=id_usergroup)

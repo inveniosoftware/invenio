@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012 CERN.
+# Copyright (C) 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@
 {% block body %}
   <div class="row">
   <div class="col-sm-3 col-md-3 col-pad-left-0">
+    {%- block panel_group -%}
     <div class="panel-group">
       <div class="panel panel-default">
         <div class="panel-heading"><strong>Settings</strong></div>
@@ -32,6 +33,7 @@
         </ul>
       </div>
     </div>
+    {%- endblock panel_group -%}
   </div>
    <div class="col-sm-9 col-md-9 col-pad-right-0">
     {%- block settings_body -%}{%- endblock settings_body -%}

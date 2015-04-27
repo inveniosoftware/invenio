@@ -19,6 +19,8 @@
 
 """OAIHarverster Blueprint."""
 
+from __future__ import unicode_literals
+
 from flask import Blueprint
 
 blueprint = Blueprint('oaiharverster', __name__,

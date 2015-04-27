@@ -19,6 +19,8 @@
 
 """Implementation of Blueprint for previewers."""
 
+from __future__ import unicode_literals
+
 import itertools
 import os
 

@@ -19,6 +19,8 @@
 
 """WebLinkback - Configuration Parameters"""
 
+from __future__ import unicode_literals
+
 CFG_WEBLINKBACK_STATUS = {'APPROVED': 'approved',
                           'PENDING': 'pending',
                           'REJECTED': 'rejected',

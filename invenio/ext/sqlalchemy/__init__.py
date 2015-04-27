@@ -17,30 +17,27 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.sqlalchemy.
+"""Initialization and configuration for `flask_sqlalchemy`."""
 
-    This module provides initialization and configuration for
-    `flask_sqlalchemy` module.
-"""
+from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
+
+from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 
 import sqlalchemy
-
-from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
-from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
-from sqlalchemy import event
-from sqlalchemy.ext.hybrid import hybrid_property, Comparator
+import sqlalchemy.dialects.postgresql
+from sqlalchemy import event, types
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.pool import Pool
+
 from sqlalchemy_utils import JSONType
 
-from invenio.utils.hash import md5
+from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyInteger, \
+    LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
+
 from .expressions import AsBINARY
-from .types import MarshalBinary, PickleBinary, GUID
+from .types import GUID, MarshalBinary, PickleBinary
 from .utils import get_model_type
-from invenio.ext.sqlalchemy.types import (LegacyInteger, LegacyMediumInteger,
-                                          LegacySmallInteger,
-                                          LegacyTinyInteger,
-                                          LegacyBigInteger)
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -92,7 +89,7 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MarshalBinary = MarshalBinary
     obj.PickleBinary = PickleBinary
 
-    ## Overwrite :meth:`MutableDick.update` to detect changes.
+    # Overwrite :meth:`MutableDick.update` to detect changes.
     from sqlalchemy.ext.mutable import MutableDict
 
     def update_mutable_dict(self, *args, **kwargs):
@@ -103,38 +100,17 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MutableDict = MutableDict
 
 
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy import types
-import sqlalchemy.dialects.postgresql
+# @compiles(types.Text, 'postgresql')
+# @compiles(sqlalchemy.dialects.postgresql.TEXT, 'postgresql')
+# def compile_text(element, compiler, **kw):
+#     """Redefine Text filed type for PostgreSQL."""
+#     return 'TEXT'
 
 
-@compiles(types.Text, 'postgresql')
-@compiles(sqlalchemy.dialects.postgresql.TEXT, 'postgresql')
-def compile_text(element, compiler, **kw):
-    """Redefine Text filed type for PostgreSQL."""
-    return 'TEXT'
-
-
-@compiles(types.VARBINARY, 'postgresql')
-def compile_text(element, compiler, **kw):
-    """Redefine VARBINARY filed type for PostgreSQL."""
-    return 'BYTEA'
-
-
-class PasswordComparator(Comparator):
-
-    """Implement a password comparator."""
-
-    def __eq__(self, other):
-        """Implement the equal operator."""
-        return self.__clause_element__() == self.hash(other)
-
-    def hash(self, password):
-        """Generate a hashed version of the password."""
-        if db.engine.name != 'mysql':
-            return md5(password).digest()
-        email = self.__clause_element__().table.columns.email
-        return db.func.aes_encrypt(email, password)
+# @compiles(types.VARBINARY, 'postgresql')
+# def compile_text(element, compiler, **kw):
+#     """Redefine VARBINARY filed type for PostgreSQL."""
+#     return 'BYTEA'
 
 
 def autocommit_on_checkin(dbapi_con, con_record):
@@ -154,8 +130,6 @@ def autocommit_on_checkin(dbapi_con, con_record):
 class SQLAlchemy(FlaskSQLAlchemy):
 
     """Database object."""
-
-    PasswordComparator = PasswordComparator
 
     def init_app(self, app):
         """Init application."""
@@ -242,7 +216,7 @@ def setup_app(app):
             port=cfg.get('CFG_DATABASE_PORT'),
         )
 
-    ## Let's initialize database.
+    # Let's initialize database.
     db.init_app(app)
 
     return app

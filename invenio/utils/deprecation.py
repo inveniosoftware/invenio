@@ -73,11 +73,11 @@ once Invenio v2.1 has been released.
 """
 
 
-class RemovedInInvenio22Warning(PendingDeprecationWarning):
+class RemovedInInvenio23Warning(PendingDeprecationWarning):
+
+    """Mark feature that will be removed in Invenio version 2.3."""
+
+
+class RemovedInInvenio22Warning(DeprecationWarning):
 
     """Mark feature that will be removed in Invenio version 2.2."""
-
-
-class RemovedInInvenio21Warning(DeprecationWarning):
-
-    """Mark feature that will be removed in Invenio version 2.1."""

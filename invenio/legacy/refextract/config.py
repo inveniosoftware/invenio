@@ -19,6 +19,8 @@
 
 """RefExtract configuration"""
 
+from __future__ import unicode_literals
+
 import pkg_resources
 from invenio.config import CFG_VERSION
 

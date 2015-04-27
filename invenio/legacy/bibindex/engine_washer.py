@@ -66,16 +66,20 @@ re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
 
 def lower_index_term(term):
-    """
-    Return safely lowered index term TERM.  This is done by converting
-    to UTF-8 first, because standard Python lower() function is not
-    UTF-8 safe.  To be called by both the search engine and the
-    indexer when appropriate (e.g. before stemming).
+    """Return safely lowered index term TERM.
+
+    This is done by converting to unicode string, if not already,
+    and use it's lower() function. Standard Python lower() function is not
+    UTF-8 safe.
 
     In case of problems with UTF-8 compliance, this function raises
     UnicodeDecodeError, so the client code may want to catch it.
     """
-    return unicode(term, 'utf-8').lower().encode('utf-8')
+    try:
+        return unicode(term, 'utf-8').lower()
+    except TypeError:
+        # term is already Unicode
+        return term.lower()
 
 latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
 def remove_latex_markup(phrase):
@@ -117,6 +121,7 @@ def remove_stopwords(word, stopwords_kb=None):
             return ""
     return word
 
+
 def length_check(word):
     """Returns word after length check.
 
@@ -127,12 +132,12 @@ def length_check(word):
         return ""
     return word
 
+
 def wash_index_term(term, max_char_length=50, lower_term=True):
-    """
-    Return washed form of the index term TERM that would be suitable
-    for storing into idxWORD* tables.  I.e., lower the TERM if
-    LOWER_TERM is True, and truncate it safely to MAX_CHAR_LENGTH
-    UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
+    """Return washed form of the index term TERM for storing into idxWORD* tables.
+
+    I.e., lower the TERM if LOWER_TERM is True, and truncate it safely to
+    MAX_CHAR_LENGTH UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
 
     The function works by an internal conversion of TERM, when needed,
     from its input Python UTF-8 binary string format into Python
@@ -145,9 +150,11 @@ def wash_index_term(term, max_char_length=50, lower_term=True):
     column in idxINDEX* tables.
     """
     if lower_term:
-        washed_term = unicode(term, 'utf-8').lower()
-    else:
+        washed_term = lower_index_term(term)
+    elif not isinstance(term, unicode):
         washed_term = unicode(term, 'utf-8')
+    else:
+        washed_term = term
     if len(washed_term) <= max_char_length:
         # no need to truncate the term, because it will fit
         # nicely even if it uses four-byte UTF-8 characters
@@ -155,6 +162,7 @@ def wash_index_term(term, max_char_length=50, lower_term=True):
     else:
         # truncate the term in a safe position:
         return washed_term[:max_char_length].encode('utf-8')
+
 
 def wash_author_name(p):
     """

@@ -24,12 +24,14 @@ from __future__ import unicode_literals
 import distutils.sysconfig
 from os.path import join
 
-from invenio.version import __version__
 from invenio.utils.shell import which
+from invenio.version import __version__
+
 
 EXTENSIONS = [
     'invenio.ext.confighacks',
     'invenio.ext.jinja2hacks',
+    'invenio.ext.passlib:Passlib',
     'invenio.ext.debug_toolbar',
     'invenio.ext.babel',
     'invenio.ext.sqlalchemy',
@@ -517,7 +519,7 @@ CFG_OAI_LICENSE_URI_SUBFIELD = "u"
 CFG_OAI_LOAD = 500
 CFG_OAI_METADATA_FORMATS = {
     'oai_dc': ('XOAIDC', 'http://www.openarchives.org/OAI/1.1/dc.xsd',
-                           'http://purl.org/dc/elements/1.1/'),
+                         'http://purl.org/dc/elements/1.1/'),
     'marcxml': ('XOAIMARC',
                 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
                 'http://www.loc.gov/MARC21/slim'),
@@ -538,12 +540,6 @@ CFG_OAI_RIGHTS_URI_SUBFIELD = "u"
 CFG_OAI_SAMPLE_IDENTIFIER = "oai:atlantis.cern.ch:123"
 CFG_OAI_SET_FIELD = "909COp"
 CFG_OAI_SLEEP = 2
-CFG_OAUTH1_CONFIGURATIONS = {}
-CFG_OAUTH1_PROVIDERS = []
-CFG_OAUTH2_CONFIGURATIONS = {}
-CFG_OAUTH2_PROVIDERS = []
-CFG_OPENID_CONFIGURATIONS = {}
-CFG_OPENID_PROVIDERS = []
 CFG_OPENOFFICE_SERVER_HOST = "localhost"
 CFG_OPENOFFICE_SERVER_PORT = 2002
 CFG_OPENOFFICE_USER = "nobody"

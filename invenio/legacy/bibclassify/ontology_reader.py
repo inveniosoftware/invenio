@@ -485,12 +485,11 @@ class KeywordToken:
                 for label in self.compositeof:
                     _get_ckw_components(new_vals, label)
                 self.compositeof = new_vals
-            except TaxonomyError:
+            except TaxonomyError as err:
                 # the composites will be empty
                 # (better than to have confusing, partial matches)
                 self.compositeof = []
-                log.error(
-                    'We reset this composite keyword, so that it does not match anything. Please fix the taxonomy.')
+                log.error(err)
 
     def isComposite(self):
         """Return value of _composite."""

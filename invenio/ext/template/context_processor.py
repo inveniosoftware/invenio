@@ -52,7 +52,7 @@ class template_args(object):
 
         def setup_app(app):
 
-            @template_args('search.index', app=app)
+            @template_args('collections.index', app=app)
             def foo():
                 return dict(foo='bar')
 
@@ -61,7 +61,7 @@ class template_args(object):
 
     .. code-block:: python
 
-        from invenio.modules.search.views.search import index
+        from invenio.modules.collections.views.collections import index
 
         @template_args(index)
         def bar():

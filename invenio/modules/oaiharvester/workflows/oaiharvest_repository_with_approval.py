@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,34 +27,3 @@ class oaiharvest_repository_with_approval(oaiharvest_harvest_repositories):
     """A workflow for use with OAI harvesting in BibSched with approval."""
 
     record_workflow = "oaiharvest_record_approval"
-
-    @staticmethod
-    def get_description(bwo):
-        """Return description of object."""
-        from flask import render_template
-
-        identifiers = None
-
-        extra_data = bwo.get_extra_data()
-        if 'options' in extra_data and 'identifiers' in extra_data["options"]:
-            identifiers = extra_data["options"]["identifiers"]
-
-        results = bwo.get_tasks_results()
-
-        if 'review_workflow' in results:
-            result_progress = results['review_workflow'][0]['result']
-        else:
-            result_progress = {}
-
-        current_task = extra_data['_last_task_name']
-
-        return render_template("workflows/styles/harvesting_description.html",
-                               identifiers=identifiers,
-                               result_progress=result_progress,
-                               current_task=current_task)
-
-    @staticmethod
-    def get_title(bwo):
-        """Return title of object."""
-        return "Summary of OAI harvesting from: {0}".format(
-            bwo.get_extra_data()["repository"]["name"])

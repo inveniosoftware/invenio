@@ -23,17 +23,9 @@ from __future__ import print_function
 
 import datetime
 
-import os
-
-import sys
-
-from pipes import quote
-
 from flask import current_app
 
 from invenio.ext.script import Manager, change_command_name, print_progress
-
-from six import iteritems
 
 manager = Manager(usage="Perform database operations")
 
@@ -54,8 +46,14 @@ option_default_data = manager.option(
 @option_yes_i_know
 def init(user='root', password='', yes_i_know=False):
     """Initialize database and user."""
-    from invenio.ext.sqlalchemy import db
+    from invenio.ext.sqlalchemy.utils import initialize_database_user
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
+
+    from sqlalchemy_utils.functions import database_exists, create_database, \
+        drop_database
+
+    from sqlalchemy.engine.url import URL
+    from sqlalchemy import create_engine
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -63,38 +61,38 @@ def init(user='root', password='', yes_i_know=False):
         " `inveniomanage database drop`."
     ))
 
-    # Step 1: drop database and recreate it
-    if db.engine.name == 'mysql':
-        # FIXME improve escaping
-        args = dict((k, str(v).replace('$', '\$'))
-                    for (k, v) in iteritems(current_app.config)
-                    if k.startswith('CFG_DATABASE'))
-        args = dict(zip(args, map(quote, args.values())))
-        prefix = ('{cmd} -u {user} --password={password} '
-                  '-h {CFG_DATABASE_HOST} -P {CFG_DATABASE_PORT} ')
-        cmd_prefix = prefix.format(cmd='mysql', user=user, password=password,
-                                   **args)
-        cmd_admin_prefix = prefix.format(cmd='mysqladmin', user=user,
-                                         password=password,
-                                         **args)
-        cmds = [
-            cmd_prefix + '-e "DROP DATABASE IF EXISTS {CFG_DATABASE_NAME}"',
-            (cmd_prefix + '-e "CREATE DATABASE IF NOT EXISTS '
-             '{CFG_DATABASE_NAME} DEFAULT CHARACTER SET utf8 '
-             'COLLATE utf8_general_ci"'),
-            # Create user and grant access to database.
-            (cmd_prefix + '-e "GRANT ALL PRIVILEGES ON '
-             '{CFG_DATABASE_NAME}.* TO {CFG_DATABASE_USER}@localhost '
-             'IDENTIFIED BY {CFG_DATABASE_PASS}"'),
-            cmd_admin_prefix + 'flush-privileges'
-        ]
-        for cmd in cmds:
-            cmd = cmd.format(**args)
-            print(cmd)
-            if os.system(cmd):
-                print("ERROR: failed execution of", cmd, file=sys.stderr)
-                sys.exit(1)
-        print('>>> Database has been installed.')
+    # Step 1: create URI to connect admin user
+    cfg = current_app.config
+    SQLALCHEMY_DATABASE_URI = URL(
+        cfg.get('CFG_DATABASE_TYPE', 'mysql'),
+        username=user,
+        password=password,
+        host=cfg.get('CFG_DATABASE_HOST'),
+        database=cfg.get('CFG_DATABASE_NAME'),
+        port=cfg.get('CFG_DATABASE_PORT'),
+    )
+
+    # Step 2: drop the database if already exists
+    if database_exists(SQLALCHEMY_DATABASE_URI):
+        drop_database(SQLALCHEMY_DATABASE_URI)
+        print('>>> Database has been dropped.')
+
+    # Step 3: create the database
+    create_database(SQLALCHEMY_DATABASE_URI, encoding='utf8')
+    print('>>> Database has been created.')
+
+    # Step 4: setup connection with special user
+    engine = create_engine(SQLALCHEMY_DATABASE_URI)
+    engine.connect()
+
+    # Step 5: grant privileges for the user
+    initialize_database_user(
+        engine=engine,
+        database_name=current_app.config['CFG_DATABASE_NAME'],
+        database_user=current_app.config['CFG_DATABASE_USER'],
+        database_pass=current_app.config['CFG_DATABASE_PASS'],
+    )
+    print('>>> Database user has been initialized.')
 
 
 @option_yes_i_know
@@ -120,11 +118,7 @@ def drop(yes_i_know=False, quiet=False):
     test_sqla_utf8_chain()
     list(models)
 
-    # Step 2: disable foreign key checks
-    if db.engine.name == 'mysql':
-        db.engine.execute('SET FOREIGN_KEY_CHECKS=0;')
-
-    # Step 3: destroy associated data
+    # Step 2: destroy associated data
     try:
         from invenio.legacy.webstat.api import destroy_customevents
         msg = destroy_customevents()
@@ -152,7 +146,7 @@ def drop(yes_i_know=False, quiet=False):
                 dropper(table)
                 dropped += 1
             except Exception:
-                print('\r', '>>> problem with dropping ', table)
+                print('\r>>> problem with dropping {0}'.format(table))
                 current_app.logger.exception(table)
 
         if dropped == N:
@@ -175,7 +169,6 @@ def create(default_data=True, quiet=False):
     """Create database tables from sqlalchemy models."""
     print(">>> Going to create tables...")
 
-    from sqlalchemy import event
     from invenio.utils.date import get_time_estimator
     from invenio.ext.sqlalchemy.utils import test_sqla_connection, \
         test_sqla_utf8_chain
@@ -186,18 +179,6 @@ def create(default_data=True, quiet=False):
     test_sqla_utf8_chain()
 
     list(models)
-
-    def cfv_after_create(target, connection, **kw):
-        print
-        print(">>> Modifing table structure...")
-        from invenio.legacy.dbquery import run_sql
-        run_sql('ALTER TABLE collection_field_fieldvalue DROP PRIMARY KEY')
-        run_sql('ALTER TABLE collection_field_fieldvalue ADD INDEX id_collection(id_collection)')
-        run_sql('ALTER TABLE collection_field_fieldvalue CHANGE id_fieldvalue id_fieldvalue mediumint(9) unsigned')
-        #print(run_sql('SHOW CREATE TABLE collection_field_fieldvalue'))
-
-    from invenio.modules.search.models import CollectionFieldFieldvalue
-    event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
 
     tables = db.metadata.sorted_tables
 
@@ -218,7 +199,7 @@ def create(default_data=True, quiet=False):
                 creator(table)
                 created += 1
             except Exception:
-                print('\r', '>>> problem with creating ', table)
+                print('\r>>> problem with creating {0}'.format(table))
                 current_app.logger.exception(table)
 
         if created == N:
@@ -275,11 +256,7 @@ def uri():
 def version():
     """Get running version of database driver."""
     from invenio.ext.sqlalchemy import db
-    try:
-        return db.engine.dialect.dbapi.__version__
-    except Exception:
-        import MySQLdb
-        return MySQLdb.__version__
+    return db.engine.dialect.dbapi.__version__
 
 
 @manager.option('-v', '--verbose', action='store_true', dest='verbose',
@@ -288,12 +265,8 @@ def version():
 def driver_info(verbose=False):
     """Get name of running database driver."""
     from invenio.ext.sqlalchemy import db
-    try:
-        return db.engine.dialect.dbapi.__name__ + (('==' + version())
-                                                   if verbose else '')
-    except Exception:
-        import MySQLdb
-        return MySQLdb.__name__ + (('==' + version()) if verbose else '')
+    return db.engine.dialect.dbapi.__name__ + (('==' + version())
+                                               if verbose else '')
 
 
 @manager.option('-l', '--line-format', dest='line_format', default="%s: %s")

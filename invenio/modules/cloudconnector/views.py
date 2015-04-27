@@ -19,10 +19,15 @@
 
 """Cloud Application Blueprint."""
 
-from flask import (Blueprint, render_template, request, flash,
-                   redirect, url_for, current_app, make_response)
+from __future__ import unicode_literals
+
+from flask import Blueprint, current_app, flash, make_response, redirect, \
+    render_template, request, url_for
+
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
 from flask_login import login_required
+
 from flask_menu import register_menu
 
 from invenio.base.i18n import _

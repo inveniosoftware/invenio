@@ -17,6 +17,8 @@
 
 """OAI Harvest Configuration."""
 
+from __future__ import unicode_literals
+
 __revision__ = "$Id$"
 
 

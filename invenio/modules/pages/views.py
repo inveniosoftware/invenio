@@ -18,19 +18,22 @@
 
 """Views for Pages module."""
 
+from __future__ import unicode_literals
+
 import six
 
-from flask import Blueprint, request, render_template, current_app
+from flask import Blueprint, current_app, render_template, request
 from flask.ctx import after_this_request
-from sqlalchemy import event
-from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import NotFound
 
 from invenio.base.globals import cfg
-from invenio.ext.sqlalchemy import db
 from invenio.base.signals import before_handle_user_exception
-# from invenio.ext.cache import cache
+from invenio.ext.sqlalchemy import db
 from invenio.modules.pages.models import Page
+
+from sqlalchemy import event
+from sqlalchemy.orm.exc import NoResultFound
+
+from werkzeug.exceptions import NotFound
 
 blueprint = Blueprint('pages', __name__, url_prefix='/',
                       template_folder='templates')
@@ -41,7 +44,7 @@ def register():
     """Register all pages before the first application request."""
     try:
         _add_url_rule([page.url for page in Page.query.all()])
-    except:
+    except Exception:
         current_app.logger.warn('Pages were not loaded.')
 
 

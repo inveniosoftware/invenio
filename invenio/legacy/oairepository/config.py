@@ -17,6 +17,8 @@
 
 """OAI Repository Configuration."""
 
+from __future__ import unicode_literals
+
 # Maximum number of records to put in a single bibupload
 CFG_OAI_REPOSITORY_MARCXML_SIZE = 1000
 

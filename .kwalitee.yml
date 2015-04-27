@@ -42,6 +42,7 @@ components:
 - classifier
 - cloudconnector
 - collect
+- collections
 - comments
 - communities
 - config
@@ -114,6 +115,7 @@ components:
 - textminer
 - tickets
 - travis
+- unapi
 - upgrader
 - uploader
 - version

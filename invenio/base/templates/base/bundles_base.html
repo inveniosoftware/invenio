@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,9 +31,6 @@
  # modes.
  #}
 {%- if config.get("ASSETS_DEBUG") -%}
-  {%- if not config.get("LESS_RUN_IN_DEBUG") -%}
-    {% bundle "less.js" %}
-  {%- endif -%}
   {%- if not config.get("REQUIREJS_RUN_IN_DEBUG") -%}
     {% bundle "require.js" %}
   {%- endif -%}

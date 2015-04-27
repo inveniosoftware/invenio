@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -56,6 +56,8 @@ from invenio.modules.upgrader.api import op
 from invenio.utils.text import wait_for_user
 %(imports)s
 
+# Important: Below is only a best guess. You MUST validate which previous
+# upgrade you depend on.
 depends_on = %(depends_on)s
 
 

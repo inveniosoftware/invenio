@@ -159,14 +159,4 @@ Contents:
    VIII. all the above failed
      -> authorization failed
 
-4. External login methods
-
-   If you want to call defined external loginmethods, it can be done by:
-
-   import invenio.external_authentication
-   example_method = invenio.external_authentication.example()
-   example_method.auth_user("testuser", "testpassword")
-
-   Example is here a class used as an example, which must contain the method
-   auth_user.
 </pre>

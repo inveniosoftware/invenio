@@ -16,16 +16,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.modules.accounts.validators
-    -----------------------------------
 
-    Implements account validators.
-"""
+"""Implements account validators."""
+
 import re
+
 from flask import current_app
-from sqlalchemy.exc import SQLAlchemyError
+
 from flask_wtf import validators
+
+from sqlalchemy.exc import SQLAlchemyError
 
 from invenio.base.i18n import _
 
@@ -54,6 +54,7 @@ def wash_login_method(login_method):
 
 
 def validate_nickname_or_email(form, field):
+    """Validate nickname or email."""
     try:
         User.query.filter(User.nickname == field.data).one()
     except SQLAlchemyError:
@@ -61,16 +62,19 @@ def validate_nickname_or_email(form, field):
             User.query.filter(User.email == field.data).one()
         except SQLAlchemyError:
             raise validators.ValidationError(
-                _('Not valid nickname or email: %(x_data)s', x_data=(field.data, )))
+                _('Not a valid nickname or email: %(x_data)s',
+                  x_data=field.data)
+            )
 
 
 def validate_nickname(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
-       At the moment we just check whether it is not empty, does not
-       contain blanks or @, is not equal to `guest', etc.
 
-       This check relies on re_invalid_nickname regexp (see above)
-       Return 1 if nickname is okay, return 0 if it is not.
+    At the moment we just check whether it is not empty, does not
+    contain blanks or @, is not equal to `guest', etc.
+
+    This check relies on re_invalid_nickname regexp (see above)
+    Return 1 if nickname is okay, return 0 if it is not.
     """
     if nickname and \
        not(nickname.startswith(' ') or nickname.endswith(' ')) and \
@@ -83,9 +87,10 @@ def validate_nickname(nickname):
 
 def validate_email(email):
     """Check whether wanted EMAIL address supplied by the user is valid.
-       At the moment we just check whether it contains '@' and whether
-       it doesn't contain blanks.  We also check the email domain if
-       CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN is set.
+
+    At the moment we just check whether it contains '@' and whether
+    it doesn't contain blanks.  We also check the email domain if
+    CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN is set.
     """
     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = current_app.config.get(
         'CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN')
@@ -96,5 +101,6 @@ def validate_email(email):
     elif CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN:
         if not email.endswith(CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN):
             raise validators.ValidationError(
-                _("Supplied email address %(x_addr)s is invalid.", x_addr=email)
+                _("Supplied email address %(x_addr)s is invalid.",
+                  x_addr=email)
             )

@@ -180,7 +180,7 @@
                  href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                  class="{{ ' active' if active }}">
                 <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if of==i.code }}"></i>
-                {{ i.name }}
+                {{ i.names.get(g.ln, i.name) }}
               </a></li>
             {%- endfor -%}
             <!-- dropdown menu links -->
@@ -230,7 +230,9 @@
             <div class="form-group">
               <select name="of" class="col-md-2 form-control">
               {%- for i in export_formats -%}
-                <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
+                <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>
+                  {{ i.names.get(g.ln, i.name) }}
+                </option>
               {%- endfor -%}
               </select>
             </div>

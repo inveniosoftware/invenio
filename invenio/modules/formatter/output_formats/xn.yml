@@ -1,0 +1,8 @@
+content_type: text/xml
+default: NLM.xsl
+description: XML NLM.
+mime_type: application/x-nlm
+name: NLM
+url: http://www.nlm.nih.gov/databases/dtd/
+rules: []
+visibility: 0

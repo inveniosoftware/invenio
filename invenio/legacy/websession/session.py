@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -48,7 +48,7 @@ from invenio.config import (CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER,
 from invenio.legacy.websession.websession_config import (CFG_WEBSESSION_COOKIE_NAME,
                                       CFG_WEBSESSION_ONE_DAY,
                                       CFG_WEBSESSION_CLEANUP_CHANCE)
-from invenio.utils.redis import get_redis
+from invenio.ext.cache import cache
 from invenio.utils.hash import md5
 
 
@@ -536,15 +536,14 @@ class InvenioSessionRedis(InvenioSessionBase):
         return 'session_%s' % sid
 
     def load_from_storage(self, sid):
-        return get_redis().get(self.generate_key(sid))
+        return cache.get(self.generate_key(sid))
 
     def delete_from_storage(self, sid):
-        return get_redis().delete(self.generate_key(sid))
+        return cache.delete(self.generate_key(sid))
 
     def save_in_storage(self, sid, session_object, timeout, uid):  # pylint: disable=W0613
-        return get_redis().setex(self.generate_key(sid),
-                                 session_object,
-                                 timeout)
+        return cache.set(self.generate_key(sid), session_object,
+                         timeout=timeout)
 
 if CFG_WEBSESSION_STORAGE == 'mysql':
     InvenioSession = InvenioSessionMySQL

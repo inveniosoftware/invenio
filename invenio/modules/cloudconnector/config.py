@@ -19,9 +19,11 @@
 
 """Configuration for all cloud services and general cloudutils config."""
 
-from werkzeug import secure_filename
+from __future__ import unicode_literals
 
 from invenio.base.config import CFG_SITE_NAME
+
+from werkzeug import secure_filename
 
 # General configuration
 CLOUDCONNECTOR_ROWS_PER_PAGE = 10

@@ -28,7 +28,7 @@ from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.search.models import Collection
+from invenio.modules.collections.models import Collection
 from invenio.utils.memoise import Memoise
 
 from sqlalchemy.exc import IntegrityError
@@ -136,7 +136,8 @@ def get_kb_mappings(kb_name="", key="", value="", match_type="s", sortby="to",
     :param sortby: the sorting criteria ('from' or 'to')
     :param key: return only entries where key matches this
     :param value: return only entries where value matches this
-    :limit return only X number of entries
+    :param limit: return only X number of entries
+    :return: list of knowledge converted in dictionary
     """
     # query
     query = db.session.query(models.KnwKBRVAL).join(models.KnwKB)
@@ -409,19 +410,23 @@ def delete_kb(kb_name):
 
 
 def get_elements_that_use_kb(name):
-    # FIXME remove the obsolete function
     """Return a list of elements that call given kb.
 
     WARNING: this routine is obsolete.
 
-    [ {'filename':"filename_1.py"
-       'name': "a name"
-      },
-      ...
-    ]
+    .. code-block:: python
+
+        [
+         {
+          'filename':"filename_1.py",
+          'name': "a name"
+         },
+         ..
+        ]
 
     :return: elements sorted by name
     """
+    # FIXME remove the obsolete function
     warnings.warn("The method 'get_elements_that_use_kb(name) is obsolete!'",
                   DeprecationWarning)
 
@@ -459,7 +464,7 @@ def get_elements_that_use_kb(name):
     keys.sort()
     return map(format_elements.get, keys)
 
-### kb functions for export
+# kb functions for export
 
 
 def get_kbs_info(kbtype="", searchkbname=""):
@@ -557,7 +562,7 @@ def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     :param searchkey: search using this key
     :param searchvalue: search using this value
     :param searchtype: s = substring, e=exact
-    :return a list of dictionaries [{'key'=>x, 'value'=>y},..]
+    :return: a list of dictionaries [{'key'=>x, 'value'=>y},..]
     """
     kb = get_kb_by_name(kb_name)
     return kb.get_kbr_items(searchkey, searchvalue, searchtype)
@@ -568,10 +573,8 @@ def get_kbd_values(kbname, searchwith=""):
 
     :param kbname:     name of the knowledge base
     :param searchwith: a term to search with
+    :return: list of values
     """
-    from invenio.legacy import search_engine
-
-    # first check that the kb in question is dynamic
     kb = get_kb_by_name(kbname)
     kbid = kb.id
     if not kbid:
@@ -581,8 +584,20 @@ def get_kbd_values(kbname, searchwith=""):
         return []
     if kbtype != 'd':
         return []
+    return get_kbd_values_by_def(kb.kbdefs.to_dict(), searchwith)
+
+
+def get_kbd_values_by_def(confdict, searchwith=""):
+    """Return a list of values by searching a dynamic kb.
+
+    :param confdict: dictionary with keys "field", "expression"
+        and "collection" name
+    :param searchwith: a term to search with
+    :return: list of values
+    """
+    from invenio.legacy import search_engine
+
     # get the configuration so that we see what the field is
-    confdict = kb.kbdefs.to_dict()
     if not confdict:
         return []
     if 'field' not in confdict:
@@ -635,9 +650,7 @@ def get_kbd_values_json(kbname, searchwith=""):
 
 def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
                                expression=""):
-    """Dynamically create a dynamic KB for a specific search; then destroy it.
-
-    This probably isn't the method you want.
+    """Get list of kbd values for bibedit.
 
     Example1: tag=100__a : return values of 100__a
     Example2: tag=100__a, searchwith=Jill: return values of 100__a that match
@@ -657,17 +670,9 @@ def get_kbd_values_for_bibedit(tag, collection="", searchwith="",
                        if present, '%' is substituted with /searcwith/.
                        If absent, /searchwith/ is searched for in /tag/.
     """
-    dkbname = "tmp_dynamic_"+tag+'_'+expression
-    kb_id = add_kb(kb_name=dkbname, kb_type='dynamic')
-    # get the kb name since it may be catenated by a number
-    # in case there are concurrent calls.
-    kb_name = get_kb_name(kb_id)
-    add_kb_mapping(kb_name, tag, expression, collection)
-    # now, get stuff
-    myvalues = get_kbd_values(kb_name, searchwith)
-    # the tmp dyn kb is now useless, delete it
-    delete_kb(kb_name)
-    return myvalues
+    return get_kbd_values_by_def(dict(
+        field=tag, expression=expression, collection=collection
+    ), searchwith)
 
 
 def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):

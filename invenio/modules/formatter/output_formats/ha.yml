@@ -1,0 +1,6 @@
+content_type: text/html
+default: AID_HTML_very_brief.bft
+description: Very brief HTML output format for author/paper claiming facility.
+name: HTML author claiming
+rules: []
+visibility: 0

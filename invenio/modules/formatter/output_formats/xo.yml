@@ -1,0 +1,7 @@
+content_type: application/xml
+default: MODS.xsl
+description: Metadata Object Description Schema
+name: MODS
+url: http://www.loc.gov/standards/mods/v3/mods-3-3.xsd
+rules: []
+visibility: 0

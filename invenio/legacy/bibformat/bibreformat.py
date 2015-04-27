@@ -1,7 +1,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2007, 2008, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -176,25 +176,15 @@ def bibreformat_task(fmt, recids, without_fmt, process):
 def check_validity_input_formats(input_formats):
     """Check the validity of every input format.
 
-    @param input_formats: list of given formats
-    @type input_formats: list
-    @return: if there is any invalid input format it returns this value
-    @rtype: string
+    :param input_formats: list of given formats
+    :type input_formats: list
+    :return: if there is any invalid input format it returns this value
+    :rtype: string
     """
-    from invenio.legacy.search_engine import get_available_output_formats
-    valid_formats = get_available_output_formats()
-
-    # let's to extract the values of the available formats
-    format_values = []
-    for aformat in valid_formats:
-        format_values.append(aformat['value'])
-
-    invalid_format = ''
-    for aformat in input_formats:
-        if aformat.lower() not in format_values:
-            invalid_format = aformat.lower()
-            break
-    return invalid_format
+    from invenio.modules.formatter import registry
+    tested_formats = set([aformat.lower() for aformat in input_formats])
+    invalid_formats = tested_formats - set(registry.output_formats.keys())
+    return invalid_formats[0] if len(invalid_formats) else ''
 
 
 ### Bibreformat all selected records (using new python bibformat)

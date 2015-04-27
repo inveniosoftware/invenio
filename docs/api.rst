@@ -39,6 +39,7 @@ Extensions
    ext/jasmine
    ext/logging
    ext/login
+   ext/passlib
    ext/session
    ext/sqlalchemy
    ext/template
@@ -55,6 +56,7 @@ Modules
    modules/documents
    modules/formatter
    modules/jsonalchemy
+   modules/knowledge
    modules/multimedia
    modules/oauthclient
    modules/redirector

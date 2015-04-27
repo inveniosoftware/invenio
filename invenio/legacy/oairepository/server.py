@@ -31,47 +31,47 @@ if sys.hexversion < 0x2050000:
 else:
     from glob import iglob
 from flask import url_for, abort
+from flask_login import current_user
+from intbitset import intbitset
 from six import iteritems
 
 from invenio.config import \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_CACHEDIR, \
+     CFG_CERN_SITE, \
      CFG_OAI_DELETED_POLICY, \
      CFG_OAI_EXPIRE, \
+     CFG_OAI_FRIENDS, \
      CFG_OAI_IDENTIFY_DESCRIPTION, \
      CFG_OAI_ID_FIELD, \
+     CFG_OAI_ID_PREFIX, \
      CFG_OAI_LOAD, \
-     CFG_OAI_SET_FIELD, \
-     CFG_OAI_PREVIOUS_SET_FIELD, \
      CFG_OAI_METADATA_FORMATS, \
-     CFG_CACHEDIR, \
+     CFG_OAI_PREVIOUS_SET_FIELD, \
+     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD, \
+     CFG_OAI_PROVENANCE_BASEURL_SUBFIELD, \
+     CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD, \
+     CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD, \
+     CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD, \
+     CFG_OAI_SAMPLE_IDENTIFIER, \
+     CFG_OAI_SET_FIELD, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
-     CFG_WEBSTYLE_HTTP_USE_COMPRESSION, \
-     CFG_CERN_SITE, \
-     CFG_OAI_SAMPLE_IDENTIFIER, \
-     CFG_OAI_ID_PREFIX, \
-     CFG_OAI_FRIENDS, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-     CFG_OAI_PROVENANCE_BASEURL_SUBFIELD, \
-     CFG_OAI_PROVENANCE_DATESTAMP_SUBFIELD, \
-     CFG_OAI_PROVENANCE_METADATANAMESPACE_SUBFIELD, \
-     CFG_OAI_PROVENANCE_ORIGINDESCRIPTION_SUBFIELD, \
-     CFG_OAI_PROVENANCE_HARVESTDATE_SUBFIELD, \
-     CFG_OAI_PROVENANCE_ALTERED_SUBFIELD
+     CFG_WEBSTYLE_HTTP_USE_COMPRESSION
 
-from intbitset import intbitset
-from invenio.utils.html import X, EscapedXMLString
-from invenio.legacy.dbquery import run_sql, wash_table_column_name
-from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
-    get_all_field_values, search_unit_in_bibxxx, get_record, search_pattern, \
-    get_records_that_can_be_displayed
-from invenio.modules.formatter import format_record
-from invenio.legacy.bibrecord import record_get_field_instances
-from invenio.ext.logging import register_exception
-from flask_login import current_user
-from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
-from invenio.utils.date import localtime_to_utc, utc_to_localtime
 from invenio.base.globals import cfg
+from invenio.ext.logging import register_exception
+from invenio.legacy.bibrecord import record_get_field_instances
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
+    search_unit_in_bibxxx, get_record, search_pattern
+from invenio.modules.formatter import format_record
+from invenio.modules.search.utils import get_records_that_can_be_displayed
+from invenio.utils.date import localtime_to_utc, utc_to_localtime
+from invenio.utils.html import X, EscapedXMLString
 
 CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -101,6 +101,18 @@ CFG_ERRORS = {
 
 CFG_MIN_DATE = "1970-01-01T00:00:00Z"
 CFG_MAX_DATE = "9999-12-31T23:59:59Z"
+
+
+def get_all_field_values(tag):
+    """
+    Return all existing values stored for a given tag.
+    @param tag: the full tag, e.g. 909C0b
+    @type tag: string
+    @return: the list of values
+    @rtype: list of strings
+    """
+    table = 'bib%02dx' % int(tag[:2])
+    return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]
 
 
 def oai_error(argd, errors):
@@ -580,7 +592,10 @@ def oai_get_recid(identifier):
     if identifier:
         recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e', ap=-9)
         if recids:
-            displayable_recids = get_records_that_can_be_displayed(current_user, recids)
+            displayable_recids = get_records_that_can_be_displayed(
+                current_user.get('precached_permitted_restricted_collections', []),
+                recids
+            )
             for recid in displayable_recids:
                 if record_exists(recid) > 0:
                     return recid
@@ -642,19 +657,19 @@ def oai_get_recid_list(set_spec="", fromdate="", untildate=""):
     """
     ret = intbitset()
     if not set_spec:
-        ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_SET_FIELD, type='e')
+        ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_SET_FIELD, m='e')
         if CFG_OAI_DELETED_POLICY != 'no':
-            ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
+            ret |= search_unit_in_bibxxx(p='*', f=CFG_OAI_PREVIOUS_SET_FIELD, m='e')
     else:
-        ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_SET_FIELD, type='e')
-        ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_SET_FIELD, type='e')
+        ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_SET_FIELD, m='e')
+        ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_SET_FIELD, m='e')
         if CFG_OAI_DELETED_POLICY != 'no':
-            ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
-            ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, type='e')
+            ret |= search_unit_in_bibxxx(p=set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, m='e')
+            ret |= search_unit_in_bibxxx(p='%s:*' % set_spec, f=CFG_OAI_PREVIOUS_SET_FIELD, m='e')
     if CFG_OAI_DELETED_POLICY == 'no':
-        ret -= search_unit_in_bibxxx(p='DELETED', f='980__%', type='e')
+        ret -= search_unit_in_bibxxx(p='DELETED', f='980__%', m='e')
         if CFG_CERN_SITE:
-            ret -= search_unit_in_bibxxx(p='DUMMY', f='980__%', type='e')
+            ret -= search_unit_in_bibxxx(p='DUMMY', f='980__%', m='e')
     return filter_out_based_on_date_range(ret, fromdate, untildate, set_spec)
 
 def oai_generate_resumption_token(set_spec):

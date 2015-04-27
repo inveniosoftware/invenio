@@ -60,6 +60,8 @@
     asynchronously the module that must be bundles using ``r.js``.
 """
 
+from __future__ import unicode_literals
+
 import mimetypes
 
 from invenio.ext.assets import Bundle, RequireJSFilter
@@ -134,21 +136,6 @@ admin = Bundle(
     output="admin.js",
     filters=RequireJSFilter(exclude=[jquery]),
     weight=50
-)
-
-# less.js is only used when the following configuration is set:
-#
-#  - ASSETS_DEBUG is True
-#  - LESS_RUN_IN_DEBUG is False
-#
-lessjs = Bundle(
-    "vendors/less/dist/less.js",
-    output="less.js",
-    filters="uglifyjs",
-    weight=0,
-    bower={
-        "less": "latest"
-    }
 )
 
 # require.js is only used when:

@@ -1,0 +1,8 @@
+content_type: text/xml
+default: MARCXML.bft
+description: XML MARC.
+mime_type: application/marcxml+xml
+name: MARCXML
+url: http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd
+rules: []
+visibility: 0

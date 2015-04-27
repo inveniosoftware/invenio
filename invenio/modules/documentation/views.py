@@ -19,21 +19,25 @@
 
 """Documentation Flask Blueprint."""
 
+from __future__ import unicode_literals
+
 import os
 
-from flask import render_template, current_app, abort, url_for, Blueprint
+from flask import Blueprint, abort, current_app, render_template, url_for
 from flask.helpers import send_from_directory
-from werkzeug.utils import cached_property, import_string
+
+from flask_breadcrumbs import current_breadcrumbs, default_breadcrumb_root, \
+    register_breadcrumb
+
+from flask_menu import register_menu
+
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
 
 from sphinx.websupport import WebSupport
 from sphinx.websupport.errors import DocumentNotFoundError
 
-from invenio.base.globals import cfg
-from invenio.base.i18n import _
-from flask_breadcrumbs import (default_breadcrumb_root,
-                                   register_breadcrumb,
-                                   current_breadcrumbs)
-from flask_menu import register_menu
+from werkzeug.utils import cached_property, import_string
 
 
 class DocsBlueprint(Blueprint):
@@ -65,7 +69,7 @@ class DocsBlueprint(Blueprint):
         """Return static file."""
         try:
             return super(self.__class__, self).send_static_file(filename)
-        except:
+        except Exception:
             cache_timeout = self.get_send_file_max_age(filename)
             return send_from_directory(
                 os.path.join(current_app.instance_path, "docs", "static"),

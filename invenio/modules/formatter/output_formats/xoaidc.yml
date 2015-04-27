@@ -1,0 +1,7 @@
+content_type: text/xml
+default: OAI_DC.xsl
+description: OAI DC.
+name: OAI DC
+url: http://www.openarchives.org/OAI/2.0/oai_dc.xsd
+rules: []
+visibility: 0

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,10 @@
 
 """Tags bundles."""
 
-from invenio.ext.assets import Bundle
+from __future__ import unicode_literals
 
 from invenio.base.bundles import styles as _css
+from invenio.ext.assets import Bundle
 
 
 _css.contents.append("css/tags/popover.css")

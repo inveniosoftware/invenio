@@ -211,28 +211,3 @@ def convert(xmltext, template_filename=None, template_source=None):
     del xml
 
     return result
-
-
-# def bc_profile():
-#     """
-#     Runs a benchmark
-#     """
-#     global xmltext
-#
-#     convert(xmltext, 'oaidc2marcxml.xsl')
-#     return
-#
-# def benchmark():
-#     """
-#     Benchmark the module, using profile and pstats
-#     """
-#     import profile
-#     import pstats
-#     from invenio.modules.formatter import record_get_xml
-#
-#     global xmltext
-#
-#     xmltext = record_get_xml(10, 'oai_dc')
-#     profile.run('bc_profile()', "bibconvert_xslt_profile")
-#     p = pstats.Stats("bibconvert_xslt_profile")
-#     p.strip_dirs().sort_stats("cumulative").print_stats()

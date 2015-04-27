@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,6 +35,7 @@ code are left in this module.
 from __future__ import print_function
 
 import os
+import re
 from six import iteritems
 import config as bconfig
 
@@ -44,8 +45,8 @@ import text_normalizer as normalizer
 import keyword_analyzer as keyworder
 import acronym_analyzer as acronymer
 
-from invenio.utils.url import make_user_agent_string
 from invenio.utils.text import encode_for_xml
+from invenio.utils.filedownload import download_url
 
 log = bconfig.get_logger("bibclassify.engine")
 
@@ -60,6 +61,7 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
                                 rebuild_cache=False, only_core_tags=False, extract_acronyms=False,
                                 api=False, **kwargs):
     """Output the keywords for each source in sources."""
+    from invenio.legacy.refextract.engine import get_plaintext_document_body
 
     # Inner function which does the job and it would be too much work to
     # refactor the call (and it must be outside the loop, before it did
@@ -68,6 +70,12 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
         if output_mode == "text":
             print("Input file: %s" % source)
 
+        line_nb = len(text_lines)
+        word_nb = 0
+        for line in text_lines:
+            word_nb += len(re.findall("\S+", line))
+
+        log.info("Remote file has %d lines and %d words." % (line_nb, word_nb))
         output = get_keywords_from_text(
             text_lines,
             taxonomy_name,
@@ -99,19 +107,19 @@ def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text"
                     continue
                 filename = os.path.join(entry, filename)
                 if os.path.isfile(filename):
-                    text_lines = extractor.text_lines_from_local_file(filename)
+                    text_lines, dummy = get_plaintext_document_body(filename)
                     if text_lines:
                         source = filename
                         process_lines()
         elif os.path.isfile(entry):
-            text_lines = extractor.text_lines_from_local_file(entry)
+            text_lines, dummy = get_plaintext_document_body(entry)
             if text_lines:
                 source = os.path.basename(entry)
                 process_lines()
         else:
             # Treat as a URL.
-            text_lines = extractor.text_lines_from_url(entry,
-                                                       user_agent=make_user_agent_string("BibClassify"))
+            local_file = download_url(entry)
+            text_lines, dummy = get_plaintext_document_body(local_file)
             if text_lines:
                 source = entry.split("/")[-1]
                 process_lines()
@@ -122,9 +130,10 @@ def get_keywords_from_local_file(local_file, taxonomy_name, output_mode="text",
                                  match_mode="full", no_cache=False, with_author_keywords=False,
                                  rebuild_cache=False, only_core_tags=False, extract_acronyms=False, api=False,
                                  **kwargs):
-    """Outputs keywords reading a local file. Arguments and output are the same
-    as for :see: get_keywords_from_text() """
+    """Output keywords reading a local file.
 
+    Arguments and output are the same as for :see: get_keywords_from_text().
+    """
     log.info("Analyzing keywords for local file %s." % local_file)
     text_lines = extractor.text_lines_from_local_file(local_file)
 
@@ -147,7 +156,7 @@ def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
                            with_author_keywords=False, rebuild_cache=False,
                            only_core_tags=False, extract_acronyms=False,
                            **kwargs):
-    """Extract keywords from the list of strings
+    """Extract keywords from the list of strings.
 
     :param text_lines: list of strings (will be normalized before being
         joined into one string)
@@ -165,7 +174,6 @@ def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
         (single_keywords, composite_keywords, author_keywords, acronyms)
         for other output modes it returns formatted string
     """
-
     cache = reader.get_cache(taxonomy_name)
     if not cache:
         reader.set_cache(taxonomy_name,
@@ -202,7 +210,8 @@ def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
 
 
 def extract_single_keywords(skw_db, fulltext):
-    """Find single keywords in the fulltext
+    """Find single keywords in the fulltext.
+
     :var skw_db: list of KeywordToken objects
     :var fulltext: string, which will be searched
     :return : dictionary of matches in a format {

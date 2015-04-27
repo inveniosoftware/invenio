@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -41,6 +41,7 @@ class CrossRefMixin(InvenioTestCase):
             lambda k: not k.startswith("invenio.ext.crossref"),
             EXTENSIONS)
         cfg["CROSSREF_API_URL"] = "http://api.example.org/works/"
+        cfg["CACHE_TYPE"] = "simple"
         return cfg
 
 

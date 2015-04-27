@@ -1,0 +1,15 @@
+content_type: text/html
+default: Default_HTML_detailed.tpl
+description: HTML detailed output format, used for Detailed record pages.
+name: HTML detailed
+rules:
+- {field: 980.a, template: Picture_HTML_detailed.tpl, value: 'PICTURE '}
+- {field: 980.a, template: Poetry_HTML_detailed.tpl, value: 'POETRY '}
+- {field: 980.a, template: Institute_HTML_detailed.bft, value: 'INSTITUTE '}
+- {field: 980.a, template: People_HTML_detailed.bft, value: 'AUTHOR '}
+- {field: 980.a, template: Journal_HTML_detailed.bft, value: 'JOURNAL '}
+- {field: 980.a, template: Subject_HTML_detailed.bft, value: 'SUBJECT '}
+- {field: 980.a, template: Detailed_HEPDATA_dataset.bft, value: 'DATA '}
+- {field: 773.t, template: Journal_HTML_detailed.bft, value: 'Atlantis Times '}
+- {field: 980.a, template: Video_HTML_detailed.tpl, value: 'VIDEO '}
+visibility: 0

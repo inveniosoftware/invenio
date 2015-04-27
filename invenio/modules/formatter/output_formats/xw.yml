@@ -1,0 +1,7 @@
+content_type: text/xml
+default: RefWorks.xsl
+description: RefWorks.
+name: RefWorks
+url: http://www.refworks.com/RefWorks/help/RefWorks_Tagged_Format.htm
+rules: []
+visibility: 0

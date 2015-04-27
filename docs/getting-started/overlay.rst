@@ -227,7 +227,6 @@ the application).
     (myoverlay)$ inveniomanage config set CFG_SITE_SECURE_URL https://0.0.0.0:4000
     (myoverlay)$ inveniomanage config set DEBUG True
     (myoverlay)$ inveniomanage config set ASSETS_DEBUG True
-    (myoverlay)$ inveniomanage config set LESS_RUN_IN_DEBUG False
 
 
 Database setup

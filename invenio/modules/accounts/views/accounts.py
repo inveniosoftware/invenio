@@ -17,35 +17,37 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebAccount Flask Blueprint"""
+"""WebAccount Flask Blueprint."""
+
 from __future__ import absolute_import
 
-from werkzeug import CombinedMultiDict, ImmutableMultiDict
-from flask import render_template, request, flash, redirect, url_for, \
-    g, abort, current_app, Blueprint
+from flask import Blueprint, abort, current_app, flash, g, redirect, \
+    render_template, request, url_for
+
+from flask_breadcrumbs import register_breadcrumb
+
 from flask_login import current_user, login_required
 
-#from invenio import websession_config
-from invenio.legacy import webuser
-from ..forms import LoginForm, RegisterForm, LostPasswordForm
-from ..models import User
-from ..validators import wash_login_method
+from flask_menu import register_menu
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from werkzeug import CombinedMultiDict, ImmutableMultiDict
+
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from flask_breadcrumbs import register_breadcrumb
-from invenio.ext.login import login_user, logout_user, authenticate, \
-    reset_password, login_redirect
-from flask_menu import register_menu
+from invenio.ext.login import UserInfo, authenticate, login_redirect, \
+    login_user, logout_user, reset_password
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
+from invenio.legacy import webuser
 from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation
 from invenio.utils.datastructures import LazyDict, flatten_multidict
-from invenio.utils.url import rewrite_to_secure_url
 
-
-#CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
-#CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+from ..forms import LoginForm, LostPasswordForm, RegisterForm
+from ..models import User
+from ..validators import wash_login_method
 
 blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
                       template_folder='../templates',
@@ -89,6 +91,7 @@ def login(nickname=None, password=None, login_method=None, action='',
                     "success"
                 )
                 return login_redirect(referer)
+
             else:
                 flash(_("Invalid credentials."), "error")
         except Exception as e:
@@ -97,7 +100,7 @@ def login(nickname=None, password=None, login_method=None, action='',
             )
             flash(_("Problem with login."), "error")
 
-    return render_template('accounts/login.html', form=form)
+    return render_template('accounts/login.html', form=form), 401
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
@@ -177,9 +180,7 @@ def logout():
 
 
 def load_user_settings():
-    """
-    Handy function to populate LazyDic with user settings.
-    """
+    """Handy function to populate LazyDic with user settings."""
     from invenio.modules.dashboard.settings import Settings
     from invenio.base.utils import autodiscover_user_settings
     modules = autodiscover_user_settings()
@@ -224,7 +225,8 @@ def index():
         order_middle = dashboard_settings.get('orderMiddle', []) or []
         order_right = dashboard_settings.get('orderRight', []) or []
 
-        extract_plugins = lambda x: [p for p in plugins if p.name in x if p]
+        def extract_plugins(x):
+            return [p for p in plugins if p.name in x if p]
 
         plugins_left = sorted(extract_plugins(order_left),
                               key=lambda w: plugin_sort(w, order_left))
@@ -232,9 +234,9 @@ def index():
                                 key=lambda w: plugin_sort(w, order_middle))
         plugins_right = sorted(extract_plugins(order_right),
                                key=lambda w: plugin_sort(w, order_right))
-        closed_plugins = [p for p in plugins if not p in plugins_left and
-                                                not p in plugins_middle and
-                                                not p in plugins_right]
+        closed_plugins = [p for p in plugins if p not in plugins_left and
+                          p not in plugins_middle and
+                          p not in plugins_right]
         plugins = [plugins_left, plugins_middle, plugins_right]
     else:
         plugins = sorted(plugins, key=lambda w: plugin_sort(w, plugins))
@@ -312,18 +314,27 @@ def lost():
 def access():
     try:
         mail = mail_cookie_check_mail_activation(request.values['mailcookie'])
-        User.query.filter(User.email == mail).one().note = 1
+
+        u = User.query.filter(User.email == mail).one()
+        u.note = 1
         try:
             db.session.commit()
-        except:
+        except SQLAlchemyError:
             db.session.rollback()
             flash(_('Authorization failled.'), 'error')
-        flash(
-            _('Your email address has been validated, and you can now proceed '
-              'to  sign-in.'),
-            'success'
-        )
-    except:
+            redirect('/')
+
+        if current_user.is_authenticated():
+            current_user.reload()
+            flash(_('Your email address has been validated'), 'success')
+        else:
+            UserInfo(u.id).reload()
+            flash(
+                _('Your email address has been validated, and you can '
+                  'now proceed to sign-in.'),
+                'success'
+            )
+    except Exception:
         current_app.logger.exception("Authorization failed.")
         flash(_('The authorization token is invalid.'), 'error')
     return redirect('/')

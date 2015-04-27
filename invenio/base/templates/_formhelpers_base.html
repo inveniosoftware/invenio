@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@
   {% set label_size = fieldkwargs.get('label_size') %}
   {% set field_size = fieldkwargs.get('field_size') %}
   {% set with_label = fieldkwargs.pop('with_label', True) %}
-  {%- if field.name == "csrf_token" or field.type == 'HiddenField' -%}
+  {%- if field.widget.input_type == 'hidden' -%}
   {{ field(**fieldkwargs)|safe }}
   {%- else -%}
   <div class="form-group {% if show_error_list and field.errors %} has-error{% endif %}">

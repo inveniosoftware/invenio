@@ -1,0 +1,7 @@
+content_type: text/xml
+default: EndNote.xsl
+description: XML EndNote.
+name: EndNote
+url: http://www.endnote.com/support/
+rules: []
+visibility: 0

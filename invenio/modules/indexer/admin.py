@@ -19,6 +19,8 @@
 
 """Indexer Flask Blueprint."""
 
+from __future__ import unicode_literals
+
 import itertools
 
 from invenio.base.i18n import _

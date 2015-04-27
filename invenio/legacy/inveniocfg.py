@@ -190,9 +190,6 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
                        'CFG_DEVEL_TEST_DATABASE_ENGINES',
                        'CFG_REFEXTRACT_KBS_OVERRIDE',
-                       'CFG_OPENID_CONFIGURATIONS',
-                       'CFG_OAUTH1_CONFIGURATIONS',
-                       'CFG_OAUTH2_CONFIGURATIONS',
                        'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES',
                        'CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING',
                        'CFG_BIBSCHED_NON_CONCURRENT_TASKS',
@@ -544,10 +541,14 @@ def cli_cmd_reset_siteadminemail(conf):
     print(">>> Going to reset CFG_SITE_ADMIN_EMAIL...")
     from invenio.legacy.dbquery import run_sql
     siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
-    run_sql("DELETE FROM user WHERE id=1")
-    run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
-                        (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
-            (siteadminemail,))
+
+    from invenio.modules.accounts.models import User
+    from invenio.ext.sqlalchemy import db
+    User.query.filter_by(id=1).delete()
+    u = User(id=1, email=siteadminemail, password='', note=1, nickname='admin')
+    db.session.add(u)
+    db.session.commit()
+
     print("You may want to restart Apache now.")
     print(">>> CFG_SITE_ADMIN_EMAIL reset successfully.")
 

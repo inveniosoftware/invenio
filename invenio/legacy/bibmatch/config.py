@@ -16,6 +16,9 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """BibMatch Configuration."""
+
+from __future__ import unicode_literals
+
 import logging
 import logging.handlers
 from invenio.config import CFG_TMPDIR

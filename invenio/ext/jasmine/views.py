@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,7 +19,10 @@
 
 """Views for Jasmine test runner."""
 
-from flask import Blueprint, render_template, send_file, abort, url_for
+from __future__ import unicode_literals
+
+from flask import Blueprint, abort, render_template, send_file, url_for
+
 from .registry import specs
 
 blueprint = Blueprint(
