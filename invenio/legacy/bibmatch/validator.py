@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -942,7 +942,8 @@ def soft_compare_names(origin_name, target_name):
     if orig_name[0].lower() == targ_name[0].lower():
         score += 0.6
     else:
-        if ((jaro_fctn(orig_name[0].lower(), targ_name[0].lower()) < .95)
+        if ((jaro_fctn(unicode(orig_name[0].lower()),
+                       unicode(targ_name[0].lower())) < .95)
                 or min(len(orig_name[0]), len(targ_name[0])) <= 4):
             score += 0.0
         else:
