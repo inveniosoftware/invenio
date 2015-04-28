@@ -29,33 +29,31 @@
   <hr/>
   <div class="row">
     <div class="col-md-6">
+      <p>
 {%- block footer_credits %}
-      {{ config["CFG_SITE_NAME_INTL"][g.ln] }}<br/>
-      {{ _("Powered by") }} <a class="footer" href="http://invenio-software.org/">Invenio</a>
-      v{{ config.CFG_VERSION }}<br />
-      {{ _("Maintained by") }} <a class="footer" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">
-        {{- config.CFG_SITE_SUPPORT_EMAIL -}}
-      </a><br/>
+        {{ config["CFG_SITE_NAME_INTL"][g.ln] }}<br/>
+        {{ _("Powered by") }} <a class="footer" href="http://invenio-software.org/">Invenio</a>
+        v{{ config.CFG_VERSION }}<br />
+        {{ _("Maintained by") }} <a class="footer" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">
+          {{- config.CFG_SITE_SUPPORT_EMAIL -}}
+        </a><br/>
   {%- if lastupdated -%}
       {{ _("Last updated") }}: {{ lastupdated|invenio_format_date }}
   {%- endif -%}
 {%- endblock footer_credits %}
+      </p>
     </div>
     <div class="col-md-6">
 {%- block footer_languages %}
-      <p class="langs">
   {%- if config.CFG_LANGUAGE_LIST_LONG -%}
-        {{ _("This site is also available in the following languages:") }} <br />
+      {{ _("This site is also available in the following languages:") }}
+      <ul class="langs list-inline">
     {%- for (lang, lang_namelong) in config.CFG_LANGUAGE_LIST_LONG %}
-        &nbsp;
-      {%- if lang != g.ln -%}
-      <a href="?ln={{ lang }}" class="langinfo" hreflang="{{ lang }}">{{ lang_namelong }}</a>
-      {%- else -%}
-        {{ lang_namelong }}
-      {%- endif %}
+
+      <li><a href="?ln={{ lang }}" class="langinfo{% if lang == g.ln %} langinfo-active{% endif %}" hreflang="{{ lang }}">{{ lang_namelong }}</a></li>
     {%- endfor %}
   {%- endif -%}
-      </p>
+      </ul>
 {%- endblock footer_languages %}
     </div>
   </div>
