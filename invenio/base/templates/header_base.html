@@ -24,7 +24,7 @@
 # {% include 'header.html' %}
 #}
 
-  <nav class="navbar navbar-inverse">
+  <nav class="navbar navbar-inverse navbar-static-top">
     <div class="container">
       <div class="navbar-header">
         <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
@@ -52,7 +52,7 @@
                   </ul>
                 </li>
             {%- else -%}
-            <li{% if (item.url|length > 1 and request.path.startswith(item.url)) or request.path == item.url %} class="active"{% endif %}><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            <li{% if item.active %} class="active"{% endif %}><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
             {%- endif -%}
         {%- endfor -%}
         </ul>
