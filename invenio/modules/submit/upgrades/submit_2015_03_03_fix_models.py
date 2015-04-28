@@ -95,7 +95,14 @@ def do_upgrade():
                 (index + 1, rec[0], rec[1]))
 
     # drop primary keys
-    op.drop_constraint('id_father', 'sbmCOLLECTION_sbmDOCTYPE', type_='primary')
+    try:
+        op.drop_constraint('id_father', 'sbmCOLLECTION_sbmDOCTYPE',
+                           type_='primary')
+    except OperationalError:
+        # the primary key is already dropped
+        warnings.warn("""Primary key of sbmCOLLECTION_sbmDOCTYPE """
+                      """table has been already dropped.""")
+
     # create new primary key with id
     op.create_primary_key('pk_sbmCOLLECTION_sbmDOCTYPE_id',
                           'sbmCOLLECTION_sbmDOCTYPE', ['id'])
