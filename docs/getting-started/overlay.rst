@@ -223,8 +223,8 @@ the application).
     (myoverlay)$ inveniomanage config set CFG_DATABASE_NAME mysql-database
     (myoverlay)$ inveniomanage config set CFG_DATABASE_USER mysql-user
     # HOST configuration (for redirects, etc.)
-    (myoverlay)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
-    (myoverlay)$ inveniomanage config set CFG_SITE_SECURE_URL https://0.0.0.0:4000
+    (myoverlay)$ inveniomanage config set CFG_SITE_URL http://invenio.example.com
+    (myoverlay)$ inveniomanage config set CFG_SITE_SECURE_URL https://invenio.example.com
     (myoverlay)$ inveniomanage config set DEBUG True
     (myoverlay)$ inveniomanage config set ASSETS_DEBUG True
     (myoverlay)$ inveniomanage config set LESS_RUN_IN_DEBUG False
