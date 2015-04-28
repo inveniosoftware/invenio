@@ -39,6 +39,7 @@ Extensions
    ext/jasmine
    ext/logging
    ext/login
+   ext/script
    ext/session
    ext/sqlalchemy
    ext/template

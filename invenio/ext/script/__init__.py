@@ -17,7 +17,28 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Initialize and configure Flask-Script extension."""
+"""Initialize and configure Flask-Script extension.
+
+Configuration
+^^^^^^^^^^^^^
+The following configuration variables are provided:
+
+===================== =======================================================
+`bind address`        Preferred binding address of the server. Can be used to
+                      select a specific interface or to bind to all via
+                      `0.0.0.0`.
+`bind port`           Preferred binding port of the server. Can differ from
+                      the one stated in `CFG_SITE_URL` so it can be accessed
+                      via reverse proxy.
+===================== =======================================================
+
+They are assigned by the following parameters, in decreasing priority:
+
+1. Command line arguments of `inveniomanage runserver`
+2. `SERVER_BIND_ADDRESS` and `SERVER_BIND_PORT` configuration
+3. Values guessed from `CFG_SITE_URL`
+4. Defaults (`127.0.0.1:80`)
+"""
 
 from __future__ import print_function
 
@@ -28,7 +49,9 @@ import re
 from types import FunctionType
 
 from flask import current_app, flash
+
 from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
+
 from flask_script import Manager as FlaskExtManager
 from flask_script.commands import Clean, Server, Shell, ShowUrls
 
@@ -184,8 +207,14 @@ def register_manager(manager):
     manager.add_command("show-urls", ShowUrls())
     manager.add_command("shell", Shell())
     parsed_url = urlparse(manager.app.config.get('CFG_SITE_URL'))
-    port = parsed_url.port or 80
-    host = parsed_url.hostname or '127.0.0.1'
+    host = manager.app.config.get(
+        'SERVER_BIND_ADDRESS',
+        parsed_url.hostname or '127.0.0.1'
+    )
+    port = manager.app.config.get(
+        'SERVER_BIND_PORT',
+        parsed_url.port or 80
+    )
     runserver = Server(host=host, port=port)
     manager.add_command("runserver", runserver)
 
