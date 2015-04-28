@@ -34,28 +34,25 @@ def info():
 
 def do_upgrade():
     """Implement your upgrades here."""
-    # drop primary keys
-    # (not necessary, because trick in invenio/base/scripts/database.py already
-    # remove the primary key)
-    # op.drop_constraint(None, 'collection_field_fieldvalue',
-    #                    type_='primary')
-
     # add column "id" in the table
     op.add_column('collection_field_fieldvalue',
                   db.Column('id', db.MediumInteger(9, unsigned=True),
                             nullable=False))
 
     # set all new ids
-    records = run_sql("""SELECT id_collection, id_field, type, score,
-                      score_fieldvalue
+    records = run_sql("""SELECT id_collection, id_field, id_fieldvalue,
+                      type, score, score_fieldvalue
                       FROM collection_field_fieldvalue AS cff
-                      ORDER BY cff.id_collection, id_field, type, score,
-                      score_fieldvalue""")
+                      ORDER BY cff.id_collection, id_field, id_fieldvalue,
+                      type, score, score_fieldvalue""")
     for index, rec in enumerate(records):
-        run_sql("""UPDATE collection_field_fieldvalue
-                SET id = %s WHERE id_collection = %s AND id_field = %s
-                AND type = %s AND score = %s AND score_fieldvalue = %s """,
-                (index + 1, rec[0], rec[1], rec[2], rec[3], rec[4]))
+        sql = """UPDATE collection_field_fieldvalue
+                 SET id = %%s
+                 WHERE id_collection = %%s AND id_field = %%s
+                 AND type = %%s AND score = %%s AND score_fieldvalue = %%s
+                 AND id_fieldvalue %s
+              """ % ('=%s' % (rec[2], ) if rec[2] is not None else 'is NULL', )
+        run_sql(sql, (index + 1, rec[0], rec[1], rec[3], rec[4], rec[5]))
 
     # create new primary key with id
     op.create_primary_key('pk_collection_field_fieldvalue_id',
