@@ -791,7 +791,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        opfts.append(['+', p, f, 'w'])
+        opfts.append(['+', p, f, 'e'])
         return opfts
 
     ## check arguments: is desired matching type set?
@@ -3458,7 +3458,7 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        return get_nearest_terms_in_bibwords(p, f, n_below, n_above)
+        return get_nearest_terms_in_idxphrase(p, f, n_below, n_above)
 
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
@@ -3606,7 +3606,7 @@ def get_nbhits_in_bibxxx(p, f, in_hitset=None):
 
     # FIXME: quick hack for the journal index
     if f == 'journal':
-        return get_nbhits_in_bibwords(p, f)
+        return get_nbhits_in_idxphrases(p, f)
 
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
