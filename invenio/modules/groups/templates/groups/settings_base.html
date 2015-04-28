@@ -1,0 +1,158 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2012, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- import "accounts/settings/helpers.html" as helpers with context -%}
+{%- from "groups/helpers.html" import searchbar with context -%}
+{%- from "groups/helpers.html" import emptyprompt with context -%}
+{%- from "groups/helpers.html" import emptysearch with context -%}
+{%- from "paginate.html" import paginate with context -%}
+{%- from "paginate.html" import list_status with context -%}
+
+{%- extends "accounts/settings/index_base.html" -%}
+
+{%- bundles "groups.css" -%}
+
+{%- block settings_body %}
+
+{%- block pending_groups %}
+{%- if pending_ugs|length > 0 %}
+{{ helpers.panel_start(
+    _('Pending invitations'),
+    with_body=False,
+    icon='fa fa-group fa-fw'
+   ) }}
+<div class="panel-body">
+  {%- block pending_groups_description %}
+    Invitations you received from communities admins. Click accept in order to become a member of the particular team
+    or reject to cancel a pending invitation.
+  {%- endblock pending_groups_description %}
+</div>
+{%- block pending_groups_list  %}
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th class="col-md-7">{{ _("Name") }}</th>
+      <th class="col-md-1">{{ _("Members") }}</th>
+      <th class="col-md-4"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for ug in pending_ugs %}
+    <tr>
+      <td>
+        <div>
+          <b>{{ ug.name }}</b>
+        </div>
+        <br>
+        <small>{{ ug.description|truncate(200, True)|safe }}</small>
+      </td>
+      <td class="text-center vcenter">{{ members|length }}</td>
+      <td class="text-center btn-toolbar vcenter">
+        <a class="btn btn-xs btn-danger pull-right" href="{{ url_for('.reject', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Reject") }}
+        </a>
+        <a class="btn btn-xs btn-success pull-right" href="{{ url_for('.accept',  ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-link"></i>{{ _("Accept") }}
+        </a>
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{%- endblock pending_groups_list %}
+{{ helpers.panel_end(with_body=False) }}
+{%- endif %}
+{%- endblock pending_groups %}
+
+{% block my_groups %}
+{{ helpers.panel_start(
+    _('My Groups'),
+    with_body=False,
+    icon='fa fa-group fa-fw',
+    btn=_('New group') if ugs.items|length > 0 else "", btn_icon='fa fa-plus', btn_href=url_for('.new')
+   ) }}
+<div class="panel-body">
+  {%- block groups_description %}
+  List of teams your are currently member of. While being in particular teams you gain special privileges,
+  which enables you to get more involved in growth of the community.
+  {%- endblock groups_description %}
+</div>
+{%- if ugs.items|length == 0 and not request.args['p'] %}
+{{ emptyprompt(
+    btn=_('New group'), btn_icon='fa fa-fw fa-plus',
+    btn_href=url_for('.new'),
+    heading=_('Go ahead and create new group !'), footer=_('Sugar, spice and everything nice.')
+   ) }}
+{%- elif ugs.items|length == 0 and request.args['p'] %}
+{{ searchbar() }}
+{{ emptysearch(heading=_("No results found")) }}
+{%- else %}
+{{ searchbar() }}
+{%- block groups_list %}
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th class="col-md-7">{{ _("Name") }}</th>
+      <th class="col-md-1">{{ _("Members") }}</th>
+      <th class="col-md-4"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {%- for ug in ugs.items %}
+    <tr>
+      <td>
+        <div>
+          <b>{{ ug.name }}</b>
+        </div>
+        <br>
+        <small>{{ ug.description|truncate(200, True)|safe }}</small>
+      </td>
+      <td class="text-center vcenter">{{ members[ug.id]|length }}</td>
+      <td class="text-center btn-toolbar vcenter">
+        {%- if ug.is_member(current_user.id) %}
+        <a class="btn btn-xs btn-danger pull-right" href="{{ url_for('.leave', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-chain-broken"></i>{{ _("Leave") }}
+        </a>
+        {%- elif ug.is_admin(current_user.id) %}
+        <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.manage',  ug_id=ug.id) }}">
+          <i class="fa fa-fw fa fa-wrench"></i>{{ _("Manage") }}
+        </a>
+        {% endif %}
+        {%- if ug.is_admin(current_user.id) or ug.members_visibility == "VISIBLE" %}
+        <a class="btn btn-xs btn-default pull-right" href="{{ url_for('.members', ug_id=ug.id) }}">
+          <i class="fa fa-fw fa-users"></i>{{ _("Members") }}
+        </a>
+        {%- endif %}
+      </td>
+    </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+{%- endblock groups_list %}
+<ul class="list-group">
+  <li class="list-group-item text-center">
+    {{ list_status(ugs) }}
+    {{ paginate(ugs, small=True) if ugs.items|length }}
+  </li>
+</ul>
+{%- endif %}
+{{ helpers.panel_end(with_body=False) }}
+{%- endblock my_groups %}
+
+{%- endblock settings_body%}
