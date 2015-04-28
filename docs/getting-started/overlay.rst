@@ -136,25 +136,23 @@ it later on. Here is its minimal content.
         }
     )
 
-Now we can install it in editable mode (``-e``) meaning you don't have to
+Now we can install it in editable mode (``-e``), meaning you don't have to
 reinstall it after each change
 
 .. code-block:: console
 
     (myoverlay)$ pip install -e .
 
-This way will use the latest invenio version published on PyPI, as a developer,
-you may want to use the development version of Invenio. To do so, create a file
-called ``requirements.txt``.
+This will fetch the latest Invenio version published on PyPI. As a developer,
+you may instead want to use the development version of Invenio from GitHub. To
+do so, create a file called ``requirements.txt`` with the following content:
 
 .. code-block:: text
 
-    git://github.com/inveniosoftware/invenio@pu#egg=Invenio-dev
+    git+git://github.com/inveniosoftware/invenio@pu#egg=Invenio-dev
     -e .
 
-The installation process changes a little bit. It still contains the ``-e .``
-command we used before but specify the github version of Invenio instead of the
-PyPI one.
+and install using:
 
 .. code-block:: console
 
