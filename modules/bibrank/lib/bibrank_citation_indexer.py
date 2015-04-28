@@ -58,13 +58,14 @@ def record_duplicates_in_asana(match, recids):
         return
     from invenio.config import CFG_ASANA_API_KEY
     from asana import asana
+    from urllib import quote
     api = asana.AsanaAPI(CFG_ASANA_API_KEY)
     CFG_INSPIRE_ASANA_WORKSPACE = 2292912319883
     CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT = 32667517046092
+    notes = "https://inspirehep.net/search?p=%s" % quote(' or '.join("recid:%s" % recid for recid in recids))
+
     if len(recids) == 2:
-        notes = "https://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[1], recids[0])
-    else:
-        notes = "\n".join("https://inspirehep.net/record/%s" % recid for recid in recids)
+        notes += "\nhttps://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[1], recids[0])
 
     ticket = api.create_task(name='%s refers to record IDs %s' % (match, ', '.join(str(recid) for recid in recids)),
                              workspace=CFG_INSPIRE_ASANA_WORKSPACE, notes=notes,
