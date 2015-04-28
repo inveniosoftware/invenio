@@ -85,13 +85,14 @@ def faceted_results_filter(recids, filter_data, facets):
             out[t][v] = map(lambda i: i[2], k)
 
     filter_data = out
-
+    print filter_data
     # Intersect and diff records with selected facets.
     output = recids
 
     if '+' in filter_data:
         values = filter_data['+']
         for key, facet in iteritems(facets):
+            print key, facet
             if key in values:
                 output.intersection_update(facet.get_facet_recids(values[key]))
 
