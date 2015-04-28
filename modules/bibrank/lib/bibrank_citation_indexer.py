@@ -53,6 +53,24 @@ re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK \
                    = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 
+def record_duplicates_in_asana(match, recids):
+    if not CFG_INSPIRE_SITE:
+        return
+    from invenio.config import CFG_ASANA_API_KEY
+    from asana import asana
+    api = asana.AsanaAPI(CFG_ASANA_API_KEY)
+    CFG_INSPIRE_ASANA_WORKSPACE = 2292912319883
+    CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT = 32667517046092
+    if len(recids) == 2:
+        notes = "https://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[1], recids[0])
+    else:
+        notes = "\n".join("https://inspirehep.net/record/%s" % recid for recid in recids)
+
+    ticket = api.create_task(name='%s refers to record IDs %s' % (match, ', '.join(str(recid) for recid in recids)),
+                             workspace=CFG_INSPIRE_ASANA_WORKSPACE, notes=notes,
+                             projects=[CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT])
+
+
 def compute_weights():
     sql = "SELECT citee, COUNT(citer) FROM rnkCITATIONDICT GROUP BY citee"
     weights = {}
@@ -848,6 +866,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 msg = "Whoops: record '%d' report number value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, refnumber, repr(recids[:50]))
+                # record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -896,6 +915,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 msg = "Whoops: record '%d' reference value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids[:50]))
+                record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -935,6 +955,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 msg = "Whoops: record '%d' DOI value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids[:50]))
+                record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -974,6 +995,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 msg = "Whoops: record '%d' HDL value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids[:50]))
+                record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
@@ -1034,6 +1056,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
                 msg = "Whoops: record '%d' ISBN value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids[:50]))
+                record_duplicates_in_asana(p, recids)
                 write_message(msg, stream=sys.stderr)
 
             for recid in list(recids)[:1]:  # take only the first one
