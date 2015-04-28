@@ -53,6 +53,8 @@ require.config({
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
     "select2": "vendor/select2/select2.min",
+    "ckeditor-core": "vendors/ckeditor/ckeditor",
+    "ckeditor-jquery": "vendors/ckeditor/adapters/jquery"
   },
   shim: {
     jquery: {
@@ -154,5 +156,8 @@ require.config({
       deps: ["jquery"],
       exports: "select2"
     },
+    "ckeditor-jquery": {
+      deps: ["jquery", "ckeditor-core"]
+    }
   }
 });
