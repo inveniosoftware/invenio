@@ -24,16 +24,16 @@ from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 
 import sqlalchemy
-import sqlalchemy.dialects.postgresql
-from sqlalchemy import event, types
+
+from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyInteger, \
+    LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
+
+from sqlalchemy import event, types as engine_types
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.pool import Pool
 
 from sqlalchemy_utils import JSONType
-
-from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyInteger, \
-    LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
 
 from .expressions import AsBINARY
 from .types import GUID, MarshalBinary, PickleBinary
@@ -60,12 +60,12 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'Char', engine_types.CHAR)
     try:
         setattr(obj, 'TinyText', engine_types.TINYTEXT)
-    except:
+    except AttributeError:
         setattr(obj, 'TinyText', engine_types.TEXT)
     setattr(obj, 'hybrid_property', hybrid_property)
     try:
         setattr(obj, 'Double', engine_types.DOUBLE)
-    except:
+    except AttributeError:
         setattr(obj, 'Double', engine_types.FLOAT)
     setattr(obj, 'Binary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
@@ -107,17 +107,17 @@ def _include_sqlalchemy(obj, engine=None):
 #     return 'TEXT'
 
 
-# @compiles(types.VARBINARY, 'postgresql')
-# def compile_text(element, compiler, **kw):
-#     """Redefine VARBINARY filed type for PostgreSQL."""
-#     return 'BYTEA'
+@compiles(engine_types.VARBINARY, 'postgresql')
+def compile_text(element, compiler, **kw):
+    """Redefine VARBINARY filed type for PostgreSQL."""
+    return 'BYTEA'
 
 
 def autocommit_on_checkin(dbapi_con, con_record):
     """Call autocommit on raw mysql connection for fixing bug in MySQL 5.5."""
     try:
         dbapi_con.autocommit(True)
-    except:
+    except Exception:
         pass
         # FIXME
         # from invenio.ext.logging import register_exception
