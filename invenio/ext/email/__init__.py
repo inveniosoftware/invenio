@@ -237,7 +237,7 @@ def send_email(fromaddr,
     if type(bccaddr) is not list:
         bccaddr = bccaddr.strip().split(',')
 
-    body = forge_email(fromaddr, toaddr, subject, content, html_content,
+    msg = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
                        html_footer, ln, charset, replytoaddr, attachments,
                        bccaddr)
@@ -247,7 +247,7 @@ def send_email(fromaddr,
             raise EmailError(g._(
                 'The system is not attempting to send an email from %(x_from)s'
                 ', to %(x_to)s, with body %(x_body)s.', x_from=fromaddr,
-                x_to=toaddr, x_body=body))
+                x_to=toaddr, x_body=content))
         except EmailError:
             register_exception()
         return False
@@ -255,7 +255,7 @@ def send_email(fromaddr,
     failure_reason = ''
     while not sent and attempt_times > 0:
         try:
-            sent = body.send()
+            sent = msg.send()
         except Exception as e:
             failure_reason = str(e)
             register_exception()
@@ -269,7 +269,7 @@ def send_email(fromaddr,
                         exc = sys.exc_info()[0], \
                         sender = fromaddr, \
                         receipient = toaddr, \
-                        email_body = body))
+                        email_body = content))
                 except EmailError:
                     register_exception()
         if not sent:
@@ -281,7 +281,7 @@ def send_email(fromaddr,
         # sender and recipients
         if forward_failures_to_admin:
             # prepend '> ' to every line of the original message
-            quoted_body = '> ' + '> '.join(body.splitlines(True))
+            quoted_body = '> ' + '> '.join(content.splitlines(True))
 
             # define and fill in the report template
             admin_report_subject = g._('Error while sending an email: %(x_subject)s',
@@ -305,7 +305,7 @@ def send_email(fromaddr,
         try:
             raise EmailError(g._(
                 'Error in sending email from %(x_from)s to %(x_to)s with body'
-                '%(x_body)s.', x_from=fromaddr, x_to=toaddr, x_body=body))
+                '%(x_body)s.', x_from=fromaddr, x_to=toaddr, x_body=content))
         except EmailError:
             register_exception()
     return sent
@@ -347,7 +347,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         every element of the list could be a tuple: (filename, mimetype)
     @param bccaddr: [string or list-of-strings] to be used for BCC header of the email
                     (if string, then receivers are separated by ',')
-    @return: forged email as a string"""
+    @return: forged email as an EmailMessage object"""
     ln = default_ln(ln)
     if html_images is None:
         html_images = {}
