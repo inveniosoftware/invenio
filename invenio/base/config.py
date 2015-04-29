@@ -67,7 +67,7 @@ PACKAGES = [
 PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
     'invenio.modules.archiver',
-    'invenio.modules.communities',
+    'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.linkbacks',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
