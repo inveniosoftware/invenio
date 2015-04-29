@@ -17,16 +17,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
 
 define(
   [
     'jquery',
+    'bootstrap-tagsinput',
     'flight/lib/component',
   ],
   function(
     $,
+    tagsinput,
     defineComponent) {
+
+    'use strict';
 
     return defineComponent(HoldingPenTags);
 
@@ -40,45 +43,11 @@ define(
     *
     */
     function HoldingPenTags() {
-      this.attributes({
-        // URLs
-        tags: []
-      });
-
-      this.init_tags = function() {
-        var $node = this.$node;
-        $node.tagsinput({
-            tagClass: function (item) {
-                switch (item.value) {
-                  case 'In process':
-                    return 'label label-warning';
-                  case 'Need action':
-                    return 'label label-danger';
-                  case 'Waiting':
-                    return 'label label-warning';
-                  case 'Done':
-                    return 'label label-success';
-                  case 'New':
-                    return 'label label-info';
-                  case 'Error':
-                    return 'label label-danger';
-                  default:
-                    return 'badge badge-warning';
-                }
-            },
-            itemValue: 'value',
-            itemText: 'text'
-        });
-        // Add any existing tags
-        this.attr.tags.map(function(item) {
-          $node.tagsinput('add', item);
-        });
-      }
 
       this.addTagFromMenu = function(ev, data) {
         // Tagsinput already deal with existing tags.
         this.$node.tagsinput('add', data);
-      }
+      };
 
       this.addTagFromFreetext = function(ev) {
         // ev.item is the freeinput text
@@ -87,27 +56,27 @@ define(
           // event.cancel: set to true to prevent the item getting added
           ev.cancel = false;
         }
-      }
+      };
 
-      this.onTagsUpdate = function() {
-        // Extract first only the "real" value (ignore translated ones)
-        var tags = this.$node.tagsinput("items").map(function(currentValue, index, array) {
+      this.getCurrentTags = function() {
+        // Extract only the "real" value (ignore translated ones)
+        return this.$node.tagsinput("items").map(function(currentValue, index, array) {
           return currentValue.value;
-        })
+        });
+      };
 
-        var data = {
-          'tags': tags
-        };
-        this.trigger(document, "reloadHoldingPenTable", data);
-      }
+      this.onTagsUpdate = function(ev, data) {
+        var payload = {};
+        payload.tags = this.getCurrentTags();
+        this.trigger(document, "reloadHoldingPenTable", payload);
+      };
 
 
       this.after('initialize', function() {
-        this.on(document, "initHoldingPenTable", this.init_tags);
         this.on(document, "addTagFromMenu", this.addTagFromMenu);
-        this.on(document, "itemAdded", this.onTagsUpdate);
-        this.on(document, "itemRemoved", this.onTagsUpdate);
-        this.on(document, 'beforeFreeInputItemAdd', this.addTagFromFreetext);
+        this.on("itemAdded", this.onTagsUpdate);
+        this.on("itemRemoved", this.onTagsUpdate);
+        this.on('beforeFreeInputItemAdd', this.addTagFromFreetext);
         console.log("Tags init");
       });
     }

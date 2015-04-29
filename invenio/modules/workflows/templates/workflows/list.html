@@ -42,10 +42,42 @@
         page: 1,
         per_page: 10
       };
+      var $node = $("#tags");
+      $node.tagsinput({
+          tagClass: function (item) {
+              switch (item.value) {
+                case 'In process':
+                  return 'label label-warning';
+                case 'Need action':
+                  return 'label label-danger';
+                case 'Waiting':
+                  return 'label label-warning';
+                case 'Done':
+                  return 'label label-success';
+                case 'New':
+                  return 'label label-info';
+                case 'Error':
+                  return 'label label-danger';
+                default:
+                  return 'badge badge-warning';
+              }
+          },
+          itemValue: 'value',
+          itemText: 'text'
+      });
+      // Add any existing tags
+      context.tags.map(function(item) {
+        $node.tagsinput('add', item);
+      });
       initialize(context);
       initialize_actions(context);
-      $(document).trigger("initHoldingPenTable");
+      var data = {};
+      data.tags = context.tags.map(function(currentValue, index, array) {
+          return currentValue.value;
+      });
+      $(document).trigger("reloadHoldingPenTable", data);
     });
+
   </script>
 
 {% endblock javascript %}
@@ -54,20 +86,19 @@
 
 
   <div class="container">
-    <div class="row">
-      {% block hotkey_help %}
+    {% block help_bar %}
+    <div id="help-bar" class="row">
       <div class="pull-left">
         <p class="text-muted">Ctrl+A: Select all, Esc: Deselect</p>
       </div>
       <div id="batch-action-buttons" class="pull-right hidden">
-        <span class="text-muted">Batch Actions: </span>
+        <span class="text-muted">{{ _("For all selected") }}: </span>
         <button class="btn btn-success arxiv-approval-action-accept batch-button" role="button" data-value="accept_core">CORE</button>
         <button class="btn btn-warning arxiv-approval-action-accept batch-button" role="button" data-value="accept">Accept</button>
         <button class="btn btn-danger arxiv-approval-action-reject batch-button"  role="button" data-value="reject">Reject</button>
       </div>
-      {% endblock %}
     </div>
-    <br>
+    {% endblock %}
     <div class="row">
       {% block navigation %}
       <nav id="list-header" class="navbar navbar-default" role="navigation">
@@ -99,6 +130,9 @@
                 <span id="total_found">{{object_list|count}}</span>
               </strong>
               {{ _('entries found') }}
+            </p>
+            <p id="list-loading" class="navbar-text">
+              <i class="fa fa-spinner fa-spin"></i> {{ _('Loading') }}
             </p>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -147,7 +181,7 @@
              cellpadding="0"
              cellspacing="0"
              border="0"
-             class="table table-hover">
+             class="table">
         <tbody>
         </tbody>
       </table>

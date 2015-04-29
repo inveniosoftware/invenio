@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,16 +27,25 @@
   with_body=False,
   icon="fa fa-link fa-fw"
   )}}
-  <div class="panel-body">
-    <p>{{_("Here will we show your current actions to do and filter settings")}}</p>
+  <div class="row">
+    <div class="col-md-6 col-sm-12">
+      <ul class="list-group">
+        <li class="list-group-item list-group-item-warning">
+          <span class="badge">{{ halted_state|length }}</span>
+          {{ _("Records that needs attention") }}
+        </li>
+        <li class="list-group-item list-group-item-danger">
+          <span class="badge">{{ error_state|length }}</span>
+          {{ _("Records in error state") }}
+        </li>
+      </ul>
+    </div>
   </div>
-  <ul class="list-group">
-    {% for task, object_count in tasks.items() %}
-      <a href="{{ url_for('holdingpen.list_objects')|safe }}" class="list-group-item">
-        <span class="badge">{{object_count}}</span>
-        {{task}}
-      </a>
-    {% endfor %}
-  </ul>
+
+  <div class="row">
+    <div class="col-md-12">
+      <a href="{{ url_for('holdingpen.list_objects')|safe }}" class="btn btn-primary btn-lg" role="button">{{ _('Go to Holding Pen') }}</a>
+    </div>
+  </div>
   {{helpers.panel_end(with_body=False)}}
 {% endblock %}

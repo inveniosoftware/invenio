@@ -46,14 +46,18 @@ define(
       });
 
       this.updatePagination = function(ev, data) {
-          var pagination_data = {
-              "has_prev": data.page > 1,
-              "has_next": data.page < data.pages,
-              "next": data.page + 1,
-              "prev": data.page - 1,
-              "iter_pages": data.iter_pages
-          };
-          this.$node.html(tpl_pagination(pagination_data));
+          if (data.total_count > 0) {
+            var pagination_data = {
+                "has_prev": data.page > 1,
+                "has_next": data.page < data.pages,
+                "next": data.page + 1,
+                "prev": data.page - 1,
+                "iter_pages": data.iter_pages
+            };
+            this.$node.html(tpl_pagination(pagination_data));
+          } else {
+            this.$node.html("");
+          }
       };
 
       this.changePage = function(ev, data) {

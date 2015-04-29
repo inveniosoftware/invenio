@@ -61,13 +61,12 @@ from ..registry import actions, workflows
 from ..utils import (
     alert_response_wrapper,
     extract_data,
-    get_action_list,
     get_data_types,
-    get_formatted_holdingpen_object,
     get_holdingpen_objects,
     get_previous_next_objects,
     get_rendered_task_results,
-    sort_bwolist,
+    get_rows,
+    sort_bwolist
 )
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -115,11 +114,11 @@ def index():
 
     Acts as a hub for catalogers (may be removed)
     """
-    # FIXME: Add user filtering
-    bwolist = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.HALTED)])
-    action_list = get_action_list(bwolist)
-
-    return dict(tasks=action_list)
+    # TODO: Add user filtering
+    error_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.ERROR)])
+    halted_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.HALTED)])
+    return dict(error_state=error_state,
+                halted_state=halted_state)
 
 
 @blueprint.route('/load', methods=['GET', 'POST'])
@@ -134,7 +133,7 @@ def index():
 def load(page, per_page, sort_key):
     """Load objects for the table."""
     # FIXME: Load tags in this way until wash_arguments handles lists.
-    tags = request.args.getlist("tags[]") or []
+    tags = request.args.getlist("tags[]") or []  # empty to show all
     sort_key = request.args.get(
         'sort_key', session.get('holdingpen_sort_key', "created")
     )
@@ -158,14 +157,16 @@ def load(page, per_page, sort_key):
             res["active"] = False
         pages_iteration.append(res)
 
-    table_data = {'rows': [],
-                  'pagination': {
-                    "page": pagination.page,
-                    "pages": pagination.pages,
-                    "iter_pages": pages_iteration,
-                    "per_page": pagination.per_page,
-                    "total_count": pagination.total_count
-                  }}
+    table_data = {
+        'rows': [],
+        'pagination': {
+            "page": pagination.page,
+            "pages": pagination.pages,
+            "iter_pages": pages_iteration,
+            "per_page": pagination.per_page,
+            "total_count": pagination.total_count
+        }
+    }
 
     # Add current ids in table for use by previous/next
     session['holdingpen_current_ids'] = [o.id for o in object_list]
@@ -178,42 +179,7 @@ def load(page, per_page, sort_key):
         pagination.per_page*pagination.page,
         pagination.total_count
     )
-    for bwo in object_list[display_start:display_end]:
-        action_name = bwo.get_action()
-        action_message = bwo.get_action_message()
-        if not action_message:
-            action_message = ""
-
-        preformatted = get_formatted_holdingpen_object(bwo)
-
-        action = actions.get(action_name, None)
-        mini_action = None
-        if action:
-            mini_action = getattr(action, "render_mini", None)
-
-        extra_data = bwo.get_extra_data()
-        record = bwo.get_data()
-
-        if not hasattr(record, "get"):
-            try:
-                record = dict(record)
-            except (ValueError, TypeError):
-                record = {}
-        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
-        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
-        row = render_template('workflows/list_row.html',
-                              title=preformatted["title"],
-                              object=bwo,
-                              record=record,
-                              extra_data=extra_data,
-                              description=preformatted["description"],
-                              action=action,
-                              mini_action=mini_action,
-                              action_message=action_message,
-                              pretty_date=pretty_date,
-                              version=ObjectVersion,
-                              )
-        table_data['rows'].append(row)
+    table_data["rows"] = get_rows(object_list[display_start:display_end])
     table_data["rendered_rows"] = "".join(table_data["rows"])
     return jsonify(table_data)
 
@@ -228,30 +194,12 @@ def list_objects():
         "holdingpen_tags",
         [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
     )
-    object_list = get_holdingpen_objects(tags)
-    action_list = get_action_list(object_list)
-    type_list = get_data_types()
-
-    if 'version' in request.args:
-        for key, value in ObjectVersion.MAPPING.items():
-            if value == int(request.args.get('version')):
-                if key not in tags:
-                    tags.append(key)
-
-    tags_to_print = []
-    for tag in tags:
-        if tag:
-            tags_to_print.append({
-                "text": str(_(tag)),
-                "value": tag,
-            })
-
+    tags_to_print = [{"text": str(_(tag)), "value": tag} for tag in tags if tag]
     return render_template(
         'workflows/list.html',
-        action_list=action_list,
         tags=json.dumps(tags_to_print),
-        object_list=object_list,
-        type_list=type_list,
+        object_list=get_holdingpen_objects(tags),
+        type_list=get_data_types(),
         per_page=session.get('holdingpen_per_page')
     )
 
@@ -267,14 +215,12 @@ def details(objectid):
     from invenio.ext.sqlalchemy import db
     from itertools import groupby
 
-    of = "hd"
     bwobject = BibWorkflowObject.query.get_or_404(objectid)
     previous_object, next_object = get_previous_next_objects(
         session.get("holdingpen_current_ids"),
         objectid
     )
-
-    formatted_data = bwobject.get_formatted_data(of)
+    formatted_data = bwobject.get_formatted_data()
     extracted_data = extract_data(bwobject)
 
     action_name = bwobject.get_action()
@@ -310,24 +256,25 @@ def details(objectid):
     results = get_rendered_task_results(bwobject)
     workflow_definition = get_workflow_info(extracted_data['workflow_func'])
     task_history = bwobject.get_extra_data().get('_task_history', [])
-    return render_template('workflows/details.html',
-                           bwobject=bwobject,
-                           rendered_actions=rendered_actions,
-                           history_objects=history_objects,
-                           bwparent=extracted_data['bwparent'],
-                           info=extracted_data['info'],
-                           log=extracted_data['logtext'],
-                           data_preview=formatted_data,
-                           workflow=extracted_data['w_metadata'],
-                           task_results=results,
-                           previous_object=previous_object,
-                           next_object=next_object,
-                           task_history=task_history,
-                           workflow_definition=workflow_definition,
-                           versions=ObjectVersion,
-                           pretty_date=pretty_date,
-                           workflow_class=workflows.get(extracted_data['w_metadata'].name),
-                           )
+    return render_template(
+        'workflows/details.html',
+        bwobject=bwobject,
+        rendered_actions=rendered_actions,
+        history_objects=history_objects,
+        bwparent=extracted_data['bwparent'],
+        info=extracted_data['info'],
+        log=extracted_data['logtext'],
+        data_preview=formatted_data,
+        workflow=extracted_data['w_metadata'],
+        task_results=results,
+        previous_object=previous_object,
+        next_object=next_object,
+        task_history=task_history,
+        workflow_definition=workflow_definition,
+        versions=ObjectVersion,
+        pretty_date=pretty_date,
+        workflow_class=workflows.get(extracted_data['w_metadata'].name),
+    )
 
 
 @blueprint.route('/files/<int:object_id>/<path:filename>',
@@ -443,19 +390,26 @@ def resolve_action():
     Will call the resolve() function of the specific action.
     """
     objectids = request.values.getlist('objectids[]') or []
-    ids_length = len(objectids)
+    ids_resolved = 0
 
     for objectid in objectids:
         bwobject = BibWorkflowObject.query.get_or_404(objectid)
         action_name = bwobject.get_action()
-        action_form = actions[action_name]
-        res = action_form().resolve(bwobject)
+        if action_name:
+            action_form = actions[action_name]
+            res = action_form().resolve(bwobject)
+            ids_resolved += 1
 
-    if ids_length == 1:
+    if ids_resolved == 1:
         return jsonify(res)
+    elif ids_resolved == 0:
+        return jsonify({
+            "message": "No records resolved!",
+            "category": "danger"
+        })
     else:
         return jsonify({
-            "message": "{0} number of records resolved.".format(ids_length),
+            "message": "{0} number of records resolved.".format(ids_resolved),
             "category": "info"
         })
 

@@ -304,7 +304,6 @@ class BibWorkflowObject(db.Model):
         obj.start_workflow("sample_workflow")
     """
 
-    # db table definition
     __tablename__ = "bwlOBJECT"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -321,8 +320,10 @@ class BibWorkflowObject(db.Model):
                              db.ForeignKey('bwlWORKFLOW.uuid'), nullable=True,
                              name="id_workflow")
     version = db.Column(db.Integer(3),
-                        default=ObjectVersion.INITIAL, nullable=False)
-    id_parent = db.Column(db.Integer, db.ForeignKey('bwlOBJECT.id'),
+                        default=ObjectVersion.INITIAL,
+                        nullable=False,
+                        index=True)
+    id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
                           default=None)
     child_objects = db.relationship("BibWorkflowObject",
                                     remote_side=[id_parent])
@@ -330,8 +331,10 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    data_type = db.Column(db.String(150), default="",
-                          nullable=True)
+    data_type = db.Column(db.String(150),
+                          default="",
+                          nullable=True,
+                          index=True)
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
 
@@ -399,13 +402,20 @@ class BibWorkflowObject(db.Model):
             pass
         return
 
-    def get_formatted_data(self, of="hd"):
+    def get_formatted_data(self, of=None):
         """Get the formatted representation for this object."""
         from .registry import workflows
+        if of is None:
+            of = cfg.get("WORKFLOWS_HOLDING_PEN_DEFAULT_OUTPUT_FORMAT")
         try:
             name = self.get_workflow_name()
             if not name:
                 return ""
+            # TODO: this can be removed when workflow refactoring is done
+            if not hasattr(self, "data"):
+                self.data = self.get_data()
+            if not hasattr(self, "extra_data"):
+                self.extra_data = self.get_extra_data()
             workflow_definition = workflows[name]
             formatted_data = workflow_definition.formatter(
                 self,
@@ -560,22 +570,7 @@ class BibWorkflowObject(db.Model):
 
         :return: name of action assigned as string, or None
         """
-        try:
-            return self.get_extra_data()["_action"]
-        except KeyError:
-            # No widget, try old _widget
-            extra_data = self.get_extra_data()
-            if "_widget" in extra_data:
-                import warnings
-
-                warnings.warn("Widget's are now stored in '_action'",
-                              DeprecationWarning)
-                # Migrate to new naming
-                extra_data["_action"] = extra_data['_widget']
-                del extra_data["_widget"]
-                self.set_extra_data(extra_data)
-                return extra_data["_action"]
-            return None
+        return self.get_extra_data().get("_action")
 
     def get_action_message(self):
         """Retrieve the currently assigned widget, if any."""

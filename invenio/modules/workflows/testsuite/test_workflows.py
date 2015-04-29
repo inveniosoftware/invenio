@@ -558,7 +558,6 @@ distances from it.
         # Let's do that last task again, shall we?
         continue_oid(oid=obj_halted.id, start_point="restart_prev",
                      module_name="unit_tests")
-
         self.assertEqual(37, obj_halted.get_data())
         self.assertEqual(ObjectVersion.COMPLETED, obj_halted.version)
 

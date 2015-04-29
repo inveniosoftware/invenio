@@ -56,7 +56,7 @@ define(
       this.get_action_values = function (elem) {
         return {
           "value": elem.data("value"),
-          "objectid": elem.data("objectid"),
+          "objectids": [elem.data("objectid")],
         };
       };
 

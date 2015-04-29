@@ -50,6 +50,11 @@ class WorkflowBase(object):
         return "No description"
 
     @staticmethod
+    def get_additional(bwo, **kwargs):
+        """Return the value to put in the additional column of HoldingPen."""
+        return ""
+
+    @staticmethod
     def formatter(obj, **kwargs):
         """Format the object."""
         return "No data"
@@ -65,7 +70,7 @@ class RecordWorkflow(WorkflowBase):
     def get_title(bwo):
         """Get the title."""
         field_map = {"title": "title"}
-        record = bwo.get_data()
+        record = bwo.data
         extracted_titles = []
         if hasattr(record, "get") and "title" in record:
             if isinstance(record["title"], str):
@@ -77,26 +82,22 @@ class RecordWorkflow(WorkflowBase):
     @staticmethod
     def get_description(bwo):
         """Get the description (identifiers and categories) from the object data."""
-        from invenio_records.api import Record
-        from flask import render_template, current_app
+        from flask import render_template
 
-        record = bwo.get_data()
-        final_identifiers = {}
-        try:
-            identifiers = Record(record.dumps()).persistent_identifiers
-            for values in identifiers.values():
-                final_identifiers.extend([i.get("value") for i in values])
-        except Exception:
-            current_app.logger.exception("Could not get identifiers")
-            if hasattr(record, "get"):
-                final_identifiers = [
-                    record.get("system_control_number", {}).get("value", 'No ids')
-                ]
-            else:
-                final_identifiers = []
-
+        record = bwo.data
+        # Get identifiers
+        final_identifiers = []
         categories = []
+
         if hasattr(record, "get"):
+            doi = record.get("doi")
+            if doi:
+                final_identifiers.append(doi)
+
+            system_no = record.get("system_number_external", {}).get("value")
+            if system_no:
+                final_identifiers.append(system_no)
+
             if 'subject' in record:
                 lookup = ["subject", "term"]
             elif "subject_term" in record:
@@ -120,7 +121,7 @@ class RecordWorkflow(WorkflowBase):
         from pprint import pformat
         from invenio_records.api import Record
 
-        data = bwo.get_data()
+        data = bwo.data
         if not data:
             return ''
 

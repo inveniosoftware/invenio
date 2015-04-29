@@ -39,6 +39,8 @@ define(
     *
     */
     function HoldingPen() {
+      var request = false;
+
       this.attributes({
         // Selectors
         totalSelector: "#total_found",
@@ -50,7 +52,7 @@ define(
 
         // Data
         page: 1,
-        sort_key: ""
+        sort_key: "",
       });
 
       this.preparePayload = function (data) {
@@ -67,15 +69,28 @@ define(
         var $node = this.$node;
         var that = this;
 
-        $.ajax({
+        if (this.request && this.request.readyState !== 4) {
+          console.log("Abort");
+          this.request.abort();
+        }
+
+        this.request = $.ajax({
           type: "GET",
           url: this.attr.load_url,
           data: this.preparePayload(data),
+          beforeSend: function() {
+            console.log("Starting");
+            $("#list-loading").show();
+          },
           success: function(result) {
             var table = $node.find("tbody");
             table.html(result.rendered_rows);
             $(that.attr.totalSelector).html(result.pagination.total_count);
             that.trigger(document, "updatePagination", result.pagination);
+          },
+          complete: function() {
+            console.log("Ending request");
+            $("#list-loading").hide();
           }
         });
       };
@@ -88,23 +103,23 @@ define(
           qKey: 81
         };
 
-        if (event.ctrlKey && event.keyCode == keyCodes.aKey) {
+        var data = {};
+
+        if (event.ctrlKey && event.keyCode === keyCodes.aKey) {
           this.trigger(document, "selectAll");
           event.preventDefault();
         }
-        if (event.keyCode == keyCodes.escKey) {
+        if (event.keyCode === keyCodes.escKey) {
           this.trigger(document, "deselectAll");
           event.preventDefault();
         }
-        if (event.altKey && event.keyCode == keyCodes.wKey) {
-          var data = {};
+        if (event.altKey && event.keyCode === keyCodes.wKey) {
           data.el = $(this.attr.nextSelector);
 
           this.trigger(document,"hotkeysPagination", data);
           event.preventDefault();
         }
-        if (event.altKey && event.keyCode == keyCodes.qKey) {
-          var data = {};
+        if (event.altKey && event.keyCode === keyCodes.qKey) {
           data.el = $(this.attr.previousSelector);
 
           this.trigger(document,"hotkeysPagination", data);
@@ -113,7 +128,6 @@ define(
       };
 
       this.after('initialize', function() {
-        this.on(document, "initHoldingPenTable", this.reloadTable);
         this.on(document, "reloadHoldingPenTable", this.reloadTable);
         this.on(document, "keydown", this.holdingPenKeyCodes);
         console.log("HP init");

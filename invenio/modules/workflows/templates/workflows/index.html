@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,27 +21,23 @@
 
 {% block hpbody %}
   <div class="row">
-    <div class="col-md-12">
-      <p>{{ _('Here is a list of actions remaining to be resolved grouped by type of action') }} ({{ _('work in progress') }}).</p>
-    </div>
-  </div>
-
-  <div class="row">
     <div class="col-md-6 col-sm-12">
       <ul class="list-group">
-        {% for task, object_count in tasks.items() %}
-          <a href="{{ url_for('holdingpen.list_objects')|safe }}" class="list-group-item">
-            <span class="badge">{{ object_count }}</span>
-            {{task}}
-          </a>
-        {% endfor %}
+        <li class="list-group-item list-group-item-warning">
+          <span class="badge">{{ halted_state|length }}</span>
+          {{ _("Records that needs attention") }}
+        </li>
+        <li class="list-group-item list-group-item-danger">
+          <span class="badge">{{ error_state|length }}</span>
+          {{ _("Records in error state") }}
+        </li>
       </ul>
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-12">
-      <a href="{{ url_for('holdingpen.list_objects')|safe }}" class="btn btn-primary btn-lg pull-right" role="button">{{ _('Go to Holding Pen') }}</a>
+      <a href="{{ url_for('holdingpen.list_objects')|safe }}" class="btn btn-primary btn-lg" role="button">{{ _('Go to Holding Pen') }}</a>
     </div>
   </div>
 {% endblock %}

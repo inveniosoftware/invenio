@@ -17,25 +17,22 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.workflows.views.settings
-    ----------------------------------------
-
-    Represents the Holding Pen on user settings page with overview
-    over any actions assigned to user.
-
-    WORK IN PROGRESS
-"""
+"""Represents the Holding Pen on user settings page."""
 
 from __future__ import absolute_import
 
-from flask import Blueprint, render_template, request
-#from flask import redirect, url_for
-from flask_login import login_required
+from flask import Blueprint, request
+
 from flask_breadcrumbs import register_breadcrumb
+from flask_login import login_required
 from flask_menu import register_menu
+
+from invenio.base.decorators import templated
 from invenio.base.i18n import _
-from .holdingpen import get_holdingpen_objects, get_action_list
+
+from .holdingpen import get_holdingpen_objects
+from ..models import ObjectVersion
+
 
 blueprint = Blueprint(
     'workflows_settings',
@@ -57,11 +54,9 @@ blueprint = Blueprint(
 @register_breadcrumb(
     blueprint, 'breadcrumbs.settings.workflows', _('Your actions')
 )
+@templated("workflows/settings/index.html")
 def index():
-    bwolist = get_holdingpen_objects()
-    action_list = get_action_list(bwolist)
-
-    return render_template(
-        "workflows/settings/index.html",
-        tasks=action_list
-    )
+    error_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.ERROR)])
+    halted_state = get_holdingpen_objects([ObjectVersion.name_from_version(ObjectVersion.HALTED)])
+    return dict(error_state=error_state,
+                halted_state=halted_state)

@@ -60,7 +60,7 @@ define(
         // that we need to remove AND uncheck
         // ELSE
         // the opposite (empty, so we need to add to the array)
-        if ($(this.attr.selectAllSelector).prop('checked') == false) {
+        if ($(this.attr.selectAllSelector).prop('checked') === false) {
           this.deselectAll();
         } else {
           this.selectAll();
@@ -71,7 +71,7 @@ define(
         data.selectedIDs = this.attr.selectedIDs;
 
         this.trigger(document, "return_data_for_exec", data);
-        $.event.trigger("deselectAll", document);
+        this.deselectAll();
       };
 
       this.batchActionButtons = function(ev, data) {
@@ -116,7 +116,7 @@ define(
 
       this.selectCheckbox = function (ev, data) {
         var row = $(data.el);
-        if (row.prop('checked') == false) {
+        if (row.prop('checked') === false) {
           this.removeElementFromIDs(row.val());
         } else {
           this.attr.selectedIDs.push(row.val());
