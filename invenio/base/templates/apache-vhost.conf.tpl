@@ -53,7 +53,7 @@ WSGIImportScript {{ cfg.wsgi.script_fullpath }} process-group={{ cfg.wsgi.proces
 
 {{ '#' if not cfg.listen_directive_needed(scheme) }}Listen {{ cfg.vhosts[scheme].port }}
 <IfVersion < 2.3.11>
-{{ '#' if not cfg.listen_directive_needed(scheme) }}NameVirtualHost {{ cfg.vhost_ip_address }}
+{{ '#' if not cfg.listen_directive_needed(scheme) }}NameVirtualHost {{ cfg.vhost_ip_address }}:{{ cfg.vhosts[scheme].port }}>
 </IfVersion>
 
 <VirtualHost {{ cfg.vhost_ip_address }}:{{ cfg.vhosts[scheme].port }}>
