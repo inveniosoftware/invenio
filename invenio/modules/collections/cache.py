@@ -20,9 +20,11 @@
 """Implementation of collections caching."""
 
 from intbitset import intbitset
+from werkzeug import cached_property
 
 from invenio.base.globals import cfg
 from invenio.legacy.miscutil.data_cacher import DataCacher, DataCacherProxy
+from invenio.modules.indexer.models import IdxINDEX
 from invenio.utils.memoise import memoize
 
 from .models import Collection, Collectionname
@@ -83,10 +85,14 @@ class CollectionRecListDataCacher(DataCacher):
             ])
 
         def timestamp_verifier():
-            from invenio.legacy.dbquery import get_table_update_time
-            return get_table_update_time('collection')
+            return IdxINDEX.query.filter_by(id=self._index_id).value(
+                'last_updated').strftime("%Y-%m-%d %H:%M:%S")
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+    @cached_property
+    def _index_id(self):
+        return IdxINDEX.get_from_field('collection').id
 
 
 collection_reclist_cache = DataCacherProxy(CollectionRecListDataCacher)
