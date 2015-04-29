@@ -27,6 +27,10 @@ services:
 
 language: python
 
+cache:
+  - apt
+  - pip
+
 env:
   - REQUIREMENTS=lowest REXTRAS=docs
   - REQUIREMENTS=release REXTRAS=docs
