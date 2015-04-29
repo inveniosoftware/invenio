@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -213,5 +213,5 @@ def setup_app(app):
             logger.addHandler(handler)
 
 
-sentry = LocalProxy(lambda: current_app.extension['sentry'])
+sentry = LocalProxy(lambda: current_app.extensions['sentry'])
 """Proxy object to sentry instance."""
