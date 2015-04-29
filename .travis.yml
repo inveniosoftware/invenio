@@ -83,4 +83,4 @@ before_script:
 script:
   - "sphinx-build -qnNW docs docs/_build/html"
   - "python setup.py test"
-  - "wget --no-check-certificate -O /dev/null http://localhost:4000"
+  - "wget --no-check-certificate -O /dev/null http://localhost:4000 || more \"$VIRTUAL_ENV/var/log/apache*.{out,err}\" && exit 1"
