@@ -449,8 +449,8 @@ the following commands.
     (invenio)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
     (invenio)$ inveniomanage config set CFG_DATABASE_NAME $BRANCH
     (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
-    (invenio)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
-    (invenio)$ inveniomanage config set CFG_SITE_SECURE_URL http://0.0.0.0:4000
+    (invenio)$ inveniomanage config set CFG_SITE_URL http://localhost:4000
+    (invenio)$ inveniomanage config set CFG_SITE_SECURE_URL http://localhost:4000
 
 Assets in non-development mode may be combined and minified using various
 filters (see :ref:`ext_assets`). We need to set the path to the binaries if
