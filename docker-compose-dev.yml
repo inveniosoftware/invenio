@@ -21,7 +21,7 @@ web:
   build: .
   command: /code/scripts/docker_devboot.sh master inveniomanage runserver -h 0.0.0.0 -p 5000 -d -r
   ports:
-    - "5000:5000"
+    - "127.0.0.1:5000:5000"
   environment:
     - CACHE_REDIS_HOST=cache
     - CFG_DATABASE_HOST=db
@@ -54,11 +54,11 @@ worker:
 redis:
   image: redis
   ports:
-    - "6379:6379"
+    - "127.0.0.1:6379:6379"
 mysql:
   image: mysql
   ports:
-    - "3306:3306"
+    - "127.0.0.1:3306:3306"
   environment:
     - MYSQL_DATABASE=invenio
     - MYSQL_USER=invenio

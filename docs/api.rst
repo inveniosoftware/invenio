@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -40,6 +40,7 @@ Extensions
    ext/logging
    ext/login
    ext/passlib
+   ext/script
    ext/session
    ext/sqlalchemy
    ext/template
