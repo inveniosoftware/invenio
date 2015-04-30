@@ -78,8 +78,12 @@ def generate_secret_key():
     """Generate secret key."""
     import string
     import random
-    return ''.join([random.choice(string.ascii_letters + string.digits)
-                    for dummy in range(0, 256)])
+
+    rng = random.SystemRandom()
+    return ''.join(
+        rng.choice(string.ascii_letters + string.digits)
+        for dummy in range(0, 256)
+    )
 
 
 def print_progress(p, L=40, prefix='', suffix=''):
