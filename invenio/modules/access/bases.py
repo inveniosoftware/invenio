@@ -61,6 +61,16 @@ def AclFactory(obj=''):
             functionality,
             e.g. :class:`~invenio.modules.records.bases:DocumentsHooks`
 
+        .. note::
+
+                If the object has embed restrictions it will override the
+                access right of the parent. For example in
+                :class:`~invenio.modules.documents.api:Document` and
+                :class:`~invenio.modules.records.api:Record` the `Document`
+                will override the `Record` restriction which means if the
+                `Record` is restricted and the `Document` is open the user
+                will have access to the file.
+
             :param user_info: an instance of
                 :class:`~invenio.ext.login.legacy_user.UserInfo`
                 (default: :class:`flask_login.current_user`)
@@ -86,7 +96,7 @@ def AclFactory(obj=''):
             except AttributeError:
                 pass
 
-            if is_authorized[0] != 0:
+            if is_authorized[0] != 0 and not any(restriction.values()):
                 return is_authorized
 
             for auth_type, auth_value in six.iteritems(restriction):
