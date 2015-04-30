@@ -19,17 +19,41 @@
 ## 1. Base (stable)                                                          ##
 ###############################################################################
 
-FROM python:2.7
+FROM python:2.7-slim
 MAINTAINER CERN <info@invenio-software.org>
 
 # nodejs repo
 # detects distribution and adds the right repo
 # See: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
-RUN curl -sL https://deb.nodesource.com/setup | bash -
+RUN apt-get update && \
+    apt-get -qy install --fix-missing --no-install-recommends \
+        curl \
+        && \
+    curl -sL https://deb.nodesource.com/setup | bash -
 
 # install requirements from repos
+# also clean up apt
 RUN apt-get update && \
-    apt-get -qy install poppler-utils git subversion nodejs mysql-client sudo --fix-missing
+    apt-get -qy upgrade --fix-missing --no-install-recommends && \
+    apt-get -qy install --fix-missing --no-install-recommends \
+        gcc \
+        git \
+        libffi-dev \
+        libmysqlclient-dev \
+        libssl-dev \
+        libxslt-dev \
+        mysql-client \
+        nodejs \
+        poppler-utils \
+        subversion \
+        sudo \
+        && \
+    apt-get clean autoclean && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/{apt,dpkg}/ && \
+    (find /usr/share/doc -depth -type f ! -name copyright -delete || true) && \
+    (find /usr/share/doc -empty -delete || true) && \
+    rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
 
 # install python requirements
 RUN pip install --upgrade pip && \
@@ -86,6 +110,9 @@ RUN pip install -e .[$REXTRAS] --quiet
 
 # build translation catalog
 RUN python setup.py compile_catalog
+
+# clean up
+RUN rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
 
 # step back
 # in general code should not be writeable, especially because we are using

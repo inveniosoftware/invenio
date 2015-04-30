@@ -298,7 +298,7 @@ def send_email(fromaddr,
                 x_recipient=', '.join(toaddr),
                 x_body=quoted_body)
 
-            send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL,
+            send_email(cfg['CFG_SITE_ADMIN_EMAIL'], cfg['CFG_SITE_ADMIN_EMAIL'],
                        admin_report_subject, admin_report_body,
                        forward_failures_to_admin=False)
 
