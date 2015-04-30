@@ -58,7 +58,6 @@ Modules
    modules/formatter
    modules/jsonalchemy
    modules/knowledge
-   modules/multimedia
    modules/oauthclient
    modules/redirector
    modules/tags
