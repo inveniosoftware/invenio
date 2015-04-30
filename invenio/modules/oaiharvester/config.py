@@ -19,8 +19,18 @@
 
 """OAI harvest config."""
 
+
 from __future__ import unicode_literals
+
+import os
+
+from invenio.base.config import CFG_DATADIR
+
 
 OAIHARVESTER_DEFAULT_NAMESPACE_MAP = {
     None: "http://www.openarchives.org/OAI/2.0/",
 }
+"""The default namespace used when handling OAI-PMH results."""
+
+OAIHARVESTER_STORAGEDIR = os.path.join(CFG_DATADIR, "oaiharvester", "storage")
+"""Path to a storage directory where the oaiharvester may put files."""

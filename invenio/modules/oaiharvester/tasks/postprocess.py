@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -95,7 +95,7 @@ def arxiv_fulltext_download(obj, eng):
 
     if "pdf" not in obj.extra_data["_result"]:
         extract_path = os.path.join(
-            cfg['CFG_TMPSHAREDDIR'],
+            cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
             str(eng.uuid)
         )
         if not os.path.exists(extract_path):
@@ -201,7 +201,7 @@ def plot_extract(plotextractor_types=("latex",)):
             # Run LaTeX plotextractor
             if "tarball" not in obj.extra_data["_result"]:
                 extract_path = os.path.join(
-                    cfg['CFG_TMPSHAREDDIR'],
+                    cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
                     str(eng.uuid)
                 )
                 if not os.path.exists(extract_path):
@@ -310,7 +310,7 @@ def refextract(obj, eng):
 
     if not pdf:
         extract_path = os.path.join(
-            cfg['CFG_TMPSHAREDDIR'],
+            cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
             str(eng.uuid)
         )
         if not os.path.exists(extract_path):
@@ -368,7 +368,7 @@ def author_list(obj, eng):
         obj.extra_data["_result"] = {}
     if "tarball" not in obj.extra_data["_result"]:
         extract_path = os.path.join(
-            cfg['CFG_TMPSHAREDDIR'],
+            cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
             str(eng.uuid)
         )
         if not os.path.exists(extract_path):
@@ -418,15 +418,15 @@ def author_list(obj, eng):
                     eng.log.error("Error parsing authorlist record for id: %s" % (
                         identifiers,))
                 authorlist_record = authorlist_record[0][0]
-                # Convert any LaTeX symbols in authornames
+
+            # Convert any LaTeX symbols in authornames
             translate_fieldvalues_from_latex(authorlist_record, '100', code='a')
             translate_fieldvalues_from_latex(authorlist_record, '700', code='a')
 
-            updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' \
-                          + record_xml_output(authorlist_record) + '</collection>'
-            if not None == updated_xml:
-                # We store the path to the directory  the tarball contents live
-                # Read and grab MARCXML from plotextractor run
+            author_xml = record_xml_output(authorlist_record)
+            if author_xml:
+                updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' \
+                              + record_xml_output(authorlist_record) + '</collection>'
                 new_dict_representation = convert_marcxml_to_bibfield(updated_xml)
                 obj.data['authors'] = new_dict_representation["authors"]
                 obj.data['number_of_authors'] = new_dict_representation[
@@ -460,7 +460,7 @@ def upload_step(obj, eng):
         default_args.extend(['-P', str(arguments.get('u_priority', 5))])
 
     extract_path = os.path.join(
-        cfg['CFG_TMPSHAREDDIR'],
+        cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
         str(eng.uuid)
     )
     if not os.path.exists(extract_path):
@@ -523,7 +523,7 @@ def filter_step(obj, eng):
     if script_name:
         marcxml_value = Record(obj.data.dumps()).legacy_export_as_marc()
         extract_path = os.path.join(
-            cfg['CFG_TMPSHAREDDIR'],
+            cfg.get('OAIHARVESTER_STORAGEDIR', cfg.get('CFG_TMPSHAREDDIR')),
             str(eng.uuid)
         )
         if not os.path.exists(extract_path):
