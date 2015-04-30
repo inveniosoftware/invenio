@@ -59,7 +59,7 @@ from .models import (
 from .signals import (workflow_finished,
                       workflow_halted,
                       workflow_started)
-from .utils import dictproperty
+from .utils import dictproperty, get_task_history
 
 
 class WorkflowStatus(object):
@@ -533,7 +533,11 @@ BibWorkflowEngine
             obj.set_data(obj.data)
             obj.extra_data["_task_counter"] = self._i[1]
             obj.extra_data["_last_task_name"] = callback.func_name
-            obj.update_task_history(callback)
+            task_history = get_task_history(callback)
+            if "_task_history" not in obj:
+                obj.extra_data["_task_history"] = [task_history]
+            else:
+                obj.extra_data["_task_history"].append(task_history)
             obj.set_extra_data(obj.extra_data)
 
     def get_current_taskname(self):

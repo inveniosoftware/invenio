@@ -458,6 +458,16 @@ def get_previous_next_objects(object_list, current_object_id):
     return previous_object_id, next_object_id
 
 
+def get_task_history(last_task):
+    """Append last task to task history."""
+    if hasattr(last_task, 'branch') and last_task.branch:
+        return
+    elif hasattr(last_task, 'hide') and last_task.hide:
+        return
+    else:
+        return get_func_info(last_task)
+
+
 def get_func_info(func):
     """Retrieve a function's information."""
     name = func.func_name
@@ -476,7 +486,8 @@ def get_func_info(func):
     varnames = func.func_code.co_freevars
     if closure:
         for index, arg in enumerate(closure):
-            parameters.append((varnames[index], arg.cell_contents))
+            if not callable(arg.cell_contents):
+                parameters.append((varnames[index], arg.cell_contents))
     return unicodifier({
         "nicename": nicename,
         "doc": doc,

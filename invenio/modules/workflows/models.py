@@ -382,18 +382,6 @@ class BibWorkflowObject(db.Model):
             pass
         return
 
-    def update_task_history(self, last_task):
-        """Append last task to task history."""
-        from .utils import get_func_info
-        if "_task_history" not in self.extra_data:
-            self.extra_data["_task_history"] = []
-        if hasattr(last_task, 'branch') and last_task.branch:
-            return
-        elif hasattr(last_task, 'hide') and last_task.hide:
-            return
-        else:
-            self.extra_data["_task_history"].append(get_func_info(last_task))
-
     def get_formatted_data(self, of="hd"):
         """Get the formatted representation for this object."""
         from .registry import workflows
