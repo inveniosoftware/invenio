@@ -241,7 +241,7 @@ def create_config(force=False, no_ssl=False):
             def generate_fullpath(type_, stream):
                 return path.join(
                     app_cfg['CFG_LOGDIR'],
-                    'apache-{type}.{stream}'
+                    'apache{type}.{stream}'
                     .format( type='-' + type_ if type_ else '', stream=stream))
             return {
                 'out': {
