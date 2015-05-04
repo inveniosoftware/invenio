@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -62,10 +62,16 @@ same.
 
 """
 
-from functools import wraps
+from __future__ import unicode_literals
+
 from flask import Flask as FlaskBase, current_app
-from werkzeug.utils import import_string
+
+from functools import wraps
+
+from six import text_type
+
 from werkzeug.local import LocalProxy
+from werkzeug.utils import import_string
 
 from .signals import before_handle_user_exception
 
@@ -89,6 +95,8 @@ def _decorate_url_adapter_build(wrapped):
         force_external = kwargs.get('force_external', True)
         url_scheme = getattr(wrapped.im_self, 'url_scheme', 'http')
         kwargs['force_external'] = False
+        if not isinstance(args[0], text_type):
+            args[0] = args[0].decode('utf-8')
         url = wrapped(*args, **kwargs)
         if force_external:
             url = url_scheme_prefixes.get(url_scheme) + url

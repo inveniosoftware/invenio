@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,14 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-    invenio.ext.confighacks
-    -----------------------
 
-    This module fixes problems with missing ``invenio.config`` module.
-"""
+"""This module fixes problems with missing ``invenio.config`` module."""
+
 import os
+
 import sys
+
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio23Warning
+
 from six import iteritems
 
 
@@ -55,22 +58,28 @@ def get_relative_url(url):
 
 
 def setup_app(app):
-    """
-    This extension wraps application configs and installs it as python module
-    to ``invenio.config``. As a next step it sets an attribute ``config`` to
-    ``invenio`` module to enable import statment `from invenio import config`.
-    """
+    """The extension wraps application configs.
 
+    This extension wraps application configs and installs it as python module
+    to ``invenio.config``.
+    As a next step it sets an attribute ``config`` to ``invenio`` module
+    to enable import statment `from invenio import config`.
+    """
     # STEP 0: Special treatment of base URL, adding CFG_BASE_URL.
     CFG_BASE_URL = get_relative_url(app.config.get("CFG_SITE_URL"))
     app.config['CFG_BASE_URL'] = CFG_BASE_URL
 
     # STEP 1: create simple :class:`.Wrapper`.
     class Wrapper(object):
+
+        """Wrapper."""
+
         def __init__(self, wrapped):
+            """Init."""
             self.wrapped = wrapped
 
         def __getattr__(self, name):
+            """Get attr."""
             # Perform custom logic here
             if name == '__file__':
                 return __file__
@@ -78,11 +87,15 @@ def setup_app(app):
                 return os.path.dirname(__file__)
             try:
                 from invenio.base.helpers import utf8ifier
+                warnings.warn(
+                    "Usage of invenio.config.{0} is deprecated".format(name),
+                    RemovedInInvenio23Warning
+                )
                 return utf8ifier(self.wrapped[name])
-            except:
+            except Exception:
                 pass
-                #import traceback
-                #traceback.print_stack()
+                # import traceback
+                # traceback.print_stack()
 
     # STEP 2: wrap application config and sets it as `invenio.config` module.
     sys.modules['invenio.config'] = Wrapper(app.config)
