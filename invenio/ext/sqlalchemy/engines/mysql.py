@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,86 +21,11 @@
 
 import base64
 
-# SQLAlchemy
 import sqlalchemy
 
-import sqlalchemy.types as types
+from sqlalchemy import types as types
 from sqlalchemy.ext.compiler import compiles
-
-from sqlalchemy.schema import CreateIndex, PrimaryKeyConstraint
-
-
-@compiles(CreateIndex, 'mysql')
-def visit_create_index(element, compiler, **kw):
-    """Return create index statement with defined length for text field.
-
-    example:
-    CREATE TABLE tableA
-        ...
-        description TEXT(40)
-        ...
-        INDEX ix_tableA_description ON (description(40))
-    """
-    index = element.element
-    preparer = compiler.preparer
-    table = preparer.format_table(index.table)
-    name = preparer.quote(index.name, index.name.quote)
-
-    text = "ALTER TABLE %s ADD " % (table, )
-    if index.unique:
-        text += "UNIQUE "
-    text += "INDEX %s" % (name, )
-
-    lst = index.kwargs.get('mysql_length', None)
-
-    columns = []
-    for i, c in enumerate(index.columns):
-        cname = c.name
-        suffix = ''
-        if isinstance(lst, (list, tuple)) and len(lst) > i \
-                and lst[i] is not None:
-            suffix = '(%d)' % lst[i]
-        elif c.type != types.NULLTYPE \
-                and str(c.type).startswith('TEXT') \
-                and (c.type.length is not None):
-            suffix = '(%d)' % c.type.length
-        columns.append(cname + suffix)
-
-    text += '(' + ', '.join(columns) + ')'
-
-    if 'mysql_using' in index.kwargs:
-        using = index.kwargs['mysql_using']
-        if using is not None:
-            text += " USING %s" % (preparer.quote(using, index.quote))
-
-    return text
-
-
-@compiles(PrimaryKeyConstraint, 'mysql')
-def visit_primary_key_constraint(*element):
-    """
-    Return create primary key constrains.
-
-    Return create primary key constrains with defined length
-    for text field.
-    """
-    constraint, compiler = element
-    if len(constraint) == 0:
-        return ''
-    text = ""
-    if constraint.name is not None:
-        text += "CONSTRAINT %s " % \
-                compiler.preparer.format_constraint(constraint)
-    text += "PRIMARY KEY "
-    text += "(%s)" % ', '.join(c.name +
-                               (c.type != types.NULLTYPE
-                                and (str(c.type).startswith('TEXT')
-                                     and (c.type.length is not None))
-                                and '(%d)' % c.type.length
-                                or '')
-                               for c in constraint)
-    text += compiler.define_constraint_deferrability(constraint)
-    return text
+from sqlalchemy.types import TypeDecorator
 
 
 @compiles(types.Text, 'sqlite')
@@ -139,8 +64,6 @@ def compile_binary(element, compiler, **kw):
 def compile_largebinary(element, compiler, **kw):
     """Redefine LargeBinary filed type for MySQL."""
     return 'LONGBLOB'
-
-from sqlalchemy.types import TypeDecorator
 
 
 class iBinary(TypeDecorator):

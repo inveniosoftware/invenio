@@ -27,9 +27,10 @@ from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.collections.models import Collection
 from invenio.utils.text import slugify
 
+from sqlalchemy.dialects import mysql
 from sqlalchemy.event import listens_for
-
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.schema import Index
 
 
 class KnwKB(db.Model):
@@ -281,7 +282,9 @@ class KnwKBRVAL(db.Model):
     __tablename__ = 'knwKBRVAL'
     m_key = db.Column(db.String(255), nullable=False, primary_key=True,
                       index=True)
-    m_value = db.Column(db.Text(30), nullable=False, index=True)
+    m_value = db.Column(
+        db.Text().with_variant(mysql.TEXT(30), 'mysql'),
+        nullable=False)
     id_knwKB = db.Column(db.MediumInteger(8), db.ForeignKey(KnwKB.id),
                          nullable=False, server_default='0',
                          primary_key=True)
@@ -342,5 +345,8 @@ class KnwKBRVAL(db.Model):
                 'value': self.m_value,
                 'kbid': self.kb.id if self.kb else None,
                 'kbname': self.kb.name if self.kb else None}
+
+
+Index('ix_knwKBRVAL_m_value', KnwKBRVAL.m_value, mysql_length=30)
 
 __all__ = ('KnwKB', 'KnwKBDDEF', 'KnwKBRVAL')

@@ -29,6 +29,8 @@ from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User
 
+from sqlalchemy.schema import Index
+
 
 class Field(db.Model):
 
@@ -168,7 +170,12 @@ class WebQuery(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
                    autoincrement=True)
     type = db.Column(db.Char(1), nullable=False, server_default='r')
-    urlargs = db.Column(db.Text(100), nullable=False, index=True)
+    urlargs = db.Column(
+        db.Text().with_variant(db.Text(100), 'mysql'),
+        nullable=False)
+
+
+Index('ix_query_urlargs', WebQuery.urlargs, mysql_length=100)
 
 
 class UserQuery(db.Model):
@@ -191,6 +198,7 @@ class UserQuery(db.Model):
 
     @classmethod
     def log(cls, urlargs=None, id_user=None):
+        """Log."""
         id_user = id_user if not None else current_user.get_id()
         urlargs = urlargs or request.query_string
         if id_user < 0:

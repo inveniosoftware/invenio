@@ -20,11 +20,15 @@
 """Record models."""
 
 from flask import current_app
+
 from intbitset import intbitset
-from sqlalchemy.ext.declarative import declared_attr
-from werkzeug import cached_property
 
 from invenio.ext.sqlalchemy import db, utils
+
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.schema import Index
+
+from werkzeug import cached_property
 
 
 class Record(db.Model):
@@ -59,8 +63,8 @@ class Record(db.Model):
         dbcollids = get_fieldvalues(self.id, "980__%")
 
         return ("DELETED" in dbcollids) or \
-               (current_app.config.get('CFG_CERN_SITE')
-                and "DUMMY" in dbcollids)
+               (current_app.config.get('CFG_CERN_SITE') and
+                "DUMMY" in dbcollids)
 
     @staticmethod
     def _next_merged_recid(recid):
@@ -109,7 +113,8 @@ class Record(db.Model):
     @cached_property
     def is_processed(self):
         """Return True is recods is processed (not in any collection)."""
-        from invenio.modules.collections.cache import is_record_in_any_collection
+        from invenio.modules.collections.cache import \
+            is_record_in_any_collection
         return not is_record_in_any_collection(self.id,
                                                recreate_cache_if_needed=False)
 
@@ -163,8 +168,9 @@ class BibxxxMixin(utils.TableNameMixin):
                    autoincrement=True)
     tag = db.Column(db.String(6), nullable=False, index=True,
                     server_default='')
-    value = db.Column(db.Text(35), nullable=False,
-                      index=True)
+    value = db.Column(
+        db.Text().with_variant(db.Text(35), 'mysql'),
+        nullable=False)
 
 
 class BibrecBibxxxMixin(utils.TableFromCamelNameMixin):
@@ -202,12 +208,16 @@ models = []
 
 for idx in range(100):
     Bibxxx = "Bib{0:02d}x".format(idx)
-    globals()[Bibxxx] = type(Bibxxx, (db.Model, BibxxxMixin), {})
+    globals_Bibxxx = type(Bibxxx, (db.Model, BibxxxMixin), {})
+    globals()[Bibxxx] = globals_Bibxxx
     BibrecBibxxx = "BibrecBib{0:02d}x".format(idx)
     globals()[BibrecBibxxx] = type(BibrecBibxxx,
                                    (db.Model, BibrecBibxxxMixin), {})
 
     models += [Bibxxx, BibrecBibxxx]
+
+    Index('ix_{0:02d}x_value'.format(idx),
+          globals_Bibxxx.value, mysql_length=35)
 
 __all__ = tuple([
     'Record',

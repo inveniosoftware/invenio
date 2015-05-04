@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013 CERN.
+# Copyright (C) 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,22 +17,21 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-WebComment database models.
-"""
+"""WebComment database models."""
 
-# General imports.
-from sqlalchemy import event
-from invenio.ext.sqlalchemy import db
-
-# Create your models here.
-from invenio.modules.records.models import Record as Bibrec
-from invenio.modules.accounts.models import User
 from invenio.base.signals import record_after_update
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
+from invenio.modules.accounts.models import User
+from invenio.modules.records.models import Record as Bibrec
+
+from sqlalchemy import event
 
 
 class CmtRECORDCOMMENT(db.Model):
+
     """Represents a CmtRECORDCOMMENT record."""
+
     __tablename__ = 'cmtRECORDCOMMENT'
 
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
@@ -69,40 +68,39 @@ class CmtRECORDCOMMENT(db.Model):
 
     @property
     def is_deleted(self):
+        """Check if is deleted."""
         return self.status != 'ok'
 
     def is_collapsed(self, id_user):
-        """Returns true if the comment is collapsed by user."""
+        """Return true if the comment is collapsed by user."""
         return CmtCOLLAPSED.query.filter(db.and_(
             CmtCOLLAPSED.id_bibrec == self.id_bibrec,
             CmtCOLLAPSED.id_cmtRECORDCOMMENT == self.id,
             CmtCOLLAPSED.id_user == id_user)).count() > 0
 
+    @session_manager
     def collapse(self, id_user):
-        """Collapses comment beloging to user."""
+        """Collapse comment beloging to user."""
         c = CmtCOLLAPSED(id_bibrec=self.id_bibrec, id_cmtRECORDCOMMENT=self.id,
                          id_user=id_user)
-        try:
-            db.session.add(c)
-            db.session.commit()
-        except:
-            db.session.rollback()
+        db.session.add(c)
+        db.session.commit()
 
     def expand(self, id_user):
-        """Expands comment beloging to user."""
+        """Expand comment beloging to user."""
         CmtCOLLAPSED.query.filter(db.and_(
             CmtCOLLAPSED.id_bibrec == self.id_bibrec,
             CmtCOLLAPSED.id_cmtRECORDCOMMENT == self.id,
             CmtCOLLAPSED.id_user == id_user)).delete(synchronize_session=False)
 
     __table_args__ = (db.Index('cmtRECORDCOMMENT_reply_order_cached_data',
-                               reply_order_cached_data, mysql_length=[40]),
+                               reply_order_cached_data, mysql_length=40),
                       db.Model.__table_args__)
 
 
 @event.listens_for(CmtRECORDCOMMENT, 'after_insert')
 def after_insert(mapper, connection, target):
-    """Updates reply order cache  and send record-after-update signal."""
+    """Update reply order cache  and send record-after-update signal."""
     record_after_update.send(CmtRECORDCOMMENT, recid=target.id_bibrec)
 
     from .api import get_reply_order_cache_data
@@ -114,14 +112,17 @@ def after_insert(mapper, connection, target):
             parent_reply_order = parent.reply_order_cached_data \
                 if parent.reply_order_cached_data else ''
             parent_reply_order += get_reply_order_cache_data(target.id)
-            connection.execute(db.update(CmtRECORDCOMMENT.__table__).
-                               where(CmtRECORDCOMMENT.id == parent.id).
-                               values(reply_order_cached_data=parent_reply_order))
+            connection.execute(
+                db.update(CmtRECORDCOMMENT.__table__).
+                where(CmtRECORDCOMMENT.id == parent.id).
+                values(reply_order_cached_data=parent_reply_order))
             trans.commit()
 
 
 class CmtACTIONHISTORY(db.Model):
+
     """Represents a CmtACTIONHISTORY record."""
+
     __tablename__ = 'cmtACTIONHISTORY'
     id_cmtRECORDCOMMENT = db.Column(db.Integer(15, unsigned=True),
                                     db.ForeignKey(CmtRECORDCOMMENT.id),
@@ -141,7 +142,9 @@ class CmtACTIONHISTORY(db.Model):
 
 
 class CmtSUBSCRIPTION(db.Model):
+
     """Represents a CmtSUBSCRIPTION record."""
+
     __tablename__ = 'cmtSUBSCRIPTION'
 
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
@@ -157,6 +160,7 @@ class CmtSUBSCRIPTION(db.Model):
 
 
 class CmtCOLLAPSED(db.Model):
+
     """Represents a CmtCOLLAPSED record."""
 
     __tablename__ = 'cmtCOLLAPSED'
@@ -170,7 +174,7 @@ class CmtCOLLAPSED(db.Model):
                         primary_key=True)
 
 
-__all__ = ['CmtRECORDCOMMENT',
+__all__ = ('CmtRECORDCOMMENT',
            'CmtACTIONHISTORY',
            'CmtSUBSCRIPTION',
-           'CmtCOLLAPSED']
+           'CmtCOLLAPSED')

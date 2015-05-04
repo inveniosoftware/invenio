@@ -38,9 +38,10 @@ from invenio.modules.search.models import Field, Fieldvalue
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.orderinglist import ordering_list
 from sqlalchemy.orm.collections import attribute_mapped_collection
+from sqlalchemy.schema import Index
 
 from werkzeug.utils import cached_property
-# Create your models here.
+
 
 external_collection_mapper = attribute_multi_dict_collection(
     creator=lambda k, v: CollectionExternalcollection(type=k,
@@ -59,19 +60,22 @@ class Collection(db.Model):
                'nbrecs: {0.nbrecs}>'.format(self)
 
     def __unicode__(self):
+        """Unicode."""
         suffix = ' ({0})'.format(_('default')) if self.id == 1 else ''
         return u"{0.id}. {0.name}{1}".format(self, suffix)
 
     def __str__(self):
+        """Str."""
+        # TODO it's compatible with python 3?
         return unicode(self).encode('utf-8')
 
     __tablename__ = 'collection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True)
-    name = db.Column(db.String(255), unique=True, index=True,
-                     nullable=False)
-    dbquery = db.Column(db.Text(20), nullable=True,
-                        index=True)
+    name = db.Column(db.String(255), unique=True, index=True, nullable=False)
+    dbquery = db.Column(
+        db.Text().with_variant(db.Text(20), 'mysql'),
+        nullable=True)
 
     @property
     def nbrecs(self):
@@ -136,6 +140,7 @@ class Collection(db.Model):
 
     @property
     def name_ln(self):
+        """Name ln."""
         from invenio.legacy.search_engine import get_coll_i18nname
         return get_coll_i18nname(self.name,
                                  getattr(g, 'ln', cfg['CFG_SITE_LANG']))
@@ -151,6 +156,7 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def portalboxes_ln(self):
+        """Get Portalboxes ln."""
         return db.object_session(self).query(CollectionPortalbox).\
             with_parent(self).\
             options(db.joinedload_all(CollectionPortalbox.portalbox)).\
@@ -159,6 +165,7 @@ class Collection(db.Model):
 
     @property
     def most_specific_dad(self):
+        """Most specific dad."""
         results = sorted(
             db.object_session(self).query(Collection).join(
                 Collection.sons
@@ -262,9 +269,7 @@ class Collection(db.Model):
     @property
     # @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def search_within(self):
-        """
-        Collect search within options.
-        """
+        """Collect search within options."""
         default = [('', _('any field'))]
         found = [(o.field.code, o.field.name_ln) for o in self._search_within]
         if not found:
@@ -423,6 +428,9 @@ class Collection(db.Model):
         return breadcrumbs
 
 
+Index('ix_collection_dbquery', Collection.dbquery, mysql_length=20)
+
+
 class Collectionname(db.Model):
 
     """Represent a Collectionname record."""
@@ -440,10 +448,12 @@ class Collectionname(db.Model):
 
     @db.hybrid_property
     def ln_type(self):
+        """Get ln type."""
         return (self.ln, self.type)
 
     @ln_type.setter
     def set_ln_type(self, value):
+        """Set ln type."""
         (self.ln, self.type) = value
 
 
@@ -480,6 +490,7 @@ class Collectionboxname(db.Model):
 class Collectiondetailedrecordpagetabs(db.Model):
 
     """Represent a Collectiondetailedrecordpagetabs record."""
+
     __tablename__ = 'collectiondetailedrecordpagetabs'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id),
@@ -493,6 +504,7 @@ class Collectiondetailedrecordpagetabs(db.Model):
 class CollectionCollection(db.Model):
 
     """Represent a CollectionCollection record."""
+
     __tablename__ = 'collection_collection'
     id_dad = db.Column(db.MediumInteger(9, unsigned=True),
                        db.ForeignKey(Collection.id), primary_key=True)
@@ -514,6 +526,7 @@ class CollectionCollection(db.Model):
 class Example(db.Model):
 
     """Represent a Example record."""
+
     __tablename__ = 'example'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                    autoincrement=True)
@@ -524,6 +537,7 @@ class Example(db.Model):
 class CollectionExample(db.Model):
 
     """Represent a CollectionExample record."""
+
     __tablename__ = 'collection_example'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
@@ -539,6 +553,7 @@ class CollectionExample(db.Model):
 class Portalbox(db.Model):
 
     """Represent a Portalbox record."""
+
     __tablename__ = 'portalbox'
     id = db.Column(db.MediumInteger(9, unsigned=True), autoincrement=True,
                    primary_key=True)
@@ -547,8 +562,7 @@ class Portalbox(db.Model):
 
 
 def get_pbx_pos():
-    """Returns a list of all the positions for a portalbox"""
-
+    """Return a list of all the positions for a portalbox."""
     position = {}
     position["rt"] = "Right Top"
     position["lt"] = "Left Top"
@@ -562,6 +576,7 @@ def get_pbx_pos():
 class CollectionPortalbox(db.Model):
 
     """Represent a CollectionPortalbox record."""
+
     __tablename__ = 'collection_portalbox'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)
@@ -583,6 +598,7 @@ class CollectionPortalbox(db.Model):
 class Externalcollection(db.Model):
 
     """Represent a Externalcollection record."""
+
     __tablename__ = 'externalcollection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True)
@@ -591,6 +607,7 @@ class Externalcollection(db.Model):
 
     @property
     def engine(self):
+        """Engine."""
         from invenio.legacy.websearch_external_collections.searcher import (
             external_collections_dictionary
         )
@@ -601,6 +618,7 @@ class Externalcollection(db.Model):
 class CollectionExternalcollection(db.Model):
 
     """Represent a CollectionExternalcollection record."""
+
     __tablename__ = 'collection_externalcollection'
     id_collection = db.Column(db.MediumInteger(9,
                                                unsigned=True),
@@ -634,6 +652,7 @@ class CollectionExternalcollection(db.Model):
 class CollectionFormat(db.Model):
 
     """Represent a CollectionFormat record."""
+
     __tablename__ = 'collection_format'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                               db.ForeignKey(Collection.id), primary_key=True)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,19 +17,17 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.modules.pages.models
-    ----------------------------
+"""Contains page model."""
 
-    Contains page model.
-"""
+from datetime import datetime
 
 from invenio.ext.sqlalchemy import db
-from datetime import datetime
 
 
 class Page(db.Model):
+
     """Represents a page."""
+
     __tablename__ = 'pages'
 
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
@@ -37,11 +35,13 @@ class Page(db.Model):
                    autoincrement=True)
     url = db.Column(db.String(100), unique=True, nullable=False)
     title = db.Column(db.String(200), nullable=True)
-    content = db.Column(db.TEXT(length=2**32-2), nullable=True)
+    content = db.Column(
+        db.Text().with_variant(db.Text(length=2**32-2), 'mysql'),
+        nullable=True)
     # Default is pages/templates/default.html
     template_name = db.Column(db.String(70), nullable=True)
     created = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     last_modified = db.Column(db.DateTime(), nullable=False,
                               default=datetime.now, onupdate=datetime.now)
 
-__all__ = ['Page']
+__all__ = ('Page',)
