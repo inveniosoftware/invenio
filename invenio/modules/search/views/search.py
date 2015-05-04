@@ -41,39 +41,34 @@ Template hierarchy.
 """
 
 import cStringIO
-import functools
-import json
 import string
-
-from flask import make_response, g, request, flash, jsonify, \
-    redirect, url_for, current_app, abort, session, Blueprint, \
-    render_template
-from flask_breadcrumbs import \
-    register_breadcrumb, current_breadcrumbs, default_breadcrumb_root
-from flask_login import current_user
 from math import ceil
+
+from flask import (Blueprint, abort, current_app, flash, g, jsonify,
+                   make_response, redirect, render_template, request, session,
+                   url_for)
+from flask_breadcrumbs import (current_breadcrumbs, default_breadcrumb_root,
+                               register_breadcrumb)
+from flask_login import current_user
 from six import iteritems
 from werkzeug.local import LocalProxy
 
-from invenio.base.decorators import wash_arguments, templated
+from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
 from invenio.base.signals import websearch_before_browse
-from invenio.modules.indexer.models import IdxINDEX
 from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.utils.pagination import Pagination
-from invenio.modules.search.registry import facets
 from invenio.modules.collections.decorators import check_collection
+from invenio.modules.indexer.models import IdxINDEX
+from invenio.modules.search.registry import facets
+from invenio.utils.pagination import Pagination
 
 from .. import receivers
 from ..api import SearchEngine
-from ..cache import get_search_query_id, get_collection_name_from_cache
-from ..facet_builders import get_current_user_records_that_can_be_displayed, \
-    faceted_results_filter
+from ..cache import get_search_query_id
 from ..forms import EasySearchForm
 from ..models import Field
 from ..washers import wash_search_urlargd
-
 
 blueprint = Blueprint('search', __name__, url_prefix="",
                       template_folder='../templates',
@@ -296,7 +291,7 @@ def rss(collection, p, jrec, so, rm):
     recids = searcher.search(collection=collection.name)
 
     ctx = dict(
-        records=len(get_current_user_records_that_can_be_displayed(qid)),
+        records=len(recids),
         qid=qid,
         rg=rg
     )

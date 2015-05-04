@@ -19,10 +19,15 @@
 
 """Utility functions for search engine."""
 
-import numpy
+import functools
 
+import numpy
+import six
+
+from flask import g
 from intbitset import intbitset
 from six import iteritems, string_types
+from werkzeug.utils import import_string
 
 from invenio.base.globals import cfg
 from invenio.modules.collections.cache import (
@@ -195,3 +200,58 @@ def get_permitted_restricted_collections(user_info,
         if auth[0] == 0:
             ret.append(collection)
     return ret
+
+
+def g_memoise(method=None, key=None):
+    """Memoise method results on application context."""
+    if method is None:
+        return functools.partial(g_memoise, key=key)
+
+    key = key or method.__name__
+
+    @functools.wraps(method)
+    def decorator(*args, **kwargs):
+        results = getattr(g, key, None)
+        if results is None:
+            results = method(*args, **kwargs)
+            setattr(g, key, results)
+        return results
+    return decorator
+
+
+@g_memoise
+def query_enhancers():
+    """Return list of query enhancers."""
+    functions = []
+    for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
+        if isinstance(enhancer, six.string_types):
+            enhancer = import_string(enhancer)
+            functions.append(enhancer)
+    return functions
+
+
+@g_memoise
+def parser():
+    """Return search query parser."""
+    query_parser = cfg['SEARCH_QUERY_PARSER']
+    if isinstance(query_parser, six.string_types):
+        query_parser = import_string(query_parser)
+    return query_parser
+
+
+@g_memoise
+def query_walkers():
+    """Return query walker instances."""
+    return [
+        import_string(walker)() if isinstance(walker, six.string_types)
+        else walker() for walker in cfg['SEARCH_QUERY_WALKERS']
+    ]
+
+
+@g_memoise
+def search_walkers():
+    """Return in search walker instances."""
+    return [
+        import_string(walker)() if isinstance(walker, six.string_types)
+        else walker() for walker in cfg['SEARCH_WALKERS']
+    ]

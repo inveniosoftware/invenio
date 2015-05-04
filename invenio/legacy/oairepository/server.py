@@ -67,9 +67,9 @@ from invenio.legacy.bibrecord import record_get_field_instances
 from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
-    search_unit_in_bibxxx, get_record, search_pattern
+    search_unit_in_bibxxx, get_record
 from invenio.modules.formatter import format_record
-from invenio.modules.search.utils import get_records_that_can_be_displayed
+from invenio.modules.search.api import SearchEngine
 from invenio.utils.date import localtime_to_utc, utc_to_localtime
 from invenio.utils.html import X, EscapedXMLString
 
@@ -590,13 +590,11 @@ def oai_get_recid(identifier):
     record if multiple recids matches but some of them are deleted (e.g. in
     case of merging). Returns None if no record matches."""
     if identifier:
-        recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e', ap=-9)
+        recids = SearchEngine('{f}:"{p}"'.format(
+            f=CFG_OAI_ID_FIELD, p=identifier)
+        ).search()
         if recids:
-            displayable_recids = get_records_that_can_be_displayed(
-                current_user.get('precached_permitted_restricted_collections', []),
-                recids
-            )
-            for recid in displayable_recids:
+            for recid in recids:
                 if record_exists(recid) > 0:
                     return recid
     return None

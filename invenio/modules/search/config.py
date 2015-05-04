@@ -37,6 +37,12 @@ SEARCH_QUERY_ENHANCERS = [
     'invenio.modules.search.enhancers.facet_filter.apply',
 ]
 
+# SEARCH_WALKERS -- a comma separated list of strings. Each string is
+# a AST visitor class.
+SEARCH_WALKERS = [
+    'invenio.modules.search.walkers.search_unit:SearchUnit',
+]
+
 # do we want experimental features? (0=no, 1=yes)
 CFG_EXPERIMENTAL_FEATURES = 0
 

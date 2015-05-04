@@ -20,28 +20,13 @@
 """Search engine API."""
 
 import pypeg2
-import six
 
-from flask import g
 from flask_login import current_user
-from invenio.base.globals import cfg
-from werkzeug.utils import cached_property, import_string
+from werkzeug.utils import cached_property
 
+from .utils import parser, query_enhancers, query_walkers, search_walkers
 from .walkers.match_unit import MatchUnit
 from .walkers.terms import Terms
-
-
-def query_enhancers():
-    """Return list of query enhancers."""
-    functions = getattr(g, 'search_query_enhancers', None)
-    if functions is None:
-        functions = []
-        for enhancer in cfg['SEARCH_QUERY_ENHANCERS']:
-            if isinstance(enhancer, six.string_types):
-                enhancer = import_string(enhancer)
-                functions.append(enhancer)
-        setattr(g, 'search_query_enhancers', functions)
-    return functions
 
 
 class SearchEngine(object):
@@ -53,20 +38,11 @@ class SearchEngine(object):
         self._query = query
 
     @cached_property
-    def parser(self):
-        query_parser = cfg['SEARCH_QUERY_PARSER']
-        if isinstance(query_parser, six.string_types):
-            query_parser = import_string(query_parser)
-        return query_parser
-
-    @cached_property
     def query(self):
         """Parse query string using given grammar."""
-        tree = pypeg2.parse(self._query, self.parser, whitespace="")
-        for walker in cfg['SEARCH_QUERY_WALKERS']:
-            if isinstance(walker, six.string_types):
-                walker = import_string(walker)
-            tree = tree.accept(walker())
+        tree = pypeg2.parse(self._query, parser(), whitespace="")
+        for walker in query_walkers():
+            tree = tree.accept(walker)
         return tree
 
     def search(self, user_info=None, collection=None):
@@ -78,8 +54,9 @@ class SearchEngine(object):
             query = enhancer(query, user_info=user_info,
                              collection=collection)
 
-        from invenio.modules.search.walkers.search_unit import SearchUnit
-        return query.accept(SearchUnit())
+        for walker in search_walkers():
+            query = query.accept(walker)
+        return query
 
     def match(self, record, user_info=None):
         """Return True if record match the query."""
