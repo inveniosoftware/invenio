@@ -71,6 +71,7 @@ import shutil
 import socket
 import subprocess
 import sys
+from distutils.sysconfig import get_python_lib
 import warnings
 from distutils import dir_util
 from os import path
@@ -191,6 +192,7 @@ def create_config(force=False, no_ssl=False):
         def __init__(self):
             """Initialize easily resolvable values."""
             self.sys_prefix = sys.prefix
+            self.python_lib_dir = get_python_lib()
             self.admin_email = app_cfg['CFG_SITE_ADMIN_EMAIL']
             self.collect_static_root = app_cfg['COLLECT_STATIC_ROOT']
             self.bibdocfile_use_xsendfile = \
