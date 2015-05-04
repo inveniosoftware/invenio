@@ -199,11 +199,6 @@ def create_config(force=False, no_ssl=False):
                 app_cfg['CFG_BIBDOCFILE_USE_XSENDFILE']
             self.webstyle_http_use_compression = \
                 app_cfg['CFG_WEBSTYLE_HTTP_USE_COMPRESSION']
-            self.wsgi_processes = app_cfg.get('APACHE_WSGI_DAEMON_PROCESSES', 5)
-            # Debug
-            if app_cfg['DEBUG']:
-                print('DEBUG enabled: Overriding wsgi_processes of Apache to 1')
-                self.wsgi_processes = 1
 
         @staticproperty
         def sso():
@@ -464,6 +459,12 @@ def create_config(force=False, no_ssl=False):
             :rtype: dict
             """
             wsgi = {}
+
+            wsgi['processes'] = app_cfg.get('APACHE_WSGI_DAEMON_PROCESSES', 5)
+            # Debug
+            if app_cfg['DEBUG']:
+                print('DEBUG enabled: Overriding wsgi_processes of Apache to 1')
+                self.wsgi['processes'] = 1
 
             try:
                 wsgi['user'] = app_cfg['APACHE_RUNNING_AS_USER']
