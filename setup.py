@@ -157,6 +157,9 @@ extras_require = {
         "oauth2client>=1.4.0",
         "urllib3>=1.8.3"
     ],
+    "iiif": [
+        "Flask-IIIF>=0.2.0",
+    ],
     "img": [
         "qrcode>=5.1",
         "Pillow>=2.7.0"
