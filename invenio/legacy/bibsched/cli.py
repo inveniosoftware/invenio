@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -375,12 +375,12 @@ def sleep_task(task):
 
 
 def fetch_debug_mode():
-    r = run_sql('SELECT value FROM schSTATUS WHERE name = "debug_mode"')
+    r = run_sql("SELECT value FROM schSTATUS WHERE name = 'debug_mode'")
     try:
         debug_mode = bool(int(r[0][0]))
     except (ValueError, IndexError):
         # We insert the missing configuration variable in the DB
-        run_sql('INSERT INTO schSTATUS (name, value) VALUES ("debug_mode", "0")')
+        run_sql("INSERT INTO schSTATUS (name, value) VALUES ('debug_mode', '0')")
         debug_mode = False
     return debug_mode
 
@@ -846,16 +846,16 @@ class BibSched(object):
 
     def check_auto_mode(self):
         """Check if the queue is in automatic or manual mode"""
-        r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
+        r = run_sql("SELECT value FROM schSTATUS WHERE name = 'auto_mode'")
         try:
             status = int(r[0][0])
         except (ValueError, IndexError):
             # We insert the missing configuration variable in the DB
-            run_sql('INSERT INTO schSTATUS (name, value) VALUES ("auto_mode", "1")')
+            run_sql("INSERT INTO schSTATUS (name, value) VALUES ('auto_mode', '1')")
             status = 1
 
         if not status:
-            r = run_sql('SELECT value FROM schSTATUS WHERE name = "resume_after"')
+            r = run_sql("SELECT value FROM schSTATUS WHERE name = 'resume_after'")
             try:
                 date_string = r[0][0]
             except IndexError:
@@ -864,8 +864,8 @@ class BibSched(object):
                 if date_string:
                     resume_after = datetime.datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))
                     if datetime.datetime.now() > resume_after:
-                        run_sql('UPDATE schSTATUS SET value = "" WHERE name = "resume_after"')
-                        run_sql('UPDATE schSTATUS SET value = "1" WHERE name = "auto_mode"')
+                        run_sql("UPDATE schSTATUS SET value = '' WHERE name = 'resume_after'")
+                        run_sql("UPDATE schSTATUS SET value = '1' WHERE name = 'auto_mode'")
                         status = 1
 
         return status
@@ -1204,7 +1204,7 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None): # py
     write_message("BibSched daemon status: %s" % daemon_status)
 
     if run_sql("show tables like 'schSTATUS'"):
-        r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
+        r = run_sql("SELECT value FROM schSTATUS WHERE name = 'auto_mode'")
         try:
             mode = bool(int(r[0][0]))
         except (ValueError, IndexError):
