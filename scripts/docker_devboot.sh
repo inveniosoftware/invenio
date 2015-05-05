@@ -91,6 +91,8 @@ CFG_WEBSUBMIT_COUNTERSDIR = u'/home/invenio/var/data/submit/counters'
 CFG_WEBSUBMIT_STORAGEDIR = u'/home/invenio/var/data/submit/storage'
 
 DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
+
+DEBUG = True
 EOF
 
         # load dev config
