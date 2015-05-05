@@ -46,9 +46,9 @@ class BibWorkflowEngine(DbWorkflowEngine):
     """Special engine for Invenio.
 
     The reason why base64 is used throughout this class is due to a bug in
-    CPython pickle streams which sometimes contain non-ASCII characters. Because
-    of this it is impossible to correctly use json on such data without base64
-    encoding it first.
+    CPython pickle streams which sometimes contain non-ASCII characters.
+    Because of this it is impossible to correctly use json on such data without
+    base64 encoding it first.
     """
 
     def __init__(self, db_obj, **extra_data):
@@ -116,10 +116,11 @@ class BibWorkflowEngine(DbWorkflowEngine):
 
     @property
     def db(self):
+        """Return SQLAlchemy db."""
         return db
 
     @staticproperty
-    def processing_factory():
+    def processing_factory():  # pylint: disable=no-method-argument
         """Provide a proccessing factory."""
         return InvProcessingFactory
 
@@ -194,7 +195,7 @@ class BibWorkflowEngine(DbWorkflowEngine):
         """Return the appropriate logger instance."""
         db_handler_obj = DbWorkflowLogHandler(DbWorkflowEngineLog, "uuid")
         return get_logger(logger_name="workflow.%s" % self.db_obj.uuid,
-                              db_handler_obj=db_handler_obj, obj=self)
+                          db_handler_obj=db_handler_obj, obj=self)
 
     @property
     def has_completed(self):
@@ -202,8 +203,8 @@ class BibWorkflowEngine(DbWorkflowEngine):
         res = self.db.session.query(self.db.func.count(DbWorkflowObject.id)).\
             filter(DbWorkflowObject.id_workflow == self.uuid).\
             filter(DbWorkflowObject.version.in_(
-                [ObjectStatus.INITIAL,
-                 ObjectStatus.COMPLETED]
+                [ObjectStatus.INITIAL,  # pylint: disable=no-member
+                 ObjectStatus.COMPLETED]  # pylint: disable=no-member
             )).group_by(DbWorkflowObject.version).all()
         return len(res) == 2 and res[0] == res[1]
 
@@ -278,6 +279,18 @@ BibWorkflowEngine
         """
         self.db_obj.extra_data.update(kwargs)
 
+    # Deprecated
+    def get_current_object(self):
+        return self.current_object
+
+    # Deprecated
+    def objects_of_statuses(self, statuses):
+        results = []
+        for obj in self.database_objects:
+            if obj.version in statuses:
+                results.append(obj)
+        return results
+
 
 class InvActionMapper(ActionMapper):
 
@@ -302,7 +315,7 @@ class InvActionMapper(ActionMapper):
 class InvProcessingFactory(DbProcessingFactory):
 
     @staticproperty
-    def action_mapper():
+    def action_mapper():  # pylint: disable=no-method-argument
         """Set a mapper for actions while processing."""
         return InvActionMapper
 
