@@ -215,6 +215,40 @@ class RemoteAccountTestCase(OAuth2ClientTestCase):
                 )
             )
 
+    def test_invalid_authorized_response(self):
+        from simplejson import JSONDecodeError
+        from invenio.modules.oauthclient.client import oauth
+
+        # Fake an authorized request
+        with self.app.test_client() as c:
+            # Ensure remote apps have been loaded (due to before first
+            # request)
+            c.get(url_for("oauthclient.login", remote_app='test'))
+
+            oauth.remote_apps['test'].handle_oauth2_response = MagicMock(
+                side_effect=JSONDecodeError('Expecting value', '', 0)
+            )
+
+            from invenio.modules.oauthclient.views.client import serializer
+
+            state = serializer.dumps({
+                'app': 'test',
+                'sid': session.sid,
+                'next': None,
+            })
+
+            self.assertRaises(
+                JSONDecodeError,
+                c.get,
+                url_for(
+                    "oauthclient.authorized",
+                    remote_app='test',
+                    code='test',
+                    state=state
+                )
+            )
+
+
     @patch('invenio.modules.oauthclient.views.client.session')
     def test_state_token(self, session):
         from invenio.modules.oauthclient.views.client import serializer
