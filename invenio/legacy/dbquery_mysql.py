@@ -45,8 +45,9 @@ from invenio.utils.datastructures import LazyDict
 
 from thread import get_ident
 
-from werkzeug.utils import cached_property
+from sqlalchemy.exc import InterfaceError, OperationalError
 
+from werkzeug.utils import cached_property
 
 __revision__ = "$Id$"
 
