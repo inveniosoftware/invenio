@@ -243,14 +243,14 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                 oai_src_post = []
 
             oai_src = OaiHARVEST.query.get(oai_src_id)
-            oai_src.setspecs = " ".join(oai_src_sets)
-            oai_src.baseurl = oai_src_baseurl
-            oai_src.name = oai_src_name
-            oai_src.metadataprefix = oai_src_prefix
-            oai_src.postprocess = "-".join(oai_src_post)
+            oai_src.setspecs = " ".join(oai_src_sets).strip()
+            oai_src.baseurl = oai_src_baseurl.strip()
+            oai_src.name = oai_src_name.strip()
+            oai_src.metadataprefix = oai_src_prefix.strip()
+            oai_src.postprocess = "-".join(oai_src_post).strip()
             oai_src.arguments = oai_src_args
-            oai_src.comment = oai_src_comment
-            oai_src.workflows = oai_src_workflow
+            oai_src.comment = oai_src_comment.strip()
+            oai_src.workflows = oai_src_workflow.strip()
             oai_src.save()
             # OAI source modified!
             show_form = False
@@ -359,15 +359,15 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
             else:
                 oai_src_lastrun = datetime.datetime.now()
 
-            res = OaiHARVEST(name=oai_src_name,
-                             baseurl=oai_src_baseurl,
-                             metadataprefix=oai_src_prefix,
+            res = OaiHARVEST(name=oai_src_name.strip(),
+                             baseurl=oai_src_baseurl.strip(),
+                             metadataprefix=oai_src_prefix.strip(),
                              lastrun=oai_src_lastrun,
                              postprocess="-".join(oai_src_post),
-                             comment=oai_src_comment,
-                             setspecs=" ".join(oai_src_sets),
+                             comment=oai_src_comment.strip(),
+                             setspecs=" ".join(oai_src_sets).strip(),
                              arguments=oai_src_args,
-                             workflows=oai_src_workflow)
+                             workflows=oai_src_workflow.strip())
             res.save()
             # OAI source added!
             show_form = False
