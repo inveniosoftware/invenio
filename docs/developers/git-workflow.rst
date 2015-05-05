@@ -222,7 +222,7 @@ always safe to upgrade the system at any moment in time by (1) backing
 up their ``etc`` folder containing local configuration, (2) installing
 the corresponding ``maint-X.Y`` branch updates, and (3) rolling back the
 ``etc`` folder with their customizations.  This upgrade process will be
-automatized in the future via special ``inveniocfg`` options.
+automatized in the future via special ``inveniomanage`` options.
 
 ``master``
 ~~~~~~~~~~
@@ -237,7 +237,7 @@ may change, the config is not frozen and may change, etc, until the
 release time.  So while ``master`` is relatively stable for usage, it
 should be treated with extreme care, because updates between day D1
 and day D2 may require DB schema and ``etc`` configuration changes that
-are not covered by usual ``inveniocfg`` update statements, so people
+are not covered by usual ``inveniomanage`` update statements, so people
 should be prepared to study the differences and update DB schemata and
 config files themselves.
 

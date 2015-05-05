@@ -30,8 +30,8 @@ Demo Sites
     Atlantis Institute of Fictive Science is an official demo site of
     Invenio.  It demonstrates a basic setup of Invenio. You could
     (should) obtain this site if you install Invenio for the first
-    time, by lauching `inveniocfg --create-demo-site` and
-    `inveniocfg --load-demo-records`. This is useful to verify the
+    time, by lauching 
+    `inveniomanage demosite create`. This is useful to verify the
     functionality of your installation prior to customizing the system
     for production.
 
@@ -41,8 +41,8 @@ Demo Sites
     Atlantis Institute of Fictive Science is an official demo site of
     Invenio.  It demonstrates a basic setup of Invenio. You could
     (should) obtain this site if you install Invenio next branch for the first
-    time, by lauching `inveniocfg --create-demo-site` and
-    `inveniocfg --load-demo-records`. This is useful to verify the
+    time, by lauching 
+    `inveniomanage demosite create`. This is useful to verify the
     functionality of your installation prior to customizing the system
     for production. (The next branch is based on new technologies such as
     `Werkzeug <http://werkzeug.pocoo.org/>`_, `Flask <http://flask.pocoo.org/>`_,

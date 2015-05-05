@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,55 @@
 
 from __future__ import print_function
 
+import os
+import socket
+
 from invenio.ext.script import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
+
+
+def _detect_ip_address():
+    """Detect IP address of this computer.
+
+    Useful for creating Apache vhost conf snippet on RHEL like machines.
+    However, if wanted site is 0.0.0.0, then use that, since we are running
+    inside Docker.
+
+    :return: IP address, or '*' if cannot detect
+    :rtype: string
+
+    .. note:: creates socket for real in order to detect real IP address,
+              not the loopback one.
+    """
+    from invenio.base.globals import cfg
+    if '0.0.0.0' in cfg.get('CFG_SITE_URL'):
+        return '0.0.0.0'
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('invenio-software.org', 0))
+        return s.getsockname()[0]
+    except Exception:
+        return '*'
+
+
+def _grep_version_from_executable(path_to_exec, version_regexp):
+    """Try to detect a program version.
+
+    Grep in its binary PATH_TO_EXEC and looking for VERSION_REGEXP.  Return
+    program version as a string.  Return empty string if not succeeded.
+    """
+    from invenio.utils.shell import run_shell_command
+    exec_version = ""
+    if os.path.exists(path_to_exec):
+        dummy1, cmd2_out, dummy2 = run_shell_command(
+            "strings %s | grep %s", (path_to_exec, version_regexp))
+        if cmd2_out:
+            for cmd2_out_line in cmd2_out.split("\n"):
+                if len(cmd2_out_line) > len(exec_version):
+                    # the longest the better
+                    exec_version = cmd2_out_line
+    return exec_version
 
 
 @manager.command
@@ -33,7 +79,6 @@ def version(separator='\n', formatting='{version} [{executable}]'):
     returned format is 'apache_version [apache_path]'.)  Return empty
     list if no success.
     """
-    from invenio.legacy.inveniocfg import _grep_version_from_executable
     from invenio.utils.shell import run_shell_command
     out = []
     dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
@@ -68,8 +113,6 @@ def create_config(force=False, no_ssl=False):
     CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
 
     def get_context():
-        from invenio.legacy.inveniocfg import _detect_ip_address
-
         conf = current_app.config
 
         ## Apache vhost conf file is distro specific, so analyze needs:

@@ -300,7 +300,6 @@ setup(
             'gotoadmin = invenio.modules.redirector.scripts.redirector:main',
             'hepdataharvest = '
             ' invenio.utils.hepdata.scripts.hepdataharvest:main',
-            'inveniocfg = invenio.legacy.inveniocfg:main',
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
             'inveniounoconv = '
             ' invenio.legacy.websubmit.scripts.inveniounoconv:main',

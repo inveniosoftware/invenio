@@ -39,15 +39,18 @@ from .request_class import LegacyRequest
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
     from invenio.config import CFG_PREFIX
-    from invenio.base.scripts.config import get_conf
+    from invenio.ext.sqlalchemy import db
+    from invenio.modules.accounts.models import User
     # from invenio.legacy.inveniocfg import cli_cmd_reset_sitename
-    from invenio.legacy.inveniocfg import cli_cmd_reset_siteadminemail
     # from invenio.legacy.inveniocfg import cli_cmd_reset_fieldnames
 
-    conf = get_conf()
     # FIXME refactor fixtures so these calls are not needed
     # cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_siteadminemail(conf)
+    User.query.filter_by(id=1).delete()
+    siteadminemail = current_app.config.get('CFG_SITE_ADMIN_EMAIL')
+    u = User(id=1, email=siteadminemail, password='', note=1, nickname='admin')
+    db.session.add(u)
+    db.session.commit()
     # cli_cmd_reset_fieldnames(conf)
 
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,

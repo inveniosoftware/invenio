@@ -104,7 +104,7 @@ def warn_user_about_tests(test_suite_type='regression'):
 **                                                                  **
 **    $ inveniocfg --drop-demo-site                                 **
 **    $ inveniocfg --create-demo-site                               **
-**    $ inveniocfg --load-demo-records                              **
+**    $ inveniomanage demosite create                              **
 **                                                                  **
 ** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
 **                                                                  **

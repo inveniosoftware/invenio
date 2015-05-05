@@ -64,20 +64,6 @@ def get_instance_config_object(filename='invenio.cfg', silent=True):
     return d
 
 
-def get_conf():
-    """Prepare configuration."""
-    try:
-        from invenio.config import CFG_ETCDIR
-    except Exception:
-        CFG_ETCDIR = None
-    from invenio.legacy.inveniocfg import prepare_conf
-
-    class TmpOptions(object):
-        conf_dir = CFG_ETCDIR
-
-    return prepare_conf(TmpOptions())
-
-
 @manager.command
 def get(name):
     """
