@@ -37,8 +37,8 @@ ServerTokens Prod
 
 # WSGI
 WSGIRestrictStdout Off
-WSGIPythonHome {{ cfg.sys_prefix }}
-WSGIPythonPath {{ cfg.python_lib_dir }}
+WSGIPythonHome {{ cfg.python_home }}
+WSGIPythonPath "{{ cfg.python_path }}"
 {{ '#' if not cfg.wsgi.socket_directive_needed }}WSGISocketPrefix {{ cfg.wsgi.socket_prefix }}
 WSGIDaemonProcess {{ cfg.wsgi.process_name }} processes={{ cfg.wsgi.processes }} threads=1 user={{ cfg.wsgi.user }} display-name=%{GROUP} inactivity-timeout=3600 maximum-requests=10000
 WSGIImportScript {{ cfg.wsgi.script_fullpath }} process-group={{ cfg.wsgi.process_group }} application-group=%{GLOBAL}
