@@ -189,7 +189,8 @@ class AccAuthorization(db.Model):
                              db.ForeignKey(AccACTION.id), nullable=True,
                              index=True)
     _id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
-                                nullable=True, name="id_accARGUMENT")
+                                nullable=True, name="id_accARGUMENT",
+                                index=True)
     argumentlistid = db.Column(db.MediumInteger(8), nullable=True)
 
     role = db.relationship(AccROLE, backref='authorizations')
