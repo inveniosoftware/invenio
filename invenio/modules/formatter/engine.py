@@ -36,59 +36,48 @@ L{BibFormatObject} class directly. For eg:
 @see: bibformat.py, bibformat_utils.py
 """
 
+import cgi
+import inspect
+import os
 import re
 import sys
-import os
-import inspect
 import traceback
-import cgi
 import types
-
-from flask import has_app_context, current_app
+import warnings
+from HTMLParser import HTMLParseError
 from operator import itemgetter
+
+from flask import current_app, has_app_context
 from six import iteritems
 from werkzeug.utils import cached_property
 
-from invenio.base.globals import cfg
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_BIBFORMAT_CACHED_FORMATS, \
-     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, \
-     CFG_BIBFORMAT_HIDDEN_TAGS
-from invenio.ext.logging import \
-     register_exception
-from invenio.legacy.bibrecord import \
-     create_record, \
-     record_get_field_instances, \
-     record_get_field_value, \
-     record_get_field_values, \
-     record_xml_output, \
-     record_empty
-from . import registry
-from .engines import xslt
-from invenio.base.i18n import \
-     language_list_long, \
-     wash_language, \
-     gettext_set_language
 import invenio.legacy.bibformat.dblayer as bibformat_dblayer
-from .config import \
-     CFG_BIBFORMAT_TEMPLATES_DIR, \
-     CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
-     CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
-     CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
-     CFG_BIBFORMAT_OUTPUTS_PATH, \
-     InvenioBibFormatError
-from invenio.modules.formatter.utils import \
-     parse_tag
-from invenio.utils.html import \
-     HTMLWasher, \
-     CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
-     CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
-from invenio.modules.knowledge.api import get_kbr_values
+from invenio.base.globals import cfg
+from invenio.base.i18n import gettext_set_language, language_list_long, \
+    wash_language
+from invenio.config import CFG_BIBFORMAT_CACHED_FORMATS, \
+    CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, CFG_BIBFORMAT_HIDDEN_TAGS, \
+    CFG_SITE_LANG
+from invenio.ext.logging import register_exception
 from invenio.ext.template import render_template_to_string
-from HTMLParser import HTMLParseError
+from invenio.legacy.bibrecord import create_record, record_empty, \
+    record_get_field_instances, record_get_field_value, \
+    record_get_field_values, record_xml_output
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.formatter.registry import template_context_functions
+from invenio.modules.formatter.utils import parse_tag
+from invenio.modules.knowledge.api import get_kbr_values
+from invenio.utils.deprecation import RemovedInInvenio22Warning
+from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST, \
+    CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, HTMLWasher
+from invenio.utils.memoise import memoize
+
+from . import registry
+from .config import CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
+    CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
+    CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_OUTPUTS_PATH, \
+    CFG_BIBFORMAT_TEMPLATES_DIR, InvenioBibFormatError
+from .engines import xslt
 
 # Cache for data we have already read and parsed
 format_templates_cache = {}
@@ -203,7 +192,6 @@ sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 
 
-from invenio.utils.memoise import memoize
 
 
 class LazyTemplateContextFunctionsCache(object):
@@ -251,6 +239,11 @@ class LazyTemplateContextFunctionsCache(object):
 
         def insert(name):
             def _bfe_element(bfo, **kwargs):
+                warnings.warn(
+                    "BFE elements ({0}) are deprecated. "
+                    "Use Jinja2 filters or macros.".format(name),
+                    RemovedInInvenio22Warning
+                )
                 # convert to utf-8 for legacy app
                 kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
                               for k, v in iteritems(kwargs))
@@ -628,6 +621,11 @@ def format_with_format_template(format_template_filename, bfo,
     if format_template_filename is None or \
             format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
         # .bft
+        warnings.warn(
+            "BFT template format ({0}) is deprecated. "
+            "Use Jinja2 templates.".format(format_template_filename),
+            RemovedInInvenio22Warning
+        )
         evaluated_format, needs_2nd_pass = eval_format_template_elements(
                                                         format_content,
                                                         bfo,
