@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -233,9 +233,9 @@ def cli_quick_match_all_docids(options, recids=None):
     if deleted_docs is None and action_undelete:
         deleted_docs = 'only'
     if deleted_docs == 'no':
-        tmp_query.append('status<>"DELETED"')
+        tmp_query.append("status<>'DELETED'")
     elif deleted_docs == 'only':
-        tmp_query.append('status="DELETED"')
+        tmp_query.append("status='DELETED'")
     if md_doc[0] is not None:
         tmp_query.append('modification_date>=%s')
         tmp_params.append(md_doc[0])
