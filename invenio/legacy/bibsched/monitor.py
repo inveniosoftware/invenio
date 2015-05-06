@@ -881,7 +881,7 @@ order to let this task run. The current priority is %s. New value:"
             status = 0
         else:
             # Otherwise check the daemon status
-            r = run_sql("SELECT value FROM schSTATUS WHERE name = 'auto_mode'")
+            r = run_sql("""SELECT value FROM "schSTATUS" WHERE name = 'auto_mode'""")
             try:
                 status = int(r[0][0])
             except (ValueError, IndexError):
@@ -902,18 +902,18 @@ order to let this task run. The current priority is %s. New value:"
 
         # Enable automatic mode
         if new_mode:
-            run_sql("UPDATE schSTATUS SET value = '' WHERE name = 'resume_after'")
-            run_sql("UPDATE schSTATUS SET value = '1' WHERE name = 'auto_mode'")
+            run_sql("""UPDATE "schSTATUS" SET value = '' WHERE name = 'resume_after'""")
+            run_sql("""UPDATE "schSTATUS" SET value = '1' WHERE name = 'auto_mode'""")
             log('queue changed to automatic mode')
         # Enable manual mode
         else:
-            run_sql("UPDATE schSTATUS SET value = '0' WHERE name = 'auto_mode'")
+            run_sql("""UPDATE "schSTATUS" SET value = '0' WHERE name = 'auto_mode'""")
             if duration:
                 resume_after = datetime.now() + timedelta(seconds=duration)
                 resume_after = resume_after.strftime("%Y-%m-%d %H:%M:%S")
             else:
                 resume_after = ""
-            run_sql('REPLACE INTO schSTATUS (name, value) VALUES ("resume_after", %s)', [resume_after])
+            run_sql("""REPLACE INTO "schSTATUS" (name, value) VALUES ('resume_after', %s)""", [resume_after])
             if duration:
                 log('queue changed to manual mode for %ss' % duration)
             else:
@@ -934,7 +934,7 @@ order to let this task run. The current priority is %s. New value:"
             self.debug_mode = 1
             value = "1"
 
-        run_sql('UPDATE schSTATUS SET value = %s WHERE name = "debug_mode"',
+        run_sql("""UPDATE "schSTATUS" SET value = %s WHERE name = 'debug_mode' """,
                 [value])
 
 
@@ -1083,7 +1083,7 @@ order to let this task run. The current priority is %s. New value:"
 
     def update_rows(self):
         self.manual_mode_time_left = None
-        r = run_sql("SELECT value FROM schSTATUS WHERE name = 'resume_after'")
+        r = run_sql("""SELECT value FROM "schSTATUS" WHERE name = 'resume_after'""")
         if r and r[0] and r[0][0]:
             date_string = r[0][0]
             resume_after = datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))

@@ -379,7 +379,7 @@ def get_user_metadata_uploads(req):
                             s.status \
                             FROM hstBATCHUPLOAD h INNER JOIN schTASK s \
                             ON h.id_schTASK = s.id \
-                            WHERE h.user=%s and h.batch_mode="metadata"
+                            WHERE h.user=%s and h.batch_mode='metadata'
                             ORDER BY h.submitdate DESC""", (user_info['nickname'],))
     return upload_list
 
@@ -391,7 +391,7 @@ def get_user_document_uploads(req):
                           s.status \
                           FROM hstBATCHUPLOAD h INNER JOIN schTASK s \
                           ON h.id_schTASK = s.id \
-                          WHERE h.user=%s and h.batch_mode="document"
+                          WHERE h.user=%s and h.batch_mode='document'
                           ORDER BY h.submitdate DESC""", (user_info['nickname'],))
     return upload_list
 

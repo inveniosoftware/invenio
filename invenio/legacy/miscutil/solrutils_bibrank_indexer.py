@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011 CERN.
+# Copyright (C) 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -145,7 +145,7 @@ def get_recIDs_by_date(dates=""):
     """
     if not dates:
         write_message("Using the last update time for the rank method")
-        res = run_sql('SELECT last_updated FROM rnkMETHOD WHERE name="wrd"')
+        res = run_sql("""SELECT last_updated FROM "rnkMETHOD" WHERE name='wrd'""")
 
         if not res:
             return
@@ -177,7 +177,7 @@ def word_index(run): # pylint: disable=W0613
         id_ranges = get_recIDs_by_date()
         if id_ranges:
             solr_add_ranges([(id_range[0], id_range[1]) for id_range in id_ranges])
-            run_sql('UPDATE rnkMETHOD SET last_updated=%s WHERE name="wrd"', (starting_time, ))
+            run_sql("""UPDATE "rnkMETHOD" SET last_updated=%s WHERE name='wrd'""", (starting_time, ))
         else:
             write_message("No new records. Solr index is up to date")
 

@@ -49,7 +49,7 @@ from sqlalchemy.exc import ProgrammingError
 
 CFG_SUPERADMINROLE_ID = 0
 try:
-    id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s',
+    id_tmp = run_sql("""SELECT id FROM "accROLE" WHERE name=%s""",
                      (SUPERADMINROLE, ))
     if id_tmp:
         CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
@@ -110,7 +110,7 @@ def acc_delete_action(id_action=0, name_action=0):
         return 0
 
     # delete the action
-    if run_sql("""DELETE FROM accACTION WHERE id=%s""", (id_action, )):
+    if run_sql("""DELETE FROM "accACTION" WHERE id=%s""", (id_action, )):
         # delete all entries related
         return 1 + run_sql("""DELETE FROM "accROLE_accACTION_accARGUMENT" WHERE
             "id_accACTION" =%s""", (id_action, ))
@@ -316,7 +316,7 @@ def acc_delete_role(id_role=0, name_role=0):
             (id_role, ))
 
         # delegated rights over the role
-        rolenames = run_sql("""SELECT name FROM accROLE""")
+        rolenames = run_sql("""SELECT name FROM "accROLE" """)
         # string of rolenames
         roles_str = ''
         for (name, ) in rolenames:
@@ -810,7 +810,7 @@ def acc_add_role_action_arguments_names(name_role='', name_action='',
 
     # find id of the action, return 0 if it doesn't exist
     res = run_sql(
-        """SELECT id from accACTION where name = %s""", (name_action, ))
+        """SELECT id from "accACTION" where name = %s""", (name_action, ))
     if res:
         id_action = res[0][0]
     else:
@@ -1014,7 +1014,7 @@ def acc_delete_role_action(id_role=0, id_action=0):
     """delete all connections between a role and an action."""
     count = run_sql(
         """DELETE FROM "accROLE_accACTION_accARGUMENT"
-           WHERE "id_accROLE"  = %s AND "id_accACTION"  = %s """,
+           WHERE "id_accROLE" = %s AND "id_accACTION" = %s """,
         (id_role, id_action))
 
     return count
@@ -1030,7 +1030,7 @@ def acc_get_action_id(name_action):
     name_action - name of the wanted action
     """
     try:
-        return run_sql("""SELECT id FROM accACTION WHERE name = %s""",
+        return run_sql("""SELECT id FROM "accACTION" WHERE name = %s""",
                        (name_action, ), run_on_slave=True)[0][0]
     except (ProgrammingError, IndexError):
         return 0
@@ -1039,7 +1039,7 @@ def acc_get_action_id(name_action):
 def acc_get_action_name(id_action):
     """get name of action when id is given."""
     try:
-        return run_sql("""SELECT name FROM accACTION WHERE id = %s""",
+        return run_sql("""SELECT name FROM "accACTION" WHERE id = %s""",
                        (id_action, ))[0][0]
     except (ProgrammingError, IndexError):
         return ''
@@ -1048,7 +1048,7 @@ def acc_get_action_name(id_action):
 def acc_get_action_description(id_action):
     """get description of action when id is given."""
     try:
-        return run_sql("""SELECT description FROM accACTION WHERE id = %s""",
+        return run_sql("""SELECT description FROM "accACTION" WHERE id = %s""",
                        (id_action, ))[0][0]
     except (ProgrammingError, IndexError):
         return ''
@@ -1972,7 +1972,7 @@ def acc_cleanup_arguments():
         idstr += '%s' % argument_id
 
     # delete unreferenced arguments
-    count = run_sql("""DELETE FROM accARGUMENT
+    count = run_sql("""DELETE FROM "accARGUMENT"
     WHERE id in (%s)""" % (idstr, ))
 
     # return count and ids of deleted arguments

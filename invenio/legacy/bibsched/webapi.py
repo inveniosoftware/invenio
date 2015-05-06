@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2014 CERN.
+# Copyright (C) 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -89,17 +89,17 @@ def get_bibsched_tasks():
     Run SQL query to get all tasks present in bibsched queue
     """
     waiting_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress FROM schTASK WHERE (status='WAITING' OR status='SLEEPING') ORDER BY priority DESC, runtime ASC, id ASC")
-    other_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress\
-                           FROM schTASK WHERE status IN ('RUNNING',\
+    other_tasks = run_sql("""SELECT id,proc,priority,user,runtime,status,progress\
+                           FROM "schTASK" WHERE status IN ('RUNNING',\
                            'CONTINUING','SCHEDULED','ABOUT TO STOP',\
-                           'ABOUT TO SLEEP', 'DONE WITH ERRORS', 'ERRORS REPORTED')")
+                           'ABOUT TO SLEEP', 'DONE WITH ERRORS', 'ERRORS REPORTED')""")
     return other_tasks + waiting_tasks
 
 def get_bibsched_mode():
     """
     Gets bibsched running mode: AUTOMATIC or MANUAL
     """
-    r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
+    r = run_sql("""SELECT value FROM "schSTATUS" WHERE name = 'auto_mode' """)
     try:
         mode = bool(int(r[0][0]))
     except (ValueError, IndexError):

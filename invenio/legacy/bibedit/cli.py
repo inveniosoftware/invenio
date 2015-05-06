@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -194,7 +194,7 @@ def check_rev(recid, verbose=True, fix=False):
 
 
 def fix_rev(recid, job_date, verbose=True):
-    sql = 'DELETE FROM hstRECORD WHERE id_bibrec = %s AND job_date = "%s"'
+    sql = """DELETE FROM hstRECORD WHERE id_bibrec = %s AND job_date = '%s' """
     run_sql(sql, (recid, job_date))
 
 

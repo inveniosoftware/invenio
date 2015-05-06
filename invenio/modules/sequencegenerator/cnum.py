@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,58 +17,56 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Sequence Generator Cnum."""
+
 from __future__ import print_function
 
+from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.bibrecord import create_record, record_get_field_value
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.search_engine import perform_request_search
 from invenio.modules.sequencegenerator.backend import SequenceGenerator
 
-from invenio.legacy.bibedit.utils import get_bibrecord
-from invenio.legacy.bibrecord import record_get_field_value, create_record
-from invenio.legacy.search_engine import perform_request_search
-
-from invenio.legacy.dbquery import run_sql
 
 class ConferenceNoStartDateError(Exception):
+
+    """ConferenceNoStartDateError."""
+
     pass
 
 
 class CnumSeq(SequenceGenerator):
-    """
-    cnum sequence generator
-    """
+
+    """cnum sequence generator."""
+
     seq_name = 'cnum'
 
     def _get_record_cnums(self, value):
-        """
-        Get all the values that start with the base cnum
+        """Get all the values that start with the base cnum.
 
-        @param value: base cnum
-        @type value: string
+        :param value: base cnum
+        :type value: string
 
-        @return: values starting by the base cnum
-        @rtype: tuple
+        :return: values starting by the base cnum
+        :rtype: tuple
         """
-        return run_sql("""SELECT seq_value FROM seqSTORE WHERE seq_value
-                          LIKE %s AND seq_name=%s""",
-                          (value + "%", self.seq_name))
+        return run_sql("""SELECT seq_value FROM "seqSTORE" WHERE seq_value
+                       LIKE %s AND seq_name=%s""",
+                       (value + "%", self.seq_name))
 
     def _next_value(self, recid=None, xml_record=None, start_date=None):
-        """
-        Returns the next cnum for the given recid
+        """Return the next cnum for the given recid.
 
-        @param recid: id of the record where the cnum will be generated
-        @type recid: int
-
-        @param xml_record: record in xml format
-        @type xml_record: string
-
-        @param start_date: use given start date
-        @type start_date: string
-
-        @return: next cnum for the given recid. Format is Cyy-mm-dd.[.1n]
-        @rtype: string
-
-        @raises ConferenceNoStartDateError: No date information found in the
-        given recid
+        :param recid: id of the record where the cnum will be generated
+        :type recid: int
+        :param xml_record: record in xml format
+        :type xml_record: string
+        :param start_date: use given start date
+        :type start_date: string
+        :return: next cnum for the given recid. Format is Cyy-mm-dd.[.1n]
+        :rtype: string
+        :raises ConferenceNoStartDateError: No date information found in the
+                given recid
         """
         bibrecord = None
         if recid is None and xml_record is not None:
@@ -94,7 +92,9 @@ class CnumSeq(SequenceGenerator):
         else:
             # Get the max current revision, cnums are in format Cyy-mm-dd,
             # Cyy-mm-dd.1, Cyy-mm-dd.2
-            highest_revision = max([0] + [int(rev[0].split('.')[1]) for rev in record_cnums if '.' in rev[0]])
+            highest_revision = max([0] +
+                                   [int(rev[0].split('.')[1])
+                                    for rev in record_cnums if '.' in rev[0]])
             new_cnum = base_cnum + '.' + str(highest_revision + 1)
 
         return new_cnum
@@ -103,28 +103,26 @@ class CnumSeq(SequenceGenerator):
 # Helper functions to populate cnums from existing database records
 
 def _cnum_exists(cnum):
-    """
-    Checks existance of a given cnum in seqSTORE table
-    """
-    return run_sql("""select seq_value from seqSTORE where seq_value=%s and seq_name='cnum'""", (cnum, ))
+    """Check existance of a given cnum in seqSTORE table."""
+    return run_sql("""select seq_value from "seqSTORE" where
+                      seq_value=%s and seq_name='cnum'""", (cnum, ))
 
 
 def _insert_cnum(cnum):
-    """
-    Inserts a new cnum in table seqSTORE
-    """
-    return run_sql("INSERT INTO seqSTORE (seq_name, seq_value) VALUES (%s, %s)", ("cnum", cnum))
+    """Insert a new cnum in table seqSTORE."""
+    return run_sql("""INSERT INTO "seqSTORE" (seq_name, seq_value)
+                      VALUES (%s, %s)""", ("cnum", cnum))
 
 
 def populate_cnums():
-    """
-    Populates table seqSTORE with the cnums present in CONFERENCE records
-    """
+    """Populate table seqSTORE with the cnums present in CONFERENCE records."""
     # First get all records from conference collection
-    conf_records = perform_request_search(cc="Conferences", p="111__g:C*", rg=0)
+    conf_records = perform_request_search(cc="Conferences",
+                                          p="111__g:C*", rg=0)
 
     for recid in conf_records:
-        cnum = record_get_field_value(get_bibrecord(recid), tag="111", ind1="", ind2="", code="g")
+        cnum = record_get_field_value(
+            get_bibrecord(recid), tag="111", ind1="", ind2="", code="g")
         if cnum:
             if not _cnum_exists(cnum):
                 _insert_cnum(cnum)

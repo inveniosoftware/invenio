@@ -556,7 +556,7 @@ barcode NOT IN (SELECT id_bibrec FROM crcLOAN WHERE loaned_on > %%s AND \
 loaned_on < %%s AND type = 'normal') GROUP BY id_bibrec ORDER BY COUNT(*) DESC %s" % \
         (sql_from, sql_where, limit_n)
 
-    items_sql = "SELECT id_bibrec, COUNT(*) items FROM crcITEM GROUP BY id_bibrec"
+    items_sql = """SELECT id_bibrec, COUNT(*) items FROM "crcITEM" GROUP BY id_bibrec"""
     creation_date_sql = "SELECT creation_date FROM bibrec WHERE id=%s"
     authors_sql = "SELECT bx.value FROM bib10x bx, bibrec_bib10x bibx \
 WHERE bx.id = bibx.id_bibxxx AND bx.tag LIKE '100__a' AND bibx.id_bibrec=%s"
@@ -689,8 +689,8 @@ def get_keyevent_returns_table(args, return_sql=False):
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
     # Overdue returns:
-    sql = "SELECT COUNT(*) FROM crcLOAN l WHERE loaned_on > %s AND loaned_on < %s AND \
-due_date < NOW() AND (returned_on IS NULL OR returned_on > due_date)"
+    sql = """SELECT COUNT(*) FROM "crcLOAN" l WHERE loaned_on > %s AND loaned_on < %s AND \
+due_date < NOW() AND (returned_on IS NULL OR returned_on > due_date)"""
 
     if return_sql:
         return sql % (lower, upper)
@@ -862,7 +862,7 @@ def get_keyevent_ill_requests_lists(args, return_sql=False, limit=50):
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
-    sql_from = "FROM crcILLREQUEST ill "
+    sql_from = """FROM "crcILLREQUEST" ill """
     sql_where = "WHERE status != '%s' AND request_date > %%s AND request_date < %%s " \
                     % CFG_BIBCIRCULATION_ITEM_STATUS_CANCELLED
 
@@ -873,7 +873,7 @@ def get_keyevent_ill_requests_lists(args, return_sql=False, limit=50):
         param.append(args['doctype'])
     if 'supplier' in args and args['supplier'] != '':
         sql_from += ", crcLIBRARY lib "
-        sql_where += "AND lib.id=ill.id_crcLIBRARY AND lib.name=%s "
+        sql_where += """AND lib.id=ill."id_crcLIBRARY" AND lib.name=%s """
         param.append(args['supplier'])
     param = tuple(param)
 
@@ -1224,8 +1224,8 @@ def get_keyevent_user_statistics(args, return_sql=False):
     param = (lower, upper, lower, upper)
 
     # Total number of  active users:
-    users = "SELECT COUNT(DISTINCT user) FROM ((SELECT id_crcBORROWER user %s %s) \
-UNION (SELECT id_crcBORROWER user %s %s)) res" % \
+    users = """SELECT COUNT(DISTINCT user) FROM ((SELECT "id_crcBORROWER" user %s %s)
+UNION (SELECT "id_crcBORROWER" user %s %s)) res""" % \
         (sql_from_ill, sql_where_ill, sql_from_loan, sql_where_loan)
 
     if return_sql:
@@ -1259,12 +1259,12 @@ def get_keyevent_user_lists(args, return_sql=False, limit=50):
         limit = "LIMIT %d" % limit
     else:
         limit = ""
-    sql = "SELECT user, SUM(trans) FROM \
-((SELECT id_crcBORROWER user, COUNT(*) trans FROM crcILLREQUEST ill \
-WHERE request_date > %%s AND request_date < %%s GROUP BY id_crcBORROWER) UNION \
-(SELECT id_crcBORROWER user, COUNT(*) trans FROM crcLOAN l WHERE loaned_on > %%s AND \
-loaned_on < %%s GROUP BY id_crcBORROWER)) res GROUP BY user ORDER BY SUM(trans) DESC \
-%s" % (limit)
+    sql = """SELECT user, SUM(trans) FROM
+((SELECT "id_crcBORROWER" user, COUNT(*) trans FROM "crcILLREQUEST" ill
+WHERE request_date > %%s AND request_date < %%s GROUP BY "id_crcBORROWER") UNION
+(SELECT "id_crcBORROWER" user, COUNT(*) trans FROM "crcLOAN" l WHERE loaned_on > %%s AND
+loaned_on < %%s GROUP BY "id_crcBORROWER")) res GROUP BY user ORDER BY SUM(trans) DESC
+%s""" % (limit)
 
     if return_sql:
         return sql % param
@@ -1307,7 +1307,7 @@ def get_keyevent_snapshot_bibsched_status():
     @return: Information about the number of tasks in the different status modes.
     @type: [(str, int)]
     """
-    sql = "SELECT status, COUNT(status) FROM schTASK GROUP BY status"
+    sql = """SELECT status, COUNT(status) FROM "schTASK" GROUP BY status"""
     return [(x[0], int(x[1])) for x in run_sql(sql)]
 
 
@@ -1354,14 +1354,14 @@ def get_keyevent_bibcirculation_report(freq='yearly'):
         datefrom = datetime.date.today().strftime("%Y-%m-01 00:00:00")
     else: #yearly
         datefrom = datetime.date.today().strftime("%Y-01-01 00:00:00")
-    loans, renewals = run_sql("SELECT COUNT(*), \
-SUM(number_of_renewals) \
-FROM crcLOAN WHERE loaned_on > %s", (datefrom, ))[0]
-    returns = run_sql("SELECT COUNT(*) FROM crcLOAN \
-WHERE returned_on!='0000-00-00 00:00:00' and loaned_on > %s", (datefrom, ))[0][0]
-    illrequests = run_sql("SELECT COUNT(*) FROM crcILLREQUEST WHERE request_date > %s",
+    loans, renewals = run_sql("""SELECT COUNT(*),
+SUM(number_of_renewals)
+FROM "crcLOAN" WHERE loaned_on > %s""", (datefrom, ))[0]
+    returns = run_sql("""SELECT COUNT(*) FROM "crcLOAN"
+WHERE returned_on!='0000-00-00 00:00:00' and loaned_on > %s""", (datefrom, ))[0][0]
+    illrequests = run_sql("""SELECT COUNT(*) FROM "crcILLREQUEST" WHERE request_date > %s""",
                           (datefrom, ))[0][0]
-    holdrequest = run_sql("SELECT COUNT(*) FROM crcLOANREQUEST WHERE request_date > %s",
+    holdrequest = run_sql("""SELECT COUNT(*) FROM "crcLOANREQUEST" WHERE request_date > %s""",
                           (datefrom, ))[0][0]
     return (loans, renewals, returns, illrequests, holdrequest)
 
@@ -1375,14 +1375,14 @@ def get_last_updates():
     """
     try:
         last_index = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
-                    (str(run_sql('SELECT last_updated FROM "idxINDEX" WHERE \
-                    name="global"')[0][0])))
+                    (str(run_sql("""SELECT last_updated FROM "idxINDEX" WHERE
+                    name='global'""")[0][0])))
         last_rank = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
-                    (str(run_sql('SELECT last_updated FROM rnkMETHOD ORDER BY \
-                            last_updated DESC LIMIT 1')[0][0])))
+                    (str(run_sql("""SELECT last_updated FROM "rnkMETHOD" ORDER BY
+                            last_updated DESC LIMIT 1""")[0][0])))
         last_sort = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
-                    (str(run_sql('SELECT last_updated FROM bsrMETHODDATA ORDER BY \
-                            last_updated DESC LIMIT 1')[0][0])))
+                    (str(run_sql("""SELECT last_updated FROM "bsrMETHODDATA" ORDER BY
+                            last_updated DESC LIMIT 1""")[0][0])))
         file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
         last_coll = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
                     (str(file_coll_last_update.read())))
@@ -1415,18 +1415,18 @@ def get_list_link(process, category=None):
     @type: string
     """
     if process == "index":
-        list_registers = run_sql('SELECT id FROM bibrec WHERE \
-                            modification_date > (SELECT last_updated FROM \
-                            "idxINDEX" WHERE name=%s)', (category,))
+        list_registers = run_sql("""SELECT id FROM bibrec WHERE
+                            modification_date > (SELECT last_updated FROM
+                            "idxINDEX" WHERE name=%s)""", (category,))
     elif process == "rank":
-        list_registers = run_sql('SELECT id FROM bibrec WHERE \
-                            modification_date > (SELECT last_updated FROM \
-                            rnkMETHOD WHERE name=%s)', (category,))
+        list_registers = run_sql("""SELECT id FROM bibrec WHERE
+                            modification_date > (SELECT last_updated FROM
+                            "rnkMETHOD" WHERE name=%s)""", (category,))
     elif process == "sort":
-        list_registers = run_sql('SELECT id FROM bibrec WHERE \
-                            modification_date > (SELECT last_updated FROM \
-                            bsrMETHODDATA WHERE id_bsrMETHOD=(SELECT id \
-                            FROM bsrMETHOD WHERE name=%s))', (category,))
+        list_registers = run_sql("""SELECT id FROM bibrec WHERE
+                            modification_date > (SELECT last_updated FROM
+                            "bsrMETHODDATA" WHERE "id_bsrMETHOD"=(SELECT id
+                            FROM "bsrMETHOD" WHERE name=%s))""", (category,))
     elif process == "collect":
         file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
         coll_last_update = file_coll_last_update.read()
@@ -1502,18 +1502,18 @@ def get_record_ingestion_status(record_id):
     @type: int
     """
     counter = 0
-    counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                        id=%s AND modification_date > (SELECT last_updated FROM \
-                        "idxINDEX" WHERE name="global")', (record_id, ))[0][0]
+    counter += run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                        id=%s AND modification_date > (SELECT last_updated FROM
+                        "idxINDEX" WHERE name='global')""", (record_id, ))[0][0]
 
-    counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                        id=%s AND modification_date > (SELECT last_updated FROM \
-                        rnkMETHOD ORDER BY last_updated DESC LIMIT 1)', \
+    counter += run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                        id=%s AND modification_date > (SELECT last_updated FROM
+                        "rnkMETHOD" ORDER BY last_updated DESC LIMIT 1)""", \
                         (record_id, ))[0][0]
 
-    counter = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                        id=%s AND modification_date > (SELECT last_updated FROM \
-                        bsrMETHODDATA ORDER BY last_updated DESC LIMIT 1)', \
+    counter = run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                        id=%s AND modification_date > (SELECT last_updated FROM
+                        "bsrMETHODDATA" ORDER BY last_updated DESC LIMIT 1)""", \
                         (record_id, ))[0][0]
     file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
     last_coll = file_coll_last_update.read()
@@ -1562,21 +1562,21 @@ def get_specific_ingestion_status(record_id, process, method=None):
         last_time = run_sql ('SELECT last_updated FROM "idxINDEX" WHERE \
                             name=%s', (method,))[0][0]
     elif process == "rank":
-        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                                id=%s AND modification_date > (SELECT \
-                                last_updated FROM rnkMETHOD WHERE name=%s)',
+        list_registers = run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                                id=%s AND modification_date > (SELECT
+                                last_updated FROM "rnkMETHOD" WHERE name=%s)""",
                                 (record_id, method,))
-        last_time = run_sql ('SELECT last_updated FROM rnkMETHOD WHERE \
-                            name=%s', (method,))[0][0]
+        last_time = run_sql ("""SELECT last_updated FROM "rnkMETHOD" WHERE
+                            name=%s""", (method,))[0][0]
     elif process == "sort":
-        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                                id=%s AND modification_date > (SELECT \
-                                last_updated FROM bsrMETHODDATA WHERE \
-                                id_bsrMETHOD=(SELECT id FROM bsrMETHOD \
-                                WHERE name=%s))', (record_id, method,))
-        last_time = run_sql ('SELECT last_updated FROM bsrMETHODDATA WHERE \
-                            id_bsrMETHOD=(SELECT id FROM bsrMETHOD \
-                            WHERE name=%s)', (method,))[0][0]
+        list_registers = run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                                id=%s AND modification_date > (SELECT
+                                last_updated FROM "bsrMETHODDATA" WHERE
+                                "id_bsrMETHOD"=(SELECT id FROM "bsrMETHOD"
+                                WHERE name=%s))""", (record_id, method,))
+        last_time = run_sql ("""SELECT last_updated FROM "bsrMETHODDATA" WHERE
+                            "id_bsrMETHOD"=(SELECT id FROM "bsrMETHOD"
+                            WHERE name=%s)""", (method,))[0][0]
     elif process == "collect":
         file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
         last_time = file_coll_last_update.read()
@@ -1627,9 +1627,9 @@ def get_general_status():
     @return: number of processes not updated
     @type: int
     """
-    return run_sql('SELECT COUNT(*) FROM bibrec WHERE \
-                    modification_date > (SELECT last_updated FROM \
-                    "idxINDEX" WHERE name="global")')[0][0]
+    return run_sql("""SELECT COUNT(*) FROM bibrec WHERE
+                    modification_date > (SELECT last_updated FROM
+                    "idxINDEX" WHERE name='global')""")[0][0]
 
 
 
@@ -1788,7 +1788,7 @@ def get_customevent_dump(args):
         # Get the event col names
         try:
             event_cols[event_id] = cPickle.loads(run_sql(
-                    "SELECT cols FROM staEVENT WHERE id = %s",
+                    """SELECT cols FROM "staEVENT" WHERE id = %s""",
                     (event_id, ))[0][0])
         except TypeError:
             event_cols[event_id] = ["Unnamed"]
@@ -1813,7 +1813,7 @@ def get_customevent_table(event_id):
     event table name.
     """
     res = run_sql(
-        "SELECT CONCAT('staEVENT', number) FROM staEVENT WHERE id = %s", (event_id, ))
+        """SELECT CONCAT("staEVENT", number) FROM "staEVENT" WHERE id = %s""", (event_id, ))
     try:
         return res[0][0]
     except IndexError:
@@ -1826,7 +1826,7 @@ def get_customevent_args(event_id):
     Helper function that for a certain event id retrives the corresponding
     event argument (column) names.
     """
-    res = run_sql("SELECT cols FROM staEVENT WHERE id = %s", (event_id, ))
+    res = run_sql("""SELECT cols FROM "staEVENT" WHERE id = %s""", (event_id, ))
     try:
         if res[0][0]:
             return cPickle.loads(res[0][0])
@@ -2767,7 +2767,7 @@ def _get_item_doctype():
     """Returns all the possible types of document for an item"""
     dts = []
     for dat in run_sql("""SELECT DISTINCT(request_type)
-        FROM crcILLREQUEST ORDER BY request_type ASC"""):
+        FROM "crcILLREQUEST" ORDER BY request_type ASC"""):
         dts.append((dat[0], dat[0]))
     return dts
 
@@ -2775,7 +2775,7 @@ def _get_item_doctype():
 def _get_request_statuses():
     """Returns all the possible statuses for an ILL request"""
     dts = []
-    for dat in run_sql("SELECT DISTINCT(status) FROM crcILLREQUEST ORDER BY status ASC"):
+    for dat in run_sql("""SELECT DISTINCT(status) FROM "crcILLREQUEST" ORDER BY status ASC"""):
         dts.append((dat[0], dat[0]))
     return dts
 
@@ -2783,7 +2783,7 @@ def _get_request_statuses():
 def _get_libraries():
     """Returns all the possible libraries"""
     dts = []
-    for dat in run_sql("SELECT name FROM crcLIBRARY ORDER BY name ASC"):
+    for dat in run_sql("""SELECT name FROM "crcLIBRARY" ORDER BY name ASC"""):
         if not CFG_CERN_SITE or not "CERN" in dat[0]: # do not add internal libraries for CERN site
             dts.append((dat[0], dat[0]))
     return dts
@@ -2792,7 +2792,7 @@ def _get_libraries():
 def _get_loan_periods():
     """Returns all the possible loan periods for an item"""
     dts = []
-    for dat in run_sql("SELECT DISTINCT(loan_period) FROM crcITEM ORDER BY loan_period ASC"):
+    for dat in run_sql("""SELECT DISTINCT(loan_period) FROM "crcITEM" ORDER BY loan_period ASC"""):
         dts.append((dat[0], dat[0]))
     return dts
 
