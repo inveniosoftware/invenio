@@ -41,7 +41,10 @@ Template hierarchy.
 """
 
 import cStringIO
+import datetime
 import string
+import time
+
 from math import ceil
 
 from flask import (Blueprint, abort, current_app, flash, g, jsonify,
@@ -51,6 +54,7 @@ from flask_breadcrumbs import (current_breadcrumbs, default_breadcrumb_root,
                                register_breadcrumb)
 from flask_login import current_user
 from six import iteritems
+from werkzeug.http import http_date
 from werkzeug.local import LocalProxy
 
 from invenio.base.decorators import templated, wash_arguments
@@ -101,12 +105,37 @@ def min_length(length, code=406):
 
 
 def response_formated_records(recids, collection, of, **kwargs):
-    """TODO."""
+    """Return formatter records.
+
+    Response contains correct Cache and TTL information in HTTP headers.
+    """
     from invenio.modules.formatter import (get_output_format_content_type,
                                            print_records)
     response = make_response(print_records(recids, collection=collection,
                                            of=of, **kwargs))
     response.mimetype = get_output_format_content_type(of)
+    current_time = datetime.datetime.now()
+    response.headers['Last-Modified'] = http_date(
+        time.mktime(current_time.timetuple())
+    )
+    expires = current_app.config.get(
+        'CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT', None)
+
+    if expires is None:
+        response.headers['Cache-Control'] = (
+            'no-store, no-cache, must-revalidate, '
+            'post-check=0, pre-check=0, max-age=0'
+        )
+        response.headers['Expires'] = '-1'
+    else:
+        expires_time = current_time + datetime.timedelta(seconds=expires)
+        response.headers['Vary'] = 'Accept'
+        response.headers['Cache-Control'] = (
+            'public' if current_user.is_guest else 'private'
+        )
+        response.headers['Expires'] = http_date(time.mktime(
+            expires_time.timetuple()
+        ))
     return response
 
 
