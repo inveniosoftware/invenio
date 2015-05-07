@@ -69,8 +69,8 @@ def get(name):
     """
     Return value of VARNAME read from CONF files.
 
-    Useful for third-party programs to access values of conf options such as
-    CFG_PREFIX.  Return None if VARNAME is not found.
+    Useful for third-party programs to access values of conf options.
+    Return None if VARNAME is not found.
 
     """
     try:

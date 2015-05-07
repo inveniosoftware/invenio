@@ -38,7 +38,7 @@ from invenio.config import CFG_BINDIR, CFG_TMPSHAREDDIR, CFG_LOGDIR, \
                             CFG_OAI_ID_FIELD, CFG_BATCHUPLOADER_DAEMON_DIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS, \
-                            CFG_PREFIX, CFG_SITE_LANG
+                            CFG_SITE_LANG
 from invenio.utils.text import encode_for_xml
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.base.i18n import gettext_set_language
@@ -400,9 +400,7 @@ def get_daemon_doc_files():
     files = {}
     for folder in ['/revise', '/append']:
         try:
-            daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                         or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
-            directory = daemon_dir + '/documents' + folder
+            directory = os.path.join(CFG_BATCHUPLOADER_DAEMON_DIR, 'documents', folder)
             files[directory] = [(filename, []) for filename in os.listdir(directory) if os.path.isfile(os.path.join(directory, filename))]
             for file_instance, info in files[directory]:
                 stat_info = os.lstat(os.path.join(directory, file_instance))
@@ -421,9 +419,7 @@ def get_daemon_meta_files():
     files = {}
     for folder in ['/correct', '/replace', '/insert', '/append']:
         try:
-            daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                         or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
-            directory = daemon_dir + '/metadata' + folder
+            directory = os.path.join(CFG_BATCHUPLOADER_DAEMON_DIR, 'metadata', folder)
             files[directory] = [(filename, []) for filename in os.listdir(directory) if os.path.isfile(os.path.join(directory, filename))]
             for file_instance, info in files[directory]:
                 stat_info = os.lstat(os.path.join(directory, file_instance))

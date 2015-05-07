@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ from six import iteritems
 # Invenio imports:
 
 from invenio.legacy.dbquery import run_sql
-from invenio.config import CFG_PREFIX, \
+from invenio.config import CFG_COMMENTSDIR, \
     CFG_SITE_LANG, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
     CFG_SITE_SUPPORT_EMAIL,\
@@ -1001,8 +1001,7 @@ def move_attached_files_to_storage(attached_files, recID, comid):
     @param comid: the comment ID to which we attach the files
     """
     for filename, filepath in iteritems(attached_files):
-        dest_dir = os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
-                                str(recID), str(comid))
+        dest_dir = os.path.join(CFG_COMMENTSDIR, str(recID), str(comid))
         try:
             os.makedirs(dest_dir)
         except:
@@ -1018,11 +1017,10 @@ def get_attached_files(recid, comid):
     @param recid: the recid to which the comment belong
     @param comid: the commment id for which we want to retrieve files
     """
-    base_dir = os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
-                            str(recid), str(comid))
+    base_dir = os.path.join(CFG_COMMENTSDIR, str(recid), str(comid))
     if os.path.isdir(base_dir):
         filenames = os.listdir(base_dir)
-        return [(filename, os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+        return [(filename, os.path.join(CFG_COMMENTSDIR,
                                         str(recid), str(comid), filename),
                  CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + str(recid) + '/comments/attachments/get/' + str(comid) + '/' + filename) \
                 for filename in filenames]

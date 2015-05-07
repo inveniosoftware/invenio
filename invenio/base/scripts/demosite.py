@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -80,7 +80,6 @@ def populate(packages=[], default_data=True, files=None,
         packages = ['invenio_demosite.base']
 
     from werkzeug.utils import import_string
-    from invenio.config import CFG_PREFIX
     map(import_string, packages)
 
     from invenio.ext.sqlalchemy import db
@@ -98,29 +97,28 @@ def populate(packages=[], default_data=True, files=None,
         bibupload_flags = '-i -r --force'
     for f in files:
         job_id += 1
-        for cmd in ["%s/bin/bibupload -u admin %s %s" % (CFG_PREFIX, bibupload_flags, f),
-                    "%s/bin/bibupload %d" % (CFG_PREFIX, job_id)]:
+        for cmd in ["bibupload -u admin %s %s" % (bibupload_flags, f),
+                    "bibupload %d" % (job_id)]:
             if os.system(cmd):
                 print("ERROR: failed execution of", cmd)
                 sys.exit(1)
 
-    i = count(1).next
-    for cmd in ["bin/bibdocfile --textify --with-ocr --recid 97",
-                "bin/bibdocfile --textify --all",
-                "bin/bibindex -u admin",
-                "bin/bibindex %d" % (job_id + i(),),
-                "bin/bibindex -u admin -w global",
-                "bin/bibindex %d" % (job_id + i(),),
-                "bin/bibreformat -u admin -o HB",
-                "bin/bibreformat %d" % (job_id + i(),),
-                "bin/bibrank -u admin",
-                "bin/bibrank %d" % (job_id + i(),),
-                "bin/bibsort -u admin -R",
-                "bin/bibsort %d" % (job_id + i(),),
-                "bin/oairepositoryupdater -u admin",
-                "bin/oairepositoryupdater %d" % (job_id + i(),),
-                "bin/bibupload %d" % (job_id + i(),)]:
-        cmd = os.path.join(CFG_PREFIX, cmd)
+    i = count(job_id).next
+    for cmd in ("bibdocfile --textify --with-ocr --recid 97",
+                "bibdocfile --textify --all",
+                "bibindex -u admin",
+                "bibindex %d" % i(),
+                "bibindex -u admin -w global",
+                "bibindex %d" % i(),
+                "bibreformat -u admin -o HB",
+                "bibreformat %d" % i(),
+                "bibrank -u admin",
+                "bibrank %d" % i(),
+                "bibsort -u admin -R",
+                "bibsort %d" % i(),
+                "oairepositoryupdater -u admin",
+                "oairepositoryupdater %d" % i(),
+                "bibupload %d" % i()):
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)
             sys.exit(1)

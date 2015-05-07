@@ -32,7 +32,7 @@ import os
 
 from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-        CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
+        CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_TMPDIR, \
         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
         CFG_INSPIRE_SITE
 from invenio.legacy.bibsched.bibtask import task_init, task_set_option, task_get_option, \
@@ -197,7 +197,7 @@ def clean_tempfiles():
     write_message("- deleting old temporary files attached with CKEditor")
     gc_exec_command('find %s/var/tmp/attachfile/ '
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_PREFIX, CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE,
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE,
                vstr))
 
     write_message("- deleting old XML files submitted via BibEdit")

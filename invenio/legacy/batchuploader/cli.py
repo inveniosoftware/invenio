@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2013 CERN.
+# Copyright (C) 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,8 +35,7 @@ import tempfile
 import shutil
 from invenio.config import (CFG_TMPSHAREDDIR,
                             CFG_BATCHUPLOADER_DAEMON_DIR,
-                            CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY,
-                            CFG_PREFIX)
+                            CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY)
 from invenio.legacy.bibsched.bibtask import (
     task_init,
     task_set_option,
@@ -67,12 +66,10 @@ def task_run_core():
         and uploads them.
         Files are then moved to the corresponding DONE folders.
     """
-    daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
-                 or CFG_PREFIX + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
     # Check if directory /batchupload exists
     if not task_get_option('documents'):
         # Metadata upload
-        parent_dir = daemon_dir + "/metadata/"
+        parent_dir = os.path.join(CFG_BATCHUPLOADER_DAEMON_DIR, "metadata/")
         progress = 0
         try:
             os.makedirs(parent_dir)

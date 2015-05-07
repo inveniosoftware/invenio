@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -74,7 +74,7 @@ import time
 import tempfile
 from MySQLdb.converters import conversions
 from MySQLdb import escape, escape_string
-from invenio.config import CFG_PREFIX, CFG_TMPDIR
+from invenio.config import CFG_TMPDIR
 from invenio.legacy.dbquery import run_sql
 from invenio.utils.shell import run_shell_command
 
@@ -240,7 +240,7 @@ def load_submission(doctype, dump, method=None):
         remove_submission(doctype, method)
 
     # Load the dump
-    (exit_code, out_msg, err_msg) = run_shell_command("%s/bin/dbexec < %s", (CFG_PREFIX, os.path.abspath(dump_path)))
+    (exit_code, out_msg, err_msg) = run_shell_command("dbexec < %s", (os.path.abspath(dump_path)))
     if exit_code:
         messages.append("ERROR: failed to load submission:" + err_msg)
         return (1, messages)

@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_PREFIX, \
+     CFG_TMPDIR, \
      CFG_CERN_SITE
 from invenio.utils.crossref import get_marcxml_for_doi, CrossrefError
 from invenio.utils import apache
@@ -554,16 +554,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
 
         # URL where the file can be fetched after upload
-        user_files_path = '%(CFG_SITE_URL)s/submit/getattachedfile/%(uid)s' % \
-                          {'uid': uid,
-                           'CFG_SITE_URL': CFG_SITE_URL,
-                           'filetype': filetype}
+        user_files_path = os.path.join(CFG_SITE_URL, 'submit', 'getattachedfile', uid)
 
         # Path to directory where uploaded files are saved
-        user_files_absolute_path = '%(CFG_PREFIX)s/var/tmp/attachfile/%(uid)s/%(filetype)s' % \
-                                   {'uid': uid,
-                                    'CFG_PREFIX': CFG_PREFIX,
-                                    'filetype': filetype}
+        user_files_absolute_path = os.path.join(CFG_TMPDIR, 'attachfile', uid, filetype)
         try:
             os.makedirs(user_files_absolute_path)
         except:
@@ -666,13 +660,13 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
             # ../ and other dangerous components are removed.
-            path = os.path.abspath(CFG_PREFIX + '/var/tmp/attachfile/' + \
-                                   '/'  + str(argd['uid']) + \
-                                   '/' + argd['type'] + '/' + argd['file'])
+            path = os.path.abspath(os.path.join(CFG_TMPDIR, 'attachfile',
+                                                str(argd['uid']),
+                                                argd['type'], argd['file']))
 
             # Check that we are really accessing attachements
             # directory, for the declared record.
-            if path.startswith(CFG_PREFIX + '/var/tmp/attachfile/') and os.path.exists(path):
+            if path.startswith(os.path.join(CFG_TMPDIR, 'attachfile/') and os.path.exists(path):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases

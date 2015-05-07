@@ -24,6 +24,9 @@ from __future__ import unicode_literals
 import distutils.sysconfig
 from os.path import join
 
+from werkzeug import LocalProxy
+
+from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.utils.shell import which
 from invenio.version import __version__
 
@@ -77,26 +80,39 @@ LEGACY_WEBINTERFACE_EXCLUDE = [
     'invenio.legacy.websubmit',
 ]
 
-CFG_PREFIX = distutils.sysconfig.get_config_var("prefix")
+_cfg_prefix = distutils.sysconfig.get_config_var("prefix")
 
-CFG_BATCHUPLOADER_DAEMON_DIR = join(CFG_PREFIX, "var", "batchupload")
-CFG_BIBDOCFILE_FILEDIR = join(CFG_PREFIX, "var", "data", "files")
-CFG_BINDIR = join(CFG_PREFIX, "bin")
-CFG_CACHEDIR = join(CFG_PREFIX, "var", "cache")
-CFG_ETCDIR = join(CFG_PREFIX, "etc")
-CFG_LOCALEDIR = join(CFG_PREFIX, "share", "locale")
-CFG_LOGDIR = join(CFG_PREFIX, "var", "log")
-CFG_RUNDIR = join(CFG_PREFIX, "var", "run")
-CFG_PYLIBDIR = join(CFG_PREFIX, "lib", "python")
-CFG_TMPDIR = join(CFG_PREFIX, "var", "tmp")
-CFG_TMPSHAREDDIR = join(CFG_PREFIX, "var", "tmp-shared")
-CFG_WEBDIR = join(CFG_PREFIX, "var", "www")
-CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = join(CFG_PREFIX, "etc", "bibconvert", "config")
-CFG_WEBSUBMIT_COUNTERSDIR = join(CFG_PREFIX, "var", "data", "submit", "counters")
-CFG_WEBSUBMIT_STORAGEDIR = join(CFG_PREFIX, "var", "data", "submit", "storage")
-CFG_BIBEDIT_CACHEDIR = join(CFG_PREFIX, "var", "tmp-shared", "bibedit-cache")
 
-#FIXME check the usage and replace by SQLALCHEMY_URL
+@deprecated(
+    'Use a more specific variable from invenio/base/config.py instead',
+    RemovedInInvenio22Warning)
+def _cfg_prefix_for_proxy():
+    return _cfg_prefix
+
+CFG_PREFIX = LocalProxy(_cfg_prefix_for_proxy)
+CFG_DATADIR = join(_cfg_prefix, 'var', 'data')
+CFG_BATCHUPLOADER_DAEMON_DIR = join(_cfg_prefix, "var", "batchupload")
+CFG_BATCHUPLOADER_DAEMON_DIR = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
+    or _cfg_prefix + '/' + CFG_BATCHUPLOADER_DAEMON_DIR
+CFG_BIBDOCFILE_FILEDIR = join(CFG_DATADIR, "files")
+CFG_BINDIR = join(_cfg_prefix, "bin")
+CFG_ETCDIR = join(_cfg_prefix, "etc")
+CFG_CACHEDIR = join(_cfg_prefix, "var", "cache")
+CFG_LOGDIR = join(_cfg_prefix, "var", "log")
+CFG_RUNDIR = join(_cfg_prefix, "var", "run")
+CFG_TMPDIR = join(_cfg_prefix, "var", "tmp")
+CFG_WEBDIR = join(_cfg_prefix, "var", "www")
+CFG_PYLIBDIR = join(_cfg_prefix, "lib", "python")
+CFG_LOCALEDIR = join(_cfg_prefix, "share", "locale")
+CFG_TMPSHAREDDIR = join(_cfg_prefix, "var", "tmp-shared")
+CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = join(_cfg_prefix, "etc", "bibconvert", "config")
+CFG_WEBSUBMIT_COUNTERSDIR = join(CFG_DATADIR, "submit", "counters")
+CFG_WEBSUBMIT_STORAGEDIR = join(CFG_DATADIR, "submit", "storage")
+CFG_BIBEDIT_CACHEDIR = join(_cfg_prefix, "var", "tmp-shared", "bibedit-cache")
+CFG_COMMENTSDIR = join(CFG_DATADIR, "comments")
+CFG_BASKETSDIR = join(CFG_DATADIR, "baskets")
+
+# FIXME check the usage and replace by SQLALCHEMY_URL
 CFG_DATABASE_HOST = "localhost"
 CFG_DATABASE_NAME = "invenio"
 CFG_DATABASE_PASS = "my123p$ss"
@@ -415,7 +431,7 @@ CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', 'oairepositoryupdater', ]
 CFG_BIBSCHED_GC_TASKS_TO_REMOVE = [
     'bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
 CFG_BIBSCHED_LOG_PAGER = which("less")
-CFG_BIBSCHED_LOGDIR = join(CFG_PREFIX, "var", "log", "bibsched")
+CFG_BIBSCHED_LOGDIR = join(_cfg_prefix, "var", "log", "bibsched")
 CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY = 500
 CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS = 1
 CFG_BIBSCHED_NODE_TASKS = {}

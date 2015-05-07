@@ -39,7 +39,6 @@ from invenio.legacy.bibsched.bibtask_config import \
     CFG_BIBTASK_MONOTASKS, \
     CFG_BIBTASK_FIXEDTIMETASKS
 from invenio.config import \
-    CFG_PREFIX, \
     CFG_TMPSHAREDDIR, \
     CFG_BIBSCHED_REFRESHTIME, \
     CFG_BINDIR, \
@@ -204,7 +203,7 @@ def get_my_pid(process, args=''):
 def get_task_pid(task_id):
     """Return the pid of task_name/task_id"""
     try:
-        path = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)
+        path = os.path.join(CFG_RUNDIR, 'bibsched_task_%d.pid' % task_id)
         pid = int(open(path).read())
         os.kill(pid, 0)
         return pid

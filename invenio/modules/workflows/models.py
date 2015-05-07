@@ -28,7 +28,7 @@ from datetime import datetime
 from invenio.base.globals import cfg
 from invenio.base.helpers import unicodifier
 from invenio.base.utils import classproperty
-from invenio.ext.logging import deprecated
+from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 
@@ -56,7 +56,7 @@ class ObjectVersion(object):
 
     @classproperty
     @deprecated("Please use ObjectVersion.COMPLETED "
-                "instead of ObjectVersion.FINAL")
+                "instead of ObjectVersion.FINAL", RemovedInInvenio22Warning)
     def FINAL(cls):
         return cls.COMPLETED
 

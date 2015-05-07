@@ -2,7 +2,7 @@
 # Comments and reviews for records.
 
 # This file is part of Invenio.
-# Copyright (C) 2008, 2010, 2011 CERN.
+# Copyright (C) 2008, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -53,7 +53,7 @@ def process_CKEditor_upload(form, uid, user_files_path, user_files_absolute_path
     @type user_files_path: string
     @param user_files_absolute_path: the base path on the server where
         the files should be saved.
-        Eg:C{%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s}
+        Eg:C{%(CFG_DATADIR)s/comments/%(recid)s/%(uid)s}
     @type user_files_absolute_path: string
     @param recid: the record ID for which we upload a file. Leave None if not relevant.
     @type recid: int

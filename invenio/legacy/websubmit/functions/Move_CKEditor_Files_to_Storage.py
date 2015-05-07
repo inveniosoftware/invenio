@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011 CERN.
+# Copyright (C) 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ from invenio.legacy.bibdocfile.api import decompose_file
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
-     CFG_PREFIX, \
+     CFG_TMPDIR, \
      CFG_SITE_RECORD
 
 re_ckeditor_link = re.compile('"(' + CFG_SITE_URL + '|' + CFG_SITE_SECURE_URL + ')' + \
@@ -84,8 +84,7 @@ def Move_CKEditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                 # Does original file exists, or do we just have the
                 # icon? We expect the original file at a well defined
                 # location
-                possible_original_path = os.path.join(CFG_PREFIX,
-                                                      'var', 'tmp',
+                possible_original_path = os.path.join(CFG_TMPDIR
                                                       'attachfile',
                                                       uid,
                                                       file_type,

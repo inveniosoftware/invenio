@@ -23,7 +23,7 @@ from __future__ import print_function
 
 BibTask class.
 
-A BibTask is an executable under CFG_BINDIR, whose name is stored in
+A BibTask is a resolvable executable, whose name is stored in
 bibtask_config.CFG_BIBTASK_VALID_TASKS.
 A valid task must call the task_init function with the proper parameters.
 Generic task related parameters (user, sleeptime, runtime, task_id, task_name
@@ -66,8 +66,6 @@ from invenio.legacy.dbquery import run_sql, _db_login
 from invenio.modules.accounts.models import User
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import (
-    CFG_PREFIX,
-    CFG_BINDIR,
     CFG_BIBSCHED_PROCESS_USER,
     CFG_TMPDIR,
     CFG_SITE_SUPPORT_EMAIL,
@@ -156,8 +154,7 @@ def get_sleeptime(argv):
 
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
-    @param name: is the name of the bibtask. It must be a valid executable under
-        C{CFG_BINDIR}.
+    @param name: is the name of the bibtask. It must be a valid executable.
     @type name: string
     @param user: is a string that will appear as the "user" submitting the task.
         Since task are submitted via API it make sense to set the
@@ -302,7 +299,7 @@ def task_low_level_submission(name, user, *argv):
         sleeptime = get_sleeptime(argv)
         sequenceid = get_sequenceid(argv)
         host = get_host(argv)
-        argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
+        argv = tuple([name] + list(argv))
 
         if special_name:
             name = '%s:%s' % (name, special_name)
@@ -513,7 +510,7 @@ def task_init(authorization_action="",
     setup_loggers(_TASK_PARAMS.get('task_id'))
 
     task_name = os.path.basename(sys.argv[0])
-    if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
+    if task_name not in CFG_BIBTASK_VALID_TASKS:
         raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
     from invenio.base.factory import configure_warnings

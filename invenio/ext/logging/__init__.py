@@ -157,9 +157,6 @@ Please follow Invenio :ref:`deprecationpolicy` section.
 from __future__ import absolute_import
 
 import logging
-import warnings
-
-from functools import wraps
 
 from .wrappers import get_pretty_traceback, register_exception
 
@@ -171,21 +168,3 @@ def setup_app(app):
         logger = logging.getLogger('py.warnings')
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(logging.WARNING)
-
-
-# Improved version of http://code.activestate.com/recipes/391367-deprecated/
-def deprecated(message, category=DeprecationWarning):
-    def wrap(func):
-        """Decorator which can be used to mark functions as deprecated.
-
-        :param message: text to include in the warning
-        :param category: warning category
-        """
-        @wraps(func)
-        def new_func(*args, **kwargs):
-            warnings.warn(message, category, stacklevel=3)
-            return func(*args, **kwargs)
-        return new_func
-    return wrap
-
-__all__ = ('register_exception', 'get_pretty_traceback')

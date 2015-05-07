@@ -30,7 +30,7 @@ from six import iteritems
 from . import registry
 
 from invenio.config import \
-     CFG_PREFIX, \
+     CFG_LOCALEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_LANGS, \
      CFG_SITE_NAME, \
@@ -739,7 +739,8 @@ def get_mo_last_modification():
     """
     # Take one of the mo files. They are all installed at the same
     # time, so last modication date should be the same
-    mo_file = '%s/share/locale/%s/LC_MESSAGES/invenio.mo' % (CFG_PREFIX, CFG_SITE_LANG)
+    mo_file = os.path.join(CFG_LOCALEDIR, CFG_SITE_LANG, 'LC_MESSAGES',
+                           'invenio.mo')
 
     if os.path.exists(os.path.abspath(mo_file)):
         return os.stat(mo_file).st_mtime

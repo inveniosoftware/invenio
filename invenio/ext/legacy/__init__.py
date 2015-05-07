@@ -38,7 +38,6 @@ from .request_class import LegacyRequest
 
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
-    from invenio.config import CFG_PREFIX
     from invenio.ext.sqlalchemy import db
     from invenio.modules.accounts.models import User
     # from invenio.legacy.inveniocfg import cli_cmd_reset_sitename
@@ -53,9 +52,9 @@ def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     db.session.commit()
     # cli_cmd_reset_fieldnames(conf)
 
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -a -D" % CFG_PREFIX,
-                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
-                "%s/bin/bibsort 1" % CFG_PREFIX, ]:
+    for cmd in ("webaccessadmin -u admin -c -a -D",
+                "bibsort -u admin --load-config",
+                "bibsort 1"):
         if os.system(cmd):
             print("ERROR: failed execution of", cmd)
             sys.exit(1)

@@ -2,7 +2,7 @@
 # Comments and reviews for records.
 
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -47,22 +47,20 @@ from invenio.modules.comments.api import check_recID_is_in_range, \
     perform_display_your_comments
 
 from invenio.config import \
-    CFG_TMPSHAREDDIR, \
-    CFG_SITE_LANG, \
-    CFG_SITE_URL, \
-    CFG_SITE_SECURE_URL, \
-    CFG_PREFIX, \
-    CFG_SITE_NAME, \
-    CFG_SITE_NAME_INTL, \
-    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-    CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-    CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
-    CFG_SITE_RECORD, \
-    CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-    CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-    CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, \
-    collect_user_info
+     CFG_TMPSHAREDDIR, \
+     CFG_SITE_LANG, \
+     CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
+     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
+     CFG_SITE_RECORD, \
+     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.legacy.search_engine import create_navtrail_links, \
     guess_primary_collection_of_a_record
@@ -857,15 +855,16 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
             # ../ and other dangerous components are removed.
-            path = os.path.abspath(CFG_PREFIX + '/var/data/comments/' + \
-                                   str(self.recid) + '/'  + str(argd['comid']) + \
-                                   '/' + argd['file'])
+            path = os.path.abspath(os.path.join(CFG_COMMENTSDIR,
+                                                str(self.recid),
+                                                str(argd['comid']),
+                                                argd['file']))
 
             # Check that we are really accessing attachements
             # directory, for the declared record.
-            if path.startswith(CFG_PREFIX + '/var/data/comments/' + \
-                               str(self.recid)) and \
-                   os.path.exists(path):
+            if path.startswith(os.path.join(CFG_COMMENTSDIR,
+                               str(self.recid))) and \
+                    os.path.exists(path):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases

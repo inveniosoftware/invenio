@@ -72,6 +72,10 @@ fixing all places ``old_method`` is used, so that it can be easily removed
 once Invenio v2.1 has been released.
 """
 
+import warnings
+
+from functools import wraps
+
 
 class RemovedInInvenio23Warning(PendingDeprecationWarning):
 
@@ -81,3 +85,19 @@ class RemovedInInvenio23Warning(PendingDeprecationWarning):
 class RemovedInInvenio22Warning(DeprecationWarning):
 
     """Mark feature that will be removed in Invenio version 2.2."""
+
+
+# Improved version of http://code.activestate.com/recipes/391367-deprecated/
+def deprecated(message, category):
+    def wrap(func=None):
+        """Decorator which can be used to mark functions as deprecated.
+
+        :param message: text to include in the warning
+        :param category: warning category
+        """
+        @wraps(func)
+        def new_func(*args, **kwargs):
+            warnings.warn(message, category, stacklevel=3)
+            return func(*args, **kwargs)
+        return new_func
+    return wrap
