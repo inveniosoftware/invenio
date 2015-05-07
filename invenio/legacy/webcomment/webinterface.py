@@ -59,7 +59,8 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
      CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE
+     CFG_ACCESS_CONTROL_LEVEL_SITE, \
+     CFG_COMMENTSDIR
 from invenio.legacy.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.legacy.webpage import page, pageheaderonly, pagefooteronly
 from invenio.legacy.search_engine import create_navtrail_links, \
@@ -863,7 +864,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             # Check that we are really accessing attachements
             # directory, for the declared record.
             if path.startswith(os.path.join(CFG_COMMENTSDIR,
-                               str(self.recid))) and \
+                                            str(self.recid))) and \
                     os.path.exists(path):
                 return stream_file(req, path)
 

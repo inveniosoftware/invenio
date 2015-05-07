@@ -969,7 +969,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
             if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
                 try:
                     u = User.query.filter_by(id=uid).one()
-                    if u.verify_password(password_entered, migrate=Tru):
+                    if u.verify_password(password_entered, migrate=True):
                         ok = True
                 except Exception:
                     pass

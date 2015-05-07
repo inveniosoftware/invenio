@@ -84,7 +84,7 @@ def Move_CKEditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                 # Does original file exists, or do we just have the
                 # icon? We expect the original file at a well defined
                 # location
-                possible_original_path = os.path.join(CFG_TMPDIR
+                possible_original_path = os.path.join(CFG_TMPDIR,
                                                       'attachfile',
                                                       uid,
                                                       file_type,

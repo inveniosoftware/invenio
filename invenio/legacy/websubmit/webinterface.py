@@ -666,7 +666,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
             # Check that we are really accessing attachements
             # directory, for the declared record.
-            if path.startswith(os.path.join(CFG_TMPDIR, 'attachfile/') and os.path.exists(path):
+            if path.startswith(os.path.join(CFG_TMPDIR, 'attachfile')) and os.path.exists(path):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases
