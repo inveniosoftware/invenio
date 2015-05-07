@@ -211,7 +211,7 @@ The following might not be necessary but is good to have for completeness.
 
 .. code-block:: console
 
-    $ brew install libjpeg libtiff freetype
+    $ brew install libjpeg libtiff freetype libffi
     $ pip install -I pillow
 
 Install ``node`` by following `Node on OS X`_
@@ -243,7 +243,6 @@ The commands for ``OS X`` are the same as in ``Linux``.
 
     For developers, honcho is recommended and will make your life
     easier because it launches all the servers together as it finds the ``Procfile``.
-
 
 .. _MySQL on OS X:
 
@@ -536,6 +535,14 @@ which must be running alongside with the web server.
      * Running on http://0.0.0.0:4000/
      * Restarting with reloader
 
+.. note::
+
+    On OS X, the command ``service`` might not be found when starting the redis
+    server. To run redis, just type:
+
+    .. code-block:: console
+
+        $ redis-server
 
 **Troubleshooting:** As a developer, you may want to use the provided
 ``Procfile`` with `honcho <https://pypi.python.org/pypi/honcho>`_. It
