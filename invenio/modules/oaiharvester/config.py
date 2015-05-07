@@ -34,3 +34,6 @@ OAIHARVESTER_DEFAULT_NAMESPACE_MAP = {
 
 OAIHARVESTER_STORAGEDIR = os.path.join(CFG_DATADIR, "oaiharvester", "storage")
 """Path to a storage directory where the oaiharvester may put files."""
+
+OAIHARVESTER_RECORD_ARXIV_ID_LOOKUP = "system_control_number.value"
+"""Path to the arXiv ID value used by sample post-process tasks."""
