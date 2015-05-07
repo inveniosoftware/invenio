@@ -40,8 +40,8 @@ except ImportError:
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 def expected_response():
-    from invenio.config import CFG_INSPIRE_SITE
-    if CFG_INSPIRE_SITE:
+    from invenio.base.globals import cfg
+    if cfg['CFG_INSPIRE_SITE']:
         EXPECTED_RESPONSE = """<record>
       <controlfield tag="001">1</controlfield>
       <datafield tag="999" ind1="C" ind2="5">
@@ -189,8 +189,8 @@ class DocExtractTest(InvenioTestCase):
 
     @unittest.skipUnless(HAS_REQUESTS, 'no request')
     def test_upload(self):
-        from invenio.config import CFG_SITE_URL, CFG_ETCDIR
-        url = CFG_SITE_URL + '/textmining/api/extract-references-pdf'
+        from invenio.base.globals import cfg
+        url = cfg['CFG_SITE_URL'] + '/textmining/api/extract-references-pdf'
 
         pdf = open(pkg_resources.resource_filename(
             'invenio.modules.textminer.testsuite',
@@ -203,17 +203,17 @@ class DocExtractTest(InvenioTestCase):
 
     @unittest.skipUnless(HAS_REQUESTS, 'no request')
     def test_url(self):
-        from invenio.config import CFG_SITE_URL
-        url = CFG_SITE_URL + '/textmining/api/extract-references-pdf-url'
+        from invenio.base.globals import cfg
+        url = cfg['CFG_SITE_URL'] + '/textmining/api/extract-references-pdf-url'
 
-        pdf = CFG_SITE_URL + '/textmining/example.pdf'
+        pdf = cfg['CFG_SITE_URL'] + '/textmining/example.pdf'
         response = requests.post(url, data={'url': pdf})
         compare_references(self, response.content, expected_response())
 
     @unittest.skipUnless(HAS_REQUESTS, 'no request')
     def test_txt(self):
-        from invenio.config import CFG_SITE_URL
-        url = CFG_SITE_URL + '/textmining/api/extract-references-txt'
+        from invenio.base.globals import cfg
+        url = cfg['CFG_SITE_URL'] + '/textmining/api/extract-references-txt'
 
         pdf = open(pkg_resources.resource_filename(
             'invenio.modules.textminer.testsuite',

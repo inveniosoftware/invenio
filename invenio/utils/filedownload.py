@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-File handling utilities.
+
+"""File handling utilities.
 
 Main API usage:
     >>> from filedownloadutils import download_url
@@ -35,35 +35,39 @@ import tempfile
 import shutil
 import sys
 
+from invenio.base.globals import cfg
 from invenio.utils.url import make_invenio_opener
 
 URL_OPENER = make_invenio_opener('filedownloadutils')
 
-from invenio.config import (CFG_TMPSHAREDDIR,
-                            CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS)
 
 #: block size when performing I/O.
 CFG_FILEUTILS_BLOCK_SIZE = 1024 * 8
 
 
 class InvenioFileDownloadError(Exception):
+
     """A generic download exception."""
+
     def __init__(self, msg, code=None):
+        """Init."""
         Exception.__init__(self, msg)
         self.code = code
 
 
 class InvenioFileCopyError(Exception):
+
     """A generic file copy exception."""
+
     pass
 
 
 def download_url(url, content_type=None, download_to_file=None,
                  retry_count=10, timeout=10.0):
-    """
-    Will download a file from given URL (either local or external) to the
-    desired path (or generate one if none is given). Local files are copied
-    directly.
+    """Will download a file from given URL (either local or external).
+
+    Save it to the desired path (or generate one if none is given).
+    Local files are copied directly.
 
     The function will retry a number of times based on retry_count (default 10)
     parameter and sleeps a number of seconds based on given timeout
@@ -76,27 +80,28 @@ def download_url(url, content_type=None, download_to_file=None,
     that the desired content_type is equal to the content-type of returned
     file.
 
-    @param url: where the file lives on the interwebs
-    @type url: string
+    :param url: where the file lives on the interwebs
+    :type url: string
 
-    @param content_type: desired content_type to check for in external URLs.
+    :param content_type: desired content_type to check for in external URLs.
                          (optional)
-    @type content_type: string
+    :type content_type: string
 
-    @param download_to_file: where the file should live after download.
+    :param download_to_file: where the file should live after download.
                              (optional)
-    @type download_to_file: string
+    :type download_to_file: string
 
-    @param retry_count: number of times to retry. Defaults to 10.
+    :param retry_count: number of times to retry. Defaults to 10.
                         (optional)
-    @type retry_count: int
+    :type retry_count: int
 
-    @param timeout: number of seconds to sleep between attempts.
+    :param timeout: number of seconds to sleep between attempts.
                     Defaults to 10.0 seconds. (optional)
-    @type timeout: float
+    :type timeout: float
 
-    @return: the path of the downloaded/copied file
-    @raise InvenioFileDownloadError: raised upon URL/HTTP errors, file errors or wrong format
+    :return: the path of the downloaded/copied file
+    :raise InvenioFileDownloadError: raised upon URL/HTTP errors, file errors
+        or wrong format
     """
     if not download_to_file:
         download_to_file = safe_mkstemp(suffix=".tmp",
@@ -120,30 +125,30 @@ def download_url(url, content_type=None, download_to_file=None,
 
 def download_external_url(url, download_to_file, content_type=None,
                           retry_count=10, timeout=10.0, verbose=False):
-    """
-    Download a url (if it corresponds to a remote file) and return a
-    local url to it. If format is specified, a check will be performed
-    in order to make sure that the format of the downloaded file is equal
-    to the expected format.
+    """Download a url (if it corresponds to a remote file).
 
-    @param url: the URL to download
-    @type url: string
+    It returns a local url to it. If format is specified, a check will be
+    performed in order to make sure that the format of the downloaded file is
+    equal to the expected format.
 
-    @param download_to_file: the path to download the file to
-    @type download_to_file: string
+    :param url: the URL to download
+    :type url: string
 
-    @param content_type: the content_type of the file (optional)
-    @type content_type: string
+    :param download_to_file: the path to download the file to
+    :type download_to_file: string
 
-    @param retry_count: max number of retries for downloading the file
-    @type retry_count: int
+    :param content_type: the content_type of the file (optional)
+    :type content_type: string
 
-    @param timeout: time to sleep in between attemps
-    @type timeout: int
+    :param retry_count: max number of retries for downloading the file
+    :type retry_count: int
 
-    @return: the path to the download local file
-    @rtype: string
-    @raise StandardError: if the download failed
+    :param timeout: time to sleep in between attemps
+    :type timeout: int
+
+    :return: the path to the download local file
+    :rtype: string
+    :raise StandardError: if the download failed
     """
     error_str = ""
     error_code = None
@@ -215,9 +220,9 @@ def download_external_url(url, download_to_file, content_type=None,
 
 
 def finalize_download(url, download_to_file, content_type, request):
-    """
-    Finalizes the download operation by doing various checks, such as format
-    type, size check etc.
+    """Finalize the download operation by doing various checks.
+
+    Checks such as format type, size check etc.
     """
     # If format is given, a format check is performed.
     if content_type and content_type not in request.headers['content-type']:
@@ -250,18 +255,17 @@ def finalize_download(url, download_to_file, content_type, request):
 
 
 def download_local_file(filename, download_to_file):
-    """
-    Copies a local file to Invenio's temporary directory.
+    """Copie a local file to Invenio's temporary directory.
 
-    @param filename: the name of the file to copy
-    @type filename: string
+    :param filename: the name of the file to copy
+    :type filename: string
 
-    @param download_to_file: the path to save the file to
-    @type download_to_file: string
+    :param download_to_file: the path to save the file to
+    :type download_to_file: string
 
-    @return: the path of the temporary file created
-    @rtype: string
-    @raise StandardError: if something went wrong
+    :return: the path of the temporary file created
+    :rtype: string
+    :raise StandardError: if something went wrong
     """
     # Try to copy.
     try:
@@ -271,8 +275,8 @@ def download_local_file(filename, download_to_file):
                   % (path, os.path.normpath(path))
             raise InvenioFileCopyError(msg)
 
-        allowed_path_list = CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS
-        allowed_path_list.append(CFG_TMPSHAREDDIR)
+        allowed_path_list = cfg['CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS']
+        allowed_path_list.append(cfg['CFG_TMPSHAREDDIR'])
         for allowed_path in allowed_path_list:
             if path.startswith(allowed_path):
                 shutil.copy(path, download_to_file)
@@ -299,11 +303,13 @@ def is_url_a_local_file(url):
 
 
 def safe_mkstemp(suffix, prefix='filedownloadutils_'):
-    """Create a temporary filename that don't have any '.' inside a part
-    from the suffix."""
+    """Create a temporary filename that don't have any '.' inside.
+
+    It skip the suffix.
+    """
     tmpfd, tmppath = tempfile.mkstemp(suffix=suffix,
                                       prefix=prefix,
-                                      dir=CFG_TMPSHAREDDIR)
+                                      dir=cfg['CFG_TMPSHAREDDIR'])
     # Close the file and leave the responsability to the client code to
     # correctly open/close it.
     os.close(tmpfd)
@@ -315,23 +321,24 @@ def safe_mkstemp(suffix, prefix='filedownloadutils_'):
         os.remove(tmppath)
         tmpfd, tmppath = tempfile.mkstemp(suffix=suffix,
                                           prefix=prefix,
-                                          dir=CFG_TMPSHAREDDIR)
+                                          dir=cfg['CFG_TMPSHAREDDIR'])
         os.close(tmpfd)
     return tmppath
 
 
 def open_url(url, headers=None):
-    """
-    Opens a URL. If headers are passed as argument, no check is performed and
-    the URL will be opened.
+    """Open a URL.
 
-    @param url: the URL to open
-    @type url: string
+    If headers are passed as argument, no check is performed and the URL will
+    be opened.
 
-    @param headers: the headers to use
-    @type headers: dictionary
+    :param url: the URL to open
+    :type url: string
 
-    @return: a file-like object as returned by urllib2.urlopen.
+    :param headers: the headers to use
+    :type headers: dictionary
+
+    :return: a file-like object as returned by urllib2.urlopen.
     """
     request = urllib2.Request(url)
     if headers:

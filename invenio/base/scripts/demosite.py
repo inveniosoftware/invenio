@@ -29,11 +29,8 @@ import warnings
 
 import pkg_resources
 
-from itertools import count
-
 from invenio.base.utils import run_py_func
 from invenio.ext.script import Manager
-from invenio.modules.scheduler.models import SchTASK
 
 
 warnings.warn("Use of `inveniomanage demosite populate` is being deprecated. "

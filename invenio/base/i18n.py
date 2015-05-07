@@ -42,6 +42,8 @@ import babel
 
 from flask_babel import gettext, lazy_gettext
 
+from invenio.base.globals import cfg
+
 # Placemark for the i18n function
 _ = lazy_gettext
 
@@ -62,18 +64,17 @@ def wash_language(ln):
 
     Return it in case of success, return the default language otherwise.
     """
-    from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     if not ln:
-        return CFG_SITE_LANG
+        return cfg['CFG_SITE_LANG']
     if isinstance(ln, list):
         ln = ln[0]
     ln = ln.replace('-', '_')
-    if ln in CFG_SITE_LANGS:
+    if ln in cfg['CFG_SITE_LANGS']:
         return ln
-    elif ln[:2] in CFG_SITE_LANGS:
+    elif ln[:2] in cfg['CFG_SITE_LANGS']:
         return ln[:2]
     else:
-        return CFG_SITE_LANG
+        return cfg['CFG_SITE_LANG']
 
 
 def wash_languages(lns):
@@ -81,15 +82,14 @@ def wash_languages(lns):
 
     Return it in case of success, return the default language otherwise.
     """
-    from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS
     for ln in lns:
         if ln:
             ln = ln.replace('-', '_')
-            if ln in CFG_SITE_LANGS:
+            if ln in cfg['CFG_SITE_LANGS']:
                 return ln
-            elif ln[:2] in CFG_SITE_LANGS:
+            elif ln[:2] in cfg['CFG_SITE_LANGS']:
                 return ln[:2]
-    return CFG_SITE_LANG
+    return cfg['CFG_SITE_LANG']
 
 
 def language_list_long(enabled_langs_only=True):
@@ -103,7 +103,7 @@ def language_list_long(enabled_langs_only=True):
     translations in webdoc sources or bibformat templates.
     """
     if enabled_langs_only:
-        from invenio.config import CFG_SITE_LANGS
+        CFG_SITE_LANGS = cfg['CFG_SITE_LANGS']
     else:
         from invenio.base.config import CFG_SITE_LANGS
 
