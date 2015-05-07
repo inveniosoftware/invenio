@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -56,6 +56,7 @@ from invenio.config import \
     CFG_BIBSCHED_NON_CONCURRENT_TASKS, \
     CFG_VERSION, \
     CFG_BIBSCHED_NEVER_STOPS
+from invenio.base.globals import cfg
 from invenio.legacy.dbquery import run_sql, real_escape_string
 from invenio.ext.logging import register_exception
 from invenio.utils.shell import run_shell_command
@@ -150,7 +151,7 @@ def get_editor():
     """
     paths = (
         os.environ.get('EDITOR', ''),
-        CFG_BIBSCHED_EDITOR,
+        cfg['CFG_BIBSCHED_EDITOR'],
         '/usr/bin/vim',
         '/usr/bin/emacs',
         '/usr/bin/vi',
