@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
+# Copyright (C) 2007, 2008, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,5 +27,5 @@ from invenio.base.factory import with_app_context
 
 @with_app_context()
 def main():
-    from invenio.legacy.webstat.admin import admin_main
+    from invenio.legacy.webstat.admin import main as admin_main
     return admin_main()

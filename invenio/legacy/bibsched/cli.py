@@ -56,6 +56,7 @@ from invenio.config import \
     CFG_BIBSCHED_NON_CONCURRENT_TASKS, \
     CFG_VERSION, \
     CFG_BIBSCHED_NEVER_STOPS
+from invenio.base.globals import cfg
 from invenio.legacy.dbquery import run_sql, real_escape_string
 from invenio.ext.logging import register_exception
 from invenio.utils.shell import run_shell_command
@@ -150,7 +151,7 @@ def get_editor():
     """
     paths = (
         os.environ.get('EDITOR', ''),
-        CFG_BIBSCHED_EDITOR,
+        cfg['CFG_BIBSCHED_EDITOR'],
         '/usr/bin/vim',
         '/usr/bin/emacs',
         '/usr/bin/vi',
