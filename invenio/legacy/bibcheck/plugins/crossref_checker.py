@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,7 +23,7 @@ metadata returned by crossref.
 """
 
 from invenio.utils.crossref import get_metadata_for_dois
-from invenio.bibknowledge import get_kbr_values
+from invenio.modules.knowledge.api import get_kbr_values
 import difflib
 import re
 
