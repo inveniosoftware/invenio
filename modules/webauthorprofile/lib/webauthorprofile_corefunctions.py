@@ -66,6 +66,7 @@ from invenio.intbitset import intbitset
 from invenio.bibformat import format_record, format_records
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 from invenio.orcidutils import get_dois_from_orcid
+from invenio.errorlib import register_exception
 
 
 # After this delay, we assume that a process computing an empty claimed cache is dead
@@ -430,7 +431,11 @@ def _get_external_publications(person_id):
 
     external_pubs = dict()
     external_pubs['arxiv'] = get_arxiv_pubs(person_id)
-    external_pubs['doi'] = get_orcid_pubs(person_id)
+    try:
+        external_pubs['doi'] = get_orcid_pubs(person_id)
+    except:
+        register_exception(alert_admin=True)
+        external_pubs['doi'] = {}
 
     # TODO: (ORCID pubs | ARXIV pubs) - (ORCID pubs & ARXIV pubs)
 
