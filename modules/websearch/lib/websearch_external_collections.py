@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -185,6 +185,9 @@ def select_external_engines(collection_name, selected_external_searches):
 # Search
 def do_external_search(req, lang, vprint, basic_search_units, search_engines, print_search_info=True, print_body=True):
     """Make the external search."""
+    if not search_engines:
+        return
+
     _ = gettext_set_language(lang)
     vprint(3, 'beginning external search')
     engines_list = []
