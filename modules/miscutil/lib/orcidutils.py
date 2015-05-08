@@ -174,9 +174,9 @@ def _get_extids_from_orcid(orcid_id):
                         if extid_type == 'DOI':
                             ext_ids_dict[extid_type].add(get_doi(value))
                         ext_ids_dict[extid_type].add(value)
-            except KeyError:
+            except (TypeError, KeyError):
                 pass
-    except KeyError:
+    except (TypeError, KeyError):
         pass
 
     return ext_ids_dict
@@ -210,9 +210,9 @@ def get_dois_from_orcid(orcid_id):
                     doi = get_doi(ext_id['value'])
                     if doi is not None:
                         dois.append(doi)
-            except KeyError:
+            except (TypeError, KeyError):
                 pass
-    except KeyError:
+    except (TypeError, KeyError):
         pass
 
     return dois
@@ -278,7 +278,7 @@ def _get_access_token_from_orcid(scope, extra_params=None):
     if code == requests.codes.ok:
         try:
             res = json.loads(response.content)['access_token']
-        except KeyError:
+        except (TypeError, KeyError):
             register_exception(alert_admin=True)
             return None
     return res
