@@ -17,12 +17,16 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Upgrade command line."""
+
 from __future__ import absolute_import
 
-from datetime import date
 import os
 import os.path
+
 import sys
+
+from datetime import date
 
 from werkzeug.utils import import_string
 
@@ -50,10 +54,13 @@ UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import warnings
-from sqlalchemy import *
+
 from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
 from invenio.utils.text import wait_for_user
+
+from sqlalchemy import *
+
 %(imports)s
 
 # Important: Below is only a best guess. You MUST validate which previous
@@ -62,6 +69,7 @@ depends_on = %(depends_on)s
 
 
 def info():
+    \"\"\"Info message.\"\"\"
     return "Short description of upgrade displayed to end-user"
 
 
