@@ -26,10 +26,12 @@ from functools import partial, wraps
 from flask import current_app, flash, redirect, render_template, \
     request, session, url_for
 from flask_login import current_user
-import six
-from werkzeug.utils import import_string
 
 from invenio.base.globals import cfg
+
+import six
+
+from werkzeug.utils import import_string
 
 from .client import oauth, signup_handlers
 from .errors import OAuthClientError, OAuthError, \

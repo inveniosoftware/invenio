@@ -20,11 +20,12 @@
 """Utility methods to help find, authenticate or register a remote user."""
 
 from flask import current_app
+
 from flask_login import logout_user
 
-from invenio.ext.login import authenticate, UserInfo
-from invenio.ext.sqlalchemy import db
+from invenio.ext.login import UserInfo, authenticate
 from invenio.ext.script import generate_secret_key
+from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, UserEXT
 
 from .models import RemoteAccount, RemoteToken

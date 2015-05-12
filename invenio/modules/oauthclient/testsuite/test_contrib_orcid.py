@@ -22,16 +22,19 @@
 from __future__ import absolute_import
 
 from flask import session, url_for
-from mock import MagicMock
-from six.moves.urllib_parse import parse_qs, urlparse
 
 import httpretty
 
 from invenio.ext.sqlalchemy import db
+
 from invenio.testsuite import make_test_suite, run_test_suite
 
-from ..contrib.orcid import REMOTE_APP, account_info
+from mock import MagicMock
+
+from six.moves.urllib_parse import parse_qs, urlparse
+
 from .helpers import OAuth2ClientTestCase
+from ..contrib.orcid import REMOTE_APP, account_info
 
 
 class OrcidTestCase(OAuth2ClientTestCase):
