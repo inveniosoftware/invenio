@@ -23,6 +23,8 @@ from __future__ import absolute_import
 
 from flask import session, url_for
 
+from flask_email.backends import locmem
+
 import httpretty
 
 from invenio.ext.sqlalchemy import db
@@ -66,6 +68,8 @@ class OrcidTestCase(OAuth2ClientTestCase):
                 consumer_key='changeme',
                 consumer_secret='changeme',
             ),
+            # use local memory mailbox
+            EMAIL_BACKEND='flask_email.backends.locmem.Mail',
         ))
         return app
 
@@ -95,6 +99,9 @@ class OrcidTestCase(OAuth2ClientTestCase):
         User.query.filter_by(email=self.example_email).delete()
         User.query.filter_by(email=self.existing_email).delete()
         db.session.commit()
+        # empty the mailbox
+        if hasattr(locmem, 'outbox'):
+            del locmem.outbox[:]
 
     def mock_response(self, app='test', data=None):
         """Mock the oauth response to use the remote."""
@@ -193,6 +200,13 @@ class OrcidTestCase(OAuth2ClientTestCase):
             ).one()
             self.assertEqual(u.given_names, "Josiah")
             self.assertEqual(u.family_name, "Carberry")
+            # check that the user's email is not yet validated
+            self.assertEqual(u.note, '2',
+                             'email address should not be validated')
+            # check that the validation email has been sent
+            self.assertTrue(hasattr(locmem, 'outbox') and
+                            len(locmem.outbox) == 1,
+                            'validation email not sent')
 
             # Disconnect link
             resp = c.get(

@@ -23,6 +23,7 @@ from flask import current_app
 
 from flask_login import logout_user
 
+from invenio.base.globals import cfg
 from invenio.ext.login import UserInfo, authenticate
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, UserEXT
@@ -94,15 +95,23 @@ def oauth_register(account_info, form_data=None):
                 nickname=account_info.get('nickname', ''),
                 email=email,
                 password=None,
-                note='1',  # Activated - assumes email is validated
+                # email has to be validated
+                note='2',
             )
 
             try:
                 db.session.add(u)
                 db.session.commit()
-                return UserInfo(u.id)
             except Exception:
                 current_app.logger.exception("Cannot create user")
+                return None
+
+            # verify the email
+            if cfg['CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT']:
+                u.verify_email()
+
+            return UserInfo(u.id)
+
     return None
 
 
