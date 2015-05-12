@@ -346,9 +346,9 @@ class InvenioSession(dict):
         cookies = []
         uid = self.get('uid', -1)
         if uid > 0 and CFG_SITE_SECURE_URL.startswith("https://"):
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS', HttpOnly=True)
         else:
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO', HttpOnly=True)
         cookies.append(stub_cookie)
         if self._req.is_https() or not CFG_SITE_SECURE_URL.startswith("https://") or uid <= 0:
             cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid, HttpOnly=True)
