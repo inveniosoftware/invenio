@@ -24,7 +24,6 @@ from flask import current_app
 from flask_login import logout_user
 
 from invenio.ext.login import UserInfo, authenticate
-from invenio.ext.script import generate_secret_key
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User, UserEXT
 
@@ -94,7 +93,7 @@ def oauth_register(account_info, form_data=None):
             u = User(
                 nickname=account_info.get('nickname', ''),
                 email=email,
-                password=generate_secret_key(),
+                password=None,
                 note='1',  # Activated - assumes email is validated
             )
 
