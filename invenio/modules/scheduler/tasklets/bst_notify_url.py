@@ -26,9 +26,7 @@ import urlparse
 import urllib2
 import time
 
-from invenio.config import \
-     CFG_SITE_ADMIN_EMAIL, \
-     CFG_SITE_NAME
+from invenio.base.globals import cfg
 from invenio.legacy.bibsched.bibtask import write_message, \
      task_sleep_now_if_required
 from invenio.ext.email import send_email
@@ -107,14 +105,14 @@ def bst_notify_url(url, data=None,
         write_message("Notifying by email %(admin_emails)s" % \
                       {'admin_emails': str(admin_emails)})
         subject = "%(CFG_SITE_NAME)s could not contact %(url)s" % \
-                  {'CFG_SITE_NAME': CFG_SITE_NAME,
+                  {'CFG_SITE_NAME': cfg['CFG_SITE_NAME'],
                    'url': url}
         content = """\n%(CFG_SITE_NAME)s unsuccessfully tried to contact %(url)s.
 
 Number of attempts: %(attempt_times)i. No further attempts will be made.
 
 """ % \
-                  {'CFG_SITE_NAME': CFG_SITE_NAME,
+                  {'CFG_SITE_NAME': cfg['CFG_SITE_NAME'],
                    'url': url,
                    'attempt_times': attempt_times}
         if data:
@@ -123,7 +121,7 @@ Number of attempts: %(attempt_times)i. No further attempts will be made.
                       {'data': data[:max_data_length],
                        'extension': len(data) > max_data_length and ' [...]' or ''}
         # Send email. If sending fails, we will stop the queue
-        return send_email(fromaddr=CFG_SITE_ADMIN_EMAIL,
+        return send_email(fromaddr=cfg['CFG_SITE_ADMIN_EMAIL'],
                           toaddr=admin_emails,
                           subject=subject,
                           content=content)

@@ -36,11 +36,10 @@ import os
 import sys
 import tempfile
 import time
-import sys
 
 # Here are some good Invenio APIs
 
-from invenio.config import CFG_TMPDIR
+from invenio.base.globals import cfg
 
 # BibRecord -> to create MARCXML records
 from invenio.legacy.bibrecord import record_add_field, record_xml_output
@@ -149,7 +148,7 @@ def bst_twitter_fetcher(query):
     @param user: the user
     """
     ## We prepare a temporary MARCXML file to upload.
-    fd, name = tempfile.mkstemp(suffix='.xml', prefix='tweets', dir=CFG_TMPDIR)
+    fd, name = tempfile.mkstemp(suffix='.xml', prefix='tweets', dir=cfg['CFG_TMPDIR'])
     tweets = get_tweets(query)
     if tweets:
         os.write(fd, """<collection>\n""")
