@@ -395,10 +395,12 @@ def resolve_action():
     for objectid in objectids:
         bwobject = BibWorkflowObject.query.get_or_404(objectid)
         action_name = bwobject.get_action()
+
         if action_name:
             action_form = actions[action_name]
             res = action_form().resolve(bwobject)
             ids_resolved += 1
+
 
     if ids_resolved == 1:
         return jsonify(res)
@@ -409,7 +411,7 @@ def resolve_action():
         })
     else:
         return jsonify({
-            "message": "{0} number of records resolved.".format(ids_resolved),
+            "message": "{0} records resolved.".format(ids_resolved),
             "category": "info"
         })
 
@@ -427,21 +429,3 @@ def entry_data_preview(objectid, of):
         return jsonify(data={})
     formatted_data = bwobject.get_formatted_data(of)
     return jsonify(data=formatted_data)
-
-
-@blueprint.route('/get_context', methods=['GET', 'POST'])
-@login_required
-@permission_required(viewholdingpen.name)
-def get_context():
-    """Return the a JSON structure with URL maps and actions."""
-    context = {}
-    context['url_prefix'] = blueprint.url_prefix
-    context['holdingpen'] = {
-        "url_load": url_for('holdingpen.load_table'),
-        "url_preview": url_for('holdingpen.entry_data_preview'),
-        "url_restart_record": url_for('holdingpen.restart_record'),
-        "url_restart_record_prev": url_for('holdingpen.restart_record_prev'),
-        "url_continue_record": url_for('holdingpen.continue_record'),
-    }
-
-    return jsonify(context)

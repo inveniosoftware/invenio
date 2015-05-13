@@ -52,7 +52,7 @@ define(
 
         // Data
         page: 1,
-        sort_key: "",
+        sort_key: ""
       });
 
       this.preparePayload = function (data) {
@@ -86,7 +86,7 @@ define(
             var table = $node.find("tbody");
             table.html(result.rendered_rows);
             $(that.attr.totalSelector).html(result.pagination.total_count);
-            that.trigger(document, "updatePagination", result.pagination);
+            that.trigger(document, "tableReloaded", result);
           },
           complete: function() {
             console.log("Ending request");

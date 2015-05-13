@@ -44,7 +44,7 @@ define(
     function HoldingPenCommon() {
       this.attributes({
         // URL
-        alertSelector: "#alert-message",
+        alertSelector: "#alert-message"
       });
 
       this.setAlertMessage = function (ev, data) {

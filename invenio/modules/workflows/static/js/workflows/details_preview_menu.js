@@ -47,7 +47,7 @@ define(
         this.trigger(document, "setPreviewByFormat", {
           format: data.el.name
         });
-      }
+      };
 
       this.after('initialize', function() {
         this.on("click", {

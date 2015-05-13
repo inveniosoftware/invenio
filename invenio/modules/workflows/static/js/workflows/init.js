@@ -36,7 +36,7 @@ require(
     "js/workflows/details_actions_buttons",
     "js/workflows/details_preview",
     "js/workflows/details_preview_menu",
-    "js/workflows/actions/init",
+    "js/workflows/actions/init"
   ],
   function() {
     // This file is simply here to make sure the above dependencies are

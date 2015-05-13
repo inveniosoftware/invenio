@@ -23,7 +23,7 @@ define(
      "js/workflows/details_actions",
      "js/workflows/details_actions_buttons",
      "js/workflows/details_preview",
-     "js/workflows/details_preview_menu",
+     "js/workflows/details_preview_menu"
   ],
   function(
     HoldingPenCommon,
@@ -44,7 +44,7 @@ define(
       DetailsActions.attachTo(document, {
         restart_url: context.restart_url,
         delete_url: context.delete_url,
-        id_object: context.id_object,
+        id_object: context.id_object
       });
       DetailsActionsButtons.attachTo(document);
     }

@@ -79,6 +79,7 @@ define(
       };
 
 
+
       // Selection/Deselection
       this.selectAll = function() {
         var $this = this;
@@ -96,12 +97,10 @@ define(
           $(this).checked = true;
         });
 
-        console.log("Array: " + this.attr.selectedIDs);
         this.checkIfBatchActionButtonsAppear();
       };
 
       this.deselectAll = function() {
-
         // Uncheck every box...
         $(this.attr.selectAllSelector).prop('checked', false);
         this.attr.selectedIDs.forEach(function(id) {
@@ -109,27 +108,23 @@ define(
         });
         // And empty the array
         this.attr.selectedIDs = [];
-
-        console.log("Array: " + this.attr.selectedIDs);
         this.checkIfBatchActionButtonsAppear();
       };
 
       this.selectCheckbox = function (ev, data) {
         var row = $(data.el);
-        if (row.prop('checked') === false) {
-          this.removeElementFromIDs(row.val());
+        var removedIDs = {"ids": []};
+
+        if (row.prop('checked') == false) {
+          removedIDs.ids.push(row.val());
+          this.removeElementFromIDs(removedIDs);
         } else {
           this.attr.selectedIDs.push(row.val());
         }
-
-        console.log("Array: " + this.attr.selectedIDs);
         this.checkIfBatchActionButtonsAppear();
       };
 
-      this.selectOrDeselectAll = function (ev) {
-        $(this.attr.selectAllSelector).click();
-        this.checkIfBatchActionButtonsAppear();
-      };
+
 
       // "Utility" functions
       this.checkIfBatchActionButtonsAppear = function() {
@@ -140,11 +135,36 @@ define(
         }
       };
 
-      this.removeElementFromIDs = function(id) {
+      this.removeSentElements = function(ev, removedIDs) {
+        this.removeElementFromIDs(removedIDs);
+      };
+
+      this.removeElementFromIDs = function(removedIDs) {
         var idArray = this.attr.selectedIDs;
-        if (idArray.length > 0) {
-          var index = idArray.indexOf(id);
-          idArray.splice(index, 1);
+
+        removedIDs.ids.forEach(function(id) {
+          var index = idArray.indexOf(id.toString());
+          if (index > -1) {
+           idArray.splice(index, 1);
+          }
+        });
+
+        console.log("Remaining: " + this.attr.selectedIDs);
+      };
+
+      this.setCheckboxes = function(ev, data) {
+        var idArray = this.attr.selectedIDs;
+
+        idArray.forEach(function(id) {
+          if ($("input[value=" + id +"]").prop('checked') == false) {
+            $("input[value=" + id +"]").prop('checked', true);
+          }
+        });
+
+        if (idArray.length == 0 || (data.pagination.per_page != idArray.length && data.pagination.pages > 1)) {
+          $(this.attr.selectAllSelector).prop('checked', false);
+        } else if (data.pagination.pages == 1 && data.pagination.total_count == idArray.length) {
+          $(this.attr.selectAllSelector).prop('checked', true);
         }
       };
 
@@ -155,12 +175,15 @@ define(
 
         this.on(document, "execute", this.batchActions);
         this.on(document, "hotkeysPagination", this.deselectAll);
+        this.on(document, "removeSentElements", this.removeSentElements);
+        this.on(document, "tableReloaded", this.setCheckboxes);
 
         this.on("click", {
           selectAllSelector: this.batchCheck,
           checkboxSelector: this.selectCheckbox,
           batchButtonSelector: this.batchActionButtons
         });
+
         console.log("Selection init");
       });
     }

@@ -46,18 +46,18 @@ define(
       });
 
       this.updatePagination = function(ev, data) {
-          if (data.total_count > 0) {
-            var pagination_data = {
-                "has_prev": data.page > 1,
-                "has_next": data.page < data.pages,
-                "next": data.page + 1,
-                "prev": data.page - 1,
-                "iter_pages": data.iter_pages
-            };
-            this.$node.html(tpl_pagination(pagination_data));
-          } else {
-            this.$node.html("");
-          }
+        if (data.pagination.total_count > 0) {
+          var pagination_data = {
+            "has_prev": data.pagination.page > 1,
+            "has_next": data.pagination.page < data.pagination.pages,
+            "next": data.pagination.page + 1,
+            "prev": data.pagination.page - 1,
+            "iter_pages": data.pagination.iter_pages
+          };
+          this.$node.html(tpl_pagination(pagination_data));
+        } else {
+          this.$node.html("");
+        }
       };
 
       this.changePage = function(ev, data) {
@@ -76,7 +76,7 @@ define(
         this.on("click", {
           paginationButtonSelector: this.changePage
         });
-        this.on(document, "updatePagination", this.updatePagination);
+        this.on(document, "tableReloaded", this.updatePagination);
 
         // Hotkeys pagination
         this.on(document, "hotkeysPagination", this.changePage);

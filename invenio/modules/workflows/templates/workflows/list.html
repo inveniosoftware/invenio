@@ -38,6 +38,7 @@
         load_table_url: "{{ url_for('holdingpen.load')|safe }}",
         tags: JSON.parse('{{tags|safe}}'),
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
+        edit_url: "{{ url_for('holdingpen.edit_record')|safe }}",
         attach_action_to: "#list",
         page: 1,
         per_page: 10
@@ -93,9 +94,17 @@
       </div>
       <div id="batch-action-buttons" class="pull-right hidden">
         <span class="text-muted">{{ _("For all selected") }}: </span>
-        <button class="btn btn-success arxiv-approval-action-accept batch-button" role="button" data-value="accept_core">CORE</button>
-        <button class="btn btn-warning arxiv-approval-action-accept batch-button" role="button" data-value="accept">Accept</button>
-        <button class="btn btn-danger arxiv-approval-action-reject batch-button"  role="button" data-value="reject">Reject</button>
+        <div class="btn-group" role="group">
+          <button class="btn btn-success arxiv-approval-action-accept batch-button" role="button" data-value="accept_core">
+            <i class="fa fa-check"></i> CORE
+          </button>
+          <button class="btn btn-warning arxiv-approval-action-accept batch-button" role="button" data-value="accept">
+            <i class="fa fa-check"></i> Accept
+          </button>
+          <button class="btn btn-danger arxiv-approval-action-reject batch-button"  role="button" data-value="reject">
+            <i class="fa fa-times"></i> Reject
+          </button>
+        </div>
       </div>
     </div>
     {% endblock %}
@@ -112,10 +121,10 @@
               <select id="perpage-menu"
                       aria-controls="list"
                       class="form-control input-sm">
-                  <option{% if per_page == 10 %} selected{% endif %} value="10">10</option>
-                  <option{% if per_page == 25 %} selected{% endif %} value="25">25</option>
-                  <option{% if per_page == 100 %} selected{% endif %} value="100">100</option>
-                  <option{% if per_page == 500 %} selected{% endif %} value="500">500</option>
+                  <option {% if per_page == 10 %} selected {% endif %} value="10">10</option>
+                  <option {% if per_page == 25 %} selected {% endif %} value="25">25</option>
+                  <option {% if per_page == 100 %} selected {% endif %} value="100">100</option>
+                  <option {% if per_page == 500 %} selected {% endif %} value="500">500</option>
               </select>
             </li>
           </ul>
@@ -152,7 +161,7 @@
               <a href="#" class="dropdown-toggle dropdown-headline" data-toggle="dropdown">{{ _('Status') }}<b class="caret"></b></a>
               <ul id="tags-menu" class="dropdown-menu" role="menu">
                 <li><a id="version-halted" class="version-selection" name="Need action">{{ _('Need action') }}</a></li>
-                <li><a id="version-halted" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
+                <li><a id="version-waiting" class="version-selection" name="Waiting">{{ _('Waiting') }}</a></li>
                 <li><a id="version-completed" class="version-selection" name="Done">{{ _('Done') }}</a></li>
                 <li><a id="version-running" class="version-selection" name="In process">{{ _('In process') }}</a></li>
                 <li><a id="version-initial" class="version-selection" name="New">{{ _('New') }}</a></li>

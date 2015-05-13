@@ -22,7 +22,7 @@
 define(
   [
     'jquery',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
@@ -49,13 +49,13 @@ define(
         var value = this.attr.valuePrefix + data.el.name;
         this.trigger(document, "addTagFromMenu", {
           value: value,
-          text: value,
+          text: value
         });
       };
 
       this.after('initialize', function() {
         this.on("click", {
-          menuitemSelector: this.triggerAddTagFromMenu,
+          menuitemSelector: this.triggerAddTagFromMenu
         });
         console.log("Tags menu init");
       });

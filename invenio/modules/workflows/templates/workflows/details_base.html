@@ -41,7 +41,7 @@
         delete_url: "{{ url_for('holdingpen.delete_from_db')|safe }}",
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
         id_object: "{{ bwobject.id }}",
-        attach_action_to: document,
+        attach_action_to: document
       };
       initialize(context);
       initialize_actions(context);

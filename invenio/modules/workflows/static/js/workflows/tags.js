@@ -22,7 +22,7 @@ define(
   [
     'jquery',
     'bootstrap-tagsinput',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
