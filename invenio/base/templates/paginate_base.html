@@ -39,11 +39,19 @@ It assumes that page exists in the current context.
     <li {% if not obj.has_prev -%} class="disabled" {%- endif %}}>
       {%- set new_args = args.copy() -%}
       {%- do new_args.update({'page': 1}) -%}
+      {%- if not obj.has_prev %}
+      <span title="first">&laquo;</span>
+      {% else %}
       <a title="first" href="{{ url_for(endpoint, **new_args) if obj.has_prev}}">&laquo;</a>
+      {%- endif %}
     </li>
     <li {% if not obj.has_prev -%} class="disabled" {%- endif %}}>
       {%- do args.update({'page': obj.page-1 }) -%}
+      {%- if not obj.has_prev %}
+      <span title="prev">&lsaquo;</span>
+      {% else %}
       <a title="prev" href="{{ url_for(endpoint, **args) if obj.has_prev }}">&lsaquo;</a>
+      {%- endif %}
     </li>
     {%- for page_p in obj.iter_pages() %}
       {%- if page_p %}
@@ -59,12 +67,20 @@ It assumes that page exists in the current context.
     <li {% if not obj.has_next -%} class="disabled" {%- endif %}}>
       {%- set new_args = args.copy() -%}
       {%- do new_args.update({'page': obj.page+1}) -%}
+      {%- if not obj.has_next %}
+      <span title ="next">&rsaquo;</span>
+      {% else %}
       <a title ="next" href="{{ url_for(endpoint, **new_args) if obj.has_next }}">&rsaquo;</a>
+      {%- endif %}
     </li>
     <li {% if not obj.has_next -%} class="disabled" {%- endif %}}>
       {%- set new_args = args.copy() -%}
       {%- do new_args.update({'page': obj.pages }) -%}
+      {%- if not obj.has_next %}
+      <span title="last">&raquo;</span>
+      {% else %}
       <a title="last" href="{{ url_for(endpoint, **new_args) if obj.has_next }}">&raquo;</a>
+      {%- endif %}
     </li>
   </ul>
 </div>
