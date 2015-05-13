@@ -20,14 +20,16 @@
 """Implement custom field widgets."""
 
 import json
-import six
-
-from werkzeug import MultiDict
-from wtforms.widgets import HTMLString, HiddenInput, Input, RadioInput, \
-    TextInput, html_params
 
 from invenio.ext.template import render_template_to_string
 from invenio.ext.template.utils import render_macro_from_template
+
+import six
+
+from werkzeug import MultiDict
+
+from wtforms.widgets import HTMLString, HiddenInput, Input, RadioInput, \
+    TextInput, html_params
 
 
 def date_widget(field, **kwargs):
@@ -49,6 +51,30 @@ def bootstrap_submit(field, **dummy_kwargs):
                                         value=field.label.text,)
     html = [u'<div style="float:right;" >' + html + u'</div>']
     return HTMLString(u''.join(html))
+
+
+class JinjaWidget(object):
+
+    """Renders given Jinja template."""
+
+    def __call__(self, field, **kwargs):
+        """Render given field using a tempalte.
+
+        :param field: field that should be rendered.
+        :param template: path to Jinja template.
+        :type template: str
+        """
+        template = kwargs.pop('template', field.template)
+        field_id = kwargs.pop('id', field.id)
+
+        return HTMLString(
+            render_template_to_string(
+                template,
+                field=field,
+                field_id=field_id,
+                **kwargs
+            )
+        )
 
 
 class PLUploadWidget(object):

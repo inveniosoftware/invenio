@@ -27,6 +27,7 @@ from .date import *
 from .doi import *
 from .file_upload import *
 from .issn import *
+from .jinja import *
 from .journal import *
 from .keywords import *
 from .language import *
