@@ -76,6 +76,14 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     </xsl:if>
   </xsl:template>
 
+  <!-- FUNCTION  print-j-authororcid: prints the authors ORCID inside xxx__j subfield -->
+  <xsl:template name="print-j-authororcid">
+    <xsl:param name="orcid"/>
+    <xsl:if test="not(contains($orcid, 'UNDEFINED')) and $orcid!=''">
+      <subfield code="j">ORCID:<xsl:value-of select="normalize-space($orcid)"/></subfield>
+    </xsl:if>
+  </xsl:template>
+
   <!-- FUNCTION  print-h-authorid: prints the authors ID inside xxx__h subfield -->
   <xsl:template name="print-h-authorid">
     <xsl:param name="authorid"/>
@@ -87,8 +95,8 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-u-affiliation: prints the authors affiliation inside xxx__u subfield -->
   <xsl:template name="print-u-affiliation">
     <xsl:param name="orgid"/>
-    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] | 
-                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] | 
+    <xsl:variable name="orgname" select="//foaf:Organization[@id=$orgid]/cal:orgName[@source='spiresICN'] |
+                                         //foaf:Organization[@id=$orgid]/cal:orgName[@source='inspire'] |
                                          //foaf:Organization[@id=$orgid]/cal:orgName[@source='INSPIRE']" />
           <xsl:choose>
       <xsl:when test="not(contains($orgname, 'UNDEFINED')) and $orgname!=''" >
@@ -125,9 +133,14 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     <xsl:for-each select="./cal:authorIDs/cal:authorID">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
-            <xsl:when test="@source='INSPIRE'">
+            <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
                 <xsl:call-template name="print-i-authorinspireid">
                     <xsl:with-param name="authorid" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="@source='ORCID' or @source='orcid'">
+                <xsl:call-template name="print-j-authororcid">
+                    <xsl:with-param name="orcid" select="."/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -141,9 +154,14 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
     <xsl:for-each select="./cal:authorids/cal:authorid">
       <xsl:if test="not(.//*[contains(., 'UNDEFINED')])">
         <xsl:choose>
-            <xsl:when test="@source='INSPIRE'">
+            <xsl:when test="@source='INSPIRE' or @source='Inspire ID'">
                 <xsl:call-template name="print-i-authorinspireid">
                     <xsl:with-param name="authorid" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="@source='ORCID' or @source='orcid'">
+                <xsl:call-template name="print-j-authororcid">
+                    <xsl:with-param name="orcid" select="."/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
