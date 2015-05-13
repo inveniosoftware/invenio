@@ -87,8 +87,22 @@ Setting up MySQL Server requires you to give some credentials for the root
 user. You will need the root password later on and we will refer to it as
 ``$MYSQL_ROOT``.
 
+If you are on CentOS 7, the mysql-server package is not available in the
+default repository. First we need to add the official YUM repository provided
+by Oracle. The YUM repository configuration can be downloaded from the `MySQL
+website <http://dev.mysql.com/downloads/repo/yum/>`_. Choose the desired
+distribution (Red Hat Enterprise Linux 7 / Oracle Linux 7 for CentOS 7) and
+click Download.
+The download link can be retrieved without registering for an Oracle account.
+Locate the "No thanks, just start my download" link and pass the link URL as a
+parameter to rpm.
+
 .. code-block:: console
 
+    # only needed with CentOS version >= 7
+    $ sudo rpm -Uvh http://dev.mysql.com/get/mysql-community-release...
+
+    # for every CentOS version
     $ sudo yum install mysql-server
     $ sudo service mysqld status
     mysqld is stopped
@@ -197,7 +211,7 @@ The following might not be necessary but is good to have for completeness.
 
 .. code-block:: console
 
-    $ brew install libjpeg libtiff freetype
+    $ brew install libjpeg libtiff freetype libffi
     $ pip install -I pillow
 
 Install ``node`` by following `Node on OS X`_
@@ -229,7 +243,6 @@ The commands for ``OS X`` are the same as in ``Linux``.
 
     For developers, honcho is recommended and will make your life
     easier because it launches all the servers together as it finds the ``Procfile``.
-
 
 .. _MySQL on OS X:
 
@@ -522,6 +535,14 @@ which must be running alongside with the web server.
      * Running on http://0.0.0.0:4000/
      * Restarting with reloader
 
+.. note::
+
+    On OS X, the command ``service`` might not be found when starting the redis
+    server. To run redis, just type:
+
+    .. code-block:: console
+
+        $ redis-server
 
 **Troubleshooting:** As a developer, you may want to use the provided
 ``Procfile`` with `honcho <https://pypi.python.org/pypi/honcho>`_. It
