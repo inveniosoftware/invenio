@@ -41,6 +41,16 @@
         delete_url: "{{ url_for('holdingpen.delete_from_db')|safe }}",
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
         id_object: "{{ bwobject.id }}",
+
+        {% if next_object %}
+          next_page_url: "{{ url_for('holdingpen.details', objectid=next_object) }}",
+        {% endif %}
+        {% if previous_object %}
+          previous_page_url: "{{ url_for('holdingpen.details', objectid=previous_object) }}",
+        {% endif %}
+
+        main_list_url: "{{ url_for('holdingpen.list_objects') }}",
+
         attach_action_to: document
       };
       initialize(context);

@@ -20,40 +20,40 @@
 define(
   [
     'jquery',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
     defineComponent) {
 
-    'use strict';
+    "use strict";
 
-    return defineComponent(DetailsActionsButtons);
+    return defineComponent(DetailsPage);
 
-    /**
-    * .. js:class:: DetailsActionsButtons()
-    *
-    * UI component for handling the buttons for restarting/deleting an object.
-    *
-    * :param string previewMenuItemSelector: DOM selector for each menu item
-    *
-    */
-    function DetailsActionsButtons() {
+    function DetailsPage() {
       this.attributes({
-        actionButtonSelector: ".details-action"
+        next_page_url: "",
+        previous_page_url: "",
+        main_list_url: ""
       });
 
-      this.triggerActionButton = function(ev, data) {
-        this.trigger(document, "detailsButtonClick", {
-          action: $(data.el).data("action")
-        });
+      // The logic here is:
+      // 1. If there is a next page, go there
+      // 2. If there is not a next page, go to the previous one.
+      // 3. If that was the last record (no next/previous pages) go to the main list.
+      this.changePage = function() {
+        var host = window.location.host;
+
+        if (this.attr.next_page_url) {
+          window.location.href = this.attr.next_page_url;
+        } else {
+          window.location.href = this.attr.main_list_url;
+        }
       };
 
       this.after('initialize', function() {
-        this.on("click", {
-          actionButtonSelector: this.triggerActionButton
-        });
-        console.log("Details preview menu init");
+        this.on(document, "changePage", this.changePage);
+        console.log("Details Page init");
       });
     }
 });

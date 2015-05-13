@@ -51,7 +51,7 @@ define(
 
       this.after('initialize', function() {
         this.on("click", {
-          previewMenuItemSelector: this.setPreviewByFormat,
+          previewMenuItemSelector: this.setPreviewByFormat
         });
         console.log("Details preview menu init");
       });

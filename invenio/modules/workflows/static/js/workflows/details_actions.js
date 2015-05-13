@@ -76,7 +76,7 @@ define(
       };
 
       this.after('initialize', function() {
-        this.on(document, "detailsButtonClick", this.handleDetailsButton)
+        this.on(document, "detailsButtonClick", this.handleDetailsButton);
         console.log("Details actions init");
       });
     }

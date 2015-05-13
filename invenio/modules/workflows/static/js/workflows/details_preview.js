@@ -56,33 +56,33 @@ define(
         var $this = this;
         var container_selector = 'div[id="object_preview_container' + $this.attr.id_object + '"]';
         $.ajax({
-            url: $this.attr.preview_url,
-            data: {'objectid': $this.attr.id_object,
-                   'of': data.format},
-            success: function (json) {
-                if (data.format === "xm" || data.format === "xo") {
-                    if (json.data === "") {
-                        json.data = "Preview not available";
-                    }
-                    $(container_selector).empty();
-                    $(container_selector).append(
-                      "<pre><code id='object_preview' class='language-markup'></code></pre>"
-                    );
-                    $('code[id="object_preview"]').text(json.data);
-                    Prism.highlightElement($('code[id="object_preview"]')[0]);
-                } else {
-                    if (json.data === "") {
-                        json.data = "Preview not available";
-                    }
-                    $(container_selector).empty();
-                    $(container_selector).append(json.data);
-                }
+          url: $this.attr.preview_url,
+          data: {'objectid': $this.attr.id_object,
+                 'of': data.format},
+          success: function (json) {
+            if (data.format === "xm" || data.format === "xo") {
+              if (json.data === "") {
+                json.data = "Preview not available";
+              }
+              $(container_selector).empty();
+              $(container_selector).append(
+                "<pre><code id='object_preview' class='language-markup'></code></pre>"
+              );
+              $('code[id="object_preview"]').text(json.data);
+              Prism.highlightElement($('code[id="object_preview"]')[0]);
+            } else {
+              if (json.data === "") {
+                json.data = "Preview not available";
+              }
+              $(container_selector).empty();
+              $(container_selector).append(json.data);
             }
+          }
         });
       };
 
       this.after('initialize', function() {
-        this.on(document, "setPreviewByFormat", this.renderPreviewByFormat)
+        this.on(document, "setPreviewByFormat", this.renderPreviewByFormat);
         console.log("Details init");
       });
     }
