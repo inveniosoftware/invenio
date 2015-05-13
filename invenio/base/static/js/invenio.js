@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2013, 2014 CERN.
+ * Copyright (C) 2013, 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -202,4 +202,70 @@ require(['jquery', 'bootstrap'], function ($) {
   });
 
   $('[rel=tooltip]').tooltip();
+
+  $(document).ready(function(){
+    var delta = 10;
+
+    // name your elements here
+    var stickyElement  = '.sticky',   // the element you want to make sticky
+    bottomElement  = 'footer'; // the bottom element where you want the sticky element to stop (usually the footer)
+
+    $(stickyElement).each(function() {
+      var element = this;
+
+      // figure out if we are not in one-column mode
+      $(window).on('resize orientationChanged', null, element, function(evt) {
+        var element = evt.data;
+        $(element).css('width', '');
+
+        window.setTimeout(function() {
+          $(element).css('width', $(element).outerWidth());
+
+          if (window.matchMedia('(min-width: 992px)').matches) {
+            // let's save some messy code in clean variables
+            // when should we start affixing? (the amount of pixels to the top from the element)
+            var fromTop = $(element).offset().top - delta,
+            stopOn = $(document).height() - ($(bottomElement).offset().top)       // top pixel of the footer
+              + ($(element).outerHeight() - $(element).height())                  // height calculation error
+              - ($(window).outerHeight() - $(element).outerHeight() - 2 * delta); // amount of screenspace which is not used by the sticky element
+
+            var offset = {
+              top: fromTop
+            };
+
+            // minimum is zero (aka not used)
+            if (stopOn > 0) {
+              offset.bottom = stopOn;
+            }
+
+            // let's put a sticky width on the element and assign it to the top
+            $(element).css('top', delta);
+            // assign the affix to the element
+            $(element).affix({
+              offset: offset
+                // when the affix get's called then make sure the position is the default (fixed) and it's at the top
+            });
+
+            // trigger the scroll event so it always activates
+            $(window).trigger('scroll');
+          } else {
+            // WARNING: these lines destroys affix for all elements!
+            // we are waiting for bootstrap to get their plugin
+            // system into a usable state so that we can destroy
+            // plugins cleanly
+            $(window).off('scroll.bs.affix.data-api');
+            $(window).off('click.bs.affix.data-api');
+
+            $(element).removeData('bs.affix');
+            window.setTimeout(function(){
+              $(element).css('top', '');
+              $(element).removeClass('affix affix-top affix-bottom');
+            }, 10);
+          }
+        }, 100);
+      });
+      $(window).trigger('resize');
+    });
+
+  });
 });
