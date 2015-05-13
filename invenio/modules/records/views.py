@@ -244,7 +244,8 @@ def file(recid, filename):
 def citations(recid):
     """Display citations."""
     from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list,\
-        get_self_cited_by, calculate_co_cited_with_list
+        calculate_co_cited_with_list
+    from invenio.legacy.bibrank.selfcites_searcher import get_self_cited_by
     citations = dict(
         citinglist=calculate_cited_by_list(recid),
         selfcited=get_self_cited_by(recid),
