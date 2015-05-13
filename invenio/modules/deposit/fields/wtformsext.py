@@ -39,6 +39,7 @@ from werkzeug import MultiDict
 
 import wtforms
 
+from wtforms.fields.core import Flags
 from wtforms.utils import unset_value
 
 from ..field_base import WebDepositField
@@ -67,6 +68,28 @@ for attr_name in dir(wtforms):
         pass
 
 
+class FlagProxy(object):
+    def __init__(self, obj):
+        self._obj = obj
+
+    def __getattr__(self, k):
+        result = getattr(self._obj._flags, k)
+
+        if k in self._obj._populate:
+            for f in self._obj.form._fields:
+                x = getattr(self._obj.form._fields[f].flags, k)
+                if x:
+                    result = x
+
+        return result
+
+    def __setattr__(self, k, v):
+        if k.startswith('_'):
+            dict.__setattr__(self, k, v)
+        else:
+            setattr(self._obj._flags, k, v)
+
+
 #
 # Special needs for field enclosures
 #
@@ -85,6 +108,8 @@ class FormField(WebDepositField, wtforms.FormField):
         if 'processors' in kwargs:
             raise TypeError('FormField cannot take processors. '
                             'Instead, define them on the enclosed fields.')
+        self._flags = Flags()
+        self._populate = kwargs.pop('populate', ['required'])
         super(FormField, self).__init__(*args, **kwargs)
 
     def reset_field_data(self, exclude=[]):
@@ -144,6 +169,21 @@ class FormField(WebDepositField, wtforms.FormField):
         """Set flags."""
         self.form.set_flags(flags)
         super(FormField, self).set_flags(flags)
+
+    @property
+    def flags(self):
+        """Get flags in form of a proxy.
+
+        This proxy accumulats flags stored in this object and all children
+        fields.
+        """
+        return FlagProxy(self)
+
+    @flags.setter
+    def flags(self, v):
+        """Set flags stored in this object."""
+        if not isinstance(v, FlagProxy):
+            self._flags = v
 
     @property
     def json_data(self):
