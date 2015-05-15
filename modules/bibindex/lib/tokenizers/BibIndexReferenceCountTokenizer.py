@@ -44,6 +44,7 @@ class BibIndexReferenceCountTokenizer(BibIndexMultiFieldTokenizer):
     def tokenize(self, recID):
         """Uses get_field_count from bibindex_engine_utils
            for finding a number of references of a publication and pass it in the list"""
+        from invenio.search_engine import get_record
         rec = get_record(recID)
         return [str(len(record_get_field_instances(rec, '999', 'C', '5')))]
 
@@ -52,7 +53,6 @@ class BibIndexReferenceCountTokenizer(BibIndexMultiFieldTokenizer):
         Will tokenize with use of bibfield.
         @param recID: id of the record
         """
-        from invenio.search_engine import get_record
         rec = get_record(recID)
         return [str(rec.get(self.nonmarc_tag) or 0)]
 
