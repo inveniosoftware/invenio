@@ -619,6 +619,7 @@ class SpiresToInvenioSyntaxConverter:
         'refersto.excluding.selfcites': 'referstoexcludingselfcites:',
         'refersto.nosc': 'referstoexcludingselfcites:',
         'referstox': 'referstoexcludingselfcites:',
+        'rc': 'referencecount:',
 
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
