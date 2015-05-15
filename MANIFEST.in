@@ -65,5 +65,7 @@ recursive-include invenio/modules/*/translations *.mo *.po *.pot
 
 recursive-include invenio/testsuite *
 
+recursive-include scripts *.sh
+
 recursive-exclude * *.py[co]
 recursive-exclude * *.php
