@@ -60,7 +60,7 @@ except ImportError:
     from StringIO import StringIO
 
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
-                   '--insert', '--replace', '--correct', '--append']
+                   '--insert', '--replace', '--correct', '--append', '--holdingpen']
 
 _CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS_RE = re.compile(CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS)
 
