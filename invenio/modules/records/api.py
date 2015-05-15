@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@
 
 """Record API."""
 
+import datetime
 import six
 
 from flask import current_app
@@ -26,11 +27,13 @@ from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from werkzeug.utils import cached_property
 
+from invenio.ext.sqlalchemy import db
+from invenio.modules.jsonalchemy.errors import ReaderException
 from invenio.modules.jsonalchemy.reader import Reader
 from invenio.modules.jsonalchemy.wrappers import SmartJson
-from invenio.modules.jsonalchemy.errors import ReaderException
 
-from .models import Record as RecordModel
+from .errors import RecordError, HistoryRecordNotFoundError
+from .models import Record as RecordModel, RecordHistory
 
 
 class Record(SmartJson):
@@ -58,11 +61,28 @@ class Record(SmartJson):
         raise NotImplementedError()
 
     @classmethod
-    def get_record(cls, recid, reset_cache=False):
+    def get_record(cls, recid, reset_cache=False, revision=None):
         """Get one record from the DB.
 
         :param reset_cache: If set to `True` it creates the JSON again.
+        :param revision: If not None and revision exists it tries to retrieve
+            it from `record_json_history`.
         """
+        if revision is not None:
+            try:
+                timestamp = datetime.datetime.strptime(
+                    revision[:14], '%Y%m%d%H%M%S')
+                hst_json = RecordHistory.query.get((recid, timestamp))
+                if hst_json is None:
+                    raise NoResultFound
+                return Record(hst_json.json)
+            except ValueError:
+                raise RecordError('Wrong revision: {0}'.format(revision))
+            except (NoResultFound, AttributeError):
+                raise HistoryRecordNotFoundError(
+                    "Revision {0} not found, maybe you need to port old "
+                    "history data.")
+
         if not reset_cache:
             try:
                 json = cls.storage_engine.get_one(recid)
@@ -86,7 +106,6 @@ class Record(SmartJson):
         record['creation_date'] = record_sql.creation_date
         record._save()
         record_sql.additional_info = record.additional_info
-        from invenio.ext.sqlalchemy import db
         db.session.merge(record_sql)
         db.session.commit()
         return record
@@ -94,7 +113,7 @@ class Record(SmartJson):
     @classmethod
     def get_blob(cls, recid):
         """Get the blob from where the record was created."""
-        #FIXME: start using bibarchive or bibingest for this
+        # FIXME: start using bibarchive or bibingest for this
         from invenio.modules.formatter.models import Bibfmt
         from zlib import decompress
         try:
@@ -106,10 +125,27 @@ class Record(SmartJson):
             current_app.logger.exception(
                 'Error retrieving the blob for recid {0}'.format(recid))
 
+    @classmethod
+    def get_revision_list(cls, recid):
+        """Retrieve all revision ids (including the current one) for the recid.
+
+        :param recid:
+        :returns: list of string with revision ids.
+
+        """
+        return [r[0].strftime('%Y%m%d%H%M%S')
+                for r in RecordHistory.query.filter_by(
+                    id=recid).values('revision')]
+
     @property
     def blob(self):
         """Return data blob."""
         return self.__class__.get_blob(self['recid'])
+
+    @property
+    def revisions(self):
+        """Return list of revisions for the current record."""
+        return self.__class__.get_revision_list(self['recid'])
 
     @cached_property
     def persistent_identifiers(self):
@@ -160,7 +196,6 @@ class Record(SmartJson):
         record_sql.creation_date = self['creation_date']
         record_sql.master_format = self.additional_info.master_format
         record_sql.additional_info = self.additional_info
-        from invenio.ext.sqlalchemy import db
         db.session.merge(record_sql)
         db.session.commit()
 
@@ -196,9 +231,9 @@ class Record(SmartJson):
                             '</controlfield>\n'.expandtabs(tabsize) \
                             % (key, encode_for_marcxml(v))
                     elif len(key) == 6:
-                        if not (tag == key[:3]
-                                and ind1 == key[3].replace('_', '')
-                                and ind2 == key[4].replace('_', '')):
+                        if not (tag == key[:3] and
+                                ind1 == key[3].replace('_', '') and
+                                ind2 == key[4].replace('_', '')):
                             tag = key[:3]
                             ind1 = key[3].replace('_', '')
                             ind2 = key[4].replace('_', '')
@@ -230,8 +265,8 @@ class Record(SmartJson):
         :func:`~invenio.legacy.bibrecord.create_record`.
         """
         # FIXME: it might be a bit overkilling
-        from invenio.legacy.bibrecord import create_record
-        record, status_code, errors = create_record(
+        from invenio.legacy.bibrecord import create_record as _create_record
+        record, status_code, errors = _create_record(
             self.legacy_export_as_marc()
         )
         if status_code == 0:

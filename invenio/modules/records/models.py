@@ -159,6 +159,30 @@ class RecordMetadata(db.Model):
     record = db.relationship(Record, backref='record_json')
 
 
+class RecordHistory(db.Model):
+
+    """Represents the revisions of a record if any."""
+
+    __tablename__ = 'record_json_history'
+
+    id = db.Column(
+        db.MediumInteger(8, unsigned=True),
+        db.ForeignKey(Record.id),
+        primary_key=True,
+        nullable=False
+    )
+
+    revision = db.Column(
+        db.DateTime,
+        primary_key=True,
+        nullable=False
+    )
+
+    json = db.Column(db.JSON, nullable=False)
+
+    record = db.relationship(Record, backref='history')
+
+
 class BibxxxMixin(utils.TableNameMixin):
 
     """Mixin for Bibxxx tables."""
@@ -222,4 +246,5 @@ for idx in range(100):
 __all__ = tuple([
     'Record',
     'RecordMetadata',
+    'RecordHistory'
 ] + models)
