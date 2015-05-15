@@ -262,6 +262,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
         if connection is not None:
             raise
         try:
+            time.sleep(30) # In case of DB restart give it 30s to breath.
             db = _db_login(dbhost, relogin=1)
             cur = db.cursor()
             gc.disable()
