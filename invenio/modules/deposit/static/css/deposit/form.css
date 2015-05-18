@@ -90,6 +90,10 @@ span.ui-icon.ui-icon-circle-triangle-e {
   padding-left: 0;
 }
 
+.field-without-label {
+  padding: 0 20px;
+}
+
 /*Uploader*/
 
 .uploaders {
