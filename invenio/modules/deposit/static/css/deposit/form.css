@@ -80,6 +80,16 @@ span.ui-icon.ui-icon-circle-triangle-e {
   padding: 0 20px;
 }
 
+.checkbox > ul, .radio > ul {
+  list-style-type: none;
+  padding-left: 40px;
+}
+
+.checkbox > ul label, .radio > ul label {
+  font-weight: inherit;
+  padding-left: 0;
+}
+
 /*Uploader*/
 
 .uploaders {
