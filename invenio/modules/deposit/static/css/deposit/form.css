@@ -76,6 +76,10 @@ span.ui-icon.ui-icon-circle-triangle-e {
   display: block;
 }
 
+.field-without-label {
+  padding: 0 20px;
+}
+
 /*Uploader*/
 
 .uploaders {

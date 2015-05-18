@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -47,18 +47,17 @@
 {% endblock form_submit_dialog %}
 {% block deposit_page %}
 <div class="row">
+    <div class="col-md-3 col-md-push-9">
+        {% if form._drafting %}
+            {% include "deposit/myview.html" %}
+        {% endif %}
+    </div>
     {% block file_container %}
-        <div id="file_container" class="col-md-8 form-feedback-warning">
+        <div id="file_container" class="col-md-9 col-md-pull-3 form-feedback-warning">
             <div id="flash-message"></div>
             {% include "deposit/form.html" %}
         </div>
     {% endblock %}
-    {% if form._drafting %}
-        <div class="col-md-4">
-            {% include "deposit/myview.html" %}
-        </div>
-    {% endif %}
-    </div>
 </div>
 {% endblock deposit_page %}
 {% endblock %}
