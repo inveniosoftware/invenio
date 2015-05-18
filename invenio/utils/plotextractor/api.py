@@ -79,11 +79,11 @@ def get_marcxml_plots_from_tarball(tarball):
     extracted_image_data = get_plots(str(tarball))
     if extracted_image_data:
         extracted_image_data = remove_dups(extracted_image_data)
-        create_contextfiles(extracted_image_data)
-        marc_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n'
-        marc_xml += create_MARC(extracted_image_data, tarball, None)
-        marc_xml += "\n</collection>"
-        return marc_xml
+        image_marc_xml = create_MARC(extracted_image_data, tarball, None)
+        if image_marc_xml:
+            create_contextfiles(extracted_image_data)
+            return ('<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n'
+                    '{0}\n</collection>'.format(image_marc_xml))
 
 
 def get_tarball_from_arxiv(arxiv_id, save_to_folder):
