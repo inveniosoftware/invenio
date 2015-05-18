@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,11 +18,15 @@
 #}
 <div class="panel panel-default">
     <div class="panel-heading">
-        <a data-toggle="collapse" class="panel-toggle{{ ' collapsed' if group.meta.classes is not none else '' }}" href="#collapse-{{ idx }}"> {{ group.name }} <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span> <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></a>
-        {% if group.meta.indication %}
-            <span class="text-muted pull-right" style="padding-right: 10px;">{{ group.meta.indication }}</span>
-        {% endif %}
-
+        <a data-toggle="collapse" class="panel-toggle{{ ' collapsed' if group.meta.classes is not none else '' }}" href="#collapse-{{ idx }}">
+            <h3 class="panel-title">
+                {{ group.name }}
+                {% if group.meta.indication %}
+                    <span class="text-muted pull-right" style="padding-right: 10px;">&nbsp;{{ group.meta.indication }}</span>
+                {% endif %}
+                <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span> <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+            </h3>
+        </a>
     </div>
     <div id="collapse-{{ idx }}" class="panel-collapse collapse {{ 'in' if group.meta.classes is none else group.meta.classes }}">
     <div class="panel-body">

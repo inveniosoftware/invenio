@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -62,6 +62,18 @@ span.ui-icon.ui-icon-circle-triangle-e {
 }
 .upload-stop {
   display:none;
+}
+
+.hide-on-collapsed {
+  display: block;
+}
+
+.panel-toggle.collapsed .hide-on-collapsed, .show-on-collapsed {
+  display: none;
+}
+
+.panel-toggle.collapsed .show-on-collapsed {
+  display: block;
 }
 
 /*Uploader*/
