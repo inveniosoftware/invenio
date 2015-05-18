@@ -132,6 +132,9 @@ class WebDepositField(Field):
         :type disabled: bool
         :param export_key: Name of key to use during export
         :type export_key: str or callable
+        :param preamble: Short text that should appear in before the field,
+                         usually meant for longer explanations.
+        :type preamble: str
 
         :see http://wtforms.simplecodes.com/docs/1.0.4/validators.html for
              how to write validators.
@@ -149,6 +152,7 @@ class WebDepositField(Field):
         self.widget_classes = kwargs.pop('widget_classes', None)
         self.autocomplete_limit = kwargs.pop('autocomplete_limit', 20)
         self.readonly = kwargs.pop('readonly', None)
+        self.preamble = kwargs.pop('preamble', None)
 
         # Initialize empty message variables, which are usually modified
         # during the post-processing phases.

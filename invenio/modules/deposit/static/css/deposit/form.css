@@ -90,8 +90,9 @@ span.ui-icon.ui-icon-circle-triangle-e {
   padding-left: 0;
 }
 
-.field-without-label {
-  padding: 0 20px;
+.field-preamble {
+  font-weight: 600;
+  margin: 7px 0;
 }
 
 /*Uploader*/
