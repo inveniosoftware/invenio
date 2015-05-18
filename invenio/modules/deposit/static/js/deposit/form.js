@@ -871,6 +871,28 @@ define(function(require, exports, module) {
     })
     // Initialize jquery_plugins
     $(this.attr.datepickerSelector).datetimepicker(this.attr.datepicker_options);
+
+    $('.form-group input[type="radio"]').on('mousedown', function(){
+        // http://stackoverflow.com/a/6246260
+        var $self = $(this);
+        if( $self.is(':checked') ){
+            var uncheck = function(){
+                setTimeout(function(){
+                    $self.removeAttr('checked');
+                    $self.trigger('change');
+                },0);
+            };
+            var unbind = function(){
+                $self.unbind('mouseup',up);
+            };
+            var up = function(){
+                uncheck();
+                unbind();
+            };
+            $self.bind('mouseup',up);
+            $self.one('mouseout', unbind);
+        }
+    });
   });
 
   }
