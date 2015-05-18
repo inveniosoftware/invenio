@@ -35,14 +35,17 @@ import os
 
 import tempfile
 from collections import Iterable, namedtuple
+
 from datetime import datetime
 from six import iteritems, callable
 from six.moves import cPickle
 from sqlalchemy import desc
+from sqlalchemy.exc import DontWrapMixin
 from sqlalchemy.orm.exc import NoResultFound
-from workflow.engine_db import ObjectStatus
-from .logger import get_logger, DbWorkflowLogHandler
-from functools import partial
+from sqlalchemy_utils.types.choice import ChoiceType
+from workflow.engine_db import ObjectStatusBehaviour
+from invenio.modules.workflows.logger import get_logger, DbWorkflowLogHandler
+from workflow.utils import staticproperty
 
 from .utils import get_func_info, get_workflow_definition
 from invenio.base.globals import cfg
@@ -52,6 +55,36 @@ from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 
 from invenio.utils.deprecation import deprecated, RemovedInInvenio23Warning
+
+
+class ObjectStatus(ObjectStatusBehaviour):
+
+    INITIAL = u"New"
+    COMPLETED = u"Done"
+    HALTED = u"Need action"
+    RUNNING = u"In process"
+    WAITING = u"Waiting"
+    ERROR = u"Error"
+
+    @staticproperty
+    @deprecated("Please use ObjectStatus.COMPLETED "
+                "instead of ObjectStatus.FINAL",
+                RemovedInInvenio23Warning)
+    def FINAL():  # pylint: disable=no-method-argument
+        return ObjectStatus.COMPLETED
+
+
+class IncompatibleEnumException(Exception, DontWrapMixin):
+    pass
+
+
+class FortifiedChoiceType(ChoiceType):
+
+    def process_bind_param(self, value, dialect):
+        if value not in self.choices:
+            raise IncompatibleEnumException(
+                "Value {0} not compatible with database".format(value))
+        return self.type_impl.process_bind_param(value, dialect)
 
 
 def _decode(data):
@@ -97,7 +130,6 @@ class Workflow(db.Model):
 
     _uuid = db.Column(db.String(36), primary_key=True, nullable=False,
                       name="uuid")
-
     name = db.Column(db.String(255), default="Default workflow",
                      nullable=False)
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
@@ -111,10 +143,6 @@ class Workflow(db.Model):
     objects = db.relationship("DbWorkflowObject",
                               backref='bwlWORKFLOW',
                               cascade="all, delete, delete-orphan")
-    counter_initial = db.Column(db.Integer, default=0, nullable=False)
-    counter_halted = db.Column(db.Integer, default=0, nullable=False)
-    counter_error = db.Column(db.Integer, default=0, nullable=False)
-    counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
 
     child_logs = db.relationship("DbWorkflowEngineLog",
@@ -130,6 +158,48 @@ class Workflow(db.Model):
     def uuid(self, value):
         """Set uud."""
         self._uuid = str(value) if value else None
+
+    def get_counter(self, object_status):
+        return DbWorkflowObject.query.filter(
+                DbWorkflowObject.id_workflow == self.uuid,
+                DbWorkflowObject.version == object_status
+            ).count()
+
+    @db.hybrid_property
+    def counter_initial(self):
+        return self.get_counter(ObjectStatus.INITIAL)
+
+    # Deprecated
+    @counter_initial.setter
+    def counter_initial(self, value):
+        pass
+
+    @db.hybrid_property
+    def counter_halted(self):
+        return self.get_counter(ObjectStatus.HALTED)
+
+    # Deprecated
+    @counter_halted.setter
+    def counter_halted(self, value):
+        pass
+
+    @db.hybrid_property
+    def counter_error(self):
+        return self.get_counter(ObjectStatus.ERROR)
+
+    # Deprecated
+    @counter_error.setter
+    def counter_error(self, value):
+        pass
+
+    @db.hybrid_property
+    def counter_finished(self):
+        return self.get_counter(ObjectStatus.COMPLETED)
+
+    # Deprecated
+    @counter_finished.setter
+    def counter_finished(self, value):
+        pass
 
     def __getattr__(self, name):
         """Return `extra_data` user-facing storage representations.
@@ -284,7 +354,7 @@ class Workflow(db.Model):
         db.session.delete(cls.get(Workflow.uuid == uuid).first())
 
     @session_manager
-    def save(self, status):
+    def save(self, status=None):
         """Save object to persistent storage."""
         self.modified = datetime.now()
         if status is not None:
@@ -384,6 +454,16 @@ class DbWorkflowObject(db.Model):
         Workflow, foreign_keys=[_id_workflow], remote_side=Workflow.uuid,
         post_update=True,
     )
+
+    @db.hybrid_property
+    def id_workflow(self):  # pylint: disable=method-hidden
+        """Get id_workflow."""
+        return self._id_workflow
+
+    @id_workflow.setter
+    def id_workflow(self, value):
+        """Set id_workflow."""
+        self._id_workflow = str(value) if value else None
 
     _log = None
 
@@ -839,8 +919,8 @@ class DbWorkflowObject(db.Model):
             else:
                 self.log.debug("Saving task counter: %s" % (task_counter,))
                 self.extra_data["_task_counter"] = task_counter  # Used by admins
-        self._data = DbWorkflowObject._encode(self.data)
-        self._extra_data = DbWorkflowObject._encode(self.extra_data)
+        self._data = _encode(self.data)
+        self._extra_data = _encode(self.extra_data)
 
         self.modified = datetime.now()
         if version is not None:
