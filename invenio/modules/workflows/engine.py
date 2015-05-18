@@ -159,7 +159,7 @@ class BibWorkflowEngine(DbWorkflowEngine):
         raise WaitProcessing(message=msg, action=action, payload=payload)
 
     def continue_object(self, workflow_object, restart_point='restart_task',
-                        task_offset=1, stop_on_halt=False):
+                        stop_on_halt=False):
         """Continue workflow for one given object from "restart_point".
 
         :param object:
@@ -173,23 +173,14 @@ class BibWorkflowEngine(DbWorkflowEngine):
         Use stop_on_halt to stop processing the workflow if HaltProcessing is
         raised.
         """
-        pos = workflow_object.get_current_task()
-        if not pos:
-            pos = [0]
-
-        if restart_point == "restart_prev":
-            pos[-1] -= task_offset
-        elif restart_point == "continue_next":
-            pos[-1] += task_offset
-        elif restart_point == "restart_task":
-            pass
-        else:
-            raise AssertionError("Unknown `restart_point`: %s" % restart_point)
-
-        self.state.reset()
-        self.state.callback_pos = pos
-        self.process([workflow_object], stop_on_halt=stop_on_halt,
-                     reset_state=False)
+        translate = {
+            'restart_task': 'current',
+            'continue_next': 'next',
+            'restart_prev': 'prev',
+        }
+        self.state.callback_pos = workflow_object.get_current_task() or [0]
+        self.restart(task=translate[restart_point], obj='first',
+                     objects=[workflow_object], stop_on_halt=stop_on_halt)
 
     def init_logger(self):
         """Return the appropriate logger instance."""
