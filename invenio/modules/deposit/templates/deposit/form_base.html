@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -47,7 +47,7 @@
     {% block form_header scoped %}{{ form_action_bar() }}{% endblock form_header%}
 
     {% block form_title scoped %}
-        <h1>{{ form._title }}</h1>
+        <h1 id="deposit-top">{{ form._title }}</h1>
         {% if form._subtitle %}
             <p class="text-muted"><small>{{ form._subtitle|safe }}</small></p>
         {% endif %}
@@ -60,6 +60,7 @@
                 {% if grouploop.first %}
                     <div id="webdeposit_form_accordion">
                 {% endif %}
+                <div id="depositgroup-{{ grouploop.index }}">
                 {% block form_group_header scoped %}
                     {% if group %}
                         {{ form_group_accordion_start(group, grouploop.index) }}
@@ -86,10 +87,13 @@
                     {% endif %}
 
                 {% endblock form_group_footer %}
+                </div>
 
                 {% if grouploop.last %}</div>{% endif %}
             {% endblock form_group %}
         {% endfor %}
     {% endblock form_body %}
-    {% block form_footer scoped %}{{ form_action_bar() }}{% endblock form_footer %}
+    {% block form_footer scoped %}
+        <div id="deposit-bottom">{{ form_action_bar() }}</div>
+    {% endblock form_footer %}
 </form>

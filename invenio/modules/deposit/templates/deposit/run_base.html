@@ -51,6 +51,20 @@
         {% if form._drafting %}
             {% include "deposit/myview.html" %}
         {% endif %}
+        {% block form_navigation %}
+        <div class="sticky well scrollspy-target">
+            <ul class="nav nav-pills nav-stacked deposit-nav">
+                <li role="presentation"><a href="#deposit-top"><i class="fa fa-align-justify fa-fw"></i> {{ form._title }}</a></li>
+            {% for group, fields in form.get_groups() %}
+                {% set grouploop = loop %}
+                <li role="presentation"><a href="#depositgroup-{{ grouploop.index }}">
+                    <i class="fa fa-dot-circle-o fa-fw"></i> {{ group.name if group.name else _('Other Information') }}{% if group and group.meta.indication %}<span class="text-muted pull-right" style="padding-right: 10px;">&nbsp;{{ group.meta.indication }}</span>{% endif %}
+                </a></li>
+            {% endfor %}
+                <li role="presentation"><a href="#deposit-bottom"><i class="fa fa-check fa-fw"></i> {{ _('Submit') }}</a></li>
+            </ul>
+        </div>
+        {% endblock %}
     </div>
     {% block file_container %}
         <div id="file_container" class="col-md-9 col-md-pull-3 form-feedback-warning">

@@ -95,6 +95,11 @@ span.ui-icon.ui-icon-circle-triangle-e {
   margin: 7px 0;
 }
 
+.deposit-nav > li > a {
+  font-size: 85%;
+  padding: 7px 10px;
+}
+
 /*Uploader*/
 
 .uploaders {
