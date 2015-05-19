@@ -3,25 +3,30 @@ root = true
 [*]
 indent_style = space
 end_of_line = lf
-insert_final_newline = true
-trim_trailing_whitespace = true
+insert_final_newline = false
+trim_trailing_whitespace = false
 charset = utf-8
 
 # Python files
 [*.py]
-indent_style = space
 indent_size = 4
 # isort plugin configuration
 known_first_party = invenio
 multi_line_output = 2
 default_section = THIRDPARTY
 
-# JS files
-[*.js]
-indent_style = space
+# RST files (used by sphinx)
+[*.rst]
+indent_size = 4
+
+# CSS, HTML, JS, JSON, YML
+[*.{css,html,js,json,yml}]
 indent_size = 2
 
 # Matches the exact files either package.json or .travis.yml
 [{package.json,.travis.yml}]
-indent_style = space
 indent_size = 2
+
+# Dockerfile
+[Dockerfile]
+indent_size = 4
