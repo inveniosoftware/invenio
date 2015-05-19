@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012 CERN.
+# Copyright (C) 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,7 +26,9 @@ from cgi import escape
 
 from pprint import pformat
 from operator import itemgetter
+
 import re
+import urllib
 
 try:
     from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
@@ -800,7 +802,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.add_person_external_id(pid, ext_sys, ext_id, userinfo)
 
-            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def set_uid():
             '''
@@ -829,7 +831,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 dest_uid_arxiv_papers = webapi.get_arxiv_papers_of_author(dest_uid_pid)
                 webapi.add_arxiv_papers_to_author(dest_uid_arxiv_papers, pid)
 
-            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def add_missing_external_ids():
             if argd['pid'] > -1:
@@ -840,7 +842,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             update_external_ids_of_authors([pid], overwrite=False)
 
-            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def associate_profile():
             '''
@@ -863,12 +865,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 pinfo['should_check_to_autoclaim'] = True
                 pinfo["login_info_message"] = "confirm_success"
                 session.dirty = True
-                redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, redirect_pid))
+                redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, urllib.quote(redirect_pid)))
             # if someone have already claimed this profile it redirects to choose_profile with an error message
             else:
                 param = ''
                 if 'search_param' in argd and argd['search_param']:
-                    param = '&search_param=' + argd['search_param']
+                    param = '&search_param=' + urllib.quote(argd['search_param'])
                 redirect_to_url(req, '%s/author/choose_profile?failed=%s%s' % (CFG_SITE_URL, True, param))
 
         def bibref_check_submit():
@@ -938,7 +940,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             session.dirty = True
 
-            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, primary_cname)
+            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(primary_cname))
             return redirect_to_url(req, redirect_url)
 
         def cancel_rt_ticket():
@@ -963,7 +965,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 rt_id = int(bibrefrecs[0])
                 webapi.delete_request_ticket(pid, rt_id)
 
-            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, pid))
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, urllib.quote(str(pid))))
 
         def cancel_search_ticket(without_return=False):
             if 'search_ticket' in pinfo:
@@ -974,7 +976,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 pid = pinfo["claimpaper_admin_last_viewed_pid"]
 
                 if not without_return:
-                    return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+                    return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
             if not without_return:
                 return self.search(req, form)
@@ -1066,7 +1068,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             session.dirty = True
 
-            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def claim_to_other_person():
             if argd['selection'] is not None:
@@ -1124,12 +1126,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 t = WebInterfaceAuthorTicketHandling()
                 t.add_operation(req, form)
 
-            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def close_rt_ticket():
             BIBCATALOG_SYSTEM.ticket_set_attribute(0, argd['rtid'], 'status', 'resolved')
             remove_rtid_from_ticket(argd['rtid'], argd['pid'])
-            return redirect_to_url(req, "%s/author/claim/%s#tabTickets" % (CFG_SITE_URL, webapi.get_person_redirect_link(argd['pid'])))
+            return redirect_to_url(req, "%s/author/claim/%s#tabTickets" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(argd['pid']))))
 
         def delete_external_ids():
             '''
@@ -1150,7 +1152,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.delete_person_external_ids(pid, existing_ext_ids, userinfo)
 
-            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid))))
 
         def none_action():
             return self._error_page(req, ln,
@@ -1231,7 +1233,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
             session.dirty = True
 
-            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, primary_cname)
+            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(primary_cname))
             return redirect_to_url(req, redirect_url)
 
         def send_message():
@@ -1323,7 +1325,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             else:
                 webapi.update_person_canonical_name(pid, cname, userinfo)
 
-            return redirect_to_url(req, "%s/author/claim/%s%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid), '#tabData'))
+            return redirect_to_url(req, "%s/author/claim/%s%s" % (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(pid)), '#tabData'))
 
         action_functions = {'add_external_id': add_external_id,
                             'set_uid': set_uid,
@@ -1381,7 +1383,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         '''
         webapi.delete_request_ticket(pid, tid)
         return redirect_to_url(req, "%s/author/claim/%s" %
-                               (CFG_SITE_URL, webapi.get_person_redirect_link(str(pid))))
+                               (CFG_SITE_URL, urllib.quote(webapi.get_person_redirect_link(str(pid)))))
 
     def _cancel_transaction_from_rt_ticket(self, tid, pid, action, bibref):
         '''
@@ -1417,7 +1419,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         webapi.delete_request_ticket(pid, tid)
 
-        redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, pid))
+        redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, urllib.quote(str(pid))))
 
     def _error_page(self, req, ln=CFG_SITE_LANG, message=None, intro=True):
         '''
@@ -2036,7 +2038,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             redirect_pid = pid
             if last_visited_pid:
                 redirect_pid = last_visited_pid
-            redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, str(redirect_pid)))
+            redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, urllib.quote(str(redirect_pid))))
         else:
             # get name strings and email addresses from SSO/Oauth logins:
             # {'system':{'name':[variant1,...,variantn], 'email':'blabla@bla.bla',
@@ -2874,7 +2876,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
         # TODO: what to do in case some ORCID server error occurs?
         if orcid_id is None or orcid_dois is None:
-            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(pinfo['pid'])))
 
         # TODO: it would be smarter if:
         # 1. we save in the db the orcid_dois
@@ -2885,7 +2887,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         orcid_info['import_pubs'] = True
         session.dirty = True
 
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(pinfo['pid'])))
 
     def _get_identifier_from_path(self, path):
         '''Return identifier from path to manage_profile page.
@@ -2936,7 +2938,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
             person_id = session.pop('orcid_pid')
             session.dirty = True
-            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, person_id))
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(person_id)))
 
         set_token(session['orcid_pid'], session['oauth2_access_token'])
 
@@ -2948,7 +2950,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
         session.dirty = True
 
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, person_id))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(person_id)))
 
 
     def connect_author_with_hepname(self, req, form):
@@ -2974,7 +2976,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         pinfo = session['personinfo']
         last_visited_page = webapi.history_get_last_visited_url(pinfo['visit_diary'], just_page=True)
 
-        redirect_to_url(req, "%s/author/%s/%s" % (CFG_SITE_URL, last_visited_page, cname))
+        redirect_to_url(req, "%s/author/%s/%s" % (CFG_SITE_URL, last_visited_page, urllib.quote(cname)))
 
     def connect_author_with_hepname_ajax(self, req, form):
         '''
@@ -3037,7 +3039,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session = get_session(req)
 
         webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, pid))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(pid)))
 
     def suggest_orcid_ajax(self, req, form):
         '''
@@ -3292,7 +3294,7 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
 
         for item in autoclaim:
             webapi.add_operation_to_ticket(item, ticket)
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_BASE_URL, pinfo['pid']))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_BASE_URL, urllib.quote(pinfo['pid'])))
 
     def modify_operation(self, req, form):
         '''
@@ -3657,14 +3659,14 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
             # Check if canonical id: e.g. "J.R.Ellis.1"
             pid = get_person_id_from_canonical_id(self.path)
             if pid >= 0:
-                url = "%s/author/profile/%s" % (CFG_BASE_URL, get_person_redirect_link(pid))
+                url = "%s/author/profile/%s" % (CFG_BASE_URL, urllib.quote(get_person_redirect_link(pid)))
                 redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
                 return
             else:
                 try:
                     pid = int(self.path)
                 except ValueError:
-                    redirect_to_url(req, "%s/author/search?q=%s" % (CFG_BASE_URL, self.path))
+                    redirect_to_url(req, "%s/author/search?q=%s" % (CFG_BASE_URL, urllib.quote(self.path)))
                     return
                 else:
                     if author_has_papers(pid):
@@ -3673,14 +3675,14 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
                             redirect_id = cid
                         else:
                             redirect_id = pid
-                        url = "%s/author/profile/%s" % (CFG_BASE_URL, redirect_id)
+                        url = "%s/author/profile/%s" % (CFG_BASE_URL, urllib.quote(redirect_id))
                         redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
                         return
 
             redirect_to_url(req, "%s/author/search" % CFG_BASE_URL)
             return
         else:
-            url = "%s/author/profile/%s" % (CFG_BASE_URL, self.path)
+            url = "%s/author/profile/%s" % (CFG_BASE_URL, urllib.quote(self.path))
             redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
             return
 
