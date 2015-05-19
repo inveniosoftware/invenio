@@ -70,11 +70,46 @@ If desired, you may already rewrite the body of ``old_method()``, but it must
 be API backward compatible so that existing code does not break. Please start
 fixing all places ``old_method`` is used, so that it can be easily removed
 once Invenio v2.1 has been released.
+
+Configuration Settings
+----------------------
+The verbosity and logging of deprecation warnings rely on these variables:
+
+===================================== ==========================================
+`CFG_DEPRECATION_DBG_IGNORED_REGEXES` Regular expressions that are matched
+                                      against a full file path and will be cause
+                                      a deprecation warning to be silenced,
+                                      based on
+                                      `CFG_DEPRECATION_DBG_PRINT_WARNINGS` and
+                                      `CFG_DEPRECATION_DBG_LOG_BACKTRACES`.
+
+`CFG_DEPRECATION_DBG_PRINT_WARNINGS`  Silence deprecation warnings that are set
+                                      in `CFG_DEPRECATION_DBG_IGNORED_REGEXES`
+                                      from stderr. 
+
+`CFG_DEPRECATION_DBG_LOG_BACKTRACES`  Log backtraces of deprecation warnings.
+                                      This options always takes
+                                      `CFG_DEPRECATION_DBG_IGNORED_REGEXES` into
+                                      consideration. This setting may cause the
+                                      logs to rapidly increase in size! Only
+                                      use when tackling deprecation warnings.
+===================================== ==========================================
+
+..note::
+    For these options to be in effect, DEBUG must be enabled.
+
+..note::
+    These options only take effect once the application has been intialized,
+    i.e.  some warnings will be printed during bootstrap.
 """
 
+import sys
+import re
+import traceback
 import warnings
-
 from functools import wraps
+
+from flask import current_app
 
 
 class RemovedInInvenio23Warning(PendingDeprecationWarning):
@@ -87,14 +122,49 @@ class RemovedInInvenio22Warning(DeprecationWarning):
     """Mark feature that will be removed in Invenio version 2.2."""
 
 
+# Inspired by http://stackoverflow.com/a/22376126/1727265
+def warn_with_traceback(message, category, filename, lineno, file=sys.stderr,
+                        line=None):
+    """Log deprecation warnings to debug logger."""
+
+    # Format
+    formatted_warning = warnings.formatwarning(message, category, filename,
+                                               lineno, line)
+
+    try:
+        current_app.config
+    except RuntimeError:
+        # App not yet initialized; see no evil, hear no evil.
+        file.write(formatted_warning)
+        return
+
+    ignore_path_matches = current_app.config['CFG_DEPRECATION_DBG_IGNORED_REGEXES']
+    formatted_stack = ''.join(traceback.format_stack())
+
+    log_this = (
+        current_app.config['CFG_DEPRECATION_DBG_LOG_BACKTRACES']
+        and
+        not re.search('^  File .*('+'|'.join(ignore_path_matches)+')',
+                      formatted_stack, flags=re.MULTILINE)
+    )
+
+    # Debug
+    if log_this:
+        current_app.logger.debug(formatted_warning)
+        current_app.logger.debug(formatted_stack)
+
+    # Warn
+    if current_app.config['CFG_DEPRECATION_DBG_PRINT_WARNINGS']:
+        file.write(formatted_warning)
+
 # Improved version of http://code.activestate.com/recipes/391367-deprecated/
 def deprecated(message, category):
-    def wrap(func=None):
-        """Decorator which can be used to mark functions as deprecated.
+    """Decorator which can be used to mark functions as deprecated.
 
-        :param message: text to include in the warning
-        :param category: warning category
-        """
+    :param message: text to include in the warning
+    :param category: warning category
+    """
+    def wrap(func=None):
         @wraps(func)
         def new_func(*args, **kwargs):
             warnings.warn(message, category, stacklevel=3)
