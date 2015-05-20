@@ -65,7 +65,7 @@ Invenio runs on Unix-like systems and requires MySQL database server
 and Apache/Python web application server.  Please consult the INSTALL
 file for more information.
 
-Good luck and thanks for choosing Invenio.
+Happy hacking and thanks for flying Invenio.
 
 | Invenio Development Team
 |   Email: info@invenio-software.org
