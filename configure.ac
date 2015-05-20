@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -955,7 +955,7 @@ AC_MSG_RESULT([**   1) Type 'make' to build your Invenio system.                
 AC_MSG_RESULT([**   2) Type 'make install' to install your Invenio system.               **])
 AC_MSG_RESULT([** After that you can start customizing your installation as documented   **])
 AC_MSG_RESULT([** in the INSTALL file (i.e. edit invenio.conf, run inveniocfg, etc).     **])
-AC_MSG_RESULT([** Good luck, and thanks for choosing Invenio.                            **])
+AC_MSG_RESULT([** Happy hacking and thanks for flying Invenio.                           **])
 AC_MSG_RESULT([**              -- Invenio Development Team <info@invenio-software.org>   **])
 AC_MSG_RESULT([****************************************************************************])
 
