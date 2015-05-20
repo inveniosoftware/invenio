@@ -2458,7 +2458,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'citedbyexcludingselfcites':
         # we are doing search by the citation count
         hitset = search_unit_citedby_excluding_selfcites(p)
-    elif m == 'a' or m == 'r' or f == 'subject':
+    elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
             # FIXME: workaround for not having phrase index yet
