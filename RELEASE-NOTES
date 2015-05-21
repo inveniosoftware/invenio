@@ -1,58 +1,97 @@
---------------------------------------------------------------------
-Invenio v1.0.8 is released
-March 2, 2015
-http://invenio-software.org/
---------------------------------------------------------------------
+============================
+ Invenio v1.0.9 is released
+============================
 
-Invenio v1.0.8 was released on March 2, 2015.
+Invenio v1.0.9 was released on May 21, 2015.
+
+About
+-----
+
+Invenio is a digital library framework enabling you to build your own
+digital library or document repository on the web.
 
 This old stable release update is recommended to all Invenio sites
-using v1.0.7 or previous releases.
+using v1.0.8 or previous releases.
 
-What's new:
------------
+Security fixes
+--------------
 
- *) docker: initial release (#2736)
++ WebStyle:
 
- *) docs: initial release of CONTRIBUTING guide (#2163)
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
 
- *) installation: MathJax distribution location update (#2732);
-    disable SSLv2/SSLv3 in Apache config (#2515)
+Improved features
+-----------------
 
-Download:
++ installation:
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.8.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.8.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.8.tar.gz.sig>
++ global:
 
-Installation notes:
--------------------
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
+Download
+--------
+
+- http://invenio-software.org/download/invenio-1.0.9.tar.gz
+- http://invenio-software.org/download/invenio-1.0.9.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.0.9.tar.gz.sig
+
+Installation
+------------
 
 Please follow the INSTALL file bundled in the distribution tarball.
 
-Upgrade notes:
---------------
+Upgrade
+-------
 
-If you are upgrading from Invenio v1.0.7, then:
+If you are upgrading from Invenio v1.0.8, then:
 
- a) Stop your bibsched queue and your Apache server.
+a) Stop your bibsched queue and your Apache server.
 
- b) Install the update:
+b) Install the update::
 
-     $ tar xvfz invenio-1.0.8.tar.gz
-     $ cd invenio-1.0.8
+     $ tar xvfz invenio-1.0.9.tar.gz
+     $ cd invenio-1.0.9
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
-     $ make update-v1.0.7-tables
+     $ make update-v1.0.8-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
          /opt/invenio/etc/
 
- c) Restart your Apache server and your bibsched queue.
+c) Restart your Apache server and your bibsched queue.
 
-- end of file -
+Happy hacking and thanks for flying Invenio.
+
+| Invenio Development Team
+|   Email: info@invenio-software.org
+|   IRC: #invenio on irc.freenode.net
+|   Twitter: http://twitter.com/inveniosoftware
+|   GitHub: http://github.com/inveniosoftware
+|   URL: http://invenio-software.org
