@@ -1,759 +1,102 @@
---------------------------------------------------------------------
-Invenio v1.2.0 is released
-March 3, 2015
-http://invenio-software.org/
---------------------------------------------------------------------
+============================
+ Invenio v1.1.6 is released
+============================
 
-Invenio v1.2.0 was released on March 3, 2015.
+Invenio v1.1.6 was released on May 21, 2015.
 
-This new stable release introduces new Invenio release series v1.2.
-Invenio v1.2 brings over 1200 commits on top of Invenio v1.1, authored
-by over 50 contributors.  Invenio v1.2 contains many new features and
-improvements, such as the new document model, the new authority record
-control, and much more.  Invenio v1.2 is recommended to all Invenio
-installations using v1.1 or previous stable release series.
+About
+-----
 
-What's new:
------------
+Invenio is a digital library framework enabling you to build your own
+digital library or document repository on the web.
 
- *) BatchUploader: apache error codes; insert or replace mode;
-    authorize via CIDR; add holdingpen directory; several
-    improvements; bibtask logs via email (#1255); multiple
-    improvements (#603); fix for permission checking (#1747 #1748)
+This old stable release update is recommended to all Invenio sites
+using v1.1.5 or previous releases.
 
- *) BibAuthorID: user prefs and session fix; inactivation of
-    test_save_matrix() (#1678); merge and manage fixes; caches badly
-    stored in user settings; fix 'create new person' ticketing issue;
-    leftover print statement; disables debug output; Claiming page is
-    now reloaded after commit.; hepnames match;
-    add_cname_to_hepname_record(); hotfix in name comparison; remove
-    changes tempfile.rootdir; graceful external system query; adds
-    webuser user merge utility; fix arXiv redirect link; improvements
-    and bug fixes; improvements and bug fixes; DOIs from ORCID check;
-    WaP daemon and BAI interface fixes; fix in templates handlers;
-    hotfixes for authorpages and webauthorprofile daemon; Help pages
-    and messages; a new hope; use defaultdict from containerutils
+Security fixes
+--------------
 
- *) BibAuthority: new names for authority collections; source file
-    mode fix; separate Authorities collection (#1605); initial release
-    (#1602); fix for unit test suite
++ WebStyle:
 
- *) BibCatalog: ticket_id type is now string (#2096); better error
-    reporting; requestor on ticket submit; ticket_submit() docstring
-    update (#2094); improve RT search error handling; return empty
-    list if no search params; RT discovery; email content cleanup; bug
-    fix; pylint fixes; refactoring; adds bibcatalog bin to ignored
-    files; add daemon task (#1528); default email backend (#872); new
-    email ticketing backend (#872)
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
 
- *) BibCheck: $$9 bibcheck to DOIs (#1955); improvements in DOI checks
-    (#1955); allow filtering by subfield contents (#2474); last_run
-    correct update; properly cumulates records; compatiblity with
-    dateutil 2.2; improve url plugin and tasklet; improve url plugin;
-    adds --config option; improve exception handling crossref queries;
-    add retry download to crossrefutils; improve doi plugin; avoid
-    checking dummy records; add option to consider deleted records;
-    new BibCheck module
+Improved features
+-----------------
 
- *) BibCirculation: library creation and other fixes (#2550 #2551
-    #2552 #2562 #2373); fix for CERN returnees; fix for typo; missing
-    web tests; minor spelling error fix; fix for mandatory library
-    type (#1519); email ID changes and test fixes (#1479); admin guide
-    cleanup; patron-driven acquisition and more (#1280); personid CERN
-    attribute; ILL improvement; CERN LDAP improvements (#1186); set
-    colour of some buttons; fix for ILL title and request type; fix
-    for library ID variable name; various updates; fixed notes link;
-    code cleaning; better ill/purchase search; auto-fill for purchase
-    request; remove reference to apache_user; optimize CERN LDAP
-    query; temporary barcode for new copies; extended ILL to manage
-    acquisition; make statuses customizable; lots of small fixes;
-    'cancelled' status for ILL request; sorting last issued loans;
-    edit ill request details; loan and renew process enhancement;
-    added budget_code to crcILLREQUEST; edit library type; arrival
-    date and library merge; extended item statuses; improved
-    book_title_from_MARC; fixed multi-barcode loan; fixed user
-    interface loan renewal; pylint and kwalitee cleaning; small fixes
-    on printing & intrface; daemon for overdue letters; email alerts
-    for new requests; delete a copy of a book; added CERN id in
-    borrower profile (#207); use new URL handler for admin pages;
-    avoid multiple loan creation (#305)
++ installation:
 
- *) BibClassify: ontology cache check improvement (#2672); always use
-    invenio code; raises an exception if rdflib is missing; unit tests
-    temp dir fix; remove ability to run as standalone (#1459)
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
 
- *) BibConvert: lxml support for local document() (#2497)
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
 
- *) BibDocFile: pickle support fix (#2549); decompose_file_url() and
-    subformat (#2556 #2557); bibdocfile.BibDoc memory fix (#2082
-    #2136); change name failure raises exception (#2071); more robust
-    decompose_bibdocfile_url() (#1957); escape file URLs in /files tab
-    (#2067); fix type of bibrec-bibdoc connection (#1759); get_icon()
-    for smallest size icon (#1350 #1743); undefined variable fix;
-    register downloads with recid (#1831 #1832); new web tests;
-    bibdocmoreinfo query typo fix (#1706); textification with OCR fix
-    (#1676); get_file() exact_docformat support; display counts in
-    tabs; fix "delete" CLI option; no access to filesystem; preferred
-    extension (#1619); load plugins at global level; migration script
-    fix; fixes wrong variable name; error reporting changes; CERN AFS
-    awareness (#1388); retry mkstemp in case of failure; CERN AFS
-    awareness (#1388); fix for bibdoc unattached to record (#1551);
-    improve BibDoc display in Files tab; raise exception in
-    _build_file_list(); additional mimetypes support; fix version in
-    register_download() (#1532); fix for BibDocFile instantiation
-    (#1317); implements format renaming (#1318); allow doctype
-    renaming (#980); revert md5 property patch (#1249); new document
-    data model; fix for display of hidden icons; change_name missing
-    parameter fix (#1818)
-
- *) BibEdit: only notifications on error; kwalitee improvements; add
-    email notification on submit; user name in BibSched column;
-    wrongly displayed HP changeset bug; autocompletion of fields from
-    KBs (#1258 #73); author names into history revisions; duplicate
-    code removal; new RT ticket through UI dialog; int object is not
-    iterable fix; InvalidCache exception on clone; modal submission
-    preview window; check for record in BibSched queue fix; debugging
-    all user actions; holding pen fix; prevent deletion of managed
-    DOIs fields (#1445); fix revert when no 005 in history; Holding
-    Pen fix; add AJAX profiling option; adds affiliation guessing;
-    bibHOLDINGPEN from TEXT to longblob; bibupload xml file path
-    conflicts; support for simple ticketing; small merging fix;
-    BibEdit web test improvements.; fix textmarc2xmlmarc unit test;
-    record from history instead of bibfmt; BibCatalog and other
-    improvements; fixes errors in case of deleted records; several
-    bugfixes; moves files cache to the database; open DOI source in
-    new window; fixes pdf detection; several improvements; HoldingPen
-    multiple improvements; update
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE; fixes date
-    parsing problem; hide authors when they exceed max number;
-    multiple fixes and improvements (#1190); send latest timestamp
-    when reverting; update admin help page and shortcuts; remove extra
-    holding pen call; show/hide specific parts of the record; merge
-    record with template; custom errors for AJAX requests; better
-    holdingpen integration (#87); tab switch between fields; minor
-    fixes; fix perform_doi_search function; refactoring and fixes; use
-    perform_request_search on search; add version to bibedit css name;
-    sort HoldingPen changes alphabetically; add direct link to
-    dx.doi.org; save changes periodically; avoid sync request to see
-    if record has pdf; change cache folder; amend textmarc to xmlmarc
-    unit test (#1269); import CrossRef data; improvements and fixes
-    (#761 #1032); css changes; allow opening deleted records (#573);
-    delete cache if record not modified; add extraction of references
-    from URL; several fixes; introduce textmarc editor; cnum
-    generation on conference records; multiple improvements (#696);
-    revert to master version (#792 #63 #118 #125); fix return binding
-    on Jeditable cells; fix jEditable callback when pressing return;
-    fix input default value; disable preview button when reverting
-    record; fix jEditable callback when pressing return; hide delete
-    record button by default; add field in specific position (#583);
-    fix apply all HP changes (#125); clean JavaScript code (#63);
-    extract css into a separate file (#118); upgrade to jQuery 1.5
-
- *) BibEditMulti: only notifications on error; add email notification
-    on submit; adds support for hidden fields (#707); allow non-
-    delayed processing and priority change; several improvements;
-    display all MARC fields (#1489); fix for multilanguage interface
-    (#1331); multiple improvements and fixes (#1146 #1147 #1148 #1130
-    #1149 #1156 #1158)
-
- *) BibEncode: support for FFmpeg >= v0.9; updated for latest
-    BibDocFile APIs; fix uuid Python 2.4 compatibility (#1478)
-
- *) BibExport: update Google Scholar exporter; hidden files and
-    recrawling
-
- *) BibField: new CFG_BIBFORMAT_HIDDEN_RECJSON_FIELDS (#2197 #2396);
-    better create_record error catching (#2510); fix copyright field
-    names (#1933); backported improvements from pu (#1687); no caching
-    of calculated fields; change recid field type to integer (#1633);
-    improvements backported from next; fix number_of_copies field
-    (#1625); new upgrade recipe to remove json cache; new field
-    filtering for `get_record`; elimination of None values in recjson;
-    `schema` in `split_blob`; `is_empty` update; fix for '__eq__' to
-    better compare recs; fix for `is_type_isbn`; continuable vs fatal
-    errors; bibdoc integration; new decorator @only_if_master_format;
-    better handling of calculated fields; fix for misbehavior when
-    parsing rules; new producer section added to config; clean up of
-    atlantis.cfg demo file (#1557); volume subfield addition; creation
-    date addition and keyword fix; new fft field in `atlantis.cfg`;
-    Python-2.4 compatibility fix (#1533); legacy_export_as_marc
-    escaping fix (#1509); new calculated fields; virtual field aliases
-    amended (#1530); new @persistent_identifier "decorator" (#1500);
-    bug fixes when using decorators (#1502); fix for lxml
-    compatibility; Python-2.4 compliance; initial release (#1300)
-
- *) BibFormat: new BFO for authority records (#1699 #1749); links to
-    public resources of authors (#1700 #1749); better display of
-    authority records (#1749 #1699); ORCID display for authors;
-    removal of obsolete BFX engine (#2563 #2124); recjson update using
-    bibreformat (#1708 #2220); PEP8 fixes in bibreformat (#2220); add
-    sponsor information to copyright (#1975); larger column
-    `format.code` (#2072); advertise /doi URL in DC output; improve
-    Dublin Core output (#320 #1213); configurable /record; new
-    bfe_oai_identifier element; new bfe_date parsing/formatting
-    options; plot file identification improvements (#1514); fix for
-    eval_format_element return type; file rights fix; new
-    bfe_arxiv_link; affiliation improvements; left over print in
-    format_record; reworks exceptions handling; only save default site
-    lang on the fly; look for missing caches by default; fix snippet
-    generation; needs_2nd_pass in bibreformat; duplicate code in
-    bibreformat.py; improves and updates bfe_plots; fixes tests; fix
-    external function for libxslt; improve Google Scholar support
-    (#1513); Displays the DOI in the EndNote; dublin core export now
-    includes DOI; to fixup to removes old php format; small fixes;
-    several fixes; fix in date comparison; second formatting pass
-    (#1464); lazy missing formats updates; empty record check;
-    progress display improvement; initial example of Twitter Card
-    support; fix for snippet generation; author links for mobile app;
-    initial release of mobile app formats; new Solr fulltext snippet
-    facility (#1301); QR-code format element (#1441); add DataCite XSL
-    stylesheet; remove 0248_a field from title; fixes last run date
-    for HDREF (#1236)
-
- *) BibIndex: ambiguous SQL query fix for MariaDB-5.5 (#2759);
-    tag.recjsonvalue NOT NULL (#1947 #2259); fix new-old record
-    incremental indexing (#2693); clean up after authority regression
-    test (#2448); author ID performance improvements (#1952); upgrade
-    recipe for `tag.recjson_value`; recjson fields in admin interface;
-    indexing non-MARC standards; abstraction layer for terms
-    retrieval; WordTable API changes; move helper functions to utils
-    file; changes in WordTable argument list; PEP8 compliance fixes;
-    fix for virtual index filtering; new DOI index (#1655); virtual
-    index queue dupe optimisation; new 'all-virtual' CLI option; minor
-    engine refactoring; documentation for virtual indexes; new pattern
-    for tokenizer inheritance (#1704); new abstract class for indexes;
-    separate class for virtual index (#1661); common words in virtual
-    index (#1653); fixes admin regression tests;
-    BibIndexDefaultTokenizer upgrade; bad word check optimized;
-    consistency check optimizations (#1436); ingestion health and
-    "unneeded" indexes (#1632); index type in admin interface; virtual
-    global index (#1574); indexing only affected indexes (#1573);
-    clean warning messages in test suite (#1615); filetype and
-    itemcount tokenizer fix (#1609); new index 'filetype' (#473); new
-    index 'itemcount'; tokenisation of authority records; fix syntax
-    error in bibstat; support for CJK languages (#285); pluginutils
-    for tokenizers (#852); centralisation of tokenizers (#852); new
-    regression tests; centralisation of LaTeX/HTML treatment (#852);
-    centralisation of stopword treatment (#852); centralisation of
-    synonym treatment (#852); fix for external fulltext indexing;
-    rework of error handling (#1075); move of text extraction to
-    BibDocFile; new exacttitle index (#1397); new filename index
-    (#1717)
-
- *) BibKnowledge: searchtype parameter in KB export (#2570 #2581); fix
-    get_kbt_items_for_bibedit (#1879 #1895); lxml port
-    get_kbt_items_for_bibedit
-
- *) BibMatch: allow tests to login over plain http; Fix validator
-    problem; use other author comparison function; more print
-    statements; improves get_longest_words; improve fuzzy queries;
-    validation fixes
-
- *) BibMerge: adds CFG_SITE_RECORD as script data (#2580 #2237);
-    `onclickSubmitButton` missing comma fix (#2230); prevent loss of
-    DOI when merging records (#1446); delete cache of master record
-    before submission; change order of updates; add subfield sorting
-    and interface fixes; several fixes; add 981__a field to master
-    record; delete duplicate record first (#1645)
-
- *) BibRank: fix path for download history graph (#2554 #2374); fix of
-    similar-to-recid result order (#1745 #2236); missing selfcites for
-    collaborations; record ID citations catchup; citation blobs in
-    Redis (#1689); adds a new option to disable bibsort (#1617); minor
-    refactoring in word ranking; handle missing files when removing
-    graphs; more leanient date handling in citation graphs; more
-    leanient date handling in citation graphs; remove outdated import
-    in citations tab; exception when gnuplot is not available; unicode
-    recid in citation indexer; Added ISBN, recid and HBL identifiers;
-    fix bad variable name; fixes for sorting; missing drop table
-    rnkSELFCITEDICT; new way to generate graphs (#1244); consider only
-    one year in citation graph; fixes for cited by sort; function to
-    get citations of a single record; fixes sorting; optimized cited
-    by sorting; filter citations on collections (#1504); logging of
-    citation changes (#1426); store selfcites in a table (#1417);
-    citesummary optimizations (#1481 #1217); handle records with
-    mulitple journals (#1394); optimized cited by sorting; no citerank
-    error when no citations (#1624); better Solr regression tests;
-    faster Solr indexer; new multi-tag Solr indexer; index latest
-    records first in Solr; increase rnkDOWNLOADS.file_format size;
-    self cites upgrade recipe improvement (#1482); detect external
-    word similarity ranker; storing citation indexer warnings in DB
-    (#1210); optimisations in citation algorithm (#1073); selfcites
-    fixes; fix for citation indexer checks; citation indexer sanity
-    checks and alerts (#1091); reference linking improvements (#950);
-    citation indexer date check change (#946); fix for missing Python
-    files in Makefile; two algorithms for self-citations (#945);
-    change import to defining module; better exception handling in
-    Solr indexer (#1199); better default mode in Solr indexer (#1192);
-    more invalid Solr character replacements; new Solr and Xapian
-    ranking bridge (#1084 #1168)
-
- *) BibRecord: namespaces ignored for lxml (#2604); search & compare
-    subfields; new API records_identical(); new API
-    identical_records(); record_get_field_values with filtering
-    (#1550); filter field instances (#1550)
-
- *) BibReformat: chunking of updated records query
-
- *) BibSched: email-logs-on-error parameter (#2205); check schSTATUS
-    when detecting status; pep8 for bibtask.py; pep8 for bibched.py;
-    subdirs for bibsched logs; fixes a bug with --profile cli option;
-    fix priority for the same sequence id; increase max log file size
-    to 5Mb; display mode for non-periodical tasks; adds more task
-    changing commands; get_modified_records_since() (#1538); monitor
-    auto mode selection bug; invalid sql in monitor history tab;
-    setting to continue on errors; many improvements (#1177 #991);
-    error when switching to manual; refactoring and improvements
-    (#1274 #1275 #1449); enhanced write_message(); motd update check;
-    problem parsing task CLI options (#1330); interface responsiveness
-    improvements (#1303); priority in automatic mode; CLI-started
-    tasks host field; kwalitee fixes; shell output leakage upon task
-    kill (#1343); single error reporting (#1342); scheduling algorithm
-    improvements (#1281); fixes task chain-sleeping (#1304); fixes
-    monotasks for multi-node (#1304); fixes for multi-node setup
-    (#925); new --email-logs-to bibtask CLI (#1252); subprocess
-    instead of deprecated popen2; new web UI for BibSched live view
-
- *) BibSort: improved washers (#2283 #1754); add check before
-    deleting; fix typos and CLI arguments
-
- *) BibUpload: creation_date based on incoming 005 (#2693 #1604
-    #2684); faster recjson deletion after updates (#1708); no reload()
-    in regression tests (#1702); --append only new fields (#1440);
-    removed print statement; do not always process MoreInfo;
-    CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG fix; new
-    CFG_BIBUPLOAD_MATCH_DELETED_RECORDS (#1438); affected fields and
-    insert mode; 8564_s support; less useless computation; less
-    verbose; messages cleaning; ingore 856 tag order in conflict
-    (#1606); smarter conflict report; smarter conflict detection; no
-    tickets in pretend mode; ticket creation fix; improves utf-8
-    checks; task error messages (#1449); utf-8 encoding; encoding
-    checks; regression tests cleanup; matching existing records
-    (#1438); pretend holding pen fix (#1618); fill affected_fields in
-    hstRECORD (#1572); fix for inserts with 005 (#1595); conflicting
-    revision ticket queue; smart record uploader fixes; BibCatalog
-    connection; sensible history and other goodies (#498 #1250 #871);
-    bibrec timestamp bug (#1431); smart record uploader (#816 #864
-    #897); check DOI uniqueness (#1160)
-
- *) DocExtract: new CMS PAS report numbers; additional report numbers;
-    extract page-end from references; removes stdout ouput from tests;
-    rework of regression tests; fixes regression tests; improves
-    bibrecord; increases compiled regexp cache size; preload
-    docextract author regexp; using -i instead of -r; preload kbs on
-    wsgi load; re-enable caching of kbs; outdated import in webtool;
-    reduce verbose in tests; fixes DESY-THIS rn recognition; 5 digits
-    arxiv numbers detection; do not create old tickets; lower
-    bibupload priority; webinterface text box fix; optional unidecode
-    dependency; help messages & compatibility warnings (#1220);
-    several improvements; move mislabelled regression tests (#1309);
-    journal rawref search fix (#1306); nose-friendly refextract tests;
-    fix reference extractor unit tests; refextract unit tests file
-    name fix; preparing for merging into master; multiple fixes (#966
-    #958); new docextract and refextract modules (#944 #1014)
-
- *) HepData: updates to formats; fixes unit tests; clean hepdata.js
-    inclusion; new HepData module; adds hepdataharvest bin to ignored
-    files
-
- *) HepNames: update form migrated to INSPIRE
-
- *) I18N: PO file update for the release of v1.2.0; more complete
-    POTFILES.in; fix wrong msgids in Persian translation; updates to
-    the Persian translation; POTFILES.in update; initial Persian
-    (Farsi) translation; infrastructure for Persian (Farsi); several
-    fixes in Spanish translation; Catalan and Spanish updates to
-    Search Guide; Catalan and Spanish updates to Search Tips
-
- *) InvenioConnector: allow logins over plain http; fix for CDS
-    authentication
-
- *) OAIHarvest: fix identifier parsing (#2408); conversion argument
-    name upgrade (#1753); error reporting fix (#1804 #1812); respect
-    hidden fields; do not launch BibIndex when done; bibindex priority
-    to 4; only update lastrun on successful harvest; small daemon
-    enhancement; fixes missing import; priority of single harvest
-    tasks; improves arXiv identifier harvesting; several improvements
-    (#547); sample OAI-ArXiv conversion update (#678); CERN-specific
-    "arXiv" doctype; consider source_id for selective post-processing;
-    configurable selective post-processing (#1477)
-
- *) OAIRepository: lower priority to updating uploads (#2525); fix for
-    hidden OAI tags (#2642); more lenient time limit for tests; do not
-    report cache not found errors; allows running slow machine;
-    oai_get_recid() for merged/deleted records (#1429); marcxml
-    created in shared directory; forcing clients to re-harvest (#1218)
-
- *) PdfChecker: clean up after regression tests (#2448); log full list
-    of updated recids; skip records without unique ids in 037 tags;
-    new module for arxiv pdf checker
-
- *) RefExtract: avoid double encoding (#2602); refactored book
-    handling; improved book search; addresses warning in tests;
-    removes leftover print; only accpet digits as numeration; allows
-    more lines between title and numeration; changes condition for
-    ticket creation; improves docextract, refextract
-
- *) SolrUtils: fix of similar-to-recid result order (#1745 #2236);
-    better exception handling in indexers; faster snippet factility;
-    support entire full-text indexing; cleaner schema.xml; support
-    high count of logical clauses
-
- *) WebAccess: automatically fetch SSO nicknames (#2583); CERN-
-    specific authorization message; fixes user details page links;
-    CFG_ACCESS_CONTROL_LEVEL_SITE=1 support (#1501); remove Facebook
-    testing credentials; update check for "external" account at CERN;
-    ORCID support (#1124); OpenID and OAuth authentication (#1124);
-    new CERN auth method support
-
- *) WebAlert: update tests for newly introduced records
-
- *) WebApiKey: unit Vs. regression tests
-
- *) WebAuthorList: fix import from recid; fix import from record id;
-    ignore empty affiliations when exporting; add new author list
-    manager tool
-
- *) WebAuthorProfile: reenable profile pages; disable if not
-    available; compatiblity with atlantis; fixes unit tests; recompute
-    link as a post action; new regression test suite
-
- *) WebBasket: 'move item' improvements; new 'move item' functionality
-    (#1547); Create Basket link in the main display (#1333); correct
-    referer when adding to basket (#1194); fix copying external items
-
- *) WebComment: fix for get_first_comments_or_remarks (#2522 #2523);
-    more prominent subscription link (#2434); deleted record message;
-    "Your Comments" page; link to "Your Comments" after posting; "Your
-    Comments" page (#974)
-
- *) WebJournal: Indico seminars widget improvement (#1980 #1981); fix
-    image dimension retrieval; sample Twitter Card markup; new image
-    template; better exception handling when caching; structured cache
-    (#1544); CERN-specific fix; fix for what's new widget test case
-
- *) WebLinkback: safer notification email; clean regression test suite
-    (#1285); fix for importing CFG_DATABASE values; pending linkback
-    notification emails (#1247); minor improvement; better
-    documentation; module optional (#1245); better global /linkbacks
-    page; better /linkbacks tab display; better URL title display; fix
-    for DB name in regression tests; fix for user_info passing; unit
-    test module rename; auto-increment regression test fix (#1136);
-    initial release (#627 #857 #1136); fix truncated FSF address in
-    docstring
-
- *) WebMessage: English corrections in output messages (#1849)
-
- *) WebSearch: optional refersto/citedby record limit (#2711); removal
-    of hard-coded Holdings tab (#2592 #2664); new test case for
-    pattern-limit queries (#1750 #1751); search results pattern limit
-    fix (#1750 #1751); proper re-raise in RSS handling (#2084 #2598);
-    fix for the number of printed records (#2512); inverted collection
-    scores (#2058); stemming and '*' (#2468); smarter journal hint
-    (#2352); new Journal Hint Service (#2352); kwalitee fix (#2352);
-    richer `/record` and `/search` API docs (#2303); fix for record
-    numbering in pagination (#1762 #1763); new Add-to-Search Interface
-    (#622 #271 #1738); CERN-specific video latest additions (#2068);
-    CERN-specific lecture latest additions (#2068); improve detection
-    of record owners (#2068); better retrieval of record tabs (#2068);
-    fix IndexError in is_hosted_collection (#1764); CERN-specific hack
-    for latest additions (#1976); CERN-specific collection sorting
-    (#2017); fix for 'rhs is of unknown type' (#1819); resolve
-    (internal) DOIs (#1322); anyfield in CFG_WEBSEARCH_SYNONYM_KBRS
-    (#1493); faster collection children cache (#1739); initial support
-    for recjson output; fix detailed record page tab tracebacks;
-    update collection page markup; fix search URL in timeout message;
-    CERN-specific collection sorting; better sort order in citation
-    tabs (#1307); timestamp detection fix for empty sites; sorting
-    fixes (#1674); reverse order and scores; rg parameter with
-    of='id'; reworks async downloader; wgsi.errors in fake request;
-    handle case in /collections/<collection name> urls; fixes
-    regression tests; stdout.flush conflicting with mod_wsgi; changes
-    citation tab count; search API changes for record sorting (#1657);
-    fix sorting options (#801); spires date parsing errors fixes; no
-    'back to search' on empty session; display deleted records in
-    citation log; make query parser use Invenio datetime; fix mixed
-    parameter for re.sub(); bibfmt on innodb; outdated import in
-    citations tab; takes into account new record in tests; fix HepData
-    templates; change CFG_SITE_URL to CFG_BASE_URL; fixes search bug
-    with --empty hitset; add cataloguer: search unit; SPIRES date
-    format 11/93; change CFG_SITE_URL to CFG_BASE_URL; testing fixing
-    subject lookup; add record edit link in brief; pep8 fixes; INSPIRE
-    vol to use volume field; INSPIRE texkey in 035__%; handles
-    selfcites searches; spires syntax and quotes; INSPIRE fulltext
-    warning update; find doi in search engine (#1051); CV output
-    formats (#314); correct record sums from hosted colls (#1651);
-    search services (#1278); custom i18n collection boxes (#1286);
-    item count regression test activation; fix for hidden-field admin
-    access test; support for intbitset output format (#1460); fix
-    missing cc info in req object; CERN-specific hack update; display
-    number of hits in mobile output; Greek translation of Search
-    Guide; fix Python 2.4 syntax error; most popular field values
-    optimisation (#1096); fix Search Guide reformatting; fix Search
-    Guide mismatch tags; Search Guide reformat and pretty-print; fix
-    browsing deleted/restricted records (#1292); webcoll performance
-    improvements; permitted restricted colls for guests; empty unit
-    test suite for summarizer; removal of excess summariser tests;
-    revamping of citesummary pages (#134); summarizer unit test
-    update; fix searching with limits; enforcement of record view
-    restrictions; translation-friendly overview box; restricted record
-    search improvements; fix for regression test link targets; fix for
-    double display of the footer; better restricted collection search
-    (#1161); "p=el*;rm=citation" test inactivation (#1174); sorting
-    test amendments; mixed ranking/sorting test amendments; wildcard
-    limit parameter is 0 in p_r_s; bugfix for empty set sorting;
-    refactored perform_request_search() (#542); add regression tests
-    for "em" parameter; add "em" parameter; include 'cc' in RSS
-    <channel>'s <link> (#2013 #2014); fix for "--language" option
-    (#1399 #2219)
-
- *) WebSession: no differentiation between guests (#2786 #2813); CSRF
-    token in profiling settings (#1855); disable ORCID login (#1667);
-    user preference to enable profiling; new Redis session storage
-    backend (#1688); fixes session_cleanup; session_param_get()
-    default value (#1294)
-
- *) WebStat: fix for custom query summary graph (#2553 #2375); default
-    query in the Custom query summary (#2388); list link fix for
-    system health UI page (#1713); ingestion health monitor fix
-    (#1631); use Invenio instead of CDS in pages; new ingestion
-    monitor (#936); no wildcard limit for custom summary data; add
-    bibcirculation config variables
-
- *) WebStyle: richer documentation on record page tabs (#216); ping
-    handler returning 200 status code (#2700); POST handling fix
-    (#1951); req object with no headers; fix gotoadmin CLI parmeters
-    parsing (#1427); move charset higher in the document; move of lang
-    and dir attributes to html; fixes for /goto CERN-HR plugin
-    example; silence client disconnected errors; blocking read in
-    handle_file_post; add missing icons to Makefile;
-    WebInterfaceDisabledPages(); quote canonical and alternate URLs
-    (#1515); /info pages using webdoc infrastructure; more accurate
-    "Restricted" flag display (#867); inactivate two regression tests
-    (#1293); goto engine typo fix; canonical and alternate URLs (#1251
-    #368); new /goto URL handler (#1178); memory leak fix in session
-    handling (#571)
-
- *) WebSubmit: Set_Embargo optional and functional (#2699); link to
-    successfully created record (#1641); more robust JavaScript check
-    (#1741); print white space instead of None (#1741); support for
-    elements' custom_level (#1741); `test_revise_picture_admin` test
-    fix (#2142); `deferRelatedFormatsCreation` param fix (#2142);
-    Link_Records error message fix (#1734); fix access restrictions in
-    /uploadfile (#1703 #2066); allow record owners to upload files;
-    allow image conversion of .tiff (#1909); grant access to the
-    superadmin as owner (#2065); doilookup function in webinterface
-    (#2025); guests support improved in /direct URL (#1240); rotate
-    created icons according to EXIF (#1516); web tests for DEMOART and
-    DEMOPIC; DEMOART uses bibdocfile_managedocfile; skip pdf
-    optimization if pdfopt is missing; fixes for openoffice handling;
-    INSPIRE specific amendments; add traceback info on error; new
-    Run_PlotExtractor function (#1506); source file mode fix; login
-    offer to guests on action page; fix for icon creation for
-    bibdocfiles; jquery-ui update for photo submission
-
- *) containerutils: new Python-2.4 defaultdict
-
- *) crossrefutils: new Fundref-based APIs
-
- *) dataciteutils: refactor DataCite API wrapper (#1457); DataCite DOI
-    support and test cases
-
- *) dateutils: adds __add__ to our custom datetime; strptime for
-    Python-2.4 compatibility; fix for strftime() function; consolidate
-    localtime_to_utc; day ranges; fix for unit test suite; new
-    get_time_estimator function
-
- *) dbdump: partial dumps; ignore with regexp (#579); dump on detached
-    slave (#1282); fix compress mode; add option to ignore tables; add
-    slave support; improve error handling
-
- *) dbquery: fix for importing CFG_DATABASE values; more reinstall-
-    friendly dbquery
-
- *) demo site: fix double 245 MARC field
-
- *) docker: more complete configuration
-
- *) errorlib: Sentry logging improvements (#2535 #2546); tags context
-    fix for sentry (#2623); fix Sentry context syntax issue (#1960
-    #2147); context support in sentry (#1960 #2147); support for
-    Sentry logging (#1726); makes SMS messages shorter; time
-    independent tests; hostname in error notifications (#1546); wrap
-    warnings to invenio.err (#1616)
-
- *) filedownloadutils: add verbose to download_url(); utility for file
-    retrieval (#1076)
-
- *) general: new CFG_SCOAP3_SITE flag; optional remote debugger; test
-    fixes; Propagating exceptions in debug mode; unit-tests fixes
-
- *) git: ignore KDevelop4 project files
-
- *) global: PEP-8 style in block comments (#1904); test suite original
-    modification date fix (#2737); removal of INSERT DELAYED SQL
-    statements (#2268 #2269); removal of leftover files;
-    InvenioTestCase in test suite (part 2); InvenioTestCase in test
-    suite; cdsweb.cern.ch becomes cds.cern.ch
-
- *) htmlutils: render MathML by MathJax; improve js string escaping
-
- *) importutils: fix None values error; Makefile clean up; Python 2.4
-    support and test case; initial release
-
- *) installation: new release_1_2_0 upgrade recipe;
-    2015_03_03_tag_value upgrade recipe; 2013_09_16_aidPERSONIDDATA
-    fix; 2014_08_12_format upgrade recipe fix; all upgrade recipes in
-    tabcreate (#1753); richer uninstall-jquery-plugins (#2418);
-    python-twitter requirement update (#2015); lxml recommended;
-    location of demo_table_jui.css; location of jquery.omniwindow.js;
-    location of jquery.blockUI.js; location of sly.min.js; location of
-    parsley.js; Redis and Nydus pre-requisites; jinja2 prerequisite
-    (#1677); move h5py to extra requirements; h5py requirement clean-
-    up; update to MathJax-2.3; add h5py dependency; use custom faster
-    jeditable; ColVis.js on invenio-software.org; table creation fix;
-    Python-2.6 and pip requirements; fix for BibAuthority upgrade
-    recipe; fix for rnkDOWNLOADS upgrade recipe; help for BibAuthorID
-    email settings; support for Apache-2.4 (#1552); help for `--load-
-    bibfield-conf` step; oaiREPOSITORY_last_updated upgrade; fix for
-    table drops and upgrades; selfcites upgrade recipe add-on; more
-    gentle idxINDEX.indexer recipe; maint-1.1-to-master upgrade recipe
-    (#1198); fix for 2012_10_29 upgrade recipe; fix for duplicate /css
-    alias
-
- *) intbitset: initialization from iterator (#1698); no crash when
-    intbitset is on rhs (#1287); atomic installation; union() and
-    isdisjoint() support; type checking for operators
-
- *) inveniocfg: adds option to failt tests on first error; restore
-    wrapping showarning after running unit tests; do not capture
-    warning in unit tests; workaround bibfmt corruption; fixes
-    BibSched check in upgrader; new derived config CFG_BASE_URL
-
- *) inveniogc: guest users gc optimization (#428 #1950); clean up gc
-    tasks (#1950); delete refextract logs after 7 days (from 28);
-    BibEdit related improvements.; add new session deletion mode;
-    delete BibEdit temporary files
-
- *) kwalitee: even stricter PEP-8 compliance
-
- *) mailutils: better email header type detection (#2713); support
-    invalid senders (#2256 #2385); fix for send_email() error on DEV
-    site (#1744); extend send_email with BCC option; send_email() with
-    attachments (#1253)
-
- *) mathpreview: js-based math preview panel (#1221)
-
- *) oaiharvest: fixes harvest() web interface (#2524)
-
- *) plotextractor: recid parsing fix (#2566); sanity in plotextractor
-    tests; do not add FFT if there is no location; remove dummy
-    caption generation; fixes arg parsing and more; more shell
-    argument escaping; process files of a record; fix CLI parameters
-    parsing
-
- *) redisutils: initial release
-
- *) sequtils: increases size of seqSTORE.seq_value; no texkey if no
-    year; increases size of seqSTORE.seq_value; fix texkey generation;
-    add start_date parameter to CnumSeq; wait for BibUpload to finish;
-    new seq generator for texkeys
-
- *) shellutils: Mac OS compatibility (#1184)
-
- *) solrutils: clean unit and regression test suite (#1284); add
-    search and ranking tests; fix for ranking result display; better
-    collection filter generator; removal of unused code; better
-    invalid character handling (#1197); add documentation
-
- *) testutils: wait for element to be displayed/hidden; default to
-    assertEqual in py26; add new relative url function;
-    regression_tests fix; new JavaScript unit test framework
-
- *) textmarc2xmlmarc: remove content regexp check (#1267)
-
- *) textutils: wash_for_utf8() simplification (#1755);
-    translate_to_ascii() unknown chars fix (#1754); show_diff() API
-    clean-up (#1465); fix old import statement; sharp-s to ss;
-    unidecode verision; add ALA-LC transliteration (#1092); create
-    function to show diff view
-
- *) urlutils: new function get_relative_url(); use hashlib instead of
-    md5 if possible
-
- *) xmlmarc2textmarc: order only by tags
-
-Download:
+Bug fixes
 ---------
 
-  <http://invenio-software.org/download/invenio-1.2.0.tar.gz>
-  <http://invenio-software.org/download/invenio-1.2.0.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.2.0.tar.gz.sig>
++ global:
 
-Installation notes:
--------------------
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
+Download
+--------
+
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz.sig
+
+Installation
+------------
 
 Please follow the INSTALL file bundled in the distribution tarball.
 
-Upgrade notes:
---------------
+Upgrade
+-------
 
-We recommend to test the upgrade on a development server first.
 Please proceed as follows:
 
- a) Stop your bibsched queue and your Apache server.
+a) Stop your bibsched queue and your Apache server.
 
- b) Install the update:
+b) Install the update::
 
-     $ tar xvfz invenio-1.2.0.tar.gz
-     $ cd invenio-1.2.0
+     $ tar xvfz invenio-1.1.6.tar.gz
+     $ cd invenio-1.1.6
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
-     $ sh /opt/invenio/etc/build/config.nice # (1)
+     $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ sudo -u www-data make check-upgrade
-     $ sudo -u www-data make install # (2)
-     $ sudo diff -r -u /opt/invenio/etc.OLD/ \
-         /opt/invenio/etc/ # (3)
+     $ make check-upgrade
+     $ sudo -u www-data make install
+     $ sudo rsync -a /opt/invenio/etc.OLD/ \
+         --exclude invenio-autotools.conf \
+         /opt/invenio/etc/ # (1)
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
-     $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade # (4)
+     $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
-    Notes:
+     (1) If you are upgrading from previous stable release series
+         (v0.99 or v1.0), please don't run this rsync command but
+         diff, in order to inspect changes and adapt your old
+         configuration to the new Invenio v1.1 release series.
 
-    (1) If you are upgrading from previous Invenio stable release
-        series, you may need to upgrade your system packages.  For
-        example, Python-2.6 is now the minimal required Python
-        version.  Hence you may need to run:
+c) Restart your Apache server and your bibsched queue.
 
-           $ sudo pip install -r requirements.txt
-           $ sudo pip install -r requirements-extras.txt
-           $ ./configure ...
+Happy hacking and thanks for flying Invenio.
 
-        as indicated in the INSTALL file.
-
-    (2) After installing new files from the release tarball, you will
-        most probably also want to upgrade your jQuery and other
-        runtime dependencies, by running:
-
-           $ sudo -u www-data make install-jquery-plugins
-
-        and similar statements as indicated in the INSTALL file.
-
-    (3) Due to many new features brought by this new release series,
-        please study the configuration changes carefully.  You may
-        need to adapt several CFG variables, `etc` files, and any
-        local templates you may have customised previously.  We
-        recommend to test the upgrade carefully on a development
-        server.
-
-    (4) This command will perform the database upgrade, which may take
-        considerable time due to upgrading the document model.  Note
-        that the command will also inform you about any further
-        actions you should take, for example you may be asked to run:
-
-           $ inveniocfg --load-bibsched-conf
-           $ inveniocfg --reset-recjson-cache
-           $ webcoll -u admin -f
-
- c) Restart your Apache server and your bibsched queue.
-
-- end of file -
+| Invenio Development Team
+|   Email: info@invenio-software.org
+|   IRC: #invenio on irc.freenode.net
+|   Twitter: http://twitter.com/inveniosoftware
+|   GitHub: http://github.com/inveniosoftware
+|   URL: http://invenio-software.org
