@@ -6,193 +6,234 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.9 -- released 2015-05-21
+-------------------------------------
+
+Security fixes
+~~~~~~~~~~~~~~
+
++ WebStyle:
+
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ installation:
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
+~~~~~~~~~
+
++ global:
+
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
 Invenio v1.1.5 -- released 2015-03-02
 -------------------------------------
 
- *) BibCirculation: get_book_cover quick fix (#2578 #2653); fix for
+  - BibCirculation: get_book_cover quick fix (#2578 #2653); fix for
     wrong non-borrower message (#2597)
 
- *) OAIHarvest: remove_duplicates and regexp fixes (#2300 #2608)
+  - OAIHarvest: remove_duplicates and regexp fixes (#2300 #2608)
 
- *) WebBasket: better formatting of deletion message (#2449)
+  - WebBasket: better formatting of deletion message (#2449)
 
- *) docker: initial release (#2736)
+  - docker: initial release (#2736)
 
- *) docs: initial release of CONTRIBUTING guide (#2163)
+  - docs: initial release of CONTRIBUTING guide (#2163)
 
- *) installation: MathJax distribution location update (#2732);
+  - installation: MathJax distribution location update (#2732);
     explicit jQuery plugin versions (#11 #2655); disable SSLv2/SSLv3
     in Apache config (#2515)
 
 Invenio v1.0.8 -- released 2015-03-02
 -------------------------------------
 
- *) docker: initial release (#2736)
+  - docker: initial release (#2736)
 
- *) docs: initial release of CONTRIBUTING guide (#2163)
+  - docs: initial release of CONTRIBUTING guide (#2163)
 
- *) installation: MathJax distribution location update (#2732);
+  - installation: MathJax distribution location update (#2732);
     disable SSLv2/SSLv3 in Apache config (#2515)
 
 Invenio v1.1.4 -- released 2014-08-31
 -------------------------------------
 
- *) BibDocFile: FFT comment/description documentation (#635);
+  - BibDocFile: FFT comment/description documentation (#635);
     duplicate docname fix (#1930); convert files and icons
     asynchronously (#1428)
 
- *) BibEncode: fix video-encoded files synchro to DB (#1647)
+  - BibEncode: fix video-encoded files synchro to DB (#1647)
 
- *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
+  - BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
 
- *) BibSched: authorization typo fix in BibTasklet (#1746); more
+  - BibSched: authorization typo fix in BibTasklet (#1746); more
     customizable icon creation tasklet; icons creation tasklet
 
- *) BibSort: `last_updated` column name typo fix (#1408 #1742)
+  - BibSort: `last_updated` column name typo fix (#1408 #1742)
 
- *) OAIRepository: OAI-PMH handler URL documented (#1027 #2152)
+  - OAIRepository: OAI-PMH handler URL documented (#1027 #2152)
 
- *) WebComment: attachments in multi-node setup
+  - WebComment: attachments in multi-node setup
 
- *) WebJournal: update demo "Article Header" style
+  - WebJournal: update demo "Article Header" style
 
- *) WebSearch: disable meta tags for deleted records (#1680)
+  - WebSearch: disable meta tags for deleted records (#1680)
 
- *) WebSession: CSRF token in API key settings form (#1855); CSRF
+  - WebSession: CSRF token in API key settings form (#1855); CSRF
     tokens in account settings forms (#1855); Python-2.4 combatibility
     issue fix
 
- *) WebSubmit: file stamper option to copy metadata (#1569); new
+  - WebSubmit: file stamper option to copy metadata (#1569); new
     Create_Modify_Interface parameters; value escaping for
     modifications (#1578); better value escaping (#1578); more
     customizable Link_Records function; no double-submit (#1020)
 
- *) installation: GnuPG key server location update; location of
+  - installation: GnuPG key server location update; location of
     jquery.treeview
 
- *) jQuery: fix for DataTables dependency URL location (#2078)
+  - jQuery: fix for DataTables dependency URL location (#2078)
 
- *) sequtils: more robust cnum generation (#2119)
+  - sequtils: more robust cnum generation (#2119)
 
- *) I18N: fix gender problem in a French translation (#2089)
+  - I18N: fix gender problem in a French translation (#2089)
 
 Invenio v1.0.7 -- released 2014-08-31
 -------------------------------------
 
- *) BibDocFile: FFT comment/description documentation (#635);
+  - BibDocFile: FFT comment/description documentation (#635);
     duplicate docname fix (#1930)
 
- *) BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
+  - BibRank: (Overflow|ZeroDivision)Error usability (#105 #2146)
 
- *) WebSession: CSRF tokens in account settings forms (#1855)
+  - WebSession: CSRF tokens in account settings forms (#1855)
 
- *) installation: GnuPG key server location update; location of
+  - installation: GnuPG key server location update; location of
     jquery.treeview
 
- *) I18N: fix gender problem in a French translation (#2089)
+  - I18N: fix gender problem in a French translation (#2089)
 
 Invenio v1.1.3 -- released 2014-02-25
 -------------------------------------
 
- *) BatchUploader: rights to ::1 for robot upload; avoid
+  - BatchUploader: rights to ::1 for robot upload; avoid
     tempfile.tempdir redefinition (#1594)
 
- *) BibCatalog: no newlines in subject for RT plugin
+  - BibCatalog: no newlines in subject for RT plugin
 
- *) BibDocFile: RHEL6 magic bindings support (#1466)
+  - BibDocFile: RHEL6 magic bindings support (#1466)
 
- *) BibFormat: fix for BibTeX regression tests; better BibTeX title
+  - BibFormat: fix for BibTeX regression tests; better BibTeX title
     and collaboration
 
- *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
+  - BibRank: temporary file storage in CFG_TMPDIR (#1594)
 
- *) BibSword: author MARC tag definition fix
+  - BibSword: author MARC tag definition fix
 
- *) BibUpload: FFT replace warning in guide
+  - BibUpload: FFT replace warning in guide
 
- *) I18N: PO file update for the release of v1.1.3; PO file update for
+  - I18N: PO file update for the release of v1.1.3; PO file update for
     the release of v1.0.6; PO file update for the release of v0.99.9;
     collection demo names for new translations
 
- *) OAIHarvest: for for bad exception handling
+  - OAIHarvest: for for bad exception handling
 
- *) OAIRepository: optional support for --notimechange
+  - OAIRepository: optional support for --notimechange
 
- *) Travis CI: initial release of configuration
+  - Travis CI: initial release of configuration
 
- *) WebSearch: nonexisting record API test case fix (#1692); correct
+  - WebSearch: nonexisting record API test case fix (#1692); correct
     record sums from hosted colls (#1651); space between records in
     MARC HTML; fix for BibTeX regression tests; field-filtered MARCXML
     API output (#1591); more complete API regression test suite;
     get_fieldvalues_alephseq_like() utils; asciification of `oe`
     grapheme (#1582); bug fix for SPIRES date math search
 
- *) WebSession: fix mail cookie expiration (#1596)
+  - WebSession: fix mail cookie expiration (#1596)
 
- *) WebSubmit: fix for typo in Shared_Functions; optional pdftk
+  - WebSubmit: fix for typo in Shared_Functions; optional pdftk
     regression tests
 
- *) dbquery: closes redundant connection
+  - dbquery: closes redundant connection
 
- *) git: addition of compile to gitignore; new entry in gitignore
+  - git: addition of compile to gitignore; new entry in gitignore
 
- *) global: language value always in link URLs
+  - global: language value always in link URLs
 
- *) installation: pip requirement version updates; pip requirements;
+  - installation: pip requirement version updates; pip requirements;
     no user prompt for warnings; empty Travis configuration; location
     of jquery-1.7.1.min.js; location of flot; information about
     unidecode; fix autotools rsync instructions
 
- *) intbitset: no crash when intbitset is on rhs (#1287)
+  - intbitset: no crash when intbitset is on rhs (#1287)
 
- *) inveniocfg: fix for mod_headers
+  - inveniocfg: fix for mod_headers
 
- *) kwalitee: list comprehensions instead of lambdas; compatibility
+  - kwalitee: list comprehensions instead of lambdas; compatibility
     with pylint 1.0.0
 
 Invenio v1.0.6 -- released 2014-01-31
 -------------------------------------
 
- *) BatchUploader: avoid tempfile.tempdir redefinition (#1594)
+  - BatchUploader: avoid tempfile.tempdir redefinition (#1594)
 
- *) BibRank: temporary file storage in CFG_TMPDIR (#1594)
+  - BibRank: temporary file storage in CFG_TMPDIR (#1594)
 
- *) BibUpload: FFT replace warning in guide
+  - BibUpload: FFT replace warning in guide
 
- *) dbquery: closes redundant connection
+  - dbquery: closes redundant connection
 
- *) global: language value always in link URLs
+  - global: language value always in link URLs
 
- *) installation: fix autotools rsync instructions; pip requirements;
+  - installation: fix autotools rsync instructions; pip requirements;
     pip requirement version updates
 
- *) intbitset: no crash when intbitset is on rhs (#1287)
+  - intbitset: no crash when intbitset is on rhs (#1287)
 
- *) WebSearch: asciification of `oe` grapheme (#1582); correct record
+  - WebSearch: asciification of `oe` grapheme (#1582); correct record
     sums from hosted colls (#1651); nonexisting record API test case
     fix (#1692); space between records in MARC HTML
 
- *) WebSession: fix mail cookie expiration (#1596)
+  - WebSession: fix mail cookie expiration (#1596)
 
- *) WebSubmit: fix for typo in Shared_Functions
+  - WebSubmit: fix for typo in Shared_Functions
 
 CDS Invenio v0.99.9 -- released 2014-01-31
 ------------------------------------------
 
- *) temporary file storage in CFG_TMPDIR (BibRank)
+  - temporary file storage in CFG_TMPDIR (BibRank)
 
 Invenio v1.1.2 -- released 2013-08-19
 -------------------------------------
 
- *) BibAuthorID: fix in name comparisons (#1313 #1314); improvements
+  - BibAuthorID: fix in name comparisons (#1313 #1314); improvements
     and fixes; improvements, fixes and optimizations; UI and backend
     improvements
 
- *) BibCatalog: removal of print statement (#1337)
+  - BibCatalog: removal of print statement (#1337)
 
- *) BibClassify: escape keywords in tag cloud and MARCXML
+  - BibClassify: escape keywords in tag cloud and MARCXML
 
- *) BibDocFile: better JS washing in web UI; display file upload
+  - BibDocFile: better JS washing in web UI; display file upload
     progress (#1020 #1021); display "Restricted" label correctly
     (#1299); fix check-md5 with bibdocfsinfo cache (#1249); fix
     check-md5 with bibdocfsinfo cache (#1249); fix error in calling
@@ -200,9 +241,9 @@ Invenio v1.1.2 -- released 2013-08-19
     (#1060); revert md5 property patch (#1249); support new magic
     library (#1207)
 
- *) BibEncode: minor fix in process_batch_job()
+  - BibEncode: minor fix in process_batch_job()
 
- *) BibFormat: additional fulltext file display in HB (#1219); checks
+  - BibFormat: additional fulltext file display in HB (#1219); checks
     for bibformat bin; fix CLI call to old PHP-based formatter; fixes
     unit tests (#1320); fix for fulltext file format; fix snippets for
     phrase queries (#1201); format_element initialisation fix; passing
@@ -210,67 +251,67 @@ Invenio v1.1.2 -- released 2013-08-19
     Invenio; setUp/tearDown in unit tests (#1319); skip hidden icons
     in OpenGraph image tag
 
- *) BibIndex: better wording for stemming in admin UI; replacement of
+  - BibIndex: better wording for stemming in admin UI; replacement of
     CDS Invenio by Invenio; synonym indexing speed up (#1484); use
     human friendly index name (#1329)
 
- *) BibKnowledge: /kb/export 500 error fix; optional memoisation of
+  - BibKnowledge: /kb/export 500 error fix; optional memoisation of
     KBR lookups (#1484)
 
- *) BibMerge: delete cache file on submit
+  - BibMerge: delete cache file on submit
 
- *) BibSched: bibupload max_priority check; bugfix for high-priority
+  - BibSched: bibupload max_priority check; bugfix for high-priority
     monotasks; increases size of monitor columns;
     parse_runtime_limit() fix (#1432); parse_runtime_limit() tests fix
     (#1432)
 
- *) BibUpload: FMT regression test case fix (#1152); indicators in
+  - BibUpload: FMT regression test case fix (#1152); indicators in
     strong tags (#939)
 
- *) CKEditor: updated to version 3.6.6
+  - CKEditor: updated to version 3.6.6
 
- *) dateutils: strftime improvement (#1065); strptime for Python-2.4
+  - dateutils: strftime improvement (#1065); strptime for Python-2.4
     compatibility
 
- *) errorlib: hiding bibcatalog info in exception body
+  - errorlib: hiding bibcatalog info in exception body
 
- *) global: test suite nosification
+  - global: test suite nosification
 
- *) htmlutils: fix single quote escaping; improve js string escaping;
+  - htmlutils: fix single quote escaping; improve js string escaping;
     MathJax 2.1 (#1050)
 
- *) I18N: updates to Catalan and Spanish translations
+  - I18N: updates to Catalan and Spanish translations
 
- *) installation: fix collectiondetailedrecordpagetabs (#1496); fix
+  - installation: fix collectiondetailedrecordpagetabs (#1496); fix
     for jQuery hotkeys add-on URL (#1507); fix for MathJax OS X
     install issue (#1455); support for Apache-2.4 (#1552)
 
- *) inveniocfg: tests runner file closure fix (#1327)
+  - inveniocfg: tests runner file closure fix (#1327)
 
- *) InvenioConnector: fix for CDS authentication; mechanize dependency
+  - InvenioConnector: fix for CDS authentication; mechanize dependency
 
- *) inveniogc: consider journal cache subdirs
+  - inveniogc: consider journal cache subdirs
 
- *) memoiseutils: initial release
+  - memoiseutils: initial release
 
- *) OAIHarvest: fix path for temporary authorlists; holding-pen UI
+  - OAIHarvest: fix path for temporary authorlists; holding-pen UI
     bugfixes (#1401)
 
- *) OAIRepository: CFG_OAI_REPOSITORY_MARCXML_SIZE; no bibupload -n
+  - OAIRepository: CFG_OAI_REPOSITORY_MARCXML_SIZE; no bibupload -n
 
- *) RefExtract: replacement of CDS Invenio by Invenio
+  - RefExtract: replacement of CDS Invenio by Invenio
 
- *) WebAccess: fix variable parsing in robot auth (#1456); IP-based
+  - WebAccess: fix variable parsing in robot auth (#1456); IP-based
     rules and offline user fix (#1233); replacement of CDS Invenio by
     InveniO
 
- *) WebApiKey: renames unit tests to regression tests (#1324)
+  - WebApiKey: renames unit tests to regression tests (#1324)
 
- *) WebAuthorProfile: fix XSS vulnerability
+  - WebAuthorProfile: fix XSS vulnerability
 
- *) WebComment: escape review "title"; escape review "title"
+  - WebComment: escape review "title"; escape review "title"
 
- *) WebSearch: 410 HTTP code for deleted records; advanced search
+  - WebSearch: 410 HTTP code for deleted records; advanced search
     notification if no hits; better cleaning of word patterns; fix
     infinite synonym lookup cases (#804); handles "find feb 12"
     (#948); nicer browsing of fuzzy indexes (#1348); respect default
@@ -279,276 +320,276 @@ Invenio v1.1.2 -- released 2013-08-19
     two-digit search; unit test disabling for CFG_CERN_SITE; unit test
     update (#1326)
 
- *) WebSession: fix for list of admin activities (#1444); login_method
+  - WebSession: fix for list of admin activities (#1444); login_method
     changes; unit vs regression test suite cleanup
 
- *) WebStat: use CFG_JOURNAL_TAG instead of 773/909C4 (#546)
+  - WebStat: use CFG_JOURNAL_TAG instead of 773/909C4 (#546)
 
- *) WebSubmit: new websubmitadmin CLI (#1334); replacement of CDS
+  - WebSubmit: new websubmitadmin CLI (#1334); replacement of CDS
 
 Invenio v1.0.5 -- released 2013-08-19
 -------------------------------------
 
- *) BibClassify: escape keywords in tag cloud and MARCXML
+  - BibClassify: escape keywords in tag cloud and MARCXML
 
- *) BibDocFile: support new magic library
+  - BibDocFile: support new magic library
 
- *) BibFormat: additional fulltext file display in HB; fix CLI call to
+  - BibFormat: additional fulltext file display in HB; fix CLI call to
     old PHP-based formatter; format_element initialisation fix
 
- *) BibIndex: better wording for stemming in admin UI
+  - BibIndex: better wording for stemming in admin UI
 
- *) BibKnowledge: /kb/export 500 error fix
+  - BibKnowledge: /kb/export 500 error fix
 
- *) BibUpload: FMT regression test case fix; indicators in strong tags
+  - BibUpload: FMT regression test case fix; indicators in strong tags
 
- *) errorlib: hiding bibcatalog info in exception body
+  - errorlib: hiding bibcatalog info in exception body
 
- *) global: test suite nosification
+  - global: test suite nosification
 
- *) installation: fix collectiondetailedrecordpagetabs; support for
+  - installation: fix collectiondetailedrecordpagetabs; support for
     Apache-2.4
 
- *) WebAccess: IP-based rules and offline user fix; replacement of CDS
+  - WebAccess: IP-based rules and offline user fix; replacement of CDS
     Invenio by InveniO
 
- *) WebComment: escape review "title"
+  - WebComment: escape review "title"
 
- *) WebSearch: respect default `rg` in Advanced Search
+  - WebSearch: respect default `rg` in Advanced Search
 
- *) WebSession: fix for list of admin activities; login_method changes
+  - WebSession: fix for list of admin activities; login_method changes
 
- *) WebSubmit: new websubmitadmin CLI
+  - WebSubmit: new websubmitadmin CLI
 
 CDS Invenio v0.99.8 -- released 2013-08-19
 ------------------------------------------
 
- *) escape keywords in tag cloud and MARCXML (BibClassify)
+  - escape keywords in tag cloud and MARCXML (BibClassify)
 
- *) fix CLI call to old PHP-based formatter; fix format_element
+  - fix CLI call to old PHP-based formatter; fix format_element
     initialisation (BibFormat)
 
- *) better wording for stemming in admin UI (BibIndex)
+  - better wording for stemming in admin UI (BibIndex)
 
- *) IP-based rules and offline user fix (WebAccess)
+  - IP-based rules and offline user fix (WebAccess)
 
- *) escape review "title" (WebComment)
+  - escape review "title" (WebComment)
 
- *) fix collectiondetailedrecordpagetabs (installation)
+  - fix collectiondetailedrecordpagetabs (installation)
 
 Invenio v1.1.1 -- released 2012-12-21
 -------------------------------------
 
- *) BatchUploader: error reporting improvements
+  - BatchUploader: error reporting improvements
 
- *) BibAuthorID: arXiv login upgrade; fix for small bug in claim
+  - BibAuthorID: arXiv login upgrade; fix for small bug in claim
     interface
 
- *) BibConvert: fix bug with SPLITW function; target/source CLI flag
+  - BibConvert: fix bug with SPLITW function; target/source CLI flag
     description fix
 
- *) BibDocFile: better error report for unknown format; explicit
+  - BibDocFile: better error report for unknown format; explicit
     redirection to secure URL; fix for file upload in submissions
 
- *) BibEdit: 'bibedit' CSS class addition to page body
+  - BibEdit: 'bibedit' CSS class addition to page body
 
- *) BibFormat: clean Default_HTML_meta template; fix for js_quicktags
+  - BibFormat: clean Default_HTML_meta template; fix for js_quicktags
     location; ISBN tag update for meta format; "ln" parameter in
     bfe_record_url output; meta header output fix; relator code filter
     in bfe_authors; fix for reformatting by record IDs
 
- *) errorlib: register_exception improvements
+  - errorlib: register_exception improvements
 
- *) global: login link using absolute URL redirection
+  - global: login link using absolute URL redirection
 
- *) installation: aidUSERINPUTLOG consistency upgrade; bigger
+  - installation: aidUSERINPUTLOG consistency upgrade; bigger
     hstRECORD.marcxml size; fix for wrong name in tabcreate; inclusion
     of JS quicktags in tarball; mark upgrade recipes as applied;
     rephrase 1.1 upgrade recipe warning; safer upgrader bibsched
     status parse; strip spaces in CFG list values
 
- *) jQuery: tablesorter location standardisation
+  - jQuery: tablesorter location standardisation
 
- *) mailutils: authentication and TLS support
+  - mailutils: authentication and TLS support
 
- *) OAIRepository: Edit OAI Set page bug fix; fix for OAI set editing;
+  - OAIRepository: Edit OAI Set page bug fix; fix for OAI set editing;
     print_record() fixes
 
- *) plotextractor: washing of captions and context
+  - plotextractor: washing of captions and context
 
- *) pluginutils: fix for failing bibformat test case
+  - pluginutils: fix for failing bibformat test case
 
- *) solrutils: addition of files into release tarball
+  - solrutils: addition of files into release tarball
 
- *) WebAccess: admin interface usability improvement; guest unit tests
+  - WebAccess: admin interface usability improvement; guest unit tests
     for firerole
 
- *) WebAlert: new regression tests for alerts
+  - WebAlert: new regression tests for alerts
 
- *) WebComment: cleaner handling of non-reply comments
+  - WebComment: cleaner handling of non-reply comments
 
- *) WebJournal: better language handling in widgets; CERN-specific
+  - WebJournal: better language handling in widgets; CERN-specific
     translation; explicit RSS icon dimensions; fix for
     CFG_TMPSHAREDDIR; fix for retrieval of deleted articles; search
     select form by name
 
- *) WebSearch: fix for webcoll grid layout markup;
+  - WebSearch: fix for webcoll grid layout markup;
     get_all_field_values() typo; next-hit/previous-hit numbering fix;
     respect output format content-type; washing of 'as' argument
 
- *) WebSession: fix for login-with-referer issue; fix for
+  - WebSession: fix for login-with-referer issue; fix for
     merge_usera_into_userb()
 
- *) WebStyle: dumb page loading fix Google Analytics documentation
+  - WebStyle: dumb page loading fix Google Analytics documentation
     update; memory leak fix in session handling; new /ping handler;
     removal of excess language box call; req.is_https() fix;
 
- *) WebSubmit: display login link on /submit page; fix for
+  - WebSubmit: display login link on /submit page; fix for
     Send_APP_Mail function; fix the approval URL for publiline
 
- *) WebUser: fix for referer URL protocol
+  - WebUser: fix for referer URL protocol
 
 Invenio v1.0.4 -- released 2012-12-21
 -------------------------------------
 
- *) installation: inclusion of JS quicktags in tarball
+  - installation: inclusion of JS quicktags in tarball
 
- *) bibdocfile: better error report for unknown format
+  - bibdocfile: better error report for unknown format
 
- *) WebAccess: admin interface usability improvement
+  - WebAccess: admin interface usability improvement
 
 Invenio v1.0.3 -- released 2012-12-19
 -------------------------------------
 
- *) BatchUploader: error reporting improvements
+  - BatchUploader: error reporting improvements
 
- *) BibConvert: fix bug with SPLITW function; target/source CLI flag
+  - BibConvert: fix bug with SPLITW function; target/source CLI flag
     description fix
 
- *) BibEdit: 'bibedit' CSS class addition to page body
+  - BibEdit: 'bibedit' CSS class addition to page body
 
- *) BibFormat: fix for js_quicktags location
+  - BibFormat: fix for js_quicktags location
 
- *) jQuery: tablesorter location standardisation
+  - jQuery: tablesorter location standardisation
 
- *) WebComment: cleaner handling of non-reply comments
+  - WebComment: cleaner handling of non-reply comments
 
- *) WebJournal: explicit RSS icon dimensions; fix for
+  - WebJournal: explicit RSS icon dimensions; fix for
     CFG_TMPSHAREDDIR; fix for retrieval of deleted articles
 
- *) WebSearch: external search pattern_list escape fix; respect output
+  - WebSearch: external search pattern_list escape fix; respect output
     format content-type; washing of 'as' argument
 
- *) WebStyle: dumb page loading fix; Google Analytics documentation
+  - WebStyle: dumb page loading fix; Google Analytics documentation
     update; memory leak fix in session handling; new /ping handler;
     removal of excess language box call; req.is_https() fix
 
- *) WebSubmit: fix for Send_APP_Mail function
+  - WebSubmit: fix for Send_APP_Mail function
 
- *) WebUser: fix for referer URL protocol
+  - WebUser: fix for referer URL protocol
 
 CDS Invenio v0.99.7 -- released 2012-12-18
 ------------------------------------------
 
- *) Google Analytics documentation update (WebStyle)
+  - Google Analytics documentation update (WebStyle)
 
- *) target/source CLI flag description fix (BibConvert)
+  - target/source CLI flag description fix (BibConvert)
 
 Invenio v1.1.0 -- released 2012-10-21
 -------------------------------------
 
- *) BatchUploader: RESTful interface, runtime checks, TextMARC input,
+  - BatchUploader: RESTful interface, runtime checks, TextMARC input,
     job priority selection
 
- *) BibAuthorID: new automatic author disambiguation and paper
+  - BibAuthorID: new automatic author disambiguation and paper
     claiming facility
 
- *) BibCatalog: storage of ticket requestor, default RT user
+  - BibCatalog: storage of ticket requestor, default RT user
 
- *) BibCirculation: security fixes
+  - BibCirculation: security fixes
 
- *) BibClassify: UI improvements and refactoring
+  - BibClassify: UI improvements and refactoring
 
- *) BibConvert: new BibTeX-to-MARCXML conversion, new oaidmf2marcxml
+  - BibConvert: new BibTeX-to-MARCXML conversion, new oaidmf2marcxml
     conversion, fixes for WORDS
 
- *) BibDocFile: new filesystem cache for faster statistics, caseless
+  - BibDocFile: new filesystem cache for faster statistics, caseless
     authorisation, disable HTTP range requests, improve file format
     policies, and more
 
- *) BibEdit: new options related to preview and printing, reference
+  - BibEdit: new options related to preview and printing, reference
     curation, autocompletion, record and field template manager,
     editing fields and subfields, per-collection authorisations, use
     of knowledge bases, and more
 
- *) BibEditMulti: new actions with conditions on fields, partial
+  - BibEditMulti: new actions with conditions on fields, partial
     matching for subfields, faster preview generation, and more
 
- *) BibEncode: new audio and video media file processing tool, new
+  - BibEncode: new audio and video media file processing tool, new
     Video demo collection
 
- *) BibFormat: new full-text snippet display facility, new
+  - BibFormat: new full-text snippet display facility, new
     configuration for I18N caching, updates to EndNote, Excel, Dublin
     Core and other formats, updates to formatting elements such as
     DOI, author, updates to podcast output, updates to XSLT
     processing, and more
 
- *) OAIHarvest: new configurable workflow with reference extraction,
+  - OAIHarvest: new configurable workflow with reference extraction,
     new author list extraction post process, upload priority, OpenAIRE
     compliance, better handling of timeouts, and more
 
- *) BibIndex: new full-text indexing via Solr, new support for author
+  - BibIndex: new full-text indexing via Solr, new support for author
     ID indexing, better author tokeniser
 
- *) BibKnowledge: dynamic knowledge bases for record editor, support
+  - BibKnowledge: dynamic knowledge bases for record editor, support
     for JSON format
 
- *) BibMatch: new matching of restricted collections
+  - BibMatch: new matching of restricted collections
 
- *) BibMerge: subfield order in slave record, confirmation pop up,
+  - BibMerge: subfield order in slave record, confirmation pop up,
     record selection bug fix
 
- *) BibRank: new index term count ranking method, new support for flot
+  - BibRank: new index term count ranking method, new support for flot
     graphs, updates to citation graphs
 
- *) BibRecord: new possibility to use lxml parser, sanity checks
+  - BibRecord: new possibility to use lxml parser, sanity checks
 
- *) BibSched: new motd-like facility for queue monitor, new
+  - BibSched: new motd-like facility for queue monitor, new
     continuable error status for tasks, new tasklet framework, new
     multi-node support, new monotask support, new support for task
     sequences, improvements to scheduling algorithm
 
- *) BibSort: new in-memory fast sorting tool using configurable
+  - BibSort: new in-memory fast sorting tool using configurable
     buckets
 
- *) BibUpload: new automatic generation of MARC tag 005, new
+  - BibUpload: new automatic generation of MARC tag 005, new
     `--callback-url' CLI parameter, fixes for appending existing
     files, fixes for multiple 001 tags, and more
 
- *) WebAccess: new external person ID support, performance
+  - WebAccess: new external person ID support, performance
     improvements, robot manager UI improvements, fixes for firerole
     handling,
 
- *) WebAlert: new alert description facility, fixes for restricted
+  - WebAlert: new alert description facility, fixes for restricted
     collections
 
- *) WebApiKey: new user-signed Web API key facility
+  - WebApiKey: new user-signed Web API key facility
 
- *) WebAuthorProfile: new author pages with dynamic box layout
+  - WebAuthorProfile: new author pages with dynamic box layout
 
- *) WebBasket: add to basket interface improvements, better XML
+  - WebBasket: add to basket interface improvements, better XML
     export, fixes for external records and other improvements
 
- *) WebComment: new collapsible comment support, new permalink to
+  - WebComment: new collapsible comment support, new permalink to
     comments, loss prevention of unsubmitted comments, tidying up HTML
     markup of comments, and more
 
- *) WebJournal: new Open Graph markup, more customisable newsletter,
+  - WebJournal: new Open Graph markup, more customisable newsletter,
     redirect to latest release of specific category, refresh chosen
     collections on release, remove unnecessary encoding/decoding,
     update weather widget for new APIs, and more
 
- *) WebSearch: new index-time and search-time synonym support, new
+  - WebSearch: new index-time and search-time synonym support, new
     Open Graph markup, new Google Scholar friendly metadata in page
     header, new limit option for wildcard queries, new support for
     access to merged records, new next/previous/back link support, new
@@ -557,182 +598,182 @@ Invenio v1.1.0 -- released 2012-10-21
     to SPIRES query syntax support, improvements to self-cite math,
     primary collection guessing, other numerous fixes
 
- *) WebSession: new useful guest sessions, reintroduces configurable
+  - WebSession: new useful guest sessions, reintroduces configurable
     IP checking, enforcement of nickname refresh, several other fixes
 
- *) WebStat: new login statistics, new custom query summary, error
+  - WebStat: new login statistics, new custom query summary, error
     analyser, custom event improvements
 
- *) WebStyle: new display restriction flag for restricted records, new
+  - WebStyle: new display restriction flag for restricted records, new
     initial right-to-left language support, authenticated user and
     HTTPS support, IP check for proxy configurations, layout updates
     and fixes for MSIE, and more
 
- *) WebSubmit: new initial support for converting to PDF/X, new
+  - WebSubmit: new initial support for converting to PDF/X, new
     embargo support, better LibreOffice compatibility, better async
     file upload, enhancements for Link_Records, support for hiding
     HIDDEN files in document manager, configurable initial value for
     counter, make use of BibSched task sequences, and more
 
- *) installation: updates to jQuery, CKEditor, unoconv, and other
+  - installation: updates to jQuery, CKEditor, unoconv, and other
     prerequisites
 
- *) dbdump: new compression support, reworked error handling
+  - dbdump: new compression support, reworked error handling
 
- *) dbquery: new possibility to query DB slave nodes, new dict-like
+  - dbquery: new possibility to query DB slave nodes, new dict-like
     output, fix for MySQL 5.5.3 and higher versions
 
- *) errorlib: stack analysis improvements, outline style improvements
+  - errorlib: stack analysis improvements, outline style improvements
     for invenio.err
 
- *) htmlutils: improvements to HTML markup removal, HTML tidying
+  - htmlutils: improvements to HTML markup removal, HTML tidying
 
- *) I18N: new Arabic and Lithuanian translations, updates to Catalan,
+  - I18N: new Arabic and Lithuanian translations, updates to Catalan,
     Czech, French, German, Greek, Italian, Russian, Slovak, Spanish
     translations
 
- *) intbitset: new performance improvements, new get item support, new
+  - intbitset: new performance improvements, new get item support, new
     pickle support, several memory leak fixes
 
- *) inveniocfg: new automated Invenio Upgrader tool
+  - inveniocfg: new automated Invenio Upgrader tool
 
- *) InvenioConnector: new search with retries, improved search
+  - InvenioConnector: new search with retries, improved search
     parameters, improved local site check, use of Invenio user agent
 
- *) jsonutils: new JSON utility library
+  - jsonutils: new JSON utility library
 
- *) mailutils: possibility to specify Reply-To header, fixes to
+  - mailutils: possibility to specify Reply-To header, fixes to
     multipart
 
- *) plotextractor: better TeX detection, better PDF harvesting from
+  - plotextractor: better TeX detection, better PDF harvesting from
     arXiv, configurable sleep timer
 
- *) pluginutils: new create_enhanced_plugin_builder API, external
+  - pluginutils: new create_enhanced_plugin_builder API, external
     plugin loading
 
- *) RefExtract: new daemon operation mode, new DOI recognition, better
+  - RefExtract: new daemon operation mode, new DOI recognition, better
     author recognition, new author knowledge base
 
- *) remote debugger: new remote debuggng support
+  - remote debugger: new remote debuggng support
 
- *) sequtils: new sequence generator tool
+  - sequtils: new sequence generator tool
 
- *) solrutils: new support for full-text query dispatching to Solr
+  - solrutils: new support for full-text query dispatching to Solr
 
- *) testutils: new Selenium web test framework
+  - testutils: new Selenium web test framework
 
- *) textutils: updates to string-to-ascii functions, LaTeX symbols to
+  - textutils: updates to string-to-ascii functions, LaTeX symbols to
     Unicode
 
- *) urlutils: fix for redirect_to_url
+  - urlutils: fix for redirect_to_url
 
- *) xmlmarclint: fix for error report formatting
+  - xmlmarclint: fix for error report formatting
 
- *) ... and other numerous smaller fixes and improvements
+  - ... and other numerous smaller fixes and improvements
 
 Invenio v1.0.2 -- released 2012-10-19
 -------------------------------------
 
- *) BibConvert: fix for static files in admin guide
+  - BibConvert: fix for static files in admin guide
 
- *) BibEdit: regression test case fix
+  - BibEdit: regression test case fix
 
- *) BibFormat: fix call to bfe_primary_report_number; revert fix for
+  - BibFormat: fix call to bfe_primary_report_number; revert fix for
     format validation report
 
- *) BibHarvest: OAI harvesting via HTTP proxy
+  - BibHarvest: OAI harvesting via HTTP proxy
 
- *) BibRank: begin_date initialisation in del_recids(); INSERT DELAYED
+  - BibRank: begin_date initialisation in del_recids(); INSERT DELAYED
     INTO rnkPAGEVIEWS; user-friendlier message for similar docs
 
- *) BibUpload: clarify correct/replace mode help
+  - BibUpload: clarify correct/replace mode help
 
- *) WebJournal: catch ValueError when reading cache; use
+  - WebJournal: catch ValueError when reading cache; use
     CFG_TMPSHAREDDIR in admin UI
 
- *) WebSearch: allow webcoll to query hidden tags; external collection
+  - WebSearch: allow webcoll to query hidden tags; external collection
     search fix; external search XSS vulnerability fix; fix for
     parentheses inside quotes; get_collection_reclist() fix; more uses
     of `rg` configurable default; 'verbose' mode available to admins
     only; XSS and verbose improvements
 
- *) WebSession: fix possibly undefined variables; prevent nickname
+  - WebSession: fix possibly undefined variables; prevent nickname
     modification
 
- *) WebStyle: workaround IE bug with cache and HTTPS
+  - WebStyle: workaround IE bug with cache and HTTPS
 
- *) WebSubmit: configurable Document File Manager; fix JS check for
+  - WebSubmit: configurable Document File Manager; fix JS check for
     mandatory fields; unoconv calling fix
 
- *) bibdocfile: guess_format_from_url() improvement;
+  - bibdocfile: guess_format_from_url() improvement;
     guess_format_from_url() improvements; INSERT DELAYED INTO
     rnkDOWNLOADS
 
- *) global: removal of psyco
+  - global: removal of psyco
 
- *) I18N: Spanish and Catalan updates to Search Tips; updates to
+  - I18N: Spanish and Catalan updates to Search Tips; updates to
     German translation
 
- *) installation: fix for jQuery UI custom; fix md5sum example
+  - installation: fix for jQuery UI custom; fix md5sum example
     arguments; new index on session.session_expiry
 
- *) intbitset: fix memory leak
+  - intbitset: fix memory leak
 
- *) inveniogc: tmp directory removal improvements
+  - inveniogc: tmp directory removal improvements
 
- *) urlutils: MS Office redirection workaround
+  - urlutils: MS Office redirection workaround
 
 CDS Invenio v0.99.6 -- released 2012-10-18
 ------------------------------------------
 
- *) improved XSS safety in external collection searching (WebSearch)
+  - improved XSS safety in external collection searching (WebSearch)
 
- *) verbose level in the search results pages is now available only to
+  - verbose level in the search results pages is now available only to
     admins, preventing potential restricted record ID disclosure even
     though record content would remain restricted (WebSearch)
 
 Invenio v1.0.1 -- released 2012-06-28
 -------------------------------------
 
- *) BibFormat: fix format validation report; fix opensearch prefix
+  - BibFormat: fix format validation report; fix opensearch prefix
     exclusion in RSS; fix retrieval of collection identifier
 
- *) BibIndex: new unit tests for the Greek stemmer
+  - BibIndex: new unit tests for the Greek stemmer
 
- *) BibSched: improve low level submission arg parsing; set ERROR
+  - BibSched: improve low level submission arg parsing; set ERROR
     status when wrong params; task can stop immediately when sleeping
 
- *) BibSword: remove dangling documentation
+  - BibSword: remove dangling documentation
 
- *) BibUpload: fix setting restriction in -a/-ir modes
+  - BibUpload: fix setting restriction in -a/-ir modes
 
- *) WebAlert: simplify HTML markup
+  - WebAlert: simplify HTML markup
 
- *) WebComment: only logged users to use report abuse
+  - WebComment: only logged users to use report abuse
 
- *) WebJournal: hide deleted records
+  - WebJournal: hide deleted records
 
- *) WebSearch: adapt test cases for citation summary; fix collection
+  - WebSearch: adapt test cases for citation summary; fix collection
     order on the search page; look at access control when webcolling;
     sorting in citesummary breakdown links
 
- *) WebSession: simplify HTML markup
+  - WebSession: simplify HTML markup
 
- *) WebSubmit: capitalise doctypes in Doc File Manager; check
+  - WebSubmit: capitalise doctypes in Doc File Manager; check
     authorizations in endaction; check for problems when archiving;
     ensure unique tmp file name for upload; fix email formatting; fix
     Move_to_Done function; remove 8564_ field from demo templates;
     skip file upload if necessary; update CERN-specific config
 
- *) bibdocfile: BibRecDocs recID argument type check
+  - bibdocfile: BibRecDocs recID argument type check
 
- *) data cacher: deletes cache before refilling it
+  - data cacher: deletes cache before refilling it
 
- *) dbquery: fix dbexec CLI WRT max allowed packet
+  - dbquery: fix dbexec CLI WRT max allowed packet
 
- *) I18N: updates to Greek translation
+  - I18N: updates to Greek translation
 
- *) installation: fix circular install-jquery-plugins; fix demo user
+  - installation: fix circular install-jquery-plugins; fix demo user
     initialisation; fix jQuery tablesorter download URL; fix jQuery
     uploadify download URL; more info about max_allowed_packet; remove
     unneeded rxp binary package
@@ -740,94 +781,94 @@ Invenio v1.0.1 -- released 2012-06-28
 Invenio v1.0.0 -- released 2012-02-29
 -------------------------------------
 
- *) BatchUploader: fix retrieval of recs from extoaiid
+  - BatchUploader: fix retrieval of recs from extoaiid
 
- *) BibCirculation: fix regexp for dictionary checking; security check
+  - BibCirculation: fix regexp for dictionary checking; security check
     before eval
 
- *) BibConvert: fix UP and DOWN for UTF-8 strings
+  - BibConvert: fix UP and DOWN for UTF-8 strings
 
- *) bibdocfile: add missing normalize_format() calls;
+  - bibdocfile: add missing normalize_format() calls;
     check_bibdoc_authorization caseless; fix append WRT
     description/restriction; fix cli_set_batch function; fix
     documentation WRT --with-version; fix handling of embargo firerole
     rule; fix parsing of complex subformats
 
- *) BibEdit: fix crash in Ajax request; fix undefined dictionary key
+  - BibEdit: fix crash in Ajax request; fix undefined dictionary key
 
- *) BibFormat: better escape BFE in admin test UI; do not exit if no
+  - BibFormat: better escape BFE in admin test UI; do not exit if no
     XSLT processor found; fix regression test; fix URL to ejournal
     resolver; fix XSLT formatting of MARCXML snippets; removes 'No
     fulltext' message; special handling of INSPIRE-PUBLIC type; use
     default namespace in XSL
 
- *) BibHarvest: check for empty resumptionToken; fix MARCXML creation
+  - BibHarvest: check for empty resumptionToken; fix MARCXML creation
     in OAI updater; optional JSON dependency
 
- *) BibIndex: fix author:Campbell-Wilson word query; fix
+  - BibIndex: fix author:Campbell-Wilson word query; fix
     double-stemming upon indexing; fix Porter stemmer in multithread;
     Greek stemmer improvements
 
- *) BibKnowledge: make XML/XSLT libs optional
+  - BibKnowledge: make XML/XSLT libs optional
 
- *) BibRank: CERN hack to inactivate similarity lists; fix citation
+  - BibRank: CERN hack to inactivate similarity lists; fix citation
     indexer time stamp updating; fix citation indexing of deleted
     records; fix citedby/refersto for infinite sets; fix empty
     citation data cacher; fix incremental citation indexer leaks; make
     numpy optional; minimum x-axis in citation history graphs; run
     citation indexer after word indexer
 
- *) BibRecord: fix for record_get_field_instances()
+  - BibRecord: fix for record_get_field_instances()
 
- *) BibSched: fix guess_apache_process_user_from_ps; use larger
+  - BibSched: fix guess_apache_process_user_from_ps; use larger
     timouts for launching tasks
 
- *) BibUpload: FFT regression tests not to use CDS
+  - BibUpload: FFT regression tests not to use CDS
 
- *) htmlutils: fix FCKeditor upload URLs
+  - htmlutils: fix FCKeditor upload URLs
 
- *) installation: add note about optional hashlib; change table TYPE
+  - installation: add note about optional hashlib; change table TYPE
     to ENGINE in SQL; fix 'install-mathjax-plugin'; fix issue with
     FCKeditor; fix 'make install-jquery-plugins'; fix output message
     cosmetics; new 'make install-ckeditor-plugin'; re-enable WSGI
     pre-loading
 
- *) intbitset: fix never ending loop in __repr__; fix several memory
+  - intbitset: fix never ending loop in __repr__; fix several memory
     leaks
 
- *) inveniocfg: fix resetting ranking method names
+  - inveniocfg: fix resetting ranking method names
 
- *) inveniogc: new CLI options check/optimise tables
+  - inveniogc: new CLI options check/optimise tables
 
- *) kwalitee: grep-like output and exit status changes; use
+  - kwalitee: grep-like output and exit status changes; use
     `--check-some` as default CLI option
 
- *) mailutils: remove unnecessary 'multipart/related'
+  - mailutils: remove unnecessary 'multipart/related'
 
- *) plotextractor: fix INSPIRE unit test
+  - plotextractor: fix INSPIRE unit test
 
- *) textmarc2xmlmarc: fix handling of BOM
+  - textmarc2xmlmarc: fix handling of BOM
 
- *) urlutils: new Indico request generator helper
+  - urlutils: new Indico request generator helper
 
- *) WebAccess: fix Access policy page; fix FireRole handling integer
+  - WebAccess: fix Access policy page; fix FireRole handling integer
     uid; fix retrieving emails from firerole
 
- *) WebAlert: fix the display of records in alerts
+  - WebAlert: fix the display of records in alerts
 
- *) WebBasket: fix missing return statement; fix number of items in
+  - WebBasket: fix missing return statement; fix number of items in
     public baskets
 
- *) WebComment: CERN-specific hack for ATLAS comments; fix discussion
+  - WebComment: CERN-specific hack for ATLAS comments; fix discussion
     display in bfe_comments; fix washing of email to admin; improve
     sanity checks
 
- *) WebHelp: HOWTO MARC document update
+  - WebHelp: HOWTO MARC document update
 
- *) WebJournal: fix seminar widget encoding issue; fix seminar widget
+  - WebJournal: fix seminar widget encoding issue; fix seminar widget
     for new Indico APIs; update weather widget for new APIs
 
- *) WebSearch: add refersto:/a b c/ example to guide; CERN-specific
+  - WebSearch: add refersto:/a b c/ example to guide; CERN-specific
     hack for journal sorting; CERN-specific hack for latest additions;
     fix case-insensitive collection search; fix CDSIndico external
     search; fix collection translation in admin UI; fix
@@ -838,30 +879,30 @@ Invenio v1.0.0 -- released 2012-02-29
     for INSPIRE author pages; replace CDS Indico by Indico; updates
     some output phrases
 
- *) WebSession: fix crash when no admin user exists
+  - WebSession: fix crash when no admin user exists
 
- *) WebStyle: better service failure message; fix implementation of
+  - WebStyle: better service failure message; fix implementation of
     req.get_hostname; fluid width of the menu; pre-load citation
     dictionaries for web
 
- *) WebSubmit: avoid printing empty doctype section;
+  - WebSubmit: avoid printing empty doctype section;
     check_user_can_view_record in publiline; fix filename bug in
     document manager; fix handling of uploaded files; fix
     record_search_pattern in DEMOJRN
 
- *) xmlmarclint: 'no valid record detected' error
+  - xmlmarclint: 'no valid record detected' error
 
- *) I18N: updates to Catalan, Czech, French, German, Greek, Italian,
+  - I18N: updates to Catalan, Czech, French, German, Greek, Italian,
     Slovak, and Spanish translations
 
- *) Note: for a complete list of new features in Invenio v1.0 release
+  - Note: for a complete list of new features in Invenio v1.0 release
     series over Invenio v0.99 release series, please see:
     <http://invenio-software.org/blog/invenio-1.0.0-rc0>
 
 CDS Invenio v0.99.5 -- released 2012-02-21
 ------------------------------------------
 
- *) improved sanity checks when reporting, voting, or replying to a
+  - improved sanity checks when reporting, voting, or replying to a
     comment, or when accessing comment attachments, preventing URL
     mangling attempts (WebComment)
 
@@ -869,1175 +910,1173 @@ CDS Invenio v0.99.5 -- released 2012-02-21
 CDS Invenio v0.99.4 -- released 2011-12-19
 ------------------------------------------
 
- *) fixed double stemming during indexing (BibIndex)
+  - fixed double stemming during indexing (BibIndex)
 
- *) fixed collection translation in admin UI (WebSearch)
+  - fixed collection translation in admin UI (WebSearch)
 
- *) fixed UP and DOWN functions for UTF-8 strings (BibConvert)
+  - fixed UP and DOWN functions for UTF-8 strings (BibConvert)
 
 Invenio v1.0.0-rc0 -- released 2010-12-21
 -----------------------------------------
 
- *) CDS Invenio becomes Invenio as of this release
+  - CDS Invenio becomes Invenio as of this release
 
- *) new facility of hosted collections; support for external records
+  - new facility of hosted collections; support for external records
     in search collections, user alerts and baskets (WebSearch,
     WebAlert, WebBasket)
 
- *) support for nested parentheses in search query syntax (WebSearch)
+  - support for nested parentheses in search query syntax (WebSearch)
 
- *) new refersto/citedby search operators for second-order searches in
+  - new refersto/citedby search operators for second-order searches in
     citation map (BibRank, WebSearch)
 
- *) numerous improvements to SPIRES query syntax parser (WebSearch)
+  - numerous improvements to SPIRES query syntax parser (WebSearch)
 
- *) enhancement to search results summaries, e.g. co-author lists on
+  - enhancement to search results summaries, e.g. co-author lists on
     author pages, e.g. h-index (WebSearch)
 
- *) new support for unAPI, Zotero, OpenSearch, AWS (WebSearch)
+  - new support for unAPI, Zotero, OpenSearch, AWS (WebSearch)
 
- *) new phrase and word-pair indexes (BibIndex)
+  - new phrase and word-pair indexes (BibIndex)
 
- *) new fuzzy author name matching mode (BibIndex)
+  - new fuzzy author name matching mode (BibIndex)
 
- *) new time-dependent citation ranking family of methods (BibRank)
+  - new time-dependent citation ranking family of methods (BibRank)
 
- *) full-text search now shows context snippets (BibFormat)
+  - full-text search now shows context snippets (BibFormat)
 
- *) improvements to the basket UI, basket export facility (WebBasket)
+  - improvements to the basket UI, basket export facility (WebBasket)
 
- *) new support for FCKeditor in submissions and user comments,
+  - new support for FCKeditor in submissions and user comments,
     possibility to attach files (WebComment, WebSubmit)
 
- *) commenting facility enhanced with rounds and threads (WebComment)
+  - commenting facility enhanced with rounds and threads (WebComment)
 
- *) new facility to moderate user comments (WebComment)
+  - new facility to moderate user comments (WebComment)
 
- *) enhanced CLI tool for document file management bringing new
+  - enhanced CLI tool for document file management bringing new
     options such as hidden file flag (WebSubmit)
 
- *) numerous improvements to the submission system, e.g. asynchronous
+  - numerous improvements to the submission system, e.g. asynchronous
     JavaScript upload support, derived document formats, icon
     creation, support for automatic conversion of OpenOffice
     documents, PDF/A, OCR (WebSubmit)
 
- *) new full-text file metadata reader/writer tool (WebSubmit)
+  - new full-text file metadata reader/writer tool (WebSubmit)
 
- *) new experimental SWORD protocol client application (BibSword)
+  - new experimental SWORD protocol client application (BibSword)
 
- *) complete rewrite of the record editor using Ajax technology for
+  - complete rewrite of the record editor using Ajax technology for
     faster user operation, with new features such as field templates,
     cloning, copy/paste, undo/redo, auto-completion, etc (BibEdit)
 
- *) new multi-record editor to alter many records in one go (BibEdit)
+  - new multi-record editor to alter many records in one go (BibEdit)
 
- *) new Ajax-based record differ and merger (BibMerge)
+  - new Ajax-based record differ and merger (BibMerge)
 
- *) new fuzzy record matching mode, with possibility to match records
+  - new fuzzy record matching mode, with possibility to match records
     against remote Invenio installations (BibMatch)
 
- *) new circulation and holdings module (BibCirculation)
+  - new circulation and holdings module (BibCirculation)
 
- *) new facility for matching provenance information when uploading
+  - new facility for matching provenance information when uploading
     records (BibUpload)
 
- *) new possibility of uploading incoming changes into holding pen
+  - new possibility of uploading incoming changes into holding pen
     (BibUpload)
 
- *) new batch uploader facility to support uploading of metadata files
+  - new batch uploader facility to support uploading of metadata files
     and of full-text files either in CLI or over web (BibUpload)
 
- *) new record exporting module supporting e.g. Sitemap and Google
+  - new record exporting module supporting e.g. Sitemap and Google
     Scholar export methods (BibExport)
 
- *) improvements to the keyword classifier, e.g. author and core
+  - improvements to the keyword classifier, e.g. author and core
     keywords (BibClassify)
 
- *) new facility for external robot-like login method (WebAccess)
+  - new facility for external robot-like login method (WebAccess)
 
- *) numerous improvements to the journal creation facility, new
+  - numerous improvements to the journal creation facility, new
     journal `Atlantis Times' demo journal (WebJournal)
 
- *) refactored and improved OAI exporter and harvester (BibHarvest)
+  - refactored and improved OAI exporter and harvester (BibHarvest)
 
- *) new taxonomy-based and dynamic-query knowledge base types
+  - new taxonomy-based and dynamic-query knowledge base types
     (BibKnowledge)
 
- *) possibility to switch on/off user features such as alerts and
+  - possibility to switch on/off user features such as alerts and
     baskets based on RBAC rules (WebAccess and other modules)
 
- *) various improvements to task scheduler, for example better
+  - various improvements to task scheduler, for example better
     communication with tasks, possibility to run certain bibsched
     tasks within given time limit, etc (BibSched)
 
- *) new database dumper for backup purposes (MiscUtil)
+  - new database dumper for backup purposes (MiscUtil)
 
- *) new plotextractor library for extracting plots from compuscripts,
+  - new plotextractor library for extracting plots from compuscripts,
     new figure caption index and the Plots tab (MiscUtil, BibIndex,
     Webearch)
 
- *) enhanced reference extrator, e.g. support for DOI, for author name
+  - enhanced reference extrator, e.g. support for DOI, for author name
     recognition (MiscUtil)
 
- *) new register emergency feature e.g. to alert admins by SMS in case
+  - new register emergency feature e.g. to alert admins by SMS in case
     the task queue stops (MiscUtil)
 
- *) infrastructure move from mod_python to mod_wsgi, support for
+  - infrastructure move from mod_python to mod_wsgi, support for
     mod_xsendfile (WebStyle and many modules)
 
- *) infrastructure move from jsMath to MathJax (MiscUtil)
+  - infrastructure move from jsMath to MathJax (MiscUtil)
 
- *) some notable backward-incompatible changes: removed authentication
+  - some notable backward-incompatible changes: removed authentication
     methods related to Apache user and group files, changed BibFormat
     element's API (BibFormat, many modules)
 
- *) new translations (Afrikaans, Galician, Georgian, Romanian,
+  - new translations (Afrikaans, Galician, Georgian, Romanian,
     Kinyarwanda) plus many translation updates
 
- *) other numerous improvements and bug fixes done in about 1600
+  - other numerous improvements and bug fixes done in about 1600
     commits over Invenio v0.99 series
 
 CDS Invenio v0.99.3 -- released 2010-12-13
 ------------------------------------------
 
- *) fixed issues in the harvesting daemon when harvesting from more
+  - fixed issues in the harvesting daemon when harvesting from more
     than one OAI repository (BibHarvest)
 
- *) fixed failure in formatting engine when dealing with
+  - fixed failure in formatting engine when dealing with
     not-yet-existing records (BibFormat)
 
- *) fixed traversal of final URL parts in the URL dispatcher
+  - fixed traversal of final URL parts in the URL dispatcher
     (WebStyle)
 
- *) improved bibdocfile URL recognition upon upload of MARC files
+  - improved bibdocfile URL recognition upon upload of MARC files
     (BibUpload)
 
- *) fixed bug in admin interface for adding authorizations (WebAccess)
+  - fixed bug in admin interface for adding authorizations (WebAccess)
 
- *) keyword extractor is now compatible with rdflib releases older
+  - keyword extractor is now compatible with rdflib releases older
     than 2.3.2 (BibClassify)
 
- *) output of `bibsched status' now shows the queue mode status as
+  - output of `bibsched status' now shows the queue mode status as
     AUTOMATIC or MANUAL to help queue monitoring (BibSched)
 
 CDS Invenio v0.99.2 -- released 2010-10-20
 ------------------------------------------
 
- *) stricter checking of access to restricted records: in order to
+  - stricter checking of access to restricted records: in order to
     view a restricted record, users are now required to have
     authorizations to access all restricted collections the given
     record may belong to (WebSearch)
 
- *) strict checking of user query history when setting up email
+  - strict checking of user query history when setting up email
     notification alert, preventing URL mangling attempts (WebAlert)
 
- *) fixed possible Unix signal conflicts for tasks performing I/O
+  - fixed possible Unix signal conflicts for tasks performing I/O
     operations or running external processes, relevant notably to
     full-text indexing of remote files (BibSched)
 
- *) fixed full-text indexing and improved handling of files of
+  - fixed full-text indexing and improved handling of files of
     `unexpected' extensions (BibIndex, WebSubmit)
 
- *) streaming of files of `unknown' MIME type now defaults to
+  - streaming of files of `unknown' MIME type now defaults to
     application/octet-stream (WebSubmit)
 
- *) fixed addition of new MARC fields in the record editor (BibEdit)
+  - fixed addition of new MARC fields in the record editor (BibEdit)
 
- *) fixed issues in full-text file attachment via MARC (BibUpload)
+  - fixed issues in full-text file attachment via MARC (BibUpload)
 
- *) fixed authaction CLI client (WebAccess)
+  - fixed authaction CLI client (WebAccess)
 
- *) ... plus other minor fixes and improvements
+  - ... plus other minor fixes and improvements
 
 CDS Invenio v0.99.1 -- released 2008-07-10
 ------------------------------------------
 
- *) search engine syntax now supports parentheses (WebSearch)
+  - search engine syntax now supports parentheses (WebSearch)
 
- *) search engine syntax now supports SPIRES query language
+  - search engine syntax now supports SPIRES query language
     (WebSearch)
 
- *) strict respect for per-collection sort options on the search
+  - strict respect for per-collection sort options on the search
     results pages (WebSearch)
 
- *) improved parsing of search query with respect to non-existing
+  - improved parsing of search query with respect to non-existing
     field terms (WebSearch)
 
- *) fixed "any collection" switch on the search results page
+  - fixed "any collection" switch on the search results page
     (WebSearch)
 
- *) added possibility for progressive display of detailed record page
+  - added possibility for progressive display of detailed record page
     tabs (WebSearch)
 
- *) added support for multi-page RSS output (WebSearch)
+  - added support for multi-page RSS output (WebSearch)
 
- *) new search engine summarizer module with the cite summary output
+  - new search engine summarizer module with the cite summary output
     format (WebSearch, BibRank)
 
- *) "cited by" links are now generated only when needed (WebSearch)
+  - "cited by" links are now generated only when needed (WebSearch)
 
- *) new experimental comprehensive author page (WebSearch)
+  - new experimental comprehensive author page (WebSearch)
 
- *) stemming for many indexes is now enabled by default (BibIndex)
+  - stemming for many indexes is now enabled by default (BibIndex)
 
- *) new intelligent journal index (BibIndex)
+  - new intelligent journal index (BibIndex)
 
- *) new logging of missing citations (BibRank)
+  - new logging of missing citations (BibRank)
 
- *) citation indexer and searcher improvements and caching (BibRank)
+  - citation indexer and searcher improvements and caching (BibRank)
 
- *) new low-level task submission facility (BibSched)
+  - new low-level task submission facility (BibSched)
 
- *) new options in bibsched task monitor: view task options, log and
+  - new options in bibsched task monitor: view task options, log and
     error files; prune task to a history table; extended status
     reporting; failed tasks now need acknowledgement in order to
     restart the queue (BibSched)
 
- *) safer handling of task sleeping and waking up (BibSched)
+  - safer handling of task sleeping and waking up (BibSched)
 
- *) new experimental support for task priorities and concurrent task
+  - new experimental support for task priorities and concurrent task
     execution (BibSched)
 
- *) improved user-configured browser language matching (MiscUtil)
+  - improved user-configured browser language matching (MiscUtil)
 
- *) new default behaviour not differentiating between guest users;
+  - new default behaviour not differentiating between guest users;
     this removes a need to keep sessions/uids for guests and robots
     (WebSession)
 
- *) optimized sessions and collecting external user information (WebSession)
+  - optimized sessions and collecting external user information (WebSession)
 
- *) improved logging conflicts for external vs internal users
+  - improved logging conflicts for external vs internal users
     (WebAccess)
 
- *) improved Single Sign-On session preservation (WebAccess)
+  - improved Single Sign-On session preservation (WebAccess)
 
- *) new 'become user' debugging facility for admins (WebAccess)
+  - new 'become user' debugging facility for admins (WebAccess)
 
- *) new bibdocfile CLI tool to manipulate full-text files archive
+  - new bibdocfile CLI tool to manipulate full-text files archive
     (WebSubmit)
 
- *) optimized redirection of old URLs (WebSubmit)
+  - optimized redirection of old URLs (WebSubmit)
 
- *) new icon creation tool in the submission input chain (WebSubmit)
+  - new icon creation tool in the submission input chain (WebSubmit)
 
- *) improved full-text file migration tool (WebSubmit)
+  - improved full-text file migration tool (WebSubmit)
 
- *) improved stamping of full-text files (WebSubmit)
+  - improved stamping of full-text files (WebSubmit)
 
- *) new approval-related end-submission functions (WebSubmit)
+  - new approval-related end-submission functions (WebSubmit)
 
- *) comments and descriptions of full-text files are now kept also in
+  - comments and descriptions of full-text files are now kept also in
     bibdoc tables, not only in MARC; they are synchronized during
     bibupload (WebSubmit, BibUpload)
 
- *) fixed navigation in public baskets (WebBasket)
+  - fixed navigation in public baskets (WebBasket)
 
- *) added detailed record page link to basket records (WebBasket)
+  - added detailed record page link to basket records (WebBasket)
 
- *) new removal of HTML markup in alert notification emails (WebAlert)
+  - new removal of HTML markup in alert notification emails (WebAlert)
 
- *) improved OAI harvester logging and handling (BibHarvest)
+  - improved OAI harvester logging and handling (BibHarvest)
 
- *) improved error checking (BibConvert)
+  - improved error checking (BibConvert)
 
- *) improvements to the record editing tool: subfield order change,
+  - improvements to the record editing tool: subfield order change,
     repetitive subfields; improved record locking features;
     configurable per-collection curators (BibEdit)
 
- *) fully refactored WebJournal module (WebJournal)
+  - fully refactored WebJournal module (WebJournal)
 
- *) new RefWorks output format, thanks to Theodoros Theodoropoulos
+  - new RefWorks output format, thanks to Theodoros Theodoropoulos
     (BibFormat)
 
- *) fixed keyword detection tool's output; deactivated taxonomy
+  - fixed keyword detection tool's output; deactivated taxonomy
     compilation (BibClassify)
 
- *) new /stats URL for administrators (WebStat)
+  - new /stats URL for administrators (WebStat)
 
- *) better filtering of unused translations (WebStyle)
+  - better filtering of unused translations (WebStyle)
 
- *) updated French, Italian, Norwegian and Swedish translations;
+  - updated French, Italian, Norwegian and Swedish translations;
     updated Japanese translation (thanks to Makiko Matsumoto and Takao
     Ishigaki); updated Greek translation (thanks to Theodoros
     Theodoropoulos); new Hungarian translation (thanks to Eva Papp)
 
- *) ... plus many other minor bug fixes and improvements
+  - ... plus many other minor bug fixes and improvements
 
 CDS Invenio v0.99.0 -- released 2008-03-27
 ------------------------------------------
 
- *) new Invenio configuration language, new inveniocfg configuration
+  - new Invenio configuration language, new inveniocfg configuration
     tool permitting more runtime changes and enabling separate local
     customizations (MiscUtil)
 
- *) phased out WML dependency everywhere (all modules)
+  - phased out WML dependency everywhere (all modules)
 
- *) new common RSS cache implementation (WebSearch)
+  - new common RSS cache implementation (WebSearch)
 
- *) improved access control to the detailed record pages (WebSearch)
+  - improved access control to the detailed record pages (WebSearch)
 
- *) when searching non-existing collections, do not revert to
+  - when searching non-existing collections, do not revert to
     searching in public Home anymore (WebSearch)
 
- *) strict calculation of number of hits per multiple collections
+  - strict calculation of number of hits per multiple collections
     (WebSearch)
 
- *) propagate properly language environment in browse pages, thanks to
+  - propagate properly language environment in browse pages, thanks to
     Ferran Jorba (WebSearch)
 
- *) search results sorting made accentless, thanks to Ferran Jorba
+  - search results sorting made accentless, thanks to Ferran Jorba
     (WebSearch)
 
- *) new OpenURL interface (WebSearch)
+  - new OpenURL interface (WebSearch)
 
- *) added new search engine API argument to limit searches to record
+  - added new search engine API argument to limit searches to record
     creation/modification dates and times instead of hitherto creation
     dates only (WebSearch)
 
- *) do not allow HTTP POST method for searches to prevent hidden
+  - do not allow HTTP POST method for searches to prevent hidden
     mining (WebSearch)
 
- *) added alert and RSS teaser for search engine queries (WebSearch)
+  - added alert and RSS teaser for search engine queries (WebSearch)
 
- *) new optimized index structure for fast integer bit vector
+  - new optimized index structure for fast integer bit vector
     operations, leading to significant indexing time improvements
     (MiscUtil, BibIndex, WebSearch)
 
- *) new tab-based organisation of detailed record pages, with new URL
+  - new tab-based organisation of detailed record pages, with new URL
     schema (/record/1/usage) and related CSS changes (BibFormat,
     MiscUtil, WebComment, WebSearch, WebStyle, WebSubmit)
 
- *) phased out old PHP based code; migration to Python-based output
+  - phased out old PHP based code; migration to Python-based output
     formats recommended (BibFormat, WebSubmit)
 
- *) new configurability to show/hide specific output formats for
+  - new configurability to show/hide specific output formats for
     specific collections (BibFormat, WebSearch)
 
- *) new configurability to have specific stemming settings for
+  - new configurability to have specific stemming settings for
     specific indexes (BibIndex, WebSearch)
 
- *) optional removal of LaTeX markup for indexer (BibIndex, WebSearch)
+  - optional removal of LaTeX markup for indexer (BibIndex, WebSearch)
 
- *) performance optimization for webcoll and optional arguments to
+  - performance optimization for webcoll and optional arguments to
     refresh only parts of collection cache (WebSearch)
 
- *) optional verbosity argument propagation to the output formatter
+  - optional verbosity argument propagation to the output formatter
     (BibFormat, WebSearch)
 
- *) new convenient reindex option to the indexer (BibIndex)
+  - new convenient reindex option to the indexer (BibIndex)
 
- *) fixed problem with indexing of some lengthy UTF-8 accented names,
+  - fixed problem with indexing of some lengthy UTF-8 accented names,
     thanks to Theodoros Theodoropoulos for reporting the problem
     (BibIndex)
 
- *) fixed full-text indexing of HTML pages (BibIndex)
+  - fixed full-text indexing of HTML pages (BibIndex)
 
- *) new Stemmer module dependency, fixes issues on 64-bit systems
+  - new Stemmer module dependency, fixes issues on 64-bit systems
     (BibIndex)
 
- *) fixed download history graph display (BibRank)
+  - fixed download history graph display (BibRank)
 
- *) improved citation ranking and history graphs, introduced
+  - improved citation ranking and history graphs, introduced
     self-citation distinction, added new demo records (BibRank)
 
- *) fixed range redefinition and output message printing problems in
+  - fixed range redefinition and output message printing problems in
     the ranking indexer, thanks to Mike Marino (BibRank)
 
- *) new XSLT output formatter support; phased out old BFX formats
+  - new XSLT output formatter support; phased out old BFX formats
     (BibFormat)
 
- *) I18N output messages are now translated in the output formatter
+  - I18N output messages are now translated in the output formatter
     templates (BibFormat)
 
- *) formats fixed to allow multiple author affiliations (BibFormat)
+  - formats fixed to allow multiple author affiliations (BibFormat)
 
- *) improved speed of the record output reformatter in case of large
+  - improved speed of the record output reformatter in case of large
     sets (BibFormat)
 
- *) support for displaying LaTeX formulas via JavaScript (BibFormat)
+  - support for displaying LaTeX formulas via JavaScript (BibFormat)
 
- *) new and improved output formatter elements (BibFormat)
+  - new and improved output formatter elements (BibFormat)
 
- *) new escaping modes for format elements (BibFormat)
+  - new escaping modes for format elements (BibFormat)
 
- *) output format template editor cache and element dependency
+  - output format template editor cache and element dependency
     checker improvements (BibFormat)
 
- *) output formatter speed improvements in PHP-compatible mode
+  - output formatter speed improvements in PHP-compatible mode
     (BibFormat)
 
- *) new demo submission configuration and approval workflow examples
+  - new demo submission configuration and approval workflow examples
     (WebSubmit)
 
- *) new submission full-text file stamper utility (WebSubmit)
+  - new submission full-text file stamper utility (WebSubmit)
 
- *) new submission icon-creation utility (WebSubmit)
+  - new submission icon-creation utility (WebSubmit)
 
- *) separated submission engine and database layer (WebSubmit)
+  - separated submission engine and database layer (WebSubmit)
 
- *) submission functions can now access user information (WebSubmit)
+  - submission functions can now access user information (WebSubmit)
 
- *) implemented support for restricted icons (WebSubmit, WebAccess)
+  - implemented support for restricted icons (WebSubmit, WebAccess)
 
- *) new full-text file URL and cleaner storage facility; requires file
+  - new full-text file URL and cleaner storage facility; requires file
     names to be unique within a given record (WebSearch, WebSubmit)
 
- *) experimental release of the complex approval and refereeing
+  - experimental release of the complex approval and refereeing
     workflow (WebSubmit)
 
- *) new end-submission functions to move files to storage space
+  - new end-submission functions to move files to storage space
     (WebSubmit)
 
- *) added support for MD5 checking of full-text files (WebSubmit)
+  - added support for MD5 checking of full-text files (WebSubmit)
 
- *) improved behaviour of the submission system with respect to the
+  - improved behaviour of the submission system with respect to the
     browser "back" button (WebSubmit)
 
- *) removed support for submission "cookies" (WebSubmit)
+  - removed support for submission "cookies" (WebSubmit)
 
- *) flexible report number generation during submission (WebSubmit)
+  - flexible report number generation during submission (WebSubmit)
 
- *) added support for optional filtering step in the OAI harvesting
+  - added support for optional filtering step in the OAI harvesting
     chain (BibHarvest)
 
- *) new text-oriented converter functions IFDEFP, JOINMULTILINES
+  - new text-oriented converter functions IFDEFP, JOINMULTILINES
     (BibConvert)
 
- *) selective harvesting improvements, sets, non-standard responses,
+  - selective harvesting improvements, sets, non-standard responses,
     safer resumption token handling (BibHarvest)
 
- *) OAI archive configuration improvements: collections retrieval,
+  - OAI archive configuration improvements: collections retrieval,
     multiple set definitions, new clean mode, timezones, and more
     (BibHarvest)
 
- *) OAI gateway improvements: XSLT used to produce configurable output
+  - OAI gateway improvements: XSLT used to produce configurable output
     (BibHarvest)
 
- *) added support for "strong tags" that can resist metadata replace
+  - added support for "strong tags" that can resist metadata replace
     mode (BibUpload)
 
- *) added external OAI ID tag support to the uploader (BibUpload)
+  - added external OAI ID tag support to the uploader (BibUpload)
 
- *) added support for full-text file transfer during uploading
+  - added support for full-text file transfer during uploading
     (BibUpload)
 
- *) preserving full history of all MARCXML versions of a record
+  - preserving full history of all MARCXML versions of a record
     (BibEdit, BibUpload)
 
- *) XMLMARC to TextMarc improvements: empty indicators and more
+  - XMLMARC to TextMarc improvements: empty indicators and more
     (BibEdit)
 
- *) numerous reference extraction tool improvements: year handling,
+  - numerous reference extraction tool improvements: year handling,
     LaTeX handling, URLs, journal titles, output methods, and more
     (BibEdit)
 
- *) new classification daemon (BibClassify)
+  - new classification daemon (BibClassify)
 
- *) classification taxonomy caching resulting in speed optimization
+  - classification taxonomy caching resulting in speed optimization
     (BibClassify)
 
- *) new possibility to define more than one keyword taxonomy per
+  - new possibility to define more than one keyword taxonomy per
     collection (BibClassify)
 
- *) fixed non-standalone keyword detection, thanks to Annette Holtkamp
+  - fixed non-standalone keyword detection, thanks to Annette Holtkamp
     (BibClassify)
 
- *) new embedded page generation profiler (WebStyle)
+  - new embedded page generation profiler (WebStyle)
 
- *) new /help pages layout and webdoc formatting tool (WebStyle)
+  - new /help pages layout and webdoc formatting tool (WebStyle)
 
- *) new custom style template verification tool (WebStyle)
+  - new custom style template verification tool (WebStyle)
 
- *) added support for the XML page() output format, suitable for AJAX
+  - added support for the XML page() output format, suitable for AJAX
     interfaces (WebStyle)
 
- *) introduction of navigation menus (WebStyle)
+  - introduction of navigation menus (WebStyle)
 
- *) general move from HTML to XHTML markup (all modules)
+  - general move from HTML to XHTML markup (all modules)
 
- *) fixed alert deletion tool vulnerability (WebAlert)
+  - fixed alert deletion tool vulnerability (WebAlert)
 
- *) do not advertise baskets/alerts much for guest users; show only
+  - do not advertise baskets/alerts much for guest users; show only
     the login link (WebSession)
 
- *) password reset interface improvements (WebSession)
+  - password reset interface improvements (WebSession)
 
- *) new permanent "remember login" mechanism (WebSession, WebAccess)
+  - new permanent "remember login" mechanism (WebSession, WebAccess)
 
- *) local user passwords are now encrypted (WebSession, WebAccess)
+  - local user passwords are now encrypted (WebSession, WebAccess)
 
- *) new LDAP external authentication plugin (WebAccess)
+  - new LDAP external authentication plugin (WebAccess)
 
- *) new password reset mechanism using new secure mail cookies and
+  - new password reset mechanism using new secure mail cookies and
     temporary role membership facilities (WebAccess, WebSession)
 
- *) added support for Single Sign-On Shibboleth based authentication
+  - added support for Single Sign-On Shibboleth based authentication
     method (WebAccess)
 
- *) new firewall-like based role definition language, new demo
+  - new firewall-like based role definition language, new demo
     examples (WebAccess)
 
- *) external authentication and groups improvements: nicknames,
+  - external authentication and groups improvements: nicknames,
     account switching, and more (WebSession, WebAccess)
 
- *) task log viewer integrated in the task monitor (BibSched)
+  - task log viewer integrated in the task monitor (BibSched)
 
- *) new journal creation module (WebJournal)
+  - new journal creation module (WebJournal)
 
- *) new generic statistic gathering and display facility (WebStat)
+  - new generic statistic gathering and display facility (WebStat)
 
- *) deployed new common email sending facility (MiscUtil, WebAlert,
+  - deployed new common email sending facility (MiscUtil, WebAlert,
     WebComment, WebSession, WebSubmit)
 
- *) dropped support for MySQL-4.0, permitting to use clean and strict
+  - dropped support for MySQL-4.0, permitting to use clean and strict
     UTF-8 storage methods; upgrade of MySQLdb to at least 1.2.1_p2
     required (MiscUtil)
 
- *) uncatched exceptions are now being sent by email to the
+  - uncatched exceptions are now being sent by email to the
     administrator (MiscUtil, WebStyle)
 
- *) new general garbage collector with a possibility to run via the
+  - new general garbage collector with a possibility to run via the
     task scheduler and a possibility to clean unreferenced
     bibliographic values (MiscUtil)
 
- *) new generic SQL and data cacher (MiscUtil)
+  - new generic SQL and data cacher (MiscUtil)
 
- *) new HTML page validator plugin (MiscUtil)
+  - new HTML page validator plugin (MiscUtil)
 
- *) new web test suite running in a real browser (MiscUtil)
+  - new web test suite running in a real browser (MiscUtil)
 
- *) improved code kwalitee checker (MiscUtil)
+  - improved code kwalitee checker (MiscUtil)
 
- *) translation updates: Spanish and Catalan (thanks to Ferran Jorba),
+  - translation updates: Spanish and Catalan (thanks to Ferran Jorba),
     Japanese (Toru Tsuboyama), German (Benedikt Koeppel), Polish
     (Zbigniew Szklarz and Zbigniew Leonowicz), Greek (Theodoros
     Theodoropoulos), Russian (Yana Osborne), Swedish, Italian, French
 
- *) new translations: Chinese traditional and Chinese simplified
+  - new translations: Chinese traditional and Chinese simplified
     (thanks to Kam-ming Ku)
 
- *) ... plus many other minor bug fixes and improvements
+  - ... plus many other minor bug fixes and improvements
 
 CDS Invenio v0.92.1 -- released 2007-02-20
 ------------------------------------------
 
- *) new support for external authentication systems (WebSession,
+  - new support for external authentication systems (WebSession,
     WebAccess)
 
- *) new support for external user groups (WebSession)
+  - new support for external user groups (WebSession)
 
- *) new experimental version of the reference extraction program
+  - new experimental version of the reference extraction program
     (BibEdit)
 
- *) new optional Greek stopwords list, thanks to Theodoropoulos
+  - new optional Greek stopwords list, thanks to Theodoropoulos
     Theodoros (BibIndex)
 
- *) new Get_Recid submission function (WebSubmit)
+  - new Get_Recid submission function (WebSubmit)
 
- *) new config variable governing the display of the download history
+  - new config variable governing the display of the download history
     graph (BibRank)
 
- *) started deployment of user preferences (WebSession, WebSearch)
+  - started deployment of user preferences (WebSession, WebSearch)
 
- *) split presentation style for "Narrow search", "Focus on" and
+  - split presentation style for "Narrow search", "Focus on" and
     "Search also" search interface boxes (WebSearch, WebStyle)
 
- *) updated CERN Indico and KEK external collection searching facility
+  - updated CERN Indico and KEK external collection searching facility
     (WebSearch)
 
- *) fixed search interface portalbox and collection definition
+  - fixed search interface portalbox and collection definition
     escaping behaviour (WebSearch Admin)
 
- *) fixed problems with external system number and OAI ID matching
+  - fixed problems with external system number and OAI ID matching
     (BibUpload)
 
- *) fixed problem with case matching behaviour (BibUpload)
+  - fixed problem with case matching behaviour (BibUpload)
 
- *) fixed problems with basket record display and basket topic change
+  - fixed problems with basket record display and basket topic change
     (WebBasket)
 
- *) fixed output format template attribution behaviour (BibFormat)
+  - fixed output format template attribution behaviour (BibFormat)
 
- *) improved language context propagation in output formats
+  - improved language context propagation in output formats
     (BibFormat)
 
- *) improved output format treatment of HTML-aware fields (BibFormat)
+  - improved output format treatment of HTML-aware fields (BibFormat)
 
- *) improved BibFormat migration kit (BibFormat)
+  - improved BibFormat migration kit (BibFormat)
 
- *) improved speed and eliminated set duplication of the OAI
+  - improved speed and eliminated set duplication of the OAI
     repository gateway (BibHarvest)
 
- *) fixed resumption token handling (BibHarvest)
+  - fixed resumption token handling (BibHarvest)
 
- *) improved record editing interface (BibEdit)
+  - improved record editing interface (BibEdit)
 
- *) fixed problem with empty fields treatment (BibConvert)
+  - fixed problem with empty fields treatment (BibConvert)
 
- *) updated Report_Number_Generation submission function to be able to
+  - updated Report_Number_Generation submission function to be able to
     easily generate report numbers from any submission information
     (WebSubmit)
 
- *) fixed problem with submission field value escaping (WebSubmit)
+  - fixed problem with submission field value escaping (WebSubmit)
 
- *) fixed problem with submission collection ordering (WebSubmit)
+  - fixed problem with submission collection ordering (WebSubmit)
 
- *) fixed BibSched task signal handling inconsistency (BibSched)
+  - fixed BibSched task signal handling inconsistency (BibSched)
 
- *) fixed TEXT versus BLOB database problems for some tables/columns
+  - fixed TEXT versus BLOB database problems for some tables/columns
 
- *) minor updates to the HOWTO Migrate guide and several admin guides
+  - minor updates to the HOWTO Migrate guide and several admin guides
     (WebHelp, BibIndex, BibFormat)
 
- *) minor bugfixes to several modules; see ChangeLog for details and
+  - minor bugfixes to several modules; see ChangeLog for details and
     credits
 
 CDS Invenio v0.92.0 -- released 2006-12-22
 ------------------------------------------
 
- *) previously experimental output formatter in Python improved and
+  - previously experimental output formatter in Python improved and
     made default (BibFormat)
 
- *) previously experimental new submission admin interface in Python
+  - previously experimental new submission admin interface in Python
     improved and made default (WebSubmit)
 
- *) new XML-oriented output formatting mode (BibFormat)
+  - new XML-oriented output formatting mode (BibFormat)
 
- *) new export-oriented output formats: EndNote, NLM (BibFormat)
+  - new export-oriented output formats: EndNote, NLM (BibFormat)
 
- *) RSS 2.0 latest additions feed service (WebSearch, BibFormat)
+  - RSS 2.0 latest additions feed service (WebSearch, BibFormat)
 
- *) new XML-oriented metadata converter mode (BibConvert)
+  - new XML-oriented metadata converter mode (BibConvert)
 
- *) new metadata uploader in Python (BibUpload)
+  - new metadata uploader in Python (BibUpload)
 
- *) new integrated parallel external collection searching (WebSearch)
+  - new integrated parallel external collection searching (WebSearch)
 
- *) improved document classifier: composite keywords, wildcards, cloud
+  - improved document classifier: composite keywords, wildcards, cloud
     output (BibClassify)
 
- *) improved UTF-8 fulltext indexing (BibIndex)
+  - improved UTF-8 fulltext indexing (BibIndex)
 
- *) improved external login authentication subsystem (WebAccess)
+  - improved external login authentication subsystem (WebAccess)
 
- *) added possibility to order submission categories (WebSubmit)
+  - added possibility to order submission categories (WebSubmit)
 
- *) improved handling of cached search interface page formats,
+  - improved handling of cached search interface page formats,
     preferential sort pattern functionality, international collection
     names (WebSearch)
 
- *) improved behaviour of OAI harvester: sets, deleted records,
+  - improved behaviour of OAI harvester: sets, deleted records,
     harvested metadata transformation (BibHarvest)
 
- *) improved MARCXML schema compatibility concerning indicators;
+  - improved MARCXML schema compatibility concerning indicators;
     updates to the HTML MARC output format (BibEdit, BibUpload,
     BibFormat, and other modules)
 
- *) multiple minor bugs fixed thanks to the wider deployment of the
+  - multiple minor bugs fixed thanks to the wider deployment of the
     regression test suite (all modules)
 
- *) new translation (Croatian) and several translation updates
+  - new translation (Croatian) and several translation updates
     (Catalan, Bulgarian, French, Greek, Spanish); thanks to Ferran
     Jorba, Beatriu Piera, Alen Vodopijevec, Jasna Marković, Theodoros
     Theodoropoulos, and Nikolay Dyankov (see also THANKS file)
 
- *) removed dependency on PHP; not needed anymore
+  - removed dependency on PHP; not needed anymore
 
- *) full compatibility with MySQL 4.1 and 5.0; upgrade from MySQL 4.0
+  - full compatibility with MySQL 4.1 and 5.0; upgrade from MySQL 4.0
     now recommended
 
- *) full compatibility with FreeBSD and Mac OS X
+  - full compatibility with FreeBSD and Mac OS X
 
 CDS Invenio v0.90.1 -- released 2006-07-23
 ------------------------------------------
 
- *) output messages improved and enhanced to become more easily
+  - output messages improved and enhanced to become more easily
     translatable in various languages (all modules)
 
- *) new translation (Bulgarian) and several updated translations
+  - new translation (Bulgarian) and several updated translations
     (Greek, French, Russian, Slovak)
 
- *) respect langugage choice in various web application links
+  - respect langugage choice in various web application links
     (WebAlert, WebBasket, WebComment, WebSession, WebSubmit)
 
- *) fixed problem with commenting rights in a group-shared basket that
+  - fixed problem with commenting rights in a group-shared basket that
     is also a public basket with lesser rights (WebBasket)
 
- *) guest users are now forbidden to share baskets (WebBasket)
+  - guest users are now forbidden to share baskets (WebBasket)
 
- *) fixed guest user garbage collection, adapted to the new baskets
+  - fixed guest user garbage collection, adapted to the new baskets
     schema (WebSession)
 
- *) added possibility to reject group membership requests; sending
+  - added possibility to reject group membership requests; sending
     informational messages when users are approved/refused by group
     administrators (WebSession)
 
- *) experimental release of the new BibFormat in Python (BibFormat)
+  - experimental release of the new BibFormat in Python (BibFormat)
 
- *) started massive deployment of the regression test suite, checking
+  - started massive deployment of the regression test suite, checking
     availability of all web interface pages (BibEdit, BibFormat,
     BibHarvest, BibIndex, BibRank, MiscUtil, WebAccess, WebBasket,
     WebComment, WebMessage, WebSearch, WebSession, WebSubmit)
 
- *) updated developer documentation (I18N output messages policy, test
+  - updated developer documentation (I18N output messages policy, test
     suite policy, coding style)
 
 CDS Invenio v0.90.0 -- released 2006-06-30
 ------------------------------------------
 
- *) formerly known as CDSware; the application name change clarifies
+  - formerly known as CDSware; the application name change clarifies
     the relationship with respect to the CDS Sofware Consortium
     producing two flagship applications (CDS Indico and Invenio)
 
- *) version number increased to v0.90 in the anticipation of the
+  - version number increased to v0.90 in the anticipation of the
     forthcoming v1.0 release after all the major codebase changes are
     now over
 
- *) new possibility to define user groups (WebGroup)
+  - new possibility to define user groups (WebGroup)
 
- *) new personal basket organization in topics (WebBasket)
+  - new personal basket organization in topics (WebBasket)
 
- *) new basket sharing among user groups (WebBasket)
+  - new basket sharing among user groups (WebBasket)
 
- *) new open peer reviewing and commenting on documents (WebComment)
+  - new open peer reviewing and commenting on documents (WebComment)
 
- *) new user and group web messaging system (WebMessage)
+  - new user and group web messaging system (WebMessage)
 
- *) new ontology-based document classification system (BibClassify)
+  - new ontology-based document classification system (BibClassify)
 
- *) new WebSubmit Admin (WebSubmit)
+  - new WebSubmit Admin (WebSubmit)
 
- *) new record editing web interface (BibEdit)
+  - new record editing web interface (BibEdit)
 
- *) new record matching tool  (BibMatch)
+  - new record matching tool  (BibMatch)
 
- *) new OAI repository administration tool (BibHarvest)
+  - new OAI repository administration tool (BibHarvest)
 
- *) new OAI periodical harvesting tool (BibHarvest)
+  - new OAI periodical harvesting tool (BibHarvest)
 
- *) new web layout templating system (WebStyle)
+  - new web layout templating system (WebStyle)
 
- *) new clean URL schema (e.g. /collection/Theses, /record/1234)
+  - new clean URL schema (e.g. /collection/Theses, /record/1234)
     (WebStyle)
 
- *) new BibTeX output format support (BibFormat)
+  - new BibTeX output format support (BibFormat)
 
- *) new possibility of secure HTTPS authentication while keeping the
+  - new possibility of secure HTTPS authentication while keeping the
     rest of the site non-HTTPS (WebSession)
 
- *) new centralized error library (MiscUtil)
+  - new centralized error library (MiscUtil)
 
- *) new gettext-based international translations, with two new beta
+  - new gettext-based international translations, with two new beta
     translations (Japanese, Polish)
 
- *) new regression testing suite framework (MiscUtil)
+  - new regression testing suite framework (MiscUtil)
 
- *) new all prerequisites are now apt-gettable for Debian "Sarge"
+  - new all prerequisites are now apt-gettable for Debian "Sarge"
     GNU/Linux
 
- *) new full support for Mac OS X
+  - new full support for Mac OS X
 
- *) ... plus many fixes and changes worth one year of development
+  - ... plus many fixes and changes worth one year of development
 
 CDSware v0.7.1 -- released 2005-05-04
 -------------------------------------
 
- *) important bugfix for bibconvert's ``source data in a directory''
+  - important bugfix for bibconvert's ``source data in a directory''
     mode, as invoked by the web submission system (BibConvert)
 
- *) minor bugfix in the search engine, thanks to Frederic Gobry
+  - minor bugfix in the search engine, thanks to Frederic Gobry
     (WebSearch)
 
- *) minor bugfix in the WebSearch Admin interface (WebSearch)
+  - minor bugfix in the WebSearch Admin interface (WebSearch)
 
- *) automatic linking to Google Print in the ``Haven't found what you
+  - automatic linking to Google Print in the ``Haven't found what you
     were looking for...'' page box (WebSearch)
 
- *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba
+  - BibFormat Admin Guide cleaned, thanks to Ferran Jorba
 
- *) new Catalan translation, thanks to Ferran Jorba
+  - new Catalan translation, thanks to Ferran Jorba
 
- *) updated Greek and Portuguese translations, thanks to Theodoros
+  - updated Greek and Portuguese translations, thanks to Theodoros
     Theodoropoulos and FlÃ¡vio C. Coelho
 
- *) updated Spanish translation
+  - updated Spanish translation
 
 CDSware v0.7.0 -- released 2005-04-06
 -------------------------------------
 
- *) experimental release of the refextract program for automatic
+  - experimental release of the refextract program for automatic
     reference extraction from PDF fulltext files (BibEdit)
 
- *) experimental release of the citation and download ranking tools
+  - experimental release of the citation and download ranking tools
     (BibRank)
 
- *) new module for gathering usage statistics out of Apache log files
+  - new module for gathering usage statistics out of Apache log files
     (WebStat)
 
- *) new similar-records-navigation tool exploring end-user viewing
+  - new similar-records-navigation tool exploring end-user viewing
     habits: "people who viewed this page also viewed" (WebSearch,
     BibRank)
 
- *) OAI gateway validated against OAI Repository Explorer (BibHarvest)
+  - OAI gateway validated against OAI Repository Explorer (BibHarvest)
 
- *) fixed "records modified since" option for the indexer (BibIndex)
+  - fixed "records modified since" option for the indexer (BibIndex)
 
- *) collection cache update is done only when the cache is not up to
+  - collection cache update is done only when the cache is not up to
     date (WebSearch) [closing #WebSearch-016]
 
- *) cleanup of user login mechanism (WebSession, WebAccess)
+  - cleanup of user login mechanism (WebSession, WebAccess)
 
- *) fixed uploading of already-existing records in the insertion mode
+  - fixed uploading of already-existing records in the insertion mode
     (BibUpload)
 
- *) fixed submission in UTF-8 languages (WebSubmit)
+  - fixed submission in UTF-8 languages (WebSubmit)
 
- *) updated HOWTO Run Your Existing CDSware Installation (WebHelp)
+  - updated HOWTO Run Your Existing CDSware Installation (WebHelp)
 
- *) test suite improvements (WebSearch, BibHarvest, BibRank,
+  - test suite improvements (WebSearch, BibHarvest, BibRank,
     BibConvert)
 
- *) German translation updated and new German stopwords list added,
+  - German translation updated and new German stopwords list added,
     thanks to Guido Pelzer
 
- *) new Greek and Ukrainian translations, thanks to Theodoros
+  - new Greek and Ukrainian translations, thanks to Theodoros
     Theodoropoulos and Vasyl Ostrovskyi
 
- *) all language codes now comply to RFC 1766 and ISO 639
+  - all language codes now comply to RFC 1766 and ISO 639
 
- *) numerous other small fixes and improvements, with many
+  - numerous other small fixes and improvements, with many
     contributions by the EPFL team headed by Frederic Gobry
     (BibConvert, BibUpload, WebSearch, WebSubmit, WebSession)
 
 CDSware v0.5.0 -- released 2004-12-17
 -------------------------------------
 
- *) new rank engine, featuring word similarity rank method and the
+  - new rank engine, featuring word similarity rank method and the
     journal impact factor rank demo (BibRank)
 
- *) search engine includes ranking option (WebSearch)
+  - search engine includes ranking option (WebSearch)
 
- *) record similarity search based on word frequency (WebSearch,
+  - record similarity search based on word frequency (WebSearch,
     BibRank)
 
- *) stopwords possibility when ranking and indexing (BibRank, BibIndex)
+  - stopwords possibility when ranking and indexing (BibRank, BibIndex)
 
- *) stemming possibility when ranking and indexing (BibRank, BibIndex)
+  - stemming possibility when ranking and indexing (BibRank, BibIndex)
 
- *) search engine boolean query processing stages improved (WebSearch)
+  - search engine boolean query processing stages improved (WebSearch)
 
- *) search engine accent matching in phrase searches (WebSearch)
+  - search engine accent matching in phrase searches (WebSearch)
 
- *) regular expression searching mode introduced into the Simple
+  - regular expression searching mode introduced into the Simple
     Search interface too (WebSearch)
 
- *) Search Tips split into a brief Search Tips page and detailed
+  - Search Tips split into a brief Search Tips page and detailed
     Search Guide page (WebSearch)
 
- *) improvements to the ``Try your search on'' hints (WebSearch)
+  - improvements to the ``Try your search on'' hints (WebSearch)
 
- *) author search hints introduced (WebSearch)
+  - author search hints introduced (WebSearch)
 
- *) search interface respects title prologue/epilogue portalboxes
+  - search interface respects title prologue/epilogue portalboxes
     (WebSearch)
 
- *) improvements to admin interfaces (WebSearch, BibIndex, BibRank,
+  - improvements to admin interfaces (WebSearch, BibIndex, BibRank,
     WebAccess)
 
- *) basket item ordering problem fixed (WebBasket)
+  - basket item ordering problem fixed (WebBasket)
 
- *) access error messages introduced (WebAccess and its clients)
+  - access error messages introduced (WebAccess and its clients)
 
- *) new account management to enable/disable guest users and
+  - new account management to enable/disable guest users and
     automatic vs to-be-approved account registration (WebAccess)
 
- *) possibility for temporary read-only access to, and closure of, the
+  - possibility for temporary read-only access to, and closure of, the
     site; useful for backups (WebAccess and its clients)
 
- *) possibility for external authentication login methods (WebAccess)
+  - possibility for external authentication login methods (WebAccess)
 
- *) new XML MARC handling library (BibEdit)
+  - new XML MARC handling library (BibEdit)
 
- *) when uploading, bad XML records are marked as errors (BibUpload)
+  - when uploading, bad XML records are marked as errors (BibUpload)
 
- *) improvements to the submission engine and its admin interface,
+  - improvements to the submission engine and its admin interface,
     thanks to Tiberiu Dondera (WebSubmit)
 
- *) preparations for electronic mail submission feature, not yet
+  - preparations for electronic mail submission feature, not yet
     functional (ElmSubmit)
 
- *) added example on MARC usage at CERN (WebHelp)
+  - added example on MARC usage at CERN (WebHelp)
 
- *) legacy compatibility with MySQL 3.23.x assured (BibUpload)
+  - legacy compatibility with MySQL 3.23.x assured (BibUpload)
 
- *) legacy compatibility with Python 2.2 assured (WebSubmit)
+  - legacy compatibility with Python 2.2 assured (WebSubmit)
 
- *) test suite additions and corrections (BibRank, BibIndex,
+  - test suite additions and corrections (BibRank, BibIndex,
     WebSearch, BibEdit)
 
- *) French translation fixes, thanks to Eric Grand
+  - French translation fixes, thanks to Eric Grand
 
- *) minor Czech and Slovak translation cleanup
+  - minor Czech and Slovak translation cleanup
 
 CDSware v0.3.3 (DEVELOPMENT) -- released 2004-07-16
 ---------------------------------------------------
 
- *) new international phrases, collection and field names; thanks to
+  - new international phrases, collection and field names; thanks to
     Guido, Flavio, Tullio
 
- *) collection international names are now respected by the search
+  - collection international names are now respected by the search
     engine and interfaces (WebSearch)
 
- *) field international names are now respected by the search
+  - field international names are now respected by the search
     engine and interfaces (WebSearch)
 
- *) when no hits found in a given collection, do not display all
+  - when no hits found in a given collection, do not display all
     public hits straight away but only link to them (WebSearch)
 
- *) records marked as DELETED aren't shown anymore in XML MARC and
+  - records marked as DELETED aren't shown anymore in XML MARC and
     other formats (WebSearch)
 
- *) detailed record page now features record creation and modification
+  - detailed record page now features record creation and modification
     times (WebSearch)
 
- *) improved XML MARC parsing and cumulative record count in case of
+  - improved XML MARC parsing and cumulative record count in case of
     uploading of several files in one go (BibUpload)
 
- *) personal `your admin activities' page introduced (WebSession)
+  - personal `your admin activities' page introduced (WebSession)
 
- *) added option to fulltext-index local files only (BibIndex)
+  - added option to fulltext-index local files only (BibIndex)
 
- *) initial release of the BibIndex Admin interface (BibIndex)
+  - initial release of the BibIndex Admin interface (BibIndex)
 
- *) checking of mandatory selection box definitions (WebSubmit)
+  - checking of mandatory selection box definitions (WebSubmit)
 
- *) WebSearch Admin interface cleanup (WebSearch)
+  - WebSearch Admin interface cleanup (WebSearch)
 
- *) introducing common test suite infrastructure (WebSearch, BibIndex,
+  - introducing common test suite infrastructure (WebSearch, BibIndex,
     MiscUtil, WebHelp)
 
- *) fixed accent and link problems for photo demo records (MiscUtil)
+  - fixed accent and link problems for photo demo records (MiscUtil)
 
- *) conference title exported via OAI XML DC (BibHarvest)
+  - conference title exported via OAI XML DC (BibHarvest)
 
- *) enabled building out of source directory; thanks to Frederic
+  - enabled building out of source directory; thanks to Frederic
 
 CDSware v0.3.2 (DEVELOPMENT) -- released 2004-05-12
 ---------------------------------------------------
 
- *) admin area improved: all the modules have now Admin Guides; some
+  - admin area improved: all the modules have now Admin Guides; some
     guides were updated, some are still to be updated (WebHelp,
     BibConvert, BibFormat, BibIndex, BibSched, WebAlert, WebSession,
     WebSubmit, BibEdit, BibHarvest, BibRank, BibUpload, WebAccess,
     WebBasket, WebSearch, WebStyle)
 
- *) initial release of the WebSearch Admin interface (WebSearch)
+  - initial release of the WebSearch Admin interface (WebSearch)
 
- *) initial release of the BibRank Admin interface (BibRank)
+  - initial release of the BibRank Admin interface (BibRank)
 
- *) search cache expiry after insertion of new records (WebSearch)
+  - search cache expiry after insertion of new records (WebSearch)
 
- *) search engine now does on-the-fly formatting via BibFormat CLI
+  - search engine now does on-the-fly formatting via BibFormat CLI
 
     call to handle restricted site situations (WebSearch)
- *) webcoll default verbosity decreased for efficiency (WebSearch)
+  - webcoll default verbosity decreased for efficiency (WebSearch)
 
- *) added BibConvert configuration example for converting XML Dublin
+  - added BibConvert configuration example for converting XML Dublin
     Core to XML MARC (BibConvert)
 
- *) BibConvert knowledge base mode extended by various case-sensitive
+  - BibConvert knowledge base mode extended by various case-sensitive
     matching possibilities (BibConvert)
 
- *) fixed various problems with fulltext file names and the submission
+  - fixed various problems with fulltext file names and the submission
     from MS Windows platform (WebSubmit)
 
- *) fixed problem with bibupload append mode not updating XML MARC
+  - fixed problem with bibupload append mode not updating XML MARC
     properly (BibUpload)
 
- *) fixed small problems with the submission interface such as
+  - fixed small problems with the submission interface such as
     multiple fields selection (WebSubmit)
 
- *) session revoking and session expiry strengthened (WebSession)
+  - session revoking and session expiry strengthened (WebSession)
 
- *) page design and style sheet updated to better fit large variety of
+  - page design and style sheet updated to better fit large variety of
     browsers (WebStyle)
 
- *) added output format argument for basket display (WebBasket)
+  - added output format argument for basket display (WebBasket)
 
- *) new Swedish translation and updated German, Russian, and Spanish
+  - new Swedish translation and updated German, Russian, and Spanish
     translations; thanks to Urban, Guido, Lyuba, and Magaly
 
- *) faster creation of I18N static HTML and PHP files during make
+  - faster creation of I18N static HTML and PHP files during make
 
 CDSware v0.3.1 (DEVELOPMENT) -- released 2004-03-12
 ---------------------------------------------------
 
- *) security fix preventing exposure of local configuration variables
+  - security fix preventing exposure of local configuration variables
     by malicious URL crafting (WebSearch, WebSubmit, WebAlert,
     WebBasket, WebSession, BibHarvest, MiscUtil)
 
- *) initial release of the ranking engine (BibRank)
+  - initial release of the ranking engine (BibRank)
 
- *) new guide on HOWTO Run Your CDSware Installation (WebHelp)
+  - new guide on HOWTO Run Your CDSware Installation (WebHelp)
 
- *) fixed submit configurations with respect to fulltext links and
+  - fixed submit configurations with respect to fulltext links and
     metadata tags (WebSubmit, MiscUtil)
 
- *) Your Account personal corner now shows the list and the status
+  - Your Account personal corner now shows the list and the status
     of submissions and approvals (WebSession)
 
- *) uniform help and version number option for CLI executables
+  - uniform help and version number option for CLI executables
     (WebSearch, BibSched, BibIndex, BibRank, BibHarvest, BibConvert,
     WebAccess, BibFormat, WebSession, WebAlert)
 
- *) uniform technique for on-the-fly formatting of search results via
+  - uniform technique for on-the-fly formatting of search results via
     `hb_' and `hd_' output format parameters (WebSearch)
 
- *) check for presence of pcntl and mysql PHP libraries (BibUpload)
+  - check for presence of pcntl and mysql PHP libraries (BibUpload)
 
 CDSware v0.3.0 (DEVELOPMENT) -- released 2004-03-05
 ---------------------------------------------------
 
- *) new development branch release (important SQL table changes)
+  - new development branch release (important SQL table changes)
 
- *) introducing a new submission engine and the end-user web
+  - introducing a new submission engine and the end-user web
     interface (WebSubmit)
 
- *) bibupload is now a BibSched task with new options (BibUpload)
+  - bibupload is now a BibSched task with new options (BibUpload)
 
- *) BibWords renamed into BibIndex in the view of future phrase
+  - BibWords renamed into BibIndex in the view of future phrase
     indexing changes (BibIndex)
 
- *) more secure DB server connectivity (BibSched)
+  - more secure DB server connectivity (BibSched)
 
- *) record matching functionality (BibConvert)
+  - record matching functionality (BibConvert)
 
- *) character encoding conversion tables (BibConvert)
+  - character encoding conversion tables (BibConvert)
 
- *) Qualified Dublin Core conversion example (BibConvert)
+  - Qualified Dublin Core conversion example (BibConvert)
 
- *) OAI deleted records policy can now be specified (BibHarvest)
+  - OAI deleted records policy can now be specified (BibHarvest)
 
- *) multi-language collection portalboxes (WebSearch)
+  - multi-language collection portalboxes (WebSearch)
 
- *) HTML pages now respect language selections (WebSearch, WebHelp)
+  - HTML pages now respect language selections (WebSearch, WebHelp)
 
- *) minor layout changes (WebStyle)
+  - minor layout changes (WebStyle)
 
- *) updated Russian and other translations
+  - updated Russian and other translations
 
- *) ChangeLog is now generated from CVS log messages
+  - ChangeLog is now generated from CVS log messages
 
- *) plus the usual set of bugfixes (see ChangeLog)
+  - plus the usual set of bugfixes (see ChangeLog)
 
 CDSware v0.1.2 (DEVELOPMENT) -- released 2003-12-21
 ---------------------------------------------------
 
- *) development branch release
+  - development branch release
 
- *) fix BibReformat task launching problem (BibFormat)
+  - fix BibReformat task launching problem (BibFormat)
 
- *) fix BibTeX -> XML MARC conversion example (BibConvert)
+  - fix BibTeX -> XML MARC conversion example (BibConvert)
 
- *) updated Spanish translation
+  - updated Spanish translation
 
 CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
 ---------------------------------------------------
 
- *) development branch release
+  - development branch release
 
- *) access control engine now used by BibWords, BibFormat (admin and
+  - access control engine now used by BibWords, BibFormat (admin and
     bibreformat), WebSearch (webcoll), and BibTaskEx
 
- *) access control engine admin guide started (WebAccess)
+  - access control engine admin guide started (WebAccess)
 
- *) search engine support for sorting by more than one field (WebSearch)
+  - search engine support for sorting by more than one field (WebSearch)
 
- *) more internationalization of the search engine messages (WebSearch)
+  - more internationalization of the search engine messages (WebSearch)
 
- *) new language: Norwegian (bokmÃ¥l)
+  - new language: Norwegian (bokmÃ¥l)
 
- *) simple example for converting BibTeX into XML MARC (BibConvert)
+  - simple example for converting BibTeX into XML MARC (BibConvert)
 
- *) new optional --with-python configuration option
+  - new optional --with-python configuration option
 
- *) Python module detection during configure
+  - Python module detection during configure
 
- *) bugfixes: os.tempnam() warning, login page referer, and others
+  - bugfixes: os.tempnam() warning, login page referer, and others
 
 CDSware v0.1.0 (DEVELOPMENT) -- released 2003-12-04
 ---------------------------------------------------
 
- *) development branch release
+  - development branch release
 
- *) search engine redesign to yield five times more search performance
+  - search engine redesign to yield five times more search performance
     for larger sites (WebSearch, BibWords)
 
- *) fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
+  - fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and
     MS Excel files (WebSearch)
 
- *) integrated combined metadata/fulltext/citation search (WebSearch)
+  - integrated combined metadata/fulltext/citation search (WebSearch)
 
- *) multi-stage search guidance in cases of no exact match (WebSearch)
+  - multi-stage search guidance in cases of no exact match (WebSearch)
 
- *) OAI-PMH harvestor (BibHarvest)
+  - OAI-PMH harvestor (BibHarvest)
 
- *) bibliographic task scheduler (BibSched)
+  - bibliographic task scheduler (BibSched)
 
- *) automatic daemon mode of the indexer, the formatter and the
+  - automatic daemon mode of the indexer, the formatter and the
     collection cache generator (BibWords, BibFormat, WebSearch)
 
- *) user management and session handling rewrite (WebSession)
+  - user management and session handling rewrite (WebSession)
 
- *) user personalization, document baskets and notification alert
+  - user personalization, document baskets and notification alert
     system (WebBasket, WebAlert)
 
- *) role-based access control engine (WebAccess)
+  - role-based access control engine (WebAccess)
 
- *) internationalization of the interface started (currently with
+  - internationalization of the interface started (currently with
     Czech, German, English, Spanish, French, Italian, Portuguese,
     Russian, and Slovak support)
 
- *) web page design update (WebStyle)
+  - web page design update (WebStyle)
 
- *) introduction of programmer-oriented technical documentation corner
+  - introduction of programmer-oriented technical documentation corner
     (WebHelp)
 
- *) source tree reorganization, mod_python technology adopted for most
+  - source tree reorganization, mod_python technology adopted for most
     of the modules
 
 CDSware v0.0.9 (STABLE) -- released 2002-08-01
 ----------------------------------------------
 
- *) first "public" alpha release of CDSware
+  - first "public" alpha release of CDSware
 
- *) recently standardized Library of Congress' MARC XML schema adopted
+  - recently standardized Library of Congress' MARC XML schema adopted
     in all CDSware modules as the new default internal XML file format
     (BibConvert, BibFormat, BibUpload, WebSubmit, WebSearch)
 
- *) support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
+  - support for OAI-PMH v2.0 in addition to OAI-PMH v1.1 (WebSearch)
 
- *) search interface now honors multiple output formats per collection
+  - search interface now honors multiple output formats per collection
     (BibFormat, WebSearch)
 
- *) search interface now honors search fields, search options, and
+  - search interface now honors search fields, search options, and
     sort options from the database config tables (WebSearch,
     WebSearch Admin)
 
- *) search interface now honors words indexes from the database config
+  - search interface now honors words indexes from the database config
     tables (BibWords, WebSearch)
 
- *) easy reformatting of already uploaded bibliographic records via
+  - easy reformatting of already uploaded bibliographic records via
     web admin. tool (BibFormat Admin/Reformat Records)
 
- *) new submission form field type ("response") allowing
+  - new submission form field type ("response") allowing
     greater flexibility (WebSubmit) [thanks to Frank Sudholt]
 
- *) demo site "Atlantis Institute of Science" updated to demonstrate:
+  - demo site "Atlantis Institute of Science" updated to demonstrate:
     Pictures collection of photographs; specific per-collection
     formats; references inside Articles and Preprints; "cited by"
     search link; published version linking; subject category
     searching; search within, search options, sort options in the web
     collection pages.
-
-- end of file -
