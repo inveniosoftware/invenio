@@ -1,8 +1,8 @@
 ============================
- Invenio v1.1.6 is released
+ Invenio v1.2.1 is released
 ============================
 
-Invenio v1.1.6 was released on May 21, 2015.
+Invenio v1.2.1 was released on May 21, 2015.
 
 About
 -----
@@ -10,11 +10,16 @@ About
 Invenio is a digital library framework enabling you to build your own
 digital library or document repository on the web.
 
-This old stable release update is recommended to all Invenio sites
-using v1.1.5 or previous releases.
+This stable release update is recommended to all Invenio sites using
+v1.2.0 or previous releases.
 
 Security fixes
 --------------
+
++ BibAuthorID:
+
+  - Improves URL redirecting by properly quoting all URL parts, in
+    order to better protect against possible XSS attacks.
 
 + WebStyle:
 
@@ -39,10 +44,33 @@ Improved features
 Bug fixes
 ---------
 
++ BibDocFile:
+
+  - Safer upgrade recipe for migrations from the old document storage
+    model (used in v1.1) to the new document storage model (used in
+    v1.2).
+
++ WebSearch:
+
+  - Removes special behaviour of the "subject" index that was hard-
+    coded based on the index name.  Installations should rather
+    specify wanted behaviour by means of configurable tokeniser
+    instead.
+
+  - Collection names containing slashes are now supported again.
+    However we recommend not to use slashes in collection names; if
+    slashes were wanted for aesthetic reasons, they can be added in
+    visible collection translations.  (#2902)
+
 + global:
 
   - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
     which is the new canonical URL of the demo site.  (#2867)
+
++ installation:
+
+  - Releases constraint on using an old version of `h5py` that was
+    anyway no longer available on PyPI.
 
 + testutils:
 
@@ -54,9 +82,9 @@ Bug fixes
 Download
 --------
 
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz.md5
-- http://invenio-software.org/download/invenio-1.1.6.tar.gz.sig
+- http://invenio-software.org/download/invenio-1.2.1.tar.gz
+- http://invenio-software.org/download/invenio-1.2.1.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.2.1.tar.gz.sig
 
 Installation
 ------------
@@ -72,8 +100,8 @@ a) Stop your bibsched queue and your Apache server.
 
 b) Install the update::
 
-     $ tar xvfz invenio-1.1.6.tar.gz
-     $ cd invenio-1.1.6
+     $ tar xvfz invenio-1.2.1.tar.gz
+     $ cd invenio-1.2.1
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
@@ -86,9 +114,11 @@ b) Install the update::
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
      (1) If you are upgrading from previous stable release series
-         (v0.99 or v1.0), please don't run this rsync command but
-         diff, in order to inspect changes and adapt your old
-         configuration to the new Invenio v1.1 release series.
+         (v0.99, v1.0 or v1.1), please don't run this rsync command
+         but diff, in order to inspect changes and adapt your old
+         configuration to the new Invenio v1.2 release series.  For
+         more information you may also want to consult release notes
+         coming with Invenio v1.2.0.
 
 c) Restart your Apache server and your bibsched queue.
 
