@@ -1046,7 +1046,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                 pinfo['should_check_to_autoclaim'] = True
                 pinfo["login_info_message"] = "confirm_success"
                 session.dirty = True
-                redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, urllib.quote(redirect_pid)))
+                redirect_to_url(req, '%s/author/manage_profile/%s'
+                                % (CFG_SITE_URL, urllib.quote(str(redirect_pid))))
             # if someone have already claimed this profile it redirects to choose_profile with an error message
             else:
                 param=''
