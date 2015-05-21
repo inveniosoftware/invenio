@@ -2876,7 +2876,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
         # TODO: what to do in case some ORCID server error occurs?
         if orcid_id is None or orcid_dois is None:
-            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(pinfo['pid'])))
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(str(pinfo['pid']))))
 
         # TODO: it would be smarter if:
         # 1. we save in the db the orcid_dois
@@ -2887,7 +2887,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         orcid_info['import_pubs'] = True
         session.dirty = True
 
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(pinfo['pid'])))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(str(pinfo['pid']))))
 
     def _get_identifier_from_path(self, path):
         '''Return identifier from path to manage_profile page.
@@ -2938,7 +2938,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
             person_id = session.pop('orcid_pid')
             session.dirty = True
-            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(person_id)))
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(str(person_id))))
 
         set_token(session['orcid_pid'], session['oauth2_access_token'])
 
@@ -2950,7 +2950,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
 
         session.dirty = True
 
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(person_id)))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, urllib.quote(str(person_id))))
 
 
     def connect_author_with_hepname(self, req, form):
