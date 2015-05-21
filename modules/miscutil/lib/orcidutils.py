@@ -416,18 +416,86 @@ def _orcid_fetch_works(pid):
     '''
 
     doid, existing_papers = _get_ext_orcids_using_pid(pid)
-    papers_recs = [x[3] for x in get_papers_of_author(pid, 
+    papers_recs = [x[3] for x in get_papers_of_author(pid,
                                                       include_unclaimed=False)]
 
+    bibtask.write_message("Papers fetched")
     # chunks the works from orcid_list
-
     for orcid_small_list in _get_orcid_dictionaries(papers_recs, pid,
                                                     existing_papers, doid):
 
-        xml_to_push = OrcidXmlExporter.export(orcid_small_list, 'works.xml')
-        xml_to_push = RE_ALLOWED_XML_1_0_CHARS.sub('',
-                                                   xml_to_push).encode('utf-8')
-        yield (doid, xml_to_push, len(orcid_small_list))
+        yield (doid, orcid_small_list, len(orcid_small_list))
+
+
+def _push_few_works(doid, short_list, number, pid, token):
+    '''Push works with fallback in case of duplicates.
+
+    If there is a duplicate, the function will remove the problematic
+    paper from the list and repush.
+
+    @return: did the push finish successfully
+    @rtype: bool
+    '''
+    url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
+        doid + '/orcid-works'
+
+    xml_to_push = OrcidXmlExporter.export(short_list, 'works.xml')
+    xml_to_push = RE_ALLOWED_XML_1_0_CHARS.sub('',
+                                               xml_to_push).encode('utf-8')
+
+    bibtask.write_message(
+        "Pushing %s works for %s. Personid: %s" %
+        (number, doid, pid))
+
+    headers = {'Accept': 'application/vnd.orcid+xml',
+               'Content-Type': 'application/vnd.orcid+xml',
+               'Authorization': 'Bearer ' + token
+               }
+
+    response = requests.post(url, xml_to_push, headers=headers)
+
+    code = response.status_code
+
+    if code == 401:
+        # The token has expired or the user revoke his token
+        delete_token(pid)
+        bibtask.write_message("Token deleted for %s" % (pid,))
+        register_exception(subject="The ORCID token expired.")
+        return True
+    elif code != 201 and code != 200:
+        try:
+            response.raise_for_status()
+        except HTTPError, exc:
+            m = re.search(r"have the same external id \"(.*)\"", response.text)
+            if m:
+                bibtask.write_message("Works have the same doi: %s" % m.groups()[0])
+                wrong_id = m.groups()[0]
+                shorter_list = [x for x in short_list if
+                                all(t[1] != wrong_id for
+                                    t in x['work_external_identifiers'])]
+                blacklist = {}
+                try:
+                    blacklist = json.loads(open(CFG_ORCIDUTILS_BLACKLIST_FILE,
+                                                'r').read())
+                except IOError:
+                    # No such file
+                    pass
+                if blacklist:
+                    if doid in blacklist:
+                        blacklist[doid].append(wrong_id)
+                    else:
+                        blacklist[doid] = [wrong_id]
+                    json.dump(blacklist, open(CFG_ORCIDUTILS_BLACKLIST_FILE,
+                                              'w'))
+                if len(shorter_list) == 0:
+                    return True
+                return _push_few_works(doid, shorter_list, number, pid, token)
+            else:
+                bibtask.write_message(exc)
+                bibtask.write_message(response.text)
+            return False
+    bibtask.write_message("Pushing works succedded")
+    return True
 
 
 def _orcid_push_with_bibtask():
@@ -453,40 +521,17 @@ def _orcid_push_with_bibtask():
             # change when the papers' data is being fetched.
             trigger_aidtoken_change(pid, 1)
 
-            headers = {'Accept': 'application/vnd.orcid+xml',
-                       'Content-Type': 'application/vnd.orcid+xml',
-                       'Authorization': 'Bearer ' + token
-                       }
+            for (doid, orcid_small_list,
+                 number) in _orcid_fetch_works(int(pid)):
 
-            for (doid, xml_to_push, number) in _orcid_fetch_works(int(pid)):
-
-                url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
-                    doid + '/orcid-works'
-
-                bibtask.write_message(
-                    "Pushing %s works for %s. The token is %s" %
-                    (number, pid, token))
-
-                response = requests.post(url, xml_to_push, headers=headers)
-
-                code = response.status_code
-
-                if code == 401:
-                    # The token has expired or the user revoke his token
-                    delete_token(pid)
-                    bibtask.write_message("Token deleted for %s" % pid)
-                    register_exception(subject="The ORCID token expired.")
-                    break
-                elif code != 201 and code != 200:
-                    try:
-                        response.raise_for_status()
-                    except HTTPError, exc:
-                        bibtask.write_message(exc)
-                        bibtask.write_message(response.text)
-                    success = False
+                bibtask.write_message("Running pushing")
+                success = _push_few_works(doid, orcid_small_list, number, pid,
+                                          token)
+                if not success:
                     break
 
             trigger_aidtoken_change(pid, 0)
+            bibtask.write_message("Flag changed")
 
     return success
 
