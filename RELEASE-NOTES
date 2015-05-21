@@ -1,55 +1,79 @@
---------------------------------------------------------------------
-Invenio v1.1.5 is released
-March 2, 2015
-http://invenio-software.org/
---------------------------------------------------------------------
+============================
+ Invenio v1.1.6 is released
+============================
 
-Invenio v1.1.5 was released on March 2, 2015.
+Invenio v1.1.6 was released on May 21, 2015.
 
-This stable release update is recommended to all Invenio sites using
-v1.1.4 or previous releases.
+About
+-----
 
-What's new:
------------
+Invenio is a digital library framework enabling you to build your own
+digital library or document repository on the web.
 
- *) BibCirculation: get_book_cover quick fix (#2578 #2653); fix for
-    wrong non-borrower message (#2597)
+This old stable release update is recommended to all Invenio sites
+using v1.1.5 or previous releases.
 
- *) OAIHarvest: remove_duplicates and regexp fixes (#2300 #2608)
+Security fixes
+--------------
 
- *) WebBasket: better formatting of deletion message (#2449)
++ WebStyle:
 
- *) docker: initial release (#2736)
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
 
- *) docs: initial release of CONTRIBUTING guide (#2163)
+Improved features
+-----------------
 
- *) installation: MathJax distribution location update (#2732);
-    explicit jQuery plugin versions (#11 #2655); disable SSLv2/SSLv3
-    in Apache config (#2515)
++ installation:
 
-Download:
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
 ---------
 
-  <http://invenio-software.org/download/invenio-1.1.5.tar.gz>
-  <http://invenio-software.org/download/invenio-1.1.5.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.1.5.tar.gz.sig>
++ global:
 
-Installation notes:
--------------------
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
+Download
+--------
+
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz.md5
+- http://invenio-software.org/download/invenio-1.1.6.tar.gz.sig
+
+Installation
+------------
 
 Please follow the INSTALL file bundled in the distribution tarball.
 
-Upgrade notes:
---------------
+Upgrade
+-------
 
 Please proceed as follows:
 
- a) Stop your bibsched queue and your Apache server.
+a) Stop your bibsched queue and your Apache server.
 
- b) Install the update:
+b) Install the update::
 
-     $ tar xvfz invenio-1.1.5.tar.gz
-     $ cd invenio-1.1.5
+     $ tar xvfz invenio-1.1.6.tar.gz
+     $ cd invenio-1.1.6
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
@@ -61,13 +85,18 @@ Please proceed as follows:
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
-    Notes:
+     (1) If you are upgrading from previous stable release series
+         (v0.99 or v1.0), please don't run this rsync command but
+         diff, in order to inspect changes and adapt your old
+         configuration to the new Invenio v1.1 release series.
 
-    (1) If you are upgrading from previous stable release series
-        (v0.99 or v1.0), please don't run this rsync command but diff,
-        in order to inspect changes and adapt your old configuration
-        to the new Invenio v1.1 release series.
+c) Restart your Apache server and your bibsched queue.
 
- c) Restart your Apache server and your bibsched queue.
+Happy hacking and thanks for flying Invenio.
 
-- end of file -
+| Invenio Development Team
+|   Email: info@invenio-software.org
+|   IRC: #invenio on irc.freenode.net
+|   Twitter: http://twitter.com/inveniosoftware
+|   GitHub: http://github.com/inveniosoftware
+|   URL: http://invenio-software.org
