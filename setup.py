@@ -101,6 +101,7 @@ install_requires = [
     "intbitset>=2.0",
     "invenio-client>=0.1.0",
     "invenio-query-parser>=0.2",
+    "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
     "libmagic>=1.0",

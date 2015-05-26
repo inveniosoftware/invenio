@@ -21,7 +21,9 @@
 
 from flask import current_app, request
 from flask.sessions import SessionMixin
+
 from flask_login import current_user
+
 from werkzeug.datastructures import CallbackDict
 
 
@@ -65,24 +67,6 @@ class Session(CallbackDict, SessionMixin):
         """
         self._remember_me = remember_me
         self['_permanent'] = remember_me
-
-    def save_ip(self, request):
-        """Save IP for current scheme."""
-        remote_ip = request.remote_addr
-        scheme_a = '_http_ip' if request.scheme == 'http' else '_https_ip'
-        scheme_b = '_https_ip' if request.scheme == 'http' else '_http_ip'
-
-        if scheme_a not in self:
-            self[scheme_a] = remote_ip
-        if scheme_b not in self:
-            self[scheme_b] = None
-
-    def check_ip(self, request):
-        """Check that session is used from the same IP where it was created."""
-        remote_ip = request.remote_addr
-        if self.get('_{0}_ip'.format(request.scheme), remote_ip) != remote_ip:
-            return False
-        return True
 
     def _get_uid(self):
         return self.get('user_id', -1)

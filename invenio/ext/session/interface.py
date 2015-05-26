@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,17 +19,22 @@
 
 """Flask :class:`~flask.sessions.SessionInterface` implementation."""
 
-import six
+from datetime import datetime, timedelta
+from uuid import uuid4
 
-from datetime import timedelta, datetime
 from flask import current_app, request
 from flask.helpers import locked_cached_property
 from flask.sessions import SessionInterface as FlaskSessionInterface
-from uuid import uuid4
+
+from invenio.config import SECRET_KEY as secret_key
+from invenio.utils.serializers import LzmaPickle as Serializer
+
+from itsdangerous import BadSignature, TimestampSigner
+
+import six
+
 from werkzeug.exceptions import BadRequest
 from werkzeug.utils import import_string
-
-from invenio.utils.serializers import ZlibPickle as Serializer
 
 
 class SessionInterface(FlaskSessionInterface):
@@ -69,6 +74,20 @@ class SessionInterface(FlaskSessionInterface):
             if isinstance(storage_string, six.string_types) \
             else storage_string()
 
+    @locked_cached_property
+    def sign_sid(self):
+        """Return ``True`` if cookie session id is signed."""
+        return current_app.config.get('SESSION_SIGN', True)
+
+    @locked_cached_property
+    def sign_salt(self):
+        """Return salt for session id signing."""
+        return current_app.config.get('SESSION_SALT', 'inveniosalt')
+
+    def get_signer(self):
+        """Return signer for cookie content signing."""
+        return TimestampSigner(secret_key, self.sign_salt)
+
     def generate_sid(self):
         """Generate unique session identifier."""
         sid = uuid4().hex
@@ -82,8 +101,35 @@ class SessionInterface(FlaskSessionInterface):
 
     def open_session(self, app, request):
         """Return session instance."""
-        sid = request.cookies.get(app.session_cookie_name) or \
+        sid_signed = request.cookies.get(app.session_cookie_name) or \
             request.args.get('session_id')
+
+        # extract sid from signed version
+        sid = None
+        if sid_signed:
+            if self.sign_sid:
+                s = self.get_signer()
+
+                # get maximum age without asking the cache (for
+                # session.permanent) so we need to assume the worst case
+                max_age = max(
+                    app.permanent_session_lifetime.total_seconds(),
+                    timedelta(days=1).total_seconds()
+                )
+                try:
+                    sid = s.unsign(
+                        sid_signed,
+                        max_age=max_age
+                    )
+                except BadSignature:
+                    # just ignore hackers and give them a new sid
+                    # (this might also occur in case of clock divergence, but
+                    # that should be a rare case)
+                    sid = None
+            else:
+                # we did not sign, so it is just the same
+                sid = sid_signed
+
         if not sid:
             sid = self.generate_sid()
             return self.session_class(sid=sid)
@@ -92,9 +138,13 @@ class SessionInterface(FlaskSessionInterface):
             if data:
                 session = self.session_class(self.serializer.loads(data),
                                              sid=sid)
-                if session.check_ip(request):
-                    return session
-        except:
+                return session
+        except Exception:
+            # this might have multiple reasons:
+            #   - backend error (cache object timeout, cache flushed, ...)
+            #   - error during deserialization
+            #   - cache data does not match session_class (upgrades?)
+            #   - earth stopped rotating
             current_app.logger.warning(
                 "Load session error. Returning empty session.",
                 exc_info=True)
@@ -106,11 +156,7 @@ class SessionInterface(FlaskSessionInterface):
         if not session:
             current_app.logger.debug("Empty session: " + str(request.url))
             return
-        #    response.delete_cookie(app.session_cookie_name,
-        #                            domain=domain)
-        #    response.delete_cookie(app.session_cookie_name + 'stub',
-        #                            domain=domain)
-        #    return
+
         timeout = self.get_session_expiration_time(app, session)
         session_expiry = datetime.utcnow() + timeout
         max_age = cookie_expiry = None
@@ -119,44 +165,37 @@ class SessionInterface(FlaskSessionInterface):
             max_age = app.permanent_session_lifetime
             cookie_expiry = session_expiry
         sid = session.sid
-        if session.logging_in:
-            # # FIXME Do we really need to delete the session after login?
-            # # The user just logged in, better change the session ID
-            # sid = self.generate_sid()
-            # flashes = get_flashed_messages(with_categories=True)
-            # # And remove the cookie that has been set
-            # self.backend.delete(session.sid)
-            # session.clear()
-            # response.delete_cookie(app.session_cookie_name, domain=domain)
-            # response.delete_cookie(app.session_cookie_name + 'stub',
-            #                        domain=domain)
-            # session.sid = sid
-            # session.uid = uid
-            # # Fixes problem with lost flashes after login.
-            # map(lambda (cat, msg): flash(msg, cat), flashes)
-            pass
-        # Set all user id keys for compatibility.
 
+        # Set all user id keys for compatibility.
         if len(session.keys()) == 1 and '_id' in session:
             session.delete()
             return
         elif not session.modified:
             return
+        import warnings
+        warnings.warn(str(session))
 
         session.uid = uid
-        session.save_ip(request)
         self.backend.set(sid,
                          self.serializer.dumps(dict(session)),
                          timeout=timeout)
 
+        # sign sid
+        if self.sign_sid:
+            s = self.get_signer()
+            sid_signed = s.sign(sid)
+        else:
+            # we did not sign, so it is just the same
+            sid_signed = sid
+
         if not self.has_secure_url:
-            response.set_cookie(app.session_cookie_name, sid,
+            response.set_cookie(app.session_cookie_name, sid_signed,
                                 expires=cookie_expiry, httponly=True,
                                 domain=domain, max_age=max_age)
         elif session.uid > 0:
             # User is authenticated, we shall use HTTPS then
             if request.scheme == 'https':
-                response.set_cookie(app.session_cookie_name, sid,
+                response.set_cookie(app.session_cookie_name, sid_signed,
                                     expires=cookie_expiry, httponly=True,
                                     domain=domain, secure=True,
                                     max_age=max_age)
@@ -167,7 +206,7 @@ class SessionInterface(FlaskSessionInterface):
                 raise BadRequest("The user is being authenticated over HTTP "
                                  "rather than HTTPS?")
         else:
-            response.set_cookie(app.session_cookie_name, sid, httponly=True,
+            response.set_cookie(app.session_cookie_name, sid_signed, httponly=True,
                                 domain=domain)
             response.set_cookie(app.session_cookie_name + 'stub', 'NO',
                                 httponly=True, domain=domain)
