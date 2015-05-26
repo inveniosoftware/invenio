@@ -507,7 +507,7 @@ distances from it.
 
         obj_running = DbWorkflowObject()
         obj_running.set_data(1234)
-        obj_running.save(version=5)
+        obj_running.save(version=ObjectStatus.ERROR)
         try:
             start_by_oids('test_workflow', [obj_running.id],
                           module_name="unit_tests")
@@ -537,7 +537,6 @@ distances from it.
         self.assertEqual(1, obj_halted.get_data())
 
         # Try to restart, we should halt again actually.
-        # import ipdb; ipdb.set_trace()
         continue_oid(oid=obj_halted.id, start_point="restart_task",
                      module_name="unit_tests")
 
@@ -545,14 +544,12 @@ distances from it.
         self.assertEqual(ObjectStatus.WAITING, obj_halted.version)
 
         # We skip to next part, this should work
-        # import ipdb; ipdb.set_trace()
         continue_oid(oid=obj_halted.id, module_name="unit_tests")
 
         self.assertEqual(19, obj_halted.get_data())
         self.assertEqual(ObjectStatus.COMPLETED, obj_halted.version)
 
         # Let's do that last task again, shall we?
-        # import ipdb; ipdb.set_trace()
         continue_oid(oid=obj_halted.id, start_point="restart_prev",
                      module_name="unit_tests")
 

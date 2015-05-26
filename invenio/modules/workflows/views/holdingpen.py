@@ -192,7 +192,7 @@ def details(objectid):
 
     history_objects = {}
     temp = groupby(history_objects_db_request,
-                   lambda x: x.version)
+                   lambda x: x.status)
     for key, value in temp:
         if key != ObjectStatus.RUNNING:
             value = list(value)
@@ -201,8 +201,8 @@ def details(objectid):
 
     history_objects = sum(history_objects.values(), [])
     for obj in history_objects:
-        obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.version]["class"]
-        obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.version]["message"]
+        obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.status]["class"]
+        obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.status]["message"]
     results = get_rendered_task_results(bwobject)
     workflow_definition = get_workflow_info(extracted_data['workflow_func'])
     task_history = bwobject.get_extra_data().get('_task_history', [])
@@ -388,7 +388,7 @@ def load_table():
 
     Function used for the passing of JSON data to DataTables:
 
-    1. First checks for what record version to show
+    1. First checks for what record status to show
     2. Then the sorting direction.
     3. Then if the user searched for something.
 
@@ -396,7 +396,7 @@ def load_table():
     """
     tags = session.setdefault(
         "holdingpen_tags",
-        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+        [ObjectStatus.labels[ObjectStatus.HALTED.value]]
     )
     if request.method == "POST":
         if request.json and "tags" in request.json:
@@ -462,8 +462,8 @@ def load_table():
                 record = dict(record)
             except (ValueError, TypeError):
                 record = {}
-        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
-        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
+        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.status]["class"]
+        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.status]["message"]
         row = render_template('workflows/row_formatter.html',
                               title=preformatted["title"],
                               object=bwo,
@@ -474,7 +474,7 @@ def load_table():
                               mini_action=mini_action,
                               action_message=action_message,
                               pretty_date=pretty_date,
-                              version=ObjectStatus,
+                              status=ObjectStatus,
                               )
 
         row = row.split("<!--sep-->")

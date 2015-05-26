@@ -42,8 +42,13 @@ from six.moves import cPickle
 from sqlalchemy import desc
 from sqlalchemy.exc import DontWrapMixin
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy_utils.types.choice import ChoiceType
 from workflow.engine_db import ObjectStatusBehaviour
+from sqlalchemy_utils.types.choice import (
+    ChoiceType as BadChoiceType,
+    ChoiceTypeImpl,
+    Enum,
+    EnumTypeImpl,
+)
 from invenio.modules.workflows.logger import get_logger, DbWorkflowLogHandler
 from workflow.utils import staticproperty
 
@@ -59,12 +64,23 @@ from invenio.utils.deprecation import deprecated, RemovedInInvenio23Warning
 
 class ObjectStatus(ObjectStatusBehaviour):
 
-    INITIAL = u"New"
-    COMPLETED = u"Done"
-    HALTED = u"Need action"
-    RUNNING = u"In process"
-    WAITING = u"Waiting"
-    ERROR = u"Error"
+    INITIAL = 0
+    COMPLETED = 1
+    HALTED = 2
+    RUNNING = 3
+    WAITING = 4
+    ERROR = 5
+
+    @staticproperty
+    def labels():  # pylint: disable=no-method-argument
+        return {
+            0: "New",
+            1: "Done",
+            2: "Need action",
+            3: "In process",
+            4: "Waiting",
+            5: "Error",
+        }
 
     @staticproperty
     @deprecated("Please use ObjectStatus.COMPLETED "
@@ -74,17 +90,51 @@ class ObjectStatus(ObjectStatusBehaviour):
         return ObjectStatus.COMPLETED
 
 
-class IncompatibleEnumException(Exception, DontWrapMixin):
-    pass
-
-
-class FortifiedChoiceType(ChoiceType):
+class CallbackPosType(db.PickleType):
 
     def process_bind_param(self, value, dialect):
-        if value not in self.choices:
-            raise IncompatibleEnumException(
-                "Value {0} not compatible with database".format(value))
-        return self.type_impl.process_bind_param(value, dialect)
+        if not isinstance(value, Iterable):
+            raise TypeError("Task counter must be an iterable!")
+        return self.type_impl.process_bind_param(value, dialect)  # pylint: disable=no-member
+
+
+class FixedEnumTypeImpl(EnumTypeImpl):
+    """EnumTypeImpl at b6e22bd08f8efd9b3f157021edc9fdfea8ec3923"""
+
+    def _coerce(self, value):
+        if value is None:
+            return None
+        if value in self.enum_class:
+            return value
+        return self.enum_class(value)
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return None
+        return self.enum_class(value).value
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return None
+        return self.enum_class(value)
+
+
+class ChoiceType(BadChoiceType):
+    """ChoiceType with patched EnumTypeImpl."""
+    def __init__(self, choices, impl=None):
+        self.choices = choices
+
+        if (
+            Enum is not None and
+            isinstance(choices, type) and
+            issubclass(choices, Enum)
+        ):
+            self.type_impl = FixedEnumTypeImpl(enum_class=choices)
+        else:
+            self.type_impl = ChoiceTypeImpl(choices=choices)
+
+        if impl:
+            self.impl = impl
 
 
 def _decode(data):
@@ -139,7 +189,8 @@ class Workflow(db.Model):
     _extra_data = db.Column(db.LargeBinary,
                             nullable=False,
                             default=_encoded_default_extra_data)
-    status = db.Column(db.Integer, default=0, nullable=False)
+    status = db.Column(ChoiceType(WorkflowStatus, impl=db.Integer()),
+                        default=WorkflowStatus.NEW, nullable=False)
     objects = db.relationship("DbWorkflowObject",
                               backref='bwlWORKFLOW',
                               cascade="all, delete, delete-orphan")
@@ -415,32 +466,32 @@ class DbWorkflowObject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     # Our internal data column. Default is encoded dict.
-    _data = db.Column(db.LargeBinary,
-                      nullable=False,
+    _data = db.Column(db.LargeBinary, nullable=False,
                       default=_encoded_default_data)
-    _extra_data = db.Column(db.LargeBinary,
-                            nullable=False,
+
+    _extra_data = db.Column(db.LargeBinary, nullable=False,
                             default=_encoded_default_extra_data)
 
     _id_workflow = db.Column(db.String(36),
                              db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
-    version = db.Column(db.Integer,
-                        default=ObjectStatus.INITIAL,
-                        nullable=False,
-                        index=True)
+
+    status = db.Column(ChoiceType(ObjectStatus, impl=db.Integer()),
+                       default=ObjectStatus.INITIAL, nullable=False,
+                       index=True)
+
     id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
                           default=None)
-    child_objects = db.relationship("DbWorkflowObject",
-                                    remote_side=[id_parent])
+
+    child_objects = db.relationship("DbWorkflowObject", remote_side=[id_parent])
+
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
+
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
+
     status = db.Column(db.String(255), default="", nullable=False)
 
-    data_type = db.Column(db.String(150),
-                          default="",
-                          nullable=True,
-                          index=True)
+    data_type = db.Column(db.String(150), default="", nullable=True, index=True)
 
     uri = db.Column(db.String(500), default="")
 

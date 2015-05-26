@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,7 +28,6 @@ from invenio.base.globals import cfg
 from .utils import BibWorkflowObjectIdContainer
 from invenio.modules.workflows.models import DbWorkflowObject
 from invenio.modules.workflows.errors import WorkflowWorkerError
-from workflow.engine_db import ObjectStatus
 
 
 class WorkerBackend(object):
@@ -314,7 +313,7 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
     # Resume workflow if there are objects to resume
     objects = DbWorkflowObject.query.filter(
         DbWorkflowObject.id_workflow == id_workflow,
-        DbWorkflowObject.version == ObjectStatus.HALTED
+        DbWorkflowObject.version == DbWorkflowObject.version.type.choices.HALTED
     ).all()
     for obj in objects:
         yield continue_oid(oid=obj.id, start_point=start_point,

@@ -23,8 +23,13 @@ from __future__ import absolute_import
 from copy import deepcopy
 from uuid import uuid1 as new_uuid
 
-from workflow.engine import ActionMapper
-from workflow.engine_db import DbWorkflowEngine, ObjectStatus, DbProcessingFactory
+from workflow.engine import ActionMapper, TransitionActions
+from workflow.engine_db import (
+    DbProcessingFactory,
+    DbTransitionAction,
+    DbWorkflowEngine,
+    WorkflowStatus,
+)
 from workflow.errors import WorkflowDefinitionError
 from .logger import DbWorkflowLogHandler, get_logger
 
@@ -39,6 +44,7 @@ from invenio.modules.workflows.models import (
 from .utils import dictproperty, get_task_history
 from workflow.utils import staticproperty
 from invenio.ext.sqlalchemy import db
+from .models import ObjectStatus
 
 
 class BibWorkflowEngine(DbWorkflowEngine):
@@ -98,7 +104,8 @@ class BibWorkflowEngine(DbWorkflowEngine):
             name=name,
             id_user=id_user,
             module_name=module_name,
-            uuid=new_uuid()
+            uuid=new_uuid(),
+            # status=WorkflowStatus.NEW,   # XXX Temporary
         )
         return cls(db_obj, **extra_data)
 
@@ -118,6 +125,10 @@ class BibWorkflowEngine(DbWorkflowEngine):
     def db(self):
         """Return SQLAlchemy db."""
         return db
+
+    @staticproperty
+    def object_status():  # pylint: disable=no-method-argument
+        return ObjectStatus
 
     @staticproperty
     def processing_factory():  # pylint: disable=no-method-argument
@@ -159,7 +170,7 @@ class BibWorkflowEngine(DbWorkflowEngine):
         raise WaitProcessing(message=msg, action=action, payload=payload)
 
     def continue_object(self, workflow_object, restart_point='restart_task',
-                        stop_on_halt=False):
+                        task_offset=1, stop_on_halt=False):
         """Continue workflow for one given object from "restart_point".
 
         :param object:
@@ -194,8 +205,8 @@ class BibWorkflowEngine(DbWorkflowEngine):
         res = self.db.session.query(self.db.func.count(DbWorkflowObject.id)).\
             filter(DbWorkflowObject.id_workflow == self.uuid).\
             filter(DbWorkflowObject.version.in_(
-                [ObjectStatus.INITIAL,  # pylint: disable=no-member
-                 ObjectStatus.COMPLETED]  # pylint: disable=no-member
+                [self.object_status.INITIAL,
+                 self.object_status.COMPLETED]
             )).group_by(DbWorkflowObject.version).all()
         return len(res) == 2 and res[0] == res[1]
 
@@ -304,6 +315,11 @@ class InvActionMapper(ActionMapper):
             obj.extra_data["_task_history"].append(task_history)
 
 class InvProcessingFactory(DbProcessingFactory):
+
+    @staticproperty
+    def transition_exception_mapper():  # pylint: disable=no-method-argument
+        """Define our for handling transition exceptions."""
+        return InvTransitionAction
 
     @staticproperty
     def action_mapper():  # pylint: disable=no-method-argument

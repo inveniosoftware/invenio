@@ -25,7 +25,6 @@ import msgpack
 from flask import current_app, jsonify
 from functools import wraps
 from six import text_type
-from .models import ObjectStatus
 
 from invenio.base.helpers import unicodifier
 from invenio.base.wrappers import lazy_import
@@ -219,13 +218,13 @@ def get_holdingpen_objects(ptags=None):
     Uses DataTable naming for filtering/sorting. Work in progress.
     """
     if ptags is None:
-        ptags = ObjectStatus.name(ObjectStatus.HALTED)
+        ptags = DbWorkflowObject.version.type.choices.HALTED.label
 
     tags_copy = ptags[:]
     version_showing = []
     for tag in ptags:
-        if tag in ObjectStatus:
-            version_showing.append(ObjectStatus.MAPPING[tag])
+        if tag in DbWorkflowObject.version.type.choices:
+            version_showing.append(DbWorkflowObject.version.type.choices.MAPPING[tag])
             tags_copy.remove(tag)
 
     ssearch = tags_copy
@@ -267,8 +266,8 @@ def get_versions_from_tags(tags):
     tags_copy = tags[:]
     version_showing = []
     for i in range(len(tags_copy) - 1, -1, -1):
-        if tags_copy[i] in ObjectStatus.MAPPING:
-            version_showing.append(ObjectStatus.MAPPING[tags_copy[i]])
+        if tags_copy[i] in DbWorkflowObject.version.type.choices.MAPPING:
+            version_showing.append(DbWorkflowObject.version.type.choices.MAPPING[tags_copy[i]])
             del tags_copy[i]
     return version_showing, tags_copy
 
