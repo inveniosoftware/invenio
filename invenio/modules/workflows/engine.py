@@ -315,3 +315,45 @@ class InvProcessingFactory(DbProcessingFactory):
         """Action to take before the proccessing of an object begins."""
         obj.reset_error_message()
         super(InvProcessingFactory, InvProcessingFactory).before_object(eng, objects, obj)
+
+
+
+class InvTransitionAction(DbTransitionAction):
+
+    @staticmethod
+    def WaitProcessing(obj, eng, callbacks, exc_info):
+        """Take actions when WaitProcessing is raised.
+
+        ..note::
+            We're essentially doing HaltProcessing, plus `obj.set_action` and
+            object status `WAITING` instead of `HALTED`.
+        """
+        e = exc_info[1]
+        obj.set_action(e.action, e.message)
+        obj.save(version=eng.object_status.WAITING, task_counter=eng.state.callback_pos,
+                 id_workflow=eng.uuid)
+        eng.save(WorkflowStatus.HALTED)
+        eng.log.warning("Workflow '%s' halted at task %s with message: %s",
+                        eng.name, eng.current_taskname or "Unknown", e.message)
+        TransitionActions.HaltProcessing(obj, eng, callbacks, exc_info)
+
+    @staticmethod
+    def HaltProcessing(obj, eng, callbacks, exc_info):
+        e = exc_info[1]
+        if e.action:
+            obj.set_action(e.action, e.message)
+            obj.save(version=eng.object_status.HALTED, task_counter=eng.state.callback_pos,
+                     id_workflow=eng.uuid)
+            eng.save(WorkflowStatus.HALTED)
+            TransitionActions.HaltProcessing(obj, eng, callbacks, exc_info)
+            eng.log.warning("Workflow '%s' waiting at task %s with message: %s",
+                            eng.name, eng.current_taskname or "Unknown", e.message)
+        else:
+            from invenio.utils.deprecation import RemovedInInvenio23Warning
+            import warnings
+            warnings.warn(
+                "Raising HaltProcessing with e.action to emulate "
+                "WaitProcessing is deprecated. Use eng.wait() instead",
+                RemovedInInvenio23Warning
+            )
+            InvTransitionAction.WaitProcessing(obj, eng, callbacks, exc_info)
