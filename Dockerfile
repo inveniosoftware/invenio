@@ -39,6 +39,7 @@ RUN apt-get update && \
         gcc \
         git \
         libffi-dev \
+        liblzma-dev \
         libmysqlclient-dev \
         libssl-dev \
         libxslt-dev \
