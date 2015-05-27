@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,12 +19,14 @@
 
 """Models for storing access tokens and links between users and remote apps."""
 
-from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy_utils.types.encrypted import EncryptedType
-
 from invenio.config import SECRET_KEY as secret_key
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import User
+
+from sqlalchemy.ext.mutable import MutableDict
+
+from sqlalchemy_utils.types.encrypted import EncryptedType
+
 
 class TextEncryptedType(EncryptedType):
 
@@ -68,12 +70,19 @@ class RemoteAccount(db.Model):
     #
     # Relationships propoerties
     #
-    user = db.relationship('User')
+    user = db.relationship(
+        'User',
+        backref=db.backref(
+            'oauth_remote_account',
+            cascade="all, delete-orphan"
+        )
+    )
     """SQLAlchemy relationship to user."""
 
     tokens = db.relationship(
         "RemoteToken",
         backref="remote_account",
+        cascade="all, delete-orphan"
     )
     """SQLAlchemy relationship to RemoteToken objects."""
 
