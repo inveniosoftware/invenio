@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,10 @@
 
 """Test for delayed workflows."""
 
-from invenio.testsuite import make_test_suite, run_test_suite
-from ...workflows.testsuite.test_workflows import WorkflowTasksTestCase
 from invenio.celery import celery
+from invenio.testsuite import make_test_suite, run_test_suite
+
+from ...workflows.testsuite.test_workflows import WorkflowTasksTestCase
 
 
 class WorkflowDelayedTest(WorkflowTasksTestCase):
@@ -36,7 +37,8 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
     def tearDown(self):
         """ Clean up created objects."""
         from invenio.modules.workflows.models import Workflow
-        Workflow.get(Workflow.module_name == "unit_tests").delete()
+        self.delete_objects(
+            Workflow.get(Workflow.module_name == "unit_tests").all())
         self.cleanup_registries()
 
     def test_workflow_delay(self):
@@ -95,7 +97,8 @@ class WorkflowDelayedTest(WorkflowTasksTestCase):
         """Deep test of celery worker."""
         from ..workers.worker_celery import (celery_run, celery_restart,
                                              celery_continue)
-        from invenio.modules.workflows.utils import BibWorkflowObjectIdContainer
+        from invenio.modules.workflows.utils import \
+            BibWorkflowObjectIdContainer
         from invenio.modules.workflows.models import (BibWorkflowObject,
                                                       get_default_extra_data)
 

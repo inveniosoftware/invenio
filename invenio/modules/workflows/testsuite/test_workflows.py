@@ -21,13 +21,17 @@
 
 from __future__ import absolute_import
 
-import random
-import time
 import logging
 
-from ..registry import WorkflowsRegistry
+import random
+
+import time
+
 from flask_registry import ImportPathRegistry
+
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+
+from ..registry import WorkflowsRegistry
 
 TEST_PACKAGES = [
     'invenio.modules.*',
@@ -106,7 +110,8 @@ distances from it.
     def tearDown(self):
         """ Clean up created objects."""
         from invenio.modules.workflows.models import Workflow
-        Workflow.get(Workflow.module_name == "unit_tests").delete()
+        self.delete_objects(
+            Workflow.get(Workflow.module_name == "unit_tests").all())
         self.cleanup_registries()
 
     def test_halt(self):
@@ -117,7 +122,8 @@ distances from it.
         from invenio.modules.workflows.models import (BibWorkflowObjectLog,
                                                       ObjectVersion)
 
-        halt_engine = lambda obj, eng: eng.halt("Test")
+        def halt_engine(obj, eng):
+            return eng.halt("Test")
 
         class HaltTest(object):
             workflow = [halt_engine]
@@ -142,8 +148,11 @@ distances from it.
         from invenio.modules.workflows.models import (BibWorkflowObjectLog,
                                                       ObjectVersion)
 
-        always_true = lambda obj, eng: True
-        halt_engine = lambda obj, eng: eng.halt("Test")
+        def always_true(obj, eng):
+            return True
+
+        def halt_engine(obj, eng):
+            return eng.halt("Test")
 
         class BranchTest(object):
             workflow = [
@@ -445,8 +454,9 @@ distances from it.
                                                       ObjectVersion)
 
         initial_data = 20
-        obj_init = BibWorkflowObject(id_workflow=11,
-                                     version=ObjectVersion.INITIAL)
+        obj_init = BibWorkflowObject(
+            id_workflow=None,
+            version=ObjectVersion.INITIAL)
         obj_init.set_data(initial_data)
         obj_init.save()
 
@@ -644,7 +654,8 @@ class TestWorkflowTasks(WorkflowTasksTestCase):
     def tearDown(self):
         """Clean up tests."""
         from invenio.modules.workflows.models import Workflow
-        Workflow.get(Workflow.module_name == "unit_tests").delete()
+        self.delete_objects(
+            Workflow.get(Workflow.module_name == "unit_tests").all())
         self.cleanup_registries()
 
     def test_logic_tasks_restart(self):
