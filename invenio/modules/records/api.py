@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -63,12 +63,15 @@ class Record(SmartJson):
 
         :param reset_cache: If set to `True` it creates the JSON again.
         """
+        def get_record_from_cache():
+            json = cls.storage_engine.get_one(recid)
+            if json is None:
+                raise NoResultFound
+            return Record(json)
+
         if not reset_cache:
             try:
-                json = cls.storage_engine.get_one(recid)
-                if json is None:
-                    raise NoResultFound
-                return Record(json)
+                return get_record_from_cache()
             except (NoResultFound, AttributeError):
                 pass
         # try to retrieve the record from the master format if any
@@ -89,7 +92,7 @@ class Record(SmartJson):
         from invenio.ext.sqlalchemy import db
         db.session.merge(record_sql)
         db.session.commit()
-        return record
+        return get_record_from_cache()
 
     @classmethod
     def get_blob(cls, recid):
