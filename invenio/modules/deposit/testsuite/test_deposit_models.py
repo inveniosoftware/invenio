@@ -20,11 +20,16 @@
 """Unit tests for the Deposit models."""
 
 from flask_registry import RegistryError
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class DepositionTest(InvenioTestCase):
+
+    """Test."""
+
     def setUp(self):
+        """Test."""
         from invenio.modules.deposit.models import DepositionType
         from invenio.modules.deposit.registry import deposit_types, \
             deposit_default_type
@@ -50,6 +55,7 @@ class DepositionTest(InvenioTestCase):
         deposit_default_type.register(DefaultType)
 
     def test_create(self):
+        """Test."""
         from invenio.ext.login.legacy_user import UserInfo
         from invenio.modules.deposit.models import Deposition
 
@@ -57,9 +63,13 @@ class DepositionTest(InvenioTestCase):
         d = Deposition.create(user)
         assert d.type == self.DefaultType
         assert Deposition.get(d.id).type == self.DefaultType
-        d = Deposition.create(user, type=self.AnotherType)
-        assert d.type == self.AnotherType
-        assert Deposition.get(d.id).type == self.AnotherType
+        d2 = Deposition.create(user, type=self.AnotherType)
+        assert d2.type == self.AnotherType
+        assert Deposition.get(d2.id).type == self.AnotherType
+
+        # remove the records
+        Deposition.delete(d)
+        Deposition.delete(d2)
 
 TEST_SUITE = make_test_suite(DepositionTest)
 
