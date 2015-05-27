@@ -51,16 +51,4 @@ bower install --silent --allow-root
 inveniomanage collect > /dev/null
 inveniomanage assets build
 
-# change asset config AFTER initial asset build
-# WARNING: Be careful when modifying the Invenio configuration file directly
-# because the file is parsed as python and therefore a mistake will lead to a
-# non-starting Invenio setup.
-cat <<EOF >> "$cfgfile"
-CLEANCSS_BIN = u'false'
-LESS_BIN = u'false'
-REQUIREJS_BIN = u'false'
-UGLIFYJS_BIN = u'false'
-ASSETS_AUTO_BUILD = False
-EOF
-
 echo "Loaded developer configuration. Do NOT use this in production mode!"
