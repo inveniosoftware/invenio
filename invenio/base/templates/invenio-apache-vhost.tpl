@@ -68,7 +68,7 @@ WSGIPythonHome {{pythonhome}}
         DocumentRoot {{ config.COLLECT_STATIC_ROOT }}
         <Directory {{ config.COLLECT_STATIC_ROOT }}>
            DirectorySlash Off
-           Options FollowSymLinks MultiViews -Indexes
+           Options +FollowSymLinks +MultiViews -Indexes
            AllowOverride None
            <IfVersion >= 2.4>
            Require all granted
@@ -119,7 +119,7 @@ WSGIPythonHome {{pythonhome}}
         <Directory {{ config.CFG_WSGIDIR }}>
            WSGIProcessGroup invenio
            WSGIApplicationGroup %{GLOBAL}
-           Options FollowSymLinks MultiViews
+           Options +FollowSymLinks +MultiViews
            AllowOverride None
            <IfVersion >= 2.4>
            Require all granted
