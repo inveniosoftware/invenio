@@ -70,7 +70,7 @@ class User(db.Model):
     password_salt = db.Column(db.String(255))
     password_scheme = db.Column(db.String(50), nullable=False, index=True)
 
-    note = db.Column(db.String(255), nullable=True)
+    _note = db.Column(db.String(255), name="note", nullable=True)
     given_names = db.Column(db.String(255), nullable=False, server_default='')
     family_name = db.Column(db.String(255), nullable=False, server_default='')
     settings = db.Column(db.MutableDict.as_mutable(db.MarshalBinary(
@@ -83,6 +83,16 @@ class User(db.Model):
 
     PROFILE_FIELDS = ['nickname', 'email', 'family_name', 'given_names']
     """List of fields that can be updated with update_profile."""
+
+    @hybrid_property
+    def note(self):
+        """Return the note."""
+        return self._note
+
+    @note.setter
+    def note(self, note):
+        """Set the note."""
+        self._note = str(note)
 
     @hybrid_property
     def password(self):

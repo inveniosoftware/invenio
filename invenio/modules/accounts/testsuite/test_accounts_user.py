@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
+# Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,15 +19,30 @@
 
 """Unit tests for the user handling library."""
 
-# Note: unit tests located here were moved to the regression test
-# suite.  Keeping this file here with empty test case set in order to
-# overwrite any previously installed file.  Also, keeping TEST_SUITE
-# empty so that `inveniocfg --run-unit-tests' would not complain.
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
-#from invenio.base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, run_test_suite  # , InvenioTestCase
 
-TEST_SUITE = make_test_suite()
+class UserTestCase(InvenioTestCase):
+    """Test User class."""
+
+    def test_note_is_converted_to_string(self):
+        from invenio.modules.accounts.models import User
+        u = User(email="test@test.pl", password="")
+        u.note = 2
+        self.assertTrue(isinstance(u.note, str))
+
+    def test_verify_email_works_with_numbers_and_strings(self):
+        from invenio.modules.accounts.models import User
+        u = User(email="test@test.pl", password="")
+        u.note = 2
+        self.assertTrue(u.verify_email())
+
+        u2 = User(email="test2@test2.pl", password="")
+        u2.note = "2"
+        self.assertTrue(u2.verify_email())
+
+
+TEST_SUITE = make_test_suite(UserTestCase)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
