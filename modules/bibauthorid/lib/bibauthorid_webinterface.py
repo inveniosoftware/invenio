@@ -3040,7 +3040,7 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
         session = get_session(req)
 
         webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid, session['uid'])
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(pid)))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, urllib.quote(str(pid))))
 
     def suggest_orcid_ajax(self, req, form):
         '''
@@ -3295,7 +3295,7 @@ class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
 
         for item in autoclaim:
             webapi.add_operation_to_ticket(item, ticket)
-        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_BASE_URL, urllib.quote(pinfo['pid'])))
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_BASE_URL, urllib.quote(str(pinfo['pid']))))
 
     def modify_operation(self, req, form):
         '''
@@ -3676,7 +3676,7 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
                             redirect_id = cid
                         else:
                             redirect_id = pid
-                        url = "%s/author/profile/%s" % (CFG_BASE_URL, urllib.quote(redirect_id))
+                        url = "%s/author/profile/%s" % (CFG_BASE_URL, urllib.quote(str(redirect_id)))
                         redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
                         return
 
