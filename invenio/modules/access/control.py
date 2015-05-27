@@ -31,7 +31,7 @@ from intbitset import intbitset
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.ext import principal
 from invenio.ext.sqlalchemy import db
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, truncate_table
 from invenio.modules.access.firerole import (
     acc_firerole_check_user, compile_role_definition, deserialize,
     load_role_definition, serialize
@@ -349,7 +349,7 @@ def acc_update_role(id_role=0, name_role='', dummy=0, description='',
 
     return run_sql("""UPDATE "accROLE" SET description = %s,
         firerole_def_ser = %s, firerole_def_src = %s
-        WHERE id = %s""", (description, firerole_def_ser,
+        WHERE id = %s""", (description, bytearray(firerole_def_ser or ""),
                            firerole_def_src, id_role))
 
 
@@ -1804,11 +1804,11 @@ def acc_delete_all_settings():
     from invenio.ext.sqlalchemy import db
     db.session.commit()
 
-    run_sql("""TRUNCATE "accROLE" """)
-    run_sql("""TRUNCATE "accACTION" """)
-    run_sql("""TRUNCATE "accARGUMENT" """)
-    run_sql("""TRUNCATE "user_accROLE" """)
-    run_sql("""TRUNCATE "accROLE_accACTION_accARGUMENT" """)
+    truncate_table("accROLE")
+    truncate_table("accACTION")
+    truncate_table("accARGUMENT")
+    truncate_table("user_accROLE")
+    truncate_table("accROLE_accACTION_accARGUMENT")
 
     return 1
 

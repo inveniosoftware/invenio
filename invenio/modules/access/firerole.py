@@ -225,10 +225,10 @@ def acc_firerole_extract_emails(firerole_def_obj):
                         authorized_emails.add(
                             expr[:-len(' [CERN]')].lower().strip() + ':cern.ch')
                         emails = run_sql(
-                            "SELECT user.email FROM usergroup JOIN "
+                            """SELECT "user".email FROM usergroup JOIN """
                             "user_usergroup ON "
                             "usergroup.id=user_usergroup.id_usergroup "
-                            "JOIN user ON user.id=user_usergroup.id_user "
+                            """JOIN "user" ON "user".id=user_usergroup.id_user """
                             "WHERE usergroup.name=%s", (expr, ))
                     for email in emails:
                         authorized_emails.add(email[0].lower().strip())
@@ -241,7 +241,7 @@ def acc_firerole_extract_emails(firerole_def_obj):
                 for reg_p, expr in expressions_list:
                     if reg_p:
                         continue
-                    email = run_sql("SELECT email FROM user WHERE id=%s",
+                    email = run_sql("""SELECT email FROM "user" WHERE id=%s""",
                                     (expr, ))
                     if email:
                         authorized_emails.add(email[0][0].lower().strip())
