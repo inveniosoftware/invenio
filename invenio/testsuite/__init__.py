@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -23,29 +24,44 @@ from __future__ import print_function, with_statement
 
 # pylint: disable=E1102
 
-CFG_TESTUTILS_VERBOSE = 1
+import binascii
+
+import cgi
 
 import difflib
+
 import os
+
 import sys
+
 import time
+
 pyv = sys.version_info
 if pyv[0] == 2 and pyv[1] < 7:
     import unittest2 as unittest
 else:
     import unittest
-import cgi
-import subprocess
-import binascii
+
 import StringIO
 
+import subprocess
+
 from flask import url_for
+
 from functools import wraps
-from warnings import warn
+
+from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
+
+from itertools import chain, repeat
+
 from six import iteritems
 from six.moves.urllib.parse import urlsplit, urlunsplit
+
 from urllib import urlencode
-from itertools import chain, repeat
+
+from warnings import warn
+
 from xml.dom.minidom import parseString
 
 try:
@@ -55,18 +71,21 @@ except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
 
-#try:
-#    from nose.tools import nottest
-#except ImportError:
-#    def nottest(f):
-#        """Helper decorator to mark a function as not to be tested by nose."""
-#        f.__test__ = False
-#        return f
+# try:
+#     from nose.tools import nottest
+# except ImportError:
+#     def nottest(f):
+#         "Helper decorator to mark a function as not to be tested by nose."
+#         f.__test__ = False
+#         return f
+
+
+CFG_TESTUTILS_VERBOSE = 1
 
 nottest = unittest.skip('nottest')
 
 
-#@nottest
+# @nottest
 def warn_user_about_tests(test_suite_type='regression'):
     """Display a standard warning.
 
@@ -124,7 +143,7 @@ Please confirm by typing 'Yes, I know!': """ % test_suite_type)
     return
 
 
-#@nottest
+# @nottest
 def make_test_suite(*test_cases):
     """Build up a test suite given separate test cases."""
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
@@ -133,7 +152,9 @@ def make_test_suite(*test_cases):
 from invenio.base.factory import create_app
 # pyparsing needed to import here before flask_testing in order to avoid
 # pyparsing troubles due to twill
+
 import pyparsing  # pylint: disable=W0611
+
 from flask_testing import TestCase
 
 
@@ -192,10 +213,10 @@ class InvenioTestCase(TestCase):
     def login(self, username, password):
         """Log in as username and password."""
         from invenio.config import CFG_SITE_SECURE_URL
-        #from invenio.utils.url import rewrite_to_secure_url
+        # from invenio.utils.url import rewrite_to_secure_url
         return self.client.post(url_for('webaccount.login'),
                                 base_url=CFG_SITE_SECURE_URL,
-                                #rewrite_to_secure_url(request.base_url),
+                                # rewrite_to_secure_url(request.base_url),
                                 data=dict(nickname=username,
                                           password=password),
                                 follow_redirects=True)
@@ -211,17 +232,41 @@ class InvenioTestCase(TestCase):
         """Return a short description of the test case."""
         return
 
+    @session_manager
+    def delete_objects(self, list_of_objects):
+        """Delete a list of objects from the database.
+
+        :param list_of_objects: list of objects to delete
+        """
+        for obj in list_of_objects:
+            db.session.delete(obj)
+
+    @session_manager
+    def create_objects(self, list_of_objects):
+        """Create a list of new objects into the database.
+
+        :param list_of_objects: list of objects to create
+        """
+        for obj in list_of_objects:
+            db.session.add(obj)
+
 
 class InvenioXmlTestCase(InvenioTestCase):
+
+    """Invenio Xml Test Case."""
+
     def assertXmlEqual(self, got, want):
+        """Assert xml equal."""
         xml_lines = parseString(got).toprettyxml(encoding='utf-8').split('\n')
         xml = '\n'.join(line for line in xml_lines if line.strip())
-        xml2_lines = parseString(want).toprettyxml(encoding='utf-8').split('\n')
+        xml2_lines = parseString(want).toprettyxml(
+            encoding='utf-8').split('\n')
         xml2 = '\n'.join(line for line in xml2_lines if line.strip())
         try:
             self.assertEqual(xml, xml2)
         except AssertionError:
-            for line in difflib.unified_diff(xml.split('\n'), xml2.split('\n')):
+            for line in difflib.unified_diff(xml.split('\n'),
+                                             xml2.split('\n')):
                 print(line.strip('\n'))
             raise
 
@@ -243,13 +288,15 @@ class FlaskSQLAlchemyTest(InvenioTestCase):
         db.drop_all()
 
 
-#@nottest
+# @nottest
 def make_flask_test_suite(*test_cases):
     """Build up a Flask test suite given separate test cases."""
     from operator import add
     from invenio.config import CFG_DEVEL_TEST_DATABASE_ENGINES as engines
-    create_type = lambda c: [type(k + c.__name__, (c,), d)
-                             for k, d in iteritems(engines)]
+
+    def create_type(c):
+        return [type(k + c.__name__, (c,), d)
+                for k, d in iteritems(engines)]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                               for case in reduce(add, map(create_type,
@@ -357,7 +404,7 @@ class InvenioTestUtilsBrowserException(Exception):
     pass
 
 
-#@nottest
+# @nottest
 def test_web_page_existence(url):
     """
     Test whether URL exists and is well accessible.
@@ -368,7 +415,7 @@ def test_web_page_existence(url):
     browser = mechanize.Browser()
     try:
         browser.open(url)
-    except:
+    except Exception:
         raise
     return True
 
@@ -399,7 +446,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     return browser
 
 
-#@nottest
+# @nottest
 def test_web_page_content(url,
                           username="guest",
                           password="",
@@ -573,7 +620,7 @@ def merge_error_messages(error_messages):
     return out
 
 
-#@nottest
+# @nottest
 def build_and_run_unit_test_suite():
     """Build and run the unit tests.
 
@@ -601,7 +648,7 @@ def build_and_run_unit_test_suite():
     return runner.run(complete_suite).wasSuccessful()
 
 
-#@nottest
+# @nottest
 def build_and_run_js_unit_test_suite():
     """Build and run the JavaScript unit tests.
 
@@ -687,7 +734,7 @@ def build_and_run_js_unit_test_suite():
     return exitcode
 
 
-#@nottest
+# @nottest
 def build_and_run_regression_test_suite():
     """Build and run the regression tests.
 
@@ -718,7 +765,7 @@ def build_and_run_regression_test_suite():
     return runner.run(complete_suite).wasSuccessful()
 
 
-#@nottest
+# @nottest
 def build_and_run_web_test_suite():
     """Build and run the web tests.
 
@@ -789,7 +836,7 @@ class InvenioWebTestCase(InvenioTestCase):
         try:
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_name(element_name))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element=element_name)
 
     def find_element_by_link_text_with_timeout(self, element_link_text,
@@ -810,7 +857,7 @@ class InvenioWebTestCase(InvenioTestCase):
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_link_text(
                     element_link_text))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element=element_link_text)
 
     def find_element_by_partial_link_text_with_timeout(
@@ -834,7 +881,7 @@ class InvenioWebTestCase(InvenioTestCase):
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_partial_link_text(
                     element_partial_link_text))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(
                 element=element_partial_link_text)
 
@@ -866,7 +913,7 @@ class InvenioWebTestCase(InvenioTestCase):
         try:
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_id(element_id))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element=element_id)
 
         if text:
@@ -877,7 +924,7 @@ class InvenioWebTestCase(InvenioTestCase):
                 WebDriverWait(self.browser, timeout).until(
                     lambda driver: (driver.find_element_by_id(element_id) and
                                     q.text == text))
-            except:
+            except Exception:
                 # let's store the result of the comparison in the errors list
                 try:
                     self.assertEqual(q.text, text)
@@ -900,7 +947,7 @@ class InvenioWebTestCase(InvenioTestCase):
         try:
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_xpath(element_xpath))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element=element_xpath)
 
     def find_elements_by_class_name_with_timeout(self, element_class_name,
@@ -921,7 +968,7 @@ class InvenioWebTestCase(InvenioTestCase):
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.find_element_by_class_name(
                     element_class_name))
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element=element_class_name)
 
     def find_page_source_with_timeout(self, timeout=30):
@@ -938,7 +985,7 @@ class InvenioWebTestCase(InvenioTestCase):
         try:
             WebDriverWait(self.browser, timeout).until(
                 lambda driver: driver.page_source)
-        except:
+        except Exception:
             raise InvenioWebTestCaseException(element="page source")
 
     def login(self, username="guest", password="", force_ln='en',
@@ -1188,7 +1235,7 @@ class InvenioWebTestCase(InvenioTestCase):
         try:
             alert = self.browser.switch_to_alert()
             alert.accept()
-        except:
+        except Exception:
             pass
 
 
@@ -1221,7 +1268,7 @@ class InvenioWebTestCaseException(Exception):
         return repr(self.message)
 
 
-#@nottest
+# @nottest
 def build_and_run_flask_test_suite():
     """Build and run the flask tests.
 
