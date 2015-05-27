@@ -259,6 +259,9 @@ setup(
     description='Invenio digital library framework',
     long_description=__doc__,
     packages=packages,
+    namespace_packages=[
+        'invenio.modules',
+    ],
     package_dir={'invenio_docs': 'docs'},
     include_package_data=True,
     zip_safe=False,

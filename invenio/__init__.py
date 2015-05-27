@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,3 +28,6 @@ protocol and uses MARC21 as its underlying bibliographic standard.
 
 # Version information
 from .version import __version__
+
+# namespace package
+__import__("pkg_resources").declare_namespace(__name__)
