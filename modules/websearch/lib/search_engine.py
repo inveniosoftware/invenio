@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -181,6 +181,8 @@ from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 from invenio.bibauthorid_config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT_TO_COLLECTIONS
+from invenio.obelixutils import obelix, clean_user_info
+
 
 websearch_templates = invenio.template.load('websearch')
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
@@ -4185,6 +4187,11 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
     else:
         related_to = pattern
 
+    if obelix and rank_method_code == "rrm":
+        user_id = collect_user_info(req)['uid']
+        solution_recs, solution_scores = obelix.rank_records(hitset_global, user_id, rg=rg, jrec=jrec)
+        return solution_recs, solution_scores, "(", ")", ""
+
     solution_recs, solution_scores, prefix, suffix, comment = \
         rank_records_bibrank(rank_method_code=rank_method_code,
                              rank_limit_relevance=rank_limit_relevance,
@@ -4633,6 +4640,11 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         relevance = relevances[irec]
                     else:
                         relevance = ''
+
+                    # Hide the score results, we don't want to show them as they are
+                    if rm == "rrm":
+                        relevance = ''
+
                     record = print_record(recid,
                                           format,
                                           ot=ot,
@@ -6463,8 +6475,13 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
     print_records_prologue(req, of, cc=cc)
     results_final_colls = []
     wlqh_results_overlimit = 0
+    results_final_colls_scores = []
+    seconds_to_rank_and_print = time.time()
+    cols_in_result_ordered = []
+    original_result_ordered = []
     for coll in colls_to_search:
         if coll in results_final and len(results_final[coll]):
+
             if of.startswith("h"):
                 req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
@@ -6494,6 +6511,8 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)
+                results_final_colls_scores.append(results_final_relevances)
+
             else:
                 wlqh_results_overlimit = 1
 
@@ -6517,6 +6536,28 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                             sc, pl_in_url,
                                             d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1, em=em))
+
+            if obelix:
+                try:
+                    cols_in_result_ordered.append(coll)
+                    original_result_order = list(results_final[coll])[::-1]
+                    if jrec and jrec > 0 and rg and rg > 0:
+                        original_result_ordered.append(original_result_order[jrec:jrec+rg])
+                    elif rg and rg > 0:
+                        original_result_ordered.append(original_result_order[:rg])
+                except Exception:
+                    register_exception(alert_admin=True)
+
+    try:
+        obelix.log('search_result',
+                   clean_user_info(collect_user_info(req)),
+                   original_result_ordered,
+                   results_final_colls, results_final_colls_scores,
+                   cols_in_result_ordered,
+                   time.time()-seconds_to_rank_and_print,
+                   jrec, rg, rm, cc)
+    except Exception:
+        register_exception(alert_admin=True)
 
     if req and not isinstance(req, cStringIO.OutputType):
         # store the last search results page

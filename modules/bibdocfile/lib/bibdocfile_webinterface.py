@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -68,6 +68,7 @@ from invenio.bibdocfile_managedocfiles import \
      move_uploaded_files_to_storage
 
 bibdocfile_templates = invenio.template.load('bibdocfile')
+from invenio.obelixutils import obelix, clean_user_info
 
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
@@ -163,6 +164,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     docformat += ';%s' % args['subformat']
             else:
                 docname = args['docname']
+
+            try:
+                obelix.log('download_after_search',
+                        clean_user_info(user_info), self.recid)
+            except Exception:
+                register_exception(alert_admin=True)
 
             if not docformat:
                 docformat = args['format']

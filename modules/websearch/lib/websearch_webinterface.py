@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -57,6 +57,7 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_SITE_RECORD
+
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -108,6 +109,7 @@ from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.bibfield import get_record
 from invenio.shellutils import mymkdir
+from invenio.obelixutils import obelix, clean_user_info
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -279,6 +281,15 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 navmenuid='search')
 
         from invenio.search_engine import record_exists, get_merged_recid
+
+        try:
+            obelix.log('page_view_after_search',
+                       clean_user_info(user_info),
+                       argd['recid'])
+
+        except Exception:
+            register_exception(alert_admin=True)
+
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
         # will be redirect to the new one
