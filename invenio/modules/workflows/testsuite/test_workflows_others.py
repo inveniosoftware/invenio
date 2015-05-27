@@ -23,6 +23,21 @@
 from invenio.testsuite import make_test_suite, run_test_suite
 
 from .test_workflows import WorkflowTasksTestCase
+import sys
+from six import StringIO
+from contextlib import contextmanager
+
+
+@contextmanager
+def redirect_stderr():
+    """Redirect stderr to a StringIO instance."""
+    old_stderr = sys.stderr
+    old_stderr.flush()
+    sio = StringIO()
+    sys.stderr = sio
+    yield sio
+    sio.close()
+    sys.stderr = old_stderr
 
 
 class WorkflowOthers(WorkflowTasksTestCase):
@@ -70,13 +85,14 @@ class WorkflowOthers(WorkflowTasksTestCase):
         from workflow.errors import WorkflowError
         from invenio.modules.workflows.api import start
 
-        with self.assertRaises(WorkflowError) as e:
-            start("test_workflow_error", [2],
-                  module_name="unit_tests")
-            self.assertTrue("ZeroDivisionError" in e.message)
-            self.assertTrue("call_a()" in e.message)
-            self.assertTrue("call_b()" in e.message)
-            self.assertTrue("call_c()" in e.message)
+        with redirect_stderr() as stderr:
+            with self.assertRaises(WorkflowError):
+                stderr.seek(0)
+                start("test_workflow_error", [2], module_name="unit_tests")
+                self.assertTrue("ZeroDivisionError" in stderr)
+                self.assertTrue("call_a()" in stderr)
+                self.assertTrue("call_b()" in stderr)
+                self.assertTrue("call_c()" in stderr)
 
 
 TEST_SUITE = make_test_suite(WorkflowOthers)
