@@ -21,38 +21,29 @@
 from __future__ import print_function
 
 import os
+
 import sys
 
 from flask import (abort, current_app, g, render_template, request,
                    send_from_directory, url_for)
-from flask_admin.menu import MenuLink
-from werkzeug.exceptions import HTTPException
-from werkzeug.wrappers import BaseResponse
 
-from .request_class import LegacyRequest
+from flask_admin.menu import MenuLink
+
 from invenio.base import signals
 from invenio.base.scripts.database import create, recreate
 from invenio.base.utils import run_py_func
 
+from werkzeug.exceptions import HTTPException
+from werkzeug.wrappers import BaseResponse
+
+from .request_class import LegacyRequest
+
 
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
-    from invenio.ext.sqlalchemy import db
-    from invenio.modules.accounts.models import User
-    # from invenio.legacy.inveniocfg import cli_cmd_reset_sitename
-    # from invenio.legacy.inveniocfg import cli_cmd_reset_fieldnames
     from invenio.legacy.bibsort.daemon import main as bibsort
     from invenio.modules.access.scripts.webaccessadmin import main as \
         webaccessadmin
-
-    # FIXME refactor fixtures so these calls are not needed
-    # cli_cmd_reset_sitename(conf)
-    User.query.filter_by(id=1).delete()
-    siteadminemail = current_app.config.get('CFG_SITE_ADMIN_EMAIL')
-    u = User(id=1, email=siteadminemail, password='', note=1, nickname='admin')
-    db.session.add(u)
-    db.session.commit()
-    # cli_cmd_reset_fieldnames(conf)
 
     for cmd in (
         (webaccessadmin, "webaccessadmin -u admin -c -a -D"),
