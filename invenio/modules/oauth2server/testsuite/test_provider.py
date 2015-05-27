@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,20 +20,25 @@
 from __future__ import absolute_import, print_function
 
 import logging
+
 import os
 
 from datetime import datetime, timedelta
-from flask import url_for, request
+
+from flask import request, url_for
+
 from flask_oauthlib.client import prepare_request
-from mock import MagicMock
-try:
-    from six.moves.urllib.parse import urlparse
-except ImportError:
-    from urllib.parse import urlparse
 
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+
+from mock import MagicMock
+
+try:
+    from six.moves.urllib.parse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 from .helpers import create_client
 
@@ -149,14 +154,15 @@ class ProviderTestCase(InvenioTestCase):
 
     def tearDown(self):
         super(ProviderTestCase, self).tearDown()
+        from ..models import Client
         # Set back any previous value of DEBUG environment variable.
         if self.app.config.get('CFG_SITE_SECURE_URL').startswith('http://'):
             os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = self.os_debug
         self.base_url = None
 
-        for o in self.objects:
-            db.session.delete(o)
-        db.session.commit()
+        self.delete_objects(
+            Client.query.filter_by(name='test-personal', user_id=1).all())
+        self.delete_objects(self.objects)
 
     def parse_redirect(self, location, parse_fragment=False):
         from werkzeug.urls import url_parse, url_decode, url_unparse
@@ -186,6 +192,8 @@ class OAuth2ProviderTestCase(ProviderTestCase):
 
         db.session.add(c)
         db.session.commit()
+
+        self.delete_objects([c])
 
     def test_invalid_authorize_requests(self):
         # First login on provider site
@@ -462,6 +470,7 @@ class OAuth2ProviderTestCase(ProviderTestCase):
             assert r.json.get('scopes') == [u'test:scope']
 
     def test_client_flow(self):
+        from ..models import Client
         data = dict(
             client_id='dev',
             client_secret='dev',  # A public client should NOT do this!
@@ -504,6 +513,9 @@ class OAuth2ProviderTestCase(ProviderTestCase):
         assert r.json.get('client') == 'confidential'
         assert r.json.get('user') == self.objects[0].id
         assert r.json.get('scopes') == [u'test:scope']
+
+        self.delete_objects(
+            Client.query.filter_by(client_id='dev', client_secret='dev').all())
 
     def test_auth_flow_denied(self):
         # First login on provider site
@@ -745,6 +757,7 @@ class OAuth2ProviderExpirationTestCase(ProviderTestCase):
         self.assert401(r)
 
     def test_not_allowed_public_refresh_flow(self):
+        from ..models import Client
         # First login on provider site
         self.login("tester", "tester")
 
@@ -820,6 +833,9 @@ class OAuth2ProviderExpirationTestCase(ProviderTestCase):
 
         # Only confidential clients can refresh expired token.
         self.assert401(r)
+
+        self.delete_objects(
+            Client.query.filter_by(client_id='dev', client_secret='dev').all())
 
 
 class RedisTestCase(ProviderTestCase):
