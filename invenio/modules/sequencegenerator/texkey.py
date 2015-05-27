@@ -17,27 +17,33 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from .backend import SequenceGenerator
-from invenio.legacy.bibedit.utils import get_bibrecord
-from invenio.legacy.bibrecord import record_get_field_value, create_record
+"""Texkey."""
 
-# Imports related to the texkey generation daemon
-from invenio.legacy.search_engine import perform_request_search, get_record
-from invenio.legacy.bibrecord import field_get_subfield_values, \
-                              record_get_field_instances, \
-                              record_add_field, print_rec
-from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
-from invenio.legacy.bibsched.bibtask import task_init, write_message, \
-    task_low_level_submission, task_update_progress, \
-    task_sleep_now_if_required
-from invenio.legacy.dbquery import run_sql
+import os
+
+import random
 
 import string
-import random
+
 import time
-import os
-from unidecode import unidecode
+
+from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
+from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.bibrecord import create_record, \
+    field_get_subfield_values, print_rec, record_add_field, \
+    record_get_field_instances, record_get_field_value
+from invenio.legacy.bibsched.bibtask import task_init, \
+    task_low_level_submission, task_sleep_now_if_required, \
+    task_update_progress, write_message
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.search_engine import get_record, perform_request_search
+
 from tempfile import mkstemp
+
+from unidecode import unidecode
+
+from .backend import SequenceGenerator
+
 
 DESCRIPTION = """
     Generate TexKeys in records without one
@@ -55,25 +61,30 @@ TEXKEY_MAXTRIES = 10
 
 
 class TexkeyNoAuthorError(Exception):
-    """ Error raised when the record does not have a main author or a
+
+    """No author error.
+
+    Error raised when the record does not have a main author or a
     collaboration field
     """
+
     pass
 
 
 class TexkeyNoYearError(Exception):
-    """ Error raised when the record does not have a year field
-    """
+
+    """Error raised when the record does not have a year field."""
+
     pass
 
 
 def _texkey_random_chars(recid, use_random=False):
-    """ Generate the three random chars for the end of the texkey """
+    """Generate the three random chars for the end of the texkey."""
     if recid and not use_random:
         # Legacy random char generation from Spires
         texkey_third_part = chr((recid % 26) + 97) + \
-                            chr(((recid / 26) % 26) + 97) + \
-                            chr(((recid * 26) % 26) + 97)
+            chr(((recid / 26) % 26) + 97) + \
+            chr(((recid * 26) % 26) + 97)
     else:
         letters = string.letters.lower()
         texkey_third_part = ""
@@ -84,25 +95,24 @@ def _texkey_random_chars(recid, use_random=False):
 
 
 class TexkeySeq(SequenceGenerator):
-    """
-    texkey sequence generator
-    """
+
+    """texkey sequence generator."""
+
     seq_name = 'texkey'
 
     def _next_value(self, recid=None, xml_record=None, bibrecord=None):
-        """
-        Returns the next texkey for the given recid
+        """Return the next texkey for the given recid.
 
-        @param recid: id of the record where the texkey will be generated
-        @type recid: int
+        :param recid: id of the record where the texkey will be generated
+        :type recid: int
 
-        @param xml_record: record in xml format
-        @type xml_record: string
+        :param xml_record: record in xml format
+        :type xml_record: string
 
-        @return: next texkey for the given recid.
-        @rtype: string
+        :return: next texkey for the given recid.
+        :rtype: string
 
-        @raises TexkeyNoAuthorError: No main author (100__a) or collaboration
+        :raises TexkeyNoAuthorError: No main author (100__a) or collaboration
         (710__g) in the given recid
         """
         if recid is None and xml_record is not None:
@@ -111,28 +121,28 @@ class TexkeySeq(SequenceGenerator):
             bibrecord = get_bibrecord(recid)
 
         main_author = record_get_field_value(bibrecord,
-                                            tag="100",
-                                            ind1="",
-                                            ind2="",
-                                            code="a")
+                                             tag="100",
+                                             ind1="",
+                                             ind2="",
+                                             code="a")
 
         if not main_author:
             # Try with collaboration name
             main_author = record_get_field_value(bibrecord,
-                                            tag="710",
-                                            ind1="",
-                                            ind2="",
-                                            code="g")
+                                                 tag="710",
+                                                 ind1="",
+                                                 ind2="",
+                                                 code="g")
             main_author = "".join([p for p in main_author.split()
-                                if p.lower() != "collaboration"])
+                                   if p.lower() != "collaboration"])
 
         if not main_author:
             # Try with corporate author
             main_author = record_get_field_value(bibrecord,
-                                            tag="100",
-                                            ind1="",
-                                            ind2="",
-                                            code="a")
+                                                 tag="100",
+                                                 ind1="",
+                                                 ind2="",
+                                                 code="a")
             if not main_author:
                 raise TexkeyNoAuthorError
 
@@ -144,28 +154,28 @@ class TexkeySeq(SequenceGenerator):
             texkey_first_part = ""
 
         year = record_get_field_value(bibrecord,
-                                        tag="269",
-                                        ind1="",
-                                        ind2="",
-                                        code="c")
+                                      tag="269",
+                                      ind1="",
+                                      ind2="",
+                                      code="c")
         if not year:
             year = record_get_field_value(bibrecord,
-                                    tag="260",
-                                    ind1="",
-                                    ind2="",
-                                    code="c")
+                                          tag="260",
+                                          ind1="",
+                                          ind2="",
+                                          code="c")
             if not year:
                 year = record_get_field_value(bibrecord,
-                                    tag="773",
-                                    ind1="",
-                                    ind2="",
-                                    code="y")
+                                              tag="773",
+                                              ind1="",
+                                              ind2="",
+                                              code="y")
                 if not year:
                     year = record_get_field_value(bibrecord,
-                                    tag="502",
-                                    ind1="",
-                                    ind2="",
-                                    code="d")
+                                                  tag="502",
+                                                  ind1="",
+                                                  ind2="",
+                                                  code="d")
 
                     if not year:
                         raise TexkeyNoYearError
@@ -177,32 +187,34 @@ class TexkeySeq(SequenceGenerator):
 
         texkey_third_part = _texkey_random_chars(recid)
 
-        texkey = texkey_first_part + ":" + texkey_second_part + texkey_third_part
+        texkey = texkey_first_part + ":" + \
+            texkey_second_part + texkey_third_part
 
         tries = 0
         while self._value_exists(texkey) and tries < TEXKEY_MAXTRIES:
             # Key is already in the DB, generate a new one
             texkey_third_part = _texkey_random_chars(recid, use_random=True)
-            texkey = texkey_first_part + ":" + texkey_second_part + texkey_third_part
+            texkey = texkey_first_part + ":" + \
+                texkey_second_part + texkey_third_part
             tries += 1
 
         return texkey
 
 
-### Functions related to texkey generator daemon ###
+# Functions related to texkey generator daemon #
 
 def submit_task(to_submit, mode, sequence_id):
-    """ calls bibupload with all records to be modified
+    """call bibupload with all records to be modified.
 
-    @param to_submit: list of xml snippets to be submitted
-    @type: list
-    @param mode: mode to be used in bibupload
-    @type: list
-    @param sequence_id: sequence id to be included in the task_id
-    @type: str
+    :param to_submit: list of xml snippets to be submitted
+    :type: list
+    :param mode: mode to be used in bibupload
+    :type: list
+    :param sequence_id: sequence id to be included in the task_id
+    :type: str
 
-    @return: id of the submitted task
-    @rtype: int
+    :return: id of the submitted task
+    :rtype: int
     """
     (temp_fd, temp_path) = mkstemp(prefix=PREFIX,
                                    dir=CFG_TMPSHAREDDIR)
@@ -220,48 +232,50 @@ def submit_task(to_submit, mode, sequence_id):
 
 
 def submit_bibindex_task(to_update, sequence_id):
-    """ submits a bibindex task for a set of records
+    """submit a bibindex task for a set of records.
 
-    @param to_update: list of recids to be updated by bibindex
-    @type: list
-    @param sequence_id: sequence id to be included in the task_id
-    @type: str
+    :param to_update: list of recids to be updated by bibindex
+    :type: list
+    :param sequence_id: sequence id to be included in the task_id
+    :type: str
 
-    @return: id of bibindex task
-    @rtype: int
+    :return: id of bibindex task
+    :rtype: int
     """
     recids = [str(r) for r in to_update]
     return task_low_level_submission('bibindex', PREFIX, '-I',
-                                      sequence_id, '-P', '2', '-w', 'global',
-                                      '-i', ','.join(recids))
+                                     sequence_id, '-P', '2', '-w', 'global',
+                                     '-i', ','.join(recids))
 
 
 def wait_for_task(task_id):
-    sql = 'select status from schTASK where id = %s'
+    """Wait for task."""
+    sql = 'select status from "schTASK" where id = %s'
     while run_sql(sql, [task_id])[0][0] not in ('DONE', 'ACK', 'ACK DONE'):
         task_sleep_now_if_required(True)
         time.sleep(5)
 
-def process_chunk(to_process, sequence_id):
-    """ submit bibupload task and wait for it to finish
 
-    @param to_process: list of marcxml snippets
-    @type: list
+def process_chunk(to_process, sequence_id):
+    """submit bibupload task and wait for it to finish.
+
+    :param to_process: list of marcxml snippets
+    :type: list
     """
     task_id = submit_task(to_process, 'a', sequence_id)
     return wait_for_task(task_id)
 
 
 def create_xml(recid, texkey):
-    """ Create the marcxml snippet with the new texkey
+    """Create the marcxml snippet with the new texkey.
 
-    @param recid: recid of the record to be updated
-    @type: int
-    @param texkey: texkey that has been generated
-    @type: str
+    :param recid: recid of the record to be updated
+    :type: int
+    :param texkey: texkey that has been generated
+    :type: str
 
-    @return: marcxml with the fields to be record_add_field
-    @rtype: str
+    :return: marcxml with the fields to be record_add_field
+    :rtype: str
     """
     record = {}
     record_add_field(record, '001', controlfield_value=str(recid))
@@ -271,9 +285,12 @@ def create_xml(recid, texkey):
 
 
 def task_run_core():
-    """ Performs a search to find records without a texkey, generates a new
-    one and uploads the changes in chunks """
-    recids = perform_request_search(p='-035:spirestex -035:inspiretex', cc='HEP')
+    """Perform a search to find records without a texkey.
+
+    generates a new one and uploads the changes in chunks
+    """
+    recids = perform_request_search(
+        p='-035:spirestex -035:inspiretex', cc='HEP')
 
     write_message("Found %s records to assign texkeys" % len(recids))
     processed_recids = []
@@ -284,7 +301,8 @@ def task_run_core():
         # Check that the record does not have already a texkey
         has_texkey = False
         recstruct = get_record(recid)
-        for instance in record_get_field_instances(recstruct, tag="035", ind1="", ind2=""):
+        for instance in record_get_field_instances(recstruct, tag="035",
+                                                   ind1="", ind2=""):
             try:
                 provenance = field_get_subfield_values(instance, "9")[0]
             except IndexError:
@@ -299,7 +317,8 @@ def task_run_core():
             provenances = ["SPIRESTeX", "INSPIRETeX"]
             if provenance in provenances and value:
                 has_texkey = True
-                write_message("INFO: Record %s has already texkey %s" % (recid, value))
+                write_message(
+                    "INFO: Record %s has already texkey %s" % (recid, value))
 
         if not has_texkey:
             TexKeySeq = TexkeySeq()
@@ -307,12 +326,15 @@ def task_run_core():
             try:
                 new_texkey = TexKeySeq.next_value(recid)
             except TexkeyNoAuthorError:
-                write_message("WARNING: Record %s has no first author or collaboration" % recid)
+                write_message((
+                    "WARNING: Record %s has no first author or "
+                    "collaboration") % recid)
                 continue
             except TexkeyNoYearError:
                 write_message("WARNING: Record %s has no year" % recid)
                 continue
-            write_message("Created texkey %s for record %d" % (new_texkey, recid))
+            write_message("Created texkey %s for record %d" %
+                          (new_texkey, recid))
             xml = create_xml(recid, new_texkey)
             processed_recids.append(recid)
             xml_to_process.append(xml)
@@ -326,7 +348,7 @@ def task_run_core():
         process_chunk(xml_to_process, sequence_id)
 
     # Finally, index all the records processed
-    #FIXME: Waiting for sequence id to be fixed
+    # FIXME: Waiting for sequence id to be fixed
     # if processed_recids:
     #     submit_bibindex_task(processed_recids, sequence_id)
 
@@ -334,15 +356,15 @@ def task_run_core():
 
 
 def main():
-    """Constructs the bibtask."""
+    """Construct the bibtask."""
     # Build and submit the task
     task_init(authorization_action='runtexkeygeneration',
-        authorization_msg="Texkey generator task submission",
-        description=DESCRIPTION,
-        help_specific_usage=HELP_MESSAGE,
-        version="Invenio v%s" % CFG_VERSION,
-        specific_params=("", []),
-        # task_submit_elaborate_specific_parameter_fnc=parse_option,
-        # task_submit_check_options_fnc=check_options,
-        task_run_fnc=task_run_core
-    )
+              authorization_msg="Texkey generator task submission",
+              description=DESCRIPTION,
+              help_specific_usage=HELP_MESSAGE,
+              version="Invenio v%s" % CFG_VERSION,
+              specific_params=("", []),
+              # task_submit_elaborate_specific_parameter_fnc=parse_option,
+              # task_submit_check_options_fnc=check_options,
+              task_run_fnc=task_run_core
+              )

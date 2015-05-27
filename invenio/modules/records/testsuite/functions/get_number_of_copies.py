@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,6 +29,6 @@ def get_number_of_copies(recid):
     from invenio.legacy.dbquery import run_sql
     if recid:
         try:
-            return run_sql('SELECT COUNT(*) FROM crcITEM WHERE id_bibrec=%s', (recid,))[0][0]
-        except:
+            return run_sql('SELECT COUNT(*) FROM "crcITEM" WHERE id_bibrec=%s', (recid,))[0][0]
+        except Exception:
             return -1

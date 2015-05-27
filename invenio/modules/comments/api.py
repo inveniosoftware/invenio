@@ -33,7 +33,7 @@ from six import iteritems
 
 # Invenio imports:
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, datetime_format
 from invenio.config import CFG_COMMENTSDIR, \
     CFG_SITE_LANG, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
@@ -340,7 +340,8 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
     if cmt_id > 0 and value in [-1, 1] and check_user_can_vote(cmt_id, client_ip_address, uid):
         action_date = convert_datestruct_to_datetext(time.localtime())
         action_code = CFG_WEBCOMMENT_ACTION_CODE['VOTE']
-        query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT,
+        # FIXME compatibility with postgresql
+        query = """INSERT INTO "cmtACTIONHISTORY" ("id_cmtRECORDCOMMENT",
                     id_bibrec, id_user, client_host, action_time,
                     action_code)
                    VALUES (%s, NULL ,%s, inet_aton(%s), %s, %s)"""
@@ -364,7 +365,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     max_action_time = convert_datestruct_to_datetext(time.localtime(max_action_time))
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_COMMENT']
     query = """SELECT id_bibrec
-               FROM cmtACTIONHISTORY
+               FROM "cmtACTIONHISTORY"
                WHERE id_bibrec=%s AND
                      action_code=%s AND
                      action_time>%s
@@ -388,7 +389,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     """
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_REVIEW']
     query = """SELECT id_bibrec
-               FROM cmtACTIONHISTORY
+               FROM "cmtACTIONHISTORY"
                WHERE id_bibrec=%s AND
                      action_code=%s
             """
@@ -411,9 +412,9 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
     uid = wash_url_argument(uid, 'int')
-    query = """SELECT id_cmtRECORDCOMMENT
-               FROM cmtACTIONHISTORY
-               WHERE id_cmtRECORDCOMMENT=%s"""
+    query = """SELECT "id_cmtRECORDCOMMENT"
+               FROM "cmtACTIONHISTORY"
+               WHERE "id_cmtRECORDCOMMENT"=%s"""
     params = (cmt_id,)
     if uid < 0:
         query += " AND client_host=inet_aton(%s)"
@@ -428,7 +429,7 @@ def get_comment_collection(cmt_id):
     """
     Extract the collection where the comment is written
     """
-    query = "SELECT id_bibrec FROM cmtRECORDCOMMENT WHERE id=%s"
+    query = """SELECT id_bibrec FROM "cmtRECORDCOMMENT" WHERE id=%s"""
     recid = run_sql(query, (cmt_id,))
     record_primary_collection = guess_primary_collection_of_a_record(recid[0][0])
     return record_primary_collection
@@ -463,7 +464,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
         return 0
     action_date = convert_datestruct_to_datetext(time.localtime())
     action_code = CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE']
-    query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT, id_bibrec,
+    query = """INSERT INTO "cmtACTIONHISTORY" ("id_cmtRECORDCOMMENT", id_bibrec,
                   id_user, client_host, action_time, action_code)
                VALUES (%s, NULL, %s, inet_aton(%s), %s, %s)"""
     params = (cmt_id, uid, client_ip_address, action_date, action_code)
@@ -543,9 +544,9 @@ def check_user_can_report(cmt_id, client_ip_address, uid=-1):
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
     uid = wash_url_argument(uid, 'int')
-    query = """SELECT id_cmtRECORDCOMMENT
-               FROM cmtACTIONHISTORY
-               WHERE id_cmtRECORDCOMMENT=%s"""
+    query = """SELECT "id_cmtRECORDCOMMENT"
+               FROM "cmtACTIONHISTORY"
+               WHERE "id_cmtRECORDCOMMENT"=%s"""
     params = (uid,)
     if uid < 0:
         query += " AND client_host=inet_aton(%s)"
@@ -562,9 +563,12 @@ def query_get_user_contact_info(uid):
     @return: tuple (nickname, email, last_login), if none found return ()
     Note: for the moment, if no nickname, will return email address up to the '@'
     """
+    # FIXME compatibility with postgresql
     query1 = """SELECT nickname, email,
-                     DATE_FORMAT(last_login, '%%Y-%%m-%%d %%H:%%i:%%s')
-                     FROM user WHERE id=%s"""
+                       """ + \
+                           datetime_format('last_login') + \
+                       """
+                     FROM "user" WHERE id=%s"""
     params1 = (uid,)
     res1 = run_sql(query1, params1)
     if res1:
@@ -583,7 +587,7 @@ def query_get_user_reports_and_votes(uid):
     query1 = """SELECT nb_votes_yes,
                        nb_votes_total,
                        nb_abuse_reports
-                FROM cmtRECORDCOMMENT
+                FROM "cmtRECORDCOMMENT"
                 WHERE id_user=%s"""
     params1 = (uid,)
     res1 = run_sql(query1, params1)
@@ -607,7 +611,9 @@ def query_get_comment(comID):
                        id_bibrec,
                        id_user,
                        body,
-                       DATE_FORMAT(date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
+                       """ + \
+                           datetime_format('date_creation') + ', ' \
+                       """
                        star_score,
                        nb_votes_yes,
                        nb_votes_total,
@@ -615,7 +621,7 @@ def query_get_comment(comID):
                        nb_abuse_reports,
                        round_name,
                        restriction
-                FROM cmtRECORDCOMMENT
+                FROM "cmtRECORDCOMMENT"
                 WHERE id=%s"""
     params1 = (comID,)
     res1 = run_sql(query1, params1)
@@ -632,7 +638,7 @@ def query_record_report_this(comID):
     success is integer 1 if success, integer 0 if not, -2 if comment does not exist
     """
     #retrieve nb_abuse_reports
-    query1 = "SELECT nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id=%s"
+    query1 = """SELECT nb_abuse_reports FROM "cmtRECORDCOMMENT" WHERE id=%s"""
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1) == 0:
@@ -640,7 +646,7 @@ def query_record_report_this(comID):
 
     #increment and update
     nb_abuse_reports = int(res1[0][0]) + 1
-    query2 = "UPDATE cmtRECORDCOMMENT SET nb_abuse_reports=%s WHERE id=%s"
+    query2 = """UPDATE "cmtRECORDCOMMENT" SET nb_abuse_reports=%s WHERE id=%s"""
     params2 = (nb_abuse_reports, comID)
     res2 = run_sql(query2, params2)
     return (int(res2), nb_abuse_reports)
@@ -654,7 +660,7 @@ def query_record_useful_review(comID, value):
     @return: integer 1 if successful, integer 0 if not
     """
     # retrieve nb_useful votes
-    query1 = "SELECT nb_votes_total, nb_votes_yes FROM cmtRECORDCOMMENT WHERE id=%s"
+    query1 = """SELECT nb_votes_total, nb_votes_yes FROM "cmtRECORDCOMMENT" WHERE id=%s"""
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)==0:
@@ -665,7 +671,7 @@ def query_record_useful_review(comID, value):
     if value >= 1:
         nb_votes_yes = int(res1[0][1]) + 1
     nb_votes_total = int(res1[0][0]) + 1
-    query2 = "UPDATE cmtRECORDCOMMENT SET nb_votes_total=%s, nb_votes_yes=%s WHERE id=%s"
+    query2 = """UPDATE "cmtRECORDCOMMENT" SET nb_votes_total=%s, nb_votes_yes=%s WHERE id=%s"""
     params2 = (nb_votes_total, nb_votes_yes, comID)
     res2 = run_sql(query2, params2)
     return int(res2)
@@ -720,7 +726,9 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
     #display_order = order_dict['nd']
     query = """SELECT user.nickname,
                       cmt.id_user,
-                      DATE_FORMAT(cmt.date_creation, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s'),
+                       """ + \
+                       datetime_format('cmt.date_creation', False, True) + ', ' \
+                       """
                       cmt.body,
                       cmt.status,
                       cmt.nb_abuse_reports,
@@ -728,8 +736,8 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
                       cmt.round_name,
                       cmt.restriction,
                       %(reply_to_column)s
-               FROM   cmtRECORDCOMMENT cmt LEFT JOIN user ON
-                                              user.id=cmt.id_user
+               FROM   "cmtRECORDCOMMENT" cmt LEFT JOIN "user" ON
+                                              "user".id=cmt.id_user
                WHERE cmt.id_bibrec=%%s
                %(ranking_only)s
                %(display_since)s
@@ -740,7 +748,7 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
 #                      'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
                       'display_since' : display_since == '0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since,
                'display_order': display_order,
-               'reply_to_column':  recID > 0 and 'cmt.in_reply_to_id_cmtRECORDCOMMENT' or 'cmt.in_reply_to_id_bskRECORDCOMMENT'}
+               'reply_to_column':  recID > 0 and 'cmt."in_reply_to_id_cmtRECORDCOMMENT"' or 'cmt."in_reply_to_id_bskRECORDCOMMENT"'}
     params = (recID,)
     res = run_sql(query, params)
 #    return res
@@ -827,7 +835,7 @@ def get_comment_ancestors(comID, depth=None):
     if depth == 0:
         return []
 
-    res = run_sql("SELECT in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id=%s", (comID,))
+    res = run_sql("""SELECT "in_reply_to_id_cmtRECORDCOMMENT" FROM "cmtRECORDCOMMENT" WHERE id=%s""", (comID,))
     if res:
         parent_comID = res[0][0]
         if parent_comID == 0:
@@ -928,7 +936,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         #msg = msg.replace('</div><', '</div>\n<')
         #msg = msg.replace('</p><', '</p>\n<')
 
-    query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
+    query = """INSERT INTO "cmtRECORDCOMMENT" (id_bibrec,
                                            id_user,
                                            body,
                                            date_creation,
@@ -937,24 +945,24 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                            title,
                                            round_name,
                                            restriction,
-                                           in_reply_to_id_cmtRECORDCOMMENT)
+                                           "in_reply_to_id_cmtRECORDCOMMENT")
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
     params = (recID, uid, msg, current_date, score, 0, note, round_name, restriction, reply_to or 0)
     res = run_sql(query, params)
     if res:
         new_comid = int(res)
         move_attached_files_to_storage(attached_files, recID, new_comid)
-        parent_reply_order = run_sql("""SELECT reply_order_cached_data from cmtRECORDCOMMENT where id=%s""", (reply_to,))
+        parent_reply_order = run_sql("""SELECT reply_order_cached_data from "cmtRECORDCOMMENT" where id=%s""", (reply_to,))
         if not parent_reply_order or parent_reply_order[0][0] is None:
             # This is not a reply, but a first 0-level comment
             parent_reply_order = ''
         else:
             parent_reply_order = parent_reply_order[0][0]
-        run_sql("""UPDATE cmtRECORDCOMMENT SET reply_order_cached_data=%s WHERE id=%s""",
+        run_sql("""UPDATE "cmtRECORDCOMMENT" SET reply_order_cached_data=%s WHERE id=%s""",
                 (parent_reply_order + get_reply_order_cache_data(new_comid), new_comid))
         action_code = CFG_WEBCOMMENT_ACTION_CODE[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
         action_time = convert_datestruct_to_datetext(time.localtime())
-        query2 = """INSERT INTO cmtACTIONHISTORY  (id_cmtRECORDCOMMENT,
+        query2 = """INSERT INTO "cmtACTIONHISTORY"  ("id_cmtRECORDCOMMENT",
                      id_bibrec, id_user, client_host, action_time, action_code)
                     VALUES (%s, %s, %s, inet_aton(%s), %s, %s)"""
         params2 = (res, recID, uid, client_ip_address, action_time, action_code)
@@ -1036,7 +1044,7 @@ def subscribe_user_to_discussion(recID, uid):
                   subscribe the user
     @param uid: user id
     """
-    query = """INSERT INTO cmtSUBSCRIPTION (id_bibrec, id_user, creation_time)
+    query = """INSERT INTO "cmtSUBSCRIPTION" (id_bibrec, id_user, creation_time)
                     VALUES (%s, %s, %s)"""
     params = (recID, uid, convert_datestruct_to_datetext(time.localtime()))
     try:
@@ -1054,7 +1062,7 @@ def unsubscribe_user_from_discussion(recID, uid):
     @param uid: user id
     @return 1 if successful, 0 if not
     """
-    query = """DELETE FROM cmtSUBSCRIPTION
+    query = """DELETE FROM "cmtSUBSCRIPTION"
                      WHERE id_bibrec=%s AND id_user=%s"""
     params = (recID, uid)
     try:
@@ -1107,7 +1115,7 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
     subscribers_emails = {}
 
     # Get users that have subscribed to this discussion
-    query = """SELECT id_user FROM cmtSUBSCRIPTION WHERE id_bibrec=%s"""
+    query = """SELECT id_user FROM "cmtSUBSCRIPTION" WHERE id_bibrec=%s"""
     params = (recID,)
     res = run_sql(query, params)
     for row in res:
@@ -2008,7 +2016,7 @@ def check_comment_belongs_to_record(comid, recid):
     @param comid: the id of the comment to check membership
     @param recid: the recid of the record we want to check if comment belongs to
     """
-    query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
+    query = """SELECT id_bibrec from "cmtRECORDCOMMENT" WHERE id=%s"""
     params = (comid,)
     res = run_sql(query, params)
     if res and res[0][0] == recid:
@@ -2053,18 +2061,18 @@ def toggle_comment_visibility(uid, comid, collapse, recid):
     # removed. For optimized retrieval of row to delete, the id_bibrec
     # column is used, though not strictly necessary.
     if collapse:
-        query = """SELECT id_bibrec from cmtRECORDCOMMENT WHERE id=%s"""
+        query = """SELECT id_bibrec from "cmtRECORDCOMMENT" WHERE id=%s"""
         params = (comid,)
         res = run_sql(query, params)
         if res:
-            query = """INSERT IGNORE INTO cmtCOLLAPSED (id_bibrec, id_cmtRECORDCOMMENT, id_user)
+            query = """INSERT INTO "cmtCOLLAPSED" (id_bibrec, "id_cmtRECORDCOMMENT", id_user)
                               VALUES (%s, %s, %s)"""
             params = (res[0][0], comid, uid)
             run_sql(query, params)
         return True
     else:
-        query = """DELETE FROM cmtCOLLAPSED WHERE
-                      id_cmtRECORDCOMMENT=%s and
+        query = """DELETE FROM "cmtCOLLAPSED" WHERE
+                      "id_cmtRECORDCOMMENT"=%s and
                       id_user=%s and
                       id_bibrec=%s"""
         params = (comid, uid, recid)
@@ -2079,7 +2087,7 @@ def get_user_collapsed_comments_for_record(uid, recid):
     # (vary per user) so it cannot be found when querying for the
     # comment. We must therefore provide a efficient way to retrieve
     # the collapsed state for a given discussion page and user.
-    query = """SELECT id_cmtRECORDCOMMENT from cmtCOLLAPSED WHERE id_user=%s and id_bibrec=%s"""
+    query = """SELECT "id_cmtRECORDCOMMENT" from "cmtCOLLAPSED" WHERE id_user=%s and id_bibrec=%s"""
     params = (uid, recid)
     return [res[0] for res in run_sql(query, params)]
 
@@ -2089,7 +2097,7 @@ def is_comment_deleted(comid):
 
     @param comid: ID of comment to check
     """
-    query = "SELECT status from cmtRECORDCOMMENT WHERE id=%s"
+    query = """SELECT status from "cmtRECORDCOMMENT" WHERE id=%s"""
     params = (comid,)
     res = run_sql(query, params)
     if res and res[0][0] != 'ok':
@@ -2132,14 +2140,14 @@ def perform_display_your_comments(user_info,
     nb_total_pages = 0
 
     if selected_display_format_option in ('rc', 'co'):
-        nb_total_results = run_sql("SELECT count(id) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+        nb_total_results = run_sql("""SELECT count(id) from "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0""", \
                                    (user_info['uid'], ))[0][0]
     else:
         if selected_order_by_option in ('grlf', 'grof'):
-            nb_total_results = run_sql("SELECT count(distinct(id_bibrec)) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+            nb_total_results = run_sql("""SELECT count(distinct(id_bibrec)) from "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0""", \
                                        (user_info['uid'], ))[0][0]
         else:
-            nb_total_results = run_sql("SELECT count(id_bibrec) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+            nb_total_results = run_sql("""SELECT count(id_bibrec) from "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0""", \
                                        (user_info['uid'], ))[0][0]
     if page_number < 1:
         page_number = 1
@@ -2155,9 +2163,9 @@ def perform_display_your_comments(user_info,
     elif selected_order_by_option == "ocf":
         query_params += " ORDER BY date_creation ASC"
     elif selected_order_by_option == "grlf":
-        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT max(date_creation) as maxdatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.maxdatecreation DESC, cmt.date_creation DESC"
+        query = """SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt."in_reply_to_id_cmtRECORDCOMMENT" FROM "cmtRECORDCOMMENT" as cmt left join (SELECT max(date_creation) as maxdatecreation, id_bibrec FROM "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.maxdatecreation DESC, cmt.date_creation DESC"""
     elif selected_order_by_option == "grof":
-        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT min(date_creation) as mindatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.mindatecreation ASC"
+        query = """SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt."in_reply_to_id_cmtRECORDCOMMENT" FROM "cmtRECORDCOMMENT" as cmt left join (SELECT min(date_creation) as mindatecreation, id_bibrec FROM "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.mindatecreation ASC"""
 
     if selected_display_number_option.isdigit():
         selected_display_number_option_as_int = int(selected_display_number_option)
@@ -2175,7 +2183,7 @@ def perform_display_your_comments(user_info,
     if selected_order_by_option in ("grlf", "grof"):
         res = run_sql(query + query_params, (user_info['uid'], user_info['uid']))
     else:
-        res = run_sql("SELECT id_bibrec, id, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0" + query_params, (user_info['uid'], ))
+        res = run_sql("""SELECT id_bibrec, id, date_creation, body, status, "in_reply_to_id_cmtRECORDCOMMENT" FROM "cmtRECORDCOMMENT" WHERE id_user=%s AND star_score = 0""" + query_params, (user_info['uid'], ))
 
     return webcomment_templates.tmpl_your_comments(user_info, res,
                                                    page_number=page_number,

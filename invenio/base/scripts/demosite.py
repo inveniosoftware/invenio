@@ -22,21 +22,23 @@
 from __future__ import print_function
 
 import os
+
 import sys
+
 import warnings
-from itertools import count
 
 import pkg_resources
 
+from itertools import count
+
 from invenio.base.utils import run_py_func
 from invenio.ext.script import Manager
+from invenio.modules.scheduler.models import SchTASK
 
 
 warnings.warn("Use of `inveniomanage demosite populate` is being deprecated. "
               "Please use `uploader` module to insert demo records.",
               PendingDeprecationWarning)
-
-
 
 
 manager = Manager(usage=__doc__)
@@ -75,12 +77,12 @@ def populate(packages=[], default_data=True, files=None,
     # Load cli interfaces for tools that we are going to need
     from invenio.legacy.bibupload.engine import main as bibupload
     from invenio.legacy.bibindex.engine import main as bibindex
-    from invenio.legacy.oairepository.updater import main as oairepositoryupdater
+    from invenio.legacy.oairepository.updater import \
+        main as oairepositoryupdater
     from invenio.legacy.bibsort.daemon import main as bibsort
-    from invenio.legacy.bibdocfile.cli import main as bibdocfile
     from invenio.legacy.bibrank.cli import main as bibrank
 
-    ## Step 0: confirm deletion
+    # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
         "WARNING: You are going to override data in tables!"
     ))
@@ -94,10 +96,11 @@ def populate(packages=[], default_data=True, files=None,
     from werkzeug.utils import import_string
     map(import_string, packages)
 
-    from invenio.ext.sqlalchemy import db
     print(">>> Going to load demo records...")
-    db.session.execute("TRUNCATE schTASK")
-    db.session.commit()
+
+    if not job_id:
+        job_id = SchTASK.query.count()
+
     if files is None:
         files = [pkg_resources.resource_filename(
             'invenio',
@@ -119,8 +122,8 @@ def populate(packages=[], default_data=True, files=None,
 
     i = count(job_id + 1).next
     for cmd in (
-        #(bibdocfile, "bibdocfile --textify --with-ocr --recid 97"),
-        #(bibdocfile, "bibdocfile --textify --all"),
+        # (bibdocfile, "bibdocfile --textify --with-ocr --recid 97"),
+        # (bibdocfile, "bibdocfile --textify --all"),
         (bibindex, "bibindex -u admin"),
         (bibindex, "bibindex %d" % i()),
         (bibindex, "bibindex -u admin -w global"),
