@@ -205,7 +205,7 @@ console> inveniomanage database init --yes-i-know
 
 The values printed above were detected from your
 configuration. If they are not right, then please edit your
-invenio-local.conf file and rerun 'inveniocfg --update-all' first.
+instance configuration file (invenio.cfg).
 
 
 If the problem is of different nature, then please inspect
@@ -377,14 +377,15 @@ def initialize_database_user(engine, database_name, database_user,
     if engine.name == 'mysql':
         from MySQLdb import escape_string
         # create user and grant privileges
-        engine.execute((
-            """GRANT ALL PRIVILEGES ON {0}.* """
-            """TO {1}@'%%' IDENTIFIED BY "{2}" """)
-            .format(
-                database_name,
-                database_user,
-                escape_string(database_pass)
-            ))
+        for host in ['%%', 'localhost']:
+            engine.execute((
+                """GRANT ALL PRIVILEGES ON {0}.* """
+                """TO {1}@'{2}' IDENTIFIED BY "{3}" """).format(
+                    database_name,
+                    database_user,
+                    host,
+                    escape_string(database_pass)
+                ))
     elif engine.name == 'postgresql':
         # check if already exists
         res = engine.execute(
