@@ -62,7 +62,7 @@ ORCID_JSON_TO_XML_EXT_ID = {
 
 ORCID_SINGLE_REQUEST_WORKS = 50
 MAX_COAUTHORS = 25
-MAX_DESCRIPTION_LENGTH = 2499
+MAX_DESCRIPTION_LENGTH = 4999
 
 ############################### PULLING ########################################
 
@@ -551,18 +551,6 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
     @type orcid: string
     '''
 
-    def _description_weight(description):
-        '''Punish for exceeding length limit and using mathml.
-
-        The bigger the result is, the better description corresponds to it.
-        '''
-        # Assumption: MAX_DESCRIPTION_LENGTH >> 200
-        mathml_punishment = MAX_DESCRIPTION_LENGTH - 200 if "mml:math" \
-            in description else 0
-        length = len(description)
-        length_score = 0 if length > MAX_DESCRIPTION_LENGTH else length
-        return length_score - mathml_punishment
-
     orcid_list = []
 
     for recid in papers:
@@ -593,9 +581,10 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
         short_descriptions = \
             record_get_field_values(recstruct, '520', '', '', 'a')
         if short_descriptions:
-            work_dict['short_description'] = max([encode_for_jinja_and_xml(sd)
-                                                 for sd in short_descriptions],
-                                                 key=_description_weight)
+            work_dict['short_description'] = encode_for_jinja_and_xml(
+                                             short_descriptions[0])[
+                                             :MAX_DESCRIPTION_LENGTH
+                                             ].rsplit(' ', 1)[0]
 
         journal_title = record_get_field_value(recstruct, '773', '', '', 'p')
         if journal_title:
