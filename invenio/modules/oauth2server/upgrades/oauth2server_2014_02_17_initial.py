@@ -17,22 +17,26 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Upgrade recipe."""
+
 import warnings
 
-from sqlalchemy import *
 from invenio.ext.sqlalchemy import db
-from sqlalchemy_utils import URLType
 from invenio.modules.upgrader.api import op
+
+from sqlalchemy_utils.types import URLType
+
 
 depends_on = []
 
 
 def info():
+    """Info."""
     return "Tables for oauth2server"
 
 
 def do_upgrade():
-    """ Implement your upgrades here  """
+    """Implement your upgrades here."""
     if not op.has_table('oauth2CLIENT'):
         op.create_table(
             'oauth2CLIENT',
@@ -68,7 +72,8 @@ def do_upgrade():
             db.Column('_scopes', db.Text(), nullable=True),
             db.Column('is_personal', db.Boolean(), nullable=True),
             db.Column('is_internal', db.Boolean(), nullable=True),
-            db.ForeignKeyConstraint(['client_id'], ['oauth2CLIENT.client_id'], ),
+            db.ForeignKeyConstraint(
+                ['client_id'], ['oauth2CLIENT.client_id'],),
             db.ForeignKeyConstraint(['user_id'], ['user.id'], ),
             db.PrimaryKeyConstraint('id'),
             db.UniqueConstraint('access_token'),
@@ -85,5 +90,7 @@ def do_upgrade():
     #     unique=True
     # )
 
+
 def estimate():
+    """Estimate."""
     return 1

@@ -17,30 +17,28 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-    invenio.ext.sqlalchemy.
-
-    This module provides initialization and configuration for
-    `flask_sqlalchemy` module.
-"""
+"""Initialization and configuration for `flask_sqlalchemy` module."""
 
 import sqlalchemy
 
-from flask_registry import RegistryProxy, ModuleAutoDiscoveryRegistry
-from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
-from sqlalchemy import event
-from sqlalchemy.ext.hybrid import hybrid_property, Comparator
-from sqlalchemy.pool import Pool
-from sqlalchemy_utils import JSONType
+from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 
+from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
+
+from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyInteger, \
+    LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
 from invenio.utils.hash import md5
+
+from sqlalchemy import event, types
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.pool import Pool
+
+from sqlalchemy_utils.types import JSONType
+
 from .expressions import AsBINARY
-from .types import MarshalBinary, PickleBinary, GUID
+from .types import GUID, MarshalBinary, PickleBinary
 from .utils import get_model_type
-from invenio.ext.sqlalchemy.types import (LegacyInteger, LegacyMediumInteger,
-                                          LegacySmallInteger,
-                                          LegacyTinyInteger,
-                                          LegacyBigInteger)
 
 
 def _include_sqlalchemy(obj, engine=None):
@@ -63,12 +61,12 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'Char', engine_types.CHAR)
     try:
         setattr(obj, 'TinyText', engine_types.TINYTEXT)
-    except:
+    except Exception:
         setattr(obj, 'TinyText', engine_types.TEXT)
     setattr(obj, 'hybrid_property', hybrid_property)
     try:
         setattr(obj, 'Double', engine_types.DOUBLE)
-    except:
+    except Exception:
         setattr(obj, 'Double', engine_types.FLOAT)
     setattr(obj, 'Binary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
@@ -92,7 +90,7 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MarshalBinary = MarshalBinary
     obj.PickleBinary = PickleBinary
 
-    ## Overwrite :meth:`MutableDick.update` to detect changes.
+    # Overwrite :meth:`MutableDick.update` to detect changes.
     from sqlalchemy.ext.mutable import MutableDict
 
     def update_mutable_dict(self, *args, **kwargs):
@@ -103,11 +101,6 @@ def _include_sqlalchemy(obj, engine=None):
     obj.MutableDict = MutableDict
 
 
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy import types
-import sqlalchemy.dialects.postgresql
-
-
 @compiles(types.Text, 'postgresql')
 @compiles(sqlalchemy.dialects.postgresql.TEXT, 'postgresql')
 def compile_text(element, compiler, **kw):
@@ -116,7 +109,7 @@ def compile_text(element, compiler, **kw):
 
 
 @compiles(types.VARBINARY, 'postgresql')
-def compile_text(element, compiler, **kw):
+def compile_varbinary(element, compiler, **kw):
     """Redefine VARBINARY filed type for PostgreSQL."""
     return 'BYTEA'
 
@@ -141,7 +134,7 @@ def autocommit_on_checkin(dbapi_con, con_record):
     """Call autocommit on raw mysql connection for fixing bug in MySQL 5.5."""
     try:
         dbapi_con.autocommit(True)
-    except:
+    except Exception:
         pass
         # FIXME
         # from invenio.ext.logging import register_exception
@@ -242,7 +235,7 @@ def setup_app(app):
             port=cfg.get('CFG_DATABASE_PORT'),
         )
 
-    ## Let's initialize database.
+    # Let's initialize database.
     db.init_app(app)
 
     return app
