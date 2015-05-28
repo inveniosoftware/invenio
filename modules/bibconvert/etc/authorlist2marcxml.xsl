@@ -68,10 +68,10 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-i-authorinspireid: prints the authors INSPIRE ID inside xxx__i subfield -->
   <xsl:template name="print-i-authorinspireid">
     <xsl:param name="authorid"/>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and $authorid!='' and contains($authorid, 'INSPIRE') ">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and $authorid!='' and contains($authorid, 'INSPIRE') ">
       <subfield code="i"><xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'INSPIRE'))  and $authorid!=''">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and not(contains($authorid, 'INSPIRE'))  and $authorid!=''">
       <subfield code="i">INSPIRE-<xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
   </xsl:template>
@@ -79,7 +79,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-j-authororcid: prints the authors ORCID inside xxx__j subfield -->
   <xsl:template name="print-j-authororcid">
     <xsl:param name="orcid"/>
-    <xsl:if test="not(contains($orcid, 'UNDEFINED')) and $orcid!=''">
+    <xsl:if test="not(contains($orcid, 'UNDEFINED')) and not(contains($orcid, 'undefined')) and $orcid!=''">
       <subfield code="j">ORCID:<xsl:value-of select="normalize-space($orcid)"/></subfield>
     </xsl:if>
   </xsl:template>
@@ -87,7 +87,7 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-h-authorid: prints the authors ID inside xxx__h subfield -->
   <xsl:template name="print-h-authorid">
     <xsl:param name="authorid"/>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED'))">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined'))">
       <subfield code="h"><xsl:value-of select="normalize-space(@source)" />-<xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
   </xsl:template>
