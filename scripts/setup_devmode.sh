@@ -47,7 +47,7 @@ EOF
 
 # fetch and build assets
 inveniomanage bower -i bower-base.json > bower.json
-bower install --silent --allow-root
+bower install --silent
 inveniomanage collect > /dev/null
 inveniomanage assets build
 
