@@ -68,7 +68,7 @@ from invenio.modules.search.registry import facets
 from invenio.utils.pagination import Pagination
 
 from .. import receivers
-from ..api import SearchEngine
+from ..api import Query
 from ..cache import get_search_query_id
 from ..forms import EasySearchForm
 from ..models import Field
@@ -316,8 +316,7 @@ def rss(collection, p, jrec, so, rm):
     rg = int(argd['rg'])
 
     qid = get_search_query_id(**argd)
-    searcher = SearchEngine(p)
-    recids = searcher.search(collection=collection.name)
+    recids = Query(p).search(collection=collection.name)
 
     ctx = dict(
         records=len(recids),
@@ -368,8 +367,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     collection_breadcrumbs(collection)
 
     qid = get_search_query_id(p=p, cc=collection.name)
-    searcher = SearchEngine(p)
-    recids = searcher.search(collection=collection.name)
+    recids = Query(p).search(collection=collection.name)
     records = len(recids)
     recids = sort_and_rank_records(recids, so=so, rm=rm, sf=sf,
                                    sp=sp, p=p, of='id', rg=rg, jrec=jrec)

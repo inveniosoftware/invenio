@@ -322,8 +322,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
        This function is suitable as a mid-level API.
     """
     if f is None:
-        from invenio.modules.search.api import SearchEngine
-        results = SearchEngine(p).search()
+        from invenio.modules.search.api import Query
+        results = Query(p).search()
     else:
         results = search_unit(p, f, m, wl=wl)
     import warnings
@@ -667,11 +667,11 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
     import warnings
     warnings.warn('Deprecated perform_request_search({}).'.format(str(kwargs)),
                   stacklevel=2)
-    from invenio.modules.search.api import SearchEngine
+    from invenio.modules.search.api import Query
     p = create_add_to_search_pattern(p, p1, f1, m1, "")
     p = create_add_to_search_pattern(p, p2, f2, m2, op1)
     p = create_add_to_search_pattern(p, p3, f3, m3, op2)
-    return SearchEngine(p).search(collection=cc)
+    return Query(p).search(collection=cc)
 
 
 def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,

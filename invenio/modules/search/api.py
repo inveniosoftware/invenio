@@ -29,9 +29,13 @@ from .walkers.match_unit import MatchUnit
 from .walkers.terms import Terms
 
 
-class SearchEngine(object):
+class Query(object):
 
-    """Search engine implemetation."""
+    """Search engine implemetation.
+
+    .. versionadded:: 2.1
+       New search and match API.
+    """
 
     def __init__(self, query):
         """Initialize with search query."""

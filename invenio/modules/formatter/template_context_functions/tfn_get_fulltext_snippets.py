@@ -29,8 +29,8 @@ from invenio.modules.search.cache import get_pattern_from_cache
 @cache.memoize(timeout=5)
 def get_fulltext_terms_from_search_pattern(search_pattern):
     """Return fulltext terms from search pattern."""
-    from invenio.modules.search.api import SearchEngine
-    return SearchEngine(search_pattern).terms(keywords=['fulltext'])
+    from invenio.modules.search.api import Query
+    return Query(search_pattern).terms(keywords=['fulltext'])
 
 
 def template_context_function(id_bibrec, pattern, qid, current_user):

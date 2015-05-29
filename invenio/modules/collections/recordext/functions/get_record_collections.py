@@ -21,7 +21,7 @@
 
 from six import iteritems
 
-from invenio.modules.search.api import SearchEngine
+from invenio.modules.search.api import Query
 from invenio.utils.datastructures import LazyDict
 
 COLLECTIONS_DELETED_RECORDS = '{dbquery} AND NOT collection:"DELETED"'
