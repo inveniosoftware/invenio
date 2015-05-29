@@ -158,6 +158,14 @@ def setup_app(app):
             return value.decode('utf8')
         return value
 
+    @app.template_filter('s')
+    def tostr(value):
+        if not isinstance(value, str):
+            if isinstance(value, unicode):
+                value = value.encode('utf8')
+            value = str(value)
+        return value
+
     @app.template_filter('prefix')
     def _prefix(value, prefix=''):
         return prefix + value if test_not_empty(value) else ''
