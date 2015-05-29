@@ -25,13 +25,13 @@
     </li>
     {% if admin_view.can_create %}
     <li>
-        <a href="{{ get_url('.create_view', url=return_url, kbtype='t') }}" title="{{ _('Create new record "Taxonomy"') }}">{{ _('Create KB "Taxonomy"') }}</a>
+        <a href="{{ get_url('.create_view', url=return_url, kbtype='t') }}" title="{{ _('Create new record "Taxonomy"')|s|e|u }}">{{ _('Create KB "Taxonomy"') }}</a>
     </li>
     <li>
-        <a href="{{ get_url('.create_view', url=return_url, kbtype='d') }}" title="{{ _('Create new record "Dynamic"') }}">{{ _('Create KB "Dynamic"') }}</a>
+        <a href="{{ get_url('.create_view', url=return_url, kbtype='d') }}" title="{{ _('Create new record "Dynamic"')|s|e|u }}">{{ _('Create KB "Dynamic"') }}</a>
     </li>
     <li>
-        <a href="{{ get_url('.create_view', url=return_url, kbtype='w') }}" title="{{ _('Create new record "Written As"') }}">{{ _('Create KB "Writtes As"') }}</a>
+        <a href="{{ get_url('.create_view', url=return_url, kbtype='w') }}" title="{{ _('Create new record "Written As"')|s|e|u }}">{{ _('Create KB "Written As"') }}</a>
     </li>
     {% endif %}
 
