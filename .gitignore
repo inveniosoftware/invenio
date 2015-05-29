@@ -12,6 +12,8 @@
 *.sse2f
 *.x86f
 *~
+*.swm
+*.swn
 .coverage
 .eggs
 .kdev4/
