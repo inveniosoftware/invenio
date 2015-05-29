@@ -446,7 +446,7 @@ def truncate_index_table(index_name):
     if index_id:
         write_message('Truncating %s index table in order to reindex.' % \
                       index_name, verbose=2)
-        run_sql("""UPDATE "idxINDEX" SET last_updated='0000-00-00 00:00:00'
+        run_sql("""UPDATE "idxINDEX" SET last_updated='1900-01-01 00:00:00'
                    WHERE id=%s""", (index_id, ))
         run_sql("TRUNCATE idxWORD%02dF" % index_id) # kwalitee: disable=sql
         run_sql("TRUNCATE idxWORD%02dR" % index_id) # kwalitee: disable=sql
@@ -2023,7 +2023,7 @@ def get_recIDs_from_cli(indexes=[]):
     # need to first update idxINDEX table to find proper recIDs for reindexing
     if task_get_option("reindex"):
         for index_name in indexes:
-            run_sql("""UPDATE "idxINDEX" SET last_updated='0000-00-00 00:00:00'
+            run_sql("""UPDATE "idxINDEX" SET last_updated='1900-01-01 00:00:00'
                        WHERE name=%s""", (index_name,))
 
     if task_get_option("id"):

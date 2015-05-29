@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -184,8 +184,10 @@ class Cookie(object):
         # The attribute _valid_attr is provided by the metaclass 'metaCookie'.
         for name in self._valid_attr:
             if hasattr(self, name):
-                if name in ("secure", "discard", "httponly"):
+                if name in ("secure", "discard"):
                     result.append(name)
+                elif name == "httponly":
+                    result.append("HttpOnly")
                 else:
                     result.append("%s=%s" % (name, getattr(self, name)))
         # pylint: enable=E1101

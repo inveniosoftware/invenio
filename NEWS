@@ -6,6 +6,157 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.2.1 -- released 2015-05-21
+-------------------------------------
+
+Security fixes
+~~~~~~~~~~~~~~
+
++ BibAuthorID:
+
+  - Improves URL redirecting by properly quoting all URL parts, in
+    order to better protect against possible XSS attacks.
+
++ WebStyle:
+
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ installation:
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
+~~~~~~~~~
+
++ BibDocFile:
+
+  - Safer upgrade recipe for migrations from the old document storage
+    model (used in v1.1) to the new document storage model (used in
+    v1.2).
+
++ WebSearch:
+
+  - Removes special behaviour of the "subject" index that was hard-
+    coded based on the index name.  Installations should rather
+    specify wanted behaviour by means of configurable tokeniser
+    instead.
+
+  - Collection names containing slashes are now supported again.
+    However we recommend not to use slashes in collection names; if
+    slashes were wanted for aesthetic reasons, they can be added in
+    visible collection translations.  (#2902)
+
++ global:
+
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ installation:
+
+  - Releases constraint on using an old version of `h5py` that was
+    anyway no longer available on PyPI.
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
+Invenio v1.1.6 -- released 2015-05-21
+-------------------------------------
+
+Security fixes
+~~~~~~~~~~~~~~
+
++ WebStyle:
+
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ installation:
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
+~~~~~~~~~
+
++ global:
+
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
+Invenio v1.0.9 -- released 2015-05-21
+-------------------------------------
+
+Security fixes
+~~~~~~~~~~~~~~
+
++ WebStyle:
+
+  - Adds back the `HttpOnly` cookie attribute in order to better
+    protect against potential XSS vulnerabilities.  (#3064)
+
+Improved features
+~~~~~~~~~~~~~~~~~
+
++ installation:
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIDaemonProcess` user value, taken from the configuration
+    variable `CFG_BIBSCHED_PROCESS_USER`, provided it is set.  This
+    change makes it easier to run Invenio under non-Apache user
+    identity.
+
+  - Apache virtual environments are now created with appropriate
+    `WSGIPythonHome` directive so that it would be easier to run
+    Invenio from within Python virtual environments.
+
+Bug fixes
+~~~~~~~~~
+
++ global:
+
+  - Replaces `invenio-demo.cern.ch` by `demo.invenio-software.org`
+    which is the new canonical URL of the demo site.  (#2867)
+
++ testutils:
+
+  - Switches off SSL verification when running the test suite.  Useful
+    for Python-2.7.9 where self-signed SSL certificates (that are
+    usually used on development installations) would cause apparent
+    test failures.  (#2868)
+
 Invenio v2.0.3 -- released 2015-05-15
 -------------------------------------
 

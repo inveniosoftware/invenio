@@ -318,15 +318,14 @@ class InvenioSessionBase(dict):
         cookies = []
         uid = self.get('_uid', -1)
         if uid > 0 and CFG_SITE_SECURE_URL.startswith("https://"):
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS', HttpOnly=True)
         else:
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO', HttpOnly=True)
         cookies.append(stub_cookie)
         if self._req.is_https() or not CFG_SITE_SECURE_URL.startswith("https://") or uid <= 0:
-            cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid)
+            cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid, HttpOnly=True)
             if CFG_SITE_SECURE_URL.startswith("https://") and uid > 0:
                 cookie.secure = True
-                cookie.httponly = True
             cookies.append(cookie)
         for cookie in cookies:
             cookie.path = '/'
