@@ -20,34 +20,40 @@
 """Deposit Blueprint implementation."""
 
 import json
-from functools import wraps
 import warnings
+from functools import wraps
 
-from flask import current_app, Blueprint, \
+from flask import Blueprint, abort, current_app, \
+    flash, \
+    jsonify, \
+    make_response, \
+    redirect, \
     render_template, \
     request, \
-    jsonify, \
-    redirect, \
-    url_for, \
-    flash, \
     send_file, \
-    abort, \
-    make_response
-from werkzeug.datastructures import MultiDict
-from werkzeug.utils import secure_filename
-from flask_login import current_user, login_required
+    url_for
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
+from flask_login import current_user, login_required
+
 from flask_menu import register_menu
 
 from invenio.base.i18n import _
+from invenio.ext.principal import permission_required
+
+from werkzeug.datastructures import MultiDict
+from werkzeug.utils import secure_filename
+
+from ..acl import usedeposit
+from ..models import Deposition, DepositionDoesNotExists, \
+    DepositionDraftCacheManager, DepositionFile, DepositionNotDeletable, \
+    DepositionType, DraftDoesNotExists, FilenameAlreadyExists, \
+    ForbiddenAction, FormDoesNotExists, InvalidDepositionAction, \
+    InvalidDepositionType
 from ..signals import template_context_created
-from ..models import Deposition, DepositionType, \
-    DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
-    DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
-    DepositionDraftCacheManager, FilenameAlreadyExists, ForbiddenAction, \
-    InvalidDepositionAction
 from ..storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
+
 
 blueprint = Blueprint(
     'webdeposit',
@@ -96,6 +102,16 @@ def deposition_error_handler(endpoint='.index'):
     return decorator
 
 
+def deposition_type_from_request():
+    """Return deposition from parsed view arguments."""
+    return request.view_args.get(
+        'deposition_type', None
+    ) or (
+        Deposition.get_type(request.view_args.get('uuid'))
+        if request.view_args.get('uuid', None) else None
+    )
+
+
 @blueprint.route('/')
 @login_required
 @register_menu(blueprint, 'main.webdeposit', _('Deposit'), order=2)
@@ -110,7 +126,7 @@ def index():
     draft_cache.save()
 
     ctx = dict(
-        deposition_types=DepositionType.all(),
+        deposition_types=DepositionType.all_authorized(current_user),
         my_depositions=Deposition.get_depositions(current_user),
         prefill_data=draft_cache.data,
     )
@@ -127,6 +143,7 @@ def index():
 @blueprint.route('/<depositions:deposition_type>')
 @login_required
 @register_breadcrumb(blueprint, '.type', _('Select or create'))
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def deposition_type_index(deposition_type):
     """Render deposition type index."""
     if len(DepositionType.keys()) <= 1 and \
@@ -160,6 +177,7 @@ def deposition_type_index(deposition_type):
 @blueprint.route('/create/', methods=['POST', 'GET'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def create(deposition_type=None):
     """Create a new deposition."""
     if request.is_xhr and request.method != 'POST':
@@ -190,6 +208,7 @@ def create(deposition_type=None):
 @blueprint.route('/<int:uuid>/<draft_id>', methods=['POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def save(deposition_type=None, uuid=None, draft_id=None):
     """Save and run error check on field values.
 
@@ -268,6 +287,7 @@ def save(deposition_type=None, uuid=None, draft_id=None):
 @blueprint.route('/<int:uuid>/delete')
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def delete(deposition_type=None, uuid=None):
     """Delete the whole deposition with uuid=uuid (including form drafts).
 
@@ -285,6 +305,7 @@ def delete(deposition_type=None, uuid=None):
 @blueprint.route('/<int:uuid>/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def run(deposition_type=None, uuid=None):
     """Run the workflow and show the current output of the workflow."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -297,6 +318,7 @@ def run(deposition_type=None, uuid=None):
 @blueprint.route('/<int:uuid>/edit/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def edit(deposition_type=None, uuid=None):
     """Reinitialize a completed workflow (i.e. prepare it for editing)."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -318,6 +340,7 @@ def edit(deposition_type=None, uuid=None):
 @blueprint.route('/<int:uuid>/discard/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def discard(deposition_type=None, uuid=None):
     """Stop an inprogress workflow (i.e. discard editing changes).
 
@@ -344,6 +367,7 @@ def discard(deposition_type=None, uuid=None):
 @blueprint.route('/<int:uuid>/<draft_id>/status/', methods=['GET', 'POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def status(deposition_type=None, uuid=None, draft_id=None):
     """Get the status of a draft (uncompleted/completed)."""
     warnings.warn("View has been deprecated", DeprecationWarning)
@@ -356,6 +380,7 @@ def status(deposition_type=None, uuid=None, draft_id=None):
 @blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/url/', methods=['POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def upload_url(deposition_type=None, uuid=None):
     """Upload a new file by use of a URL."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -388,6 +413,7 @@ def upload_url(deposition_type=None, uuid=None):
 @blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/', methods=['POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def upload_file(deposition_type=None, uuid=None):
     """Upload a new file (with chunking support)."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -427,6 +453,7 @@ def upload_file(deposition_type=None, uuid=None):
 @blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/delete/', methods=['POST'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def delete_file(deposition_type=None, uuid=None):
     """Delete an uploaded file."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -447,6 +474,7 @@ def delete_file(deposition_type=None, uuid=None):
 @blueprint.route('/<depositions:deposition_type>/<int:uuid>/file/', methods=['GET'])
 @login_required
 @deposition_error_handler()
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def get_file(deposition_type=None, uuid=None):
     """Download an uploaded file."""
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
@@ -469,6 +497,7 @@ def get_file(deposition_type=None, uuid=None):
 @blueprint.route('/<int:uuid>/<draft_id>/<field_name>/',
                  methods=['GET', 'POST'])
 @login_required
+@permission_required(usedeposit.name, type=deposition_type_from_request)
 def autocomplete(deposition_type=None, uuid=None, draft_id=None,
                  field_name=None):
     """Auto-complete a form field."""
