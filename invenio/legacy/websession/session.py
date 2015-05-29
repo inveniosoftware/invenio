@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -318,15 +318,14 @@ class InvenioSessionBase(dict):
         cookies = []
         uid = self.get('_uid', -1)
         if uid > 0 and CFG_SITE_SECURE_URL.startswith("https://"):
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'HTTPS', HttpOnly=True)
         else:
-            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO')
+            stub_cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME + 'stub', 'NO', HttpOnly=True)
         cookies.append(stub_cookie)
         if self._req.is_https() or not CFG_SITE_SECURE_URL.startswith("https://") or uid <= 0:
-            cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid)
+            cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid, HttpOnly=True)
             if CFG_SITE_SECURE_URL.startswith("https://") and uid > 0:
                 cookie.secure = True
-                cookie.httponly = True
             cookies.append(cookie)
         for cookie in cookies:
             cookie.path = '/'
