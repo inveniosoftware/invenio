@@ -21,13 +21,21 @@
 
 import hashlib
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from passlib.utils.compat import str_to_uascii
 from passlib.utils.handlers import HasUserContext, StaticHandler
 
+from six import binary_type, text_type
+
 __all__ = ('invenio_aes_encrypted_email', )
+
+
+def _to_binary(val):
+    if isinstance(val, text_type):
+        return val.encode('utf-8')
+    return val
 
 
 def _mysql_aes_key(key):
@@ -54,8 +62,10 @@ def _mysql_aes_engine(key):
 
 def mysql_aes_encrypt(val, key):
     """MySQL AES encrypt value with secret key."""
-    k = _mysql_aes_key(key)
-    v = _mysql_aes_pad(val)
+    assert isinstance(val, binary_type) or isinstance(val, text_type)
+    assert isinstance(key, binary_type) or isinstance(key, text_type)
+    k = _mysql_aes_key(_to_binary(key))
+    v = _mysql_aes_pad(_to_binary(val))
     e = _mysql_aes_engine(k).encryptor()
 
     return e.update(v) + e.finalize()
@@ -63,9 +73,12 @@ def mysql_aes_encrypt(val, key):
 
 def mysql_aes_decrypt(encrypted_val, key):
     """MySQL AES decrypt value with secret key."""
-    k = _mysql_aes_key(key)
-    d = _mysql_aes_engine(k).decryptor()
-    return _mysql_aes_unpad(d.update(encrypted_val) + d.finalize())
+    assert isinstance(encrypted_val, binary_type) \
+        or isinstance(encrypted_val, text_type)
+    assert isinstance(key, binary_type) or isinstance(key, text_type)
+    k = _mysql_aes_key(_to_binary(key))
+    d = _mysql_aes_engine(_to_binary(k)).decryptor()
+    return _mysql_aes_unpad(d.update(_to_binary(encrypted_val)) + d.finalize())
 
 
 class invenio_aes_encrypted_email(HasUserContext, StaticHandler):
