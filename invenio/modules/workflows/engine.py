@@ -204,10 +204,10 @@ class BibWorkflowEngine(DbWorkflowEngine):
         """Return True if workflow is fully completed."""
         res = self.db.session.query(self.db.func.count(DbWorkflowObject.id)).\
             filter(DbWorkflowObject.id_workflow == self.uuid).\
-            filter(DbWorkflowObject.version.in_(
-                [self.object_status.INITIAL,
-                 self.object_status.COMPLETED]
-            )).group_by(DbWorkflowObject.version).all()
+            filter(DbWorkflowObject.status.in_(
+                [DbWorkflowObject.known_statuses.INITIAL,
+                 DbWorkflowObject.known_statuses.COMPLETED]
+            )).group_by(DbWorkflowObject.status).all()
         return len(res) == 2 and res[0] == res[1]
 
     def set_workflow_by_name(self, workflow_name):
@@ -289,7 +289,7 @@ BibWorkflowEngine
     def objects_of_statuses(self, statuses):
         results = []
         for obj in self.database_objects:
-            if obj.version in statuses:
+            if obj.status in statuses:
                 results.append(obj)
         return results
 

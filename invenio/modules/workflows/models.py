@@ -42,7 +42,6 @@ from six.moves import cPickle
 from sqlalchemy import desc
 from sqlalchemy.exc import DontWrapMixin
 from sqlalchemy.orm.exc import NoResultFound
-from workflow.engine_db import ObjectStatusBehaviour
 from sqlalchemy_utils.types.choice import (
     ChoiceType as BadChoiceType,
     ChoiceTypeImpl,
@@ -50,6 +49,7 @@ from sqlalchemy_utils.types.choice import (
     EnumTypeImpl,
 )
 from invenio.modules.workflows.logger import get_logger, DbWorkflowLogHandler
+from workflow.engine_db import WorkflowStatus, EnumLabel
 from workflow.utils import staticproperty
 
 from .utils import get_func_info, get_workflow_definition
@@ -62,7 +62,7 @@ from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.utils.deprecation import deprecated, RemovedInInvenio23Warning
 
 
-class ObjectStatus(ObjectStatusBehaviour):
+class ObjectStatus(EnumLabel):
 
     INITIAL = 0
     COMPLETED = 1
@@ -213,7 +213,7 @@ class Workflow(db.Model):
     def get_counter(self, object_status):
         return DbWorkflowObject.query.filter(
                 DbWorkflowObject.id_workflow == self.uuid,
-                DbWorkflowObject.version == object_status
+                DbWorkflowObject.status == object_status
             ).count()
 
     @db.hybrid_property
@@ -489,8 +489,6 @@ class DbWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
 
-    status = db.Column(db.String(255), default="", nullable=False)
-
     data_type = db.Column(db.String(150), default="", nullable=True, index=True)
 
     uri = db.Column(db.String(500), default="")
@@ -518,15 +516,19 @@ class DbWorkflowObject(db.Model):
 
     _log = None
 
-    @db.hybrid_property
-    def id_workflow(self):
-        """Get id_workflow."""
-        return self._id_workflow
+    @staticproperty
+    def known_statuses():  # pylint: disable=no-method-argument
+        return ObjectStatus
 
-    @id_workflow.setter
-    def id_workflow(self, value):
-        """Set id_workflow."""
-        self._id_workflow = str(value) if value else None
+    # Deprecated
+    @db.hybrid_property
+    def version(self):
+        return self.status
+
+    # Deprecated (raise some warning here XXX)
+    @version.setter
+    def version_setter(self, value):
+        pass
 
     def __getattr__(self, name):
         """Return `data` and `extra_data` user-facing storage representations.
@@ -566,7 +568,6 @@ class DbWorkflowObject(db.Model):
                                    db_handler_obj=db_handler_obj,
                                    loglevel=logging.DEBUG,obj=self)
         return self._log
-        return self.version
 
     # Deprecated
     def get_data(self):
@@ -625,9 +626,9 @@ class DbWorkflowObject(db.Model):
     def __repr__(self):
         """Represent a DbWorkflowObject."""
         return "<DbWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
-               "version = %s, id_parent = %s, created = %s, extra_data = %s)" \
+               "status = %s, id_parent = %s, created = %s, extra_data = %s)" \
                % (str(self.id), str(self.get_data()), str(self.id_workflow),
-                  str(self.version), str(self.id_parent), str(self.created),
+                  str(self.status), str(self.id_parent), str(self.created),
                   str(self.get_extra_data()))
 
     def __eq__(self, other):
@@ -636,7 +637,7 @@ class DbWorkflowObject(db.Model):
             if self._data == other._data and \
                     self._extra_data == other._extra_data and \
                     self.id_workflow == other.id_workflow and \
-                    self.version == other.version and \
+                    self.status == other.status and \
                     self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
@@ -883,10 +884,6 @@ class DbWorkflowObject(db.Model):
             from .api import continue_oid as continue_func
         return continue_func(self.id, start_point, **kwargs)
 
-    def change_status(self, message):
-        """Change the status."""
-        self.status = message
-
     def get_current_task(self):
         """Return the current task from the workflow engine for this object."""
         try:
@@ -954,15 +951,15 @@ class DbWorkflowObject(db.Model):
 
     def copy(self, other):
         """Copy data and metadata except id and id_workflow."""
-        for attr in ('version', 'id_parent', 'created',
-                     'modified', 'status', 'data_type', 'uri'):  # XXX: Is this really complete?
+        for attr in ('status', 'id_parent', 'created',
+                     'modified', 'status', 'data_type', 'uri'):
             setattr(self, attr, getattr(other, attr))
         setattr(self, 'data', other.data)
         setattr(self, 'extra_data', other.extra_data)
         self.save()
 
     @session_manager
-    def save(self, version=None, task_counter=None, id_workflow=None):
+    def save(self, status=None, task_counter=None, id_workflow=None):
         """Save object to persistent storage."""
         if task_counter is not None:
             if not isinstance(task_counter, Iterable):
@@ -974,8 +971,8 @@ class DbWorkflowObject(db.Model):
         self._extra_data = _encode(self.extra_data)
 
         self.modified = datetime.now()
-        if version is not None:
-            self.version = version
+        if status is not None:
+            self.status = status
         if id_workflow is not None:
             self.id_workflow = id_workflow
         db.session.add(self)
@@ -1027,7 +1024,7 @@ class DbWorkflowObject(db.Model):
 
     @classmethod
     @session_manager
-    def create_object_revision(cls, old_obj, version, **kwargs):
+    def create_object_revision(cls, old_obj, status, **kwargs):
         """Create a Workflow Object copy with customized values."""
         # Create new object and copy it
         obj = DbWorkflowObject(**kwargs)
@@ -1035,7 +1032,7 @@ class DbWorkflowObject(db.Model):
 
         # Overwrite some changes
 
-        obj.version = version
+        obj.status = status
         obj.created = datetime.now()
         obj.modified = datetime.now()
         for key, value in iteritems(kwargs):

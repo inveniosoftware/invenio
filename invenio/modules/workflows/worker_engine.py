@@ -20,7 +20,7 @@
 
 from invenio.modules.workflows.client import run_workflow, continue_execution
 from .engine import BibWorkflowEngine
-from invenio.modules.workflows.models import DbWorkflowObject, Workflow, ObjectStatus
+from invenio.modules.workflows.models import DbWorkflowObject, Workflow
 from workflow.errors import WorkflowObjectStatusError
 
 
@@ -42,7 +42,7 @@ def run_worker(wname, data, **kwargs):
     engine = BibWorkflowEngine.with_name(wname, **kwargs)
     engine.save()
     objects = get_workflow_object_instances(data, engine)
-    run_workflow(engine, objects, **kwargs)
+    run_workflow(engine, objects)
     return engine
 
 
@@ -68,7 +68,7 @@ def restart_worker(wid, **kwargs):
         # First we get all initial objects
         initials = DbWorkflowObject.query.filter(
             DbWorkflowObject.id_workflow == wid,
-            DbWorkflowObject.status == ObjectStatus.INITIAL
+            DbWorkflowObject.status == DbWorkflowObject.known_statuses.INITIAL
         ).all()
 
         # Then we reset their children to the same state as initial
@@ -84,7 +84,7 @@ def restart_worker(wid, **kwargs):
             objects.append(running_object)
     else:
         objects = get_workflow_object_instances(kwargs["data"], engine)
-    run_workflow(wfe=engine, data=objects, **kwargs)
+    run_workflow(wfe=engine, data=objects)
     return engine
 
 
@@ -113,8 +113,7 @@ def continue_worker(oid, restart_point="continue_next", **kwargs):
 
     engine = BibWorkflowEngine(workflow, **kwargs)
     engine.save()
-    continue_execution(engine, workflow_object, restart_point=restart_point,
-                       **kwargs)
+    continue_execution(engine, workflow_object, restart_point=restart_point)
     return engine
 
 
@@ -150,8 +149,8 @@ def get_workflow_object_instances(data, engine):
             if data_object.id:
                 data_object.log.debug("Existing workflow object found for "
                                       "this object. Saving a snapshot.")
-                if data_object.status == ObjectStatus.COMPLETED:
-                    data_object.status = ObjectStatus.INITIAL
+                if data_object.status == data_object.known_statuses.COMPLETED:
+                    data_object.status = data_object.known_statuses.INITIAL
                 workflow_objects.append(
                     generate_snapshot(data_object, engine)
                 )
@@ -190,13 +189,13 @@ def generate_snapshot(workflow_object, engine):
     :returns: DbWorkflowObject -- workflow_object instance
     :raises: WorkflowObjectStatusError
     """
-    if workflow_object.status == ObjectStatus.RUNNING:
+    if workflow_object.status == workflow_object.known_statuses.RUNNING:
         # Trying to run an object that is running. Dangerous!
         msg = "Object is already in RUNNING state!"
         workflow_object.log.debug(msg)
         raise WorkflowObjectStatusError(msg,
-                                         obj_status=workflow_object.status,
-                                         id_object=workflow_object.id)
+                                        obj_status=workflow_object.status,
+                                        id_object=workflow_object.id)
     else:
         # Create initial snapshot
         initial_object = DbWorkflowObject.create_object_revision(
@@ -235,7 +234,7 @@ def create_data_object_from_data(data_object, engine, data_type):
     # create an initial object for each data object.
     current_obj = DbWorkflowObject.create_object(
         id_workflow=engine.uuid,
-        status=ObjectStatus.INITIAL,
+        status=DbWorkflowObject.known_statuses.INITIAL,
         data_type=data_type
     )
 

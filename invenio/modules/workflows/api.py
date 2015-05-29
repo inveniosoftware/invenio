@@ -313,7 +313,7 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
     # Resume workflow if there are objects to resume
     objects = DbWorkflowObject.query.filter(
         DbWorkflowObject.id_workflow == id_workflow,
-        DbWorkflowObject.version == DbWorkflowObject.version.type.choices.HALTED
+        DbWorkflowObject.status == DbWorkflowObject.known_statuses.HALTED
     ).all()
     for obj in objects:
         yield continue_oid(oid=obj.id, start_point=start_point,
