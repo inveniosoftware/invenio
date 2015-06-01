@@ -31,9 +31,6 @@ web:
     - ./docs:/code/docs:rw
     - ./scripts:/code/scripts:ro
     - /code/invenio/base/translations
-    - /home/invenio
-    - /tmp:/tmp:rw
-    - /usr/local/var/invenio.base-instance
   links:
     - mysql:db
     - redis:cache
