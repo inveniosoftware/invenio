@@ -1,8 +1,8 @@
 ============================
- Invenio v2.0.3 is released
+ Invenio v2.0.4 is released
 ============================
 
-Invenio v2.0.3 was released on May 15, 2015.
+Invenio v2.0.4 was released on June 1, 2015.
 
 About
 -----
@@ -10,98 +10,81 @@ About
 Invenio is a digital library framework enabling you to build your own
 digital library or document repository on the web.
 
-Security fixes
---------------
-
-+ script:
-
-  - Switches from insecure standard random number generator to secure
-    OS-driven entropy source (/dev/urandom on linux) for secret key
-    generation.
-
 New features
 ------------
 
-+ formatter:
++ template:
 
-  - Adds html_class and link_label attributes to bfe_edit_record.
-    (#3020)
-
-+ script:
-
-  - Adds `SERVER_BIND_ADDRESS` and `SERVER_BIND_PORT` to overwrite
-    bind address and port independently from the public URL. This
-    gives control over the used network interface as well as the
-    ability to bind Invenio to a protected port and use a reverse
-    proxy for access. Priority of the config is (1) runserver command
-    arguments, (2) `SERVER_BIND_ADDRESS` and `SERVER_BIND_PORT`
-    configuration, (3) data from `CFG_SITE_URL`, (4) defaults
-    (`127.0.0.1:80`).
+  - Adds Jinja2 filter 's' to convert anything to 'str'.
 
 Improved features
 -----------------
 
-+ docker:
++ BibDocFile:
 
-  - Slims down docker image by building on top of less bloated base
-    image and only install what is really required. Also purges
-    unneeded packages, flushes caches and clean temporary files. All
-    these parts should not be in a production image and are also not
-    required by developers. You can still install components when
-    extending the Invenio base image.
+  - Escapes file name special characters including accents and spaces
+    in document URLs.
 
-+ docs:
++ installation:
 
-  - Adds missing 'libffi' library and howto start redis server.
-    Causing an exception when running `pip install --process-
-    dependency-links -e .[development]`: 'ffi.h' file not found and
-    'sudo: service: command not found' when starting redis server (OS
-    X Yosemite, 10.10).
-
-  - Adds a step describing how to install MySQL on CentOS 7 because it
-    does not have 'mysql-server' package by default.
+  - Adds default priviledges for database user to access from any
+    host.
 
 Bug fixes
 ---------
 
-+ email:
++ arxiv:
 
-  - Fixes 'send_email' to expect an 'EmailMessage' object from the
-    'forge_email' method rather than a string-like object. (#3076)
+  - Adds proper quotation around OAI-PMH query to avoid a query parser
+    exception due to colons in the OAI identifiers.
 
-  - Fixes reference to CFG_SITE_ADMIN_EMAIL (not a global).
++ global:
+
+  - Catches possible KeyError exceptions when using dotted notation in
+    a list to allow for the case when items are missing certain keys.
+
++ installation:
+
+  - Fixes syntax error in generated Apache virtual host configuration.
+
++ knowledge:
+
+  - Fixes HTML character encoding in admin templates. (#3118)
 
 + legacy:
 
-  - Makes lazy loading of `stopwords_kb` variable to avoid file
-    parsing during script loading. (#1462)
+  - Changes the default timestamp to a valid datetime value when
+    reindexing via `-R`.
 
-+ logging:
++ WebSearch:
 
-  - Fixes Sentry proxy definition pointing to a wrong application
-    attribute.
-
-+ matcher:
-
-  - Fixes Unicode conversion required to use the levenshtein_distance
-    function. (#3047)
+  - Removes special behaviour of the "subject" index that was hard-
+    coded based on the index name.  Installations should rather
+    specify wanted behaviour by means of configurable tokeniser
+    instead.
 
 Installation
 ------------
 
    $ pip install invenio
 
+Upgrade
+-------
+
+   $ bibsched stop
+   $ sudo systemctl stop apache2
+   $ pip install --upgrade invenio==2.0.4
+   $ inveniomanage upgrader check
+   $ inveniomanage upgrader run
+   $ sudo systemctl start apache2
+   $ bibsched start
+
 Documentation
 -------------
 
-   http://invenio.readthedocs.org/en/v2.0.3
+   http://invenio.readthedocs.org/en/v2.0.4
 
-Homepage
---------
-
-   https://github.com/inveniosoftware/invenio
-
-Happy hacking and thanks for choosing Invenio.
+Happy hacking and thanks for flying Invenio.
 
 | Invenio Development Team
 |   Email: info@invenio-software.org
