@@ -577,7 +577,7 @@ register python argcomplete for inveniomanage.
 4. Final words
 --------------
 
-Happy hacking and thanks for choosing Invenio.
+Happy hacking and thanks for flying Invenio.
 
        - Invenio Development Team
          <info@invenio-software.org>
