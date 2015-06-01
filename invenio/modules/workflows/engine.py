@@ -305,8 +305,7 @@ class InvActionMapper(ActionMapper):
     @staticmethod
     def after_each_callback(eng, callback_func, obj):
         """Action to take after every WF callback."""
-        eng.set_extra_data(eng.extra_data)
-        obj.extra_data["_task_counter"] = eng.state.callback_pos
+        obj.callback_pos = eng.state.callback_pos
         obj.extra_data["_last_task_name"] = callback_func.func_name
         task_history = get_task_history(callback_func)
         if "_task_history" not in obj:
@@ -333,7 +332,6 @@ class InvProcessingFactory(DbProcessingFactory):
         super(InvProcessingFactory, InvProcessingFactory).before_object(eng, objects, obj)
 
 
-
 class InvTransitionAction(DbTransitionAction):
 
     @staticmethod
@@ -346,7 +344,7 @@ class InvTransitionAction(DbTransitionAction):
         """
         e = exc_info[1]
         obj.set_action(e.action, e.message)
-        obj.save(version=eng.object_status.WAITING, task_counter=eng.state.callback_pos,
+        obj.save(status=eng.object_status.WAITING, callback_pos=eng.state.callback_pos,
                  id_workflow=eng.uuid)
         eng.save(WorkflowStatus.HALTED)
         eng.log.warning("Workflow '%s' halted at task %s with message: %s",
@@ -358,7 +356,7 @@ class InvTransitionAction(DbTransitionAction):
         e = exc_info[1]
         if e.action:
             obj.set_action(e.action, e.message)
-            obj.save(version=eng.object_status.HALTED, task_counter=eng.state.callback_pos,
+            obj.save(status=eng.object_status.HALTED, callback_pos=eng.state.callback_pos,
                      id_workflow=eng.uuid)
             eng.save(WorkflowStatus.HALTED)
             TransitionActions.HaltProcessing(obj, eng, callbacks, exc_info)

@@ -275,7 +275,6 @@ it contains some additional information by default.
     {
         "_tasks_results": {},
         "owner": {},
-        "_task_counter": {},
         "_error_msg": None,
         "_last_task_name": "",
         "latest_object": -1,

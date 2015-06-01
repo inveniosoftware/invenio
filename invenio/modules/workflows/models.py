@@ -153,7 +153,6 @@ def get_default_extra_data():
     return {
         "_tasks_results": {},
         "owner": {},
-        "_task_counter": {},
         "_error_msg": None,
         "_last_task_name": "",
         "latest_object": -1,
@@ -414,6 +413,7 @@ class Workflow(db.Model):
         db.session.add(self)
 
 
+
 Mapping = namedtuple('Mapping', ['db_name', 'default_x_data'])
 
 
@@ -498,6 +498,8 @@ class DbWorkflowObject(db.Model):
     child_logs = db.relationship("DbWorkflowObjectLog",
                                  backref='bibworkflowobject',
                                  cascade="all, delete, delete-orphan")
+
+    callback_pos = db.Column(CallbackPosType())  # ex-task_counter
 
     workflow = db.relationship(
         Workflow, foreign_keys=[_id_workflow], remote_side=Workflow.uuid,
@@ -783,7 +785,7 @@ class DbWorkflowObject(db.Model):
     def get_action_message(self):
         """Retrieve the currently assigned widget, if any."""
         try:
-            return unicodifier(self.get_extra_data()["_message"])
+            return unicodifier(self.extra_data["_message"])
         except KeyError:
             # No widget
             return ""
@@ -884,13 +886,10 @@ class DbWorkflowObject(db.Model):
             from .api import continue_oid as continue_func
         return continue_func(self.id, start_point, **kwargs)
 
+    # Deprecated
     def get_current_task(self):
         """Return the current task from the workflow engine for this object."""
-        try:
-            return self.extra_data["_task_counter"]
-        except KeyError:
-            # Assume old version "task_counter"
-            return self.extra_data["task_counter"]
+        return self.callback_pos
 
     def get_current_task_info(self):
         """Return dictionary of current task function info for this object."""
@@ -959,14 +958,11 @@ class DbWorkflowObject(db.Model):
         self.save()
 
     @session_manager
-    def save(self, status=None, task_counter=None, id_workflow=None):
+    def save(self, status=None, callback_pos=None, id_workflow=None):
         """Save object to persistent storage."""
-        if task_counter is not None:
-            if not isinstance(task_counter, Iterable):
-                raise ValueError("Task counter must be an iterable!")
-            else:
-                self.log.debug("Saving task counter: %s" % (task_counter,))
-                self.extra_data["_task_counter"] = task_counter  # Used by admins
+        if callback_pos is not None:
+            self.log.debug("Saving callback pos: %s" % (callback_pos,))
+            self.callback_pos = callback_pos  # Used by admins
         self._data = _encode(self.data)
         self._extra_data = _encode(self.extra_data)
 
