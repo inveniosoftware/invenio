@@ -115,5 +115,4 @@ EOF
 ) 200>$CFG_MARKER_LOCK
 
 # run payload
-$@
-exit $?
+exec $@

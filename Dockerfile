@@ -140,3 +140,9 @@ VOLUME /home/invenio
 VOLUME /tmp
 VOLUME /usr/local/var/invenio.base-instance
 
+# install init scripts
+ENTRYPOINT ["/code/scripts/docker_boot.sh"]
+
+# default to bash
+CMD ["bash"]
+

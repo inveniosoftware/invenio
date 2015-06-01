@@ -19,7 +19,7 @@
 
 web:
   build: .
-  command: /code/scripts/docker_devboot.sh inveniomanage runserver -h 0.0.0.0 -p 5000 -d -r
+  command: inveniomanage runserver -h 0.0.0.0 -p 5000 -d -r
   ports:
     - "127.0.0.1:5000:5000"
   environment:
@@ -36,7 +36,7 @@ web:
     - redis:cache
 worker:
   build: .
-  command: /code/scripts/docker_devboot.sh celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
+  command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
   environment:
     - BROKER_URL=redis://cache:6379/1
     - CACHE_REDIS_HOST=cache
