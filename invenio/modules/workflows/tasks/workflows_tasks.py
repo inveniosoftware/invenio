@@ -138,6 +138,7 @@ def start_async_workflow(workflow_to_run="",
 
         if preserve_data:
             record_object.set_data(obj.data)
+            record_object.save()
         if not workflow_to_run and get_workflow_from:
             # We get the workflow from the definition variables
             workflow = get_workflow_from(eng)
