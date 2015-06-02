@@ -39,10 +39,10 @@ def format_element(bfo, tag="909C4", label="", separator="<br/> ", description_l
             break
     if not fields:
         fields = bfo.fields(tag)
-    doi_list = [] 
+    doi_list = []
     for field in fields:
         if field.get('2', 'DOI') == 'DOI' and 'a' in field:
-            desc = field.get('y', '')
+            desc = field.get('y', '') or field.get('q', '')
             front = end = ''
             if desc:
                 if description_location == 'front':
