@@ -211,7 +211,7 @@ The following might not be necessary but is good to have for completeness.
 
 .. code-block:: console
 
-    $ brew install libjpeg libtiff freetype libffi
+    $ brew install libjpeg libtiff freetype libffi xz
     $ pip install -I pillow
 
 Install ``node`` by following `Node on OS X`_
