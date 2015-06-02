@@ -25,6 +25,7 @@ from cPickle import dumps, loads
 from datetime import datetime, timedelta
 
 from invenio.base.wrappers import lazy_import
+from invenio.ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.accounts.models import User
@@ -32,7 +33,6 @@ from invenio.utils.hash import md5
 
 from random import random
 
-from sqlalchemy import bindparam
 from sqlalchemy.orm import validates
 
 from .errors import \
@@ -112,11 +112,9 @@ class AccMAILCOOKIE(db.Model):
 
         obj, data = db.session.query(
             cls,
-            db.func.aes_decrypt(
-                cls._data, bindparam('password')
-            ).label('decrypted')
-        ).params(password=password).filter_by(id=cookie_id).one()
-        obj.data = loads(data)
+            AccMAILCOOKIE._data
+        ).filter_by(id=cookie_id).one()
+        obj.data = mysql_aes_decrypt(loads(data), password)
 
         (kind_check, params, expiration, onetime_check) = obj.data
         assert obj.kind in cls.AUTHORIZATIONS_KIND
@@ -144,8 +142,7 @@ class AccMAILCOOKIE(db.Model):
             kind=kind,
             onetime=int(onetime),
         )
-        # FIXME aes_encrypt exists?
-        cookie._data = db.func.aes_encrypt(dumps(data), password)
+        cookie._data = mysql_aes_encrypt(dumps(data), password)
         db.session.add(cookie)
         db.session.commit()
         db.session.refresh(cookie)
