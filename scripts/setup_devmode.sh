@@ -22,11 +22,11 @@
 # Sets the configuration of Invenio to defaults which are sutable for
 # developers.
 #
-# !!!                  WARNING                      !!!
-# !!! Do NOT use these configurations in production !!!
+# !!!                             WARNING                               !!!
+# !!! Do NOT use these configurations in production without adjustement !!!
 #
 
-echo "Load developer configuration. Do NOT use this in production mode!"
+echo "Load predefined configuration. Please ADJUST this before running in production mode!"
 
 # initialize Invenio configuration and search for the reported config file path
 inveniomanage config create secret-key
@@ -47,8 +47,8 @@ EOF
 
 # fetch and build assets
 inveniomanage bower -i bower-base.json > bower.json
-bower install --silent --allow-root
+bower install --silent
 inveniomanage collect > /dev/null
 inveniomanage assets build
 
-echo "Loaded developer configuration. Do NOT use this in production mode!"
+echo "Load predefined configuration. Please ADJUST this before running in production mode!"
