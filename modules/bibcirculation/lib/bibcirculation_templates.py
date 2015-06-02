@@ -1542,15 +1542,6 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
                                     {'recid': recid, 'ln': ln},
                                     (book_title_from_MARC(recid)))
 
-        if len(result) == 0 and len(infos) == 0:
-            out += """
-            <script type="text/javascript">
-                $(window).keydown(function(event){
-                    window.location.href="%(url)s/admin2/bibcirculation/loan_return?ln=%(ln)s";
-                });
-            </script>
-            """ % {'url': CFG_SITE_URL, 'ln': ln}
-
         out += """
            <form name="return_form"
                  action="%s/admin2/bibcirculation/loan_return?ln=%s" method="get" >
