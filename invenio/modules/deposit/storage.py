@@ -30,15 +30,19 @@ from invenio.base.globals import cfg
 
 
 class UploadError(IOError):
-    pass
+
+    """Error during upload."""
 
 
 class ExternalFile(object):
+
+    """Wrapper around a URL to make it behave like a file.
+
+    Allows external files to be passed to the storage layer.
     """
-    Wrapper around a URL to make it behave like a file which can be passed to
-    the storage layer
-    """
+
     def __init__(self, url, filename):
+        """Initialiez external file."""
         from invenio.legacy.bibdocfile.api import open_url, \
             InvenioBibdocfileUnauthorizedURL
         try:
@@ -63,24 +67,27 @@ class ExternalFile(object):
             raise UploadError('URL could not be opened: %s' % str(e))
 
     def close(self):
+        """Close the external file."""
         self._file.close()
 
     def read(self):
+        """Read the external file."""
         return self._file.read()
 
 
 class Storage(object):
-    """
-    Default storage backend
-    """
+
+    """Default storage backend."""
+
     _fsdir = None
 
     def __init__(self, fs_path):
+        """Initialize with file system path."""
         self.fs_path = fs_path
 
     @property
     def storage(self):
-        """ Get the pyFilesytem object for the backend path """
+        """Get the pyFilesytem object for the backend path."""
         if self._fsdir is None:
             # Opens a directory, creates it if needed, and ensures
             # it is writeable.
@@ -90,12 +97,12 @@ class Storage(object):
         return self._fsdir
 
     def unique_filename(self, filename):
-        """ Generate a unique secure filename """
+        """Generate a unique secure filename."""
         return str(uuid.uuid4()) + "-" + filename
 
     def save(self, incoming_file, filename, unique_name=True,
              with_checksum=True, chunksize=65536):
-        """ Store the incoming file """
+        """Store the incoming file."""
         if unique_name:
             filename = self.unique_filename(filename)
 
@@ -123,39 +130,42 @@ class Storage(object):
 
     @staticmethod
     def delete(fs_path):
-        """ Delete the file on storage """
+        """.Delete the file on storage."""
         (dirurl, filename) = opener.pathsplit(fs_path)
         fs = opener.fsopendir(dirurl)
         fs.remove(filename)
 
     @staticmethod
     def is_local(fs_path):
-        """ Determine if file is a local file """
+        """Determine if file is a local file."""
         (dirurl, filename) = opener.pathsplit(fs_path)
         fs = opener.fsopendir(dirurl)
         return fs.hassyspath(filename)
 
     @staticmethod
     def get_url(fs_path):
-        """ Get a URL for the file """
+        """Get a URL for the file."""
         (dirurl, filename) = opener.pathsplit(fs_path)
         fs = opener.fsopendir(dirurl)
         return fs.getpathurl(filename)
 
     @staticmethod
     def get_syspath(fs_path):
-        """ Get a local system path to the file """
+        """Get a local system path to the file."""
         (dirurl, filename) = opener.pathsplit(fs_path)
         fs = opener.fsopendir(dirurl)
         return fs.getsyspath(filename)
 
 
 class DepositionStorage(Storage):
+
+    """Deposition storage backend.
+
+    Saves files to a folder (<CFG_WEBDEPOSIT_UPLOAD_FOLDER>/<deposition_id>/).
     """
-    Deposition storage backend that will save files to a
-    a folder (<CFG_WEBDEPOSIT_UPLOAD_FOLDER>/<deposition_id>/).
-    """
+
     def __init__(self, deposition_id):
+        """Initialize storage."""
         self.fs_path = path.join(
             cfg['DEPOSIT_STORAGEDIR'],
             str(deposition_id)
@@ -163,12 +173,15 @@ class DepositionStorage(Storage):
 
 
 class ChunkedDepositionStorage(DepositionStorage):
-    """
-    Chunked storage backend, capable of handling storage of a file
-    in multiple chunks. Otherwise similar to DepositionStorage.
+
+    """Chunked storage backend.
+
+    Capable of handling storage of a file in multiple chunks. Otherwise
+    similar to DepositionStorage.
     """
 
     def chunk_filename(self, filename, chunks, chunk):
+        """Generate chunk file name."""
         return "%s_%s_%s" % (
             filename,
             chunks,
@@ -176,6 +189,7 @@ class ChunkedDepositionStorage(DepositionStorage):
         )
 
     def save(self, incoming_file, filename, chunk=None, chunks=None):
+        """Save one chunk of an incoming file."""
         try:
             # Generate chunked file name
             chunk = int(chunk)
