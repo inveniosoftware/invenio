@@ -43,6 +43,7 @@ define(function(require) {
             var PlUploader = new plupload.Uploader({
                 browse_button: this.$node[0],
                 url: this.attr.url,
+                chunk_size: '10mb',
                 max_file_size: this.attr.max_file_size,
                 drop_element: this.attr.drop_element,
                 dragdrop: true,
