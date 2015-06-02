@@ -22,7 +22,7 @@ Docker
 
 This page describes how to set up Docker containers for development purposes.
 
-.. image:: /_static/docker-compose-setup.png
+.. image:: /_static/docker-compose-setup.svg
 
 Setup
 -----
@@ -35,7 +35,7 @@ Install Docker_ and `Docker Compose`_. Now run:
     docker-compose-dev.yml up
 
 This builds and runs the docker containers. You can now connect to
-`localhost:5000` to see your Invenio installation. The `admin` user does not
+`localhost:28080` to see your Invenio installation. The `admin` user does not
 have any password.
 
 Should you require a fresh installation and therefore wipe all your instance

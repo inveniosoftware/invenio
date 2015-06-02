@@ -19,9 +19,9 @@
 
 web:
   build: .
-  command: inveniomanage runserver -h 0.0.0.0 -p 5000
+  command: inveniomanage runserver -h 0.0.0.0 -p 28080
   ports:
-    - "5000:5000"
+    - "28080:28080"
   environment:
     - CACHE_REDIS_HOST=cache
     - CFG_DATABASE_HOST=db
