@@ -847,7 +847,7 @@ class BibSched(object):
                 register_exception(alert_admin=True)
             else:
                 register_emergency(
-                    'Light emergency from %s: BibTask failed: %s'.format(CFG_SITE_URL, msg)
+                    'Light emergency from {0}: BibTask failed: {1}'.format(CFG_SITE_URL, msg)
                 )
 
         # Update our tasks list (to know who is running, sleeping, etc.)
@@ -890,10 +890,11 @@ class BibSched(object):
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except Exception, err:
             register_exception(alert_admin=True)
-            if not "bibupload ->" in err and not "bibupload:" in err:
+            if "bibupload ->" not in err and "bibupload:" not in err:
                 try:
-                    register_emergency('Emergency from %s: BibSched halted: %s'
-                                                             % (CFG_SITE_URL, err))
+                    register_emergency(
+                        'Emergency from {0}: BibSched halted: {1}'.format(CFG_SITE_URL, err)
+                    )
                 except NotImplementedError:
                     pass
             raise
