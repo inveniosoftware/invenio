@@ -22,6 +22,7 @@ import traceback
 from .errors import WorkflowHalt, WorkflowError
 from .models import ObjectVersion
 from .engine import WorkflowStatus
+from .signals import workflow_halted, workflow_error
 
 
 def run_workflow(wfe, data, stop_on_halt=False,
@@ -71,6 +72,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                        wfe.get_current_taskname() or "Unknown",
                        workflowhalt_triggered.message)
             wfe.log.warning(message)
+            workflow_halted.send(current_obj)
             if stop_on_halt:
                 break
         except Exception as exception_triggered:
@@ -87,6 +89,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                     id_workflow=wfe.uuid
                 )
             wfe.save(status=WorkflowStatus.ERROR)
+            workflow_error.send(current_obj)
             if stop_on_error:
                 if isinstance(exception_triggered, WorkflowError):
                     raise exception_triggered
