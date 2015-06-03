@@ -111,7 +111,7 @@ done by attaching to running container:
 
     docker exec -it invenio_web_1 sphinx-build -nW docs docs/_build/html
 
-.. NOTE::
+.. note::
     This needs do be done in a running or initialized container because it
     requires that Invenio is set up correctly. Otherwise, the script will break
     because of missing access rights.
@@ -125,6 +125,11 @@ finished setup and the webservice is running. Then use:
 .. code-block:: shell
 
     docker exec -it invenio_web_1 python setup.py test
+
+.. note::
+    Running the test requires the deactivation of redirection debugging. You
+    can archive this by setting the configuration variable
+    `DEBUG_TB_INTERCEPT_REDIRECTS = False`.
 
 Overlays
 --------
