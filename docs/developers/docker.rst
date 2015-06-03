@@ -38,6 +38,22 @@ This builds and runs the docker containers. You can now connect to
 `localhost:28080` to see your Invenio installation. The `admin` user does not
 have any password.
 
+.. note::
+    If you are using `boot2docker`_ you need to set up port forwarding by
+    running the following command in a new terminal:
+
+    .. code-block:: shell
+
+        boot2docker ssh -vnNT \
+            -Llocalhost:28080:localhost:28080 \
+            -Llocalhost:26379:localhost:26379 \
+            -Llocalhost:23306:localhost:23306
+
+    You have to run this after Invenio booted up. Do **not** stop it while you
+    are working with Invenio. Otherwise the port forwarding gets stopped. You
+    have to restart the forwarding when your restart the Docker containers. The
+    process can be stopped using `CTRL-C`.
+
 Should you require a fresh installation and therefore wipe all your instance
 data, run:
 
@@ -61,11 +77,17 @@ webinterface at port `5555`:
 
 .. code-block:: shell
 
-    celery flower --broker=redis://localhost:6379/1
+    celery flower --broker=redis://localhost:26379/1
 
 
 Code changes and live reloading
 -------------------------------
+
+.. note::
+    This section does not apply to OS X, Windows and boot2docker as these
+    systems are not properly supported by the used watchdog mechanism. When
+    you are using one of these setups, you have to restart the Docker
+    containers to reload the code and templates.
 
 As long as you do not add new requirements (python and bower) and only change
 files inside the `invenio` package, it is not required to rebuild the docker
@@ -196,6 +218,7 @@ up and running and the initialization is complete:
     docker exec -it inveniodemosite_web_1 inveniomanage demosite populate \
         --packages=invenio_demosite.base --yes-i-know
 
+.. _boot2docker: http://boot2docker.io/
 .. _Docker: https://www.docker.com/
 .. _Docker Compose: https://docs.docker.com/compose/
 .. _flower: https://flower.readthedocs.org/
