@@ -22,6 +22,14 @@
 
 __revision__ = "$Id$"
 
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio22Warning
+
+warnings.warn("External collection search will be removed in 2.2. Please check "
+              "new Record REST API.",
+              RemovedInInvenio22Warning)
+
 import cgi
 import sys
 from copy import copy
