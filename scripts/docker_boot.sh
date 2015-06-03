@@ -73,9 +73,6 @@ CFG_RUNDIR = u'/home/invenio/var/run'
 CFG_TMPDIR = u'/tmp/invenio-`hostname`'
 CFG_TMPSHAREDDIR = u'/home/invenio/var/tmp-shared'
 CFG_WEBDIR = u'/home/invenio/var/www'
-CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = u'/home/invenio/etc/bibconvert/config'
-CFG_WEBSUBMIT_COUNTERSDIR = u'/home/invenio/var/data/submit/counters'
-CFG_WEBSUBMIT_STORAGEDIR = u'/home/invenio/var/data/submit/storage'
 
 DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
 EOF

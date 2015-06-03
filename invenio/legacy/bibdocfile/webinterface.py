@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -63,7 +63,6 @@ from invenio.modules.collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
-websubmit_templates = invenio.legacy.template.load('websubmit')
 websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.legacy.bibdocfile.managedocfiles import \
@@ -473,8 +472,6 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
      'ln': argd['ln'],
      'CFG_SITE_URL': CFG_SITE_URL,
      'CFG_SITE_RECORD': CFG_SITE_RECORD}
-
-            body += websubmit_templates.tmpl_page_do_not_leave_submission_js(argd['ln'], enabled=True)
 
         return page(title = _("Document File Manager") + (argd['recid'] and (': ' + _("Record #%(x_rec)i", x_rec=argd['recid'])) or ''),
                     navtrail=navtrail,

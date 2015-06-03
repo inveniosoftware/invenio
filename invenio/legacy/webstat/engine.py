@@ -46,7 +46,6 @@ from invenio.legacy.search_engine import perform_request_search, \
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.dbquery import run_sql, \
     wash_table_column_name
-from invenio.legacy.websubmit.admin_dblayer import get_docid_docname_alldoctypes
 from invenio.legacy.bibcirculation.utils import book_title_from_MARC, \
     book_information_from_MARC
 from invenio.legacy.bibcirculation.db_layer import get_id_bibrec, \
@@ -2746,8 +2745,6 @@ def _run_cmd(command):
 def _get_doctypes():
     """Returns all the possible doctypes of a new submission"""
     doctypes = [("all", "All")]
-    for doctype in get_docid_docname_alldoctypes():
-        doctypes.append(doctype)
     return doctypes
 
 

@@ -303,8 +303,6 @@ setup(
             'hepdataharvest = '
             ' invenio.utils.hepdata.scripts.hepdataharvest:main',
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
-            'inveniounoconv = '
-            ' invenio.legacy.websubmit.scripts.inveniounoconv:main',
             'oaiharvest = invenio.legacy.oaiharvest.scripts.oaiharvest:main',
             'oairepositoryupdater = '
             ' invenio.legacy.oairepository.scripts.oairepositoryupdater:main',
@@ -319,8 +317,6 @@ setup(
             'webmessageadmin = '
             ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
             'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',
-            'websubmitadmin = '
-            ' invenio.legacy.websubmit.scripts.websubmitadmin:main',
             'xmlmarc2textmarc = '
             ' invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',

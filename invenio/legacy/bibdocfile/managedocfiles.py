@@ -1,7 +1,7 @@
 # $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
 
 # This file is part of Invenio.
-# Copyright (C) 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -89,11 +89,6 @@ from invenio.legacy.bibdocfile.cli import cli_fix_marc
 from invenio.legacy.bibdocfile.api import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
      InvenioBibDocFileError, BibDocMoreInfo
-from invenio.legacy.websubmit.functions.Shared_Functions import \
-     createRelatedFormats
-from invenio.legacy.websubmit.icon_creator import \
-     create_icon, InvenioWebSubmitIconCreatorError
-from invenio.legacy.websubmit.file_converter import get_missing_formats
 from invenio.ext.logging import register_exception
 from invenio.legacy.dbquery import run_sql
 from invenio.utils.url import create_html_mailto
@@ -685,16 +680,6 @@ def create_file_upload_interface(recid,
                         # Automatically create additional formats when
                         # possible AND wanted
                         additional_formats = []
-                        if create_related_formats and not defer_related_formats_creation:
-                            additional_formats = createRelatedFormats(new_uploaded_filepath,
-                                                                      overwrite=False)
-
-                            for additional_format in additional_formats:
-                                # Log
-                                log_action(working_dir, 'addFormat', filename,
-                                           additional_format, file_rename,
-                                           file_description, file_comment,
-                                           file_doctype, True, file_restriction)
 
                 if file_action == "revise" and file_target != "":
                     # Log
@@ -707,18 +692,6 @@ def create_file_upload_interface(recid,
                     # Automatically create additional formats when
                     # possible AND wanted
                     additional_formats = []
-                    if create_related_formats and not defer_related_formats_creation:
-                        additional_formats = createRelatedFormats(new_uploaded_filepath,
-                                                                  overwrite=False)
-
-                        for additional_format in additional_formats:
-                            # Log
-                            log_action(working_dir, 'addFormat',
-                                       (file_rename or file_target),
-                                       additional_format, file_rename,
-                                       file_description, file_comment,
-                                       file_target_doctype, True,
-                                       file_restriction)
 
                 if file_action == "addFormat" and file_target != "":
                     # We have already checked above that this format does
@@ -1147,7 +1120,6 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
     @type display_hidden_files: boolean
     """
     abstract_bibdocs = {}
-    create_related_formats_for_bibdocs = {}
     i = 0
     for bibdoc in bibdocs:
         hidden_p = True in [bibdocfile.hidden_p() for bibdocfile in bibdoc.list_latest_files()]
@@ -1213,8 +1185,6 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
                  'hidden_p': False,
                  'formats_to_be_created': []}
             abstract_bibdocs[(rename or bibdoc_name)]['updated'] = True
-            if create_related_formats:
-                create_related_formats_for_bibdocs[(rename or bibdoc_name)] = True
         elif action == "revise" and not file_path:
             # revision of attributes of a file (description, name,
             # comment or restriction) but no new file.
@@ -1244,15 +1214,6 @@ def build_updated_files_list(bibdocs, actions, recid, display_hidden_files=False
                            docid=-1, status='',
                            checksum=checksum, more_info=more_info))
             abstract_bibdocs[bibdoc_name]['updated'] = True
-
-    # For each BibDoc for which we would like to create related
-    # formats, do build the list of formats that should be created
-    for docname in create_related_formats_for_bibdocs.keys():
-        current_files_for_bibdoc = [bibdocfile.get_path() for bibdocfile in abstract_bibdocs[docname]['list_latest_files']]
-        missing_formats = []
-        for missing_formats_group in get_missing_formats(current_files_for_bibdoc).values():
-            missing_formats.extend(missing_formats_group)
-            abstract_bibdocs[docname]['formats_to_be_created'] = missing_formats
 
     return abstract_bibdocs.values()
 
@@ -1888,8 +1849,6 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
     # deleted nor renamed by a later action)
     pending_bibdocs = {}
     newly_added_bibdocs = [] # Does not consider new formats/revisions
-    create_related_formats_for_bibdocs = {}
-    create_icons_for_bibdocs = {}
     performed_actions = read_actions_log(working_dir)
     sequence_id = bibtask_allocate_sequenceid(working_dir)
     for action, bibdoc_name, file_path, rename, description, \
@@ -1910,21 +1869,19 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
                 newly_added_bibdocs.append(new_bibdoc)
 
             if create_related_formats:
-                # Schedule creation of related formats when possible.
-                create_related_formats_for_bibdocs[rename or bibdoc_name] = True
+                raise RuntimeError(
+                    "Creation of related formats is not supported anymore."
+                )
 
             if doctype in create_icon_doctypes or '*' in create_icon_doctypes:
-                # Schedule creation of icons when possible.
-                create_icons_for_bibdocs[rename or bibdoc_name] = True
+                raise RuntimeError(
+                    "Creation of icons is not supported anymore."
+                )
 
         elif action == 'addFormat':
             add_format(file_path, bibdoc_name, recid, doctype, working_dir,
                        icon_sizes, create_icon_doctypes,
                        pending_bibdocs, bibrecdocs)
-
-            if doctype in create_icon_doctypes or '*' in create_icon_doctypes:
-                # Schedule creation of icons when possible.
-                create_icons_for_bibdocs[rename or bibdoc_name] = True
 
         elif action == 'revise':
             new_bibdoc = \
@@ -1939,12 +1896,14 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
 
 
             if create_related_formats:
-                # Schedule creation of related formats
-                create_related_formats_for_bibdocs[rename or bibdoc_name] = True
+                raise RuntimeError(
+                    "Creation of related formats is not supported anymore."
+                )
 
             if doctype in create_icon_doctypes or '*' in create_icon_doctypes:
-                # Schedule creation of icons when possible.
-                create_icons_for_bibdocs[rename or bibdoc_name] = True
+                raise RuntimeError(
+                    "Creation of icons is not supported anymore."
+                )
 
         elif action == 'delete':
             delete(bibdoc_name, recid, working_dir, pending_bibdocs,
@@ -1977,10 +1936,6 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
                     while bibrecdocs.has_docname_p(new_filename) or (new_filename in new_names):
                         new_filename = rename + '_%i' % file_counter
                         file_counter += 1
-                    if create_related_formats_for_bibdocs.has_key(bibdoc_to_rename.get_docname()):
-                        create_related_formats_for_bibdocs[bibdoc_to_rename.get_docname()] = new_filename
-                    if create_icons_for_bibdocs.has_key(bibdoc_to_rename.get_docname()):
-                        create_icons_for_bibdocs[bibdoc_to_rename.get_docname()] = new_filename
                     bibdoc_to_rename.change_name(recid, new_filename)
                     new_names.append(new_filename) # keep track of name, or we have to reload bibrecdoc...
                     _do_log(working_dir, 'Renamed ' + str(bibdoc_to_rename.get_docname()))
@@ -1992,30 +1947,6 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
     # Update the MARC
     cli_fix_marc(None, [recid], interactive=False)
 
-    # Schedule related formats creation for selected BibDoc
-    if create_related_formats_for_bibdocs:
-        additional_params = []
-        # Add task sequence ID
-        additional_params.append('-I')
-        additional_params.append(str(sequence_id))
-        additional_params.append("-a")
-        additional_params.append("docnames=%s" % '/'.join(create_related_formats_for_bibdocs.keys()))
-        task_low_level_submission('bibtasklet', 'bibdocfile', '-N', 'createFormats', '-T', 'bst_create_related_formats', '-a', 'recid=%s' % recid, *additional_params)
-
-    # Schedule icons creation for selected BibDoc
-    additional_params = []
-    # Add task sequence ID
-    additional_params.append('-I')
-    additional_params.append(str(sequence_id))
-    additional_params.append("-a")
-    additional_params.append("docnames=%s" % '/'.join(create_icons_for_bibdocs.keys()))
-    additional_params.append("-a")
-    additional_params.append("icon_sizes=%s" % ','.join(icon_sizes))
-    additional_params.append('-a')
-    additional_params.append("add_default_icon=1")
-    additional_params.append('-a')
-    additional_params.append("inherit_moreinfo=1")
-    task_low_level_submission('bibtasklet', 'bibdocfile', '-N', 'createIcons', '-T', 'bst_create_icons', '-a', 'recid=%s' % recid, *additional_params)
 
 def add(file_path, bibdoc_name, rename, doctype, description, comment,
         file_restriction, recid, working_dir, icon_sizes, create_icon_doctypes,
@@ -2339,44 +2270,6 @@ def _do_log(log_dir, msg):
     file_desc = open(log_file, "a+")
     file_desc.write("%s --> %s\n" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
     file_desc.close()
-
-
-def _create_icon(file_path, icon_size, docformat='gif', verbosity=9):
-    """
-    Creates icon of given file.
-
-    Returns path to the icon. If creation fails, return None, and
-    register exception (send email to admin).
-
-
-    @param file_path: full path to icon
-    @type file_path: string
-
-    @param icon_size: the scaling information to be used for the
-                      creation of the new icon.
-    @type icon_size: int
-
-    @param verbosity: the verbosity level under which the program
-                      is to run;
-    @type verbosity: int
-    """
-    icon_path = None
-    try:
-        filename = os.path.splitext(os.path.basename(file_path))[0]
-        (icon_dir, icon_name) = create_icon(
-            {'input-file':file_path,
-             'icon-name': "icon-%s" % filename,
-             'multipage-icon': False,
-             'multipage-icon-delay': 0,
-             'icon-scale': icon_size,
-             'icon-file-format': docformat,
-             'verbosity': verbosity})
-        icon_path = icon_dir + os.sep + icon_name
-    except InvenioWebSubmitIconCreatorError as e:
-        register_exception(prefix='Icon for file %s could not be created: %s' % \
-                           (file_path, str(e)),
-                           alert_admin=False)
-    return icon_path
 
 
 def get_upload_file_interface_javascript(form_url_params):

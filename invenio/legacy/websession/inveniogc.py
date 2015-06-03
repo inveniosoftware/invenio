@@ -41,7 +41,6 @@ from invenio.legacy.bibsched.bibtask_config import CFG_BIBSCHED_LOGDIR
 from invenio.modules.access.mailcookie import mail_cookie_gc
 from invenio.legacy.bibdocfile.api import BibDoc
 from invenio.legacy.bibsched.cli import gc_tasks
-from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
 from invenio.modules.upgrader.api import op
 from invenio.utils.date import convert_datestruct_to_datetext
 from intbitset import intbitset
@@ -156,12 +155,6 @@ def clean_tempfiles():
             ' -atime +%s -exec gzip %s -9 {} \;' \
                 % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                 CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
-
-        # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
-        write_message("- deleting old video submissions")
-        gc_exec_command('find %s -name %s* -atime +%s -exec rm %s -f {} \;' \
-                        % (CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_TMP_VIDEO_PREFIX,
-                        CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO, vstr))
 
     write_message("- deleting temporary old "
             "RefExtract files")

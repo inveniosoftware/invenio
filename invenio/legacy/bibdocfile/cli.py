@@ -52,7 +52,6 @@ from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.utils.text import encode_for_xml
-from invenio.legacy.websubmit.file_converter import can_perform_ocr
 from invenio.utils.shell import retry_mkstemp
 
 def _xml_mksubfield(key, subfield, fft):
@@ -741,9 +740,8 @@ def cli_textify(options):
     force = getattr(options, 'force', None)
     perform_ocr = getattr(options, 'perform_ocr', None)
     if perform_ocr:
-        if not can_perform_ocr():
-            print("WARNING: OCR requested but OCR is not possible", file=sys.stderr)
-            perform_ocr = False
+        print("WARNING: OCR requested but OCR is not possible", file=sys.stderr)
+        perform_ocr = False
     if perform_ocr:
         additional = ' using OCR (this might take some time)'
     else:

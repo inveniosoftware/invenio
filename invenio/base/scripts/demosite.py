@@ -119,8 +119,8 @@ def populate(packages=[], default_data=True, files=None,
 
     i = count(job_id + 1).next
     for cmd in (
-        (bibdocfile, "bibdocfile --textify --with-ocr --recid 97"),
-        (bibdocfile, "bibdocfile --textify --all"),
+        #(bibdocfile, "bibdocfile --textify --with-ocr --recid 97"),
+        #(bibdocfile, "bibdocfile --textify --all"),
         (bibindex, "bibindex -u admin"),
         (bibindex, "bibindex %d" % i()),
         (bibindex, "bibindex -u admin -w global"),

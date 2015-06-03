@@ -37,8 +37,6 @@ from invenio.legacy.bibsword.client import perform_display_sub_status, \
 from invenio.legacy.webpage import page
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.legacy.websubmit.functions.Get_Recid import \
-                                           get_existing_records_for_reportnumber
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.bibsword.config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER
 
@@ -245,18 +243,6 @@ class WebInterfaceSword(WebInterfaceDirectory):
 
             elif argd['id_record'] == '':
                 error_messages.append("You must specify a report number")
-
-            else:
-                recids = \
-                    get_existing_records_for_reportnumber(argd['id_record'])
-                if len(recids) == 0:
-                    error_messages.append(\
-                        "No document found with the given report number")
-                elif len(recids) > 1:
-                    error_messages.append(\
-                    "Several documents have been found with given the report number")
-                else:
-                    argd['recid'] = recids[0]
 
             if argd['id_remote_server'] in ['0', '']:
                 error_messages.append("No remote server was selected")

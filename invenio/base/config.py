@@ -73,9 +73,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.pages',
 ]
 
-LEGACY_WEBINTERFACE_EXCLUDE = [
-    'invenio.legacy.websubmit',
-]
+LEGACY_WEBINTERFACE_EXCLUDE = []
 
 _cfg_prefix = distutils.sysconfig.get_config_var("prefix")
 
@@ -94,9 +92,6 @@ CFG_WEBDIR = join(_cfg_prefix, "var", "www")
 CFG_PYLIBDIR = join(_cfg_prefix, "lib", "python")
 CFG_LOCALEDIR = join(_cfg_prefix, "share", "locale")
 CFG_TMPSHAREDDIR = join(_cfg_prefix, "var", "tmp-shared")
-CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = join(_cfg_prefix, "etc", "bibconvert", "config")
-CFG_WEBSUBMIT_COUNTERSDIR = join(CFG_DATADIR, "submit", "counters")
-CFG_WEBSUBMIT_STORAGEDIR = join(CFG_DATADIR, "submit", "storage")
 CFG_BIBEDIT_CACHEDIR = join(_cfg_prefix, "var", "tmp-shared", "bibedit-cache")
 CFG_COMMENTSDIR = join(CFG_DATADIR, "comments")
 CFG_BASKETSDIR = join(CFG_DATADIR, "baskets")
@@ -736,7 +731,6 @@ CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST = ['404r', '400', '5*', '41*', ]
 CFG_WEBSTYLE_HTTP_USE_COMPRESSION = 0
 CFG_WEBSTYLE_REVERSE_PROXY_IPS = []
 CFG_WEBSTYLE_TEMPLATE_SKIN = "default"
-CFG_WEBSUBMIT_USE_MATHJAX = 0
 CFG_XAPIAN_ENABLED = ""
 CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE = 0
 CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1, 2]
