@@ -57,9 +57,7 @@ RUN apt-get update && \
 
 # install python requirements
 RUN pip install --upgrade pip && \
-    pip install mock && \
-    pip install unittest2 && \
-    pip install watchdog
+    pip install flower mock unittest2 watchdog
 
 # install nodejs requirements
 RUN npm update && \
