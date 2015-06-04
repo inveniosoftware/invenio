@@ -842,8 +842,8 @@ class BibSched(object):
 
         try:
             self.check_errors()
-        except RecoverableError, msg:
-            if "bibupload ->" in msg or "bibupload:" in msg:
+        except RecoverableError as msg:
+            if "bibupload ->" in str(msg) or "bibupload:" in str(msg):
                 register_exception(alert_admin=True)
             else:
                 register_emergency(
@@ -888,9 +888,9 @@ class BibSched(object):
                     self.tick()
                 else:
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
-        except Exception, err:
+        except Exception as err:
             register_exception(alert_admin=True)
-            if "bibupload ->" not in err and "bibupload:" not in err:
+            if "bibupload ->" not in str(err) and "bibupload:" not in str(err):
                 try:
                     register_emergency(
                         'Emergency from {0}: BibSched halted: {1}'.format(CFG_SITE_URL, err)
