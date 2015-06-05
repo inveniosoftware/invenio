@@ -17,10 +17,12 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Legacy BibEdit."""
+
 import warnings
 
-from invenio.utils.deprecation import RemovedInInvenio22Warning
+from invenio.utils.deprecation import RemovedInInvenio23Warning
 
-warnings.warn("BibEdit will be removed in 2.2. Please check "
+warnings.warn("Legacy BibEdit will be removed in 2.3. Please check "
               "'invenio.modules.editor' module.",
-              RemovedInInvenio22Warning)
+              RemovedInInvenio23Warning)

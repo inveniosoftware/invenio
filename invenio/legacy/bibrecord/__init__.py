@@ -85,6 +85,12 @@ bibrecord_tests.py and bibupload_regression_tests.py.
 
 """
 
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio23Warning
+
+warnings.warn("Legacy BibRecord will be removed in 2.3.",
+              RemovedInInvenio23Warning)
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 

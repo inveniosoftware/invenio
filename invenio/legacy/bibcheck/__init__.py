@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,13 @@ BibCheck API
 
 This API lets other modules interact with bibcheck.
 """
+
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio22Warning
+
+warnings.warn("Legacy BibCheck will be removed in 2.2.",
+              RemovedInInvenio22Warning)
 
 from invenio.legacy.bibcheck import task as bibcheck_task
 
@@ -53,4 +60,3 @@ def check_record(record, enabled_rules=None):
             plugin["check_record"](record, **rule["checker_params"])
 
     return record
-

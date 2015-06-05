@@ -2,7 +2,7 @@
 # -*- mode: python; coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -22,6 +22,13 @@
 
 It checks periodically if arxiv papers are not missing pdfs
 """
+
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio22Warning
+
+warnings.warn("Legacy BibAuthority will be removed in 2.2.",
+              RemovedInInvenio22Warning)
 
 from invenio.base.factory import with_app_context
 
