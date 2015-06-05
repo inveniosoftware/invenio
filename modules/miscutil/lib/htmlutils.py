@@ -444,10 +444,7 @@ def get_mathjax_header(https=False):
            $MJV variable in the root Makefile.am
     """
     if CFG_MATHJAX_HOSTING.lower() == 'cdn':
-        if https:
-            mathjax_path = "https://d3eoax9i5htok0.cloudfront.net/mathjax/2.1-latest"
-        else:
-            mathjax_path = "http://cdn.mathjax.org/mathjax/2.1-latest"
+        mathjax_path = "//cdn.mathjax.org/mathjax/2.5-latest"
     else:
         mathjax_path = "/MathJax"
 
