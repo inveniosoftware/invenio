@@ -627,11 +627,10 @@ class DbWorkflowObject(db.Model):
 
     def __repr__(self):
         """Represent a DbWorkflowObject."""
-        return "<DbWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
-               "status = %s, id_parent = %s, created = %s, extra_data = %s)" \
-               % (str(self.id), str(self.get_data()), str(self.id_workflow),
-                  str(self.status), str(self.id_parent), str(self.created),
-                  str(self.get_extra_data()))
+        return "<DbWorkflowObject(id = %s, id_workflow = %s, " \
+               "status = %s, id_parent = %s, created = %s, )" \
+               % (str(self.id), str(self.id_workflow), str(self.status),
+                  str(self.id_parent), str(self.created))
 
     def __eq__(self, other):
         """Enable equal operators on DbWorkflowObjects."""
