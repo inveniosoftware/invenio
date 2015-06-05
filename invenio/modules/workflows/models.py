@@ -192,12 +192,12 @@ class Workflow(db.Model):
                         default=WorkflowStatus.NEW, nullable=False)
     objects = db.relationship("DbWorkflowObject",
                               backref='bwlWORKFLOW',
-                              cascade="all, delete, delete-orphan")
+                              cascade="all, delete-orphan")
     module_name = db.Column(db.String(64), nullable=False)
 
     child_logs = db.relationship("DbWorkflowEngineLog",
                                  backref='bwlWORKFLOW',
-                                 cascade="all, delete, delete-orphan")
+                                 cascade="all, delete-orphan")
 
     @db.hybrid_property
     def uuid(self):
@@ -395,7 +395,6 @@ class Workflow(db.Model):
         #     {'_extra_data': base64.b64encode(cPickle.dumps(extra_data))}
         # )
 
-    # XXX Sure has a misleading name
     @classmethod
     @session_manager
     def delete(cls, uuid=None):
@@ -473,13 +472,14 @@ class DbWorkflowObject(db.Model):
                             default=_encoded_default_extra_data)
 
     _id_workflow = db.Column(db.String(36),
-                             db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
+                             db.ForeignKey("bwlWORKFLOW.uuid", ondelete='CASCADE'),
+                             nullable=True)
 
     status = db.Column(ChoiceType(ObjectStatus, impl=db.Integer()),
                        default=ObjectStatus.INITIAL, nullable=False,
                        index=True)
 
-    id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
+    id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id", ondelete='CASCADE'),
                           default=None)
 
     child_objects = db.relationship("DbWorkflowObject", remote_side=[id_parent])
@@ -497,7 +497,7 @@ class DbWorkflowObject(db.Model):
 
     child_logs = db.relationship("DbWorkflowObjectLog",
                                  backref='bibworkflowobject',
-                                 cascade="all, delete, delete-orphan")
+                                 cascade="all, delete-orphan")
 
     callback_pos = db.Column(CallbackPosType())  # ex-task_counter
 
@@ -1048,7 +1048,7 @@ class DbWorkflowObjectLog(db.Model):
     __tablename__ = 'bwlOBJECTLOGGING'
     id = db.Column(db.Integer, primary_key=True)
     id_object = db.Column(db.Integer,
-                          db.ForeignKey('bwlOBJECT.id'),
+                          db.ForeignKey('bwlOBJECT.id', ondelete='CASCADE'),
                           nullable=False)
     log_type = db.Column(db.Integer, default=0, nullable=False)
     created = db.Column(db.DateTime, default=datetime.now)
