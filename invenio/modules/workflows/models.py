@@ -251,7 +251,7 @@ class Workflow(db.Model):
     def counter_finished(self, value):
         pass
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         """Return `extra_data` user-facing storage representations.
 
         Initialize the one requested with default content if it is not yet
@@ -271,10 +271,10 @@ class Workflow(db.Model):
             else:
                 stored_data = getattr(self, mapping.db_name)
             setattr(self, name, _decode(stored_data))
-        return self.__dict__[name]
+        return object.__getattribute__(self, name)
 
     def __dir__(self):
-        """Restore auto-completion for names found via `__getattr__`."""
+        """Restore auto-completion for names found via `__getattribute__`."""
         dir_ = dir(type(self)) + list(self.__dict__.keys())
         dir_.extend(('extra_data',))
         return sorted(dir_)
@@ -532,7 +532,7 @@ class DbWorkflowObject(db.Model):
     def version_setter(self, value):
         pass
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         """Return `data` and `extra_data` user-facing storage representations.
 
         Initialize the one requested with default content if it is not yet
@@ -553,10 +553,10 @@ class DbWorkflowObject(db.Model):
             else:
                 stored_data = getattr(self, mapping.db_name)
             setattr(self, name, _decode(stored_data))
-        return self.__dict__[name]
+        return object.__getattribute__(self, name)
 
     def __dir__(self):
-        """Restore auto-completion for names found via `__getattr__`."""
+        """Restore auto-completion for names found via `__getattribute__`."""
         dir_ = dir(type(self)) + list(self.__dict__.keys())
         dir_.extend(('data', 'extra_data',))
         return sorted(dir_)

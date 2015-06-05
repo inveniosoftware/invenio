@@ -75,11 +75,12 @@ class BibWorkflowEngine(DbWorkflowEngine):
         dir_.extend(('extra_data',))
         return sorted(dir_)
 
-    def __getattr__(self, name):
+    def __getattribute__(self, name):
         """Return `extra_data` user-facing storage representations."""
         if name == 'extra_data':
             return self.db_obj.extra_data
-        return self.__dict__[name]
+        else:
+            return object.__getattribute__(self, name)
 
     def __setattr__(self, name, val):
         """Set `extra_data` user-facing storage representations."""
