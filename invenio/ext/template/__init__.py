@@ -231,4 +231,8 @@ def setup_app(app):
         )
         return rv
 
+    @app.template_test('list')
+    def _is_list(value):
+        return isinstance(value, list)
+
     return app
