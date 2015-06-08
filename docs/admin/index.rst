@@ -30,7 +30,6 @@ Admin's Guide
    bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
-   bibformat-admin-guide
    bibindex-admin-guide
    bibknowledge-admin-guide
    bibmatch-admin-guide

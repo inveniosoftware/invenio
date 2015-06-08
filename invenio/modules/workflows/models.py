@@ -27,8 +27,6 @@ from datetime import datetime
 
 from invenio.base.globals import cfg
 from invenio.base.helpers import unicodifier
-from invenio.base.utils import classproperty
-from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 
@@ -53,12 +51,6 @@ class ObjectVersion(object):
     ERROR = 5
     MAPPING = {"New": 0, "Done": 1, "Need action": 2,
                "In process": 3, "Waiting": 4, "Error": 5}
-
-    @classproperty
-    @deprecated("Please use ObjectVersion.COMPLETED "
-                "instead of ObjectVersion.FINAL", RemovedInInvenio22Warning)
-    def FINAL(cls):
-        return cls.COMPLETED
 
     @classmethod
     def name_from_version(cls, version):

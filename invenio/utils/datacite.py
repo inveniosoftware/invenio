@@ -23,63 +23,13 @@ from __future__ import absolute_import
 
 import re
 import urllib2
-import warnings
 
-from datacite import DataCiteMDSClient
-from datacite.errors import DataCiteBadRequestError, \
-    DataCiteForbiddenError, \
-    DataCiteGoneError, \
-    DataCiteNoContentError, \
-    DataCiteNotFoundError, \
-    DataCitePreconditionError, \
-    DataCiteRequestError, \
-    DataCiteServerError, \
-    DataCiteUnauthorizedError
-from datacite.request import DataCiteRequest
-
-from invenio.base.globals import cfg
-from invenio.utils.deprecation import RemovedInInvenio22Warning
 from invenio.utils.xmlDict import ElementTree, XmlDictConfig
 
 
 __all__ = (
-    'DataCite', 'DataciteMetadata', 'DataCiteRequest',
-    'DataCiteServerError', 'DataCiteRequestError', 'DataCiteNoContentError',
-    'DataCiteBadRequestError', 'DataCiteUnauthorizedError',
-    'DataCiteForbiddenError', 'DataCiteNotFoundError', 'DataCiteGoneError',
-    'DataCitePreconditionError'
+    'DataciteMetadata',
 )
-
-
-class DataCite(DataCiteMDSClient):
-
-    """DataCite API wrapper.
-
-    .. deprecated:: 2.0.2
-       Use http://datacite.readthedocs.org/en/latest/ instead.
-    """
-
-    def __init__(self, username=None, password=None, url=None, prefix=None,
-                 test_mode=None, api_ver="2"):
-        """Initialize API client.
-
-        Compatibility layer on top of external DataCite API client.
-        """
-        warnings.warn("Use of invenio.utils.datacite:DataCite is "
-                      "deprecated in favor of "
-                      "http://datacite.readthedocs.org/en/latest/.",
-                      RemovedInInvenio22Warning)
-
-        super(DataCite, self).__init__(
-            username=username or cfg.get('CFG_DATACITE_USERNAME', ''),
-            password=password or cfg.get('CFG_DATACITE_PASSWORD', ''),
-            url=url or cfg.get('CFG_DATACITE_URL',
-                               'https://mds.datacite.org/'),
-            prefix=prefix or cfg.get('CFG_DATACITE_DOI_PREFIX', '10.5072'),
-            test_mode=test_mode if test_mode is not None else cfg.get(
-                'CFG_DATACITE_TESTMODE', False),
-            api_ver=api_ver or "2"
-        )
 
 
 class DataciteMetadata(object):

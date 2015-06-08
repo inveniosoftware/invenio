@@ -24,14 +24,13 @@ __revision__ = "$Id$"
 
 # pylint: disable=C0301
 
-import os
 import pkg_resources
 import sys
 
+from invenio.base.config import PACKAGES
 from invenio.base.globals import cfg
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
 from flask_registry import PkgResourcesDirDiscoveryRegistry, RegistryProxy, \
     ImportPathRegistry, ModuleAutoDiscoveryRegistry
 
@@ -39,8 +38,6 @@ bibformat = lazy_import('invenio.modules.formatter')
 bibformat_engine = lazy_import('invenio.modules.formatter.engine')
 bibformat_utils = lazy_import('invenio.modules.formatter.utils')
 bibformat_config = lazy_import('invenio.modules.formatter.config')
-bibformatadminlib = lazy_import('invenio.legacy.bibformat.adminlib')
-format_templates = lazy_import('invenio.modules.formatter.testsuite.format_templates')
 gettext_set_language = lazy_import('invenio.base.i18n:gettext_set_language')
 
 TEST_PACKAGES = [
@@ -52,225 +49,10 @@ TEST_PACKAGES = [
 test_registry = RegistryProxy('test_registry', ImportPathRegistry,
                               initial=TEST_PACKAGES)
 
-format_templates_registry = lambda: PkgResourcesDirDiscoveryRegistry(
-    'format_templates', registry_namespace=test_registry)
-
-format_elements_registry = lambda: ModuleAutoDiscoverySubRegistry(
-    'format_elements', registry_namespace=test_registry, silent=True)
-
 output_formats_directories_registry = lambda: ModuleAutoDiscoveryRegistry(
     'output_formats', registry_namespace=test_registry, silent=True
 )
 
-
-class FormatTemplateTest(InvenioTestCase):
-    """ bibformat - tests on format templates"""
-
-    def setUp(self):
-        self.app.extensions['registry']['format_templates'] = format_templates_registry()
-
-    def tearDown(self):
-        del self.app.extensions['registry']['format_templates']
-
-    def test_get_format_template(self):
-        """bibformat - format template parsing and returned structure"""
-
-        #Test correct parsing and structure
-        template_1 = bibformat_engine.get_format_template("Test1.bft", with_attributes=True)
-        self.assert_(template_1 is not None)
-        self.assertEqual(template_1['code'],  "test\n<name>this value should stay as it is</name>\n<description>this one too</description>\n")
-        self.assertEqual(template_1['attrs']['name'], "name_test")
-        self.assertEqual(template_1['attrs']['description'], "desc_test")
-
-        #Test correct parsing and structure of file without description or name
-        template_2 = bibformat_engine.get_format_template("Test_2.bft", with_attributes=True)
-        self.assert_(template_2 is not None)
-        self.assertEqual(template_2['code'],  "test")
-        self.assertEqual(template_2['attrs']['name'], "Test_2.bft")
-        self.assertEqual(template_2['attrs']['description'], "")
-
-        #Test correct parsing and structure of file without description or name
-        unknown_template = bibformat_engine.get_format_template("test_no_template.test", with_attributes=True)
-        self.assertEqual(unknown_template,  None)
-
-
-    def test_get_format_templates(self):
-        """ bibformat - loading multiple format templates"""
-        templates = bibformat_engine.get_format_templates(with_attributes=True)
-        #test correct loading
-        self.assert_("Test1.bft" in templates.keys())
-        self.assert_("Test_2.bft" in templates.keys())
-        self.assert_("Test3.bft" in templates.keys())
-        self.assert_("Test_no_template.test" not in templates.keys())
-
-        #Test correct pasrsing and structure
-        self.assertEqual(templates['Test1.bft']['code'],  "test\n<name>this value should stay as it is</name>\n<description>this one too</description>\n")
-        self.assertEqual(templates['Test1.bft']['attrs']['name'], "name_test")
-        self.assertEqual(templates['Test1.bft']['attrs']['description'], "desc_test")
-
-    def test_get_format_template_attrs(self):
-        """ bibformat - correct parsing of attributes in format template"""
-        attrs = bibformat_engine.get_format_template_attrs("Test1.bft")
-        self.assertEqual(attrs['name'], "name_test")
-        self.assertEqual(attrs['description'], "desc_test")
-
-
-class FormatElementTest(InvenioTestCase):
-    """ bibformat - tests on format templates"""
-
-    def setUp(self):
-        # pylint: disable=C0103
-        """bibformat - setting python path to test elements"""
-        self.app.extensions['registry']['format_elements'] = format_elements_registry()
-
-    def tearDown(self):
-        del self.app.extensions['registry']['format_elements']
-
-    def test_resolve_format_element_filename(self):
-        """bibformat - resolving format elements filename """
-        #Test elements filename starting without bfe_, with underscore instead of space
-        filenames = ["test 1", "test 1.py", "bfe_test 1", "bfe_test 1.py", "BFE_test 1",
-                     "BFE_TEST 1", "BFE_TEST 1.py", "BFE_TeST 1.py", "BFE_TeST 1",
-                     "BfE_TeST 1.py", "BfE_TeST 1", "test_1", "test_1.py", "bfe_test_1",
-                     "bfe_test_1.py", "BFE_test_1",
-                     "BFE_TEST_1", "BFE_TEST_1.py", "BFE_Test_1.py", "BFE_TeST_1",
-                     "BfE_TeST_1.py", "BfE_TeST_1"]
-
-        for i in range(len(filenames)-2):
-            filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
-            self.assert_(filename_1 is not None)
-
-            filename_2 = bibformat_engine.resolve_format_element_filename(filenames[i+1])
-            self.assertEqual(filename_1, filename_2)
-
-
-        #Test elements filename starting with bfe_, and with underscores instead of spaces
-        filenames = ["test 2", "test 2.py", "bfe_test 2", "bfe_test 2.py", "BFE_test 2",
-                     "BFE_TEST 2", "BFE_TEST 2.py", "BFE_TeST 2.py", "BFE_TeST 2",
-                     "BfE_TeST 2.py", "BfE_TeST 2", "test_2", "test_2.py", "bfe_test_2",
-                     "bfe_test_2.py", "BFE_test_2",
-                     "BFE_TEST_2", "BFE_TEST_2.py", "BFE_TeST_2.py", "BFE_TeST_2",
-                     "BfE_TeST_2.py", "BfE_TeST_2"]
-
-        for i in range(len(filenames)-2):
-            filename_1 = bibformat_engine.resolve_format_element_filename(filenames[i])
-            self.assert_(filename_1 is not None)
-
-            filename_2 = bibformat_engine.resolve_format_element_filename(filenames[i+1])
-            self.assertEqual(filename_1, filename_2)
-
-        #Test non existing element
-        non_existing_element = bibformat_engine.resolve_format_element_filename("BFE_NON_EXISTING_ELEMENT")
-        self.assertEqual(non_existing_element, None)
-
-    def test_get_format_element(self):
-        """bibformat - format elements parsing and returned structure"""
-        #Test loading with different kind of names, for element with spaces in name, without bfe_
-        element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
-        self.assert_(element_1 is not None)
-        element_1_bis = bibformat_engine.get_format_element("bfe_tEst_1.py", with_built_in_params=True)
-        self.assertEqual(element_1, element_1_bis)
-
-        #Test loading with different kind of names, for element without spaces in name, wit bfe_
-        element_2 = bibformat_engine.get_format_element("test 2", with_built_in_params=True)
-        self.assert_(element_2 is not None)
-        element_2_bis = bibformat_engine.get_format_element("bfe_tEst_2.py", with_built_in_params=True)
-        self.assertEqual(element_2, element_2_bis)
-
-        #Test loading incorrect elements
-        try:
-            element_3 = bibformat_engine.get_format_element("test 3", with_built_in_params=True)
-        except bibformat_engine.InvenioBibFormatError as e:
-            self.assertEqual(str(e), 'Format element test 3 could not be found.')
-        else:
-            self.fail("Should have raised InvenioBibFormatError")
-
-        try:
-            element_4 = bibformat_engine.get_format_element("test 4", with_built_in_params=True)
-        except bibformat_engine.InvenioBibFormatError as e:
-            self.assertEqual(str(e), 'Format element test 4 could not be found.')
-        else:
-            self.fail("Should have raised SyntaxError")
-
-        try:
-            unknown_element = bibformat_engine.get_format_element("TEST_NO_ELEMENT", with_built_in_params=True)
-        except bibformat_engine.InvenioBibFormatError as e:
-            self.assertEqual(str(e), 'Format element TEST_NO_ELEMENT could not be found.')
-        else:
-            self.fail("Should have raised InvenioBibFormatError")
-
-        #Test element without docstring
-        element_5 = bibformat_engine.get_format_element("test_5", with_built_in_params=True)
-        self.assert_(element_5 is not None)
-        self.assertEqual(element_5['attrs']['description'], '')
-        self.assert_({'name': "param1",
-                     'description': "(no description provided)",
-                     'default': ""} in element_5['attrs']['params'])
-        self.assertEqual(element_5['attrs']['seealso'], [])
-
-        #Test correct parsing:
-
-        #Test type of element
-        self.assertEqual(element_1['type'], "python")
-        #Test name = element filename, with underscore instead of spaces,
-        #without BFE_ and uppercase
-        self.assertEqual(element_1['attrs']['name'], "TEST_1")
-        #Test description parsing
-        self.assertEqual(element_1['attrs']['description'], "Prints test")
-        #Test @see: parsing
-        self.assertEqual(element_1['attrs']['seealso'], ["element2.py", "unknown_element.py"])
-        #Test @param parsing
-        self.assert_({'name': "param1",
-                      'description': "desc 1",
-                      'default': ""} in element_1['attrs']['params'])
-
-        self.assert_({'name': "param2",
-                      'description': "desc 2",
-                      'default': "default value"} in element_1['attrs']['params'])
-
-
-
-        #Test non existing element
-        try:
-            non_existing_element = bibformat_engine.get_format_element("BFE_NON_EXISTING_ELEMENT")
-        except bibformat_engine.InvenioBibFormatError as e:
-            self.assertEqual(str(e), 'Format element BFE_NON_EXISTING_ELEMENT could not be found.')
-        else:
-            self.fail("Should have raised InvenioBibFormatError")
-
-    def test_get_format_element_attrs_from_function(self):
-        """ bibformat - correct parsing of attributes in 'format' docstring"""
-        element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
-        function = element_1['code']
-        attrs = bibformat_engine.get_format_element_attrs_from_function(function,
-                                                                        element_1['attrs']['name'],
-                                                                        with_built_in_params=True)
-
-        self.assertEqual(attrs['name'], "TEST_1")
-        #Test description parsing
-        self.assertEqual(attrs['description'], "Prints test")
-        #Test @see: parsing
-        self.assertEqual(attrs['seealso'], ["element2.py", "unknown_element.py"])
-
-    def test_get_format_elements(self):
-        """bibformat - multiple format elements parsing and returned structure"""
-        elements = bibformat_engine.get_format_elements()
-        self.assert_(isinstance(elements, dict))
-        self.assertEqual(elements['TEST_1']['attrs']['name'], "TEST_1")
-        self.assertEqual(elements['TEST_2']['attrs']['name'], "TEST_2")
-        self.assert_("TEST_3" not in elements.keys())
-        self.assert_("TEST_4" not in elements.keys())
-
-    def test_get_tags_used_by_element(self):
-        """bibformat - identification of tag usage inside element"""
-        del self.app.extensions['registry']['format_elements']
-        from invenio.modules.formatter.registry import format_elements
-        list(format_elements)
-        bibformat_engine.TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements.cache.clear()
-        #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = self.old_import_path
-        tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
-        self.failUnless(len(tags) == 4,
-                        'Could not correctly identify tags used in bfe_abstract.py')
 
 class OutputFormatTest(InvenioTestCase):
     """ bibformat - tests on output formats"""
@@ -598,6 +380,12 @@ class MiscTest(InvenioTestCase):
 class FormatTest(InvenioTestCase):
     """ bibformat - generic tests on function that do the formatting. Main functions"""
 
+    @property
+    def config(self):
+        data = super(FormatTest, self).config
+        data['PACKAGES'] = TEST_PACKAGES + data.get('PACKAGES', PACKAGES)
+        return data
+
     def setUp(self):
         # pylint: disable=C0103
         """ bibformat - prepare BibRecord objects"""
@@ -706,25 +494,12 @@ class FormatTest(InvenioTestCase):
             output_formats_directories_registry()
         from invenio.modules.formatter.registry import output_formats as ofs
         ofs.expunge()
-        self.app.extensions['registry']['format_elements'] = format_elements_registry()
-        self.app.extensions['registry']['format_templates'] = format_templates_registry()
-        from invenio.modules.formatter.registry import format_templates_lookup
-        format_templates_lookup.expunge()
-        #self.old_import_path = cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH']
-        #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        self.old_templates_path = cfg['CFG_BIBFORMAT_TEMPLATES_PATH']
-        cfg['CFG_BIBFORMAT_TEMPLATES_PATH'] = format_templates.__path__[0]
 
     def tearDown(self):
         sys.path.pop()
         del self.app.extensions['registry']['output_formats_directories']
         from invenio.modules.formatter.registry import output_formats
         output_formats.expunge()
-        from invenio.modules.formatter.registry import format_templates_lookup
-        format_templates_lookup.expunge()
-        del self.app.extensions['registry']['format_elements']
-        #cfg['CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH'] = self.old_import_path
-        cfg['CFG_BIBFORMAT_TEMPLATES_PATH'] = self.old_templates_path
 
     def test_decide_format_template(self):
         """ bibformat - choice made by function decide_format_template"""
@@ -732,7 +507,7 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(result, "Thesis_detailed.bft")
 
         result = bibformat_engine.decide_format_template(self.bfo_3, "test3")
-        self.assertEqual(result, "Test3.bft")
+        self.assertEqual(result, "Test3.tpl")
 
         #Only default matches
         result = bibformat_engine.decide_format_template(self.bfo_2, "test1")
@@ -752,14 +527,14 @@ class FormatTest(InvenioTestCase):
 
     def test_format_record(self):
         """ bibformat - correct formatting"""
+        from jinja2 import TemplateNotFound
         #use output format that has no match TEST DISABLED DURING MIGRATION
         #result = bibformat_engine.format_record(recID=None, of="test2", xml_record=self.xml_text_2)
         #self.assertEqual(result.replace("\n", ""),"")
 
         #use output format that link to unknown template
-        result, needs_2nd_pass = bibformat_engine.format_record(recID=None, of="test3", xml_record=self.xml_text_2)
-        self.assertEqual(result.replace("\n", ""), "")
-        self.assertEqual(needs_2nd_pass, False)
+        self.assertRaises(TemplateNotFound, bibformat_engine.format_record,
+                          recID=None, of="test3", xml_record=self.xml_text_2)
 
         #Unknown output format TEST DISABLED DURING MIGRATION
         #result = bibformat_engine.format_record(recID=None, of="unkno", xml_record=self.xml_text_3)
@@ -767,7 +542,7 @@ class FormatTest(InvenioTestCase):
 
         #Default formatting
         result, needs_2nd_pass = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
-        self.assertEqual(result, '''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
+        self.assertEqual(result, '''<h1>hi</h1> this is my template''')
         self.assertEqual(needs_2nd_pass, False)
 
     def test_empty_formatting(self):
@@ -786,88 +561,6 @@ class FormatTest(InvenioTestCase):
 #                                                 verbose=9,
 #                                                 xml_record=self.empty_record_xml)
 #         self.assertEqual(result, self.empty_record_xml)
-
-    def test_format_with_format_template(self):
-        """ bibformat - correct formatting with given template"""
-        del self.app.extensions['registry']['output_formats_directories']
-        from invenio.modules.formatter.registry import output_formats
-        output_formats.expunge()
-        list(output_formats)
-        template = bibformat_engine.get_format_template("Test3.bft")
-        result, no_cache = bibformat_engine.format_with_format_template(
-                                        format_template_filename=None,
-                                        bfo=self.bfo_1,
-                                        verbose=0,
-                                        format_template_code=template['code'])
-
-        self.assertEqual(result, '''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
-        self.assertEqual(no_cache, False)
-
-
-    def test_format_2_passes_manually(self):
-        result, needs_2nd_pass = bibformat_engine.format_record(
-                                                recID=None,
-                                                of="test6",
-                                                xml_record=self.xml_text_2)
-        self.assertEqual(result, "<bfe_test_6 />\n")
-        self.assertEqual(needs_2nd_pass, True)
-
-        out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      xml_record=self.xml_text_2,
-                                                      template=result)
-        self.assertEqual(out, "helloworld\n")
-
-    def test_format_translations_no_2nd_pass_en(self):
-        result, needs_2nd_pass = bibformat_engine.format_record(
-                                                recID=None,
-                                                of="test7",
-                                                xml_record=self.xml_text_2,
-                                                ln='en')
-        self.assertEqual(result.strip(), 'Title en\n<input type="button" value="Record"/>')
-        self.assertEqual(needs_2nd_pass, False)
-
-    def test_format_translations_no_2nd_pass_fr(self):
-        ln = 'fr'
-        result, needs_2nd_pass = bibformat_engine.format_record(
-                                                recID=None,
-                                                of="test7",
-                                                xml_record=self.xml_text_2,
-                                                ln=ln)
-        _ = gettext_set_language(ln)
-        self.assertEqual(result.strip(), 'Titre fr\n<input type="button" value="%s"/>' % _('Record'))
-        self.assertEqual(needs_2nd_pass, False)
-
-    def test_format_translations_with_2nd_pass_en(self):
-        result, needs_2nd_pass = bibformat_engine.format_record(
-                                                recID=None,
-                                                of="test8",
-                                                xml_record=self.xml_text_2,
-                                                ln='en')
-        self.assertEqual(result.strip(), '<lang>\n  <en>Title en</en>\n  <fr>Titre fr</fr>\n</lang>\n<bfe_test_6 />\n<input type="button" value="_(Record)_"/>')
-        self.assertEqual(needs_2nd_pass, True)
-
-        out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      template=result,
-                                                      xml_record=self.xml_text_2,
-                                                      ln='en')
-        self.assertEqual(out, 'Title en\nhelloworld\n<input type="button" value="Record"/>')
-
-    def test_format_translations_with_2nd_pass_fr(self):
-        ln = 'fr'
-        result, needs_2nd_pass = bibformat_engine.format_record(
-                                                recID=None,
-                                                of="test8",
-                                                xml_record=self.xml_text_2,
-                                                ln=ln)
-        _ = gettext_set_language(ln)
-        self.assertEqual(result.strip(), '<lang>\n  <en>Title en</en>\n  <fr>Titre fr</fr>\n</lang>\n<bfe_test_6 />\n<input type="button" value="_(Record)_"/>')
-        self.assertEqual(needs_2nd_pass, True)
-
-        out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      template=result,
-                                                      xml_record=self.xml_text_2,
-                                                      ln=ln)
-        self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="%s"/>' % _('Record'))
 
     def test_engine_xslt_format(self):
         from ..engines import xslt
@@ -938,25 +631,19 @@ class MarcFilteringTest(InvenioTestCase):
 class BibFormat2ndPassTest(InvenioTestCase):
     """Check for 2 passes parsing for record"""
 
+    @property
+    def config(self):
+        data = super(BibFormat2ndPassTest, self).config
+        data['PACKAGES'] = TEST_PACKAGES + data.get('PACKAGES', PACKAGES)
+        return data
+
     def setUp(self):
-        self.app.extensions['registry']['format_templates'] = format_templates_registry()
-        self.app.extensions['registry']['format_elements'] = format_elements_registry()
-        self.app.extensions['registry']['output_formats_directories'] = output_formats_directories_registry()
-        from invenio.modules.formatter.registry import output_formats
-        output_formats.expunge()
         self.xml_text = '''<record>
     <controlfield tag="001">33</controlfield>
     <datafield tag="980" ind1="" ind2="">
         <subfield code="b">thesis </subfield>
     </datafield>
 </record>'''
-
-    def tearDown(self):
-        from invenio.modules.formatter.registry import output_formats
-        output_formats.expunge()
-        del self.app.extensions['registry']['output_formats_directories']
-        del self.app.extensions['registry']['format_templates']
-        del self.app.extensions['registry']['format_elements']
 
     def test_format_2_passes(self):
         from invenio.modules.formatter import format_record
@@ -966,9 +653,7 @@ class BibFormat2ndPassTest(InvenioTestCase):
 
 
 
-TEST_SUITE = make_test_suite(FormatTemplateTest,
-                             OutputFormatTest,
-                             FormatElementTest,
+TEST_SUITE = make_test_suite(OutputFormatTest,
                              PatternTest,
                              MiscTest,
                              FormatTest,

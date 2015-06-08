@@ -75,7 +75,6 @@ def populate(packages=[], default_data=True, files=None,
     # Load cli interfaces for tools that we are going to need
     from invenio.legacy.bibupload.engine import main as bibupload
     from invenio.legacy.bibindex.engine import main as bibindex
-    from invenio.legacy.bibformat.bibreformat import main as bibreformat
     from invenio.legacy.oairepository.updater import main as oairepositoryupdater
     from invenio.legacy.bibsort.daemon import main as bibsort
     from invenio.legacy.bibdocfile.cli import main as bibdocfile
@@ -126,8 +125,6 @@ def populate(packages=[], default_data=True, files=None,
         (bibindex, "bibindex %d" % i()),
         (bibindex, "bibindex -u admin -w global"),
         (bibindex, "bibindex %d" % i()),
-        (bibreformat, "bibreformat -u admin -o HB"),
-        (bibreformat, "bibreformat %d" % i()),
         (bibrank, "bibrank -u admin"),
         (bibrank, "bibrank %d" % i()),
         (bibsort, "bibsort -u admin -R"),

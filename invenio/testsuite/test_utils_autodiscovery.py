@@ -32,10 +32,6 @@ class AutodiscoveryTest(InvenioTestCase):
 
     def test_autodiscover_modules(self):
         """autodiscover modules"""
-        modules = autodiscover_modules(
-            ['invenio.modules.formatter.format_elements'],
-            related_name_re='bfe_.+', ignore_exceptions=True)
-        assert(len(modules) > 10)
         modules = autodiscover_modules(['invenio.base'], related_name_re='config')
         assert(len(modules) == 1)
         assert(None not in modules)

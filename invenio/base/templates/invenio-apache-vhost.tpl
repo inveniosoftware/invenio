@@ -108,9 +108,9 @@ WSGIPythonHome {{pythonhome}}
                     config.CFG_WEBSUBMIT_STORAGEDIR,
                     config.DEPOSIT_STORAGEDIR,
                     config.CFG_TMPDIR,
-                    [config.CFG_PREFIX, 'var', 'tmp', 'attachfile']|path_join,
-                    [config.CFG_PREFIX, 'var', 'data', 'comments']|path_join,
-                    [config.CFG_PREFIX, 'var', 'data', 'baskets', 'comments']|path_join,
+                    [config.CFG_TMPDIR, 'attachfile']|path_join,
+                    [config.CFG_DATADIR, 'comments']|path_join,
+                    [config.CFG_DATADIR, 'baskets', 'comments']|path_join,
                     '/tmp'] %}
         {% if xsfp %}{{ '#' if not config.CFG_BIBDOCFILE_USE_XSENDFILE }}XSendFilePath {{ xsfp }}{% endif %}
     {%- endfor -%}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+# Copyright (C) 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,24 +16,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Creates the <img> element of the big thumbnail
-"""
 
+"""Test Formater Blueprint."""
 
-def format_element(bfo, z_field="POSTER"):
-    """ Called bz Bibformat to create the element.
-    """
-    fields = bfo.fields('8564_')
-    if fields:
-        for field in fields:
-            if field.get('z') == z_field:
-                url = field.get('u', '')
-                alt = field.get('y', '')
-                return '<img src=\"%s\" alt=\"%s\"/>' % (url, alt)
+from __future__ import unicode_literals
 
-def escape_values(bfo):
-    """
-    Called by BibFormat in order to check if output of this element
-    should be escaped.
-    """
-    return 
+from flask import Blueprint
+
+blueprint = Blueprint('test_formatter', __name__,
+                      template_folder='templates', static_folder='static')

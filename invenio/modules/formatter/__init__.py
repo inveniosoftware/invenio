@@ -83,17 +83,6 @@ def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
         on_the_fly=on_the_fly,
         save_missing=save_missing,
         **kwargs)
-    if needs_2nd_pass or force_2nd_pass:
-        out = bibformat_engine.format_record_2nd_pass(
-            recID=recID,
-            of=of,
-            template=out,
-            ln=ln,
-            verbose=verbose,
-            search_pattern=search_pattern,
-            xml_record=xml_record,
-            user_info=user_info,
-            **kwargs)
 
     return out
 

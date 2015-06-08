@@ -1,4 +1,4 @@
 rules:
-- {field: 980.a, template: Unknown.bft, value: 'PICTURE'}
-- {field: 980.a, template: Test3.bft, value: 'ARTICLE'}
-default: Default_unknown.bft
+- {field: 980.a, template: Unknown.tpl, value: 'PICTURE'}
+- {field: 980.a, template: Test3.tpl, value: 'ARTICLE'}
+default: Default_unknown.tpl

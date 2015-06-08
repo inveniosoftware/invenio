@@ -24,16 +24,12 @@ from __future__ import unicode_literals
 import distutils.sysconfig
 from os.path import join
 
-from werkzeug import LocalProxy
-
-from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.utils.shell import which
 from invenio.version import __version__
 
 
 EXTENSIONS = [
     'invenio.ext.confighacks',
-    'invenio.ext.jinja2hacks',
     'invenio.ext.passlib:Passlib',
     'invenio.ext.debug_toolbar',
     'invenio.ext.babel',
@@ -83,14 +79,6 @@ LEGACY_WEBINTERFACE_EXCLUDE = [
 
 _cfg_prefix = distutils.sysconfig.get_config_var("prefix")
 
-
-@deprecated(
-    'Use a more specific variable from invenio/base/config.py instead',
-    RemovedInInvenio22Warning)
-def _cfg_prefix_for_proxy():
-    return _cfg_prefix
-
-CFG_PREFIX = LocalProxy(_cfg_prefix_for_proxy)
 CFG_DATADIR = join(_cfg_prefix, 'var', 'data')
 CFG_BATCHUPLOADER_DAEMON_DIR = join(_cfg_prefix, "var", "batchupload")
 CFG_BATCHUPLOADER_DAEMON_DIR = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \

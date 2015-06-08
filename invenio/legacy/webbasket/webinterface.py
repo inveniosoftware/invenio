@@ -27,7 +27,7 @@ import cgi
 import urllib
 from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
-                           CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
+                           CFG_SITE_SECURE_URL, CFG_DATADIR, CFG_SITE_LANG
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language
@@ -208,11 +208,11 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
                            'bskid': argd['bskid'],
                            'CFG_SITE_SECURE_URL': CFG_SITE_SECURE_URL}
         # Path to directory where uploaded files are saved
-        user_files_absolute_path = '%(CFG_PREFIX)s/var/data/baskets/comments/%(bskid)s/%(recid)s/%(uid)s' % \
+        user_files_absolute_path = '%(CFG_DATADIR)s/baskets/comments/%(bskid)s/%(recid)s/%(uid)s' % \
                                    {'uid': uid,
                                     'recid': argd['recid'],
                                     'bskid': argd['bskid'],
-                                    'CFG_PREFIX': CFG_PREFIX}
+                                    'CFG_DATADIR': CFG_DATADIR}
 
         # Check that user can
         # 1. is logged in

@@ -282,9 +282,7 @@ Some further remarks on this templating system:
 1.3 Look of Bibliographic References
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Bibliographic metadata is formatted using
-`BibFormat <bibformat-admin>`__. Read the `BibFormat
-documentation <bibformat-admin-guide>`__ for more information.
+Bibliographic metadata is formatted using ``formatter`` module.
 
 1.4 Specific Configurations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

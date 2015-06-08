@@ -37,21 +37,15 @@ L{BibFormatObject} class directly. For eg:
 """
 
 import cgi
-import inspect
 import os
 import re
-import sys
-import traceback
 import types
-import warnings
-from HTMLParser import HTMLParseError
-from operator import itemgetter
 
-from flask import current_app, has_app_context
-from six import iteritems
+from HTMLParser import HTMLParseError
+
+from flask import current_app
 from werkzeug.utils import cached_property
 
-import invenio.legacy.bibformat.dblayer as bibformat_dblayer
 from invenio.base.globals import cfg
 from invenio.base.i18n import gettext_set_language, language_list_long, \
     wash_language
@@ -67,10 +61,8 @@ from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.formatter.registry import template_context_functions
 from invenio.modules.formatter.utils import parse_tag
 from invenio.modules.knowledge.api import get_kbr_values
-from invenio.utils.deprecation import RemovedInInvenio22Warning
 from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST, \
     CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, HTMLWasher
-from invenio.utils.memoise import memoize
 
 from . import registry
 from .config import CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
@@ -81,7 +73,6 @@ from .engines import xslt
 
 # Cache for data we have already read and parsed
 format_templates_cache = {}
-format_elements_cache = {}
 format_outputs_cache = {}
 
 html_field = '<!--HTML-->' # String indicating that field should be
@@ -192,8 +183,6 @@ sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 
 
-
-
 class LazyTemplateContextFunctionsCache(object):
     """Loads bibformat elements using plugin builder and caches results."""
 
@@ -209,80 +198,7 @@ class LazyTemplateContextFunctionsCache(object):
 
         return elem
 
-    @memoize
-    def bibformat_elements(self, modules=None):
-        """Returns bibformat elements."""
-        if modules is None:
-            modules = registry.format_elements
-
-        elem = {}
-        for m in modules:
-            if m is None:
-                continue
-            name = m.__name__.split('.')[-1]
-            if name in elem:
-                continue
-            filename = m.__file__[:-1] if m.__file__.endswith('.pyc') \
-                else m.__file__
-            register_func = getattr(m, 'format_element',
-                                    getattr(m, 'format', None))
-            escape_values = getattr(m, 'escape_values', None)
-            if register_func and isinstance(register_func, types.FunctionType):
-                register_func._escape_values = escape_values
-                register_func.__file__ = filename
-                elem[name] = register_func
-
-        return elem
-
-    @cached_property
-    def functions(self):
-
-        def insert(name):
-            def _bfe_element(bfo, **kwargs):
-                warnings.warn(
-                    "BFE elements ({0}) are deprecated. "
-                    "Use Jinja2 filters or macros.".format(name),
-                    RemovedInInvenio22Warning
-                )
-                # convert to utf-8 for legacy app
-                kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
-                              for k, v in iteritems(kwargs))
-                format_element = get_format_element(name)
-                (out, dummy) = eval_format_element(format_element,
-                                                   bfo,
-                                                   kwargs)
-                # returns unicode for jinja2
-                return out.decode('utf-8')
-            return _bfe_element
-
-        # Old bibformat templates
-        tfn_from_files = dict((name.lower(), insert(name.lower()))
-                              for name in self.bibformat_elements().keys())
-        # Update with new template context functions
-        tfn_from_files.update(self.template_context_functions)
-
-        bfe_from_tags = {}
-        if has_app_context():
-            from invenio.ext.sqlalchemy import db
-            from invenio.modules.search.models import Tag
-
-            # get functions from tag table
-            bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
-                                  insert(fix_tag_name(name)))
-                                 for name in map(itemgetter(0),
-                                                 db.session.query(Tag.name).all()))
-
-        # overwrite functions from tag table with functions from files
-        bfe_from_tags.update(tfn_from_files)
-        return bfe_from_tags
-
 TEMPLATE_CONTEXT_FUNCTIONS_CACHE = LazyTemplateContextFunctionsCache()
-
-
-def get_format_element_path(filename):
-    if filename.endswith('.py'):
-        filename = filename[:-3]
-    return TEMPLATE_CONTEXT_FUNCTIONS_CACHE.bibformat_elements()[filename].__file__
 
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
@@ -339,10 +255,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
-    if verbose == 9 and template is not None:
-        out += """\n<br/><span class="quicknote">
-        Using %s template for record %i.
-        </span>""" % (template, recID)
 
     path = registry.format_templates_lookup.get(template)
 
@@ -350,26 +262,10 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
        template.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION)
        or path is None or os.access(path, os.R_OK)
        ):
-        # template not found in new BibFormat. Call old one
-        if verbose == 9:
-            if template is None:
-                out += """\n<br/><span class="quicknote">
-                No template found for output format %s and record %i.
-                (Check invenio.err log file for more details)
-                </span>""" % (of, recID)
-            else:
-                out += """\n<br/><span class="quicknote">
-                Template %s could not be read.
-                </span>""" % (template)
         try:
             raise InvenioBibFormatError(_('No template could be found for output format %(code)s.', code=of))
         except InvenioBibFormatError as exc:
             register_exception(req=bfo.req)
-
-            if verbose > 5:
-                out += """\n<br/><span class="quicknote">
-                          %s
-                          </span>""" % str(exc)
 
         return out, False
 
@@ -426,63 +322,10 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
     @return: formatted record
     @rtype: string
     """
-    from invenio.legacy.search_engine import record_exists
     if search_pattern is None:
         search_pattern = []
 
     out = ""
-
-    if verbose == 9:
-        out += """\n<span class="quicknote">
-        Formatting record %i with output format %s.
-        </span>""" % (recID, of)
-    if not on_the_fly and \
-       (ln == CFG_SITE_LANG or
-        of.lower() == 'xm' or
-        (of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS)) and \
-       record_exists(recID) != -1:
-        # Try to fetch preformatted record. Only possible for records
-        # formatted in CFG_SITE_LANG language (other are never
-        # stored), or of='xm' which does not depend on language.
-        # Exceptions are made for output formats defined in
-        # CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, which are
-        # always served from the same cache for any language.  Also,
-        # do not fetch from DB when record has been deleted: we want
-        # to return an "empty" record in that case
-        res, needs_2nd_pass = bibformat_dblayer.get_preformatted_record(recID, of)
-        if res is not None:
-            # record 'recID' is formatted in 'of', so return it
-            if verbose == 9:
-                last_updated = bibformat_dblayer.get_preformatted_record_date(recID, of)
-                out += """\n<br/><span class="quicknote">
-                Found preformatted output for record %i (cache updated on %s).
-                </span><br/>""" % (recID, last_updated)
-            if of.lower() == 'xm':
-                res = filter_hidden_fields(res, user_info)
-            # try to replace language links in pre-cached res, if applicable:
-            if ln != CFG_SITE_LANG and of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS:
-                # The following statements try to quickly replace any
-                # language arguments in URL links.  Not an exact
-                # science, but should work most of the time for most
-                # of the formats, with not too many false positives.
-                # We don't have time to parse output much here.
-                res = res.replace('?ln=' + CFG_SITE_LANG, '?ln=' + ln)
-                res = res.replace('&ln=' + CFG_SITE_LANG, '&ln=' + ln)
-                res = res.replace('&amp;ln=' + CFG_SITE_LANG, '&amp;ln=' + ln)
-            out += res
-            return out, needs_2nd_pass
-        else:
-            if verbose == 9:
-                out += """\n<br/><span class="quicknote">
-                No preformatted output found for record %s.
-                </span>"""% recID
-
-
-    # Live formatting of records in all other cases
-    if verbose == 9:
-        out += """\n<br/><span class="quicknote">
-        Formatting record %i on-the-fly.
-        </span>""" % recID
 
     try:
         out_, needs_2nd_pass = format_record(recID=recID,
@@ -498,16 +341,6 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
         if of.lower() in ('xm', 'xoaimarc'):
             out = filter_hidden_fields(out, user_info, force_filtering=of.lower()=='xoaimarc')
 
-        # We have spent time computing this format
-        # We want to save this effort if the format is cached
-        if save_missing and recID and ln == cfg['CFG_SITE_LANG'] \
-                and of.lower() in cfg['CFG_BIBFORMAT_CACHED_FORMATS'] \
-                and verbose == 0:
-            bibformat_dblayer.save_preformatted_record(recID,
-                                                       of,
-                                                       out,
-                                                       needs_2nd_pass)
-
         return out, needs_2nd_pass
     except Exception:
         current_app.logger.exception(
@@ -515,22 +348,6 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                 recid=recID, of=of
             ))
         raise
-
-
-def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
-                           search_pattern=None, xml_record=None,
-                           user_info=None, of=None, verbose=0, **kwargs):
-    # Create light bfo object
-    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
-    # Translations
-    template = translate_template(template, ln)
-    # Format template
-    r, dummy = format_with_format_template(format_template_filename=None,
-                                           format_template_code=template,
-                                           bfo=bfo,
-                                           verbose=verbose,
-                                           extra_context=kwargs)
-    return r
 
 
 def decide_format_template(bfo, of):
@@ -618,23 +435,7 @@ def format_with_format_template(format_template_filename, bfo,
     elif not format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         format_content = get_format_template(format_template_filename)['code']
 
-    if format_template_filename is None or \
-            format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
-        # .bft
-        warnings.warn(
-            "BFT template format ({0}) is deprecated. "
-            "Use Jinja2 templates.".format(format_template_filename),
-            RemovedInInvenio22Warning
-        )
-        evaluated_format, needs_2nd_pass = eval_format_template_elements(
-                                                        format_content,
-                                                        bfo,
-                                                        verbose)
-        if not needs_2nd_pass:
-            evaluated_format = translate_template(evaluated_format, bfo.lang)
-
-
-    elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
+    if format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
         #try:
         from functools import wraps
@@ -663,17 +464,13 @@ def format_with_format_template(format_template_filename, bfo,
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
 
-        ctx = TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions
-        if extra_context is not None:
-            ctx.update(extra_context)
-
         evaluated_format = render_template_to_string(
             'format/record/'+format_template_filename,
             recid=bfo.recID,
             record=record,
             format_record=_format_record,
             qid=qid,
-            bfo=bfo, **ctx).encode('utf-8')
+            bfo=bfo, **(extra_context or {})).encode('utf-8')
         needs_2nd_pass = False
     else:
         from invenio.modules.records.api import get_record as new_get_record
@@ -693,333 +490,6 @@ def format_with_format_template(format_template_filename, bfo,
         needs_2nd_pass = False
 
     return evaluated_format, needs_2nd_pass
-
-
-def eval_format_template_elements(format_template, bfo, verbose=0):
-    """
-    Evalutes the format elements of the given template and replace each element with its value.
-
-    Prepare the format template content so that we can directly replace the marc code by their value.
-    This implies:
-      1. Look for special tags
-      2. replace special tags by their evaluation
-
-    :param format_template: the format template code
-    :param bfo: the object containing parameters for the current formatting
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-                    5: errors, 7: errors and warnings,
-                    9: errors and warnings, stop if error (debug mode ))
-    @return: tuple (result, errors)
-    """
-    _ = gettext_set_language(bfo.lang)
-    status = {'no_cache': False}
-
-    # First define insert_element_code(match), used in re.sub() function
-    def insert_element_code(match):
-        """
-        Analyses 'match', interpret the corresponding code, and return the result of the evaluation.
-
-        Called by substitution in 'eval_format_template_elements(...)'
-
-        :param match: a match object corresponding to the special tag that must be interpreted
-        """
-
-        function_name = match.group("function_name")
-
-        # Ignore lang tags the processing is done outside
-        if function_name == 'lang':
-            return match.group(0)
-
-        try:
-            format_element = get_format_element(function_name, verbose)
-        except Exception as e:
-            register_exception(req=bfo.req)
-            format_element = None
-            if verbose >= 5:
-                return '<b><span style="color: rgb(255, 0, 0);">' + \
-                       cgi.escape(str(e)).replace('\n', '<br/>') + \
-                       '</span>'
-        if format_element is None:
-            try:
-                raise InvenioBibFormatError(
-                    _('Could not find format element named %(function_name)s.',
-                      function_name=function_name))
-            except InvenioBibFormatError as exc:
-                register_exception(req=bfo.req)
-
-            if verbose >= 5:
-                return '<b><span style="color: rgb(255, 0, 0);">' + \
-                       str(exc.message)+'</span></b>'
-        else:
-            params = {}
-            # Look for function parameters given in format template code
-            all_params = match.group('params')
-            if all_params is not None:
-                function_params_iterator = pattern_function_params.finditer(all_params)
-                for param_match in function_params_iterator:
-                    name = param_match.group('param')
-                    value = param_match.group('value')
-                    params[name] = value
-
-            if params.get('no_cache') == '1':
-                result = match.group("function_name")
-                del params['no_cache']
-                if params:
-                    params_str = ' '.join('%s="%s"' % (k, v) for k, v in params.iteritems())
-                    result = "<bfe_%s %s />" % (result, params_str)
-                else:
-                    result = "<bfe_%s />" % result
-                status['no_cache'] = True
-            else:
-                # Evaluate element with params and return (Do not return errors)
-                result, dummy = eval_format_element(format_element,
-                                                    bfo,
-                                                    params,
-                                                    verbose)
-            return result
-
-    # Substitute special tags in the format by our own text.
-    # Special tags have the form <BNE_format_element_name [param="value"]* />
-    fmt = pattern_tag.sub(insert_element_code, format_template)
-    return fmt, status['no_cache']
-
-
-def eval_format_element(format_element, bfo, parameters=None, verbose=0):
-    """
-    Returns the result of the evaluation of the given format element
-    name, with given L{BibFormatObject} and parameters. Also returns
-    the errors of the evaluation.
-
-    :param format_element: a format element structure as returned by get_format_element
-    :param bfo: a L{BibFormatObject} used for formatting
-    :param parameters: a dict of parameters to be used for formatting. Key is parameter and value is value of parameter
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
-
-    @return: tuple (result, errors)
-    """
-    if parameters is None:
-        parameters = {}
-
-    errors = []
-    #Load special values given as parameters
-    prefix = parameters.get('prefix', "")
-    suffix = parameters.get('suffix', "")
-    default_value = parameters.get('default', "")
-    escape = parameters.get('escape', "")
-    output_text = ''
-
-    _ = gettext_set_language(bfo.lang)
-
-    # 3 possible cases:
-    # a) format element file is found: we execute it
-    # b) format element file is not found, but exist in tag table (e.g. bfe_isbn)
-    # c) format element is totally unknown. Do nothing or report error
-    if format_element is not None and format_element['type'] == "python":
-        # a) We found an element with the tag name, of type "python"
-        # Prepare a dict 'params' to pass as parameter to 'format'
-        # function of element
-        params = {}
-
-        # Look for parameters defined in format element
-        # Fill them with specified default values and values
-        # given as parameters.
-        # Also remember if the element overrides the 'escape'
-        # parameter
-        format_element_overrides_escape = False
-        for param in format_element['attrs']['params']:
-            name = param['name']
-            default = param['default']
-            params[name] = parameters.get(name, default)
-            if name == 'escape':
-                format_element_overrides_escape = True
-
-        # Add BibFormatObject
-        params['bfo'] = bfo
-
-        # Execute function with given parameters and return result.
-        function = format_element['code']
-        _ = gettext_set_language(bfo.lang)
-
-        try:
-            output_text = function(**params)
-        except Exception as e:
-            register_exception(req=bfo.req)
-            name = format_element['attrs']['name']
-            try:
-                raise InvenioBibFormatError(
-                    _('Error when evaluating format element %(x_name)s '
-                      'with parameters %(x_params)s.',
-                      x_name=name, x_params=str(params)))
-            except InvenioBibFormatError, exc:
-                errors.append(exc.message)
-
-            # Log exception
-            message = _(
-                "Error when evaluating format element %(format_element)s with"
-                " parameters %(parameters)s.",
-                format_element=name,
-                parameters=str(params)
-            )
-            current_app.logger.exception(
-                message
-            )
-            errors.append(message)
-
-            # In debug mode - include traceback in output
-            if current_app.debug:
-                tb = sys.exc_info()[2]
-                stack = traceback.format_exception(
-                    Exception, e, tb, limit=None
-                )
-                output_text = '<span class="well"><pre style="color:red;">' \
-                    '%s\n\n%s</pre></span>' % (message, "".join(stack))
-
-        # None can be returned when evaluating function
-        if output_text is None:
-            output_text = ""
-        else:
-            try:
-                output_text = str(output_text)
-            except:
-                output_text = output_text.encode('utf-8')
-
-        # Escaping:
-        # (1) By default, everything is escaped in mode 1
-        # (2) If evaluated element has 'escape_values()' function, use
-        #     its returned value as escape mode, and override (1)
-        # (3) If template has a defined parameter 'escape' (in allowed
-        #     values), use it, and override (1) and (2). If this
-        #     'escape' parameter is overriden by the format element
-        #     (defined in the 'format' function of the element), leave
-        #     the escaping job to this element
-
-        # (1)
-        escape_mode = 1
-
-        # (2)
-        escape_function = format_element['escape_function']
-        if escape_function is not None:
-            try:
-                escape_mode = escape_function(bfo=bfo)
-            except Exception as e:
-                try:
-                    raise InvenioBibFormatError(_('Escape mode for format element %(x_name)s could not be retrieved. Using default mode instead.', x_name=name))
-                except InvenioBibFormatError as exc:
-                    register_exception(req=bfo.req)
-                    errors.append(exc.message)
-
-                if verbose >= 5:
-                    tb = sys.exc_info()[2]
-
-                    output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
-                                   str(exc.message) +'</span></b> '
-        # (3)
-        if escape in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
-            escape_mode = int(escape)
-
-        # If escape is equal to 1, then escape all
-        # HTML reserved chars.
-        if escape_mode > 0 and not format_element_overrides_escape:
-            output_text = escape_field(output_text, mode=escape_mode)
-
-        # Add prefix and suffix if they have been given as parameters and if
-        # the evaluation of element is not empty
-        if output_text.strip() != "":
-            output_text = prefix + output_text + suffix
-
-        # Add the default value if output_text is empty
-        if output_text == "":
-            output_text = default_value
-
-        return output_text, errors
-
-    elif format_element is not None and format_element['type'] == "field":
-        # b) We have not found an element in files that has the tag
-        # name. Then look for it in the table "tag"
-        #
-        # <BFE_LABEL_IN_TAG prefix = "" suffix = "" separator = ""
-        #                   nbMax="" escape="0"/>
-        #
-
-        # Load special values given as parameters
-        separator = parameters.get('separator ', "")
-        nbMax = parameters.get('nbMax', "")
-        escape = parameters.get('escape', "1") # By default, escape here
-
-        # Get the fields tags that have to be printed
-        tags = format_element['attrs']['tags']
-
-        output_text = []
-
-        # Get values corresponding to tags
-        for tag in tags:
-            p_tag = parse_tag(tag)
-            values = record_get_field_values(bfo.get_record(),
-                                             p_tag[0],
-                                             p_tag[1],
-                                             p_tag[2],
-                                             p_tag[3])
-            if len(values)>0 and isinstance(values[0], dict):
-                #flatten dict to its values only
-                values_list = [x.values() for x in values]
-                #output_text.extend(values)
-                for values in values_list:
-                    output_text.extend(values)
-            else:
-                output_text.extend(values)
-
-        if nbMax != "":
-            try:
-                nbMax = int(nbMax)
-            except ValueError:
-                name = format_element['attrs']['name']
-                try:
-                    raise InvenioBibFormatError(_('"nbMax" parameter for %(x_param)s must be an "int".', x_param=name))
-                except InvenioBibFormatError as exc:
-                    register_exception(req=bfo.req)
-                    errors.append(exc.message)
-
-                if verbose >= 5:
-                    output_text = output_text.append(exc.message)
-            else:
-                output_text = output_text[:nbMax]
-
-        # Add prefix and suffix if they have been given as parameters and if
-        # the evaluation of element is not empty.
-        # If evaluation is empty string, return default value if it exists.
-        # Else return empty string
-        if ("".join(output_text)).strip() != "":
-            # If escape is equal to 1, then escape all
-            # HTML reserved chars.
-            if escape == '1':
-                output_text = cgi.escape(separator.join(output_text))
-            else:
-                output_text = separator.join(output_text)
-
-            output_text = prefix + output_text + suffix
-        else:
-            #Return default value
-            output_text = default_value
-
-        return (output_text, errors)
-    else:
-        # c) Element is unknown
-        try:
-            raise InvenioBibFormatError(_('Could not find format element named %(format_element)s.', format_element=format_element))
-        except InvenioBibFormatError as exc:
-            register_exception(req=bfo.req)
-            errors.append(exc.message)
-
-        if verbose < 5:
-            return ("", errors)
-        elif verbose >= 5:
-            if verbose >= 9:
-                sys.exit(exc.message)
-            return ('<b><span style="color: rgb(255, 0, 0);">' +
-                    str(exc.message)+'</span></b>', errors)
 
 
 def filter_languages(format_template, ln=CFG_SITE_LANG):
@@ -1075,6 +545,7 @@ def filter_languages(format_template, ln=CFG_SITE_LANG):
     filtered_format_template = pattern_lang.sub(search_lang_tag, format_template)
     return filtered_format_template
 
+
 def get_format_template(filename, with_attributes=False):
     """
     Returns the structured content of the given formate template.
@@ -1089,480 +560,20 @@ def get_format_template(filename, with_attributes=False):
     :param with_attributes: if True, fetch the attributes (names and description) for format'
     @return: strucured content of format template
     """
-    _ = gettext_set_language(CFG_SITE_LANG)
-
-    if not filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) and \
-           not filename.endswith(".xsl"):
-        return None
-
-    # Get from cache whenever possible
-    if filename in format_templates_cache:
-        # If we must return with attributes and template exist in
-        # cache with attributes then return cache.
-        # Else reload with attributes
-        if with_attributes and \
-               'attrs' in format_templates_cache[filename]:
-            return format_templates_cache[filename]
+    if not filename.lower().endswith(".xsl"):
+        raise RuntimeError('Unsupported file type {}.'.format(filename))
 
     format_template = {'code': ""}
     try:
         path = registry.format_templates_lookup[filename]
 
         format_file = open(path)
-        format_content = format_file.read()
+        format_template['code'] = format_file.read()
         format_file.close()
-
-        # Load format template code
-        # Remove name and description
-        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
-            code_and_description = pattern_format_template_name.sub("",
-                                                                    format_content, 1)
-            code = pattern_format_template_desc.sub("", code_and_description, 1)
-        else:
-            code = format_content
-
-        format_template['code'] = code
-
-    except:
+    except Exception:
         register_exception()
 
-    # Save attributes if necessary
-    if with_attributes:
-        format_template['attrs'] = get_format_template_attrs(filename)
-
-    # Cache and return
-    format_templates_cache[filename] = format_template
     return format_template
-
-
-def get_format_templates(with_attributes=False):
-    """
-    Returns the list of all format templates, as dictionary with filenames as keys
-
-    if 'with_attributes' is true, returns the name and description. Else 'attrs' is not
-    returned as key in each dictionary (it might, if it has already been loaded previously)::
-
-      [{'code':"<b>Some template code</b>"
-        'attrs': {'name': "a name", 'description': "a description"}
-       },
-      ...
-      }
-
-    :param with_attributes: if True, fetch the attributes (names and description) for formats
-    @return: the list of format templates (with code and info)
-    """
-    format_templates = {}
-
-    for filename in registry.format_templates:
-        if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) or \
-               filename.endswith(".xsl"):
-            filename = os.path.basename(filename)
-            format_templates[filename] = get_format_template(filename,
-                                                             with_attributes)
-
-    return format_templates
-
-def get_format_template_attrs(filename):
-    """
-    Returns the attributes of the format template with given filename
-
-    The attributes are {'name', 'description'}
-    Caution: the function does not check that path exists or
-    that the format element is valid.
-    :param filename: the name of a format template
-    @return: a structure with detailed information about given format template
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-    attrs = {}
-    attrs['name'] = ""
-    attrs['description'] = ""
-    try:
-        template_file = open(registry.format_templates_lookup[filename])
-        code = template_file.read()
-        template_file.close()
-
-        match = None
-        if filename.endswith(".xsl"):
-            # .xsl
-            attrs['name'] = filename[:-4]
-        else:
-            # .bft
-            match = pattern_format_template_name.search(code)
-            if match is not None:
-                attrs['name'] = match.group('name')
-            else:
-                attrs['name'] = filename
-
-
-            match = pattern_format_template_desc.search(code)
-            if match is not None:
-                attrs['description'] = match.group('desc').rstrip('.')
-    except Exception as e:
-        try:
-            raise InvenioBibFormatError(_('Could not read format template named %(filename)s. %(error)s.', filename=filename, error=str(e)))
-        except InvenioBibFormatError:
-            register_exception()
-
-        attrs['name'] = filename
-
-    return attrs
-
-
-def get_format_element(element_name, verbose=0, with_built_in_params=False,
-                       soft_fail=False):
-    """
-    Returns the format element structured content.
-
-    Return None if element cannot be loaded (file not found, not readable or
-    invalid)
-
-    The returned structure is::
-      {'attrs': {some attributes in dict. See get_format_element_attrs_from_*}
-      'code': the_function_code,
-      'type':"field" or "python" depending if element is defined in file or table,
-      'escape_function': the function to call to know if element output must be escaped}
-
-    :param element_name: the name of the format element to load
-    :param verbose: the level of verbosity from 0 to 9 (O: silent,
-                                                       5: errors,
-                                                       7: errors and warnings,
-                                                       9: errors and warnings, stop if error (debug mode ))
-    :param with_built_in_params: if True, load the parameters built in all elements
-    @return: a dictionary with format element attributes
-    """
-    _ = gettext_set_language(CFG_SITE_LANG)
-
-    # Resolve filename and prepare 'name' as key for the cache
-    filename = resolve_format_element_filename(element_name)
-    if filename is not None:
-        name = filename.upper()
-    else:
-        name = element_name.upper()
-
-    if name in format_elements_cache:
-        element = format_elements_cache[name]
-        if not with_built_in_params or \
-               (with_built_in_params and
-                'builtin_params' in element['attrs']):
-            return element
-
-    if filename is None:
-        # Element is maybe in tag table
-        if bibformat_dblayer.tag_exists_for_name(element_name):
-            format_element = {'attrs': get_format_element_attrs_from_table(
-                element_name,
-                with_built_in_params),
-                              'code': None,
-                              'escape_function': None,
-                              'type': "field"}
-            # Cache and returns
-            format_elements_cache[name] = format_element
-            return format_element
-
-        elif soft_fail:
-            register_exception()
-            return None
-        else:
-            raise InvenioBibFormatError(
-                _('Format element %(x_element_name)s could not be found.',
-                  x_element_name=element_name))
-
-    else:
-        format_element = {}
-
-        module_name = filename
-        if module_name.endswith(".py"):
-            module_name = module_name[:-3]
-
-        # Load function 'format_element()' inside element
-        try:
-            function_format = TEMPLATE_CONTEXT_FUNCTIONS_CACHE.\
-                bibformat_elements()[module_name]
-            format_element['code'] = function_format
-        except:
-            if soft_fail:
-                register_exception()
-                return None
-            else:
-                raise
-
-        # Load function 'escape_values()' inside element
-        format_element['escape_function'] = function_format._escape_values
-
-        # Prepare, cache and return
-        format_element['attrs'] = get_format_element_attrs_from_function(
-                function_format,
-                element_name,
-                with_built_in_params)
-        format_element['type'] = "python"
-        format_elements_cache[name] = format_element
-        return format_element
-
-def get_format_elements(with_built_in_params=False):
-    """
-    Returns the list of format elements attributes as dictionary structure
-
-    Elements declared in files have priority over element declared in 'tag' table
-    The returned object has this format::
-      {element_name1: {'attrs': {'description':..., 'seealso':...
-                               'params':[{'name':..., 'default':..., 'description':...}, ...]
-                               'builtin_params':[{'name':..., 'default':..., 'description':...}, ...]
-                              },
-                     'code': code_of_the_element
-                    },
-       element_name2: {...},
-       ...}
-
-     Returns only elements that could be loaded (not error in code)
-
-    @return: a dict of format elements with name as key, and a dict as attributes
-    :param with_built_in_params: if True, load the parameters built in all elements
-    """
-    format_elements = {}
-
-    mappings = bibformat_dblayer.get_all_name_tag_mappings()
-
-    for name in mappings:
-        format_elements[name.upper().replace(" ", "_").strip()] = get_format_element(name, with_built_in_params=with_built_in_params)
-
-    for module in registry.format_elements:
-        filename = os.path.basename(module.__file__)
-        filename_test = filename.upper().replace(" ", "_")
-        if filename_test.endswith(".PYC"):
-            filename_test = filename_test[:-1]
-        if filename_test.endswith(".PY") and not filename.upper().startswith("__INIT__.PY"):
-            if filename_test.startswith("BFE_"):
-                filename_test = filename_test[4:]
-            element_name = filename_test[:-3]
-            element = get_format_element(element_name,
-                                         with_built_in_params=with_built_in_params,
-                                         soft_fail=True)
-            if element is not None:
-                format_elements[element_name] = element
-
-    return format_elements
-
-def get_format_element_attrs_from_function(function, element_name,
-                                           with_built_in_params=False):
-    """
-    Returns the attributes of the function given as parameter.
-
-    It looks for standard parameters of the function, default
-    values and comments in the docstring.
-
-    The attributes are::
-                        {'name' : "name of element" #basically the name of 'name' parameter
-                        'description': "a string description of the element",
-                        'seealso' : ["element_1.py", "element_2.py", ...] #a list of related elements
-                        'params': [{'name':"param_name",   #a list of parameters for this element (except 'bfo')
-                                    'default':"default value",
-                                    'description': "a description"}, ...],
-                        'builtin_params': {name: {'name':"param_name",#the parameters builtin for all elem of this kind
-                                            'default':"default value",
-                                            'description': "a description"}, ...},
-                        }
-    :param function: the formatting function of a format element
-    :param element_name: the name of the element
-    :param with_built_in_params: if True, load the parameters built in all elements
-    @return: a structure with detailed information of a function
-    """
-
-    attrs = {}
-    attrs['description'] = ""
-    attrs['name'] = element_name.replace(" ", "_").upper()
-    attrs['seealso'] = []
-
-    docstring = function.__doc__
-    if isinstance(docstring, str):
-        # Look for function description in docstring
-        #match = pattern_format_element_desc.search(docstring)
-        description = docstring.split("@param")[0]
-        description = description.split("@see:")[0]
-        attrs['description'] = description.strip().rstrip('.')
-
-        # Look for @see: in docstring
-        match = pattern_format_element_seealso.search(docstring)
-        if match is not None:
-            elements = match.group('see').rstrip('.').split(",")
-            for element in elements:
-                attrs['seealso'].append(element.strip())
-
-    params = {}
-    # Look for parameters in function definition
-    args, dummy_varargs, dummy_varkw, defaults = inspect.getargspec(function)
-
-    # Prepare args and defaults_list such that we can have a mapping
-    # from args to defaults
-    args.reverse()
-    if defaults is not None:
-        defaults_list = list(defaults)
-        defaults_list.reverse()
-    else:
-        defaults_list = []
-
-    for arg, default in map(None, args, defaults_list):
-        if arg == "bfo":
-            #Don't keep this as parameter. It is hidden to users, and
-            #exists in all elements of this kind
-            continue
-        param = {}
-        param['name'] = arg
-        if default is None:
-            #In case no check is made inside element, we prefer to
-            #print "" (nothing) than None in output
-            param['default'] = ""
-        else:
-            param['default'] = default
-        param['description'] = "(no description provided)"
-
-        params[arg] = param
-
-    if isinstance(docstring, str):
-        # Look for AT param descriptions in docstring.
-        # Add description to existing parameters in params dict
-        params_iterator = pattern_format_element_params.finditer(docstring)
-        for match in params_iterator:
-            name = match.group('name')
-            if name in params:
-                params[name]['description'] = match.group('desc').rstrip('.')
-
-    attrs['params'] = params.values()
-
-    # Load built-in parameters if necessary
-    if with_built_in_params:
-
-        builtin_params = []
-        # Add 'prefix' parameter
-        param_prefix = {}
-        param_prefix['name'] = "prefix"
-        param_prefix['default'] = ""
-        param_prefix['description'] = """A prefix printed only if the
-                                         record has a value for this element"""
-        builtin_params.append(param_prefix)
-
-        # Add 'suffix' parameter
-        param_suffix = {}
-        param_suffix['name'] = "suffix"
-        param_suffix['default'] = ""
-        param_suffix['description'] = """A suffix printed only if the
-                                         record has a value for this element"""
-        builtin_params.append(param_suffix)
-
-        # Add 'default' parameter
-        param_default = {}
-        param_default['name'] = "default"
-        param_default['default'] = ""
-        param_default['description'] = """A default value printed if the
-                                          record has no value for this element"""
-        builtin_params.append(param_default)
-
-        # Add 'escape' parameter
-        param_escape = {}
-        param_escape['name'] = "escape"
-        param_escape['default'] = ""
-        param_escape['description'] = """0 keeps value as it is. Refer to main
-                                         documentation for escaping modes
-                                         1 to 7"""
-        builtin_params.append(param_escape)
-
-        attrs['builtin_params'] = builtin_params
-
-    return attrs
-
-def get_format_element_attrs_from_table(element_name,
-                                        with_built_in_params=False):
-    """
-    Returns the attributes of the format element with given name in 'tag' table.
-
-    Returns None if element_name does not exist in tag table.
-
-    The attributes are::
-                       {'name' : "name of element" #basically the name of 'element_name' parameter
-                        'description': "a string description of the element",
-                        'seealso' : [] #a list of related elements. Always empty in this case
-                        'params': [],  #a list of parameters for this element. Always empty in this case
-                        'builtin_params': [{'name':"param_name", #the parameters builtin for all elem of this kind
-                                            'default':"default value",
-                                            'description': "a description"}, ...],
-                        'tags':["950.1", 203.a] #the list of tags printed by this element
-                       }
-
-    :param element_name: an element name in database
-    :param element_name: the name of the element
-    :param with_built_in_params: if True, load the parameters built in all elements
-    @return: a structure with detailed information of an element found in DB
-    """
-
-    attrs = {}
-    tags = bibformat_dblayer.get_tags_from_name(element_name)
-    field_label = "field"
-    if len(tags)>1:
-        field_label = "fields"
-
-    attrs['description'] = "Prints %s %s of the record" % (field_label,
-                                                           ", ".join(tags))
-    attrs['name'] = element_name.replace(" ", "_").upper()
-    attrs['seealso'] = []
-    attrs['params'] = []
-    attrs['tags'] = tags
-
-    # Load built-in parameters if necessary
-    if with_built_in_params:
-        builtin_params = []
-
-        # Add 'prefix' parameter
-        param_prefix = {}
-        param_prefix['name'] = "prefix"
-        param_prefix['default'] = ""
-        param_prefix['description'] = """A prefix printed only if the
-                                       record has a value for this element"""
-        builtin_params.append(param_prefix)
-
-        # Add 'suffix' parameter
-        param_suffix = {}
-        param_suffix['name'] = "suffix"
-        param_suffix['default'] = ""
-        param_suffix['description'] = """A suffix printed only if the
-                                         record has a value for this element"""
-        builtin_params.append(param_suffix)
-
-        # Add 'separator' parameter
-        param_separator = {}
-        param_separator['name'] = "separator"
-        param_separator['default'] = " "
-        param_separator['description'] = """A separator between elements of
-                                            the field"""
-        builtin_params.append(param_separator)
-
-        # Add 'nbMax' parameter
-        param_nbMax = {}
-        param_nbMax['name'] = "nbMax"
-        param_nbMax['default'] = ""
-        param_nbMax['description'] = """The maximum number of values to
-                                      print for this element. No limit if not
-                                      specified"""
-        builtin_params.append(param_nbMax)
-
-        # Add 'default' parameter
-        param_default = {}
-        param_default['name'] = "default"
-        param_default['default'] = ""
-        param_default['description'] = """A default value printed if the
-                                          record has no value for this element"""
-        builtin_params.append(param_default)
-
-        # Add 'escape' parameter
-        param_escape = {}
-        param_escape['name'] = "escape"
-        param_escape['default'] = ""
-        param_escape['description'] = """If set to 1, replaces special
-                                         characters '&', '<' and '>' of this
-                                         element by SGML entities"""
-        builtin_params.append(param_escape)
-
-        attrs['builtin_params'] = builtin_params
-
-    return attrs
 
 
 def get_output_format(code, with_attributes=False, verbose=0):
@@ -1579,57 +590,14 @@ def get_output_formats(with_attributes=False):
     return dict(registry.output_formats)
 
 
-def resolve_format_element_filename(element_name):
-    """
-    Returns the filename of element corresponding to x{element_name}
-
-    This is necessary since format templates code call
-    elements by ignoring case, for eg. <BFE_AUTHOR> is the
-    same as <BFE_author>.
-    It is also recommended that format elements filenames are
-    prefixed with bfe_ . We need to look for these too.
-
-    The name of the element has to start with "BFE_".
-
-    :param element_name: a name for a format element
-    @return: the corresponding filename, with right case
-    """
-
-    if not element_name.endswith(".py"):
-        name = element_name.replace(" ", "_").upper() +".PY"
-    else:
-        name = element_name.replace(" ", "_").upper()
-
-    files = registry.format_elements
-
-    for element in files:
-        filename = element.__file__
-        if filename.endswith('.pyc'):
-            filename = filename[:-1]
-        basename = os.path.basename(filename)
-
-        test_filename = basename.replace(" ", "_").upper()
-
-        if test_filename == name or \
-                test_filename == "BFE_" + name or \
-                "BFE_" + test_filename == name:
-            return basename
-
-    # No element with that name found
-    # Do not log error, as it might be a normal execution case:
-    # element can be in database
-    return None
-
-
 def clear_caches():
     """
     Clear the caches (Output Format, Format Templates and Format Elements).
 
     @return: None
     """
-    global format_templates_cache, format_elements_cache, format_outputs_cache
+    global format_templates_cache, format_outputs_cache
     format_templates_cache = {}
-    format_elements_cache = {}
     format_outputs_cache = {}
 
 class BibFormatObject(object):
