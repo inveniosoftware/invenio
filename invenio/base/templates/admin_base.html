@@ -22,6 +22,11 @@
 {%- block css -%}{% block head_css %}<link href="{{ url_for('admin.static', filename='css/admin.css') }}" rel="stylesheet">{% endblock %}{%- endblock css -%}
 {%- bundle "admin.js" %}
 
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "admin-lte.css" %}
+{% endblock %}
+
 {% block header %}
   {%- include "base/scripts.html" %}
   {{ super() }}

@@ -133,9 +133,21 @@ invenio = Bundle(
 
 admin = Bundle(
     "js/admin.js",
+    "vendors/admin-lte/dist/js/app.min.js",
     output="admin.js",
     filters=RequireJSFilter(exclude=[jquery]),
     weight=50
+)
+
+adminnextgen = Bundle(
+    "vendors/admin-lte/dist/css/AdminLTE.min.css",
+    "vendors/admin-lte/dist/css/skins/skin-blue.min.css",  # change for other skin
+    output="admin-lte.css",
+    filters="less,cleancss",
+    weight=50,
+    bower={
+        "admin-lte": "latest"
+    }
 )
 
 # require.js is only used when:
