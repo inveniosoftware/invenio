@@ -103,7 +103,7 @@ def arxiv_fulltext_download(obj, eng):
     """Perform the fulltext download step for arXiv records.
 
     :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     from invenio.utils.plotextractor.api import get_pdf_from_arxiv
 
@@ -239,8 +239,8 @@ def plot_extract(plotextractor_types=("latex",)):
 def refextract(obj, eng):
     """Perform the reference extraction step.
 
-    :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param obj: DbWorkflowObject to process
+    :param eng: DbWorkflowEngine processing the object
     """
     from invenio.legacy.refextract.api import extract_references_from_file_xml
     from invenio.utils.plotextractor.api import get_pdf_from_arxiv
@@ -291,8 +291,8 @@ def refextract(obj, eng):
 def author_list(obj, eng):
     """Perform the special authorlist extraction step.
 
-    :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param obj: DbWorkflowObject to process
+    :param eng: DbWorkflowEngine processing the object
     """
     from invenio.legacy.bibrecord import create_records, record_xml_output
     from invenio.legacy.bibconvert.xslt_engine import convert
@@ -386,8 +386,8 @@ def author_list(obj, eng):
 def upload_step(obj, eng):
     """Perform the upload step.
 
-    :param obj: BibWorkflowObject to process
-    :param eng: BibWorkflowEngine processing the object
+    :param obj: DbWorkflowObject to process
+    :param eng: DbWorkflowEngine processing the object
     """
     from invenio_records.api import Record
     from invenio.legacy.bibsched.bibtask import task_low_level_submission

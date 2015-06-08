@@ -23,18 +23,17 @@ If you want to run a workflow using the workflows module,
 this is the high level API you will want to use.
 """
 
-from werkzeug.utils import import_string, cached_property
+from werkzeug.utils import import_string, cached_property, ImportStringError
 from invenio.base.globals import cfg
 from invenio.base.config import CFG_BIBWORKFLOW_WORKER
 from .utils import BibWorkflowObjectIdContainer
-from .models import BibWorkflowObject
-from .errors import WorkflowWorkerError
+from invenio.modules.workflows.models import DbWorkflowObject
+from invenio.modules.workflows.errors import WorkflowWorkerError
+from workflow.engine_db import ObjectStatus
 
 
 class WorkerBackend(object):
-
-    """
-    WorkerBackend is a class representing the worker.
+    """WorkerBackend is a class representing the worker.
 
     It will automatically get the worker thanks to the configuration
     when called.
@@ -42,8 +41,7 @@ class WorkerBackend(object):
 
     @cached_property
     def worker(self):
-        """
-        Represent the worker.
+        """Represent the worker.
 
         This cached property is the one which is returning the worker
         to use.
@@ -75,7 +73,7 @@ def start(workflow_name, data, **kwargs):
     equal to the name of a file containing the workflow definition.
 
     The data passed should be a list of object(s) to run through the
-    workflow. For example: a list of dict, JSON string, BibWorkflowObjects
+    workflow. For example: a list of dict, JSON string, DbWorkflowObjects
     etc.
 
     Special custom keyword arguments can be given to the workflow engine
@@ -90,7 +88,7 @@ def start(workflow_name, data, **kwargs):
     :param data: the workflow name to run. Ex: "my_workflow".
     :type data: list
 
-    :return: BibWorkflowEngine that ran the workflow.
+    :return: DbWorkflowEngine that ran the workflow.
     """
     from .worker_engine import run_worker
     if not isinstance(data, list):
@@ -131,10 +129,10 @@ def start_delayed(workflow_name, data, **kwargs):
 
     if isinstance(data, list):
         for i in range(0, len(data)):
-            if isinstance(data[i], BibWorkflowObject):
+            if isinstance(data[i], DbWorkflowObject):
                 data[i] = BibWorkflowObjectIdContainer(data[i]).to_dict()
     else:
-        if isinstance(data, BibWorkflowObject):
+        if isinstance(data, DbWorkflowObject):
             data = [BibWorkflowObjectIdContainer(data).to_dict()]
     return WORKER().run_worker(workflow_name, data, **kwargs)
 
@@ -180,10 +178,11 @@ def start_by_wid_delayed(wid, **kwargs):
 
 
 def start_by_oids(workflow_name, oids, **kwargs):
-    """Start workflow by name with :py:class:`.models.BibWorkflowObject` ids.
+    """Start workflow by name with :py:class:`invenio.modules.workflows.models.DbWorkflowObject`
+    ids.
 
     Wrapper to call :py:func:`.start` with list of
-    :py:class:`.models.BibWorkflowObject` ids.
+    :py:class:`invenio.modules.workflows.models.DbWorkflowObject` ids.
 
     Special custom keyword arguments can be given to the workflow engine
     in order to pass certain variables to the tasks in the workflow execution,
@@ -192,23 +191,24 @@ def start_by_oids(workflow_name, oids, **kwargs):
     :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name: str
 
-    :param oids: BibWorkflowObject id's to run.
+    :param oids: DbWorkflowObject id's to run.
     :type oids: list
 
     :return: BibWorkflowEngine that ran the workflow.
     """
     if not oids:
-        from .errors import WorkflowAPIError
+        from workflow.errors import WorkflowAPIError
         raise WorkflowAPIError("No Object IDs are defined")
 
-    objects = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id.in_(list(oids))
+    objects = DbWorkflowObject.query.filter(
+        DbWorkflowObject.id.in_(list(oids))
     ).all()
     return start(workflow_name, objects, **kwargs)
 
 
 def start_by_oids_delayed(workflow_name, oids, **kwargs):
-    """Start asynchronously workflow by name with :py:class:`.models.BibWorkflowObject` ids.
+    """Start asynchronously workflow by name with
+    :py:class:`invenio.modules.workflows.models.DbWorkflowObject` ids.
 
     Similar behavior as :py:func:`.start_by_oids`, except it calls
     :py:func:`.start_delayed`.
@@ -223,17 +223,17 @@ def start_by_oids_delayed(workflow_name, oids, **kwargs):
     :param workflow_name: the workflow name to run. Ex: "my_workflow".
     :type workflow_name: str
 
-    :param oids: list of BibWorkflowObject id's to run.
+    :param oids: list of DbWorkflowObject id's to run.
     :type oids: list
 
     :return: AsynchronousResultWrapper.
     """
     if not oids:
-        from .errors import WorkflowAPIError
+        from workflow.errors import WorkflowAPIError
         raise WorkflowAPIError("No Object IDs are defined")
 
-    objects = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id.in_(list(oids))
+    objects = DbWorkflowObject.query.filter(
+        DbWorkflowObject.id.in_(list(oids))
     ).all()
     return start_delayed(workflow_name, objects, **kwargs)
 
@@ -248,7 +248,7 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     in order to pass certain variables to the tasks in the workflow execution,
     such as a task-id from BibSched, the current user etc.
 
-    :param oid: id of BibWorkflowObject to run.
+    :param oid: id of DbWorkflowObject to run.
     :type oid: str
 
     :param start_point: where should the workflow start from? One of:
@@ -260,7 +260,7 @@ def continue_oid(oid, start_point="continue_next", **kwargs):
     :return: BibWorkflowEngine that ran the workflow
     """
     from .worker_engine import continue_worker
-    return continue_worker(oid, start_point, **kwargs)
+    return continue_worker(oid, restart_point=start_point, **kwargs)
 
 
 def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
@@ -276,7 +276,7 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
     holds a reference to the workflow id via the function
     `AsynchronousResultWrapper.get`.
 
-    :param oid: id of BibWorkflowObject to run.
+    :param oid: id of DbWorkflowObject to run.
     :type oid: str
 
     :param start_point: where should the workflow start from? One of:
@@ -292,8 +292,7 @@ def continue_oid_delayed(oid, start_point="continue_next", **kwargs):
 
 def resume_objects_in_workflow(id_workflow, start_point="continue_next",
                                **kwargs):
-    """
-    Resume workflow for any halted or failed objects from given workflow.
+    """Resume workflow for any halted or failed objects from given workflow.
 
     This is a generator function and will yield every workflow created per
     object which needs to be resumed.
@@ -314,12 +313,10 @@ def resume_objects_in_workflow(id_workflow, start_point="continue_next",
 
     yield: BibWorkflowEngine that ran the workflow
     """
-    from .models import ObjectVersion
-
     # Resume workflow if there are objects to resume
-    objects = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id_workflow == id_workflow,
-        BibWorkflowObject.version == ObjectVersion.HALTED
+    objects = DbWorkflowObject.query.filter(
+        DbWorkflowObject.id_workflow == id_workflow,
+        DbWorkflowObject.version == ObjectStatus.HALTED
     ).all()
     for obj in objects:
         yield continue_oid(oid=obj.id, start_point=start_point,

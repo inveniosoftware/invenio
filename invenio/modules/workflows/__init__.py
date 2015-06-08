@@ -79,7 +79,7 @@ take two arguments:
             eng.halt("Data higher than 20.")
 
 
-`obj` (:py:class:`.models.BibWorkflowObject`)
+`obj` (:py:class:`invenio.modules.workflows.models.DbWorkflowObject`)
     *is the current object being worked on*
 
     `obj` adds extra functionality by wrapping around your data and
@@ -122,7 +122,7 @@ Finally, to run your workflow you there are mainly two use-cases:
     * run only a **single data object**, or
     * run **multiple data objects** through a workflow.
 
-The former use the :py:class:`.models.BibWorkflowObject` model API, and
+The former use the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` model API, and
 the latter use the :py:mod:`.api`.
 
 Run a single data object
@@ -133,7 +133,7 @@ Run a single data object
 
 .. code-block:: python
 
-    from invenio.modules.workflows.models import BibWorkflowObject
+    from workflows.models import DbWorkflowObject
     myobj = BibWorkflowObject.create_object()
     myobj.set_data(10)
     eng = myobj.start_workflow("myworkflow")
@@ -142,7 +142,7 @@ Run a single data object
 Once the workflow completes it will return the engine instance that ran it.
 
 To get the data, simply call the `get_data()` function of
-:py:class:`.models.BibWorkflowObject`
+:py:class:`invenio.modules.workflows.models.DbWorkflowObject`
 
 .. code-block:: python
 
@@ -263,7 +263,7 @@ asynchronously in a task queue.
 Working with extra data
 =======================
 
-If you need to add some extra data to the :py:class:`.models.BibWorkflowObject` that is
+If you need to add some extra data to the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` that is
 not suitable to add to the ``obj.data`` attribute, you can make use if the
 ``obj.extra_data`` attribute.
 
@@ -285,7 +285,7 @@ it contains some additional information by default.
         "_task_history: [],
     }
 
-This information is used by the :py:class:`.models.BibWorkflowObject` to store some additional
+This information is used by the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` to store some additional
 data related to the workflow execution and additional data added by tasks.
 
 It also stores information that is integrated with Holding Pen - the graphical interface

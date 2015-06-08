@@ -44,7 +44,7 @@ define(
         delete_url: "",
         restart_url: "",
 
-        // BibWorkflowObject id
+        // DbWorkflowObject id
         id_object: "",
       });
 

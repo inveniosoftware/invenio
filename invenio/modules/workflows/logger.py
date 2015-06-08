@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,6 +19,7 @@
 """ Logging part of workflows module."""
 
 import logging
+from sqlalchemy.exc import IntegrityError
 
 
 def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
@@ -55,17 +56,17 @@ def get_logger(logger_name, db_handler_obj, level=10, **kwargs):
     logger.setLevel(level)
 
     # Add any kwargs to extra parameter and return logger
-    wrapped_logger = BibWorkflowLogAdapter(logger, kwargs)
+    wrapped_logger = DbWorkflowLogAdapter(logger, kwargs)
     return wrapped_logger
 
 
-class BibWorkflowLogHandler(logging.Handler, object):
+class DbWorkflowLogHandler(logging.Handler, object):
 
     """Implements a handler for logging to database."""
 
     def __init__(self, model, id_name):
-        """Instanciate a BibWorkflowLogHandler object."""
-        super(BibWorkflowLogHandler, self).__init__()
+        """Instanciate a DbWorkflowLogHandler object."""
+        super(DbWorkflowLogHandler, self).__init__()
 
         self.model = model
         self.id_name = id_name
@@ -77,14 +78,17 @@ class BibWorkflowLogHandler(logging.Handler, object):
         log_obj = self.model(id_object=getattr(record.obj, self.id_name),
                              log_type=record.levelno,
                              message=record.msg)
-        db.session.add(log_obj)
-        db.session.commit()
+        try:
+            log_obj.save()
+        except IntegrityError:
+            # Object no longer in the database
+            pass
 
 
-class BibWorkflowLogAdapter(logging.LoggerAdapter):
+class DbWorkflowLogAdapter(logging.LoggerAdapter):
 
     """
-    BibWorkflowLogAdapter class.
+    DbWorkflowLogAdapter class.
 
     This example adapter expects the passed in dict-like object to have a
     'obj' key, whose value in brackets is used during logging.

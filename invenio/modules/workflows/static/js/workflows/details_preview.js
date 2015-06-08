@@ -40,7 +40,7 @@ define(
     * highlighting when required.
     *
     * :param string preview_url: URL for getting the formatted content.
-    * :param string id_object: ID of the BibWorkflowObject being displayed.
+    * :param string id_object: ID of the DbWorkflowObject being displayed.
     *
     */
     function DetailsPreview() {
@@ -48,7 +48,7 @@ define(
         // URL
         preview_url: "",
 
-        // BibWorkflowObject id
+        // DbWorkflowObject id
         id_object: "",
       });
 

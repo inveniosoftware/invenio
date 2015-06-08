@@ -21,8 +21,8 @@
 from functools import wraps
 from time import sleep
 
-from invenio.modules.workflows.errors import WorkflowError
-from invenio.modules.workflows.models import BibWorkflowEngineLog
+from workflow.errors import WorkflowError
+from invenio.modules.workflows.models import DbWorkflowEngineLog
 
 from six import callable, string_types
 
@@ -34,16 +34,16 @@ def interrupt_workflow(obj, eng):
     The object will be in the state HALTED.
 
     :param obj: BibworkflowObject to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
-    eng.halt("interrupting workflow.")
+    eng.haltProcessing("interrupting workflow.")
 
 
 def get_nb_workflow_created(obj, eng):
     """Return the number of workflows created.
 
     :param obj: BibworkflowObject to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     :return the number of workflow created since the last clean.
     """
     try:
@@ -122,12 +122,12 @@ def start_async_workflow(workflow_to_run="",
         workflow to run (optional).
     :type get_workflow_from_engine_definition: function
     """
-    from ...workflows.models import BibWorkflowObject
+    from invenio.modules.workflows.models import DbWorkflowObject
     from invenio.modules.workflows.api import start_delayed
 
     @wraps(start_async_workflow)
     def _start_workflow(obj, eng):
-        record_object = BibWorkflowObject.create_object()
+        record_object = DbWorkflowObject.create_object()
         record_object.save()  # Saving to set default extra_data and data
 
         if preserve_extra_data_keys:
@@ -184,7 +184,7 @@ def wait_for_workflows_to_complete(obj, eng):
     It acts like a barrier.
 
     :param obj: BibworkflowObject being process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     if '_workflow_ids' in eng.extra_data:
         for workflow_id in eng.extra_data['_workflow_ids']:
@@ -203,7 +203,7 @@ def wait_for_a_workflow_to_complete_obj(obj, eng):
     It acts like a barrier
 
     :param obj: BibworkflowObject to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     if not obj.data:
         eng.extra_data["_nb_workflow"] = 0
@@ -276,18 +276,19 @@ def workflow_result_management(async_result, eng):
         eng.extra_data["_uuid_workflow_succeed"].append(engine.uuid)
     except WorkflowError as e:
         eng.log.error("Error: Workflow failed %s" % str(e))
-        workflowlog = BibWorkflowEngineLog.query.filter(
-            BibWorkflowEngineLog.id_object == e.id_workflow
-        ).filter(BibWorkflowEngineLog.log_type >= 40).all()
+        workflowlog = DbWorkflowEngineLog.query.filter(
+            DbWorkflowEngineLog.id_object == e.id_workflow
+        ).filter(DbWorkflowEngineLog.log_type >= 40).all()
 
         for log in workflowlog:
             eng.log.error(log.message)
 
-        for i in e.payload:
-            eng.log.error(str(i))
-        eng.extra_data["_uuid_workflow_crashed"].append(e.id_workflow)
-        eng.extra_data["_nb_workflow_failed"] += 1
-        eng.extra_data["_nb_workflow_finish"] += 1
+        if e.payload:
+            for i in e.payload:
+                eng.log.error(str(i))
+            eng.extra_data["_uuid_workflow_crashed"].append(e.id_workflow)
+            eng.extra_data["_nb_workflow_failed"] += 1
+            eng.extra_data["_nb_workflow_finish"] += 1
     except Exception as e:
         eng.log.error("Error: Workflow failed %s" % str(e))
         eng.extra_data["_nb_workflow_failed"] += 1
@@ -360,7 +361,7 @@ def get_list_of_workflows_to_wait(obj, eng):
      asynchrnous workflow.
 
     :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     return eng.extra_data["_workflow_ids"]
 
@@ -369,7 +370,7 @@ def get_status_async_result_obj_data(obj, eng):
     """Return the status of the asyncresult in data.
 
     :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     return obj.data.state
 
@@ -378,7 +379,7 @@ def get_workflows_progress(obj, eng):
     """Return the progress of sub workflows.
 
     :param obj: Bibworkflow Object to process
-    :param eng: BibWorkflowEngine processing the object
+    :param eng: DbWorkflowEngine processing the object
     """
     try:
         return (eng.extra_data["_nb_workflow_finish"] * 100.0) / (eng.extra_data["_nb_workflow"])
@@ -461,7 +462,7 @@ def log_info(message):
 def get_workflow_from_engine_definition(eng):
     """Get the record_workflow defined in `WorkflowDefinitino.record_workflow`."""
     from ..registry import workflows
-    from ..errors import WorkflowDefinitionError
+    from workflow.errors import WorkflowDefinitionError
 
     if eng.name not in workflows:
         # No workflow with that name exists

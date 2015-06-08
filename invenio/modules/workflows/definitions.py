@@ -57,7 +57,7 @@ class WorkflowBase(object):
 
 class RecordWorkflow(WorkflowBase):
 
-    """Workflow to be used where BibWorkflowObject is a Record instance."""
+    """Workflow to be used where DbWorkflowObject is a Record instance."""
 
     workflow = []
 

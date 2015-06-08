@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,12 +18,11 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+from invenio.base.helpers import with_app_context
 from invenio.celery import celery
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.base.helpers import with_app_context
-
-from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 from invenio.modules.workflows.errors import WorkflowWorkerError
+from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')

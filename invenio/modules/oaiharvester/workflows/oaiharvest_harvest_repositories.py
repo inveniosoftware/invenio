@@ -158,7 +158,7 @@ class oaiharvest_harvest_repositories(RecordWorkflow):
     def formatter(bwo):
         """Return description of object."""
         from flask import render_template
-        from invenio.modules.workflows.models import BibWorkflowObject
+        from invenio.modules.workflows.models import DbWorkflowObject
         from invenio.modules.workflows.registry import workflows
 
         identifiers = None
@@ -178,7 +178,7 @@ class oaiharvest_harvest_repositories(RecordWorkflow):
 
         related_objects = []
         for id_object in extra_data.get("objects_spawned", list()):
-            spawned_object = BibWorkflowObject.query.get(id_object)
+            spawned_object = DbWorkflowObject.query.get(id_object)
             if spawned_object:
                 workflow = workflows.get(spawned_object.get_workflow_name())
                 related_objects.append(

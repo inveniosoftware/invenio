@@ -38,10 +38,11 @@ def approve_record(obj, eng):
     :param eng: BibWorkflowEngine processing the object
     """
     try:
-        eng.halt(action="approval",
-                 msg='Record needs approval')
+        eng.haltProcessing('Record needs approval',
+                           action="approval")
     except KeyError:
         # Log the error
+        # FIXME: How would this even happen
         obj.extra_data["_error_msg"] = 'Could not assign action'
 
 
@@ -99,7 +100,9 @@ def set_obj_extra_data_key(key, value):
         if callable(my_key):
             while callable(my_key):
                 my_key = my_key(obj, eng)
-        obj.extra_data[str(my_key)] = my_value
+        extra_data = obj.extra_data
+        extra_data[str(my_key)] = my_value
+        obj.set_extra_data(extra_data)
 
     return _set_obj_extra_data_key
 
@@ -136,7 +139,7 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
     """
     @wraps(convert_record)
     def _convert_record(obj, eng):
-        from invenio.modules.workflows.errors import WorkflowError
+        from workflow.errors import WorkflowError
         from invenio.legacy.bibconvert.xslt_engine import convert
 
         eng.log.info("Starting conversion using %s stylesheet" %

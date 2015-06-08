@@ -127,7 +127,7 @@ def harvest_records(obj, eng):
     :param eng: BibWorkflowEngine processing the object
     """
     from invenio.modules.oaiharvester.utils import collect_identifiers
-    from invenio.modules.workflows.errors import WorkflowError
+    from workflow.errors import WorkflowError
 
     harvested_identifier_list = []
 
