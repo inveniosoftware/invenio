@@ -54,11 +54,12 @@ from fs.opener import opener
 
 from invenio.modules.jsonalchemy.wrappers import SmartJson
 from invenio.modules.jsonalchemy.reader import Reader
+from invenio.modules.relationships.api import Node
 
 from . import signals, errors
 
 
-class Document(SmartJson):
+class Document(Node, SmartJson):
     """Document"""
 
     __storagename__ = 'documents'
