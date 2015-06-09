@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,13 +21,17 @@
 
 import re
 
+import httpretty
+
 from invenio.base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+
 get_xml_from_textmarc = lazy_import('invenio.legacy.bibedit.utils:get_xml_from_textmarc')
 perform_doi_search = lazy_import('invenio.legacy.bibedit.engine:perform_doi_search')
 
+
 class TextmarcToXMLTests(InvenioTestCase):
-    """ Test utility functions to convert textmarc to XML """
+    """Test utility functions to convert textmarc to XML."""
 
     def test_get_xml_from_textmarc_success(self):
         textmarc = """100__ $$aDoe, J.$$uCERN
@@ -55,7 +59,7 @@ class TextmarcToXMLTests(InvenioTestCase):
 </record>
         """
         self.assertEqual(re.sub("\s+", " ", output['resultXML'].strip()),
-            re.sub("\s+", " ", xml_expected_output.strip()))
+                         re.sub("\s+", " ", xml_expected_output.strip()))
 
     def test_get_xml_from_textmarc_wrong_field(self):
         textmarc = """1sasd00__ $$aDoe, J.$$uCERN
@@ -93,27 +97,62 @@ class TextmarcToXMLTests(InvenioTestCase):
         </record>"""
 
         self.assertEqual(re.sub("\s+", " ", output['resultXML'].strip()),
-            re.sub("\s+", " ", xml_expected_output.strip()))
+                         re.sub("\s+", " ", xml_expected_output.strip()))
+
 
 class TestPerformDoiSearch(InvenioTestCase):
-    """Test the perform_doi_search function, which resolves the doi using
-    dx.doi.org page and returns the url of the resource
+    """Test the perform_doi_search function.
+
+    It resolves the doi using dx.doi.org page and returns the url of
+    the resource.
     """
 
+    @httpretty.activate
     def test_normal(self):
-        """Checks if some standard doi is working"""
+        """Check if some standard doi is working"""
         doi = "10.1007/BF02724522"
         wrong_output = {}
+
+        def response(request, uri, headers):
+            headers.update({
+                'status': 303,
+                'Location': 'http://link.springer.com/10.1007/BF02724522'
+            })
+            return (303, headers, '')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            'http://dx.doi.org/?hdl=10.1016%2F0550-3213%2889%2990423-9',
+            body=response,
+        )
+
         self.assertNotEqual(perform_doi_search(doi), wrong_output)
 
+    @httpretty.activate
     def test_no_headers(self):
-        """Checks if the doi that requires 'User-Agent' header is working"""
+        """Check if the doi that requires 'User-Agent' header is working"""
         doi = "10.1016/0550-3213(89)90423-9"
         wrong_output = {}
+
+        def response(request, uri, headers):
+            assert 'user-agent' in request.headers
+            headers.update({
+                'status': 303,
+                'Location': 'http://linkinghub.elsevier.com/retrieve/pii/'
+                            '0550321389904239'
+            })
+            return (303, headers, '')
+
+        httpretty.register_uri(
+            httpretty.POST,
+            'http://dx.doi.org/',
+            body=response,
+        )
+
         self.assertNotEqual(perform_doi_search(doi), wrong_output)
 
 TEST_SUITE = make_test_suite(TextmarcToXMLTests,
-                            TestPerformDoiSearch)
+                             TestPerformDoiSearch)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
