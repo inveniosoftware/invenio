@@ -83,6 +83,7 @@ components:
 - messages
 - mixer
 - multimedia
+- news
 - oaiharvester
 - oairepository
 - oauth2server

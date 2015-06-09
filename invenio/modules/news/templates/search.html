@@ -1,0 +1,74 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "layout.html" %}
+
+{% block page_body %}{% block body %}
+
+					<form action="{{ url_for(config.CFG_WEBNEWS_SEARCH[1:]) }}" method=post>
+						<div class="form-group input-group">
+							<input type="text" class="form-control" name='keywords' value="{{session['huk']}}" required/>
+							<span class="input-group-btn">
+								<button name="action_search" type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
+									 <i class="glyphicon glyphicon-search"></i><span>Search</span>
+								</button>
+							</span>
+						</div>
+					</form>
+					{%- if searchResult %}
+					<div class="page-header">
+						<h3>News Stories</h3>
+					</div>
+                        <div class="panel-group" id="accordion">
+                            {% for result in searchResult %}
+                            <div class="panel panel-default" id="panel{{result.id}}">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a data-toggle="collapse" data-target="#collapse{{result.id}}"
+                                   href="#collapseTwo" class="collapsed">
+                                  {{result.title}}
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapse{{result.id}}" class="panel-collapse collapse">
+                                    <div class="panel-body">
+                                {{result.body}}
+
+
+                                    </div> Author:{{result.nickname}} <br/>Tags:
+                                     {% for tag in result.nwsTAG %}
+                                    <a href='{{ url_for(config.CFG_WEBNEWS_SEARCH[1:]) }}/?keywords={{Encode(Arr=tag.tag)}}'>{{tag.tag}}</a>
+                                     {% endfor %}
+
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+					{% else %}
+					No Result Found
+					{%- endif %}
+				</div>
+            </div>
+		</div>
+	</div>
+
+{% endblock %}
+{% endblock %}
+
+{% block title %}{% endblock %}
