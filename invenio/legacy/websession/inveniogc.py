@@ -42,6 +42,7 @@ from invenio.modules.access.mailcookie import mail_cookie_gc
 from invenio.legacy.bibdocfile.api import BibDoc
 from invenio.legacy.bibsched.cli import gc_tasks
 from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+from invenio.modules.upgrader.api import op
 from invenio.utils.date import convert_datestruct_to_datetext
 from intbitset import intbitset
 
@@ -330,7 +331,7 @@ def clean_sessions():
     """
     Deletes expired sessions only.
     """
-    if not CFG_INSPIRE_SITE:
+    if op.has_table('session') and not CFG_INSPIRE_SITE:
         deleted_sessions = 0
         timelimit = convert_datestruct_to_datetext(time.gmtime())
         write_message("Deleting expired sessions since %s" % (timelimit,))

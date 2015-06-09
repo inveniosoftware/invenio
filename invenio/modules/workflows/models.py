@@ -701,7 +701,7 @@ class BibWorkflowObject(db.Model):
         Warning: Currently assumes non-binary content.
         """
         if directory is None:
-            directory = cfg['CFG_TMPSHAREDIR']
+            directory = cfg['CFG_TMPSHAREDDIR']
         tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                             prefix=prefix,
                                             suffix=suffix)
