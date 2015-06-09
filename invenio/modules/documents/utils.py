@@ -92,7 +92,7 @@ def _get_legacy_bibdocs(recid, filename=None):
         (bibdoc.fullpath, bibdoc.is_restricted(current_user))
         for bibdoc in BibRecDocs(recid).list_latest_files(list_hidden=False)
         if not bibdoc.subformat and not filename or
-        bibdoc.name + bibdoc.superformat == filename
+        bibdoc.get_full_name() == filename
     ]
 
 
@@ -122,7 +122,7 @@ def _parse_legacy_syntax(identifier):
         `recid:{recid}-{filename}`.
     """
     if '-' in identifier:
-        record_id, filename = identifier.split('recid:')[1].split('-')
+        record_id, filename = identifier.split('recid:')[1].split('-', 1)
     else:
         record_id, filename = identifier.split('recid:')[1], None
     return record_id, filename
