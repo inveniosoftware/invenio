@@ -30,7 +30,7 @@
        from invenio.modules.oauthclient.contrib import cern
 
        CERN_REMOTE_APP = copy.deepcopy(cern.REMOTE_APP)
-       CERN_REMOTE_APP.update(dict(request_token_params={
+       CERN_REMOTE_APP["params"].update(dict(request_token_params={
            "resource": "changeme.cern.ch",  # replace with your server
            "scope": "Name Email Bio Groups",
        }))
