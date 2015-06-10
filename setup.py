@@ -314,8 +314,6 @@ setup(
             ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
-            'webmessageadmin = '
-            ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
             'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',
             'xmlmarc2textmarc = '
             ' invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
