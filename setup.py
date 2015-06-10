@@ -306,7 +306,6 @@ setup(
             'oaiharvest = invenio.legacy.oaiharvest.scripts.oaiharvest:main',
             'oairepositoryupdater = '
             ' invenio.legacy.oairepository.scripts.oairepositoryupdater:main',
-            'arxiv-pdf-checker = invenio.legacy.pdfchecker:main',
             'refextract = invenio.legacy.refextract.scripts.refextract:main',
             'textmarc2xmlmarc = '
             ' invenio.legacy.bibrecord.scripts.textmarc2xmlmarc:main',

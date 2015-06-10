@@ -87,7 +87,6 @@ components:
 - oauth2server
 - oauthclient
 - pages
-- pdfchecker
 - pidstore
 - previewer
 - principal
