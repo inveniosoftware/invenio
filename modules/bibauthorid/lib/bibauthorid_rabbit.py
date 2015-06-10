@@ -209,7 +209,20 @@ def rabbit(bibrecs=None, check_invalid_papers=False,
 
             matched_pids = [p for p in matched_pids if int(p) not in used_pids]
 
-            if not matched_pids or int(matched_pids[0]) in pids_having_rec:
+            best_matched_pid = None
+            for matched_pid in matched_pids:
+                # Because of the wrongly labeled data in the db, all
+                # of the possible choices have to be checked. If one of the
+                # coauthors, who had his signature already considered, claimed
+                # in the past one of the signatures of currently considered
+                # author, the algorithm will think that two signatures belong
+                # to the same person, and, will create an unnecessary new
+                # profile.
+                if not int(matched_pid) in pids_having_rec:
+                    best_matched_pid = matched_pid
+                    break
+
+            if not best_matched_pid:
                 new_pid = new_person_from_signature(list(sig) + [rec],
                                                     name, matchable_name)
                 M_NAME_PIDS_CACHE[matchable_name] = new_pid
@@ -217,11 +230,11 @@ def rabbit(bibrecs=None, check_invalid_papers=False,
                 updated_pids.add(new_pid)
             else:
                 add_signature(list(sig) + [rec], name,
-                              matched_pids[0], m_name=matchable_name)
-                M_NAME_PIDS_CACHE[matchable_name] = matched_pids[0]
-                used_pids.add(matched_pids[0])
-                updated_pids.add(matched_pids[0])
-                pids_having_rec.add(matched_pids[0])
+                              best_matched_pid, m_name=matchable_name)
+                M_NAME_PIDS_CACHE[matchable_name] = best_matched_pid
+                used_pids.add(best_matched_pid)
+                updated_pids.add(best_matched_pid)
+                pids_having_rec.add(best_matched_pid)
 
         logger.log('Finished with %s' % str(rec))
 
