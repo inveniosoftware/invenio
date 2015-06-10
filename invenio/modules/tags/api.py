@@ -21,10 +21,13 @@
 """API for the tags."""
 
 from flask_login import current_user
-from sqlalchemy.exc import DBAPIError
+
 from invenio.ext.sqlalchemy import db
 from invenio.modules.accounts.models import Usergroup
-import invenio.modules.tags.errors as tags_errors
+from invenio.modules.tags import errors as tags_errors
+
+from sqlalchemy.exc import DBAPIError
+
 from .models import WtgTAG, WtgTAGRecord
 
 
@@ -146,7 +149,7 @@ def update_tag_of_user(uid, tag_name, dictionary_to_update):
         raise tags_errors.TagOwnerError(
             "The tag's owner id does not match the given id")
     # initialize variables to default values
-    usergroup_id = 0
+    usergroup_id = None
     group_rights = WtgTAG.ACCESS_LEVELS['View']
     show_in_description = True
     # get the values that user uploaded

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,13 +20,15 @@
 """Test tags REST API."""
 
 from __future__ import print_function
+
 from collections import OrderedDict
+
 from datetime import datetime
-from dateutil.tz import tzutc
+
 from invenio.base.wrappers import lazy_import
-from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.ext.restful.utils import APITestCase
 from invenio.ext.restful import validation_errors
+from invenio.ext.restful.utils import APITestCase
+from invenio.testsuite import make_test_suite, run_test_suite
 
 
 db = lazy_import('invenio.ext.sqlalchemy.db')
@@ -40,7 +42,8 @@ class TestTagsRestfulAPI(APITestCase):
         """Run before each test."""
         from invenio.modules.accounts.models import User
 
-        self.user_a = User(email='user_a@example.com', nickname='user_a')
+        self.user_a = User(email='tag_user_a@example.com',
+                           nickname='tag_user_a')
         self.user_a.password = "iamusera"
 
         try:
@@ -53,13 +56,8 @@ class TestTagsRestfulAPI(APITestCase):
 
     def tearDown(self):
         """Run after every test."""
-        from invenio.modules.accounts.models import User
-
         self.remove_oauth_token()
-        User.query.filter(User.nickname.in_([
-            self.user_a.nickname,
-        ])).delete(synchronize_session=False)
-        db.session.commit()
+        self.delete_objects([self.user_a])
 
     def test_405_methods_tagslistresource(self):
         """Test methods that return 405."""
@@ -122,7 +120,7 @@ class TestTagsRestfulAPI(APITestCase):
         ordered_json_answer = OrderedDict(
             sorted(answer.json.items(), key=lambda t: t[0])
         )
-        #query the created tag
+        # query the created tag
         retrieved_tag = WtgTAG.query.filter(
             WtgTAG.name == data[data.keys()[0]]).first()
         expected_result = dict(
@@ -222,8 +220,8 @@ class TestTagsRestfulAPI(APITestCase):
                     code=validation_errors['INCORRECT_TYPE']['error_code'],
                     message=(
                         validation_errors['INCORRECT_TYPE']['error_mesg'] +
-                        ": " + "'" + ordered_to_update.keys()[1] + "' "
-                        + "must be of boolean type"
+                        ": " + "'" + ordered_to_update.keys()[1] + "' " +
+                        "must be of boolean type"
                     ),
                     field=ordered_to_update.keys()[1],
                 ),
@@ -232,8 +230,8 @@ class TestTagsRestfulAPI(APITestCase):
                           ['error_code']),
                     message=(
                         validation_errors['VALUE_OUT_OF_BOUNDS']
-                        ['error_mesg'] + " : " + "unallowed value "
-                        + str(ordered_to_update[ordered_to_update.keys()[0]])
+                        ['error_mesg'] + " : " + "unallowed value " +
+                        str(ordered_to_update[ordered_to_update.keys()[0]])
                     ),
                     field=ordered_to_update.keys()[0],
                 )
@@ -501,7 +499,7 @@ class TestTagsRestfulAPI(APITestCase):
                 sorted(tag_representation.items(), key=lambda t: t[0])
             )
             ordered_created_tags.append(ordered_tag_repr)
-        #now query DB
+        # now query DB
         get_answer = self.get(
             'recordlisttagresource',
             user_id=self.user_a.id,
