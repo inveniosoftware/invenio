@@ -114,7 +114,7 @@ class AccMAILCOOKIE(db.Model):
             cls,
             AccMAILCOOKIE._data
         ).filter_by(id=cookie_id).one()
-        obj.data = mysql_aes_decrypt(loads(data), password)
+        obj.data = loads(mysql_aes_decrypt(data, password))
 
         (kind_check, params, expiration, onetime_check) = obj.data
         assert obj.kind in cls.AUTHORIZATIONS_KIND
