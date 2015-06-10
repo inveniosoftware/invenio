@@ -21,17 +21,15 @@
 
 import math
 
-from flask import session, request, render_template
-from flask_login import current_user
+from flask import render_template, request, session
 from flask.helpers import url_for
 
-from sqlalchemy import event
-
-from werkzeug.utils import import_string
+from flask_login import current_user
 
 from invenio.base.globals import cfg
 from invenio.modules.cloudconnector.registry import fsopeners
-# TODO from invenio.modules.tags.models import WtgTAGRecord
+
+from werkzeug.utils import import_string
 
 
 def get_fsopener_module(key):

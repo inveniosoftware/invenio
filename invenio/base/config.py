@@ -70,6 +70,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.multimedia',
     'invenio.modules.pages',
+    'invenio.modules.tags',
 ]
 
 LEGACY_WEBINTERFACE_EXCLUDE = []

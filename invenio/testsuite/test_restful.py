@@ -17,13 +17,14 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import url_for, request
+from flask import request, url_for
+
 from flask_restful import Resource
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
-from invenio.ext.restful import require_api_auth, require_oauth_scopes, \
-    require_header
+from invenio.ext.restful import require_api_auth, require_header, \
+    require_oauth_scopes
 from invenio.ext.sqlalchemy import db
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class DecoratorsTestCase(InvenioTestCase):
@@ -212,7 +213,8 @@ class RestfulPaginationTestCase(InvenioTestCase):
                     link_header = p.link_header(**kwargs)
                     response = make_response(json.dumps(data_to_return))
                     response.headers[link_header[0]] = link_header[1]
-                    response.headers['Content-Type'] = request.headers['Content-Type']
+                    response.headers[
+                        'Content-Type'] = request.headers['Content-Type']
                 except InvalidPageError as e:
                     exception = {}
                     exception['message'] = e.error_msg
@@ -348,6 +350,45 @@ class RestfulPaginationTestCase(InvenioTestCase):
         self.assertEqual(answer_get.json, expected)
 
 
+class WtgTAGPaginationMokup:
+
+    total = 6
+
+    class TagMockup():
+        def __init__(self, id):
+            self.id = id
+            self.name = 'tag' + str(id)
+            self.id_user = id + 1
+
+    @staticmethod
+    def items():
+        items = list()
+        for i in range(WtgTAGPaginationMokup.total):
+            obj = WtgTAGPaginationMokup.TagMockup(id=i)
+            items.append(obj)
+        return items
+
+    class paginate:
+
+        def __init__(self, page, per_page, error_out=True):
+            self.page = page
+            self.per_page = per_page
+            self.pages = int(WtgTAGPaginationMokup.total / per_page) + 1
+
+        @property
+        def has_next(self):
+            return (self.page * self.per_page) < WtgTAGPaginationMokup.total
+
+        @property
+        def has_prev(self):
+            return ((self.page - 1) * self.per_page) > 0
+
+        @property
+        def items(self):
+            return WtgTAGPaginationMokup.items()[
+                (self.page - 1) * self.per_page:self.page * self.per_page]
+
+
 class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
 
     def setUp(self):
@@ -374,7 +415,7 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
                 Declared the attributes to marshal with a tag.
                 :param retrieved_tag: a tag from the database
                 """
-                #get fields from the given tag
+                # get fields from the given tag
                 self.id = retrieved_tag.id
                 self.name = retrieved_tag.name
                 self.id_user = retrieved_tag.id_user
@@ -393,7 +434,6 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
             def get(self):
                 import json
                 from flask import make_response
-                from invenio.modules.tags.models import WtgTAG
                 from invenio.ext.restful.errors import(
                     RestfulError, InvalidPageError
                 )
@@ -420,7 +460,7 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
                     # need to sort by id
                     # also assuming only one user so no need to filter
                     # user's id
-                    tags_q = WtgTAG.query.order_by(WtgTAG.id)
+                    tags_q = WtgTAGPaginationMokup()
                     p = pagination.RestfulSQLAlchemyPagination(
                         query=tags_q, page=page, per_page=per_page
                     )
@@ -440,7 +480,8 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
                     link_header = p.link_header(**kwargs)
                     response = make_response(json.dumps(tags_to_return))
                     response.headers[link_header[0]] = link_header[1]
-                    response.headers['Content-Type'] = request.headers['Content-Type']
+                    response.headers[
+                        'Content-Type'] = request.headers['Content-Type']
                 except (RestfulError, InvalidPageError) as e:
                     exception = {}
                     exception['message'] = e.error_msg
@@ -474,17 +515,10 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
         db.session.commit()
 
     def test_pagination_flow(self):
-        from invenio.modules.tags import api as tags_api
-        # template of tags names
-        tag_name_template = "tag{}"
         # endpoint
         endpoint = "/api/testtags/?"
         # links template
         link_template = '<{}per_page={}&page={}>; rel="{}"'
-        # create tags
-        for i in range(1, 7):
-            tag_name = tag_name_template.format(i)
-            tags_api.create_tag_for_user(self.user.id, tag_name)
 
         # request first page
         answer_get = self.client.get(
@@ -495,13 +529,13 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
         tags_names_from_request = [x['name'] for x in answer_get.json]
         links_string = answer_get.headers['Link']
         expected_names = []
-        for i in range(1, 3):
-            expected_name = tag_name_template.format(i)
+        for i in range(0, 2):
+            expected_name = WtgTAGPaginationMokup.items()[i].name
             expected_names.append(expected_name)
 
         first_link = link_template.format(endpoint, 2, 1, "first")
         next_link = link_template.format(endpoint, 2, 2, "next")
-        last_link = link_template.format(endpoint, 2, 3, "last")
+        last_link = link_template.format(endpoint, 2, 4, "last")
         expected_links_string = "{0},{1},{2}".format(
             first_link,
             next_link,
@@ -522,14 +556,14 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
         links_string = answer_get.headers['Link']
         # check if names of tags are the expected ones
         expected_names = []
-        for i in range(3, 5):
-            expected_name = tag_name_template.format(i)
+        for i in range(2, 4):
+            expected_name = WtgTAGPaginationMokup.items()[i].name
             expected_names.append(expected_name)
 
         first_link = link_template.format(endpoint, 2, 1, "first")
         prev_link = link_template.format(endpoint, 2, 1, "prev")
         next_link = link_template.format(endpoint, 2, 3, "next")
-        last_link = link_template.format(endpoint, 2, 3, "last")
+        last_link = link_template.format(endpoint, 2, 4, "last")
         expected_links_string = "{0},{1},{2},{3}".format(
             first_link,
             prev_link,
@@ -552,13 +586,13 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
         links_string = answer_get.headers['Link']
         # check if names of tags are the expected ones
         expected_names = []
-        for i in range(5, 7):
-            expected_name = tag_name_template.format(i)
+        for i in range(4, 6):
+            expected_name = WtgTAGPaginationMokup.items()[i].name
             expected_names.append(expected_name)
 
         first_link = link_template.format(endpoint, 2, 1, "first")
         prev_link = link_template.format(endpoint, 2, 2, "prev")
-        last_link = link_template.format(endpoint, 2, 3, "last")
+        last_link = link_template.format(endpoint, 2, 4, "last")
         expected_links_string = "{0},{1},{2}".format(
             first_link,
             prev_link,
@@ -567,9 +601,6 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
 
         self.assertEqual(set(tags_names_from_request), set(expected_names))
         self.assertEqual(links_string, expected_links_string)
-
-        # delete created tags
-        tags_api.delete_all_tags_from_user(self.user.id)
 
     def test_paginate_nonexistentpage(self):
         from invenio.ext.restful import errors
