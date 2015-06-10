@@ -40,8 +40,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_VERSION, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
-     CFG_INSPIRE_SITE, \
-     CFG_WEBLINKBACK_TRACKBACK_ENABLED
+     CFG_INSPIRE_SITE
 
 from invenio.base.i18n import gettext_set_language, language_list_long, is_language_rtl
 from invenio.utils.url import make_canonical_urlargd, create_html_link, \

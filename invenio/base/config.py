@@ -68,7 +68,6 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
     'invenio.modules.archiver',
     'invenio.modules.communities',  # remove with invenio/modules/communities
-    'invenio.modules.linkbacks',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
 ]
@@ -663,7 +662,6 @@ CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS = 20
 CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS = 1
 CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR = False
 CFG_WEBDEPOSIT_UPLOAD_FOLDER = "var/tmp/webdeposit_uploads"
-CFG_WEBLINKBACK_TRACKBACK_ENABLED = 0
 CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS = 60
 CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES = 30
 CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE = 20000

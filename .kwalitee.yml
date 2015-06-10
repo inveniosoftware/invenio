@@ -74,7 +74,6 @@ components:
 - knowledge
 - kwalitee
 - legacy
-- linkbacks
 - logging
 - login
 - matcher

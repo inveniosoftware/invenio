@@ -188,7 +188,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'youraccount',
         'youralerts',
         'yourbaskets',
-        'yourmessages',
         'yourloans',
         'yourcomments',
         'ill',
@@ -197,7 +196,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'error',
         'oai2d', ('oai2d.py', 'oai2d'),
         ('getfile.py', 'getfile'),
-        'submit',
         'rss',
         'stats',
         'journal',
@@ -208,7 +206,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'bibsword',
         'ping',
         'admin2',
-        'linkbacks',
         'textmining',
         'goto',
         'info',
@@ -222,11 +219,9 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
                                               WebInterfaceDisabledPages)()
 
     _mapping = dict(
-        submit='WebInterfaceSubmitPages',
         youraccount='WebInterfaceYourAccountPages',
         youralerts='WebInterfaceYourAlertsPages',
         yourbaskets='WebInterfaceYourBasketsPages',
-        yourmessages='WebInterfaceYourMessagesPages',
         yourloans='WebInterfaceYourLoansPages',
         ill='WebInterfaceILLPages',
         yourtickets='WebInterfaceYourTicketsPages',
@@ -244,7 +239,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         batchuploader='WebInterfaceBatchUploaderPages',
         bibsword='WebInterfaceSword',
         ping='WebInterfacePingPages',
-        linkbacks='WebInterfaceRecentLinkbacksPages',
         textmining='WebInterfaceDocExtract',
         yourcomments='WebInterfaceYourCommentsPages',
         goto='WebInterfaceGotoPages',

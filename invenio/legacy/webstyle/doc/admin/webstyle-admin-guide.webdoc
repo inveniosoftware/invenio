@@ -417,11 +417,6 @@ The following tabs are available:
     <td>Displays the holdings if the record is a book with items</td>
     <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/holdings"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/holdings</a></td>
   </tr>
-  <tr>
-    <td>Linkbacks</td>
-    <td>Displays the linkbacks to the given record</td>
-    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/linkbacks"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/linkbacks</a></td>
-  </tr>
 </table>
 
 <p>The mini panel is only displayed when the <em>Information</em> tab is

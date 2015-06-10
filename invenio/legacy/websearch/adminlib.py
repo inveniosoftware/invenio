@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -44,7 +44,6 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
-     CFG_WEBLINKBACK_TRACKBACK_ENABLED, \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE
@@ -3409,7 +3408,6 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 8},
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 9},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 10},
-            'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 11},
             'hepdata'   : {'label': _('HepData'),          'visible': False, 'enabled': True, 'order': 12},
             }
 
@@ -3427,9 +3425,6 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         # assume all tabs are displayed
         for key in tabs.keys():
             tabs[key]['visible'] = True
-
-    if not CFG_WEBLINKBACK_TRACKBACK_ENABLED:
-        tabs['linkbacks']['visible'] = False
 
     if not CFG_WEBCOMMENT_ALLOW_COMMENTS:
         tabs['comments']['visible'] = False
