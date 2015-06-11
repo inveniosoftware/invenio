@@ -44,6 +44,7 @@ from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_di
     get_hepnames_data, get_self_pubs, get_collabtuples, get_internal_publications, \
     get_external_publications, expire_all_cache_for_person, get_person_oldest_date, \
     get_datasets, get_canonical_name_of_author
+from invenio.webauthorprofile_config import deserialize
 
 from invenio.bibauthorid_general_utils import get_doi_url, get_arxiv_url, get_inspire_record_url
 from invenio.webpage import page
@@ -55,6 +56,7 @@ from invenio.bibauthorid_webinterface import WebInterfaceAuthorTicketHandling
 import invenio.bibauthorid_webapi as webapi
 from invenio.bibauthorid_dbinterface import get_canonical_name_of_author
 from invenio.bibauthorid_config import CFG_BIBAUTHORID_ENABLED, AID_VISIBILITY
+from invenio.bibformat import format_record
 import invenio.template
 import cProfile, pstats, cStringIO
 
@@ -62,7 +64,7 @@ websearch_templates = invenio.template.load('websearch')
 webauthorprofile_templates = invenio.template.load('webauthorprofile')
 bibauthorid_template = invenio.template.load('bibauthorid')
 
-from invenio.search_engine import page_end
+from invenio.search_engine import page_end, perform_request_search
 JSON_OK = False
 
 if hexversion < 0x2060000:
@@ -715,25 +717,50 @@ class WebAuthorPages(WebInterfaceDirectory):
 
     @wrap_json_req_profiler
     def create_authorpage_pubs_list(self, req, form):
+
+        def get_unsorted_datasets(items):
+            return [(title, get_inspire_record_url(recid),
+                     recid) for recid, title
+                    in items.iteritems()][0:10]
+
+        def get_sorted_internal_pubs(items, order):
+            result = []
+            current_index = 0
+            while(current_index < 10):
+                y = order[current_index]
+                item = filter(lambda x: x[0] == y, items.iteritems())
+                recid, title = item[0]
+                result.append((title, get_inspire_record_url(recid), recid))
+                current_index += 1
+            return result
+
         if 'jsondata' in form:
             json_data = json.loads(str(form['jsondata']))
             json_data = json_unicode_to_utf8(json_data)
             if 'personId' in json_data:
                 person_id = json_data['personId']
 
+                try:
+                    canonical_name = get_canonical_name_of_author(person_id)[0][0]
+                    internal_search_pubs = perform_request_search(p="exactauthor:%s" % canonical_name,
+                                                                  sf="earliestdate",
+                                                                  so="d")
+                except IndexError:
+                    canonical_name = None
+                    internal_search_pubs = []
+
                 internal_pubs, internal_pubsStatus = get_internal_publications(person_id)
                 external_pubs, external_pubsStatus = get_external_publications(person_id)
                 datasets_pubs, datasets_pubsStatus = get_datasets(person_id)
 
                 if internal_pubs is not None and internal_pubsStatus is True:
-                    internal_pubs = sorted([(title, get_inspire_record_url(recid), recid) for recid, title
-                                            in internal_pubs.iteritems()], key=lambda x: x[2], reverse=True)[0:10]
+                    internal_pubs = \
+                        get_sorted_internal_pubs(internal_pubs, internal_search_pubs)
                 else:
                     internal_pubs = list()
 
                 if datasets_pubs is not None and datasets_pubsStatus is True:
-                    datasets_pubs_to_display = sorted([(title, get_inspire_record_url(recid), recid) for recid, title
-                                                       in datasets_pubs.iteritems()], key=lambda x: x[2], reverse=True)[0:10]
+                    datasets_pubs_to_display = get_unsorted_datasets(datasets_pubs)
                 else:
                     datasets_pubs_to_display = list()
 
@@ -752,10 +779,6 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 external_pubs = arxiv_pubs + doi_pubs
 
-                try:
-                    canonical_name = get_canonical_name_of_author(person_id)[0][0]
-                except IndexError:
-                    canonical_name = None
                 all_pubs_search_link = "%s/search?p=exactauthor%%3A%s&sf=earliestdate" % (CFG_BASE_URL, canonical_name)
 
                 if datasets_pubs:
