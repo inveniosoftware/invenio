@@ -164,7 +164,6 @@ DEF_ACTIONS = (
                ('runoaiharvest', 'run oaiharvest task', '', 'no'),
                ('runoairepository', 'run oairepositoryupdater task', '', 'no'),
                ('runbibedit', 'run Record Editor', 'collection', 'yes'),
-               ('runbibeditmulti', 'run Multi-Record Editor', '', 'no'),
                ('runbibdocfile', 'run Document File Manager', '', 'no'),
                ('runbibmerge', 'run Record Merger', '', 'no'),
                ('runbibswordclient', 'run BibSword client', '', 'no'),
@@ -239,7 +238,6 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
     'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
