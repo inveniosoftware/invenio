@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,12 +33,14 @@ from invenio.bibtask import task_init, write_message, \
     task_sleep_now_if_required
 from invenio.dbquery import run_sql
 
-import string
-import random
-import time
 import os
-from unidecode import unidecode
+import random
+import re
+import string
+import time
+
 from tempfile import mkstemp
+from unidecode import unidecode
 
 DESCRIPTION = """
     Generate TexKeys in records without one
@@ -82,6 +84,15 @@ def _texkey_random_chars(recid, use_random=False):
             texkey_third_part += random.choice(letters)
 
     return texkey_third_part
+
+
+def _get_year(datestring=''):
+    """extract 4 digit substring from a datestring"""
+    ymatch = re.search(r'\d{4}', datestring)
+    if ymatch:
+        return ymatch.group()
+    else:
+        return None
 
 
 class TexkeySeq(SequenceGenerator):
@@ -150,37 +161,40 @@ class TexkeySeq(SequenceGenerator):
         except KeyError:
             texkey_first_part = ""
 
-        year = record_get_field_value(bibrecord,
-                                        tag="269",
-                                        ind1="",
-                                        ind2="",
-                                        code="c")
+        year = _get_year(
+            record_get_field_value(bibrecord,
+                                   tag="269",
+                                   ind1="",
+                                   ind2="",
+                                   code="c"))
         if not year:
-            year = record_get_field_value(bibrecord,
-                                    tag="260",
-                                    ind1="",
-                                    ind2="",
-                                    code="c")
+            year = _get_year(
+                record_get_field_value(bibrecord,
+                                       tag="260",
+                                       ind1="",
+                                       ind2="",
+                                       code="c"))
             if not year:
-                year = record_get_field_value(bibrecord,
-                                    tag="773",
-                                    ind1="",
-                                    ind2="",
-                                    code="y")
+                year = _get_year(
+                    record_get_field_value(bibrecord,
+                                           tag="773",
+                                           ind1="",
+                                           ind2="",
+                                           code="y"))
                 if not year:
-                    year = record_get_field_value(bibrecord,
-                                    tag="502",
-                                    ind1="",
-                                    ind2="",
-                                    code="d")
+                    year = _get_year(
+                        record_get_field_value(bibrecord,
+                                               tag="502",
+                                               ind1="",
+                                               ind2="",
+                                               code="d"))
 
                     if not year:
                         raise TexkeyNoYearError
 
-        try:
-            texkey_second_part = year.split("-")[0]
-        except KeyError:
-            texkey_second_part = ""
+        texkey_second_part = ''
+        if year:
+            texkey_second_part = year
 
         texkey_third_part = _texkey_random_chars(recid)
 
