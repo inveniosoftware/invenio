@@ -726,16 +726,12 @@ class WebAuthorPages(WebInterfaceDirectory):
         def get_sorted_internal_pubs(items, order):
             result = []
             current_index = 0
-            offset = 0
-            while(current_index < 10 and current_index + offset < len(order)):
-                recid = order[current_index + offset]
-                if recid in items:
-                    title = items[recid]
-                    result.append((title, get_inspire_record_url(recid),
-                                   recid))
-                    current_index += 1
-                else:
-                    offset += 1
+            while(current_index < 10):
+                y = order[current_index]
+                item = filter(lambda x: x[0] == y, items.iteritems())
+                recid, title = item[0]
+                result.append((title, get_inspire_record_url(recid), recid))
+                current_index += 1
             return result
 
         if 'jsondata' in form:
