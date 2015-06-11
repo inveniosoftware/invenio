@@ -299,8 +299,6 @@ setup(
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
             'docextract = invenio.legacy.docextract.scripts.docextract:main',
             'gotoadmin = invenio.modules.redirector.scripts.redirector:main',
-            'hepdataharvest = '
-            ' invenio.utils.hepdata.scripts.hepdataharvest:main',
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
             'oaiharvest = invenio.legacy.oaiharvest.scripts.oaiharvest:main',
             'oairepositoryupdater = '

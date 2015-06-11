@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ $(document).ready(function() {
     data = { 'personId': gPID };
     funcs = ['create_authorpage_name_variants', 'create_authorpage_combined_papers', 'create_authorpage_keywords', 'create_authorpage_fieldcodes', 'create_authorpage_affiliations',
                  'create_authorpage_coauthors', 'create_authorpage_pubs', 'create_authorpage_authors_pubs', 'create_authorpage_citations', 'create_authorpage_pubs_graph',
-                 'create_authorpage_hepdata', 'create_authorpage_collaborations', 'create_authorpage_pubs_list'];
+                 'create_authorpage_collaborations', 'create_authorpage_pubs_list'];
     funcsLength = funcs.length;
     var count = Math.min( gNumOfWorkers, funcs.length);
     xhrPool = [];
