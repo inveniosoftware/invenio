@@ -155,11 +155,6 @@ descriptions the module relationship diagram is presented.
  BibUpload come from the BibConvert utility.
  </li>
 
- <li><strong>ElmSubmit</strong> is an email submission gateway that
- permits for automatic document uploads from trusted sources via
- email.  (Usually web submission or harvesting is preferred.)
- </li>
-
  <li><strong>MiscUtil</strong> is a collection of miscellaneous
  utilities that other modules are using, like the international
  messages, etc.

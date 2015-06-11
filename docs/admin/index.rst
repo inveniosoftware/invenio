@@ -39,7 +39,6 @@ Admin's Guide
    bibsword-client-admin-guide
    bibupload-admin-guide
    docextract-admin-guide
-   elmsubmit-admin-guide
    oaiharvest-admin-guide
    oairepository-admin-guide
    publiline-admin-guide

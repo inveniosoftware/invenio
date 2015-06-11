@@ -154,21 +154,6 @@ data are uploaded in Invenio, you may want to modify them via
 
 <tr>
 <td>
-  <strong>ElmSubmit Admin</strong>
-</td>
-<td>
-    Enables you to configure the submission of documents by electronic mail.
-</td>
-<td>
-  <small class="note">command-line program</small>
-</td>
-<td>
-  <a href="elmsubmit-admin-guide">ElmSubmit Admin Guide</a>
-</td>
-</tr>
-
-<tr>
-<td>
   <strong>BibEdit Admin</strong>
 </td>
 <td>

@@ -298,7 +298,6 @@ setup(
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
             'docextract = invenio.legacy.docextract.scripts.docextract:main',
-            'elmsubmit = invenio.legacy.elmsubmit.scripts.elmsubmit:main',
             'gotoadmin = invenio.modules.redirector.scripts.redirector:main',
             'hepdataharvest = '
             ' invenio.utils.hepdata.scripts.hepdataharvest:main',
