@@ -25,7 +25,6 @@ from invenio.modules.workflows.tasks.marcxml_tasks import (
 )
 from ..tasks.postprocess import (
     arxiv_fulltext_download,
-    author_list,
     check_record,
     convert_record_with_repository,
     filter_step,
@@ -56,10 +55,6 @@ class oaiharvest_record_post_process(RecordWorkflow):
         workflow_if(post_process_selected("p")),
         [
             plot_extract(),
-        ],
-        workflow_if(post_process_selected("a")),
-        [
-            author_list,
         ],
         workflow_if(post_process_selected("r")),
         [

@@ -147,14 +147,14 @@ except ImportError:
 
 try:
     from invenio.legacy.bibcirculation.admin_webinterface import \
-         WebInterfaceBibCirculationAdminPages
+        WebInterfaceBibCirculationAdminPages
 except ImportError:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
 
 try:
     from invenio.legacy.bibsched.webinterface import \
-         WebInterfaceBibSchedPages
+        WebInterfaceBibSchedPages
 except ImportError:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
@@ -209,7 +209,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'textmining',
         'goto',
         'info',
-        'authorlist',
     ] + test_exports
 
     def __init__(self):
@@ -242,7 +241,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         textmining='WebInterfaceDocExtract',
         yourcomments='WebInterfaceYourCommentsPages',
         goto='WebInterfaceGotoPages',
-        authorlist='WebInterfaceAuthorlistPages',
     )
 
     def __new__(cls):

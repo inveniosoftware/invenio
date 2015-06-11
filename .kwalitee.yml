@@ -29,7 +29,6 @@ components:
 - archiver
 - arxiv
 - assets
-- authorlist
 - authorprofiles
 - authors
 - babel
