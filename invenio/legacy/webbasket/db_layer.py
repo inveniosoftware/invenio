@@ -373,7 +373,6 @@ def move_baskets_to_topic(uid, bskids, new_topic):
 def delete_basket(bskid):
     """Delete given basket."""
 
-    # TODO: check if any alerts are automaticly adding items to the given basket.
     bskid = int(bskid)
 
     query1 = "DELETE FROM bskBASKET WHERE id=%s"
@@ -397,9 +396,6 @@ def delete_basket(bskid):
 
     query5 = "DELETE FROM usergroup_bskBASKET WHERE id_bskBASKET=%s"
     run_sql(query5, (bskid,))
-
-    query6 = "DELETE FROM user_query_basket WHERE id_basket=%s"
-    run_sql(query6, (bskid,))
 
     return int(res)
 
@@ -2069,7 +2065,7 @@ def is_user_subscribed_to_basket(uid, bskid):
     return __wash_sql_count(res)
 
 def count_subscribers(uid, bskid):
-    """Returns a (number of users, number of groups, number of alerts) tuple
+    """Returns a (number of users, number of groups, 0) tuple
     for the given user (uid) and basket (bskid)."""
 
     uid = int(uid)
@@ -2093,14 +2089,7 @@ def count_subscribers(uid, bskid):
     res_users = run_sql(query_users, params_users)
     nb_users = __wash_sql_count(res_users)
 
-    query_alerts = """  SELECT      count(id_query)
-                        FROM        user_query_basket
-                        WHERE       id_basket=%s
-                        GROUP BY    id_basket"""
-    params_alerts = (bskid,)
-    res_alerts = run_sql(query_alerts, params_alerts)
-    nb_alerts = __wash_sql_count(res_alerts)
-    return (nb_users, nb_groups, nb_alerts)
+    return (nb_users, nb_groups, 0)
 
 def get_groups_subscribing_to_basket(bskid):
     """ get list of (group id, group name, rights) tuples for a given basket

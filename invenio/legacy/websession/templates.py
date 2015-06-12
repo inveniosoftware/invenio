@@ -578,14 +578,6 @@ class Template:
             'your_comments' : _("Your Comments"),
             'comments_explain' : _("Display all the comments you have submitted so far."),
             }
-        out += """</dd>
-        <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a></dt>
-        <dd>%(explain_alerts)s""" % {
-          'ln' : ln,
-          'your_alerts' : _("Your Alerts"),
-          'explain_alerts' : _("Subscribe to a search which will be run periodically by our service. The result can be sent to you via Email or stored in one of your baskets."),
-        }
-        out += "</dd>"
         if CFG_CERN_SITE:
             out += """</dd>
             <dt><a href="%(CFG_SITE_SECURE_URL)s/yourloans/display?ln=%(ln)s">%(your_loans)s</a></dt>
@@ -610,15 +602,13 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'alerts' or 'baskets')
+          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'baskets')
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
         if (type=='baskets'):
             msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
-        elif (type=='alerts'):
-            msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.", **{'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                 'x_url_close': '</a>'})
         return """<table class="errorbox" summary="">
@@ -729,8 +719,6 @@ class Template:
             comments_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourcomments/?ln=' + ln + '">',
                                      'x_url_close': '</a>'}
             out += self.tmpl_account_template(_("Your Comments"), comments_description, ln, '/yourcomments/?ln=%s' % ln)
-        if alerts:
-            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
 
         if searches:
             out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)

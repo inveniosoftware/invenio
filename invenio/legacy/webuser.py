@@ -697,7 +697,6 @@ def create_userinfobox_body(req, uid, language="en"):
                                             admin=user_info['precached_useadmin'],
                                             usebaskets=user_info['precached_usebaskets'],
                                             usemessages=user_info['precached_usemessages'],
-                                            usealerts=user_info['precached_usealerts'],
                                             usegroups=user_info['precached_usegroups'],
                                             useloans=user_info['precached_useloans'],
                                             usestats=user_info['precached_usestats']

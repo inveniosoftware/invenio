@@ -1784,7 +1784,7 @@ class Template:
         """
         display a confirm message
         @param bskid: basket id
-        @param nb*: nb of users/groups/alerts linked to this basket
+        @param nb*: nb of users/groups/dummy linked to this basket
         @param category: private, group or external baskets are selected
         @param selected_topic: if private baskets, topic nb
         @param selected_group_id: if group: group to display baskets of
@@ -1797,8 +1797,6 @@ class Template:
             message += '<p>' + cgi.escape(_("%(x_num)i users are subscribed to this basket.", x_num=nb_users), True) + '</p>'
         if nb_groups:
             message += '<p>' + cgi.escape(_("%(x_num)i user groups are subscribed to this basket.", x_num=nb_groups), True) + '</p>'
-        if nb_alerts:
-            message += '<p>' + cgi.escape(_("You have set %(x_num)i alerts on this basket.", x_num=nb_alerts), True) + '</p>'
         out = """
 <table class="confirmoperation">
   <tr>

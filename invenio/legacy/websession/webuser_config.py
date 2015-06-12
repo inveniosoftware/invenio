@@ -32,7 +32,6 @@ CFG_WEBUSER_USER_TABLES = (
     ("user_usergroup", "id_user"),
     ("user_accROLE", "id_user"),
     ("user_query", "id_user"),
-    ("user_query_basket", "id_user"),
     ("bskREC", "id_user_who_added_item"),
     ("user_bskBASKET", "id_user"),
     ("bskRECORDCOMMENT", "id_user"),

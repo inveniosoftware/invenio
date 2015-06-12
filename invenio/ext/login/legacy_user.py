@@ -48,7 +48,6 @@ CFG_USER_DEFAULT_INFO = {
     'precached_usebaskets': False,
     'precached_useloans': False,
     'precached_usegroups': False,
-    'precached_usealerts': False,
     'precached_usemessages': False,
     'precached_viewsubmissions': False,
     'precached_useapprove': False,
@@ -208,8 +207,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
             user_info, 'useloans')[0] == 0
         data['precached_usegroups'] = acc_authorize_action(
             user_info, 'usegroups')[0] == 0
-        data['precached_usealerts'] = acc_authorize_action(
-            user_info, 'usealerts')[0] == 0
         data['precached_usemessages'] = acc_authorize_action(
             user_info, 'usemessages')[0] == 0
         data['precached_usestats'] = acc_authorize_action(

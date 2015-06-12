@@ -354,7 +354,6 @@ def guest_user_garbage_collector():
                 'bskRECORDCOMMENT': 0,
                 'bskEXTREC': 0,
                 'bskEXTFMT': 0,
-                'user_query_basket': 0,
                 'mail_cookie': 0,
                 'email_addresses': 0,
                 'role_membership' : 0}
@@ -480,19 +479,6 @@ def guest_user_garbage_collector():
         delcount['bskEXTREC'] += run_sql("""DELETE FROM "bskEXTREC" WHERE id=%s""", (id_basket,))
         delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE id_bskEXTREC=%s""", (id_basket,))
 
-    # 4 - DELETE ALERTS NOT OWNED BY ANY USER
-    write_message('- deleting alerts not owned by any user')
-
-    # select user ids in uqb that reference non-existent users
-    write_message("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""", verbose=9)
-    result = run_sql("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
-    write_message(result, verbose=9)
-
-    # delete all these entries
-    for (id_user,) in result:
-        write_message("""DELETE FROM "user_query_basket" WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
-        delcount['user_query_basket'] += run_sql("""DELETE FROM "user_query_basket" WHERE id_user = %s """, (id_user,))
-
     # 5 - delete expired mailcookies
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
@@ -517,7 +503,6 @@ def guest_user_garbage_collector():
     write_message("""  %7s basket_external_records.""" % (delcount['bskEXTREC'],))
     write_message("""  %7s basket_external_formats.""" % (delcount['bskEXTFMT'],))
     write_message("""  %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'],))
-    write_message("""  %7s user_query_baskets.""" % (delcount['user_query_basket'],))
     write_message("""  %7s mail_cookies.""" % (delcount['mail_cookie'],))
     write_message("""  %7s non confirmed email addresses.""" % delcount['email_addresses'])
     write_message("""  %7s role_memberships.""" % (delcount['role_membership'],))
