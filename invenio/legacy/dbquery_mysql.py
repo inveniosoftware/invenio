@@ -19,11 +19,7 @@
 
 """Invenio utilities to run SQL queries.
 
-The main API functions are:
-    - run_sql()
-    - run_sql_many()
-    - run_sql_with_limit()
-but see the others as well.
+The main API function is run_sql(), but see the others as well.
 """
 
 # dbquery clients can import these from here:
@@ -133,15 +129,6 @@ def get_connection_for_dump_on_slave():
     return connection
 
 
-class InvenioDbQueryWildcardLimitError(Exception):
-
-    """Exception raised when query limit reached."""
-
-    def __init__(self, res):
-        """Initialization."""
-        self.res = res
-
-
 def _db_login(dbhost=None, relogin=0):
     """Login to the database."""
     # Note: we are using "use_unicode=False", because we want to
@@ -192,33 +179,6 @@ def _db_login(dbhost=None, relogin=0):
             )
             connection.autocommit(True)
             return connection
-
-
-def _db_logout(dbhost=None):
-    """Close a connection."""
-    if dbhost is None:
-        dbhost = cfg['CFG_DATABASE_HOST']
-    try:
-        del _DB_CONN[dbhost][(os.getpid(), get_ident())]
-    except KeyError:
-        pass
-
-
-def close_connection(dbhost=None):
-    """Enforce the closing of a connection.
-
-    Highly relevant in multi-processing and multi-threaded modules
-    """
-    if dbhost is None:
-        dbhost = cfg['CFG_DATABASE_HOST']
-    try:
-        db = _DB_CONN[dbhost][(os.getpid(), get_ident())]
-        cur = db.cursor()
-        cur.execute("UNLOCK TABLES")
-        db.close()
-        del _DB_CONN[dbhost][(os.getpid(), get_ident())]
-    except KeyError:
-        pass
 
 
 def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
@@ -323,90 +283,6 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         return rc
 
 
-def run_sql_many(query, params, limit=None, run_on_slave=False):
-    """Run SQL on the server with PARAM.
-
-    This method does executemany and is therefore more efficient than execute
-    but it has sense only with queries that affect state of a database
-    (INSERT, UPDATE). That is why the results just count number of affected
-    rows.
-
-    @param params: tuple of tuple of string params to insert in the query
-
-    @param limit: query will be executed in parts when number of
-         parameters is greater than limit (each iteration runs at most
-         `limit' parameters)
-
-    @return: SQL result as provided by database
-    """
-    if limit is None:
-        limit = cfg['CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT']
-
-    if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
-        # do not connect to the database as the site is closed for maintenance:
-        return []
-    elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
-        # Read only website
-        if not query.upper().startswith("SELECT") \
-           and not query.upper().startswith("SHOW"):
-            return
-
-    dbhost = cfg['CFG_DATABASE_HOST']
-    if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
-        dbhost = cfg['CFG_DATABASE_SLAVE']
-    i = 0
-    r = None
-    while i < len(params):
-        # make partial query safely (mimicking procedure from run_sql())
-        try:
-            db = _db_login(dbhost)
-            cur = db.cursor()
-            gc.disable()
-            rc = cur.executemany(query, params[i:i + limit])
-            gc.enable()
-        except (OperationalError, MySQLdbOperationalError, InterfaceError):
-            try:
-                db = _db_login(dbhost, relogin=1)
-                cur = db.cursor()
-                gc.disable()
-                rc = cur.executemany(query, params[i:i + limit])
-                gc.enable()
-            except (OperationalError, MySQLdbOperationalError, InterfaceError):
-                raise
-        # collect its result:
-        if r is None:
-            r = rc
-        else:
-            r += rc
-        i += limit
-    return r
-
-
-def run_sql_with_limit(query, param=None, n=0, with_desc=False,
-                       wildcard_limit=0, run_on_slave=False):
-    """Run SQL with limit.
-
-    This function should be used in some cases, instead of run_sql function, in
-    order to protect the db from queries that might take a log time to respond
-    Ex: search queries like [a-z]+ ; cern*; a->z;
-    The parameters are exactly the ones for run_sql function.
-    In case the query limit is reached, an InvenioDbQueryWildcardLimitError
-    will be raised.
-    """
-    try:
-        int(wildcard_limit)
-    except ValueError:
-        raise
-
-    if wildcard_limit < 1:  # no limit on the wildcard queries
-        return run_sql(query, param, n, with_desc, run_on_slave=run_on_slave)
-    safe_query = query + " limit %s" % wildcard_limit
-    res = run_sql(safe_query, param, n, with_desc, run_on_slave=run_on_slave)
-    if len(res) == wildcard_limit:
-        raise InvenioDbQueryWildcardLimitError(res)
-    return res
-
-
 def blob_to_string(ablob):
     """Return string representation of ABLOB.
 
@@ -447,69 +323,44 @@ def log_sql_query(dbhost, sql, param=None):
         pass
 
 
-def get_table_update_time(tablename, run_on_slave=False):
-    """Return update time of TABLENAME.
+def get_table_update_time(table_name, run_on_slave=False):
+    """Return update time of table_name.
 
-    TABLENAME can contain wildcard `%' in which case we return the maximum
-    update time value.
+    table_name can contain the wildcard '%', in which case we return the
+    maximum update time value.
     """
-    # Note: in order to work with all of MySQL 4.0, 4.1, 5.0, this
-    # function uses SHOW TABLE STATUS technique with a dirty column
-    # position lookup to return the correct value.  (Making use of
-    # Index_Length column that is either of type long (when there are
-    # some indexes defined) or of type None (when there are no indexes
-    # defined, e.g. table is empty).  When we shall use solely
-    # MySQL-5.0, we can employ a much cleaner technique of using
-    # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
-    # table_name='collection'.
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
-                  run_on_slave=run_on_slave)
-    update_times = []  # store all update times
-    for row in res:
-        if type(row[10]) is long or \
-           row[10] is None:
-            # MySQL-4.1 and 5.0 have creation_time in 11th position,
-            # so return next column:
-            update_times.append(str(row[12]))
-        else:
-            # MySQL-4.0 has creation_time in 10th position, which is
-            # of type datetime.datetime or str (depending on the
-            # version of MySQLdb), so return next column:
-            update_times.append(str(row[11]))
-    return max(update_times)
+    result = max(run_sql('''
+        SELECT update_time
+        FROM information_schema.tables
+        WHERE table_name LIKE %s and table_schema=%s''',
+        (table_name, cfg['CFG_DATABASE_NAME']), run_on_slave=run_on_slave))
+
+    return str(result[0])
 
 
-def get_table_status_info(tablename, run_on_slave=False):
-    """Return table status information on TABLENAME.
+def get_table_status_info(table_name, run_on_slave=False):
+    """Return table status information on table_name.
 
-    Returned is a dict with keys like Name, Rows, Data_length, Max_data_length,
-    etc. If TABLENAME does not exist, return empty dict.
+    Returns a dict with keys Name, Rows, Data_length, and Index_length.
+    If table_name does not exist, returns an empty dict.
     """
-    # Note: again a hack so that it works on all MySQL 4.0, 4.1, 5.0
-    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename,),
-                  run_on_slave=run_on_slave)
-    table_status_info = {}  # store all update times
-    for row in res:
-        if type(row[10]) is long or \
-           row[10] is None:
-            # MySQL-4.1 and 5.0 have creation time in 11th position:
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[4]
-            table_status_info['Data_length'] = row[6]
-            table_status_info['Max_data_length'] = row[8]
-            table_status_info['Create_time'] = row[11]
-            table_status_info['Update_time'] = row[12]
-        else:
-            # MySQL-4.0 has creation_time in 10th position, which is
-            # of type datetime.datetime or str (depending on the
-            # version of MySQLdb):
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[3]
-            table_status_info['Data_length'] = row[5]
-            table_status_info['Max_data_length'] = row[7]
-            table_status_info['Create_time'] = row[10]
-            table_status_info['Update_time'] = row[11]
-    return table_status_info
+    result = run_sql('''
+        SELECT
+            table_name,
+            table_rows,
+            data_length,
+            index_length
+        FROM
+            information_schema.tables
+        WHERE
+            table_name=%s AND table_schema=%s''',
+        (table_name, cfg['CFG_DATABASE_NAME']), run_on_slave=run_on_slave)
+
+    if result:
+        return {'Name': result[0][0], 'Rows': result[0][1],
+                'Data_length': result[0][2], 'Index_length': result[0][3]}
+
+    return {}
 
 
 def wash_table_column_name(colname):

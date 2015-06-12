@@ -121,7 +121,6 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL, \
 
 from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from intbitset import intbitset
-from invenio.legacy.dbquery import InvenioDbQueryWildcardLimitError
 from invenio.utils.serializers import deserialize_via_marshal
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.logging import register_exception
@@ -141,8 +140,7 @@ from invenio.legacy.bibrank.selfcites_searcher import get_self_cited_by_list, \
                                                       get_self_cited_by, \
                                                       get_self_refers_to_list
 
-from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
-    wash_table_column_name, get_table_update_time
+from invenio.legacy.dbquery import run_sql, wash_table_column_name
 from invenio.legacy.webuser import getUid, collect_user_info
 from invenio.legacy.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
 from invenio.base.i18n import gettext_set_language
