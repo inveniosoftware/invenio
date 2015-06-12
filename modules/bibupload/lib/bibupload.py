@@ -1158,7 +1158,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase=False):
     if rec_id is None:
         # 5th step we look for the DOI.
         record_dois = record_extract_dois(record)
-        matching_recids = set()
+        matching_recids = intbitset()
         if record_dois:
             # try to find the corresponding rec id from the database
             for record_doi in record_dois:
@@ -1172,6 +1172,8 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase=False):
                           " database %s that match the DOI(s) in the input"
                           " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
                           verbose=1, stream=sys.stderr)
+                from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+                record_duplicates_in_asana(record_doi, matching_recids)
                 return -1
             elif len(matching_recids) == 1:
                 rec_id = matching_recids.pop()
@@ -1220,7 +1222,7 @@ def check_record_doi_is_unique(rec_id, record):
     """
     record_dois = record_extract_dois(record)
     if record_dois:
-        matching_recids = set()
+        matching_recids = intbitset()
         for record_doi in record_dois:
             possible_recid = find_record_from_doi(record_doi)
             if possible_recid:
@@ -1230,6 +1232,8 @@ def check_record_doi_is_unique(rec_id, record):
             msg = "   Failed: Multiple records found in the" \
                       " database %s that match the DOI(s) in the input" \
                       " MARCXML %s" % (repr(matching_recids), repr(record_dois))
+            from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+            record_duplicates_in_asana(", ".join(record_dois), matching_recids)
             return (False, msg)
         elif len(matching_recids) == 1:
             matching_recid = matching_recids.pop()
@@ -1238,6 +1242,8 @@ def check_record_doi_is_unique(rec_id, record):
                 msg = "   Failed: DOI(s) %s found in this record (#%s)" \
                       " already exist(s) in another other record (#%s)" % \
                       (repr(record_dois), rec_id, matching_recid)
+                from invenio.bibrank_citation_indexer import record_duplicates_in_asana
+                record_duplicates_in_asana(", ".join(record_dois), matching_recids)
                 return (False, msg)
     return (True, "")
 
