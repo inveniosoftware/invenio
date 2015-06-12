@@ -23,13 +23,16 @@ web:
   ports:
     - "28080:28080"
   environment:
+    - BROKER_URL=amqp://guest:guest@rabbit:5672//
     - CACHE_REDIS_HOST=cache
+    - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
-    - INVENIO_APP_CONFIG_ENVS=CACHE_REDIS_HOST,CFG_DATABASE_HOST
+    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST
   volumes:
     - /tmp:/tmp
   links:
     - mysql:db
+    - rabbitmq:rabbit
     - redis:cache
 worker:
   build: .
@@ -44,6 +47,7 @@ worker:
     - web
   links:
     - mysql:db
+    - rabbitmq:rabbit
     - redis:cache
 redis:
   image: redis
@@ -54,3 +58,7 @@ mysql:
     - MYSQL_USER=invenio
     - MYSQL_PASSWORD=my123p$ss
     - MYSQL_ROOT_PASSWORD=mysecretpassword
+rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "127.0.0.1:25672:15672"

@@ -23,10 +23,12 @@ web:
   ports:
     - "127.0.0.1:28080:28080"
   environment:
+    - BROKER_URL=amqp://guest:guest@rabbit:5672//
     - CACHE_REDIS_HOST=cache
+    - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
     - DEBUG=True
-    - INVENIO_APP_CONFIG_ENVS=CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG
+    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG
   volumes:
     - ./invenio:/code/invenio:ro
     - ./docs:/code/docs:rw
@@ -34,12 +36,13 @@ web:
     - /code/invenio/base/translations
   links:
     - mysql:db
+    - rabbitmq:rabbit
     - redis:cache
 worker:
   build: .
   command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
   environment:
-    - BROKER_URL=redis://cache:6379/1
+    - BROKER_URL=amqp://guest:guest@rabbit:5672//
     - CACHE_REDIS_HOST=cache
     - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
@@ -49,6 +52,7 @@ worker:
     - web
   links:
     - mysql:db
+    - rabbitmq:rabbit
     - redis:cache
 redis:
   image: redis
@@ -63,3 +67,7 @@ mysql:
     - MYSQL_USER=invenio
     - MYSQL_PASSWORD=my123p$ss
     - MYSQL_ROOT_PASSWORD=mysecretpassword
+rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "127.0.0.1:25672:15672"

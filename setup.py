@@ -114,6 +114,7 @@ install_requires = [
     "pyPDF>=1.13",
     "pyPDF2>=1.17",
     "PyLD>=0.5.2",
+    "pyOpenSSL>=0.15.1",
     "pyStemmer>=1.3",
     "python-dateutil>=1.5",
     "python-magic>=0.4.6",

@@ -47,6 +47,7 @@ have any password.
         boot2docker ssh -vnNT \
             -Llocalhost:28080:localhost:28080 \
             -Llocalhost:26379:localhost:26379 \
+            -Llocalhost:25672:localhost:25672 \
             -Llocalhost:23306:localhost:23306
 
     You have to run this after Invenio booted up. Do **not** stop it while you

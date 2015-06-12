@@ -34,6 +34,9 @@ CFG_MARKER_LOCK=$CFG_SHARED_FOLDER/boot.lock
 CFG_MARKER_DONE=$CFG_SHARED_FOLDER/boot.initialized
 CFG_MARKER_RUNNING=$CFG_SHARED_FOLDER/boot.running
 
+CFG_SSL_CURVE=secp521r1
+CFG_SSL_DAYS=1024
+
 # echo function for stderr
 echoerr() { echo "$@" 1>&2; }
 
@@ -43,6 +46,17 @@ init() {
     mkdir -p $CFG_SHARED_FOLDER/static/vendors
     ln -s $CFG_SHARED_FOLDER/static/vendors bower_components
     rm .bowerrc
+
+
+    # create certificates for celery
+    PATH_CELERY_SSL=/home/invenio/ssl/celery
+    mkdir -p $PATH_CELERY_SSL
+    openssl ecparam -name $CFG_SSL_CURVE -genkey -param_enc explicit -out $PATH_CELERY_SSL/ca.key
+    openssl req -x509 -new -nodes -key $PATH_CELERY_SSL/ca.key -days $CFG_SSL_DAYS -out $PATH_CELERY_SSL/ca.pem -subj "/C=CH/ST=Test/L=Geneva/O=Invenio/CN=Invenio Celery CA"
+    openssl ecparam -name $CFG_SSL_CURVE -genkey -param_enc explicit -out $PATH_CELERY_SSL/client.key
+    openssl req -new -nodes -key $PATH_CELERY_SSL/client.key -out $PATH_CELERY_SSL/client.csr -subj "/C=CH/ST=Test/L=Geneva/O=Invenio/CN=Invenio Celery Client"
+    openssl x509 -req -days $CFG_SSL_DAYS -in $PATH_CELERY_SSL/client.csr -signkey $PATH_CELERY_SSL/ca.key -out $PATH_CELERY_SSL/client.pem
+    rm $PATH_CELERY_SSL/client.csr
 
 
     # set some additional configs to be in sync with the docker-compose
@@ -76,6 +90,13 @@ CFG_WEBDIR = u'/home/invenio/var/www'
 CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = u'/home/invenio/etc/bibconvert/config'
 CFG_WEBSUBMIT_COUNTERSDIR = u'/home/invenio/var/data/submit/counters'
 CFG_WEBSUBMIT_STORAGEDIR = u'/home/invenio/var/data/submit/storage'
+
+CELERY_TASK_SERIALIZER = u'auth'
+CELERY_SECURITY_SERIALIZER = u'msgpack'
+CELERY_SECURITY_DIGEST = u'sha256'
+CELERY_SECURITY_KEY = u'/home/invenio/ssl/celery/client.key'
+CELERY_SECURITY_CERTIFICATE = u'/home/invenio/ssl/celery/client.pem'
+CELERY_SECURITY_CERT_STORE = u'/home/invenio/ssl/celery/ca.pem'
 
 DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
 EOF
