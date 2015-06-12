@@ -191,7 +191,6 @@ DEF_ACTIONS = (
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
                ('moderatecomments', 'moderate comments', 'collection', 'no'),
-               ('runbatchuploader', 'run batchuploader', 'collection', 'yes'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
                ('claimpaper_view_pid_universe', 'View the Claim Paper interface', '', 'no'),
                ('claimpaper_claim_own_papers', 'Clam papers to his own personID', '', 'no'),
@@ -253,7 +252,6 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgwebjournal' : (_("Configure WebJournal"), "%s/admin/webjournal/webjournaladmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
     'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
     'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }

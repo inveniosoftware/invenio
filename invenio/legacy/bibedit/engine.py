@@ -29,6 +29,7 @@ import urllib
 import urllib2
 import cookielib
 import json
+import sys
 
 from flask import url_for
 from invenio.modules import formatter as bibformat
@@ -91,8 +92,6 @@ from invenio.utils.html import get_mathjax_header
 from invenio.utils.text import wash_for_xml, show_diff
 from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
-
-from invenio.legacy.batchuploader.engine import perform_upload_check
 
 from invenio.legacy.bibcirculation.db_layer import get_number_copies, has_copies
 from invenio.legacy.bibcirculation.utils import create_item_details_url
@@ -974,6 +973,69 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['resultCode'] = cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']["record_submitted"]
 
     return response
+
+
+def perform_upload_check(xml_record, mode):
+    """Perform a upload simulation with the given record and mode.
+
+    @return: string describing errors
+    @rtype: string
+    """
+    import invenio.legacy.bibupload.engine as bibupload_module
+    from invenio.legacy.bibupload.engine import xml_marc_to_records, bibupload
+    from invenio.legacy.bibrecord import \
+        record_strip_empty_volatile_subfields, \
+        record_strip_empty_fields
+
+    error_cache = []
+
+    def my_writer(msg, stream=sys.stdout, verbose=1):
+        if verbose == 1:
+            if 'DONE' not in msg:
+                error_cache.append(msg.strip())
+
+    orig_writer = bibupload_module.write_message
+    bibupload_module.write_message = my_writer
+
+    error_cache.extend(perform_basic_upload_checks(xml_record))
+    if error_cache:
+        # There has been some critical error
+        return '\n'.join(error_cache)
+
+    recs = xml_marc_to_records(xml_record)
+    try:
+        upload_mode = mode[2:]
+        # Adapt input data for bibupload function
+        if upload_mode == "r insert-or-replace":
+            upload_mode = "replace_or_insert"
+        for record in recs:
+            if record:
+                record_strip_empty_volatile_subfields(record)
+                record_strip_empty_fields(record)
+                bibupload(record, opt_mode=upload_mode, pretend=True)
+    finally:
+        bibupload_module.write_message = orig_writer
+
+    return '\n'.join(error_cache)
+
+
+def perform_basic_upload_checks(xml_record):
+    """ Performs tests that would provoke the bibupload task to fail with
+    an exit status 1, to prevent batchupload from crashing while alarming
+    the user wabout the issue
+    """
+    from invenio.legacy.bibupload.engine import writing_rights_p
+    from invenio.legacy.bibrecord import create_records
+
+    errors = []
+    if not writing_rights_p():
+        errors.append("Error: BibUpload does not have rights to write fulltext files.")
+    recs = create_records(xml_record, 1, 1)
+    if recs == []:
+        errors.append("Error: Cannot parse MARCXML file.")
+    elif recs[0][0] is None:
+        errors.append("Error: MARCXML file has wrong format: %s" % recs)
+    return errors
 
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data,

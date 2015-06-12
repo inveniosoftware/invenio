@@ -960,8 +960,6 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/merge/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Merger"))
                 if action == "runbibswordclient":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/bibsword/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run BibSword Client"))
-                if action == "runbatchuploader":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibknowledge":
