@@ -1240,7 +1240,7 @@ def check_record_doi_is_unique(rec_id, record):
                       " already exist(s) in another other record (#%s)" % \
                       (repr(record_dois), rec_id, matching_recid)
                 from invenio.bibrank_citation_indexer import record_duplicates_in_asana
-                record_duplicates_in_asana(", ".join(record_dois), matching_recids)
+                record_duplicates_in_asana(", ".join(record_dois), intbitset([int(matching_recid), int(rec_id)]))
                 return (False, msg)
     return (True, "")
 
