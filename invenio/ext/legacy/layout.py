@@ -160,12 +160,6 @@ except ImportError:
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
 
 
-if CFG_DEVEL_SITE:
-    test_exports = ['httptest']
-else:
-    test_exports = []
-
-
 class WebInterfaceAdminPages(WebInterfaceDirectory):
 
     """This class implements /admin2 admin pages."""
@@ -208,13 +202,10 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'textmining',
         'goto',
         'info',
-    ] + test_exports
+    ]
 
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
-        if CFG_DEVEL_SITE:
-            self.httptest = webinterfaces.get('WebInterfaceHTTPTestPages',
-                                              WebInterfaceDisabledPages)()
 
     _mapping = dict(
         youraccount='WebInterfaceYourAccountPages',
