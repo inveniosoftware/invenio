@@ -133,5 +133,5 @@ def register_admin(app, admin):
     """Called on app initialization to register administration interface."""
     admin.add_view(
         FacetsAdmin(app, FacetCollection, db.session, name='Facets',
-                    category="")
+                    category="", menu_icon_type='fa', menu_icon_value='fa-folder')
     )

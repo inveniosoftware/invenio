@@ -57,20 +57,31 @@ Usage example - create a file called <module>_admin.py::
     def register_admin(app, admin):
         admin.add_view(MyModelAdmin(MyModel, db.session, name='My model',
                                     category="My Category"))
+
+Admin UI skins
+~~~~~~~~~~~~~~
+
+AdminLTE provides several different skins, please see
+https://almsaeedstudio.com/themes/AdminLTE/documentation/index.html#layout.
+
+A global variable `ADMIN_UI_SKIN` is defined and is set to `skin-blue` as
+default. To change the skin, just edit the value of the variable to one of
+the provided skins.
 """
 
 from __future__ import absolute_import
 
 from flask_admin import Admin
+
 from flask_registry import ModuleAutoDiscoveryRegistry
 
 from .views import AdminIndexView
 
 
-#
-# Utility method
-#
 class AdminDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
+
+    """Utility method."""
+
     setup_func_name = 'register_admin'
 
     def __init__(self, *args, **kwargs):
@@ -84,15 +95,28 @@ class AdminDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
 
 
 def setup_app(app):
-    """
-    Register all administration views with the Flask application
-    """
+    """Register all administration views with the Flask application."""
     app.config.setdefault("ADMIN_NAME", "Invenio")
+
+    # No icon support for category items used in the admin sidebar-menu in flask-admin yet.
+    # See issue: https://github.com/flask-admin/flask-admin/issues/898
+    # Dictionary: <category_name> : <css_classes_displaying_icon>
+    app.config.setdefault(
+        "ADMIN_CATEGORIES",
+        {
+            "Access": "fa fa-eye",
+            "Indexes": "fa fa-bullseye",
+            "Knowledge": "fa fa-mortar-board",
+            "Persistent Identifiers": "fa fa-compass",
+            "Legacy Admin": "fa fa-bomb"
+        })
+
+    app.config.setdefault("ADMIN_UI_SKIN", "skin-blue")
 
     # Initialize app
     admin = Admin(
         name=app.config['ADMIN_NAME'],
-        index_view=AdminIndexView(),
+        index_view=AdminIndexView(menu_icon_type='fa', menu_icon_value='fa-home'),
         base_template="admin_base.html",
         template_mode='bootstrap3'
     )

@@ -64,8 +64,9 @@ from __future__ import unicode_literals
 
 import mimetypes
 
-from invenio.ext.assets import Bundle, RequireJSFilter
+from flask import current_app
 
+from invenio.ext.assets import Bundle, RequireJSFilter
 
 mimetypes.add_type("text/css", ".less")
 
@@ -139,12 +140,12 @@ admin = Bundle(
     weight=50
 )
 
-adminnextgen = Bundle(
+admin_styles = Bundle(
     "vendors/admin-lte/dist/css/AdminLTE.min.css",
-    "vendors/admin-lte/dist/css/skins/skin-blue.min.css",  # change for other skin
-    output="admin-lte.css",
+    "vendors/admin-lte/dist/css/skins/{0}.min.css".format(current_app.config.get("ADMIN_UI_SKIN")),
+    output="admin.css",
     filters="less,cleancss",
-    weight=50,
+    weight=91,  # load after invenio.css
     bower={
         "admin-lte": "latest"
     }

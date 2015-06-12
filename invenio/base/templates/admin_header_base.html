@@ -1,0 +1,88 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% block headerbox %}
+<header class="main-header">
+  <a href="{{ url_for('collections.index') }}" class="navbar-brand logo">
+    <img src="{{ url_for('static', filename='img/logo_white.svg') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation">
+  <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+    <span class="sr-only">Toggle navigation</span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </a>
+  <ul class="nav navbar-nav">
+  {%- for item in current_menu.submenu('main').children if item.visible recursive %}
+    {%- if item.children -%}
+        <li class="dropdown">.
+          <a href="{{ item.url }}" style="display: inline-block; padding-right: 5px;"> {{ item.text|safe }} </a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="display: inline-block; padding-left: 5px;">
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu pull-right">
+            {{ loop(item.children) }}
+          </ul>
+        </li>
+    {%- else -%}
+    <li{% if item.active %} class="active"{% endif %}><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+    {%- endif -%}
+  {%- endfor -%}
+  </ul>
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li class="dropdown user user-menu">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="glyphicon glyphicon-user"></i> {{ current_user.nickname|default(current_user.email) }}
+            <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <div class="navbar-content">
+                <div class="row">
+                  <div class="col-md-3">
+                    <i class="fa fa-user fa-3x"></i>
+                  </div>
+                  <div class="col-md-9">
+                    <strong>
+                      {{ current_user.nickname|default(current_user.email) }}
+                    </strong>
+                    <p class="text-muted small"> {{ current_user.email }} </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+            {%- for item in current_menu.submenu('settings').children if item.visible %}
+            {% if loop.first %}<li class="divider"></li>{% endif -%}
+            <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            {%- endfor %}
+            <li class="divider"></li>
+            <li>
+              <a href="{{ url_for('webaccount.logout') }}">
+                <i class="glyphicon glyphicon-log-out"></i> {{ _('Logout') }}
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+{% endblock headerbox %}
