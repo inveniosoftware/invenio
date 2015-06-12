@@ -53,6 +53,14 @@ re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK \
                    = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 
+_RECORDS_WITH_ERRATUM = None
+def get_records_wit_erratum():
+    global _RECORDS_WITH_ERRATUM
+    if _RECORDS_WITH_ERRATUM is None:
+        from invenio.search_engine import search_pattern
+        _RECORDS_WITH_ERRATUM = search_pattern(p='**', f='773__m')
+    return _RECORDS_WITH_ERRATUM
+
 def record_duplicates_in_asana(match, recids):
     if not CFG_INSPIRE_SITE:
         return
@@ -67,7 +75,11 @@ def record_duplicates_in_asana(match, recids):
     if len(recids) == 2:
         notes += "\nhttps://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[1], recids[0])
 
-    ticket = api.create_task(name='%s refers to record IDs %s' % (match, ', '.join(str(recid) for recid in recids)),
+    prefix = ""
+    if recids & get_records_wit_erratum():
+        prefix = "[ERRATUM?] "
+
+    ticket = api.create_task(name='%s%s refers to record IDs %s' % (prefix, match, ', '.join(str(recid) for recid in recids)),
                              workspace=CFG_INSPIRE_ASANA_WORKSPACE, notes=notes,
                              projects=[CFG_INSPIRE_ASANA_DUPLICATE_RECIDS_PROJECT])
 
