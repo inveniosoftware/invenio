@@ -1895,7 +1895,7 @@ def create_custom_summary_graph(data, path, title):
         matplotlib.use('Agg')
         import matplotlib.pyplot as plt
     except:
-        from invenio.errorlib import register_exception
+        from invenio.ext.logging.wrappers import register_exception
         register_exception()
         return False
 

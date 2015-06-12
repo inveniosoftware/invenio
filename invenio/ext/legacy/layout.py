@@ -225,7 +225,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         ill='WebInterfaceILLPages',
         yourtickets='WebInterfaceYourTicketsPages',
         comments='WebInterfaceCommentsPages',
-        error='WebInterfaceErrorPages',
         oai2d='WebInterfaceOAIProviderPages',
         rss='WebInterfaceRSSFeedServicePages',
         stats='WebInterfaceStatsPages',

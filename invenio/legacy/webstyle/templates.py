@@ -419,19 +419,6 @@ URI: http://%(host)s%(page)s
                   </tr>
                   <tr>
                     <td>
-                      <form action="%(siteurl)s/error/send" method="post">
-                        %(send_error_label)s
-                        <input class="adminbutton" type="submit" value="%(send_label)s" />
-                        <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
-                        <input type="hidden" name="url" value="URI: http://%(host)s%(page)s" />
-                        <input type="hidden" name="time" value="Time: %(time)s" />
-                        <input type="hidden" name="browser" value="%(browser)s" />
-                        <input type="hidden" name="client" value="Client: %(client)s" />
-                        <input type="hidden" name="error" value="%(error)s" />
-                        <input type="hidden" name="sys_error" value="%(sys_error)s" />
-                        <input type="hidden" name="traceback" value="%(traceback)s" />
-                        <input type="hidden" name="referer" value="%(referer)s" />
-                      </form>
                     </td>
                   </tr>
                 </tbody>
