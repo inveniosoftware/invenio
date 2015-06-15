@@ -545,6 +545,7 @@ DEF_ACTIONS = (
                ('cfgbibsort', 'configure BibSort', '', 'no'),
                ('runbibindex', 'run BibIndex', '', 'no'),
                ('runbibupload', 'run BibUpload', '', 'no'),
+               ('runbibcheck', 'run BibCheck', '', 'no'),
                ('runwebcoll', 'run webcoll', 'collection', 'yes'),
                ('runbibformat', 'run BibFormat', 'format', 'yes'),
                ('runbibclassify', 'run BibClassify', 'taxonomy', 'yes'),
