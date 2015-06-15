@@ -523,6 +523,10 @@ def get_next_starting_date(rule):
     min_last_updated = run_sql("select min(last_updated) from idxINDEX")[0][0]
     cache_last_updated = dt(get_cache_last_updated_timestamp())
 
+    if not min_last_updated or not cache_last_updated:
+        # Some tables have never been initialized. Let's return the Epoch
+        return datetime(1970, 1, 1)
+
     return min(min_last_updated, task_starting_time, cache_last_updated)
 
 
