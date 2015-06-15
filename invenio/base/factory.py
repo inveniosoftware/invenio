@@ -172,9 +172,10 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
     variable will be used. If that one does not exist, a path inside
     `sys.prefix` will be used.
 
-    If `static_folder` is `None`, the `<PREFIX>_STATIC_FOLDER` environment
-    variable will be used. If that one does not exist, a path inside the
-    detected `instance_path` will be used.
+    .. versionadded:: 2.2
+        If `static_folder` is `None`, the `<PREFIX>_STATIC_FOLDER` environment
+        variable will be used. If that one does not exist, a path inside the
+        detected `instance_path` will be used.
     """
     configure_warnings()
 
