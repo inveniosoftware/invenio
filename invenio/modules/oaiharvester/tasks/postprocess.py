@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014, 2015 CERN.
+# Copyright (C) 2014 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -344,6 +344,97 @@ def refextract(obj, eng):
             obj.log.info("No references")
     else:
         obj.log.error("Not able to download and process the PDF ")
+
+
+def author_list(obj, eng):
+    """Perform the special authorlist extraction step.
+
+    :param obj: Bibworkflow Object to process
+    :param eng: BibWorkflowEngine processing the object
+    """
+    from invenio.legacy.oaiharvest.utils import (translate_fieldvalues_from_latex,
+                                                 find_matching_files)
+    from invenio.legacy.bibrecord import create_records, record_xml_output
+    from invenio.legacy.bibconvert.xslt_engine import convert
+    from invenio.utils.plotextractor.cli import get_defaults
+    from invenio.modules.workflows.utils import convert_marcxml_to_bibfield
+    from invenio.utils.plotextractor.getter import harvest_single
+    from invenio.modules.workflows.errors import WorkflowError
+    from invenio.utils.plotextractor.converter import untar
+    from invenio.utils.shell import Timeout
+
+    identifiers = obj.data["system_control_number"]["value"]
+    if "_result" not in obj.extra_data:
+        obj.extra_data["_result"] = {}
+    if "tarball" not in obj.extra_data["_result"]:
+        extract_path = os.path.join(
+            cfg['CFG_TMPSHAREDDIR'],
+            str(eng.uuid)
+        )
+        if not os.path.exists(extract_path):
+            os.makedirs(extract_path)
+        tarball, pdf = harvest_single(
+            obj.data["system_control_number"]["value"], extract_path,
+            ["tarball"])
+        tarball = str(tarball)
+        if tarball is None:
+            raise WorkflowError(str(
+                "Error harvesting tarball from id: %s %s" % (
+                    identifiers, extract_path)), eng.uuid, id_object=obj.id)
+        obj.extra_data["_result"]["tarball"] = tarball
+
+    sub_dir, dummy = get_defaults(obj.extra_data["_result"]["tarball"],
+                                  cfg['CFG_TMPDIR'], "")
+
+    try:
+        untar(obj.extra_data["_result"]["tarball"], sub_dir)
+        obj.log.info("Extracted tarball to: {0}".format(sub_dir))
+    except Timeout:
+        eng.log.error('Timeout during tarball extraction on %s' % (
+            obj.extra_data["_result"]["tarball"]))
+
+    xml_files_list = find_matching_files(sub_dir, ["xml"])
+
+    obj.log.info("Found xmlfiles: {0}".format(xml_files_list))
+
+    authors = ""
+
+    for xml_file in xml_files_list:
+        xml_file_fd = open(xml_file, "r")
+        xml_content = xml_file_fd.read()
+        xml_file_fd.close()
+
+        match = REGEXP_AUTHLIST.findall(xml_content)
+        if match:
+            obj.log.info("Found a match for author extraction")
+
+            a_stylesheet = obj.extra_data["repository"]["arguments"].get(
+                "a_stylesheet"
+            ) or "authorlist2marcxml.xsl"
+            authors = convert(xml_content, a_stylesheet)
+            authorlist_record = create_records(authors)
+            if len(authorlist_record) == 1:
+                if authorlist_record[0][0] is None:
+                    eng.log.error("Error parsing authorlist record for id: %s" % (
+                        identifiers,))
+                authorlist_record = authorlist_record[0][0]
+                # Convert any LaTeX symbols in authornames
+            translate_fieldvalues_from_latex(authorlist_record, '100', code='a')
+            translate_fieldvalues_from_latex(authorlist_record, '700', code='a')
+
+            updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' \
+                          + record_xml_output(authorlist_record) + '</collection>'
+            if not None == updated_xml:
+                # We store the path to the directory  the tarball contents live
+                # Read and grab MARCXML from plotextractor run
+                new_dict_representation = convert_marcxml_to_bibfield(updated_xml)
+                obj.data['authors'] = new_dict_representation["authors"]
+                obj.data['number_of_authors'] = new_dict_representation[
+                    "number_of_authors"]
+                obj.add_task_result("authors", new_dict_representation["authors"])
+                obj.add_task_result("number_of_authors",
+                                    new_dict_representation["number_of_authors"])
+                break
 
 
 def upload_step(obj, eng):
