@@ -209,7 +209,8 @@ def get_dois_from_orcid(orcid_id):
                     ext_id = ext_id_pair['work-external-identifier-id']
                     doi = get_doi(ext_id['value'])
                     if doi is not None:
-                        dois.append(doi)
+                        current_dois = doi.split(",")
+                        dois.append(current_dois[0])
             except (TypeError, KeyError):
                 pass
     except (TypeError, KeyError):
