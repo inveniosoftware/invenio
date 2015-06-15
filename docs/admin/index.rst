@@ -36,7 +36,6 @@ Admin's Guide
    bibrank-admin-guide
    bibsched-admin-guide
    bibsort-admin-guide
-   bibsword-client-admin-guide
    bibupload-admin-guide
    docextract-admin-guide
    oaiharvest-admin-guide

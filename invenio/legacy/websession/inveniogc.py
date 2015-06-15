@@ -68,10 +68,6 @@ CFG_MAX_ATIME_ZIP_OAI = 3
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
 # After how many day to remove old cached webjournal files
 CFG_WEBJOURNAL_TTL = 7
-# After how many days to zip obsolete bibsword xml log files
-CFG_MAX_ATIME_ZIP_BIBSWORD = 7
-# After how many days to remove obsolete bibsword xml log files
-CFG_MAX_ATIME_RM_BIBSWORD = 28
 # After how many days to remove temporary video uploads
 CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 # After how many days to remove obsolete refextract xml output files
@@ -143,18 +139,6 @@ def clean_tempfiles():
         ' -mtime +%s -exec rm %s -rf {} \;' \
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
-
-    if not CFG_INSPIRE_SITE:
-        write_message("- deleting/gzipping temporary old "
-                "BibSword files")
-        gc_exec_command('find %s %s -name "bibsword_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_RM_BIBSWORD, vstr))
-        gc_exec_command('find %s %s -name "bibsword_*"'
-            ' -atime +%s -exec gzip %s -9 {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
 
     write_message("- deleting temporary old "
             "RefExtract files")
