@@ -23,6 +23,7 @@ from __future__ import absolute_import
 
 import ast
 import os
+import re
 import sys
 import urllib
 import warnings
@@ -156,22 +157,44 @@ def configure_warnings():
         warnings.simplefilter("default", DeprecationWarning)
 
 
-def create_app(instance_path=None, **kwargs_config):
+def create_app(instance_path=None, static_folder=None, **kwargs_config):
     """Prepare Invenio application based on Flask.
 
     Invenio consists of a new Flask application with legacy support for
     the old WSGI legacy application and the old Python legacy
     scripts (URLs to ``*.py`` files).
+
+    For configuration variables detected from environment variables, a prefix
+    will be used which is the uppercase version of the app name, excluding
+    any non-alphabetic ('[^A-Z]') characters.
+
+    If `instance_path` is `None`, the `<PREFIX>_INSTANCE_PATH` environment
+    variable will be used. If that one does not exist, a path inside
+    `sys.prefix` will be used.
+
+    If `static_folder` is `None`, the `<PREFIX>_STATIC_FOLDER` environment
+    variable will be used. If that one does not exist, a path inside the
+    detected `instance_path` will be used.
     """
     configure_warnings()
 
     # Flask application name
     app_name = '.'.join(__name__.split('.')[0:2])
 
-    # Force instance folder to always be located in under system prefix
-    instance_path = instance_path or os.path.join(
-        sys.prefix, 'var', app_name + '-instance'
-    )
+    # Prefix for env variables
+    env_prefix = re.sub('[^A-Z]', '', app_name.upper())
+
+    # Detect instance path
+    instance_path = instance_path or \
+        os.getenv(env_prefix + '_INSTANCE_PATH') or \
+        os.path.join(
+            sys.prefix, 'var', app_name + '-instance'
+        )
+
+    # Detect static files path
+    static_folder = static_folder or \
+        os.getenv(env_prefix + '_STATIC_FOLDER') or \
+        os.path.join(instance_path, 'static')
 
     # Create instance path
     try:
@@ -191,7 +214,7 @@ def create_app(instance_path=None, **kwargs_config):
         # by the webserver from CFG_WEBDIR. In order to generate independent
         # url for static files use func:`url_for('static', filename='test')`.
         static_url_path='',
-        static_folder=os.path.join(instance_path, 'static'),
+        static_folder=static_folder,
         template_folder='templates',
         instance_relative_config=True,
         instance_path=instance_path,
