@@ -53,7 +53,7 @@ def check_record(record, source_field, new_code,
         pattern_matches = re.search(pattern, val)
         if (pattern_matches and not complement) or \
            (complement and not pattern_matches):
-            record_modify_subfield(record, "035", new_code, val,
+            record_modify_subfield(record, source_field[:3], new_code, val,
                                    pos[2], field_position_local=pos[1])
             record.set_amended('move from %s to %s: %s' %
-                               (source_field.replace(" ","_"), new_code, val))
+                               (source_field.replace(" ", "_"), new_code, val))
