@@ -21,7 +21,7 @@
 
 from datetime import timedelta
 
-from flask import render_template, url_for
+from flask import g, render_template, url_for
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
@@ -59,6 +59,8 @@ def send_account_activation_email(user):
         cfg.get('CFG_SITE_SUPPORT_EMAIL'),
         user.email,
         _("Account registration at %(sitename)s",
-          sitename=cfg['CFG_SITE_NAME']),
+          sitename=cfg["CFG_SITE_NAME_INTL"].get(getattr(g, 'ln',
+                                                 cfg['CFG_SITE_LANG']),
+                                                 cfg['CFG_SITE_NAME'])),
         render_template("accounts/emails/activation.tpl", **ctx)
     )
