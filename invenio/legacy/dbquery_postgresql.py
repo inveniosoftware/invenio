@@ -144,7 +144,8 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
 
     This method does executemany and is therefore more efficient than execute
     but it has sense only with queries that affect state of a database
-    (INSERT, UPDATE). That is why the results just count number of affected rows
+    (INSERT, UPDATE). That is why the results just count number of affected
+    rows.
 
     :param params: tuple of tuple of string params to insert in the query
 
@@ -198,7 +199,7 @@ def blob_to_string(ablob):
             return ablob
         else:
             # BLOB is array.array in MySQLdb 1.0.0 and later
-            return ablob.tostring()
+            return str(ablob)
     else:
         return ablob
 
@@ -297,9 +298,10 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     # dbhost = cfg['CFG_DATABASE_HOST']
     # if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
     #    dbhost = cfg['CFG_DATABASE_SLAVE']
-    connection_object = db.engine.raw_connection()
-    escaped_string = connection_object.escape(unescaped_string)
-    return escaped_string
+    # connection_object = db.engine.raw_connection()
+    # escaped_string = connection_object.escape(unescaped_string)
+    from psycopg2.extensions import adapt
+    return str(adapt(unescaped_string))
 
 
 def run_sql_with_limit(query, param=None, n=0, with_desc=False,
@@ -325,3 +327,109 @@ def run_sql_with_limit(query, param=None, n=0, with_desc=False,
     if len(res) == wildcard_limit:
         raise InvenioDbQueryWildcardLimitError(res)
     return res
+
+
+def check_table_exists(table_name):
+    """Check if a table exists."""
+    return run_sql(
+        """
+        SELECT EXISTS (
+            SELECT 1
+            FROM   pg_catalog.pg_class c
+            JOIN   pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE    c.relname = %s
+            AND    c.relkind = 'r'
+        )""", (table_name,))[0][0]
+
+
+def get_table_names():
+    """get list tables."""
+    return run_sql(
+        """
+        select relname
+        FROM   pg_catalog.pg_class c
+        JOIN   pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+        where nspname = 'public'
+        """)
+
+
+def rlike():
+    """Mysql RLIKE operator."""
+    return "~*"
+
+
+def date_format(value, use_double_percent=True):
+    """Format query to get date format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "YYYY-mm-dd"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def datetime_format(value, use_double_percent=True, use_quad_percent=False):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "YYYY-mm-dd HH24:MI:SS"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def date_format_year_month(value, use_double_percent=True):
+    """Format query to get date format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "YYYY-mm"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def date_format_year_month_day_hour(value, use_double_percent=True):
+    """Format query to get date format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "YYYY-mm-dd HH24"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def date_format_ymdhis(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "YYYYmmdd HH24MISS"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def date_format_dby(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    date_format = "dd month YYYY"
+    return "to_char(" + value + ", '" + date_format + "')"
+
+
+def regexp():
+    """mysql REGEXP operator."""
+    return "~"
+
+
+def truncate_table(table_name):
+    """truncade table."""
+    return run_sql(
+        """TRUNCATE TABLE "%s" RESTART IDENTITY CASCADE""" % table_name)
