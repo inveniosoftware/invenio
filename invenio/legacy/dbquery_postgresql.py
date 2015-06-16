@@ -177,37 +177,29 @@ def get_table_update_time(tablename, run_on_slave=False):
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def get_table_status_info(tablename, run_on_slave=False):
-    """Return table status information on TABLENAME.
+def get_table_status_info(table_name, run_on_slave=False):
+    """Return table status information on table_name.
 
-    Returned is a dict with keys like Name, Rows, Data_length, Max_data_length,
-    etc.  If TABLENAME does not exist, return empty dict.
+    Returns a dict with keys Name, Rows, Data_length, and Index_length.
+    If table_name does not exist, returns an empty dict.
     """
-    # FIXME how can I implement it with PostgreSQL???
-    res = run_sql("""SHOW TABLE STATUS LIKE "%s" """, (tablename,),
-                  run_on_slave=run_on_slave)
-    table_status_info = {}  # store all update times
-    for row in res:
-        if type(row[10]) is long or \
-           row[10] is None:
-            # MySQL-4.1 and 5.0 have creation time in 11th position:
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[4]
-            table_status_info['Data_length'] = row[6]
-            table_status_info['Max_data_length'] = row[8]
-            table_status_info['Create_time'] = row[11]
-            table_status_info['Update_time'] = row[12]
-        else:
-            # MySQL-4.0 has creation_time in 10th position, which is
-            # of type datetime.datetime or str (depending on the
-            # version of MySQLdb):
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[3]
-            table_status_info['Data_length'] = row[5]
-            table_status_info['Max_data_length'] = row[7]
-            table_status_info['Create_time'] = row[10]
-            table_status_info['Update_time'] = row[11]
-    return table_status_info
+    result = run_sql('''
+        SELECT
+            relname,
+            n_tup_ins - n_tup_del,
+            pg_total_relation_size(relname::text) - pg_indexes_size(relname::text),
+            pg_indexes_size(relname::text)
+        FROM
+            pg_stat_all_tables
+        WHERE
+            relname=%s''',
+        (table_name,), run_on_slave=run_on_slave)
+
+    if result:
+        return {'Name': result[0][0], 'Rows': result[0][1],
+                'Data_length': result[0][2], 'Index_length': result[0][3]}
+
+    return {}
 
 
 def wash_table_column_name(colname):
