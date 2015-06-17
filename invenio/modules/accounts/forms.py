@@ -87,7 +87,7 @@ def repeat_email_validator(form, field):
         raise StopValidation()
 
     if field.data != form.email.data:
-        raise ValidationError(_("Email addresses does not match."))
+        raise ValidationError(_("Email addresses do not match."))
 
 
 def password_validator(form, field):
