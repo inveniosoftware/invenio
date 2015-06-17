@@ -22,6 +22,14 @@
 
 """Invenio Search Engine in mod_python."""
 
+import warnings
+
+from invenio.utils.deprecation import RemovedInInvenio23Warning
+
+warnings.warn("Legacy search_engine will be removed in 2.3. Please check "
+              "'invenio.modules.search' module.",
+              RemovedInInvenio23Warning)
+
 __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
