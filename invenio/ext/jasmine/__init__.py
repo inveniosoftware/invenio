@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -147,10 +147,9 @@ See http://jasmine.github.io/2.0/ajax.html for further information.
 
 from __future__ import absolute_import
 
-from .views import blueprint
-from . import bundles
-from ..assets.registry import bundles as bundles_registry
 from .registry import specs as specs_registry
+from .views import blueprint
+from ..assets.registry import bundles as bundles_registry
 
 
 def setup_app(app):
@@ -161,6 +160,7 @@ def setup_app(app):
 
         # Register bundles
         with app.app_context():
+            from . import bundles
             bundles_registry.register((bundles, bundles.jasmine_js))
             bundles_registry.register((bundles, bundles.jasmine_styles))
             # invenio/invenio/base seems to be working dir here
