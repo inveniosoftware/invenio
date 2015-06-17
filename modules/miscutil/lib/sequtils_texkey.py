@@ -123,28 +123,28 @@ class TexkeySeq(SequenceGenerator):
             bibrecord = get_bibrecord(recid)
 
         main_author = record_get_field_value(bibrecord,
-                                            tag="100",
-                                            ind1="",
-                                            ind2="",
-                                            code="a")
+                                             tag="100",
+                                             ind1="",
+                                             ind2="",
+                                             code="a")
 
         if not main_author:
             # Try with collaboration name
             main_author = record_get_field_value(bibrecord,
-                                            tag="710",
-                                            ind1="",
-                                            ind2="",
-                                            code="g")
+                                                 tag="710",
+                                                 ind1="",
+                                                 ind2="",
+                                                 code="g")
             main_author = "".join([p for p in main_author.split()
-                                if p.lower() != "collaboration"])
+                                   if p.lower() != "collaboration"])
 
         if not main_author:
             # Try with corporate author
             main_author = record_get_field_value(bibrecord,
-                                            tag="100",
-                                            ind1="",
-                                            ind2="",
-                                            code="a")
+                                                 tag="100",
+                                                 ind1="",
+                                                 ind2="",
+                                                 code="a")
             if not main_author:
                 # Check if it is a Proceedings record
                 collections = [collection.lower() for collection in
@@ -188,7 +188,6 @@ class TexkeySeq(SequenceGenerator):
                                                ind1="",
                                                ind2="",
                                                code="d"))
-
                     if not year:
                         raise TexkeyNoYearError
 
@@ -198,13 +197,15 @@ class TexkeySeq(SequenceGenerator):
 
         texkey_third_part = _texkey_random_chars(recid)
 
-        texkey = texkey_first_part + ":" + texkey_second_part + texkey_third_part
+        texkey = "%s:%s%s" % \
+                 (texkey_first_part, texkey_second_part, texkey_third_part)
 
         tries = 0
         while self._value_exists(texkey) and tries < TEXKEY_MAXTRIES:
             # Key is already in the DB, generate a new one
             texkey_third_part = _texkey_random_chars(recid, use_random=True)
-            texkey = texkey_first_part + ":" + texkey_second_part + texkey_third_part
+            texkey = "%s:%s%s" % \
+                     (texkey_first_part, texkey_second_part, texkey_third_part)
             tries += 1
 
         return texkey
@@ -253,8 +254,8 @@ def submit_bibindex_task(to_update, sequence_id):
     """
     recids = [str(r) for r in to_update]
     return task_low_level_submission('bibindex', PREFIX, '-I',
-                                      sequence_id, '-P', '2', '-w', 'global',
-                                      '-i', ','.join(recids))
+                                     sequence_id, '-P', '2', '-w', 'global',
+                                     '-i', ','.join(recids))
 
 
 def wait_for_task(task_id):
@@ -262,6 +263,7 @@ def wait_for_task(task_id):
     while run_sql(sql, [task_id])[0][0] not in ('DONE', 'ACK', 'ACK DONE'):
         task_sleep_now_if_required(True)
         time.sleep(5)
+
 
 def process_chunk(to_process, sequence_id):
     """ submit bibupload task and wait for it to finish
@@ -294,7 +296,8 @@ def create_xml(recid, texkey):
 def task_run_core():
     """ Performs a search to find records without a texkey, generates a new
     one and uploads the changes in chunks """
-    recids = perform_request_search(p='-035:spirestex -035:inspiretex', cc='HEP')
+    recids = perform_request_search(p='-035:spirestex -035:inspiretex',
+                                    cc='HEP')
 
     write_message("Found %s records to assign texkeys" % len(recids))
     processed_recids = []
@@ -305,7 +308,10 @@ def task_run_core():
         # Check that the record does not have already a texkey
         has_texkey = False
         recstruct = get_record(recid)
-        for instance in record_get_field_instances(recstruct, tag="035", ind1="", ind2=""):
+        for instance in record_get_field_instances(recstruct,
+                                                   tag="035",
+                                                   ind1="",
+                                                   ind2=""):
             try:
                 provenance = field_get_subfield_values(instance, "9")[0]
             except IndexError:
@@ -320,7 +326,8 @@ def task_run_core():
             provenances = ["SPIRESTeX", "INSPIRETeX"]
             if provenance in provenances and value:
                 has_texkey = True
-                write_message("INFO: Record %s has already texkey %s" % (recid, value))
+                write_message("INFO: Record %s has already texkey %s" %
+                              (recid, value))
 
         if not has_texkey:
             TexKeySeq = TexkeySeq()
@@ -328,12 +335,15 @@ def task_run_core():
             try:
                 new_texkey = TexKeySeq.next_value(recid)
             except TexkeyNoAuthorError:
-                write_message("WARNING: Record %s has no first author or collaboration" % recid)
+                write_message(
+                    "WARNING: Record %s has no first author or collaboration" %
+                    recid)
                 continue
             except TexkeyNoYearError:
                 write_message("WARNING: Record %s has no year" % recid)
                 continue
-            write_message("Created texkey %s for record %d" % (new_texkey, recid))
+            write_message("Created texkey %s for record %d" %
+                          (new_texkey, recid))
             xml = create_xml(recid, new_texkey)
             processed_recids.append(recid)
             xml_to_process.append(xml)
@@ -347,7 +357,7 @@ def task_run_core():
         process_chunk(xml_to_process, sequence_id)
 
     # Finally, index all the records processed
-    #FIXME: Waiting for sequence id to be fixed
+    # FIXME: Waiting for sequence id to be fixed
     # if processed_recids:
     #     submit_bibindex_task(processed_recids, sequence_id)
 
@@ -358,12 +368,11 @@ def main():
     """Constructs the bibtask."""
     # Build and submit the task
     task_init(authorization_action='runtexkeygeneration',
-        authorization_msg="Texkey generator task submission",
-        description=DESCRIPTION,
-        help_specific_usage=HELP_MESSAGE,
-        version="Invenio v%s" % CFG_VERSION,
-        specific_params=("", []),
-        # task_submit_elaborate_specific_parameter_fnc=parse_option,
-        # task_submit_check_options_fnc=check_options,
-        task_run_fnc=task_run_core
-    )
+              authorization_msg="Texkey generator task submission",
+              description=DESCRIPTION,
+              help_specific_usage=HELP_MESSAGE,
+              version="Invenio v%s" % CFG_VERSION,
+              specific_params=("", []),
+              # task_submit_elaborate_specific_parameter_fnc=parse_option,
+              # task_submit_check_options_fnc=check_options,
+              task_run_fnc=task_run_core)
