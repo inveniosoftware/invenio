@@ -27,25 +27,15 @@ depends_on = [u'workflows_2014_08_12_initial']
 
 def info():
     """Info message."""
-    return "Resize uuid columns on workflows tables."
+    return "Resize id_object column on bwlWORKFLOWLOGGING table."
 
 
 def do_upgrade():
     """Implement your upgrades here."""
-    with op.batch_alter_table("bwlWORKFLOW") as batch_op:
-        batch_op.alter_column(
-            column_name='uuid',
-            type_=db.UUID(), nullable=False
-        )
-    with op.batch_alter_table("bwlOBJECT") as batch_op:
-        batch_op.alter_column(
-            column_name='id_workflow',
-            type_=db.UUID(), nullable=True
-        )
     with op.batch_alter_table("bwlWORKFLOWLOGGING") as batch_op:
         batch_op.alter_column(
             column_name='id_object',
-            type_=db.UUID(), nullable=False
+            type_=db.String(36), nullable=False
         )
 
 

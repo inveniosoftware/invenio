@@ -93,7 +93,8 @@ class Workflow(db.Model):
 
     __tablename__ = "bwlWORKFLOW"
 
-    uuid = db.Column(db.UUID(), primary_key=True, nullable=False)
+    _uuid = db.Column(db.String(36), primary_key=True, nullable=False,
+                      name="uuid")
 
     name = db.Column(db.String(255), default="Default workflow",
                      nullable=False)
@@ -115,6 +116,16 @@ class Workflow(db.Model):
     child_logs = db.relationship("BibWorkflowEngineLog",
                                  backref='bwlWORKFLOW',
                                  cascade="all, delete, delete-orphan")
+
+    @db.hybrid_property
+    def uuid(self):
+        """Get uuid."""
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, value):
+        """Set uud."""
+        self._uuid = str(value) if value else None
 
     def __repr__(self):
         """Represent a workflow object."""
@@ -306,8 +317,9 @@ class BibWorkflowObject(db.Model):
                             nullable=False,
                             default=get_default_extra_data())
 
-    id_workflow = db.Column(db.UUID(),
-                            db.ForeignKey('bwlWORKFLOW.uuid'), nullable=True)
+    _id_workflow = db.Column(db.String(36),
+                             db.ForeignKey('bwlWORKFLOW.uuid'), nullable=True,
+                             name="id_workflow")
     version = db.Column(db.Integer(3),
                         default=ObjectVersion.INITIAL, nullable=False)
     id_parent = db.Column(db.Integer, db.ForeignKey('bwlOBJECT.id'),
@@ -334,6 +346,16 @@ class BibWorkflowObject(db.Model):
     )
 
     _log = None
+
+    @db.hybrid_property
+    def id_workflow(self):
+        """Get id_workflow."""
+        return self._id_workflow
+
+    @id_workflow.setter
+    def id_workflow(self, value):
+        """Set id_workflow."""
+        self._id_workflow = str(value) if value else None
 
     @property
     def log(self):
@@ -908,12 +930,22 @@ class BibWorkflowEngineLog(db.Model):
 
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)
-    id_object = db.Column(db.UUID(),
-                          db.ForeignKey('bwlWORKFLOW.uuid'),
-                          nullable=False)
+    _id_object = db.Column(db.String(36),
+                           db.ForeignKey('bwlWORKFLOW.uuid'),
+                           nullable=False, name="id_object")
     log_type = db.Column(db.Integer, default=0, nullable=False)
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.TEXT, default="", nullable=False)
+
+    @db.hybrid_property
+    def id_object(self):
+        """Get id_object."""
+        return self._id_object
+
+    @id_object.setter
+    def id_object(self, value):
+        """Set id_object."""
+        self._id_object = str(value) if value else None
 
     def __str__(self):
         """Print a log."""
