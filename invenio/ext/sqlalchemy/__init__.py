@@ -19,7 +19,6 @@
 
 """Initialization and configuration for `flask_sqlalchemy`."""
 
-import sqlalchemy
 
 from flask_registry import ModuleAutoDiscoveryRegistry, RegistryProxy
 
@@ -27,6 +26,8 @@ from flask_sqlalchemy import SQLAlchemy as FlaskSQLAlchemy
 
 from invenio.ext.sqlalchemy.types import LegacyBigInteger, LegacyBoolean, \
     LegacyInteger, LegacyMediumInteger, LegacySmallInteger, LegacyTinyInteger
+
+import sqlalchemy
 
 from sqlalchemy import event, types as engine_types
 from sqlalchemy.ext.compiler import compiles
@@ -194,6 +195,14 @@ class SQLAlchemy(FlaskSQLAlchemy):
                 'charset': 'utf8mb4',
             })
             event.listen(Pool, 'checkin', autocommit_on_checkin)
+        elif info.drivername == 'postgresql':
+            from psycopg2.extensions import adapt, register_adapter
+            from werkzeug.local import LocalProxy
+
+            def adapt_proxy(proxy):
+                return adapt(proxy._get_current_object())
+
+            register_adapter(LocalProxy, adapt_proxy)
 
 
 db = SQLAlchemy()
