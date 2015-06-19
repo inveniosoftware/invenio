@@ -57,6 +57,29 @@ class CeleryTest(CeleryTestCase):
         with self.celery_app.loader.flask_app.test_request_context():
             self.assertEqual(invenio_db_test(1), 1)
 
+    def test_msgpack_uuid(self):
+        from invenio.celery.msgpack_append import register
+        register()
+
+        from uuid import uuid4
+        my_uuid = uuid4()
+
+        from kombu.serialization import dumps, loads
+        content_type, content_encoding, serialized_uuid = \
+            dumps(my_uuid, serializer='msgpack_append')
+
+        self.assertEqual(content_type, 'application/x-msgpack-append')
+        self.assertEqual(content_encoding, 'utf-8')
+
+        resulting_uuid = loads(serialized_uuid,
+                               content_type=content_type,
+                               content_encoding=content_encoding)
+
+        self.assertEqual(
+            my_uuid,
+            resulting_uuid,
+        )
+
 
 TEST_SUITE = make_test_suite(CeleryTest)
 
