@@ -21,6 +21,7 @@
 
 from __future__ import absolute_import
 
+import ast
 import os
 import sys
 import urllib
@@ -228,6 +229,10 @@ def create_app(instance_path=None, **kwargs_config):
         if cfg_name:
             cfg_value = app.config.get(cfg_name)
             cfg_value = os.getenv(cfg_name, cfg_value)
+            try:
+                cfg_value = ast.literal_eval(cfg_value)
+            except (SyntaxError, ValueError):
+                pass
             app.config[cfg_name] = cfg_value
             app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
 
