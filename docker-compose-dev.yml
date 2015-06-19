@@ -19,33 +19,32 @@
 
 web:
   build: .
-  command: /code/scripts/docker_devboot.sh master inveniomanage runserver -h 0.0.0.0 -p 5000 -d -r
+  command: inveniomanage runserver -h 0.0.0.0 -p 28080 -d -r
   ports:
-    - "127.0.0.1:5000:5000"
+    - "127.0.0.1:28080:28080"
   environment:
     - CACHE_REDIS_HOST=cache
     - CFG_DATABASE_HOST=db
-    - INVENIO_APP_CONFIG_ENVS=CACHE_REDIS_HOST,CFG_DATABASE_HOST
+    - DEBUG=True
+    - INVENIO_APP_CONFIG_ENVS=CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG
   volumes:
     - ./invenio:/code/invenio:ro
     - ./docs:/code/docs:rw
     - ./scripts:/code/scripts:ro
     - /code/invenio/base/translations
-    - /home/invenio
-    - /tmp:/tmp:rw
-    - /usr/local/var/invenio.base-instance
   links:
     - mysql:db
     - redis:cache
 worker:
   build: .
-  command: /code/scripts/docker_devboot.sh slave celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
+  command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
   environment:
     - BROKER_URL=redis://cache:6379/1
     - CACHE_REDIS_HOST=cache
     - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
-    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST
+    - DEBUG=True
+    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG
   volumes_from:
     - web
   links:
@@ -54,11 +53,11 @@ worker:
 redis:
   image: redis
   ports:
-    - "127.0.0.1:6379:6379"
+    - "127.0.0.1:26379:6379"
 mysql:
   image: mysql
   ports:
-    - "127.0.0.1:3306:3306"
+    - "127.0.0.1:23306:3306"
   environment:
     - MYSQL_DATABASE=invenio
     - MYSQL_USER=invenio

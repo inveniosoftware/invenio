@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.2.0\n"
+"Project-Id-Version: Invenio 1.2.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2015-03-03 18:01+0100\n"
+"POT-Creation-Date: 2015-05-21 17:22+0200\n"
 "PO-Revision-Date: 2014-04-12 06:30+0330\n"
 "Last-Translator: Mehdi Zahedi <mehdizahedin@gmail.com>\n"
 "Language-Team: FA <info@invenio-software.org>\n"
@@ -2289,46 +2289,46 @@ msgid ""
 "profiles, you can fix that here. </br>"
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:286
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:288
 msgid "Fatal: Author ID capabilities are disabled on this system."
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:289
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:326
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:291
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:328
 msgid "Fatal: You are not allowed to access this functionality."
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1577
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1579
 msgid "Claim this paper"
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1668
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:3187
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1670
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:3189
 msgid ""
 "<p>We're sorry. An error occurred while handling your request. Please find "
 "more information below:</p>"
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1673
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:3192
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1675
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:3194
 #: modules/websubmit/lib/websubmit_templates.py:340
 msgid "Notice"
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1914
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2228
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2234
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2710
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2924
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2959
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:1916
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2230
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2236
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2712
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2926
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2961
 msgid "This page is not accessible directly."
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2308
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2310
 msgid " "
 msgstr ""
 
-#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2948
+#: modules/bibauthorid/lib/bibauthorid_webinterface.py:2950
 msgid "Profile management"
 msgstr ""
 

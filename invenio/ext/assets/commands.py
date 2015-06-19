@@ -20,12 +20,16 @@
 
 import argparse
 import os
-import pkg_resources
+
 import warnings
 
 from flask import current_app, json
+
 from flask_assets import ManageAssets
+
 from flask_script import Command, Option
+
+import pkg_resources
 
 from .registry import bundles
 
@@ -81,7 +85,7 @@ class BowerCommand(Command):
             "dependencies": {},
             "resolutions": {
                 "jquery": "~1.11",  # <2 would pick 1.7.2 (thx jquery.treeview)
-                "bootstrap": "~3.2"
+                "bootstrap": "~3.3"
             }
         }
 

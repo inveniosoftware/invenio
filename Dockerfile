@@ -115,6 +115,11 @@ RUN python setup.py compile_catalog
 # clean up
 RUN rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
 
+
+###############################################################################
+## 5. Final Steps (changing)                                                 ##
+###############################################################################
+
 # step back
 # in general code should not be writeable, especially because we are using
 # `pip install -e`
@@ -127,3 +132,18 @@ RUN mkdir -p /code/src && \
     chown -R root:root /code/src && \
     chown -R invenio:invenio /usr/local/var/invenio.base-instance
 USER invenio
+
+# add volumes
+# do this AFTER `chown`, because otherwise directory permissions are not
+# preserved
+VOLUME /code
+VOLUME /home/invenio
+VOLUME /tmp
+VOLUME /usr/local/var/invenio.base-instance
+
+# install init scripts
+ENTRYPOINT ["/code/scripts/docker_boot.sh"]
+
+# default to bash
+CMD ["bash"]
+

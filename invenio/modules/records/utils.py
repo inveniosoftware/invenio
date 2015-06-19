@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -38,10 +38,10 @@ from .api import get_record
 
 def get_unique_record_json(param):
     """API to query records from the database."""
-    from invenio.modules.search.api import SearchEngine
+    from invenio.modules.search.api import Query
     data, query = {}, {}
     data['status'] = 'notfound'
-    recid = SearchEngine(param).search()
+    recid = Query(param).search()
     if len(recid) == 1:
         query = get_record(recid[0]).dumps(clean=True)
         data['status'] = 'success'

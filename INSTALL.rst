@@ -211,7 +211,7 @@ The following might not be necessary but is good to have for completeness.
 
 .. code-block:: console
 
-    $ brew install libjpeg libtiff freetype libffi
+    $ brew install libjpeg libtiff freetype libffi xz
     $ pip install -I pillow
 
 Install ``node`` by following `Node on OS X`_
@@ -577,7 +577,7 @@ register python argcomplete for inveniomanage.
 4. Final words
 --------------
 
-Happy hacking and thanks for choosing Invenio.
+Happy hacking and thanks for flying Invenio.
 
        - Invenio Development Team
          <info@invenio-software.org>

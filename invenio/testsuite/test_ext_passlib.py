@@ -37,6 +37,20 @@ class MySQLAESEncryptTestCase(InvenioTestCase):
             hexlify(mysql_aes_encrypt("test", "key")),
             "9e9ce44cd9df2b201f51947e03bccbe2"
         )
+        self.assertEqual(
+            hexlify(mysql_aes_encrypt(u"test", "key")),
+            "9e9ce44cd9df2b201f51947e03bccbe2"
+        )
+        self.assertEqual(
+            hexlify(mysql_aes_encrypt("test", u"key")),
+            "9e9ce44cd9df2b201f51947e03bccbe2"
+        )
+        self.assertEqual(
+            hexlify(mysql_aes_encrypt(u"test", u"key")),
+            "9e9ce44cd9df2b201f51947e03bccbe2"
+        )
+        self.assertRaises(AssertionError, mysql_aes_encrypt, object(), "key")
+        self.assertRaises(AssertionError, mysql_aes_encrypt, "val", object())
 
     def test_mysql_aes_decrypt(self):
         """Test mysql_aes_encrypt."""
@@ -45,6 +59,13 @@ class MySQLAESEncryptTestCase(InvenioTestCase):
                               "key"),
             "test"
         )
+        self.assertEqual(
+            mysql_aes_decrypt(unhexlify(u"9e9ce44cd9df2b201f51947e03bccbe2"),
+                              u"key"),
+            "test"
+        )
+        self.assertRaises(AssertionError, mysql_aes_decrypt, object(), "key")
+        self.assertRaises(AssertionError, mysql_aes_decrypt, "val", object())
 
 
 class PasslibTestCase(InvenioTestCase):
@@ -76,6 +97,19 @@ class PasslibTestCase(InvenioTestCase):
         assert ctx.verify("mypassword", hashval,
                           scheme="invenio_aes_encrypted_email",
                           user="info@invenio-software.org", )
+        assert ctx.needs_update(hashval)
+
+    def test_unicode_regression(self):
+        """Test legacy encryption."""
+        ctx = self.app.extensions['passlib']
+        hashval = ctx.encrypt(
+            u"mypassword",
+            scheme="invenio_aes_encrypted_email",
+            user=u"info@invenio-software.org",
+        )
+        assert ctx.verify(u"mypassword", hashval,
+                          scheme="invenio_aes_encrypted_email",
+                          user=u"info@invenio-software.org", )
         assert ctx.needs_update(hashval)
 
 

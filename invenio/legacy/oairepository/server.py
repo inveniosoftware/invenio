@@ -69,7 +69,7 @@ from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SP
 from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
     search_unit_in_bibxxx, get_record
 from invenio.modules.formatter import format_record
-from invenio.modules.search.api import SearchEngine
+from invenio.modules.search.api import Query
 from invenio.utils.date import localtime_to_utc, utc_to_localtime
 from invenio.utils.html import X, EscapedXMLString
 
@@ -590,7 +590,7 @@ def oai_get_recid(identifier):
     record if multiple recids matches but some of them are deleted (e.g. in
     case of merging). Returns None if no record matches."""
     if identifier:
-        recids = SearchEngine('{f}:"{p}"'.format(
+        recids = Query('{f}:"{p}"'.format(
             f=CFG_OAI_ID_FIELD, p=identifier)
         ).search()
         if recids:

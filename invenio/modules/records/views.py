@@ -231,6 +231,14 @@ def file(recid, filename):
             return send_file(file_, mimetype='application/octet-stream',
                              attachment_filename=filename)
         return send_file(document['uri'])
+
+    from invenio.modules.documents.utils import _get_legacy_bibdocs
+    for fullpath, permission in _get_legacy_bibdocs(recid, filename=filename):
+        if not permission:
+            error = 401
+            continue
+        return send_file(fullpath)
+
     abort(error)
 
 

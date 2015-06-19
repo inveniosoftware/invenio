@@ -21,11 +21,13 @@
 
 import hashlib
 
-from sqlalchemy import *
-from sqlalchemy.dialects import mysql
-
+from invenio.ext.passlib.hash import mysql_aes_encrypt
 from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
+
+from sqlalchemy import select
+from sqlalchemy.dialects import mysql
+
 
 depends_on = [u'accounts_2014_11_07_usergroup_name_column_unique']
 
@@ -62,10 +64,14 @@ def do_upgrade():
 
     # Migrate password blob to password varchar.
     for row in conn.execute(select([u])):
+        # NOTE: Empty string passwords were stored as empty strings
+        # instead of a hashed version, hence they must be treated differently.
+        legacy_pw = row[u.c.password] or mysql_aes_encrypt(row[u.c.email], "")
+
         stmt = u.update().where(
             u.c.id == row[u.c.id]
         ).values(
-            new_password=hashlib.sha256(row[u.c.password]).hexdigest()
+            new_password=hashlib.sha256(legacy_pw).hexdigest()
         )
         conn.execute(stmt)
 

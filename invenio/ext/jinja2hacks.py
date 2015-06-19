@@ -113,7 +113,7 @@ def utf8escape(s):
     """
     if isinstance(s, str):
         warnings.warn("Convert string '{0}' in template to unicode.".format(s),
-                      RuntimeWarning, stacklevel=3)
+                      DeprecationWarning, stacklevel=3)
         return jinja2_escape(s.decode('utf8'))
     return jinja2_escape(s)
 # Ensure function name is identical to replaced function.
@@ -136,6 +136,6 @@ class Markup(jinja2_Markup):
             encoding = 'utf8'
             warnings.warn(
                 "Convert string '{0}' in template to unicode.".format(base),
-                RuntimeWarning, stacklevel=3)
+                DeprecationWarning, stacklevel=3)
         return jinja2_Markup.__new__(cls, base=base, encoding=encoding,
                                      errors=errors)

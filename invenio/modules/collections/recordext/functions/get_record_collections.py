@@ -21,7 +21,7 @@
 
 from six import iteritems
 
-from invenio.modules.search.api import SearchEngine
+from invenio.modules.search.api import Query
 from invenio.utils.datastructures import LazyDict
 
 COLLECTIONS_DELETED_RECORDS = '{dbquery} AND NOT collection:"DELETED"'
@@ -33,7 +33,7 @@ def _queries():
     from invenio.modules.collections.models import Collection
     return dict(
         (collection.name, dict(
-            query=SearchEngine(COLLECTIONS_DELETED_RECORDS.format(
+            query=Query(COLLECTIONS_DELETED_RECORDS.format(
                 dbquery=collection.dbquery)
             ),
             ancestors=set(c.name for c in collection.ancestors

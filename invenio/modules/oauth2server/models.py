@@ -22,6 +22,7 @@
 from __future__ import absolute_import
 
 from flask import current_app
+
 from flask_login import current_user
 
 from invenio.base.i18n import _
@@ -31,7 +32,7 @@ from invenio.ext.sqlalchemy import db
 
 import six
 
-from sqlalchemy_utils import URLType
+from sqlalchemy_utils.types import URLType
 from sqlalchemy_utils.types.encrypted import AesEngine, EncryptedType
 
 from werkzeug.security import gen_salt

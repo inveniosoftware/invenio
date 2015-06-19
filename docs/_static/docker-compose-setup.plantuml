@@ -77,11 +77,11 @@ node "worker" as container_worker {
 }
 
 () "TTY via `docker exec`" as interface_tty
-() "webinterface at localhost:5000" as interface_web
+() "webinterface at localhost:28080" as interface_web
 () "builded docs" as interface_docs
 () "live code and template updates" as interface_code
-() "mysql at localhost:3306" as interface_mysql
-() "redis + celery debug (e.g. via flower) at localhost:6379" as interface_redis
+() "mysql at localhost:23306" as interface_mysql
+() "redis + celery debug (e.g. via flower) at localhost:26379" as interface_redis
 
 container_mysql -up-|> image_mysql
 container_redis -up-|> image_redis

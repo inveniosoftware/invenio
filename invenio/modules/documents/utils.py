@@ -78,8 +78,8 @@ def _get_document(uuid):
         return path
 
 
-def _get_legacy_bibdoc(recid, filename=None):
-    """Get the the fullpath of legacy bibdocfile.
+def _get_legacy_bibdocs(recid, filename=None):
+    """Get all fullpaths of legacy bibdocfile.
 
     :param int recid: The record id
     :param str filename: A specific filename
@@ -88,12 +88,23 @@ def _get_legacy_bibdoc(recid, filename=None):
     """
     from invenio.ext.login import current_user
     from invenio.legacy.bibdocfile.api import BibRecDocs
-    paths = [
+    return [
         (bibdoc.fullpath, bibdoc.is_restricted(current_user))
         for bibdoc in BibRecDocs(recid).list_latest_files(list_hidden=False)
         if not bibdoc.subformat and not filename or
         bibdoc.name + bibdoc.superformat == filename
     ]
+
+
+def _get_legacy_bibdoc(recid, filename=None):
+    """Get the fullpath of legacy bibdocfile.
+
+    :param int recid: The record id
+    :param str filename: A specific filename
+    :returns: bibdocfile full path and access rights
+    :rtype: tuple
+    """
+    paths = _get_legacy_bibdocs(recid, filename=filename)
     try:
         path = paths[0]
     except IndexError:

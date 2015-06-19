@@ -24,6 +24,8 @@ from __future__ import print_function
 
 import urlparse
 
+from flask import current_app
+
 from intbitset import intbitset
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
@@ -45,18 +47,6 @@ from invenio.modules.access.models import AccACTION, AccAuthorization, \
 from six import iteritems
 
 from sqlalchemy.exc import ProgrammingError
-
-
-CFG_SUPERADMINROLE_ID = 0
-try:
-    id_tmp = run_sql("""SELECT id FROM "accROLE" WHERE name=%s""",
-                     (SUPERADMINROLE, ))
-    if id_tmp:
-        CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
-except Exception:
-    pass
-
-# ACTIONS
 
 
 def acc_add_action(name_action='', description='', optional='no',
@@ -1480,7 +1470,7 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True,
         id_action=id_action)).fetchall())
 
     if always_add_superadmin:
-        roles.add(CFG_SUPERADMINROLE_ID)
+        roles.add(current_app.config.get("CFG_SUPERADMINROLE_ID", 1))
 
     # Unpack arguments
     if batch_args:
@@ -1610,7 +1600,7 @@ def acc_find_possible_actions(id_role, id_action):
         # action without arguments"
         if run_sql(
             """SELECT "id_accROLE"
-               FROM ""accROLE_accACTION_accARGUMENT"
+               FROM "accROLE_accACTION_accARGUMENT"
                WHERE "id_accROLE" = %s AND "id_accACTION"  = %s AND
                      "id_accARGUMENT" = 0 AND argumentlistid = 0""",
                 (id_role, id_action)):

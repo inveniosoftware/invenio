@@ -43,6 +43,8 @@ from flask import current_app
 from invenio.base.globals import cfg
 from invenio.utils.datastructures import LazyDict
 
+from MySQLdb import OperationalError as MySQLdbOperationalError
+
 from thread import get_ident
 
 from sqlalchemy.exc import InterfaceError, OperationalError
@@ -275,7 +277,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
-    except (OperationalError, InterfaceError):
+    except (OperationalError, MySQLdbOperationalError, InterfaceError):
         # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping()
         # first?
@@ -284,10 +286,11 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         try:
             db = _db_login(dbhost, relogin=1)
             cur = db.cursor()
+            cur.execute("SET SESSION sql_mode = %s", ['ANSI_QUOTES'])
             gc.disable()
             rc = cur.execute(sql, param)
             gc.enable()
-        except (OperationalError, InterfaceError):
+        except (OperationalError, MySQLdbOperationalError, InterfaceError):
             # unexpected disconnect, bad malloc error, etc
             raise
 
@@ -361,14 +364,14 @@ def run_sql_many(query, params, limit=None, run_on_slave=False):
             gc.disable()
             rc = cur.executemany(query, params[i:i + limit])
             gc.enable()
-        except (OperationalError, InterfaceError):
+        except (OperationalError, MySQLdbOperationalError, InterfaceError):
             try:
                 db = _db_login(dbhost, relogin=1)
                 cur = db.cursor()
                 gc.disable()
                 rc = cur.executemany(query, params[i:i + limit])
                 gc.enable()
-            except (OperationalError, InterfaceError):
+            except (OperationalError, MySQLdbOperationalError, InterfaceError):
                 raise
         # collect its result:
         if r is None:
