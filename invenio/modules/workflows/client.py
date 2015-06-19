@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,10 +20,11 @@
 """Low-level functions to run workflows."""
 
 import traceback
-from .errors import WorkflowHalt, WorkflowError
-from .models import ObjectVersion
+
 from .engine import WorkflowStatus
-from .signals import workflow_halted, workflow_error
+from .errors import WorkflowError, WorkflowHalt
+from .models import ObjectVersion
+from .signals import workflow_error, workflow_halted
 
 
 def run_workflow(wfe, data, stop_on_halt=False,

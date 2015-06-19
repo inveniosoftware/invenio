@@ -52,7 +52,6 @@ define(
 
         // Data
         page: 1,
-        sort_key: ""
       });
 
       this.preparePayload = function (data) {

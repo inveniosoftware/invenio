@@ -40,10 +40,11 @@ from flask import (
     request,
     send_from_directory,
     session,
-    url_for,
 )
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
+
 from flask_login import login_required
+
 from flask_menu import register_menu
 
 from invenio.base.decorators import templated, wash_arguments
@@ -128,14 +129,14 @@ def index():
 @wash_arguments({
     'page': (int, 1),
     'per_page': (int, 0),
-    'sort_key': (unicode, "created"),
+    'sort_key': (unicode, "updated"),
 })
 def load(page, per_page, sort_key):
     """Load objects for the table."""
     # FIXME: Load tags in this way until wash_arguments handles lists.
     tags = request.args.getlist("tags[]") or []  # empty to show all
     sort_key = request.args.get(
-        'sort_key', session.get('holdingpen_sort_key', "created")
+        'sort_key', session.get('holdingpen_sort_key', "updated")
     )
     per_page = per_page or session.get('holdingpen_per_page') or 10
     object_list = get_holdingpen_objects(tags)
@@ -194,7 +195,8 @@ def list_objects():
         "holdingpen_tags",
         [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
     )
-    tags_to_print = [{"text": str(_(tag)), "value": tag} for tag in tags if tag]
+    tags_to_print = [{"text": tag, "value": tag}
+                     for tag in tags if tag]
     return render_template(
         'workflows/list.html',
         tags=json.dumps(tags_to_print),
@@ -277,7 +279,7 @@ def details(objectid):
     )
 
 
-@blueprint.route('/files/<int:object_id>/<path:filename>',
+@blueprint.route('/result/<int:object_id>/<path:filename>',
                  methods=['POST', 'GET'])
 @login_required
 @permission_required(viewholdingpen.name)
@@ -301,6 +303,22 @@ def get_file_from_task_result(object_id=None, filename=None):
         fileinfo = task_results[filename][0].get("result", dict())
         directory, actual_filename = os.path.split(fileinfo.get("full_path", ""))
         return send_from_directory(directory, actual_filename)
+
+
+@blueprint.route('/file/<int:object_id>/<path:filename>',
+                 methods=['POST', 'GET'])
+@login_required
+@permission_required(viewholdingpen.name)
+def get_file_from_object(object_id=None, filename=None):
+    """Send the requested file to user from a workflow object FFT value."""
+    bwobject = BibWorkflowObject.query.get_or_404(object_id)
+    data = bwobject.get_data()
+    urls = data.get("fft.url", [])
+    for url in urls:
+        if os.path.basename(filename) == os.path.basename(url):
+            directory, actual_filename = os.path.split(url)
+            return send_from_directory(directory, actual_filename)
+    # Return 404
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
@@ -400,7 +418,6 @@ def resolve_action():
             action_form = actions[action_name]
             res = action_form().resolve(bwobject)
             ids_resolved += 1
-
 
     if ids_resolved == 1:
         return jsonify(res)

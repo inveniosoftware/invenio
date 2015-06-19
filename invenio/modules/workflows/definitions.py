@@ -36,7 +36,9 @@ class WorkflowBase(object):
     """Base class for workflow definition.
 
     Interface to define which functions should be imperatively implemented.
-    All workflows should inherit from this class.
+
+    All workflows intended to work well with Holding Pen should inherit from
+    this class.
     """
 
     @staticmethod
@@ -58,6 +60,11 @@ class WorkflowBase(object):
     def formatter(obj, **kwargs):
         """Format the object."""
         return "No data"
+
+    @staticmethod
+    def get_sort_data(obj, **kwargs):
+        """Return a dictionary of key values useful for sorting in Holding Pen."""
+        return {}
 
 
 class RecordWorkflow(WorkflowBase):
