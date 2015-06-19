@@ -31,12 +31,17 @@ Install Docker_ and `Docker Compose`_. Now run:
 
 .. code-block:: shell
 
-    docker-compose -f docker-compose-dev.yml build docker-compose -f
-    docker-compose-dev.yml up
+    docker-compose -f docker-compose-dev.yml build docker-compose -f \
+        docker-compose-dev.yml up
 
 This builds and runs the docker containers. You can now connect to
 `localhost:28080` to see your Invenio installation. The `admin` user does not
 have any password.
+
+.. caution::
+    This will mirror the current source code directory into the Docker
+    container, so make sure to delete all `*.pyc`-files before. They might
+    not be compatible with the Python version and libraries of Docker image.
 
 .. note::
     If you are using `boot2docker`_ you need to set up port forwarding by
