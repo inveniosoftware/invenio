@@ -408,6 +408,12 @@ def fetch_updated_arxiv_records(date):
     return recids - search_pattern(p="980:DELETED")
 
 
+def fetch_records_modified_since(last_date):
+    """Fetch all the recids of records modified since last_date in the system"""
+    return intbitset(run_sql("SELECT id FROM bibrec WHERE"
+        " modification_date>=%s", (last_date, )))
+
+
 def task_run_core(name=NAME):
     """Entry point for the arxiv-pdf-checker task"""
 
@@ -422,6 +428,9 @@ def task_run_core(name=NAME):
             last_date)
         if task_get_option('missing'):
             recids |= fetch_records_missing_arxiv_fulltext()
+        else:
+            recids |= fetch_records_missing_arxiv_fulltext() & \
+                fetch_records_modified_since(last_date)
 
     updated_recids = set()
 
@@ -487,7 +496,7 @@ def main():
               help_specific_usage="""
   Scheduled (daemon) options:
   -i, --id       Record id to check.
-  -m, --missing  Run on all records which are missing an arXiv PDF (slow!)
+  -m, --missing  Run on *all* records which are missing an arXiv PDF (slow!)
   Examples:
    (run a daemon job)
       arxiv-pdf-checker
