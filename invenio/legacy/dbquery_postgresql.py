@@ -18,11 +18,7 @@
 """
 Invenio utilities to run SQL queries.
 
-The main API functions are:
-    - run_sql()
-    - run_sql_many()
-    - run_sql_with_limit()
-but see the others as well.
+The main API function is run_sql(), but see the others as well.
 """
 from __future__ import print_function
 
@@ -47,15 +43,6 @@ from invenio.ext.sqlalchemy import db
 def _db_login(*args, **kwargs):
     warnings.warn("Use of _db_login is obsolete for postgresql.",
                   DeprecationWarning)
-
-
-class InvenioDbQueryWildcardLimitError(Exception):
-
-    """Exception raised when query limit reached."""
-
-    def __init__(self, res):
-        """Initialization."""
-        self.res = res
 
 
 def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
@@ -139,53 +126,6 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False,
         return cur
 
 
-def run_sql_many(query, params, limit=None, run_on_slave=False):
-    """Run SQL on the server with PARAM.
-
-    This method does executemany and is therefore more efficient than execute
-    but it has sense only with queries that affect state of a database
-    (INSERT, UPDATE). That is why the results just count number of affected
-    rows.
-
-    :param params: tuple of tuple of string params to insert in the query
-
-    :param limit: query will be executed in parts when number of
-         parameters is greater than limit (each iteration runs at most
-         `limit' parameters)
-
-    :return: SQL result as provided by database
-    """
-    if limit is None:
-        limit = cfg['CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT']
-
-    if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
-        # do not connect to the database as the site is closed for maintenance:
-        return []
-    elif cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] > 0:
-        # Read only website
-        if not query.upper().startswith("SELECT") and \
-                not query.upper().startswith("SHOW"):
-            return
-
-    # dbhost = cfg['CFG_DATABASE_HOST']
-    # if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
-        # dbhost = cfg['CFG_DATABASE_SLAVE']
-    i = 0
-    r = None
-    while i < len(params):
-        # make partial query safely (mimicking procedure from run_sql())
-        gc.disable()
-        rc = db.session.execute(query, params[i:i + limit]).fetchall()
-        gc.enable()
-        # collect its result:
-        if r is None:
-            r = rc
-        else:
-            r += rc
-        i += limit
-    return r
-
-
 def blob_to_string(ablob):
     """Return string representation of ABLOB.
 
@@ -237,37 +177,29 @@ def get_table_update_time(tablename, run_on_slave=False):
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def get_table_status_info(tablename, run_on_slave=False):
-    """Return table status information on TABLENAME.
+def get_table_status_info(table_name, run_on_slave=False):
+    """Return table status information on table_name.
 
-    Returned is a dict with keys like Name, Rows, Data_length, Max_data_length,
-    etc.  If TABLENAME does not exist, return empty dict.
+    Returns a dict with keys Name, Rows, Data_length, and Index_length.
+    If table_name does not exist, returns an empty dict.
     """
-    # FIXME how can I implement it with PostgreSQL???
-    res = run_sql("""SHOW TABLE STATUS LIKE "%s" """, (tablename,),
-                  run_on_slave=run_on_slave)
-    table_status_info = {}  # store all update times
-    for row in res:
-        if type(row[10]) is long or \
-           row[10] is None:
-            # MySQL-4.1 and 5.0 have creation time in 11th position:
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[4]
-            table_status_info['Data_length'] = row[6]
-            table_status_info['Max_data_length'] = row[8]
-            table_status_info['Create_time'] = row[11]
-            table_status_info['Update_time'] = row[12]
-        else:
-            # MySQL-4.0 has creation_time in 10th position, which is
-            # of type datetime.datetime or str (depending on the
-            # version of MySQLdb):
-            table_status_info['Name'] = row[0]
-            table_status_info['Rows'] = row[3]
-            table_status_info['Data_length'] = row[5]
-            table_status_info['Max_data_length'] = row[7]
-            table_status_info['Create_time'] = row[10]
-            table_status_info['Update_time'] = row[11]
-    return table_status_info
+    result = run_sql('''
+        SELECT
+            relname,
+            n_tup_ins - n_tup_del,
+            pg_total_relation_size(relname::text) - pg_indexes_size(relname::text),
+            pg_indexes_size(relname::text)
+        FROM
+            pg_stat_all_tables
+        WHERE
+            relname=%s''',
+        (table_name,), run_on_slave=run_on_slave)
+
+    if result:
+        return {'Name': result[0][0], 'Rows': result[0][1],
+                'Data_length': result[0][2], 'Index_length': result[0][3]}
+
+    return {}
 
 
 def wash_table_column_name(colname):
@@ -302,31 +234,6 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     # escaped_string = connection_object.escape(unescaped_string)
     from psycopg2.extensions import adapt
     return str(adapt(unescaped_string))
-
-
-def run_sql_with_limit(query, param=None, n=0, with_desc=False,
-                       wildcard_limit=0, run_on_slave=False):
-    """Run SQL with limit.
-
-    This function should be used in some cases, instead of run_sql function, in
-    order to protect the db from queries that might take a log time to respond
-    Ex: search queries like [a-z]+ ; cern*; a->z;
-    The parameters are exactly the ones for run_sql function.
-    In case the query limit is reached, an InvenioDbQueryWildcardLimitError
-    will be raised.
-    """
-    try:
-        int(wildcard_limit)
-    except ValueError:
-        raise
-
-    if wildcard_limit < 1:  # no limit on the wildcard queries
-        return run_sql(query, param, n, with_desc, run_on_slave=run_on_slave)
-    safe_query = query + " limit %s" % wildcard_limit
-    res = run_sql(safe_query, param, n, with_desc, run_on_slave=run_on_slave)
-    if len(res) == wildcard_limit:
-        raise InvenioDbQueryWildcardLimitError(res)
-    return res
 
 
 def check_table_exists(table_name):

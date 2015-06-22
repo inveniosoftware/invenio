@@ -44,7 +44,7 @@ def report_table_status(tablename):
         out =  "%14s %17d %17d %17d" % (table_info['Name'],
                                         table_info['Rows'],
                                         table_info['Data_length'],
-                                        table_info['Max_data_length']
+                                        table_info['Index_length']
                                         )
     return out
 

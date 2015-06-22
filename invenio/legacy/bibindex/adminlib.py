@@ -36,7 +36,7 @@ from invenio.legacy.bibrank.adminlib import write_outcome, \
     createhiddenform
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.dbquery import (run_sql, get_table_status_info,
-                                    wash_table_column_name)
+                                    wash_table_column_name, check_table_exists)
 from invenio.legacy.bibindex.engine_stemmer import get_stemming_language_map
 import invenio.legacy.template
 from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
@@ -2653,9 +2653,11 @@ def add_idx(idxNAME):
             return (0, (0, "A index with the given name already exists."))
 
         for i in xrange(1, 100):
-            res = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (i, ))
-            res2 = get_table_status_info("idxWORD%02d%%" % i)
-            if not res and not res2:
+            index_exists = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (i, ))
+            forward_table_exists = check_table_exists('idxWORD%02dF' % i)
+            reverse_table_exists = check_table_exists('idxWORD%02dR' % i)
+
+            if not index_esists and not forward_table_exists and not reverse_table_exists:
                 idxID = i
                 break
         if idxID == 0:
@@ -2718,16 +2720,17 @@ def add_idx(idxNAME):
                             KEY type (type)
                             ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (idxID, ))
-        res2 = get_table_status_info("idxWORD%02dF" % idxID)
-        res3 = get_table_status_info("idxWORD%02dR" % idxID)
-        if res and res2 and res3:
-            return (1, res[0][0])
-        elif not res:
+        index_created = run_sql("""SELECT id from "idxINDEX" WHERE id=%s""", (idxID, ))
+        forward_table_exists = check_table_exists('idxWORD%02dF' % idxID)
+        reverse_table_exists = check_table_exists('idxWORD%02dR' % idxID)
+
+        if index_created and forward_table_exists and reverse_table_exists:
+            return (1, index_created[0][0])
+        elif not index_created:
             return (0, (0, "Could not add the new index to idxINDEX"))
-        elif not res2:
+        elif not forward_table_exists:
             return (0, (0, "Forward table not created for unknown reason."))
-        elif not res3:
+        elif not reverse_table_exists:
             return (0, (0, "Reverse table not created for unknown reason."))
     except StandardError as e:
         return (0, e)
