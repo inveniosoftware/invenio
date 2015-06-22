@@ -122,9 +122,9 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
 
         # FIXME We should NOT use regular expressions to parse XML. This works
         # for the time being to escape namespaces.
-        rt_obj = re.search('<.*resumptionToken.*>(.+)</.*resumptionToken.*>',
+        rt_obj = re.search('<.*resumptionToken.*>(.*)</.*resumptionToken.*>',
             harvested_data, re.DOTALL)
-        if rt_obj is not None and rt_obj != "":
+        if rt_obj is not None and rt_obj.group(1) != "":
             http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
             i = i + 1
         else:
