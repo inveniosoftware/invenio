@@ -200,7 +200,7 @@ class AccAuthorization(db.Model):
     @db.hybrid_property
     def id_accARGUMENT(self):
         """get id_accARGUMENT."""
-        return self.id_accARGUMENT
+        return self._id_accARGUMENT
 
     @id_accARGUMENT.setter
     def id_accARGUMENT(self, value):
