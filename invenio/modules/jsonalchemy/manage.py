@@ -19,9 +19,9 @@
 
 """Generate JSONSchema output from existing JSONAlchemy models."""
 
-from __future__ import print_function
-
+import argparse
 import json
+import sys
 
 from flask import current_app
 
@@ -35,7 +35,10 @@ manager = Manager(usage=__doc__)
                 help="Desired namespace")
 @manager.option('-m', '--model', dest='model', default='__default__',
                 help="Desired model. e.g. 'hep'")
-def jsonschema(model, namespace="recordext"):
+@manager.option('-O', '--output', dest='output_file',
+                type=argparse.FileType('w'), default=sys.stdout,
+                help="Output file.", nargs='?')
+def jsonschema(model, namespace="recordext", output_file=sys.stdout):
     """Print JSONSchema output from existing JSONAlchemy models."""
     from invenio.modules.jsonalchemy.parser import ModelParser
     from invenio.modules.jsonalchemy.parser import FieldParser
@@ -87,7 +90,7 @@ def jsonschema(model, namespace="recordext"):
         if description:
             property_['description'] = description
 
-    print(json.dumps(out, indent=4, sort_keys=True))
+    output_file.write(json.dumps(out, indent=4, sort_keys=True))
 
 
 def main():
