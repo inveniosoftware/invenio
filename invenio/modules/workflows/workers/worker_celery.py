@@ -17,8 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
-from __future__ import print_function
+from six import reraise
 
 from invenio.base.helpers import with_app_context
 from invenio.celery import celery
@@ -134,13 +133,9 @@ class CeleryResult(AsynchronousResultWrapper):
         if postprocess is None:
             return self.asyncresult.get()
         else:
-            # Celery saves the traceback as plaintext, so it can only print a
-            # less informative stack. We handle this explicitly by printing the
-            # full traceback to stderr.
             try:
                 result = self.asyncresult.get()
             except Exception as e:
-                e.args += (self.asyncresult.traceback,)
-                raise e
+                reraise(e, None, self.asyncresult.traceback)
             else:
                 return postprocess(result)
