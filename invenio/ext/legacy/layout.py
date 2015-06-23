@@ -173,7 +173,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
 
     _exports = [
         'youraccount',
-        'yourbaskets',
         'yourloans',
         'yourcomments',
         'ill',
@@ -200,7 +199,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
 
     _mapping = dict(
         youraccount='WebInterfaceYourAccountPages',
-        yourbaskets='WebInterfaceYourBasketsPages',
         yourloans='WebInterfaceYourLoansPages',
         ill='WebInterfaceILLPages',
         yourtickets='WebInterfaceYourTicketsPages',

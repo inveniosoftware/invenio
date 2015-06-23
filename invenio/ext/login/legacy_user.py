@@ -45,7 +45,6 @@ CFG_USER_DEFAULT_INFO = {
     'session': None,
     'precached_permitted_restricted_collections': [],
     'precached_allowed_deposition_types': [],
-    'precached_usebaskets': False,
     'precached_useloans': False,
     'precached_usegroups': False,
     'precached_usemessages': False,
@@ -200,8 +199,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
             get_permitted_restricted_collections(user_info)
         data['precached_allowed_deposition_types'] = \
             get_authorized_deposition_types(user_info)
-        data['precached_usebaskets'] = acc_authorize_action(
-            user_info, 'usebaskets')[0] == 0
         data['precached_useloans'] = acc_authorize_action(
             user_info, 'useloans')[0] == 0
         data['precached_usegroups'] = acc_authorize_action(

@@ -316,12 +316,6 @@ def guest_user_garbage_collector():
                 'user': 0,
                 'user_query': 0,
                 'query': 0,
-                'bskBASKET': 0,
-                'user_bskBASKET': 0,
-                'bskREC': 0,
-                'bskRECORDCOMMENT': 0,
-                'bskEXTREC': 0,
-                'bskEXTFMT': 0,
                 'mail_cookie': 0,
                 'email_addresses': 0,
                 'role_membership' : 0}
@@ -408,49 +402,6 @@ def guest_user_garbage_collector():
     for (id_user,) in result:
         delcount['query'] += run_sql("""DELETE FROM query WHERE id = %s""", (id_user,))
 
-
-    # 3 - DELETE BASKETS NOT OWNED BY ANY USER
-    write_message("- deleting baskets not owned by any user")
-
-    # select basket ids
-    write_message(""" SELECT ub."id_bskBASKET"\n  FROM "user_bskBASKET" AS ub LEFT JOIN "user" AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""", verbose=9)
-    try:
-        result = run_sql("""SELECT ub."id_bskBASKET"
-                              FROM "user_bskBASKET" AS ub LEFT JOIN "user" AS u
-                                ON u.id = ub.id_user
-                             WHERE u.id IS NULL""")
-    except:
-        result = []
-    write_message(result, verbose=9)
-
-    # delete from user_basket and basket one by one
-    write_message("""  DELETE FROM "user_bskBASKET" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM "bskBASKET" WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM "bskREC" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT'""", verbose=9)
-    write_message("""  DELETE FROM "bskRECORDCOMMENT" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
-    for (id_basket,) in result:
-        delcount['user_bskBASKET'] += run_sql("""DELETE FROM "user_bskBASKET" WHERE "id_bskBASKET" = %s""", (id_basket,))
-        delcount['bskBASKET'] += run_sql("""DELETE FROM "bskBASKET" WHERE id = %s""", (id_basket,))
-        delcount['bskREC'] += run_sql("""DELETE FROM "bskREC" WHERE "id_bskBASKET" = %s""", (id_basket,))
-        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM "bskRECORDCOMMENT" WHERE "id_bskBASKET" = %s""", (id_basket,))
-    write_message("""SELECT DISTINCT ext.id, rec."id_bibrec_or_bskEXTREC"
-                     FROM bskEXTREC AS ext
-                     LEFT JOIN "bskREC" AS rec
-                     ON ext.id=-rec."id_bibrec_or_bskEXTREC"
-                     WHERE "id_bibrec_or_bskEXTREC" is NULL""", verbose=9)
-    try:
-        result = run_sql("""SELECT DISTINCT ext.id FROM "bskEXTREC" AS ext
-                            LEFT JOIN "bskREC" AS rec ON ext.id=-rec."id_bibrec_or_bskEXTREC"
-                            WHERE "id_bibrec_or_bskEXTREC" is NULL""")
-    except:
-        result = []
-    write_message(result, verbose=9)
-    write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskEXTFMT WHERE "id_bskEXTREC" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
-    for (id_basket,) in result:
-        delcount['bskEXTREC'] += run_sql("""DELETE FROM "bskEXTREC" WHERE id=%s""", (id_basket,))
-        delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE "id_bskEXTREC"=%s""", (id_basket,))
-
     # 5 - delete expired mailcookies
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
@@ -469,12 +420,6 @@ def guest_user_garbage_collector():
     write_message("""  %7s users.""" % (delcount['user'],))
     write_message("""  %7s user_queries.""" % (delcount['user_query'],))
     write_message("""  %7s queries.""" % (delcount['query'],))
-    write_message("""  %7s baskets.""" % (delcount['bskBASKET'],))
-    write_message("""  %7s user_baskets.""" % (delcount['user_bskBASKET'],))
-    write_message("""  %7s basket_records.""" % (delcount['bskREC'],))
-    write_message("""  %7s basket_external_records.""" % (delcount['bskEXTREC'],))
-    write_message("""  %7s basket_external_formats.""" % (delcount['bskEXTFMT'],))
-    write_message("""  %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'],))
     write_message("""  %7s mail_cookies.""" % (delcount['mail_cookie'],))
     write_message("""  %7s non confirmed email addresses.""" % delcount['email_addresses'])
     write_message("""  %7s role_memberships.""" % (delcount['role_membership'],))

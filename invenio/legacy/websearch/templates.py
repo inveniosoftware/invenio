@@ -2956,18 +2956,7 @@ class Template:
           - 'ln' *string* - The language to display
 
         """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """
-              <form action="%(siteurl)s/yourbaskets/add" method="post">
-              <table>
-              """ % {
-                'siteurl' : CFG_BASE_URL,
-              }
-
-        return out
+        return "<table/>"
 
     def tmpl_record_format_htmlbrief_footer(self, ln, display_add_to_basket=True):
         """Returns the footer of the search results list when output
@@ -2982,19 +2971,8 @@ class Template:
           - 'ln' *string* - The language to display
           - 'display_add_to_basket' *bool* - whether to display Add-to-basket button
         """
+        return  "</table><br />"
 
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """</table>
-               <br />
-               <input type="hidden" name="colid" value="0" />
-               %(add_to_basket)s
-               </form>""" % {
-               'add_to_basket': display_add_to_basket and """<input class="formbutton" type="submit" name="action" value="%s" />""" % _("Add to basket") or "",
-                 }
-
-        return out
 
     def tmpl_record_format_htmlbrief_body(self, ln, recid,
                                           row_number, relevance,
@@ -3028,19 +3006,6 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        checkbox_for_baskets = """<input name="recid" type="checkbox" value="%(recid)s" />""" % \
-                               {'recid': recid, }
-        if not display_add_to_basket:
-            checkbox_for_baskets = ''
-        out = """
-                <tr><td valign="top" align="right" style="white-space: nowrap;">
-                    %(checkbox_for_baskets)s
-                    <abbr class="unapi-id" title="%(recid)s"></abbr>
-
-                %(number)s.
-               """ % {'recid': recid,
-                      'number': row_number,
-                      'checkbox_for_baskets': checkbox_for_baskets}
         if relevance:
             out += """<br /><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
                 'prologue' : relevances_prologue,
@@ -3180,13 +3145,8 @@ class Template:
             if len(results) != 0:
                 if of == 'hb':
                     out += """
-                          <form action="%(siteurl)s/yourbaskets/add" method="post">
-                          <input type="hidden" name="colid" value="%(col_db_id)s" />
                           <table>
-                          """ % {
-                            'siteurl' : CFG_BASE_URL,
-                            'col_db_id' : db_id,
-                          }
+                          """
             else:
                 if of == 'hb':
                     out += """
@@ -3200,10 +3160,6 @@ class Template:
                 if of == 'hb':
                     out += """</table>
                            <br />"""
-                    if display_add_to_basket:
-                        out += """<input class="formbutton" type="submit" name="action" value="%(basket)s" />
-                    """ % {'basket' : _("Add to basket")}
-                    out += """</form>"""
             else:
                 if of == 'hb':
                     out += """

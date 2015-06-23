@@ -84,14 +84,6 @@
            rel="tooltip"
            title="{{ _('Toggle all') }}"></i>
       </span>
-      {% if current_user.precached_usebaskets %}
-        <button name="action" value="addtobasket" class="btn btn-default">
-          <i class="glyphicon glyphicon-bookmark"
-             rel="tooltip"
-             title="{{ _('Add to basket') }}"></i>
-          <span style="display: none">{{ _('Add to basket') }}</span>
-        </button>
-      {% endif %}
     </span>
   </div>
 {% endblock %}{% endmacro %}

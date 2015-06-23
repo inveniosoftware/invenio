@@ -119,7 +119,6 @@ CFG_EXTERNAL_AUTH_SSO_REFRESH = 600
 DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'),
              ('anyuser', 'Any user', 'allow any'),
-             ('basketusers', 'Users who can use baskets', 'allow any'),
              ('loanusers', 'Users who can use loans', 'allow any'),
              ('groupusers', 'Users who can use groups', 'allow any'),
              ('messageusers', 'Users who can use messages', 'allow any'),
@@ -178,7 +177,6 @@ DEF_ACTIONS = (
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
-               ('usebaskets', 'use baskets', '', 'no'),
                ('useloans', 'use loans', '', 'no'),
                ('usegroups', 'use groups', '', 'no'),
                ('usemessages', 'use messages', '', 'no'),
@@ -208,8 +206,7 @@ for action in DEF_ACTIONS:
 
 # Default authorizations
 #              role          action        arguments
-DEF_AUTHS = (('basketusers', 'usebaskets', {}),
-             ('loanusers', 'useloans', {}),
+DEF_AUTHS = (('loanusers', 'useloans', {}),
              ('groupusers', 'usegroups', {}),
              ('messageusers', 'usemessages', {}),
              ('holdingsusers', 'viewholdings', {}),

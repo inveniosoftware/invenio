@@ -563,13 +563,6 @@ class Template:
           'search_explain' : _("View all the searches you performed during the last 30 days."),
 
         }
-        out += """
-        <dt><a href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</a></dt>
-        <dd>%(basket_explain)s""" % {
-        'ln' : ln,
-        'your_baskets' : _("Your Baskets"),
-        'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
-        }
         if not guest:
             out += """
             <dt><a href="../yourcomments/?ln=%(ln)s">%(your_comments)s</a></dt>
@@ -607,8 +600,6 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        if (type=='baskets'):
-            msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.", **{'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                 'x_url_close': '</a>'})
         return """<table class="errorbox" summary="">
@@ -710,9 +701,6 @@ class Template:
 
         if loans:
             out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
-
-        if baskets:
-            out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
 
         if comments:
             comments_description = _("You can consult the list of %(x_url_open)syour comments%(x_url_close)s submitted so far.")
