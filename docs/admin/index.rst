@@ -42,8 +42,6 @@ Admin's Guide
    oairepository-admin-guide
    publiline-admin-guide
    webcomment-admin-guide
-   webjournal-admin-guide
-   webjournal-editor-guide
    webmessage-admin-guide
    websearch-admin-guide
    websession-admin-guide

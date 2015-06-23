@@ -66,8 +66,6 @@ CFG_MAX_ATIME_RM_OAI = 14
 CFG_MAX_ATIME_ZIP_OAI = 3
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
-# After how many day to remove old cached webjournal files
-CFG_WEBJOURNAL_TTL = 7
 # After how many days to remove temporary video uploads
 CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 # After how many days to remove obsolete refextract xml output files
@@ -80,8 +78,6 @@ CFG_MAX_ATIME_RM_ICON = 7
 # After how many days to remove obsolete WebSubmit-created temporary
 # stamp files
 CFG_MAX_ATIME_RM_STAMP = 7
-# After how many days to remove obsolete WebJournal-created update XML
-CFG_MAX_ATIME_RM_WEBJOURNAL_XML = 7
 # After how many days to remove obsolete temporary files attached with
 # the CKEditor in WebSubmit context?
 CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE = 28
@@ -166,12 +162,6 @@ def clean_tempfiles():
                 % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                 CFG_MAX_ATIME_RM_STAMP, vstr))
 
-        write_message("- deleting old temporary WebJournal XML files")
-        gc_exec_command('find %s %s -name "webjournal_publish_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
-
     write_message("- deleting old temporary files attached with CKEditor")
     gc_exec_command('find %s/var/tmp/attachfile/ '
         ' -atime +%s -exec rm %s -f {} \;' \
@@ -206,28 +196,6 @@ def clean_cache():
                 write_message("Error: %s" % e)
     write_message("""%s rss cache file pruned out of %s.""" % (count, len(filenames)))
     write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
-
-    if not CFG_INSPIRE_SITE:
-        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
-        webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
-        filenames = []
-        try:
-            for root, dummy, files in os.walk(webjournal_cache_dir):
-                filenames.extend(os.path.join(root, filename) for filename in files)
-        except OSError:
-            pass
-        count = 0
-        for filename in filenames:
-            filename = os.path.join(webjournal_cache_dir, filename)
-            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
-            if not (datetime.datetime.now() < last_update_time + datetime.timedelta(days=CFG_WEBJOURNAL_TTL)):
-                try:
-                    os.remove(filename)
-                    count += 1
-                except OSError, e:
-                    write_message("Error: %s" % e)
-        write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
-        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")
 
 
 def clean_bibxxx():

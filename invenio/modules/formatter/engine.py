@@ -631,7 +631,7 @@ class BibFormatObject(object):
     # The format in which the record is being formatted
     output_format = ''
 
-    req = None # DEPRECATED: use bfo.user_info instead. Used by WebJournal.
+    req = None # DEPRECATED: use bfo.user_info instead.
 
     def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=None,
                  xml_record=None, user_info=None, output_format=''):

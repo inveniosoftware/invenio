@@ -213,8 +213,6 @@ QA</a>.</p>
 
   <li>"sta*": acc is the table name prefix used by WebStat
 
-  <li>"jrn*": acc is the table name prefix used by WebJournal
-
   <li>"collection*": many tables to describe collections and search
         interface pages
 
