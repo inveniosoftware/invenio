@@ -20,7 +20,7 @@
 """Database cache for formatter."""
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.records.models import Record as Bibrec
+from invenio_records.models import Record as Bibrec
 
 
 class Bibfmt(db.Model):

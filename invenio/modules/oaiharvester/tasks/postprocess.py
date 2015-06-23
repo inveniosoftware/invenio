@@ -389,7 +389,7 @@ def upload_step(obj, eng):
     :param obj: BibWorkflowObject to process
     :param eng: BibWorkflowEngine processing the object
     """
-    from invenio.modules.records.api import Record
+    from invenio_records.api import Record
     from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
     repository = obj.extra_data.get("repository", {})
@@ -452,7 +452,7 @@ def upload_step(obj, eng):
 
 def filter_step(obj, eng):
     """Run an external python script."""
-    from invenio.modules.records.api import Record
+    from invenio_records.api import Record
     from invenio.utils.shell import run_shell_command
 
     repository = obj.extra_data.get("repository", {})

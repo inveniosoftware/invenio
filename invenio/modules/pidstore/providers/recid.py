@@ -26,7 +26,7 @@
 from sqlalchemy.exc import SQLAlchemyError
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.records.models import Record
+from invenio_records.models import Record
 
 from invenio.modules.pidstore.provider import PidProvider
 

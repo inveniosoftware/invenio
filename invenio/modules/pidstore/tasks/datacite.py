@@ -24,7 +24,7 @@ from celery.utils.log import get_task_logger
 from invenio.base.globals import cfg
 from invenio.celery import celery
 from invenio.modules.formatter import format_record
-from invenio.modules.records.api import get_record
+from invenio_records.api import get_record
 
 from ..models import PersistentIdentifier
 

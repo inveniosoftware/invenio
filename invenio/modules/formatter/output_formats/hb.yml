@@ -2,7 +2,7 @@ content_type: text/html
 default: Default_HTML_brief.tpl
 description: HTML brief output format, used for search results pages.
 name: HTML brief
-rules:
+_rules:
 - {field: 980.a, template: Picture_HTML_brief.tpl, value: 'PICTURE '}
 - {field: 980.a, template: Poetry_HTML_brief.tpl, value: 'POETRY '}
 - {field: 980.a, template: Institute_HTML_brief.bft, value: 'INSTITUTE '}

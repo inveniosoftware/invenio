@@ -256,25 +256,25 @@ class TagData(DataSet):
     class Tag_1:
         id = 1
         value = u'100__a'
-        recjson_value = u'authors[0].full_name'
+        recjson_value = u'main_entry_personal_name.personal_name'
         name = u'first author name'
 
     class Tag_2:
         id = 2
         value = u'700__a'
-        recjson_value = u'contributor.full_name'
+        recjson_value = u'added_entry_personal_name.personal_name'
         name = u'additional author name'
 
     class Tag_3:
         id = 3
         value = u'245__%'
-        recjson_value = u'title'
+        recjson_value = u'title_statement'
         name = u'main title'
 
     class Tag_4:
         id = 4
         value = u'246__%'
-        recjson_value = u'title_additional'
+        recjson_value = u'varying_form_of_title'
         name = u'additional title'
 
     class Tag_5:
@@ -286,13 +286,13 @@ class TagData(DataSet):
     class Tag_6:
         id = 6
         value = u'6531_a'
-        recjson_value = u'keywords.term'
+        recjson_value = u'index_term_uncontrolled.uncontrolled_term'
         name = u'keyword'
 
     class Tag_7:
         id = 7
         value = u'037__a'
-        recjson_value = u'primary_report_number'
+        recjson_value = u'source_of_acquisition.stock_number'
         name = u'primary report number'
 
     class Tag_8:
@@ -322,7 +322,7 @@ class TagData(DataSet):
     class Tag_12:
         id = 12
         value = u'65017a'
-        recjson_value = u'subject.term'
+        recjson_value = u'subject_added_entry_topical_term.topical_term_or_geographic_name_entry_element'
         name = u'main subject'
 
     class Tag_13:

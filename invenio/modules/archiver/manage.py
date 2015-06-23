@@ -62,7 +62,7 @@ def delete(recid, version=-1, delete_all=False):
 def update(dry_run=False):
     """Check if all records have an archive from their latest version."""
     from invenio.ext.sqlalchemy import db
-    from invenio.modules.records.models import Record
+    from invenio_records.models import Record
     from .api import get_archive_package, create_archive_package
     from .errors import ArchiverError
     records = db.select([Record.id, Record.modification_date])

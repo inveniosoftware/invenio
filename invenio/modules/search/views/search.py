@@ -59,11 +59,9 @@ from werkzeug.local import LocalProxy
 
 from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
-from invenio.base.signals import websearch_before_browse
 from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.modules.collections.decorators import check_collection
-from invenio.modules.indexer.models import IdxINDEX
 from invenio.modules.search.registry import facets
 from invenio.utils.pagination import Pagination
 
@@ -216,16 +214,6 @@ def _create_neareset_term_box(argd_orig):
         return '<!-- not found -->'  # no comments
 
 
-def sort_and_rank_records(recids, so=None, rm=None, sf=None, sp=None, p='',
-                          jrec=None, rg=None, of='id'):
-    """TODO."""
-    from invenio.legacy.search_engine import sort_or_rank_records
-    return sort_or_rank_records(
-        request.get_legacy_request(), recids, rm, sf, so, sp, p,
-        jrec=jrec, rg=rg, of=of
-    )
-
-
 def crumb_builder(url):
     """TODO."""
     def _crumb_builder(collection):
@@ -251,7 +239,6 @@ def collection_breadcrumbs(collection, endpoint=None):
 
 @blueprint.route('/browse', methods=['GET', 'POST'])
 @register_breadcrumb(blueprint, '.browse', _('Browse results'))
-@templated('search/browse.html')
 @wash_arguments({'p': (unicode, ''),
                  'f': (unicode, None),
                  'of': (unicode, 'hb'),
@@ -262,39 +249,7 @@ def collection_breadcrumbs(collection, endpoint=None):
 @check_collection(default_collection=True)
 def browse(collection, p, f, of, so, rm, rg, jrec):
     """Render browse page."""
-    from invenio.legacy.search_engine import browse_pattern_phrases
-    argd = argd_orig = wash_search_urlargd(request.args)
-
-    colls = [collection.name] + request.args.getlist('c')
-    if f is None and ':' in p[1:]:
-        f, p = string.split(p, ":", 1)
-        argd['f'] = f
-        argd['p'] = p
-
-    websearch_before_browse.send(collection, **argd)
-
-    records = map(
-        lambda (r, h): (r.decode('utf-8'), h),
-        browse_pattern_phrases(req=request.get_legacy_request(),
-                               colls=colls, p=p, f=f, rg=rg, ln=g.ln))
-
-    @register_template_context_processor
-    def index_context():
-        box = lambda: _create_neareset_term_box(argd_orig)
-        pagination = Pagination(int(ceil(jrec / float(rg))), rg, len(records))
-        breadcrumbs = current_breadcrumbs + collection_breadcrumbs(collection)
-        return dict(
-            collection=collection,
-            create_nearest_terms_box=box,
-            pagination=pagination,
-            rg=rg, p=p, f=f,
-            easy_search_form=EasySearchForm(csrf_enabled=False),
-            breadcrumbs=breadcrumbs
-        )
-
-    return dict(records=records)
-
-websearch_before_browse.connect(receivers.websearch_before_browse_handler)
+    return 'Not supported.'
 
 
 @blueprint.route('/rss', methods=['GET'])
@@ -369,8 +324,6 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     qid = get_search_query_id(p=p, cc=collection.name)
     recids = Query(p).search(collection=collection.name)
     records = len(recids)
-    recids = sort_and_rank_records(recids, so=so, rm=rm, sf=sf,
-                                   sp=sp, p=p, of='id', rg=rg, jrec=jrec)
 
     # back-to-search related code
     if request and not isinstance(request.get_legacy_request(),
@@ -389,7 +342,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
         session["websearch-last-query-hits"] = last_query_hits
 
     ctx = dict(
-        facets=facets.get_facets_config(collection, qid),
+        facets={},  # facets.get_facets_config(collection, qid),
         records=records,
         rg=rg,
         create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
@@ -420,7 +373,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     #           req, cc, [p, p1, p2, p3], f, ec, verbose,
     #           ln, selected_external_collections_infos, em=em)
 
-    return response_formated_records(recids, collection, of, **ctx)
+    return response_formated_records(recids[jrec-1:jrec-1+rg], collection, of, **ctx)
 
 
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
@@ -462,10 +415,11 @@ def autocomplete(field, q):
 
     :return: list of values matching query.
     """
-    IdxPHRASE = IdxINDEX.idxPHRASEF(field, fallback=False)
-    results = IdxPHRASE.query.filter(
-        IdxPHRASE.term.contains(q)).limit(20).values('term')
-    results = map(lambda r: {'value': r[0]}, results)
+    # IdxPHRASE = IdxINDEX.idxPHRASEF(field, fallback=False)
+    # results = IdxPHRASE.query.filter(
+    #     IdxPHRASE.term.contains(q)).limit(20).values('term')
+    # results = map(lambda r: {'value': r[0]}, results)
+    results = {}
 
     return jsonify(results=results)
 

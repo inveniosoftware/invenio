@@ -615,7 +615,7 @@ class TestMarcReader(InvenioTestCase):
             </record>
             </collection>
         """
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
         blob = list(split_blob(xml, 'marc', schema='foo'))
         self.assertTrue(len(blob) == 0)
         blob = list(split_blob(xml, 'marc'))[0]
@@ -1408,7 +1408,7 @@ class TestMarcReader(InvenioTestCase):
 
     def test_reserved_words(self):
         """Test subfield name evaluation."""
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
         from invenio.modules.jsonalchemy.parser import FieldParser
 
         blob = """

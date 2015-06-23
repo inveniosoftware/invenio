@@ -86,8 +86,7 @@ class Collection(db.Model):
     @property
     def reclist(self):
         """Return hit set with record identifiers."""
-        from .cache import get_collection_reclist
-        return get_collection_reclist(self.name)
+        return intbitset([])
 
     @property
     def is_hosted(self):

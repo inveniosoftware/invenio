@@ -45,7 +45,7 @@ class DataCiteTasksTest(InvenioTestCase):
         ).delete()
 
     def patch_get_record(self, get_record_patch):
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
         r = Record(
             json={
                 self.app.config['PIDSTORE_DATACITE_RECORD_DOI_FIELD']:

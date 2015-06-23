@@ -37,9 +37,8 @@ from invenio.modules.scheduler.models import SchTASK
 
 
 warnings.warn("Use of `inveniomanage demosite populate` is being deprecated. "
-              "Please use `uploader` module to insert demo records.",
-              PendingDeprecationWarning)
-
+              "Please use `inveniomanage records create`.",
+              DeprecationWarning)
 
 manager = Manager(usage=__doc__)
 
@@ -75,12 +74,7 @@ def populate(packages=[], default_data=True, files=None,
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
     # Load cli interfaces for tools that we are going to need
-    from invenio.legacy.bibupload.engine import main as bibupload
-    from invenio.legacy.bibindex.engine import main as bibindex
-    from invenio.legacy.oairepository.updater import \
-        main as oairepositoryupdater
-    from invenio.legacy.bibsort.daemon import main as bibsort
-    from invenio.legacy.bibrank.cli import main as bibrank
+    from invenio_records.manage import create
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -98,47 +92,22 @@ def populate(packages=[], default_data=True, files=None,
 
     print(">>> Going to load demo records...")
 
-    if not job_id:
-        job_id = SchTASK.query.count()
-
     if files is None:
         files = [pkg_resources.resource_filename(
             'invenio',
             os.path.join('testsuite', 'data', 'demo_record_marc_data.xml'))]
 
     # upload demo site files:
-    bibupload_flags = '-i'
-    if extra_info is not None and 'force-recids' in extra_info:
-        bibupload_flags = '-i -r --force'
+    bibupload_flags = '-t marcxml'
     for f in files:
         job_id += 1
         for cmd in (
-            (bibupload, "bibupload -u admin %s %s" % (bibupload_flags, f)),
-            (bibupload, "bibupload %d" % (job_id))
+            (create, "create %s -i %s" % (bibupload_flags, f)),
         ):
             if run_py_func(*cmd, passthrough=True).exit_code:
                 print("ERROR: failed execution of", *cmd)
                 sys.exit(1)
 
-    i = count(job_id + 1).next
-    for cmd in (
-        # (bibdocfile, "bibdocfile --textify --with-ocr --recid 97"),
-        # (bibdocfile, "bibdocfile --textify --all"),
-        (bibindex, "bibindex -u admin"),
-        (bibindex, "bibindex %d" % i()),
-        (bibindex, "bibindex -u admin -w global"),
-        (bibindex, "bibindex %d" % i()),
-        (bibrank, "bibrank -u admin"),
-        (bibrank, "bibrank %d" % i()),
-        (bibsort, "bibsort -u admin -R"),
-        (bibsort, "bibsort %d" % i()),
-        (oairepositoryupdater, "oairepositoryupdater -u admin"),
-        (oairepositoryupdater, "oairepositoryupdater %d" % i()),
-        (bibupload, "bibupload %d" % i()),
-    ):
-        if run_py_func(*cmd, passthrough=True).exit_code:
-            print("ERROR: failed execution of", *cmd)
-            sys.exit(1)
     print(">>> Demo records loaded successfully.")
 
 

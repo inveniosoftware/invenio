@@ -19,12 +19,13 @@
 
 """Implementation of collections caching."""
 
+import warnings
+
 from intbitset import intbitset
 from werkzeug import cached_property
 
 from invenio.base.globals import cfg
 from invenio.legacy.miscutil.data_cacher import DataCacher, DataCacherProxy
-from invenio.modules.indexer.models import IdxINDEX
 from invenio.utils.memoise import memoize
 
 from .models import Collection, Collectionname
@@ -64,61 +65,11 @@ def get_collection_allchildren(coll, recreate_cache_if_needed=True):
     return collection_allchildren_cache.cache[coll]
 
 
-class CollectionRecListDataCacher(DataCacher):
-
-    """Implement cache for collection reclist hitsets.
-
-    This class is not to be used directly; use function
-    get_collection_reclist() instead.
-    """
-
-    def __init__(self):
-        def cache_filler():
-            from invenio.modules.search.searchext.engines.native import \
-                search_unit_in_idxphrases
-            collections = Collection.query.all()
-            setattr(get_all_recids, 'cache', dict())
-            setattr(get_collection_nbrecs, 'cache', dict())
-            return dict([
-                (c.name, search_unit_in_idxphrases(c.name, 'collection', 'e'))
-                for c in collections
-            ])
-
-        def timestamp_verifier():
-            return IdxINDEX.query.filter_by(id=self._index_id).value(
-                'last_updated').strftime("%Y-%m-%d %H:%M:%S")
-
-        DataCacher.__init__(self, cache_filler, timestamp_verifier)
-
-    @cached_property
-    def _index_id(self):
-        return IdxINDEX.get_from_field('collection').id
-
-
-collection_reclist_cache = DataCacherProxy(CollectionRecListDataCacher)
-
-
-def get_collection_reclist(coll, recreate_cache_if_needed=True):
-    """Return hitset of recIDs that belong to the collection 'coll'."""
-    from invenio.modules.search.searchext.engines.native import \
-        search_unit_in_idxphrases
-
-    if recreate_cache_if_needed:
-        collection_reclist_cache.recreate_cache_if_needed()
-    if coll not in collection_reclist_cache.cache:
-        return intbitset()
-    if not collection_reclist_cache.cache[coll]:
-        c_coll = Collection.query.filter_by(name=coll).first()
-        if c_coll:
-            collection_reclist_cache.cache[coll] = search_unit_in_idxphrases(
-                c_coll.name, 'collection', 'e')
-    return collection_reclist_cache.cache[coll] or intbitset()
-
-
 @memoize
 def get_collection_nbrecs(coll):
     """Return number of records in collection."""
-    return len(get_collection_reclist(coll))
+    # FIXME
+    return 0
 
 
 class RestrictedCollectionDataCacher(DataCacher):
@@ -138,8 +89,6 @@ class RestrictedCollectionDataCacher(DataCacher):
                 AccAuthorization.id_accACTION == VIEWRESTRCOLL_ID
             ).values(AccARGUMENT.value)]
 
-            setattr(get_all_restricted_recids, 'cache', dict())
-
         def timestamp_verifier():
             from invenio.legacy.dbquery import get_table_update_time
             return max(get_table_update_time('accROLE_accACTION_accARGUMENT'),
@@ -157,37 +106,16 @@ def collection_restricted_p(collection, recreate_cache_if_needed=True):
     return collection in restricted_collection_cache.cache
 
 
-@memoize
-def get_all_restricted_recids():
-    """Return the set of all the restricted recids.
-
-    I.e. the ids of those records which belong to at least one restricted
-    collection.
-    """
-    ret = intbitset()
-    for collection in restricted_collection_cache.cache:
-        ret |= get_collection_reclist(collection)
-    return ret
-
-
-@memoize
-def get_all_recids():
-    """Return the set of all recids."""
-    ret = intbitset()
-    for collection in collection_reclist_cache.cache:
-        ret |= get_collection_reclist(collection)
-    return ret
-
-
 def is_record_in_any_collection(recID, recreate_cache_if_needed=True):
     """Return True if the record belongs to at least one collection.
 
     This is a good, although not perfect, indicator to guess if webcoll has
     already run after this record has been entered into the system.
     """
-    if recreate_cache_if_needed:
-        collection_reclist_cache.recreate_cache_if_needed()
-    return recID in get_all_recids()
+    from invenio_records.api import get_record
+    warnings.warn("Use record['_collections'] directly.", DeprecationWarning,
+                  stacklevel=2)
+    return bool(get_record(recID).get('_collections', []))
 
 
 class CollectionI18nNameDataCacher(DataCacher):

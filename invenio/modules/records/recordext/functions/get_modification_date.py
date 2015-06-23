@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,14 +18,13 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+from invenio.base.utils import toposort_depends
+from invenio.modules.pidstore.recordext.functions import reserve_recid
+from invenio_records.signals import before_record_insert
+
+
 def get_modification_date(recid):
-    """
-    Returns creation date for given record.
-
-    @param recid:
-
-    @return: Creation date
-    """
+    """Return creation date for given record."""
     # WARNING: HACK/FIXME
     #
     # When bibupload inserts/updates records it sets hstRECORD.job_date=t1 and
@@ -47,7 +46,7 @@ def get_modification_date(recid):
     # to be fixed in bibupload instead. Unfortunately so much other code is
     # might rely on the current behaviour that it's hard to change.
     from invenio.modules.formatter.models import Bibfmt
-    from invenio.modules.records.models import Record as Bibrec
+    from invenio_records.models import Record as Bibrec
 
     try:
         return Bibfmt.query.filter_by(
@@ -58,3 +57,10 @@ def get_modification_date(recid):
             return Bibrec.query.get(recid).modification_date
         except AttributeError:
             return None
+
+
+@before_record_insert.connect
+@toposort_depends(reserve_recid.reserve_recid)
+def modification_date(record, *args, **kwargs):
+    if record.get('modification_date', None) is not None:
+        record['modification_date'] = get_modification_date(record['recid'])

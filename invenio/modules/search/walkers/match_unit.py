@@ -20,7 +20,8 @@
 """Implement AST vistor."""
 
 import re
-import six
+
+from invenio.utils.memoise import memoize
 
 from invenio_query_parser.ast import (
     AndOp, KeywordOp, OrOp,
@@ -32,22 +33,28 @@ from invenio_query_parser.ast import (
 )
 from invenio_query_parser.visitor import make_visitor
 
+import six
+
+
+@memoize
+def get_field_tags(field, tagtype="marc"):
+    """Returns a list of tags for the field code 'field'.
+
+    Example: field='author', output=['100__%','700__%'].
+    """
+    from invenio.modules.search.models import Field
+    return list(Field.get_field_tags(field, tagtype=tagtype))
+
 
 def match_unit(record, p, f=None, m='a', wl=None):
     """Match record to basic match unit."""
-    from invenio.modules.jsonalchemy.parser import guess_legacy_field_names
-    from invenio.legacy.bibindex.engine_utils import get_field_tags
-
     if record is None:
         return p is None
 
     if f is not None:
-        fields = (get_field_tags(f, 'nonmarc') +
-                  guess_legacy_field_names(f, 'marc', 'recordext')[f] + [f])
+        fields = (get_field_tags(f, 'nonmarc') + [f])
         for field in fields:
-            if field not in record:
-                continue
-            if match_unit(record[field], p, f=None, m=m, wl=None):
+            if match_unit(record.get(field), p, f=None, m=m, wl=None):
                 return True
         return False
 

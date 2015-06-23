@@ -155,7 +155,7 @@ class Arxiv(object):
         """Search for given ArXiv ID."""
         arxiv = arxiv or request.args.get("arxiv")
 
-        from invenio.modules.records.utils import get_unique_record_json
+        from invenio_records.utils import get_unique_record_json
 
         # query the database
         result = get_unique_record_json(

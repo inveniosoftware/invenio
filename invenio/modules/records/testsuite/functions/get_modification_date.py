@@ -26,7 +26,7 @@ def get_modification_date(recid):
 
     @return: Creation date
     """
-    from invenio.modules.records.models import Record as Bibrec
+    from invenio_records.models import Record as Bibrec
     try:
         return Bibrec.query.get(recid).modification_date
     except AttributeError:

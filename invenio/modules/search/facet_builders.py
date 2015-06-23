@@ -27,7 +27,6 @@ from operator import itemgetter
 from six import iteritems
 
 from invenio.base.globals import cfg
-from invenio.modules.collections.cache import get_collection_reclist
 from invenio.modules.collections.models import Collection
 
 from .cache import (
@@ -174,24 +173,4 @@ class CollectionFacetBuilder(FacetBuilder):
 
     def get_facets_for_query(self, qid, limit=20, parent=None):
         """Return record ids as intbitset."""
-        recIDsHitSet = self.get_recids_intbitset(qid)
-        parent = request.args.get('parent', None)
-        if parent is not None:
-            collection = Collection.query.filter(
-                Collection.name == parent).first_or_404()
-        else:
-            cc = search_results_cache.get(
-                get_search_results_cache_key_from_qid(qid) + '::cc')
-            if cc is not None:
-                collection = Collection.query.filter(
-                    Collection.name == cc).first_or_404()
-            else:
-                collection = Collection.query.get(1)
-        facet = []
-        for c in collection.collection_children_r:
-            num_records = len(get_collection_reclist(
-                c.name, recreate_cache_if_needed=False
-            ).intersection(recIDsHitSet))
-            if num_records:
-                facet.append((c.name, num_records, c.name_ln))
-        return sorted(facet, key=lambda x: x[1], reverse=True)[0:limit]
+        pass

@@ -199,7 +199,7 @@
               {%- endblock search_result_prefix -%}
               {%- block search_result_record scoped -%}
               <div class="col-sm-11 col-xs-11">
-                {{ format_record(recid, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|safe }}
+                {{ format_record(recid, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|u|safe }}
                 {{ '<hr/>'|safe if not recordloop.last }}
               </div>
               {%- endblock search_result_record -%}

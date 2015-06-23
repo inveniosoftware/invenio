@@ -33,6 +33,8 @@ from invenio_query_parser.ast import (
 
 from invenio_query_parser.visitor import make_visitor
 
+from invenio.modules.search.enhancers.search import SearchOp
+
 
 class ElasticSearchDSL(object):
 
@@ -48,6 +50,21 @@ class ElasticSearchDSL(object):
         eg. {"author": ["author.last_name, author.first_name"]}
         """
         self.keyword_dict = cfg['SEARCH_ELASTIC_KEYWORD_MAPPING']
+
+    @visitor(SearchOp)
+    def visit(self, node):
+        from intbitset import intbitset
+        from invenio.ext.es import es
+        results = es.search(
+            index='records',
+            doc_type='record',
+            body={
+                'size': 9999999,
+                'fields': ['control_number'],
+                'query': node.query
+            }
+        )
+        return intbitset([int(r['_id']) for r in results['hits']['hits']])
 
     def map_keyword_to_fields(self, keyword):
         """Convert keyword to keyword list for searches

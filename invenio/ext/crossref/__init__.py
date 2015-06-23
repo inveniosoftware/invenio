@@ -137,7 +137,7 @@ class CrossRef(object):
         doi = (self.app.config.get("CROSSREF_SEARCH_PREFIX", "") + doi if doi
                else request.args.get("doi"))
 
-        from invenio.modules.records.utils import get_unique_record_json
+        from invenio_records.utils import get_unique_record_json
 
         # query the database
         result = get_unique_record_json(doi)

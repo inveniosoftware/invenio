@@ -31,7 +31,7 @@ from flask import current_app, abort, request
 from flask_login import current_user
 from functools import wraps
 
-from invenio.modules.records.api import get_record
+from invenio_records.api import get_record
 from invenio.modules.editor.models import HstRECORD
 from invenio.modules.deposit.models import Deposition, Agent, \
     DepositionDraftCacheManager

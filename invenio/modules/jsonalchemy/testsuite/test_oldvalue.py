@@ -55,7 +55,7 @@ class TestOldValue(InvenioTestCase):
         What is the reason behind the mentioned behaviour needs further
         investigation.
         """
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
 
         # Check if it works when the value is provided.
         xml = '''<collection><record><datafield tag="100" ind1=" " ind2=" ">

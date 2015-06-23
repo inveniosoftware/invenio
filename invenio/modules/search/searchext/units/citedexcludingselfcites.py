@@ -27,7 +27,7 @@ def search_unit(query, f, m, wl=None):
 
     Query usually looks like '10->23'.
     """
-    from invenio.modules.records.models import Record
+    from invenio_records.models import Record
     from invenio.legacy.bibrank.citation_searcher import (
         get_records_with_num_cites
     )

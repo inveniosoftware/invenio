@@ -65,7 +65,7 @@ class TestToInt(InvenioTestCase):
         xml = '<collection><record><datafield tag="999" ind1="" ind2= "">' \
               '<subfield code="b">Value</subfield></datafield></record>' \
               '</collection>'
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
         simple_record = Record.create(xml, master_format='marc',
                                       model="test_toint",
                                       namespace='testsuite')

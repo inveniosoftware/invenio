@@ -30,7 +30,7 @@ from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.modules.comments.models import CmtRECORDCOMMENT
 from invenio.modules.comments.views import blueprint as comments_blueprint
-from invenio.modules.records.views import request_record
+from invenio_records.views import request_record
 
 from sqlalchemy.event import listen
 

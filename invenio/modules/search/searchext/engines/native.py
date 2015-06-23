@@ -27,10 +27,10 @@ from flask import current_app
 from intbitset import intbitset
 
 from invenio.base.globals import cfg
-from invenio.modules.indexer.models import IdxINDEX
-from invenio.modules.indexer.utils import field_tokenizer_cache
-from invenio.modules.records import models
-from invenio.modules.records.models import Record
+# from invenio.modules.indexer.models import IdxINDEX
+# from invenio.modules.indexer.utils import field_tokenizer_cache
+from invenio_records import models
+from invenio_records.models import Record
 from invenio.modules.search.errors import InvenioWebSearchWildcardLimitError
 from invenio.modules.search.models import Field
 from invenio.modules.search.registry import units

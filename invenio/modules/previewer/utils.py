@@ -43,7 +43,7 @@ def get_record_files(recid, filename):
 
 def get_record_documents(recid, filename):
     """Yield LegacyBibDoc files from Documents."""
-    from invenio.modules.records.api import get_record
+    from invenio_records.api import get_record
     from invenio.modules.documents.api import Document
     from invenio.legacy.bibdocfile.api import decompose_file
 

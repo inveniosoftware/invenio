@@ -102,7 +102,7 @@ def upload(service, src, dest):
 # TODO @event.listens_for(WtgTAGRecord, 'after_insert')
 def receive_after_insert(mapper, connection, target):
     """Check 'after_insert' signal for Tags."""
-    from invenio.modules.records.api import get_record
+    from invenio_records.api import get_record
 
     record = get_record(target.id_bibrec)
     if 'files' in record:

@@ -25,7 +25,7 @@ from intbitset import intbitset
 def search_unit(query, f, m, wl=None):
     """Return hitset of recIDs found that were created during 'query'."""
     from invenio.ext.sqlalchemy import db
-    from invenio.modules.records.models import Record
+    from invenio_records.models import Record
 
     return intbitset(db.session.query(Record.id).filter(
         *Record.filter_time_interval(query)).all())

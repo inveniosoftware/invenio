@@ -24,7 +24,7 @@ from workflow.engine import GenericWorkflowEngine as WorkflowEngine
 from invenio.base.globals import cfg
 from invenio.celery import celery
 from invenio.modules.jsonalchemy.reader import Reader
-from invenio.modules.records.api import Record
+from invenio_records.api import Record
 from invenio.modules.workflows.registry import workflows
 
 from . import signals

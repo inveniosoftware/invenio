@@ -30,7 +30,7 @@ from flask_breadcrumbs import default_breadcrumb_root
 
 from invenio.base.globals import cfg
 from invenio.config import CFG_SITE_RECORD
-from invenio.modules.records.views import request_record
+from invenio_records.views import request_record
 
 from .registry import previewers
 from .utils import get_record_documents, get_record_files

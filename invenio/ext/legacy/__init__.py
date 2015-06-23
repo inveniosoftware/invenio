@@ -41,14 +41,11 @@ from .request_class import LegacyRequest
 
 def cli_cmd_reset(sender, yes_i_know=False, drop=True, **kwargs):
     """Reset legacy values."""
-    from invenio.legacy.bibsort.daemon import main as bibsort
     from invenio.modules.access.scripts.webaccessadmin import main as \
         webaccessadmin
 
     for cmd in (
         (webaccessadmin, "webaccessadmin -u admin -c -a -D"),
-        (bibsort, "bibsort -u admin --load-config"),
-        (bibsort, "bibsort 1"),
     ):
         if run_py_func(*cmd, passthrough=True).exit_code:
             print("ERROR: failed execution of", *cmd)
@@ -169,7 +166,7 @@ def setup_app(app):
         else:
             return send_from_directory(app.static_folder, filename)
 
-    @app.before_first_request
+    # FIXME @app.before_first_request
     def _setup_legacy_admin_menu():
         """Add legacy menu admin to *Flask-Admin* interface."""
         from invenio.legacy.registry import webadmin

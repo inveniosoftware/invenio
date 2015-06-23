@@ -23,8 +23,8 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 
 from invenio.ext.sqlalchemy import db, utils
 from invenio.modules.accounts.models import User
-from invenio.modules.records.models import Record
-from invenio.modules.records.api import get_record
+from invenio_records.models import Record
+from invenio_records.api import get_record
 
 from .errors import SignatureExistsError
 

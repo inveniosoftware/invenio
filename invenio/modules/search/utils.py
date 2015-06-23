@@ -32,7 +32,6 @@ from werkzeug.utils import import_string
 from invenio.base.globals import cfg
 from invenio.modules.collections.cache import (
     get_collection_allchildren,
-    get_collection_reclist,
     restricted_collection_cache,
 )
 
@@ -118,66 +117,6 @@ def get_most_popular_field_values(recids, tags, exclude_values=None,
         ln.append(val.lower())
     # sort by frequency (desc) and then by lowercased name.
     return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
-
-
-def get_records_that_can_be_displayed(permitted_restricted_collections,
-                                      hitset_in_any_collection,
-                                      current_coll=None, colls=None):
-    """Return records that can be displayed."""
-    current_coll = current_coll or cfg['CFG_SITE_NAME']
-    records_that_can_be_displayed = intbitset()
-
-    if colls is None:
-        colls = [current_coll]
-
-    policy = cfg['CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY'].strip().upper()
-
-    # real & virtual
-    current_coll_children = get_collection_allchildren(current_coll)
-
-    # Add all restricted collections, that the user has access to, and are
-    # under the current collection do not use set here, in order to maintain a
-    # specific order: children of 'cc' (real, virtual, restricted), rest of 'c'
-    # that are  not cc's children
-    colls_to_be_displayed = set([
-        coll for coll in current_coll_children
-        if coll in colls or coll in permitted_restricted_collections
-    ])
-    colls_to_be_displayed |= set([coll for coll in colls
-                                  if coll not in colls_to_be_displayed])
-
-    # Get all records in applicable collections
-    records_that_can_be_displayed = intbitset()
-    for coll in colls_to_be_displayed:
-        records_that_can_be_displayed |= get_collection_reclist(coll)
-
-    if policy == 'ANY':
-        # User needs to have access to at least one collection that restricts
-        # the records. We need this to be able to remove records that are both
-        # in a public and restricted collection.
-        permitted_recids = intbitset()
-        notpermitted_recids = intbitset()
-        for collection in restricted_collection_cache.cache:
-            if collection in permitted_restricted_collections:
-                permitted_recids |= get_collection_reclist(collection)
-            else:
-                notpermitted_recids |= get_collection_reclist(collection)
-        notpermitted_recids -= permitted_recids
-    else:
-        # User needs to have access to all collections that restrict a records.
-        notpermitted_recids = intbitset()
-        for collection in restricted_collection_cache.cache:
-            if collection not in permitted_restricted_collections:
-                notpermitted_recids |= get_collection_reclist(collection)
-
-    # Remove records that can not be seen by user
-    records_that_can_be_displayed -= notpermitted_recids
-
-    # Intersect only if there are some matched records
-    if not hitset_in_any_collection.is_infinite():
-        records_that_can_be_displayed &= hitset_in_any_collection
-
-    return records_that_can_be_displayed
 
 
 def get_permitted_restricted_collections(user_info,

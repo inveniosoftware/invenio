@@ -204,7 +204,7 @@ def quick_match_record(obj, eng):
                                                  find_records_from_extoaiid,
                                                  find_record_from_oaiid,
                                                  find_record_from_doi)
-    from invenio.modules.records.api import Record
+    from invenio_records.api import Record
 
     identifier_function_to_check = {'recid': find_record_from_recid,
                                     'system_number': find_record_from_sysno,

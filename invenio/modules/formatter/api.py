@@ -24,7 +24,7 @@ import zlib
 from sqlalchemy.exc import SQLAlchemyError
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.records.models import Record as Bibrec
+from invenio_records.models import Record as Bibrec
 from invenio.modules.search.models import Tag
 from invenio.utils.date import convert_datetime_to_utc_string, strftime
 

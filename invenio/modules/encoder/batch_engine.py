@@ -32,19 +32,12 @@ from invenio.legacy.bibsched.bibtask import (
                              task_low_level_submission
                              )
 from invenio.legacy.bibdocfile.api import BibRecDocs, compose_file, compose_format, decompose_file
-from invenio.legacy.search_engine import (
-                                   record_exists,
-                                   get_collection_reclist,
-                                   search_pattern,
-                                   get_fieldvalues
-                                   )
 from invenio.modules.encoder.encode import encode_video, assure_quality
 from invenio.modules.encoder.extract import extract_frames
 from invenio.modules.encoder.profiles import (
                                         get_encoding_profile,
                                         get_extract_profile
                                         )
-from invenio.legacy.bibdocfile.cli import cli_fix_marc
 from invenio.modules.encoder.utils import chose2
 from invenio.modules.encoder.metadata import (
                                         pbcore_metadata
@@ -255,7 +248,8 @@ def create_update_jobs_by_collection(
     @param job_directory: fullpath to the directory storing the job files
     @type job_directory: string
     """
-    recids = get_collection_reclist(collection)
+    from invenio.modules.search.api import Query
+    recids = Query().search(collection=collection)
     return create_update_jobs_by_recids(recids, batch_template_file,
                                         job_directory)
 
@@ -272,7 +266,8 @@ def create_update_jobs_by_search(pattern,
     @param job_directory: fullpath to the directory storing the job files
     @type job_directory: string
     """
-    recids = search_pattern(p=pattern)
+    from invenio.modules.search.api import Query
+    recids = Query(pattern).search()
     return create_update_jobs_by_recids(recids, batch_template_file,
                                         job_directory)
 
@@ -383,6 +378,7 @@ def process_batch_job(batch_job_file):
     @return: 1 if the process was successful, 0 if not
     @rtype; int
     """
+    from invenio.legacy.bibdocfile.cli import cli_fix_marc
 
     def upload_marcxml_file(marcxml):
         """ Creates a temporary marcxml file and sends it to bibupload
@@ -408,8 +404,8 @@ def process_batch_job(batch_job_file):
     batch_job = sanitise_batch_job(batch_job)
 
     ## Check if the record exists
-    if record_exists(batch_job['recid']) < 1:
-        raise Exception("Record not found")
+    # if record_exists(batch_job['recid']) < 1:
+    #     raise Exception("Record not found")
 
     recdoc = BibRecDocs(batch_job['recid'])
 

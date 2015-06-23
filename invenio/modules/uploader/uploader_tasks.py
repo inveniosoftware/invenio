@@ -44,7 +44,7 @@ def create_records_for_workflow(records, **kwargs):
     :param records: List of records to be process.
     :kwargs:
     """
-    from invenio.modules.records.api import Record
+    from invenio_records.api import Record
     for i, obj in enumerate(records):
         records[i] = (obj[0], Record(json=obj[1]))
 
@@ -236,7 +236,7 @@ def manage_attached_documents(step):
     """Attach and treat all the documents embeded in the input filex."""
     from invenio.modules.documents import api
     from invenio.modules.documents.tasks import set_document_contents
-    from invenio.modules.records.utils import name_generator
+    from invenio_records.utils import name_generator
 
     def _manage_attached_documents(obj, eng):
         record = obj[1]

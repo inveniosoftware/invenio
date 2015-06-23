@@ -36,8 +36,8 @@ from invenio.base.globals import cfg
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
 
-from invenio.modules.records.utils import visible_collection_tabs
-from invenio.modules.records.views import request_record
+from invenio_records.utils import visible_collection_tabs
+from invenio_records.views import request_record
 
 from invenio.utils.mail import email_quote_txt
 

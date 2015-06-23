@@ -23,7 +23,7 @@ from invenio.base.signals import record_after_update
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.accounts.models import User
-from invenio.modules.records.models import Record as Bibrec
+from invenio_records.models import Record as Bibrec
 
 from sqlalchemy import event
 

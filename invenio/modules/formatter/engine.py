@@ -247,11 +247,11 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     #Create a BibFormat Object to pass that contain record and context
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
 
-    if of.lower() != 'xm' and (not bfo.get_record()
-                                            or record_empty(bfo.get_record())):
-        # Record only has recid: do not format, excepted
-        # for xm format
-        return "", False
+    # if of.lower() != 'xm' and (not bfo.get_record()
+    #                                         or record_empty(bfo.get_record())):
+    #     # Record only has recid: do not format, excepted
+    #     # for xm format
+    #     return "", False
 
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
@@ -439,7 +439,7 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = '<!-- empty -->'
         #try:
         from functools import wraps
-        from invenio.modules.records.api import \
+        from invenio_records.api import \
             create_record as new_create_record, \
             get_record as new_get_record
         from flask_login import current_user
@@ -473,7 +473,7 @@ def format_with_format_template(format_template_filename, bfo,
             bfo=bfo, **(extra_context or {})).encode('utf-8')
         needs_2nd_pass = False
     else:
-        from invenio.modules.records.api import get_record as new_get_record
+        from invenio_records.api import get_record as new_get_record
 
         #.xsl
         if bfo.xml_record:

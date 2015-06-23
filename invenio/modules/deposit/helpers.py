@@ -20,7 +20,7 @@
 
 import six
 
-from invenio.modules.records.api import Record
+from invenio_records.api import Record
 from .models import DepositionDraft
 
 

@@ -57,9 +57,11 @@ EXTENSIONS = [
     'flask_breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
     'invenio.ext.iiif',
+    'invenio.ext.es',
 ]
 
 PACKAGES = [
+    'invenio_records',
     'invenio.modules.*',
     'invenio.base',
 ]
@@ -70,6 +72,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.multimedia',
     'invenio.modules.pages',
+    'invenio.modules.records',
     'invenio.modules.tags',
 ]
 

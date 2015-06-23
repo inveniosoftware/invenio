@@ -19,10 +19,11 @@
 
 """Record field function."""
 
-from six import iteritems
-
+from invenio_records.signals import before_record_insert
 from invenio.modules.search.api import Query
 from invenio.utils.datastructures import LazyDict
+
+from six import iteritems
 
 COLLECTIONS_DELETED_RECORDS = '{dbquery} AND NOT collection:"DELETED"'
 
@@ -60,3 +61,8 @@ def get_record_collections(record):
             output.add(name)
             output |= data['ancestors']
     return list(output)
+
+
+@before_record_insert.connect
+def update_collections(sender, *args, **kwargs):
+    sender['_collections'] = get_record_collections(sender)

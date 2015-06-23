@@ -62,7 +62,7 @@ class BagitHandler(object):
     @property
     def metadata(self):
         """Return record metadata."""
-        from invenio.modules.records.api import get_record
+        from invenio_records.api import get_record
         return get_record(self.recid).dumps()
 
     def _zip(self, destination=None):

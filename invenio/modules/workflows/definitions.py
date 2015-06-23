@@ -77,7 +77,7 @@ class RecordWorkflow(WorkflowBase):
     @staticmethod
     def get_description(bwo):
         """Get the description (identifiers and categories) from the object data."""
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
         from flask import render_template, current_app
 
         record = bwo.get_data()
@@ -118,7 +118,7 @@ class RecordWorkflow(WorkflowBase):
     def formatter(bwo, **kwargs):
         """Nicely format the record."""
         from pprint import pformat
-        from invenio.modules.records.api import Record
+        from invenio_records.api import Record
 
         data = bwo.get_data()
         if not data:

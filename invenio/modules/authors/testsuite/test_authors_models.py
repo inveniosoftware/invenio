@@ -69,7 +69,7 @@ class AuthorModelsTestCase(InvenioTestCase):
         from invenio.ext.sqlalchemy import db
         from invenio.modules.authors import models
         from invenio.modules.accounts.models import User
-        from invenio.modules.records.models import Record
+        from invenio_records.models import Record
         from invenio.modules.authors.errors import SignatureExistsError
 
         self.db = db

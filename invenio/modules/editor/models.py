@@ -25,7 +25,7 @@ import os
 import shutil
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.records.models import Record as Bibrec
+from invenio_records.models import Record as Bibrec
 
 from sqlalchemy import event
 
