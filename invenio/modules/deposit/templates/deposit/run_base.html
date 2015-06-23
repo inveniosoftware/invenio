@@ -137,11 +137,13 @@
           pluploader: {
             url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
             max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+            max_files_count: {{config.DEPOSIT_MAX_UPLOAD_FILES_COUNT|default('null')}},
             drop_element: $('#field-plupload_file')[0]
           }{% if config.DEPOSIT_DROPBOX_API_KEY %},
 
           dropboxuploader: {
-            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
+            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}',
+            max_files_count: {{config.DEPOSIT_MAX_UPLOAD_FILES_COUNT|default('null')}}
           }{% endif %}
         };
 

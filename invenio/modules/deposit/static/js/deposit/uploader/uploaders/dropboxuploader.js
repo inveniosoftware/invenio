@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -29,6 +29,7 @@ define(function(require) {
 
         this.attributes({
             dropbox_url: "http://httpbin.org/post",
+            max_files_count: null,
             preupload_hooks: {}
         });
 
@@ -40,6 +41,15 @@ define(function(require) {
         var options = {
 
             success: function(files) {
+                if (self.attr.max_files_count && (Object.keys(dropboxFiles).length + files.length > self.attr.max_files_count)) {
+                    var maxFilesToAdd = self.attr.max_files_count - Object.keys(dropboxFiles).length;
+                    while (files.length > maxFilesToAdd) {
+                        files.pop();
+                    }
+                    self.trigger('uploaderError', {
+                        message: "Max files count exceeded."
+                    });
+                }
                 var newFiles = {};
                 files.forEach(function(file) {
                     if (dropboxFiles[file.name] === undefined) {

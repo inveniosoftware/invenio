@@ -61,3 +61,6 @@ DEPOSIT_MAX_UPLOAD_SIZE = 104857600
 
 DEPOSIT_DROPBOX_API_KEY = None
 """API key DropBox Saver widget."""
+
+DEPOSIT_MAX_UPLOAD_FILES_COUNT = 100
+"""Maximum files count."""

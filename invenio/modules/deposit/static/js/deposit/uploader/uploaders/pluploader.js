@@ -31,6 +31,7 @@ define(function(require) {
             url: "http://httpbin.org/post",
             drop_element: null,
             max_file_size: null,
+            max_files_count: null,
             preupload_hooks: {},
             filters: {prevent_duplicates: true}
         });
@@ -79,6 +80,13 @@ define(function(require) {
              */
 
             PlUploader.bind('FilesAdded', function(up, files) {
+                if (that.attr.max_files_count && (up.files.length > that.attr.max_files_count)) {
+                    up.removeFile(files[files.length-1]);
+                    files.pop();
+                    that.trigger('uploaderError', {
+                        message: "Max files count exceeded."
+                    });
+                }
                 files = $.map(files, function(file) {
                     return {
                         id: file.id,
