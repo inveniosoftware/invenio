@@ -278,6 +278,13 @@ except:
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
 
 try:
+    from invenio.bibz39_webinterface import \
+         WebInterfacebibz39Pages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfacebibz39Pages = WebInterfaceDumbPages
+
+try:
     from invenio.docextract_webinterface import WebInterfaceDocExtract
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -324,12 +331,13 @@ else:
 
 class WebInterfaceAdminPages(WebInterfaceDirectory):
     """This class implements /admin2 admin pages."""
-    _exports = ['index', 'bibcirculation', 'bibsched']
+    _exports = ['index', 'bibcirculation', 'bibsched','bibz39']
     def index(self, req, form):
         return "FIXME: return /help/admin content"
     bibcirculation = WebInterfaceBibCirculationAdminPages()
 
     bibsched = WebInterfaceBibSchedPages()
+    bibz39 = WebInterfacebibz39Pages()
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -369,6 +377,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'goto',
                    'info',
                    'authorlist',
+                   'bibz39',
                ] + test_exports + openaire_exports
 
     def __init__(self):
@@ -384,6 +393,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         youralerts = WebInterfaceDisabledPages()
         yourbaskets = WebInterfaceDisabledPages()
         yourmessages = WebInterfaceDisabledPages()
+        bibz39 = WebInterfacebibz39Pages()
         yourloans = WebInterfaceDisabledPages()
         ill = WebInterfaceDisabledPages()
         yourgroups = WebInterfaceDisabledPages()
@@ -416,6 +426,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         youralerts = WebInterfaceYourAlertsPages()
         yourbaskets = WebInterfaceYourBasketsPages()
         yourmessages = WebInterfaceYourMessagesPages()
+        bibz39 = WebInterfacebibz39Pages()
         yourloans = WebInterfaceYourLoansPages()
         ill = WebInterfaceILLPages()
         yourgroups = WebInterfaceYourGroupsPages()
