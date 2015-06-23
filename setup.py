@@ -135,6 +135,7 @@ install_requires = [
     "Sphinx>=1.3",
     "SQLAlchemy>=1.0",
     "SQLAlchemy-Utils[encrypted]>=0.30.1",
+    "toposort>=1.4",
     "unidecode>=0.04.1",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
