@@ -23,7 +23,12 @@ from __future__ import absolute_import
 from copy import deepcopy
 from uuid import uuid1 as new_uuid
 
-from workflow.engine import ActionMapper, TransitionActions
+from workflow.engine import (
+    ActionMapper,
+    TransitionActions,
+    Continue,
+    Break,
+)
 from workflow.engine_db import (
     DbProcessingFactory,
     DbTransitionAction,
@@ -372,3 +377,24 @@ class InvTransitionAction(DbTransitionAction):
                 RemovedInInvenio23Warning
             )
             InvTransitionAction.WaitProcessing(obj, eng, callbacks, exc_info)
+
+    @staticmethod
+    def StopProcessing(obj, eng, callbacks, exc_info):
+        """Gracefully stop the execution of the engine."""
+        msg = "Processing was stopped for object: {0}".format(obj.id)
+        eng.log.debug(msg)
+        raise Break
+
+    @staticmethod
+    def SkipToken(obj, eng, callbacks, exc_info):
+        """Action to take when SkipToken is raised."""
+        msg = "Skipped running this object: {0}".format(obj.id)
+        eng.log.debug(msg)
+        raise Continue
+
+    @staticmethod
+    def AbortProcessing(obj, eng, callbacks, exc_info):
+        """Action to take when AbortProcessing is raised."""
+        msg = "Processing was aborted for object: {0}".format(obj.id)
+        eng.log.debug(msg)
+        raise Break
