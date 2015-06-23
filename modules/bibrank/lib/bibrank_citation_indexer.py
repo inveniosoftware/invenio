@@ -73,7 +73,7 @@ def record_duplicates_in_asana(match, recids):
     notes = "https://inspirehep.net/search?p=%s" % quote(' or '.join("recid:%s" % recid for recid in recids))
 
     if len(recids) == 2:
-        notes += "\nhttps://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[1], recids[0])
+        notes += "\nhttps://inspirehep.net/record/merge/#recid1=%s&recid2=%s" % (recids[0], recids[1])
 
     prefix = ""
     if recids & get_records_wit_erratum():
