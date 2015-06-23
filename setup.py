@@ -75,6 +75,7 @@ install_requires = [
     "chardet>=2.3.0",
     "datacite>=0.1.0",
     "dictdiffer>=0.0.3",
+    "elasticsearch>=1.3.0",
     "feedparser>=5.1",
     "fixture>=1.5",
     "Flask>=0.10.1",
@@ -159,7 +160,6 @@ extras_require = {
         "dropbox>=2.1.0"
     ],
     "elasticsearch": [
-        "pyelasticsearch>=0.6.1"
     ],
     "googledrive": [
         "google-api-python-client>=1.2",
