@@ -42,7 +42,6 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_READING_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
-     CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_BIBRANK_SHOW_CITATION_STATS, \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
      CFG_WEBSEARCH_RSS_TTL, \
@@ -68,18 +67,13 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS, \
      CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
-from invenio.modules.search.services import \
-     CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
 from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 from invenio.base.globals import cfg
 from invenio.utils.url import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.utils.html import nmtoken_from_string
 from invenio.ext.legacy.handler import wash_urlargd
-from invenio.legacy.bibrank.citation_searcher import get_cited_by_count
 from invenio.legacy.webuser import session_param_get
-from invenio.modules.search.services import \
-     CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
 from invenio.modules.formatter import format_record
 
 from intbitset import intbitset
@@ -1751,18 +1745,6 @@ class Template:
                                         _("Similar records"),
                                         {'class': "moreinfo"})}
 
-        if CFG_BIBRANK_SHOW_CITATION_LINKS:
-            num_timescited = get_cited_by_count(recid)
-            if num_timescited:
-                out += '''<span class="moreinfo"> - %s </span>''' % \
-                       create_html_link(self.build_search_url(p='refersto:recid:%d' % recid,
-                                                              sf=sf,
-                                                              so=so,
-                                                              sp=sp,
-                                                              rm=rm,
-                                                              ln=ln),
-                                        {}, _("Cited by %(x_num)i records", x_num=num_timescited), {'class': "moreinfo"})
-
         return out
 
     def tmpl_record_body(self, titles, authors, dates, rns, abstracts, urls_u, urls_z, ln):
@@ -3212,14 +3194,10 @@ class Template:
         for link_label, link_url in labels_and_urls:
             count += 1
             out += """<span %(itemclass)s>%(separator)s <a class="searchserviceitem" href="%(url)s">%(link_label)s</a></span>""" % \
-                   {'itemclass' : count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT and 'class="moreserviceitemslist" style="display:none"' or '',
+                   {'itemclass' : '',
                     'separator': count > 1 and ', ' or '',
                     'url' : link_url,
                     'link_label' : cgi.escape(link_label)}
-
-        if count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT:
-            out += """ <a class="lessserviceitemslink" style="display:none;" href="#">%s</a>""" % _("Less suggestions")
-            out += """ <a class="moreserviceitemslink" style="" href="#">%s</a>""" % _("More suggestions")
 
         return out
 

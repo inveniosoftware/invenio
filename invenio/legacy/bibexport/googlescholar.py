@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2010, 2011, 2014 CERN.
+# Copyright (C) 2008, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -55,7 +55,6 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_RECORD
 from invenio.legacy.bibsched.bibtask import write_message, task_update_progress, task_sleep_now_if_required
-from invenio.legacy.search_engine import get_collection_reclist, get_all_restricted_recids
 from intbitset import intbitset
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.bibexport.sitemap import \
@@ -175,16 +174,11 @@ def get_all_public_records_modified_last_month(collections):
     accessible collection.
     returns list of (recid, last_modification) tuples
     """
-    all_restricted_recids = get_all_restricted_recids()
+    # FIXME use search API
     current_date = datetime.date.today()
     one_month_ago = current_date - datetime.timedelta(days = 31)
-    recids = intbitset()
-    for collection in collections:
-        recids += get_collection_reclist(collection)
-    recids = recids.difference(all_restricted_recids)
-    query = 'SELECT id, modification_date FROM bibrec WHERE modification_date > %s'
-    res = run_sql(query, (one_month_ago,))
-    return [(recid, lastmod) for (recid, lastmod) in res if recid in recids]
+    return []
+
 
 class GoogleScholarExportException(Exception):
     """Exception indicating an error during exportting for Google scholar."""

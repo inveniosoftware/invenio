@@ -570,7 +570,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             # concurrent processes call get_record at the same time and the
             # does not exists (i.e. all process will try to generate and save
             # the recjson)
-            from invenio.modules.records.api import get_record as _get_record
+            from invenio_records.api import get_record as _get_record
             _get_record(rec_id)
 
             # Fire record signals.

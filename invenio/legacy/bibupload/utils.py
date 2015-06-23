@@ -50,7 +50,7 @@ def close_temp_file(file_out, filename):
 
 def create_marcxml(record):
     """Create MARCXML based on type of input variable."""
-    from invenio.modules.records.api import Record
+    from invenio_records.api import Record
     if isinstance(record, six.string_types):
         return record
     elif isinstance(record, Record):

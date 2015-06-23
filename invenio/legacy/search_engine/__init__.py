@@ -79,13 +79,6 @@ from invenio.config import \
      CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_XAPIAN_ENABLED
 
-try:
-    from invenio.config import CFG_BIBSORT_DEFAULT_FIELD, \
-        CFG_BIBSORT_DEFAULT_FIELD_ORDER
-except ImportError:
-    CFG_BIBSORT_DEFAULT_FIELD = 'latest first'
-    CFG_BIBSORT_DEFAULT_FIELD_ORDER = 'd'
-
 from invenio.modules.search.searchext.engines.native import search_unit
 from invenio.modules.search.utils import get_most_popular_field_values
 from invenio.modules.search.errors import \
@@ -97,19 +90,6 @@ from invenio.legacy.bibrecord import (get_fieldvalues,
                                       get_fieldvalues_alephseq_like)
 from .utils import record_exists
 from invenio.legacy.bibrecord import create_record, record_xml_output
-from invenio.legacy.bibrank.record_sorter import (
-    get_bibrank_methods,
-    is_method_valid,
-    rank_records as rank_records_bibrank,
-    rank_by_citations)
-from invenio.legacy.bibrank.downloads_similarity import register_page_view_event, calculate_reading_similarity_list
-from invenio.legacy.bibindex.engine_stemmer import stem
-from invenio.modules.indexer.tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
-from invenio.legacy.bibindex.engine_utils import author_name_requires_phrase_search, \
-    get_field_tags
-from invenio.legacy.bibindex.engine_washer import wash_index_term, lower_index_term, wash_author_name
-from invenio.legacy.bibindex.engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.legacy.bibrank.downloads_grapher import create_download_history_graph_and_box
 from invenio.legacy.miscutil.data_cacher import DataCacher
 from invenio.legacy.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.modules.access.control import acc_get_action_id
@@ -119,7 +99,6 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_USERIDS_IN_TAGS
 
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from intbitset import intbitset
 from invenio.legacy.dbquery import InvenioDbQueryWildcardLimitError
 from invenio.utils.serializers import deserialize_via_marshal
@@ -128,29 +107,12 @@ from invenio.ext.logging import register_exception
 from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.legacy import bibrecord
 
-import invenio.legacy.template
-websearch_templates = invenio.legacy.template.load('websearch')
-
-from invenio.legacy.bibrank.citation_searcher import calculate_cited_by_list, \
-    calculate_co_cited_with_list, get_records_with_num_cites, \
-    get_refersto_hitset, get_citedby_hitset, get_cited_by_list, \
-    get_refers_to_list, get_citers_log
-
-from invenio.legacy.bibrank.citation_grapher import create_citation_history_graph_and_box
-from invenio.legacy.bibrank.selfcites_searcher import get_self_cited_by_list, \
-                                                      get_self_cited_by, \
-                                                      get_self_refers_to_list
-
 from invenio.legacy.dbquery import run_sql, run_sql_with_limit, \
     wash_table_column_name, get_table_update_time
 from invenio.legacy.webuser import getUid, collect_user_info
-from invenio.legacy.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
 from invenio.base.i18n import gettext_set_language
 
 from invenio.utils import apache
-
-from invenio.legacy.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
-from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 from sqlalchemy.exc import DatabaseError
 
@@ -175,23 +137,15 @@ EM_REPOSITORY={"body" : "B",
                "rt_portalbox" : "Prt",
                "search_services": "SER"};
 
-from invenio.modules.collections.cache import collection_reclist_cache
 from invenio.modules.collections.cache import collection_restricted_p
 from invenio.modules.collections.cache import restricted_collection_cache
 from invenio.modules.search.utils import get_permitted_restricted_collections
-from invenio.modules.collections.cache import get_all_restricted_recids
 
 
-from invenio.modules.records.access import check_user_can_view_record
+from invenio_records.access import check_user_can_view_record
 
-from invenio.modules.collections.cache import get_collection_reclist
 from invenio.modules.collections.cache import get_coll_i18nname
 from invenio.modules.search.cache import get_field_i18nname
-
-from invenio.modules.indexer.models import IdxINDEX
-
-
-get_index_id_from_field = IdxINDEX.get_index_id_from_field
 
 
 def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
@@ -199,19 +153,7 @@ def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, t
     ancestors (except Home collection).  If aas==1, then links to
     Advanced Search interfaces; otherwise Simple Search.
     """
-
-    dads = []
-    for dad in get_coll_ancestors(cc):
-        if dad != CFG_SITE_NAME: # exclude Home collection
-            dads.append((dad, get_coll_i18nname(dad, ln, False)))
-
-    if self_p and cc != CFG_SITE_NAME:
-        dads.append((cc, get_coll_i18nname(cc, ln, False)))
-
-    return websearch_templates.tmpl_navtrail_links(
-        aas=aas, ln=ln, dads=dads)
-
-from invenio.modules.indexer.utils import get_synonym_terms
+    return ''
 
 from invenio.modules.search.washers import *
 
@@ -238,64 +180,6 @@ def get_coll_ancestors(coll):
 
 
 from invenio.modules.collections.cache import get_collection_allchildren
-
-
-def browse_pattern_phrases(req, colls, p, f, rg, ln=CFG_SITE_LANG):
-    """Returns either biliographic phrases or words indexes."""
-
-    ## is p enclosed in quotes? (coming from exact search)
-    if p.startswith('"') and p.endswith('"'):
-        p = p[1:-1]
-
-    ## okay, "real browse" follows:
-    ## FIXME: the maths in the get_nearest_terms_in_bibxxx is just a test
-
-    if not f and p.find(":") > 0: # does 'p' contain ':'?
-        f, p = p.split(":", 1)
-
-    coll_hitset = intbitset()
-    for coll_name in colls:
-        coll_hitset |= get_collection_reclist(coll_name)
-
-    index_id = get_index_id_from_field(f)
-    if index_id != 0:
-        browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll_hitset)
-    else:
-        browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-        while not browsed_phrases:
-            # try again and again with shorter and shorter pattern:
-            try:
-                p = p[:-1]
-                browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-            except:
-                register_exception(req=req, alert_admin=True)
-                # probably there are no hits at all:
-                return []
-
-        ## try to check hits in these particular collection selection:
-        browsed_phrases_in_colls = []
-        if 0:
-            for phrase in browsed_phrases:
-                phrase_hitset = intbitset()
-                phrase_hitsets = search_pattern("", phrase, f, 'e')
-                for coll in colls:
-                    phrase_hitset.union_update(phrase_hitsets[coll])
-                if len(phrase_hitset) > 0:
-                    # okay, this phrase has some hits in colls, so add it:
-                    browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
-
-        ## were there hits in collections?
-        if browsed_phrases_in_colls == []:
-            if browsed_phrases != []:
-                #write_warning(req, """<p>No match close to <em>%s</em> found in given collections.
-                #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
-                ## try to get nbhits for these phrases in any collection:
-                for phrase in browsed_phrases:
-                    nbhits = get_nbhits_in_bibxxx(phrase, f, coll_hitset)
-                    if nbhits > 0:
-                        browsed_phrases_in_colls.append([phrase, nbhits])
-
-    return browsed_phrases_in_colls
 
 
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
@@ -431,116 +315,6 @@ def get_all_collections_of_a_record(recID, recreate_cache_if_needed=True):
     return ret
 
 
-from invenio.modules.search.models import Field
-
-get_field_name = Field.get_field_name
-
-
-def get_merged_recid(recID):
-    """ Return the record ID of the record with
-    which the given record has been merged.
-    @param recID: deleted record recID
-    @type recID: int
-    @return: merged record recID
-    @rtype: int or None
-    """
-    merged_recid = None
-    for val in get_fieldvalues(recID, "970__d"):
-        try:
-            merged_recid = int(val)
-            break
-        except ValueError:
-            pass
-    return merged_recid
-
-
-def record_empty(recID):
-    """
-    Is this record empty, e.g. has only 001, waiting for integration?
-
-    @param recID: the record identifier.
-    @type recID: int
-    @return: 1 if the record is empty, 0 otherwise.
-    @rtype: int
-    """
-    return bibrecord.record_empty(get_record(recID))
-
-def record_public_p(recID, recreate_cache_if_needed=True):
-    """Return 1 if the record is public, i.e. if it can be found in the Home collection.
-       Return 0 otherwise.
-    """
-    return recID in get_collection_reclist(CFG_SITE_NAME, recreate_cache_if_needed=recreate_cache_if_needed)
-
-
-from invenio.modules.sorter.cache import SORTING_METHODS, CACHE_SORTED_DATA
-
-
-def rank_records(rank_method_code, rank_limit_relevance, hitset_global,
-                 pattern=None, verbose=0, sort_order='d', of='hb',
-                 ln=CFG_SITE_LANG, rg=None, jrec=None, field='',
-                 sorting_methods=SORTING_METHODS):
-    """Initial entry point for ranking records, acts like a dispatcher.
-       (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
-       (ii)rank_method_code is not in bsrMETHOD, use bibrank;
-    """
-    # Special case: sorting by citations is fast because we store the
-    # ranking dictionary in memory, so we do not use bibsort buckets.
-    if CFG_BIBSORT_ENABLED and sorting_methods and rank_method_code != 'citation':
-        for sort_method in sorting_methods:
-            definition = sorting_methods[sort_method]
-            if definition.startswith('RNK') and \
-                   definition.replace('RNK:', '').strip().lower() == rank_method_code.lower():
-                solution_recs, solution_scores = \
-                        sort_records_bibsort(req, hitset_global, sort_method,
-                                             '', sort_order, verbose, of, ln,
-                                             rg, jrec, 'r')
-                comment = ''
-                if verbose > 0:
-                    comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
-                return solution_recs, solution_scores, '(', ')', comment
-
-    if rank_method_code.lower() == 'citation':
-        related_to = []
-    else:
-        related_to = pattern
-
-    solution_recs, solution_scores, prefix, suffix, comment = \
-        rank_records_bibrank(rank_method_code=rank_method_code,
-                             rank_limit_relevance=rank_limit_relevance,
-                             hitset=hitset_global,
-                             verbose=verbose,
-                             field=field,
-                             related_to=related_to,
-                             rg=rg,
-                             jrec=jrec)
-
-    # Solution recs can be None, in case of error or other cases
-    # which should be all be changed to return an empty list.
-    if solution_recs and sort_order == 'd':
-        solution_recs.reverse()
-        solution_scores.reverse()
-
-    return solution_recs, solution_scores, prefix, suffix, comment
-
-
-def sort_or_rank_records(req, recIDs, rm, sf, so, sp, p, verbose=0, of='hb',
-                         ln=CFG_SITE_LANG, rg=None, jrec=None, field='',
-                         sorting_methods=SORTING_METHODS):
-    """Sort or rank records.
-
-    Entry point for deciding to either sort or rank records.
-    """
-    if rm:
-        ranking_result = rank_records(rm, 0, recIDs, p, verbose, so,
-                                      of, ln, rg, jrec, field,
-                                      sorting_methods)
-        if ranking_result[0]:
-            return ranking_result[0]  # ranked recids
-    elif sf or (CFG_BIBSORT_ENABLED and SORTING_METHODS):
-        from invenio.modules.sorter.engine import sort_records
-        return sort_records(recIDs, sf, so, sp, rg, jrec)
-    return recIDs.tolist()
-
 
 def slice_records(recIDs, jrec, rg):
     if not jrec:
@@ -588,7 +362,7 @@ def get_record(recid):
     import warnings
     warnings.warn('Deprecated get_record({}).'.format(str(recid)),
                   stacklevel=2)
-    from invenio.modules.records import api
+    from invenio_records import api
     try:
         return api.get_record(recid).legacy_create_recstruct()
     except AttributeError:

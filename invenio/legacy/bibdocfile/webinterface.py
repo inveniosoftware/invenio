@@ -40,7 +40,7 @@ from invenio.modules.access.local_config import VIEWRESTRCOLL
 from invenio.modules.access.mailcookie import mail_cookie_create_authorize_action
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.modules.access.control import acc_is_role
-from invenio.modules.records.api import get_record
+from invenio_records.api import get_record
 from invenio.legacy.bibrecord import record_empty
 from invenio.legacy.webpage import page, pageheaderonly, \
     pagefooteronly, warning_page, write_warning
@@ -52,7 +52,7 @@ from invenio.base.i18n import gettext_set_language
 from invenio.legacy.search_engine import \
      guess_primary_collection_of_a_record, record_exists, \
      create_navtrail_links, check_user_can_view_record
-from invenio.modules.records.access import is_user_owner_of_record
+from invenio_records.access import is_user_owner_of_record
 from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format

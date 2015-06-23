@@ -75,7 +75,6 @@ from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.legacy.webuser import get_user_info, get_email, \
      collect_user_info, get_user_preferences, list_registered_users
 from invenio.legacy.dbquery import run_sql
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.legacy.refextract.api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
@@ -781,13 +780,14 @@ def can_record_have_physical_copies(recid):
 
     col_id = Collection.query.filter_by(
         name=guess_primary_collection_of_a_record(recid)).value('id')
-    collections = get_detailed_page_tabs(col_id, recid)
+    return False
+    # collections = get_detailed_page_tabs(col_id, recid)
 
-    if ("holdings" not in collections or
-            "visible" not in collections["holdings"]):
-        return False
+    # if ("holdings" not in collections or
+    #         "visible" not in collections["holdings"]):
+    #     return False
 
-    return collections["holdings"]["visible"] is True
+    # return collections["holdings"]["visible"] is True
 
 
 def get_record_collections(recid=0, recstruct=None):

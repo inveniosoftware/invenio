@@ -38,9 +38,6 @@ from invenio.legacy.bibrecord import (create_record,
                                       record_xml_output)
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.legacy.search_engine import get_record
-from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import (
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM,
-    CFG_JOURNAL_TAG)
 
 from invenio.base.globals import cfg
 from .engine import (get_kbs,

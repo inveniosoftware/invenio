@@ -17,13 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.legacy.bibrank.citation_indexer import \
-    get_recids_matching_query as bibrank_search, \
-    standardize_report_number
-from invenio.modules.indexer.tokenizers.BibIndexJournalTokenizer import \
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM
-from invenio.legacy.bibrank.tag_based_indexer import load_config
-from invenio.legacy.search_engine import get_collection_reclist, get_fieldvalues
+from invenio.legacy.search_engine import get_fieldvalues
 from intbitset import intbitset
 
 

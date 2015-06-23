@@ -36,7 +36,6 @@ from invenio.legacy.refextract.regexs import re_kb_line, \
 from invenio.legacy.docextract.utils import write_message
 from invenio.legacy.docextract.text import re_group_captured_multiple_space
 from invenio.utils.hash import md5
-from invenio.legacy.search_engine import get_collection_reclist
 from invenio.legacy.search_engine.utils import get_fieldvalues
 
 
@@ -664,7 +663,8 @@ def load_kb_from_records(kb_name, builder):
                 yield value
 
     def lazy_parser(collection, left_tags, right_tags):
-        for recid in get_collection_reclist(collection):
+        from invenio.modules.search.api import Query
+        for recid in Query().search(collection=collection):
             try:
                 # Key tag
                 # e.g. for journals database: 711__a
