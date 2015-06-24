@@ -460,8 +460,8 @@ the following commands.
 
     (invenio)$ inveniomanage config set CFG_EMAIL_BACKEND flask_email.backends.console.Mail
     (invenio)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
-    (invenio)$ inveniomanage config set CFG_DATABASE_NAME $BRANCH
-    (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
+    (invenio)$ inveniomanage config set CFG_DATABASE_NAME `echo $BRANCH | sed -e 's/[^A-Za-z0-9]//g'`
+    (invenio)$ inveniomanage config set CFG_DATABASE_USER `echo $BRANCH | sed -e 's/[^A-Za-z0-9]//g'`
     (invenio)$ inveniomanage config set CFG_SITE_URL http://localhost:4000
     (invenio)$ inveniomanage config set CFG_SITE_SECURE_URL http://localhost:4000
 
