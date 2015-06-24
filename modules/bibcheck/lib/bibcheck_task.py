@@ -59,7 +59,7 @@ from invenio.search_engine import \
     search_unit_in_bibxxx, \
     search_pattern
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_xml_output, record_add_field
+from invenio.bibrecord import record_xml_output, record_add_field, record_modify_subfield
 from invenio.pluginutils import PluginContainer
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
@@ -314,6 +314,83 @@ class AmendableRecord(dict):
                                     if filter_enabled:
                                         position = position + (filter_position,)
                                     yield position, value
+
+    def update_subfield(self, field, pattern=None, replace=None, new_code=None,
+                        complement=False, subfield_filter=(None, None), count=0):
+        """ Like update_subfields for one field """
+        self.update_subfields([field, ], pattern, replace, new_code,
+                              complement, subfield_filter, count)
+
+    def update_subfields(self, fields, pattern=None, replace=None, new_code=None,
+                         complement=False, subfield_filter=(None, None), count=0):
+        """
+        Update subfield - various combinations:
+        :param fields: Field(s) to make the substitution on
+        :param pattern: Regular expression to look for (None = change all)
+        :param replace: String to substitute. (None = keep value)
+               Supports backreferences, unless complement = True
+        :param new_code: Move to new subfield code (None = don't move)
+        :param complement: Change fields not matching pattern (False)
+        :param subfield_filter: Apply only to fields with additional (code, filter_value)
+        :param count: Maximum number of replacements to make (0 = unlimited)
+        
+        Examples:
+        update_subfields(fields=['035__a', ], pattern='^[A-Za-z]+:[12][0-9]{3}[a-z]{2,3}$', 
+                    new_code='z', complement=True, subfield_filter=('9', 'INSPIRETeX'))
+            moves texkeys with wrong syntax to $$z                  
+            035__ $$9INSPIRETeX$$a:2015fwa
+            ->
+            035__ $$9INSPIRETeX$$z:2015fwa
+            
+        update_subfields(fields=['100__i','700__i'], pattern='[jJ][aA][cC][oO][wW]\D*', 
+                         replace='JACoW-', new_code='j')
+            moves corrected JACoW-IDs from $$i to $$j
+            700__ $$iJACoW-00012345
+            ->
+            700__ $$jJACoW-00012345
+        """
+
+        import re
+
+        for pos, val in self.iterfields(fields, subfield_filter):
+            source_field = pos[0]
+            message = source_field[0:5]
+            if pattern:
+                if replace:
+                    if complement:
+                        new_val = replace
+                        pattern_matches = re.search(pattern, val)
+                    else:
+                        new_val = re.sub(pattern, replace, val, count)
+                        if new_val == val:
+                            pattern_matches = re.search(pattern, val)
+                        else:
+                            pattern_matches = True
+                else:
+                    new_val = val
+                    pattern_matches = re.search(pattern, val)
+            else:
+                pattern_matches = True
+                if replace:
+                    new_val = replace
+                else:
+                    new_val = val
+
+
+            if new_code:
+                message += ': move from %s to %s' % (source_field[5], new_code)
+            else:
+                new_code = source_field[5]
+
+            if not new_val == val:
+                message += ': replace %s by %s' % (val, new_val)
+            else:
+                message += ': %s' % (val)
+
+            if bool(pattern_matches) != bool(complement):
+                record_modify_subfield(self, source_field[0:3], new_code, new_val,
+                                       pos[2], field_position_local=pos[1])
+                self.set_amended(message)
 
     def _query(self, position):
         """ Return a position """
