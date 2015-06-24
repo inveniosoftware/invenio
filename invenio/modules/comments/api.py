@@ -73,7 +73,7 @@ from invenio.modules.access.models import CmtRECORDCOMMENT
 from invenio.legacy.search_engine import \
     guess_primary_collection_of_a_record, \
     check_user_can_view_record
-from invenio.modules.collections.cache import get_collection_reclist
+# from invenio.modules.collections.cache import get_collection_reclist
 from invenio.legacy.bibrecord import get_fieldvalues
 from invenio.utils.htmlwasher import EmailWasher
 try:

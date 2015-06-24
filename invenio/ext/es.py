@@ -28,6 +28,16 @@ from invenio.celery import celery
 es = Elasticsearch()
 
 
+SEARCH_RECORD_MAPPING = {
+    "properties": {
+        "_collections": {
+            "type": "string",
+            "index": "not_analyzed"
+        }
+    }
+}
+
+
 @celery.task
 def index_record(recid):
     from invenio_records.models import RecordMetadata
@@ -42,6 +52,8 @@ def index_record(recid):
 
 def create_index(sender, **kwargs):
     es.indices.create(index='records', ignore=400)
+    es.indices.put_mapping(doc_type='record', body=SEARCH_RECORD_MAPPING,
+                           index='records')
 
 
 def delete_index(sender, **kwargs):
