@@ -47,6 +47,7 @@ from invenio.utils.serializers import serialize_via_marshal, deserialize_via_mar
 from invenio.utils.text import strip_accents
 
 from sqlalchemy.exc import DatabaseError
+from MySQLdb import IntegrityError
 
 
 options = {} # global variable to hold task options
@@ -485,7 +486,7 @@ class WordTable:
             try:
                 run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % self.tablename[:-1],
                         (recID, serialize_via_marshal([])))
-            except DatabaseError:
+            except (DatabaseError, IntegrityError):
                 # okay, it's an already existing record, no problem
                 pass
 

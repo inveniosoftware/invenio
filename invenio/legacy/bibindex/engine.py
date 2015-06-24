@@ -98,6 +98,7 @@ from invenio.utils.serializers import serialize_via_marshal, \
     deserialize_via_marshal
 
 from sqlalchemy.exc import DatabaseError
+from MySQLdb import IntegrityError
 
 from .engine_utils import get_index_id_from_index_name
 
@@ -982,7 +983,8 @@ class VirtualIndexTable(AbstractIndexTable):
                        (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
                 run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
-            except DatabaseError:
+            except (DatabaseError, IntegrityError):
+                # okay, it's an already existing record, no problem
                 pass
 
     def insert_index(self, index_id, recID_low, recID_high):
@@ -1016,7 +1018,8 @@ class VirtualIndexTable(AbstractIndexTable):
             run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
                 run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
-            except DatabaseError:
+            except (DatabaseError, IntegrityError):
+                # okay, it's an already existing record, no problem
                 pass
 
     def remove_index(self, index_id, recID_low, recID_high):
@@ -1047,7 +1050,8 @@ class VirtualIndexTable(AbstractIndexTable):
             run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
                 run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
-            except DatabaseError:
+            except (DatabaseError, IntegrityError):
+                # okay, it's an already existing record, no problem
                 pass
 
     def update_cache_for_record(self, index_name, recID, old_values, new_values):
@@ -1487,7 +1491,7 @@ class WordTable(AbstractIndexTable):
             # ... and, for new records, enter the CURRENT status as empty:
             try:
                 run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
-            except DatabaseError:
+            except (DatabaseError, IntegrityError):
                 # okay, it's an already existing record, no problem
                 pass
 
