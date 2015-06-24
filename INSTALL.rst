@@ -351,7 +351,9 @@ locally and it will make your life easier. ``(invenio)$`` tells your that the
 
 .. code-block:: console
 
-    $ mkvirtualenv invenio
+    $ # choose an unique name for your virtual environment
+    $ export VENAME=invenio
+    $ mkvirtualenv $VENAME
     (invenio)$ # we are in the invenio environment now and
     (invenio)$ # can leave it using the deactivate command.
     (invenio)$ deactivate
@@ -458,10 +460,12 @@ the following commands.
 
 .. code-block:: console
 
+    (invenio)$ # sanitaze for usage as database name and user
+    (invenio)$ export SAFE_NAME=`echo $VENAME$BRANCH | sed -e 's/[^A-Za-z0-9]//g'`
     (invenio)$ inveniomanage config set CFG_EMAIL_BACKEND flask_email.backends.console.Mail
     (invenio)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
-    (invenio)$ inveniomanage config set CFG_DATABASE_NAME $BRANCH
-    (invenio)$ inveniomanage config set CFG_DATABASE_USER $BRANCH
+    (invenio)$ inveniomanage config set CFG_DATABASE_NAME $SAFE_NAME
+    (invenio)$ inveniomanage config set CFG_DATABASE_USER $SAFE_NAME
     (invenio)$ inveniomanage config set CFG_SITE_URL http://localhost:4000
     (invenio)$ inveniomanage config set CFG_SITE_SECURE_URL http://localhost:4000
 
