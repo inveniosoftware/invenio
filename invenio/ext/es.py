@@ -33,6 +33,24 @@ SEARCH_RECORD_MAPPING = {
         "_collections": {
             "type": "string",
             "index": "not_analyzed"
+        },
+        "collections": {
+            "properties": {
+                "primary": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                },
+                "secondary": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                }
+            }
+        },
+        "division": {
+            "type": "string"
+        },
+        "experiment": {
+            "type": "string"
         }
     }
 }
@@ -47,6 +65,18 @@ def index_record(recid):
         doc_type='record',
         body=record.json,
         id=record.id
+    )
+
+
+@celery.task
+def index_collection_percolator(name, dbquery):
+    from invenio.modules.search.api import Query
+    from invenio.modules.search.walkers.elasticsearch import ElasticSearchDSL
+    es.index(
+        index='records',
+        doc_type='.percolator',
+        body={'query': Query(dbquery).query.accept(ElasticSearchDSL())},
+        id=name
     )
 
 
@@ -70,11 +100,23 @@ def setup_app(app):
     from sqlalchemy.event import listens_for
 
     signals.pre_command.connect(delete_index, sender=drop)
-    signals.post_command.connect(create_index, sender=create)
+    signals.pre_command.connect(create_index, sender=create)
     signals.pre_command.connect(delete_index, sender=recreate)
-    signals.post_command.connect(create_index, sender=recreate)
+    signals.pre_command.connect(create_index, sender=recreate)
 
     @listens_for(RecordMetadata, 'after_insert')
     @listens_for(RecordMetadata, 'after_update')
     def new_record(mapper, connection, target):
         index_record.delay(target.id)
+
+    # FIXME add after_delete
+
+    from invenio.modules.collections.models import Collection
+
+    @listens_for(Collection, 'after_insert')
+    @listens_for(Collection, 'after_update')
+    def new_collection(mapper, connection, target):
+        if target.dbquery is not None:
+            index_collection_percolator.delay(target.name, target.dbquery)
+
+    # FIXME add after_delete
