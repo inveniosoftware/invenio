@@ -178,7 +178,8 @@ def acc_update_action(id_action=0, name_action='', verbose=0, **update):
                 run_sql("""DELETE FROM "accROLE_accACTION_accARGUMENT"
                         WHERE "id_accACTION"  = %s %s """,
                         (id_action, update['allowedkeywords'] and
-                         'AND "id_accARGUMENT" != -1' or ''))
+                         ('AND ("id_accARGUMENT" != -1 '
+                         '      OR "id_accARGUMENT" IS NULL)') or ''))
 
         if 'optional' in update:
             # check if there changing optional or not
