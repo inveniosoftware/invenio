@@ -93,9 +93,6 @@ from invenio.utils.text import wash_for_xml, show_diff
 from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
-from invenio.legacy.bibcirculation.db_layer import get_number_copies, has_copies
-from invenio.legacy.bibcirculation.utils import create_item_details_url
-
 from invenio.legacy.refextract.api import FullTextNotAvailable, \
                                    get_pdf_doc, \
                                    record_has_fulltext
@@ -771,8 +768,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
             revisions_history = get_record_revision_timestamps(recid)
             revisions_authors = get_record_revision_authors(recid)
-            number_of_physical_copies = get_number_copies(recid)
-            bibcirc_details_URL = create_item_details_url(recid, ln)
+            number_of_physical_copies = 0
+            bibcirc_details_URL = None
             can_have_copies = can_record_have_physical_copies(recid)
             managed_DOIs = [doi for doi in record_extract_dois(record) if \
                             re.compile(CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN).match(doi)]
@@ -866,10 +863,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         existing_cache = cache_exists(recid, uid)
         pending_changes = []
 
-        if has_copies(recid):
-            response['resultCode'] = \
-                cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_physical_copies_exist']
-        elif existing_cache and cache_expired(recid, uid) and \
+        if existing_cache and cache_expired(recid, uid) and \
                 record_locked_by_other_user(recid, uid):
             response['resultCode'] = \
                 cfg['CFG_BIBEDIT_AJAX_RESULT_CODES_REV']['error_rec_locked_by_user']

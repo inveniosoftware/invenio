@@ -184,7 +184,6 @@ DEF_ACTIONS = (
                ('usemessages', 'use messages', '', 'no'),
                ('viewholdings', 'view holdings', 'collection', 'yes'),
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
-               ('runbibcirculation', 'run BibCirculation', '', 'no'),
                ('moderatecomments', 'moderate comments', 'collection', 'no'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
                ('claimpaper_view_pid_universe', 'View the Claim Paper interface', '', 'no'),
@@ -243,7 +242,6 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibsort' : (_("Configure BibSort"), "%s/admin/bibsort/bibsortadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
     'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
     'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }

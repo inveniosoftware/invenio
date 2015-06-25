@@ -33,7 +33,7 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "bibclassify", "bibexport",
                            "dbdump", "bibencode",
-                           "bibtasklet", "refextract", "bibcircd", "bibsort",
+                           "bibtasklet", "refextract", "bibsort",
                            "selfcites", "arxiv-pdf-checker", "bibcatalog",
                            "bibtex", "bibcheck")
 

@@ -26,7 +26,6 @@ Admin's Guide
 
    bibauthority-admin-guide
    bibcheck-admin-guide
-   bibcirculation-admin-guide
    bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
