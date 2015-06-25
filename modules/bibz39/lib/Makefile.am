@@ -19,7 +19,8 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
 	bibz39_webapi.py \
-	bibz39_webinterface.py
+	bibz39_webinterface.py \
+	bibz39_config.py
 
 jsdir=$(localstatedir)/www/js
 

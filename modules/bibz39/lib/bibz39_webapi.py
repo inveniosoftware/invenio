@@ -30,9 +30,11 @@ def get_css():
            #search_area {
             text-align: center;
            }
-           #result_area {
+           #middle_area {
             width: 50%;
             margin: 0 auto;
+           }
+           #result_area {
             margin-top: 20px;
             border-collapse: collapse;
             overflow: hidden;
