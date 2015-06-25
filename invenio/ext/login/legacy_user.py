@@ -52,7 +52,6 @@ CFG_USER_DEFAULT_INFO = {
     'precached_viewsubmissions': False,
     'precached_useapprove': False,
     'precached_useadmin': False,
-    'precached_usestats': False,
     'precached_viewclaimlink': False,
     'precached_usepaperclaim': False,
     'precached_usepaperattribution': False,
@@ -209,8 +208,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
             user_info, 'usegroups')[0] == 0
         data['precached_usemessages'] = acc_authorize_action(
             user_info, 'usemessages')[0] == 0
-        data['precached_usestats'] = acc_authorize_action(
-            user_info, 'runwebstatadmin')[0] == 0
         try:
             data['precached_viewsubmissions'] = isUserSubmitter(user_info)
         except Exception:

@@ -165,7 +165,6 @@ DEF_ACTIONS = (
                ('runbibedit', 'run Record Editor', 'collection', 'yes'),
                ('runbibdocfile', 'run Document File Manager', '', 'no'),
                ('runbibmerge', 'run Record Merger', '', 'no'),
-               ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ', 'yes'),

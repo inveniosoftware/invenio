@@ -67,7 +67,6 @@ from invenio.legacy.webbasket.db_layer import get_basket_name, \
      get_max_user_rights_on_basket
 from invenio.utils.url import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
-from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.legacy.webuser import collect_user_info
 from invenio.modules.comments.api import check_user_can_attach_file_to_comments
@@ -328,16 +327,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
 
-        # register event in webstat
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["display", "", user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         rssurl = CFG_SITE_SECURE_URL + "/rss"
 
         if argd['of'] != 'hb':
@@ -411,16 +400,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 #                                                  format=argd['of'],
                                                   ln=argd['ln'])
 
-        # register event in webstat
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["search", "", user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title       = _("Search baskets"),
                     body        = body,
                     navtrail    = navtrail,
@@ -473,17 +452,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                       recid=argd['recid'],
                                                       cmtid=argd['cmtid'],
                                                       ln=argd['ln'])
-
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["write_note", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title       = _("Add a note"),
                     body        = body,
@@ -545,18 +513,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                      ln=argd['ln'],
                                                      reply_to=argd['reply_to'])
 
-        # TODO: do not stat event if save was not succussful
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["save_note", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title       = _("Display item and notes"),
                     body        = body,
                     navtrail    = navtrail,
@@ -617,19 +573,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                        recid=argd['recid'],
                                                        cmtid=argd['cmtid'],
                                                        ln=argd['ln'])
-
-        # TODO: do not stat event if delete was not succussful
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["delete_note", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title       = _("Display item and notes"),
                     body        = body,
@@ -721,18 +664,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
 
-        # register event in webstat
-        bskid = argd['bskid']
-        basket_str = "%s (%s)" % (get_basket_name(bskid), bskid)
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["add", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title       = _('Add to basket'),
                     body        = body,
                     navtrail    = navtrail,
@@ -806,17 +737,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                   ln=argd['ln'])
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
-
-            # register event in webstat
-            basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-            if user_info['email']:
-                user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-            else:
-                user_str = ""
-            try:
-                register_customevent("baskets", ["delete", basket_str, user_str])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             return page(title = _("Delete a basket"),
                         body        = body,
@@ -906,17 +826,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               group=argd['group'],
                                               bskid=argd['bskid'],
                                               ln=argd['ln'])
-
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["modify", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title = title,
                     body        = body,
@@ -1034,17 +943,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
 
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["edit", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title = _("Edit basket"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -1124,17 +1022,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
 
-        # register event in webstat
-        #basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        #if user_info['email']:
-        #    user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        #else:
-        #    user_str = ""
-        #try:
-        #    register_customevent("baskets", ["edit", basket_str, user_str])
-        #except:
-        #    register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title       = _("Edit topic"),
                     body        = body,
                     navtrail    = navtrail + navtrail_end,
@@ -1201,17 +1088,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                 move_from_basket=argd['move_from_basket'],
                                 referer=argd['referer'],
                                 ln=argd['ln'])
-
-            # register event in webstat
-            basket_str = "%s ()" % argd['new_basket_name']
-            if user_info['email']:
-                user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-            else:
-                user_str = ""
-            try:
-                register_customevent("baskets", ["create_basket", basket_str, user_str])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             if ( argd['recid'] and argd['colid'] >= 0 ):
                 url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&copy=%i&referer=%s&bskid=%i&colid=%i&move_from_basket=%i&recid=%s&wait=1&ln=%s'
@@ -1291,17 +1167,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if not argd['bskid']:
             (body, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
-
-            # register event in webstat
-            if user_info['email']:
-                user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-            else:
-                user_str = ""
-            try:
-                register_customevent("baskets", ["list_public_baskets", "", user_str])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         else:
             (body, dummy, navtrail) = perform_request_display_public(uid=uid,
                                                                   selected_bskid=argd['bskid'],
@@ -1309,17 +1174,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                   of=argd['of'],
                                                                   ln=argd['ln'])
             title = _('Public basket')
-
-            # register event in webstat
-            basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-            if user_info['email']:
-                user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-            else:
-                user_str = ""
-            try:
-                register_customevent("baskets", ["display_public", basket_str, user_str])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         rssurl = CFG_SITE_SECURE_URL + "/rss"
 
@@ -1365,8 +1219,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         user_info = collect_user_info(req)
-        nb_views_show = acc_authorize_action(user_info, 'runwebstatadmin')
-        nb_views_show_p = not(nb_views_show[0])
+        # nb_views_show = acc_authorize_action(user_info, 'runwebstatadmin')
+        nb_views_show_p = False
 
         (body, navtrail) = perform_request_list_public_baskets(uid,
                                                                argd['limit'],
@@ -1541,17 +1395,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                             cmtid=argd['cmtid'],
                                                             ln=argd['ln'])
 
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["write_public_note", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
         return page(title       = _("Add a note"),
                     body        = body,
                     navtrail    = navtrail,
@@ -1604,18 +1447,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                       editor_type=argd['editor_type'],
                                                                       ln=argd['ln'],
                                                                       reply_to=argd['reply_to'])
-
-        # TODO: do not stat event if save was not succussful
-        # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["save_public_note", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title       = _("Display item and notes"),
                     body        = body,

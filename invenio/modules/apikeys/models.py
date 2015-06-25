@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013 CERN.
+# Copyright (C) 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -177,7 +177,6 @@ class WebAPIKey(db.Model):
         @return: If everything goes well it returns the user's uid, if not -1
         """
 
-        from invenio.legacy.webstat.api import register_customevent
         from flask import request
         api_key = signature = timestamp = None
 
@@ -250,8 +249,6 @@ class WebAPIKey(db.Model):
             if signature != server_signature:
                 return -1
 
-        #If the signature is fine, log the key activity and return the UID
-        register_customevent("apikeyusage", [uid, api_key, path, url_req])
         return uid
 
     @classmethod

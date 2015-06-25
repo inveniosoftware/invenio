@@ -1,7 +1,7 @@
 # Administrator interface for Bibcirculation
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -47,7 +47,6 @@ from invenio.config import \
 import invenio.modules.access.engine as acce
 from invenio.legacy.webpage import page
 from invenio.legacy.webuser import getUid, page_not_authorized
-from invenio.legacy.webstat.api import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.ext.email import send_email
 from invenio.legacy.search_engine import perform_request_search, record_exists
@@ -682,11 +681,6 @@ def register_new_loan(req, barcode, borrower_id,
             last_id = db.new_loan(borrower_id, recid, barcode,
                         due_date, CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
                         'normal', note_format)
-            # register event in webstat
-            try:
-                register_customevent("loanrequest", [request_id, last_id])
-            except:
-                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             tag_all_requests_as_done(barcode, borrower_id)
 
@@ -795,10 +789,6 @@ def make_new_loan_from_request(req, check_id, barcode, ln=CFG_SITE_LANG):
         db.new_loan(borrower_id, recid, barcode, due_date,
                     CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, 'normal', '')
         infos.append(_('A new loan has been registered with success.'))
-        #try:
-        #    register_customevent("baskets", ["display", "", user_str])
-        #except:
-        #    register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
     tag_all_requests_as_done(barcode, borrower_id)
     db.update_item_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, barcode)

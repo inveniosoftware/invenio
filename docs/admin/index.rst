@@ -45,5 +45,4 @@ Admin's Guide
    webmessage-admin-guide
    websearch-admin-guide
    websession-admin-guide
-   webstat-admin-guide
    webstyle-admin-guide
