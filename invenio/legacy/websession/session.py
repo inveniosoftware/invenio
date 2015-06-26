@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-
+#
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -107,6 +108,8 @@ class InvenioSessionBase(dict):
     def __init__(self, req, sid=None):
         self._remember_me = False
         self._req, self._sid, self._secret = req, sid, None
+        from invenio.legacy.websession.websession_config import \
+            CFG_WEBSESSION_ENABLE_LOCKING
         self._lock = CFG_WEBSESSION_ENABLE_LOCKING
         self._new = 1
         self._locked = 0
@@ -494,7 +497,7 @@ class InvenioSessionMySQL(InvenioSessionBase):
             Session cleanup procedure which to be executed at the end
             of the request handling.
             """
-            run_sql("""DELETE LOW_PRIORITY FROM session
+            run_sql("""DELETE FROM session
                        WHERE session_expiry <= UTC_TIMESTAMP()""")
 
         self.cleanup_function = cb_session_cleanup
@@ -507,7 +510,7 @@ class InvenioSessionMySQL(InvenioSessionBase):
             return ret[0][0]
 
     def delete_from_storage(self, sid):
-        return run_sql("""DELETE LOW_PRIORITY FROM session
+        return run_sql("""DELETE FROM session
                           WHERE session_key=%s""", [sid])
 
     def save_in_storage(self, sid, session_object, timeout, uid):

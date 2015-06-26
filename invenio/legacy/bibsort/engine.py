@@ -51,8 +51,8 @@ def get_bibsort_methods_details(method_list = None):
     results = []
     if not method_list:
         try:
-            results = run_sql("SELECT id, name, definition, washer \
-                              FROM bsrMETHOD")
+            results = run_sql("""SELECT id, name, definition, washer
+                              FROM "bsrMETHOD" """)
         except Error as err:
             write_message("The error: [%s] occured while trying to read " \
                           "the bibsort data from the database." \
@@ -65,7 +65,7 @@ def get_bibsort_methods_details(method_list = None):
         for method in method_list:
             try:
                 res = run_sql("""SELECT id, name, definition, washer \
-                              FROM bsrMETHOD where name = %s""", (method, ))
+                              FROM "bsrMETHOD" where name = %s""", (method, ))
             except Error as err:
                 write_message("The error: [%s] occured while trying to get " \
                               "the bibsort data from the database for method %s." \
@@ -175,8 +175,8 @@ def get_data_for_definition_rnk(method_name, rnk_name):
     '''Returns the dictionary with data for method_name ranking method'''
     try:
         res = run_sql('SELECT d.relevance_data \
-                          from rnkMETHODDATA d, rnkMETHOD r WHERE \
-                          d.id_rnkMETHOD = r.id AND \
+                          from "rnkMETHODDATA" d, "rnkMETHOD" r WHERE \
+                          d."id_rnkMETHOD" = r.id AND \
                           r.name = %s', (rnk_name, ))
         if res and res[0]:
             write_message('Data extracted from table rnkMETHODDATA for sorting method %s' \
@@ -311,18 +311,18 @@ def write_to_methoddata_table(id_method, data_dict, data_dict_ordered, data_list
     date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
-            date = run_sql('SELECT last_updated from bsrMETHODDATA WHERE id_bsrMETHOD = %s', (id_method, ))[0][0]
+            date = run_sql('SELECT last_updated from "bsrMETHODDATA" WHERE "id_bsrMETHOD" = %s', (id_method, ))[0][0]
         except IndexError:
             pass # keep the generated date
     write_message("Starting writing the data for method_id=%s " \
                   "to the database (table bsrMETHODDATA)" %id_method, verbose=5)
     try:
         write_message('Deleting old data..', verbose=5)
-        run_sql("DELETE FROM bsrMETHODDATA WHERE id_bsrMETHOD = %s", (id_method, ))
+        run_sql("""DELETE FROM "bsrMETHODDATA" WHERE "id_bsrMETHOD" = %s""", (id_method, ))
         write_message('Inserting new data..', verbose=5)
-        run_sql("INSERT into bsrMETHODDATA \
-            (id_bsrMETHOD, data_dict, data_dict_ordered, data_list_sorted, last_updated) \
-            VALUES (%s, %s, %s, %s, %s)", \
+        run_sql("""INSERT into "bsrMETHODDATA"
+            ("id_bsrMETHOD", data_dict, data_dict_ordered, data_list_sorted, last_updated)
+            VALUES (%s, %s, %s, %s, %s)""", \
             (id_method, serialized_data_dict, serialized_data_dict_ordered, \
              serialized_data_list_sorted, date, ))
     except Error as err:
@@ -344,19 +344,19 @@ def write_to_buckets_table(id_method, bucket_no, bucket_data, bucket_last_value,
     date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if not update_timestamp:
         try:
-            date = run_sql('SELECT last_updated from bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s and bucket_no = %s', \
+            date = run_sql('SELECT last_updated from "bsrMETHODDATABUCKET" WHERE "id_bsrMETHOD" = %s and bucket_no = %s', \
                            (id_method, bucket_no))[0][0]
         except IndexError:
             pass # keep the generated date
     try:
         write_message('Deleting old data.', verbose=5)
-        run_sql("DELETE FROM bsrMETHODDATABUCKET \
-                WHERE id_bsrMETHOD = %s AND bucket_no = %s", \
+        run_sql("""DELETE FROM "bsrMETHODDATABUCKET"
+                WHERE "id_bsrMETHOD" = %s AND bucket_no = %s""", \
                 (id_method, bucket_no, ))
         write_message('Inserting new data.', verbose=5)
-        run_sql("INSERT into bsrMETHODDATABUCKET \
-            (id_bsrMETHOD, bucket_no, bucket_data, bucket_last_value, last_updated) \
-            VALUES (%s, %s, %s, %s, %s)", \
+        run_sql("""INSERT into "bsrMETHODDATABUCKET"
+            ("id_bsrMETHOD", bucket_no, bucket_data, bucket_last_value, last_updated)
+            VALUES (%s, %s, %s, %s, %s)""", \
             (id_method, bucket_no, serialized_bucket_data, bucket_last_value, date, ))
     except Error as err:
         write_message("The error [%s] occured when inserting new bibsort data " \
@@ -439,8 +439,9 @@ def get_modified_or_inserted_recs(method_list):
         return 0
 
     try:
-        query = "SELECT min(d.last_updated) from bsrMETHODDATA d, bsrMETHOD m \
-                WHERE m.name in (%s) AND d.id_bsrMETHOD = m.id" % \
+        query = """SELECT min(d.last_updated) from "bsrMETHODDATA" d,
+                                                   "bsrMETHOD" m
+                WHERE m.name in (%s) AND d."id_bsrMETHOD" = m.id""" % \
                 ("%s," * len(method_list))[:-1]
         last_updated = str(run_sql(query, tuple(method_list))[0][0])
     except Error as err:
@@ -476,8 +477,8 @@ def get_modified_non_rnk_methods(non_rnk_method_list):
     for method in non_rnk_method_list:
         try:
             dummy = str(run_sql('SELECT d.last_updated \
-                                       FROM bsrMETHODDATA d, bsrMETHOD m \
-                                       WHERE m.id = d.id_bsrMETHOD \
+                                       FROM "bsrMETHODDATA" d, "bsrMETHOD" m \
+                                       WHERE m.id = d."id_bsrMETHOD" \
                                        AND m.name=%s', (method, ))[0][0])
             updated_ranking_methods.append(method)
         except IndexError: #method is not in bsrMETHODDATA -> is new
@@ -494,7 +495,7 @@ def get_modified_rnk_methods(rnk_method_list, bibsort_methods):
         method_name = bibsort_methods[method]['definition'].replace('RNK:', '').strip()
         try:
             last_updated_rnk = str(run_sql('SELECT last_updated \
-                                           FROM rnkMETHOD \
+                                           FROM "rnkMETHOD" \
                                            WHERE name = %s', (method_name, ))[0][0])
         except IndexError:
             write_message("The method %s could not be found in rnkMETHOD" \
@@ -505,8 +506,8 @@ def get_modified_rnk_methods(rnk_method_list, bibsort_methods):
         if method not in deleted_ranking_methods:
             try:
                 last_updated_bsr = str(run_sql('SELECT d.last_updated \
-                                       FROM bsrMETHODDATA d, bsrMETHOD m \
-                                       WHERE m.id = d.id_bsrMETHOD \
+                                       FROM "bsrMETHODDATA" d, "bsrMETHOD" m \
+                                       WHERE m.id = d."id_bsrMETHOD" \
                                        AND m.name=%s', (method, ))[0][0])
                 if last_updated_rnk >= last_updated_bsr:
                     # rnk data has been updated after bibsort ran
@@ -528,8 +529,8 @@ def delete_bibsort_data_for_method(method_id):
     from bibsort tables (except bsrMETHOD).
     Returns False in case some error occured, True otherwise"""
     try:
-        run_sql("DELETE FROM bsrMETHODDATA WHERE id_bsrMETHOD = %s", (method_id, ))
-        run_sql("DELETE FROM bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s", (method_id, ))
+        run_sql("""DELETE FROM "bsrMETHODDATA" WHERE "id_bsrMETHOD" = %s""", (method_id, ))
+        run_sql("""DELETE FROM "bsrMETHODDATABUCKET" WHERE "id_bsrMETHOD" = %s""", (method_id, ))
     except:
         return False
     return True
@@ -540,11 +541,11 @@ def delete_all_data_for_method(method_id):
     Returns False in case some error occured, True otherwise"""
     method_name = 'method name'
     try:
-        run_sql("DELETE FROM bsrMETHODDATA WHERE id_bsrMETHOD = %s", (method_id, ))
-        run_sql("DELETE FROM bsrMETHODDATABUCKET WHERE id_bsrMETHOD = %s", (method_id, ))
-        run_sql("DELETE FROM bsrMETHODNAME WHERE id_bsrMETHOD = %s", (method_id, ))
-        run_sql("DELETE FROM bsrMETHOD WHERE id = %s", (method_id, ))
-        method_name = run_sql("SELECT name from bsrMETHOD WHERE id = %s", (method_id, ))[0][0]
+        run_sql("""DELETE FROM "bsrMETHODDATA" WHERE "id_bsrMETHOD" = %s""", (method_id, ))
+        run_sql("""DELETE FROM "bsrMETHODDATABUCKET" WHERE "id_bsrMETHOD" = %s""", (method_id, ))
+        run_sql("""DELETE FROM "bsrMETHODNAME" WHERE "id_bsrMETHOD" = %s""", (method_id, ))
+        run_sql("""DELETE FROM "bsrMETHOD" WHERE id = %s""", (method_id, ))
+        method_name = run_sql("""SELECT name from "bsrMETHOD" WHERE id = %s""", (method_id, ))[0][0]
     except Error:
         return False
     except IndexError:
@@ -557,8 +558,8 @@ def add_sorting_method(method_name, method_definition, method_treatment):
     """This method will add a new sorting method in the database
     and update the config file"""
     try:
-        run_sql("INSERT INTO bsrMETHOD(name, definition, washer) \
-            VALUES (%s, %s, %s)", (method_name, method_definition, method_treatment))
+        run_sql("""INSERT INTO "bsrMETHOD"(name, definition, washer)
+            VALUES (%s, %s, %s)""", (method_name, method_definition, method_treatment))
     except Error:
         return False
     return True
@@ -567,8 +568,8 @@ def update_bibsort_tables(recids, method, update_timestamp = True):
     """Updates the data structures for sorting method: method
     for the records in recids"""
 
-    res = run_sql("SELECT id, definition, washer \
-                  from bsrMETHOD where name = %s", (method, ))
+    res = run_sql("""SELECT id, definition, washer
+                  from "bsrMETHOD" where name = %s""", (method, ))
     if res and res[0]:
         method_id = res[0][0]
         definition = res[0][1]
@@ -577,8 +578,8 @@ def update_bibsort_tables(recids, method, update_timestamp = True):
         write_message('No sorting method called %s could be found ' \
                       'in bsrMETHOD table.' %method, sys.stderr)
         return False
-    res = run_sql("SELECT data_dict, data_dict_ordered, data_list_sorted \
-                  FROM bsrMETHODDATA where id_bsrMETHOD = %s", (method_id, ))
+    res = run_sql("""SELECT data_dict, data_dict_ordered, data_list_sorted
+                  FROM "bsrMETHODDATA" where "id_bsrMETHOD" = %s""", (method_id, ))
     if res and res[0]:
         data_dict = deserialize_via_marshal(res[0][0])
         data_dict_ordered = {}
@@ -663,9 +664,9 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
     bucket_insert = {}
     bucket_delete = {}
     write_message("Updating the buckets for method_id = %s" %method_id, verbose=5)
-    buckets = run_sql("SELECT bucket_no, bucket_last_value \
-                      FROM bsrMETHODDATABUCKET \
-                      WHERE id_bsrMETHOD = %s", (method_id, ))
+    buckets = run_sql("""SELECT bucket_no, bucket_last_value
+                      FROM "bsrMETHODDATABUCKET"
+                      WHERE "id_bsrMETHOD" = %s""", (method_id, ))
     if not buckets:
         write_message("No bucket data found for method_id %s." \
                       %method_id, sys.stderr)
@@ -704,8 +705,8 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
 
     for bucket_no in buckets_dict:
         if (bucket_no in bucket_insert) or (bucket_no in bucket_delete):
-            res = run_sql("SELECT bucket_data FROM bsrMETHODDATABUCKET \
-                          where id_bsrMETHOD = %s AND bucket_no = %s", \
+            res = run_sql("""SELECT bucket_data FROM "bsrMETHODDATABUCKET"
+                          where "id_bsrMETHOD" = %s AND bucket_no = %s""", \
                           (method_id, bucket_no, ))
             bucket_data = intbitset(res[0][0])
             for recid in bucket_insert.get(bucket_no, []):
@@ -715,14 +716,14 @@ def perform_update_buckets(recids_current_ordered, recids_to_insert, recids_old_
                     bucket_data.remove(recid)
             if update_timestamp:
                 date = strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                run_sql("UPDATE bsrMETHODDATABUCKET \
-                    SET bucket_data = %s, last_updated = %s \
-                    WHERE id_bsrMETHOD = %s AND bucket_no = %s", \
+                run_sql("""UPDATE "bsrMETHODDATABUCKET"
+                    SET bucket_data = %s, last_updated = %s
+                    WHERE "id_bsrMETHOD" = %s AND bucket_no = %s""", \
                     (bucket_data.fastdump(), date, method_id, bucket_no, ))
             else:
-                run_sql("UPDATE bsrMETHODDATABUCKET \
-                    SET bucket_data = %s \
-                    WHERE id_bsrMETHOD = %s AND bucket_no = %s", \
+                run_sql("""UPDATE "bsrMETHODDATABUCKET"
+                    SET bucket_data = %s
+                    WHERE "id_bsrMETHOD" = %s AND bucket_no = %s""", \
                     (bucket_data.fastdump(), method_id, bucket_no, ))
             write_message("Updating bucket %s for method %s." %(bucket_no, method_id), verbose=5)
 

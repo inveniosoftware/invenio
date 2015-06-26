@@ -1,5 +1,5 @@
 # $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
-
+#
 # This file is part of Invenio.
 # Copyright (C) 2010, 2011, 2012, 2013, 2014, 2015 CERN.
 #
@@ -1942,7 +1942,7 @@ def move_uploaded_files_to_storage(working_dir, recid, icon_sizes,
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
-    run_sql("DELETE LOW_PRIORITY from bibfmt WHERE format='HB' AND id_bibrec=%s", (recid,))
+    run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (recid,))
 
     # Update the MARC
     cli_fix_marc(None, [recid], interactive=False)

@@ -70,7 +70,8 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
     """Clean revisions of the given recid, by removing duplicate revisions
     that do not change the content of the record."""
     if recid == '*':
-        recids = intbitset(run_sql("SELECT DISTINCT id_bibrec FROM hstRECORD"))
+        recids = intbitset(run_sql(
+            """SELECT DISTINCT id_bibrec FROM "hstRECORD" """))
     else:
         try:
             recids = [int(recid)]
@@ -78,19 +79,19 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
             print('ERROR: record ID must be integer, not %s.' % recid)
             sys.exit(1)
     for recid in recids:
-        all_revisions = run_sql("SELECT marcxml, job_id, job_name, job_person, job_date FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date ASC", (recid,))
+        all_revisions = run_sql("""SELECT marcxml, job_id, job_name, job_person, job_date FROM "hstRECORD" WHERE id_bibrec=%s ORDER BY job_date ASC""", (recid,))
         previous_rec = {}
         deleted_revisions = 0
         for marcxml, job_id, job_name, job_person, job_date in all_revisions:
             try:
-                current_rec = create_record(zlib.decompress(marcxml))[0]
+                current_rec = create_record(zlib.decompress(str(marcxml)))[0]
             except Exception:
                 print("ERROR: corrupted revisions found. Please run %s --fix-revisions '*'" % sys.argv[0], file=sys.stderr)
                 sys.exit(1)
             if records_identical(current_rec, previous_rec):
                 deleted_revisions += 1
                 if not dry_run:
-                    run_sql("DELETE FROM hstRECORD WHERE id_bibrec=%s AND job_id=%s AND job_name=%s AND job_person=%s AND job_date=%s", (recid, job_id, job_name, job_person, job_date))
+                    run_sql("""DELETE FROM "hstRECORD" WHERE id_bibrec=%s AND job_id=%s AND job_name=%s AND job_person=%s AND job_date=%s""", (recid, job_id, job_name, job_person, job_date))
             previous_rec = current_rec
         if verbose and deleted_revisions:
             print("record %s: deleted %s duplicate revisions out of %s" % (recid, deleted_revisions, len(all_revisions)))
@@ -194,7 +195,7 @@ def check_rev(recid, verbose=True, fix=False):
 
 
 def fix_rev(recid, job_date, verbose=True):
-    sql = """DELETE FROM hstRECORD WHERE id_bibrec = %s AND job_date = '%s' """
+    sql = """DELETE FROM "hstRECORD" WHERE id_bibrec = %s AND job_date = '%s' """
     run_sql(sql, (recid, job_date))
 
 

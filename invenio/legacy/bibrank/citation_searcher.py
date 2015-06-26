@@ -115,21 +115,21 @@ def get_citation_dict(dictname):
 
 def get_refers_to(recordid):
     """Return a list of records referenced by this record"""
-    rows = run_sql("SELECT citee FROM rnkCITATIONDICT WHERE citer = %s",
+    rows = run_sql("""SELECT citee FROM "rnkCITATIONDICT" WHERE citer = %s""",
                    [recordid])
     return set(r[0] for r in rows)
 
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
-    rows = run_sql("SELECT citer FROM rnkCITATIONDICT WHERE citee = %s",
+    rows = run_sql("""SELECT citer FROM "rnkCITATIONDICT" WHERE citee = %s""",
                    [recordid])
     return set(r[0] for r in rows)
 
 
 def get_cited_by_count(recordid):
     """Return how many records cite given RECORDID."""
-    rows = run_sql("SELECT 1 FROM rnkCITATIONDICT WHERE citee = %s",
+    rows = run_sql("""SELECT 1 FROM "rnkCITATIONDICT" WHERE citee = %s""",
                    [recordid])
     return len(rows)
 
@@ -211,7 +211,7 @@ def get_cited_by_list(recids, record_limit=None):
         limited_recids = recids
 
     in_sql = ','.join('%s' for dummy in limited_recids)
-    rows = run_sql("""SELECT citer, citee FROM rnkCITATIONDICT
+    rows = run_sql("""SELECT citer, citee FROM "rnkCITATIONDICT"
                        WHERE citee IN (%s)""" % in_sql, limited_recids)
 
     cites = {}
@@ -239,7 +239,7 @@ def get_refers_to_list(recids, record_limit=None):
         limited_recids = recids
 
     in_sql = ','.join('%s' for dummy in limited_recids)
-    rows = run_sql("""SELECT citee, citer FROM rnkCITATIONDICT
+    rows = run_sql("""SELECT citee, citer FROM "rnkCITATIONDICT"
                        WHERE citer IN (%s)""" % in_sql, limited_recids)
 
     refs = {}
@@ -274,7 +274,7 @@ def get_refersto_hitset(ahitset, record_limit=None):
                 limited_ahitset = ahitset
 
             in_sql = ','.join('%s' for dummy in limited_ahitset)
-            rows = run_sql("""SELECT citer FROM rnkCITATIONDICT
+            rows = run_sql("""SELECT citer FROM "rnkCITATIONDICT"
                               WHERE citee IN (%s)""" % in_sql, limited_ahitset)
             out = intbitset(rows)
     return out
@@ -325,7 +325,7 @@ def get_citedby_hitset(ahitset, record_limit=None):
                 limited_ahitset = ahitset
 
             in_sql = ','.join('%s' for dummy in limited_ahitset)
-            rows = run_sql("""SELECT citee FROM rnkCITATIONDICT
+            rows = run_sql("""SELECT citee FROM "rnkCITATIONDICT"
                               WHERE citer IN (%s)""" % in_sql, limited_ahitset)
             out = intbitset(rows)
     return out
@@ -375,6 +375,6 @@ def calculate_co_cited_with_list(record_id, sort_order="d"):
 
 def get_citers_log(recid):
     return run_sql("""SELECT citer, type, action_date
-                      FROM rnkCITATIONLOG
+                      FROM "rnkCITATIONLOG"
                       WHERE citee = %s
                       ORDER BY action_date DESC""", [recid])

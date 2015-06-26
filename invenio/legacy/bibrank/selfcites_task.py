@@ -52,7 +52,7 @@ from invenio.legacy.bibsched.bibtask import \
     task_get_option, write_message, \
     task_sleep_now_if_required, \
     task_update_progress
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, truncate_table
 from invenio.legacy.bibrank.selfcites_indexer import \
     compute_friends_self_citations, \
     compute_simple_self_citations, \
@@ -81,8 +81,8 @@ def compute_and_store_self_citations(recid, tags, citations_fun, selfcites_dic,
     references = get_refers_to(recid)
     recids_to_check = set([recid]) | set(references)
     placeholders = ','.join('%s' for r in recids_to_check)
-    rec_row = run_sql("SELECT MAX(`modification_date`) FROM `bibrec`"
-                      " WHERE `id` IN (%s)" % placeholders, recids_to_check)
+    rec_row = run_sql("""SELECT MAX("modification_date") FROM "bibrec" """
+                      """ WHERE "id" IN (%s)""" % placeholders, recids_to_check)
 
     try:
         rec_timestamp = rec_row[0]
@@ -90,9 +90,9 @@ def compute_and_store_self_citations(recid, tags, citations_fun, selfcites_dic,
         write_message("record not found")
         return
 
-    cached_citations_row = run_sql("SELECT `count` FROM `rnkSELFCITES`"
-               " WHERE `last_updated` >= %s"
-               " AND `id_bibrec` = %s", (rec_timestamp[0], recid))
+    cached_citations_row = run_sql("""SELECT "count" FROM "rnkSELFCITES" """
+               """ WHERE "last_updated" >= %s"""
+               """ AND "id_bibrec" = %s""", (rec_timestamp[0], recid))
     if cached_citations_row and cached_citations_row[0][0]:
         if verbose:
             write_message("%s found (cached)" % cached_citations_row[0])
@@ -100,8 +100,8 @@ def compute_and_store_self_citations(recid, tags, citations_fun, selfcites_dic,
         cites = citations_fun(recid, tags)
         selfcites_dic[recid] = len(cites)
         replace_cites(recid, cites)
-        sql = """REPLACE INTO rnkSELFCITES (`id_bibrec`, `count`, `references`,
-                 `last_updated`) VALUES (%s, %s, %s, NOW())"""
+        sql = """REPLACE INTO "rnkSELFCITES" ("id_bibrec", "count", "references",
+                 "last_updated") VALUES (%s, %s, %s, NOW())"""
         references_string = ','.join(str(r) for r in references)
         run_sql(sql, (recid, len(cites), references_string))
         if verbose:
@@ -116,7 +116,7 @@ def replace_cites(recid, new_cites):
     * removes the old ones from the database
     """
     old_cites = set(row[0] for row in run_sql("""SELECT citer
-                                                  FROM rnkSELFCITEDICT
+                                                  FROM "rnkSELFCITEDICT"
                                                   WHERE citee = %s""", [recid]))
 
     cites_to_add = new_cites - old_cites
@@ -125,12 +125,12 @@ def replace_cites(recid, new_cites):
     for cit in cites_to_add:
         write_message('adding cite %s %s' % (recid, cit), verbose=1)
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        run_sql("""INSERT INTO rnkSELFCITEDICT (citee, citer, last_updated)
+        run_sql("""INSERT INTO "rnkSELFCITEDICT" (citee, citer, last_updated)
                    VALUES (%s, %s, %s)""", (recid, cit, now))
 
     for cit in cites_to_delete:
         write_message('deleting cite %s %s' % (recid, cit), verbose=1)
-        run_sql("""DELETE FROM rnkSELFCITEDICT
+        run_sql("""DELETE FROM "rnkSELFCITEDICT"
                    WHERE citee = %s and citer = %s""", (recid, cit))
 
 
@@ -155,9 +155,9 @@ def fetch_index_update():
 def fetch_records(start_date, end_date):
     """Filter records not indexed out of recids
     """
-    sql = """SELECT `id` FROM `bibrec`
-             WHERE `modification_date` <= %s
-             AND `modification_date` > %s"""
+    sql = """SELECT "id" FROM "bibrec"
+             WHERE "modification_date" <= %s
+             AND "modification_date" > %s"""
     records = run_sql(sql, (end_date, start_date))
     return intbitset(records)
 
@@ -178,7 +178,7 @@ def fetch_concerned_records(name, ids_param):
 
 def store_last_updated(name, date):
     """Updates method last run date"""
-    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, name))
+    run_sql("""UPDATE "rnkMETHOD" SET last_updated=%s WHERE name=%s""", (date, name))
 
 
 def read_configuration(rank_method_code):
@@ -263,9 +263,9 @@ def empty_self_cites_tables():
     The purpose is to rebuild the tables from scratch in case there is problem
     with them: inconsitencies, corruption,...
     """
-    run_sql('TRUNCATE rnkSELFCITES')
-    run_sql('TRUNCATE rnkEXTENDEDAUTHORS')
-    run_sql('TRUNCATE rnkRECORDSCACHE')
+    truncate_table("rnkSELFCITES")
+    truncate_table("rnkEXTENDEDAUTHORS")
+    truncate_table("rnkRECORDSCACHE")
 
 
 def fill_self_cites_tables(rank_method_code, config):

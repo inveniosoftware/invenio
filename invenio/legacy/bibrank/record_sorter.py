@@ -45,6 +45,7 @@ from invenio.legacy.bibrank.word_searcher import find_similar
 # Do not remove these lines
 # it is necessary for func_object = globals().get(function)
 from invenio.legacy.bibrank.word_searcher import word_similarity
+from invenio.legacy.bibrank.citation_searcher import get_citation_dict
 from invenio.legacy.miscutil.solrutils_bibrank_searcher import word_similarity_solr
 from invenio.legacy.miscutil.xapianutils_bibrank_searcher import word_similarity_xapian
 from invenio.modules.ranker.registry import configuration
@@ -106,7 +107,7 @@ def create_external_ranking_option(section, option, dictionary, config):
 def create_rnkmethod_cache():
     """Create cache with vital information for each rank method."""
 
-    bibrank_meths = run_sql("SELECT name from rnkMETHOD")
+    bibrank_meths = run_sql("""SELECT name from "rnkMETHOD" """)
 
     for (rank_method_code,) in bibrank_meths:
         filepath = configuration.get(rank_method_code + '.cfg', '')
@@ -124,15 +125,15 @@ def create_rnkmethod_cache():
             METHODS[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
             METHODS[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
         else:
-            raise Exception("Error in configuration config_file: %s" % (config_file + ".cfg", ))
+            raise Exception("Error in configuration config_file: %s" % (filepath, ))
 
-        i8n_names = run_sql("""SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s""", (rank_method_code,))
+        i8n_names = run_sql("""SELECT ln,value from "rnkMETHODNAME","rnkMETHOD" where "id_rnkMETHOD"="rnkMETHOD".id and "rnkMETHOD".name=%s""", (rank_method_code,))
         for (ln, value) in i8n_names:
             METHODS[rank_method_code][ln] = value
 
         if config.has_option(cfg_function, "table"):
             METHODS[rank_method_code]["rnkWORD_table"] = config.get(cfg_function, "table")
-            query = "SELECT count(*) FROM %sR" % wash_table_column_name(METHODS[rank_method_code]["rnkWORD_table"][:-1])
+            query = """SELECT count(*) FROM "%sR" """ % wash_table_column_name(METHODS[rank_method_code]["rnkWORD_table"][:-1])
             METHODS[rank_method_code]["col_size"] = run_sql(query)[0][0]
 
         if config.has_option(cfg_function, "stemming") and config.get(cfg_function, "stemming"):
@@ -170,9 +171,9 @@ def is_method_valid(colID, rank_method_code):
     """
 
     if colID is None:
-        return run_sql("SELECT COUNT(*) FROM rnkMETHOD WHERE name=%s", (rank_method_code,))[0][0]
+        return run_sql("""SELECT COUNT(*) FROM "rnkMETHOD" WHERE name=%s""", (rank_method_code,))[0][0]
 
-    enabled_colls = dict(run_sql("SELECT id_collection, score from collection_rnkMETHOD,rnkMETHOD WHERE id_rnkMETHOD=rnkMETHOD.id AND name=%s", (rank_method_code,)))
+    enabled_colls = dict(run_sql("""SELECT id_collection, score from "collection_rnkMETHOD","rnkMETHOD" WHERE "id_rnkMETHOD"="rnkMETHOD".id AND name=%s""", (rank_method_code,)))
 
     try:
         colID = int(colID)
@@ -373,7 +374,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance, verbo
     voutput - contains extra information, content dependent on verbose value"""
 
     voutput = ""
-    rnkdict = run_sql("SELECT relevance_data FROM rnkMETHODDATA,rnkMETHOD where rnkMETHOD.id=id_rnkMETHOD and rnkMETHOD.name=%s", (rank_method_code,))
+    rnkdict = run_sql("""SELECT relevance_data FROM "rnkMETHODDATA","rnkMETHOD" where "rnkMETHOD".id="id_rnkMETHOD" and "rnkMETHOD".name=%s""", (rank_method_code,))
 
     if not rnkdict:
         return (None, "Warning: Could not load ranking data for method %s." % rank_method_code, "", voutput)

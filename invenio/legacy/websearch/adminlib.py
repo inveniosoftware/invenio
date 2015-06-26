@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -2403,7 +2404,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     actions = []
     output += """<br /><b>Last BibSched tasks:</b><br />"""
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='webcoll' and runtime< now() ORDER by runtime""")
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
         webcoll__update_time = runtime
@@ -2411,7 +2412,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     else:
         actions.append(['', 'webcoll', '', '', 'Not executed yet'])
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime< now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='bibindex' and runtime< now() ORDER by runtime""")
 
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
@@ -2423,7 +2424,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     output += """<br /><b>Next scheduled BibSched run:</b><br />"""
     actions = []
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime > now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='webcoll' and runtime > now() ORDER by runtime""")
 
     webcoll_future = ""
     if len(res) > 0:
@@ -2434,7 +2435,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     else:
         actions.append(['', 'webcoll', '', '', 'Not scheduled'])
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime > now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='bibindex' and runtime > now() ORDER by runtime""")
 
     bibindex_future = ""
     if len(res) > 0:
@@ -2813,7 +2814,7 @@ def get_col_rnk(colID, ln):
     colID - id from collection"""
 
     try:
-        res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, )))
+        res1 = dict(run_sql("""SELECT "id_rnkMETHOD", '' FROM "collection_rnkMETHOD" WHERE id_collection=%s""", (colID, )))
         res2 = get_def_name('', "rnkMETHOD")
         result = filter(lambda x: x[0] in res1, res2)
         return result
@@ -2946,7 +2947,7 @@ def attach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)", (colID, rnkID))
+        res = run_sql("""INSERT INTO "collection_rnkMETHOD"(id_collection, "id_rnkMETHOD") values (%s,%s)""", (colID, rnkID))
         return (1, "")
     except StandardError as e:
         register_exception()
@@ -2958,7 +2959,7 @@ def detach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s", (colID, rnkID))
+        res = run_sql("""DELETE FROM "collection_rnkMETHOD" WHERE id_collection=%s AND "id_rnkMETHOD"=%s""", (colID, rnkID))
         return (1, "")
     except StandardError as e:
         register_exception()
@@ -3086,7 +3087,7 @@ def delete_col(colID):
     try:
         res = run_sql("DELETE FROM collection WHERE id=%s", (colID, ))
         res = run_sql("DELETE FROM collectionname WHERE id_collection=%s", (colID, ))
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, ))
+        res = run_sql("""DELETE FROM "collection_rnkMETHOD" WHERE id_collection=%s""", (colID, ))
         res = run_sql("DELETE FROM collection_collection WHERE id_dad=%s", (colID, ))
         res = run_sql("DELETE FROM collection_collection WHERE id_son=%s", (colID, ))
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s", (colID, ))

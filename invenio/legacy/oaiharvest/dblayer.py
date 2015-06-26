@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -231,7 +231,7 @@ def get_entry_logs_size(oai_src_id):
 
 
 def delete_holdingpen_entry(hpupdate_id):
-    query = "DELETE FROM bibHOLDINGPEN WHERE changeset_id=%s"
+    query = """DELETE FROM "bibHOLDINGPEN" WHERE changeset_id=%s"""
     run_sql(query, (hpupdate_id, ))
 
 
@@ -242,7 +242,10 @@ def get_holdingpen_day_fragment(year, month, day, limit, start, filter_key):
     filtersql = ""
     if filter_key != "":
         filtersql = " and oai_id like '%%%s%%' " % (filter_key, )
-    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date > '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (
+    query = """SELECT oai_id, changeset_date, changeset_id FROM "bibHOLDINGPEN"
+               WHERE changeset_date > '%i-%i-%i 00:00:00' and
+                     changeset_date <= '%i-%i-%i 23:59:59' %s
+                     ORDER BY changeset_date LIMIT %i, %i""" % (
         year, month, day, year, month, day, filtersql, start, limit)
     query_results = run_sql(query)
     return query_results
@@ -255,7 +258,10 @@ def get_holdingpen_day_size(year, month, day, filter_key):
     filtersql = ""
     if filter_key != "":
         filtersql = " and oai_id like '%%%s%%' " % (filter_key, )
-    query = "SELECT count(*) FROM bibHOLDINGPEN WHERE year(changeset_date) = '%i' and month(changeset_date) = '%i' and day(changeset_date) = '%i' %s" % (
+    query = """SELECT count(*) FROM "bibHOLDINGPEN"
+               WHERE year(changeset_date) = '%i' and
+                     month(changeset_date) = '%i' and
+                     day(changeset_date) = '%i' %s""" % (
         year, month, day, filtersql)
     query_results = run_sql(query)
     return int(query_results[0][0])
@@ -269,7 +275,11 @@ def get_holdingpen_month(year, month, filter_key):
     if filter_key != "":
         filtersql = " and oai_id like '%%%s%%' " % (filter_key, )
 
-    query = "select day(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' and month(changeset_date) = '%i' %s group by day(changeset_date)" % (
+    query = """select day(changeset_date), count(*)
+               from "bibHOLDINGPEN"
+               where year(changeset_date) = '%i' and
+                     month(changeset_date) = '%i' %s
+               group by day(changeset_date)""" % (
         year, month, filtersql)
     return run_sql(query)
 
@@ -281,7 +291,10 @@ def get_holdingpen_year(year, filter_key):
     filterSql = ""
     if filter_key != "":
         filterSql = " and oai_id like '%%%s%%' " % (filter_key, )
-    query = "select month(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' %s group by month(changeset_date)" % (
+    query = """select month(changeset_date), count(*)
+               from "bibHOLDINGPEN"
+               where year(changeset_date) = '%i' %s
+               group by month(changeset_date)""" % (
         year, filterSql)
     return run_sql(query)
 
@@ -293,7 +306,7 @@ def get_holdingpen_years(filter_key):
     filtersql = ""
     if filter_key != "":
         filtersql = " where oai_id like '%%%s%%' " % (filter_key, )
-    query = "select year(changeset_date), count(*) changeset_date from bibHOLDINGPEN %s group by year(changeset_date)" % (
+    query = """select year(changeset_date), count(*) changeset_date from "bibHOLDINGPEN" %s group by year(changeset_date)""" % (
         filtersql,)
     results = run_sql(query)
     return results
@@ -304,7 +317,7 @@ def get_holdingpen_entry_details(hpupdate_id):
     Returning the detials of the Holding Pen entry, the result of this function is a tuple:
     (oai_id, record_id,  date_inserted, content)
     """
-    query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
+    query = """SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM "bibHOLDINGPEN" WHERE changeset_id=%s"""
     return run_sql(query, (hpupdate_id,))[0]
 
 

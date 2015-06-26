@@ -201,7 +201,7 @@ def single_tag_rank(config):
 
 def get_lastupdated(rank_method_code):
     """Get the last time the rank method was updated"""
-    res = run_sql("SELECT rnkMETHOD.last_updated FROM rnkMETHOD WHERE name=%s", (rank_method_code, ))
+    res = run_sql("""SELECT "rnkMETHOD".last_updated FROM "rnkMETHOD" WHERE name=%s""", (rank_method_code, ))
     if res:
         return res[0][0]
     else:
@@ -209,18 +209,18 @@ def get_lastupdated(rank_method_code):
 
 def intoDB(dic, date, rank_method_code):
     """Insert the rank method data into the database"""
-    mid = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
+    mid = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", (rank_method_code, ))
     del_rank_method_codeDATA(rank_method_code)
     serdata = serialize_via_marshal(dic)
     midstr = str(mid[0][0])
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
+    run_sql("""INSERT INTO "rnkMETHODDATA"("id_rnkMETHOD", relevance_data) VALUES (%s,%s)""", (midstr, serdata,))
     if date:
-        run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
+        run_sql("""UPDATE "rnkMETHOD" SET last_updated=%s WHERE name=%s""", (date, rank_method_code))
 
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    id = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", (rank_method_code, ))
+    res = run_sql("""SELECT relevance_data FROM "rnkMETHODDATA" WHERE "id_rnkMETHOD"=%s""", (id[0][0], ))
     if res:
         return deserialize_via_marshal(res[0][0])
     else:
@@ -228,13 +228,13 @@ def fromDB(rank_method_code):
 
 def del_rank_method_codeDATA(rank_method_code):
     """Delete the data for a rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    id = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", (rank_method_code, ))
+    run_sql("""DELETE FROM "rnkMETHODDATA" WHERE "id_rnkMETHOD"=%s""", (id[0][0], ))
 
 def del_recids(rank_method_code, range_rec):
     """Delete some records from the rank method"""
-    id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    id = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", (rank_method_code, ))
+    res = run_sql("""SELECT relevance_data FROM "rnkMETHODDATA" WHERE "id_rnkMETHOD"=%s""", (id[0][0], ))
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
         write_message("Old size: %s" % len(rec_dict))
@@ -387,7 +387,7 @@ def get_valid_range(rank_method_code):
     """Return a range of records"""
     write_message("Getting records from collections enabled for rank method.", verbose=9)
 
-    res = run_sql("SELECT collection.name FROM collection, collection_rnkMETHOD, rnkMETHOD WHERE collection.id=id_collection and id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s",  (rank_method_code, ))
+    res = run_sql("""SELECT collection.name FROM collection, "collection_rnkMETHOD", "rnkMETHOD" WHERE collection.id=id_collection and "id_rnkMETHOD"="rnkMETHOD".id and "rnkMETHOD".name=%s""",  (rank_method_code, ))
     l_of_colls = []
     for coll in res:
         l_of_colls.append(coll[0])
@@ -428,12 +428,12 @@ def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
-        rnkid = run_sql("SELECT id FROM rnkMETHOD where name=%s", (rank_method_code, ))
+        rnkid = run_sql("""SELECT id FROM "rnkMETHOD" where name=%s""", (rank_method_code, ))
         if rnkid:
             rnkid = str(rnkid[0][0])
-            res = run_sql("SELECT value FROM rnkMETHODNAME where type=%s and ln=%s and id_rnkMETHOD=%s", (type, ln, rnkid))
+            res = run_sql("""SELECT value FROM "rnkMETHODNAME" where type=%s and ln=%s and "id_rnkMETHOD"=%s""", (type, ln, rnkid))
             if not res:
-                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (CFG_SITE_LANG, rnkid, type))
+                res = run_sql("""SELECT value FROM "rnkMETHODNAME" WHERE ln=%s and "id_rnkMETHOD"=%s and type=%s""", (CFG_SITE_LANG, rnkid, type))
             if not res:
                 return rank_method_code
             return res[0][0]

@@ -57,7 +57,7 @@ import pkg_resources
 import time
 import ConfigParser
 from invenio.utils.date import strftime
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, truncate_table
 from invenio.base.globals import cfg
 from invenio.config import CFG_ETCDIR
 from invenio.legacy.bibsort.engine import run_bibsort_update, \
@@ -94,11 +94,11 @@ def load_configuration():
             return False
         to_insert.append((name, definition, washer))
     # all the values were correctly read from the config file
-    run_sql("TRUNCATE TABLE bsrMETHOD")
+    truncate_table("bsrMETHOD")
     write_message('Old data has been deleted from bsrMETHOD table', verbose=5)
     for row in to_insert:
-        run_sql("INSERT INTO bsrMETHOD(name, definition, washer) \
-                VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
+        run_sql("""INSERT INTO "bsrMETHOD"(name, definition, washer)
+                VALUES (%s, %s, %s)""", (row[0], row[1], row[2]))
         write_message('Method %s has been inserted into bsrMETHOD table' \
                       %row[0], verbose=5)
     return True
@@ -107,7 +107,8 @@ def load_configuration():
 def dump_configuration():
     """Creates a dump of the data existing in the bibsort tables"""
     try:
-        results = run_sql("SELECT id, name, definition, washer FROM bsrMETHOD")
+        results = run_sql("""SELECT id, name, definition, washer
+                          FROM "bsrMETHOD" """)
     except Error as err:
         write_message("The error: [%s] occured while trying to get \
                       the bibsort data from the database." %err, sys.stderr)
@@ -178,7 +179,7 @@ def rebalance(methods):
 def print_sorting_methods():
     """Outputs the available sorting methods from the DB"""
     try:
-        results = run_sql("SELECT name FROM bsrMETHOD")
+        results = run_sql("""SELECT name FROM "bsrMETHOD" """)
     except Error as err:
         write_message("The error: [%s] occured while trying to \
               get the bibsort data from the database." %err)

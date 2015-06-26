@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -82,10 +82,13 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         if requestor:
             requestorset = " requestor: %s\n" % requestor
         if owner:
-            ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
-            if "bibcatalog_username" in ownerprefs:
-                owner = ownerprefs["bibcatalog_username"]
-            ownerset = " owner: %s\n" % owner
+            from invenio.modules.accounts.models import User
+            user = User.query.filter_by(nickname=owner).first()
+            if user:
+                ownerprefs = invenio.legacy.webuser.get_user_preferences(user.id)
+                if "bibcatalog_username" in ownerprefs:
+                    owner = ownerprefs["bibcatalog_username"]
+                ownerset = " owner: %s\n" % owner
 
         textset += ownerset + requestorset + recidset + queueset + priorityset + '\n'
 

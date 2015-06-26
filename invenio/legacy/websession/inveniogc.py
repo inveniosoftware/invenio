@@ -281,7 +281,7 @@ def clean_sessions():
         timelimit = convert_datestruct_to_datetext(time.gmtime())
         write_message("Deleting expired sessions since %s" % (timelimit,))
 
-        query = "DELETE LOW_PRIORITY FROM session WHERE session_expiry < %s"
+        query = "DELETE FROM session WHERE session_expiry < %s"
         write_message(query % (timelimit,), verbose=9)
         deleted_sessions += run_sql(query, (timelimit,))
 
@@ -291,7 +291,7 @@ def clean_bibedit_cache():
     """Deletes experied bibedit cache entries"""
     datecut = datetime.datetime.now() - datetime.timedelta(days=CFG_MAX_ATIME_BIBEDIT_TMP)
     datecut_str = datecut.strftime("%Y-%m-%d %H:%M:%S")
-    run_sql("DELETE FROM bibEDITCACHE WHERE post_date < %s", [datecut_str])
+    run_sql("""DELETE FROM "bibEDITCACHE" WHERE post_date < %s""", [datecut_str])
 
 def guest_user_garbage_collector():
     """Session Garbage Collector
@@ -341,10 +341,10 @@ def guest_user_garbage_collector():
     write_message("- deleting guest users without session")
 
     # get uids
-    write_message("""  SELECT u.id\n  FROM user AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""", verbose=9)
+    write_message("""  SELECT u.id\n  FROM "user" AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""", verbose=9)
 
     result = run_sql("""SELECT u.id
-    FROM user AS u LEFT JOIN session AS s
+    FROM "user" AS u LEFT JOIN session AS s
     ON u.id = s.uid
     WHERE s.uid IS NULL AND u.email = ''""")
     write_message(result, verbose=9)
@@ -359,10 +359,10 @@ def guest_user_garbage_collector():
                 uidstr += "%s" % (id_user,)
 
             # delete users
-            write_message("  DELETE FROM user WHERE"
+            write_message("""  DELETE FROM "user" WHERE"""
                 " id IN (TRAVERSE LAST RESULT) AND email = '' \n", verbose=9)
-            delcount['user'] += run_sql("DELETE FROM user WHERE"
-                " id IN (%s) AND email = ''" % (uidstr,))
+            delcount['user'] += run_sql("""DELETE FROM "user" WHERE
+                id IN (%s) AND email = '' """ % (uidstr,))
 
 
     # 2 - DELETE QUERIES NOT ATTACHED TO ANY USER
@@ -375,7 +375,7 @@ def guest_user_garbage_collector():
 
     users_with_queries = intbitset(run_sql("""SELECT DISTINCT id_user
                                               FROM user_query"""))
-    existing_users = intbitset(run_sql("SELECT id FROM user"))
+    existing_users = intbitset(run_sql("""SELECT id FROM "user" """))
     users_with_queries_to_be_deleted = users_with_queries - existing_users
     write_message("  Users with queries: %s" % len(users_with_queries),
                   verbose=9)
@@ -413,10 +413,10 @@ def guest_user_garbage_collector():
     write_message("- deleting baskets not owned by any user")
 
     # select basket ids
-    write_message(""" SELECT ub.id_bskBASKET\n  FROM user_bskBASKET AS ub LEFT JOIN user AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""", verbose=9)
+    write_message(""" SELECT ub."id_bskBASKET"\n  FROM "user_bskBASKET" AS ub LEFT JOIN "user" AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""", verbose=9)
     try:
-        result = run_sql("""SELECT ub.id_bskBASKET
-                              FROM user_bskBASKET AS ub LEFT JOIN user AS u
+        result = run_sql("""SELECT ub."id_bskBASKET"
+                              FROM "user_bskBASKET" AS ub LEFT JOIN "user" AS u
                                 ON u.id = ub.id_user
                              WHERE u.id IS NULL""")
     except:
@@ -424,20 +424,24 @@ def guest_user_garbage_collector():
     write_message(result, verbose=9)
 
     # delete from user_basket and basket one by one
-    write_message("""  DELETE FROM user_bskBASKET WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskBASKET WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskREC WHERE id_bskBASKET = 'TRAVERSE LAST RESULT'""", verbose=9)
-    write_message("""  DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' \n""", verbose=9)
+    write_message("""  DELETE FROM "user_bskBASKET" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT' """, verbose=9)
+    write_message("""  DELETE FROM "bskBASKET" WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
+    write_message("""  DELETE FROM "bskREC" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT'""", verbose=9)
+    write_message("""  DELETE FROM "bskRECORDCOMMENT" WHERE "id_bskBASKET" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket,) in result:
-        delcount['user_bskBASKET'] += run_sql("""DELETE FROM user_bskBASKET WHERE id_bskBASKET = %s""", (id_basket,))
-        delcount['bskBASKET'] += run_sql("""DELETE FROM bskBASKET WHERE id = %s""", (id_basket,))
-        delcount['bskREC'] += run_sql("""DELETE FROM bskREC WHERE id_bskBASKET = %s""", (id_basket,))
-        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = %s""", (id_basket,))
-    write_message(""" SELECT DISTINCT ext.id, rec.id_bibrec_or_bskEXTREC FROM bskEXTREC AS ext \nLEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC WHERE id_bibrec_or_bskEXTREC is NULL""", verbose=9)
+        delcount['user_bskBASKET'] += run_sql("""DELETE FROM "user_bskBASKET" WHERE "id_bskBASKET" = %s""", (id_basket,))
+        delcount['bskBASKET'] += run_sql("""DELETE FROM "bskBASKET" WHERE id = %s""", (id_basket,))
+        delcount['bskREC'] += run_sql("""DELETE FROM "bskREC" WHERE "id_bskBASKET" = %s""", (id_basket,))
+        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM "bskRECORDCOMMENT" WHERE "id_bskBASKET" = %s""", (id_basket,))
+    write_message("""SELECT DISTINCT ext.id, rec."id_bibrec_or_bskEXTREC"
+                     FROM bskEXTREC AS ext
+                     LEFT JOIN "bskREC" AS rec
+                     ON ext.id=-rec."id_bibrec_or_bskEXTREC"
+                     WHERE "id_bibrec_or_bskEXTREC" is NULL""", verbose=9)
     try:
-        result = run_sql("""SELECT DISTINCT ext.id FROM bskEXTREC AS ext
-                            LEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC
-                            WHERE id_bibrec_or_bskEXTREC is NULL""")
+        result = run_sql("""SELECT DISTINCT ext.id FROM "bskEXTREC" AS ext
+                            LEFT JOIN "bskREC" AS rec ON ext.id=-rec."id_bibrec_or_bskEXTREC"
+                            WHERE "id_bibrec_or_bskEXTREC" is NULL""")
     except:
         result = []
     write_message(result, verbose=9)
@@ -445,14 +449,14 @@ def guest_user_garbage_collector():
     write_message("""  DELETE FROM bskEXTFMT WHERE "id_bskEXTREC" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
     for (id_basket,) in result:
         delcount['bskEXTREC'] += run_sql("""DELETE FROM "bskEXTREC" WHERE id=%s""", (id_basket,))
-        delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE id_bskEXTREC=%s""", (id_basket,))
+        delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE "id_bskEXTREC"=%s""", (id_basket,))
 
     # 5 - delete expired mailcookies
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
 
     ## 5b - delete expired not confirmed email address
-    write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
+    write_message("""DELETE FROM "user" WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
     delcount['email_addresses'] = run_sql("""DELETE FROM "user" WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""", (CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS,))
 
     # 6 - delete expired roles memberships

@@ -374,11 +374,11 @@ def perform_request_touchset(oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 def get_oai_set(id=''):
     """Returns a row parameters for a given id"""
     sets = []
-    sql = "SELECT id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, setDefinition FROM oaiREPOSITORY"
+    sql = """SELECT id, "setSpec", "setName", "setCollection", "setDescription", p1,f1,m1, p2,f2,m2, p3,f3,m3, "setDefinition" FROM "oaiREPOSITORY" """
     try:
         if id:
             sql += " WHERE id=%s" % id
-        sql += " ORDER BY setSpec asc"
+        sql += """ ORDER BY "setSpec" asc"""
         res = run_sql(sql)
         for row in res:
             set = ['']*16
@@ -413,7 +413,7 @@ def touch_oai_set(setSpec):
 
     Note: the last_updated time is in localtime to the server.
     """
-    run_sql("UPDATE oaiREPOSITORY SET last_updated=NOW() WHERE setSpec=%s", (setSpec, ))
+    run_sql("""UPDATE "oaiREPOSITORY" SET last_updated=NOW() WHERE "setSpec"=%s""", (setSpec, ))
 
 def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                    oai_set_collection, oai_set_description,
@@ -437,12 +437,12 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                          'p3=' + oai_set_p3  + ';' + \
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
-        run_sql("""UPDATE oaiREPOSITORY SET
-                            setName=%s,
-                            setSpec=%s,
-                            setCollection=%s,
-                            setDescription=%s,
-                            setDefinition=%s,
+        run_sql("""UPDATE "oaiREPOSITORY" SET
+                            "setName"=%s,
+                            "setSpec"=%s,
+                            "setCollection"=%s,
+                            "setDescription"=%s,
+                            "setDefinition"=%s,
                             p1=%s,
                             f1=%s,
                             m1=%s,
@@ -495,9 +495,9 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection,
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
 
-        run_sql("""INSERT INTO oaiREPOSITORY (id, setName, setSpec,
-                           setCollection, setDescription, setDefinition,
-                           setRecList, p1, f1, m1, p2, f2, m2, p3, f3, m3)
+        run_sql("""INSERT INTO "oaiREPOSITORY" (id, "setName", "setSpec",
+                           "setCollection", "setDescription", "setDefinition",
+                           "setRecList", p1, f1, m1, p2, f2, m2, p3, f3, m3)
                          VALUES (0, %s, %s, %s, %s, %s, NULL, %s, %s, %s,
                            %s, %s, %s, %s, %s, %s)""",
                       (oai_set_name, oai_set_spec, oai_set_collection,
@@ -513,7 +513,7 @@ def delete_oai_set(oai_set_id):
     """"""
 
     try:
-        run_sql("DELETE FROM oaiREPOSITORY WHERE id=%s", (oai_set_id,))
+        run_sql("""DELETE FROM "oaiREPOSITORY" WHERE id=%s""", (oai_set_id,))
         return (1, "")
     except StandardError as e:
         register_exception(alert_admin=True)

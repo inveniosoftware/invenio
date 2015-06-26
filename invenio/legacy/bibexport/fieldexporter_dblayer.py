@@ -3,7 +3,7 @@
 # $Id: webmessage_dblayer.py,v 1.28 2008/08/08 13:28:15 cparker Exp $
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011 CERN.
+# Copyright (C) 2009, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ import tempfile
 import shutil
 from time import localtime
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, datetime_format
 from invenio.utils.date import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
 from invenio.legacy import bibrecord as bibrecord
@@ -537,7 +537,7 @@ def delete_job(job_id):
     @return 1 if delete was successful
     """
 
-    query = """UPDATE expJOB SET deleted = 1 WHERE id=%s"""
+    query = """UPDATE "expJOB" SET deleted = 1 WHERE id=%s"""
     query_parameters = (job_id, )
 
     result = run_sql(query, query_parameters)
@@ -551,7 +551,7 @@ def _exist_job(job_id):
     @return: True if the job exists, otherwise return False
     """
 
-    query = """SELECT COUNT(id) FROM expJOB WHERE id=%s"""
+    query = """SELECT COUNT(id) FROM "expJOB" WHERE id=%s"""
 
     result = run_sql(query, (job_id, ))
 
@@ -575,9 +575,11 @@ def get_job(job_id):
                         jobname,
                         jobfreq,
                         output_format,
-                        DATE_FORMAT(lastrun,'%%Y-%%m-%%d %%H:%%i:%%s'),
+                        """ + \
+                            datetime_format('lastrun') + ',' + \
+                        """
                         output_directory
-                FROM expJOB WHERE id=%s"""
+                FROM "expJOB" WHERE id=%s"""
     query_result = run_sql(query, (job_id,))
 
     (id, name, frequency, output_format, last_run, output_directory) = query_result[0]
@@ -603,9 +605,11 @@ def get_job_by_name(job_name):
                         jobname,
                         jobfreq,
                         output_format,
-                        DATE_FORMAT(lastrun,'%%Y-%%m-%%d %%H:%%i:%%s'),
+                        """ + \
+                            datetime_format('lastrun') + ',' + \
+                        """
                         output_directory
-                FROM expJOB WHERE jobname=%s"""
+                FROM "expJOB" WHERE jobname=%s"""
     query_result = run_sql(query, (job_name,))
 
     if 0 == len(query_result):
@@ -630,17 +634,19 @@ def get_all_jobs(user_id):
     @return: list of Job objects containing all the jobs
     owned by the user given as a parameter"""
 
-    query = """SELECT expJOB.id,
-                        expJOB.jobname,
-                        expJOB.jobfreq,
-                        expJOB.output_format,
-                        DATE_FORMAT(expJOB.lastrun,'%%Y-%%m-%%d %%H:%%i:%%s'),
-                        expJOB.output_directory
-                FROM expJOB
-                INNER JOIN user_expJOB
-                ON expJOB.id = user_expJOB.id_expJOB
-                WHERE user_expJOB.id_user = %s
-                AND expJOB.deleted = 0
+    query = """SELECT "expJOB".id,
+                        "expJOB".jobname,
+                        "expJOB".jobfreq,
+                        "expJOB".output_format,
+                        """ + \
+                            datetime_format('"expJOB".lastrun') + ',' + \
+                        """
+                        "expJOB".output_directory
+                FROM "expJOB"
+                INNER JOIN "user_expJOB"
+                ON "expJOB".id = "user_expJOB"."id_expJOB"
+                WHERE "user_expJOB".id_user = %s
+                AND "expJOB".deleted = 0
             """
     query_parameters = (user_id, )
     query_result = run_sql(query, query_parameters)
@@ -665,7 +671,7 @@ def _insert_job(user_id, job):
     @param job: Job object containing information about the job
 
     @return: Returns the identifier of the job"""
-    job_id = run_sql("""INSERT INTO expJOB(jobname,
+    job_id = run_sql("""INSERT INTO "expJOB"(jobname,
                                            jobfreq,
                                            output_format,
                                            lastrun,
@@ -678,8 +684,8 @@ def _insert_job(user_id, job):
                          job.get_output_directory()
                          ))
     # create relation between job and user
-    run_sql("""INSERT INTO user_expJOB(id_user,
-                                           id_expJOB)
+    run_sql("""INSERT INTO "user_expJOB"(id_user,
+                                           "id_expJOB")
                         VALUES(%s, %s)""",
                         (user_id,
                          job_id
@@ -691,7 +697,7 @@ def _update_job(job):
 
     @param job: Object containing information about the job.
     """
-    run_sql("""UPDATE expJOB SET jobname = %s,
+    run_sql("""UPDATE "expJOB" SET jobname = %s,
                                  jobfreq = %s,
                                  output_format = %s,
                                  lastrun = %s,
@@ -731,7 +737,7 @@ def _exist_query(query_id):
     @return: True if the query exists, otherwise return False
     """
 
-    query = """SELECT COUNT(id) FROM expQUERY WHERE id=%s"""
+    query = """SELECT COUNT(id) FROM "expQUERY" WHERE id=%s"""
     query_parameters = (query_id, )
 
     query_result = run_sql(query, query_parameters)
@@ -756,7 +762,7 @@ def _insert_query(query, job_id):
 
     output_fields = ",".join(query.get_output_fields())
 
-    query_id = run_sql("""INSERT INTO expQUERY(name,
+    query_id = run_sql("""INSERT INTO "expQUERY"(name,
                                            search_criteria,
                                            output_fields,
                                            notes)
@@ -767,8 +773,8 @@ def _insert_query(query, job_id):
                          query.get_comment()
                          ))
 
-    run_sql("""INSERT INTO expJOB_expQUERY(id_expJOB,
-                                           id_expQUERY)
+    run_sql("""INSERT INTO "expJOB_expQUERY"("id_expJOB",
+                                           "id_expQUERY")
                         VALUES(%s, %s)""",
                         (job_id,
                          query_id
@@ -784,7 +790,7 @@ def _update_query(query):
 
     output_fields = ",".join(query.get_output_fields())
 
-    run_sql("""UPDATE expQUERY SET name = %s,
+    run_sql("""UPDATE "expQUERY" SET name = %s,
                                  search_criteria = %s,
                                  output_fields = %s,
                                  notes = %s
@@ -806,15 +812,15 @@ def get_job_queries(job_id):
     @return: list of Query objects"""
 
     query = """SELECT id,
-                        expQUERY.name,
-                        expQUERY.search_criteria,
-                        expQUERY.output_fields,
-                        expQUERY.notes
-                        FROM expQUERY
-                        INNER JOIN expJOB_expQUERY
-                        ON expQUERY.id = expJOB_expQUERY.id_expQUERY
-                        WHERE expJOB_expQUERY.id_expJOB = %s
-                        AND expQUERY.deleted = 0
+                        "expQUERY".name,
+                        "expQUERY".search_criteria,
+                        "expQUERY".output_fields,
+                        "expQUERY".notes
+                        FROM "expQUERY"
+                        INNER JOIN "expJOB_expQUERY"
+                        ON "expQUERY".id = "expJOB_expQUERY"."id_expQUERY"
+                        WHERE "expJOB_expQUERY"."id_expJOB" = %s
+                        AND "expQUERY".deleted = 0
                         """
     query_parameters = (job_id, )
 
@@ -849,7 +855,7 @@ def get_query(query_id):
                         search_criteria,
                         output_fields,
                         notes
-                        FROM expQUERY WHERE id=%s"""
+                        FROM "expQUERY" WHERE id=%s"""
     query_parameters = (query_id, )
 
     query_result = run_sql(query, query_parameters)
@@ -868,7 +874,7 @@ def delete_query(query_id):
 
     @return 1 if deletion was successful
     """
-    query = """UPDATE expQUERY SET deleted = 1 WHERE id=%s"""
+    query = """UPDATE "expQUERY" SET deleted = 1 WHERE id=%s"""
     query_parameters = (query_id, )
 
     result = run_sql(query, query_parameters)
@@ -893,7 +899,7 @@ def save_job_result(job_result):
     status = job_result.get_status()
     status_message = job_result.get_status_message()
 
-    job_result_id = run_sql("""INSERT INTO expJOBRESULT(id_expJOB,
+    job_result_id = run_sql("""INSERT INTO "expJOBRESULT"("id_expJOB",
                                            execution_time,
                                            status,
                                            status_message)
@@ -1051,10 +1057,10 @@ def get_all_job_result_ids(user_id):
     @return: list of identifiers (integer numbers)
     of the results owned by the given user
     """
-    query = """SELECT expJOBRESULT.id
-                FROM expJOBRESULT
-                INNER JOIN user_expJOB
-                ON expJOBRESULT.id_expJOB = user_expJOB.id_expJOB
+    query = """SELECT "expJOBRESULT".id
+                FROM "expJOBRESULT"
+                INNER JOIN "user_expJOB"
+                ON "expJOBRESULT"."id_expJOB" = "user_expJOB"."id_expJOB"
                 WHERE id_user = %s
                 ORDER BY execution_time DESC
             """
@@ -1096,11 +1102,13 @@ def get_job_result(job_result_id):
         return None
 
     query = """SELECT id,
-                        id_expJOB,
-                        DATE_FORMAT(execution_time,'%%Y-%%m-%%d %%H:%%i:%%s'),
+                        "id_expJOB",
+                        """ + \
+                            datetime_format('execution_time') + ',' + \
+                        """
                         status,
                         status_message
-                        FROM expJOBRESULT WHERE id=%s"""
+                        FROM "expJOBRESULT" WHERE id=%s"""
     query_result = run_sql(query, (job_result_id,))
 
     (id, job_id, execution_date_time, status, status_message) = query_result[0]
@@ -1124,15 +1132,15 @@ def _get_query_results_for_job_result(job_result_id):
     @return: list of QueryReusult objects
     contaning information about the query results
     """
-    query = """SELECT expQUERYRESULT.id,
-                        expQUERYRESULT.id_expQUERY,
-                        expQUERYRESULT.result,
-                        expQUERYRESULT.status,
-                        expQUERYRESULT.status_message
-            FROM expQUERYRESULT
-            INNER JOIN expJOBRESULT_expQUERYRESULT
-            ON expQUERYRESULT.id = expJOBRESULT_expQUERYRESULT.id_expQUERYRESULT
-            WHERE expJOBRESULT_expQUERYRESULT.id_expJOBRESULT = %s
+    query = """SELECT "expQUERYRESULT".id,
+                        "expQUERYRESULT"."id_expQUERY",
+                        "expQUERYRESULT".result,
+                        "expQUERYRESULT".status,
+                        "expQUERYRESULT".status_message
+            FROM "expQUERYRESULT"
+            INNER JOIN "expJOBRESULT_expQUERYRESULT"
+            ON "expQUERYRESULT".id = "expJOBRESULT_expQUERYRESULT"."id_expQUERYRESULT"
+            WHERE "expJOBRESULT_expQUERYRESULT"."id_expJOBRESULT" = %s
             """
     query_parameters = (job_result_id, )
 
@@ -1161,8 +1169,8 @@ def is_user_owner_of_job(user_id, job_id):
     @return: True if user is owner of the job, otherwise return False
     """
     query = """SELECT COUNT(id_user)
-                        FROM user_expJOB
-                        WHERE id_user=%s and id_expJOB=%s"""
+                        FROM "user_expJOB"
+                        WHERE id_user=%s and "id_expJOB"=%s"""
     result = run_sql(query, (user_id, job_id))
 
     if 1 == result[0][0]:
@@ -1195,11 +1203,11 @@ def is_user_owner_of_query(user_id, query_id):
 
     @return: True if user is owner of the query, otherwise return False
     """
-    query = """SELECT COUNT(user_expJOB.id_user)
-                FROM user_expJOB
-                INNER JOIN expJOB_expQUERY
-                ON user_expJOB.id_expJOB = expJOB_expQUERY.id_expJOB
-                WHERE id_user = %s AND expJOB_expQUERY.id_expQUERY = %s
+    query = """SELECT COUNT("user_expJOB".id_user)
+                FROM "user_expJOB"
+                INNER JOIN "expJOB_expQUERY"
+                ON "user_expJOB"."id_expJOB" = "expJOB_expQUERY"."id_expJOB"
+                WHERE id_user = %s AND "expJOB_expQUERY"."id_expQUERY" = %s
             """
     result = run_sql(query, (user_id, query_id))
 
@@ -1228,7 +1236,7 @@ def _insert_query_result(query_result, job_result_id):
     status = query_result.get_status()
     status_message = query_result.get_status_message()
 
-    query_result_id = run_sql("""INSERT INTO expQUERYRESULT(id_expQUERY,
+    query_result_id = run_sql("""INSERT INTO "expQUERYRESULT"("id_expQUERY",
                                            result,
                                            status,
                                            status_message)
@@ -1239,8 +1247,8 @@ def _insert_query_result(query_result, job_result_id):
                          status_message
                          ))
 
-    run_sql("""INSERT INTO expJOBRESULT_expQUERYRESULT(id_expJOBRESULT,
-                                           id_expQUERYRESULT)
+    run_sql("""INSERT INTO "expJOBRESULT_expQUERYRESULT"("id_expJOBRESULT",
+                                           "id_expQUERYRESULT")
                         VALUES(%s, %s)""",
                         (job_result_id,
                          query_result_id
@@ -1256,7 +1264,7 @@ def _exist_job_result(job_result_id):
     @return: True if the job result exists, otherwise return False
     """
 
-    query = """SELECT COUNT(id) FROM expJOBRESULT WHERE id=%s"""
+    query = """SELECT COUNT(id) FROM "expJOBRESULT" WHERE id=%s"""
 
     result = run_sql(query, (job_result_id, ))
 

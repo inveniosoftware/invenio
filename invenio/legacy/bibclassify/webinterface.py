@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -299,15 +299,15 @@ def schedule_extraction(recid, taxonomy):
 
 def _doc_already_submitted(recid):
     # check extraction was already registered
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
-        AND (status='WAITING' OR status='RUNNING')"
+    sql = """SELECT COUNT(proc) FROM "schTASK" WHERE proc='bibclassify' AND user=%s\
+        AND (status='WAITING' OR status='RUNNING')"""
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, "The automated keyword extraction \
                     for this document has been already scheduled. Please return back in a while.")
 
     # check the upload is inside the scheduled tasks
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibupload' AND user=%s\
-        AND (status='WAITING' OR status='RUNNING')"
+    sql = """SELECT COUNT(proc) FROM "schTASK" WHERE proc='bibupload' AND user=%s\
+        AND (status='WAITING' OR status='RUNNING')"""
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
                       'it will take a while for it to be ingested.')
@@ -319,15 +319,15 @@ def _doc_already_submitted(recid):
                       'at this moment, the automated extraction is not available.')
 
     # or the task was already ran
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
-        AND (status='DONE')"
+    sql = """SELECT COUNT(proc) FROM "schTASK" WHERE proc='bibclassify' AND user=%s\
+        AND (status='DONE')"""
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already processed, '
                       'but automated extraction identified no suitable keywords.')
 
     # or the extraction is in error stat
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc='bibclassify' AND user=%s\
-        AND (status='ERROR')"
+    sql = """SELECT COUNT(proc) FROM "schTASK" WHERE proc='bibclassify' AND user=%s\
+        AND (status='ERROR')"""
     if dbquery.run_sql(sql, ("extract:" + str(recid),))[0][0] > 0:
         return (True, 'The document was already scheduled, '
                       'but an error happened. This requires an'

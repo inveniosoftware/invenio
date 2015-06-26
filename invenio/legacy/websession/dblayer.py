@@ -25,7 +25,7 @@ from time import localtime
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, rlike
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.websession.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -160,7 +160,7 @@ def get_all_users_with_groups_with_login_method(login_method):
     """
     return dict(run_sql("""
         SELECT DISTINCT u.email, u.id
-        FROM user AS u JOIN user_usergroup AS uu ON u.id = uu.id_user
+        FROM "user" AS u JOIN user_usergroup AS uu ON u.id = uu.id_user
         JOIN usergroup AS ug ON ug.id = uu.id_usergroup
         WHERE ug.login_method = %s""", (login_method,)))
 
@@ -171,6 +171,7 @@ def get_visible_group_list(uid, pattern=""):
     of the group regardless user's status).
      @return: groups {id : name} whose name matches pattern
     """
+    rlike_op = rlike()
     grpID = []
     groups = {}
     #list the group the user is member of"""
@@ -193,7 +194,9 @@ def get_visible_group_list(uid, pattern=""):
 
     if pattern:
         try:
-            res2 = run_sql(query2 + """ AND name RLIKE %s ORDER BY name""", (pattern,))
+            res2 = run_sql(
+                query2 + """ AND name """ + rlike_op + """ %s ORDER BY name""",
+                (pattern,))
         except OperationalError:
             res2 = ()
     else:
@@ -302,7 +305,7 @@ def get_users_by_status(grpID, status, ln=CFG_SITE_LANG):
     """
     _ = gettext_set_language(ln)
     res = run_sql("""SELECT ug.id_user, u.nickname
-                       FROM user_usergroup ug, user u
+                       FROM user_usergroup ug, "user" u
                       WHERE ug.id_usergroup = %s
                         AND ug.id_user=u.id
                         AND user_status = %s""",
@@ -406,7 +409,7 @@ def count_nb_group_user(uid, user_status):
 def get_all_users():
     """@return: all the email:id"""
     query = """SELECT UPPER(email), id
-               FROM user
+               FROM "user"
                WHERE email != ''
             """
     res = run_sql(query)

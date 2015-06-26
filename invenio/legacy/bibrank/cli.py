@@ -137,7 +137,7 @@ def task_run_core():
     Return 1 in case of success and 0 in case of failure.
     """
     if not task_get_option("run"):
-        task_set_option("run", [name[0] for name in run_sql("SELECT name from rnkMETHOD")])
+        task_set_option("run", [name[0] for name in run_sql("""SELECT name from "rnkMETHOD" """)])
 
     for key in task_get_option("run"):
         task_sleep_now_if_required(can_stop_too=True)

@@ -250,7 +250,7 @@ def _get_ontology(ontology):
             # runs in a standalone mode,
             # it has no database - [rca, old-heritage]
             if not bconfig.STANDALONE:
-                result = dbquery.run_sql("SELECT name, location from clsMETHOD WHERE name LIKE %s",
+                result = dbquery.run_sql("""SELECT name, location from "clsMETHOD" WHERE name LIKE %s""",
                                          ('%' + ontology + '%',))
                 for onto_short_name, url in result:
                     onto_name = onto_short_name

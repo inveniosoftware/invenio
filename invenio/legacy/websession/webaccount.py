@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
+# Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -285,7 +286,7 @@ def perform_set(email, ln, can_config_bibcatalog=False,
     """
 
     try:
-        res = run_sql("SELECT id, nickname FROM user WHERE email=%s", (email,))
+        res = run_sql("""SELECT id, nickname FROM "user" WHERE email=%s""", (email,))
         uid = res[0][0]
         nickname = res[0][1]
     except IndexError:
@@ -446,7 +447,7 @@ def external_user_warning(uid):
 
     query = """
         SELECT      email
-        FROM        user
+        FROM        "user"
         WHERE       id=%s
     """
 
@@ -457,7 +458,7 @@ def external_user_warning(uid):
 
     query = """
         SELECT      *
-        FROM        userEXT
+        FROM        "userEXT"
         WHERE       id_user=%s
     """
 
