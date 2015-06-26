@@ -37,7 +37,7 @@ class TestAccMailCookie(InvenioTestCase):
 
     def tearDown(self):
         """Tear down."""
-        self.delete_objects(self.data)
+        pass
 
     def test_mail_cookie(self):
         """Test mail cookie creation."""
@@ -51,6 +51,25 @@ class TestAccMailCookie(InvenioTestCase):
         self.assertEqual(ret.data[0], 'mail_activation')
 
         self.data = [ret]
+
+        self.delete_objects(self.data)
+
+    def test_cookie_record_id_is_long(self):
+        """Test if cookie id is a long."""
+        from invenio.modules.access.models import AccMAILCOOKIE
+
+        cookie = AccMAILCOOKIE(
+            kind='mail_activation',
+            onetime=0,
+            _data="test",
+            status="W"
+        )
+        self.create_objects([cookie])
+        load_cookie = AccMAILCOOKIE.query.get(cookie.id)
+
+        assert isinstance(load_cookie.id, long)
+
+        self.delete_objects([cookie])
 
 
 TEST_SUITE = make_test_suite(TestAccMailCookie)

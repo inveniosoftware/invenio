@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2011, 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,8 +19,8 @@
 
 """Platform-independent Integer type."""
 
-from sqlalchemy.types import TypeDecorator, Integer
 from sqlalchemy.dialects.mysql import INTEGER
+from sqlalchemy.types import Integer, TypeDecorator
 
 
 class LegacyInteger(TypeDecorator):
@@ -46,3 +46,7 @@ class LegacyInteger(TypeDecorator):
                                                    unsigned=self.unsigned))
         else:
             return dialect.type_descriptor(Integer)
+
+    def process_result_value(self, value, dialect):
+        """Cast to long python variable."""
+        return long(value)
