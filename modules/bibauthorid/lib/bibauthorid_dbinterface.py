@@ -3580,7 +3580,7 @@ def get_title_of_paper(rec, recstruct=None):  # get_title_from_rec
         return record_get_field_value(recstruct, '245', '', '', 'a')
 
 
-def _get_doi_for_paper(recid, recstruct=None):  # get_doi_from_rec
+def get_doi_for_paper(recid, recstruct=None):  # get_doi_from_rec
     '''
     Gets the doi which the specified paper is associated with.
 

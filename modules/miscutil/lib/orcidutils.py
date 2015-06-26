@@ -19,37 +19,51 @@
 
 '''Utils for fetching data for ORCID library.'''
 
-from invenio.bibauthorid_backinterface import get_orcid_id_of_author
-from invenio.bibauthorid_dbinterface import _get_doi_for_paper, \
-    get_signatures_of_paper, get_name_by_bibref, \
-    get_personid_signature_association_for_paper, \
-    get_orcid_id_of_author, get_papers_of_author, get_token, get_all_tokens, \
-    delete_token, trigger_aidtoken_change
-from invenio.bibauthorid_general_utils import get_doi
-from invenio.errorlib import register_exception
-from invenio.bibformat import format_record as bibformat_record
-from invenio.bibrecord import record_get_field_value, record_get_field_values, \
-    record_get_field_instances
-from invenio.config import CFG_SITE_URL, CFG_ORCIDUTILS_BLACKLIST_FILE
-from invenio.dateutils import convert_simple_date_to_array
-from invenio.errorlib import get_pretty_traceback
-from invenio.orcid_xml_exporter import OrcidXmlExporter
-from invenio.search_engine import get_record
-from invenio.textutils import encode_for_jinja_and_xml, RE_ALLOWED_XML_1_0_CHARS
+import orcid
+import requests
+import re
+import sys
+
+from requests.exceptions import HTTPError
+from requests.exceptions import RequestException
 
 from invenio import bibtask
 
-import requests
-import re
-from requests.exceptions import HTTPError
-import sys
+from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+from invenio.bibauthorid_backinterface import get_orcid_id_of_author
+# TO DO: change name of the function
+from invenio.bibauthorid_dbinterface import delete_token
+from invenio.bibauthorid_dbinterface import get_all_tokens
+from invenio.bibauthorid_dbinterface import get_doi_for_paper
+from invenio.bibauthorid_dbinterface import get_name_by_bibref
+from invenio.bibauthorid_dbinterface import get_orcid_id_of_author
+from invenio.bibauthorid_dbinterface import get_papers_of_author
+from invenio.bibauthorid_dbinterface import \
+    get_personid_signature_association_for_paper
+from invenio.bibauthorid_dbinterface import get_signatures_of_paper
+from invenio.bibauthorid_dbinterface import get_token
+from invenio.bibauthorid_dbinterface import trigger_aidtoken_change
+from invenio.bibauthorid_general_utils import get_doi
+from invenio.bibformat import format_record as bibformat_record
+from invenio.bibrecord import record_get_field_instances
+from invenio.bibrecord import record_get_field_value
+from invenio.bibrecord import record_get_field_values
+from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_ORCIDUTILS_BLACKLIST_FILE
+from invenio.dateutils import convert_simple_date_to_array
+from invenio.errorlib import get_pretty_traceback
+from invenio.errorlib import register_exception
+from invenio.orcid_xml_exporter import OrcidXmlExporter
+from invenio.search_engine import get_record
+from invenio.textutils import encode_for_jinja_and_xml
+from invenio.textutils import RE_ALLOWED_XML_1_0_CHARS
+
 
 try:
     import json
 except ImportError:
     import simplejson as json
 
-from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
 
 ORCID_ENDPOINT_PUBLIC = CFG_OAUTH2_CONFIGURATIONS['orcid']['public_url']
 
@@ -64,19 +78,18 @@ ORCID_SINGLE_REQUEST_WORKS = 1
 MAX_COAUTHORS = 25
 MAX_DESCRIPTION_LENGTH = 4500
 
-############################### PULLING ########################################
+# ############################# PULLING #######################################
+
 
 def get_dois_from_orcid_using_pid(pid):
-
-    '''Get dois in case of unknown ORCID.
+    """Get dois in case of an unknown ORCID.
 
     @param scope: pid
     @type scope: int
 
-    @return: a pair: ORCID of person indicated by pid and list of his dois
+    @return: pair - ORCID of the person indicated by pid and list of his dois
     @rtype: tuple
-    '''
-
+    """
     # author should have already an orcid if this method was triggered
     try:
         orcid_id = get_orcid_id_of_author(pid)[0][0]
@@ -85,59 +98,29 @@ def get_dois_from_orcid_using_pid(pid):
         orcid_id = None
     return orcid_id, get_dois_from_orcid(orcid_id)
 
-def _read_public_orcid_data(orcid_id):
-
-    '''Get ORCID public profile.
-
-    @param orcid_id: Persons id in xxxx-xxxx-xxxx-xxxx format
-    @type orcid_id: str
-
-    @return: the ORCID profile
-    @rtype: json dict
-
-    '''
-
-    access_token = _get_access_token_from_orcid('/read-public', \
-            extra_params={'grant_type': 'client_credentials'})
-
-    if not access_token:
-        return None
-
-     # possible request types: 'orcid-bio', 'orcid-works', 'orcid-profile'
-    request_type = 'orcid-profile'
-    orcid_response = _get_public_orcids_from_member(orcid_id, access_token,
-                                                    request_type)
-
-    if not orcid_response:
-        return None
-
-    orcid_profile = json.loads(orcid_response)
-
-    return orcid_profile
 
 def _get_ext_orcids_using_pid(pid):
-
-    '''Get extids in case of unknown ORCID
+    """Get extids in case of an unknown ORCID.
 
     @param scope: pid
     @type scope: int
 
-    @return: a dictionary containing all external ids.
+    @return: dictionary containing all external ids.
     @rtype: tuple
-    '''
-
+    """
     # author should have already an orcid if this method was triggered
     try:
         orcid_id = get_orcid_id_of_author(pid)[0][0]
     except IndexError:
         # weird, no orcid id in the database? Let's not do anything...
+        register_exception(alert_admin=True)
         orcid_id = None
 
     return orcid_id, _get_extids_from_orcid(orcid_id)
 
-def _get_extids_from_orcid(orcid_id):
 
-    '''Get all external ids from ORCID database for a given person.
+def _get_extids_from_orcid(orcid_id):
+    """Get all external ids from ORCID database for a given person.
 
     @param orcid_id: ORCID in format xxxx-xxxx-xxxx-xxxx
     @type orcid_id: str
@@ -145,251 +128,111 @@ def _get_extids_from_orcid(orcid_id):
     @return: a dictionary which contains all external identifiers for given
         person. Identifiers are stored in sets under identifiers names keys.
     @rtype: dictionary
-
-    '''
-
-    orcid_profile = _read_public_orcid_data(orcid_id)
+    """
+    ap = orcid.MemberAPI(CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_key'],
+                         CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_secret'],
+                         'sandbox' in
+                         CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'])
 
     ext_ids_dict = {
-        'DOI' : set(),
-        'ARXIV' : set(),
-        'ISBN' : set(),
-        'OTHER_ID' : set()
+        'DOI': set(),
+        'ARXIV': set(),
+        'ISBN': set(),
+        'OTHER_ID': set()
     }
 
-    if orcid_profile == None:
+    orcid_profile = None
+    if orcid_id:
+        try:
+            orcid_profile = ap.read_record_member(orcid_id, 'activities')
+        except RequestException:
+            register_exception(alert_admin=True)
+
+    if not orcid_profile:
         return ext_ids_dict
 
     try:
-        activities = orcid_profile['orcid-profile']['orcid-activities']
-        pubs = activities['orcid-works']['orcid-work']
-        for pub in pubs:
+        for work in orcid_profile['works']['group']:
             try:
-                ext_idss = pub['work-external-identifiers']
-                ext_ids = ext_idss['work-external-identifier']
-                for ext_id_pair in ext_ids:
-                    extid_type = ext_id_pair['work-external-identifier-type']
-                    value = ext_id_pair['work-external-identifier-id']['value']
-                    if extid_type in ext_ids_dict:
-                        if extid_type == 'DOI':
-                            ext_ids_dict[extid_type].add(get_doi(value))
-                        ext_ids_dict[extid_type].add(value)
-            except (TypeError, KeyError):
+                for identifier in work['identifiers']['identifier']:
+                    identifier_type = identifier['external-identifier-type']
+                    value = identifier['external-identifier-id']
+                    if identifier_type in ext_ids_dict:
+                        if identifier_type == "DOI":
+                            ext_ids_dict[identifier_type].add(get_doi(value))
+                        ext_ids_dict[identifier_type].add(value)
+            except KeyError:
+                # No identifiers on this work.
                 pass
-    except (TypeError, KeyError):
-        pass
+    except KeyError:
+        register_exception(alert_admin=True)
 
     return ext_ids_dict
 
-def get_dois_from_orcid(orcid_id):
 
-    '''Get dois in case of know ORCID
+def get_dois_from_orcid(orcid_id):
+    """Get dois in case of a known ORCID.
 
     @param scope: orcid_id
     @type scope: string
 
     @return: dois of a person with ORCID indicated by orcid_id
     @rtype: list
-    '''
+    """
+    ap = orcid.MemberAPI(CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_key'],
+                         CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_secret'],
+                         'sandbox' in
+                         CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'])
 
-    orcid_profile = _read_public_orcid_data(orcid_id)
+    orcid_profile = None
+    if orcid_id:
+        try:
+            orcid_profile = ap.read_record_member(orcid_id, 'activities')
+        except RequestException:
+            register_exception(alert_admin=True)
 
     dois = list()
-    if orcid_profile == None:
+    if not orcid_profile:
         return dois
 
     try:
-        activities = orcid_profile['orcid-profile']['orcid-activities']
-        pubs = activities['orcid-works']['orcid-work']
-        for pub in pubs:
+        for work in orcid_profile['works']['group']:
             try:
-                ext_ids = pub['work-external-identifiers']
-                ext_id_pair = ext_ids['work-external-identifier'][0]
-                if ext_id_pair['work-external-identifier-type'] == 'DOI':
-                    ext_id = ext_id_pair['work-external-identifier-id']
-                    doi = get_doi(ext_id['value'])
-                    if doi is not None:
-                        current_dois = doi.split(",")
-                        dois.append(current_dois[0])
-            except (TypeError, KeyError):
+                for identifier in work['identifiers']['identifier']:
+                    identifier_type = identifier['external-identifier-type']
+                    value = identifier['external-identifier-id']
+                    if identifier_type == "DOI":
+                        doi = get_doi(value)
+                        if doi:
+                            current_dois = doi.split(",")
+                            dois.append(current_dois[0])
+            except KeyError:
+                # No identifiers on this work.
                 pass
-    except (TypeError, KeyError):
-        pass
+    except KeyError:
+        register_exception(alert_admin=True)
 
     return dois
 
-
-
-class OrcidServerError(Exception):
-    '''
-    Exception raised when the server status is 500 (Internal Server Error).
-    '''
-    def __str__(self):
-        return "Http response code 500. Orcid Internal Server Error."
-
-
-class OrcidRequestError(Exception):
-    '''
-    Exception raised when the server status is:
-    204 No Content
-    400 Bad Request
-    401 Unauthorized
-    403 Forbidden
-    404 Not Found
-    410 Gone (deleted)
-    '''
-    def __init__(self, code):
-        super(OrcidRequestError, self).__init__(repr(code))
-        # TODO: depending on the code we should decide whether to send
-        # an email to the system admin or not
-        self.code = code
-    def __str__(self):
-        return "Http response code %s." % repr(self.code)
-
-
-def _get_access_token_from_orcid(scope, extra_params=None):
-    '''
-    Returns a multi-use access token using the client credentials. With the
-    specific access token we can retreive public data of the given scope.
-
-    @param scope: scope
-    @type scope: str
-    @param extra_data: additional parameters {field: value}
-    @type extra_data: dict {str: str}
-
-    @return: access token
-    @rtype: str
-    '''
-
-    payload = {'client_id': CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_key'],
-               'client_secret': \
-                    CFG_OAUTH2_CONFIGURATIONS['orcid']['consumer_secret'],
-               'scope': scope}
-
-    if extra_params:
-        for field, value in extra_params.iteritems():
-            payload[field] = value
-
-    request_url = CFG_OAUTH2_CONFIGURATIONS['orcid']['access_token_url']
-    headers = {'Accept': 'application/json'}
-    response = requests.post(request_url, data=payload, headers=headers)
-    code = response.status_code
-
-    res = None
-    if code == requests.codes.ok:
-        try:
-            res = json.loads(response.content)['access_token']
-        except (TypeError, KeyError):
-            register_exception(alert_admin=True)
-            return None
-    return res
-
-
-def _get_public_orcids_from_public(orcid_id, request_type='orcid-profile',
-                                   endpoint=ORCID_ENDPOINT_PUBLIC,
-                                   response_format='json'):
-    '''
-    The API made available to the general public and which can be used without
-    any sort of authentication. This API will only return data marked by users
-    as “public” and will come with no service level agreement (SLA). The API may
-    be throttled at the IP / transaction level in order to discourage
-    inadvertent overloading and/or deliberate abuse of the system.
-
-    @param orcid_id: orcid identifier
-    @type orcid_id: str
-    @param request_type: type of request
-    @type request_type: str
-    @param endpoint: domain of the orcid server
-    @type endpoint: str
-    @param response_format: format of the orcid response
-    @type response_format: str
-
-    @return: the specified public orcid data
-    @rtype: dict
-    '''
-    request_url = '%s%s/%s' % (endpoint, orcid_id, request_type)
-
-    # 'Accept-Charset': 'UTF-8'
-    # ATTENTION: it overwrites the response format header
-    headers = {'Accept': 'application/orcid+%s' % response_format}
-    response = requests.get(request_url, headers=headers)
-    code = response.status_code
-    res = None
-    # response.raise_for_status()
-    if code == requests.codes.ok:
-        res = response.content
-    elif code == 500:
-        # raise OrcidServerError()
-        res = None
-    else:
-        # raise OrcidRequestError(code)
-        res = None
-    return res
-
-
-def _get_public_orcids_from_member(orcid_id, access_token,
-                                   request_type='orcid-profile',
-                                   endpoint=ORCID_ENDPOINT_PUBLIC,
-                                   response_format='json'):
-    '''
-    Returns the public data for the specific request query given an orcid id.
-
-    @param orcid_id: orcid identifier
-    @type orcid_id: str
-    @param access_token: access token
-    @type access_token: str
-    @param request_type: type of request
-    @type request_type: str
-    @param endpoint: domain of the orcid server
-    @type endpoint: str
-    @param response_format: format of the orcid response
-    @type response_format: str
-
-    @return: the specified public orcid data
-    @rtype: dict
-    '''
-
-    request_url = '%s%s/%s' % (endpoint, orcid_id, request_type)
-    headers = {'Accept': 'application/orcid+%s' % response_format,
-               'Authorization': 'Bearer %s' % access_token}
-    # 'Accept-Charset': 'UTF-8'
-    # ATTENTION: it overwrites the response format header
-
-    response = requests.get(request_url, headers=headers)
-    code = response.status_code
-    res = None
-    # response.raise_for_status()
-    if code == requests.codes.ok:
-        res = response.content
-    elif code == 500:
-        # raise OrcidServerError()
-        res = None
-    else:
-        # raise OrcidRequestError(code)
-        res = None
-
-    return res
-
-############################### PUSHING #######################################
+# ############################# PUSHING #######################################
 
 
 class OrcidRecordExisting(Exception):
 
-    '''Indicates that a record is present in ORCID database.'''
+    """Indicates that a record is present in ORCID database."""
 
     pass
 
 
 class DoubledIds(Exception):
 
-    '''During fetching of the papers we encountered the same id twice.'''
+    """During fetching of the papers the code encountered the same id twice."""
 
     pass
 
 
 def push_orcid_papers(pid, token):
-
-    '''Pushes papers authored by chosen person.
+    """Push papers authored by chosen person.
 
     Pushes only the papers which were absent previously in ORCID database.
 
@@ -397,8 +240,7 @@ def push_orcid_papers(pid, token):
     @type pid: int
     @param token: the token received from ORCID during authentication step.
     @type token: string
-    '''
-
+    """
     return bibtask.task_low_level_submission('orcidpush', 'admin',
                                              '--author_id=' + str(pid),
                                              '--token=' + token,
@@ -406,16 +248,14 @@ def push_orcid_papers(pid, token):
 
 
 def _orcid_fetch_works(pid):
-
-    '''Get claimed works - only those that are not already put into ORCID.
+    """Get claimed works - only those that are not already put into ORCID.
 
     @param pid: person id of an author.
     @type pid: int
     @return: a pair: person doid and
         the dictionary with works for OrcidXmlExporter.
     @rtype: tuple (str, dict)
-    '''
-
+    """
     doid, existing_papers = _get_ext_orcids_using_pid(pid)
     papers_recs = [x[3] for x in get_papers_of_author(pid,
                                                       include_unclaimed=False)]
@@ -429,14 +269,14 @@ def _orcid_fetch_works(pid):
 
 
 def _push_few_works(doid, short_list, number, pid, token):
-    '''Push works with fallback in case of duplicates.
+    """Push works with fallback in case of duplicates.
 
     If there is a duplicate, the function will remove the problematic
     paper from the list and repush.
 
     @return: did the push finish successfully
     @rtype: bool
-    '''
+    """
     url = CFG_OAUTH2_CONFIGURATIONS['orcid']['member_url'] + \
         doid + '/orcid-works'
 
@@ -469,7 +309,8 @@ def _push_few_works(doid, short_list, number, pid, token):
         except HTTPError, exc:
             m = re.search(r"have the same external id \"(.*)\"", response.text)
             if m:
-                bibtask.write_message("Works have the same doi: %s" % m.groups()[0])
+                bibtask.write_message("Works have the same doi: %s" %
+                                      m.groups()[0])
                 wrong_id = m.groups()[0]
                 shorter_list = [x for x in short_list if
                                 all(t[1] != wrong_id for
@@ -500,11 +341,11 @@ def _push_few_works(doid, short_list, number, pid, token):
 
 
 def _orcid_push_with_bibtask():
-    '''Push ORCID papers using bibtask scheduling.
+    """Push ORCID papers using bibtask scheduling.
 
     @return: did the task finish successfully
     @rtype: bool
-    '''
+    """
     pid_tokens = get_all_tokens()
     success = True
 
@@ -538,8 +379,7 @@ def _orcid_push_with_bibtask():
 
 
 def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
-
-    '''Returns list of dictionaries which can be used in ORCID library.
+    """Return list of dictionaries which can be used in ORCID library.
 
     Yields orcid list of ORCID_SINGLE_REQUEST_WORKS works of given person.
 
@@ -550,8 +390,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
     @type personid: int
     @param orcid: orcid of the author
     @type orcid: string
-    '''
-
+    """
     orcid_list = []
 
     for recid in papers:
@@ -637,8 +476,7 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
 
 
 def _get_date_from_field_number(recstruct, field, subfield):
-
-    '''Get date dictionary from MARC record.
+    """Get date dictionary from MARC record.
 
     The dictionary can have keys 'year', 'month' and 'day'
 
@@ -649,8 +487,7 @@ def _get_date_from_field_number(recstruct, field, subfield):
 
     @return: dictionary
     @rtype: dict
-    '''
-
+    """
     result = {}
 
     publication_date = \
@@ -672,15 +509,13 @@ def _get_date_from_field_number(recstruct, field, subfield):
 
 
 def _get_publication_date(recstruct):
-
-    '''Get work publication date from MARC record.
+    """Get work publication date from MARC record.
 
     @param recstruct: MARC record
 
     @return: dictionary
     @rtype: dict
-    '''
-
+    """
     first_try = _get_date_from_field_number(recstruct, '269', 'c')
     if first_try:
         return first_try
@@ -701,15 +536,13 @@ def _get_publication_date(recstruct):
 
 
 def _get_work_type(recstruct):
-
-    '''Get work type from MARC record.
+    """Get work type from MARC record.
 
     @param recstruct: MARC record
 
     @return: type of given work
     @rtype: str
-    '''
-
+    """
     work_type = record_get_field_values(recstruct, '980', '', '', 'a')
     if 'book' in [x.lower() for x in work_type]:
         return 'book'
@@ -744,8 +577,7 @@ def _get_work_type(recstruct):
 
 
 def _get_citation(recid):
-
-    '''Get citation in BibTeX format.
+    """Get citation in BibTeX format.
 
     Strips down html tags
 
@@ -754,8 +586,7 @@ def _get_citation(recid):
 
     @return: citation in BibTex format
     @rtype: string
-    '''
-
+    """
     tex_str = bibformat_record(recid, 'hx')
     bibtex_content = encode_for_jinja_and_xml(tex_str[tex_str.find('@'):
                                               tex_str.rfind('}')+1])
@@ -764,8 +595,7 @@ def _get_citation(recid):
 
 
 def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
-
-    '''Get external identifiers used by ORCID.
+    """Get external identifiers used by ORCID.
 
     Fetches DOI, ISBN, ARXIVID and INSPIREID identifiers.
 
@@ -783,8 +613,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
 
     @return: external ids in form of pairs: name if id, value.
     @rtype: list
-    '''
-
+    """
     def _stub_method():
         raise DoubledIds()
 
@@ -796,7 +625,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
         pass
 
     external_ids = []
-    doi = _get_doi_for_paper(recid, recstruct)
+    doi = get_doi_for_paper(recid, recstruct)
     # There are two different fields in MARC records responsiple for ISBN id.
     isbn = record_get_field_value(recstruct, '020', '', '', 'a')
     isbn2 = record_get_field_value(recstruct, '773', '', '', 'z')
@@ -856,8 +685,7 @@ def _get_external_ids(recid, url, recstruct, old_external_ids, orcid):
 
 
 def _get_work_contributors(recid, personid):
-
-    '''Get contributors data used by ORCID.
+    """Get contributors data used by ORCID.
 
     @param recid: the id of record
     @type recid: int
@@ -866,8 +694,7 @@ def _get_work_contributors(recid, personid):
 
     @return: contributors records with fields required by ORCID database.
     @rtype: list
-    '''
-
+    """
     work_contributors = []
     signatures = get_signatures_of_paper(recid)
 
@@ -891,7 +718,7 @@ def _get_work_contributors(recid, personid):
 
 
 def main():
-    '''Daemon responsible for pushing papers to ORCID.'''
+    """Daemon responsible for pushing papers to ORCID."""
     bibtask.task_init(
         authorization_action="orcidpush",
         task_run_fnc=_orcid_push_with_bibtask
