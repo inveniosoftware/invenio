@@ -35,7 +35,7 @@ js = Bundle(
         "plupload": "latest",
         "ckeditor": "latest",
         "flight": "latest",
-        "eonasdan-bootstrap-datetimepicker": "3.1.3",
+        "eonasdan-bootstrap-datetimepicker": "4.14.30",
     }
 )
 

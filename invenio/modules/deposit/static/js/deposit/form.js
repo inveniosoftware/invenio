@@ -57,7 +57,6 @@ define(function(require, exports, module) {
         autocomplete_url: "",
         datepicker_options: {
           format: "YYYY-MM-DD",
-          pickTime: false,
         },
 
         // Selectors
