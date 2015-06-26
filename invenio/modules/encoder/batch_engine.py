@@ -51,7 +51,6 @@ from invenio.modules.encoder.config import (
 from invenio.ext.email import send_email
 from invenio.base.i18n import gettext_set_language
 from invenio.legacy.webuser import emailUnique, get_user_preferences
-from invenio.modules.formatter.engines.xslt import format
 from invenio.utils.json import json, json_decode_file
 import invenio.config
 
@@ -699,6 +698,7 @@ def process_batch_job(batch_job_file):
         pbcore = pbcore_metadata(input_file = getval(batch_job, 'input'),
                                  pbcoreIdentifier = batch_job['recid'],
                                  aspect_override = getval(batch_job, 'aspect'))
+        from invenio.modules.formatter.engines.xslt import format
         marcxml = format(pbcore, CFG_BIBENCODE_PBCORE_MARC_XSLT)
         upload_marcxml_file(marcxml)
 
