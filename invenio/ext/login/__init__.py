@@ -46,14 +46,20 @@ def login_user(user, *args, **kwargs):
 def reset_password(email, ln=None):
     """Reset user password."""
     from datetime import timedelta
+    from invenio.base.i18n import _
     from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, \
         CFG_SITE_NAME_INTL, CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
     # create the reset key
     if ln is None:
         ln = g.ln
     from invenio.modules.access.mailcookie import mail_cookie_create_pw_reset
-    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(
-        days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+    from invenio.modules.access.errors import InvenioWebAccessMailCookieError
+    try:
+        reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(
+            days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+    except InvenioWebAccessMailCookieError:
+        flash(_("Provided data is not valid"), "error")
+        return False
     if reset_key is None:
         return False  # reset key could not be created
 
@@ -63,7 +69,6 @@ def reset_password(email, ln=None):
 
     # finally send the email
     from invenio.ext.email import send_email
-    from invenio.base.i18n import _
     if not send_email(CFG_SITE_SUPPORT_EMAIL, email, "%s %s"
                       % (_("Password reset request for"),
                          CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
