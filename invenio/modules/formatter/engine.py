@@ -200,9 +200,14 @@ def format_record(recid, of, ln=None, verbose=0, search_pattern=None,
     """
     ln = ln or cfg['CFG_SITE_LANG']
 
-    from invenio_records.api import get_record
+    from invenio_records.api import Record, get_record
 
-    record = get_record(recid)
+    if not isinstance(recid, Record):
+        record = get_record(recid)
+    else:
+        record = recid
+        recid = record['recid']
+
     template = decide_format_template(record, of)
 
     out = render_template_to_string(

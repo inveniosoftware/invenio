@@ -322,8 +322,14 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     collection_breadcrumbs(collection)
 
     qid = get_search_query_id(p=p, cc=collection.name)
-    recids = Query(p).search(collection=collection.name)
-    records = len(recids)
+    response = Query(p).search(collection=collection.name)
+    response.body.update({
+        'size': rg,
+        'from': jrec-1,
+    })
+
+    recids = map(lambda x: int(x['recid']), response.records())
+    records = len(response)
 
     # back-to-search related code
     if request and not isinstance(request.get_legacy_request(),
@@ -373,7 +379,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     #           req, cc, [p, p1, p2, p3], f, ec, verbose,
     #           ln, selected_external_collections_infos, em=em)
 
-    return response_formated_records(recids[jrec-1:jrec-1+rg], collection, of, **ctx)
+    return response_formated_records(recids, collection, of, **ctx)
 
 
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])

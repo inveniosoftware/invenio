@@ -49,7 +49,7 @@ class Query(object):
             tree = tree.accept(walker)
         return tree
 
-    def search(self, user_info=None, collection=None):
+    def search(self, user_info=None, collection=None, **kwargs):
         """Search records."""
         user_info = user_info or current_user
         # Enhance query first
@@ -60,7 +60,8 @@ class Query(object):
 
         for walker in search_walkers():
             query = query.accept(walker)
-        return query
+        return Results(query)
+
 
     def match(self, record, user_info=None):
         """Return True if record match the query."""
@@ -69,3 +70,50 @@ class Query(object):
     def terms(self, keywords=None):
         """Return list of terms for given keywords in query pattern."""
         return self.query.accept(Terms(keywords=keywords))
+
+
+class Results(object):
+
+    def __init__(self, query, **kwargs):
+        self.body = {
+            'from': 0,
+            'size': 10,
+            'query': query,
+        }
+        self.body.update(kwargs)
+
+        self._results = None
+
+    @property
+    def recids(self):
+        # FIXME add warnings
+        from intbitset import intbitset
+        from invenio.ext.es import es
+        results = es.search(
+            index='records',
+            doc_type='record',
+            body={
+                'size': 9999999,
+                'fields': ['control_number'],
+                'query': self.query
+            }
+        )
+        return intbitset([int(r['_id']) for r in results['hits']['hits']])
+
+    def _search(self):
+        from invenio.ext.es import es
+
+        if self._results is None:
+            self._results = es.search(
+                index='records',
+                doc_type='record',
+                body=self.body,
+            )
+        return self._results
+
+    def records(self):
+        from invenio_records.api import Record
+        return [Record(r['_source']) for r in self._search()['hits']['hits']]
+
+    def __len__(self):
+        return self._search()['hits']['total']

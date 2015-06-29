@@ -35,7 +35,6 @@ SEARCH_QUERY_ENHANCERS = [
     # 'invenio.modules.search.enhancers.cache_results.apply',
     'invenio.modules.search.enhancers.collection_filter.apply',
     # 'invenio.modules.search.enhancers.facet_filter.apply',
-    'invenio.modules.search.enhancers.search.apply',
 ]
 
 # SEARCH_WALKERS -- a comma separated list of strings. Each string is
