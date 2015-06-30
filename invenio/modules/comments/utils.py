@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,6 +21,8 @@
 
 from flask import request
 
+from invenio.modules.comments.models import CmtRECORDCOMMENT
+
 
 def comments_nb_counts():
     """Get number of comments for the record `recid`."""
@@ -31,9 +33,11 @@ def comments_nb_counts():
     elif recid == 0:
         return 0
     else:
-        from invenio.legacy.webcomment.adminlib import get_nb_comments
-
-        return get_nb_comments(recid, count_deleted=False)
+        return CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recid,
+            CmtRECORDCOMMENT.star_score == 0,
+            CmtRECORDCOMMENT.status.notin_('dm', 'da')
+        ])
 
 
 def reviews_nb_counts():
@@ -45,6 +49,8 @@ def reviews_nb_counts():
     elif recid == 0:
         return 0
     else:
-        from invenio.legacy.webcomment.adminlib import get_nb_reviews
-
-        return get_nb_reviews(recid, count_deleted=False)
+        return CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recid,
+            CmtRECORDCOMMENT.star_score > 0,
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+        ])

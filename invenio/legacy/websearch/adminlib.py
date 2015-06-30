@@ -3529,11 +3529,19 @@ def get_detailed_page_tabs_counts(recID):
         if reftag and len(reftag) > 4:
             tabs_counts['References'] = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
     # obtain number of comments/reviews
-    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
+    from invenio.modules.comments.models import CmtRECORDCOMMENT
     if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
-        num_comments = get_nb_comments(recID, count_deleted=False)
+        num_comments = CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recID,
+            CmtRECORDCOMMENT.star_score == 0,
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+        ])
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
-        num_reviews = get_nb_reviews(recID, count_deleted=False)
+        num_reviews = CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recID,
+            CmtRECORDCOMMENT.star_score > 0,
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+        ])
     if num_comments:
         tabs_counts['Comments'] = num_comments
         tabs_counts['Discussions'] += num_comments

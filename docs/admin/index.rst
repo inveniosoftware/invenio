@@ -40,7 +40,6 @@ Admin's Guide
    oaiharvest-admin-guide
    oairepository-admin-guide
    publiline-admin-guide
-   webcomment-admin-guide
    webmessage-admin-guide
    websearch-admin-guide
    websession-admin-guide

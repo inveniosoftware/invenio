@@ -392,10 +392,6 @@ configuration:
    record pages. You can then build your own user interface on this
    almost blank page (See `Customizing content of
    tabs <#det_page_cust_cont_tabs>`__).
--  Note that *Comments* and *Reviews* tabs will not be shown if you have
-   disabled commenting and reviewing features in your installation,
-   respectively. (``CFG_WEBCOMMENT_ALLOW_COMMENTS`` and
-   ``CFG_WEBCOMMENT_ALLOW_REVIEWS`` variable in your config file)
 
 2.3 Customizing content of tabs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -417,10 +413,6 @@ The contents of tabs are defined in the following ways:
     format. If the result returned by BibFormat is empty, the tab is
     disabled (visible, but not clickable). It can therefore be
     collection-specific.
-***Comments* and *Reviews* tabs**
-    The content of these tabs is mainly defined by function
-    ``tmpl_get_comments(..)`` in ``webcomment_templates.py``. Other
-    functions in this file are also involved in the display.
 ***Usage Statistics* tab**
     The content of this tab is defined by function
     ``tmpl_detailed_record_statistics(..)`` in
@@ -436,9 +428,6 @@ The content of the mini panel is defined in the following ways:
 ***Files***
     The content of this section is defined by the output format
     'HDFILE'. It can therefore be collection-specific.
-***Review***
-    The content of this section is defined by function
-    ``tmpl_mini_review(..)`` inside ``webcomment_templates.py``
 ***Actions***
     The content of this section is defined by the output format
     ``HDACT``. It can therefore be collection-specific.

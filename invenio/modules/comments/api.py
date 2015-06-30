@@ -69,6 +69,7 @@ from .config import CFG_WEBCOMMENT_ACTION_CODE, \
     InvenioWebCommentError, \
     InvenioWebCommentWarning
 from invenio.modules.access.engine import acc_authorize_action
+from invenio.modules.access.models import CmtRECORDCOMMENT
 from invenio.legacy.search_engine import \
     guess_primary_collection_of_a_record, \
     check_user_can_view_record
@@ -154,10 +155,22 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     # res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
     nb_res = len(res)
 
-    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
+    filters = [
+        CmtRECORDCOMMENT.id_bibrec == recID,
+        CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+    ]
 
-    nb_reviews = get_nb_reviews(recID, count_deleted=False)
-    nb_comments = get_nb_comments(recID, count_deleted=False)
+    nb_reviews = CmtRECORDCOMMENT.count(*(
+        filters + [
+            CmtRECORDCOMMENT.star_score > 0
+        ]
+    ))
+
+    nb_comments = CmtRECORDCOMMENT.count(*(
+        filters + [
+            CmtRECORDCOMMENT.star_score == 0
+        ]
+    ))
 
     # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
@@ -882,7 +895,6 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
-    msg_original = msg
     (restriction, round_name) = get_record_status(recID)
     if attached_files is None:
         attached_files = {}
