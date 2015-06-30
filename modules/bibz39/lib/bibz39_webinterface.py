@@ -52,7 +52,7 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
         referer = '/admin2/bibz39/'
         navtrail = ' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> ' % CFG_SITE_URL
 
-        auth_code, auth_message = acc_authorize_action(req, 'cfgbibedit')
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
         if auth_code != 0:
             return page_not_authorized(req=req, referer=referer,
                                        text=auth_message, navtrail=navtrail)
@@ -74,18 +74,8 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
                                                                                 new_recid))
 
         body_content = ''
-        body_content += """<div id='search_area'><form id='search_form' method="post" action="/admin2/bibz39/">
-        <label for="search">Search request:</label><br>
-        <input type="text" name="search" id="search" value="{0}" />
-        <select multiple='multiple' name='server'> """.format(cgi.escape(argd['search']))
+        body_content += self.generate_request_form(argd)
 
-        for server in CFG_Z39_SERVER.keys():
-            body_content += "<option value='{0}'>{0}</option>".format(server)
-
-        body_content += """</select>
-        <input type="submit" value="query" class="adminbutton" />
-
-        </form></div>"""
 
         if "search" in argd and argd["search"]:
 
@@ -103,23 +93,23 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
                     conn.databaseName = CFG_Z39_SERVER[server]["databasename"]
                     conn.preferredRecordSyntax = CFG_Z39_SERVER[server]["preferredRecordSyntax"]
                     query = zoom.Query('CCL', '{0}'.format(argd["search"]))
-                    body_content += "<div id='middle_area'><h3>{0}</h3>".format(server)
+                    body_content += "<h3>{0}</h3>".format(server)
                     try:
-                        for conn_res in conn.search(query):
-                            res.append(conn_res)
+                        res = list(conn.search(query))
 
-                        if len(res) <= 1:
+                        if len(res) == 1:
                             body_content += "1 result"
+                        elif len(res) == 0:
+                            body_content += "0 result"
                         else:
-                            body_content += "{0} results".format(len(res))
+                            body_content += "<p>{0} results</p>".format(len(res))
                     except zoom.Bib1Err as e:
                         body_content += "<h4>{0}</h4>".format(e)
-                        body_content += '</div>'
                         err = True
                     conn.close()
 
                     if res:
-                        body_content += "<table id='result_area'>"
+                        body_content += "<table id='result_area' class='fullwidth'>"
                         body_content += "<tr><th>ID</th><th>Title<th><th>Actions</th></tr>"
 
                         for identifier, rec in enumerate(res):
@@ -129,20 +119,18 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
                                         zmarc.MARC(rec.data, strict=0).toMARCXML()))[0])
                             title = ''
                             for title_constituant in list_of_record[identifier]["245"][0][0]:
-                                title += title_constituant[1] + "<br>"
+                                title += title_constituant[1] + " "
 
-                            if identifier % 2:
-                                class_html = "class='coloredrow'"
-                            else:
-                                class_html = ""
 
-                            body_content += "<tr {3}><td>{0}</td><td><a href='#' onclick='showxml({0})'>{1}</a><th><th>{2}</th></tr>".format(
+                            body_content += "<tr><td>{0}</td><td><a href='#/' onclick='showxml({0})'>{1}</a><th><th>{2}</th></tr>".format(
                                 identifier, title,
                                 '<form method="post" action="/admin2/bibz39/"><input type="hidden"  name="marcxml"  value="{0}"><input type="submit" value="bibedit" /></form>'.format(
                                     cgi.escape(
-                                        record_xml_output(list_of_record[identifier])).replace("\"","&quot;").replace("\'", "&quot;")), class_html)
+                                        record_xml_output(list_of_record[identifier])).replace("\"",
+                                                                                               "&quot;").replace(
+                                        "\'", "&quot;")))
 
-                        body_content += "</table></div>"
+                        body_content += "</table>"
                         body_content += '<script type="text/javascript">'
                         body_content += "var gAllMarcXml= {"
                         for i, rec in enumerate(list_of_record):
@@ -156,7 +144,6 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
 
             except zoom.QuerySyntaxError:
                 body_content += "<div> There is an error in the query syntax<br></div>"
-                body_content += '</div>'
                 if conn:
                     conn.close()
             except Exception:
@@ -185,3 +172,34 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
     def __call__(self, req, form):
         """Redirect calls without final slash."""
         redirect_to_url(req, '%s/admin2/bibz39/' % CFG_SITE_SECURE_URL)
+
+
+    def generate_request_form(self, argd):
+        html = ""
+        html += """<div id='middle_area'><h3 class="fullwidth" >Search</h3>
+
+        <form method="post" action="/admin2/bibz39/">
+        <div id='search_form'>
+        <input type="text" name="search" id="search" value="{0}" />
+
+        <input type="submit" value="query" class="adminbutton submitbutton" />
+        </div>
+        <div class='server_area'>""".format(argd["search"])
+
+        for server in CFG_Z39_SERVER.keys():
+            html += "<div><input type='checkbox' name='server' value='{0}'>{0}</div>".format(server)
+
+        html += """</div>
+
+        <div id="arrow" onclick="server_area_print()" >
+        <a href="#1">
+        <div id="serverarrow" class="fa fa-angle-double-down">
+        </div>
+        </a>
+        </div>
+
+
+
+        </form>"""
+
+        return html
