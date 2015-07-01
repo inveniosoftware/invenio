@@ -271,7 +271,6 @@ setup(
             'plotextractor = invenio.utils.scripts.plotextractor:main',
             # Legacy
             'alertengine = invenio.legacy.webalert.scripts.alertengine:main',
-            'bibcheck = invenio.legacy.bibcheck.scripts.bibcheck:main',
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
             'bibcatalog = invenio.legacy.bibcatalog.scripts.bibcatalog:main',

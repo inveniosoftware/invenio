@@ -25,7 +25,6 @@ Admin's Guide
    :maxdepth: 1
 
    bibauthority-admin-guide
-   bibcheck-admin-guide
    bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide

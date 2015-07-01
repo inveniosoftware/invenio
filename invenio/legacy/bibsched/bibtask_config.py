@@ -35,7 +35,7 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "dbdump", "bibencode",
                            "bibtasklet", "refextract", "bibsort",
                            "selfcites", "arxiv-pdf-checker", "bibcatalog",
-                           "bibtex", "bibcheck")
+                           "bibtex")
 
 # Tasks that should be run as standalone task
 if CFG_INSPIRE_SITE:
