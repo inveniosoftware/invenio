@@ -294,24 +294,6 @@ def create_wsgi_app(*args, **kwargs):
     """Create WSGI application."""
     app = create_app(*args, **kwargs)
 
-    @app.before_first_request
-    def pre_load():
-        """Pre-load citation dictionaries upon WSGI application start-up.
-
-        The citation dictionaries are loaded lazily, which is good for CLI
-        processes such as bibsched, but for web user queries we want them to
-        be available right after web server start-up.
-        """
-        # FIXME: move to invenio.modules.ranker.views when its created
-        try:
-            from invenio.legacy.bibrank.citation_searcher import \
-                get_citedby_hitset, \
-                get_refersto_hitset
-            get_citedby_hitset(None)
-            get_refersto_hitset(None)
-        except Exception:
-            pass
-
     if app.debug:
         from werkzeug.debug import DebuggedApplication
         app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)

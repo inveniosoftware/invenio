@@ -57,7 +57,6 @@ from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_str
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio.legacy.websearch.adminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.modules.collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
@@ -238,7 +237,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             cc = guess_primary_collection_of_a_record(self.recid)
             cc_id = Collection.query.filter_by(name=cc).value('id')
-            unordered_tabs = get_detailed_page_tabs(cc_id, self.recid, ln)
+            unordered_tabs = None  # get_detailed_page_tabs(cc_id, self.recid, ln)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in iteritems(unordered_tabs)]
             ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
             link_ln = ''
@@ -251,7 +250,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     for (tab_id, dummy_order) in ordered_tabs_id
                     if unordered_tabs[tab_id]['visible'] is True]
 
-            tabs_counts = get_detailed_page_tabs_counts(self.recid)
+            tabs_counts = {}  # get_detailed_page_tabs_counts(self.recid)
             top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                    tabs,
                                                                    args['ln'],

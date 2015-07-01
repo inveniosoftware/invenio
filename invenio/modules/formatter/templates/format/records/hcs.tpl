@@ -21,7 +21,5 @@
 {%- endif -%}
 
 {% block search_results %}
-  {{ tfn_summarize_records(recids, of=request.args.get('of', 'hcs'), ln=g.ln,
-                           searchpattern=request.args.get('p', ''),
-                           searchfield=request.args.get('f', '')) }}
+{{ _('Not implemented') }}
 {% endblock search_results %}

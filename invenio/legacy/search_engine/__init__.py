@@ -71,13 +71,11 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      CFG_SITE_URL, \
-     CFG_SOLR_URL, \
      CFG_WEBSEARCH_DETAILED_META_FORMAT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT, \
-     CFG_XAPIAN_ENABLED
+     CFG_WEBSEARCH_WILDCARD_LIMIT
 
 from invenio.modules.search.searchext.engines.native import search_unit
 from invenio.modules.search.utils import get_most_popular_field_values
@@ -91,7 +89,6 @@ from invenio.legacy.bibrecord import (get_fieldvalues,
 from .utils import record_exists
 from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.legacy.miscutil.data_cacher import DataCacher
-from invenio.legacy.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.modules.access.control import acc_get_action_id
 from invenio.modules.access.local_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \

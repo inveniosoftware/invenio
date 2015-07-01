@@ -28,18 +28,14 @@ Admin's Guide
    bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
-   bibindex-admin-guide
    bibknowledge-admin-guide
    bibmatch-admin-guide
-   bibrank-admin-guide
    bibsched-admin-guide
-   bibsort-admin-guide
    bibupload-admin-guide
    docextract-admin-guide
    oaiharvest-admin-guide
    oairepository-admin-guide
    publiline-admin-guide
    webmessage-admin-guide
-   websearch-admin-guide
    websession-admin-guide
    webstyle-admin-guide

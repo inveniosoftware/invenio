@@ -607,11 +607,7 @@ class Externalcollection(db.Model):
     @property
     def engine(self):
         """Engine."""
-        from invenio.legacy.websearch_external_collections.searcher import (
-            external_collections_dictionary
-        )
-        if self.name in external_collections_dictionary:
-            return external_collections_dictionary[self.name]
+        pass
 
 
 class CollectionExternalcollection(db.Model):

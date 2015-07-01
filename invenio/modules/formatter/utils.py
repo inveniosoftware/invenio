@@ -382,65 +382,6 @@ def latex_to_html(text):
 
     return text
 
-def get_pdf_snippets(recID, patterns, user_info):
-    """
-    Extract text snippets around 'patterns' from the newest PDF file of 'recID'
-    The search is case-insensitive.
-    The snippets are meant to look like in the results of the popular search
-    engine: using " ... " between snippets.
-    For empty patterns it returns ""
-
-    @param recID: record ID to consider
-    @param patterns: list of patterns to retrieve
-    @param user_info: the user_info object from collect_user_info
-    @return: snippet
-    """
-    from invenio.legacy.bibdocfile.api import BibRecDocs, check_bibdoc_authorization
-
-    text_path = ""
-    text_path_courtesy = ""
-    for bd in BibRecDocs(recID).list_bibdocs():
-        # Show excluded fulltext in snippets on Inspire, otherwise depending on authorization
-        if hasattr(bd, 'get_text') and (CFG_INSPIRE_SITE or not check_bibdoc_authorization(user_info, bd.get_status())[0]):
-            text_path = bd.get_text_path()
-            text_path_courtesy = bd.get_status()
-            if CFG_INSPIRE_SITE and not text_path_courtesy:
-                # get courtesy from doctype, since docstatus was empty:
-                text_path_courtesy = bd.get_type()
-                if text_path_courtesy == 'INSPIRE-PUBLIC':
-                    # but ignore 'INSPIRE-PUBLIC' doctype
-                    text_path_courtesy = ''
-            break # stop at the first good PDF textable file
-
-    nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
-    max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS.get('', 0)
-    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS:
-        nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
-    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS:
-        max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
-
-    if text_path and nb_chars and max_snippets:
-        out = ''
-        if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'native':
-            out = get_text_snippets(text_path, patterns, nb_chars, max_snippets)
-            if not out:
-                # no hit, so check stemmed versions:
-                from invenio.legacy.bibindex.engine_stemmer import stem
-                stemmed_patterns = [stem(p, 'en') for p in patterns]
-                out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
-        elif CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'SOLR':
-            from invenio.legacy.miscutil.solrutils_bibindex_searcher import solr_get_snippet
-            out = solr_get_snippet(patterns, recID, nb_chars, max_snippets)
-
-        if out:
-            out_courtesy = ""
-            if CFG_INSPIRE_SITE and text_path_courtesy:
-                out_courtesy = '<strong>Snippets courtesy of ' + text_path_courtesy + '</strong><br>'
-            return '%s%s' % (out_courtesy, out)
-        else:
-            return ""
-    else:
-        return ""
 
 def get_text_snippets(textfile_path, patterns, nb_chars, max_snippets):
     """

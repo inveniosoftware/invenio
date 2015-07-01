@@ -17,15 +17,7 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Perform template migration operations.
-
-Migrate output formats and output templates found in
-``CFG_BIBFORMAT_OUTPUTS_PATH`` and ``CFG_BIBFORMAT_TEMPLATES_PATH``
-respectively. It creates backup of each output format with name
-``<FORMAT>_legacy.bfo`` and generates new Jinja2 templates in
-``CFG_BIBFORMAT_JINJA_TEMPLATE_PATH``.
-"""
+"""Perform template operations."""
 
 from __future__ import print_function
 
@@ -37,7 +29,7 @@ from six import iteritems
 
 from invenio.ext.script import Manager
 
-manager = Manager(usage="Perform template migration operations.")
+manager = Manager(usage=__doc__)
 
 
 @manager.option('-o', '--output-format', dest='output_format',

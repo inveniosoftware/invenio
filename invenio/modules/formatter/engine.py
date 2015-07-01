@@ -19,40 +19,18 @@
 
 """Format a single record using specified format."""
 
-import cgi
-import os
 import re
 import types
 
-from HTMLParser import HTMLParseError
+from invenio.base.globals import cfg
+from invenio.base.i18n import language_list_long
+from invenio.ext.template import render_template_to_string
+from invenio.modules.formatter.registry import template_context_functions
 
-from flask import current_app
 from werkzeug.utils import cached_property
 
-from invenio.base.globals import cfg
-from invenio.base.i18n import gettext_set_language, language_list_long, \
-    wash_language
-from invenio.config import \
-    CFG_BIBFORMAT_HIDDEN_TAGS, \
-    CFG_SITE_LANG
-from invenio.ext.logging import register_exception
-from invenio.ext.template import render_template_to_string
-from invenio.legacy.bibrecord import create_record, record_empty, \
-    record_get_field_instances, record_get_field_value, \
-    record_get_field_values, record_xml_output
-from invenio.modules.access.engine import acc_authorize_action
-from invenio.modules.formatter.registry import template_context_functions
-from invenio.modules.formatter.utils import parse_tag
-from invenio.modules.knowledge.api import get_kbr_values
-from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST, \
-    CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, HTMLWasher
-
 from . import registry
-from .config import CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
-    CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
-    CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_OUTPUTS_PATH, \
-    CFG_BIBFORMAT_TEMPLATES_DIR, InvenioBibFormatError
-from .engines import xslt
+from .config import InvenioBibFormatError
 
 # Cache for data we have already read and parsed
 format_templates_cache = {}
@@ -62,9 +40,6 @@ html_field = '<!--HTML-->' # String indicating that field should be
                            # treated as HTML (and therefore no escaping of
                            # HTML tags should occur.
                            # Appears in some field values.
-
-washer = HTMLWasher()      # Used to remove dangerous tags from HTML
-                           # sources
 
 # Regular expression for finding <lang>...</lang> tag in format templates
 pattern_lang = re.compile(r'''
@@ -255,7 +230,7 @@ def decide_format_template(record, of):
     return output_format['default']
 
 
-def filter_languages(format_template, ln=CFG_SITE_LANG):
+def filter_languages(format_template, ln=None):
     """
     Filters the language tags that do not correspond to the specified language.
 
@@ -263,6 +238,7 @@ def filter_languages(format_template, ln=CFG_SITE_LANG):
     :param ln: the language that is NOT filtered out from the template
     @return: the format template with unnecessary languages filtered out
     """
+    ln = ln or cfg['CFG_SITE_LANG']
     # First define search_lang_tag(match) and clean_language_tag(match), used
     # in re.sub() function
     def search_lang_tag(match):
