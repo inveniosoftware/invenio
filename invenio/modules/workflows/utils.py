@@ -258,21 +258,6 @@ def get_holdingpen_objects(ptags=None):
     return bwobject_list
 
 
-def get_versions_from_tags(tags):
-    """Return a tuple with statuses from tags.
-
-    :param tags: list of tags
-    :return: tuple of (statuses to show, cleaned tags list)
-    """
-    tags_copy = tags[:]
-    status_showing = []
-    for i in range(len(tags_copy) - 1, -1, -1):
-        if tags_copy[i] in DbWorkflowObject.version.known_statuses.labels:
-            status_showing.append(DbWorkflowObject.known_statuses[tags_copy[i]])
-            del tags_copy[i]
-    return status_showing, tags_copy
-
-
 def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
     """Return the formatted output, from cache if available."""
     results = cache.get("workflows_holdingpen_{0}".format(bwo.id))
