@@ -55,6 +55,7 @@ from six import iteritems
 from werkzeug.http import http_date
 from werkzeug.local import LocalProxy
 
+from invenio.base.globals import cfg
 from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
 from invenio.ext.template.context_processor import \
@@ -90,6 +91,17 @@ def _collection_of():
     return g.collection.formatoptions[0]['code']
 
 collection_of = LocalProxy(_collection_of)
+
+
+def _default_rg():
+    """Get number of records per page from user settings."""
+    rg = cfg['CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS']
+    if 'rg' not in request.values and current_user.get('rg'):
+        rg = current_user.get('rg')
+    return int(rg) or 1
+
+default_rg = LocalProxy(_default_rg)
+
 
 """Collection output format."""
 
@@ -167,7 +179,7 @@ def collection_breadcrumbs(collection, endpoint=None):
                  'of': (unicode, 'hb'),
                  'so': (unicode, None),
                  'rm': (unicode, None),
-                 'rg': (int, 10),
+                 'rg': (int, default_rg),
                  'jrec': (int, 1)})
 @check_collection(default_collection=True)
 def browse(collection, p, f, of, so, rm, rg, jrec):
@@ -180,31 +192,22 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
 @wash_arguments({'p': (unicode, ''),
                  'jrec': (int, 1),
                  'so': (unicode, None),
-                 'rm': (unicode, None)})
+                 'rm': (unicode, None),
+                 'rg': (int, default_rg)})
 @check_collection(default_collection=True)
-def rss(collection, p, jrec, so, rm):
+def rss(collection, p, jrec, so, rm, rg):
     """Render RSS feed."""
-    of = 'xr'
-    argd = wash_search_urlargd(request.args)
-    argd['of'] = 'id'
-
-    # update search arguments with the search user preferences
-    if 'rg' not in request.values and current_user.get('rg'):
-        argd['rg'] = current_user.get('rg')
-    rg = int(argd['rg'])
-
     response = Query(p).search(collection=collection.name)
     response.body.update({
         'size': rg,
         'from': jrec-1,
     })
 
-    ctx = dict(
+    return response_formated_records(
+        response.records(), collection, 'xr',
         records=len(response),
         rg=rg,
     )
-
-    return response_formated_records(response.records(), collection, of, **ctx)
 
 
 @blueprint.route('/search', methods=['GET', 'POST'])
@@ -215,9 +218,11 @@ def rss(collection, p, jrec, so, rm):
                  'so': (unicode, None),
                  'sf': (unicode, None),
                  'sp': (unicode, None),
-                 'rm': (unicode, None)})
+                 'rm': (unicode, None),
+                 'rg': (int, default_rg),
+                 'jrec': (int, 1)})
 @check_collection(default_collection=True)
-def search(collection, p, of, ot, so, sf, sp, rm):
+def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
     """Render search page."""
     if 'action_browse' in request.args \
             or request.args.get('action', '') == 'browse':
@@ -233,22 +238,14 @@ def search(collection, p, of, ot, so, sf, sp, rm):
         del args['f']
         return redirect('.search', **args)
 
-    argd = wash_search_urlargd(request.args)
-
     # fix for queries like `/search?p=+ellis`
     p = p.strip().encode('utf-8')
-    jrec = request.values.get('jrec', 1, type=int)
-
-    # update search arguments with the search user preferences
-    if 'rg' not in request.values and current_user.get('rg'):
-        argd['rg'] = int(current_user.get('rg'))
-    rg = int(argd['rg']) or 1
 
     collection_breadcrumbs(collection)
 
     response = Query(p).search(collection=collection.name)
     response.body.update({
-        'size': rg,
+        'size': int(rg),
         'from': jrec-1,
     })
 
