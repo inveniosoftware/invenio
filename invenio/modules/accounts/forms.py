@@ -25,16 +25,17 @@ from flask_login import current_user
 
 from flask_wtf import Form, validators
 
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.utils.forms import InvenioBaseForm
+
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from wtforms.fields import BooleanField, HiddenField, PasswordField, \
     StringField, SubmitField
-from wtforms.validators import DataRequired, StopValidation, ValidationError
-
-from invenio.base.globals import cfg
-from invenio.base.i18n import _
-from invenio.utils.forms import InvenioBaseForm
+from wtforms.validators import DataRequired, EqualTo, StopValidation, \
+    ValidationError
 
 from .models import User
 from .validators import validate_email, validate_nickname, \
@@ -90,19 +91,13 @@ def repeat_email_validator(form, field):
         raise ValidationError(_("Email addresses do not match."))
 
 
-def password_validator(form, field):
-    """Validate password."""
+def min_length_password_validator(form, field):
+    """Validate minimum length for password."""
     min_length = cfg['CFG_ACCOUNT_MIN_PASSWORD_LENGTH']
     if len(field.data) < min_length:
         raise validators.ValidationError(
             _("Password must be at least %(x_pass)d characters long.",
               x_pass=min_length))
-
-
-def password2_validator(form, field):
-    """Validate password2."""
-    if field.data != form.password.data:
-        raise validators.ValidationError(_("Both passwords must match."))
 
 
 def current_user_validator(attr):
@@ -111,6 +106,20 @@ def current_user_validator(attr):
         if current_user[attr] == field.data:
             raise StopValidation()
     return _validator
+
+
+def current_user_password_validator(form, field):
+    """Validate password field if is the password of the user."""
+    id_user = current_user.get_id()
+    if not id_user:
+        raise validators.ValidationError(
+            _("Nobody is currently logged-in."))
+
+    user = User.query.filter_by(id=id_user).one()
+    if not user.verify_password(field.data):
+        raise validators.ValidationError(
+            _('The password inserted is not valid.')
+        )
 
 
 class VerificationForm(InvenioBaseForm):
@@ -126,8 +135,11 @@ class LoginForm(Form):
 
     nickname = StringField(
         _("Nickname"),
-        validators=[DataRequired(message=_("Nickname not provided")),
-                    validate_nickname_or_email])
+        validators=[
+            DataRequired(message=_("Nickname not provided")),
+            validate_nickname_or_email
+        ]
+    )
     password = PasswordField(_("Password"))
     remember = BooleanField(_("Remember Me"))
     referer = HiddenField()
@@ -139,59 +151,28 @@ class LoginForm(Form):
         field.data = wash_login_method(field.data)
 
 
-class ChangeUserEmailSettingsForm(InvenioBaseForm):
-
-    """Form to change user email settings."""
-
-    email = StringField(_("New email"))
-
-    def validate_email(self, field):
-        """Validate email."""
-        field.data = field.data.lower()
-        if validate_email(field.data.lower()) != 1:
-            raise validators.ValidationError(
-                _("Supplied email address %(email)s is invalid.",
-                  email=field.data)
-            )
-
-        # is email already taken?
-        try:
-            User.query.filter(User.email == field.data).one()
-            raise validators.ValidationError(
-                _("Supplied email address %(email)s already exists "
-                  "in the database.", email=field.data)
-            )
-        except SQLAlchemyError:
-            pass
-
-        # if the email is changed we reset the password to a random one, such
-        # that the user is forced to confirm the new email
-        import random
-        from webuser import updatePasswordUser
-        updatePasswordUser(current_user['id'], int(random.random() * 1000000))
-
-        from flask import flash, url_for
-        flash(_("Note that if you have changed your email address, you \
-                will have to <a href=%(link)s>reset</a> your password anew.",
-                link=url_for('webaccount.lost')), 'warning')
-
-
 class ProfileForm(InvenioBaseForm):
 
     """Profile form."""
 
     nickname = StringField(
         _("Username"),
-        validators=[DataRequired(), current_user_validator('nickname'),
-                    nickname_validator]
+        validators=[
+            DataRequired(),
+            current_user_validator('nickname'),
+            nickname_validator
+        ]
     )
     family_name = StringField(_("Family name"))
     given_names = StringField(_("Given names"))
     email = StringField(
         _("Email address"),
         filters=[lambda x: x.lower(), ],
-        validators=[DataRequired(), current_user_validator('email'),
-                    user_email_validator]
+        validators=[
+            DataRequired(),
+            current_user_validator('email'),
+            user_email_validator
+        ]
     )
     repeat_email = StringField(
         _("Re-enter email address"),
@@ -207,7 +188,31 @@ class LostPasswordForm(InvenioBaseForm):
 
     email = StringField(
         _("Email address"),
-        validators=[DataRequired(), email_validator]
+        validators=[
+            DataRequired(),
+            email_validator
+        ]
+    )
+
+
+class ResetPasswordForm(InvenioBaseForm):
+
+    """Form to change password."""
+
+    password = PasswordField(
+        _("New password"),
+        description=_("The password phrase may contain punctuation, "
+                      "spaces, etc."),
+        validators=[
+            DataRequired(),
+            min_length_password_validator
+        ]
+    )
+    password2 = PasswordField(
+        _("Confirm new password"),
+        validators=[
+            EqualTo('password', message=_('Both passwords must match.'))
+        ]
     )
 
 
@@ -215,13 +220,29 @@ class ChangePasswordForm(InvenioBaseForm):
 
     """Form to change password."""
 
-    current_password = PasswordField(_("Current password"),
-                                     description=_("Your current password"))
+    current_password = PasswordField(
+        _("Current password"),
+        description=_("Your current password"),
+        validators=[
+            DataRequired(),
+            current_user_password_validator
+        ]
+    )
     password = PasswordField(
         _("New password"),
         description=_("The password phrase may contain punctuation, "
-                      "spaces, etc."))
-    password2 = PasswordField(_("Confirm new password"),)
+                      "spaces, etc."),
+        validators=[
+            DataRequired(),
+            min_length_password_validator,
+        ]
+    )
+    password2 = PasswordField(
+        _("Confirm new password"),
+        validators=[
+            EqualTo('password', message=_('Both passwords must match.'))
+        ]
+    )
 
     def validate_current_password(self, field):
         """Validate current password."""
@@ -237,24 +258,33 @@ class RegisterForm(Form):
 
     email = StringField(
         _("Email address"),
-        validators=[DataRequired(message=_("Email not provided")),
-                    user_email_validator],
+        validators=[
+            DataRequired(message=_("Email not provided")),
+            user_email_validator
+        ],
         description=_("Example") + ": john.doe@example.com")
     nickname = StringField(
         _("Nickname"),
-        validators=[DataRequired(message=_("Nickname not provided")),
-                    nickname_validator],
+        validators=[
+            DataRequired(message=_("Nickname not provided")),
+            nickname_validator
+        ],
         description=_("Example") + ": johnd")
     password = PasswordField(
         _("Password"),
         description=_(
             "The password phrase may contain punctuation, spaces, etc."
         ),
-        validators=[password_validator],
+        validators=[
+            DataRequired(),
+            min_length_password_validator
+        ],
     )
     password2 = PasswordField(
         _("Confirm password"),
-        validators=[password2_validator]
+        validators=[
+            EqualTo('password', message=_('Both passwords must match.')),
+        ]
     )
     referer = HiddenField()
     action = HiddenField(default='login')

@@ -84,6 +84,7 @@ In templates you can add a sign in/up link:
 """
 
 import copy
+
 import re
 
 from flask import current_app
@@ -196,7 +197,9 @@ def account_info(remote, resp):
     res = get_dict_from_response(response)
     email = res['{0}/{1}'.format(REMOTE_APP_RESOURCE_SCHEMA,
                                  'EmailAddress')][0]
-    return dict(email=email, nickname=email)
+    common_name = res['{0}/{1}'.format(REMOTE_APP_RESOURCE_SCHEMA,
+                                       'CommonName')][0]
+    return dict(email=email, nickname=common_name)
 
 
 def account_setup(remote, token):

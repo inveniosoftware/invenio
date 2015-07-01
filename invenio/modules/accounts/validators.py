@@ -19,8 +19,6 @@
 
 """Implements account validators."""
 
-import re
-
 from flask import current_app
 
 from flask_wtf import validators
@@ -30,8 +28,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from invenio.base.i18n import _
 
 from .models import User
-
-re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
 
 def wash_login_method(login_method):
@@ -76,13 +72,10 @@ def validate_nickname(nickname):
     This check relies on re_invalid_nickname regexp (see above)
     Return 1 if nickname is okay, return 0 if it is not.
     """
-    if nickname and \
-       not(nickname.startswith(' ') or nickname.endswith(' ')) and \
-       nickname.lower() != 'guest':
-        if re_invalid_nickname.match(nickname) is not None:
-            raise validators.ValidationError(
-                _("Desired nickname %(x_name)s is invalid.", x_name=nickname)
-            )
+    if not User.check_nickname(nickname):
+        raise validators.ValidationError(
+            _("Desired nickname %(x_name)s is invalid.", x_name=nickname)
+        )
 
 
 def validate_email(email):
@@ -94,7 +87,7 @@ def validate_email(email):
     """
     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN = current_app.config.get(
         'CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN')
-    if (email.find("@") <= 0) or (email.find(" ") > 0):
+    if not User.check_email(email):
         raise validators.ValidationError(
             _("Supplied email address %(x_addr)s is invalid.", x_addr=email)
         )

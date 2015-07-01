@@ -19,7 +19,8 @@
 
 """Account database models."""
 
-# General imports.
+import re
+
 from datetime import datetime
 
 from flask_login import current_user
@@ -83,6 +84,21 @@ class User(db.Model):
 
     PROFILE_FIELDS = ['nickname', 'email', 'family_name', 'given_names']
     """List of fields that can be updated with update_profile."""
+
+    @staticmethod
+    def check_nickname(nickname):
+        """Check if it's a valid nickname."""
+        re_invalid_nickname = re.compile(""".*[,'@]+.*""")
+        return bool(nickname) and not nickname.startswith(' ') and \
+            not nickname.endswith(' ') and \
+            nickname.lower() != 'guest' and \
+            not re_invalid_nickname.match(nickname)
+
+    @staticmethod
+    def check_email(email):
+        """Check if it's a valid email."""
+        r = re.compile(r'(.)+\@(.)+\.(.)+')
+        return bool(email) and r.match(email) and not email.find(" ") > 0
 
     @hybrid_property
     def note(self):
