@@ -473,7 +473,7 @@ class DbWorkflowObject(db.Model):
 
     _id_workflow = db.Column(db.String(36),
                              db.ForeignKey("bwlWORKFLOW.uuid", ondelete='CASCADE'),
-                             nullable=True)
+                             nullable=True, name="id_workflow")
 
     status = db.Column(ChoiceType(ObjectStatus, impl=db.Integer()),
                        default=ObjectStatus.INITIAL, nullable=False,

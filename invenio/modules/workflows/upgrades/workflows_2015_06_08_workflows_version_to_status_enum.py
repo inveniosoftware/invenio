@@ -21,10 +21,6 @@ import warnings
 
 from invenio.ext.sqlalchemy import db
 from invenio.modules.upgrader.api import op
-from invenio.utils.text import wait_for_user
-
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session as BaseSession, relationship
 
 from invenio.modules.workflows.models import (
     CallbackPosType,
@@ -34,74 +30,12 @@ from invenio.modules.workflows.models import (
     _encoded_default_extra_data,
     _encoded_default_data,
     _decode,
+    DbWorkflowObject
 )
-
-Session = sessionmaker()
-Base = declarative_base()
-
 
 # Important: Below is only a best guess. You MUST validate which previous
 # upgrade you depend on.
 depends_on = [u'workflows_2014_08_12_initial']
-
-
-class Workflow(Base):
-
-    """Handle for the actual Workflow model."""
-
-    __tablename__ = "bwlWORKFLOW"
-
-    uuid = db.Column(db.String(36), primary_key=True, nullable=False)
-
-    status = db.Column(db.Integer, default=0, nullable=False)
-    status_old = db.Column(db.Integer, default=0, nullable=False)
-
-from collections import namedtuple
-Mapping = namedtuple('Mapping', ['db_name', 'default_x_data'])
-
-class DbWorkflowObject(Base):
-
-    """Handle for the actual WorkflowObject model."""
-
-    __tablename__ = "bwlOBJECT"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    version = db.Column(db.Integer,
-                        default=0, nullable=False)  # Hardcoded default because
-                                                    # Objectversion is dead
-
-    status = db.Column(ChoiceType(ObjectStatus, impl=db.Integer),
-                       default=ObjectStatus.INITIAL, nullable=False,
-                       index=True)
-
-    callback_pos = db.Column(CallbackPosType())  # ex-task_counter
-
-    _extra_data = db.Column(db.LargeBinary, nullable=False,
-                            default=_encoded_default_extra_data)
-
-    def __getattribute__(self, name):
-        """Return `data` and `extra_data` user-facing storage representations.
-
-        Initialize the one requested with default content if it is not yet
-        loaded.
-
-        Calling :py:func:`.save` is neccessary to reflect any changes made to
-        these objects in the model.
-        """
-        data_getter = {
-            # 'data': Mapping('_data', _encoded_default_data),
-            'extra_data': Mapping('_extra_data', _encoded_default_extra_data),
-        }
-        if name in data_getter and name not in self.__dict__:
-            mapping = data_getter[name]
-            if getattr(self, mapping.db_name) is None:
-                # Object has not yet been intialized
-                stored_data = mapping.default_x_data
-            else:
-                stored_data = getattr(self, mapping.db_name)
-            setattr(self, name, _decode(stored_data))
-        return object.__getattribute__(self, name)
 
 
 def info():
@@ -112,22 +46,18 @@ def info():
 def do_upgrade():
     """Implement your upgrades here."""
 
-    # Bind and session
-    bind = op.get_bind()
-    session = Session(bind=bind)
-
     # 1. <<< bwlWORKFLOW >>>
 
-    # 1.1 KILL: counter_{initial,halted,error,finished}
-
+    # 1.1 KILL: counter_{initial,halted,error,finished} + current_object
     for column_name in ('counter_initial', 'counter_halted', 'counter_error',
-                        'counter_finished'):
+                        'counter_finished', 'current_object'):
         op.drop_column('bwlWORKFLOW', column_name)
 
     # 2. <<< bwlOBJECT >>>
+    op.drop_column('bwlOBJECT', 'status')
 
     # 2.1 version -> status (ChoiceType(ObjectStatus))
-    op.alter_column('blwOBJECT',
+    op.alter_column('bwlOBJECT',
                     'version',
                     new_column_name='status',
                     existing_type=db.Integer,
@@ -139,7 +69,7 @@ def do_upgrade():
                   db.Column('callback_pos', CallbackPosType()))
 
     # 2.2 Data migration
-    for object_ in session.query(DbWorkflowObject):
+    for object_ in db.session.query(DbWorkflowObject):
         try:
             object_.callback_pos = object_.extra_data["_task_counter"]
             del object_.extra_data["_task_counter"]
@@ -147,8 +77,7 @@ def do_upgrade():
             # Assume old version "task_counter"
             object_.callback_pos = object_.extra_data["task_counter"]
             del object_.extra_data["task_counter"]
-
-    session.commit()
+        object_.save()
 
 
 def estimate():
