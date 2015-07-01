@@ -42,10 +42,8 @@ Template hierarchy.
 
 import cStringIO
 import datetime
-import string
 import time
 
-from math import ceil
 
 from flask import (Blueprint, abort, current_app, flash, g, jsonify,
                    make_response, redirect, render_template, request, session,
@@ -62,14 +60,17 @@ from invenio.base.i18n import _
 from invenio.ext.template.context_processor import \
     register_template_context_processor
 from invenio.modules.collections.decorators import check_collection
+from invenio.modules.formatter import (
+    get_output_format_content_type, format_records
+)
 from invenio.modules.search.registry import facets
 from invenio.utils.pagination import Pagination
 
-from .. import receivers
+from invenio_records.api import get_record
+
 from ..api import Query
 from ..cache import get_search_query_id
 from ..forms import EasySearchForm
-from ..models import Field
 from ..washers import wash_search_urlargd
 
 blueprint = Blueprint('search', __name__, url_prefix="",
@@ -102,15 +103,14 @@ def min_length(length, code=406):
     return checker
 
 
-def response_formated_records(recids, collection, of, **kwargs):
+def response_formated_records(records, collection, of, **kwargs):
     """Return formatter records.
 
     Response contains correct Cache and TTL information in HTTP headers.
     """
-    from invenio.modules.formatter import (get_output_format_content_type,
-                                           print_records)
-    response = make_response(print_records(recids, collection=collection,
-                                           of=of, **kwargs))
+    response = make_response(format_records(records, collection=collection,
+                                            of=of, **kwargs))
+
     response.mimetype = get_output_format_content_type(of)
     current_time = datetime.datetime.now()
     response.headers['Last-Modified'] = http_date(
@@ -135,83 +135,6 @@ def response_formated_records(recids, collection, of, **kwargs):
             expires_time.timetuple()
         ))
     return response
-
-
-class SearchUrlargs(object):
-
-    """TODO."""
-
-    DEFAULT_URLARGS = {
-        'p': {'title': 'Search', 'store': None},
-        'cc': {'title': 'Collection', 'store': None},
-        'c': {'title': 'Collection', 'store': None},
-        'rg': {'title': 'Records in Groups',
-               'store': 'websearch_group_records'},
-        'sf': {'title': 'Sort Field', 'store': None},
-        'so': {'title': 'Sort Option', 'store': 'websearch_sort_option'},
-        'rm': {'title': 'Rank Method', 'store': 'websearch_rank_method'}
-    }
-
-    def __init__(self, session=None, user=None, **kwargs):
-        """TODO."""
-        self.session = session
-        self.user = user
-        self._url_args = kwargs
-
-    @property
-    def args(self):
-        """TODO."""
-        out = self.user_args
-        out.update(self.url_args)
-        return out
-
-    @property
-    def user_storable_args(self):
-        """TODO."""
-        return dict(map(lambda (k, v): (v['store'], k),
-                    filter(lambda (k, v): v['store'],
-                    iteritems(self.DEFAULT_URLARGS))))
-
-    @property
-    def url_args(self):
-        """TODO."""
-        return filter(lambda (k, v): k in self.DEFAULT_URLARGS.keys(),
-                      iteritems(self._url_args))
-
-    @property
-    def user_args(self):
-        """TODO."""
-        if not self.user:
-            return {}
-
-        user_storable_args = self.user_storable_args
-        args_keys = user_storable_args.keys()
-        if self.user.settings is None:
-            self.user.settings = dict()
-        return dict(map(lambda (k, v): (user_storable_args[k], v),
-                    filter(lambda (k, v): k in args_keys,
-                    iteritems(self.user.settings))))
-
-
-def _create_neareset_term_box(argd_orig):
-    try:
-        p = argd_orig.pop('p', '')
-        f = argd_orig.pop('f', '')
-        if 'rg' in argd_orig and 'rg' not in request.values:
-            del argd_orig['rg']
-        if f == '' and ':' in p:
-            fx, px = p.split(':', 1)
-            if Field.get_field_name(fx) is not None:
-                f, p = fx, px
-
-        from invenio.legacy.search_engine import create_nearest_terms_box
-        return create_nearest_terms_box(argd_orig,
-                                        p=p,
-                                        f=f.lower(),
-                                        ln=g.ln,
-                                        intro_text_p=True)
-    except:  # FIXME catch all exception is bad
-        return '<!-- not found -->'  # no comments
 
 
 def crumb_builder(url):
@@ -270,16 +193,18 @@ def rss(collection, p, jrec, so, rm):
         argd['rg'] = current_user.get('rg')
     rg = int(argd['rg'])
 
-    qid = get_search_query_id(**argd)
-    recids = Query(p).search(collection=collection.name)
+    response = Query(p).search(collection=collection.name)
+    response.body.update({
+        'size': rg,
+        'from': jrec-1,
+    })
 
     ctx = dict(
-        records=len(recids),
-        qid=qid,
-        rg=rg
+        records=len(response),
+        rg=rg,
     )
 
-    return response_formated_records(recids, collection, of, **ctx)
+    return response_formated_records(response.records(), collection, of, **ctx)
 
 
 @blueprint.route('/search', methods=['GET', 'POST'])
@@ -308,7 +233,7 @@ def search(collection, p, of, ot, so, sf, sp, rm):
         del args['f']
         return redirect('.search', **args)
 
-    argd = argd_orig = wash_search_urlargd(request.args)
+    argd = wash_search_urlargd(request.args)
 
     # fix for queries like `/search?p=+ellis`
     p = p.strip().encode('utf-8')
@@ -317,69 +242,31 @@ def search(collection, p, of, ot, so, sf, sp, rm):
     # update search arguments with the search user preferences
     if 'rg' not in request.values and current_user.get('rg'):
         argd['rg'] = int(current_user.get('rg'))
-    rg = int(argd['rg'])
+    rg = int(argd['rg']) or 1
 
     collection_breadcrumbs(collection)
 
-    qid = get_search_query_id(p=p, cc=collection.name)
     response = Query(p).search(collection=collection.name)
     response.body.update({
         'size': rg,
         'from': jrec-1,
     })
 
-    recids = map(lambda x: int(x['recid']), response.records())
-    records = len(response)
-
-    # back-to-search related code
-    if request and not isinstance(request.get_legacy_request(),
-                                  cStringIO.OutputType):
-        # store the last search results page
-        session['websearch-last-query'] = request.get_legacy_request() \
-                                                 .unparsed_uri
-        hit_limit = current_app.config['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']
-        if len(recids) > hit_limit:
-            last_query_hits = None
-        else:
-            last_query_hits = recids
-        # store list of results if user wants to display hits
-        # in a single list, or store list of collections of records
-        # if user displays hits split by collections:
-        session["websearch-last-query-hits"] = last_query_hits
+    pagination = Pagination((jrec-1) // rg + 1, rg, len(response))
 
     ctx = dict(
         facets={},  # facets.get_facets_config(collection, qid),
-        records=records,
         rg=rg,
-        create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
+        create_nearest_terms_box=lambda: _("Try to modify the query."),
         easy_search_form=EasySearchForm(csrf_enabled=False),
-        ot=ot
+        ot=ot,
+        pagination=pagination,
     )
 
     # TODO add search services
-    # # WebSearch services
-    # from invenio.modules.search import services
-    # if jrec <= 1 and \
-    #        (em == "" and True or (EM_REPOSITORY["search_services"] in em)):
-    #     user_info = collect_user_info(req)
-    #     # display only on first search page, and only if wanted
-    #     # when 'em' param set.
-    #     for answer_relevance, answer_html in services.get_answers(
-    #             req, user_info, of, cc, colls_to_search, p, f, ln):
-    #         req.write('<div class="searchservicebox">')
-    #         req.write(answer_html)
-    #         if verbose > 8:
-    #             write_warning("Service relevance: %i" %
-    #                           answer_relevance, req=req)
-    #         req.write('</div>')
-
     # TODO add external collection search
-    # if not of in ['hcs', 'hcs2']:
-    #       perform_external_collection_search_with_em(
-    #           req, cc, [p, p1, p2, p3], f, ec, verbose,
-    #           ln, selected_external_collections_infos, em=em)
 
-    return response_formated_records(recids, collection, of, **ctx)
+    return response_formated_records(response.records(), collection, of, **ctx)
 
 
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
@@ -392,18 +279,7 @@ def facet(name, qid):
 
     :return: jsonified facet list sorted by number of records
     """
-    try:
-        out = facets[name].get_facets_for_query(
-            qid, limit=request.args.get('limit', 20))
-    except KeyError:
-        abort(406)
-
-    if request.is_xhr:
-        return jsonify(facet=out)
-    else:
-        response = make_response('<html><body>%s</body></html>' % str(out))
-        response.mimetype = 'text/html'
-        return response
+    return jsonify(facet={})
 
 
 @blueprint.route('/list/<any(exactauthor, keyword, affiliation, reportnumber, '
@@ -421,13 +297,7 @@ def autocomplete(field, q):
 
     :return: list of values matching query.
     """
-    # IdxPHRASE = IdxINDEX.idxPHRASEF(field, fallback=False)
-    # results = IdxPHRASE.query.filter(
-    #     IdxPHRASE.term.contains(q)).limit(20).values('term')
-    # results = map(lambda r: {'value': r[0]}, results)
-    results = {}
-
-    return jsonify(results=results)
+    return jsonify(results={})
 
 
 @blueprint.route('/search/dispatch', methods=['GET', 'POST'])
@@ -459,7 +329,8 @@ def export(collection, of, ot):
     """
     # Get list of integers with record IDs.
     recids = request.values.getlist('recid', type=int)
-    return response_formated_records(recids, collection, of, ot=ot)
+    return response_formated_records([get_record(recid) for recid in recids],
+                                     collection, of, ot=ot)
 
 
 @blueprint.route('/opensearchdescription')

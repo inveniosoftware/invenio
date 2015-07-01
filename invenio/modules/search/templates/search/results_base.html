@@ -89,7 +89,7 @@
 {% endblock %}{% endmacro %}
 
 
-{% macro render_search_results(recids, collection, pagination, format_record) %}{%- block render_search_results scoped -%}
+{% macro render_search_results(records, collection, pagination, format_record) %}{%- block render_search_results scoped -%}
   <style>
     .pagination {
       margin: 0px;
@@ -105,6 +105,7 @@
         {%- block search_results_header scoped %}
         {{ results_actions() }}
         {% block search_result_nb_recs scoped %}
+        {%- if pagination %}
         <div class="form-group">
           <p class="help-block hidden-xs">
             {%- set r_from = (pagination.page-1)*pagination.per_page+1 -%}
@@ -114,6 +115,7 @@
             {{ _('Showing records %(x_from)d to %(x_to)d out of %(x_total)d results.', x_from=r_from, x_to=r_to, x_total=r_of) }}
           </p>
         </div>
+        {% endif %}
         {% endblock search_result_nb_recs %}
         {% block search_result_settings scoped %}
         <div class="form-group pull-right">
@@ -185,7 +187,8 @@
         <hr/>
         {%- endblock search_results_header %}
         {%- block search_results scoped -%}
-        {%- for recid in recids -%}{% set recordloop = loop %}{%- block search_result scoped -%}
+        {%- for record in records -%}{% set recordloop = loop %}{%- block search_result scoped -%}
+          {%- set recid = record['recid'] %}
           {%- if of[0] == 'h' -%}
             <div class="row">
               {%- block search_result_prefix scoped -%}
@@ -199,14 +202,14 @@
               {%- endblock search_result_prefix -%}
               {%- block search_result_record scoped -%}
               <div class="col-sm-11 col-xs-11">
-                {{ format_record(recid, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|u|safe }}
+                {{ format_record(record, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|u|safe }}
                 {{ '<hr/>'|safe if not recordloop.last }}
               </div>
               {%- endblock search_result_record -%}
             </div>
           {%- else -%}
           {%- block search_result_record_nohtml scoped %}
-          {{ format_record(recid, of, ln=g.ln, extra_context=dict(collection=collection)) }}
+          {{ format_record(record, of, ln=g.ln, extra_context=dict(collection=collection)) }}
           {%- endblock search_result_record_nohtml %}
           {%- endif -%}
           {%- endblock search_result -%}
@@ -256,8 +259,8 @@
 {% if not request.is_xhr %}
 {% extends 'search/searchbar_frame.html' %}
 {% block body %}
-{{ render_search_results(recids, collection, pagination, format_record) }}
+{{ render_search_results(records, collection, pagination, format_record) }}
 {% endblock %}
 {% else %}
-{{ render_search_results(recids, collection, pagination, format_record) }}
+{{ render_search_results(records, collection, pagination, format_record) }}
 {% endif %}

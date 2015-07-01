@@ -91,7 +91,7 @@ def datacite_update(recid):
         logger.info("Updating DOI %s for record %s" % (doi_val, recid))
 
         url = "%s/record/%s" % (cfg['PIDSTORE_DATACITE_SITE_URL'], recid)
-        doc = format_record(recid, cfg['PIDSTORE_DATACITE_OUTPUTFORMAT'])
+        doc = format_record(record, cfg['PIDSTORE_DATACITE_OUTPUTFORMAT'])
 
         if not pid.update(url=url, doc=doc):
             m = "Failed to update DOI %s" % doi_val
@@ -201,7 +201,7 @@ def datacite_register(recid):
             cfg.get('PIDSTORE_DATACITE_SITE_URL', cfg['CFG_SITE_URL']),
             recid
         )
-        doc = format_record(recid, cfg['PIDSTORE_DATACITE_OUTPUTFORMAT'])
+        doc = format_record(record, cfg['PIDSTORE_DATACITE_OUTPUTFORMAT'])
 
         if not pid.register(url=url, doc=doc):
             m = "Failed to register DOI %s" % doi_val

@@ -19,7 +19,7 @@
 <modsCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.loc.gov/mods/v3
                            http://www.loc.gov/standards/mods/v3/mods-3-3.xsd">
-{% for recid in recids %}
-  {{ format_record(recid, of) }}
+{% for record in records %}
+  {{ format_record(record, of) }}
 {% endfor %}
 </modsCollection>

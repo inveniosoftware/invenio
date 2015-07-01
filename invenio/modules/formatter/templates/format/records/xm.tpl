@@ -17,7 +17,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
 <collection xmlns="http://www.loc.gov/MARC21/slim">
-{% for recid in recids -%}
-  {{ format_record(recid, 'xm', user_info=current_user).strip()|safe }}
+{% for record in records -%}
+  {{ format_record(record, 'xm', user_info=current_user).strip()|safe }}
 {%- endfor %}
 </collection>

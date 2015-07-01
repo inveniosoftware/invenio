@@ -53,7 +53,7 @@
 
 {%- block inner_content -%}
   {%- block index -%}
-    {%- if not recids|length -%}
+    {%- if not records|length -%}
       {%- block index_noresult -%}
         <div class="row">
           <div class="col-md-12">
@@ -87,7 +87,7 @@
                 <div class="row">
                   <div id="search_results" class="col-md-12">
                     {%- block search_results -%}
-                      {{ render_search_results(recids, collection, pagination, format_record) }}
+                      {{ render_search_results(records, collection, pagination, format_record) }}
                     {%- endblock search_results -%}
                   </div>
                 </div>
@@ -110,7 +110,7 @@
 
 {% block javascript %}
   {{ super() }}
-  {% if recids|length %}
+  {% if records|length %}
 <script type="text/javascript">
 require(['jquery', 'js/search/search'], function($, search) {
   search({

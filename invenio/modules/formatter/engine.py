@@ -20,6 +20,7 @@
 """Format a single record using specified format."""
 
 import re
+import time
 import types
 
 from invenio.base.globals import cfg
@@ -30,6 +31,7 @@ from invenio.modules.formatter.registry import template_context_functions
 from werkzeug.utils import cached_property
 
 from . import registry
+from .api import get_output_format_content_type
 from .config import InvenioBibFormatError
 
 # Cache for data we have already read and parsed
@@ -159,7 +161,7 @@ class LazyTemplateContextFunctionsCache(object):
 TEMPLATE_CONTEXT_FUNCTIONS_CACHE = LazyTemplateContextFunctionsCache()
 
 
-def format_record(recid, of, ln=None, verbose=0, search_pattern=None,
+def format_record(record, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, **kwargs):
     """Format a record in given output format.
 
@@ -175,14 +177,6 @@ def format_record(recid, of, ln=None, verbose=0, search_pattern=None,
     """
     ln = ln or cfg['CFG_SITE_LANG']
 
-    from invenio_records.api import Record, get_record
-
-    if not isinstance(recid, Record):
-        record = get_record(recid)
-    else:
-        record = recid
-        recid = record['recid']
-
     template = decide_format_template(record, of)
 
     out = render_template_to_string(
@@ -194,6 +188,39 @@ def format_record(recid, of, ln=None, verbose=0, search_pattern=None,
     )
 
     return out
+
+
+def format_records(records, of='hb', ln=None, **ctx):
+    """Return records using Jinja template."""
+    from flask import request
+    from invenio.base.i18n import wash_language
+    from .registry import export_formats
+
+    of = of.lower()
+    jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
+    rg = request.values.get('rg', ctx.get('rg', 10), type=int)
+    ln = ln or wash_language(request.values.get('ln', cfg['CFG_SITE_LANG']))
+    ot = (request.values.get('ot', ctx.get('ot')) or '').split(',')
+
+    if jrec > records:
+        jrec = rg * (records // rg) + 1
+
+    context = dict(
+        of=of, jrec=jrec, rg=rg, ln=ln, ot=ot,
+        facets={},
+        time=time,
+        records=records,
+        export_formats=export_formats,
+        format_record=format_record,
+        **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
+    )
+    context.update(ctx)
+    return render_template_to_string(
+        ['format/records/%s.tpl' % of,
+         'format/records/%s.tpl' % of[0],
+         'format/records/%s.tpl' % get_output_format_content_type(of).
+            replace('/', '_')],
+        **context)
 
 
 def decide_format_template(record, of):

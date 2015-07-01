@@ -1,6 +1,6 @@
 {#-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2014 CERN.
+# Copyright (C) 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -71,8 +71,8 @@
       <name>p</name>
       <link>{{ url_for('search.search', _external=True) }}</link>
     </textInput>
-    {% for recid in recids[jrec:jrec+rg] %}
-    {{ format_record(recid, of) }}
+    {% for record in records %}
+    {{ format_record(record, of) }}
     {% endfor %}
   </channel>
 </rss>

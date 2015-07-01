@@ -111,7 +111,7 @@
 {% endmacro %}
 
 {% macro render_fulltext_snippets() %}
-  {% FIXME add fulltext snippets %}
+  {# FIXME add fulltext snippets #}
 {% endmacro %}
 
 {% macro record_info() %}

@@ -18,7 +18,7 @@
 -#}
 {%- set sep = joiner(", ") -%}
 [
-{%- for recid in recids -%}
-    {{ sep() }}{{- get_record(recid).dumps(clean=True, keywords=ot, filter_hidden=True)|tojson() -}}
+{%- for record in records -%}
+    {{ sep() }}{{- record.dumps(clean=True, keywords=ot, filter_hidden=True)|tojson() -}}
 {%- endfor -%}
 ]

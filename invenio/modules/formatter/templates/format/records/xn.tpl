@@ -17,7 +17,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
 <articles>
-{% for recid in recids %}
-  {{ format_record(recid, of=of) }}
+{% for record in records %}
+  {{ format_record(record, of=of) }}
 {% endfor %}
 </articles>

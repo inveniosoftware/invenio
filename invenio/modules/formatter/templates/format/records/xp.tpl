@@ -47,8 +47,8 @@
     <itunes:owner>
     <itunes:email>{{ config.CFG_SITE_ADMIN_EMAIL }}</itunes:email>
     </itunes:owner>
-    {% for recid in recids %}
-    {{ format_record(recid, of)|indent() }}
+    {% for record in records %}
+    {{ format_record(record, of)|indent() }}
     {% endfor %}
   </channel>
 </rss>

@@ -209,7 +209,7 @@ def get_output_format_visibility(code):
         return 0
 
 
-def get_output_format_content_type(code):
+def get_output_format_content_type(code, default_content_type='text/html'):
     """
     Returns the content_type of the output format given by code
 
@@ -218,7 +218,8 @@ def get_output_format_content_type(code):
     :param code: the code of the output format to get the description from
     :return: output format content_type
     """
-    return get_format_property(code, 'content_type', '') or ''
+    return get_format_property(code, 'content_type', default_content_type) or \
+        default_content_type
 
 
 def get_preformatted_record(recID, of, decompress=zlib.decompress):

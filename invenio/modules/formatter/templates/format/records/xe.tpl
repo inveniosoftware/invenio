@@ -18,8 +18,8 @@
 -#}
 <xml>
   <records>
-  {% for recid in recids %}
-    {{ format_record(recid, of=of)|indent() }}
+  {% for record in records %}
+    {{ format_record(record, of=of)|indent() }}
   {% endfor %}
   </records>
 </xml>

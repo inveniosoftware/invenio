@@ -36,7 +36,7 @@ def comments_nb_counts():
         return CmtRECORDCOMMENT.count(*[
             CmtRECORDCOMMENT.id_bibrec == recid,
             CmtRECORDCOMMENT.star_score == 0,
-            CmtRECORDCOMMENT.status.notin_('dm', 'da')
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
         ])
 
 

@@ -59,7 +59,7 @@ search_also, with context -%}
         {% for recid in collection.reclist[-10:]|reverse %}
         <div class="row">
           <div class="col-md-12">
-            {{ format_record(recid, of, ln=g.ln)|safe }}
+            {{ format_record(record, of, ln=g.ln)|safe }}
             {{ '<hr/>'|safe if not loop.last }}
           </div>
         </div>
