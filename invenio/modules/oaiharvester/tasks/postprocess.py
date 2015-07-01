@@ -294,8 +294,6 @@ def author_list(obj, eng):
     :param obj: Bibworkflow Object to process
     :param eng: BibWorkflowEngine processing the object
     """
-    from invenio.legacy.oaiharvest.utils import (translate_fieldvalues_from_latex,
-                                                 find_matching_files)
     from invenio.legacy.bibrecord import create_records, record_xml_output
     from invenio.legacy.bibconvert.xslt_engine import convert
     from invenio.utils.plotextractor.api import get_tarball_from_arxiv
@@ -303,6 +301,8 @@ def author_list(obj, eng):
     from invenio.modules.workflows.utils import convert_marcxml_to_bibfield
     from invenio.utils.plotextractor.converter import untar
     from invenio.utils.shell import Timeout
+
+    from ..utils import find_matching_files
 
     identifiers = obj.data.get(cfg.get('OAIHARVESTER_RECORD_ARXIV_ID_LOOKUP'), "")
     if "_result" not in obj.extra_data:
@@ -360,10 +360,6 @@ def author_list(obj, eng):
                         identifiers,))
                 authorlist_record = authorlist_record[0][0]
 
-            # Convert any LaTeX symbols in authornames
-            translate_fieldvalues_from_latex(authorlist_record, '100', code='a')
-            translate_fieldvalues_from_latex(authorlist_record, '700', code='a')
-
             author_xml = record_xml_output(authorlist_record)
             if author_xml:
                 updated_xml = '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n' \
@@ -393,7 +389,6 @@ def upload_step(obj, eng):
     :param obj: BibWorkflowObject to process
     :param eng: BibWorkflowEngine processing the object
     """
-    from invenio.legacy.oaiharvest.dblayer import create_oaiharvest_log_str
     from invenio.modules.records.api import Record
     from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
@@ -441,13 +436,6 @@ def upload_step(obj, eng):
                 task_id = task_low_level_submission("bibupload",
                                                     "oaiharvest",
                                                     *tuple(args))
-                repo_id = repository.get("id")
-                if repo_id:
-                    create_oaiharvest_log_str(
-                        task_id,
-                        repo_id,
-                        obj.get_data()
-                    )
             except Exception as msg:
                 eng.log.error(
                     "An exception during submitting oaiharvest task occured : %s " % (

@@ -1,7 +1,7 @@
-# -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8; -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,113 +17,137 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from __future__ import print_function
-
 """OAI harvestor - 'wget' records from an OAI repository.
 
 This 'getter' simply retrieve the records from an OAI repository.
 """
 
-__revision__ = "$Id$"
+from __future__ import print_function
 
-try:
-    import sys
-    import httplib
-    import urllib
-    import getpass
-    import socket
-    import re
-    import time
-    import base64
-    import tempfile
-    import os
-except ImportError as e:
-    print("Error: %s" % e)
-    sys.exit(1)
+import base64
+import getpass
+import httplib
+import os
+import re
+import socket
+import sys
+import tempfile
+import time
+import urllib
+import urlparse
 
-try:
-    from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION
-except ImportError as e:
-    print("Error: %s" % e)
-    sys.exit(1)
+from invenio.utils.url import make_user_agent_string
 
-class InvenioOAIRequestError(Exception):
-    pass
+from .errors import InvenioOAIRequestError
+
 
 http_response_status_code = {
-
-    "000" : "Unknown",
-    "100" : "Continue",
-    "200" : "OK",
-    "302" : "Redirect",
-    "401" : "Authentication Required",
-    "403" : "Forbidden",
-    "404" : "Not Found",
-    "500" : "Error",
-    "503" : "Service Unavailable"
+    "000": "Unknown",
+    "100": "Continue",
+    "200": "OK",
+    "302": "Redirect",
+    "401": "Authentication Required",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "500": "Error",
+    "503": "Service Unavailable"
 }
 
-def http_param_resume(http_param_dict, resumptionToken):
-    "Change parameter dictionary for harvest resumption"
 
-    http_param = {
-        'verb'            : http_param_dict['verb'],
-        'resumptionToken' : resumptionToken
+def oai_harvest_get(prefix, baseurl, harvestpath,
+                    fro=None, until=None, setspecs=None,
+                    user=None, password=None, cert_file=None,
+                    key_file=None, method="POST", verb="ListRecords",
+                    identifier=""):
+    """Retrieve OAI records from given repository, with given arguments."""
+    (addressing_scheme, network_location, path, dummy1,
+     dummy2, dummy3) = urlparse.urlparse(baseurl)
+    secure = (addressing_scheme == "https")
+
+    http_param_dict = {'verb': verb,
+                       'metadataPrefix': prefix}
+    if identifier:
+        http_param_dict['identifier'] = identifier
+    if fro:
+        http_param_dict['from'] = fro
+    if until:
+        http_param_dict['until'] = until
+
+    sets = None
+    if setspecs:
+        sets = [oai_set.strip() for oai_set in setspecs.split(' ')]
+
+    return harvest(
+        network_location, path, http_param_dict, method, harvestpath,
+        sets, secure, user, password, cert_file, key_file
+    )
+
+
+def http_param_resume(http_param_dict, resumptionToken):
+    """Change parameter dictionary for harvest resumption."""
+    return {
+        'verb': http_param_dict['verb'],
+        'resumptionToken': resumptionToken
     }
 
-    return http_param
 
 def http_request_parameters(http_param_dict, method="POST"):
-    "Assembly http request parameters for http method used"
-
+    """Assembly http request parameters for http method used."""
     return urllib.urlencode(http_param_dict)
 
-def OAI_Session(server, script, http_param_dict , method="POST", output="",
+
+def oai_session(server, script, http_param_dict, method="POST", output="",
                 resume_request_nbr=0, secure=False, user=None, password=None,
                 cert_file=None, key_file=None):
-    """Handle one OAI session (1 request, which might lead
-    to multiple answers because of resumption tokens)
+    """Handle one OAI session which might lead to multiple answers.
 
     If output filepath is given, each answer of the oai repository is saved
     in corresponding filepath, with a unique number appended at the end.
     This number starts at 'resume_request_nbr'.
 
-    Returns a tuple containing an int corresponding to the last created 'resume_request_nbr' and
-    a list of harvested files.
+    Returns a tuple containing an int corresponding to the last created
+    'resume_request_nbr' and a list of harvested files.
     """
-    sys.stderr.write("Starting the harvesting session at %s" %
-        time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-    sys.stderr.write("%s - %s\n" % (server,
-        http_request_parameters(http_param_dict)))
+    sys.stderr.write(
+        "Starting the harvesting session at %s" %
+        time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime())
+    )
+    sys.stderr.write(
+        "%s - %s\n" % (server, http_request_parameters(http_param_dict))
+    )
 
     output_path, output_name = os.path.split(output)
     harvested_files = []
     i = resume_request_nbr
     while True:
-        harvested_data = OAI_Request(server, script,
-                                     http_request_parameters(http_param_dict, method), method,
-                                     secure, user, password, cert_file, key_file)
+        harvested_data = oai_request(
+            server, script,
+            http_request_parameters(http_param_dict, method), method,
+            secure, user, password, cert_file, key_file
+        )
         if output:
             # Write results to a file specified by 'output', once we have any
             # records retrieved. Thus we check for an "noRecordsMatch" error
             # before continuation.
             if harvested_data.lower().find('<error code="noRecordsMatch">'.lower()) == -1:
-                output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,), \
+                output_fd, output_filename = tempfile.mkstemp(suffix="_%07d.harvested" % (i,),
                                                               prefix=output_name, dir=output_path)
                 os.write(output_fd, harvested_data)
                 os.close(output_fd)
                 harvested_files.append(output_filename)
             else:
                 # No records in output? Do not create a file. Warn the user.
-                sys.stderr.write("\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: "
-                                 +  "\n" + repr(harvested_data) + "\n***\n-->\n")
+                sys.stderr.write(
+                    "\n<!--\n*** WARNING: NO RECORDS IN THE HARVESTED DATA: " +
+                    "\n" + repr(harvested_data) + "\n***\n-->\n"
+                )
         else:
             sys.stdout.write(harvested_data)
 
         # FIXME We should NOT use regular expressions to parse XML. This works
         # for the time being to escape namespaces.
         rt_obj = re.search('<.*resumptionToken.*>(.*)</.*resumptionToken.*>',
-            harvested_data, re.DOTALL)
+                           harvested_data, re.DOTALL)
         if rt_obj is not None and rt_obj.group(1) != "":
             http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
             i = i + 1
@@ -132,89 +156,93 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
 
     return i, harvested_files
 
-def harvest(server, script, http_param_dict , method="POST", output="",
+
+def harvest(server, script, http_param_dict, method="POST", output="",
             sets=None, secure=False, user=None, password=None,
             cert_file=None, key_file=None):
-    """
-    Handle multiple OAI sessions (multiple requests, which might lead to
-    multiple answers).
+    """Handle multiple OAI sessions.
 
     Needed for harvesting multiple sets in one row.
 
     Returns a list of filepaths for harvested files.
 
-        Parameters:
+    Parameters:
 
-         server - *str* the server URL to harvest
-                  eg: cds.cern.ch
+             server - *str* the server URL to harvest
+                      eg: cds.cern.ch
 
-         script - *str* path to the OAI script on the server to harvest
-                  eg: /oai2d
+             script - *str* path to the OAI script on the server to harvest
+                      eg: /oai2d
 
-http_param_dict - *dict* the URL parameters to send to the OAI script
-                  eg: {'verb':'ListRecords', 'from'='2004-04-01'}
-                  EXCLUDING the setSpec parameters. See 'sets'
-                  parameter below.
+    http_param_dict - *dict* the URL parameters to send to the OAI script
+                      eg: {'verb':'ListRecords', 'from'='2004-04-01'}
+                      EXCLUDING the setSpec parameters. See 'sets'
+                      parameter below.
 
-         method - *str* if we harvest using POST or GET
-                  eg: POST
+             method - *str* if we harvest using POST or GET
+                      eg: POST
 
-         output - *str* the path (and base name) where results are
-                  saved. To handle multiple answers (for eg. triggered
-                  by multiple sets harvesting or OAI resumption
-                  tokens), this base name is suffixed with a sequence
-                  number. Eg output='/tmp/z.xml' ->
-                  '/tmp/z.xml.0000000', '/tmp/z.xml.0000001', etc.
-                  If file at given path already exists, it is
-                  overwritten.
-                  When this parameter is left empty, the results are
-                  returned on the standard output.
+             output - *str* the path (and base name) where results are
+                      saved. To handle multiple answers (for eg. triggered
+                      by multiple sets harvesting or OAI resumption
+                      tokens), this base name is suffixed with a sequence
+                      number. Eg output='/tmp/z.xml' ->
+                      '/tmp/z.xml.0000000', '/tmp/z.xml.0000001', etc.
+                      If file at given path already exists, it is
+                      overwritten.
+                      When this parameter is left empty, the results are
+                      returned on the standard output.
 
-           sets - *list* the sets to harvest. Since this function
-                  offers multiple sets harvesting in one row, the OAI
-                  'setSpec' cannot be defined in the 'http_param_dict'
-                  dict where other OAI parameters are.
+               sets - *list* the sets to harvest. Since this function
+                      offers multiple sets harvesting in one row, the OAI
+                      'setSpec' cannot be defined in the 'http_param_dict'
+                      dict where other OAI parameters are.
 
-         secure - *bool* of we should use HTTPS (True) or HTTP (false)
+             secure - *bool* of we should use HTTPS (True) or HTTP (false)
 
-           user - *str* username to use to login to the server to
-                  harvest in case it requires Basic authentication.
+               user - *str* username to use to login to the server to
+                      harvest in case it requires Basic authentication.
 
-       password - *str* a password (in clear) of the server to harvest
-                  in case it requires Basic authentication.
+           password - *str* a password (in clear) of the server to harvest
+                      in case it requires Basic authentication.
 
-       key_file - *str* a path to a PEM file that contain your private
-                  key to connect to the server in case it requires
-                  certificate-based authentication
-                  (If provided, 'cert_file' must also be provided)
+           key_file - *str* a path to a PEM file that contain your private
+                      key to connect to the server in case it requires
+                      certificate-based authentication
+                      (If provided, 'cert_file' must also be provided)
 
-       cert_file - *str* a path to a PEM file that contain your public
-                  key in case the server to harvest requires
-                  certificate-based authentication
-                  (If provided, 'key_file' must also be provided)
+           cert_file - *str* a path to a PEM file that contain your public
+                      key in case the server to harvest requires
+                      certificate-based authentication
+                      (If provided, 'key_file' must also be provided)
     """
     if sets:
         resume_request_nbr = 0
         all_harvested_files = []
         for set in sets:
             http_param_dict['set'] = set
-            resume_request_nbr, harvested_files = OAI_Session(server, script, http_param_dict, method,
-                            output, resume_request_nbr, secure, user, password,
-                            cert_file, key_file)
+            resume_request_nbr, harvested_files = oai_session(
+                server, script, http_param_dict, method,
+                output, resume_request_nbr, secure, user, password,
+                cert_file, key_file
+            )
             resume_request_nbr += 1
             all_harvested_files.extend(harvested_files)
         return all_harvested_files
     else:
-        dummy, harvested_files = OAI_Session(server, script, http_param_dict, method,
-                    output, secure=secure, user=user,
-                    password=password, cert_file=cert_file,
-                    key_file=key_file)
+        dummy, harvested_files = oai_session(
+            server, script, http_param_dict, method,
+            output, secure=secure, user=user,
+            password=password, cert_file=cert_file,
+            key_file=key_file
+        )
         return harvested_files
 
-def OAI_Request(server, script, params, method="POST", secure=False,
+
+def oai_request(server, script, params, method="POST", secure=False,
                 user=None, password=None,
                 key_file=None, cert_file=None, attempts=10):
-    """Handle OAI request. Returns harvested data.
+    """Handle a OAI request and return harvested data.
 
     Parameters:
 
@@ -256,11 +284,12 @@ def OAI_Request(server, script, params, method="POST", secure=False,
           proxy will be used in order to instantiate a connection,
           however no special treatment is supported for HTTPS
     """
+    from flask import current_app
 
-    headers = {"Content-type":"application/x-www-form-urlencoded",
-               "Accept":"text/xml",
-               "From": CFG_SITE_ADMIN_EMAIL,
-               "User-Agent":"Invenio %s" % CFG_VERSION}
+    headers = {"Content-type": "application/x-www-form-urlencoded",
+               "Accept": "text/xml",
+               "From": current_app.config.get("CFG_SITE_ADMIN_EMAIL"),
+               "User-Agent": make_user_agent_string()}
 
     proxy = os.getenv('http_proxy')
     if proxy:
@@ -273,7 +302,9 @@ def OAI_Request(server, script, params, method="POST", secure=False,
 
     if password:
         # We use basic authentication
-        headers["Authorization"] = "Basic " + base64.encodestring(user + ":" + password).strip()
+        headers["Authorization"] = "Basic " + base64.encodestring(
+            user + ":" + password
+        ).strip()
 
     i = 0
     while i < attempts:
@@ -292,7 +323,9 @@ def OAI_Request(server, script, params, method="POST", secure=False,
                 # Unsecured connection
                 conn = httplib.HTTPConnection(server)
         except (httplib.HTTPException, socket.error) as e:
-            raise InvenioOAIRequestError("An error occured when trying to connect to %s: %s" % (server, e))
+            raise InvenioOAIRequestError(
+                "An error occured when trying to connect to %s: %s" % (server, e)
+            )
 
         # Connection established, perform a request
         try:
@@ -320,14 +353,18 @@ def OAI_Request(server, script, params, method="POST", secure=False,
         status = "%d" % response.status
 
         if status in http_response_status_code:
-            sys.stderr.write("%s(%s) : %s : %s\n" % (status,
+            sys.stderr.write("%s(%s) : %s : %s\n" % (
+                status,
                 http_response_status_code[status],
                 response.reason,
-                params))
+                params)
+            )
         else:
-            sys.stderr.write("%s(%s) : %s : %s\n" % (status,
+            sys.stderr.write("%s(%s) : %s : %s\n" % (
+                status,
                 http_response_status_code['000'],
-                response.reason, params))
+                response.reason, params)
+            )
 
         if response.status == 200:
             data = response.read()
@@ -345,9 +382,8 @@ def OAI_Request(server, script, params, method="POST", secure=False,
 
         elif response.status == 302:
             sys.stderr.write("Redirecting...\n")
-            server    = response.getheader("Location").split("/")[2]
-            script    = "/" + \
-                "/".join(response.getheader("Location").split("/")[3:])
+            server = response.getheader("Location").split("/")[2]
+            script = "/" + "/".join(response.getheader("Location").split("/")[3:])
 
         elif response.status == 401:
             if user is not None:
@@ -372,5 +408,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             sys.stderr.write("Retry in 10 seconds...\n")
             time.sleep(10)
 
-    raise InvenioOAIRequestError("Harvesting interrupted (after 10 attempts) at %s: %s\n"
-        % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()), params))
+    raise InvenioOAIRequestError(
+        "Harvesting interrupted (after 10 attempts) at %s: %s\n"
+        % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()), params)
+    )

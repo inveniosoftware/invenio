@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -126,8 +126,7 @@ def harvest_records(obj, eng):
     :param obj: BibworkflowObject being
     :param eng: BibWorkflowEngine processing the object
     """
-    from invenio.legacy.oaiharvest.utils import (collect_identifiers,
-                                                 harvest_step)
+    from invenio.modules.oaiharvester.utils import collect_identifiers
     from invenio.modules.workflows.errors import WorkflowError
 
     harvested_identifier_list = []
@@ -153,16 +152,11 @@ def harvest_records(obj, eng):
             "No arguments found... It can be causing major error after this point.")
 
     # Harvest phase
-
-    try:
-        harvested_files_list = harvest_step(obj,
-                                            harvestpath)
-    except Exception as e:
-        eng.log.error("Error while harvesting %s. Skipping." % (obj.data,))
-
-        raise WorkflowError(
-            "Error while harvesting %r. Skipping : %s." % (obj.data, repr(e)),
-            id_workflow=eng.uuid, id_object=obj.id)
+    if obj.extra_data["options"]["identifiers"]:
+        # Harvesting is done per identifier instead of server-updates
+        harvested_files_list = harvest_by_identifiers(obj, harvestpath)
+    else:
+        harvested_files_list = harvest_by_dates(obj, harvestpath)
 
     if len(harvested_files_list) == 0:
         eng.log.info("No records harvested for %s" % (obj.data["name"],))
@@ -209,3 +203,61 @@ def get_records_from_file(path=None):
         return eng.extra_data["_LoopData"]["get_records_from_file"]["data"]
 
     return _get_records_from_file
+
+
+def harvest_by_identifiers(obj, harvestpath):
+    """Harvest an OAI repository by identifiers using a workflow object.
+
+    Given a repository "object" (dict from DB) and a list of OAI identifiers
+    of records in the repository perform a OAI harvest using GetRecord
+    for each.
+
+    The records will be harvested into the specified filepath.
+    """
+    from ..getter import oai_harvest_get
+
+    harvested_files_list = []
+    for oai_identifier in obj.extra_data["options"]["identifiers"]:
+        harvested_files_list.extend(oai_harvest_get(prefix=obj.data["metadataprefix"],
+                                                    baseurl=obj.data["baseurl"],
+                                                    harvestpath=harvestpath,
+                                                    verb="GetRecord",
+                                                    identifier=oai_identifier))
+    return harvested_files_list
+
+
+def harvest_by_dates(obj, harvestpath):
+    """
+    Harvest an OAI repository by dates.
+
+    Given a repository "object" (dict from DB) and from/to dates,
+    this function will perform an OAI harvest request for records
+    updated between the given dates.
+
+    If no dates are given, the repository is harvested from the beginning.
+
+    If you set fromdate == last-run and todate == None, then the repository
+    will be harvested since last time (most common type).
+
+    The records will be harvested into the specified filepath.
+    """
+    from ..getter import oai_harvest_get
+
+    if obj.extra_data["options"]["dates"]:
+        fromdate = str(obj.extra_data["options"]["dates"][0])
+        todate = str(obj.extra_data["options"]["dates"][1])
+    elif obj.data["lastrun"] is None or obj.data["lastrun"] == '':
+        fromdate = None
+        todate = None
+        obj.extra_data["_should_last_run_be_update"] = True
+    else:
+        fromdate = str(obj.data["lastrun"]).split()[0]
+        todate = None
+        obj.extra_data["_should_last_run_be_update"] = True
+
+    return oai_harvest_get(prefix=obj.data["metadataprefix"],
+                           baseurl=obj.data["baseurl"],
+                           harvestpath=harvestpath,
+                           fro=fromdate,
+                           until=todate,
+                           setspecs=obj.data["setspecs"])

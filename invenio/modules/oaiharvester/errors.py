@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8; -*-
 #
 # This file is part of Invenio.
 # Copyright (C) 2015 CERN.
@@ -10,18 +10,16 @@
 #
 # Invenio is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Legacy OAIHarvest."""
+"""OAI harvester errors."""
 
-import warnings
 
-from invenio.utils.deprecation import RemovedInInvenio22Warning
+class InvenioOAIRequestError(Exception):
 
-warnings.warn("Legacy OAIHarvest will be removed in 2.2.",
-              RemovedInInvenio22Warning)
+    """Error with the OAI-PMH request."""

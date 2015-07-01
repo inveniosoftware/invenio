@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,16 @@
 
 """OAI harvest utils."""
 
-from lxml import etree
+import os
+import re
 
 from invenio.base.globals import cfg
+from invenio.utils.shell import run_shell_command
+
+from lxml import etree
+
+
+REGEXP_OAI_ID = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)
 
 
 def record_extraction_from_file(path, oai_namespace="http://www.openarchives.org/OAI/2.0/"):
@@ -101,3 +108,71 @@ def identifier_extraction_from_string(xml_string, oai_namespace="http://www.open
     node = root.find(".//{0}identifier".format(namespace_prefix), nsmap)
     if node is not None:
         return node.text
+
+
+def collect_identifiers(harvested_file_list):
+    """Collect all OAI PMH identifiers from each file in the list.
+
+    Then adds them to a list of identifiers per file.
+
+    :param harvested_file_list: list of filepaths to harvested files
+
+    :return list of lists, containing each files' identifier list
+    """
+    result = []
+    for harvested_file in harvested_file_list:
+        try:
+            fd_active = open(harvested_file)
+        except IOError as e:
+            raise e
+        data = fd_active.read()
+        fd_active.close()
+        result.append(REGEXP_OAI_ID.findall(data))
+    return result
+
+
+def find_matching_files(basedir, filetypes):
+    """Try to find all files matching given filetypes.
+
+    By looking at all the files and filenames in the given directory,
+    including subdirectories.
+
+    :param basedir: full path to base directory to search in
+    :type basedir: string
+
+    :param filetypes: list of filetypes, extensions
+    :type filetypes: list
+
+    :return: exitcode and any error messages as: (exitcode, err_msg)
+    :rtype: tuple
+    """
+    files_list = []
+    for dirpath, dummy0, filenames in os.walk(basedir):
+        for filename in filenames:
+            full_path = os.path.join(dirpath, filename)
+            dummy1, cmd_out, dummy2 = run_shell_command(
+                'file %s', (full_path,)
+            )
+            for filetype in filetypes:
+                if cmd_out.lower().find(filetype) > -1:
+                    files_list.append(full_path)
+                elif filename.split('.')[-1].lower() == filetype:
+                    files_list.append(full_path)
+    return files_list
+
+
+def get_identifier_names(identifier):
+    """Return list of identifiers from a comma-separated string."""
+    if identifier:
+        # Let's see if the user had a comma-separated list of OAI ids.
+        stripped_idents = []
+        for ident in identifier.split(","):
+            ident = ident.strip()
+            if not ident.startswith("oai:arXiv.org"):
+                if "oai:arxiv.org" in ident.lower():
+                    ident = ident.replace("oai:arxiv.org", "oai:arXiv.org")
+                elif "arXiv" in ident:
+                    # New style arXiv ID
+                    ident = ident.replace("arXiv", "oai:arXiv.org")
+            stripped_idents.append(ident)
+        return stripped_idents

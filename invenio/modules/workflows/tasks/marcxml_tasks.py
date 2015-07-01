@@ -21,6 +21,7 @@
 
 import glob
 import os
+import time
 import traceback
 
 from functools import wraps
@@ -162,7 +163,7 @@ def convert_record(stylesheet="oaidc2marcxml.xsl"):
 
 def update_last_update(repository_list):
     """Perform the update of the update date."""
-    from invenio.legacy.oaiharvest.dblayer import update_lastrun
+    from invenio.modules.oaiharvester.models import OaiHARVEST
 
     @wraps(update_last_update)
     def _update_last_update(obj, eng):
@@ -178,7 +179,11 @@ def update_last_update(repository_list):
                         repository_list_to_process = [
                             repository_list_to_process]
                 for repository in repository_list_to_process:
-                    update_lastrun(repository["id"])
+                    repo = OaiHARVEST.query.get(repository["id"])
+                    if repo:
+                        repo.lastrun = time.strftime("%Y-%m-%d %H:%M:%S",
+                                                     time.localtime())
+                        repo.save()
 
     return _update_last_update
 
