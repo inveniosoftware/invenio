@@ -30,24 +30,35 @@ from flask_login import current_user, login_required
 
 from flask_menu import register_menu
 
-from sqlalchemy.exc import SQLAlchemyError
-
-from werkzeug import CombinedMultiDict, ImmutableMultiDict
-
 from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.login import UserInfo, authenticate, login_redirect, \
-    login_user, logout_user, reset_password
+    login_user, logout_user
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 from invenio.legacy import webuser
-from invenio.modules.access.mailcookie import mail_cookie_check_mail_activation
+from invenio.modules.access.errors import \
+    InvenioWebAccessMailCookieDeletedError, InvenioWebAccessMailCookieError
+from invenio.modules.access.mailcookie import \
+    mail_cookie_check_mail_activation, mail_cookie_check_pw_reset, \
+    mail_cookie_delete_cookie
+from invenio.modules.accounts.forms import LoginForm, LostPasswordForm, \
+    RegisterForm, ResetPasswordForm
+
 from invenio.utils.datastructures import LazyDict, flatten_multidict
 
-from ..forms import LoginForm, LostPasswordForm, RegisterForm
+from six import text_type
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from werkzeug import CombinedMultiDict, ImmutableMultiDict
+
 from ..models import User
+from ..errors import AccountSecurityError
+from ..utils import send_reset_password_email
 from ..validators import wash_login_method
+
 
 blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
                       template_folder='../templates',
@@ -65,6 +76,7 @@ blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
 @ssl_required
 def login(nickname=None, password=None, login_method=None, action='',
           remember=False, referer=None):
+    """Login."""
     if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
         return abort(401)  # page is not authorized
 
@@ -107,15 +119,16 @@ def login(nickname=None, password=None, login_method=None, action='',
 @register_breadcrumb(blueprint, '.register', _('Register'))
 @ssl_required
 def register():
+    """Register."""
     req = request.get_legacy_request()
 
     # FIXME
     if cfg.get('CFG_ACCESS_CONTROL_LEVEL_SITE') > 0:
-        return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % g.ln,
-                                           navmenuid='youraccount')
+        return webuser.page_not_authorized(
+            req, "../youraccount/register?ln=%s" % g.ln,
+            navmenuid='youraccount')
 
     form = RegisterForm(request.values, csrf_enabled=False)
-    #uid = current_user.get_id()
 
     title = _("Register")
     messages = []
@@ -130,26 +143,41 @@ def register():
             title = _("Account created")
             messages.append(_("Your account has been successfully created."))
             state = "success"
-            if cfg.get('CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT') == 1:
-                messages.append(_("In order to confirm its validity, an email message containing an account activation key has been sent to the given email address."))
-                messages.append(_("Please follow instructions presented there in order to complete the account registration process."))
+            if cfg.get('CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT') \
+                    == 1:
+                messages.append(_("In order to confirm its validity, "
+                                  "an email message containing an account "
+                                  "activation key has been sent to the given "
+                                  "email address."))
+                messages.append(_("Please follow instructions presented "
+                                  "there in order to complete the account "
+                                  "registration process."))
             if cfg.get('CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS') >= 1:
-                messages.append(_("A second email will be sent when the account has been activated and can be used."))
-            elif cfg.get('CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT') != 1:
-                user = User.query.filter(User.email == form.email.data.lower()).one()
+                messages.append(_("A second email will be sent when the "
+                                  "account has been activated and can be "
+                                  "used."))
+            elif cfg['CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT'] != 1:
+                user = User.query.filter(
+                    User.email == form.email.data.lower()).one()
                 login_user(user.get_id())
                 messages.append(_("You can now access your account."))
         else:
             title = _("Registration failure")
             state = "danger"
             if ruid == 5:
-                messages.append(_("Users cannot register themselves, only admin can register them."))
+                messages.append(_("Users cannot register themselves, only "
+                                  "admin can register them."))
             elif ruid == 6 or ruid == 1:
-                # Note, code 1 is used both for invalid email, and email sending
+                # Note, code 1 is used both for invalid email, and email
+                # sending
                 # problems, however the email address is validated by the form,
                 # so we only have to report a problem sending the email here
-                messages.append(_("The site is having troubles in sending you an email for confirming your email address."))
-                messages.append(_("The error has been logged and will be taken in consideration as soon as possible."))
+                messages.append(_("The site is having troubles in sending "
+                                  "you an email for confirming your email "
+                                  "address."))
+                messages.append(
+                    _("The error has been logged and will be "
+                      "taken in consideration as soon as possible."))
             else:
                 # Errors [-2, (1), 2, 3, 4] taken care of by form validation
                 messages.append(_("Internal error %(ruid)s", ruid=ruid))
@@ -165,6 +193,7 @@ def register():
 @register_breadcrumb(blueprint, '.logout', _('Logout'))
 @login_required
 def logout():
+    """Logout."""
     logout_user()
 
     from invenio.modules.access.local_config import \
@@ -207,6 +236,7 @@ _USER_SETTINGS = LazyDict(load_user_settings)
 @register_menu(blueprint, 'personalize', _('Personalize'))
 @register_breadcrumb(blueprint, '.', _('Your account'))
 def index():
+    """Index."""
     # load plugins
     plugins = filter(lambda x: x.is_authorized and x.widget,
                      map(lambda x: x(), _USER_SETTINGS.values()))
@@ -249,6 +279,7 @@ def index():
 @register_breadcrumb(blueprint, '.edit', _('Edit'))
 @login_required
 def edit(name):
+    """Edit."""
     if name not in _USER_SETTINGS:
         flash(_('Invalid plugin name'), 'error')
         return redirect(url_for('.index'))
@@ -287,6 +318,7 @@ def edit(name):
 @login_required
 @wash_arguments({'name': (unicode, "")})
 def view(name):
+    """View."""
     if name not in _USER_SETTINGS:
         return "1", 406
 
@@ -301,17 +333,67 @@ def view(name):
 @register_breadcrumb(blueprint, '.edit', _('Edit'))
 @ssl_required
 def lost():
+    """Lost."""
     form = LostPasswordForm(request.values)
+
     if form.validate_on_submit():
-        if reset_password(request.values['email'], g.ln):
-            flash(_('A password reset link has been sent to %(whom)s',
-                    whom=request.values['email']), 'success')
+        email = request.values['email']
+        try:
+            if send_reset_password_email(email=email):
+                flash(_('A password reset link has been sent to %(whom)s',
+                        whom=email), 'success')
+            else:
+                flash(_('Error happen when the email was send. '
+                        'Please contact the administrator.'), 'error')
+        except AccountSecurityError as e:
+            flash(e, 'error')
+
     return render_template('accounts/lost.html', form=form)
+
+
+@blueprint.route('/resetpassword', methods=['GET', 'POST'])
+@wash_arguments({"reset_key": (text_type, None)})
+@ssl_required
+def resetpassword(reset_key):
+    """Reset password form (loaded after asked new password)."""
+    email = None
+    try:
+        email = mail_cookie_check_pw_reset(reset_key)
+    except InvenioWebAccessMailCookieDeletedError:
+        flash(
+            _('This request for resetting a password has already been used.'),
+            'error'
+        )
+    except InvenioWebAccessMailCookieError:
+        flash(_('This request for resetting a password is not valid or is '
+              'expired.'), 'error')
+
+    if email is None or cfg['CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS'] >= 3:
+        return redirect(url_for('webaccount.index'))
+
+    form = ResetPasswordForm(request.values)
+
+    if form.validate_on_submit():
+        password = request.values['password']
+
+        # change password
+        user = User.query.filter_by(email=email).one()
+        user.password = password
+        db.session.merge(user)
+        db.session.commit()
+        # delete cookie
+        mail_cookie_delete_cookie(reset_key)
+
+        flash(_("The password was correctly reset."), 'success')
+        return redirect(url_for('webaccount.index'))
+
+    return render_template('accounts/resetpassword.html', form=form)
 
 
 @blueprint.route('/access', methods=['GET', 'POST'])
 @ssl_required
 def access():
+    """Access."""
     try:
         mail = mail_cookie_check_mail_activation(request.values['mailcookie'])
 

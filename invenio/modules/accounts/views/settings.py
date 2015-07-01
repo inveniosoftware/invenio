@@ -21,7 +21,7 @@
 
 from __future__ import absolute_import
 
-from flask import Blueprint, flash, g, redirect, render_template, request, \
+from flask import Blueprint, flash, redirect, render_template, request, \
     url_for
 
 from flask_breadcrumbs import register_breadcrumb
@@ -31,12 +31,15 @@ from flask_login import current_user, login_required
 from flask_menu import current_menu, register_menu
 
 from invenio.base.i18n import _
-from invenio.ext.login import reset_password
+from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 
 from ..forms import ChangePasswordForm, LostPasswordForm, ProfileForm, \
     VerificationForm
+from ..errors import AccountSecurityError
 from ..models import User
+from ..utils import send_reset_password_email
+
 
 blueprint = Blueprint(
     'accounts_settings',
@@ -84,8 +87,12 @@ def profile():
     if form == 'password':
         password_form.process(formdata=request.form)
         if password_form.validate_on_submit():
-            u.password = password_form.data['password']
+            new_password = password_form.data['password']
+            u.password = new_password
+            db.session.merge(u)
+            db.session.commit()
             flash(_("Password changed."), category="success")
+
     elif form == 'profile':
         profile_form.process(formdata=request.form)
         if profile_form.validate_on_submit():
@@ -122,13 +129,18 @@ def profile():
 def lost():
     """Lost password form for authenticated users."""
     form = LostPasswordForm(request.form)
-    if form.validate_on_submit():
-        if reset_password(form.data['email'], g.ln):
-            flash(_('A password reset link has been sent to %(whom)s',
-                    whom=request.values['email']), 'success')
-        return redirect(url_for('.profile'))
 
-    return render_template(
-        "accounts/settings/lost.html",
-        form=form,
-    )
+    if form.validate_on_submit():
+        email = request.values['email']
+
+        try:
+            if send_reset_password_email(email=email):
+                flash(_('A password reset link has been sent to %(whom)s',
+                        whom=email), 'success')
+            else:
+                flash(_('Error happen when the email was send. '
+                        'Please contact the administrator.'), 'error')
+        except AccountSecurityError as e:
+            flash(e, 'error')
+
+    return render_template("accounts/settings/lost.html", form=form)
