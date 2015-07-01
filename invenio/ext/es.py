@@ -27,30 +27,159 @@ from invenio.celery import celery
 
 es = Elasticsearch()
 
-
 SEARCH_RECORD_MAPPING = {
-    "properties": {
-        "_collections": {
-            "type": "string",
-            "index": "not_analyzed"
-        },
-        "collections": {
+    "settings": {
+        "analysis": {
+            "filter": {
+                "asciifold_with_orig": {
+                    "type": "asciifolding",
+                    "preserve_original": True
+                },
+
+                "synonyms_kbr": {
+                    "type": "synonym",
+                    "synonyms": [
+                        "production => creation"
+                    ]
+                }
+            },
+            "analyzer": {
+                "natural_text": {
+                    "type": "custom",
+                    "tokenizer":  "standard",
+                    "filter": [
+                        "asciifold_with_orig",
+                        "lowercase",
+                        "synonyms_kbr"
+                    ]
+                },
+                "basic_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "asciifold_with_orig",
+                        "lowercase"
+                    ]
+                }
+            }
+        }
+    },
+    "mappings": {
+        "record": {
+            "_all": {"enabled": False},
+            "date_detection": False,
+            "numeric_detection": True,
+            "dynamic_templates": [
+                {"default": {
+                    "match_mapping_type": "string",
+                    "mapping": {
+                        "analyzer": "basic_analyzer",
+                        "type": "string",
+                        "copy_to": "global_default"
+                    }
+                }
+                }
+            ],
             "properties": {
-                "primary": {
+                "global_fulltext": {
+                    "type": "string",
+                    "analyzer": "natural_text"
+                },
+                "global_default": {
+                    "type": "string",
+                    "analyzer": "basic_analyzer"
+                },
+                "_collections": {
                     "type": "string",
                     "index": "not_analyzed"
                 },
-                "secondary": {
+                "collections": {
+                    "properties": {
+                        "primary": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        },
+                        "secondary": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
+                },
+                "authors": {
                     "type": "string",
-                    "index": "not_analyzed"
+                    "fields": {
+                        "raw": {
+                            "type": "string",
+                            "index": "not_analyzed"
+                        }
+                    }
+                },
+                "main_entry_personal_name": {
+                    "type": "object",
+                    "properties": {
+                        "personal_name": {
+                            "type": "string",
+                            "copy_to": ["authors"],
+                            "analyzer": "natural_text"
+                        }
+                    }
+                },
+                "added_entry_personal_name": {
+                    "type": "object",
+                    "properties": {
+                        "personal_name": {
+                            "type": "string",
+                            "copy_to": ["authors"],
+                            "analyzer": "natural_text"
+                        }
+                    }
+                },
+                "abstract": {
+                    "type": "string",
+                    "analyzer": "natural_text"
+                },
+                "title": {
+                    "type": "string",
+                    "analyzer": "natural_text"
+                },
+                "title_statement": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string", "copy_to": ["title", "global_fulltext"],
+                            "analyzer": "natural_text"
+                        }
+                    }
+                },
+                "division": {
+                    "type": "string"
+                },
+                "experiment": {
+                    "type": "string"
+                },
+                "varying_form_of_title": {
+                    "type": "object",
+                    "properties": {
+                        "title_proper_short_title": {
+                            "type": "string", "copy_to": ["title", "global_fulltext"],
+                            "analyzer": "natural_text"
+                        }
+                    }
+                },
+                "summary_": {
+                    "type": "object",
+                    "properties": {
+                        "summary_": {
+                            "type": "string", "copy_to": ["abstract", "global_fulltext"],
+                            "analyzer": "natural_text"
+                        }
+                    }
+                },
+                "date": {
+                    "type": "date",
+                    "format": "yyyy||yyyy-MM||yyyy-MM-dd"
                 }
             }
-        },
-        "division": {
-            "type": "string"
-        },
-        "experiment": {
-            "type": "string"
         }
     }
 }
@@ -81,9 +210,8 @@ def index_collection_percolator(name, dbquery):
 
 
 def create_index(sender, **kwargs):
-    es.indices.create(index='records', ignore=400)
-    es.indices.put_mapping(doc_type='record', body=SEARCH_RECORD_MAPPING,
-                           index='records')
+    es.indices.delete(index='records', ignore=404)
+    es.indices.create(index='records', body=SEARCH_RECORD_MAPPING)
 
 
 def delete_index(sender, **kwargs):

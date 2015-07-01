@@ -70,6 +70,25 @@
           {%- block facets %}
             <div class="col-md-3 col-lg-2 visible-md visible-lg" id="facetparent">
               <div class="facet" id="facet_list" data-clampedwidth="#facetparent"></div>
+              {% for facet_name, data in response._search()['aggregations'].items() %}
+              <div class="panel panel-default">
+                <div class="panel-heading">{{ _(facet_name) }}</div>
+                <table class="table table-condensed">
+                {% for bucket in data['buckets'] %}
+                <tr>
+                  <td>
+                    <a href="#">
+                      {{ bucket['key'] }}
+                    </a>
+                  </td>
+                  <td>
+                    <span class="badge pull-right">{{ bucket['doc_count'] }}</span>
+                  </td>
+                </tr>
+                {% endfor %}
+                </table>
+              </div>
+              {% endfor %}
             </div>
           {%- endblock facets %}
           {%- block index_right -%}

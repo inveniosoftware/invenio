@@ -247,12 +247,17 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
     response.body.update({
         'size': int(rg),
         'from': jrec-1,
+        'aggs': {
+            "Collections": {"terms": {"field": "_collections"}},
+            "Authors": {"terms": {"field": "authors.raw"}},
+        },
     })
 
     pagination = Pagination((jrec-1) // rg + 1, rg, len(response))
 
     ctx = dict(
         facets={},  # facets.get_facets_config(collection, qid),
+        response=response,
         rg=rg,
         create_nearest_terms_box=lambda: _("Try to modify the query."),
         easy_search_form=EasySearchForm(csrf_enabled=False),
