@@ -171,7 +171,11 @@ SEARCH_ELASTIC_KEYWORD_MAPPING = {
                "added_entry_personal_name.personal_name"],
     "collection": ["_collections"],
     "title": ["title_statement.title"],
-    "980": ["collections.primary", "collections.secondary"],
+    "980": [
+        "collections.primary",
+        "collections.secondary",
+        "collections.deleted",
+    ],
     "980__a": ["collections.primary"],
     "980__b": ["collections.secondary"],
     "542__l": ["information_relating_to_copyright_status.copyright_status"],
