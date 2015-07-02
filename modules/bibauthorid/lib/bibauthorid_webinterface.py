@@ -72,7 +72,7 @@ from invenio.bibsched import bibsched_task_finished_successfully, \
 import invenio.webinterface_handler_config as apache
 import invenio.webauthorprofile_interface as webauthorapi
 import invenio.bibauthorid_webapi as webapi
-from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid, is_valid_orcid
+from invenio.bibauthorid_general_utils import get_title_of_arxiv_pubid, is_valid_orcid
 from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
     get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author, \
     get_free_author_id

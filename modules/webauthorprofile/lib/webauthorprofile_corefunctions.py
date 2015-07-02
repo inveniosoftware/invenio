@@ -53,7 +53,7 @@ from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_i
     get_names_to_records_of_author, get_existing_authors, get_confirmed_papers_of_author, \
     get_title_of_paper, get_orcid_id_of_author, get_arxiv_papers_of_author, \
     get_hepnames, remove_empty_authors, get_papers_of_author, get_pid_to_canonical_name_map
-from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid
+from invenio.bibauthorid_general_utils import get_title_of_arxiv_pubid
 from invenio.bibauthorid_config import CFG_BIBAUTHORID_ENABLED
 from invenio.webauthorprofile_dbapi import get_cached_element, precache_element, cache_element, \
     expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
@@ -67,6 +67,7 @@ from invenio.bibformat import format_record, format_records
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 from invenio.orcidutils import get_dois_from_orcid
 from invenio.errorlib import register_exception
+from invenio.dbquery import run_sql
 
 
 # After this delay, we assume that a process computing an empty claimed cache is dead
@@ -412,17 +413,17 @@ def _get_external_publications(person_id):
             # TODO: what should I return in this case
             return dict()
 
-        orcid_dois = get_dois_from_orcid(orcid_id)
+        orcid_dois = get_dois_from_orcid(orcid_id, get_titles=True)
         # TODO: what to do in case some ORCID server error occurs?
         if orcid_dois is None:
             return dict()
 
         orcid_pubs = dict()
-        for doi in orcid_dois:
-            recids_hep = perform_request_search(p=doi, cc='HEP', rg=0)
-            recids_data = perform_request_search(p=doi, cc='Data', rg=0)
-            if not (recids_hep or recids_data):
-                orcid_pubs[doi] = get_title_of_doi(doi)
+        for doi, title in orcid_dois:
+            queried_doi = run_sql('SELECT value from bib02x where tag="0247_a" and value="%s"', (doi,))
+            if not queried_doi:
+                # The paper is not available in Inspire
+                orcid_pubs[doi] = title
 
             if IS_BATCH_PROCESS:
                 time.sleep(CONNECTION_WAITTIME)

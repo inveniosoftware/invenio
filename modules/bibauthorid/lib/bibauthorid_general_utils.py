@@ -27,7 +27,6 @@ from datetime import datetime
 import sys
 import os
 from math import floor
-from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 try:
     import elementtree.ElementTree as ET
 except ImportError:
@@ -321,30 +320,6 @@ def is_arxiv_id_or_doi(identifier):
         return DOI_ID
     else:
         return None
-
-
-def get_title_of_doi(doi):
-    try:
-        xml = get_marcxml_for_doi(doi)
-    except (CrossrefError, socket.timeout):
-        return doi
-    except URLError, e:
-    # For python 2.6 socket.timeout cannot be caught directly    
-        if hasattr(e, "reason") and isinstance(e.reason, socket.timeout):
-            return doi
-        else:  # We make sure we don't cut out other URLErrors.
-            raise
-
-    root = ET.fromstring(xml)
-
-    for datafield in root.findall('datafield'):
-        tag = datafield.get('tag')
-
-        if tag == '245':
-            title = datafield.find('subfield').text
-            return title
-
-    return doi
 
 
 def get_xml_referer_of_arxiv_pubid(arxiv_pubid):

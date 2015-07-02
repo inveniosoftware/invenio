@@ -170,11 +170,14 @@ def _get_extids_from_orcid(orcid_id):
     return ext_ids_dict
 
 
-def get_dois_from_orcid(orcid_id):
+def get_dois_from_orcid(orcid_id, get_titles=False):
     """Get dois in case of a known ORCID.
 
     @param scope: orcid_id
     @type scope: string
+
+    @param get_titles: whether to add titles to the results or not
+    @type get_titles: boolean
 
     @return: dois of a person with ORCID indicated by orcid_id
     @rtype: list
@@ -198,14 +201,21 @@ def get_dois_from_orcid(orcid_id):
     try:
         for work in orcid_profile['works']['group']:
             try:
-                for identifier in work['identifiers']['identifier']:
-                    identifier_type = identifier['external-identifier-type']
-                    value = identifier['external-identifier-id']
-                    if identifier_type == "DOI":
-                        doi = get_doi(value)
-                        if doi:
-                            current_dois = doi.split(",")
-                            dois.append(current_dois[0])
+                if work['identifiers']:
+                    for identifier in work['identifiers']['identifier']:
+                        identifier_type = \
+                            identifier['external-identifier-type']
+                        value = identifier['external-identifier-id']
+                        if identifier_type == "DOI":
+                            doi = get_doi(value)
+                            if doi:
+                                current_dois = doi.split(",")
+                                if not get_titles:
+                                    dois.append(current_dois[0])
+                                else:
+                                    title = work['work-summary'][0]['title'][
+                                                 'title']['value']
+                                    dois.append((doi, title))
             except KeyError:
                 # No identifiers on this work.
                 pass
