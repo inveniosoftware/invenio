@@ -49,4 +49,5 @@ class LegacyInteger(TypeDecorator):
 
     def process_result_value(self, value, dialect):
         """Cast to long python variable."""
-        return long(value)
+        if value is not None:
+            return long(value)
