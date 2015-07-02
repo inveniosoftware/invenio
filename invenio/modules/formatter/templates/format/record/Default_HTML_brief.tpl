@@ -30,7 +30,7 @@
     {{ record.get('title_statement.title[0]', '') }}
     {{- record.get('title.volume', '')|prefix(', ') }}
     {{- record.get('title.subtitle', '')|prefix(': ') }}
-    {{- record.get('edition_statement[0].edition_statement', '')|prefix('; ') }}
+    {{- record.get('edition_statement[0].edition_statement[0]', '')|prefix('; ') }}
   </a>
 {% endblock %}
 

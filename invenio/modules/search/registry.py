@@ -62,8 +62,7 @@ class FacetsRegistry(DictModuleAutoDiscoverySubRegistry):
     """
 
     def keygetter(self, key, original_value, new_value):
-        """
-        Method used to compute the key for a value being registered.
+        """Compute the key for a value being registered.
 
         The key is the facet name stored in facet module.
 
@@ -109,8 +108,9 @@ class FacetsRegistry(DictModuleAutoDiscoverySubRegistry):
         for facet in facets_conf:
             if facet.facet_name not in self.keys():
                 raise RegistryError(
-                    'Facet %s is not available.' +
-                    'Maybe it\'s on PACKAGES_FACETS_EXCLUDE config list'
+                    'Facet %s is not available. Please check if the facet '
+                    'is located in package specified in PACKAGES_EXCLUDE or '
+                    'in PACKAGES_FACETS_EXCLUDE configuration.'
                     % facet.facet_name)
             collection_facets.append(self.get(facet.facet_name))
 

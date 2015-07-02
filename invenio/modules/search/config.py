@@ -167,8 +167,13 @@ CFG_WEBSEARCH_MAX_RECORDS_CITEDBY = 50000
 # SEARCH_ELASTIC_KEYWORD_MAPPING -- this variable holds a dictionary to map
 # invenio keywords to elasticsearch fields
 SEARCH_ELASTIC_KEYWORD_MAPPING = {
-    "author": ["main_entry_personal_name.personal_name",
-               "added_entry_personal_name.personal_name"],
+    "author": {
+        'a': ["main_entry_personal_name.personal_name",
+              "added_entry_personal_name.personal_name"],
+        'p': ["main_entry_personal_name.personal_name",
+              "added_entry_personal_name.personal_name"],
+        'e': ['authors.raw'],
+    },
     "collection": ["_collections"],
     "title": ["title_statement.title"],
     "980": [

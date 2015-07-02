@@ -248,10 +248,20 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
         'size': int(rg),
         'from': jrec-1,
         'aggs': {
-            "Collections": {"terms": {"field": "_collections"}},
-            "Authors": {"terms": {"field": "authors.raw"}},
+            "collection": {"terms": {"field": "_collections"}},
+            "author": {"terms": {"field": "authors.raw"}},
         },
     })
+
+    # FIXME refactor to separate search hook
+    from invenio.modules.search.walkers.elasticsearch import ElasticSearchDSL
+    if 'post_filter' in request.values:
+        post_filter = Query(request.values.get('post_filter')).query.accept(
+            ElasticSearchDSL()
+        )
+        response.body['post_filter'] = post_filter
+
+    current_app.logger.info(response.body)
 
     pagination = Pagination((jrec-1) // rg + 1, rg, len(response))
 

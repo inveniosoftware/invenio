@@ -69,7 +69,7 @@
         <div class="row">
           {%- block facets %}
             <div class="col-md-3 col-lg-2 visible-md visible-lg" id="facetparent">
-              <div class="facet" id="facet_list" data-clampedwidth="#facetparent"></div>
+              <div class="facet" id="facet_list" data-clampedwidth="#facetparent">
               {% for facet_name, data in response._search()['aggregations'].items() %}
               <div class="panel panel-default">
                 <div class="panel-heading">{{ _(facet_name) }}</div>
@@ -77,9 +77,12 @@
                 {% for bucket in data['buckets'] %}
                 <tr>
                   <td>
-                    <a href="#">
-                      {{ bucket['key'] }}
-                    </a>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" name="{{ facet_name }}" value="{{ bucket['key'] }}">
+                        {{ bucket['key'] }}
+                      </label>
+                    </div>
                   </td>
                   <td>
                     <span class="badge pull-right">{{ bucket['doc_count'] }}</span>
@@ -89,6 +92,7 @@
                 </table>
               </div>
               {% endfor %}
+              </div>
             </div>
           {%- endblock facets %}
           {%- block index_right -%}
@@ -131,20 +135,47 @@
   {{ super() }}
   {% if records|length %}
 <script type="text/javascript">
-require(['jquery', 'js/search/search'], function($, search) {
-  search({
-    elem: '#facet_list',
-    data: {{ facets | tojson | safe }},
-    searchResultsUrl: '{{ url_for('search.search') }}',
-    args: {{ request.args.to_dict() | tojson | safe }},
-    labels: {
-      action: '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-danger">exclude</em></abbr> selected term from results.') | safe }}',
-      exclude: '{{ _('Exclude') }}',
-      didyouknow: '{{ _('Did you know?') }}',
-      alreadyin: '{{ _('An item is already in the facet filter.') }}'
-    }
+require(['jquery', 'js/search/search'], function($) {
+  var searchResultsUrl = '{{ url_for('search.search') }}',
+      args = {{ request.args.to_dict() | tojson | safe }};
+
+  $('#facet_list label').click(function() {
+    var selectedFacets = {},
+        data = $.extend({'p': ''}, args);
+
+    $('#facet_list input:checkbox:checked').each(function() {
+      var value = $(this).val(),
+          name = $(this).attr('name');
+      if (! (name in selectedFacets)) {
+        selectedFacets[name] = []
+      }
+      selectedFacets[name].push(value)
+    })
+
+    var limit = $.map(selectedFacets, function(k, v) {
+      var fields = $.map(k, function(i) {
+        return v + ':"' + i + '"'
+      });
+      return '(' + fields.join(' OR ') + ')'
+    }).join(' AND ')
+
+    data['p'] += ' ' + limit;
+
+    $('form[name="search"] input[name=p]').val(data['p'])
+
+    // $('form[name="search"] input[name=p]').val(args['p'] + ' ' + limit)
+    // data['post_filter'] = limit;
+
+    $.ajax({
+      url: searchResultsUrl,
+      data: data,
+      context: $('#search_results')
+    }).done(
+      function(response) { $(this).html(response)}
+    )
   })
 })
 </script>
   {% endif %}
 {% endblock %}
+

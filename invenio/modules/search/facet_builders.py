@@ -105,11 +105,7 @@ def faceted_results_filter(recids, filter_data, facets):
 
 class FacetBuilder(object):
 
-    """Facet builder helper class.
-
-    Implement a general facet builder using function
-    `get_most_popular_field_values`.
-    """
+    """Facet builder helper class."""
 
     def __init__(self, name):
         """Initialize facet builder."""

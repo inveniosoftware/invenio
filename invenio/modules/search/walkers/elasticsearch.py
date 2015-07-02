@@ -49,12 +49,20 @@ class ElasticSearchDSL(object):
         """
         self.keyword_dict = cfg['SEARCH_ELASTIC_KEYWORD_MAPPING']
 
-    def map_keyword_to_fields(self, keyword):
+    def map_keyword_to_fields(self, keyword, mode='a'):
         """Convert keyword to keyword list for searches
            Map keyword to elasticsearch fields if needed
         """
         if self.keyword_dict:
             res = self.keyword_dict.get(keyword)
+            if isinstance(res, dict):
+                if mode in res:
+                    res = res[mode]
+                else:
+                    raise RuntimeError(
+                        'Not defined mapping for keyword "{keyword}" and '
+                        'mode "{mode}"'.format(keyword=keyword, mode=mode)
+                    )
             return res if res else [str(keyword)]
         return [str(keyword)]
 
@@ -73,35 +81,44 @@ class ElasticSearchDSL(object):
     @visitor(KeywordOp)
     def visit(self, node, left, right):
         if callable(right):
-            return right(left)
+            keyword = self.map_keyword_to_fields(
+                left, getattr(right, '__search_mode__', 'a')
+            )
+            return right(keyword)
         raise RuntimeError("Not supported second level operation.")
 
     @visitor(ValueQuery)
     def visit(self, node, op):
-        return op(['_all'])
+        return op(['global_fulltext'])
 
     @visitor(Keyword)
     def visit(self, node):
-        return self.map_keyword_to_fields(node.value)
+        return node.value
 
     @visitor(Value)
     def visit(self, node):
-        return lambda keyword: {
-            'multi_match': {
-                'query': node.value,
-                'fields': keyword
+        def _f(keyword):
+            return {
+                'multi_match': {
+                    'query': node.value,
+                    'fields': keyword
+                }
             }
-        }
+        _f.__search_mode__ = 'a'
+        return _f
 
     @visitor(SingleQuotedValue)
     def visit(self, node):
-        return lambda keyword: {
-            'multi_match': {
-                'query': node.value,
-                'type': 'phrase',
-                'fields': keyword
+        def _f(keyword):
+            return {
+                'multi_match': {
+                    'query': node.value,
+                    'type': 'phrase',
+                    'fields': keyword
+                }
             }
-        }
+        _f.__search_mode__ = 'p'
+        return _f
 
     @visitor(DoubleQuotedValue)
     def visit(self, node):
@@ -112,6 +129,7 @@ class ElasticSearchDSL(object):
                                     for k in keyword]}}
             else:
                 return {'term': {keyword[0]: node.value}}
+        _f.__search_mode__ = 'e'
         return _f
 
     @visitor(RegexValue)
