@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,27 +19,29 @@
 
 {% extends 'admin/model/edit.html' %}
 
-{% block tail %}
+{% block javascript %}
   {{ super() }}
   <script type="text/javascript" src="/vendors/ckeditor/ckeditor.js"></script>
   <script>
-    $(function() {
-      CKEDITOR.replace("content", {
-        toolbar:[
-          ['PasteText', 'PasteFromWord'],
-          ['Bold', 'Italic', 'Strike', '-', 'Subscript', 'Superscript', ],
-          ['NumberedList', 'BulletedList'],
-          ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
-          ['SpecialChar', 'ScientificChar'], ['Source'], ['Maximize'],
-        ],
-        disableNativeSpellChecker:false,
-        extraPlugins:'scientificchar',
-        removePlugins:'elementspath'
-      })
-      $(".form-group .col-md-4").removeClass("col-md-4")
-                                .addClass("col-md-8")
-      $('input[data-role="datetimepicker"]').parent().removeClass("col-md-2")
-                                                     .addClass("col-md-4")
+    require(['jquery'], function ($) {
+        $(function() {
+        CKEDITOR.replace("content", {
+            allowedContent: true,
+            toolbar:[
+              ['PasteText', 'PasteFromWord'],
+              ['Bold', 'Italic', 'Strike', '-', 'Subscript', 'Superscript', '-', 'RemoveFormat'],
+              ['NumberedList', 'BulletedList'],
+              ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
+              ['SpecialChar', 'ScientificChar', 'Image'], ['Source'], ['Format'],
+              ['Maximize'], ['Preview']
+            ],
+            disableNativeSpellChecker:false,
+            extraPlugins:'scientificchar',
+            removePlugins:'elementspath'
+        })
+        $(".form-group .col-md-4").removeClass("col-md-4").addClass("col-md-8")
+        $('input[data-role="datetimepicker"]').parent().removeClass("col-md-2").addClass("col-md-4")
+        });
     });
   </script>
 {% endblock %}

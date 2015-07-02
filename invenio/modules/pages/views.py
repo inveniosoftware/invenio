@@ -35,8 +35,13 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from werkzeug.exceptions import NotFound
 
-blueprint = Blueprint('pages', __name__, url_prefix='/',
-                      template_folder='templates')
+blueprint = Blueprint(
+    'pages',
+    __name__,
+    url_prefix='/',
+    template_folder='templates',
+    static_folder='static',
+)
 
 
 @blueprint.before_app_first_request
@@ -84,8 +89,9 @@ def render_page(path):
     """Internal interface to the page view."""
     page = Page.query.filter(db.or_(Page.url == request.path,
                                     Page.url == request.path + "/")).first()
+    list_of_pages = page.get_pages()
     return render_template([page.template_name, cfg['PAGES_DEFAULT_TEMPLATE']],
-                           page=page)
+                           page=page, list_of_pages=list_of_pages)
 
 
 def before_url_insert(mapper, connection, target):
