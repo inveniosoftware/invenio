@@ -23,39 +23,48 @@ web:
   ports:
     - "127.0.0.1:28080:28080"
   environment:
-    - CACHE_REDIS_HOST=cache
-    - CFG_DATABASE_HOST=db
-    - DEBUG=True
-    - DEBUG_TB_INTERCEPT_REDIRECTS=False
-    - INVENIO_APP_CONFIG_ENVS=CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS
-  volumes:
-    - ./invenio:/code/invenio:ro
-    - ./docs:/code/docs:rw
-    - ./scripts:/code/scripts:ro
-    - /code/invenio/base/translations
-  links:
-    - mysql:db
-    - redis:cache
-worker:
-  build: .
-  command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
-  environment:
-    - BROKER_URL=redis://cache:6379/1
+    - ASSETS_DEBUG=True
+    - BROKER_URL=amqp://guest:guest@rabbit:5672//
     - CACHE_REDIS_HOST=cache
     - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
     - DEBUG=True
     - DEBUG_TB_INTERCEPT_REDIRECTS=False
-    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS
-  volumes_from:
-    - web
+    - INVENIO_APP_CONFIG_ENVS=ASSETS_DEBUG,BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS
+  volumes:
+    - ./invenio:/code/invenio:ro
+    - ./docs:/code/docs:rw
+    - ./scripts:/code/scripts:ro
+    - /code/invenio/base/translations
+  read_only: true
   links:
     - mysql:db
+    - rabbitmq:rabbit
+    - redis:cache
+worker:
+  build: .
+  command: celery worker --purge -E -A invenio.celery.celery --loglevel=DEBUG
+  environment:
+    - ASSETS_DEBUG=True
+    - BROKER_URL=amqp://guest:guest@rabbit:5672//
+    - CACHE_REDIS_HOST=cache
+    - CELERY_RESULT_BACKEND=redis://cache:6379/1
+    - CFG_DATABASE_HOST=db
+    - DEBUG=True
+    - DEBUG_TB_INTERCEPT_REDIRECTS=False
+    - INVENIO_APP_CONFIG_ENVS=ASSETS_DEBUG,BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,DEBUG,DEBUG_TB_INTERCEPT_REDIRECTS
+  volumes_from:
+    - web
+  read_only: true
+  links:
+    - mysql:db
+    - rabbitmq:rabbit
     - redis:cache
 redis:
   image: redis
   ports:
     - "127.0.0.1:26379:6379"
+  read_only: true
 mysql:
   image: mysql
   ports:
@@ -65,3 +74,12 @@ mysql:
     - MYSQL_USER=invenio
     - MYSQL_PASSWORD=my123p$ss
     - MYSQL_ROOT_PASSWORD=mysecretpassword
+  volumes:
+    - /tmp
+  read_only: true
+rabbitmq:
+  image: rabbitmq:3-management
+  ports:
+    - "127.0.0.1:25672:5672"
+    - "127.0.0.1:25673:15672"
+  read_only: true

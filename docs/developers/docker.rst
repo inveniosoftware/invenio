@@ -52,6 +52,8 @@ have any password.
         boot2docker ssh -vnNT \
             -Llocalhost:28080:localhost:28080 \
             -Llocalhost:26379:localhost:26379 \
+            -Llocalhost:25673:localhost:25673 \
+            -Llocalhost:25672:localhost:25672 \
             -Llocalhost:23306:localhost:23306
 
     You have to run this after Invenio booted up. Do **not** stop it while you
@@ -103,14 +105,15 @@ session:
 
     import ipdb; ipdb.set_tracepoint()
 
-Furthermore you can debug MySQL at `localhost:3306`
-and Redis at `localhost:6379`. You might want to use flower_ for celery
-debugging and analysis as well. Just run the following command to open the
-webinterface at port `5555`:
+Furthermore you can debug MySQL at `localhost:23306`, RabbitMQ via
+`localhost:25672` (webinterface at `localhost:25673`) and Redis at
+`localhost:26379`. You might want to use flower_ for celery debugging and
+analysis as well. Just run the following command to open the webinterface at
+port `5555`:
 
 .. code-block:: shell
 
-    celery flower --broker=redis://localhost:26379/1
+    celery flower --broker=amqp://guest:guest@localhost:25672//
 
 Code changes and live reloading
 -------------------------------
