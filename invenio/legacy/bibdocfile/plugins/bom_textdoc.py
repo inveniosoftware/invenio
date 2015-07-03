@@ -87,29 +87,7 @@ class BibTextDoc(BibDoc):
         @note: the text is extracted and cached for later use. Use L{get_text}
             to retrieve it.
         """
-        from invenio.legacy.websubmit.file_converter import get_best_format_to_extract_text_from, convert_file, InvenioWebSubmitFileConverterError
-        if version is None:
-            version = self.get_latest_version()
-        docfiles = self.list_version_files(version)
-        ## We try to extract text only from original or OCRed documents.
-        filenames = [docfile.get_full_path() for docfile in docfiles if 'CONVERTED' not in docfile.flags or 'OCRED' in docfile.flags]
-        try:
-            filename = get_best_format_to_extract_text_from(filenames)
-        except InvenioWebSubmitFileConverterError:
-            ## We fall back on considering all the documents
-            filenames = [docfile.get_full_path() for docfile in docfiles]
-            try:
-                filename = get_best_format_to_extract_text_from(filenames)
-            except InvenioWebSubmitFileConverterError:
-                open(os.path.join(self.basedir, '.text;%i' % version), 'w').write('')
-                return
-        try:
-            convert_file(filename, os.path.join(self.basedir, '.text;%i' % version), '.txt', perform_ocr=perform_ocr, ln=ln)
-            if version == self.get_latest_version():
-                run_sql("UPDATE bibdoc SET text_extraction_date=NOW() WHERE id=%s", (self.id, ))
-        except InvenioWebSubmitFileConverterError as e:
-            register_exception(alert_admin=True, prefix="Error in extracting text from bibdoc %i, version %i" % (self.id, version))
-            raise InvenioBibDocFileError, str(e)
+        raise RuntimeError("Text extraction is not implemented.")
 
     def pdf_a_p(self):
         """

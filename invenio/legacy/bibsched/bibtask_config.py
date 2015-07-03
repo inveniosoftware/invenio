@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,12 +31,11 @@ from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR, CFG_INSPIRE_SITE, \
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
-                           "webstatadmin", "bibclassify", "bibexport",
-                           "dbdump", "batchuploader", "bibencode",
-                           "bibtasklet", "refextract", "bibcircd", "bibsort",
-                           "selfcites", "hepdataharvest",
-                           "arxiv-pdf-checker", "bibcatalog", "bibtex",
-                           "bibcheck")
+                           "bibclassify", "bibexport",
+                           "dbdump", "bibencode",
+                           "bibtasklet", "refextract", "bibsort",
+                           "selfcites", "arxiv-pdf-checker", "bibcatalog",
+                           "bibtex")
 
 # Tasks that should be run as standalone task
 if CFG_INSPIRE_SITE:

@@ -40,8 +40,7 @@ from invenio.utils.url import make_invenio_opener
 URL_OPENER = make_invenio_opener('filedownloadutils')
 
 from invenio.config import (CFG_TMPSHAREDDIR,
-                            CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS,
-                            CFG_WEBSUBMIT_STORAGEDIR)
+                            CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS)
 
 #: block size when performing I/O.
 CFG_FILEUTILS_BLOCK_SIZE = 1024 * 8
@@ -274,7 +273,6 @@ def download_local_file(filename, download_to_file):
 
         allowed_path_list = CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS
         allowed_path_list.append(CFG_TMPSHAREDDIR)
-        allowed_path_list.append(CFG_WEBSUBMIT_STORAGEDIR)
         for allowed_path in allowed_path_list:
             if path.startswith(allowed_path):
                 shutil.copy(path, download_to_file)

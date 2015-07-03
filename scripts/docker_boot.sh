@@ -28,7 +28,7 @@
 
 
 # location of the folder that gets shared between containers
-CFG_SHARED_FOLDER=/usr/local/var/invenio.base-instance
+CFG_SHARED_FOLDER=/home/invenio
 
 CFG_MARKER_LOCK=$CFG_SHARED_FOLDER/boot.lock
 CFG_MARKER_DONE=$CFG_SHARED_FOLDER/boot.initialized
@@ -53,7 +53,8 @@ init() {
     # WARNING: Be careful when modifying the Invenio configuration file
     # directly because the file is parsed as python and therefore a mistake
     # will lead to a non-starting Invenio setup.
-    cfgfile=/usr/local/var/invenio.base-instance/invenio.cfg
+    cfgfile=$INVENIOBASE_INSTANCE_PATH/invenio.cfg
+    mkdir -p $INVENIOBASE_INSTANCE_PATH
     cat <<EOF >> "$cfgfile"
 CFG_SITE_URL = u'http://localhost:28080'
 CFG_SITE_SECURE_URL = u'http://localhost:28080'
@@ -73,9 +74,6 @@ CFG_RUNDIR = u'/home/invenio/var/run'
 CFG_TMPDIR = u'/tmp/invenio-`hostname`'
 CFG_TMPSHAREDDIR = u'/home/invenio/var/tmp-shared'
 CFG_WEBDIR = u'/home/invenio/var/www'
-CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = u'/home/invenio/etc/bibconvert/config'
-CFG_WEBSUBMIT_COUNTERSDIR = u'/home/invenio/var/data/submit/counters'
-CFG_WEBSUBMIT_STORAGEDIR = u'/home/invenio/var/data/submit/storage'
 
 DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
 EOF

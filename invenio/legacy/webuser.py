@@ -96,7 +96,7 @@ acc_find_possible_activities = lazy_import('invenio.modules.access.control:acc_f
 mail_cookie_create_mail_activation = lazy_import('invenio.modules.access.mailcookie:mail_cookie_create_mail_activation')
 acc_firerole_check_user = lazy_import('invenio.modules.access.firerole:acc_firerole_check_user')
 load_role_definition = lazy_import('invenio.modules.access.firerole:load_role_definition')
-SUPERADMINROLE = lazy_import('invenio.modules.access.local_config:SUPERADMINROLE')
+from invenio.modules.access.local_config import SUPERADMINROLE
 CFG_EXTERNAL_AUTH_USING_SSO = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_USING_SSO')
 CFG_EXTERNAL_AUTHENTICATION = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTHENTICATION')
 CFG_WEBACCESS_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_MSGS')
@@ -124,12 +124,12 @@ def createGuestUser():
     """
     if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
         try:
-            return run_sql("insert into user (email, note) values ('', '1')")
+            return run_sql("""insert into "user" (email, note) values ('', '1')""")
         except OperationalError:
             return None
     else:
         try:
-            return run_sql("insert into user (email, note) values ('', '0')")
+            return run_sql("""insert into "user" (email, note) values ('', '0')""")
         except OperationalError:
             return None
 
@@ -159,7 +159,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         if not uid:
             uid = getUid(req)
         try:
-            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1", (uid,))
+            res = run_sql("""SELECT email FROM "user" WHERE id=%s AND note=1""", (uid,))
 
             if res and res[0][0]:
                 if text:
@@ -241,7 +241,7 @@ def getUid(req):
         elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
             return -1
     else:
-        res = run_sql("SELECT note FROM user WHERE id=%s", (uid,))
+        res = run_sql("""SELECT note FROM "user" WHERE id=%s""", (uid,))
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
             return uid
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res and res[0][0] in [1, "1"]:
@@ -290,7 +290,7 @@ def session_param_list(req):
 
 def get_last_login(uid):
     """Return the last_login datetime for uid if any, otherwise return the Epoch."""
-    res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid,), 1)
+    res = run_sql('SELECT last_login FROM "user" WHERE id=%s', (uid,), 1)
     if res and res[0][0]:
         return res[0][0]
     else:
@@ -303,7 +303,7 @@ def get_user_info(uid, ln=CFG_SITE_LANG):
     """
     _ = gettext_set_language(ln)
     query = """SELECT id, nickname
-               FROM user
+               FROM "user"
                WHERE id=%s"""
     res = run_sql(query, (uid,))
     if res:
@@ -321,7 +321,7 @@ def get_uid_from_email(email):
     """Return the uid corresponding to an email.
     Return -1 when the email does not exists."""
     try:
-        res = run_sql("SELECT id FROM user WHERE email=%s", (email,))
+        res = run_sql("""SELECT id FROM "user" WHERE email=%s""", (email,))
         if res:
             return res[0][0]
         else:
@@ -337,7 +337,7 @@ def isGuestUser(uid, run_on_slave=True):
     """
     out = 1
     try:
-        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1,
+        res = run_sql("""SELECT email FROM "user" WHERE id=%s LIMIT 1""", (uid,), 1,
                       run_on_slave=run_on_slave)
         if res:
             if res[0][0]:
@@ -349,7 +349,7 @@ def isGuestUser(uid, run_on_slave=True):
 def isUserSubmitter(user_info):
     """Return True if the user is a submitter for something; False otherwise."""
     u_email = get_email(user_info['uid'])
-    res = run_sql("SELECT email FROM sbmSUBMISSIONS WHERE email=%s LIMIT 1", (u_email,), 1)
+    res = run_sql("""SELECT email FROM "sbmSUBMISSIONS" WHERE email=%s LIMIT 1""", (u_email,), 1)
     return len(res) > 0
 
 def isUserReferee(user_info):
@@ -414,8 +414,8 @@ def confirm_email(email):
         activated = 0
     elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
         return -1
-    run_sql('UPDATE user SET note=%s where email=%s', (activated, email))
-    res = run_sql('SELECT id FROM user where email=%s', (email,))
+    run_sql('UPDATE "user" SET note=%s where email=%s', (activated, email))
+    res = run_sql('SELECT id FROM "user" where email=%s', (email,))
     if res:
         if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
             send_new_admin_account_warning(email, CFG_SITE_ADMIN_EMAIL)
@@ -453,7 +453,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
     _ = gettext_set_language(ln)
 
     # is email already taken?
-    res = run_sql("SELECT email FROM user WHERE email=%s", (email,))
+    res = run_sql("""SELECT email FROM "user" WHERE email=%s""", (email,))
     if len(res) > 0:
         return 3
 
@@ -465,7 +465,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         if not nickname_valid_p(nickname):
             return 2
         # is nickname already taken?
-        res = run_sql("SELECT nickname FROM user WHERE nickname=%s", (nickname,))
+        res = run_sql("""SELECT nickname FROM "user" WHERE nickname=%s""", (nickname,))
         if len(res) > 0:
             return 4
 
@@ -511,10 +511,10 @@ def updateDataUser(uid, email, nickname):
         return 0
 
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 2:
-        run_sql("update user set email=%s where id=%s", (email, uid))
+        run_sql("""update "user" set email=%s where id=%s""", (email, uid))
 
     if nickname and nickname != '':
-        run_sql("update user set nickname=%s where id=%s", (nickname, uid))
+        run_sql("""update "user" set nickname=%s where id=%s""", (nickname, uid))
 
     return 1
 
@@ -576,7 +576,7 @@ def username_exists_p(username):
     if username == "":
         # return not exists if asked for guest users
         return 0
-    res = run_sql("SELECT email FROM user WHERE email=%s OR nicname=%s",
+    res = run_sql("""SELECT email FROM "user" WHERE email=%s OR nicname=%s""",
                   (username, username))
     if len(res) > 0:
         return 1
@@ -586,7 +586,7 @@ def emailUnique(p_email):
     """Check if the email address only exists once. If yes, return userid, if not, -1
     """
 
-    query_result = run_sql("select id, email from user where email=%s", (p_email,))
+    query_result = run_sql("""select id, email from "user" where email=%s""", (p_email,))
     if len(query_result) == 1:
         return query_result[0][0]
     elif len(query_result) == 0:
@@ -598,7 +598,7 @@ def update_Uid(req, p_email, remember_me=False):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system with a given email and password.
     As a side effect it will discover all the restricted collection to which the user has right to
     """
-    query_ID = int(run_sql("select id from user where email=%s",
+    query_ID = int(run_sql("""select id from "user" where email=%s""",
                            (p_email,))[0][0])
 
     setUid(req, query_ID, remember_me)
@@ -622,7 +622,7 @@ def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case
     the user is not found."""
     out = "guest"
-    res = run_sql("SELECT email FROM user WHERE id=%s", (uid,), 1)
+    res = run_sql("""SELECT email FROM "user" WHERE id=%s""", (uid,), 1)
     if res and res[0][0]:
         out = res[0][0].lower()
     return out
@@ -636,26 +636,17 @@ def get_email_from_username(username):
     if username == '':
         return ''
     out = username
-    res = run_sql("SELECT email FROM user WHERE email=%s", (username,), 1) + \
-          run_sql("SELECT email FROM user WHERE nickname=%s", (username,), 1)
+    res = run_sql("""SELECT email FROM "user" WHERE email=%s""", (username,), 1) + \
+          run_sql("""SELECT email FROM "user" WHERE nickname=%s""", (username,), 1)
     if res and len(res) == 1:
         out = res[0][0].lower()
     return out
-
-#def get_password(uid):
-    #"""Return password of the user uid.  Return None in case
-    #the user is not found."""
-    #out = None
-    #res = run_sql("SELECT password FROM user WHERE id=%s", (uid,), 1)
-    #if res and res[0][0] != None:
-        #out = res[0][0]
-    #return out
 
 def get_nickname(uid):
     """Return nickname of the user uid.  Return None in case
     the user is not found."""
     out = None
-    res = run_sql("SELECT nickname FROM user WHERE id=%s", (uid,), 1)
+    res = run_sql("""SELECT nickname FROM "user" WHERE id=%s""", (uid,), 1)
     if res and res[0][0]:
         out = res[0][0]
     return out
@@ -664,7 +655,7 @@ def get_nickname_or_email(uid):
     """Return nickname (preferred) or the email address of the user uid.
     Return string 'guest' in case the user is not found."""
     out = "guest"
-    res = run_sql("SELECT nickname, email FROM user WHERE id=%s", (uid,), 1)
+    res = run_sql("""SELECT nickname, email FROM "user" WHERE id=%s""", (uid,), 1)
     if res and res[0]:
         if res[0][0]:
             out = res[0][0]
@@ -695,9 +686,8 @@ def create_userinfobox_body(req, uid, language="en"):
                                             submitter=user_info['precached_viewsubmissions'],
                                             referee=user_info['precached_useapprove'],
                                             admin=user_info['precached_useadmin'],
-                                            usebaskets=user_info['precached_usebaskets'],
+                                            usebaskets=False,
                                             usemessages=user_info['precached_usemessages'],
-                                            usealerts=user_info['precached_usealerts'],
                                             usegroups=user_info['precached_usegroups'],
                                             useloans=user_info['precached_useloans'],
                                             usestats=user_info['precached_usestats']
@@ -708,7 +698,7 @@ def create_userinfobox_body(req, uid, language="en"):
 
 def list_registered_users():
     """List all registered users."""
-    return run_sql("SELECT id,email FROM user where email!=''")
+    return run_sql("""SELECT id,email FROM "user" where email!=''""")
 
 def list_users_in_role(role):
     """List all users of a given role (see table accROLE)
@@ -757,7 +747,7 @@ def get_user_preferences(uid):
 
 def set_user_preferences(uid, pref):
     assert isinstance(pref, dict)
-    run_sql("UPDATE user SET settings=%s WHERE id=%s",
+    run_sql("""UPDATE "user" SET settings=%s WHERE id=%s""",
             (serialize_via_marshal(pref), uid))
 
 

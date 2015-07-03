@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -63,8 +64,6 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
-     CFG_HEPDATA_URL, \
-     CFG_HEPDATA_PLOTSIZE, \
      CFG_BASE_URL, \
      CFG_SITE_URL, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS, \
@@ -2957,18 +2956,7 @@ class Template:
           - 'ln' *string* - The language to display
 
         """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """
-              <form action="%(siteurl)s/yourbaskets/add" method="post">
-              <table>
-              """ % {
-                'siteurl' : CFG_BASE_URL,
-              }
-
-        return out
+        return "<table/>"
 
     def tmpl_record_format_htmlbrief_footer(self, ln, display_add_to_basket=True):
         """Returns the footer of the search results list when output
@@ -2983,19 +2971,8 @@ class Template:
           - 'ln' *string* - The language to display
           - 'display_add_to_basket' *bool* - whether to display Add-to-basket button
         """
+        return  "</table><br />"
 
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """</table>
-               <br />
-               <input type="hidden" name="colid" value="0" />
-               %(add_to_basket)s
-               </form>""" % {
-               'add_to_basket': display_add_to_basket and """<input class="formbutton" type="submit" name="action" value="%s" />""" % _("Add to basket") or "",
-                 }
-
-        return out
 
     def tmpl_record_format_htmlbrief_body(self, ln, recid,
                                           row_number, relevance,
@@ -3029,19 +3006,6 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        checkbox_for_baskets = """<input name="recid" type="checkbox" value="%(recid)s" />""" % \
-                               {'recid': recid, }
-        if not display_add_to_basket:
-            checkbox_for_baskets = ''
-        out = """
-                <tr><td valign="top" align="right" style="white-space: nowrap;">
-                    %(checkbox_for_baskets)s
-                    <abbr class="unapi-id" title="%(recid)s"></abbr>
-
-                %(number)s.
-               """ % {'recid': recid,
-                      'number': row_number,
-                      'checkbox_for_baskets': checkbox_for_baskets}
         if relevance:
             out += """<br /><div class="rankscoreinfo"><a title="rank score">%(prologue)s%(relevance)s%(epilogue)s</a></div>""" % {
                 'prologue' : relevances_prologue,
@@ -3181,13 +3145,8 @@ class Template:
             if len(results) != 0:
                 if of == 'hb':
                     out += """
-                          <form action="%(siteurl)s/yourbaskets/add" method="post">
-                          <input type="hidden" name="colid" value="%(col_db_id)s" />
                           <table>
-                          """ % {
-                            'siteurl' : CFG_BASE_URL,
-                            'col_db_id' : db_id,
-                          }
+                          """
             else:
                 if of == 'hb':
                     out += """
@@ -3201,10 +3160,6 @@ class Template:
                 if of == 'hb':
                     out += """</table>
                            <br />"""
-                    if display_add_to_basket:
-                        out += """<input class="formbutton" type="submit" name="action" value="%(basket)s" />
-                    """ % {'basket' : _("Add to basket")}
-                    out += """</form>"""
             else:
                 if of == 'hb':
                     out += """
@@ -3957,83 +3912,6 @@ class Template:
                     'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
         return out
 
-    def tmpl_record_hepdata(self, data, recid, isLong=True):
-        """ Generate a page for HepData records
-        """
-        from invenio.utils.hepdata import api as hepdatautils
-        from invenio.legacy.search_engine import get_fieldvalues
-
-        c = []
-        c.append("<div style=\"background-color: #ececec;\">")
-
-        flag_hepdata = 0
-        flag_dataverse = 0
-        for dataset in data.datasets:
-            try:
-                publisher = get_fieldvalues(dataset.recid, '520__9')[0]
-            except IndexError:
-                from invenio.utils.hepdata.api import create_hepdata_ticket
-                create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
-                continue
-            if publisher == "HEPDATA" and flag_hepdata == 0:
-                flag_hepdata = 1
-            elif publisher == "Dataverse":
-                flag_dataverse = 1
-
-        if flag_hepdata == 1 or flag_dataverse == 1:
-            c.append("<h3> This data comes from ")
-            if flag_hepdata == 1:
-                c.append('<a href="http://hepdata.cedar.ac.uk/view/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
-            if flag_hepdata == 1 and flag_dataverse == 1:
-                c.append(' and ')
-            if flag_dataverse == 1:
-                c.append('<a href="http://thedata.harvard.edu/"> Dataverse </a>')
-            c.append('</h3>')
-
-        c.append("<div style=\"background-color: #ececec;\">")
-        if data.comment:
-            c.append("<h3> Summary:</h3>")
-            c.append("""<div class="hepdataSummary">%s</div>""" % (data.comment, ))
-
-        if data.systematics and data.systematics.strip() != "":
-            c.append("<h3>Systematic data: </h3>")
-            c.append(data.systematics)
-            c.append("</div>")
-
-        if data.additional_data_links:
-            c.append("<h3>Additional data:</h3>")
-            for link in data.additional_data_links:
-                if "href" in link and "description" in link:
-                    c.append("<a href=\"%s/%s\">%s</a><br>" % (CFG_HEPDATA_URL, link["href"], link["description"]))
-
-        c.append("<h3> Datasets:</h3>")
-
-        seq = 0
-
-        for dataset in data.datasets:
-            seq += 1
-            try:
-                publisher = get_fieldvalues(dataset.recid, '520__9')[0]
-            except IndexError:
-                from invenio.utils.hepdata.api import create_hepdata_ticket
-                create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
-                continue
-            if publisher == "HEPDATA":
-                c.append(hepdatadisplayutils.render_hepdata_dataset_html(dataset, recid, seq))
-            elif publisher == "Dataverse":
-                c.append(hepdatadisplayutils.render_dataverse_dataset_html(dataset.recid))
-            elif publisher == "INSPIRE":
-                c.append(hepdatadisplayutils.render_inspire_dataset_html(dataset.recid))
-            else:
-                c.append(hepdatadisplayutils.render_other_dataset_html(dataset.recid))
-
-        c.append("</div>")
-
-        return "\n".join(c)
-
-    def tmpl_record_no_hepdata(self):
-        return "This record does not have HEP data associated"
-
     def tmpl_record_plots(self, recID, ln):
         """
           Displays little tables containing the images and captions contained in the specified document.
@@ -4059,13 +3937,7 @@ class Template:
         for fld in flds:
             image = field_get_subfield_values(fld, 'u')
             caption = field_get_subfield_values(fld, 'y')
-            data_urls = field_get_subfield_values(fld, 'z')
-            if type(data_urls) == list and len(data_urls) > 0:
-                data_urls = str(data_urls[0])
-                if data_urls.startswith("HEPDATA:"):
-                    data_urls = data_urls[8:].split(";")
-                else:
-                    data_urls = []
+            data_urls = []
 
             if type(image) == list and len(image) > 0:
                 image = image[0]

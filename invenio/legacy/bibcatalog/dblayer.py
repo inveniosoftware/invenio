@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012 CERN.
+# Copyright (C) 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,10 +27,10 @@ def get_all_new_records(since, last_id):
     Get all the newly inserted records since last run.
     """
     # Fetch all records inserted since last run
-    sql = "SELECT `id`, `creation_date` FROM `bibrec` " \
-        "WHERE `creation_date` >= %s " \
-        "AND `id` > %s " \
-        "ORDER BY `creation_date`"
+    sql = "SELECT id, creation_date FROM bibrec " \
+        "WHERE creation_date >= %s " \
+        "AND id > %s " \
+        "ORDER BY creation_date"
     return run_sql(sql, (since.isoformat(), last_id))
 
 
@@ -38,10 +38,10 @@ def get_all_modified_records(since, last_id):
     """
     Get all the newly modified records since last run.
     """
-    sql = "SELECT `id`, `modification_date` FROM `bibrec` " \
-        "WHERE `modification_date` >= %s " \
-        "AND `id` > %s " \
-        "ORDER BY `modification_date`"
+    sql = "SELECT id, modification_date FROM bibrec " \
+        "WHERE modification_date >= %s " \
+        "AND id > %s " \
+        "ORDER BY modification_date"
     return run_sql(sql, (since.isoformat(), last_id))
 
 
@@ -52,7 +52,7 @@ def can_launch_bibupload(taskid):
     if taskid == 0:
         return True
 
-    sql = 'SELECT status FROM schTASK WHERE id = %s'
+    sql = 'SELECT status FROM "schTASK" WHERE id = %s'
     if run_sql(sql, [str(taskid)])[0][0] != 'DONE':
         return False
     return True

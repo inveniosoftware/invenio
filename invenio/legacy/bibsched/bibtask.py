@@ -304,14 +304,16 @@ def task_low_level_submission(name, user, *argv):
         if special_name:
             name = '%s:%s' % (name, special_name)
 
-        verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
+        verbose_argv = 'Will execute: %s' % \
+            ' '.join([escape_shell_arg(str(argg)) for argg in argv])
 
         ## submit task:
-        task_id = run_sql("""INSERT INTO "schTASK" (proc,host,user,
+        task_id = run_sql(
+            """INSERT INTO "schTASK" (proc,host,"user",
             runtime,sleeptime,status,progress,arguments,priority,sequenceid)
             VALUES (%s,%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
             (name, host, user, runtime, sleeptime, verbose_argv,
-             marshal.dumps(argv), priority, sequenceid))
+             bytearray(marshal.dumps(argv)), priority, sequenceid))
 
     except Exception:
         register_exception(alert_admin=True)
@@ -1010,7 +1012,7 @@ def _task_submit(argv, authorization_action, authorization_msg):
                                            runtime,sleeptime,status,progress,arguments,priority,sequenceid,host)
                                          VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s,%s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
-         _TASK_PARAMS["sleeptime"], verbose_argv[:255], marshal.dumps(argv),
+         _TASK_PARAMS["sleeptime"], verbose_argv[:255], bytearray(marshal.dumps(argv)),
          _TASK_PARAMS['priority'], _TASK_PARAMS['sequence-id'],
          _TASK_PARAMS['host']))
 

@@ -58,9 +58,11 @@ RUN apt-get update && \
 
 # install python requirements
 RUN pip install --upgrade pip && \
-    pip install mock && \
-    pip install unittest2 && \
-    pip install watchdog
+    pip install ipdb \
+        ipython \
+        mock \
+        unittest2 \
+        watchdog
 
 # install nodejs requirements
 RUN npm update && \
@@ -124,13 +126,11 @@ RUN rm -rf /tmp/* /var/tmp/* /var/lib/{cache,log}/ /root/.cache/*
 # in general code should not be writeable, especially because we are using
 # `pip install -e`
 RUN mkdir -p /code/src && \
-    mkdir -p /usr/local/var/invenio.base-instance && \
     chown -R invenio:invenio /code && \
     chown -R root:root /code/invenio && \
     chown -R root:root /code/scripts && \
     chown -R root:root /code/setup.* && \
-    chown -R root:root /code/src && \
-    chown -R invenio:invenio /usr/local/var/invenio.base-instance
+    chown -R root:root /code/src
 USER invenio
 
 # add volumes
@@ -139,7 +139,10 @@ USER invenio
 VOLUME /code
 VOLUME /home/invenio
 VOLUME /tmp
-VOLUME /usr/local/var/invenio.base-instance
+
+# global environment variables
+ENV INVENIOBASE_INSTANCE_PATH /home/invenio/instance
+ENV INVENIOBASE_STATIC_FOLDER /home/invenio/static
 
 # install init scripts
 ENTRYPOINT ["/code/scripts/docker_boot.sh"]

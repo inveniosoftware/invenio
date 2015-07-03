@@ -404,66 +404,6 @@ def delete_kb(kb_name):
     db.session.delete(models.KnwKB.query.filter_by(
         name=kb_name).one())
 
-
-# Knowledge Bases Dependencies
-#
-
-
-def get_elements_that_use_kb(name):
-    """Return a list of elements that call given kb.
-
-    WARNING: this routine is obsolete.
-
-    .. code-block:: python
-
-        [
-         {
-          'filename':"filename_1.py",
-          'name': "a name"
-         },
-         ..
-        ]
-
-    :return: elements sorted by name
-    """
-    # FIXME remove the obsolete function
-    warnings.warn("The method 'get_elements_that_use_kb(name) is obsolete!'",
-                  DeprecationWarning)
-
-    format_elements = {}
-    # Retrieve all elements in files
-    from invenio.modules.formatter.engine \
-        import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
-    for element in TEMPLATE_CONTEXT_FUNCTIONS_CACHE \
-            .bibformat_elements().values():
-        path = element.__file__
-        filename = os.path.basename(element.__file__)
-        if filename.endswith(".py"):
-            formatf = open(path, 'r')
-            code = formatf.read()
-            formatf.close()
-            # Search for use of kb inside code
-            kb_pattern = re.compile('''
-            (bfo.kb)\s*                #Function call
-            \(\s*                      #Opening parenthesis
-            [\'"]+                     #Single or double quote
-            (?P<kb>%s)                 #kb
-            [\'"]+\s*                  #Single or double quote
-            ,                          #comma
-            ''' % name, re.VERBOSE | re.MULTILINE | re.IGNORECASE)
-
-            result = kb_pattern.search(code)
-            if result is not None:
-                name = ("".join(filename.split(".")[:-1])).lower()
-                if name.startswith("bfe_"):
-                    name = name[4:]
-                format_elements[name] = {'filename': filename,
-                                         'name': name}
-
-    keys = format_elements.keys()
-    keys.sort()
-    return map(format_elements.get, keys)
-
 # kb functions for export
 
 

@@ -45,15 +45,12 @@ CFG_USER_DEFAULT_INFO = {
     'session': None,
     'precached_permitted_restricted_collections': [],
     'precached_allowed_deposition_types': [],
-    'precached_usebaskets': False,
     'precached_useloans': False,
     'precached_usegroups': False,
-    'precached_usealerts': False,
     'precached_usemessages': False,
     'precached_viewsubmissions': False,
     'precached_useapprove': False,
     'precached_useadmin': False,
-    'precached_usestats': False,
     'precached_viewclaimlink': False,
     'precached_usepaperclaim': False,
     'precached_usepaperattribution': False,
@@ -202,18 +199,12 @@ class UserInfo(CombinedMultiDict, UserMixin):
             get_permitted_restricted_collections(user_info)
         data['precached_allowed_deposition_types'] = \
             get_authorized_deposition_types(user_info)
-        data['precached_usebaskets'] = acc_authorize_action(
-            user_info, 'usebaskets')[0] == 0
         data['precached_useloans'] = acc_authorize_action(
             user_info, 'useloans')[0] == 0
         data['precached_usegroups'] = acc_authorize_action(
             user_info, 'usegroups')[0] == 0
-        data['precached_usealerts'] = acc_authorize_action(
-            user_info, 'usealerts')[0] == 0
         data['precached_usemessages'] = acc_authorize_action(
             user_info, 'usemessages')[0] == 0
-        data['precached_usestats'] = acc_authorize_action(
-            user_info, 'runwebstatadmin')[0] == 0
         try:
             data['precached_viewsubmissions'] = isUserSubmitter(user_info)
         except Exception:

@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -73,7 +73,7 @@ def get_set_definitions(set_spec):
     """
     set_definitions = []
 
-    query = "select setName, setDefinition from oaiREPOSITORY where setSpec=%s"
+    query = """select "setName", "setDefinition" from "oaiREPOSITORY" where setSpec=%s"""
     res = run_sql(query, (set_spec, ))
 
     for (set_name, set_definition) in res:
@@ -115,7 +115,7 @@ def all_set_specs():
     given that a setSpec might be defined by several search
     queries. Here we return distinct values
     """
-    query = "SELECT DISTINCT setSpec FROM oaiREPOSITORY"
+    query = """SELECT DISTINCT "setSpec" FROM "oaiREPOSITORY" """
     res = run_sql(query)
 
     return [row[0] for row in res]
@@ -164,7 +164,7 @@ def get_set_name_for_set_spec(set_spec):
       set_spec - *str* the set_spec for which we would like to get the
                  setName
     """
-    query = "select setName from oaiREPOSITORY where setSpec=%s and setName!=''"
+    query = """select "setName" from "oaiREPOSITORY" where "setSpec"=%s and "setName"!='' """
     res = run_sql(query, (set_spec, ))
     if len(res) > 0:
         return res[0][0]
@@ -296,7 +296,7 @@ def oairepositoryupdater_task():
         print_repository_status(verbose=report)
         return True
 
-    if run_sql("SELECT id FROM schTASK WHERE proc='bibupload:oairepository' AND status='WAITING'"):
+    if run_sql("""SELECT id FROM "schTASK" WHERE proc='bibupload:oairepository' AND status='WAITING'"""):
         write_message("Previous requests of oairepository still being elaborated. Let's skip this execution.")
         return True
 

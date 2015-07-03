@@ -53,7 +53,8 @@ from invenio.legacy.bibauthority.engine import get_index_strings_by_control_no,\
 from invenio.legacy.search_engine import perform_request_search, \
      get_synonym_terms, \
      search_pattern
-from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name, \
+    truncate_table
 from invenio.legacy.bibindex.engine_washer import wash_index_term
 from invenio.legacy.bibsched.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
@@ -448,10 +449,10 @@ def truncate_index_table(index_name):
                       index_name, verbose=2)
         run_sql("""UPDATE "idxINDEX" SET last_updated='1900-01-01 00:00:00'
                    WHERE id=%s""", (index_id, ))
-        run_sql("TRUNCATE idxWORD%02dF" % index_id) # kwalitee: disable=sql
-        run_sql("TRUNCATE idxWORD%02dR" % index_id) # kwalitee: disable=sql
-        run_sql("TRUNCATE idxPHRASE%02dF" % index_id) # kwalitee: disable=sql
-        run_sql("TRUNCATE idxPHRASE%02dR" % index_id) # kwalitee: disable=sql
+        truncate_table("idxWORD%02dF" % index_id)
+        truncate_table("idxWORD%02dR" % index_id)
+        truncate_table("idxPHRASE%02dF" % index_id)
+        truncate_table("idxPHRASE%02dR" % index_id)
 
 
 def update_index_last_updated(indexes, starting_time=None):
@@ -544,7 +545,7 @@ def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes
     for recIDs_range in recIDs:
 
         # firstly, determine which records were updated since min_last_updated:
-        query = """SELECT id_bibrec,job_date,affected_fields FROM hstRECORD
+        query = """SELECT id_bibrec,job_date,affected_fields FROM "hstRECORD"
                    WHERE id_bibrec BETWEEN %s AND %s AND
                          job_date > '%s'""" % \
                    (recIDs_range[0], recIDs_range[1], min_last_updated)
@@ -556,10 +557,10 @@ def find_affected_records_for_index(indexes=None, recIDs=None, force_all_indexes
         # uploaded with old timestamp (via 005), so let us detect
         # those too, using their "real" modification_date:
         res = run_sql("""SELECT bibrec.id,modification_date,''
-                         FROM bibrec, hstRECORD
+                         FROM bibrec, "hstRECORD"
                          WHERE modification_date>%s
                            AND bibrec.id=id_bibrec
-                           AND (SELECT COUNT(*) FROM hstRECORD WHERE id_bibrec=bibrec.id)=1""", (min_last_updated,))
+                           AND (SELECT COUNT(*) FROM "hstRECORD" WHERE id_bibrec=bibrec.id)=1""", (min_last_updated,))
         if res:
             recIDs_info.extend(res)
 
@@ -656,7 +657,7 @@ class AbstractIndexTable(object):
         tab_name = self.table_name[:-1] + "R"
         if mode == "normal":
             for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='TEMPORARY' WHERE id_bibrec
+                query = """UPDATE "%s" SET type='TEMPORARY' WHERE id_bibrec
                 BETWEEN %%s AND %%s AND type='CURRENT'""" % tab_name
                 write_message(query % (group[0], group[1]), verbose=9)
                 run_sql(query, (group[0], group[1]))
@@ -682,11 +683,11 @@ class AbstractIndexTable(object):
         write_message('...updating reverse table %s started' % tab_name)
         if mode == "normal":
             for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                query = """UPDATE "%s" SET type='CURRENT' WHERE id_bibrec
                 BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
                 write_message(query % (group[0], group[1]), verbose=9)
                 run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
+                query = """DELETE FROM "%s" WHERE id_bibrec
                 BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
                 write_message(query % (group[0], group[1]), verbose=9)
                 run_sql(query, (group[0], group[1]))
@@ -694,11 +695,11 @@ class AbstractIndexTable(object):
                           tab_name, verbose=9)
         elif mode == "emergency":
             for group in self.recIDs_in_mem:
-                query = """UPDATE %s SET type='CURRENT' WHERE id_bibrec
+                query = """UPDATE "%s" SET type='CURRENT' WHERE id_bibrec
                 BETWEEN %%s AND %%s AND type='TEMPORARY'""" % tab_name
                 write_message(query % (group[0], group[1]), verbose=9)
                 run_sql(query, (group[0], group[1]))
-                query = """DELETE FROM %s WHERE id_bibrec
+                query = """DELETE FROM "%s" WHERE id_bibrec
                 BETWEEN %%s AND %%s AND type='FUTURE'""" % tab_name
                 write_message(query % (group[0], group[1]), verbose=9)
                 run_sql(query, (group[0], group[1]))
@@ -726,21 +727,21 @@ class AbstractIndexTable(object):
                 # yes there were some new words:
                 write_message("......... updating hitlist for ``%s''" %  \
                               word, verbose=9)
-                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
+                run_sql("""UPDATE "%s" SET hitlist=%%s WHERE term=%%s""" % wash_table_column_name(self.table_name), (set.fastdump(), word)) # kwalitee: disable=sql
 
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % \
                           word, verbose=9)
             set = intbitset(self.value[word].keys())
             try:
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
+                run_sql("""INSERT INTO "%s" (term, hitlist) VALUES (%%s, %%s)""" % wash_table_column_name(self.table_name), (word, set.fastdump())) # kwalitee: disable=sql
             except Exception, e:
                 ## We send this exception to the admin only when is not
                 ## already reparing the problem.
                 register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
 
         if not set: # never store empty words
-            run_sql("DELETE FROM %s WHERE term=%%s" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
+            run_sql("""DELETE FROM "%s" WHERE term=%%s""" % wash_table_column_name(self.table_name), (word,)) # kwalitee: disable=sql
 
     def put(self, recID, word, sign):
         """Keeps track of changes done during indexing
@@ -768,7 +769,7 @@ class AbstractIndexTable(object):
 
     def load_old_recIDs(self, word):
         """Load existing hitlist for the word from the database index files."""
-        query = "SELECT hitlist FROM %s WHERE term=%%s" % self.table_name
+        query = """SELECT hitlist FROM "%s" WHERE term=%%s""" % self.table_name
         res = run_sql(query, (word, ))
         if res:
             return intbitset(res[0][0])
@@ -917,7 +918,7 @@ class VirtualIndexTable(AbstractIndexTable):
         """
 
         tab_name = "idx" + self.table_type + ("%02d" % index_id) + "R"
-        query = """SELECT id_bibrec, termlist FROM %s WHERE id_bibrec
+        query = """SELECT id_bibrec, termlist FROM "%s" WHERE id_bibrec
                    BETWEEN %%s AND %%s""" % tab_name
         new_regular_values = run_sql(query, (records_range[0], records_range[1]))
         if new_regular_values:
@@ -936,7 +937,7 @@ class VirtualIndexTable(AbstractIndexTable):
         """
 
         virtual_tab_name = self.table_name[:-1] + "R"
-        query = """SELECT id_bibrec, termlist FROM %s
+        query = """SELECT id_bibrec, termlist FROM "%s"
                    WHERE type='CURRENT' AND
                    id_bibrec BETWEEN %%s AND %%s""" % virtual_tab_name
         old_virtual_values = run_sql(query, (records_range[0], records_range[1]))
@@ -976,12 +977,12 @@ class VirtualIndexTable(AbstractIndexTable):
             to_serialize = update_cache_for_record(index_name, recID, old_values, new_values)
             if len(to_serialize) == 0:
                 continue
-            run_sql("""INSERT INTO %s (id_bibrec,termlist,type)
+            run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type)
                        VALUES (%%s,%%s,'FUTURE')""" % \
                        wash_table_column_name(virtual_tab_name),
                        (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')""" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -1013,9 +1014,9 @@ class VirtualIndexTable(AbstractIndexTable):
             to_serialize = insert_to_cache_for_record(index_name, recID, old_values, new_values)
             if len(to_serialize) == 0:
                 continue
-            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')""" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')""" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -1044,9 +1045,9 @@ class VirtualIndexTable(AbstractIndexTable):
             to_serialize = remove_from_cache_for_record(index_name, recID, old_values)
             if len(to_serialize) == 0:
                 continue
-            run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
+            run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')""" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal(to_serialize))) # kwalitee: disable=sql
             try:
-                run_sql("INSERT INTO %s (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("""INSERT INTO "%s" (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')""" % wash_table_column_name(virtual_tab_name), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 pass
 
@@ -1134,9 +1135,9 @@ class VirtualIndexTable(AbstractIndexTable):
 
     def clean_database(self):
         """Removes all entries from corresponding tables in database"""
-        query = """DELETE FROM %s""" % self.table_name
+        query = """DELETE FROM "%s" """ % self.table_name
         run_sql(query)
-        query = """DELETE FROM %s""" % self.table_name[:-1] + "R"
+        query = """DELETE FROM "%s" """ % self.table_name[:-1] + "R"
         run_sql(query)
 
     def clean_queue_table(self, index_name):
@@ -1145,7 +1146,7 @@ class VirtualIndexTable(AbstractIndexTable):
             for specific index. It means that function will remove
             all entries from db from queue table for this index.
         """
-        query = "DELETE FROM %s WHERE index_name='%s'" % \
+        query = """DELETE FROM "%s" WHERE index_name='%s'""" % \
                  (self.table_name[:-1].lstrip(self.table_prefix) + "Q",
                   index_name)
         run_sql(query)
@@ -1299,7 +1300,7 @@ class WordTable(AbstractIndexTable):
         out = []
         bibXXx = "bib" + tag[0] + tag[1] + "x"
         bibrec_bibXXx = "bibrec_" + bibXXx
-        query = """SELECT value FROM %s AS b, %s AS bb
+        query = """SELECT value FROM "%s" AS b, "%s" AS bb
                 WHERE bb.id_bibrec=%%s AND bb.id_bibxxx=b.id
                 AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
         res = run_sql(query, (recID, tag))
@@ -1315,7 +1316,7 @@ class WordTable(AbstractIndexTable):
             @param recID_ranges: low and high recIDs of ranges
             @type recID_ranges: list [[low_id1, high_id1], [low_id2, high_id2]...]
         """
-        query = """INSERT INTO %s (runtime, id_bibrec_low, id_bibrec_high, index_name, mode)
+        query = """INSERT INTO "%s" (runtime, id_bibrec_low, id_bibrec_high, index_name, mode)
                    VALUES (%%s, %%s, %%s, %%s, %%s)"""
         for index_id, index_name in self.virtual_indexes:
             tab_name = "idx%s%02dQ" % (self.table_type, index_id)
@@ -1483,10 +1484,10 @@ class WordTable(AbstractIndexTable):
         if len(wlist) == 0: return 0
         # put words into reverse index table with FUTURE status:
         for recID in recIDs:
-            run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
+            run_sql("""INSERT INTO "%sR" (id_bibrec,termlist,type) VALUES (%%s,%%s,'FUTURE')""" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal(wlist[recID]))) # kwalitee: disable=sql
             # ... and, for new records, enter the CURRENT status as empty:
             try:
-                run_sql("INSERT INTO %sR (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
+                run_sql("""INSERT INTO "%sR" (id_bibrec,termlist,type) VALUES (%%s,%%s,'CURRENT')""" % wash_table_column_name(self.table_name[:-1]), (recID, serialize_via_marshal([]))) # kwalitee: disable=sql
             except DatabaseError:
                 # okay, it's an already existing record, no problem
                 pass
@@ -1505,7 +1506,7 @@ class WordTable(AbstractIndexTable):
            of nonMarc type"""
         marc = range(recID1, recID2 + 1)
         nonmarc = []
-        query = """SELECT id FROM %s WHERE master_format <> 'marc'
+        query = """SELECT id FROM "%s" WHERE master_format <> 'marc'
                    AND id BETWEEN %%s AND %%s""" % "bibrec"
         res = run_sql(query, (recID1, recID2))
         if res:
@@ -1584,7 +1585,7 @@ class WordTable(AbstractIndexTable):
         write_message("%s fetching existing words for records #%d-#%d started" % \
                 (self.table_name, low, high), verbose=3)
         self.recIDs_in_mem.append([low, high])
-        query = """SELECT id_bibrec,termlist FROM %sR as bb WHERE bb.id_bibrec
+        query = """SELECT id_bibrec,termlist FROM "%sR" as bb WHERE bb.id_bibrec
         BETWEEN %%s AND %%s""" % (self.table_name[:-1])
         recID_rows = run_sql(query, (low, high))
         for recID_row in recID_rows:
@@ -1599,7 +1600,7 @@ class WordTable(AbstractIndexTable):
         """
         Finds bad words in reverse tables. Returns True in case of bad words.
         """
-        query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE') LIMIT 1""" \
+        query = """SELECT 1 FROM "%sR" WHERE type IN ('TEMPORARY','FUTURE') LIMIT 1""" \
                 % (self.table_name[:-1],)
         res = run_sql(query)
         return bool(res)
@@ -1610,7 +1611,7 @@ class WordTable(AbstractIndexTable):
         Prints small report (no of words, no of bad words).
         """
         # find number of words:
-        query = """SELECT COUNT(1) FROM %s""" % (self.table_name)
+        query = """SELECT COUNT(1) FROM "%s" """ % (self.table_name)
 
         res = run_sql(query, None, 1)
         if res:
@@ -1634,7 +1635,7 @@ class WordTable(AbstractIndexTable):
         if not self.check_bad_words():
             return
 
-        query = """SELECT id_bibrec FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" \
+        query = """SELECT id_bibrec FROM "%sR" WHERE type IN ('TEMPORARY','FUTURE')""" \
                 % (self.table_name[:-1])
         res = intbitset(run_sql(query))
         recIDs = create_range_list(list(res))
@@ -1680,7 +1681,7 @@ class WordTable(AbstractIndexTable):
     def chk_recID_range(self, low, high):
         """Check if the reverse index table is in proper state"""
         ## check db
-        query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE')
+        query = """SELECT 1 FROM "%sR" WHERE type IN ('TEMPORARY','FUTURE')
         AND id_bibrec BETWEEN %%s AND %%s LIMIT 1""" % self.table_name[:-1]
         res = run_sql(query, (low, high), 1)
         if not res:
@@ -1711,7 +1712,7 @@ class WordTable(AbstractIndexTable):
         """
 
         state = {}
-        query = "SELECT id_bibrec,type FROM %sR WHERE id_bibrec BETWEEN %%s AND %%s"\
+        query = """SELECT id_bibrec,type FROM "%sR" WHERE id_bibrec BETWEEN %%s AND %%s"""\
                 % self.table_name[:-1]
         res = run_sql(query, (low, high))
         for row in res:
@@ -1728,7 +1729,7 @@ class WordTable(AbstractIndexTable):
                         ok = 0
                     else:
                         write_message("EMERGENCY: Inconsistency in index record %d detected" % recID)
-                        query = """DELETE FROM %sR
+                        query = """DELETE FROM "%sR"
                         WHERE id_bibrec=%%s""" % self.table_name[:-1]
                         run_sql(query, (recID,))
                         write_message("EMERGENCY: Inconsistency in record %d repaired." % recID)
@@ -1738,7 +1739,7 @@ class WordTable(AbstractIndexTable):
                     self.recIDs_in_mem.append([recID, recID])
 
                     # Get the words file
-                    query = """SELECT type,termlist FROM %sR
+                    query = """SELECT type,termlist FROM "%sR"
                     WHERE id_bibrec=%%s""" % self.table_name[:-1]
                     write_message(query, verbose=9)
                     res = run_sql(query, (recID,))

@@ -41,7 +41,6 @@ from invenio.legacy.bibsched.bibtask_config import CFG_BIBSCHED_LOGDIR
 from invenio.modules.access.mailcookie import mail_cookie_gc
 from invenio.legacy.bibdocfile.api import BibDoc
 from invenio.legacy.bibsched.cli import gc_tasks
-from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
 from invenio.modules.upgrader.api import op
 from invenio.utils.date import convert_datestruct_to_datetext
 from intbitset import intbitset
@@ -67,12 +66,6 @@ CFG_MAX_ATIME_RM_OAI = 14
 CFG_MAX_ATIME_ZIP_OAI = 3
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365 * 10
-# After how many day to remove old cached webjournal files
-CFG_WEBJOURNAL_TTL = 7
-# After how many days to zip obsolete bibsword xml log files
-CFG_MAX_ATIME_ZIP_BIBSWORD = 7
-# After how many days to remove obsolete bibsword xml log files
-CFG_MAX_ATIME_RM_BIBSWORD = 28
 # After how many days to remove temporary video uploads
 CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 # After how many days to remove obsolete refextract xml output files
@@ -85,8 +78,6 @@ CFG_MAX_ATIME_RM_ICON = 7
 # After how many days to remove obsolete WebSubmit-created temporary
 # stamp files
 CFG_MAX_ATIME_RM_STAMP = 7
-# After how many days to remove obsolete WebJournal-created update XML
-CFG_MAX_ATIME_RM_WEBJOURNAL_XML = 7
 # After how many days to remove obsolete temporary files attached with
 # the CKEditor in WebSubmit context?
 CFG_MAX_ATIME_RM_WEBSUBMIT_CKEDITOR_FILE = 28
@@ -145,24 +136,6 @@ def clean_tempfiles():
             % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                CFG_MAX_ATIME_RM_OAI, vstr))
 
-    if not CFG_INSPIRE_SITE:
-        write_message("- deleting/gzipping temporary old "
-                "BibSword files")
-        gc_exec_command('find %s %s -name "bibsword_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_RM_BIBSWORD, vstr))
-        gc_exec_command('find %s %s -name "bibsword_*"'
-            ' -atime +%s -exec gzip %s -9 {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
-
-        # DELETE ALL FILES CREATED DURING VIDEO SUBMISSION
-        write_message("- deleting old video submissions")
-        gc_exec_command('find %s -name %s* -atime +%s -exec rm %s -f {} \;' \
-                        % (CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_TMP_VIDEO_PREFIX,
-                        CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO, vstr))
-
     write_message("- deleting temporary old "
             "RefExtract files")
     gc_exec_command('find %s %s -name "refextract*"'
@@ -188,12 +161,6 @@ def clean_tempfiles():
             ' -atime +%s -exec rm %s -f {} \;' \
                 % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
                 CFG_MAX_ATIME_RM_STAMP, vstr))
-
-        write_message("- deleting old temporary WebJournal XML files")
-        gc_exec_command('find %s %s -name "webjournal_publish_*"'
-            ' -atime +%s -exec rm %s -f {} \;' \
-                % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
-                CFG_MAX_ATIME_RM_WEBJOURNAL_XML, vstr))
 
     write_message("- deleting old temporary files attached with CKEditor")
     gc_exec_command('find %s/var/tmp/attachfile/ '
@@ -229,28 +196,6 @@ def clean_cache():
                 write_message("Error: %s" % e)
     write_message("""%s rss cache file pruned out of %s.""" % (count, len(filenames)))
     write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
-
-    if not CFG_INSPIRE_SITE:
-        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
-        webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
-        filenames = []
-        try:
-            for root, dummy, files in os.walk(webjournal_cache_dir):
-                filenames.extend(os.path.join(root, filename) for filename in files)
-        except OSError:
-            pass
-        count = 0
-        for filename in filenames:
-            filename = os.path.join(webjournal_cache_dir, filename)
-            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
-            if not (datetime.datetime.now() < last_update_time + datetime.timedelta(days=CFG_WEBJOURNAL_TTL)):
-                try:
-                    os.remove(filename)
-                    count += 1
-                except OSError, e:
-                    write_message("Error: %s" % e)
-        write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
-        write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")
 
 
 def clean_bibxxx():
@@ -336,7 +281,7 @@ def clean_sessions():
         timelimit = convert_datestruct_to_datetext(time.gmtime())
         write_message("Deleting expired sessions since %s" % (timelimit,))
 
-        query = "DELETE LOW_PRIORITY FROM session WHERE session_expiry < %s"
+        query = "DELETE FROM session WHERE session_expiry < %s"
         write_message(query % (timelimit,), verbose=9)
         deleted_sessions += run_sql(query, (timelimit,))
 
@@ -346,7 +291,7 @@ def clean_bibedit_cache():
     """Deletes experied bibedit cache entries"""
     datecut = datetime.datetime.now() - datetime.timedelta(days=CFG_MAX_ATIME_BIBEDIT_TMP)
     datecut_str = datecut.strftime("%Y-%m-%d %H:%M:%S")
-    run_sql("DELETE FROM bibEDITCACHE WHERE post_date < %s", [datecut_str])
+    run_sql("""DELETE FROM "bibEDITCACHE" WHERE post_date < %s""", [datecut_str])
 
 def guest_user_garbage_collector():
     """Session Garbage Collector
@@ -371,13 +316,6 @@ def guest_user_garbage_collector():
                 'user': 0,
                 'user_query': 0,
                 'query': 0,
-                'bskBASKET': 0,
-                'user_bskBASKET': 0,
-                'bskREC': 0,
-                'bskRECORDCOMMENT': 0,
-                'bskEXTREC': 0,
-                'bskEXTFMT': 0,
-                'user_query_basket': 0,
                 'mail_cookie': 0,
                 'email_addresses': 0,
                 'role_membership' : 0}
@@ -397,10 +335,10 @@ def guest_user_garbage_collector():
     write_message("- deleting guest users without session")
 
     # get uids
-    write_message("""  SELECT u.id\n  FROM user AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""", verbose=9)
+    write_message("""  SELECT u.id\n  FROM "user" AS u LEFT JOIN session AS s\n  ON u.id = s.uid\n  WHERE s.uid IS NULL AND u.email = ''""", verbose=9)
 
     result = run_sql("""SELECT u.id
-    FROM user AS u LEFT JOIN session AS s
+    FROM "user" AS u LEFT JOIN session AS s
     ON u.id = s.uid
     WHERE s.uid IS NULL AND u.email = ''""")
     write_message(result, verbose=9)
@@ -415,10 +353,10 @@ def guest_user_garbage_collector():
                 uidstr += "%s" % (id_user,)
 
             # delete users
-            write_message("  DELETE FROM user WHERE"
+            write_message("""  DELETE FROM "user" WHERE"""
                 " id IN (TRAVERSE LAST RESULT) AND email = '' \n", verbose=9)
-            delcount['user'] += run_sql("DELETE FROM user WHERE"
-                " id IN (%s) AND email = ''" % (uidstr,))
+            delcount['user'] += run_sql("""DELETE FROM "user" WHERE
+                id IN (%s) AND email = '' """ % (uidstr,))
 
 
     # 2 - DELETE QUERIES NOT ATTACHED TO ANY USER
@@ -431,7 +369,7 @@ def guest_user_garbage_collector():
 
     users_with_queries = intbitset(run_sql("""SELECT DISTINCT id_user
                                               FROM user_query"""))
-    existing_users = intbitset(run_sql("SELECT id FROM user"))
+    existing_users = intbitset(run_sql("""SELECT id FROM "user" """))
     users_with_queries_to_be_deleted = users_with_queries - existing_users
     write_message("  Users with queries: %s" % len(users_with_queries),
                   verbose=9)
@@ -464,64 +402,12 @@ def guest_user_garbage_collector():
     for (id_user,) in result:
         delcount['query'] += run_sql("""DELETE FROM query WHERE id = %s""", (id_user,))
 
-
-    # 3 - DELETE BASKETS NOT OWNED BY ANY USER
-    write_message("- deleting baskets not owned by any user")
-
-    # select basket ids
-    write_message(""" SELECT ub.id_bskBASKET\n  FROM user_bskBASKET AS ub LEFT JOIN user AS u\n  ON u.id = ub.id_user\n  WHERE u.id IS NULL""", verbose=9)
-    try:
-        result = run_sql("""SELECT ub.id_bskBASKET
-                              FROM user_bskBASKET AS ub LEFT JOIN user AS u
-                                ON u.id = ub.id_user
-                             WHERE u.id IS NULL""")
-    except:
-        result = []
-    write_message(result, verbose=9)
-
-    # delete from user_basket and basket one by one
-    write_message("""  DELETE FROM user_bskBASKET WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskBASKET WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskREC WHERE id_bskBASKET = 'TRAVERSE LAST RESULT'""", verbose=9)
-    write_message("""  DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = 'TRAVERSE LAST RESULT' \n""", verbose=9)
-    for (id_basket,) in result:
-        delcount['user_bskBASKET'] += run_sql("""DELETE FROM user_bskBASKET WHERE id_bskBASKET = %s""", (id_basket,))
-        delcount['bskBASKET'] += run_sql("""DELETE FROM bskBASKET WHERE id = %s""", (id_basket,))
-        delcount['bskREC'] += run_sql("""DELETE FROM bskREC WHERE id_bskBASKET = %s""", (id_basket,))
-        delcount['bskRECORDCOMMENT'] += run_sql("""DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET = %s""", (id_basket,))
-    write_message(""" SELECT DISTINCT ext.id, rec.id_bibrec_or_bskEXTREC FROM bskEXTREC AS ext \nLEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC WHERE id_bibrec_or_bskEXTREC is NULL""", verbose=9)
-    try:
-        result = run_sql("""SELECT DISTINCT ext.id FROM bskEXTREC AS ext
-                            LEFT JOIN bskREC AS rec ON ext.id=-rec.id_bibrec_or_bskEXTREC
-                            WHERE id_bibrec_or_bskEXTREC is NULL""")
-    except:
-        result = []
-    write_message(result, verbose=9)
-    write_message("""  DELETE FROM bskEXTREC WHERE id = 'TRAVERSE LAST RESULT' """, verbose=9)
-    write_message("""  DELETE FROM bskEXTFMT WHERE "id_bskEXTREC" = 'TRAVERSE LAST RESULT' \n""", verbose=9)
-    for (id_basket,) in result:
-        delcount['bskEXTREC'] += run_sql("""DELETE FROM "bskEXTREC" WHERE id=%s""", (id_basket,))
-        delcount['bskEXTFMT'] += run_sql("""DELETE FROM "bskEXTFMT" WHERE id_bskEXTREC=%s""", (id_basket,))
-
-    # 4 - DELETE ALERTS NOT OWNED BY ANY USER
-    write_message('- deleting alerts not owned by any user')
-
-    # select user ids in uqb that reference non-existent users
-    write_message("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""", verbose=9)
-    result = run_sql("""SELECT DISTINCT uqb.id_user FROM "user_query_basket" AS uqb LEFT JOIN "user" AS u ON uqb.id_user = u.id WHERE u.id IS NULL""")
-    write_message(result, verbose=9)
-
-    # delete all these entries
-    for (id_user,) in result:
-        write_message("""DELETE FROM "user_query_basket" WHERE id_user = 'TRAVERSE LAST RESULT """, verbose=9)
-        delcount['user_query_basket'] += run_sql("""DELETE FROM "user_query_basket" WHERE id_user = %s """, (id_user,))
-
     # 5 - delete expired mailcookies
     write_message("""mail_cookie_gc()""", verbose=9)
     delcount['mail_cookie'] = mail_cookie_gc()
 
     ## 5b - delete expired not confirmed email address
-    write_message("""DELETE FROM user WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
+    write_message("""DELETE FROM "user" WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""" % CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, verbose=9)
     delcount['email_addresses'] = run_sql("""DELETE FROM "user" WHERE note='2' AND NOW()>ADDTIME(last_login, '%s 0:0:0')""", (CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS,))
 
     # 6 - delete expired roles memberships
@@ -534,13 +420,6 @@ def guest_user_garbage_collector():
     write_message("""  %7s users.""" % (delcount['user'],))
     write_message("""  %7s user_queries.""" % (delcount['user_query'],))
     write_message("""  %7s queries.""" % (delcount['query'],))
-    write_message("""  %7s baskets.""" % (delcount['bskBASKET'],))
-    write_message("""  %7s user_baskets.""" % (delcount['user_bskBASKET'],))
-    write_message("""  %7s basket_records.""" % (delcount['bskREC'],))
-    write_message("""  %7s basket_external_records.""" % (delcount['bskEXTREC'],))
-    write_message("""  %7s basket_external_formats.""" % (delcount['bskEXTFMT'],))
-    write_message("""  %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'],))
-    write_message("""  %7s user_query_baskets.""" % (delcount['user_query_basket'],))
     write_message("""  %7s mail_cookies.""" % (delcount['mail_cookie'],))
     write_message("""  %7s non confirmed email addresses.""" % delcount['email_addresses'])
     write_message("""  %7s role_memberships.""" % (delcount['role_membership'],))

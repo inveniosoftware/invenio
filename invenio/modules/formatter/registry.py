@@ -32,12 +32,6 @@ from invenio.utils.datastructures import LazyDict
 
 import yaml
 
-format_elements = RegistryProxy(
-    'format_elements',
-    ModuleAutoDiscoverySubRegistry,
-    'format_elements'
-)
-
 format_templates_directories = RegistryProxy(
     'format_templates_directories',
     ModuleAutoDiscoveryRegistry,

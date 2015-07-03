@@ -1,5 +1,5 @@
 ..  This file is part of Invenio
-    Copyright (C) 2014 CERN.
+    Copyright (C) 2014, 2015 CERN.
 
     Invenio is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
@@ -25,31 +25,21 @@ Admin's Guide
    :maxdepth: 1
 
    bibauthority-admin-guide
-   bibcheck-admin-guide
-   bibcirculation-admin-guide
    bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
-   bibformat-admin-guide
    bibindex-admin-guide
    bibknowledge-admin-guide
    bibmatch-admin-guide
    bibrank-admin-guide
    bibsched-admin-guide
    bibsort-admin-guide
-   bibsword-client-admin-guide
    bibupload-admin-guide
    docextract-admin-guide
-   elmsubmit-admin-guide
    oaiharvest-admin-guide
    oairepository-admin-guide
    publiline-admin-guide
-   webcomment-admin-guide
-   webjournal-admin-guide
-   webjournal-editor-guide
    webmessage-admin-guide
    websearch-admin-guide
    websession-admin-guide
-   webstat-admin-guide
    webstyle-admin-guide
-   websubmit-admin-guide

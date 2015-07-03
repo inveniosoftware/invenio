@@ -34,7 +34,6 @@ from invenio.config import \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_SPLASH_PAGES
 from invenio.utils.html import get_links_in_html_page
-from invenio.legacy.websubmit.file_converter import convert_file, get_file_converter_logger
 from invenio.legacy.miscutil.solrutils_bibindex_indexer import solr_add_fulltext
 from invenio.legacy.miscutil.xapianutils_bibindex_indexer import xapian_add
 from invenio.legacy.bibdocfile.api import bibdocfile_url_p, \
@@ -142,15 +141,10 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                 words = {}
                 for url in urls_to_index:
                     tmpdoc = download_url(url)
-                    file_converter_logger = get_file_converter_logger()
-                    old_logging_level = file_converter_logger.getEffectiveLevel()
-                    if self.verbose > 3:
-                        file_converter_logger.setLevel(logging.DEBUG)
                     try:
                         try:
-                            tmptext = convert_file(tmpdoc, output_format='.txt')
-                            text = open(tmptext).read()
-                            os.remove(tmptext)
+                            # FIXME
+                            text = open(tmpdoc).read()
 
                             indexer = get_idx_indexer('fulltext')
                             if indexer != 'native':

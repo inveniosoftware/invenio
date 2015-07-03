@@ -135,6 +135,7 @@ install_requires = [
     "Sphinx>=1.3",
     "SQLAlchemy>=1.0",
     "SQLAlchemy-Utils[encrypted]>=0.30.1",
+    "toposort>=1.4",
     "unidecode>=0.04.1",
     "workflow>=1.2.0",
     "WTForms>=2.0.1",
@@ -270,9 +271,6 @@ setup(
             'plotextractor = invenio.utils.scripts.plotextractor:main',
             # Legacy
             'alertengine = invenio.legacy.webalert.scripts.alertengine:main',
-            'batchuploader = invenio.legacy.bibupload.scripts.batchuploader',
-            'bibcheck = invenio.legacy.bibcheck.scripts.bibcheck:main',
-            'bibcircd = invenio.legacy.bibcirculation.scripts.bibcircd:main',
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
             'bibcatalog = invenio.legacy.bibcatalog.scripts.bibcatalog:main',
@@ -286,7 +284,6 @@ setup(
             'bibmatch = invenio.legacy.bibmatch.scripts.bibmatch:main',
             'bibrank = invenio.legacy.bibrank.scripts.bibrank:main',
             'bibrankgkb = invenio.legacy.bibrank.scripts.bibrankgkb:main',
-            'bibreformat = invenio.legacy.bibformat.scripts.bibreformat:main',
             'bibsort = invenio.legacy.bibsort.scripts.bibsort:main',
             'bibsched = invenio.legacy.bibsched.scripts.bibsched:main',
             'bibstat = invenio.legacy.bibindex.scripts.bibstat:main',
@@ -299,17 +296,10 @@ setup(
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
             'docextract = invenio.legacy.docextract.scripts.docextract:main',
-            'elmsubmit = invenio.legacy.elmsubmit.scripts.elmsubmit:main',
             'gotoadmin = invenio.modules.redirector.scripts.redirector:main',
-            'hepdataharvest = '
-            ' invenio.utils.hepdata.scripts.hepdataharvest:main',
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
-            'inveniounoconv = '
-            ' invenio.legacy.websubmit.scripts.inveniounoconv:main',
-            'oaiharvest = invenio.legacy.oaiharvest.scripts.oaiharvest:main',
             'oairepositoryupdater = '
             ' invenio.legacy.oairepository.scripts.oairepositoryupdater:main',
-            'arxiv-pdf-checker = invenio.legacy.pdfchecker:main',
             'refextract = invenio.legacy.refextract.scripts.refextract:main',
             'textmarc2xmlmarc = '
             ' invenio.legacy.bibrecord.scripts.textmarc2xmlmarc:main',
@@ -317,11 +307,6 @@ setup(
             ' invenio.modules.access.scripts.webaccessadmin:main',
             'webauthorprofile = '
             ' invenio.legacy.webauthorprofile.scripts.webauthorprofile:main',
-            'webmessageadmin = '
-            ' invenio.legacy.webmessage.scripts.webmessageadmin:main',
-            'webstatadmin = invenio.legacy.webstat.scripts.webstatadmin:main',
-            'websubmitadmin = '
-            ' invenio.legacy.websubmit.scripts.websubmitadmin:main',
             'xmlmarc2textmarc = '
             ' invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',

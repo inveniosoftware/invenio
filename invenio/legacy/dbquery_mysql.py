@@ -545,3 +545,117 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string
+
+
+def check_table_exists(table_name):
+    """Check if a table exists."""
+    return run_sql("show tables like %s""", (table_name,))
+
+
+def get_table_names():
+    """get list tables."""
+    return run_sql(
+        """
+        SHOW TABLES
+        """)
+
+
+def rlike():
+    """Mysql RLIKE operator."""
+    return "rlike"
+
+
+def date_format(value, use_double_percent=True):
+    """Format query to get date format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%Y-%%m-%%d"
+    else:
+        date_format = "%Y %m %d"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def datetime_format(value, use_double_percent=True, use_quad_percent=False):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%Y-%%m-%%d  %%H:%%i:%%s"
+    elif not use_quad_percent:
+        date_format = "%Y-%m-%d %H:%i:%s"
+    else:
+        date_format = "%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def date_format_year_month(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%Y-%%m"
+    else:
+        date_format = "%Y-%m"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def date_format_year_month_day_hour(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%Y-%%m-%%d %%H"
+    else:
+        date_format = "%Y-%m-%d %H"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def date_format_ymdhis(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%Y%%m%%d%%H%%i%%s"
+    else:
+        date_format = "%Y%m%d%H%i%s"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def date_format_dby(value, use_double_percent=True):
+    """Format query to get date/time format.
+
+    :param value: date
+    :param use_double_percent: True if, t's needed use %%Y instead %Y
+    :return: partial query
+    """
+    if use_double_percent:
+        date_format = "%%d %%b %%Y"
+    else:
+        date_format = "%d %b %y"
+    return "DATE_FORMAT(" + value + ", '" + date_format + "')"
+
+
+def regexp():
+    """mysql REGEXP operator."""
+    return "REGEXP"
+
+
+def truncate_table(table_name):
+    """Truncade table."""
+    run_sql("""TRUNCATE TABLE "%s" """ % table_name)

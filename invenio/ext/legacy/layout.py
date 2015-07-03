@@ -145,37 +145,24 @@ except ImportError:
     register_exception(alert_admin=True, subject='EMERGENCY')
     bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
-try:
-    from invenio.legacy.bibcirculation.admin_webinterface import \
-         WebInterfaceBibCirculationAdminPages
-except ImportError:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
 
 try:
     from invenio.legacy.bibsched.webinterface import \
-         WebInterfaceBibSchedPages
+        WebInterfaceBibSchedPages
 except ImportError:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
-
-
-if CFG_DEVEL_SITE:
-    test_exports = ['httptest']
-else:
-    test_exports = []
 
 
 class WebInterfaceAdminPages(WebInterfaceDirectory):
 
     """This class implements /admin2 admin pages."""
 
-    _exports = ['index', 'bibcirculation', 'bibsched']
+    _exports = ['index', 'bibsched']
 
     def index(self, req, form):
         return "FIXME: return /help/admin content"
 
-    bibcirculation = WebInterfaceBibCirculationAdminPages()
 
     bibsched = WebInterfaceBibSchedPages()
 
@@ -186,9 +173,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
 
     _exports = [
         'youraccount',
-        'youralerts',
-        'yourbaskets',
-        'yourmessages',
         'yourloans',
         'yourcomments',
         'ill',
@@ -197,41 +181,28 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'error',
         'oai2d', ('oai2d.py', 'oai2d'),
         ('getfile.py', 'getfile'),
-        'submit',
         'rss',
         'stats',
         'journal',
         'help',
         'exporter',
         'kb',
-        'batchuploader',
-        'bibsword',
         'ping',
         'admin2',
-        'linkbacks',
         'textmining',
         'goto',
         'info',
-        'authorlist',
-    ] + test_exports
+    ]
 
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
-        if CFG_DEVEL_SITE:
-            self.httptest = webinterfaces.get('WebInterfaceHTTPTestPages',
-                                              WebInterfaceDisabledPages)()
 
     _mapping = dict(
-        submit='WebInterfaceSubmitPages',
         youraccount='WebInterfaceYourAccountPages',
-        youralerts='WebInterfaceYourAlertsPages',
-        yourbaskets='WebInterfaceYourBasketsPages',
-        yourmessages='WebInterfaceYourMessagesPages',
         yourloans='WebInterfaceYourLoansPages',
         ill='WebInterfaceILLPages',
         yourtickets='WebInterfaceYourTicketsPages',
         comments='WebInterfaceCommentsPages',
-        error='WebInterfaceErrorPages',
         oai2d='WebInterfaceOAIProviderPages',
         rss='WebInterfaceRSSFeedServicePages',
         stats='WebInterfaceStatsPages',
@@ -241,14 +212,9 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         exporter='WebInterfaceFieldExporterPages',
         kb='WebInterfaceBibKnowledgePages',
         admin2='WebInterfaceAdminPages',
-        batchuploader='WebInterfaceBatchUploaderPages',
-        bibsword='WebInterfaceSword',
-        ping='WebInterfacePingPages',
-        linkbacks='WebInterfaceRecentLinkbacksPages',
         textmining='WebInterfaceDocExtract',
         yourcomments='WebInterfaceYourCommentsPages',
         goto='WebInterfaceGotoPages',
-        authorlist='WebInterfaceAuthorlistPages',
     )
 
     def __new__(cls):

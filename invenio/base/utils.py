@@ -32,7 +32,7 @@ import logging
 import shlex
 import six
 from flask import has_app_context, current_app
-from functools import partial
+from functools import partial, wraps
 from werkzeug.utils import import_string, find_modules
 
 
@@ -320,3 +320,29 @@ def run_py_func(manager_run, command_line, passthrough=False):
         sys.argv = sys_argv_orig
 
     return namedtuple('Res', ('out', 'err', 'exit_code'))(out, err, exit_code)
+
+
+def toposort_depends(*dependencies):
+    """Set topological dependencies via decorator."""
+    def decorator(wrapped):
+        wrapped.__toposort_dependencies = set(dependencies)
+        return wrapped
+    return decorator
+
+
+def toposort_extract(wrapped):
+    """Extract topological dependencies."""
+    return getattr(wrapped, '__toposort_dependencies', set())
+
+
+def toposort_send(signal, sender, **kwargs):
+    """Send signal in topological order to all connected receivers."""
+    from toposort import toposort_flatten
+    if not signal.receivers:
+        return []
+    else:
+        return [(receiver, receiver(sender, **kwargs))
+                for receiver in toposort_flatten({
+                    receiver: toposort_extract(receiver)
+                    for receiver in signal.receivers_for(sender)
+                })]

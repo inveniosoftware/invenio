@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -46,7 +46,6 @@ from invenio.legacy.webpage import page, pageheaderonly, \
     pagefooteronly, warning_page, write_warning
 from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
                             isGuestUser
-from invenio.legacy.webjournal import utils as webjournal_utils
 from invenio.ext.legacy.handler import wash_urlargd, WebInterfaceDirectory
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
@@ -63,7 +62,6 @@ from invenio.modules.collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')
-websubmit_templates = invenio.legacy.template.load('websubmit')
 websearch_templates = invenio.legacy.template.load('websearch')
 
 from invenio.legacy.bibdocfile.managedocfiles import \
@@ -111,22 +109,14 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
             if auth_code and user_info['email'] == 'guest':
-                if webjournal_utils.is_recid_in_released_issue(self.recid):
-                    # We can serve the file
-                    pass
-                else:
-                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                             make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
-                                                     CFG_SITE_SECURE_URL + user_info['uri']}, {})
-                    return redirect_to_url(req, target, norobot=True)
+                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+                target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
+                            make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
+                                                    CFG_SITE_SECURE_URL + user_info['uri']}, {})
+                return redirect_to_url(req, target, norobot=True)
             elif auth_code:
-                if webjournal_utils.is_recid_in_released_issue(self.recid):
-                    # We can serve the file
-                    pass
-                else:
-                    return page_not_authorized(req, "../", \
-                                               text = auth_message)
+                return page_not_authorized(req, "../", \
+                                            text = auth_message)
 
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
 
@@ -473,8 +463,6 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
      'ln': argd['ln'],
      'CFG_SITE_URL': CFG_SITE_URL,
      'CFG_SITE_RECORD': CFG_SITE_RECORD}
-
-            body += websubmit_templates.tmpl_page_do_not_leave_submission_js(argd['ln'], enabled=True)
 
         return page(title = _("Document File Manager") + (argd['recid'] and (': ' + _("Record #%(x_rec)i", x_rec=argd['recid'])) or ''),
                     navtrail=navtrail,

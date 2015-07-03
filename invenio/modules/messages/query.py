@@ -22,7 +22,7 @@
 from time import localtime, mktime
 from datetime import datetime
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, rlike
 from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_STATUS_CODE, \
     CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
@@ -481,9 +481,10 @@ def update_user_inbox_for_reminders(uid):
 
 def get_nicknames_like(pattern):
     """get nicknames like pattern"""
+    rlike_op = rlike()
     if pattern:
         try:
-            res = run_sql("SELECT nickname FROM user WHERE nickname RLIKE %s", (pattern,))
+            res = run_sql("""SELECT nickname FROM "user" WHERE nickname """+rlike_op+" %s""", (pattern,))
         except OperationalError:
             res = ()
         return res
@@ -492,10 +493,11 @@ def get_nicknames_like(pattern):
 def get_groupnames_like(uid, pattern):
     """Get groupnames like pattern. Will return only groups that user is allowed to see
     """
+    rlike_op = rlike()
     groups = {}
     if pattern:
         # For this use case external groups are like invisible one
-        query1 = "SELECT id, name FROM usergroup WHERE name RLIKE %s AND join_policy like 'V%%' AND join_policy<>'VE'"
+        query1 = "SELECT id, name FROM usergroup WHERE name "+rlike_op+" %s AND join_policy like 'V%%' AND join_policy<>'VE'"
         try:
             res = run_sql(query1, (pattern,))
         except OperationalError:
@@ -505,7 +507,7 @@ def get_groupnames_like(uid, pattern):
         map(lambda x: groups.setdefault(x[0], x[1]), res)
         query2 = """SELECT g.id, g.name
                     FROM usergroup g, user_usergroup ug
-                    WHERE g.id=ug.id_usergroup AND ug.id_user=%s AND g.name RLIKE %s"""
+                    WHERE g.id=ug.id_usergroup AND ug.id_user=%s AND g.name """+rlike_op+""" %s"""
         try:
             res = run_sql(query2, (uid, pattern))
         except OperationalError:

@@ -423,7 +423,7 @@ class UserEXT(db.Model):
 
     __tablename__ = 'userEXT'
 
-    id = db.Column(db.VARBINARY(255), primary_key=True, nullable=False)
+    id = db.Column(db.String(255), primary_key=True, nullable=False)
     method = db.Column(db.String(50), primary_key=True, nullable=False)
     id_user = db.Column(db.Integer(15, unsigned=True),
                         db.ForeignKey(User.id), nullable=False)

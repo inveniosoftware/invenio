@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012, 2014 CERN.
+# Copyright (C) 2011, 2012, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,9 +18,10 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Tests for Authors Models."""
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 
 class AuthorModelsTestCase(InvenioTestCase):
@@ -34,7 +35,8 @@ class AuthorModelsTestCase(InvenioTestCase):
         self.db.session.add(self._dummy_record)
         self.db.session.commit()
 
-        self._user = self.User(password='test')
+        self._user = self.User(nickname='authormodelstest',
+                               password='authormodelstest')
         self._publications = [self.Publication(id_bibrec=self._dummy_record.id)
                               for _ in range(0, 3)]
         self._authors = [self.Author() for _ in range(0, 3)]

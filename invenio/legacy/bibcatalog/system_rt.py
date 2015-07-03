@@ -24,6 +24,7 @@ This is a subclass of BibCatalogSystem
 
 import os
 import re
+import invenio
 
 from invenio.utils.serializers import deserialize_via_marshal
 from invenio.utils.shell import run_shell_command, escape_shell_arg
@@ -40,7 +41,7 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM, \
 
 def get_uid_based_on_pref(prefname, prefvalue):
     """get the user's UID based where his/her preference prefname has value prefvalue in preferences"""
-    prefs = run_sql("SELECT id, settings FROM user WHERE settings is not NULL")
+    prefs = run_sql("""SELECT id, settings FROM "user" WHERE settings is not NULL""")
     the_uid = None
     for pref in prefs:
         try:

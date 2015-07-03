@@ -66,6 +66,29 @@ data, run:
 
     docker-compose -f docker-compose-dev.yml rm -f
 
+Interactive sessions
+--------------------
+
+For interactive sessions inside the container simply attach a shell to the
+running instance:
+
+.. code-block:: shell
+
+    docker exec -it invenio_web_1 bash
+
+.. note::
+    Some tools (mostly ncurses-based ones) require the ability to detect the
+    used terminal. To enable this, set the `TERM` environment variable to the
+    correct value as a first command inside the container, e.g. by running:
+
+    .. code-block:: shell
+
+        export TERM=xterm
+
+.. note::
+    Do not forget to run `bibsched` to schedule the processing of uploaded
+    records. You can put it into automatic mode if you like.
+
 Debugging
 ---------
 
@@ -75,6 +98,13 @@ available via webinterface.
 
 .. image:: /_static/docker-debug.png
 
+You can also insert a tracepoint into the code to start an interactive debugger
+session:
+
+.. code-block:: python
+
+    import ipdb; ipdb.set_tracepoint()
+
 Furthermore you can debug MySQL at `localhost:3306`
 and Redis at `localhost:6379`. You might want to use flower_ for celery
 debugging and analysis as well. Just run the following command to open the
@@ -83,7 +113,6 @@ webinterface at port `5555`:
 .. code-block:: shell
 
     celery flower --broker=redis://localhost:26379/1
-
 
 Code changes and live reloading
 -------------------------------

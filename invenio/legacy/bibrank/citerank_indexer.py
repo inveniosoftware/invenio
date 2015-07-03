@@ -44,7 +44,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, rlike
 from invenio.legacy.bibsched.bibtask import write_message
 from invenio.modules.ranker.registry import configuration
 from invenio.utils.serializers import serialize_via_marshal
@@ -95,7 +95,7 @@ def get_citations_from_db():
     dict_of_ids = {}
 
     cit = {}
-    rows = run_sql("SELECT citer, citee FROM rnkCITATIONDICT")
+    rows = run_sql("""SELECT citer, citee FROM "rnkCITATIONDICT" """)
     for citer, citee in rows:
         cit.setdefault(citee, set()).add(citer)
 
@@ -161,10 +161,11 @@ def get_external_links_from_db_old(ref, dict_of_ids, reference_indicator):
     external link=citation that is not in our database """
     ext_links = {}
     reference_tag_regex = reference_indicator + "[a-z]"
+    rlike_op = rlike()
     for recid in dict_of_ids:
         query = "select COUNT(DISTINCT field_number) from bibrec_bib99x \
                 where id_bibrec='%s' and id_bibxxx in \
-                (select id from bib99x where tag RLIKE '%s');" \
+                (select id from bib99x where tag " + rlike_op + " '%s');" \
                     % (str(recid), reference_tag_regex)
         result_set = run_sql(query)
         if result_set:
@@ -184,6 +185,7 @@ def get_external_links_from_db(ref, dict_of_ids, reference_indicator):
     """returns a dictionary containing the number of
     external links for each recid
     external link=citation that is not in our database """
+    rlike_op = rlike()
     ext_links = {}
     dict_all_ref = {}
     for recid in dict_of_ids:
@@ -192,7 +194,8 @@ def get_external_links_from_db(ref, dict_of_ids, reference_indicator):
     reference_db_id = reference_indicator[0:2]
     reference_tag_regex = reference_indicator + "[a-z]"
     tag_list = run_sql("select id from bib" + reference_db_id + \
-                         "x where tag RLIKE %s", (reference_tag_regex, ))
+                         "x where tag " + rlike_op + " %s", (
+                                               reference_tag_regex, ))
     tag_set = set()
     for tag in tag_list:
         tag_set.add(tag[0])
@@ -604,21 +607,21 @@ are written into this file: %s" % (nr_of_ranks, filename), verbose=2)
 
 def del_rank_method_data(rank_method_code):
     """Delete the data for a rank method from rnkMETHODDATA table"""
-    id_ = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id_[0][0], ))
+    id_ = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", (rank_method_code, ))
+    run_sql("""DELETE FROM "rnkMETHODDATA" WHERE "id_rnkMETHOD"=%s""", (id_[0][0], ))
 
 
 def into_db(dict_of_ranks, rank_method_code):
     """Writes into the rnkMETHODDATA table the ranking results"""
-    method_id = run_sql("SELECT id from rnkMETHOD where name=%s", \
+    method_id = run_sql("""SELECT id from "rnkMETHOD" where name=%s""", \
         (rank_method_code, ))
     del_rank_method_data(rank_method_code)
     serialized_data = serialize_via_marshal(dict_of_ranks)
     method_id_str = str(method_id[0][0])
-    run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) \
-        VALUES(%s, %s) ", (method_id_str, serialized_data, ))
+    run_sql("""INSERT INTO "rnkMETHODDATA"("id_rnkMETHOD", relevance_data) \
+        VALUES(%s, %s) """, (method_id_str, serialized_data, ))
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", \
+    run_sql("""UPDATE "rnkMETHOD" SET last_updated=%s WHERE name=%s""", \
         (date, rank_method_code))
     write_message("Finished writing the ranks into rnkMETHOD table", verbose=5)
 

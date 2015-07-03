@@ -102,14 +102,6 @@ def request_record(f):
         title = record.get(cfg.get('RECORDS_BREADCRUMB_TITLE_KEY'), '')
         tabs = []
 
-        if cfg.get('CFG_WEBLINKBACK_TRACKBACK_ENABLED'):
-            @register_template_context_processor
-            def trackback_context():
-                from invenio.legacy.weblinkback.templates import \
-                    get_trackback_auto_discovery_tag
-                return {'headerLinkbackTrackbackLink':
-                        get_trackback_auto_discovery_tag(recid)}
-
         def _format_record(recid, of='hd', user_info=current_user, *args,
                            **kwargs):
             from invenio.modules.formatter import format_record

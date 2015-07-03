@@ -19,29 +19,24 @@
 
 """Access database models."""
 
-# General imports.
 from cPickle import dumps, loads
 
 from datetime import datetime, timedelta
 
-from invenio.base.wrappers import lazy_import
+from invenio.ext.passlib.hash import mysql_aes_decrypt, mysql_aes_encrypt
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
+from invenio.modules.access.local_config import CFG_ACC_ACTIVITIES_URLS, \
+    SUPERADMINROLE
 from invenio.modules.accounts.models import User
 from invenio.utils.hash import md5
 
 from random import random
 
-from sqlalchemy import bindparam
 from sqlalchemy.orm import validates
 
-from .errors import \
-    InvenioWebAccessMailCookieDeletedError, InvenioWebAccessMailCookieError
-
-SUPERADMINROLE = lazy_import(
-    'invenio.modules.access.local_config.SUPERADMINROLE')
-CFG_ACC_ACTIVITIES_URLS = lazy_import(
-    'invenio.modules.access.local_config.CFG_ACC_ACTIVITIES_URLS')
+from .errors import InvenioWebAccessMailCookieDeletedError, \
+    InvenioWebAccessMailCookieError
 
 
 class AccACTION(db.Model):
@@ -112,11 +107,9 @@ class AccMAILCOOKIE(db.Model):
 
         obj, data = db.session.query(
             cls,
-            db.func.aes_decrypt(
-                cls._data, bindparam('password')
-            ).label('decrypted')
-        ).params(password=password).filter_by(id=cookie_id).one()
-        obj.data = loads(data)
+            AccMAILCOOKIE._data
+        ).filter_by(id=cookie_id).one()
+        obj.data = loads(mysql_aes_decrypt(data, password))
 
         (kind_check, params, expiration, onetime_check) = obj.data
         assert obj.kind in cls.AUTHORIZATIONS_KIND
@@ -144,8 +137,7 @@ class AccMAILCOOKIE(db.Model):
             kind=kind,
             onetime=int(onetime),
         )
-        # FIXME aes_encrypt exists?
-        cookie._data = db.func.aes_encrypt(dumps(data), password)
+        cookie._data = mysql_aes_encrypt(dumps(data), password)
         db.session.add(cookie)
         db.session.commit()
         db.session.refresh(cookie)
@@ -188,14 +180,23 @@ class AccAuthorization(db.Model):
     id_accACTION = db.Column(db.Integer(15, unsigned=True),
                              db.ForeignKey(AccACTION.id), nullable=True,
                              index=True)
-    _id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
-                                nullable=True, name="id_accARGUMENT",
-                                index=True)
+    _id_accARGUMENT = db.Column(db.Integer(15), nullable=True,
+                                name="id_accARGUMENT", index=True)
     argumentlistid = db.Column(db.MediumInteger(8), nullable=True)
 
     role = db.relationship(AccROLE, backref='authorizations')
     action = db.relationship(AccACTION, backref='authorizations')
-    argument = db.relationship(AccARGUMENT, backref='authorizations')
+    argument = db.relationship(
+        AccARGUMENT, backref='authorizations',
+        primaryjoin=db.and_(
+            AccARGUMENT.id == _id_accARGUMENT,
+            _id_accARGUMENT != -1,
+            _id_accARGUMENT is not None
+        ),
+        foreign_keys=_id_accARGUMENT,
+        uselist=False,
+        cascade="all, delete",
+    )
 
     @db.hybrid_property
     def id_accARGUMENT(self):

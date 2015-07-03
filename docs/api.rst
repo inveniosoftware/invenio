@@ -60,7 +60,6 @@ Modules
    modules/knowledge
    modules/oauthclient
    modules/redirector
-   modules/tags
    modules/upgrader
    modules/uploader
    modules/workflows

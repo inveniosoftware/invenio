@@ -1776,9 +1776,9 @@ function onGetRecordSuccess(json){
   gRecIDLoading = null;
   gRecRev = json['recordRevision'];
   gRecRevAuthor = json['revisionAuthor'];
-  gPhysCopiesNum = json['numberOfCopies'];
-  gBibCircUrl = json['bibCirculationUrl'];
-  gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
+  gPhysCopiesNum = 0;
+  gBibCircUrl = null;
+  gDisplayBibCircPanel = false;
   gRecordHasPDF = json['record_has_pdf']
   gRecordHideAuthors = json['record_hide_authors']
   gManagedDOIs = json['managed_DOIs']

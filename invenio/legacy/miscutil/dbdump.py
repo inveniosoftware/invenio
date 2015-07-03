@@ -32,7 +32,8 @@ from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_PATH_GZIP, \
                             CFG_DATABASE_NAME, \
                             CFG_DATABASE_PORT, \
                             CFG_DATABASE_SLAVE
-from invenio.legacy.dbquery import get_connection_for_dump_on_slave, run_sql
+from invenio.legacy.dbquery import get_connection_for_dump_on_slave, run_sql, \
+    get_table_names as db_get_table_names
 from invenio.legacy.bibsched.bibtask import task_init, \
                                             write_message, \
                                             task_set_option, \
@@ -55,7 +56,7 @@ def get_table_names(value):
     @return: list of strings
     """
     rex = re.compile(value)
-    return [row[0] for row in run_sql("SHOW TABLES") if rex.search(row[0])]
+    return [row[0] for row in db_get_table_names() if rex.search(row[0])]
 
 def _delete_old_dumps(dirname, filename, number_to_keep):
     """
@@ -74,6 +75,7 @@ def check_slave_is_up(connection=None):
     """Raise an StandardError in case the slave is not correctly up."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    # FIXME compatibility with postgresql
     res = run_sql("SHOW SLAVE STATUS", with_dict=True, connection=connection)
     if res[0]['Slave_IO_Running'] != 'Yes':
         raise StandardError("Slave_IO_Running is not set to 'Yes'")
@@ -84,6 +86,7 @@ def check_slave_is_down(connection=None):
     """Raise an StandardError in case the slave is not correctly down."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    # FIXME compatibility with postgresql
     res = run_sql("SHOW SLAVE STATUS", with_dict=True, connection=connection)
     if res[0]['Slave_SQL_Running'] != 'No':
         raise StandardError("Slave_SQL_Running is not set to 'No'")
@@ -92,6 +95,7 @@ def detach_slave(connection=None):
     """Detach the slave."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    # FIXME compatibility with postgresql
     run_sql("STOP SLAVE SQL_THREAD", connection=connection)
     check_slave_is_down(connection)
 
@@ -99,6 +103,7 @@ def attach_slave(connection=None):
     """Attach the slave."""
     if connection is None:
         connection = get_connection_for_dump_on_slave()
+    # FIXME compatibility with postgresql
     run_sql("START SLAVE", connection=connection)
     check_slave_is_up(connection)
 
@@ -113,13 +118,13 @@ def check_slave_is_in_consistent_state(connection=None):
         connection = get_connection_for_dump_on_slave()
     i = 0
     ## Let's take the current status of dbdump (e.g. RUNNING, ABOUT TO STOP, etc.)...
-    current_status = run_sql("SELECT status FROM schTASK WHERE id=%s", (task_get_task_param('task_id'), ))[0][0]
+    current_status = run_sql("""SELECT status FROM "schTASK" WHERE id=%s""", (task_get_task_param('task_id'), ))[0][0]
     while True:
         if i == 10:
             ## Timeout!!
             raise StandardError("The slave seems not to pick up with the master")
         ## ...and let's see if it matches with what the slave sees.
-        if run_sql("SELECT status FROM schTASK WHERE id=%s AND status=%s", (task_get_task_param('task_id'), current_status), connection=connection):
+        if run_sql("""SELECT status FROM "schTASK" WHERE id=%s AND status=%s""", (task_get_task_param('task_id'), current_status), connection=connection):
             ## Bingo!
             return
         time.sleep(3)

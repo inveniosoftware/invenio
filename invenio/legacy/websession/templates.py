@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -562,13 +563,6 @@ class Template:
           'search_explain' : _("View all the searches you performed during the last 30 days."),
 
         }
-        out += """
-        <dt><a href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</a></dt>
-        <dd>%(basket_explain)s""" % {
-        'ln' : ln,
-        'your_baskets' : _("Your Baskets"),
-        'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
-        }
         if not guest:
             out += """
             <dt><a href="../yourcomments/?ln=%(ln)s">%(your_comments)s</a></dt>
@@ -577,14 +571,6 @@ class Template:
             'your_comments' : _("Your Comments"),
             'comments_explain' : _("Display all the comments you have submitted so far."),
             }
-        out += """</dd>
-        <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a></dt>
-        <dd>%(explain_alerts)s""" % {
-          'ln' : ln,
-          'your_alerts' : _("Your Alerts"),
-          'explain_alerts' : _("Subscribe to a search which will be run periodically by our service. The result can be sent to you via Email or stored in one of your baskets."),
-        }
-        out += "</dd>"
         if CFG_CERN_SITE:
             out += """</dd>
             <dt><a href="%(CFG_SITE_SECURE_URL)s/yourloans/display?ln=%(ln)s">%(your_loans)s</a></dt>
@@ -609,15 +595,11 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'alerts' or 'baskets')
+          - 'type' *string* - The type of data that will get lost in case of guest account (for the moment: 'baskets')
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
-        if (type=='baskets'):
-            msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
-        elif (type=='alerts'):
-            msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
         msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.", **{'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                 'x_url_close': '</a>'})
         return """<table class="errorbox" summary="">
@@ -720,16 +702,11 @@ class Template:
         if loans:
             out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
 
-        if baskets:
-            out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
-
         if comments:
             comments_description = _("You can consult the list of %(x_url_open)syour comments%(x_url_close)s submitted so far.")
             comments_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourcomments/?ln=' + ln + '">',
                                      'x_url_close': '</a>'}
             out += self.tmpl_account_template(_("Your Comments"), comments_description, ln, '/yourcomments/?ln=%s' % ln)
-        if alerts:
-            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
 
         if searches:
             out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
@@ -953,18 +930,8 @@ class Template:
             for action in activities:
                 if action == "runbibedit":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/edit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Editor"))
-                if action == "runbibeditmulti":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/multiedit/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Multi-Record Editor"))
-                if action == "runauthorlist":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/authorlist/">%s</a>""" % (CFG_SITE_URL, _("Run Author List Manager"))
-                if action == "runbibcirculation":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "runbibmerge":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/merge/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run Record Merger"))
-                if action == "runbibswordclient":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/bibsword/">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, _("Run BibSword Client"))
-                if action == "runbatchuploader":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibknowledge":
@@ -981,10 +948,6 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
                 if action == "cfgwebcomment":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
-                if action == "cfgweblinkback":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/weblinkback/weblinkbackadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebLinkback"))
-                if action == "cfgwebjournal":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webjournal/webjournaladmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebJournal"))
                 if action == "cfgwebsearch":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":

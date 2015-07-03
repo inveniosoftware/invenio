@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -26,11 +26,11 @@ import string
 
 from six import iteritems
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, date_format_year_month_day_hour
+
 
 def append_to_file(path, content):
-    """print result in a file"""
-
+    """print result in a file."""
     if os.path.exists(path):
         file_dest = open(path,"a")
         file_dest.write("Hit on %s reads:" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -43,7 +43,7 @@ def get_download_weight_filtering_user(dic, keys):
     """ update the dictionnary.Without duplicates.Count maximum one hit per user per hour"""
     for k in keys:
         weight = 0
-        user_ips = run_sql("select count(distinct client_host) from rnkDOWNLOADS where id_bibrec=%s group by id_bibdoc" % k)
+        user_ips = run_sql("""select count(distinct client_host) from "rnkDOWNLOADS" where id_bibrec=%s group by id_bibdoc""" % k)
         for ip in user_ips:
             weight = weight + ip[0]
             dic[k] = weight
@@ -52,7 +52,7 @@ def get_download_weight_filtering_user(dic, keys):
 def get_download_weight_total(dic, keys):
     """ update the dictionnary.Count all the hit"""
     for k in keys:
-        values = run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s %s" % (k,";"))
+        values = run_sql("""select count(*) from "rnkDOWNLOADS" where id_bibrec=%s %s""" % (k,";"))
         dic[k] = values[0][0]
     return dic
 
@@ -70,34 +70,34 @@ def database_tuples_to_single_list(tuples):
 
 def new_downloads_to_index (last_updated):
     """id_bibrec of documents downloaded since the last run of bibrank """
-    id_bibrec_list = database_tuples_to_single_list(run_sql("select id_bibrec from rnkDOWNLOADS where download_time >=\"%s\"" % last_updated))
+    id_bibrec_list = database_tuples_to_single_list(run_sql("""select id_bibrec from "rnkDOWNLOADS" where download_time >='%s' """ % last_updated))
     res = uniq(id_bibrec_list)
     return res
 
 def filter_downloads_per_hour_with_docid (keys, last_updated):
     """filter all the duplicate downloads per user for each hour intervall"""
     for k in keys:
-        id_bibdocs = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s" % k)
+        id_bibdocs = run_sql("""select distinct id_bibdoc from "rnkDOWNLOADS" where id_bibrec=%s""" % k)
         for bibdoc in id_bibdocs:
-            values = run_sql("""select  DATE_FORMAT(download_time,"%%Y-%%m-%%d %%H"), client_host from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time >=\"%s\";""" % (k, bibdoc[0], last_updated))
+            values = run_sql("""select """ + date_format_year_month_day_hour('download_time') + """, client_host from "rnkDOWNLOADS" where id_bibrec=%s and id_bibdoc=%s and download_time >=\"%s\";""" % (k, bibdoc[0], last_updated))
 
             for val in values:
                 date_res = val[0]
                 date1 = "%s:00:00" % (date_res)
                 date2 = compute_next_hour(date_res)
-                duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, bibdoc[0], date1, date2, val[1]))[0][0])-1
-                run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, bibdoc[0], date1, date2, val[1], duplicates))
+                duplicates = (run_sql("""select count(*) from "rnkDOWNLOADS" where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s;""" % (k, bibdoc[0], date1, date2, val[1]))[0][0])-1
+                run_sql("""delete from "rnkDOWNLOADS" where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;""" % (k, bibdoc[0], date1, date2, val[1], duplicates))
 
 def filter_downloads_per_hour (keys, last_updated):
     """filter all the duplicate downloads per user for each hour intervall"""
     for k in keys:
-        values = run_sql("""select DATE_FORMAT(download_time,"%%Y-%%m-%%d %%H"), client_host from rnkDOWNLOADS where id_bibrec=%s and download_time >=\"%s\";""" % (k, last_updated))
+        values = run_sql("""select """ + date_format_year_month_day_hour('download_time') + """, client_host from "rnkDOWNLOADS" where id_bibrec=%s and download_time >='%s';""" % (k, last_updated))
         for val in values:
             date_res = val[0]
             date1 = "%s:00:00" % (date_res)
             date2 = compute_next_hour(date_res)
-            duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, date1, date2, val[1]))[0][0])-1
-            run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, date1, date2, val[1], duplicates))
+            duplicates = (run_sql("""select count(*) from "rnkDOWNLOADS" where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s;""" % (k, date1, date2, val[1]))[0][0])-1
+            run_sql("""delete from "rnkDOWNLOADS" where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;""" % (k, date1, date2, val[1], duplicates))
 
 def compute_next_hour(date_res):
     """treat the change of the year, of (special)month etc.. and return the date in database format"""
@@ -137,7 +137,7 @@ def get_file_similarity_by_times_downloaded(dic, id_bibrec_list):
         #first compute the download similarity between the new documents
         #which have been downloadwd since the last run of bibrank
         dic_news = {}
-        res = run_sql("select id_bibrec,client_host from rnkDOWNLOADS where id_bibrec in %s;" % tuple_string_id_bibrec_list)
+        res = run_sql("""select id_bibrec,client_host from "rnkDOWNLOADS" where id_bibrec in %s;""" % tuple_string_id_bibrec_list)
         for res_elem in res:
             id_bibrec_key = res_elem[0]
             client_host_value = str(res_elem[1])
@@ -156,7 +156,7 @@ def get_file_similarity_by_times_downloaded(dic, id_bibrec_list):
             tuple_client_host = str(tuple(dic_news[j]))
             if len(tuple(dic_news[j])) == 1:
                 tuple_client_host = tuple_client_host.replace(',','')
-            res2 = run_sql("select id_bibrec,count(*) from rnkDOWNLOADS where client_host in %s and id_bibrec in %s and id_bibrec != %s group by id_bibrec;" %  (tuple_client_host, tuple_string_id_bibrec_list, j)) #0.0023 par requete
+            res2 = run_sql("""select id_bibrec,count(*) from "rnkDOWNLOADS" where client_host in %s and id_bibrec in %s and id_bibrec != %s group by id_bibrec;""" %  (tuple_client_host, tuple_string_id_bibrec_list, j)) #0.0023 par requete
             list_tuple.append(list(res2))
             dic_result[j] = list_tuple[0]
     #merge new values with old dictionnary

@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2013 CERN.
+# Copyright (C) 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,7 +24,7 @@ ServerSignature Off
 ServerTokens Prod
 NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
-{{ '#' if not wsgi_socket_directive_needed }}WSGISocketPrefix {{ [config.CFG_PREFIX, 'var', 'run']|path_join }}
+{{ '#' if not wsgi_socket_directive_needed }}WSGISocketPrefix {{ config.CFG_RUNDIR }}
 {{ super() }}
 {%- endblock header -%}
 {%- set wsgi_processes = config.get('APACHE_WSGI_DAEMON_PROCESSES', 5) -%}

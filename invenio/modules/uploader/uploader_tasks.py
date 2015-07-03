@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -33,9 +33,9 @@ from invenio.modules.pidstore.models import PersistentIdentifier
 
 from .errors import UploaderWorkflowException
 
-###########################################################
-##############          Pre tasks         #################
-###########################################################
+#
+# Pre tasks
+#
 
 
 def create_records_for_workflow(records, **kwargs):
@@ -48,9 +48,9 @@ def create_records_for_workflow(records, **kwargs):
     for i, obj in enumerate(records):
         records[i] = (obj[0], Record(json=obj[1]))
 
-###########################################################
-##############          Post tasks        #################
-###########################################################
+#
+# Post tasks
+#
 
 
 def return_recordids_only(records, **kwargs):
@@ -63,9 +63,9 @@ def return_recordids_only(records, **kwargs):
         records[i] = obj[1].get('recid')
 
 
-###########################################################
-##############        Workflow tasks      #################
-###########################################################
+#
+# Workflow tasks
+#
 
 
 def raise_(ex):
@@ -334,7 +334,7 @@ def legacy(step):
         if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
             update_bibfmt_format(
                 record['recid'],
-                marshal.dumps(record.legacy_create_recstruct()),
+                bytearray(marshal.dumps(record.legacy_create_recstruct())),
                 'recstruct',
                 modification_date
             )

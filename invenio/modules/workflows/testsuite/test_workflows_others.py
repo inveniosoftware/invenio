@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@
 """ Test for workflow not fitting in other categories."""
 
 from invenio.testsuite import make_test_suite, run_test_suite
+
 from .test_workflows import WorkflowTasksTestCase
 
 
@@ -35,7 +36,8 @@ class WorkflowOthers(WorkflowTasksTestCase):
     def tearDown(self):
         """ Clean up created objects."""
         from invenio.modules.workflows.models import Workflow
-        Workflow.get(Workflow.module_name == "unit_tests").delete()
+        self.delete_objects(
+            Workflow.get(Workflow.module_name == "unit_tests").all())
         self.cleanup_registries()
 
     def test_result_abstraction(self):
@@ -67,7 +69,8 @@ class WorkflowOthers(WorkflowTasksTestCase):
             start("@thisisnotatrueworkflow@", ["my_false_data"],
                   random_kay_args="value")
         except Exception as e:
-            from invenio.modules.workflows.errors import WorkflowDefinitionError
+            from invenio.modules.workflows.errors import \
+                WorkflowDefinitionError
             self.assertTrue(isinstance(e, WorkflowDefinitionError))
 
     def test_workflows_exceptions(self):

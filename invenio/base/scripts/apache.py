@@ -110,7 +110,7 @@ def create_config(force=False, no_ssl=False):
     from invenio.ext.template import render_template_to_string
     from invenio.utils.text import wrap_text_in_a_box
 
-    CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
+    CFG_ETCDIR = current_app.config.get('CFG_ETCDIR', '')
 
     def get_context():
         conf = current_app.config
@@ -119,9 +119,9 @@ def create_config(force=False, no_ssl=False):
         # Gentoo (and generic defaults):
         listen_directive_needed = True
         ssl_pem_directive_needed = False
-        ssl_pem_path = CFG_PREFIX + '/etc/apache/ssl/apache.pem'
-        ssl_crt_path = CFG_PREFIX + '/etc/apache/ssl/server.crt'
-        ssl_key_path = CFG_PREFIX + '/etc/apache/ssl/server.key'
+        ssl_pem_path = CFG_ETCDIR + '/apache/ssl/apache.pem'
+        ssl_crt_path = CFG_ETCDIR + '/apache/ssl/server.crt'
+        ssl_key_path = CFG_ETCDIR + '/apache/ssl/server.key'
         vhost_ip_address_needed = False
         wsgi_socket_directive_needed = False
         # Debian:

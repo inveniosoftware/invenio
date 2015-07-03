@@ -474,7 +474,7 @@ D - Debug mode for remote task
         self.panel = None
 
     def count_processes(self, status):
-        return run_sql("""SELECT COUNT(id) FROM schTASK
+        return run_sql("""SELECT COUNT(id) FROM "schTASK"
                          WHERE status=%s GROUP BY status""", (status,))[0][0]
 
     def change_task_name(self):
@@ -762,7 +762,7 @@ order to let this task run. The current priority is %s. New value:"
 
         if status == "WAITING":
             if process in self.helper_modules:
-                if run_sql("""UPDATE schTASK SET status='SCHEDULED', host=%s
+                if run_sql("""UPDATE "schTASK" SET status='SCHEDULED', host=%s
                               WHERE id=%s and status='WAITING'""",
                            (self.hostname, task_id)):
                     program = os.path.join(CFG_BINDIR, process)
@@ -1118,10 +1118,10 @@ order to let this task run. The current priority is %s. New value:"
             order = "runtime ASC"
             limit = ""
 
-        self.rows = run_sql("""SELECT id, proc, user, runtime, sleeptime,
+        self.rows = run_sql("""SELECT id, proc, "user", runtime, sleeptime,
                                status, progress, arguments, priority, host,
                                sequenceid
-                               FROM %s
+                               FROM "%s"
                                %s
                                ORDER BY %s
                                %s""" % (table, where, order, limit))

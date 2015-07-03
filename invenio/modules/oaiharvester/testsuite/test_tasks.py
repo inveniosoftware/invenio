@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,8 +19,9 @@
 
 """Test for workflow tasks used by OAI harvester."""
 
+from invenio.modules.workflows.testsuite.test_workflows import \
+    WorkflowTasksTestCase
 from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.modules.workflows.testsuite.test_workflows import WorkflowTasksTestCase
 
 
 class OAIHarvesterTasks(WorkflowTasksTestCase):
@@ -34,7 +35,7 @@ class OAIHarvesterTasks(WorkflowTasksTestCase):
     def tearDown(self):
         """Clean up created objects."""
         from invenio.modules.workflows.models import Workflow
-        Workflow.get(Workflow.module_name == "unit_tests").delete()
+        Workflow.get(Workflow.module_name == "unit_tests").first().delete()
         self.cleanup_registries()
 
     def test_filtering(self):

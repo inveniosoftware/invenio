@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2011, 2012 CERN.
+# Copyright (C) 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -318,7 +318,7 @@ def get_sorting_name(bsrcode):
     Returns the name asociated with the bsrcode in the bsrMETHOD table.
     """
     try:
-        return run_sql('SELECT name from bsrMETHOD where id = %s', (bsrcode,))[0][0]
+        return run_sql('SELECT name from "bsrMETHOD" where id = %s', (bsrcode,))[0][0]
     except IndexError:
         return ''
 
@@ -327,7 +327,7 @@ def get_sorting_methods():
     """
     Returns the list of all sorting methods defined
     """
-    return run_sql('SELECT id, name, definition, washer from bsrMETHOD')
+    return run_sql('SELECT id, name, definition, washer from "bsrMETHOD"')
 
 
 def create_important_box(content, color='#FF9966'):
@@ -378,7 +378,7 @@ def get_all_available_rnks():
     """
     Returns all ranking methods
     """
-    return run_sql("SELECT name FROM rnkMETHOD ORDER BY name")
+    return run_sql("""SELECT name FROM "rnkMETHOD" ORDER BY name""")
 
 
 def perform_modifytranslations(ln, bsrID, trans=None, confirm=0):

@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -52,7 +52,6 @@ from invenio.config import (CFG_SITE_URL,
                             CFG_PYLIBDIR,
                             CFG_JSTESTDRIVER_PORT,
                             CFG_WEBDIR,
-                            CFG_PREFIX,
                             CFG_BASE_URL)
 from invenio.utils.w3c_validator import (w3c_validate,
                                    w3c_errors_to_str,
@@ -386,80 +385,6 @@ def build_and_run_unit_test_suite():
     complete_suite = unittest.TestSuite(test_modules)
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
     return res.wasSuccessful()
-
-@nottest
-def build_and_run_js_unit_test_suite():
-    """
-    Init the JsTestDriver server, detect all Invenio JavaScript files with
-    names ending by '*_tests.js' and run them.
-    Called by 'inveniocfg --run-js-unit-tests'.
-    """
-    def _server_init(server_process):
-        """
-        Init JsTestDriver server and check if it succedeed
-        """
-        output_success = "Finished action run"
-        output_error = "Server failed"
-        read_timeout = 30
-
-        start_time = time.time()
-        elapsed_time = 0
-        while 1:
-            stdout_line = server_process.stdout.readline()
-            if output_success in stdout_line:
-                print '* JsTestDriver server ready\n'
-                return True
-            elif output_error in stdout_line or elapsed_time > read_timeout:
-                print '* ! JsTestDriver server init failed\n'
-                print server_process.stdout.read()
-                return False
-            elapsed_time = time.time() - start_time
-
-    def _find_and_run_js_test_files():
-        """
-        Find all JS files installed in Invenio lib directory and run
-        them on the JsTestDriver server
-        """
-        from invenio.shellutils import run_shell_command
-        errors_found = 0
-        for candidate in os.listdir(CFG_WEBDIR + "/js"):
-            base, ext = os.path.splitext(candidate)
-
-            if ext != '.js' or not base.endswith('_tests'):
-                continue
-
-            print "Found test file %s. Running tests... " % (base + ext)
-            dummy_current_exitcode, cmd_stdout, dummy_err_msg = run_shell_command(cmd="java -jar %s/JsTestDriver.jar --config %s --tests all" % \
-                                                                                  (CFG_PREFIX + "/lib/java/js-test-driver", CFG_WEBDIR + "/js/" + base + '.conf'))
-            print cmd_stdout
-            if "Fails: 0" not in cmd_stdout:
-                errors_found += 1
-        print errors_found
-        return errors_found
-
-    print "Going to start JsTestDriver server..."
-    server_process = subprocess.Popen(["java", "-jar",
-        "%s/JsTestDriver.jar" % (CFG_PREFIX + "/lib/java/js-test-driver"), "--runnerMode", "INFO",
-        "--port", "%d" % CFG_JSTESTDRIVER_PORT],
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-    try:
-        if not _server_init(server_process):
-            # There was an error initialising server
-            return 1
-
-        print "Now you can capture the browsers where you would " \
-              "like to run the tests by opening the following url:\n" \
-              "%s:%d/capture \n" % (CFG_SITE_URL, CFG_JSTESTDRIVER_PORT)
-
-        print "Press enter when you are ready to run tests"
-        raw_input()
-
-        exitcode = _find_and_run_js_test_files()
-    finally:
-        server_process.kill()
-
-    return exitcode
 
 @nottest
 def build_and_run_regression_test_suite():

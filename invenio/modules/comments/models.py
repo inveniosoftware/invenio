@@ -47,7 +47,8 @@ class CmtRECORDCOMMENT(db.Model):
                               server_default='1900-01-01 00:00:00')
     star_score = db.Column(db.TinyInteger(5, unsigned=True), nullable=False,
                            server_default='0')
-    nb_votes_yes = db.Column(db.Integer(10), nullable=False, server_default='0')
+    nb_votes_yes = db.Column(db.Integer(10), nullable=False,
+                             server_default='0')
     nb_votes_total = db.Column(db.Integer(10, unsigned=True), nullable=False,
                                server_default='0')
     nb_abuse_reports = db.Column(db.Integer(10), nullable=False,
@@ -96,6 +97,11 @@ class CmtRECORDCOMMENT(db.Model):
     __table_args__ = (db.Index('cmtRECORDCOMMENT_reply_order_cached_data',
                                reply_order_cached_data, mysql_length=40),
                       db.Model.__table_args__)
+
+    @classmethod
+    def count(cls, *criteria, **filters):
+        """Count how many comments."""
+        return cls.query.filter(*criteria).filter_by(**filters).count()
 
 
 @event.listens_for(CmtRECORDCOMMENT, 'after_insert')

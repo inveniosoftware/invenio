@@ -24,7 +24,9 @@ work with the data attributes.
 """
 
 import json
+
 import os
+
 from datetime import datetime
 
 from uuid import uuid4
@@ -34,12 +36,14 @@ from dateutil.tz import tzutc
 from flask import current_app, flash, redirect, render_template, request, \
     session, url_for
 from flask_login import current_user
+
 from flask_restful import fields, marshal
 
 from invenio.base.helpers import unicodifier
 from invenio.ext.restful import UTCISODateTime
 
 from invenio.ext.sqlalchemy import db
+from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.workflows.engine import WorkflowStatus
 from invenio.modules.workflows.models import BibWorkflowObject, ObjectVersion, \
     Workflow
@@ -143,6 +147,7 @@ class FactoryMixin(object):
 
     @classmethod
     def factory(cls, state, *args, **kwargs):
+        """Factory."""
         obj = cls(*args, **kwargs)
         obj.__setstate__(state)
         return obj
@@ -153,7 +158,8 @@ class FactoryMixin(object):
 #
 class DepositionType(object):
 
-    """
+    """Deposition type.
+
     A base class for the deposition types to ensure certain
     properties are defined on each type.
 
@@ -241,6 +247,7 @@ class DepositionType(object):
 
     @classmethod
     def default_draft_id(cls, deposition):
+        """Default draft id."""
         return '_default'
 
     @classmethod
@@ -281,9 +288,9 @@ class DepositionType(object):
 
     @classmethod
     def render_completed(cls, dummy_deposition):
-        """
-        Render page when deposition was successfully completed (i.e workflow
-        just finished successfully).
+        """Render page when deposition was successfully completed.
+
+        (i.e workflow just finished successfully).
 
         Method can be overwritten by subclasses to provide custom
         user interface.
@@ -294,9 +301,9 @@ class DepositionType(object):
 
     @classmethod
     def render_final(cls, deposition):
-        """
-        Render page when deposition was *already* successfully completed (i.e
-        a finished workflow is being executed a second time).
+        """Render page when deposition was *already* successfully completed.
+
+        (i.e a finished workflow is being executed a second time).
 
         This allows you render e.g. a preview of the record. The distinction
         between render_completed and render_final is primarily useful for the
@@ -309,7 +316,8 @@ class DepositionType(object):
 
     @classmethod
     def api_completed(cls, deposition):
-        """
+        """Workflow just finished processing.
+
         Workflow just finished processing so return an 202 Accepted, since
         usually further background processing may happen.
         """
@@ -317,9 +325,10 @@ class DepositionType(object):
 
     @classmethod
     def api_final(cls, deposition):
-        """
-        Workflow already finished, and the user tries to re-execute the
-        workflow, so send a 400 Bad Request back.
+        """Workflow already finished.
+
+        And the user tries to re-execute the workflow, so send a 400 Bad
+        Request back.
         """
         return dict(
             message="Deposition workflow already completed",
@@ -328,10 +337,10 @@ class DepositionType(object):
 
     @classmethod
     def api_step(cls, deposition):
-        """
-        Workflow was halted during processing. The workflow task that halted
-        processing is expected to provide a response to send back to the
-        client.
+        """Workflow was halted during processing.
+
+        The workflow task that halted processing is expected to provide a
+        response to send back to the client.
 
         The default response code is 500 Internal Server Error. A workflow task
         is expected to use Deposition.set_render_context() with a dictionary
@@ -350,10 +359,12 @@ class DepositionType(object):
 
     @classmethod
     def api_error(cls, deposition):
+        """Api error."""
         return dict(message='Internal Server Error', status=500), 500
 
     @classmethod
     def api_action(cls, deposition, action_id):
+        """Api action."""
         if action_id == 'run':
             return deposition.run_workflow(headless=True)
         elif action_id == 'reinitialize':
@@ -366,8 +377,7 @@ class DepositionType(object):
 
     @classmethod
     def api_metadata_schema(cls, draft_id):
-        """
-        Get the input validation schema for this draft_id
+        """Get the input validation schema for this draft_id.
 
         Allows you to override API defaults.
         """
@@ -389,27 +399,22 @@ class DepositionType(object):
 
     @classmethod
     def marshal_deposition(cls, obj):
-        """
-        Generate a JSON representation for REST API of a Deposition
-        """
+        """Generate a JSON representation for REST API of a Deposition."""
         return marshal(obj, cls.marshal_deposition_fields)
 
     @classmethod
     def marshal_draft(cls, obj):
-        """
-        Generate a JSON representation for REST API of a DepositionDraft
-        """
+        """Generate a JSON representation for REST API of a DepositionDraft."""
         return marshal(obj, cls.marshal_draft_fields)
 
     @classmethod
     def marshal_file(cls, obj):
-        """
-        Generate a JSON representation for REST API of a DepositionFile
-        """
+        """Generate a JSON representation for REST API of a DepositionFile."""
         return marshal(obj, cls.marshal_file_fields)
 
     @classmethod
     def authorize(cls, deposition, action):
+        """Authorize."""
         if action == 'create':
             return True  # Any authenticated user
         elif action == 'delete':
@@ -432,6 +437,7 @@ class DepositionType(object):
 
     @classmethod
     def authorize_draft(cls, deposition, draft, action):
+        """Authorize draft."""
         if action == 'update':
             # If deposition allows adding  a draft, then allow editing the
             # draft.
@@ -440,38 +446,37 @@ class DepositionType(object):
 
     @classmethod
     def authorize_file(cls, deposition, deposition_file, action):
+        """Authorize file."""
         return cls.authorize(deposition, 'add_file')
 
     @classmethod
     def get_identifier(cls):
-        """ Get type identifier (identical to workflow name) """
+        """Get type identifier (identical to workflow name)."""
         return cls.__name__
 
     @classmethod
     def is_enabled(cls):
-        """ Check if workflow is enabled """
+        """Check if workflow is enabled."""
         # Wrapping in a method to eventually allow enabling/disabling
         # via configuration.
         return cls.enabled
 
     @classmethod
     def is_default(cls):
-        """ Check if workflow is the default """
+        """Check if workflow is the default."""
         # Wrapping in a method to eventually allow configuration
         # via configuration.
         return cls.default
 
     @classmethod
     def run_workflow(cls, deposition):
-        """
-        Run workflow for the given BibWorkflowObject.
+        """Run workflow for the given BibWorkflowObject.
 
         Usually not invoked directly, but instead indirectly through
         Deposition.run_workflow().
         """
         if deposition.workflow_object.workflow is None or (
-                deposition.workflow_object.version == ObjectVersion.INITIAL
-                and
+                deposition.workflow_object.version == ObjectVersion.INITIAL and
                 deposition.workflow_object.workflow.status ==
                 WorkflowStatus.NEW):
             return deposition.workflow_object.start_workflow(
@@ -486,6 +491,7 @@ class DepositionType(object):
 
     @classmethod
     def reinitialize_workflow(cls, deposition):
+        """Reinitialize workflow."""
         # Only reinitialize if really needed (i.e. you can only
         # reinitialize a fully completed workflow).
         wo = deposition.workflow_object
@@ -500,6 +506,7 @@ class DepositionType(object):
 
     @classmethod
     def stop_workflow(cls, deposition):
+        """Stop workflow."""
         # Only stop workflow if really needed
         wo = deposition.workflow_object
         if wo.version != ObjectVersion.COMPLETED and \
@@ -521,12 +528,13 @@ class DepositionType(object):
 
     @classmethod
     def all(cls):
-        """ Get a dictionary of deposition types """
+        """Get a dictionary of deposition types."""
         from .registry import deposit_types
         return deposit_types.mapping()
 
     @classmethod
     def get(cls, identifier):
+        """Get."""
         try:
             return cls.all()[identifier]
         except KeyError:
@@ -534,27 +542,28 @@ class DepositionType(object):
 
     @classmethod
     def keys(cls):
-        """ Get a list of deposition type names """
+        """Get a list of deposition type names."""
         return cls.all().keys()
 
     @classmethod
     def values(cls):
-        """ Get a list of deposition type names """
+        """Get a list of deposition type names."""
         return cls.all().values()
 
     @classmethod
     def get_default(cls):
-        """ Get a list of deposition type names """
+        """Get a list of deposition type names."""
         from .registry import deposit_default_type
         return deposit_default_type.get()
 
     def __unicode__(self):
-        """ Return a name for this class """
+        """Return a name for this class."""
         return self.get_identifier()
 
     @classmethod
     def all_authorized(cls, user_info=None):
-        """
+        """Get all authorized.
+
         Return a dict of deposit types that the current user
         is allowed to view.
         """
@@ -568,8 +577,7 @@ class DepositionType(object):
 
 class DepositionFile(FactoryMixin):
 
-    """
-    Represents an uploaded file
+    """Represents an uploaded file.
 
     Creating a normal deposition file::
 
@@ -612,11 +620,13 @@ class DepositionFile(FactoryMixin):
     """
 
     def __init__(self, uuid=None, backend=None):
+        """Init."""
         self.uuid = uuid or str(uuid4())
         self._backend = backend
         self.name = ''
 
     def __getstate__(self):
+        """Get state."""
         # TODO: Add content_type attributes
         return dict(
             id=self.uuid,
@@ -624,10 +634,11 @@ class DepositionFile(FactoryMixin):
             name=self.name,
             size=self.size,
             checksum=self.checksum,
-            #bibdoc=self.bibdoc
+            # bibdoc=self.bibdoc
         )
 
     def __setstate__(self, state):
+        """Set state."""
         self.uuid = state['id']
         self._path = state['path']
         self.name = state['name']
@@ -635,23 +646,27 @@ class DepositionFile(FactoryMixin):
         self.checksum = state['checksum']
 
     def __repr__(self):
+        """Repr."""
         data = self.__getstate__()
         del data['path']
         return json.dumps(data)
 
     @property
     def backend(self):
+        """Get backend."""
         if not self._backend:
             self._backend = Storage(None)
         return self._backend
 
     @property
     def path(self):
+        """Get path."""
         if self._path is None:
             raise Exception("No path set")
         return self._path
 
     def save(self, incoming_file, filename=None, *args, **kwargs):
+        """Save."""
         self.name = secure_filename(filename or incoming_file.filename)
         (self._path, self.size, self.checksum, result) = self.backend.save(
             incoming_file, filename, *args, **kwargs
@@ -659,37 +674,39 @@ class DepositionFile(FactoryMixin):
         return result
 
     def delete(self):
-        """ Delete the file on storage """
+        """Delete the file on storage."""
         return self.backend.delete(self.path)
 
     def is_local(self):
-        """ Determine if file is a local file """
+        """Determine if file is a local file."""
         return self.backend.is_local(self.path)
 
     def get_url(self):
-        """ Get a URL for the file """
+        """Get a URL for the file."""
         return self.backend.get_url(self.path)
 
     def get_syspath(self):
-        """ Get a local system path to the file """
+        """Get a local system path to the file."""
         return self.backend.get_syspath(self.path)
 
 
 class DepositionDraftCacheManager(object):
-    """
+
+    """Dpeosition draft cache manager.
+
     Draft cache manager takes care of storing draft values in the cache prior
     to a workflow being run. The data can be loaded by the prefill_draft()
     workflow task.
     """
+
     def __init__(self, user_id):
+        """Init."""
         self.user_id = user_id
         self.data = {}
 
     @classmethod
     def from_request(cls):
-        """
-        Create a new draft cache from the current request.
-        """
+        """Create a new draft cache from the current request."""
         obj = cls(current_user.get_id())
 
         # First check if we can get it via a json
@@ -703,12 +720,13 @@ class DepositionDraftCacheManager(object):
 
     @classmethod
     def get(cls):
+        """Get."""
         obj = cls(current_user.get_id())
         obj.load()
         return obj
 
     def save(self):
-        """ Save data to session """
+        """Save data to session."""
         if self.has_data():
             session['deposit_prefill'] = self.data
             session.modified = True
@@ -716,25 +734,21 @@ class DepositionDraftCacheManager(object):
             self.delete()
 
     def load(self):
-        """ Load data from session """
+        """Load data from session."""
         self.data = session.get('deposit_prefill', {})
 
     def delete(self):
-        """ Delete data in session """
+        """Delete data in session."""
         if 'deposit_prefill' in session:
             del session['deposit_prefill']
             session.modified = True
 
     def has_data(self):
-        """
-        Determine if the cache has data.
-        """
+        """Determine if the cache has data."""
         return bool(self.data)
 
     def fill_draft(self, deposition, draft_id, clear=True):
-        """
-        Fill a draft with cached draft values
-        """
+        """Fill a draft with cached draft values."""
         draft = deposition.get_or_create_draft(draft_id)
         draft.process(self.data)
 
@@ -745,10 +759,11 @@ class DepositionDraftCacheManager(object):
 
 
 class DepositionDraft(FactoryMixin):
-    """
-    Represents the state of a form
-    """
+
+    """Represents the state of a form."""
+
     def __init__(self, draft_id, form_class=None, deposition_ref=None):
+        """Init."""
         self.id = draft_id
         self.completed = False
         self.form_class = form_class
@@ -760,6 +775,7 @@ class DepositionDraft(FactoryMixin):
         self.validate = False
 
     def __getstate__(self):
+        """Get state."""
         return dict(
             completed=self.completed,
             values=self.values,
@@ -768,6 +784,7 @@ class DepositionDraft(FactoryMixin):
         )
 
     def __setstate__(self, state):
+        """Set state."""
         self.completed = state['completed']
         self.form_class = None
         if self._deposition_ref:
@@ -779,12 +796,15 @@ class DepositionDraft(FactoryMixin):
         self.validate = state.get('validate', True)
 
     def is_completed(self):
+        """Check if it's completed."""
         return self.completed
 
     def has_form(self):
+        """Check if it has form."""
         return self.form_class is not None
 
     def authorize(self, action):
+        """Check if it's authorized."""
         if not self._deposition_ref:
             return True  # Not connected to deposition so authorize anything.
         return self._deposition_ref.type.authorize_draft(
@@ -792,15 +812,11 @@ class DepositionDraft(FactoryMixin):
         )
 
     def complete(self):
-        """
-        Set state of draft to completed.
-        """
+        """Set state of draft to completed."""
         self.completed = True
 
     def update(self, form):
-        """
-        Update draft values and flags with data from form.
-        """
+        """Update draft values and flags with data from form."""
         data = dict((key, value) for key, value in form.data.items()
                     if value is not None)
 
@@ -808,7 +824,8 @@ class DepositionDraft(FactoryMixin):
         self.flags = form.get_flags()
 
     def process(self, data, complete_form=False):
-        """
+        """Process incoming form data.
+
         Process, validate and store incoming form data and return response.
         """
         if not self.authorize('update'):
@@ -869,8 +886,8 @@ class DepositionDraft(FactoryMixin):
         # Determine changed messages
         changed_msgs = dict(
             (name, messages) for name, messages in post_processed_msgs.items()
-            if validated_msgs.get(name, []) != messages
-            or process_field_names is None or name in process_field_names
+            if validated_msgs.get(name, []) != messages or
+            process_field_names is None or name in process_field_names
         )
 
         result = {}
@@ -941,14 +958,15 @@ class DepositionDraft(FactoryMixin):
 
     @classmethod
     def merge_data(cls, drafts):
-        """
-        Merge data of multiple drafts
+        """Merge data of multiple drafts.
 
         Duplicate keys will be overwritten without warning.
         """
         data = {}
+
         # Don't include *) disabled fields, and *) empty optional fields
-        func = lambda f: not f.flags.disabled and (f.flags.required or f.data)
+        def func(f):
+            return not f.flags.disabled and (f.flags.required or f.data)
 
         for d in drafts:
             if d.has_form():
@@ -964,13 +982,15 @@ class DepositionDraft(FactoryMixin):
 
 
 class Deposition(object):
-    """
-    Wraps a BibWorkflowObject
+
+    """Wrap a BibWorkflowObject.
 
     Basically an interface to work with BibWorkflowObject data attribute in an
     easy manner.
     """
+
     def __init__(self, workflow_object, type=None, user_id=None):
+        """Init."""
         self.workflow_object = workflow_object
         if not workflow_object:
             self.files = []
@@ -993,36 +1013,40 @@ class Deposition(object):
     #
     @property
     def id(self):
+        """Get id."""
         return self.workflow_object.id
 
     @property
     def user_id(self):
+        """Get user id."""
         return self.workflow_object.id_user
 
     @user_id.setter
     def user_id(self, value):
+        """Set user id."""
         self.workflow_object.id_user = value
         self.workflow_object.workflow.id_user = value
 
     @property
     def created(self):
+        """Check if it's created."""
         return self.workflow_object.created
 
     @property
     def modified(self):
+        """Check if it's modified."""
         return self.workflow_object.modified
 
     @property
     def drafts_list(self):
-        # Needed for easy marshaling by API
+        """Needed for easy marshaling by API."""
         return self.drafts.values()
 
     #
     # Proxy methods
     #
     def authorize(self, action):
-        """
-        Determine if certain action is authorized
+        """Determine if certain action is authorized.
 
         Delegated to deposition type to allow overwriting default behavior.
         """
@@ -1041,9 +1065,7 @@ class Deposition(object):
         return self.type.marshal_deposition(self)
 
     def __getstate__(self):
-        """
-        Serialize deposition state for storing in the BibWorkflowObject
-        """
+        """Serialize deposition state for storing in the BibWorkflowObject."""
         # The bibworkflow object id and owner is implicit, as the Deposition
         # object only wraps the data attribute of a BibWorkflowObject.
 
@@ -1064,9 +1086,7 @@ class Deposition(object):
         )
 
     def __setstate__(self, state):
-        """
-        Deserialize deposition from state stored in BibWorkflowObject
-        """
+        """Deserialize deposition from state stored in BibWorkflowObject."""
         self.type = DepositionType.get(state['type'])
         self.title = state['title']
         self.files = [
@@ -1091,9 +1111,7 @@ class Deposition(object):
     # Persistence related methods
     #
     def update(self):
-        """
-        Update workflow object with latest data.
-        """
+        """Update workflow object with latest data."""
         data = self.__getstate__()
         # BibWorkflow calls get_data() before executing any workflow task, and
         # and calls set_data() after. Hence, unless we update the data
@@ -1105,9 +1123,7 @@ class Deposition(object):
         self.workflow_object.set_data(data)
 
     def reload(self):
-        """
-        Get latest data from workflow object
-        """
+        """Get latest data from workflow object."""
         self.__setstate__(self.workflow_object.get_data())
 
     def save(self):
@@ -1121,10 +1137,9 @@ class Deposition(object):
         self.update()
         self.workflow_object.save()
 
+    @session_manager
     def delete(self):
-        """
-        Delete the current deposition
-        """
+        """Delete the current deposition."""
         if not self.authorize('delete'):
             raise DepositionNotDeletable(self)
 
@@ -1132,21 +1147,15 @@ class Deposition(object):
             f.delete()
 
         if self.workflow_object.id_workflow:
-            Workflow.delete(uuid=self.workflow_object.id_workflow)
-
-            BibWorkflowObject.query.filter_by(
-                id_workflow=self.workflow_object.id_workflow
-            ).delete()
+            db.session.delete(self.workflow_object.workflow)
         else:
             db.session.delete(self.workflow_object)
-        db.session.commit()
 
     #
     # Workflow execution
     #
     def run_workflow(self, headless=False):
-        """
-        Execute the underlying workflow
+        """Execute the underlying workflow.
 
         If you made modifications to the deposition you must save if before
         running the workflow, using the save() method.
@@ -1173,9 +1182,7 @@ class Deposition(object):
                 self.type.render_completed(self)
 
     def reinitialize_workflow(self):
-        """
-        Reinitialize a workflow object (i.e. prepare it for editing)
-        """
+        """Reinitialize a workflow object (i.e. prepare it for editing)."""
         if self.state != 'done':
             raise InvalidDepositionAction("Action only allowed for "
                                           "depositions in state 'done'.")
@@ -1186,8 +1193,9 @@ class Deposition(object):
         self.type.reinitialize_workflow(self)
 
     def stop_workflow(self):
-        """
-        Stop a running workflow object (e.g. discard changes while editing).
+        """Stop a running workflow object.
+
+        (e.g. discard changes while editing).
         """
         if self.state != 'inprogress' or not self.submitted:
             raise InvalidDepositionAction("Action only allowed for "
@@ -1199,23 +1207,23 @@ class Deposition(object):
         self.type.stop_workflow(self)
 
     def set_render_context(self, ctx):
-        """
-        Set rendering context - used in workflow tasks to set what is to be
-        rendered (either by API or UI)
+        """Set rendering context.
+
+        used in workflow tasks to set what is to be rendered (either by API
+        or UI)
         """
         self.workflow_object.deposition_context = ctx
 
     def get_render_context(self):
-        """
-        Get rendering context - used by DepositionType.render_step/api_step
+        """Get rendering context.
+
+        used by DepositionType.render_step/api_step
         """
         return getattr(self.workflow_object, 'deposition_context', {})
 
     @property
     def state(self):
-        """
-        Return simplified workflow state - inprogress, done or error
-        """
+        """Return simplified workflow state - inprogress, done or error."""
         try:
             status = self.workflow_object.workflow.status
             if status == WorkflowStatus.ERROR:
@@ -1230,17 +1238,13 @@ class Deposition(object):
     # Draft related methods
     #
     def get_draft(self, draft_id):
-        """
-        Get draft
-        """
+        """Get draft."""
         if draft_id not in self.drafts:
             raise DraftDoesNotExists(draft_id)
         return self.drafts[draft_id]
 
     def get_or_create_draft(self, draft_id):
-        """
-        Get or create a draft for given draft_id
-        """
+        """Get or create a draft for given draft_id."""
         if draft_id not in self.drafts:
             if draft_id not in self.type.draft_definitions:
                 raise DraftDoesNotExists(draft_id)
@@ -1256,17 +1260,14 @@ class Deposition(object):
         return self.drafts[draft_id]
 
     def get_default_draft_id(self):
-        """
-        Get the default draft id for this deposition.
-        """
+        """Get the default draft id for this deposition."""
         return self.type.default_draft_id(self)
 
     #
     # Submission information package related methods
     #
     def get_latest_sip(self, sealed=None):
-        """
-        Get the latest submission information package
+        """Get the latest submission information package.
 
         :param sealed: Set to true to only returned latest sealed SIP. Set to
             False to only return latest unsealed SIP.
@@ -1282,9 +1283,9 @@ class Deposition(object):
         return None
 
     def create_sip(self):
-        """
-        Create a new submission information package (SIP) with metadata from
-        the drafts.
+        """Create a new submission information package (SIP).
+
+        it takes metadata from the drafts.
         """
         metadata = DepositionDraft.merge_data(self.drafts.values())
         metadata['files'] = map(
@@ -1298,9 +1299,7 @@ class Deposition(object):
         return sip
 
     def has_sip(self, sealed=True):
-        """
-        Determine if deposition has a sealed submission information package.
-        """
+        """Check if deposition has a sealed submission information package."""
         for sip in self.sips:
             if (sip.is_sealed() and sealed) or \
                (not sealed and not sip.is_sealed()):
@@ -1309,18 +1308,21 @@ class Deposition(object):
 
     @property
     def submitted(self):
+        """Check if it's submitted."""
         return self.has_sip()
 
     #
     # File related methods
     #
     def get_file(self, file_id):
+        """Get file."""
         for f in self.files:
             if f.uuid == file_id:
                 return f
         return None
 
     def add_file(self, deposition_file):
+        """Add file."""
         if not self.authorize('add_file'):
             raise ForbiddenAction('add_file', self)
 
@@ -1335,6 +1337,7 @@ class Deposition(object):
         )
 
     def remove_file(self, file_id):
+        """Remove file."""
         if not self.authorize('remove_file'):
             raise ForbiddenAction('remove_file', self)
 
@@ -1348,9 +1351,7 @@ class Deposition(object):
         return None
 
     def sort_files(self, file_id_list):
-        """
-        Order the files according the list of ids provided to this function.
-        """
+        """Order the files according the list of ids provided."""
         if not self.authorize('sort_files'):
             raise ForbiddenAction('sort_files', self)
 
@@ -1375,6 +1376,7 @@ class Deposition(object):
     #
     @classmethod
     def get_type(self, type_or_id):
+        """Get type."""
         if type_or_id and isinstance(type_or_id, type) and \
            issubclass(type_or_id, DepositionType):
                 return type_or_id
@@ -1434,6 +1436,7 @@ class Deposition(object):
 
     @classmethod
     def get_depositions(cls, user=None, type=None):
+        """Get depositions."""
         params = [
             Workflow.module_name == 'webdeposit',
         ]
@@ -1479,6 +1482,7 @@ class SubmissionInformationPackage(FactoryMixin):
     """
 
     def __init__(self, uuid=None, metadata={}):
+        """Init."""
         self.uuid = uuid or str(uuid4())
         self.metadata = metadata
         self.package = ""
@@ -1487,6 +1491,7 @@ class SubmissionInformationPackage(FactoryMixin):
         self.task_ids = []
 
     def __getstate__(self):
+        """Get state."""
         return dict(
             id=self.uuid,
             metadata=self.metadata,
@@ -1497,6 +1502,7 @@ class SubmissionInformationPackage(FactoryMixin):
         )
 
     def __setstate__(self, state):
+        """Set state."""
         self.uuid = state['id']
         self._metadata = state.get('metadata', {})
         self.package = state.get('package', None)
@@ -1506,17 +1512,21 @@ class SubmissionInformationPackage(FactoryMixin):
         self.task_ids = state.get('task_ids', [])
 
     def seal(self):
+        """Seal."""
         self.timestamp = datetime.now(tzutc()).isoformat()
 
     def is_sealed(self):
+        """Check if it's sealed."""
         return self.timestamp is not None
 
     @property
     def metadata(self):
+        """Metadata."""
         return self._metadata
 
     @metadata.setter
     def metadata(self, value):
+        """Set metadata."""
         import datetime
         import json
 
@@ -1537,6 +1547,7 @@ class Agent(FactoryMixin):
     """Agent."""
 
     def __init__(self, role=None, from_request_context=False):
+        """Init."""
         self.role = role
         self.user_id = None
         self.ip_address = None
@@ -1545,6 +1556,7 @@ class Agent(FactoryMixin):
             self.from_request_context()
 
     def __getstate__(self):
+        """Get state."""
         return dict(
             role=self.role,
             user_id=self.user_id,
@@ -1553,12 +1565,14 @@ class Agent(FactoryMixin):
         )
 
     def __setstate__(self, state):
+        """Set state."""
         self.role = state['role']
         self.user_id = state['user_id']
         self.ip_address = state['ip_address']
         self.email_address = state['email_address']
 
     def from_request_context(self):
+        """From request context."""
         from flask import request
         from invenio.ext.login import current_user
         self.ip_address = request.remote_addr

@@ -24,16 +24,12 @@ from __future__ import unicode_literals
 import distutils.sysconfig
 from os.path import join
 
-from werkzeug import LocalProxy
-
-from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.utils.shell import which
 from invenio.version import __version__
 
 
 EXTENSIONS = [
     'invenio.ext.confighacks',
-    'invenio.ext.jinja2hacks',
     'invenio.ext.passlib:Passlib',
     'invenio.ext.debug_toolbar',
     'invenio.ext.babel',
@@ -72,25 +68,15 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.annotations',
     'invenio.modules.archiver',
     'invenio.modules.communities',  # remove with invenio/modules/communities
-    'invenio.modules.linkbacks',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
+    'invenio.modules.tags',
 ]
 
-LEGACY_WEBINTERFACE_EXCLUDE = [
-    'invenio.legacy.websubmit',
-]
+LEGACY_WEBINTERFACE_EXCLUDE = []
 
 _cfg_prefix = distutils.sysconfig.get_config_var("prefix")
 
-
-@deprecated(
-    'Use a more specific variable from invenio/base/config.py instead',
-    RemovedInInvenio22Warning)
-def _cfg_prefix_for_proxy():
-    return _cfg_prefix
-
-CFG_PREFIX = LocalProxy(_cfg_prefix_for_proxy)
 CFG_DATADIR = join(_cfg_prefix, 'var', 'data')
 CFG_BATCHUPLOADER_DAEMON_DIR = join(_cfg_prefix, "var", "batchupload")
 CFG_BATCHUPLOADER_DAEMON_DIR = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
@@ -106,12 +92,8 @@ CFG_WEBDIR = join(_cfg_prefix, "var", "www")
 CFG_PYLIBDIR = join(_cfg_prefix, "lib", "python")
 CFG_LOCALEDIR = join(_cfg_prefix, "share", "locale")
 CFG_TMPSHAREDDIR = join(_cfg_prefix, "var", "tmp-shared")
-CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = join(_cfg_prefix, "etc", "bibconvert", "config")
-CFG_WEBSUBMIT_COUNTERSDIR = join(CFG_DATADIR, "submit", "counters")
-CFG_WEBSUBMIT_STORAGEDIR = join(CFG_DATADIR, "submit", "storage")
 CFG_BIBEDIT_CACHEDIR = join(_cfg_prefix, "var", "tmp-shared", "bibedit-cache")
 CFG_COMMENTSDIR = join(CFG_DATADIR, "comments")
-CFG_BASKETSDIR = join(CFG_DATADIR, "baskets")
 
 # FIXME check the usage and replace by SQLALCHEMY_URL
 CFG_DATABASE_HOST = "localhost"
@@ -318,9 +300,6 @@ CFG_BIBEDIT_PROTECTED_FIELDS = ""
 CFG_BIBEDIT_QUEUE_CHECK_METHOD = "bibrecord"
 CFG_BIBEDIT_TIMEOUT = 3600
 CFG_BIBEDIT_ADD_TICKET_RT_QUEUES = []
-CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING = 20000
-CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME = "22:00-05:00"
-CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING = 2000
 CFG_BIBFIELD_MASTER_FORMATS = ['marc', ]
 CFG_BIBFORMAT_ADDTHIS_ID = ""
 CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS = []
@@ -479,11 +458,6 @@ CFG_DEVEL_TOOLS = []
 CFG_EMAIL_BACKEND = "flask_email.backends.smtp.Mail"
 CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER = 14400
 CFG_FLASK_DISABLED_BLUEPRINTS = []
-CFG_HEPDATA_FIELD = "hepdataparent"
-CFG_HEPDATA_INDEX = "hepdataparent"
-CFG_HEPDATA_PLOTSIZE = 200
-CFG_HEPDATA_THREADS_NUM = 1
-CFG_HEPDATA_URL = "http://hepdata.cedar.ac.uk"
 CFG_ICON_CREATION_FORMAT_MAPPINGS = {'*': ['jpg']}
 CFG_INSPIRE_SITE = 0
 CFG_INTBITSET_ENABLE_SANITY_CHECKS = False
@@ -648,8 +622,6 @@ CFG_WEBAUTHORPROFILE_MAX_FIELDCODE_LIST = 100
 CFG_WEBAUTHORPROFILE_ORCID_ENDPOINT_PUBLIC = "http://pub.orcid.org/"
 CFG_WEBAUTHORPROFILE_ORCID_ENDPOINT_MEMBER = "http://api.orcid.org/"
 CFG_WEBAUTHORPROFILE_USE_ALLOWED_FIELDCODES = True
-CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS = 20
-CFG_WEBBASKET_USE_RICH_TEXT_EDITOR = False
 CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL = 1
 CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL = "info@invenio-software.org"
 CFG_WEBCOMMENT_ALLOW_COMMENTS = 1
@@ -680,7 +652,6 @@ CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS = 20
 CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS = 1
 CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR = False
 CFG_WEBDEPOSIT_UPLOAD_FOLDER = "var/tmp/webdeposit_uploads"
-CFG_WEBLINKBACK_TRACKBACK_ENABLED = 0
 CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS = 60
 CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES = 30
 CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE = 20000
@@ -748,7 +719,6 @@ CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST = ['404r', '400', '5*', '41*', ]
 CFG_WEBSTYLE_HTTP_USE_COMPRESSION = 0
 CFG_WEBSTYLE_REVERSE_PROXY_IPS = []
 CFG_WEBSTYLE_TEMPLATE_SKIN = "default"
-CFG_WEBSUBMIT_USE_MATHJAX = 0
 CFG_XAPIAN_ENABLED = ""
 CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE = 0
 CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1, 2]

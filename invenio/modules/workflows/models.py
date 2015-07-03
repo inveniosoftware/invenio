@@ -19,16 +19,17 @@
 """Models for BibWorkflow Objects."""
 
 import base64
+
 import logging
+
 import os
+
 import tempfile
 
 from datetime import datetime
 
 from invenio.base.globals import cfg
 from invenio.base.helpers import unicodifier
-from invenio.base.utils import classproperty
-from invenio.utils.deprecation import deprecated, RemovedInInvenio22Warning
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 
@@ -53,12 +54,6 @@ class ObjectVersion(object):
     ERROR = 5
     MAPPING = {"New": 0, "Done": 1, "Need action": 2,
                "In process": 3, "Waiting": 4, "Error": 5}
-
-    @classproperty
-    @deprecated("Please use ObjectVersion.COMPLETED "
-                "instead of ObjectVersion.FINAL", RemovedInInvenio22Warning)
-    def FINAL(cls):
-        return cls.COMPLETED
 
     @classmethod
     def name_from_version(cls, version):
@@ -98,7 +93,8 @@ class Workflow(db.Model):
 
     __tablename__ = "bwlWORKFLOW"
 
-    uuid = db.Column(db.String(36), primary_key=True, nullable=False)
+    _uuid = db.Column(db.String(36), primary_key=True, nullable=False,
+                      name="uuid")
 
     name = db.Column(db.String(255), default="Default workflow",
                      nullable=False)
@@ -111,9 +107,6 @@ class Workflow(db.Model):
                             default=get_default_extra_data())
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
-    objects = db.relationship("BibWorkflowObject",
-                              backref='bwlWORKFLOW',
-                              cascade="all, delete, delete-orphan")
     counter_initial = db.Column(db.Integer, default=0, nullable=False)
     counter_halted = db.Column(db.Integer, default=0, nullable=False)
     counter_error = db.Column(db.Integer, default=0, nullable=False)
@@ -123,6 +116,16 @@ class Workflow(db.Model):
     child_logs = db.relationship("BibWorkflowEngineLog",
                                  backref='bwlWORKFLOW',
                                  cascade="all, delete, delete-orphan")
+
+    @db.hybrid_property
+    def uuid(self):
+        """Get uuid."""
+        return self._uuid
+
+    @uuid.setter
+    def uuid(self, value):
+        """Set uud."""
+        self._uuid = str(value) if value else None
 
     def __repr__(self):
         """Represent a workflow object."""
@@ -205,7 +208,7 @@ class Workflow(db.Model):
         You can define either the key or the getter function.
 
         :param key: the key to access the desirable value
-        :param getter: a callable that takes a dict as param and returns a value
+        :param getter: callable that takes a dict as param and returns a value
         """
         extra_data = Workflow.get(Workflow.id_user == self.id_user,
                                   Workflow.uuid == self.uuid).one()._extra_data
@@ -246,7 +249,8 @@ class Workflow(db.Model):
     @session_manager
     def delete(cls, uuid=None):
         """Delete a workflow."""
-        cls.get(Workflow.uuid == uuid).delete()
+        uuid = uuid or cls.uuid
+        db.session.delete(cls.get(Workflow.uuid == uuid).first())
 
     @session_manager
     def save(self, status):
@@ -313,11 +317,12 @@ class BibWorkflowObject(db.Model):
                             nullable=False,
                             default=get_default_extra_data())
 
-    id_workflow = db.Column(db.String(36),
-                            db.ForeignKey("bwlWORKFLOW.uuid"), nullable=True)
+    _id_workflow = db.Column(db.String(36),
+                             db.ForeignKey('bwlWORKFLOW.uuid'), nullable=True,
+                             name="id_workflow")
     version = db.Column(db.Integer(3),
                         default=ObjectVersion.INITIAL, nullable=False)
-    id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
+    id_parent = db.Column(db.Integer, db.ForeignKey('bwlOBJECT.id'),
                           default=None)
     child_objects = db.relationship("BibWorkflowObject",
                                     remote_side=[id_parent])
@@ -330,15 +335,27 @@ class BibWorkflowObject(db.Model):
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
 
-    child_logs = db.relationship("BibWorkflowObjectLog",
-                                 backref='bibworkflowobject',
-                                 cascade="all, delete, delete-orphan")
+    child_logs = db.relationship(
+        "BibWorkflowObjectLog",
+        backref=db.backref('bibworkflowobject'),
+        cascade="all, delete, delete-orphan")
 
     workflow = db.relationship(
-        Workflow, foreign_keys=[id_workflow], remote_side=Workflow.uuid,
+        Workflow,
+        backref=db.backref('objects', cascade="all, delete-orphan")
     )
 
     _log = None
+
+    @db.hybrid_property
+    def id_workflow(self):
+        """Get id_workflow."""
+        return self._id_workflow
+
+    @id_workflow.setter
+    def id_workflow(self, value):
+        """Set id_workflow."""
+        self._id_workflow = str(value) if value else None
 
     @property
     def log(self):
@@ -679,7 +696,7 @@ class BibWorkflowObject(db.Model):
             return extra_data["task_counter"]
 
     def get_current_task_info(self):
-        """Return a dictionary of current task function info for this object."""
+        """Return dictionary of current task function info for this object."""
         from .utils import get_workflow_definition, get_func_info
 
         task_pointer = self.get_current_task()
@@ -730,7 +747,8 @@ class BibWorkflowObject(db.Model):
 
         :return: list of BibWorkflowObjectLog
         """
-        criterions = [BibWorkflowObjectLog.id_object == self.id] + list(criteria)
+        criterions = [BibWorkflowObjectLog.id_object == self.id] + \
+            list(criteria)
         res = BibWorkflowObjectLog.query.filter(
             *criterions
         ).filter_by(**filters)
@@ -805,7 +823,11 @@ class BibWorkflowObject(db.Model):
     @session_manager
     def delete(cls, oid):
         """Delete a BibWorkflowObject."""
-        cls.get(BibWorkflowObject.id == oid).delete()
+        if isinstance(oid, BibWorkflowObject):
+            db.session.delete(oid)
+        else:
+            db.session.delete(
+                BibWorkflowObject.get(BibWorkflowObject.id == oid).first())
 
     @classmethod
     @session_manager
@@ -908,12 +930,22 @@ class BibWorkflowEngineLog(db.Model):
 
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)
-    id_object = db.Column(db.String(255),
-                          db.ForeignKey('bwlWORKFLOW.uuid'),
-                          nullable=False)
+    _id_object = db.Column(db.String(36),
+                           db.ForeignKey('bwlWORKFLOW.uuid'),
+                           nullable=False, name="id_object")
     log_type = db.Column(db.Integer, default=0, nullable=False)
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.TEXT, default="", nullable=False)
+
+    @db.hybrid_property
+    def id_object(self):
+        """Get id_object."""
+        return self._id_object
+
+    @id_object.setter
+    def id_object(self, value):
+        """Set id_object."""
+        self._id_object = str(value) if value else None
 
     def __str__(self):
         """Print a log."""

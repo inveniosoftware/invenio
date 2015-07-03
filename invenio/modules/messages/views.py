@@ -20,24 +20,26 @@
 """WebMessage Flask Blueprint"""
 
 from datetime import datetime
-from flask import render_template, request, flash, redirect, url_for, Blueprint
+
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_breadcrumbs import default_breadcrumb_root, register_breadcrumb
 from flask_login import current_user, login_required
 from flask_menu import register_menu
 from sqlalchemy.sql import operators
 
-from invenio.base.decorators import (wash_arguments, templated, sorted_by,
-                                     filtered_by)
+from invenio.base.decorators import filtered_by, sorted_by, templated, \
+    wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.ext.template import render_template_to_string
 from invenio.ext.principal import permission_required
 from invenio.ext.sqlalchemy import db
+from invenio.ext.template import render_template_to_string
 
-from . import dblayer
 from . import query as dbquery
+from . import dblayer
 from .forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from .models import MsgMESSAGE, UserMsgMESSAGE, email_alert_register
+from .utils import is_no_quota_user
 
 
 class MessagesMenu(object):
@@ -96,7 +98,6 @@ def menu():
 @register_menu(blueprint, 'main.messages', MessagesMenu(), order=-3,
                visible_when=not_guest)
 def index(sort=False, filter=None):
-    from invenio.legacy.webmessage.api import is_no_quota_user
     uid = current_user.get_id()
 
     dbquery.update_user_inbox_for_reminders(uid)

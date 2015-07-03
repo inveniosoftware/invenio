@@ -146,7 +146,7 @@ def user_can_edit_record_collection(req, recid):
     normalized_collections = []
     for collection in record_collections:
         # Get the normalized collection name present in the action table
-        res = run_sql("""SELECT value FROM accARGUMENT
+        res = run_sql("""SELECT value FROM "accARGUMENT"
                          WHERE keyword='collection'
                          AND value=%s;""", (collection,))
         if res:
@@ -695,7 +695,7 @@ def _get_bibupload_task_ids():
     Ignore tasks submitted by user bibreformat.
 
     """
-    res = run_sql('''SELECT id FROM "schTASK" WHERE proc LIKE 'bibupload%' AND user <> 'bibreformat' AND status IN ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING')''')
+    res = run_sql('''SELECT id FROM "schTASK" WHERE proc LIKE 'bibupload%' AND "user" <> 'bibreformat' AND status IN ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING')''')
     return [row[0] for row in res]
 
 def _get_bibupload_filenames():
@@ -1089,7 +1089,7 @@ def get_affiliation_for_paper(rec, name):
     """
     try:
         affs = run_sql("""SELECT affiliations
-                          FROM bibEDITAFFILIATIONS
+                          FROM "bibEDITAFFILIATIONS"
                           WHERE bibrec=%s
                           AND name=%s""", (rec, name))
     except ProgrammingError:

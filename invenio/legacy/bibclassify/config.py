@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -291,7 +291,6 @@ if STANDALONE:
 
 
 # shadow the config variables that bibclassify modules use
-CFG_PREFIX = config.CFG_PREFIX
 CFG_CACHEDIR = config.CFG_CACHEDIR
 CFG_WEBDIR = config.CFG_WEBDIR
 CFG_ETCDIR = config.CFG_ETCDIR

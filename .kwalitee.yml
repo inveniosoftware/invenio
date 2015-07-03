@@ -29,7 +29,6 @@ components:
 - archiver
 - arxiv
 - assets
-- authorlist
 - authorprofiles
 - authors
 - babel
@@ -74,7 +73,6 @@ components:
 - knowledge
 - kwalitee
 - legacy
-- linkbacks
 - logging
 - login
 - matcher
@@ -88,7 +86,6 @@ components:
 - oauth2server
 - oauthclient
 - pages
-- pdfchecker
 - pidstore
 - previewer
 - principal

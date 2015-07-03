@@ -29,7 +29,7 @@ from uuid import uuid1 as new_uuid
 
 from invenio.ext.sqlalchemy import db
 
-from six import iteritems, reraise
+from six import iteritems, reraise, text_type
 from six.moves import cPickle
 
 from workflow.engine import (
@@ -130,7 +130,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                                        module_name=module_name, uuid=uuid)
                 self.save(status=WorkflowStatus.NEW)
 
-        if self.db_obj.uuid not in self.log.name:
+        if text_type(self.db_obj.uuid) not in self.log.name:
             db_handler_obj = BibWorkflowLogHandler(BibWorkflowEngineLog,
                                                    "uuid")
             self.log = get_logger(logger_name="workflow.%s" % self.db_obj.uuid,

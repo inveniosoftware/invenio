@@ -1,5 +1,6 @@
 # This file is part of Invenio.
-# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
+# Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
+#               2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -44,7 +45,6 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
-     CFG_WEBLINKBACK_TRACKBACK_ENABLED, \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_INSPIRE_SITE, \
      CFG_CERN_SITE
@@ -2404,7 +2404,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     actions = []
     output += """<br /><b>Last BibSched tasks:</b><br />"""
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='webcoll' and runtime< now() ORDER by runtime""")
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
         webcoll__update_time = runtime
@@ -2412,7 +2412,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     else:
         actions.append(['', 'webcoll', '', '', 'Not executed yet'])
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime< now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='bibindex' and runtime< now() ORDER by runtime""")
 
     if len(res) > 0:
         (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
@@ -2424,7 +2424,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     output += """<br /><b>Next scheduled BibSched run:</b><br />"""
     actions = []
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime > now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='webcoll' and runtime > now() ORDER by runtime""")
 
     webcoll_future = ""
     if len(res) > 0:
@@ -2435,7 +2435,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     else:
         actions.append(['', 'webcoll', '', '', 'Not scheduled'])
 
-    res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='bibindex' and runtime > now() ORDER by runtime")
+    res = run_sql("""select id, proc, host, "user", runtime, sleeptime, arguments, status, progress from "schTASK" where proc='bibindex' and runtime > now() ORDER by runtime""")
 
     bibindex_future = ""
     if len(res) > 0:
@@ -2814,7 +2814,7 @@ def get_col_rnk(colID, ln):
     colID - id from collection"""
 
     try:
-        res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, )))
+        res1 = dict(run_sql("""SELECT "id_rnkMETHOD", '' FROM "collection_rnkMETHOD" WHERE id_collection=%s""", (colID, )))
         res2 = get_def_name('', "rnkMETHOD")
         result = filter(lambda x: x[0] in res1, res2)
         return result
@@ -2947,7 +2947,7 @@ def attach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)", (colID, rnkID))
+        res = run_sql("""INSERT INTO "collection_rnkMETHOD"(id_collection, "id_rnkMETHOD") values (%s,%s)""", (colID, rnkID))
         return (1, "")
     except StandardError as e:
         register_exception()
@@ -2959,7 +2959,7 @@ def detach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s", (colID, rnkID))
+        res = run_sql("""DELETE FROM "collection_rnkMETHOD" WHERE id_collection=%s AND "id_rnkMETHOD"=%s""", (colID, rnkID))
         return (1, "")
     except StandardError as e:
         register_exception()
@@ -3087,7 +3087,7 @@ def delete_col(colID):
     try:
         res = run_sql("DELETE FROM collection WHERE id=%s", (colID, ))
         res = run_sql("DELETE FROM collectionname WHERE id_collection=%s", (colID, ))
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, ))
+        res = run_sql("""DELETE FROM "collection_rnkMETHOD" WHERE id_collection=%s""", (colID, ))
         res = run_sql("DELETE FROM collection_collection WHERE id_dad=%s", (colID, ))
         res = run_sql("DELETE FROM collection_collection WHERE id_son=%s", (colID, ))
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s", (colID, ))
@@ -3409,8 +3409,6 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 8},
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 9},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 10},
-            'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 11},
-            'hepdata'   : {'label': _('HepData'),          'visible': False, 'enabled': True, 'order': 12},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
@@ -3427,9 +3425,6 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         # assume all tabs are displayed
         for key in tabs.keys():
             tabs[key]['visible'] = True
-
-    if not CFG_WEBLINKBACK_TRACKBACK_ENABLED:
-        tabs['linkbacks']['visible'] = False
 
     if not CFG_WEBCOMMENT_ALLOW_COMMENTS:
         tabs['comments']['visible'] = False
@@ -3488,24 +3483,12 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             if recID in get_collection_reclist("Books & Proceedings"):
                 tabs['holdings']['visible'] = True
                 tabs['holdings']['enabled'] = True
-        # now treating the HEP data -> we have to check if there is HepData
-        # associated with the record and if so, make the tab visible and enabled
-
-        has_hepdata = record_has_hepdata_attached(recID)
-        tabs['hepdata']['visible'] = has_hepdata
-        tabs['hepdata']['enabled'] = has_hepdata
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
 
     return tabs
 
-
-
-def record_has_hepdata_attached(recID):
-    """returns True or False depending if there is HepData attached or not"""
-    from invenio.legacy.search_engine import search_pattern
-    return len(search_pattern(p="786__w:%s" % (str(recID)))) > 0
 
 def get_detailed_page_tabs_counts(recID):
     """
@@ -3546,11 +3529,19 @@ def get_detailed_page_tabs_counts(recID):
         if reftag and len(reftag) > 4:
             tabs_counts['References'] = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
     # obtain number of comments/reviews
-    from invenio.legacy.webcomment.adminlib import get_nb_reviews, get_nb_comments
+    from invenio.modules.comments.models import CmtRECORDCOMMENT
     if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
-        num_comments = get_nb_comments(recID, count_deleted=False)
+        num_comments = CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recID,
+            CmtRECORDCOMMENT.star_score == 0,
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+        ])
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
-        num_reviews = get_nb_reviews(recID, count_deleted=False)
+        num_reviews = CmtRECORDCOMMENT.count(*[
+            CmtRECORDCOMMENT.id_bibrec == recID,
+            CmtRECORDCOMMENT.star_score > 0,
+            CmtRECORDCOMMENT.status.notin_(['dm', 'da'])
+        ])
     if num_comments:
         tabs_counts['Comments'] = num_comments
         tabs_counts['Discussions'] += num_comments

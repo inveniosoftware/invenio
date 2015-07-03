@@ -289,6 +289,13 @@ def register_manager(manager):
     from six.moves.urllib.parse import urlparse
     managers = RegistryProxy('managers', ModuleAutoDiscoveryRegistry, 'manage')
 
+    def extract_name(name):
+        """Guess manager name."""
+        parts = name.split('.')
+        if len(parts) == 2:
+            return parts[0].split('_')[-1]
+        return parts[-2]
+
     with manager.app.app_context():
         for script in find_modules('invenio.base.scripts'):
             manager.add_command(script.split('.')[-1],
@@ -296,7 +303,7 @@ def register_manager(manager):
         for script in managers:
             if script.__name__ == 'invenio.base.manage':
                 continue
-            manager.add_command(script.__name__.split('.')[-2],
+            manager.add_command(extract_name(script.__name__),
                                 getattr(script, 'manager'))
 
     manager.add_command("clean", Clean())

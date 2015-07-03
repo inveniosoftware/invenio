@@ -29,6 +29,7 @@ from invenio.base.i18n import _
 from invenio.config import SECRET_KEY as secret_key
 from invenio.ext.login.legacy_user import UserInfo
 from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User
 
 import six
 
@@ -167,7 +168,7 @@ class Client(db.Model):
         default=u'',
     )
 
-    user_id = db.Column(db.ForeignKey('user.id'))
+    user_id = db.Column(db.ForeignKey('user.id'), nullable=True)
     """Creator of the client application."""
 
     client_id = db.Column(db.String(255), primary_key=True)
@@ -194,7 +195,13 @@ class Client(db.Model):
     case-sensitive strings.
     """
 
-    user = db.relationship('User')
+    user = db.relationship(
+        User,
+        backref=db.backref(
+            "oauth2clients",
+            cascade="all, delete-orphan",
+        )
+    )
     """Relationship to user."""
 
     @property
@@ -299,15 +306,26 @@ class Token(db.Model):
     )
     """Foreign key to client application."""
 
-    client = db.relationship('Client')
+    client = db.relationship(
+        'Client',
+        backref=db.backref(
+            'oauth2tokens',
+            cascade="all, delete-orphan"
+        ))
     """SQLAlchemy relationship to client application."""
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id')
+        db.Integer, db.ForeignKey('user.id'), nullable=True
     )
     """Foreign key to user."""
 
-    user = db.relationship('User')
+    user = db.relationship(
+        User,
+        backref=db.backref(
+            "oauth2tokens",
+            cascade="all, delete-orphan",
+        )
+    )
     """SQLAlchemy relationship to user."""
 
     token_type = db.Column(db.String(255), default='bearer')

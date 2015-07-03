@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,15 +17,21 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Get number of comments."""
+
 
 def get_number_of_comments(recid):
     """
-    Returns number of comments for given record.
+    Return number of comments for given record.
 
     :param recid:
 
     :return: Number of comments
     """
-    from invenio.legacy.webcomment.adminlib import get_nb_comments
+    from invenio.modules.comments.models import CmtRECORDCOMMENT
     if recid:
-        return get_nb_comments(recid)
+        filters = [
+            CmtRECORDCOMMENT.id_bibrec == recid,
+            CmtRECORDCOMMENT.star_score == 0
+        ]
+        return CmtRECORDCOMMENT.count(*filters)

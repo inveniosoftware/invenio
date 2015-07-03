@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ import calendar
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION, CFG_WEBDIR
 from invenio.base.i18n import gettext_set_language
 from intbitset import intbitset
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, date_format_year_month
 from invenio.legacy.bibrank.downloads_indexer import database_tuples_to_single_list
 from invenio.legacy.bibrank.grapher import (write_coordinates_in_tmp_file,
                                             create_temporary_image,
@@ -55,7 +55,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         # remove images older than 10 minutes
         remove_old_img("download")
         # download count graph
-        id_bibdocs = intbitset(run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s", (id_bibrec, )))
+        id_bibdocs = intbitset(run_sql("""select distinct id_bibdoc from "rnkDOWNLOADS" where id_bibrec=%s""", (id_bibrec, )))
 
         id_existing_bibdocs = intbitset(run_sql("SELECT id_bibdoc FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE id_bibrec=%s AND status<>'DELETED'", (id_bibrec, )))
 
@@ -90,7 +90,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         html_content = ""
         remove_old_img("download")
         #Users analysis graph
-        ips = database_tuples_to_single_list(run_sql("select client_host from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec))
+        ips = database_tuples_to_single_list(run_sql("""select client_host from "rnkDOWNLOADS" where id_bibrec=%s;""" % id_bibrec))
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
             if users_analysis_results[0]:
@@ -137,9 +137,9 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     local_month = local_time.tm_mon
     local_year = local_time.tm_year
 
-    creation_date_res = run_sql("""SELECT DATE_FORMAT(creation_date,"%%Y-%%m") FROM bibrec WHERE id=%s;""" % id_bibrec)
+    creation_date_res = run_sql("""SELECT """ + date_format_year_month('creation_date') + """ FROM bibrec WHERE id=%s;""" % id_bibrec)
     if creation_date_res == ():
-        creation_date_res = run_sql("""SELECT DATE_FORMAT(MIN(download_time),"%%Y-%%m") FROM rnkDOWNLOADS where id_bibrec=%s;""" % id_bibrec)
+        creation_date_res = run_sql("""SELECT """ + date_format_year_month('MIN(download_time)') + """ FROM "rnkDOWNLOADS" where id_bibrec=%s;""" % id_bibrec)
     if creation_date_res == (('0000-00',),):
         creation_date_year = local_year - 1
         creation_date_month = local_month
@@ -190,7 +190,7 @@ def create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition=""):
         elem1 = s1[1] + "-" + s1[0]
         date1 = "%s%s" % (elem0, "-01 00:00:00")
         date2 = "%s%s" % (elem1, "-%s 00:00:00" % str(end_of_month_end))
-        sql_query = "select count(*) from rnkDOWNLOADS where id_bibrec=%s %s and download_time>='%s' and download_time<'%s';" % (id_bibrec, id_bibdoc_query_addition, date1, date2)
+        sql_query = """select count(*) from "rnkDOWNLOADS" where id_bibrec=%s %s and download_time>='%s' and download_time<'%s';""" % (id_bibrec, id_bibdoc_query_addition, date1, date2)
         res = run_sql(sql_query)[0][0]
         list_tuple.append((elem[0], res))
     #list_tuple = sort_list_tuple_by_date(list_tuple)

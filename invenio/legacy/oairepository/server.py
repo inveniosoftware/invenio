@@ -64,7 +64,8 @@ from invenio.config import \
 from invenio.base.globals import cfg
 from invenio.ext.logging import register_exception
 from invenio.legacy.bibrecord import record_get_field_instances
-from invenio.legacy.dbquery import run_sql, wash_table_column_name
+from invenio.legacy.dbquery import run_sql, wash_table_column_name, \
+    datetime_format
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
     search_unit_in_bibxxx, get_record
@@ -193,7 +194,7 @@ def get_modification_date(recid):
     Return empty string if no record or modification date in UTC.
     """
     out = ""
-    res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (recid,), 1)
+    res = run_sql("SELECT " + datetime_format('modification_date') + " FROM bibrec WHERE id=%s", (recid,), 1)
     if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
@@ -203,7 +204,7 @@ def get_earliest_datestamp():
     Return empty string if no records or earliest datestamp in UTC.
     """
     out = CFG_MIN_DATE
-    res = run_sql("SELECT DATE_FORMAT(MIN(creation_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
+    res = run_sql("SELECT " + datetime_format('MIN(creation_date)', False) + "  FROM bibrec", n=1)
     if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
@@ -213,7 +214,7 @@ def get_latest_datestamp():
     Return empty string if no records or latest datestamp in UTC.
     """
     out = CFG_MAX_DATE
-    res = run_sql("SELECT DATE_FORMAT(MAX(modification_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
+    res = run_sql("SELECT " + datetime_format('MAX(modification_date)', False) + " FROM bibrec", n=1)
     if res and res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
@@ -605,9 +606,9 @@ def get_set_last_update(set_spec=""):
     Returns the last_update of a given set (or of all sets) in UTC
     """
     if set_spec:
-        last_update = run_sql("SELECT DATE_FORMAT(MAX(last_updated),'%%Y-%%m-%%d %%H:%%i:%%s') FROM oaiREPOSITORY WHERE setSpec=%s", (set_spec, ))[0][0]
+        last_update = run_sql("SELECT " + datetime_format('MAX(last_updated)') + """ FROM "oaiREPOSITORY" WHERE setSpec=%s""", (set_spec, ))[0][0]
     else:
-        last_update = run_sql("SELECT DATE_FORMAT(MAX(last_updated),'%Y-%m-%d %H:%i:%s') FROM oaiREPOSITORY")[0][0]
+        last_update = run_sql("SELECT " + datetime_format('MAX(last_updated)', False) + """ FROM "oaiREPOSITORY" """)[0][0]
     if last_update:
         return localtime_to_utc(last_update)
     else:
@@ -732,7 +733,8 @@ def get_all_sets():
     """
     Return all the sets.
     """
-    res = run_sql("SELECT setSpec, setName, setDescription FROM oaiREPOSITORY")
+    res = run_sql("""SELECT "setSpec", "setName", "setDescription"
+                     FROM "oaiREPOSITORY" """)
     ret = {}
     for row in res:
         ret[row[0]] = row

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,15 +20,15 @@
 """Implement various custom column types."""
 
 from .guid import GUID
-from .marshal_binary import MarshalBinary
-from .pickle_binary import PickleBinary
+from .legacybiginteger import LegacyBigInteger
+from .legacyboolean import LegacyBoolean
 from .legacyinteger import LegacyInteger
 from .legacymediuminteger import LegacyMediumInteger
 from .legacysmallinteger import LegacySmallInteger
 from .legacytinyinteger import LegacyTinyInteger
-from .legacybiginteger import LegacyBigInteger
-
+from .marshal_binary import MarshalBinary
+from .pickle_binary import PickleBinary
 
 __all__ = ('GUID', 'MarshalBinary', 'PickleBinary',
            'LegacyInteger', 'LegacyMediumInteger', 'LegacySmallInteger',
-           'LegacyTinyInteger', 'LegacyBigInteger')
+           'LegacyTinyInteger', 'LegacyBigInteger', 'LegacyBoolean')

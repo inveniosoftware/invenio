@@ -119,14 +119,6 @@ def drop(yes_i_know=False, quiet=False):
     list(models)
 
     # Step 2: destroy associated data
-    try:
-        from invenio.legacy.webstat.api import destroy_customevents
-        msg = destroy_customevents()
-        if msg:
-            print(msg)
-    except Exception:
-        print("ERROR: Could not destroy customevents.")
-
     tables = list(reversed(db.metadata.sorted_tables))
 
     def _dropper(items, prefix, dropper):

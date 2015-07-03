@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ import zlib
 
 from datetime import datetime, timedelta
 
-from invenio.legacy.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql, date_format_ymdhis
 
 
 def get_name_tags_all():
@@ -46,7 +46,7 @@ def get_bibupload_task_opts(task_ids):
     """Return a list with all set options for list of task IDs TASK_IDS."""
     res = []
     for task_id in task_ids:
-        res.append(run_sql("SELECT arguments FROM schTASK WHERE id=%s",
+        res.append(run_sql("""SELECT arguments FROM "schTASK" WHERE id=%s""",
                            (task_id, )))
     return res
 
@@ -54,7 +54,7 @@ def get_marcxml_of_record_revision(recid, job_date):
     """Return MARCXML string of record revision specified by RECID and JOB_DATE.
 
     """
-    return run_sql("""SELECT marcxml FROM hstRECORD
+    return run_sql("""SELECT marcxml FROM "hstRECORD"
                        WHERE id_bibrec=%s AND job_date=%s""",
                    (recid, job_date))
 
@@ -62,7 +62,7 @@ def get_info_of_record_revision(recid, job_date):
     """Return info string regarding record revision specified by RECID and JOB_DATE.
 
     """
-    return run_sql("""SELECT job_id, job_person, job_details FROM hstRECORD
+    return run_sql("""SELECT job_id, job_person, job_details FROM "hstRECORD"
                        WHERE id_bibrec=%s AND job_date=%s""",
                    (recid, job_date))
 
@@ -71,13 +71,15 @@ def get_record_revisions(recid):
       returns a list of tuples (record_id, revision_date)
     """
     return run_sql("""SELECT id_bibrec,
-                             DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
-                        FROM hstRECORD WHERE id_bibrec=%s
+                   """ + \
+                   date_format_ymdhis('job_date') + \
+                   """
+                        FROM "hstRECORD" WHERE id_bibrec=%s
                     ORDER BY job_date DESC""", (recid, ))
 
 def get_record_last_modification_date(recid):
     """Return last modification date, as timetuple, of record RECID."""
-    sql_res = run_sql('SELECT max(job_date) FROM  hstRECORD WHERE id_bibrec=%s',
+    sql_res = run_sql('SELECT max(job_date) FROM "hstRECORD" WHERE id_bibrec=%s',
                       (recid, ))
     if sql_res[0][0] is None:
         return None
@@ -94,14 +96,14 @@ def get_related_hp_changesets(recId):
         A function returning the changesets saved in the Holding Pen, related
         to the given record.
     """
-    return run_sql("""SELECT changeset_id, changeset_date FROM bibHOLDINGPEN
+    return run_sql("""SELECT changeset_id, changeset_date FROM "bibHOLDINGPEN"
                       WHERE id_bibrec=%s ORDER BY changeset_date""", (recId, ))
 
 def get_hp_update_xml(changeId):
     """
     Get the MARC XML of the Holding Pen update
     """
-    res = run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN WHERE
+    res = run_sql("""SELECT  changeset_xml, id_bibrec from "bibHOLDINGPEN" WHERE
                       changeset_id=%s""", (changeId,))
     if res:
         try:
@@ -116,14 +118,14 @@ def delete_hp_change(changeId):
     """
     Delete a change of a given number
     """
-    return run_sql("""DELETE from bibHOLDINGPEN where changeset_id=%s""",
+    return run_sql("""DELETE from "bibHOLDINGPEN" where changeset_id=%s""",
                    (str(changeId), ))
 
 def delete_related_holdingpen_changes(recId):
     """
     A function removing all the Holding Pen changes related to a given record
     """
-    return run_sql("""DELETE FROM bibHOLDINGPEN WHERE id_bibrec=%s""",
+    return run_sql("""DELETE FROM "bibHOLDINGPEN" WHERE id_bibrec=%s""",
                    (recId, ))
 
 def get_record_revision_author(recid, td):
@@ -136,7 +138,7 @@ def get_record_revision_author(recid, td):
                                                     td.tm_mday, td.tm_hour,
                                                     td.tm_min, td.tm_sec)
 
-    result = run_sql("""SELECT job_person from hstRECORD where id_bibrec=%s
+    result = run_sql("""SELECT job_person from "hstRECORD" where id_bibrec=%s
                         AND job_date=%s""", (recid, datestring))
     if result != ():
         return result[0]
@@ -148,14 +150,14 @@ def get_record_revision_author(recid, td):
 
 def cache_exists(recid, uid):
     """Check if the BibEdit cache file exists."""
-    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+    r = run_sql("""SELECT 1 FROM "bibEDITCACHE"
                    WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
     return bool(r)
 
 
 def cache_active(recid, uid):
     """Check if the BibEdit cache is active (an editor is opened)."""
-    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+    r = run_sql("""SELECT 1 FROM "bibEDITCACHE"
                    WHERE id_bibrec = %s AND uid = %s
                    AND is_active = 1""", (recid, uid))
     return bool(r)
@@ -163,7 +165,7 @@ def cache_active(recid, uid):
 
 def deactivate_cache(recid, uid):
     """Mark BibEdit cache as non active."""
-    return run_sql("""UPDATE bibEDITCACHE SET is_active = 0
+    return run_sql("""UPDATE "bibEDITCACHE" SET is_active = 0
                       WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
 
 
@@ -172,31 +174,31 @@ def update_cache_post_date(recid, uid):
     user has again accessed the record, so that locking will work correctly.
 
     """
-    run_sql("""UPDATE bibEDITCACHE SET post_date = NOW(), is_active = 1
+    run_sql("""UPDATE "bibEDITCACHE" SET post_date = NOW(), is_active = 1
                WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
 
 def get_cache(recid, uid):
     """Return a BibEdit cache object from the database."""
-    r = run_sql("""SELECT data FROM bibEDITCACHE
+    r = run_sql("""SELECT data FROM "bibEDITCACHE"
                    WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
     if r:
         return Pickle.loads(r[0][0])
 
 def update_cache(recid, uid, data):
     data_str = Pickle.dumps(data)
-    run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
+    run_sql("""INSERT INTO "bibEDITCACHE" (id_bibrec, uid, data, post_date)
             VALUES (%s, %s, %s, NOW())
             ON DUPLICATE KEY UPDATE data = %s, post_date = NOW(), is_active = 1""",
             (recid, uid, data_str, data_str))
 
 def get_cache_post_date(recid, uid):
-    r = run_sql("""SELECT post_date FROM bibEDITCACHE
+    r = run_sql("""SELECT post_date FROM "bibEDITCACHE"
                    WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
     if r:
         return r[0][0]
 
 def delete_cache(recid, uid):
-    run_sql("""DELETE FROM bibEDITCACHE
+    run_sql("""DELETE FROM "bibEDITCACHE"
                WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
 
 def uids_with_active_caches(recid):
@@ -207,7 +209,7 @@ def uids_with_active_caches(recid):
     """
     from invenio.config import CFG_BIBEDIT_TIMEOUT
     datecut = datetime.now() - timedelta(seconds=CFG_BIBEDIT_TIMEOUT)
-    rows = run_sql("""SELECT uid FROM bibEDITCACHE
+    rows = run_sql("""SELECT uid FROM "bibEDITCACHE"
                    WHERE id_bibrec = %s AND post_date > %s""",
                    (recid, datecut))
     return [int(row[0]) for row in rows]

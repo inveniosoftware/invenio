@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 CERN.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014,
+#               2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -175,10 +176,13 @@ def bibupload_pending_recids():
     This function return the intbitset of all the records that are being
     (or are scheduled to be) touched by other bibuploads.
     """
-    options = run_sql("""SELECT arguments FROM schTASK WHERE status<>'DONE' AND
-        proc='bibupload' AND (status='RUNNING' OR status='CONTINUING' OR
-        status='WAITING' OR status='SCHEDULED' OR status='ABOUT TO STOP' OR
-        status='ABOUT TO SLEEP')""")
+    options = run_sql("""SELECT arguments FROM "schTASK"
+                         WHERE status<>'DONE' AND
+                               proc='bibupload' AND
+                               (status='RUNNING' OR status='CONTINUING' OR
+                                status='WAITING' OR status='SCHEDULED' OR
+                                status='ABOUT TO STOP' OR
+                                status='ABOUT TO SLEEP')""")
     ret = intbitset()
     xmls = []
     if options:
@@ -430,7 +434,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if '005' in record:
             record_delete_field(record, '005')
             write_message("  Deleted the existing 005 tag.", verbose=2)
-        last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))[0][0]
+        last_revision = run_sql("""SELECT MAX(job_date) FROM "hstRECORD" WHERE id_bibrec=%s""", (rec_id, ))[0][0]
         if last_revision and last_revision.strftime("%Y%m%d%H%M%S.0") == record_modification_date.strftime("%Y%m%d%H%M%S.0"):
             ## We are updating the same record within the same seconds! It's less than
             ## the minimal granularity. Let's pause for 1 more second to take a breath :-)
@@ -567,7 +571,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             # does not exists (i.e. all process will try to generate and save
             # the recjson)
             from invenio.modules.records.api import get_record as _get_record
-            _get_record(rec_id)
+            _get_record(rec_id, True)
 
             # Fire record signals.
             from invenio.base import signals
@@ -583,7 +587,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
-                error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', modification_date, pretend=pretend)
+                error = update_bibfmt_format(rec_id, bytearray(marshal.dumps(record)), 'recstruct', modification_date, pretend=pretend)
                 if error == 1:
                     msg = "   Failed: ERROR: during update_bibfmt_format 'recstruct'"
                     write_message(msg, verbose=1, stream=sys.stderr)
@@ -796,7 +800,7 @@ BibUpload task information:
             BIBCATALOG_SYSTEM.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, owner=uid)
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
-    query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
+    query = """INSERT INTO "bibHOLDINGPEN" (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"""
     xml_record = record_xml_output(record)
     bibrec_ids = find_record_ids_by_oai_id(oai_id)  # here determining the identifier of the record
     if len(bibrec_ids) > 0:
@@ -1292,13 +1296,13 @@ def create_new_record(rec_id=None, pretend=False):
 def insert_bibfmt(id_bibrec, marc, bibformat, modification_date='1970-01-01 00:00:00', pretend=False):
     """Insert the format in the table bibfmt"""
     # compress the marc value
-    pickled_marc =  compress(marc)
+    pickled_marc =  compress(str(marc))
     try:
         time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
     except ValueError:
         modification_date = '1970-01-01 00:00:00'
 
-    query = """INSERT LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value)
+    query = """INSERT INTO bibfmt (id_bibrec, format, last_updated, value)
         VALUES (%s, %s, %s, %s)"""
     if not pretend:
         row_id  = run_sql(query, (id_bibrec, bibformat, modification_date, pickled_marc))
@@ -2328,9 +2332,9 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
     if nb_found == 1:
         # we are going to update the format
         # compress the format_value value
-        pickled_format_value =  compress(format_value)
+        pickled_format_value =  compress(str(format_value))
         # update the format:
-        query = """UPDATE LOW_PRIORITY bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
+        query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
         params = (modification_date, pickled_format_value, id_bibrec, format_name)
         if not pretend:
             row_id  = run_sql(query, params)
@@ -2359,7 +2363,7 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
     Delete format FORMAT_NAME from bibfmt table fo record ID_BIBREC.
     """
     if not pretend:
-        run_sql("DELETE LOW_PRIORITY FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
+        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
     return 0
 
 
@@ -2386,7 +2390,7 @@ def archive_marcxml_for_history(recID, affected_fields, pretend=False):
         tmp_affected_fields.sort()
         db_affected_fields = ",".join(tmp_affected_fields)
     if res and not pretend:
-        run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details, affected_fields)
+        run_sql("""INSERT INTO "hstRECORD" (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details, affected_fields)
                                     VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user', 'UNKNOWN'), res[0][2],
                     'mode: ' + task_get_option('mode', 'UNKNOWN') + '; file: ' + task_get_option('file_path', 'UNKNOWN') + '.',
@@ -3016,7 +3020,7 @@ def task_run_core():
 
 def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db, pretend=False):
     if oai_rec_id != "" and oai_rec_id != None:
-        query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
+        query = """UPDATE "oaiHARVESTLOG" SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         if not pretend:
             run_sql(query, (str(insertion_db), str(bibrec_id), str(oai_rec_id), str(task_id), ))
 
