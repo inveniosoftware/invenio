@@ -567,7 +567,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             # does not exists (i.e. all process will try to generate and save
             # the recjson)
             from invenio.modules.records.api import get_record as _get_record
-            _get_record(rec_id)
+            _get_record(rec_id, True)
 
             # Fire record signals.
             from invenio.base import signals
