@@ -17,33 +17,52 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sequtils import SequenceGenerator
-from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_value, create_record, \
-                              record_get_field_values
-
-# Imports related to the texkey generation daemon
-from invenio.search_engine import perform_request_search, get_record
-from invenio.bibrecord import field_get_subfield_values, \
-                              record_get_field_instances, \
-                              record_add_field, print_rec
-from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
-from invenio.bibtask import task_init, write_message, \
-    task_low_level_submission, task_update_progress, \
-    task_sleep_now_if_required
-from invenio.dbquery import run_sql
-
 import os
 import random
 import re
 import string
 import time
-
+from datetime import datetime
 from tempfile import mkstemp
+
+from invenio.bibedit_utils import get_bibrecord
+from invenio.bibrecord import create_record, \
+    field_get_subfield_values, \
+    print_rec, \
+    record_add_field, \
+    record_get_field_instances, \
+    record_get_field_value, \
+    record_get_field_values
+from invenio.bibtask import task_get_task_param, \
+    task_init, \
+    task_low_level_submission, \
+    task_set_task_param, \
+    task_sleep_now_if_required, \
+    task_update_progress, \
+    write_message
+from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
+from invenio.dbquery import run_sql
+from invenio.docextract_task import fetch_last_updated, \
+    store_last_updated
+from invenio.intbitset import intbitset
+from invenio.search_engine import get_record, \
+    perform_request_search
+from invenio.sequtils import SequenceGenerator
+from invenio.shellutils import split_cli_ids_arg
+
 from unidecode import unidecode
+
+NAME = 'texkey_generator'
 
 DESCRIPTION = """
     Generate TexKeys in records without one
+
+Options:
+
+-i, --id=low[-high]       select according to recID
+-a, --all                 check all records
+
+defaults to checking records modified since last runtime
 """
 
 HELP_MESSAGE = """
@@ -75,8 +94,8 @@ def _texkey_random_chars(recid, use_random=False):
     if recid and not use_random:
         # Legacy random char generation from Spires
         texkey_third_part = chr((recid % 26) + 97) + \
-                            chr(((recid / 26) % 26) + 97) + \
-                            chr(((recid * 26) % 26) + 97)
+            chr(((recid / 26) % 26) + 97) + \
+            chr(((recid * 26) % 26) + 97)
     else:
         letters = string.letters.lower()
         texkey_third_part = ""
@@ -148,7 +167,8 @@ class TexkeySeq(SequenceGenerator):
             if not main_author:
                 # Check if it is a Proceedings record
                 collections = [collection.lower() for collection in
-                               record_get_field_values(bibrecord, "980", code="a")]
+                               record_get_field_values(bibrecord,
+                                                       "980", code="a")]
                 if "proceedings" in collections:
                     main_author = "Proceedings"
                 else:
@@ -211,7 +231,7 @@ class TexkeySeq(SequenceGenerator):
         return texkey
 
 
-### Functions related to texkey generator daemon ###
+# ## Functions related to texkey generator daemon ###
 
 def submit_task(to_submit, mode, sequence_id):
     """ calls bibupload with all records to be modified
@@ -293,11 +313,32 @@ def create_xml(recid, texkey):
     return print_rec(record)
 
 
-def task_run_core():
+def fetch_records_modified_since(last_date):
+    """Fetch all the recids of records modified since last_date in the system
+    """
+    return intbitset(run_sql("SELECT id FROM bibrec WHERE"
+                             " modification_date>=%s", (last_date, )))
+
+
+def task_run_core(name=NAME):
     """ Performs a search to find records without a texkey, generates a new
     one and uploads the changes in chunks """
-    recids = perform_request_search(p='-035:spirestex -035:inspiretex',
-                                    cc='HEP')
+    recids = task_get_task_param('recids')
+    if recids:
+        start_date = None
+        write_message("processing recids from commandline")
+    else:
+        start_date = datetime.now()
+        recids = intbitset()
+        recids |= intbitset(perform_request_search(
+            p='-035:spirestex -035:inspiretex', cc='HEP'))
+
+        if task_get_task_param('all'):
+            write_message("processing all records without texkey")
+        else:
+            _, last_date = fetch_last_updated(name)
+            recids = recids & fetch_records_modified_since(last_date)
+            write_message("processing records modified since: %s" % last_date)
 
     write_message("Found %s records to assign texkeys" % len(recids))
     processed_recids = []
@@ -358,7 +399,32 @@ def task_run_core():
     # if processed_recids:
     #     submit_bibindex_task(processed_recids, sequence_id)
 
+    if start_date:
+        store_last_updated(0, start_date, name)
+
     return True
+
+
+# pylint: disable-msg=W0613
+def parse_option(key, value, opts, args):
+    """
+    Elaborate task submission parameter.
+    """
+    if args:
+        # There should be no standalone arguments
+        raise StandardError("Error: Unrecognised argument '%s'." % args[0])
+
+    if key in ('-i', '--id'):
+        recids = task_get_task_param('recids')
+        if not recids:
+            recids = set()
+        task_set_task_param('recids', recids)
+        recids.update(split_cli_ids_arg(value))
+    elif key in ('-a', '--all'):
+        task_set_task_param('all', True)
+
+    return True
+# pylint: enable-msg=W0613
 
 
 def main():
@@ -369,7 +435,7 @@ def main():
               description=DESCRIPTION,
               help_specific_usage=HELP_MESSAGE,
               version="Invenio v%s" % CFG_VERSION,
-              specific_params=("", []),
-              # task_submit_elaborate_specific_parameter_fnc=parse_option,
+              specific_params=("ai:", ["all", "id="]),
+              task_submit_elaborate_specific_parameter_fnc=parse_option,
               # task_submit_check_options_fnc=check_options,
               task_run_fnc=task_run_core)
