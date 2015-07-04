@@ -17,123 +17,98 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Test suite for BibClassify module."""
+"""Test suite for classifier module."""
 
-import sys
-import tempfile
-import cStringIO
 import os
-import time
-import stat
 import shutil
+import stat
+import time
 
-from flask_registry import PkgResourcesDirDiscoveryRegistry, \
-    ImportPathRegistry, RegistryProxy
-from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
-    InvenioTestCase
+from flask_registry import (
+    ImportPathRegistry,
+    PkgResourcesDirDiscoveryRegistry,
+    RegistryProxy
+)
+from invenio.testsuite import (
+    InvenioTestCase,
+    make_test_suite,
+    run_test_suite,
+)
 
 TEST_PACKAGE = 'invenio.modules.classifier.testsuite'
 
 test_registry = RegistryProxy('test_registry', ImportPathRegistry,
                               initial=[TEST_PACKAGE])
 
-taxonomies_registry = lambda: PkgResourcesDirDiscoveryRegistry(
-    'taxonomies', registry_namespace=test_registry)
+
+def _get_test_taxonomies():
+    return PkgResourcesDirDiscoveryRegistry(
+        'taxonomies', registry_namespace=test_registry)
 
 
-class BibClassifyTestCase(InvenioTestCase):
+class ClassifierTestCase(InvenioTestCase):
 
-    """ Abusive test suite - the one that takes sooooo long """
+    """Basic test class used for classifier tests."""
 
     def setUp(self):
         """Initialize stuff."""
-        from invenio import config
-        self.original_tmpdir = config.CFG_TMPDIR
-        config.CFG_TMPDIR = tempfile.gettempdir()
-
-        self.oldstdout = sys.stdout
-        self.oldstderr = sys.stderr
-        self.stdout = None
-        self.stderr = None
-
         self.taxonomy_name = "test"
-        from invenio.legacy.bibclassify import config as bconfig
-        self.log = bconfig.get_logger("bibclassify.tests")
-        self.log_level = bconfig.logging_level
-        bconfig.set_global_level(bconfig.logging.CRITICAL)
         self.app.extensions['registry']['classifierext.taxonomies'] = \
-            taxonomies_registry()
-
-    def tearDown(self):
-        from invenio import config
-        config.CFG_TMPDIR = self.original_tmpdir
-        if self.stdout:
-            self.unredirect()
-        from invenio.legacy.bibclassify import config as bconfig
-        bconfig.set_global_level(self.log_level)
-
-    def redirect(self):
-        # just for debugging in Eclipse (to see messages printed)
-        if 'stdout' in sys.argv:
-            self.stdout = sys.stdout
-            self.stderr = sys.stderr
-        else:
-            self.stdout = cStringIO.StringIO()
-            self.stderr = cStringIO.StringIO()
-
-        sys.stdout = self.stdout
-        sys.stderr = self.stderr
-
-    def unredirect(self):
-        sin, serr = '', ''
-        if self.stdout:
-            self.stdout.flush()
-            self.stdout.seek(0)
-            sin = self.stdout.read()
-            self.stderr.flush()
-            self.stderr.seek(0)
-            serr = self.stderr.read()
-
-            self.stdout.close()
-            self.stderr.close()
-        self.stdout = None
-        self.stderr = None
-        sys.stdout = self.oldstdout
-        sys.stderr = self.oldstderr
-
-        return sin, serr
-
-    @nottest
-    def get_test_file(self, recid, type='Main', format='pdf'):
-
-        from invenio.legacy.bibdocfile import api as bibdocfile
-        br = bibdocfile.BibRecDocs(recid)
-        bibdocs = br.list_bibdocs(type)
-        # we grab the first
-        for b in bibdocs:
-            x = b.get_file(format)
-            if x:
-                return x.get_full_path(), x.get_url()
+            _get_test_taxonomies()
+        self.sample_text = """
+        We study the three-dimensional effective action obtained by reducing
+        eleven-dimensional supergravity with higher-derivative terms on a background
+        solution including a warp-factor, an eight-dimensional compact manifold, and fluxes.
+        The dynamical fields are K\"ahler deformations and vectors from the M-theory three-form.
+        We show that the potential is only induced by fluxes and the naive
+        contributions obtained from higher-curvature terms on a Calabi-Yau
+        background aberration once the back-reaction to the full solution is taken
+        into account. For the resulting three-dimensional action we analyse
+        the K\"ahler potential and complex coordinates and show compatibility
+        with N=2 supersymmetry. We argue that the higher-order result is also
+        compatible with a no-scale aberration. We find that the complex
+        coordinates should be formulated as divisor integrals for which a
+        non-trivial interplay between the warp-factor terms and the
+        higher-curvature terms allow a derivation of the moduli space metric.
+        This leads us to discuss higher-derivative corrections to the M5-brane
+        action.
+        """
 
 
-class BibClassifyTest(BibClassifyTestCase):
+class ClassifierTest(ClassifierTestCase):
 
     def test_keywords(self):
-        """"""
+        """Test extraction"""
+        from invenio.modules.classifier.api import get_keywords_from_text
+        out = get_keywords_from_text(
+            text_lines=[self.sample_text],
+            taxonomy_name=self.taxonomy_name,
+            output_mode="dict"
+        )
+        output = out.get("complete_output")
+        single_keywords = output.get("Single keywords", []).keys()
 
+        assert len(single_keywords) == 3
+        assert "aberration" in single_keywords
+
+        core_keywords = output.get("Core keywords", []).keys()
+
+        assert len(core_keywords) == 2
+        assert "supersymmetry" in core_keywords
 
     def test_rebuild_cache(self):
-        """bibclassify - test rebuilding cache (takes long time)"""
-        from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader
-        info = bibclassify_ontology_reader._get_ontology(self.taxonomy_name)
+        """classifier - test rebuilding cache."""
+        from invenio.modules.classifier import reader
+        info = reader._get_ontology(self.taxonomy_name)
 
         self.assertTrue(info[0])
-        cache = bibclassify_ontology_reader._get_cache_path(info[0])
+        cache = reader._get_cache_path(info[0])
 
         if os.path.exists(cache):
             ctime = os.stat(cache)[stat.ST_CTIME]
         else:
             ctime = -1
+
         time.sleep(0.5)  # sleep a bit for timing issues
         rex = reader.get_regular_expressions(
             self.taxonomy_name, rebuild=True)
@@ -144,13 +119,14 @@ class BibClassifyTest(BibClassifyTestCase):
         self.assertEqual(len(rex[0]) + len(rex[1]), 63)
 
     def test_cache_accessibility(self):
-        """bibclassify - test cache accessibility/writability"""
+        """classifier - test cache accessibility/writability"""
         from flask import current_app
         from invenio.modules.classifier.registry import taxonomies
-        from invenio.legacy.bibclassify import ontology_reader as bibclassify_ontology_reader
+        from invenio.modules.classifier import reader
+        from invenio.modules.classifier.errors import TaxonomyError
         # we will do tests with a copy of test taxonomy, in case anything goes
         # wrong...
-        orig_name, orig_taxonomy_path, orig_taxonomy_url = bibclassify_ontology_reader._get_ontology(
+        orig_name, orig_taxonomy_path, orig_taxonomy_url = reader._get_ontology(
             self.taxonomy_name)
 
         taxonomy_name = self.taxonomy_name + '.copy'
@@ -161,130 +137,114 @@ class BibClassifyTest(BibClassifyTestCase):
         taxonomies[taxonomy_name] = taxonomy_path
         assert(os.path.exists(taxonomy_path))
 
-        name, taxonomy_path, taxonomy_url = bibclassify_ontology_reader._get_ontology(
+        name, taxonomy_path, taxonomy_url = reader._get_ontology(
             taxonomy_name)
-        cache = bibclassify_ontology_reader._get_cache_path(
+        cache = reader._get_cache_path(
             os.path.basename(taxonomy_path))
 
-        if not name:
-            raise Exception("Taxonomy wasn't found")
+        assert name
 
         if os.path.exists(cache):
             os.remove(cache)
 
-        bibclassify_ontology_reader.get_regular_expressions(
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=True, no_cache=False)
-        assert(os.path.exists(cache))
 
-        self.log.error('Testing corrupted states, please ignore errors...')
+        assert(os.path.exists(cache))
 
         # set cache unreadable
         os.chmod(cache, 000)
-        try:
-            bibclassify_ontology_reader.get_regular_expressions(
-                taxonomy_name, rebuild=False, no_cache=False)
-        except:
-            pass
-        else:
-            raise Exception('cache chmod to 000 but no exception raised')
+
+        self.assertRaises(
+            TaxonomyError,
+            reader.get_regular_expressions,
+            taxonomy_name, rebuild=False, no_cache=False
+        )
 
         # set cache unreadable and test writing
         os.chmod(cache, 000)
-        try:
-            bibclassify_ontology_reader.get_regular_expressions(
-                taxonomy_name, rebuild=True, no_cache=False)
-        except:
-            pass
-        else:
-            raise Exception('cache chmod to 000 but no exception raised')
 
-        # set cache unreadable but don't care for it
-        os.chmod(cache, 000)
-        bibclassify_ontology_reader.get_regular_expressions(
-            taxonomy_name, rebuild=False, no_cache=True)
-        bibclassify_ontology_reader.get_regular_expressions(
-            taxonomy_name, rebuild=True, no_cache=True)
+        self.assertRaises(
+            TaxonomyError,
+            reader.get_regular_expressions,
+            taxonomy_name, rebuild=True, no_cache=False
+        )
 
         # set cache readable and test writing
         os.chmod(cache, 600)
-        try:
-            bibclassify_ontology_reader.get_regular_expressions(
-                taxonomy_name, rebuild=True, no_cache=False)
-        except:
-            pass
-        else:
-            raise Exception('cache chmod to 600 but no exception raised')
+
+        self.assertRaises(
+            TaxonomyError,
+            reader.get_regular_expressions,
+            taxonomy_name, rebuild=True, no_cache=False
+        )
 
         # set cache writable only
         os.chmod(cache, 200)
-        bibclassify_ontology_reader.get_regular_expressions(
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=True, no_cache=False)
-        bibclassify_ontology_reader.get_regular_expressions(
+
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=False, no_cache=False)
 
         # set cache readable/writable but corrupted (must rebuild itself)
         os.chmod(cache, 600)
         os.remove(cache)
         open(cache, 'w').close()
-        bibclassify_ontology_reader.get_regular_expressions(
+
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=False, no_cache=False)
 
         # set cache readable/writable but corrupted (must rebuild itself)
         open(cache, 'w').close()
         try:
-            try:
-                os.rename(taxonomy_path, taxonomy_path + 'x')
-                open(taxonomy_path, 'w').close()
-                bibclassify_ontology_reader.get_regular_expressions(
-                    taxonomy_name, rebuild=False, no_cache=False)
-            except:
-                pass
+            os.rename(taxonomy_path, taxonomy_path + 'x')
+            open(taxonomy_path, 'w').close()
+            self.assertRaises(
+                TaxonomyError,
+                reader.get_regular_expressions,
+                taxonomy_name, rebuild=False, no_cache=False
+            )
         finally:
             os.rename(taxonomy_path + 'x', taxonomy_path)
 
         # make cache ok, but corrupt source
-        bibclassify_ontology_reader.get_regular_expressions(
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=True, no_cache=False)
 
         try:
-            try:
-                os.rename(taxonomy_path, taxonomy_path + 'x')
-                open(taxonomy_path, 'w').close()
-                time.sleep(.1)
-                # touch the taxonomy to be older
-                os.utime(cache, (time.time() + 100, time.time() + 100))
-                bibclassify_ontology_reader.get_regular_expressions(
-                    taxonomy_name, rebuild=False, no_cache=False)
-            except:
-                os.rename(taxonomy_path + 'x', taxonomy_path)
-                raise Exception('Cache exists and is ok, but was ignored')
+            os.rename(taxonomy_path, taxonomy_path + 'x')
+            open(taxonomy_path, 'w').close()
+            time.sleep(.1)
+            # touch the taxonomy to be older
+            os.utime(cache, (time.time() + 100, time.time() + 100))
+            reader.get_regular_expressions(
+                taxonomy_name, rebuild=False, no_cache=False)
         finally:
             os.rename(taxonomy_path + 'x', taxonomy_path)
 
         # make cache ok (but old), and corrupt source
-        bibclassify_ontology_reader.get_regular_expressions(
+        reader.get_regular_expressions(
             taxonomy_name, rebuild=True, no_cache=False)
         try:
-            try:
-                os.rename(taxonomy_path, taxonomy_path + 'x')
-                open(taxonomy_path, 'w').close()
-                bibclassify_ontology_reader.get_regular_expressions(
-                    taxonomy_name, rebuild=False, no_cache=False)
-            except:
-                pass
+            os.rename(taxonomy_path, taxonomy_path + 'x')
+            open(taxonomy_path, 'w').close()
+            self.assertRaises(
+                TaxonomyError,
+                reader.get_regular_expressions,
+                taxonomy_name, rebuild=False, no_cache=False
+            )
         finally:
             os.rename(taxonomy_path + 'x', taxonomy_path)
 
-        self.log.error('...testing of corrupted states finished.')
-
-        name, taxonomy_path, taxonomy_url = bibclassify_ontology_reader._get_ontology(
+        name, taxonomy_path, taxonomy_url = reader._get_ontology(
             taxonomy_name)
-        cache = bibclassify_ontology_reader._get_cache_path(name)
+        cache = reader._get_cache_path(name)
         os.remove(taxonomy_path)
         os.remove(cache)
 
 
-TEST_SUITE = make_test_suite(BibClassifyTest)
+TEST_SUITE = make_test_suite(ClassifierTest)
 
 
 if __name__ == '__main__':
