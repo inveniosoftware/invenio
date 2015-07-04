@@ -22,50 +22,59 @@
 
 def classify_paper(obj, eng, callback, data,
                    taxonomy, rebuild_cache=False, no_cache=False,
-                   output_mode='text', output_limit=20, spires=False,
+                   output_limit=20, spires=False,
                    match_mode='full', with_author_keywords=False,
                    extract_acronyms=False, only_core_tags=False,
                    fast_mode=False):
     """Extract keywords from data using callback with given taxonomy."""
-    from invenio.modules.classifier.errors import TaxonomyError
+    from ..errors import TaxonomyError
 
+    output_mode = 'dict'
     if not data:
         obj.log.error("No classification done due to missing data.")
         return
 
     try:
-        result = callback(data, taxonomy, rebuild_cache,
-                          no_cache, output_mode, output_limit,
-                          spires, match_mode, with_author_keywords,
-                          extract_acronyms, only_core_tags)
+        result = callback(data, taxonomy,
+                          output_mode=output_mode,
+                          output_limit=output_limit,
+                          spires=spires,
+                          match_mode=match_mode,
+                          no_cache=no_cache,
+                          with_author_keywords=with_author_keywords,
+                          rebuild_cache=rebuild_cache,
+                          only_core_tags=only_core_tags,
+                          extract_acronyms=extract_acronyms)
     except TaxonomyError as e:
-        obj.log.error(e)
-    else:
-        result["fast_mode"] = fast_mode
-        # Check if it is not empty output before adding
-        output = result.get("dict", {}).get("complete_output", {}).values()
-        if not any(output):
-            result["dict"] = {}
-        name = "classification"
-        obj.update_task_results(
-            name,
-            [{
-                "name": name,
-                "result": result,
-                "template": "workflows/results/classifier.html"
-            }]
-        )
+        obj.log.exception(e)
+        return
+
+    final_result = {"dict": result}
+    final_result["fast_mode"] = fast_mode
+    # Check if it is not empty output before adding
+    output = result.get("complete_output", {}).values()
+    if not any(output):
+        final_result["dict"] = {}
+    name = "classification"
+    obj.update_task_results(
+        name,
+        [{
+            "name": name,
+            "result": final_result,
+            "template": "workflows/results/classifier.html"
+        }]
+    )
 
 
 def classify_paper_with_oaiharvester(taxonomy, rebuild_cache=False, no_cache=False,
-                                     output_mode='text', output_limit=20, spires=False,
+                                     output_limit=20, spires=False,
                                      match_mode='full', with_author_keywords=False,
                                      extract_acronyms=False, only_core_tags=False,
                                      fast_mode=False):
     """Extract keywords from a pdf file or metadata in a OAI harvest."""
-    from invenio.legacy.bibclassify.api import (
-        bibclassify_exhaustive_call,
-        bibclassify_exhaustive_call_text,
+    from ..api import (
+        get_keywords_from_text,
+        get_keywords_from_local_file,
     )
 
     def _classify_paper_with_oaiharvester(obj, eng):
@@ -74,18 +83,18 @@ def classify_paper_with_oaiharvester(taxonomy, rebuild_cache=False, no_cache=Fal
         if not is_fast_mode:
             if "_result" in obj.extra_data and "pdf" in obj.extra_data["_result"]:
                 data = obj.extra_data["_result"]["pdf"]
-                callback = bibclassify_exhaustive_call
+                callback = get_keywords_from_local_file
             else:
                 obj.log.error("No classification done due to missing file.")
         if not data:
             data = [obj.data.get("title", {}).get("title", ""),
                     obj.data.get("abstract", {}).get("summary", "")]
-            callback = bibclassify_exhaustive_call_text
+            callback = get_keywords_from_text
             is_fast_mode = True
 
         classify_paper(obj, eng, callback, data,
                        taxonomy, rebuild_cache,
-                       no_cache, output_mode, output_limit,
+                       no_cache, output_limit,
                        spires, match_mode, with_author_keywords,
                        extract_acronyms, only_core_tags, is_fast_mode)
 
@@ -93,14 +102,14 @@ def classify_paper_with_oaiharvester(taxonomy, rebuild_cache=False, no_cache=Fal
 
 
 def classify_paper_with_deposit(taxonomy, rebuild_cache=False, no_cache=False,
-                                output_mode='text', output_limit=20, spires=False,
+                                output_limit=20, spires=False,
                                 match_mode='full', with_author_keywords=False,
                                 extract_acronyms=False, only_core_tags=False,
                                 fast_mode=False):
     """Extract keywords from a pdf file or metadata in a deposit."""
-    from invenio.legacy.bibclassify.api import (
-        bibclassify_exhaustive_call,
-        bibclassify_exhaustive_call_text,
+    from ..api import (
+        get_keywords_from_text,
+        get_keywords_from_local_file,
     )
 
     def _classify_paper_with_deposit(obj, eng):
@@ -112,7 +121,7 @@ def classify_paper_with_deposit(taxonomy, rebuild_cache=False, no_cache=False,
                 if f.name and ".pdf" in f.name.lower():
                     data = f.get_syspath()
                     break
-            callback = bibclassify_exhaustive_call
+            callback = get_keywords_from_local_file
         if not data:
             try:
                 metadata = deposition.get_latest_sip().metadata
@@ -121,11 +130,11 @@ def classify_paper_with_deposit(taxonomy, rebuild_cache=False, no_cache=False,
 
             data = [metadata.get("title", {}).get("title", ""),
                     metadata.get("abstract", {}).get("summary", "")]
-            callback = bibclassify_exhaustive_call_text
+            callback = get_keywords_from_text
 
         classify_paper(obj, eng, callback, data,
                        taxonomy, rebuild_cache,
-                       no_cache, output_mode, output_limit,
+                       no_cache, output_limit,
                        spires, match_mode, with_author_keywords,
                        extract_acronyms, only_core_tags, fast_mode)
 

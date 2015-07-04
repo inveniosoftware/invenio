@@ -222,7 +222,6 @@ CFG_BIBCIRCULATION_REQUEST_STATUS_DONE = "done"
 CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING = "pending"
 CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED = "proposed"
 CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING = "waiting"
-CFG_BIBCLASSIFY_WEB_MAXKW = 100
 CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS = [
     'hpg', 'link', 'lis', 'llb', 'mat', 'mpp', 'msg', 'docx', 'docm', 'xlsx',
     'xlsm', 'xlsb', 'pptx', 'pptm', 'ppsx', 'ppsm', ]

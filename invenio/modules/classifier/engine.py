@@ -16,285 +16,115 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-BibClassify engine.
 
-This module is the main module of BibClassify. its two main methods are
-output_keywords_for_sources and get_keywords_from_text. The first one output
-keywords for a list of sources (local files or URLs, PDF or text) while the
-second one outputs the keywords for text lines (which are obtained using the
-module bibclassify_text_normalizer).
+"""Classifier engine responsible for outputting keywords from various sources.
 
-This module also takes care of the different outputs (text, MARCXML or HTML).
-But unfortunately there is a confusion between running in a standalone mode
-and producing output suitable for printing, and running in a web-based
-mode where the webtemplate is used. For the moment the pieces of the representation
-code are left in this module.
+These sources can be PDF documents, general text, path to files or lines of
+text and keywords are outputted in different formats (text, MARCXML or HTML).
 """
 
 from __future__ import print_function
 
 import os
-import re
-from six import iteritems
-import config as bconfig
 
-from invenio.legacy.bibclassify import ontology_reader as reader
-import text_extractor as extractor
-import text_normalizer as normalizer
-import keyword_analyzer as keyworder
-import acronym_analyzer as acronymer
-
+from invenio.base.globals import cfg
 from invenio.utils.text import encode_for_xml
-from invenio.utils.filedownload import download_url
 
-log = bconfig.get_logger("bibclassify.engine")
+from six import iteritems
 
-# ---------------------------------------------------------------------
-#                          API
-# ---------------------------------------------------------------------
-
-
-def output_keywords_for_sources(input_sources, taxonomy_name, output_mode="text",
-                                output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
-                                match_mode="full", no_cache=False, with_author_keywords=False,
-                                rebuild_cache=False, only_core_tags=False, extract_acronyms=False,
-                                api=False, **kwargs):
-    """Output the keywords for each source in sources."""
-    from invenio.legacy.refextract.engine import get_plaintext_document_body
-
-    # Inner function which does the job and it would be too much work to
-    # refactor the call (and it must be outside the loop, before it did
-    # not process multiple files)
-    def process_lines():
-        if output_mode == "text":
-            print("Input file: %s" % source)
-
-        line_nb = len(text_lines)
-        word_nb = 0
-        for line in text_lines:
-            word_nb += len(re.findall("\S+", line))
-
-        log.info("Remote file has %d lines and %d words." % (line_nb, word_nb))
-        output = get_keywords_from_text(
-            text_lines,
-            taxonomy_name,
-            output_mode=output_mode,
-            output_limit=output_limit,
-            spires=spires,
-            match_mode=match_mode,
-            no_cache=no_cache,
-            with_author_keywords=with_author_keywords,
-            rebuild_cache=rebuild_cache,
-            only_core_tags=only_core_tags,
-            extract_acronyms=extract_acronyms
-        )
-        if api:
-            return output
-        else:
-            if isinstance(output, dict):
-                for i in output:
-                    print(output[i])
-
-    # Get the fulltext for each source.
-    for entry in input_sources:
-        log.info("Trying to read input file %s." % entry)
-        text_lines = None
-        source = ""
-        if os.path.isdir(entry):
-            for filename in os.listdir(entry):
-                if filename.startswith('.'):
-                    continue
-                filename = os.path.join(entry, filename)
-                if os.path.isfile(filename):
-                    text_lines, dummy = get_plaintext_document_body(filename)
-                    if text_lines:
-                        source = filename
-                        process_lines()
-        elif os.path.isfile(entry):
-            text_lines, dummy = get_plaintext_document_body(entry)
-            if text_lines:
-                source = os.path.basename(entry)
-                process_lines()
-        else:
-            # Treat as a URL.
-            local_file = download_url(entry)
-            text_lines, dummy = get_plaintext_document_body(local_file)
-            if text_lines:
-                source = entry.split("/")[-1]
-                process_lines()
-
-
-def get_keywords_from_local_file(local_file, taxonomy_name, output_mode="text",
-                                 output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
-                                 match_mode="full", no_cache=False, with_author_keywords=False,
-                                 rebuild_cache=False, only_core_tags=False, extract_acronyms=False, api=False,
-                                 **kwargs):
-    """Output keywords reading a local file.
-
-    Arguments and output are the same as for :see: get_keywords_from_text().
-    """
-    log.info("Analyzing keywords for local file %s." % local_file)
-    text_lines = extractor.text_lines_from_local_file(local_file)
-
-    return get_keywords_from_text(text_lines,
-                                  taxonomy_name,
-                                  output_mode=output_mode,
-                                  output_limit=output_limit,
-                                  spires=spires,
-                                  match_mode=match_mode,
-                                  no_cache=no_cache,
-                                  with_author_keywords=with_author_keywords,
-                                  rebuild_cache=rebuild_cache,
-                                  only_core_tags=only_core_tags,
-                                  extract_acronyms=extract_acronyms)
-
-
-def get_keywords_from_text(text_lines, taxonomy_name, output_mode="text",
-                           output_limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
-                           spires=False, match_mode="full", no_cache=False,
-                           with_author_keywords=False, rebuild_cache=False,
-                           only_core_tags=False, extract_acronyms=False,
-                           **kwargs):
-    """Extract keywords from the list of strings.
-
-    :param text_lines: list of strings (will be normalized before being
-        joined into one string)
-    :param taxonomy_name: string, name of the taxonomy_name
-    :param output_mode: string - text|html|marcxml|raw
-    :param output_limit: int
-    :param spires: boolean, if True marcxml output reflect spires codes.
-    :param match_mode: str - partial|full; in partial mode only
-        beginning of the fulltext is searched.
-    :param no_cache: boolean, means loaded definitions will not be saved.
-    :param with_author_keywords: boolean, extract keywords from the pdfs.
-    :param rebuild_cache: boolean
-    :param only_core_tags: boolean
-    :return: if output_mode=raw, it will return
-        (single_keywords, composite_keywords, author_keywords, acronyms)
-        for other output modes it returns formatted string
-    """
-    cache = reader.get_cache(taxonomy_name)
-    if not cache:
-        reader.set_cache(taxonomy_name,
-                         reader.get_regular_expressions(taxonomy_name,
-                                                        rebuild=rebuild_cache,
-                                                        no_cache=no_cache))
-        cache = reader.get_cache(taxonomy_name)
-    _skw = cache[0]
-    _ckw = cache[1]
-    text_lines = normalizer.cut_references(text_lines)
-    fulltext = normalizer.normalize_fulltext("\n".join(text_lines))
-
-    if match_mode == "partial":
-        fulltext = _get_partial_text(fulltext)
-    author_keywords = None
-    if with_author_keywords:
-        author_keywords = extract_author_keywords(_skw, _ckw, fulltext)
-    acronyms = {}
-    if extract_acronyms:
-        acronyms = extract_abbreviations(fulltext)
-
-    single_keywords = extract_single_keywords(_skw, fulltext)
-    composite_keywords = extract_composite_keywords(_ckw, fulltext, single_keywords)
-
-    if only_core_tags:
-        single_keywords = clean_before_output(_filter_core_keywors(single_keywords))
-        composite_keywords = _filter_core_keywors(composite_keywords)
-    else:
-        # Filter out the "nonstandalone" keywords
-        single_keywords = clean_before_output(single_keywords)
-    return get_keywords_output(single_keywords, composite_keywords, taxonomy_name,
-                               author_keywords, acronyms, output_mode, output_limit,
-                               spires, only_core_tags)
+from .acronymer import get_acronyms
+from .keyworder import (
+    get_author_keywords,
+    get_composite_keywords,
+    get_single_keywords,
+)
+from .reader import KeywordToken
 
 
 def extract_single_keywords(skw_db, fulltext):
     """Find single keywords in the fulltext.
 
-    :var skw_db: list of KeywordToken objects
-    :var fulltext: string, which will be searched
+    :param skw_db: list of KeywordToken objects
+    :param fulltext: string, which will be searched
     :return : dictionary of matches in a format {
             <keyword object>, [[position, position...], ],
             ..
             }
             or empty {}
     """
-    return keyworder.get_single_keywords(skw_db, fulltext) or {}
+    return get_single_keywords(skw_db, fulltext) or {}
 
 
 def extract_composite_keywords(ckw_db, fulltext, skw_spans):
-    """Returns a list of composite keywords bound with the number of
-    occurrences found in the text string.
-    :var ckw_db: list of KewordToken objects (they are supposed to be composite ones)
-    :var fulltext: string to search in
-    :skw_spans: dictionary of already identified single keywords
+    """Return a list of composite keywords bound with the number of occurrences.
+
+    :param ckw_db: list of KewordToken objects (they are supposed to be composite ones)
+    :param fulltext: string to search in
+    :param skw_spans: dictionary of already identified single keywords
+
     :return : dictionary of matches in a format {
             <keyword object>, [[position, position...], [info_about_matches] ],
             ..
             }
             or empty {}
     """
-    return keyworder.get_composite_keywords(ckw_db, fulltext, skw_spans) or {}
+    return get_composite_keywords(ckw_db, fulltext, skw_spans) or {}
 
 
 def extract_abbreviations(fulltext):
-    """Extract acronyms from the fulltext
-    :var fulltext: utf-8 string
+    """Extract acronyms from the fulltext.
+
+    :param fulltext: utf-8 string
     :return: dictionary of matches in a formt {
           <keyword object>, [matched skw or ckw object, ....]
           }
           or empty {}
     """
     acronyms = {}
-    K = reader.KeywordToken
-    for k, v in acronymer.get_acronyms(fulltext).items():
-        acronyms[K(k, type='acronym')] = v
+    for k, v in get_acronyms(fulltext).items():
+        acronyms[KeywordToken(k, type='acronym')] = v
     return acronyms
 
 
 def extract_author_keywords(skw_db, ckw_db, fulltext):
-    """Finds out human defined keyowrds in a text string. Searches for
-    the string "Keywords:" and its declinations and matches the
+    """Find out human defined keywords in a text string.
+
+    Searches for the string "Keywords:" and its declinations and matches the
     following words.
 
-    :var skw_db: list single kw object
-    :var ckw_db: list of composite kw objects
-    :var fulltext: utf-8 string
+    :param skw_db: list single kw object
+    :param ckw_db: list of composite kw objects
+    :param fulltext: utf-8 string
     :return: dictionary of matches in a formt {
           <keyword object>, [matched skw or ckw object, ....]
           }
           or empty {}
     """
     akw = {}
-    K = reader.KeywordToken
-    for k, v in keyworder.get_author_keywords(skw_db, ckw_db, fulltext).items():
-        akw[K(k, type='author-kw')] = v
+    for k, v in get_author_keywords(skw_db, ckw_db, fulltext).items():
+        akw[KeywordToken(k, type='author-kw')] = v
     return akw
 
 
-# ---------------------------------------------------------------------
-#                          presentation functions
-# ---------------------------------------------------------------------
-
-
 def get_keywords_output(single_keywords, composite_keywords, taxonomy_name,
-                        author_keywords=None, acronyms=None, style="text", output_limit=0,
-                        spires=False, only_core_tags=False):
-    """Returns a formatted string representing the keywords according
-    to the chosen style. This is the main routing call, this function will
+                        author_keywords=None, acronyms=None, output_mode="text",
+                        output_limit=0, spires=False, only_core_tags=False):
+    """Return a formatted string representing the keywords in the chosen style.
+
+    This is the main routing call, this function will
     also strip unwanted keywords before output and limits the number
-    of returned keywords
-    :var single_keywords: list of single keywords
-    :var composite_keywords: list of composite keywords
-    :var taxonomy_name: string, taxonomy name
-    :keyword author_keywords: dictionary of author keywords extracted from fulltext
-    :keyword acronyms: dictionary of extracted acronyms
-    :keyword style: text|html|marc
-    :keyword output_limit: int, number of maximum keywords printed (it applies
+    of returned keywords.
+
+    :param single_keywords: list of single keywords
+    :param composite_keywords: list of composite keywords
+    :param taxonomy_name: string, taxonomy name
+    :param author_keywords: dictionary of author keywords extracted from fulltext
+    :param acronyms: dictionary of extracted acronyms
+    :param output_mode: text|html|marc
+    :param output_limit: int, number of maximum keywords printed (it applies
             to single and composite keywords separately)
-    :keyword spires: boolen meaning spires output style
-    :keyword only_core_tags: boolean
+    :param spires: boolen meaning spires output style
+    :param only_core_tags: boolean
     """
     categories = {}
     # sort the keywords, but don't limit them (that will be done later)
@@ -310,30 +140,33 @@ def get_keywords_output(single_keywords, composite_keywords, taxonomy_name,
     complete_output = _output_complete(single_keywords_p, composite_keywords_p,
                                        author_keywords, acronyms, spires,
                                        only_core_tags, limit=output_limit)
-    functions = {"text": _output_text, "marcxml": _output_marc, "html":
-                 _output_html, "dict": _output_dict}
-    my_styles = {}
+    functions = {
+        "text": _output_text,
+        "marcxml": _output_marc,
+        "html": _output_html,
+        "dict": _output_dict
+    }
 
-    for s in style:
-        if s != "raw":
-            my_styles[s] = functions[s](complete_output, categories)
+    if output_mode != "raw":
+        return functions[output_mode](complete_output, categories)
+    else:
+        if output_limit > 0:
+            return (
+                _kw(_sort_kw_matches(single_keywords, output_limit)),
+                _kw(_sort_kw_matches(composite_keywords, output_limit)),
+                author_keywords,  # this we don't limit (?)
+                _kw(_sort_kw_matches(acronyms, output_limit))
+            )
         else:
-            if output_limit > 0:
-                my_styles["raw"] = (_kw(_sort_kw_matches(single_keywords, output_limit)),
-                                    _kw(_sort_kw_matches(composite_keywords, output_limit)),
-                                    author_keywords,  # this we don't limit (?)
-                                    _kw(_sort_kw_matches(acronyms, output_limit)))
-            else:
-                my_styles["raw"] = (single_keywords_p, composite_keywords_p, author_keywords, acronyms)
-
-    return my_styles
+            return (single_keywords_p, composite_keywords_p,
+                    author_keywords, acronyms)
 
 
 def build_marc(recid, single_keywords, composite_keywords,
                spires=False, author_keywords=None, acronyms=None):
     """Create xml record.
 
-    :var recid: ingeter
+    :var recid: integer
     :var single_keywords: dictionary of kws
     :var composite_keywords: dictionary of kws
     :keyword spires: please don't use, left for historical
@@ -349,16 +182,23 @@ def build_marc(recid, single_keywords, composite_keywords,
     single_keywords = single_keywords.items()
     composite_keywords = composite_keywords.items()
 
-    output.append(_output_marc(single_keywords, composite_keywords, author_keywords, acronyms))
+    output.append(_output_marc(
+        single_keywords,
+        composite_keywords,
+        author_keywords,
+        acronyms
+    ))
 
     output.append('</record></collection>')
 
     return '\n'.join(output)
 
 
-def _output_marc(output_complete, categories, kw_field=bconfig.CFG_MAIN_FIELD,
-                 auth_field=bconfig.CFG_AUTH_FIELD, acro_field=bconfig.CFG_ACRON_FIELD,
-                 provenience='BibClassify'):
+def _output_marc(output_complete, categories,
+                 kw_field=cfg["CLASSIFIER_RECORD_KEYWORD_FIELD"],
+                 auth_field=cfg["CLASSIFIER_RECORD_KEYWORD_AUTHOR_FIELD"],
+                 acro_field=cfg["CLASSIFIER_RECORD_KEYWORD_ACRONYM_FIELD"],
+                 provenience='Classifier'):
     """Output the keywords in the MARCXML format.
 
     :var skw_matches: list of single keywords
@@ -371,8 +211,8 @@ def _output_marc(output_complete, categories, kw_field=bconfig.CFG_MAIN_FIELD,
             into the KeywordToken objects, we would not find them
     :keyword provenience: string that identifies source (authority) that
         assigned the contents of the field
-    :return: string, formatted MARC"""
-
+    :return: string, formatted MARC
+    """
     kw_template = ('<datafield tag="%s" ind1="%s" ind2="%s">\n'
                    '    <subfield code="2">%s</subfield>\n'
                    '    <subfield code="a">%s</subfield>\n'
@@ -383,7 +223,8 @@ def _output_marc(output_complete, categories, kw_field=bconfig.CFG_MAIN_FIELD,
     output = []
 
     tag, ind1, ind2 = _parse_marc_code(kw_field)
-    for keywords in (output_complete["Single keywords"], output_complete["Core keywords"]):
+    for keywords in (output_complete["Single keywords"],
+                     output_complete["Core keywords"]):
         for kw in keywords:
             output.append(kw_template % (tag, ind1, ind2, encode_for_xml(provenience),
                                          encode_for_xml(kw), keywords[kw],
@@ -402,7 +243,7 @@ def _output_marc(output_complete, categories, kw_field=bconfig.CFG_MAIN_FIELD,
 
 def _output_complete(skw_matches=None, ckw_matches=None, author_keywords=None,
                      acronyms=None, spires=False, only_core_tags=False,
-                     limit=bconfig.CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER):
+                     limit=cfg["CLASSIFIER_DEFAULT_OUTPUT_NUMBER"]):
 
     if limit:
         resized_skw = skw_matches[0:limit]
@@ -433,7 +274,6 @@ def _output_dict(complete_output, categories):
 def _output_text(complete_output, categories):
     """Output the results obtained in text format.
 
-
     :return: str, html formatted output
     """
     output = ""
@@ -447,7 +287,7 @@ def _output_text(complete_output, categories):
             for element in list_result_sorted:
                 output += "\n{0} {1}".format(list_result[element], element)
 
-    output += "\n--\n{0}".format(_signature())
+    output += "\n--"
 
     return output
 
@@ -466,7 +306,7 @@ def _output_html(complete_output, categories):
     """
     return """<html>
     <head>
-      <title>Automatically generated keywords by bibclassify</title>
+      <title>Automatically generated keywords by Classifier</title>
     </head>
     <body>
     {0}
@@ -477,7 +317,8 @@ def _output_html(complete_output, categories):
 
 
 def _get_singlekws(skw_matches, spires=False):
-    """
+    """Get single keywords.
+
     :var skw_matches: dict of {keyword: [info,...]}
     :keyword spires: bool, to get the spires output
     :return: list of formatted keywords
@@ -489,7 +330,8 @@ def _get_singlekws(skw_matches, spires=False):
 
 
 def _get_compositekws(ckw_matches, spires=False):
-    """
+    """Get composite keywords.
+
     :var ckw_matches: dict of {keyword: [info,...]}
     :keyword spires: bool, to get the spires output
     :return: list of formatted keywords
@@ -542,7 +384,8 @@ def _get_fieldcodes(skw_matches, ckw_matches, spires=False):
     :var skw_matches: dict of {keyword: [info,...]}
     :var ckw_matches: dict of {keyword: [info,...]}
     :keyword spires: bool, to get the spires output
-    :return: string"""
+    :return: string
+    """
     fieldcodes = {}
     output = {}
 
@@ -595,7 +438,7 @@ def _get_core_keywords(skw_matches, ckw_matches, spires=False):
         if ckw.core:
             output[ckw.output(spires)] = len(info[0])
         else:
-            #test if one of the components is  not core
+            # test if one of the components is  not core
             i = 0
             for c in ckw.getComponents():
                 if c.core:
@@ -604,7 +447,8 @@ def _get_core_keywords(skw_matches, ckw_matches, spires=False):
     return output
 
 
-def _filter_core_keywors(keywords):
+def filter_core_keywords(keywords):
+    """Only return keywords that are CORE."""
     matches = {}
     for kw, info in keywords.items():
         if kw.core:
@@ -612,18 +456,11 @@ def _filter_core_keywors(keywords):
     return matches
 
 
-def _signature():
-    """Print out the bibclassify signature.
-
-    #todo: add information about taxonomy, rdflib"""
-
-    return 'bibclassify v%s' % (bconfig.VERSION,)
-
-
 def clean_before_output(kw_matches):
     """Return a clean copy of the keywords data structure.
 
-    Stripped off the standalone and other unwanted elements"""
+    Stripped off the standalone and other unwanted elements.
+    """
     filtered_kw_matches = {}
 
     for kw_match, info in iteritems(kw_matches):
@@ -638,8 +475,7 @@ def clean_before_output(kw_matches):
 
 
 def _skw_matches_comparator(kw0, kw1):
-    """
-    Compare 2 single keywords objects.
+    """Compare 2 single keywords objects.
 
     First by the number of their spans (ie. how many times they were found),
     if it is equal it compares them by lenghts of their labels.
@@ -673,23 +509,23 @@ def _sort_kw_matches(skw_matches, limit=0):
     return limit and sorted_keywords[:limit] or sorted_keywords
 
 
-def _get_partial_text(fulltext):
-    """
-    Return a short version of the fulltext used with the partial matching mode.
+def get_partial_text(fulltext):
+    """Return a short version of the fulltext used with the partial matching mode.
 
     The version is composed of 20% in the beginning and 20% in the middle of the
-    text."""
-    length = len(fulltext)
+    text.
+    """
+    def _get_index(x):
+        return int(float(x) / 100 * len(fulltext))
 
-    get_index = lambda x: int(float(x) / 100 * length)
-
-    partial_text = [fulltext[get_index(start):get_index(end)]
-                    for start, end in bconfig.CFG_BIBCLASSIFY_PARTIAL_TEXT]
+    partial_text = [fulltext[_get_index(start):_get_index(end)]
+                    for start, end in cfg["CLASSIFIER_PARTIAL_TEXT_PERCENTAGES"]]
 
     return "\n".join(partial_text)
 
 
 def save_keywords(filename, xml):
+    """Save keyword XML to filename."""
     tmp_dir = os.path.dirname(filename)
     if not os.path.isdir(tmp_dir):
         os.mkdir(tmp_dir)
@@ -697,15 +533,6 @@ def save_keywords(filename, xml):
     file_desc = open(filename, "w")
     file_desc.write(xml)
     file_desc.close()
-
-
-def get_tmp_file(recid):
-    tmp_directory = "%s/bibclassify" % bconfig.CFG_TMPDIR
-    if not os.path.isdir(tmp_directory):
-        os.mkdir(tmp_directory)
-    filename = "bibclassify_%s.xml" % recid
-    abs_path = os.path.join(tmp_directory, filename)
-    return abs_path
 
 
 def _parse_marc_code(field):
@@ -719,7 +546,3 @@ def _parse_marc_code(field):
     ind1 = field[3].replace('_', '')
     ind2 = field[4].replace('_', '')
     return tag, ind1, ind2
-
-
-if __name__ == "__main__":
-    log.error("Please use bibclassify_cli from now on.")

@@ -25,12 +25,12 @@ Admin's Guide
    :maxdepth: 1
 
    bibauthority-admin-guide
-   bibclassify-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
    bibknowledge-admin-guide
    bibsched-admin-guide
    bibupload-admin-guide
+   classifier-admin-guide
    docextract-admin-guide
    oaiharvest-admin-guide
    oairepository-admin-guide

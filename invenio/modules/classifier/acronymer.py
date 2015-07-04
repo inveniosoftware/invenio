@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,9 +16,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""
-Bibclassify acronym analyser.
-"""
+
+"""Classifier acronym analyzer."""
 
 from __future__ import print_function
 
@@ -32,10 +31,11 @@ STOPLIST = ("and", "of", "for", "the", "to", "do", "de", "theory",
 
 
 def get_acronyms(fulltext):
-    """Finds acronyms and expansions from the fulltext.
+    """Find acronyms and expansions from the fulltext.
 
      If needed, acronyms can already contain a dictionary of previously found
-    acronyms that will be merged with the current results."""
+    acronyms that will be merged with the current results.
+    """
     acronyms = {}
 
     for m in ACRONYM_BRACKETS_REGEX.finditer(fulltext):
@@ -126,7 +126,7 @@ def get_acronyms(fulltext):
 
                 if char == next_char and \
                         word.startswith(char) and \
-                                word.count(char) > 1 and \
+                        word.count(char) > 1 and \
                         not next_word.startswith(char):
                     index0 += 2
                     index1 += 1
@@ -181,8 +181,8 @@ def get_acronyms(fulltext):
                     next_char = ""
 
                 if char == next_char and word.startswith(char) and \
-                                word.count(char) > 1 and \
-                        not next_word.startswith(char):
+                   word.count(char) > 1 and \
+                   not next_word.startswith(char):
                     index0 += 2
                     index1 += 1
                 if word.startswith(char):
@@ -221,7 +221,8 @@ def _add_expansion_to_acronym_dict(acronym, expansion, level, dictionary):
     """Add an acronym to the dictionary.
 
     Takes care of avoiding duplicates and keeping the expansion marked with
-    the best score."""
+    the best score.
+    """
     if len(acronym) >= len(expansion) or acronym in expansion:
         return
 
@@ -267,8 +268,3 @@ def _equivalent_expansions(expansion1, expansion2):
         simplified_versions.append("".join(store))
 
     return simplified_versions[0] == simplified_versions[1]
-
-
-if __name__ == "__main__":
-    print(get_acronyms(
-        "asymptomatically de Sitter(dS). and what one large relative symmetric (LRS) which always has general relativity (GR)"))

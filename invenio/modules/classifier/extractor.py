@@ -17,34 +17,18 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""BibClassify text extractor.
-
-This module provides method to extract the fulltext from local or remote
-documents. Currently 2 formats of documents are supported: PDF and text
-documents.
-
-2 methods provide the functionality of the module: text_lines_from_local_file
-and text_lines_from_url.
+"""Classifier text extraction from documents like PDF and text.
 
 This module also provides the utility 'is_pdf' that uses GNU file in order to
 determine if a local file is a PDF file.
-
-This module is STANDALONE safe
 """
 
 import os
 import re
 
-from invenio.legacy.bibclassify import config as bconfig
+from flask import current_app
 
-if bconfig.STANDALONE:
-    from urllib2 import urlopen
-else:
-    from invenio.utils.url import make_invenio_opener
-
-    urlopen = make_invenio_opener('BibClassify').open
-
-log = bconfig.get_logger("bibclassify.text_extractor")
+from .errors import IncompatiblePDF2Text
 
 _ONE_WORD = re.compile("[A-Za-z]{2,}")
 
@@ -52,21 +36,25 @@ _ONE_WORD = re.compile("[A-Za-z]{2,}")
 def is_pdf(document):
     """Check if a document is a PDF file and return True if is is."""
     if not executable_exists('pdftotext'):
-        log.warning("GNU file was not found on the system. "
-                    "Switching to a weak file extension test.")
+        current_app.logger.warning(
+            "GNU file was not found on the system. "
+            "Switching to a weak file extension test."
+        )
         if document.lower().endswith(".pdf"):
             return True
         return False
-        # Tested with file version >= 4.10. First test is secure and works
+
+    # Tested with file version >= 4.10. First test is secure and works
     # with file version 4.25. Second condition is tested for file
     # version 4.10.
     file_output = os.popen('file ' + re.escape(document)).read()
     try:
         filetype = file_output.split(":")[-1]
     except IndexError:
-        log.error("Your version of the 'file' utility seems to "
-                  "be unsupported.")
-        raise Exception('Incompatible pdftotext')
+        current_app.logger.error(
+            "Your version of the 'file' utility seems to be unsupported."
+        )
+        raise IncompatiblePDF2Text('Incompatible pdftotext')
 
     pdf = filetype.find("PDF") > -1
     # This is how it should be done however this is incompatible with
@@ -78,19 +66,24 @@ def is_pdf(document):
 def text_lines_from_local_file(document, remote=False):
     """Return the fulltext of the local file.
 
-    @var document: fullpath to the file that should be read
-    @var remote: boolean, if True does not count lines (gosh!)
-    @return: list of lines if st was read or an empty list"""
+    @param document: fullpath to the file that should be read
+    @param remote: boolean, if True does not count lines
+
+    @return: list of lines if st was read or an empty list
+    """
     try:
         if is_pdf(document):
             if not executable_exists("pdftotext"):
-                log.error("pdftotext is not available on the system.")
+                current_app.logger.error(
+                    "pdftotext is not available on the system."
+                )
             cmd = "pdftotext -q -enc UTF-8 %s -" % re.escape(document)
             filestream = os.popen(cmd)
         else:
             filestream = open(document, "r")
     except IOError as ex1:
-        log.error("Unable to read from file %s. (%s)" % (document, ex1.strerror))
+        current_app.logger.error("Unable to read from file %s. (%s)"
+                                 % (document, ex1.strerror))
         return []
 
     # FIXME - we assume it is utf-8 encoded / that is not good

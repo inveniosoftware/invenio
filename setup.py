@@ -287,7 +287,6 @@ setup(
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
             'bibcatalog = invenio.legacy.bibcatalog.scripts.bibcatalog:main',
-            'bibclassify = invenio.modules.classifier.scripts.classifier:main',
             'bibconvert = invenio.legacy.bibconvert.scripts.bibconvert:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
             'bibedit = invenio.legacy.bibedit.scripts.bibedit:main',

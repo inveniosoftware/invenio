@@ -31,7 +31,7 @@ from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR, CFG_INSPIRE_SITE, \
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
-                           "bibclassify", "bibexport",
+                           "bibexport",
                            "dbdump", "bibencode",
                            "bibtasklet", "refextract", "bibsort",
                            "selfcites", "arxiv-pdf-checker", "bibcatalog",

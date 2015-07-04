@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014 CERN.
+# Copyright (C) 2008, 2009, 2010, 2011, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,31 +17,34 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-BibClassify text_normalizer.
+"""Classifier text normalizer.
 
 This module provides methods to clean the text lines. Currently, the methods
-are tuned to work with the output of pdftotext and documents in the HEP field.
-Methods can be tuned to your needs through the configuration file.
+are tuned to work with the output of `pdftotext` and documents in the HEP
+field.
 
 This modules uses the refextract module of BibEdit in order to find the
-references section and to replace unicode characters.
+references section and to replace Unicode characters.
 """
 
 import re
-import config as bconfig
+
+from flask import current_app
+
+from invenio.legacy.docextract.pdf import replace_undesirable_characters
+from invenio.legacy.refextract.find import (
+    find_end_of_reference_section,
+    find_reference_section,
+)
 
 from six import iteritems
 
-from invenio.legacy.docextract.pdf import replace_undesirable_characters
-from invenio.legacy.refextract.find import find_reference_section, find_end_of_reference_section
-
-log = bconfig.get_logger("bibclassify.text_normalizer")
 
 _washing_regex = []
 
 
 def get_washing_regex():
+    """Return a washing regex list."""
     global _washing_regex
     if len(_washing_regex):
         return _washing_regex
@@ -105,7 +108,7 @@ def get_washing_regex():
 
 
 def normalize_fulltext(fulltext):
-    """Returns a 'cleaned' version of the output provided by pdftotext."""
+    """Return a 'cleaned' version of the output provided by pdftotext."""
     # We recognize keywords by the spaces. We need these to match the
     # first and last words of the document.
     fulltext = " " + fulltext + " "
@@ -125,7 +128,7 @@ def normalize_fulltext(fulltext):
 
 
 def cut_references(text_lines):
-    """Returns the text lines with the references cut."""
+    """Return the text lines with the references cut."""
     ref_sect_start = find_reference_section(text_lines)
     if ref_sect_start is not None:
         start = ref_sect_start["start_line"]
@@ -133,7 +136,7 @@ def cut_references(text_lines):
                                             ref_sect_start["marker"], ref_sect_start["marker_pattern"])
         del text_lines[start:end + 1]
     else:
-        log.warning("Found no references to remove.")
+        current_app.logger.warning("Found no references to remove.")
         return text_lines
 
     return text_lines
@@ -242,8 +245,6 @@ def _replace_greek_characters(line):
         try:
             line = line.replace(greek_char, replacement)
         except UnicodeDecodeError:
-            log.warning("Unicode decoding error.")
+            current_app.logger.exception("Unicode decoding error.")
             return ""
-
     return line
-

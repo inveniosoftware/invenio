@@ -154,7 +154,6 @@ DEF_ACTIONS = (
                ('runbibupload', 'run BibUpload', '', 'no'),
                ('runwebcoll', 'run webcoll', 'collection', 'yes'),
                ('runbibformat', 'run BibFormat', 'format', 'yes'),
-               ('runbibclassify', 'run BibClassify', 'taxonomy', 'yes'),
                ('runbibtaskex', 'run BibTaskEx example', '', 'no'),
                ('runoaiharvest', 'run oaiharvest task', '', 'no'),
                ('runoairepository', 'run oairepositoryupdater task', '', 'no'),
