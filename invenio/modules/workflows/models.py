@@ -189,7 +189,7 @@ class Workflow(db.Model):
                             nullable=False,
                             default=_encoded_default_extra_data)
     status = db.Column(ChoiceType(WorkflowStatus, impl=db.Integer()),
-                        default=WorkflowStatus.NEW, nullable=False)
+                       default=WorkflowStatus.NEW, nullable=False)
     objects = db.relationship("DbWorkflowObject",
                               backref='bwlWORKFLOW',
                               cascade="all, delete-orphan")
@@ -568,7 +568,7 @@ class DbWorkflowObject(db.Model):
             db_handler_obj = DbWorkflowLogHandler(DbWorkflowObjectLog, "id")
             self._log = get_logger(logger_name="object.%s" % (self.id,),
                                    db_handler_obj=db_handler_obj,
-                                   loglevel=logging.DEBUG,obj=self)
+                                   loglevel=logging.DEBUG, obj=self)
         return self._log
 
     # Deprecated
