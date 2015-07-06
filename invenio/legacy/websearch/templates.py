@@ -3091,6 +3091,7 @@ class Template:
         out += "</td></tr></tbody></table>"
         return out
 
+
     def tmpl_print_service_list_links(self, label, labels_and_urls, ln=CFG_SITE_URL):
         """
         Prints service results as list

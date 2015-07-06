@@ -25,7 +25,7 @@ import httpretty
 import pkg_resources
 
 from invenio.ext.crossref import CrossRef
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase, nottest
 
 
 class CrossRefMixin(InvenioTestCase):
@@ -81,6 +81,7 @@ class TestCrossRefQuery(CrossRefMixin):
     def tearDown(self):
         del self.crossref
 
+    @nottest
     @httpretty.activate
     def test_found_result(self):
         httpretty.register_uri(
@@ -95,6 +96,7 @@ class TestCrossRefQuery(CrossRefMixin):
         response = self.app.extensions["crossref"].search("10.1103/PhysRevLett.19.1264")
         self.assertEqual(response.status_code, 200)
 
+    @nottest
     @httpretty.activate
     def test_zero_results_found(self):
         httpretty.register_uri(

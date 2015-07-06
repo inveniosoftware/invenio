@@ -48,6 +48,9 @@ cloud "shared storage" as shared {
 node "mysql:latest" as image_mysql <<image>> {
 }
 
+node "elasticsearch:latest" as image_es <<image>> {
+}
+
 node "rabbitmq:3-management" as image_rabbit <<image>> {
 }
 
@@ -65,6 +68,10 @@ node "invenio_overlay:latest" as image_overlay <<image>> {
 
 node "mysql" as container_mysql {
     [mysqld] as mysql
+}
+
+node "elasticsearch" as container_es {
+    [elasticsearch] as es
 }
 
 node "rabbit" as container_rabbit {
@@ -88,11 +95,13 @@ node "worker" as container_worker {
 () "builded docs" as interface_docs
 () "live code and template updates" as interface_code
 () "mysql at localhost:23306" as interface_mysql
+() "elasticsearch at localhost:29200" as interface_es
 () "rabbitmq at localhost:25672" as interface_rabbit
 () "rabbitmq web admin at localhost:25673" as interface_rabbitweb
 () "redis + celery debug (e.g. via flower) at localhost:26379" as interface_redis
 
 container_mysql -up-|> image_mysql
+container_es -up-|> image_es
 container_rabbit -up-> image_rabbit
 container_redis -up-|> image_redis
 
@@ -109,10 +118,12 @@ container_web -> shared
 container_worker -> shared
 
 runserver .up.> mysql
+runserver .up.> es
 runserver .up.> rabbit
 runserver .up.> redis
 
 worker .up.> mysql
+worker .up.> es
 worker .up.> rabbit
 worker .up.> redis
 
@@ -122,6 +133,7 @@ interface_docs <-up-> host_docs
 interface_code -up-> host_invenio
 interface_code -up-> host_scripts
 interface_mysql . container_mysql
+interface_es. container_es
 interface_redis . container_redis
 interface_rabbit . container_rabbit
 interface_rabbitweb . container_rabbit

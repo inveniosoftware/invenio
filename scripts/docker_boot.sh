@@ -58,7 +58,6 @@ init() {
     cat <<EOF >> "$cfgfile"
 CFG_SITE_URL = u'http://localhost:28080'
 CFG_SITE_SECURE_URL = u'http://localhost:28080'
-CFG_REDIS_HOSTS = {'default': [{'db': 0, 'host': 'cache', 'port': 6379}]}
 
 CFG_BATCHUPLOADER_DAEMON_DIR = u'/home/invenio/var/batchupload'
 CFG_BIBDOCFILE_FILEDIR = u'/home/invenio/var/data/files'

@@ -34,6 +34,82 @@ from invenio.legacy.webuser import page_not_authorized
 from invenio.utils.url import redirect_to_url
 
 
+def tupletotable(header=[], tuple=[], start='', end='', extracolumn='', highlight_rows_p=False, alternate_row_colors_p=False):
+    """create html table for a tuple.
+         header - optional header for the columns
+          tuple - create table of this
+          start - text to be added in the beginning, most likely beginning of a form
+            end - text to be added in the end, mot likely end of a form.
+    extracolumn - mainly used to put in a button.
+      highlight_rows_p - if the cursor hovering a row should highlight the full row or not
+alternate_row_colors_p - if alternate background colours should be used for the rows
+    """
+
+    # study first row in tuple for alignment
+    align = []
+    try:
+        firstrow = tuple[0]
+
+        if type(firstrow) in [int, long]:
+            align = ['admintdright']
+        elif type(firstrow) in [str, dict]:
+            align = ['admintdleft']
+        else:
+            for item in firstrow:
+                if type(item) is int:
+                    align.append('admintdright')
+                else:
+                    align.append('admintdleft')
+    except IndexError:
+        firstrow = []
+
+    tblstr = ''
+    for h in header + ['']:
+        tblstr += '  <th class="adminheader">%s</th>\n' % (h, )
+    if tblstr:
+        tblstr = ' <tr>\n%s\n </tr>\n' % (tblstr, )
+
+    tblstr = start + '<table class="admin_wvar_nomargin">\n' + tblstr
+
+    # extra column
+    try:
+        extra = '<tr class="%s">' % (
+            highlight_rows_p and 'admin_row_highlight' or '')
+
+        if type(firstrow) not in [int, long, str, dict]:
+            # for data in firstrow: extra += '<td class="%s">%s</td>\n' % ('admintd', data)
+            for i in range(len(firstrow)):
+                extra += '<td class="{0}">{1}</td>\n'.format(
+                    align[i], firstrow[i])
+        else:
+            extra += '  <td class="%s">%s</td>\n' % (align[0], firstrow)
+        extra += '<td class="extracolumn" rowspan="%s" style="vertical-align: top;">\n%s\n</td>\n</tr>\n' % (
+            len(tuple), extracolumn)
+    except IndexError:
+        extra = ''
+    tblstr += extra
+
+    # for i in range(1, len(tuple)):
+    j = 0
+    for row in tuple[1:]:
+        j += 1
+        tblstr += ' <tr class="%s %s">\n' % (highlight_rows_p and 'admin_row_highlight' or '',
+                                             (j % 2 and alternate_row_colors_p) and 'admin_row_color' or '')
+        # row = tuple[i]
+        if type(row) not in [int, long, str, dict]:
+            # for data in row: tblstr += '<td class="admintd">%s</td>\n' % (data,)
+            for i in range(len(row)):
+                tblstr += '<td class="{0}">{1}</td>\n'.format(align[i], utf8ifier(row[i]))
+        else:
+            tblstr += '  <td class="%s">%s</td>\n' % (align[0], row)
+        tblstr += ' </tr> \n'
+
+    tblstr += '</table> \n '
+    tblstr += end
+
+    return tblstr
+
+
 class WebInterfaceBibSchedPages(WebInterfaceDirectory):
     """Defines the set of /bibsched pages."""
 

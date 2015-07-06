@@ -23,9 +23,11 @@ from __future__ import absolute_import
 
 from elasticsearch import Elasticsearch
 
+from elasticsearch.connection import RequestsHttpConnection
+
 from invenio.celery import celery
 
-es = Elasticsearch()
+es = None
 
 SEARCH_RECORD_MAPPING = {
     "settings": {
@@ -226,6 +228,13 @@ def setup_app(app):
     from invenio_records.models import RecordMetadata
 
     from sqlalchemy.event import listens_for
+
+    global es
+
+    es = Elasticsearch(
+        app.config.get('ES_HOSTS', None),
+        connection_class=RequestsHttpConnection
+    )
 
     signals.pre_command.connect(delete_index, sender=drop)
     signals.pre_command.connect(create_index, sender=create)

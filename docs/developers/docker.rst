@@ -50,6 +50,7 @@ have any password.
     .. code-block:: shell
 
         boot2docker ssh -vnNT \
+            -Llocalhost:29200:localhost:29200 \
             -Llocalhost:28080:localhost:28080 \
             -Llocalhost:26379:localhost:26379 \
             -Llocalhost:25673:localhost:25673 \
@@ -105,15 +106,20 @@ session:
 
     import ipdb; ipdb.set_tracepoint()
 
-Furthermore you can debug MySQL at `localhost:23306`, RabbitMQ via
-`localhost:25672` (webinterface at `localhost:25673`) and Redis at
-`localhost:26379`. You might want to use flower_ for celery debugging and
-analysis as well. Just run the following command to open the webinterface at
-port `5555`:
+Furthermore you can debug MySQL at `localhost:23306`, Elasticsearch at
+`localhost:29200`, RabbitMQ via `localhost:25672` (webinterface at
+`localhost:25673`) and Redis at `localhost:26379`. You might want to use
+flower_ for celery debugging and analysis as well. Just run the following
+command to open the webinterface at port `5555`:
 
 .. code-block:: shell
 
     celery flower --broker=amqp://guest:guest@localhost:25672//
+
+Should you require additional information about the behaviour of the different
+containers as well as the contained processes and their interaction with the
+system and other processes, the usage of classical Linux tools like Wireshark_
+and sysdig_ might be helpful.
 
 Code changes and live reloading
 -------------------------------
@@ -264,4 +270,6 @@ Done.  Your Invenio overlay installation is now up and running.
 .. _Docker: https://www.docker.com/
 .. _Docker Compose: https://docs.docker.com/compose/
 .. _flower: https://flower.readthedocs.org/
+.. _sysdig: http://www.sysdig.org/
 .. _Werkzeug: http://werkzeug.pocoo.org/
+.. _Wireshark: https://www.wireshark.org/

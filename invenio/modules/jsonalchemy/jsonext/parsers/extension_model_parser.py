@@ -33,7 +33,7 @@ class ExtensionModelParser(ModelBaseExtensionParser):  # pylint: disable=W0232
         fields:
             ....
             extensions:
-                'invenio.modules.records.api:RecordIter'
+                'invenio_records.api:RecordIter'
                 'invenio.modules.jsonalchemy.bases:Versinable'
 
     """

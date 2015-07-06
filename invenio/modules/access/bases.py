@@ -59,14 +59,14 @@ def AclFactory(obj=''):
 
             This method is able to run *pre* and *post* hooks to extend its
             functionality,
-            e.g. :class:`~invenio.modules.records.bases:DocumentsHooks`
+            e.g. :class:`~invenio_records.bases:DocumentsHooks`
 
         .. note::
 
                 If the object has embed restrictions it will override the
                 access right of the parent. For example in
                 :class:`~invenio.modules.documents.api:Document` and
-                :class:`~invenio.modules.records.api:Record` the `Document`
+                :class:`~invenio_records.api:Record` the `Document`
                 will override the `Record` restriction which means if the
                 `Record` is restricted and the `Document` is open the user
                 will have access to the file.

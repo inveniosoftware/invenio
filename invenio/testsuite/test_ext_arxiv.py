@@ -25,7 +25,7 @@ import httpretty
 import pkg_resources
 
 from invenio.ext.arxiv import Arxiv
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase, nottest
 
 
 class ArxivMixin(InvenioTestCase):
@@ -81,6 +81,7 @@ class TestArxivQuery(ArxivMixin):
     def tearDown(self):
         del self.arxiv
 
+    @nottest
     @httpretty.activate
     def test_found_result(self):
         httpretty.register_uri(
@@ -95,6 +96,7 @@ class TestArxivQuery(ArxivMixin):
         response = self.app.extensions["arxiv"].search("1007.5048")
         self.assertEqual(response.status_code, 200)
 
+    @nottest
     @httpretty.activate
     def test_zero_results_found(self):
         httpretty.register_uri(
@@ -109,6 +111,7 @@ class TestArxivQuery(ArxivMixin):
         response = self.app.extensions["arxiv"].search("9999.9999")
         self.assertEqual(response.status_code, 404)
 
+    @nottest
     @httpretty.activate
     def test_unsupported_versioning(self):
         httpretty.register_uri(
@@ -123,6 +126,7 @@ class TestArxivQuery(ArxivMixin):
         response = self.app.extensions["arxiv"].search("1007.5048v1")
         self.assertEqual(response.status_code, 415)
 
+    @nottest
     @httpretty.activate
     def test_malformed_arxiv_id(self):
         httpretty.register_uri(
