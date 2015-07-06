@@ -24,6 +24,10 @@ services:
   - mysql
   - redis
   - elasticsearch
+  - postgresql
+
+addons:
+  postgresql: "9.3"
 
 sudo: false
 
@@ -34,9 +38,13 @@ cache:
   - pip
 
 env:
-  - REQUIREMENTS=lowest REXTRAS=docs
-  - REQUIREMENTS=release REXTRAS=docs
-  - REQUIREMENTS=devel REXTRAS=docs
+  matrix:
+    - REQUIREMENTS=lowest DB=mysql DBUSER=root REXTRAS="docs,mysql"
+    - REQUIREMENTS=release DB=mysql DBUSER=root REXTRAS="docs,mysql"
+    - REQUIREMENTS=devel DB=mysql DBUSER=root REXTRAS="docs,mysql"
+    - REQUIREMENTS=lowest DB=postgresql DBUSER=postgres REXTRAS="docs,postgresql"
+    - REQUIREMENTS=release DB=postgresql DBUSER=postgres REXTRAS="docs,postgresql"
+    - REQUIREMENTS=devel DB=postgresql DBUSER=postgres REXTRAS="docs,postgresql"
 
 python:
 # FIXME: the build times out on Python 2.6 (inveniosoftware/invenio#1789)
@@ -67,11 +75,12 @@ install:
   - "npm install --silent -g bower less clean-css uglify-js requirejs"
   # All the step below this points are solely for test purposes, don't use them
   # to setup your invenio installation. Please do RTFM instead (INSTALL.rst).
-  - "./scripts/setup_devmode.sh"
+  - "./scripts/setup_devmode.sh $DB"
 
 before_script:
+  - "psql -U postgres -c 'CREATE EXTENSION pgcrypto;'"
   - "inveniomanage apache create-config"
-  - "inveniomanage database init --yes-i-know || echo ':('"
+  - "inveniomanage database init --yes-i-know -u $DBUSER || echo ':('"
   - "inveniomanage database create --quiet || echo ':('"
 
 script:
