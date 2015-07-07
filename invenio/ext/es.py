@@ -189,6 +189,7 @@ SEARCH_RECORD_MAPPING = {
 
 @celery.task
 def index_record(recid):
+    """Index a record in elasticsearch."""
     from invenio_records.models import RecordMetadata
     record = RecordMetadata.query.get(recid)
     es.index(
@@ -201,6 +202,7 @@ def index_record(recid):
 
 @celery.task
 def index_collection_percolator(name, dbquery):
+    """Create an elasticsearch percolator for a given query."""
     from invenio.modules.search.api import Query
     from invenio.modules.search.walkers.elasticsearch import ElasticSearchDSL
     es.index(
@@ -212,11 +214,13 @@ def index_collection_percolator(name, dbquery):
 
 
 def create_index(sender, **kwargs):
+    """Create or recreate the elasticsearch index for records."""
     es.indices.delete(index='records', ignore=404)
     es.indices.create(index='records', body=SEARCH_RECORD_MAPPING)
 
 
 def delete_index(sender, **kwargs):
+    """Create the elasticsearch index for records."""
     es.indices.delete(index='records', ignore=404)
 
 
