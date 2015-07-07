@@ -31,8 +31,8 @@ Install Docker_ and `Docker Compose`_. Now run:
 
 .. code-block:: shell
 
-    docker-compose -f docker-compose-dev.yml build docker-compose -f \
-        docker-compose-dev.yml up
+   docker-compose -f docker-compose-dev.yml build
+   docker-compose -f docker-compose-dev.yml up
 
 This builds and runs the docker containers. You can now connect to
 `localhost:28080` to see your Invenio installation. The `admin` user does not
@@ -92,11 +92,9 @@ running instance:
 Debugging
 ---------
 
-The `docker-compose-dev.yml` enables Werkzeug_, a debugger that automatically
-kicks in whenever an error occurs. Stacktraces and debugger terminal are
-available via webinterface.
-
-.. image:: /_static/docker-debug.png
+The `docker-compose-dev.yml` enables Werkzeug_, a debugger that
+automatically kicks in whenever an error occurs. Stacktraces and
+debugger terminal are available via web interface.
 
 You can also insert a tracepoint into the code to start an interactive debugger
 session:
@@ -160,10 +158,10 @@ finished setup and the webservice is running. Then use:
 
     docker exec -it invenio_web_1 python setup.py test
 
-.. note::
-    Running the test requires the deactivation of redirection debugging. You
-    can archive this by setting the configuration variable
-    `DEBUG_TB_INTERCEPT_REDIRECTS = False`.
+.. note:: Running the test requires the deactivation of redirection
+    debugging. You can achieve this by setting the configuration
+    variable `DEBUG_TB_INTERCEPT_REDIRECTS = False`.  (Done for you by
+    default if you use ``docker-compose``.)
 
 Overlays
 --------
@@ -176,86 +174,88 @@ your choice:
 .. code-block:: shell
 
     cd src/invenio
-    docker build -t invenio .
+    docker build -t invenio:2.0 .
 
 Now go to your overlay and create a Dockerfile that suits your needs, e.g:
 
-
 .. code-block:: docker
 
-    # extend the Invenio base image
-    FROM invenio:latest
+   # based on the right Invenio base image
+   FROM invenio:2.0
 
-    # optional:
-    # add a maintainer for the docker image
-    #   MAINTAINER Doris Developer <doris@xtra-cool-overlay.org>
+   # get root rights again
+   USER root
 
-    # root rights are required
-    USER root
+   # optional:
+   # add new packages
+   # (update apt caches, because it was cleaned from the base image)
+   #   RUN apt-get update && \
+   #       apt-get -qy install whatever_you_need
 
-    # optional:
-    # add new packages
-    # (update apt caches, because it was cleaned from the base image)
-    #   RUN apt-get update && \
-    #       apt-get -qy install whatever_you_need
+   # optional:
+   # add new packages from pip
+   #   RUN pip install what_suits_you
 
-    # optional:
-    # add new packages from pip
-    #   RUN pip install what_suits_you
+   # optional:
+   # add new packages from npm
+   #   RUN npm update && \
+   #       npm install fun
 
-    # optional:
-    # add new packages from npm
-    #   RUN npm update && \
-    #       npm install fun
+   # optional:
+   # make even more modifications
 
-    # optional:
-    # make even more modifications
+   # add content
+   ADD . /code-overlay
+   WORKDIR /code-overlay
 
-    # add overlay code and set this as our work directory
-    ADD . /code-overlay
-    WORKDIR /code-overlay
+   # fix requirements.txt and install additional dependencies
+   RUN sed -i '/inveniosoftware\/invenio[@#]/d' requirements.txt && \
+       pip install -r requirements.txt --exists-action i
 
-    # install dependencies but ignore Invenio itself because it is already
-    # installed in the base image
-    RUN sed -i '/inveniosoftware\/invenio@/d' requirements.txt && \
-        pip install -r requirements.txt --exists-action i
+   # build
+   RUN python setup.py compile_catalog
 
-    # build overlay code
-    RUN python setup.py compile_catalog
+   # optional:
+   # do some cleanup
 
-    # optional:
-    # do some cleanup
+   # step back
+   # in general code should not be writeable, especially because we are using
+   # `pip install -e`
+   RUN mkdir -p /code-overlay/src && \
+       chown -R invenio:invenio /code-overlay && \
+       chown -R root:root /code-overlay/invenio_demosite && \
+       chown -R root:root /code-overlay/scripts && \
+       chown -R root:root /code-overlay/setup.* && \
+       chown -R root:root /code-overlay/src
 
-    # step back again
-    RUN mkdir -p /code-overlay/src && \
-        chown -R invenio:invenio /code-overlay && \
-        chown -R root:root /code-overlay/invenio_demosite && \
-        chown -R root:root /code-overlay/scripts && \
-        chown -R root:root /code-overlay/setup.* && \
-        chown -R root:root /code-overlay/src
-    USER invenio
+   # finally step back again
+   USER invenio
 
-Notice that this Dockerfile must be located in the directory of your overlay.
-You might also want to copy the `.dockerignore` that is provided by Invenio.
-Same goes for `docker-compose.yml`, `docker-compose-dev.yml` and the `scripts/`
-directory. Do not forget to add additional components if they are required,
-e.g. new packages or additional containers like databases. Now you can build
-and boot up your overlay:
+Notice that this Dockerfile must be located in the directory of your
+overlay.  For a full working example, please see `invenio-demosite
+<https://github.com/inveniosoftware/invenio-demosite/tree/maint-2.0>`_.
+Here is how to build the demo site:
 
 .. code-block:: shell
 
-    cd src/invenio-overlay
-    docker-compose -f docker-compose-dev.yml build
-    docker-compose -f docker-compose-dev.yml up
+   cd ~/private/src/invenio
+   git checkout maint-2.0
+   docker build -t invenio:2.0 .
+   cd ~/private/src/invenio-demosite
+   git checkout maint-2.0
+   docker-compose -f docker-compose-dev.yml build
+   docker-compose -f docker-compose-dev.yml up
 
-In case you want to populate demo data, e.g. when using the official
-invenio-demosite overlay, you run the following command after all daemons are
-up and running and the initialization is complete:
+After all the daemons are up and running, you can populate the demo
+site with demo records:
 
 .. code-block:: shell
 
-    docker exec -it inveniodemosite_web_1 inveniomanage demosite populate \
-        --packages=invenio_demosite.base --yes-i-know
+   docker exec -i -t -u invenio inveniodemosite_web_1 \
+          inveniomanage demosite populate \
+          --packages=invenio_demosite.base --yes-i-know
+
+Done.  Your Invenio overlay installation is now up and running.
 
 .. _boot2docker: http://boot2docker.io/
 .. _Docker: https://www.docker.com/
