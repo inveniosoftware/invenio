@@ -70,7 +70,7 @@ SEARCH_RECORD_MAPPING = {
         "record": {
             "_all": {"enabled": False},
             "date_detection": False,
-            "numeric_detection": True,
+            "numeric_detection": False,
             "dynamic_templates": [
                 {"default": {
                     "match_mapping_type": "string",
