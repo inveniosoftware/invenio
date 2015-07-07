@@ -238,7 +238,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://' or 'https://'"
 
         try:
-            self._get_instance(uid)
+            self._get_instance()
         except Exception as err:
             return "could not connect to %s: %s" % (CFG_BIBCATALOG_SYSTEM_RT_URL, err)
         return ""
@@ -296,7 +296,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if not search_atoms:
             return tickets
 
-        rt_instance = self._get_instance(uid)
+        rt_instance = self._get_instance()
         tickets = rt_instance.search(**search_atoms)
         return [int(ticket[u'id'].split('/')[1]) for ticket in tickets]
 
@@ -326,7 +326,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
             atoms['Text'] = str(text)
 
-        rt_instance = self._get_instance(uid)
+        rt_instance = self._get_instance()
         return rt_instance.create_ticket(**atoms)
 
     def ticket_comment(self, uid, ticketid, comment):
@@ -342,7 +342,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
     def ticket_steal(self, uid, ticketid):
         """assign a ticket to uid"""
-        rt_instance = self._get_instance(uid)
+        rt_instance = self._get_instance()
         ownerprefs = invenio.webuser.get_user_preferences(uid)
         if "bibcatalog_username" in ownerprefs:
             owner = ownerprefs["bibcatalog_username"]
@@ -387,7 +387,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         except ValueError:
             return 0
 
-        rt_instance = self._get_instance(uid)
+        rt_instance = self._get_instance()
         return rt_instance.edit_ticket(ticketid, **atom)
 
     def ticket_get_attribute(self, uid, ticketid, attribute):
@@ -409,7 +409,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if attributes is None:
             attributes = []
 
-        rt_instance = self._get_instance(uid)
+        rt_instance = self._get_instance()
         tdict = {}
         for key, value in rt_instance.get_ticket(ticketid).items():
             if isinstance(value, list):
