@@ -21,9 +21,12 @@ from __future__ import absolute_import
 
 import httpretty
 from mock import patch
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, \
+    run_test_suite, nottest
 
 
+# FIXME externalize module
+@nottest
 class DataCiteTasksTest(InvenioTestCase):
     def setUp(self):
         self.app.config['CFG_DATACITE_URL'] = 'https://mds.example.org/'
