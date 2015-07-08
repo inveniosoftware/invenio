@@ -19,12 +19,15 @@
 
 """Unit test checking behaviour of ``set_default_value``."""
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, \
+    run_test_suite, nottest
 
 from .test_bases import clean_field_model_definitions, \
     field_definitions, model_definitions
 
 
+# FIXME externalize module
+@nottest
 class TestOldValue(InvenioTestCase):
 
     """Tests for ``to_int`` function."""

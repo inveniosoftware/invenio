@@ -19,13 +19,16 @@
 
 """Unit tests for testing Jsonext's functions."""
 
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, \
+    InvenioTestCase, nottest
 
 from .test_bases import field_definitions, model_definitions, \
     clean_field_model_definitions
 from ..jsonext.functions.to_int import to_int
 
 
+# FIXME externalize module
+@nottest
 class TestToInt(InvenioTestCase):
 
     """Tests for ``to_int`` function."""

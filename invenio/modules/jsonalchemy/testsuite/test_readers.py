@@ -26,7 +26,8 @@ from invenio.base.wrappers import lazy_import
 from flask_registry import PkgResourcesDirDiscoveryRegistry, \
     ImportPathRegistry, RegistryProxy
 from invenio.ext.registry import ModuleAutoDiscoverySubRegistry
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, \
+    InvenioTestCase, nottest
 
 Field_parser = lazy_import('invenio.modules.jsonalchemy.parser:FieldParser')
 Model_parser = lazy_import('invenio.modules.jsonalchemy.parser:ModelParser')
@@ -48,6 +49,8 @@ function_proxy = lambda: ModuleAutoDiscoverySubRegistry(
     'functions', registry_namespace=test_registry)
 
 
+# FIXME externalize module
+@nottest
 class TestReader(InvenioTestCase):
 
     @classmethod
@@ -84,6 +87,8 @@ class TestReader(InvenioTestCase):
             master_format='json'), fields='foo')
 
 
+# FIXME externalize module
+@nottest
 class TestJSONReader(InvenioTestCase):
 
     @classmethod
@@ -168,6 +173,8 @@ class TestJSONReader(InvenioTestCase):
         self.assertEquals('bar', json['foo'])
 
 
+# FIXME externalize module
+@nottest
 class TestMarcReader(InvenioTestCase):
 
     @classmethod
