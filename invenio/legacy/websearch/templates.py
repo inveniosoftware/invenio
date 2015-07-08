@@ -78,9 +78,6 @@ from invenio.modules.formatter import format_record
 
 from intbitset import intbitset
 
-from invenio.legacy.websearch_external_collections import external_collection_get_state, get_external_collection_engine
-from invenio.legacy.websearch_external_collections.utils import get_collection_id
-from invenio.legacy.websearch_external_collections.config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.legacy.bibrecord import get_fieldvalues
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
@@ -1422,17 +1419,6 @@ class Template:
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
                     out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
-                # hosted collections are checked by default only when configured so
-                elif str(son.dbquery).startswith("hostedcollection:"):
-                    external_collection_engine = get_external_collection_engine(str(son.name))
-                    if external_collection_engine and external_collection_engine.selected_by_default:
-                        out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
-                    elif external_collection_engine and not external_collection_engine.selected_by_default:
-                        out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
-                    else:
-                        # strangely, the external collection engine was never found. In that case,
-                        # why was the hosted collection here in the first place?
-                        out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
                 else:
                     out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
             else:
@@ -1495,10 +1481,7 @@ class Template:
             internal_name = engine.name
             name = _(internal_name)
             base_url = engine.base_url
-            if external_collection_get_state(engine, collection_id) == 3:
-                checked = ' checked="checked"'
-            else:
-                checked = ''
+            checked = ''
 
             html += """<tr><td class="searchalsosearchboxbody" valign="top">
                 <input type="checkbox" name="ec" id="%(id)s" value="%(internal_name)s" %(checked)s /></td>
@@ -3107,55 +3090,6 @@ class Template:
 
         out += "</td></tr></tbody></table>"
         return out
-
-    def tmpl_print_hosted_results(self, url_and_engine, ln, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS, display_body=True, display_add_to_basket = True):
-        """Print results of a given search engine.
-        """
-
-        if display_body:
-            _ = gettext_set_language(ln)
-            #url = url_and_engine[0]
-            engine = url_and_engine[1]
-            #name = _(engine.name)
-            db_id = get_collection_id(engine.name)
-            #base_url = engine.base_url
-
-            out = ""
-
-            results = engine.parser.parse_and_get_results(None, of=of, req=req, limit=limit, parseonly=True)
-
-            if len(results) != 0:
-                if of == 'hb':
-                    out += """
-                          <table>
-                          """
-            else:
-                if of == 'hb':
-                    out += """
-                          <table>
-                          """
-
-            for result in results:
-                out += result.html.replace('>Detailed record<', '>External record<').replace('>Similar records<', '>Similar external records<')
-
-            if len(results) != 0:
-                if of == 'hb':
-                    out += """</table>
-                           <br />"""
-            else:
-                if of == 'hb':
-                    out += """
-                          </table>
-                          """
-
-            # we have already checked if there are results or no, maybe the following if should be removed?
-            if not results:
-                if of.startswith("h"):
-                    out = _('No results found...') + '<br />'
-
-            return out
-        else:
-            return ""
 
     def tmpl_print_service_list_links(self, label, labels_and_urls, ln=CFG_SITE_URL):
         """

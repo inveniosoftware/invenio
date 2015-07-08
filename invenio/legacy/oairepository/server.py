@@ -67,7 +67,7 @@ from invenio.legacy.bibrecord import record_get_field_instances
 from invenio.legacy.dbquery import run_sql, wash_table_column_name, \
     datetime_format
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
-from invenio.legacy.search_engine import record_exists, get_all_restricted_recids, \
+from invenio.legacy.search_engine import record_exists, \
     search_unit_in_bibxxx, get_record
 from invenio.modules.formatter import format_record
 from invenio.modules.search.api import Query
@@ -644,9 +644,6 @@ def filter_out_based_on_date_range(recids, fromdate="", untildate="", set_spec=N
         recids &= intbitset(run_sql("SELECT id FROM bibrec WHERE modification_date >= %s", (fromdate, )))
     elif untildate:
         recids &= intbitset(run_sql("SELECT id FROM bibrec WHERE modification_date <= %s", (untildate, )))
-
-    if cfg.get('CFG_OAI_FILTER_RESTRICTED_RECORDS', True):
-        recids = recids - get_all_restricted_recids()
 
     return recids
 

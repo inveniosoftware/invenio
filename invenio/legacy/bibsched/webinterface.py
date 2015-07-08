@@ -27,7 +27,6 @@ except ImportError:
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.ext.legacy.handler import WebInterfaceDirectory
-from invenio.legacy.bibrank.adminlib import tupletotable
 from invenio.legacy.webpage import page
 from invenio.legacy.bibsched.webapi import get_javascript, get_bibsched_tasks, \
     get_bibsched_mode, get_css, get_motd_msg
@@ -74,8 +73,6 @@ class WebInterfaceBibSchedPages(WebInterfaceDirectory):
                                 progress or '')])
                 if 'ERROR' in status:
                     bibsched_error = True
-            body_content += tupletotable(header=header, tuple=actions,
-                                         alternate_row_colors_p=True)
         if bibsched_error:
             body_content += '<br /><img src="%s"><span class="bibsched_status"> The queue contains errors</span><br />' % ("/img/aid_reject.png")
         else:
