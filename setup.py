@@ -133,6 +133,7 @@ install_requires = [
     "reportlab>=2.7,<3.2",
     "requests>=2.3,<2.4",
     "setuptools>=2.2",
+    "simplejson>=3.7",
     "six>=1.7.2",
     "toposort>=1.4",
     "Sphinx>=1.3",

@@ -24,6 +24,7 @@ services:
   - mysql
   - redis
   - mongodb
+  - elasticsearch
 
 language: python
 
@@ -58,6 +59,7 @@ install:
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
   - "travis_retry pip install unittest2"
+  - "travis_retry pip install invenio_records"
   - "travis_retry pip install -r .travis-$REQUIREMENTS-requirements.txt --allow-all-external --quiet"
   - "travis_retry pip install -e .[$REXTRAS] --quiet --process-dependency-links"
   - "python setup.py compile_catalog"
