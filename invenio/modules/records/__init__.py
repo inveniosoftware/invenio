@@ -19,4 +19,4 @@
 
 import warnings
 
-warnings.warn("Use invenio_records package.", RuntimeError)
+warnings.warn("Use invenio_records package.", category=UserWarning)
