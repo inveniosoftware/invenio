@@ -49,14 +49,14 @@ class TestElasticSearchWalker(InvenioTestCase):
     def test_value_query(self):
         self.assertEqual(ValueQuery(Value("bar")).accept(self.converter), {
             "multi_match": {
-                "fields": ["_all"], "query": "bar"}
+                "fields": ["global_fulltext"], "query": "bar"}
             })
 
     def test_single_quoted_value(self):
         tree = ValueQuery(SingleQuotedValue("bar"))
         self.assertEqual(tree.accept(self.converter), {
             "multi_match": {
-                "fields": ["_all"],
+                "fields": ["global_fulltext"],
                 "query": "bar",
                 "type": "phrase"
             }
@@ -65,13 +65,14 @@ class TestElasticSearchWalker(InvenioTestCase):
     def test_double_quoted_value(self):
         tree = ValueQuery(DoubleQuotedValue("bar"))
         self.assertEqual(tree.accept(self.converter), {
-            "term": {"_all": "bar"}
+            "term": {"global_fulltext": "bar"}
         })
 
     def test_regex_value(self):
-        # FIXME implement regex value for _all fields if needed
         tree = ValueQuery(RegexValue('^E.*s$'))
-        self.assertRaises(RuntimeError, lambda: tree.accept(self.converter))
+        self.assertEqual(tree.accept(self.converter), {
+            "regexp": {"global_fulltext": '^E.*s$'}
+        })
 
     # Key-value queries
     def test_key_val_query(self):
@@ -137,7 +138,7 @@ class TestElasticSearchWalker(InvenioTestCase):
                     },
                     {
                         "multi_match": {
-                            "fields": ["_all"],
+                            "fields": ["global_fulltext"],
                             "query": "baz",
                         }
                     }
@@ -159,7 +160,7 @@ class TestElasticSearchWalker(InvenioTestCase):
                     },
                     {
                         "multi_match": {
-                            "fields": ["_all"],
+                            "fields": ["global_fulltext"],
                             "query": "baz",
                         }
                     }
@@ -202,7 +203,7 @@ class TestElasticSearchWalker(InvenioTestCase):
                     ValueQuery(Value('ddd')))
         ll = {
                 "multi_match": {
-                    "fields": ["_all"],
+                    "fields": ["global_fulltext"],
                     "query": "ddd"
                 }
              }
@@ -211,13 +212,13 @@ class TestElasticSearchWalker(InvenioTestCase):
                     "must": [
                         {
                             "multi_match": {
-                                "fields": ["_all"],
+                                "fields": ["global_fulltext"],
                                 "query": "aaa"
                             }
                         },
                         {
                             "multi_match": {
-                                "fields": ["_all"],
+                                "fields": ["global_fulltext"],
                                 "query": "bbb"
                             }
                         }
@@ -229,7 +230,7 @@ class TestElasticSearchWalker(InvenioTestCase):
                     "must_not": [
                         {
                             "multi_match": {
-                                "fields": ["_all"],
+                                "fields": ["global_fulltext"],
                                 "query": "ccc"
                             }
                         }
