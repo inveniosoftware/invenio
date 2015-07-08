@@ -34,7 +34,7 @@ Extensions
    ext/assets
    ext/arxiv
    ext/crossref
-   ext/elasticsearch
+   ext/es
    ext/fs
    ext/jasmine
    ext/logging

@@ -18,5 +18,5 @@
 Elasticsearch
 =============
 
-.. automodule:: invenio.ext.elasticsearch
+.. automodule:: invenio.ext.es
    :members:
