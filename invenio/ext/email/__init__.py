@@ -33,10 +33,7 @@ from email.Header import Header
 from email.MIMEBase import MIMEBase
 from email.MIMEImage import MIMEImage
 from email.MIMEMultipart import MIMEMultipart
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
 from email.Utils import formatdate
-from flask import g
 from flask_email.message import EmailMultiAlternatives, EmailMessage
 from formatter import DumbWriter, AbstractFormatter
 from six import iteritems, StringIO
@@ -44,6 +41,7 @@ from time import sleep
 
 from invenio.base.globals import cfg
 from invenio.base.helpers import unicodifier
+from invenio.base.i18n import _
 from invenio.ext.template import render_template_to_string
 
 from .errors import EmailError
@@ -244,7 +242,7 @@ def send_email(fromaddr,
 
     if attempt_times < 1 or not toaddr:
         try:
-            raise EmailError(g._(
+            raise EmailError(_(
                 'The system is not attempting to send an email from %(x_from)s'
                 ', to %(x_to)s, with body %(x_body)s.', x_from=fromaddr,
                 x_to=toaddr, x_body=content))
@@ -261,7 +259,7 @@ def send_email(fromaddr,
             register_exception()
             if debug_level > 1:
                 try:
-                    raise EmailError(g._('Error in sending message. \
+                    raise EmailError(_('Error in sending message. \
                         Waiting %(sec)s seconds. Exception is %(exc)s, \
                         while sending email from %(sender)s to %(receipient)s \
                         with body %(email_body)s.', \
@@ -284,9 +282,9 @@ def send_email(fromaddr,
             quoted_body = '> ' + '> '.join(content.splitlines(True))
 
             # define and fill in the report template
-            admin_report_subject = g._('Error while sending an email: %(x_subject)s',
+            admin_report_subject = _('Error while sending an email: %(x_subject)s',
                                        x_subject=subject)
-            admin_report_body = g._(
+            admin_report_body = _(
                 "\nError while sending an email.\n"
                 "Reason: %(x_reason)s\n"
                 "Sender: \"%(x_sender)s\"\n"
@@ -303,7 +301,7 @@ def send_email(fromaddr,
                        forward_failures_to_admin=False)
 
         try:
-            raise EmailError(g._(
+            raise EmailError(_(
                 'Error in sending email from %(x_from)s to %(x_to)s with body'
                 '%(x_body)s.', x_from=fromaddr, x_to=toaddr, x_body=content))
         except EmailError:
