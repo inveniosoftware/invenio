@@ -129,12 +129,6 @@ class DepositionTestCase(InvenioTestCase):
             self.run_task_id(task_id)
 
         if with_webcoll:
-            # Run webcoll (to ensure record is assigned permissions)
-            from invenio.legacy.bibsched.bibtask import \
-                task_low_level_submission
-            task_id = task_low_level_submission('webcoll', 'webdeposit', '-q')
-            self.run_task_id(task_id)
-
             # Check if record is accessible
             response = self.client.get(
                 url_for('record.metadata', recid=sip.metadata['recid']),
