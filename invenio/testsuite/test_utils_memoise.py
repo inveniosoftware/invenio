@@ -17,20 +17,26 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Unit tests for the memoise facility.
-"""
+"""Unit tests for the memoise facility."""
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
+def fib(n):
+    """Return Fibonacci number for 'n'."""
+    out = 1
+    if n >= 2:
+        out = fib(n-2) + fib(n-1)
+    return out
+
+
 class MemoiseTest(InvenioTestCase):
+
     """Unit test cases for Memoise."""
 
     def test_memoise_fib(self):
-        """memoiseutils - test fib() memoisation"""
+        """memoiseutil - test fib() memoisation."""
         from invenio.utils.memoise import Memoise
-        from invenio.legacy.bibsched.bibtaskex import fib
         fib_memoised = Memoise(fib)
         self.assertEqual(fib(17), fib_memoised(17))
 
