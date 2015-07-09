@@ -74,7 +74,7 @@ def populate(packages=[], default_data=True, files=None,
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 
     # Load cli interfaces for tools that we are going to need
-    from invenio_records.manage import create
+    from invenio_records.manage import main as rmanager
 
     # Step 0: confirm deletion
     wait_for_user(wrap_text_in_a_box(
@@ -102,7 +102,7 @@ def populate(packages=[], default_data=True, files=None,
     for f in files:
         job_id += 1
         for cmd in (
-            (create, "create %s -i %s" % (bibupload_flags, f)),
+            (rmanager, "records create %s %s" % (bibupload_flags, f)),
         ):
             if run_py_func(*cmd, passthrough=True).exit_code:
                 print("ERROR: failed execution of", *cmd)
