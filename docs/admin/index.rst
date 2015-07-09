@@ -29,7 +29,6 @@ Admin's Guide
    bibconvert-admin-guide
    bibedit-admin-guide
    bibknowledge-admin-guide
-   bibmatch-admin-guide
    bibsched-admin-guide
    bibupload-admin-guide
    docextract-admin-guide

@@ -283,7 +283,6 @@ setup(
             'bibedit = invenio.legacy.bibedit.scripts.bibedit:main',
             'bibencode = invenio.modules.encoder.scripts.encoder:main',
             'bibexport = invenio.legacy.bibexport.scripts.bibexport:main',
-            'bibmatch = invenio.legacy.bibmatch.scripts.bibmatch:main',
             'bibsched = invenio.legacy.bibsched.scripts.bibsched:main',
             'bibtaskex = invenio.legacy.bibsched.scripts.bibtaskex:main',
             'bibtasklet = invenio.legacy.bibsched.scripts.bibtasklet:main',
