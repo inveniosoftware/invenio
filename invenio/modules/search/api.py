@@ -95,7 +95,7 @@ class Results(object):
             body={
                 'size': 9999999,
                 'fields': ['control_number'],
-                'query': self.query
+                'query': self.body.get("query")
             }
         )
         return intbitset([int(r['_id']) for r in results['hits']['hits']])
