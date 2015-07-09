@@ -21,7 +21,6 @@
 
 import json
 import os
-import re
 import warnings
 
 from invenio.base.globals import cfg
@@ -535,7 +534,7 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     :param searchwith: a term to search with
     :return: list of values
     """
-    from invenio.legacy import search_engine
+    from invenio.modules.search.api import Query
 
     # get the configuration so that we see what the field is
     if not confdict:
@@ -547,33 +546,35 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     collection = ""
     if 'collection' in confdict:
         collection = confdict['collection']
-    reclist = []  # return this
     if searchwith and expression:
         if (expression.count('%') > 0):
             expression = expression.replace("%", searchwith)
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
         else:
             # no %.. just make a combination
             expression = expression + " and " + searchwith
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
     else:  # either no expr or no searchwith.. but never mind about searchwith
         if expression:  # in this case: only expression
-            reclist = search_engine.perform_request_search(p=expression,
-                                                           cc=collection)
+            response = Query(expression).search(collection=collection)
         else:
             # make a fake expression so that only records that have this field
             # will be returned
             fake_exp = "/.*/"
             if searchwith:
                 fake_exp = searchwith
-            reclist = search_engine.perform_request_search(f=field, p=fake_exp,
-                                                           cc=collection)
-    if reclist:
-        return [val for (val, dummy) in
-                search_engine.get_most_popular_field_values(reclist, field)]
-    return []  # in case nothing worked
+            response = Query("{0}:{1}".format(field, fake_exp)).search(
+                collection=collection
+            )
+
+    # TODO wait for new search API for pagination
+    response.body["size"] = 9999999
+    values = []
+    for record in response.records():
+        value = record.get(field)
+        if value:
+            values.append(value)
+    return values
 
 
 def get_kbd_values_json(kbname, searchwith=""):
