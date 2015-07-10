@@ -27,11 +27,12 @@ web:
     - CACHE_REDIS_HOST=cache
     - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
-    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST
-  volumes:
-    - /tmp:/tmp
+    - "CFG_REDIS_HOSTS={'default': [{'db': 0, 'host': 'cache', 'port': 6379}]}"
+    - ES_HOSTS=['es']
+    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,ES_HOSTS
   read_only: true
   links:
+    - elasticsearch:es
     - mysql:db
     - rabbitmq:rabbit
     - redis:cache
@@ -43,11 +44,14 @@ worker:
     - CACHE_REDIS_HOST=cache
     - CELERY_RESULT_BACKEND=redis://cache:6379/1
     - CFG_DATABASE_HOST=db
-    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST
+    - "CFG_REDIS_HOSTS={'default': [{'db': 0, 'host': 'cache', 'port': 6379}]}"
+    - ES_HOSTS=['es']
+    - INVENIO_APP_CONFIG_ENVS=BROKER_URL,CELERY_RESULT_BACKEND,CACHE_REDIS_HOST,CFG_DATABASE_HOST,CFG_REDIS_HOSTS,ES_HOSTS
   volumes_from:
     - web
   read_only: true
   links:
+    - elasticsearch:es
     - mysql:db
     - rabbitmq:rabbit
     - redis:cache
@@ -61,9 +65,15 @@ mysql:
     - MYSQL_USER=invenio
     - MYSQL_PASSWORD=my123p$ss
     - MYSQL_ROOT_PASSWORD=mysecretpassword
-  volumes:
-    - /tmp
-  read_only: true
+# FIXME detect which volumes are required for `read_only`
+#  volumes:
+#    - /tmp
+#  read_only: true
 rabbitmq:
   image: rabbitmq:3-management
+  read_only: true
+elasticsearch:
+  image: elasticsearch
+  volumes:
+      - ./elasticsearch-docker.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
   read_only: true
