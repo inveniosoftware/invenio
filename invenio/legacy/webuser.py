@@ -81,12 +81,10 @@ from invenio.base.i18n import gettext_set_language, wash_languages, wash_languag
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db
-from invenio.legacy.websession.dblayer import get_groups
 from invenio.modules.accounts.models import User
 
-from invenio.legacy.websession.webuser_config import CFG_WEBUSER_USER_TABLES
-
 from sqlalchemy.exc import OperationalError
+
 
 acc_get_role_id = lazy_import('invenio.modules.access.control:acc_get_role_id')
 acc_get_action_roles = lazy_import('invenio.modules.access.control:acc_get_action_roles')
@@ -103,14 +101,6 @@ CFG_WEBACCESS_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACC
 CFG_WEBACCESS_WARNING_MSGS = lazy_import('invenio.modules.access.local_config:CFG_WEBACCESS_WARNING_MSGS')
 CFG_EXTERNAL_AUTH_DEFAULT = lazy_import('invenio.modules.access.local_config:CFG_EXTERNAL_AUTH_DEFAULT')
 CFG_TEMP_EMAIL_ADDRESS = lazy_import('invenio.modules.access.local_config:CFG_TEMP_EMAIL_ADDRESS')
-
-
-
-
-# import invenio.legacy.template
-# tmpl = invenio.legacy.template.load('websession')
-tmpl = lazy_import('invenio.legacy.websession.templates:Template')()
-# tmpl = object
 
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
@@ -527,44 +517,6 @@ def updatePasswordUser(uid, password):
         db.session.commit()
     return 1
 
-def merge_usera_into_userb(id_usera, id_userb):
-    """
-    Merges all the information of usera into userb.
-    Deletes afterwards any reference to usera.
-    The information about SQL tables is contained in the CFG_WEBUSER_USER_TABLES
-    variable.
-    """
-    preferencea = get_user_preferences(id_usera)
-    preferenceb = get_user_preferences(id_userb)
-    preferencea.update(preferenceb)
-    set_user_preferences(id_userb, preferencea)
-    try:
-        ## FIXME: for the time being, let's disable locking
-        ## until we will move to InnoDB and we will have
-        ## real transitions
-        #for table, dummy in CFG_WEBUSER_USER_TABLES:
-            #run_sql("LOCK TABLE %s WRITE" % table)
-
-        ## Special treatment for BibAuthorID
-        index = 0
-        table = ''
-        try:
-            for index, (table, column) in enumerate(CFG_WEBUSER_USER_TABLES):
-                run_sql("UPDATE %(table)s SET %(column)s=%%s WHERE %(column)s=%%s; DELETE FROM %(table)s WHERE %(column)s=%%s;" % {
-                    'table': table,
-                    'column': column
-                }, (id_userb, id_usera, id_usera))
-        except Exception as err:
-            msg = "Error when merging id_user=%s into id_userb=%s for table %s: %s\n" % (id_usera, id_userb, table, err)
-            msg += "users where succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[:index]])
-            msg += "users where not succesfully already merged for tables: %s\n" % ', '.join([table[0] for table in CFG_WEBUSER_USER_TABLES[index:]])
-            register_exception(alert_admin=True, prefix=msg)
-            raise
-    finally:
-        ## FIXME: locking disabled
-        #run_sql("UNLOCK TABLES")
-        pass
-
 
 def username_exists_p(username):
     """Check if USERNAME exists in the system.  Username may be either
@@ -663,37 +615,11 @@ def get_nickname_or_email(uid):
             out = res[0][1].lower()
     return out
 
+
 def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
-
-    if req:
-        if req.is_https():
-            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
-        else:
-            url_referer = CFG_SITE_URL + req.unparsed_uri
-        if '/youraccount/logout' in url_referer:
-            url_referer = ''
-    else:
-        url_referer = CFG_SITE_URL
-
-    user_info = collect_user_info(req)
-
-    try:
-        return tmpl.tmpl_create_userinfobox(ln=language,
-                                            url_referer=url_referer,
-                                            guest=int(user_info['guest']),
-                                            username=get_nickname_or_email(uid),
-                                            submitter=user_info['precached_viewsubmissions'],
-                                            referee=user_info['precached_useapprove'],
-                                            admin=user_info['precached_useadmin'],
-                                            usebaskets=False,
-                                            usemessages=user_info['precached_usemessages'],
-                                            usegroups=user_info['precached_usegroups'],
-                                            useloans=user_info['precached_useloans'],
-                                            usestats=user_info['precached_usestats']
-                                            )
-    except OperationalError:
-        return ""
+    # TODO return nothing. webuser'll be removed!
+    return ""
 
 
 def list_registered_users():

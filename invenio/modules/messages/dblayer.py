@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 from time import localtime, mktime
 from invenio.legacy.dbquery import run_sql, rlike, datetime_format
+from invenio.modules.accounts.models import UserUsergroup
 from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_STATUS_CODE, \
     CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
@@ -30,7 +31,6 @@ from invenio.modules.messages.config import \
     CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 from invenio.utils.date import datetext_default, \
                               convert_datestruct_to_datetext
-from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 from sqlalchemy.exc import OperationalError
 
@@ -386,7 +386,7 @@ def get_uids_members_of_groups(gids):
                FROM user_usergroup
                WHERE user_status!=%s AND (
             """
-    query_params = [CFG_WEBSESSION_USERGROUP_STATUS['PENDING']]
+    query_params = [UserUsergroup.USER_STATUS['PENDING']]
     if len(gids) > 0:
         for gid in gids[0:-1]:
             query += " id_usergroup=%s OR"

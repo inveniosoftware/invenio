@@ -41,7 +41,7 @@ from invenio.ext.logging import register_exception
 from invenio.utils.datastructures import flatten_multidict
 # TODO for future reimplementation of stream_file
 #from invenio.legacy.bibdocfile.api import StreamFileException
-from flask import request, after_this_request
+from flask import request, after_this_request, session
 
 
 # Magic regexp to search for usage of CFG_SITE_URL within src/href or
@@ -573,7 +573,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
-    from invenio.legacy.websession.session import get_session
     from invenio.ext.legacy.handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
     if possible_module.endswith('.pyc'):
         possible_module = possible_module[:-1]
@@ -605,7 +604,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 ## have a file (Field) instance instead of a string.
                 form[key] = value
 
-        if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https) and not req.is_https():
+        if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and session.need_https) and not req.is_https():
             from invenio.utils.url import redirect_to_url
             # We need to isolate the part of the URI that is after
             # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.

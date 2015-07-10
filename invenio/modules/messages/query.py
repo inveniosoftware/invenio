@@ -17,25 +17,20 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Query definitions for module webmessage"""
+"""Query definitions for module webmessage."""
 
-from time import localtime, mktime
 from datetime import datetime
 
-from invenio.legacy.dbquery import run_sql, rlike
-from invenio.modules.messages.config import \
-    CFG_WEBMESSAGE_STATUS_CODE, \
-    CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-    CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-    CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
-
-from invenio.utils.date import datetext_default, \
-                              convert_datestruct_to_datetext
-from invenio.legacy.websession.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
-
 from invenio.ext.sqlalchemy import db
+from invenio.legacy.dbquery import rlike, run_sql
+from invenio.modules.accounts.models import UserUsergroup
+from invenio.modules.messages.config import CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS, \
+    CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
+    CFG_WEBMESSAGE_STATUS_CODE
 from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
-from invenio.modules.accounts.models import User
+from invenio.utils.date import convert_datestruct_to_datetext, datetext_default
+
+from time import localtime, mktime
 
 from sqlalchemy.exc import OperationalError
 
@@ -345,7 +340,7 @@ def get_uids_members_of_groups(gids):
                FROM user_usergroup
                WHERE user_status!=%s AND (
             """
-    query_params = [CFG_WEBSESSION_USERGROUP_STATUS['PENDING']]
+    query_params = [UserUsergroup.USER_STATUS['PENDING']]
     if len(gids) > 0:
         for gid in gids[0:-1]:
             query += " id_usergroup=%s OR"

@@ -37,39 +37,6 @@ def login_user(user, *args, **kwargs):
     return flask_login_user(user, *args, **kwargs)
 
 
-# FIXME move to account module
-def reset_password(email, ln=None):
-    """Reset user password."""
-    from datetime import timedelta
-    from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, \
-        CFG_SITE_NAME_INTL, CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
-    # create the reset key
-    if ln is None:
-        ln = g.ln
-    from invenio.modules.access.mailcookie import mail_cookie_create_pw_reset
-    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(
-        days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
-    if reset_key is None:
-        return False  # reset key could not be created
-
-    # load the email template
-    import invenio.legacy.template
-    websession_templates = invenio.legacy.template.load('websession')
-
-    # finally send the email
-    from invenio.ext.email import send_email
-    from invenio.base.i18n import _
-    if not send_email(CFG_SITE_SUPPORT_EMAIL, email, "%s %s"
-                      % (_("Password reset request for"),
-                         CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
-                      websession_templates.
-                      tmpl_account_reset_password_email_body(
-                          email, reset_key, request.remote_addr, ln)):
-        return False  # mail could not be sent
-
-    return True  # password reset email send successfully
-
-
 def login_redirect(referer=None):
     """Redirect to url after login."""
     if referer is None:
@@ -118,7 +85,8 @@ def authenticate(nickname_or_email=None, password=None,
         current_app.logger.exception("Problem checking password.")
         return False
 
-    if login_method is not None and user.settings['login_method'] != login_method:
+    if login_method is not None and \
+            user.settings['login_method'] != login_method:
         flash(_("You are not authorized to use '%(x_login_method)s' login "
                 "method.", x_login_method=login_method), 'error')
         return False
