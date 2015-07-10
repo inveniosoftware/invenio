@@ -1,3 +1,4 @@
+# coding=utf-8
 # This file is part of Invenio.
 # Copyright (C) 2011, 2012 CERN.
 #
@@ -31,11 +32,14 @@ def get_css():
             text-align: center;
            }
            #middle_area {
-            width: 50%;
+            width: 60%;
             margin: 0 auto;
            }
            #search_form {
-            width: 100%;
+            text-align:center;
+            width:100%;
+            margin: 0 auto;
+            margin-bottom:20px;
            }
 
            #result_area {
@@ -44,50 +48,25 @@ def get_css():
             overflow: hidden;
             padding: 1px;
             border-bottom: 1px solid #B9B9B9;
+            font-size:12px;
            }
-            #arrow {
-             text-align: center;
-             display:block;
+
+           .fullwidth {
+             width:100%;
             }
 
-            #serverarrow {
-             width:100%;
-             padding: 5px;
-            }
-            .fullwidth {
-             width:100%;
-            }
            .server_area {
-            display:none;
-            background-color: #F8F8F8;
+            margin-top: 20px;
             padding-top:5px;
             padding-bottom:5px;
-            border-collapse: collapse;
-            border: 1px solid #B9B9B9;
             white-space: nowrap;
-            width: 100%;
-            border-radius: 5px;
+            font-size:14px;
+            float:left;
            }
-            input[type="text"] {
-                width: 90%;
-                padding: 3px 0px 3px 5px;
-                margin-top: 2px;
-                margin-right: 6px;
-                margin-bottom: 16px;
-                border: 1px solid #e5e5e5;
-                height: 25px;
-                line-height:15px;
-                outline: 0;
-            }
-            .submitbutton {
-              padding: 5px;
-              text-align:right;
-            }
+
             td {
                 padding: 5px;
                 margin:5px;
-                font-size:10px;
-                font-weight:300;
                 border-bottom: 1px solid #B9B9B9;
             }
 
@@ -108,8 +87,35 @@ def get_css():
             text-decoration: none; /* no underline */
            }
 
+           #middle_area th  {
+            text-align:left;
+           }
+
+           #radiobuttons {
+            text-align:center;
+            width:100%;
+            margin: 0 auto;
+            margin-bottom:20px;
+           }
            removable {
             display:none;
+           }
+           #dialog-message pre {
+            font-size:11px;
+           }
+           .bibz39_button_td {
+             text-align: center;
+           }
+           .spinning_wheel {
+             margin-top:80px;
+             margin-bottom:30px;
+             text-align: center;
+           }
+           .no-close .ui-dialog-titlebar-close {
+             display: none;
+           }
+           pagebodystripemiddle {
+            width:100%;
            }
            </style>
            """
@@ -121,34 +127,27 @@ def get_javascript():
     """
     js_scripts = """
                     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+                    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
                     <script type="text/javascript" src="%(site_url)s/js/jquery.min.js">
                     </script>
                     <script type="text/javascript" src="%(site_url)s/js/jquery-ui.min.js">
                     </script>
                     <script type="text/javascript" src="%(site_url)s/js/bibz39.js">
                     </script>
+
                     <script type="text/javascript">
                         function showxml(identifier) {
-                            if($("#removable" + identifier).length) {
-                                $(".animated").slideUp();
-                                $(".removable").remove();
-                            } else {
-                                $(".removable").remove();
-                                $("#result_area tr:eq(" + (identifier + 1) + ")").after("<tr class='removable'><td colspan='4'><div id='removable"+ identifier+"' class='animated'><pre>" + gAllMarcXml[identifier].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + "</div></pre></td></tr>");
-                                $(".animated").slideDown();
-                            }
-                            return false;
+                              $( "#dialog-message" )[0].innerHTML =  "<pre>" + gAllMarcXml[identifier].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + "</pre>"
+                              $( "#dialog-message" ).dialog({
+                              width: window.innerWidth/2,
+                              height: window.innerHeight/1.5,
+                              modal: true,
+                            });
                         }
 
-                        function server_area_print () {
-                            console.log("show");
-                            if( $(".server_area").is(":visible"))  {
-                                $(".server_area").slideUp();
-                                $("#fullwidth").attr('class', 'fa fa-angle-double-down');
-                            } else {
-                                $(".server_area").slideDown();
-                                $("#fullwidth").attr('class', 'fa fa-angle-double-down fa-rotate-180');
-                            }
+                        function spinning() {
+                            $("#middle_area > table").remove();
+                            $("#middle_area").append("<p class='spinning_wheel'><i class='fa fa-spinner fa-pulse  fa-5x'></i><p><p class='bibz39_button_td'>Searching...</p>");
                         }
                     </script>
                  """ % {'site_url': CFG_SITE_URL}

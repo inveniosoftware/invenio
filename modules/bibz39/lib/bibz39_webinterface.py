@@ -28,6 +28,7 @@ try:
 except ImportError:
     import simplejson as json
 
+from invenio.errorlib import register_exception
 from invenio.bibz39_config import CFG_Z39_SERVER
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.access_control_engine import acc_authorize_action
@@ -45,6 +46,7 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
     """Defines the set of /bibz39 pages."""
 
     _exports = ['']
+    _request_type_dict = {"ISBN": "isbn", "Title": "ti", "Authors": "au"}
 
     def index(self, req, form):
         """ Display live bibz39 queue
@@ -61,6 +63,7 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
             'search': (str, ''),
             'marcxml': (str, ''),
             'server': (list, []),
+            'search_type': (str, ""),
         })
 
         if argd['marcxml']:
@@ -76,84 +79,97 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
         body_content = ''
         body_content += self.generate_request_form(argd)
 
-
-        if "search" in argd and argd["search"]:
+        if "search" in argd and argd["search"] and 'search_type' in argd and argd["search_type"] in \
+                self._request_type_dict:
 
             conn = None
             list_of_record = []
             try:
+                res = []
+                err = False
+
                 for server in argd["server"]:
 
-                    res = []
-                    err = False
                     conn = zoom.Connection(CFG_Z39_SERVER[server]["address"],
                                            CFG_Z39_SERVER[server]["port"],
                                            user=CFG_Z39_SERVER[server].get("user", None),
                                            password=CFG_Z39_SERVER[server].get("password", None))
                     conn.databaseName = CFG_Z39_SERVER[server]["databasename"]
                     conn.preferredRecordSyntax = CFG_Z39_SERVER[server]["preferredRecordSyntax"]
-                    query = zoom.Query('CCL', '{0}'.format(argd["search"]))
-                    body_content += "<h3>{0}</h3>".format(server)
+                    query = zoom.Query('CCL', '{0}={1}'.format(
+                        self._request_type_dict[argd["search_type"]], argd["search"]))
+                    body_content += ""
                     try:
-                        res = list(conn.search(query))
+                        res.extend({"value": x, "provider": server} for x in conn.search(query))
 
-                        if len(res) == 1:
-                            body_content += "1 result"
-                        elif len(res) == 0:
-                            body_content += "0 result"
-                        else:
-                            body_content += "<p>{0} results</p>".format(len(res))
                     except zoom.Bib1Err as e:
                         body_content += "<h4>{0}</h4>".format(e)
                         err = True
                     conn.close()
+                if res:
+                    body_content += "<table id='result_area' class='fullwidth  tablesorter'>"
+                    body_content += "<tr><th>Title</th><th>Authors</th><th>Publisher</th><th>Source</th><th><div class='bibz39_button_td'>View XML</div></th><th><div class='bibz39_button_td'>Import</div></th></tr>"
 
-                    if res:
-                        body_content += "<table id='result_area' class='fullwidth'>"
-                        body_content += "<tr><th>ID</th><th>Title<th><th>Actions</th></tr>"
+                    for identifier, rec in enumerate(res):
+                        list_of_record.append(
+                            create_record(
+                                self.interpret_string(zmarc.MARC(
+                                    rec["value"].data, strict=0).toMARCXML()))[0])
+                        title = ''
+                        authors = ''
+                        publishers = ''
 
-                        for identifier, rec in enumerate(res):
-                            list_of_record.append(
-                                create_record(
-                                    self.interpret_string(
-                                        zmarc.MARC(rec.data, strict=0).toMARCXML()))[0])
-                            title = ''
+                        if "100" in list_of_record[identifier]:
+                            for author in list_of_record[identifier]["100"]:
+                                for tag in author[0]:
+                                    if tag[0] == 'a':
+                                        if authors != "":
+                                            authors += " / " + tag[1].strip(",;.")
+                                        else:
+                                            authors += tag[1].strip(",;.") + " "
+                        if "700" in list_of_record[identifier]:
+                            for author in list_of_record[identifier]["700"]:
+                                for tag in author[0]:
+                                    if tag[0] == 'a':
+                                        if authors != "":
+                                            authors += " / " + tag[1].strip(",;.")
+                                        else:
+                                            authors += tag[1].strip(",;.") + " "
+                        if "260" in list_of_record[identifier]:
+                            for publisher in list_of_record[identifier]["260"][0][0]:
+                                publishers += publisher[1] + " "
+                        if "245" in list_of_record[identifier]:
                             for title_constituant in list_of_record[identifier]["245"][0][0]:
                                 title += title_constituant[1] + " "
 
+                        body_content += "<tr><td><div class='bibz39_titles'>{0}<div><td>{4}</td><td>{5}</td</td><td>{2}</td><td><div class='bibz39_button_td'>{3}</div></td><td><div class='bibz39_button_td'>{1}</div></td></tr>".format(
+                            title,
+                            '<form method="post" action="/admin2/bibz39/"><input type="hidden"  name="marcxml"  value="{0}"><input type="submit" value="Import" /></form>'.format(
+                                cgi.escape(record_xml_output(list_of_record[identifier])).replace(
+                                    "\"", "&quot;").replace("\'", "&quot;")),
+                            rec["provider"],
+                            '<button onclick="showxml({0})">View</button>'.format(identifier),
+                            authors, publishers)
+                    body_content += "</table>"
+                    body_content += '<script type="text/javascript">'
+                    body_content += "var gAllMarcXml= {"
+                    for i, rec in enumerate(list_of_record):
+                        body_content += "{0}:{1},".format(i, json.dumps(record_xml_output(rec)))
+                    body_content += "};"
+                    body_content += '</script>'
 
-                            body_content += "<tr><td>{0}</td><td><a href='#/' onclick='showxml({0})'>{1}</a><th><th>{2}</th></tr>".format(
-                                identifier, title,
-                                '<form method="post" action="/admin2/bibz39/"><input type="hidden"  name="marcxml"  value="{0}"><input type="submit" value="bibedit" /></form>'.format(
-                                    cgi.escape(
-                                        record_xml_output(list_of_record[identifier])).replace("\"",
-                                                                                               "&quot;").replace(
-                                        "\'", "&quot;")))
-
-                        body_content += "</table>"
-                        body_content += '<script type="text/javascript">'
-                        body_content += "var gAllMarcXml= {"
-                        for i, rec in enumerate(list_of_record):
-                            body_content += "{0}:{1},".format(i, json.dumps(record_xml_output(rec)))
-                        body_content += "};"
-                        body_content += '</script>'
-
-                    else:
-                        if not err:
-                            body_content += "No result"
-
-            except zoom.QuerySyntaxError:
-                body_content += "<div> There is an error in the query syntax<br></div>"
+                else:
+                    if not err:
+                        body_content += "No result"
+            except Exception as e:
                 if conn:
                     conn.close()
-            except Exception:
-                if conn:
-                    conn.close()
-                raise
+                body_content += "<h3>An error occured</h3><p>{0}</p>".format(e)
+                register_exception()
 
-            body_content += '</div>'
+            body_content += '<div id="dialog-message" title="XML Preview"></div></div>'
 
-        return page(title="bibz39 module",
+        return page(title="Z39.50 Search",
                     body=body_content,
                     errors=[],
                     warnings=[],
@@ -176,30 +192,37 @@ class WebInterfacebibz39Pages(WebInterfaceDirectory):
 
     def generate_request_form(self, argd):
         html = ""
-        html += """<div id='middle_area'><h3 class="fullwidth" >Search</h3>
-
-        <form method="post" action="/admin2/bibz39/">
-        <div id='search_form'>
-        <input type="text" name="search" id="search" value="{0}" />
-
-        <input type="submit" value="query" class="adminbutton submitbutton" />
-        </div>
-        <div class='server_area'>""".format(argd["search"])
+        html += """
+        <div class='server_area'>Search in:<div class="bibz39_servers">"""
 
         for server in CFG_Z39_SERVER.keys():
-            html += "<div><input type='checkbox' name='server' value='{0}'>{0}</div>".format(server)
+            if (not argd["server"] and "default" in CFG_Z39_SERVER[server] and
+                    CFG_Z39_SERVER[server][
+                        "default"]) or server in argd["server"]:
+                html += "<div><input form='main_form' type='checkbox' name='server' value='{0}' checked>{0}</div>".format(
+                    server)
+            else:
+                html += "<div><input form='main_form' type='checkbox' name='server' value='{0}'>{0}</div>".format(
+                    server)
+
+        html += """</div></div><div id='middle_area'>
+
+        <form id="main_form" method="post" action="/admin2/bibz39/">
+        <div id='search_form'>
+        <div id='radiobuttons'>"""
+
+        for req_type in self._request_type_dict:
+            html += """<input type="radio" name="search_type" value="{0}"{1}> {0}""".format(
+                req_type, "checked" if req_type == argd["search_type"] else "")
 
         html += """</div>
+        <input type="text" name="search" id="search" value="{0}" />
 
-        <div id="arrow" onclick="server_area_print()" >
-        <a href="#1">
-        <div id="serverarrow" class="fa fa-angle-double-down">
-        </div>
-        </a>
+        <input type="submit" onclick="spinning()" value="search" />
         </div>
 
 
 
-        </form>"""
+        </form>""".format(argd["search"])
 
         return html
