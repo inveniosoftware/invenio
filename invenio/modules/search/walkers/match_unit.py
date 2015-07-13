@@ -21,6 +21,7 @@
 
 import re
 import six
+from collections import MutableSequence, MutableMapping
 
 from invenio_query_parser.ast import (
     AndOp, KeywordOp, OrOp,
@@ -55,16 +56,16 @@ def match_unit(record, p, f=None, m='a', wl=None):
     if m != 'e' and isinstance(p, six.string_types):
         p = re.compile(p)
 
-    if isinstance(record, list):
+    if isinstance(record, MutableSequence):
         return any([match_unit(field, p, f=f, m=m, wl=wl)
                     for field in record])
-    elif isinstance(record, dict):
+    elif isinstance(record, MutableMapping):
         return any([match_unit(field, p, f=f, m=m, wl=wl)
                     for field in record.values()])
 
     if m == 'e':
-        return str(record) == p
-    return p.search(str(record)) is not None
+        return six.text_type(record) == p
+    return p.search(six.text_type(record)) is not None
 
 
 class MatchUnit(object):
