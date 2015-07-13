@@ -60,7 +60,7 @@ ORCID_JSON_TO_XML_EXT_ID = {
     'OTHER_ID': 'other-id'
 }
 
-ORCID_SINGLE_REQUEST_WORKS = 50
+ORCID_SINGLE_REQUEST_WORKS = 1
 MAX_COAUTHORS = 25
 MAX_DESCRIPTION_LENGTH = 4999
 
@@ -619,6 +619,8 @@ def _get_orcid_dictionaries(papers, personid, old_external_ids, orcid):
 
         work_dict['visibility'] = 'public'
         orcid_list.append(work_dict)
+
+        bibtask.write_message("Pushing " + str(recid))
 
         if len(orcid_list) == ORCID_SINGLE_REQUEST_WORKS:
             bibtask.write_message("I will push " +
