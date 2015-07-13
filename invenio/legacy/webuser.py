@@ -34,16 +34,10 @@ __revision__ = "$Id$"
 
 import cgi
 import urllib
-import urlparse
-import socket
-import smtplib
 import re
-import random
 import datetime
 
-from flask import Request, current_app
-from six import iteritems
-from socket import gaierror
+from flask import current_app
 import os
 import binascii
 import time
@@ -59,15 +53,9 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
-     CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
-     CFG_CERN_SITE, \
-     CFG_INSPIRE_SITE, \
-     CFG_BIBAUTHORID_ENABLED, \
-     CFG_SITE_RECORD
+     CFG_CERN_SITE
 
 try:
     from flask import session
@@ -77,10 +65,11 @@ from invenio.legacy.dbquery import run_sql
 from invenio.utils.serializers import serialize_via_marshal
 
 
-from invenio_base.i18n import gettext_set_language, wash_languages, wash_language
+from invenio.base.i18n import gettext_set_language
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db
+#  User = lazy_import('invenio_accounts.models.User')
 from invenio_accounts.models import User
 
 from sqlalchemy.exc import OperationalError
@@ -186,61 +175,9 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                 req=req,
                 navmenuid=navmenuid)
 
-def getUid(req):
-    """Return user ID taking it from the cookie of the request.
-       Includes control mechanism for the guest users, inserting in
-       the database table when need be, raising the cookie back to the
-       client.
-
-       User ID is set to 0 when client refuses cookie or we are in the
-       read-only site operation mode.
-
-       User ID is set to -1 when we are in the permission denied site
-       operation mode.
-
-       getUid(req) -> userId
-    """
-    #if hasattr(req, '_user_info'):
-    #    return req._user_info['_uid']
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 1: return 0
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
-
-    guest = 0
-    from flask import session
-
-    uid = session.uid
-    if not session.need_https:
-        if uid == -1: # first time, so create a guest user
-            if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-                session['uid'] = 0
-                session.set_remember_me(False)
-                return 0
-            else:
-                return -1
-        else:
-            if not hasattr(req, '_user_info') and 'user_info' in session:
-                req._user_info = session['user_info']
-                req._user_info = collect_user_info(req, refresh=True)
-
-    if guest == 0:
-        guest = isGuestUser(uid)
-
-    if guest:
-        if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-            return uid
-        elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
-            return -1
-    else:
-        res = run_sql("""SELECT note FROM "user" WHERE id=%s""", (uid,))
-        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
-            return uid
-        elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res and res[0][0] in [1, "1"]:
-            return uid
-        else:
-            return -1
-
-
 from invenio.ext.login import current_user, login_user, logout_user
+
+
 getUid = lambda req: current_user.get_id()
 
 
@@ -440,8 +377,6 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
     if not email_valid_p(email):
         return 1
 
-    _ = gettext_set_language(ln)
-
     # is email already taken?
     res = run_sql("""SELECT email FROM "user" WHERE email=%s""", (email,))
     if len(res) > 0:
@@ -488,7 +423,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         db.session.rollback()
         return 7
     if activated == 1: # Ok we consider the user as logged in :-)
-        setUid(req, uid)
+        setUid(req, user.id)
     return 0
 
 def updateDataUser(uid, email, nickname):
