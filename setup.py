@@ -164,6 +164,9 @@ extras_require = {
         "oauth2client>=1.4.0",
         "urllib3>=1.8.3"
     ],
+    "iiif": [
+        # promoted to required dependenies in 2.1
+    ],
     "img": [
         "qrcode>=5.1",
         "Pillow>=2.7.0"
