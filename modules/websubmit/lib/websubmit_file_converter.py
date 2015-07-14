@@ -138,6 +138,8 @@ def get_conversion_map():
         '.hocr': {},
         '.pdf;pdfa': {},
         '.asc': {},
+        '.vtt': {},
+        '.srt': {},
     }
     if CFG_PATH_GZIP:
         ret['.ps']['.ps.gz'] = (gzip, {})
@@ -186,6 +188,9 @@ def get_conversion_map():
     ret['.html']['.txt'] = (html2text, {})
     ret['.htm']['.txt'] = (html2text, {})
     ret['.xml']['.txt'] = (html2text, {})
+    # Subtitle files
+    ret['.vtt']['.txt'] = (txt2text, {})
+    ret['.srt']['.txt'] = (txt2text, {})
     if CFG_PATH_TIFF2PDF:
         ret['.tiff']['.pdf'] = (tiff2pdf, {})
         ret['.tif']['.pdf'] = (tiff2pdf, {})
