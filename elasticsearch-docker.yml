@@ -16,5 +16,6 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 cluster.name: invenio
+discovery.zen.ping.multicast.enabled: false
 http.port: 9200
 http.publish_port: 9200
