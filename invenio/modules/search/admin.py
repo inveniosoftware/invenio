@@ -26,6 +26,8 @@ from invenio.ext.sqlalchemy import db
 from invenio.modules.collections.models import Collection, FacetCollection
 from invenio.modules.search.registry import facets
 
+from werkzeug.local import LocalProxy
+
 from wtforms.fields import IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -106,8 +108,9 @@ class FacetsAdmin(ModelView):
                 is_duplicated,
                 DataRequired(),
             ],
-            'query_factory': lambda: [(facet_name, facet_name)
-                                      for facet_name in facets.keys()],
+            'choices': LocalProxy(lambda: [
+                (facet_name, facet_name) for facet_name in facets.keys()
+            ]),
         },
     }
 
