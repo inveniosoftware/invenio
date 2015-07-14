@@ -160,18 +160,27 @@ require(['jquery', 'js/search/search'], function($) {
     }).join(' AND ')
 
     data['p'] += ' ' + limit;
-
     $('form[name="search"] input[name=p]').val(data['p'])
 
-    // $('form[name="search"] input[name=p]').val(args['p'] + ' ' + limit)
+    data['jrec'] = 1;
+
+    // $('form[name="search"] input[name=p]').val(data['p'] + ' ' + limit)
     // data['post_filter'] = limit;
+
 
     $.ajax({
       url: searchResultsUrl,
       data: data,
       context: $('#search_results')
     }).done(
-      function(response) { $(this).html(response)}
+      function(response) {
+        var path = "{{ url_for('search.search') }}?" + $.param(data);
+
+        $(this).html(response);
+        if (typeof(window.history.pushState) === 'function') {
+          window.history.pushState({path:path}, document.title, path);
+        }
+      }
     )
   })
 })

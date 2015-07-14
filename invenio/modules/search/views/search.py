@@ -40,39 +40,33 @@ Template hierarchy.
 
 """
 
-import cStringIO
 import datetime
 import time
 
 
 from flask import (Blueprint, abort, current_app, flash, g, jsonify,
-                   make_response, redirect, render_template, request, session,
+                   make_response, redirect, render_template, request,
                    url_for)
-from flask_breadcrumbs import (current_breadcrumbs, default_breadcrumb_root,
+from flask_breadcrumbs import (default_breadcrumb_root,
                                register_breadcrumb)
 from flask_login import current_user
-from six import iteritems
-from werkzeug.http import http_date
-from werkzeug.local import LocalProxy
 
+from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
-from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
-from invenio.ext.template.context_processor import \
-    register_template_context_processor
 from invenio.modules.collections.decorators import check_collection
 from invenio.modules.formatter import (
-    get_output_format_content_type, format_records
+    format_records, get_output_format_content_type
 )
-from invenio.modules.search.registry import facets
 from invenio.utils.pagination import Pagination
 
 from invenio_records.api import get_record
 
+from werkzeug.http import http_date
+from werkzeug.local import LocalProxy
+
 from ..api import Query
-from ..cache import get_search_query_id
 from ..forms import EasySearchForm
-from ..washers import wash_search_urlargd
 
 blueprint = Blueprint('search', __name__, url_prefix="",
                       template_folder='../templates',
@@ -236,7 +230,7 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
         args = request.args.copy()
         args['p'] = "{0}:{1}".format(args['f'], args['p'])
         del args['f']
-        return redirect('.search', **args)
+        return redirect(url_for('.search', **args))
 
     # fix for queries like `/search?p=+ellis`
     p = p.strip().encode('utf-8')
@@ -261,7 +255,10 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
         )
         response.body['post_filter'] = post_filter
 
-    current_app.logger.info(response.body)
+    if len(response) and jrec > len(response):
+        args = request.args.copy()
+        args['jrec'] = 1
+        return redirect(url_for('.search', **args))
 
     pagination = Pagination((jrec-1) // rg + 1, rg, len(response))
 
