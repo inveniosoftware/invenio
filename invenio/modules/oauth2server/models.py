@@ -301,7 +301,7 @@ class Token(db.Model):
     """Object ID."""
 
     client_id = db.Column(
-        db.String(40), db.ForeignKey('oauth2CLIENT.client_id'),
+        db.String(255), db.ForeignKey('oauth2CLIENT.client_id'),
         nullable=False,
     )
     """Foreign key to client application."""
@@ -315,7 +315,7 @@ class Token(db.Model):
     """SQLAlchemy relationship to client application."""
 
     user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id'), nullable=True
+        db.Integer(15, unsigned=True), db.ForeignKey('user.id'), nullable=True
     )
     """Foreign key to user."""
 

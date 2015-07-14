@@ -21,8 +21,10 @@
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio_records.models import Record as Bibrec
+
 from invenio.modules.scheduler.models import SchTASK
+
+from invenio_records.models import Record as Bibrec
 
 
 def get_default_arguments():
@@ -100,7 +102,7 @@ class OaiHARVESTLOG(db.Model):
         db.MediumInteger(8, unsigned=True),
         db.ForeignKey(Bibrec.id), nullable=False, server_default='0'
     )
-    bibupload_task_id = db.Column(db.Integer(11), db.ForeignKey(SchTASK.id),
+    bibupload_task_id = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(SchTASK.id),
                                   nullable=False, server_default='0',
                                   primary_key=True)
     oai_id = db.Column(db.String(40), nullable=False, server_default='',

@@ -356,7 +356,7 @@ def acc_update_role(id_role=0, name_role='', dummy=0, description='',
 
 # CONNECTIONS BETWEEN USER AND ROLE
 
-def acc_add_user_role(id_user=0, id_role=0, email='', name_role='',
+def acc_add_user_role(id_user=None, id_role=None, email='', name_role='',
                       expiration='9999-12-31 23:59:59'):
     """Add a new entry to table user_accROLE and returns it.
 
@@ -369,11 +369,11 @@ def acc_add_user_role(id_user=0, id_role=0, email='', name_role='',
     id_role = id_role or acc_get_role_id(name_role=name_role)
 
     # check if the id_role exists
-    if id_role and not acc_get_role_name(id_role=id_role):
+    if not id_role or (id_role and not acc_get_role_name(id_role=id_role)):
         return 0
 
     # check that the user actually exist
-    if not acc_get_user_email(id_user=id_user):
+    if not id_user or (id_user and not acc_get_user_email(id_user=id_user)):
         return 0
 
     # control if existing entry

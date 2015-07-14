@@ -716,7 +716,7 @@ class FacetCollection(db.Model):
     __tablename__ = 'facet_collection'
 
     id = db.Column(db.Integer, primary_key=True)
-    id_collection = db.Column(db.Integer, db.ForeignKey(Collection.id))
+    id_collection = db.Column(db.MediumInteger(9, unsigned=True), db.ForeignKey(Collection.id))
     order = db.Column(db.Integer)
     facet_name = db.Column(db.String(80))
 

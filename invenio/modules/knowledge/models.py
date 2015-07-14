@@ -285,7 +285,7 @@ class KnwKBRVAL(db.Model):
     m_value = db.Column(
         db.Text().with_variant(mysql.TEXT(30), 'mysql'),
         nullable=False)
-    id_knwKB = db.Column(db.MediumInteger(8), db.ForeignKey(KnwKB.id),
+    id_knwKB = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(KnwKB.id),
                          nullable=False, server_default='0',
                          primary_key=True)
     kb = db.relationship(

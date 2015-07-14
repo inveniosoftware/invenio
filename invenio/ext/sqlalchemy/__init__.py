@@ -140,22 +140,22 @@ class SQLAlchemy(FlaskSQLAlchemy):
         engine = app.config.get('CFG_DATABASE_TYPE', 'mysql')
         self.Model = get_model_type(self.Model)
         if engine == 'mysql':
-            # Override MySQL parameters to force MyISAM engine
+            # Override MySQL parameters to force InnoDB engine
             mysql_parameters = {'keep_existing': True,
                                 'extend_existing': False,
-                                'mysql_engine': 'MyISAM',
+                                'mysql_engine': 'InnoDB',
                                 'mysql_charset': 'utf8',
                                 'sql_mode': 'ansi_quotes'}
 
             original_table = self.Table
 
-            def table_with_myisam(*args, **kwargs):
+            def table_with_innodb(*args, **kwargs):
                 """Use same MySQL parameters that are used for ORM models."""
                 new_kwargs = dict(mysql_parameters)
                 new_kwargs.update(kwargs)
                 return original_table(*args, **new_kwargs)
 
-            self.Table = table_with_myisam
+            self.Table = table_with_innodb
             self.Model.__table_args__ = mysql_parameters
 
         _include_sqlalchemy(self, engine=engine)

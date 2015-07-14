@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,8 +19,9 @@
 
 from __future__ import absolute_import
 
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 from invenio.ext.sqlalchemy import db
+
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class BaseTestCase(InvenioTestCase):
@@ -32,6 +33,11 @@ class BaseTestCase(InvenioTestCase):
         db.session.expunge_all()
 
     def tearDown(self):
+        from ..models import RemoteAccount, RemoteToken
+        RemoteToken.query.delete()
+        RemoteAccount.query.delete()
+        db.session.commit()
+        db.session.expunge_all()
         db.session.expunge_all()
 
 
@@ -51,27 +57,52 @@ class RemoteAccountTestCase(BaseTestCase):
 
 
 class RemoteTokenTestCase(BaseTestCase):
+    def setUp(self):
+        super(RemoteTokenTestCase, self).setUp()
+        from invenio.modules.accounts.models import User
+        u1 = User(nickname='RemoteTokenTestCaseUser1', password='')
+        u2 = User(nickname='RemoteTokenTestCaseUser2', password='')
+        u3 = User(nickname='RemoteTokenTestCaseUser3', password='')
+        db.session.add(u1)
+        db.session.add(u2)
+        db.session.add(u3)
+        db.session.commit()
+
+        self.u1 = u1.id
+        self.u2 = u2.id
+        self.u3 = u3.id
+        db.session.expunge_all()
+
+    def tearDown(self):
+        super(RemoteTokenTestCase, self).tearDown()
+        from invenio.modules.accounts.models import User
+        User.query.filter_by(id=self.u1).delete()
+        User.query.filter_by(id=self.u2).delete()
+        User.query.filter_by(id=self.u3).delete()
+        db.session.commit()
+        db.session.expunge_all()
+
     def test_get_create(self):
         from ..models import RemoteAccount, RemoteToken
 
-        t = RemoteToken.create(2, "dev", "mytoken", "mysecret")
+        t = RemoteToken.create(self.u1, "dev", "mytoken", "mysecret")
         assert t
         assert t.token() == ('mytoken', 'mysecret')
 
-        acc = RemoteAccount.get(2, "dev")
+        acc = RemoteAccount.get(self.u1, "dev")
         assert acc
         assert t.remote_account.id == acc.id
         assert t.token_type == ''
 
         t2 = RemoteToken.create(
-            2, "dev", "mytoken2", "mysecret2",
+            self.u1, "dev", "mytoken2", "mysecret2",
             token_type='t2'
         )
         assert t2.remote_account.id == acc.id
         assert t2.token_type == 't2'
 
-        t3 = RemoteToken.get(2, "dev")
-        t4 = RemoteToken.get(2, "dev", token_type="t2")
+        t3 = RemoteToken.get(self.u1, "dev")
+        t4 = RemoteToken.get(self.u1, "dev", token_type="t2")
         assert t4.token() != t3.token()
 
         assert RemoteToken.query.count() == 2
@@ -81,12 +112,12 @@ class RemoteTokenTestCase(BaseTestCase):
     def test_get_regression(self):
         from ..models import RemoteToken
 
-        t3 = RemoteToken.create(3, "dev", "mytoken", "mysecret")
-        t4 = RemoteToken.create(4, "dev", "mytoken", "mysecret")
+        t3 = RemoteToken.create(self.u2, "dev", "mytoken", "mysecret")
+        t4 = RemoteToken.create(self.u3, "dev", "mytoken", "mysecret")
 
-        assert RemoteToken.get(3, "dev").remote_account.user_id == \
+        assert RemoteToken.get(self.u2, "dev").remote_account.user_id == \
             t3.remote_account.user_id
-        assert RemoteToken.get(4, "dev").remote_account.user_id == \
+        assert RemoteToken.get(self.u3, "dev").remote_account.user_id == \
             t4.remote_account.user_id
 
 
