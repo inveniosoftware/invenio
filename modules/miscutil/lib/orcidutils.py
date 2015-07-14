@@ -62,7 +62,7 @@ ORCID_JSON_TO_XML_EXT_ID = {
 
 ORCID_SINGLE_REQUEST_WORKS = 1
 MAX_COAUTHORS = 25
-MAX_DESCRIPTION_LENGTH = 4999
+MAX_DESCRIPTION_LENGTH = 4500
 
 ############################### PULLING ########################################
 
