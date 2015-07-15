@@ -27,15 +27,15 @@
 
 {% block record_header %}
   <a href="{{ url_for('record.metadata', recid=record['control_number']) }}">
-    {{ record.get('title_statement.title[0]', '') }}
+    {{ record.get('title_statement.title', '') }}
     {{- record.get('title.volume', '')|prefix(', ') }}
     {{- record.get('title.subtitle', '')|prefix(': ') }}
-    {{- record.get('edition_statement[0].edition_statement[0]', '')|prefix('; ') }}
+    {{- record.get('edition_statement[0].edition_statement', '')|prefix('; ') }}
   </a>
 {% endblock %}
 
 {% block record_content %}
-  {{ record.get('summary[0].summary[0]', '')|sentences(3) }}
+  {{ record.get('summary[0].summary', '')|sentences(3) }}
 {% endblock %}
 
 {% block record_info %}
