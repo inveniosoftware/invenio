@@ -61,6 +61,7 @@ EXTENSIONS = [
 ]
 
 PACKAGES = [
+    'invenio_checker',
     'invenio_records',
     'invenio_search',
     'invenio_comments',
