@@ -22,17 +22,32 @@ Solr utilities.
 """
 
 
+import os
+import urllib2
+import re
 import time
-from invenio.config import CFG_SOLR_URL
+
+from invenio.config import (
+    CFG_SOLR_URL,
+    CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY,
+    CFG_BIBINDEX_SPLASH_PAGES
+)
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
+from invenio.htmlutils import get_links_in_html_page
+from invenio.websubmit_file_converter import convert_file
 from invenio.dbquery import run_sql
-from invenio.search_engine import record_exists
-from invenio.bibdocfile import BibRecDocs
+from invenio.search_engine import record_exists, get_field_tags
+from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibdocfile import BibRecDocs, bibdocfile_url_p, download_url
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.bibindex_engine import create_range_list
 from invenio.errorlib import register_exception
 from invenio.bibrank_bridge_utils import get_tags, get_field_content_in_utf8
+from invenio.bibtask import write_message
+
+
+SOLR_CONNECTION = None
 
 
 if CFG_SOLR_URL:
@@ -103,16 +118,11 @@ def solr_add_range(lower_recid, upper_recid, tags_to_index, next_commit_counter)
     """
     for recid in range(lower_recid, upper_recid + 1):
         if record_exists(recid):
-            abstract        = get_field_content_in_utf8(recid, 'abstract', tags_to_index)
-            author          = get_field_content_in_utf8(recid, 'author', tags_to_index)
-            keyword         = get_field_content_in_utf8(recid, 'keyword', tags_to_index)
-            title           = get_field_content_in_utf8(recid, 'title', tags_to_index)
-            try:
-                bibrecdocs  = BibRecDocs(recid)
-                fulltext    = unicode(bibrecdocs.get_text(), 'utf-8')
-            except:
-                fulltext    = ''
-
+            abstract = get_field_content_in_utf8(recid, 'abstract', tags_to_index)
+            author = get_field_content_in_utf8(recid, 'author', tags_to_index)
+            keyword = get_field_content_in_utf8(recid, 'keyword', tags_to_index)
+            title = get_field_content_in_utf8(recid, 'title', tags_to_index)
+            fulltext = _get_fulltext(recid)
             solr_add(recid, abstract, author, fulltext, keyword, title)
             next_commit_counter = solr_commit_if_necessary(next_commit_counter,recid=recid)
 
@@ -182,3 +192,48 @@ def word_index(run): # pylint: disable=W0613
             write_message("No new records. Solr index is up to date")
 
     write_message("Solr ranking indexer completed")
+
+
+def _get_fulltext(recid):
+
+    words = []
+    try:
+        bibrecdocs = BibRecDocs(recid)
+        words.append(unicode(bibrecdocs.get_text(), 'utf-8'))
+    except Exception, e:
+        pass
+
+    if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
+        write_message("... %s is external URL but indexing only local files" % url, verbose=2)
+        return ' '.join(words)
+
+    urls_from_record = [url for tag in get_field_tags('fulltext')
+                        for url in get_fieldvalues(recid, tag)
+                        if not bibdocfile_url_p(url)]
+    urls_to_index = set()
+    for url_direct_or_indirect in urls_from_record:
+        for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
+            if re.match(splash_re, url_direct_or_indirect):
+                if url_re is None:
+                    write_message("... %s is file to index (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
+                    urls_to_index.add(url_direct_or_indirect)
+                    continue
+                write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
+                html = urllib2.urlopen(url_direct_or_indirect).read()
+                urls = get_links_in_html_page(html)
+                write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
+                for url in urls:
+                    if re.match(url_re, url):
+                        write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
+                        urls_to_index.add(url)
+        if urls_to_index:
+            write_message("... will extract words from %s:%s" % (recid, ', '.join(urls_to_index)), verbose=2)
+        for url in urls_to_index:
+            tmpdoc = download_url(url)
+            try:
+                tmptext = convert_file(tmpdoc, output_format='.txt')
+                words.append(open(tmptext).read())
+                os.remove(tmptext)
+            finally:
+                os.remove(tmpdoc)
+    return ' '.join(words)
