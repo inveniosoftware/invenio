@@ -25,8 +25,8 @@ from invenio.modules.formatter import format_record
 from invenio.modules.deposit.tasks import render_form, \
     create_recid, \
     prepare_sip, \
-    finalize_record_sip, \
-    upload_record_sip, \
+    dump_record_sip, \
+    store_record, \
     prefill_draft, \
     process_sip_metadata, \
     hold_for_approval
@@ -44,18 +44,18 @@ class SimpleRecordDeposition(DepositionType):
         # Create the submission information package by merging form data
         # from all drafts (in this case only one draft exists).
         prepare_sip(),
+        # Dump unmodified SIP
+        dump_record_sip(),
         # Process metadata to match your JSONAlchemy record model. This will
         # call process_sip_metadata() on your subclass.
         process_sip_metadata(),
         # Reserve a new record id, so that we can provide proper feedback to
         # user before the record has been uploaded.
         create_recid(),
-        # Generate MARC based on metadata dictionary.
-        finalize_record_sip(is_dump=False),
         # Hold the deposition for admin approval
         hold_for_approval(),
-        # Seal the SIP and write MARCXML file and call bibupload on it
-        upload_record_sip(),
+        # Finally create the record
+        store_record(),
     ]
 
     hold_for_upload = False

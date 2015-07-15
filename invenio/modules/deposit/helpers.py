@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -80,14 +80,14 @@ def deposition_record(record, form_classes, pre_process_load=None,
     )
 
 
-def make_record(values, is_dump=True):
+def make_record(values, is_dump=None):
     """
     Export recjson from drafts
     """
-    if is_dump:
-        record = Record(json=values, master_format='marc')
-    else:
-        record = Record(master_format='marc')
-        for k, v in six.iteritems(values):
-            record[k] = v
-    return record
+    if is_dump is not None:
+        import warnings
+        warnings.warn(
+            "Usage of `is_dump` parameter is deprecated and has no effect.",
+            category=UserWarning
+        )
+    return Record(data=values)

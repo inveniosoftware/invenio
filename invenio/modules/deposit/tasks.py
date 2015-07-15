@@ -21,6 +21,7 @@
 
 from __future__ import print_function
 
+import json
 import os
 import dictdiffer
 import dateutil.parser
@@ -31,7 +32,7 @@ from flask import current_app, abort, request
 from flask_login import current_user
 from functools import wraps
 
-from invenio_records.api import get_record
+from invenio_records.api import create_record, get_record
 from invenio.modules.editor.models import HstRECORD
 from invenio.modules.deposit.models import Deposition, Agent, \
     DepositionDraftCacheManager
@@ -347,7 +348,7 @@ def create_recid():
     @wraps(create_recid)
     def _create_recid(obj, dummy_eng):
         d = Deposition(obj)
-        sip = d.get_latest_sip(sealed=False)
+        sip = d.get_latest_sip(sealed=True)
         if sip is None:
             raise Exception("No submission information package found.")
 
@@ -448,7 +449,7 @@ def process_sip_metadata(processor=None):
     @wraps(process_sip_metadata)
     def _process_sip(obj, dummy_eng):
         d = Deposition(obj)
-        metadata = d.get_latest_sip(sealed=False).metadata
+        metadata = d.get_latest_sip(sealed=True).metadata
 
         if processor is not None:
             processor(d, metadata)
@@ -457,19 +458,6 @@ def process_sip_metadata(processor=None):
 
         d.update()
     return _process_sip
-
-
-def finalize_record_sip(is_dump=True):
-    """Finalize the SIP by generating the MARC and storing it in the SIP."""
-    @wraps(finalize_record_sip)
-    def _finalize_sip(obj, dummy_eng):
-        d = Deposition(obj)
-        sip = d.get_latest_sip(sealed=False)
-        sip.package = make_record(
-            sip.metadata, is_dump=is_dump
-        ).legacy_export_as_marc()
-        d.update()
-    return _finalize_sip
 
 
 def hold_for_approval():
@@ -483,43 +471,40 @@ def hold_for_approval():
     return _hold_for_approval
 
 
-def upload_record_sip():
-    """Generate the record from marc.
-
-    The function requires the marc to be generated,
-    so the function export_marc_from_json must have been called successfully
-    before
-    """
-    @wraps(upload_record_sip)
-    def create(obj, dummy_eng):
+def dump_record_sip():
+    @wraps(dump_record_sip)
+    def dump(obj, dummy_eng):
         #FIXME change share tmp directory
-        from invenio.config import CFG_TMPSHAREDDIR
-        from invenio.legacy.bibsched.bibtask import task_low_level_submission, \
-            bibtask_allocate_sequenceid
         d = Deposition(obj)
 
         sip = d.get_latest_sip(sealed=False)
-        sip.seal()
+        sip.seal() # FIXME now? or later?
 
         tmp_file_fd, tmp_file_path = mkstemp(
             prefix="webdeposit-%s-%s" % (d.id, sip.uuid),
-            suffix='.xml',
-            dir=CFG_TMPSHAREDDIR,
+            suffix='.json',
+            dir=current_app.config.get('CFG_TMPSHAREDDIR'),
         )
 
-        os.write(tmp_file_fd, sip.package)
+        os.write(tmp_file_fd, json.dumps(sip.metadata))
         os.close(tmp_file_fd)
 
-        # Trick to have access to task_sequence_id in subsequent tasks.
-        d.workflow_object.task_sequence_id = bibtask_allocate_sequenceid()
+        sip.task_ids.append(None) # FIXME
 
-        task_id = task_low_level_submission(
-            'bibupload', 'webdeposit',
-            '-r' if 'recid' in sip.metadata else '-i', tmp_file_path,
-            '-I', str(d.workflow_object.task_sequence_id)
-        )
+        d.update()
+    return dump
 
-        sip.task_ids.append(task_id)
+
+def store_record():
+    @wraps(store_record)
+    def create(obj, dummy_eng):
+        #FIXME change share tmp directory
+        d = Deposition(obj)
+
+        sip = d.get_latest_sip(sealed=True)
+        sip.seal() #FIXME ???
+
+        create_record(data=sip.metadata)
 
         d.update()
     return create
