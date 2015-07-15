@@ -24,7 +24,7 @@ from __future__ import unicode_literals
 PIDSTORE_PROVIDERS = [
     'invenio.modules.pidstore.providers.datacite:DataCite',
     'invenio.modules.pidstore.providers.local_doi:LocalDOI',
-    'invenio.modules.pidstore.providers.recid:RecordID',
+    'invenio_records.providers.recid:RecordID',
 ]
 
 PIDSTORE_OBJECT_TYPES = ['rec', ]

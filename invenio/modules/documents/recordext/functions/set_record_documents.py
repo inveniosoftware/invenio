@@ -24,7 +24,7 @@ import os
 from invenio.base.utils import toposort_depends
 from invenio.modules.documents import api
 from invenio.modules.documents.tasks import set_document_contents
-from invenio.modules.pidstore.recordext.functions import reserve_recid
+from invenio_records.recordext.functions import reserve_recid
 from invenio_records.signals import before_record_insert
 from invenio_records.utils import name_generator
 
