@@ -61,7 +61,6 @@ Modules
    modules/oauthclient
    modules/redirector
    modules/upgrader
-   modules/uploader
    modules/workflows
 
 

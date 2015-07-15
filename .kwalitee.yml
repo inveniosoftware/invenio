@@ -114,7 +114,6 @@ components:
 - travis
 - unapi
 - upgrader
-- uploader
 - version
 - webhooks
 - workflows
