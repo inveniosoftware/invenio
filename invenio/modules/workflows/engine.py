@@ -115,6 +115,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         super(BibWorkflowEngine, self).__init__()
 
         self.db_obj = None
+        self._session = None
         if isinstance(workflow_object, Workflow):
             self.db_obj = workflow_object
         else:
@@ -303,7 +304,8 @@ BibWorkflowEngine
 
     def has_completed(self):
         """Return True if workflow is fully completed."""
-        res = db.session.query(db.func.count(BibWorkflowObject.id)).\
+        session = self._session or db.session
+        res = session.query(db.func.count(BibWorkflowObject.id)).\
             filter(BibWorkflowObject.id_workflow == self.uuid).\
             filter(BibWorkflowObject.version.in_(
                 [ObjectVersion.INITIAL,
@@ -316,20 +318,21 @@ BibWorkflowEngine
         # This workflow continues a previous execution.
         if status == WorkflowStatus.HALTED:
             self.db_obj.current_object = 0
-        self.db_obj.save(status)
+        self.db_obj.save(status, self._session)
 
     def set_task_position(self, new_position):
         """Set current task position."""
         self._i[1] = new_position
 
-    def process(self, objects):
+    def process(self, objects, session=None):
         """Process objects.
 
         :param objects: objects to process.
         """
+        self._session = session
         super(BibWorkflowEngine, self).process(objects)
 
-    def restart(self, obj, task):
+    def restart(self, obj, task, session=None):
         """Restart the workflow engine at given object and task.
 
         Will restart the workflow engine instance at given object and task
@@ -393,7 +396,7 @@ BibWorkflowEngine
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
 
-        self.process(self._objects)
+        self.process(self._objects, session)
         self._unpickled = False
 
     @staticmethod
@@ -424,8 +427,10 @@ BibWorkflowEngine
             i[0] += 1
             obj = objects[i[0]]
             obj.reset_error_message()
+            obj._session = self._session
             obj.save(version=ObjectVersion.RUNNING,
-                     id_workflow=self.db_obj.uuid)
+                     id_workflow=self.db_obj.uuid,
+                     session=self._session)
             callbacks = self.callback_chooser(obj, self)
             if callbacks:
                 try:
@@ -449,7 +454,10 @@ BibWorkflowEngine
                     obj.log.debug(msg)
 
                     # Processing for the object is stopped!
-                    obj.save(version=ObjectVersion.COMPLETED)
+                    obj.save(
+                        version=ObjectVersion.COMPLETED,
+                        session=self._session
+                    )
                     self.increase_counter_finished()
                     break
                 except JumpTokenBack as step:
@@ -462,7 +470,10 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.COMPLETED)
+                    obj.save(
+                        version=ObjectVersion.COMPLETED,
+                        session=self._session
+                    )
                     self.increase_counter_finished()
                 except JumpTokenForward as step:
                     if step.args[0] < 0:
@@ -473,7 +484,10 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.COMPLETED)
+                    obj.save(
+                        version=ObjectVersion.COMPLETED,
+                        session=self._session
+                    )
                     self.increase_counter_finished()
                 except ContinueNextToken:
                     self.log.debug('Stop processing for this object, '
@@ -481,7 +495,10 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
 
                     # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.COMPLETED)
+                    obj.save(
+                        version=ObjectVersion.COMPLETED,
+                        session=self._session
+                    )
                     self.increase_counter_finished()
                     continue
                 except (HaltProcessing, WorkflowHalt) as e:
@@ -515,7 +532,10 @@ BibWorkflowEngine
                         )
 
             # We save each object once it is fully run through
-            obj.save(version=ObjectVersion.COMPLETED)
+            obj.save(
+                version=ObjectVersion.COMPLETED,
+                session=self._session
+            )
             self.increase_counter_finished()
             i[1] = [0]  # reset the callbacks pointer
         self.after_processing(objects, self)

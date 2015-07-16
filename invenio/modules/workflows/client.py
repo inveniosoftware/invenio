@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +19,14 @@
 """Low-level functions to run workflows."""
 
 import traceback
-from .errors import WorkflowHalt, WorkflowError
-from .models import ObjectVersion
+
+from invenio.ext.sqlalchemy import db
+
+from sqlalchemy.exc import InvalidRequestError
+
 from .engine import WorkflowStatus
+from .errors import WorkflowError, WorkflowHalt
+from .models import ObjectVersion
 
 
 def run_workflow(wfe, data, stop_on_halt=False,
@@ -39,15 +44,25 @@ def run_workflow(wfe, data, stop_on_halt=False,
     :param wfe: workflow engine in charge of workflow execution
     """
     while True:
+        # Make a backup of the db session and replace the global one with a
+        # new clean version. This is required because the workflow payload
+        # might do horrible things with it and we need to for querying+storing
+        # the workflow state/objects.
+        session_backup = db.session
+        db.session = db.create_scoped_session()
+
         try:
             if initial_run:
                 initial_run = False
-                wfe.process(data)
+                wfe.process(data, session_backup)
+                db.session = session_backup
                 break
             else:
-                wfe.restart('next', 'first')
+                wfe.restart('next', 'first', session_backup)
+                db.session = session_backup
                 break
         except WorkflowHalt as workflowhalt_triggered:
+            db.session = session_backup
             current_obj = wfe.get_current_object()
             if current_obj:
                 if workflowhalt_triggered.action:
@@ -74,28 +89,40 @@ def run_workflow(wfe, data, stop_on_halt=False,
             if stop_on_halt:
                 break
         except Exception as exception_triggered:
-            msg = "Error: %r\n%s" % \
-                  (exception_triggered, traceback.format_exc())
-            wfe.log.error(msg)
-            current_obj = wfe.get_current_object()
-            if current_obj:
-                # Sets an error message as a tuple (title, details)
-                current_obj.set_error_message((str(exception_triggered), msg))
-                current_obj.save(
-                    ObjectVersion.ERROR,
-                    wfe.getCurrTaskId(),
-                    id_workflow=wfe.uuid
-                )
-            wfe.save(status=WorkflowStatus.ERROR)
-            if stop_on_error:
-                if isinstance(exception_triggered, WorkflowError):
-                    raise exception_triggered
-                else:
-                    raise WorkflowError(
-                        message=msg,
-                        id_workflow=wfe.uuid,
-                        id_object=wfe.getCurrObjId(),
+            db.session = session_backup
+            try:
+                msg = "Error: %r\n%s" % \
+                      (exception_triggered, traceback.format_exc())
+                wfe.log.error(msg)
+                current_obj = wfe.get_current_object()
+                if current_obj:
+                    # Sets an error message as a tuple (title, details)
+                    current_obj.set_error_message(
+                        (str(exception_triggered), msg)
                     )
+                    current_obj.save(
+                        ObjectVersion.ERROR,
+                        wfe.getCurrTaskId(),
+                        id_workflow=wfe.uuid
+                    )
+                wfe.save(status=WorkflowStatus.ERROR)
+                if stop_on_error:
+                    if isinstance(exception_triggered, WorkflowError):
+                        raise exception_triggered
+                    else:
+                        raise WorkflowError(
+                            message=msg,
+                            id_workflow=wfe.uuid,
+                            id_object=wfe.getCurrObjId(),
+                        )
+            except InvalidRequestError:
+                # OK, we tried to backup the db session but it didn't work out.
+                # That's really really bad :(
+                raise Exception(
+                    'Something messed up our SQL session.'
+                    ' Cannot store workflow state.'
+                    ' Original exception was:\n{}'.format(msg)
+                )
 
 
 def continue_execution(wfe, workflow_object, restart_point="restart_task",

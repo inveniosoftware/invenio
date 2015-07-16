@@ -176,7 +176,11 @@ class Workflow(db.Model):
 
         See also SQLAlchemy BaseQuery's filter and filter_by documentation.
         """
-        return cls.query.filter(*criteria).filter_by(**filters)
+        session = filters.pop('session', None)
+        if session:
+            return session.query(cls).filter(*criteria).filter_by(**filters)
+        else:
+            return cls.query.filter(*criteria).filter_by(**filters)
 
     @classmethod
     def get_status(cls, uuid=None):
@@ -246,19 +250,33 @@ class Workflow(db.Model):
         )
 
     @classmethod
-    @session_manager
-    def delete(cls, uuid=None):
+    def delete(cls, uuid=None, session=None):
         """Delete a workflow."""
-        uuid = uuid or cls.uuid
-        db.session.delete(cls.get(Workflow.uuid == uuid).first())
+        if not session:
+            session = db.session
 
-    @session_manager
-    def save(self, status):
+        try:
+            uuid = uuid or cls.uuid
+            session.delete(cls.get(Workflow.uuid == uuid).first())
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
+
+    def save(self, status, session=None):
         """Save object to persistent storage."""
-        self.modified = datetime.now()
-        if status is not None:
-            self.status = status
-        db.session.add(self)
+        if not session:
+            session = db.session
+
+        try:
+            self.modified = datetime.now()
+            if status is not None:
+                self.status = status
+            session.add(self)
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
 
 
 class BibWorkflowObject(db.Model):
@@ -346,6 +364,7 @@ class BibWorkflowObject(db.Model):
     )
 
     _log = None
+    _session = None
 
     @db.hybrid_property
     def id_workflow(self):
@@ -775,7 +794,7 @@ class BibWorkflowObject(db.Model):
         self.uri = other.uri
 
     @session_manager
-    def save(self, version=None, task_counter=None, id_workflow=None):
+    def save(self, version=None, task_counter=None, id_workflow=None, session=None):
         """Save object to persistent storage."""
         if task_counter is not None:
             if isinstance(task_counter, list):
@@ -786,13 +805,16 @@ class BibWorkflowObject(db.Model):
             else:
                 raise ValueError("Task counter must be a list!")
 
+        if not session:
+            session = self._session or db.session
+
         if version is not None:
             if version != self.version:
                 self.modified = datetime.now()
             self.version = version
         if id_workflow is not None:
             self.id_workflow = id_workflow
-        db.session.add(self)
+        session.add(self)
         if self.id is not None:
             self.log.debug("Saving object: %s" % (self.id or "new",))
 
