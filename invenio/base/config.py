@@ -62,6 +62,7 @@ EXTENSIONS = [
 
 PACKAGES = [
     'invenio_records',
+    'invenio_pidstore',
     'invenio.modules.*',
     'invenio.base',
 ]
@@ -72,6 +73,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.multimedia',
     'invenio.modules.pages',
+    'invenio.modules.pidstore',
     'invenio.modules.records',
     'invenio.modules.tags',
 ]

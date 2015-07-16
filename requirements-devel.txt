@@ -18,3 +18,4 @@
 -e git+git://github.com/inveniosoftware/flask-iiif.git#egg=flask-iiif
 -e git+git://github.com/inveniosoftware/invenio-query-parser.git#egg=invenio-query-parser
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
