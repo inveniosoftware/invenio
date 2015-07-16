@@ -2733,8 +2733,8 @@ class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
                     'cname': webapi.get_canonical_id_from_person_id(person_id),
                     'link_to_record': ulevel == "admin",
                     'hepnames_link': "%s/%s/" % (CFG_BASE_URL, "record"),
-                    'new_record_link': 'http://slac.stanford.edu/spires/hepnames/additions.shtml',
-                    'update_link': "http://inspirehep.net/person/update?IRN=",
+                    'new_record_link': 'https://labs.inspirehep.net/author/new',
+                    'update_link': "http://labs.inspirehep.net/author/update?recid=",
                     'profile_link': "%s/%s" % (CFG_BASE_URL, "author/profile/")
                 })
                 html_hepnames = WebProfilePage.render_template('personal_details_box', hepnames_data)
@@ -3728,49 +3728,11 @@ class WebInterfacePerson(WebInterfaceDirectory):
         else:
             hepname_bibrec = get_bibrecord(recids[0])
 
-        # Extract all info from recid that should be included in the form
-        full_name = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="a")
-        display_name = record_get_field_value(hepname_bibrec, tag="880", ind1="", ind2="", code="a")
-        email = record_get_field_value(hepname_bibrec, tag="371", ind1="", ind2="", code="m")
-        status = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="g")
-        keynumber = record_get_field_value(hepname_bibrec, tag="970", ind1="", ind2="", code="a")
-        try:
-            keynumber = keynumber.split('-')[1]
-        except IndexError:
-            pass
-        research_field_list = record_get_field_values(hepname_bibrec, tag="650", ind1="1", ind2="7", code="a")
-        institution_list = []
-        for instance in record_get_field_instances(hepname_bibrec, tag="371", ind1="", ind2=""):
-            if not instance or field_get_subfield_values(instance, "m"):
-                continue
-            institution_info = ["", "", "", "", ""]
-            if field_get_subfield_values(instance, "a"):
-                institution_info[0] = field_get_subfield_values(instance, "a")[0]
-            if field_get_subfield_values(instance, "r"):
-                institution_info[1] = field_get_subfield_values(instance, "r")[0]
-            if field_get_subfield_values(instance, "s"):
-                institution_info[2] = field_get_subfield_values(instance, "s")[0]
-            if field_get_subfield_values(instance, "t"):
-                institution_info[3] = field_get_subfield_values(instance, "t")[0]
-            if field_get_subfield_values(instance, "z"):
-                institution_info[4] = field_get_subfield_values(instance, "z")[0]
-            institution_list.append(institution_info)
-        phd_advisor_list = record_get_field_values(hepname_bibrec, tag="701", ind1="", ind2="", code="a")
-        experiment_list = record_get_field_values(hepname_bibrec, tag="693", ind1="", ind2="", code="e")
-        web_page = record_get_field_value(hepname_bibrec, tag="856", ind1="1", ind2="", code="u")
+        redirect_to_url(req,
+                        "https://labs.inspirehep.net/author/update?recid=%s" %
+                        hepname_bibrec,
+                        redirection_type=apache.HTTP_MOVED_PERMANENTLY)
 
-        # Create form and pass as parameters all the content from the record
-        body = TEMPLATE.tmpl_update_hep_name(full_name, display_name, email,
-                                             status, research_field_list,
-                                             institution_list, phd_advisor_list,
-                                             experiment_list, web_page)
-
-        title = "HEPNames"
-        return page(title=title,
-                    metaheaderadd=TEMPLATE.tmpl_update_hep_name_headers(),
-                    body=body,
-                    req=req,
-                    )
 
 
 # pylint: enable=C0301
