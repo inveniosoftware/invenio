@@ -20,3 +20,4 @@
 -e git+git://github.com/inveniosoftware/invenio-comments.git#egg=invenio-comments
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
 -e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
+-e git+git://github.com/inveniosoftware/invenio-documents.git#egg=invenio-documents

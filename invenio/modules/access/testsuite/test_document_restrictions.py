@@ -28,7 +28,7 @@ class DocumentRestrictionsTest(InvenioTestCase):
 
     def setUp(self):
         """Run before the test."""
-        from invenio.modules.documents.api import Document
+        from invenio_documents.api import Document
         self.document = Document.create({'title': 'Test restrictions'})
 
     def tearDown(self):

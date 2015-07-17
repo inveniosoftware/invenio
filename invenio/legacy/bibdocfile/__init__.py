@@ -22,5 +22,5 @@ import warnings
 from invenio.utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("BibDocFile will be removed in 2.3. Please check "
-              "'invenio.modules.documents' module.",
+              "'invenio_documents' module.",
               RemovedInInvenio23Warning)

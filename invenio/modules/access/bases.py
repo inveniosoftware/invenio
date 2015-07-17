@@ -65,7 +65,7 @@ def AclFactory(obj=''):
 
                 If the object has embed restrictions it will override the
                 access right of the parent. For example in
-                :class:`~invenio.modules.documents.api:Document` and
+                :class:`~invenio_documents.api:Document` and
                 :class:`~invenio_records.api:Record` the `Document`
                 will override the `Record` restriction which means if the
                 `Record` is restricted and the `Document` is open the user

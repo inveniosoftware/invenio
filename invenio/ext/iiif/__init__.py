@@ -24,9 +24,9 @@
     There are two ways to initialize an IIIF image object, by ``fullpath`` and
     ``bytestream``. Can be an ``import string`` or a ``callback function``.
     By default ``identifier_to_path`` return the ``fullpath`` of
-    :class:`~invenio.modules.documents.api:Document`.
+    :class:`~invenio_documents.api:Document`.
 
-    default: :func:`~invenio.modules.documents.utis.identifier_to_path`
+    default: :func:`~invenio_documents.utis.identifier_to_path`
 """
 
 from flask_iiif import IIIF
@@ -45,17 +45,17 @@ iiif = IIIF()
 
 def setup_app(app):
     """Setup Flask-IIIF extension."""
-    if 'invenio.modules.documents' in app.config.get('PACKAGES_EXCLUDE'):
+    if 'invenio_documents' in app.config.get('PACKAGES_EXCLUDE'):
         raise MultimediaError(
             "Could not initialize the Flask-IIIF extension because "
-            ":class:`~invenio.modules.documents.api:Document` is missing"
+            ":class:`~invenio_documents.api:Document` is missing"
         )
 
     iiif.init_app(app)
     iiif.init_restful(app.extensions['restful'])
     app.config.setdefault(
         'IIIF_IMAGE_OPENER',
-        'invenio.modules.documents.utils:identifier_to_path'
+        'invenio_documents.utils:identifier_to_path'
     )
 
     uuid_to_source_handler = app.config['IIIF_IMAGE_OPENER']

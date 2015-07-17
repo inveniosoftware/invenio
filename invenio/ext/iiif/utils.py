@@ -19,7 +19,7 @@
 
 """Flask-IIIF extension utils."""
 
-from invenio.modules.documents.utils import (
+from invenio_documents.utils import (
     identifier_to_path_and_permissions
 )
 

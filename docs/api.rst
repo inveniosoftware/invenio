@@ -54,7 +54,6 @@ Modules
    modules/annotations
    modules/apikeys
    modules/documentation
-   modules/documents
    modules/formatter
    modules/jsonalchemy
    modules/knowledge

@@ -104,6 +104,7 @@ install_requires = [
     "invenio-records>=0.1.0",
     "invenio-comments>=0.1.0",
     "invenio-pidstore[datacite]>=0.1.0",
+    # TODO "invenio-documents>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",

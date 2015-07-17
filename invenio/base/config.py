@@ -63,6 +63,7 @@ EXTENSIONS = [
 PACKAGES = [
     'invenio_records',
     'invenio_comments',
+    # TODO 'invenio_documents',
     'invenio_pidstore',
     'invenio.modules.*',
     'invenio.base',
@@ -73,6 +74,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.archiver',
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
+    'invenio.modules.documents',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
     'invenio.modules.pidstore',
