@@ -114,7 +114,6 @@ install_requires = [
     "mistune>=0.4.1",
     "msgpack-python>=0.3",
     "MySQL-python>=1.2.5",
-    "numpy>=1.7",
     "nydus>=0.10.8",
     # FIXME new oauthlib release after 0.7.2 has some compatible problems with
     # the used Flask-Oauthlib version.

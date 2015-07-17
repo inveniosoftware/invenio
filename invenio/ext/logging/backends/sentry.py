@@ -161,11 +161,9 @@ def setup_app(app):
         # can be removed:
         # https://github.com/getsentry/raven-python/pull/452
         from raven.utils import _VERSION_CACHE
-        import numpy
         import webassets
         import setuptools
         _VERSION_CACHE['invenio'] = invenio.__version__
-        _VERSION_CACHE['numpy'] = numpy.__version__
         _VERSION_CACHE['webassets'] = webassets.__version__
         _VERSION_CACHE['setuptools'] = setuptools.__version__
 

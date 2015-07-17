@@ -21,7 +21,6 @@
 
 import functools
 
-import numpy
 import six
 
 from flask import g
@@ -116,7 +115,20 @@ def get_most_popular_field_values(recids, tags, exclude_values=None,
             n.append(val)
         ln.append(val.lower())
     # sort by frequency (desc) and then by lowercased name.
-    return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
+    try:
+        import numpy
+        indices = numpy.lexsort([ln, f])
+    except ImportError:
+        def _cmp(a, b):
+            if f[a] == f[b]:
+                return ln[a] - ln[b]
+            else:
+                return f[a] - f[b]
+        indices = sorted(
+            range(min(len(ln), len(f))),
+            cmp=_cmp
+        )
+    return [(n[i], -1 * f[i]) for i in indices]
 
 
 def get_permitted_restricted_collections(user_info,
