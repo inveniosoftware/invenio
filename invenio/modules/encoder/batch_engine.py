@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2011 CERN.
+# Copyright (C) 2011, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -546,7 +546,6 @@ def process_batch_job(batch_job_file):
             ## We do the encoding without and rename it afterwards
             bibdoc_video_fullpath = compose_file(
                                                  bibdoc_video_directory,
-                                                 bibdoc_slave_video_docname,
                                                  bibdoc_video_extension
                                                  )
             _task_write_message("Transcoding %s to %s;%s" % (bibdoc_slave_video_docname,
