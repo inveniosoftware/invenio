@@ -25,6 +25,7 @@ import os
 import shutil
 
 from invenio.ext.sqlalchemy import db
+
 from invenio_records.models import Record as Bibrec
 
 from sqlalchemy import event
@@ -89,6 +90,50 @@ class BibdocBibdoc(db.Model):
                               primaryjoin=Bibdoc.id == id_bibdoc1)
     bibdoc2 = db.relationship(Bibdoc, backref='bibdoc1s',
                               primaryjoin=Bibdoc.id == id_bibdoc2)
+
+
+class Bibdocfsinfo(db.Model):
+
+    """Represent a Bibdocfsinfo record."""
+
+    __tablename__ = 'bibdocfsinfo'
+
+    id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
+                          db.ForeignKey(Bibdoc.id), primary_key=True,
+                          nullable=False, autoincrement=False)
+    version = db.Column(db.TinyInteger(4, unsigned=True), primary_key=True,
+                        nullable=False, autoincrement=False)
+    format = db.Column(db.String(50), primary_key=True, nullable=False,
+                       index=True)
+    last_version = db.Column(db.Boolean, nullable=False, index=True)
+    cd = db.Column(db.DateTime, nullable=False, index=True)
+    md = db.Column(db.DateTime, nullable=False, index=True)
+    checksum = db.Column(db.Char(32), nullable=False)
+    filesize = db.Column(db.BigInteger(15, unsigned=True), nullable=False,
+                         index=True)
+    mime = db.Column(db.String(100), nullable=False, index=True)
+    master_format = db.Column(db.String(50))
+
+
+class Bibdocmoreinfo(db.Model):
+
+    """Represent a Bibdocmoreinfo record."""
+
+    __tablename__ = 'bibdocmoreinfo'
+
+    id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True)
+    id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
+                          db.ForeignKey(Bibdoc.id), nullable=True)
+    version = db.Column(db.TinyInteger(4, unsigned=True), nullable=True)
+    format = db.Column(db.String(50), nullable=True)
+    id_rel = db.Column(db.MediumInteger(9, unsigned=True), nullable=True)
+    namespace = db.Column(db.Char(25), nullable=True)
+    data_key = db.Column(db.Char(25))
+    data_value = db.Column(db.LargeBinary)
+
+    __table_args__ = (db.Index('bibdocmoreinfo_key', id_bibdoc, version,
+                               format, id_rel, namespace, data_key),
+                      db.Model.__table_args__)
 
 
 class BibrecBibdoc(db.Model):
