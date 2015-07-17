@@ -98,6 +98,7 @@ install_requires = [
     "Flask-WTF>=0.10.2",
     "cryptography>=0.6",
     "fs>=0.4",
+    "idutils>=0.1.0",
     "intbitset>=2.0",
     "invenio-client>=0.1.0",
     "invenio-query-parser>=0.2",
