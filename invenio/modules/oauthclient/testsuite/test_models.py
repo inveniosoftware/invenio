@@ -20,7 +20,6 @@
 from __future__ import absolute_import
 
 from invenio.ext.sqlalchemy import db
-
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
@@ -57,52 +56,44 @@ class RemoteAccountTestCase(BaseTestCase):
 
 
 class RemoteTokenTestCase(BaseTestCase):
-    def setUp(self):
-        super(RemoteTokenTestCase, self).setUp()
-        from invenio.modules.accounts.models import User
-        u1 = User(nickname='RemoteTokenTestCaseUser1', password='')
-        u2 = User(nickname='RemoteTokenTestCaseUser2', password='')
-        u3 = User(nickname='RemoteTokenTestCaseUser3', password='')
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.add(u3)
-        db.session.commit()
 
-        self.u1 = u1.id
-        self.u2 = u2.id
-        self.u3 = u3.id
-        db.session.expunge_all()
+    def setUp(self):
+        """Create temporary users."""
+        from invenio.modules.accounts.models import User
+        # create temporary users
+        self.user_1 = User(nickname='testremotetoken1', password='test')
+        self.user_2 = User(nickname='testremotetoken2', password='test')
+        self.user_3 = User(nickname='testremotetoken3', password='test')
+        db.session.add(self.user_1)
+        db.session.add(self.user_2)
+        db.session.add(self.user_3)
+        db.session.commit()
 
     def tearDown(self):
-        super(RemoteTokenTestCase, self).tearDown()
-        from invenio.modules.accounts.models import User
-        User.query.filter_by(id=self.u1).delete()
-        User.query.filter_by(id=self.u2).delete()
-        User.query.filter_by(id=self.u3).delete()
-        db.session.commit()
-        db.session.expunge_all()
+        """Remove temporary users."""
+        self.delete_objects([self.user_1, self.user_2, self.user_3])
 
     def test_get_create(self):
         from ..models import RemoteAccount, RemoteToken
 
-        t = RemoteToken.create(self.u1, "dev", "mytoken", "mysecret")
+        t = RemoteToken.create(self.user_1.id, "dev", "mytoken", "mysecret")
         assert t
         assert t.token() == ('mytoken', 'mysecret')
 
-        acc = RemoteAccount.get(self.u1, "dev")
+        acc = RemoteAccount.get(self.user_1.id, "dev")
         assert acc
         assert t.remote_account.id == acc.id
         assert t.token_type == ''
 
         t2 = RemoteToken.create(
-            self.u1, "dev", "mytoken2", "mysecret2",
+            self.user_1.id, "dev", "mytoken2", "mysecret2",
             token_type='t2'
         )
         assert t2.remote_account.id == acc.id
         assert t2.token_type == 't2'
 
-        t3 = RemoteToken.get(self.u1, "dev")
-        t4 = RemoteToken.get(self.u1, "dev", token_type="t2")
+        t3 = RemoteToken.get(self.user_1.id, "dev")
+        t4 = RemoteToken.get(self.user_1.id, "dev", token_type="t2")
         assert t4.token() != t3.token()
 
         assert RemoteToken.query.count() == 2
@@ -112,13 +103,15 @@ class RemoteTokenTestCase(BaseTestCase):
     def test_get_regression(self):
         from ..models import RemoteToken
 
-        t3 = RemoteToken.create(self.u2, "dev", "mytoken", "mysecret")
-        t4 = RemoteToken.create(self.u3, "dev", "mytoken", "mysecret")
+        t3 = RemoteToken.create(self.user_2.id, "dev", "mytoken", "mysecret")
+        t4 = RemoteToken.create(self.user_3.id, "dev", "mytoken", "mysecret")
 
-        assert RemoteToken.get(self.u2, "dev").remote_account.user_id == \
-            t3.remote_account.user_id
-        assert RemoteToken.get(self.u3, "dev").remote_account.user_id == \
-            t4.remote_account.user_id
+        assert RemoteToken.get(
+            self.user_2.id,
+            "dev").remote_account.user_id == t3.remote_account.user_id
+        assert RemoteToken.get(
+            self.user_3.id,
+            "dev").remote_account.user_id == t4.remote_account.user_id
 
 
 TEST_SUITE = make_test_suite(RemoteAccountTestCase, RemoteTokenTestCase)
