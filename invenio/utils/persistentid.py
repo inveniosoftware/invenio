@@ -1,5 +1,5 @@
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 """Persistent identifier validation and scheme detection."""
 
 import re
+
 from six.moves.urllib.parse import urlparse
 
 
@@ -43,13 +44,15 @@ arxiv_post_2007_regexp = re.compile(
     "(arxiv:)?(\d{4})\.(\d{4,5})(v\d+)?$",
     flags=re.I
 )
-"""See http://arxiv.org/help/arxiv_identifier and http://arxiv.org/help/arxiv_identifier_for_services."""
+"""See http://arxiv.org/help/arxiv_identifier and
+       http://arxiv.org/help/arxiv_identifier_for_services."""
 
 arxiv_pre_2007_regexp = re.compile(
     "(arxiv:)?([a-z\-]+)(\.[a-z]{2})?(/\d{4})(\d+)(v\d+)?$",
     flags=re.I
 )
-"""See http://arxiv.org/help/arxiv_identifier and http://arxiv.org/help/arxiv_identifier_for_services."""
+"""See http://arxiv.org/help/arxiv_identifier and
+       http://arxiv.org/help/arxiv_identifier_for_services."""
 
 ads_regexp = re.compile("(ads:|ADS:)?(\d{4}[A-Z]\S{13}[A-Z.:])$")
 """See http://adsabs.harvard.edu/abs_doc/help_pages/data.html"""
@@ -61,10 +64,15 @@ pmid_regexp = re.compile("(pmid:)?(\d+)$", flags=re.I)
 """PubMed ID regular expression."""
 
 ark_suffix_regexp = re.compile("ark:/\d+/.+$")
-"""See http://en.wikipedia.org/wiki/Archival_Resource_Key and https://confluence.ucop.edu/display/Curation/ARK."""
+"""See http://en.wikipedia.org/wiki/Archival_Resource_Key and
+       https://confluence.ucop.edu/display/Curation/ARK."""
 
 lsid_regexp = re.compile("urn:lsid:[^:]+(:[^:]+){2,3}$", flags=re.I)
 """See http://en.wikipedia.org/wiki/LSID."""
+
+orcid_url = "http://orcid.org/"
+
+gnd_url = "http://d-nb.info/gnd/"
 
 
 def _convert_x_to_10(x):
@@ -210,10 +218,11 @@ def is_isni(val):
 def is_orcid(val):
     """Test if argument is an ORCID ID.
 
-    See http://support.orcid.org/knowledgebase/articles/116780-structure-of-the-orcid-identifier
+    See http://support.orcid.org/knowledgebase/
+        articles/116780-structure-of-the-orcid-identifier
     """
-    if val.startswith('http://orcid.org/'):
-        val = val[len('http://orcid.org/'):]
+    if val.startswith(orcid_url):
+        val = val[len(orcid_url):]
 
     val = val.replace("-", "").replace(" ", "")
     if is_isni(val):
@@ -226,21 +235,21 @@ def is_ark(val):
     """Test if argument is an ARK."""
     res = urlparse(val)
     return ark_suffix_regexp.match(val) or (
-        res.scheme == 'http'
-        and res.netloc != ''
+        res.scheme == 'http' and
+        res.netloc != '' and
         # Note res.path includes leading slash, hence [1:] to use same reexp
-        and ark_suffix_regexp.match(res.path[1:])
-        and res.params == ''
+        ark_suffix_regexp.match(res.path[1:]) and
+        res.params == ''
     )
 
 
 def is_purl(val):
     """Test if argument is a PURL."""
     res = urlparse(val)
-    return (res.scheme == 'http'
-            and res.netloc in ['purl.org', 'purl.oclc.org', 'purl.net',
-                               'purl.com']
-            and res.path != '')
+    return (res.scheme == 'http' and
+            res.netloc in ['purl.org', 'purl.oclc.org', 'purl.net',
+                           'purl.com'] and
+            res.path != '')
 
 
 def is_url(val):
@@ -278,7 +287,8 @@ def is_arxiv_pre_2007(val):
 def is_arxiv(val):
     """Test if argument is an arXiv ID.
 
-    See http://arxiv.org/help/arxiv_identifier and http://arxiv.org/help/arxiv_identifier_for_services.
+    See http://arxiv.org/help/arxiv_identifier and
+        http://arxiv.org/help/arxiv_identifier_for_services.
     """
     return is_arxiv_post_2007(val) or is_arxiv_pre_2007(val)
 
@@ -297,6 +307,18 @@ def is_pmcid(val):
     return pmcid_regexp.match(val)
 
 
+def is_gnd(val):
+    """Test if argument is a GND Identifier."""
+    if val.startswith(gnd_url):
+        val = val[len(gnd_url):]
+
+    try:
+        int(val)
+        return True
+    except ValueError:
+        return False
+
+
 CFG_PID_SCHEMES = [
     ('doi', is_doi),
     ('ark', is_ark),
@@ -310,6 +332,7 @@ CFG_PID_SCHEMES = [
     ('isbn', is_isbn),
     ('issn', is_issn),
     ('orcid', is_orcid),
+    ('gnd', is_gnd),
     ('url', is_url),
     ('isni', is_isni),
     ('ean13', is_ean13),
@@ -364,11 +387,19 @@ def normalize_ads(val):
 
 def normalize_orcid(val):
     """Normalize an ADS bibliographic code."""
-    if val.startswith("http://orcid.org/"):
-        val = val[len("http://orcid.org/"):]
+    if val.startswith(orcid_url):
+        val = val[len(orcid_url):]
     val = val.replace("-", "").replace(" ", "")
 
     return "-".join([val[0:4], val[4:8], val[8:12], val[12:16]])
+
+
+def normalize_gnd(val):
+    """Normalize a GND identifier."""
+    if val.startswith(gnd_url):
+        val = val[len(gnd_url):]
+
+    return val
 
 
 def normalize_pmid(val):
@@ -416,6 +447,8 @@ def normalize_pid(val, scheme):
         return normalize_arxiv(val)
     elif scheme == 'orcid':
         return normalize_orcid(val)
+    elif scheme == 'gnd':
+        return normalize_gnd(val)
     return val
 
 
@@ -429,7 +462,9 @@ def to_url(val, scheme):
     elif scheme == 'arxiv':
         return "http://arxiv.org/abs/%s" % val
     elif scheme == 'orcid':
-        return "http://orcid.org/%s" % val
+        return orcid_url + "%s" % val
+    elif scheme == 'gnd':
+        return gnd_url + "%s" % val
     elif scheme == 'pmid':
         return "http://www.ncbi.nlm.nih.gov/pubmed/%s" % val
     elif scheme == 'ads':
