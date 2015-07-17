@@ -193,7 +193,6 @@ and continue with the installation of prerequisite packages:
 .. code-block:: console
 
     $ brew install redis
-    $ brew install mongodb
 
 
 .. note::

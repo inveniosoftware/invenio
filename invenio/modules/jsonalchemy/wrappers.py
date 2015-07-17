@@ -103,7 +103,7 @@ class SmartJson(SmartDict):
         This object maintains two different dictionaries, one with the pure
         JSON representation, `_dict` and a second one with the BSON
         representation of the former. This behavior helps whenever dealing with
-        JSON databases as MongoDB or PostgreSQL.
+        JSON databases like PostgreSQL.
 
         The content of the BSON dictionary is typically the same as in the JSON
         one, only if the `json` section is described in the definition of the

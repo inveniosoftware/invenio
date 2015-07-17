@@ -29,10 +29,3 @@ DOCUMENTS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy'
 DOCUMENTS_SQLALCHEMYSTORAGE = {
     'model': 'invenio.modules.documents.models:Document'
 }
-
-DOCUMENTS_MONGODBSTORAGE = {
-    'model': 'Document',
-    'host': "localhost",
-    'port': 27017,
-    'database': config.CFG_DATABASE_NAME,
-}

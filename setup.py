@@ -180,7 +180,6 @@ extras_require = {
         "Pillow>=2.7.0"
     ],
     "mongo": [
-        "pymongo>=3.0"
     ],
     "misc": [  # was requirements-extras
         "gnuplot-py==1.8",

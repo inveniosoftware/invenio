@@ -31,9 +31,6 @@ class AnnotationsListResource(Resource):
 
         Provides only minimal search query options and no JSON-LD export.
         Currently used only for IDentifying annotation objects.
-
-        Request parameters are sent to MongoDB as a search query, in dictionary
-        form.
         """
         annos = get_annotations(request.args.to_dict())
         return get_jsonld_multiple(annos, context={})
@@ -45,8 +42,7 @@ class AnnotationsListResource(Resource):
         Allows performing complex queries and exporting annotations in JSON-LD
         format. It accepts a JSON document as input, with the following
         structure (defaults as values):
-        {"query": {}       // Query to send to MongoDB, see
-                           // http://docs.mongodb.org/manual/tutorial/query-documents/
+        {"query": {}       // The search query
          "ldexport: "full" // JSON-LD export format, can be: full, inline,
                            // compacted, expanded, flattened, framed,
                            // normalized.

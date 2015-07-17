@@ -234,7 +234,7 @@ how to use it in `read the docs <http://cerberus.readthedocs.org/en/latest/>`_.
 *JSONAlchemy* only adds two things to the default *cerberus*:
 
 1. The ``force`` boolean value that tells if the value of the filed needs to be
-   casted to ``type``. 
+   casted to ``type``.
 
 2. The ``default`` function (which has no parameters) that is used if the field
    has a default value.
@@ -273,7 +273,7 @@ JSON
 ^^^^
 
 Not all the fields that we want to use have a JSON-friendly representation.
-Consider a date that we would like to use as a ``datetime`` object, yet 
+Consider a date that we would like to use as a ``datetime`` object, yet
 we want to store it as a JSON object.
 
 To solve this issue, we introduced the JSON section where a couple of
@@ -553,8 +553,6 @@ Engines
 .. autoclass:: invenio.modules.jsonalchemy.jsonext.engines.cache.CacheStorage
     :members:
 .. autoclass:: invenio.modules.jsonalchemy.jsonext.engines.memory.MemoryStorage
-    :members:
-.. autoclass:: invenio.modules.jsonalchemy.jsonext.engines.mongodb_pymongo.MongoDBStorage
     :members:
 .. autoclass:: invenio.modules.jsonalchemy.jsonext.engines.sqlalchemy.SQLAlchemyStorage
     :members:

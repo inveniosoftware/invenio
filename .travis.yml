@@ -23,7 +23,6 @@ notifications:
 services:
   - mysql
   - redis
-  - mongodb
   - elasticsearch
 
 sudo: false

@@ -55,9 +55,7 @@ What do I need?
 
 *Invenio* requires a relational database backend to store information.
 MySQL or PostgreSQL (*coming soon*) are required for basic
-functionality, but there's also support for a MongoDB of other
-experimental NoSQL solutions, including using SQLite for local
-development.
+functionality.
 
 Get Started
 ===========

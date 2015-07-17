@@ -25,15 +25,7 @@ from invenio.base import config
 
 
 ANNOTATIONS_ENGINE = ('invenio.modules.jsonalchemy.jsonext.engines.'
-                      'mongodb_pymongo:MongoDBStorage')
-
-
-ANNOTATIONS_MONGODBSTORAGE = {
-    'model': 'Annotation',
-    'host': "localhost",
-    'port': 27017,
-    'database': config.CFG_DATABASE_NAME,
-}
+                      'sqlalchemy:SQLAlchemyStorage')
 
 ANNOTATIONS_ATTACHMENTS = False
 
