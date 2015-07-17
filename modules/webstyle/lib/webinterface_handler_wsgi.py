@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of Invenio.
-# Copyright (C) 2009, 2010, 2011, 2012 CERN.
+# Copyright (C) 2009, 2010, 2011, 2012, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -61,10 +61,9 @@ CFG_WSGI_SERVE_STATIC_FILES = False
 # any src usage of an external website
 _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re.I)
 
-# Regexp to verify that the IP starts with a number (filter cases where 'unknown')
-# It is faster to verify only the start (585 ns) compared with verifying
-# the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
-_RE_IPADDRESS_START = re.compile(r"^\d+\.")
+# Regexp to verify the IP (filter cases where 'unknown').
+_RE_IPADDRESS = re.compile(r"^\d+(\.\d+){3}$")
+_RE_IPADDRESS_WITH_PORT = re.compile(r"^\d+(\.\d+){3}:\d+$")
 
 # Regexp to match IE User-Agent
 _RE_BAD_MSIE = re.compile(r"MSIE\s+(\d+\.\d+)")
@@ -275,8 +274,11 @@ class SimulatedModPythonRequest(object):
                 # we trust this proxy
                 ip_list = self.__headers_in['X-FORWARDED-FOR'].split(',')
                 for ip in ip_list:
-                    if _RE_IPADDRESS_START.match(ip):
+                    if _RE_IPADDRESS.match(ip):
                         return ip
+                    # Probably because behind a proxy
+                    elif _RE_IPADDRESS_WITH_PORT.match(ip):
+                        return ip[:ip.index(':')]
                 # no IP has the correct format, return a default IP
                 return '10.0.0.10'
             else:
