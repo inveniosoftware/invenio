@@ -31,22 +31,130 @@ For example, session_manager used to handle commit/rollback:
 
 from __future__ import print_function
 
-import base64
 import os
 import re
-import sqlalchemy
 import sys
 
+import base64
+import sqlalchemy
 from intbitset import intbitset
 
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.mutable import MutableComposite
 from sqlalchemy.orm import class_mapper, properties
 from sqlalchemy.orm.collections import InstrumentedList, collection
 
 
+
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
 all_cap_re = re.compile('([a-z0-9])([A-Z])')
+
+
+class CompositeItems(MutableComposite):
+    """MutableComposite for easier generation of dictionaries.
+
+    In order to generate predictably keyed and structured dictionaries out of
+    `MutableComposite`s, one needs to inform the `MutableComposite` of the
+    correspondence of the items in the composite with their names in the
+    model. This abstract class defines an interface for a way of achieving that.
+    """
+
+    def __composite_items__(self):
+        """Return list of supported names.
+
+        This is neccessary for figuring out keys for a dictionary made out of
+        this composite, since we have no other way of knowing which properties
+        to read.
+
+        For example if this composite is built from the following columns:
+        .. code-block:: python
+            config_a = Column(..)
+            config_b = Column(..)
+            config = composite(Config, config_a, config_b)
+        where
+            `config_a` is 'foo' and `config_b` is 'bar', and
+            column `config_a` is stored as `self.a` and column `config_b` as `b`,
+        then this method must return (('a', 'foo',
+                                       'b', 'bar'))
+
+        The presence of `__composite_keys__` and `__composite_items__` is also
+        recommended but not yet enforced.
+        """
+        raise NotImplementedError
+
+    def __composite_orig_keys__(self):
+        """Return the key names as defined in the database model.
+
+        These key names must be explicitly stated so that we can resolve the
+        name of the column that each composite has derived from.
+
+        For example if this composite is built from the following columns:
+        .. code-block:: python
+            config_a = Column(..)
+            config_b = Column(..)
+            config = composite(Config, config_a, config_b)
+        then this method must return ('config_a', 'config_b')
+
+        The order of the returned values must match the one of
+        `__composite_items__`.
+        """
+        raise NotImplementedError
+
+
+class CompositeMapping(CompositeItems):
+
+    def __init__(self):
+        """Ensure that there are no mistakes in the mapper."""
+        for key in self.__composite_mapper__().keys():
+            assert hasattr(self, key)
+        # TODO Also assert that the mapper items are in the model.
+
+    def __repr__(self):
+        """Generic representation of the contents."""
+        repr_values = ', '.join(self.__composite_items__())
+        return "{cls}: ({values})".format(cls=type(self).__name__,
+                                          values=str(repr_values))
+
+    def __setattr__(self, key, value):
+        """Intercept set events."""
+        object.__setattr__(self, key, value)
+        self.changed()
+
+    def __composite_values__(self):
+        """Iterate over the values of this composite."""
+        for key, val in self.__composite_items__():
+            yield val
+
+    def __composite_keys__(self):
+        """Iterate over the keys of this composite."""
+        for key, val in self.__composite_items__():
+            yield key
+
+    def __composite_items__(self):
+        """Iterate over (key, value) pairs of this composite."""
+        for key, val in self.__composite_mapper__().items():
+            yield key, getattr(self, key)
+
+    def __composite_orig_keys__(self):
+        """Iterate over the key names as defined in the database model."""
+        for orig_key in self.__composite_mapper__().values():
+            yield orig_key
+
+    def __composite_mapper__(self):
+        """Define the relationship between the model and local names.
+
+        For example if this composite is built from the following columns:
+        .. code-block:: python
+            config_a = Column(..)
+            config_b = Column(..)
+            config = composite(Config, config_a, config_b)
+        and
+            column `config_a` is stored as `self.a` and column `config_b` as `b`,
+        then this method must return (('a', 'config_a'),
+                                      ('b', 'config_b')
+        """
+        raise NotImplementedError
 
 
 class TableNameMixin(object):
@@ -93,20 +201,33 @@ def get_model_type(ModelBase):
 
         return retval
 
-    def todict(self):
-        """Convert model to dictionary."""
+    def todict(self, composites=False, composite_drop_consumed=True, without_none=True):
+        """Convert model to dictionary.
+
+        :param composites: also return composites
+        :type composites: bool
+
+        :param composite_drop_consumed: do not return columns that were mapped
+        to composites
+        :type composite_drop_consumed: bool
+
+        :param without_none: do not return any keys that map to `None`
+        :type without_none: bool
+        """
         def convert_datetime(value):
             try:
                 return value.strftime("%Y-%m-%d %H:%M:%S")
             except Exception:
                 return ''
 
+        ret = {}
+
         for c in self.__table__.columns:
             # NOTE This hack is not needed if you redefine types.TypeDecorator
             # for desired classes (Binary, LargeBinary, ...)
 
             value = getattr(self, c.name)
-            if value is None:
+            if without_none and value is None:
                 continue
             if isinstance(c.type, sqlalchemy.Binary):
                 value = base64.encodestring(value)
@@ -114,21 +235,83 @@ def get_model_type(ModelBase):
                 value = convert_datetime(value)
             elif isinstance(value, intbitset):
                 value = value.tolist()
-            yield(c.name, value)
+            ret[c.name] = value
+
+        # TODO: Recursive composites
+        if composites:
+            for attr_name in dir(self):
+                attr = getattr(self, attr_name)
+                try:
+                    for idx, comp_key in enumerate(attr.__composite_keys__()):
+                        # Q: Why don't you get it from `__composite_values__`?
+                        # A: Because there is no reverse mutation tracking
+                        orig_key = attr.__composite_orig_keys__()[idx]
+                        comp_val = getattr(self, orig_key)
+                        if without_none and comp_val is None:
+                            continue
+                        if attr_name not in ret:
+                            ret[attr_name] = {}
+                        ret[attr_name][comp_key] = comp_val
+                except AttributeError:
+                    # `attr` doesn't have __composite_items__
+                    continue
+                else:
+                    if composite_drop_consumed:
+                        # Pop non-composite keys from `ret` to avoid duplication
+                        try:
+                            for orig_key in attr.__composite_orig_keys__():
+                                try:
+                                    del ret[orig_key]
+                                except KeyError:
+                                    # `key` was None and `without_none` is True
+                                    # so it was never inserted for some reason.
+                                    continue
+                        except AttributeError as e:
+                            # Woops, `attr` instance doesn't support
+                            # `__composite_orig_keys__`! Revert what we've done.
+                            del ret[attr_name]
+
+        return iter(ret.items())
 
     def fromdict(self, args):
-        """Update instance from dictionary."""
-        # NOTE Why not to do things simple ...
-        self.__dict__.update(args)
+        """Update instance from a dictionary.
 
-        # for c in self.__table__.columns:
-        #    name = str(c).split('.')[1]
-        #    try:
-        #        d = args[name]
-        #    except Exception:
-        #        continue
-        #
-        #    setattr(self, c.name, d)
+        :param args: dictionary to update from
+        :type  args: dict
+        """
+        composites = self.__mapper__.composites
+
+        # Simple columns
+        for key, val in args.items():
+            try:
+                setattr(self, key, val)
+            except ValueError:
+                if key in composites.keys():
+                    pass
+
+        # Composites
+        for composite_name, composite_columns in composites.items():
+            composite = getattr(self, composite_name)
+            # If the composite is `None`, then all its arguments are `None`.
+            # Take a shot at instantiating it. Read why at:
+            # sqlalchemy.orm.descriptor_props.py:CompositeProperty._create_descriptor
+            if composite is None:
+                mapper_composite = self.__mapper__.composites[composite_name]
+                dummy_args = [None] * len(mapper_composite.columns)
+                composite = mapper_composite.composite_class(*dummy_args)
+            try:
+                for idx, composite_key in enumerate(composite.__composite_keys__()):
+                    try:
+                        val = args[composite_name][composite_key]
+                    except KeyError:
+                        # `args` has no information on this key
+                        continue
+                    else:
+                        column_name = composite.__composite_orig_keys__()[idx]
+                        setattr(self, column_name, val)
+            except AttributeError:
+                # No `__composite_keys__` found
+                continue
 
     def __iter__(self):
         """Return an iterable that supports .next() for dict(sa_instance)."""
