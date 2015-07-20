@@ -29,7 +29,7 @@ RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         curl \
         && \
-    curl -sL https://deb.nodesource.com/setup_0.10 | bash -
+    curl -sL https://deb.nodesource.com/setup_iojs_2.x | bash -
 
 # install requirements from repos
 # also clean up apt
@@ -38,15 +38,14 @@ RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         gcc \
         git \
+        iojs \
         libffi-dev \
         liblzma-dev \
         libmysqlclient-dev \
         libssl-dev \
         libxslt-dev \
         mysql-client \
-        nodejs \
         poppler-utils \
-        subversion \
         sudo \
         && \
     apt-get clean autoclean && \
