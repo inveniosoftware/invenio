@@ -8,6 +8,7 @@
 *.kdevses
 *.lib
 *.pyc
+*.pyo
 *.sbcl.core
 *.sse2f
 *.x86f

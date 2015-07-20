@@ -93,7 +93,8 @@ WORKDIR /code
 RUN python requirements.py --extras=$REXTRAS --level=min > requirements.py.lowest.txt && \
     python requirements.py --extras=$REXTRAS --level=pypi > requirements.py.release.txt && \
     python requirements.py --extras=$REXTRAS --level=dev > requirements.py.devel.txt && \
-    pip install -r requirements.py.$REQUIREMENTS.txt --allow-all-external --quiet
+    pip install --requirement requirements.py.$REQUIREMENTS.txt --allow-all-external && \
+    python -O -m compileall
 
 
 ###############################################################################
@@ -109,7 +110,8 @@ COPY . /code
 ###############################################################################
 
 # install invenio
-RUN pip install -e .[$REXTRAS] --quiet
+RUN pip install --editable .[$REXTRAS] && \
+    python -O -m compileall .
 
 # build translation catalog
 RUN python setup.py compile_catalog

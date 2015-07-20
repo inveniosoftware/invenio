@@ -142,6 +142,15 @@ As of this writing changing template files do not lead to application reloading
 and do not purge caches. As a workaround you can simple alter one of the python
 files, e.g. by using `touch`.
 
+.. note::
+    Changing the Python source files will invalidate stored bytecode files. For
+    security reasons, these bytecode files can only be recreated by the root
+    user. This can be done via:
+
+    .. code-block:: shell
+
+        docker exec -it -u root invenio_web_1 python -O -m compileall .
+
 Building documentation
 ----------------------
 
