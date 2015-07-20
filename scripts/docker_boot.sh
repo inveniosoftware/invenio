@@ -37,6 +37,75 @@ CFG_MARKER_RUNNING=$CFG_SHARED_FOLDER/boot.running
 # echo function for stderr
 echoerr() { echo "$@" 1>&2; }
 
+# test if connection is reachable
+# usage: test_connection_by_protocol PROTO URI
+#     PROTO: {tcp,udp}
+#     URI: HOST:PORT
+#
+# return 1 on success, 0 otherwise
+test_connection_by_protocol()  {
+    address=$(echo $2 | sed 's/:.*//')
+    port=$(echo $2 | sed 's/[^:]*://')
+    printf "$1://$address:$port..."
+
+    # use builtin bash function
+    timeout 1 bash -c "cat < /dev/null > /dev/$1/$address/$port" 2> /dev/null
+    if [ $? == 0 ]; then
+        echo YES
+        return 1
+    else
+        echo NO
+        return 0
+    fi
+}
+
+# test if connection is reachable
+# usage: test_connection NAME URI
+#     NAME: name of the conneciton
+#     URI: {tcp,udp}://HOST:PORT
+#
+# return 1 on success, 0 otherwise
+test_connection() {
+    printf "Test $1..."
+
+    # TCP or UDP?
+    if [[ $2 =~ ^tcp://.*$ ]]; then
+        address_port=$(echo $2 | sed 's/tcp:\/\///')
+        test_connection_by_protocol tcp $address_port
+        return $?
+    elif [[ $2 =~ ^udp://.*$ ]]; then
+        address_port=$(echo $2 | sed 's/udp:\/\///')
+        test_connection_by_protocol udp $address_port
+        return $?
+    fi
+
+    # always succeed for unkown protocols
+    return 1
+}
+
+# wait for all ports described in ENV variables of the form [A-Z]*_PORT
+wait_for_services() {
+    echo "Check if all services are reachable:"
+    ok=0
+
+    while [[ $ok == 0 ]]; do
+        sleep 2
+        ok=1
+        for e in $(printenv); do
+            # still ok or can we skip that cycle?
+            if [[ $ok == 1 ]]; then
+                k=$(echo $e | sed 's/=.*//')
+                if [[ $k =~ ^[A-Z]*_PORT$  ]]; then
+                    v=$(echo $e | sed 's/[^=]*=//')
+                    test_connection $k $v
+                    ok=$?
+                fi
+            fi
+        done
+    done
+    echo "DONE, all services are up"
+}
+
 init() {
     # prepare bower installation
     # bower is not able to handle absolute paths very well
@@ -85,6 +154,9 @@ EOF
     inveniomanage database init --user=root --password=mysecretpassword --yes-i-know
     inveniomanage database create
 }
+
+# before doing anything, we wait for our services
+wait_for_services
 
 # locked block
 (
