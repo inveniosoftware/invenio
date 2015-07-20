@@ -258,7 +258,6 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
             except (SyntaxError, ValueError):
                 pass
             app.config[cfg_name] = cfg_value
-            app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
 
     # ====================
     # Application assembly
