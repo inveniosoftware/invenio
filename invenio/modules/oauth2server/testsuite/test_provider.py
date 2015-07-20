@@ -31,7 +31,7 @@ from flask_oauthlib.client import prepare_request
 
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
-from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite, nottest
 
 from mock import MagicMock
 
@@ -195,6 +195,7 @@ class OAuth2ProviderTestCase(ProviderTestCase):
 
         self.delete_objects([c])
 
+    @nottest
     def test_invalid_authorize_requests(self):
         # First login on provider site
         self.login("tester", "tester")
