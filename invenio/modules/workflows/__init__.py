@@ -134,7 +134,7 @@ Run a single data object
 .. code-block:: python
 
     from workflows.models import DbWorkflowObject
-    myobj = BibWorkflowObject.create_object()
+    myobj = DbWorkflowObject.create_object()
     myobj.set_data(10)
     eng = myobj.start_workflow("myworkflow")
 
@@ -172,18 +172,18 @@ workflow. You can query this object to retrieve the data you sent in:
     len(eng.objects)  # outputs: 4
 
 Why 4 objects when we only shipped 2 objects? Well, we take initial snapshots
-(copy of BibWorkflowObject) of the original data. In the example above,
+(copy of DbWorkflowObject) of the original data. In the example above,
 we get 4 objects back as each object passed have a snapshot created.
 
 .. sidebar:: Object versions and YOU
 
-    The data you pass to the workflows API is wrapped in a BibWorkflowObject.
+    The data you pass to the workflows API is wrapped in a DbWorkflowObject.
 
     This object have a `version` property which tells you the state of object.
     For example, if the object is currently *halted* in the middle of a
     workflow, or if it is an *initial* object.
 
-    *initial* objects are basically snapshots of the BibWorkflowObject just
+    *initial* objects are basically snapshots of the DbWorkflowObject just
     before the workflow started. These are created to allow for objects to
     be easily restarted in the workflow with the initial data intact.
 
@@ -232,7 +232,7 @@ before continuing the processing.
 
 Luckily, there is API to do this:
 
-`BibWorkflowObject.start_workflow(delayed=True)`
+`DbWorkflowObject.start_workflow(delayed=True)`
     as when running single objects, you can pass the delayed parameter to
     enable asynchronous execution.
 
@@ -372,12 +372,12 @@ Using an action
 
 There are two ways of activating an action:
 
-    * **When halting a workflow:** :py:meth:`.engine.BibWorkflowEngine.halt` has
+    * **When halting a workflow:** :py:meth:`workflow:workflow.engine.GenericWorkflowEngine.halt` has
       a parameter that allows you to set an action that needs to be taken in
       the Holding Pen - along with a message to be displayed.
 
-    * **Directly using the :py:class:`.models.BibWorkflowObject` API**. :py:meth:`.models.BibWorkflowObject.set_action`
-      :py:meth:`.models.BibWorkflowObject.remove_action` :py:meth:`.models.BibWorkflowObject.get_action`.
+    * **Directly using the :py:class:`.models.DbWorkflowObject` API**. :py:meth:`.models.DbWorkflowObject.set_action`
+      :py:meth:`.models.DbWorkflowObject.remove_action` :py:meth:`.models.DbWorkflowObject.get_action`.
 
 
 Task results in Holding Pen
@@ -385,17 +385,17 @@ Task results in Holding Pen
 
 If you want to add some special task results to be displayed on the details page
 of the data object in Holding Pen, you can use the task results API available
-in :py:class:`.models.BibWorkflowObject`.
+in :py:class:`.models.DbWorkflowObject`.
 
 The API provides functions to manipulate the task results:
 
-:py:meth:`.models.BibWorkflowObject.add_task_result`
+:py:meth:`.models.DbWorkflowObject.add_task_result`
     Adds a task result to the end of a list associated with a label (name).
 
-:py:meth:`.models.BibWorkflowObject.update_task_results`
+:py:meth:`.models.DbWorkflowObject.update_task_results`
     Update task result for a specific label (name).
 
-:py:meth:`.models.BibWorkflowObject.get_tasks_results`
+:py:meth:`.models.DbWorkflowObject.get_tasks_results`
     Return all tasks results as a dictionary as ``{ name: [result, ..] }``
 
 
@@ -405,7 +405,7 @@ for this name.
 
 .. code-block:: python
 
-        obj = BibWorkflowObject()  # or BibWorkflowObject.query.get(id)
+        obj = DbWorkflowObject()  # or DbWorkflowObject.query.get(id)
         obj.add_task_result("foo", my_result, "path/to/template")
 
 See sample templates under `templates/workflows/results/*.html`.
