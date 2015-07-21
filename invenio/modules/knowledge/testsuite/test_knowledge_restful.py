@@ -172,13 +172,7 @@ class TestKnowledgeRestfulAPI(APITestCase):
             user_id=1,
         )
 
-        answer = get_answer.json
-
-        expected_result = dict(
-            status=404,
-        )
-
-        assert answer['status'] == expected_result['status']
+        assert get_answer.status_code == 404
 
     def test_get_knwkb_mappings(self):
         """Test the return of list of mappings."""
