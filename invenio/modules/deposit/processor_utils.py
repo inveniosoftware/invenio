@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,12 +17,15 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# from wtforms.validators import ValidationError, StopValidation, Regexp
+
+import idutils
+
 from werkzeug import MultiDict
+
 from invenio.utils.datacite import DataciteMetadata
 from invenio.utils.sherpa_romeo import SherpaRomeoSearch
+
 from invenio_records.api import get_record
-from invenio.utils import persistentid as pidutils
 
 #
 # General purpose processors
@@ -60,7 +63,7 @@ class PidSchemeDetection(object):
 
     def __call__(self, form, field, submit=False, fields=None):
         if field.data:
-            schemes = pidutils.detect_identifier_schemes(field.data)
+            schemes = idutils.detect_identifier_schemes(field.data)
             if schemes:
                 getattr(form, self.set_field).data = schemes[0]
             else:
@@ -82,12 +85,12 @@ class PidNormalize(object):
         elif self.scheme:
             scheme = self.scheme
         else:
-            schemes = pidutils.detect_identifier_schemes(field.data)
+            schemes = idutils.detect_identifier_schemes(field.data)
             if schemes:
                 scheme = schemes[0]
         if scheme:
             if field.data:
-                field.data = pidutils.normalize_pid(field.data, scheme=scheme)
+                field.data = idutils.normalize_pid(field.data, scheme=scheme)
 
 
 #
