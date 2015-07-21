@@ -194,6 +194,9 @@ extras_require = {
     "sso": [
         "Flask-SSO>=0.2"
     ],
+    "pages": [
+        "invenio-pages>=0.1.0"
+    ],
     "postgresql": [
         "psycopg2>=2.5",
     ],
