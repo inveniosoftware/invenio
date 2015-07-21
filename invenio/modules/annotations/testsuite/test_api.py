@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ CFG = lazy_import('invenio.base.globals.cfg')
 USER = lazy_import('invenio.modules.accounts.models.User')
 API = lazy_import('invenio.modules.annotations.api')
 NOTEUTILS = lazy_import('invenio.modules.annotations.noteutils')
-COMMENT = lazy_import('invenio.modules.comments.models.CmtRECORDCOMMENT')
+COMMENT = lazy_import('invenio_comments.models.CmtRECORDCOMMENT')
 
 
 class AnnotationTestCase(InvenioTestCase):

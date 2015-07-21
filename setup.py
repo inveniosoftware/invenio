@@ -102,6 +102,7 @@ install_requires = [
     "invenio-client>=0.1.0",
     "invenio-query-parser>=0.2",
     "invenio-records>=0.1.0",
+    "invenio-comments>=0.1.0",
     "invenio-pidstore[datacite]>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",

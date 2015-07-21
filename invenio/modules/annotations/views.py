@@ -28,8 +28,8 @@ from flask_login import current_user, login_required
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.modules.comments.models import CmtRECORDCOMMENT
-from invenio.modules.comments.views import blueprint as comments_blueprint
+from invenio_comments.models import CmtRECORDCOMMENT
+from invenio_comments.views import blueprint as comments_blueprint
 from invenio_records.views import request_record
 
 from sqlalchemy.event import listen
@@ -162,7 +162,7 @@ def notes(recid):
     from invenio.modules.access.local_config import VIEWRESTRCOLL
     from invenio.modules.access.mailcookie import \
         mail_cookie_create_authorize_action
-    from invenio.modules.comments.api import check_user_can_view_comments
+    from invenio_comments.api import check_user_can_view_comments
     auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
     if auth_code and current_user.is_guest:
         cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
