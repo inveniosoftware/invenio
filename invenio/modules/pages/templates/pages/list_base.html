@@ -1,0 +1,62 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+{% set title = page.title %}
+
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "list.css" %}
+{% endblock %}
+
+{% block body %}
+
+{# page.content|safe #}
+
+{% for p in list_of_pages %}
+{% if loop.index % 2 %}
+<div class="row">
+{% endif %}
+  <div class="col-md-6">
+    <article class="guide-listing">
+        <div class="guide-cover">
+            <a href="{{ p.url }}">
+                <div class="icon-container">
+                    {% if p.icon  %}
+                        <i class="mega-icon {{ p.icon }}"></i>
+                    {% else %}
+                        <i class="mega-icon fa fa-file-text-o"></i>
+                    {% endif %}
+                </div>
+                <h3 class="guide-cover-title">{{ p.title }}</h3>
+            </a>
+        </div>
+        <p class="guide-summary">
+            {{ p.description }}
+        </p>
+        <p class="guide-read-time">
+            <i class="fa fa-fw fa-clock-o"></i>5 minute read
+        </p>
+    </article>
+  </div>
+{% if (loop.index+1) % 2 %}
+</div>
+{% endif %}
+{% endfor %}
+
+{% endblock %}
