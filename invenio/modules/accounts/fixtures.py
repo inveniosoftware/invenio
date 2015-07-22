@@ -29,7 +29,6 @@ class UserData(DataSet):
     """User data."""
 
     class admin:
-        id = 1
         email = current_app.config.get('CFG_SITE_ADMIN_EMAIL')
         password = ''
         note = '1'
