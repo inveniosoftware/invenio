@@ -206,6 +206,7 @@ class SmartDict(object):
 
     def __init__(self, d=None):
         self._dict = d if d is not None else dict()
+        super(SmartDict, self).__init__()
 
     def __getitem__(self, key):
         """Return item as `dict.__getitem__` but using 'smart queries'.
