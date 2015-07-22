@@ -97,20 +97,6 @@ class AdminDiscoveryRegistry(ModuleAutoDiscoveryRegistry):
 def setup_app(app):
     """Register all administration views with the Flask application."""
     app.config.setdefault("ADMIN_NAME", "Invenio")
-
-    # No icon support for category items used in the admin sidebar-menu in flask-admin yet.
-    # See issue: https://github.com/flask-admin/flask-admin/issues/898
-    # Dictionary: <category_name> : <css_classes_displaying_icon>
-    app.config.setdefault(
-        "ADMIN_CATEGORIES",
-        {
-            "Access": "fa fa-eye",
-            "Indexes": "fa fa-bullseye",
-            "Knowledge": "fa fa-mortar-board",
-            "Persistent Identifiers": "fa fa-compass",
-            "Legacy Admin": "fa fa-bomb"
-        })
-
     app.config.setdefault("ADMIN_UI_SKIN", "skin-blue")
 
     # Initialize app
