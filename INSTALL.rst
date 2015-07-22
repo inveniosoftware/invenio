@@ -169,9 +169,9 @@ Now, it is time to start installing the prerequisites.
 
 .. code-block:: console
 
-    $ brew install python --framework -- universal
-    $ sudo pip install virtualenv
-    $ sudo pip install virtualenvwrapper
+    $ brew install python --framework --universal
+    $ pip install virtualenv
+    $ pip install virtualenvwrapper
     # edit the Bash profile
     $ $EDITOR ~/.bash_profile
 
