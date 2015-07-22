@@ -78,6 +78,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.multimedia',
     'invenio.modules.pages',
     'invenio.modules.pidstore',
+    'invenio.modules.oaiharvester',
     'invenio.modules.records',
     'invenio.modules.tags',
 ]
