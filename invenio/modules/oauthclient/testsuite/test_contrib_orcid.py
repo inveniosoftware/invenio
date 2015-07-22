@@ -127,12 +127,14 @@ class OrcidTestCase(OAuth2ClientTestCase):
         self.assertEqual(
             account_info(oauth.remote_apps['orcid'], self.example_data),
             dict(external_id="0000-0002-1825-0097",
-                 external_method="orcid")
+                 external_method="orcid",
+                 nickname="0000-0002-1825-0097")
         )
         self.assertEqual(
             account_info(oauth.remote_apps['orcid'], {}),
             dict(external_id=None,
-                 external_method="orcid")
+                 external_method="orcid",
+                 nickname=None)
         )
 
     def test_login(self):
