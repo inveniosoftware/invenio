@@ -188,6 +188,7 @@ class KnowledgeAdmin(ModelView):
 def register_admin(app, admin):
     """Called on app initialization to register administration interface."""
     category = 'Knowledge'
+    admin.category_icon_classes[category] = "fa fa-mortar-board"
     admin.add_view(
         KnowledgeAdmin(app, KnwKB, db.session,
                        name='Knowledge Base', category=category,

@@ -122,6 +122,7 @@ class AccAuthorizationAdmin(ModelView, AccMixin):
 def register_admin(app, admin):
     """Call on app initialization to register administration interface."""
     category = "Access"
+    admin.category_icon_classes[category] = "fa fa-eye"
     admin.add_view(
         AccROLEAdmin(AccROLE, db.session, name="Role", category=category)
     )
