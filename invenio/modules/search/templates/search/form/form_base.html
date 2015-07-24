@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@
   {%- if collection.id > 1 %}
   <input type="hidden" name="cc" value="{{collection.name}}">
   {%- endif %}
+  <input type="hidden" name="post_filter" value="{{request.args.get('post_filter', '')}}">
   <div class="nav navbar-nav navbar-left navbar-form">
     <div class="input-group" id="searchform-input-group">
       {% include "search/form/tips.html" %}

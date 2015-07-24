@@ -28,7 +28,10 @@ js = Bundle(
     'js/search/init.js',
     filters=RequireJSFilter(exclude=[_j, _i]),
     output="search.js",
-    weight=50
+    weight=50,
+    bower={
+        "flight": "latest",
+    }
 )
 
 styles = Bundle(

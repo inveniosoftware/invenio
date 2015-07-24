@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -18,293 +18,288 @@
  */
 
 
-define(function(require, exports, module) {
-    "use strict";
-    var $ = require('jquery')
+define([
+        'jquery',
+        'flight/lib/component',
+        'js/search/facets_filter',
+],
+function($, defineComponent, FacetsFilter) {
 
-    module.exports = function(facets) {
-        // side facet list
-        var facet_list = $(facets.elem)
+  /**
+   * Serialize the given filters as a query.
+   *
+   * The resulting query format is:
+   * `facet1:value AND (facet2:value OR facet2:value)...`
+   *
+   * @param {FacetsFilter} facetsFilter facets filters
+   * @return {string} query corresponding to the given filters
+   */
+  function facetsFilterSerializer(facetsFilter) {
+    var partials = [];
+    $.each(facetsFilter.getFilters(), function(facetName, filters) {
+      var incs = $.map(filters.inc, function(v) {
+        return facetName + ':"' + v + '"';
+      });
+      if (incs.length > 1) {
+        partials.push('(' + incs.join(' OR ') + ')');
+      } else {
+        partials.push(incs[0]);
+      }
+    });
+    return partials.join(' AND ');
+  }
 
-        $('#overlay').modal({
-            keyboard: false,
-            backdrop: 'static'
-        }).modal('hide');
+  // return flightJS component
+  return defineComponent(Search);
 
-        if (facet_list.length && typeof facets !== undefined) {
-            var parent = facet_list.closest('.container, .row'),
-                popupTimer
+  /**
+   * Main Search component. It updates the user query input field, and keep the
+   * facets filter state up to date.
+   *
+   * Listens on:
+   * - facetChange:
+   *     => {state: <'include'|'exclude'>, name: <facet name>, value: <filtered value>}
+   *     Include or exclude a filter in the facetsFilter.
+   * - facetsEdit:
+   *     => {}
+   *     Appends the serialized facets filter to the user query and clear the
+   *     facets filter.
+   * Sends:
+   * - facetsSet:
+   *     => {facetsFilter: <FacetsFilter>, serializedFacetsFilter: <serialized filter>}
+   *     Set all facets filter.
+   */
+  function Search() {
+    this.attributes({
+      // base url used for searching
+      searchUrl: undefined,
+      // query parameter used for user query
+      userQueryParam: 'p',
+      // query parameter used for facet filtering
+      facetsFilterQueryParam: 'post_filter',
+      // facets loaded by the server
+      facetsFilter: new FacetsFilter(),
+      // function used to serialize the facetsFilter in the URL
+      facetsFilterSerializer: function() { return facetsFilterSerializer; },
+      // jquery selector for the search form
+      searchFormSelector: undefined,
+      // jquery selector for the search results
+      searchResultsSelector: undefined,
+    });
 
-            facet_list.affix({
-                offset: {
-                    top: function () {
-                        return parent.offset().top
-                    },
-                    bottom: 170
-                }
-            })
-
-            facet_list.facet({
-                button_builder: function(title) {
-                    return require('hgn!./templates/button')({
-                        title: title
-                    })
-                },
-                row_builder: function(data, name) {
-                    var title = data[(data.length==3) ? 2 : 0],
-                    counter = data[1]
-                    return require('hgn!./templates/row')({
-                        target: facets.elem,
-                        key: name,
-                        value: data[0],
-                        title: title,
-                        counter: counter
-                    })
-                },
-                box_builder: function(name, title) {
-                    return require('hgn!./templates/box')({
-                        target: facets.elem,
-                        key: name,
-                        title: title
-                    })
-                },
-                facets: facets.data
-            }).on('updated', function(event) {
-                var p = $('#facet_filter input[name=p]').val(),
-                    facet = facet_list.data('facet')
-
-                $('#search-box-main input[name=p]').val(p+' '+facet.queryString());
-
-                var filter = JSON.stringify(facet.filter),
-                    hash = decodeURIComponent(document.location.hash)
-                if (filter != hash.substr(1)) {
-                    if (filter != '[]') {
-                        document.location.hash = encodeURIComponent(filter);
-                    } else {
-                        document.location.hash = '';
-                    }
-                }
-
-                var showModal = true;
-                var modalShow= function() {
-                    if (showModal) {
-                        $("#overlay").modal('show');
-                    }
-                };
-                setTimeout(modalShow, 100);
-                $.ajax(facets.searchResultsUrl, {
-                    type: 'POST',
-                    data: $.extend({}, facets.args, {filter: filter})
-                }).done(function(data) {
-                    $('#search_results').html(data);
-                    showModal = false;
-                    $("#overlay").modal('hide');
-                });
-
-            }).on('loaded', function(event) {
-
-                var typeahead = $('form[name=search] input[name=p]').data('typeahead'),
-                    facet = facet_list.data('facet')
-
-                // Move out from library
-                    var expand = jQuery.grep(facet.filter, function (a) {
-                        return a[0] == '!'
-                    })
-                    $.each(expand, function(i,v) {
-                        facet.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
-                    });
-
-                    $('[data-facet="toggle"]')
-                        .filter('[data-facet-key="'+event.name+'"]')
-                        .addClass('muted').each(function(i) {
-
-                            var toggle = $(this),
-                                filterContent = $.proxy(function() {
-                                    return facets.labels.action +
-                                        require('hgn!./templates/action')({
-                                        targe: facets.elem,
-                                        key: this.data('facet-key'),
-                                        value: this.data('facet-value'),
-                                        title: facets.labels.exclude
-                                    })
-                                }, toggle)
-
-                            toggle.popover({
-                                html: true,
-                                placement: 'right',
-                                trigger: 'manual',
-                                content: filterContent,
-                                title: facets.labels.didyouknow
-                            }).on('mouseenter', function() {
-                                if (popupTimer) {
-                                    clearTimeout(popupTimer)
-                                }
-                                popupTimer = setTimeout(function() {
-                                    toggle.popover('show')
-                                }, 2000)
-                            }).on('click', function() {
-                                if (popupTimer) {
-                                    clearTimeout(popupTimer)
-                                }
-                                toggle.popover('hide')
-                            }).parent().on('mouseleave', function() {
-                                if (popupTimer) {
-                                    clearTimeout(popupTimer)
-                                }
-                                toggle.popover('hide')
-                            })
-
-                        }).on('click', function(event) {
-                            var $el_clicked = $(this),
-                            options = facet_list.data('facet').options
-
-                            if (!$el_clicked.hasClass('expandable') && $el_clicked.attr('data-facet-key') === 'collection') {
-                                if ($el_clicked.parent().has('ul')) {
-                                    var $ul = $el_clicked.parent().find('ul')
-                                    $ul.each(function(i, ul) {
-                                        $(this).find('[data-facet="toggle"]').each(function() {
-                                            facet_list.data('facet').delete('+', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                                            facet_list.data('facet').delete('-', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                                        })
-                                    })
-
-                                    if ($el_clicked.hasClass('text-info') || $el_clicked.hasClass('text-danger')) {
-                                        $ul.remove()
-                                        $el_clicked.addClass('expandable')
-                                        facet_list.data('facet').filter = facet_list.data('facet').exclude('!', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
-                                    }
-                                }
-                            }
-                        })
-
-                    // on hover add button in popover
-                    //$('[data-facet="reset-key"]').addClass('text-info')
-
-                    $('[data-facet="reset-key"]').each(function(e) {
-                        $(this).on('click', function() {
-                            $('[data-facet-key="'+ $(this).attr('data-facet-key') +'"]')
-                            .attr('data-facet-action', '+')
-                            .removeClass('text-danger')
-                            .removeClass('text-info')
-                            .css('font-weight', 'normal')
-                            $(this).removeClass('muted').addClass('text-info')
-                        })
-                    })
-
-
-                    $('#search_results').css('min-height', facet_list.height())
-                    facet_list.affix('checkPosition');
-
-                    // When we load data we should select facets from filter.
-                    if (facet.findByKey(event.name).length > 0) {
-                        facet.rebuildFilter(facet.filter)
-                    }
-
-            }).on('deleted', function(event) {
-
-                $('[data-facet-key="'+event.key+'"]')
-                .filter('[data-facet-value="'+event.value+'"]')
-                .each(function(e) {
-                    $(this)
-                    .removeClass('text-danger')
-                    .removeClass('text-info')
-                    .css('font-weight', 'normal')
-                    .attr('data-facet-action', '+')
-                })
-
-                var resetKey = false
-                try {
-                    if ($(this).data('facet').findByKey(event.key).length === 0) {
-                        resetKey = true
-                    }
-                } catch(err) {
-                    resetKey = true
-                }
-                if (resetKey) {
-                    $('[data-facet="reset-key"]')
-                    .filter('[data-facet-key="'+event.key+'"]')
-                    .addClass('text-info')
-                }
-
-            }).on('added', function(event) {
-
-                var type = (event.op == '+')?'info':'error',
-                    other_type = (event.op == '-')?'info':'error'
-
-                $('[data-facet-key="'+event.key+'"]')
-                .filter('[data-facet-value="'+event.value+'"]')
-                .each(function(e) {
-                    if (event.op != '!') {
-                        $(this)
-                        .removeClass('text-'+other_type)
-                        .addClass('text-'+type)
-                        .css('font-weight', 'bold')
-                    }
-                })
-                .filter('.expandable')
-                .each(function() {
-
-                    var $el_clicked = $(this),
-                        options = facet_list.data('facet').options
-
-                    $el_clicked.removeClass('expandable')
-
-                    if (event.key === 'collection') {
-                        $(this).parent().find('ul').remove()
-                        var facet = {url: options.url_map[event.key],
-                            facet: event.key},
-                            data = {parent: event.value},
-                            $ul = $('<ul class="context list-unstyled"><ul>').clone().appendTo($el_clicked.parent())
-
-                        var data_facet = facet_list.data('facet')
-                        if (data_facet.find('!', event.key, event.value).length === 0) {
-                            data_facet.filter.push(['!', event.key, event.value])
-                        }
-                        data_facet.createFacetBox(facet, $ul, data)
-                    }
-                })
-
-                $('[data-facet="reset-key"]')
-                .filter('[data-facet-key="'+event.key+'"]')
-                .removeClass('text-info')
-                .addClass('muted')
-
-
-            }).on('exists', function(event) {
-                alert(facets.labels.alreadyin);
-            });
-
-            // Rebuild facet filter on hash change.
-            $(window).bind('hashchange', function() {
-                var hash = decodeURIComponent(document.location.hash),
-                    hash_filter = hash.substr(1),
-                    filter;
-
-                try {
-                    filter = $.parseJSON(hash_filter)
-                } catch (exc) {
-                    console.exception(exc)
-                }
-
-                if (typeof JSON === undefined || JSON.stringify(facet_list.data('facet').filter) != hash_filter) {
-                    facet_list.data('facet').rebuildFilter(filter || [])
-                }
-            })
-
-            // Parse hash URI component.
-            if (document.location.hash.length > 2) {
-                var hash = decodeURIComponent(document.location.hash),
-                    hash_filter = hash.substr(1),
-                    filter
-
-                try {
-                    filter = $.parseJSON(hash_filter)
-                } catch (exc) {
-                    console.exception(exc)
-                }
-
-                facet_list.data('facet').filter = filter || []
-            }
-        }
+    /**
+     * Update the search form action according to the given filter query.
+     *
+     * @param {string} serializedFacetsFilter facet filters serialized as a query.
+     */
+    this.updateSearchFormAction = function(serializedFacetsFilter) {
+      // update search form hidden field
+      $('input[type="hidden"][name="' + this.attr.facetsFilterQueryParam + '"]')
+        .prop('value', serializedFacetsFilter);
     }
-})
+
+    /**
+     * Update window URL using the given facet filter and user query.
+     *
+     * @param {string} serializedFacetsFilter facet filters serialized as a query.
+     * @param {string} userQuery (optional) query written by the user.
+     */
+    this.updateURL = function(serializedFacetsFilter, userQuery) {
+      // update the URL
+      if (typeof(window.history.pushState) === 'function') {
+        // updating the query string
+        var queryString = window.location.search;
+        queryString = setQueryStringParam(queryString,
+                                          this.attr.facetsFilterQueryParam,
+                                          serializedFacetsFilter);
+        queryString = setQueryStringParam(queryString,
+                                          this.attr.userQueryParam,
+                                          userQuery);
+        // rebuild the URL
+        var path = window.location.origin + window.location.pathname +
+          queryString + window.location.hash;
+
+        window.history.pushState({
+          path: path,
+          facetsFilter: this.facetsFilter.getFilters(),
+          userQuery: userQuery,
+        }, document.title, path);
+      }
+    }
+
+    /**
+     * Send the facets filter change in an event
+     */
+    this.broadcastFacetsFilterSet = function() {
+      // send event updating the facets menu
+      this.trigger(document, 'facetsSet', {
+        facetsFilter: this.facetsFilter,
+        serializedFacetsFilter: this.attr.facetsFilterSerializer(this.facetsFilter),
+      });
+    }
+
+    this.after('initialize', function() {
+      var that = this;
+
+      // we might have missed a pop state event. Thus it is better to use the
+      // window state if it exists.
+      if (window.history.state !== null &&
+          // there is no state for this location
+          window.history.state.facetsFilter !== null) {
+        this.facetsFilter = new FacetsFilter(window.history.state.facetsFilter);
+
+        // generate the corresponding query
+        var facetsQuery = this.attr.facetsFilterSerializer(this.facetsFilter);
+        this.broadcastFacetsFilterSet();
+
+        // update the search form
+        this.updateSearchFormAction(facetsQuery);
+
+        // update the search results
+        this.search();
+      } else {
+        // else use the one provided by the backend-generated html
+        this.facetsFilter = this.attr.facetsFilter;
+      }
+
+      // listen on events sent by the facet menu and update the facet filters
+      this.on('facetChange', function(ev, data) {
+        // update the facet filter
+        switch (data.state) {
+            case 'include':
+                this.facetsFilter.resetFacetValue(data.name, data.value);
+                this.facetsFilter.includeFacetValue(data.name, data.value);
+                break;
+            case 'exclude':
+                this.facetsFilter.resetFacetValue(data.name, data.value);
+                this.facetsFilter.excludeFacetValue(data.name, data.value);
+                break;
+            default:
+                this.facetsFilter.resetFacetValue(data.name, data.value);
+                break;
+        }
+        // generate the corresponding query
+        var facetsQuery = this.attr.facetsFilterSerializer(this.facetsFilter);
+        that.broadcastFacetsFilterSet();
+        // update the search form
+        that.updateSearchFormAction(facetsQuery);
+        var userQuery = $('form[name="search"] input[name=p]').val();
+        // update the URL
+        that.updateURL(facetsQuery, userQuery);
+
+        // update the search results
+        this.search();
+      });
+
+      // listen on the "query filter" edition event
+      this.on('facetsEdit', function(ev, data) {
+        // move the filter query from its static display to the search input.
+        // this makes it editable
+        var filterQuery = this.attr.facetsFilterSerializer(this.facetsFilter);
+        var userQuery = $('form[name="search"] input[name=p]').val();
+        userQuery += (userQuery ? ' AND ' : '') + filterQuery;
+        $('form[name="search"] input[name=p]').val(userQuery);
+
+        // reset the facetsFilter
+        this.facetsFilter = new FacetsFilter();
+        this.broadcastFacetsFilterSet();
+        this.updateSearchFormAction('');
+        // update the url so that user can click "back" button and see the
+        // previous view.
+        this.updateURL('', userQuery);
+        // reloading because the facets might have changed
+        // TODO: we should return the facets with the Ajax response.
+        window.location.reload();
+      });
+
+      // listen on popstate, i.e user clicks browser's back or forward button
+      this.on(window, 'popstate', function() {
+        // reload the page if
+        if (window.history.state === null ||
+            // there is no state for this location
+            window.history.state.facetsFilter === null ||
+            // or if the results set parent element is not here (not returned by
+            // the server) FIXME: always generate the result set?
+            $(this.attr.searchResultsSelector).length === 0 ||
+            // or the user query changed (facets might have changed)
+            window.history.state.userQuery != $('form[name="search"] input[name=p]').val()
+           ) {
+          return window.location.reload();
+        }
+        // retrieve the filters from the state
+        this.facetsFilter = new FacetsFilter(window.history.state.facetsFilter);
+        var userQuery = window.history.state.userQuery;
+
+        var facetsQuery = this.attr.facetsFilterSerializer(this.facetsFilter);
+        // broadcast the change
+        this.broadcastFacetsFilterSet();
+        // update the search form
+        this.updateSearchFormAction(this.attr.facetsFilterSerializer(this.facetsFilter));
+        // update search input with user query parameter
+        $('form[name="search"] input[name=p]').val(userQuery);
+        this.search();
+      });
+    });
+
+    /**
+     * Send a search request and update the search results
+     */
+    this.search = function() {
+      var that = this;
+      var searchUrl = this.attr.searchUrl;
+      var userQuery = $('form[name="search"] input[name=p]').val();
+      var filterQuery = this.attr.facetsFilterSerializer(this.facetsFilter);
+
+      var data = {};
+      data[this.attr.userQueryParam] = userQuery;
+      data[this.attr.facetsFilterQueryParam] = filterQuery;
+      $.ajax({
+        url: searchUrl,
+        data: data,
+        context: $(that.attr.searchResultsSelector)
+      }).done(function(response) {
+
+        $(this).html(response);
+      });
+    }
+  };
+
+  /**
+   * Generate a guid.
+   *
+   * As described here: http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+   *
+   * @return {string} a new guid
+   */
+  function guid() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+           s4() + '-' + s4() + s4() + s4();
+  }
+
+  /**
+   * Basic query string parameter replacement function.
+   *
+   * @return {string} a new guid
+   */
+  function setQueryStringParam(queryString, name, value) {
+    var encodedName = encodeURIComponent(name);
+    var encodedValue = value ? encodeURIComponent(value) : '';
+    var newQueryString = queryString.replace(new RegExp('(' + encodedName +
+                                             '=)[^\&]*'), '$1' + encodedValue);
+    if (newQueryString === queryString) {
+      if (newQueryString.length === 0) {
+        newQueryString = "?";
+      } else if (newQueryString[newQueryString.length - 1] !== '?' &&
+                 newQueryString[newQueryString.length - 1] !== '&') {
+        newQueryString += "&";
+      }
+      newQueryString += encodedName + '=' + encodedValue;
+    }
+    return newQueryString;
+  }
+});

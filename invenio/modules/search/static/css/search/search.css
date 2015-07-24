@@ -22,6 +22,36 @@
     background-color: rgba(255,255,255,0.5);
 }
 
+#search-query-filters {
+    margin-bottom: 20px;
+}
+
+#search-query-filters.empty{
+    display: none;
+}
+
+#search-query-filters .search-query-filters-header {
+    padding-right: 10px;
+    color: #337ab7;
+    display: inline-block;   
+}
+
+#search-query-filters .search-query-filters-body {
+    display: inline-block;
+}
+
+#search-query-filters .search-query-filters-text {
+    color: #333;
+}
+
+#search-query-filters .search-query-filters-edit {
+    color: #337ab7;
+    padding: 0;
+    margin-left: 10px;
+    font-size: 1.3em;
+    vertical-align: middle;
+}
+
 #facet_list .panel-heading {
     background-color: whiteSmoke;
 }

@@ -248,12 +248,22 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
     })
 
     # FIXME refactor to separate search hook
+    filtered_facets = ''
     from invenio.modules.search.walkers.elasticsearch import ElasticSearchDSL
     if 'post_filter' in request.values:
-        post_filter = Query(request.values.get('post_filter')).query.accept(
+        parsed_post_filter = Query(request.values.get('post_filter'))
+        post_filter = parsed_post_filter.query.accept(
             ElasticSearchDSL()
         )
         response.body['post_filter'] = post_filter
+        # extracting the facet filtering
+        from invenio.modules.search.walkers.facets import FacetsVisitor
+        filtered_facets = parsed_post_filter.query.accept(
+            FacetsVisitor()
+        )
+        # sets cannot be converted to json. use facetsVisitor to convert them to
+        # lists
+        filtered_facets = FacetsVisitor.jsonable(filtered_facets)
 
     if len(response) and jrec > len(response):
         args = request.args.copy()
@@ -264,6 +274,7 @@ def search(collection, p, of, ot, so, sf, sp, rm, rg, jrec):
 
     ctx = dict(
         facets={},  # facets.get_facets_config(collection, qid),
+        filtered_facets=filtered_facets,
         response=response,
         rg=rg,
         create_nearest_terms_box=lambda: _("Try to modify the query."),

@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -33,6 +33,25 @@
     </div>
   </div>
 </div>
+
+{%- block search_query_filters -%}
+<div id="search-query-filters"
+     class="row {{ 'empty' if not request.args.get('post_filter') }}">
+  <div class="col-sm-12">
+      <div class="search-query-filters-header">
+          {{_('Query filter')}}:
+      </div>
+      <div class="search-query-filters-body">
+          <span class="search-query-filters-text">
+              {{request.args.get('post_filter', '')}}
+          </span>
+          <button class="btn btn-link search-query-filters-edit">
+              <i class="fa fa-pencil-square-o"></i>
+          </button>
+      </div>
+  </div>
+</div>
+{%- endblock search_query_filters -%}
 {%- block search_form_flashed_messages -%}
 {%- for category, msg in get_flashed_messages(with_categories=True,
                                              category_filter=['websearch-after-search-form']) %}
