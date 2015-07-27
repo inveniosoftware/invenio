@@ -2121,7 +2121,7 @@ $(document).ready(function() {
 
         requestConfig.url = obj.baseUrl + source;
         requestConfig.type = "POST";
-        requestConfig.data = { jsondata: JSON.stringify( { personId: obj.pid } ) };
+        requestConfig.data = { jsondata: JSON.stringify( { personId: obj.pid.toString() } ) };
 
         $box.data( {
 
