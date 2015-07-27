@@ -19,9 +19,14 @@
 
 """Search engine API."""
 
+from __future__ import unicode_literals
+
 import pypeg2
 
 from flask_login import current_user
+
+from invenio.base.helpers import unicodifier
+
 from werkzeug.utils import cached_property
 
 from .utils import parser, query_enhancers, query_walkers, search_walkers
@@ -39,7 +44,7 @@ class Query(object):
 
     def __init__(self, query):
         """Initialize with search query."""
-        self._query = query
+        self._query = unicodifier(query)
 
     @cached_property
     def query(self):
