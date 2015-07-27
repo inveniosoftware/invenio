@@ -189,6 +189,7 @@ from invenio.modules.collections.cache import get_coll_i18nname
 from invenio.modules.search.cache import get_field_i18nname
 
 from invenio.modules.indexer.models import IdxINDEX
+from invenio.modules.indexer.nearest_terms import get_nearest_terms_in_idxphrase_with_collection
 
 
 get_index_id_from_field = IdxINDEX.get_index_id_from_field

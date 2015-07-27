@@ -161,7 +161,7 @@ def get_nearest_terms_in_idxphrase(p, f, n_below, n_above):
             [row[0] for row in res_above])
 
 
-def get_nearest_terms_in_idxphrase_with_collection(p, index_id, n_below,
+def get_nearest_terms_in_idxphrase_with_collection(p, f, n_below,
                                                    n_above, collection):
     """Browse closest bibliographic phrases considering collection.
 
@@ -171,7 +171,7 @@ def get_nearest_terms_in_idxphrase_with_collection(p, index_id, n_below,
     """
     model = IdxINDEX.idxPHRASEF(f, fallback=False)
     if model is None:
-        return None
+        return []
 
     res_below = model.query.filter(model.term < term).limit(
         n_below).order_by(model.term.asc()).values(
