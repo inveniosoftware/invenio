@@ -37,7 +37,7 @@ import tempfile
 import sys
 import traceback
 from datetime import datetime
-from MySQLdb import ProgrammingError
+from sqlalchemy.exc import ProgrammingError
 
 try:
     from six import StringIO

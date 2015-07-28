@@ -142,7 +142,7 @@ def dict2db(table_name, dict_data, mode):
     if mode == 'i': #Insert mode
         query_fields = " , " .join(dict_data.keys())
         query_values = "' , '" .join(dict_data.values())
-        query = "INSERT IGNORE INTO %s(%s) VALUES ('%s')" % (wash_table_column_name(table_name),
+        query = "INSERT INTO %s(%s) VALUES ('%s')" % (wash_table_column_name(table_name),
                                                             query_fields,
                                                             query_values)
     elif mode == 'c': #Correct mode
