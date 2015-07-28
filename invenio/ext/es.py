@@ -177,9 +177,32 @@ SEARCH_RECORD_MAPPING = {
                         }
                     }
                 },
-                "date": {
+                "date_and_time_of_latest_transaction": {
                     "type": "date",
-                    "format": "yyyy||yyyy-MM||yyyy-MM-dd"
+                    "format": "yyyy||yyyyMM||yyyyMMdd||yyyyMMddHHmmss||yyyyMMddHHmmss.S",
+                },
+                "publication_date": {
+                    "type": "date",
+                    "format": "yyyy||yyyyMM||yyyyMMdd||yyyyMMddHHmmss||yyyyMMddHHmmss.S||dd MM yyyy||dd MMM yyyy||MMM yyyy||MMM yyyy?||yyyy ('repr'.1964.)",
+                },
+                "publication_distribution_imprint": {
+                    "type": "object",
+                    "properties": {
+                        "date_of_publication_distribution": {
+                            "type": "date",
+                            "format": "yyyy||yyyyMM||yyyyMMdd||yyyyMMddHHmmss||yyyyMMddHHmmss.S||dd MM yyyy||dd MMM yyyy||MMM yyyy||MMM yyyy?||yyyy ('repr'.1964.)",
+                            "copy_to": ["publication_date"]
+                        },
+                        "name_of_publisher_distributor": {
+                            "type": "string",
+                            "analyzer": "basic_analyzer"
+
+                        },
+                        "place_of_publication_distribution": {
+                            "type": "string",
+                            "analyzer": "basic_analyzer"
+                        }
+                    }
                 }
             }
         }
