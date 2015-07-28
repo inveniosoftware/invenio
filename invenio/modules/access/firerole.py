@@ -224,12 +224,14 @@ def acc_firerole_extract_emails(firerole_def_obj):
                     if cfg['CFG_CERN_SITE'] and expr.endswith(' [CERN]'):
                         authorized_emails.add(
                             expr[:-len(' [CERN]')].lower().strip() + ':cern.ch')
+                        # NOTE: Below query should be rewritten once the ACL
+                        #   system have been rewritten
                         emails = run_sql(
-                            """SELECT "user".email FROM usergroup JOIN """
-                            "user_usergroup ON "
-                            "usergroup.id=user_usergroup.id_usergroup "
-                            """JOIN "user" ON "user".id=user_usergroup.id_user """
-                            "WHERE usergroup.name=%s", (expr, ))
+                            """SELECT "user".email FROM group JOIN """
+                            "groupMEMBER ON "
+                            "group.id=groupMEMBER.id_group "
+                            """JOIN "user" ON "user".id=groupMEMBER.id_user """
+                            "WHERE group.name=%s", (expr, ))
                     for email in emails:
                         authorized_emails.add(email[0].lower().strip())
             elif field == 'email':

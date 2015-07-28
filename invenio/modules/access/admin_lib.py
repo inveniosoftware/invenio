@@ -155,7 +155,7 @@ def perform_listgroups(req):
         return mustloginpage(req, auth_message)
 
     header = ['name']
-    groups = run_sql('select name from usergroup')
+    groups = run_sql('select name from group')
 
     output = tupletotable(header, groups, highlight_rows_p=True,
                           alternate_row_colors_p=True)
