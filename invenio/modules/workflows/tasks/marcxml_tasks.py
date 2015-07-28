@@ -211,8 +211,11 @@ def quick_match_record(obj, eng):
                                     'oaiid': find_record_from_oaiid,
                                     'system_control_number': find_records_from_extoaiid,
                                     'doi': find_record_from_doi}
+    try:
+        record = Record(obj.data.dumps())
+    except AttributeError:
+        record = Record(obj.data)
 
-    record = Record(obj.data.dumps())
     try:
         identifiers = record.persistent_identifiers
     except Exception as e:
