@@ -42,14 +42,14 @@ class OAIHarvesterTasks(WorkflowTasksTestCase):
         """Test filtering functionality."""
         from ..tasks.harvesting import filtering_oai_pmh_identifier
         from invenio.modules.workflows.api import start
-        from invenio.modules.workflows.models import BibWorkflowObject
+        from invenio.modules.workflows.models import DbWorkflowObject
 
-        my_test_obj = BibWorkflowObject()
+        my_test_obj = DbWorkflowObject()
         my_test_obj.set_data("<record><test></test>"
                              "<identifier>identifier1</identifier></record>")
         my_test_obj.save()
 
-        my_test_obj_b = BibWorkflowObject()
+        my_test_obj_b = DbWorkflowObject()
         my_test_obj_b.set_data(["<record><test></test><identifier>identifier2"
                                 "</identifier></record>"])
         my_test_obj_b.save()
@@ -89,9 +89,9 @@ class OAIHarvesterTasks(WorkflowTasksTestCase):
         """Test harvesting."""
         from ..tasks.harvesting import init_harvesting
         from invenio.modules.workflows.api import start
-        from invenio.modules.workflows.models import BibWorkflowObject
+        from invenio.modules.workflows.models import DbWorkflowObject
 
-        my_test_obj = BibWorkflowObject()
+        my_test_obj = DbWorkflowObject()
         my_test_obj.set_data([2])
         my_test_obj.save()
         engine = start("test_workflow_dummy",

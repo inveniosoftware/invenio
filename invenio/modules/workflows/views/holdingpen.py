@@ -18,7 +18,7 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Holding Pen is a web interface overlay for all BibWorkflowObject's.
+Holding Pen is a web interface overlay for all DbWorkflowObject's.
 
 This area is targeted to catalogers and administrators for inspecting
 and reacting to workflows executions. More importantly, allowing users to deal
@@ -55,7 +55,7 @@ from six import text_type
 
 from ..acl import viewholdingpen
 from ..api import continue_oid_delayed, start_delayed
-from ..models import BibWorkflowObject, ObjectVersion, Workflow
+from ..models import DbWorkflowObject, ObjectStatus, Workflow
 from ..registry import actions, workflows
 from ..utils import (
     alert_response_wrapper,
@@ -72,30 +72,31 @@ blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       template_folder='../templates',
                       static_folder='../static')
 
+# XXX Could we avoid having Yet Another Mapping?
 default_breadcrumb_root(blueprint, '.holdingpen')
 HOLDINGPEN_WORKFLOW_STATES = {
-    ObjectVersion.HALTED: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.HALTED)),
+    DbWorkflowObject.known_statuses.HALTED: {
+        'message': _(DbWorkflowObject.known_statuses.HALTED.label),
         'class': 'danger'
     },
-    ObjectVersion.WAITING: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.WAITING)),
+    DbWorkflowObject.known_statuses.WAITING: {
+        'message': _(DbWorkflowObject.known_statuses.WAITING.label),
         'class': 'warning'
     },
-    ObjectVersion.ERROR: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.ERROR)),
+    DbWorkflowObject.known_statuses.ERROR: {
+        'message': _(DbWorkflowObject.known_statuses.ERROR.label),
         'class': 'danger'
     },
-    ObjectVersion.COMPLETED: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.COMPLETED)),
+    DbWorkflowObject.known_statuses.COMPLETED: {
+        'message': _(DbWorkflowObject.known_statuses.COMPLETED.label),
         'class': 'success'
     },
-    ObjectVersion.INITIAL: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.INITIAL)),
+    DbWorkflowObject.known_statuses.INITIAL: {
+        'message': _(DbWorkflowObject.known_statuses.INITIAL.label),
         'class': 'info'
     },
-    ObjectVersion.RUNNING: {
-        'message': _(ObjectVersion.name_from_version(ObjectVersion.RUNNING)),
+    DbWorkflowObject.known_statuses.RUNNING: {
+        'message': _(DbWorkflowObject.known_statuses.RUNNING.label),
         'class': 'warning'
     }
 }
@@ -131,11 +132,11 @@ def maintable():
     action_list = get_action_list(bwolist)
     tags = session.get(
         "holdingpen_tags",
-        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+        [ObjectStatus.labels[ObjectStatus.HALTED.value]]
     )
 
     if 'version' in request.args:
-        for key, value in ObjectVersion.MAPPING.items():
+        for value, key in ObjectStatus.labels:
             if value == int(request.args.get('version')):
                 if key not in tags:
                     tags.append(key)
@@ -164,7 +165,7 @@ def details(objectid):
     from itertools import groupby
 
     of = "hd"
-    bwobject = BibWorkflowObject.query.get_or_404(objectid)
+    bwobject = DbWorkflowObject.query.get_or_404(objectid)
     previous_object, next_object = get_previous_next_objects(
         session.get("holdingpen_current_ids"),
         objectid
@@ -181,28 +182,28 @@ def details(objectid):
         rendered_actions = {}
 
     if bwobject.id_parent:
-        history_objects_db_request = BibWorkflowObject.query.filter(
-            db.or_(BibWorkflowObject.id_parent == bwobject.id_parent,
-                   BibWorkflowObject.id == bwobject.id_parent,
-                   BibWorkflowObject.id == bwobject.id)).all()
+        history_objects_db_request = DbWorkflowObject.query.filter(
+            db.or_(DbWorkflowObject.id_parent == bwobject.id_parent,
+                   DbWorkflowObject.id == bwobject.id_parent,
+                   DbWorkflowObject.id == bwobject.id)).all()
     else:
-        history_objects_db_request = BibWorkflowObject.query.filter(
-            db.or_(BibWorkflowObject.id_parent == bwobject.id,
-                   BibWorkflowObject.id == bwobject.id)).all()
+        history_objects_db_request = DbWorkflowObject.query.filter(
+            db.or_(DbWorkflowObject.id_parent == bwobject.id,
+                   DbWorkflowObject.id == bwobject.id)).all()
 
     history_objects = {}
     temp = groupby(history_objects_db_request,
-                   lambda x: x.version)
+                   lambda x: x.status)
     for key, value in temp:
-        if key != ObjectVersion.RUNNING:
+        if key != DbWorkflowObject.known_statuses.RUNNING:
             value = list(value)
             value.sort(key=lambda x: x.modified, reverse=True)
             history_objects[key] = value
 
     history_objects = sum(history_objects.values(), [])
     for obj in history_objects:
-        obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.version]["class"]
-        obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.version]["message"]
+        obj._class = HOLDINGPEN_WORKFLOW_STATES[obj.status]["class"]
+        obj.message = HOLDINGPEN_WORKFLOW_STATES[obj.status]["message"]
     results = get_rendered_task_results(bwobject)
     workflow_definition = get_workflow_info(extracted_data['workflow_func'])
     task_history = bwobject.get_extra_data().get('_task_history', [])
@@ -220,7 +221,7 @@ def details(objectid):
                            next_object=next_object,
                            task_history=task_history,
                            workflow_definition=workflow_definition,
-                           versions=ObjectVersion,
+                           versions=ObjectStatus,
                            pretty_date=pretty_date,
                            workflow_class=workflows.get(extracted_data['w_metadata'].name),
                            )
@@ -244,7 +245,7 @@ def get_file_from_task_result(object_id=None, filename=None):
         }
 
     """
-    bwobject = BibWorkflowObject.query.get_or_404(object_id)
+    bwobject = DbWorkflowObject.query.get_or_404(object_id)
     task_results = bwobject.get_tasks_results()
     if filename in task_results and task_results[filename]:
         fileinfo = task_results[filename][0].get("result", dict())
@@ -259,7 +260,7 @@ def get_file_from_task_result(object_id=None, filename=None):
 @alert_response_wrapper
 def restart_record(objectid, start_point='continue_next'):
     """Restart the initial object in its workflow."""
-    bwobject = BibWorkflowObject.query.get_or_404(objectid)
+    bwobject = DbWorkflowObject.query.get_or_404(objectid)
 
     workflow = Workflow.query.filter(
         Workflow.uuid == bwobject.id_workflow).first()
@@ -306,7 +307,7 @@ def restart_record_prev(objectid):
 @alert_response_wrapper
 def delete_from_db(objectid):
     """Delete the object from the db."""
-    BibWorkflowObject.delete(objectid)
+    DbWorkflowObject.delete(objectid)
     return jsonify(dict(
         category="success",
         message=_("Object deleted successfully.")
@@ -339,7 +340,7 @@ def resolve_action(objectid):
 
     Will call the resolve() function of the specific action.
     """
-    bwobject = BibWorkflowObject.query.get_or_404(objectid)
+    bwobject = DbWorkflowObject.query.get_or_404(objectid)
     action_name = bwobject.get_action()
     action_form = actions[action_name]
     res = action_form().resolve(bwobject)
@@ -353,7 +354,7 @@ def resolve_action(objectid):
                  'of': (text_type, None)})
 def entry_data_preview(objectid, of):
     """Present the data in a human readble form or in xml code."""
-    bwobject = BibWorkflowObject.query.get_or_404(objectid)
+    bwobject = DbWorkflowObject.query.get_or_404(objectid)
     if not bwobject:
         flash("No object found for %s" % (objectid,))
         return jsonify(data={})
@@ -388,7 +389,7 @@ def load_table():
 
     Function used for the passing of JSON data to DataTables:
 
-    1. First checks for what record version to show
+    1. First checks for what record status to show
     2. Then the sorting direction.
     3. Then if the user searched for something.
 
@@ -396,7 +397,7 @@ def load_table():
     """
     tags = session.setdefault(
         "holdingpen_tags",
-        [ObjectVersion.name_from_version(ObjectVersion.HALTED)]
+        [ObjectStatus.labels[ObjectStatus.HALTED.value]]
     )
     if request.method == "POST":
         if request.json and "tags" in request.json:
@@ -462,8 +463,8 @@ def load_table():
                 record = dict(record)
             except (ValueError, TypeError):
                 record = {}
-        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["class"]
-        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.version]["message"]
+        bwo._class = HOLDINGPEN_WORKFLOW_STATES[bwo.status]["class"]
+        bwo.message = HOLDINGPEN_WORKFLOW_STATES[bwo.status]["message"]
         row = render_template('workflows/row_formatter.html',
                               title=preformatted["title"],
                               object=bwo,
@@ -474,7 +475,7 @@ def load_table():
                               mini_action=mini_action,
                               action_message=action_message,
                               pretty_date=pretty_date,
-                              version=ObjectVersion,
+                              status=ObjectStatus,
                               )
 
         row = row.split("<!--sep-->")

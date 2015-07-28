@@ -31,13 +31,13 @@ class TestWorkflowModels(InvenioTestCase):
 
     def setUp(self):
         """Setup tests."""
-        from invenio.modules.workflows.models import BibWorkflowObject, \
+        from invenio.modules.workflows.models import DbWorkflowObject, \
             Workflow
         from uuid import uuid1 as new_uuid
 
         self.workflow = Workflow(name='test_workflow', uuid=new_uuid(),
                                  id_user=0, module_name="Unknown")
-        self.bibworkflowobject = BibWorkflowObject(workflow=self.workflow)
+        self.bibworkflowobject = DbWorkflowObject(workflow=self.workflow)
 
         self.create_objects([self.workflow, self.bibworkflowobject])
 
@@ -47,7 +47,7 @@ class TestWorkflowModels(InvenioTestCase):
 
     def test_deleting_workflow(self):
         """Test deleting workflow."""
-        from invenio.modules.workflows.models import BibWorkflowObject, \
+        from invenio.modules.workflows.models import DbWorkflowObject, \
             Workflow
         bwo_id = self.bibworkflowobject.id
 
@@ -57,8 +57,8 @@ class TestWorkflowModels(InvenioTestCase):
         # assert bibworkflowobject is deleted
         self.assertFalse(
             db.session.query(
-                BibWorkflowObject.query.filter(
-                    BibWorkflowObject.id == bwo_id).exists()).scalar())
+                DbWorkflowObject.query.filter(
+                    DbWorkflowObject.id == bwo_id).exists()).scalar())
 
     def test_deleting_bibworkflowobject(self):
         """Test deleting workflowobject."""

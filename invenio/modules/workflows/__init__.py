@@ -36,7 +36,7 @@ Create a workflow for your data using functions as individual tasks.
 
 .. code-block:: python
 
-    from invenio.modules.workflows.tasks.sample_tasks import (
+    from workflow.tasks.sample_tasks import (
         add_data,
         halt_if_higher_than_20,
     )
@@ -79,7 +79,7 @@ take two arguments:
             eng.halt("Data higher than 20.")
 
 
-`obj` (:py:class:`.models.BibWorkflowObject`)
+`obj` (:py:class:`invenio.modules.workflows.models.DbWorkflowObject`)
     *is the current object being worked on*
 
     `obj` adds extra functionality by wrapping around your data and
@@ -122,7 +122,7 @@ Finally, to run your workflow you there are mainly two use-cases:
     * run only a **single data object**, or
     * run **multiple data objects** through a workflow.
 
-The former use the :py:class:`.models.BibWorkflowObject` model API, and
+The former use the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` model API, and
 the latter use the :py:mod:`.api`.
 
 Run a single data object
@@ -133,8 +133,8 @@ Run a single data object
 
 .. code-block:: python
 
-    from invenio.modules.workflows.models import BibWorkflowObject
-    myobj = BibWorkflowObject.create_object()
+    from workflows.models import DbWorkflowObject
+    myobj = DbWorkflowObject.create_object()
     myobj.set_data(10)
     eng = myobj.start_workflow("myworkflow")
 
@@ -142,7 +142,7 @@ Run a single data object
 Once the workflow completes it will return the engine instance that ran it.
 
 To get the data, simply call the `get_data()` function of
-:py:class:`.models.BibWorkflowObject`
+:py:class:`invenio.modules.workflows.models.DbWorkflowObject`
 
 .. code-block:: python
 
@@ -172,18 +172,18 @@ workflow. You can query this object to retrieve the data you sent in:
     len(eng.objects)  # outputs: 4
 
 Why 4 objects when we only shipped 2 objects? Well, we take initial snapshots
-(copy of BibWorkflowObject) of the original data. In the example above,
+(copy of DbWorkflowObject) of the original data. In the example above,
 we get 4 objects back as each object passed have a snapshot created.
 
 .. sidebar:: Object versions and YOU
 
-    The data you pass to the workflows API is wrapped in a BibWorkflowObject.
+    The data you pass to the workflows API is wrapped in a DbWorkflowObject.
 
     This object have a `version` property which tells you the state of object.
     For example, if the object is currently *halted* in the middle of a
     workflow, or if it is an *initial* object.
 
-    *initial* objects are basically snapshots of the BibWorkflowObject just
+    *initial* objects are basically snapshots of the DbWorkflowObject just
     before the workflow started. These are created to allow for objects to
     be easily restarted in the workflow with the initial data intact.
 
@@ -232,7 +232,7 @@ before continuing the processing.
 
 Luckily, there is API to do this:
 
-`BibWorkflowObject.start_workflow(delayed=True)`
+`DbWorkflowObject.start_workflow(delayed=True)`
     as when running single objects, you can pass the delayed parameter to
     enable asynchronous execution.
 
@@ -263,7 +263,7 @@ asynchronously in a task queue.
 Working with extra data
 =======================
 
-If you need to add some extra data to the :py:class:`.models.BibWorkflowObject` that is
+If you need to add some extra data to the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` that is
 not suitable to add to the ``obj.data`` attribute, you can make use if the
 ``obj.extra_data`` attribute.
 
@@ -275,7 +275,6 @@ it contains some additional information by default.
     {
         "_tasks_results": {},
         "owner": {},
-        "_task_counter": {},
         "_error_msg": None,
         "_last_task_name": "",
         "latest_object": -1,
@@ -285,7 +284,7 @@ it contains some additional information by default.
         "_task_history: [],
     }
 
-This information is used by the :py:class:`.models.BibWorkflowObject` to store some additional
+This information is used by the :py:class:`invenio.modules.workflows.models.DbWorkflowObject` to store some additional
 data related to the workflow execution and additional data added by tasks.
 
 It also stores information that is integrated with Holding Pen - the graphical interface
@@ -373,12 +372,12 @@ Using an action
 
 There are two ways of activating an action:
 
-    * **When halting a workflow:** :py:meth:`.engine.BibWorkflowEngine.halt` has
+    * **When halting a workflow:** :py:meth:`workflow:workflow.engine.GenericWorkflowEngine.halt` has
       a parameter that allows you to set an action that needs to be taken in
       the Holding Pen - along with a message to be displayed.
 
-    * **Directly using the :py:class:`.models.BibWorkflowObject` API**. :py:meth:`.models.BibWorkflowObject.set_action`
-      :py:meth:`.models.BibWorkflowObject.remove_action` :py:meth:`.models.BibWorkflowObject.get_action`.
+    * **Directly using the :py:class:`.models.DbWorkflowObject` API**. :py:meth:`.models.DbWorkflowObject.set_action`
+      :py:meth:`.models.DbWorkflowObject.remove_action` :py:meth:`.models.DbWorkflowObject.get_action`.
 
 
 Task results in Holding Pen
@@ -386,17 +385,17 @@ Task results in Holding Pen
 
 If you want to add some special task results to be displayed on the details page
 of the data object in Holding Pen, you can use the task results API available
-in :py:class:`.models.BibWorkflowObject`.
+in :py:class:`.models.DbWorkflowObject`.
 
 The API provides functions to manipulate the task results:
 
-:py:meth:`.models.BibWorkflowObject.add_task_result`
+:py:meth:`.models.DbWorkflowObject.add_task_result`
     Adds a task result to the end of a list associated with a label (name).
 
-:py:meth:`.models.BibWorkflowObject.update_task_results`
+:py:meth:`.models.DbWorkflowObject.update_task_results`
     Update task result for a specific label (name).
 
-:py:meth:`.models.BibWorkflowObject.get_tasks_results`
+:py:meth:`.models.DbWorkflowObject.get_tasks_results`
     Return all tasks results as a dictionary as ``{ name: [result, ..] }``
 
 
@@ -406,7 +405,7 @@ for this name.
 
 .. code-block:: python
 
-        obj = BibWorkflowObject()  # or BibWorkflowObject.query.get(id)
+        obj = DbWorkflowObject()  # or DbWorkflowObject.query.get(id)
         obj.add_task_result("foo", my_result, "path/to/template")
 
 See sample templates under `templates/workflows/results/*.html`.

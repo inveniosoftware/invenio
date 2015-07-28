@@ -73,7 +73,6 @@ install_requires = [
     # Cerberus>=0.7.1 api changes and is not yet supported
     "Cerberus>=0.7,<0.7.1",
     "chardet>=2.3.0",
-    "datacite>=0.1.0",
     "dictdiffer>=0.0.3",
     "elasticsearch>=1.3.0",
     "feedparser>=5.1",
@@ -103,6 +102,8 @@ install_requires = [
     "invenio-client>=0.1.0",
     "invenio-query-parser>=0.2",
     "invenio-records>=0.1.0",
+    "invenio-comments>=0.1.0",
+    "invenio-pidstore[datacite]>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
@@ -115,6 +116,9 @@ install_requires = [
     "MySQL-python>=1.2.5",
     "numpy>=1.7",
     "nydus>=0.10.8",
+    # FIXME new oauthlib release after 0.7.2 has some compatible problems with
+    # the used Flask-Oauthlib version.
+    "oauthlib==0.7.2",
     "passlib>=1.6.2",
     # pyparsing>=2.0.2 has a new api and is not compatible yet
     "pyparsing>=2.0.1,<2.0.2",
@@ -192,6 +196,9 @@ extras_require = {
     ],
     "sso": [
         "Flask-SSO>=0.2"
+    ],
+    "pages": [
+        "invenio-pages>=0.1.0"
     ],
     "postgresql": [
         "psycopg2>=2.5",

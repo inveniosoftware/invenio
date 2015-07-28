@@ -142,7 +142,7 @@ def get_original_comment(note):
     :param note: the note
     :return: the comment in which the note appeared
     """
-    from invenio.modules.comments.models import CmtRECORDCOMMENT
+    from invenio_comments.models import CmtRECORDCOMMENT
     from sqlalchemy.orm.exc import NoResultFound
     if "comment" in note:
         try:

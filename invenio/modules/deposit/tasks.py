@@ -42,7 +42,7 @@ from invenio.modules.formatter import format_record
 from .helpers import record_to_draft, make_record, \
     deposition_record
 from invenio.legacy.bibdocfile.api import BibRecDocs
-from invenio.modules.pidstore.models import PersistentIdentifier
+from invenio_pidstore.models import PersistentIdentifier
 
 
 #

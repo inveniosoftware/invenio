@@ -19,7 +19,7 @@
 """Generic record process in harvesting with backwards compatibility."""
 
 from invenio.modules.workflows.definitions import RecordWorkflow
-from invenio.modules.workflows.tasks.logic_tasks import workflow_if
+from workflow.tasks.logic_tasks import workflow_if
 from invenio.modules.workflows.tasks.marcxml_tasks import (
     convert_record_to_bibfield,
 )

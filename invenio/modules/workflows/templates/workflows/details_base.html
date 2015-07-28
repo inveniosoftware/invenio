@@ -294,12 +294,12 @@
         {%- endblock -%}
 
         {%- block workflow_completed -%}
-          {% if bwobject.version == 1 %}
+          {% if bwobject.status == bwobject.known_statuses.COMPLETED %}
             <div id="successmessage" class="alert alert-success">
               {{ _('Workflow completed with success') }}
               <a class="close" data-dismiss="alert">&times;</a>
             </div>
-          {% elif bwobject.version == 3 %}
+          {% elif bwobject.status == bwobject.known_statuses.RUNNING %}
             <div class="alert alert-warning">
               {{ _('Object is currently processing') }}
               <a class="close" data-dismiss="alert">&times;</a>

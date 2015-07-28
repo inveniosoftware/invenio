@@ -18,8 +18,9 @@
 
 """ Implements a workflow for testing."""
 
-from ...tasks.sample_tasks import (add_data, halt_if_data_less_than,
-                                   reduce_data_by_one)
+# FIXME: This belongs to workflow
+from workflow.tasks.sample_tasks import (add_data, halt_if_data_less_than,
+                                         reduce_data_by_one)
 
 
 class test_workflow(object):

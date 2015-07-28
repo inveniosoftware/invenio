@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,13 +17,13 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from six import reraise
 
+from invenio.base.helpers import with_app_context
 from invenio.celery import celery
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.base.helpers import with_app_context
-
-from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 from invenio.modules.workflows.errors import WorkflowWorkerError
+from invenio.modules.workflows.worker_result import AsynchronousResultWrapper
 
 
 @celery.task(name='invenio.modules.workflows.workers.worker_celery.run_worker')
@@ -133,4 +133,9 @@ class CeleryResult(AsynchronousResultWrapper):
         if postprocess is None:
             return self.asyncresult.get()
         else:
-            return postprocess(self.asyncresult.get())
+            try:
+                result = self.asyncresult.get()
+            except Exception as e:
+                reraise(e, None, self.asyncresult.traceback)
+            else:
+                return postprocess(result)

@@ -18,7 +18,7 @@
 
 """ Implements a workflow for testing. """
 
-from ...tasks.sample_tasks import task_b, add_data, generate_error
+from workflow.tasks.sample_tasks import task_b, add_data, generate_error
 
 
 class test_workflow_error(object):

@@ -23,10 +23,24 @@
 from invenio.testsuite import make_test_suite, run_test_suite
 
 from .test_workflows import WorkflowTasksTestCase
+import sys
+from six import StringIO
+from contextlib import contextmanager
+
+
+@contextmanager
+def redirect_stderr():
+    """Redirect stderr to a StringIO instance."""
+    old_stderr = sys.stderr
+    old_stderr.flush()
+    sio = StringIO()
+    sys.stderr = sio
+    yield sio
+    sio.close()
+    sys.stderr = old_stderr
 
 
 class WorkflowOthers(WorkflowTasksTestCase):
-
     """Class to test the other tasks and workflows."""
 
     def setUp(self):
@@ -42,51 +56,43 @@ class WorkflowOthers(WorkflowTasksTestCase):
 
     def test_result_abstraction(self):
         """Test abastraction layer for celery worker."""
-        from invenio.ext.sqlalchemy import db
         from ..utils import BibWorkflowObjectIdContainer
-        from ..models import BibWorkflowObject
+        from invenio.modules.workflows.models import DbWorkflowObject
         from ..worker_result import AsynchronousResultWrapper
 
         bwoic = BibWorkflowObjectIdContainer(None)
         self.assertEqual(None, bwoic.get_object())
-        test_object = BibWorkflowObject()
-        test_object.set_data(45)
+        test_object = DbWorkflowObject()
+        test_object.data = 45
         test_object.save()
         bwoic2 = BibWorkflowObjectIdContainer(test_object)
         self.assertEqual(bwoic2.get_object().id, test_object.id)
         result = bwoic2.to_dict()
         self.assertEqual(bwoic2.from_dict(result).id, test_object.id)
-        db.session.delete(test_object)
-        try:
+        with self.assertRaises(TypeError):
             AsynchronousResultWrapper(None)
-        except Exception as e:
-            self.assertTrue(isinstance(e, TypeError))
 
     def test_acces_to_undefineworkflow(self):
         """Test of access to undefined workflow."""
         from invenio.modules.workflows.api import start
-        try:
+        from workflow.errors import WorkflowDefinitionError
+        with self.assertRaises(WorkflowDefinitionError):
             start("@thisisnotatrueworkflow@", ["my_false_data"],
                   random_kay_args="value")
-        except Exception as e:
-            from invenio.modules.workflows.errors import \
-                WorkflowDefinitionError
-            self.assertTrue(isinstance(e, WorkflowDefinitionError))
 
     def test_workflows_exceptions(self):
         """Test for workflows exception."""
-        from invenio.modules.workflows.errors import WorkflowError
+        from workflow.errors import WorkflowError
         from invenio.modules.workflows.api import start
 
-        try:
-            start("test_workflow_error", [2],
-                  module_name="unit_tests")
-        except Exception as e:
-            self.assertTrue(isinstance(e, WorkflowError))
-            self.assertTrue("ZeroDivisionError" in e.message)
-            self.assertTrue("call_a()" in e.message)
-            self.assertTrue("call_b()" in e.message)
-            self.assertTrue("call_c()" in e.message)
+        with redirect_stderr() as stderr:
+            with self.assertRaises(WorkflowError):
+                stderr.seek(0)
+                start("test_workflow_error", [2], module_name="unit_tests")
+                self.assertTrue("ZeroDivisionError" in stderr)
+                self.assertTrue("call_a()" in stderr)
+                self.assertTrue("call_b()" in stderr)
+                self.assertTrue("call_c()" in stderr)
 
 
 TEST_SUITE = make_test_suite(WorkflowOthers)

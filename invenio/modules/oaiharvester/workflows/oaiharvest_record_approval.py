@@ -20,9 +20,9 @@
 """Generic record process in harvesting with backwards compatibility."""
 
 from invenio.modules.workflows.definitions import RecordWorkflow
-from invenio.modules.workflows.tasks.logic_tasks import (
-    workflow_else,
+from workflow.tasks.logic_tasks import (
     workflow_if,
+    workflow_else,
 )
 from invenio.modules.workflows.tasks.marcxml_tasks import (
     approve_record,

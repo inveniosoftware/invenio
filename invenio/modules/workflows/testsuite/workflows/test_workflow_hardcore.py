@@ -18,7 +18,7 @@
 
 """ Implements a workflow for testing."""
 
-from ...tasks.sample_tasks import task_reduce_and_halt, sleep_task
+from workflow.tasks.sample_tasks import task_reduce_and_halt, sleep_task
 
 
 class test_workflow_hardcore(object):

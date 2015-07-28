@@ -48,8 +48,12 @@ class DepositionTestCase(InvenioTestCase):
         """
         Remove all traces of the specified deposition type
         """
-        from invenio.modules.workflows.models import Workflow, \
-            BibWorkflowObject, BibWorkflowObjectLog, BibWorkflowEngineLog
+        from invenio.modules.workflows.models import (
+            Workflow,
+            DbWorkflowObject,
+            DbWorkflowObjectLog,
+            DbWorkflowEngineLog
+        )
         from invenio.ext.sqlalchemy import db
 
         workflow_ids = map(
@@ -62,24 +66,24 @@ class DepositionTestCase(InvenioTestCase):
         if workflow_ids:
             obj_ids = map(
                 lambda x: x.id,
-                BibWorkflowObject.query.filter(
-                    BibWorkflowObject.id_workflow.in_(workflow_ids)
+                DbWorkflowObject.query.filter(
+                    DbWorkflowObject.id_workflow.in_(workflow_ids)
                 ).all()
             )
 
             db.session.commit()
 
             if obj_ids:
-                BibWorkflowObjectLog.query.filter(
-                    BibWorkflowObjectLog.id_object.in_(obj_ids)
+                DbWorkflowObjectLog.query.filter(
+                    DbWorkflowObjectLog.id_object.in_(obj_ids)
                 ).delete(synchronize_session=False)
 
-            BibWorkflowEngineLog.query.filter(
-                BibWorkflowEngineLog.id_object.in_(workflow_ids)
+            DbWorkflowEngineLog.query.filter(
+                DbWorkflowEngineLog.id_object.in_(workflow_ids)
             ).delete(synchronize_session=False)
 
-            BibWorkflowObject.query.filter(
-                BibWorkflowObject.id.in_(obj_ids)
+            DbWorkflowObject.query.filter(
+                DbWorkflowObject.id.in_(obj_ids)
             ).delete(synchronize_session=False)
 
             Workflow.query.filter(
