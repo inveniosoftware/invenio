@@ -23,9 +23,9 @@ from flask import current_app, has_request_context, request, session
 
 from flask_login import UserMixin
 
-from werkzeug.datastructures import CallbackDict, CombinedMultiDict
-
 from invenio.ext.cache import cache
+
+from werkzeug.datastructures import CallbackDict, CombinedMultiDict
 
 __all__ = ('UserInfo', )
 
@@ -156,8 +156,8 @@ class UserInfo(CombinedMultiDict, UserMixin):
             data['family_name'] = user.family_name or ''
             data['email'] = user.email or ''
             data['note'] = user.note or ''
-            data['group'] = map(lambda x: x.usergroup.name,
-                                user.usergroups or [])
+            data['group'] = map(lambda x: x.group.name,
+                                user.groups or [])
             data.update(user.settings or {})
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest))  # '1' or '0'
