@@ -64,7 +64,8 @@ SEARCH_RECORD_MAPPING = {
                     ]
                 }
             }
-        }
+        },
+        "index.percolator.map_unmapped_fields_as_string": True,
     },
     "mappings": {
         "record": {
