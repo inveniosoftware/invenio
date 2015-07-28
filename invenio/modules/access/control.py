@@ -24,8 +24,6 @@ from __future__ import print_function
 
 import urlparse
 
-from flask import current_app
-
 from intbitset import intbitset
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
@@ -1471,7 +1469,7 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True,
         id_action=id_action)).fetchall())
 
     if always_add_superadmin:
-        roles.add(current_app.config.get("CFG_SUPERADMINROLE_ID", 1))
+        roles.add(acc_get_role_id(SUPERADMINROLE))
 
     # Unpack arguments
     if batch_args:

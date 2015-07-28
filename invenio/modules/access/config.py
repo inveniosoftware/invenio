@@ -21,4 +21,3 @@ from __future__ import unicode_literals
 
 CFG_EXTERNAL_AUTH_USING_SSO = False
 CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
-CFG_SUPERADMINROLE_ID = 1
