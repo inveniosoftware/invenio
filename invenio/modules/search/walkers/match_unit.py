@@ -20,20 +20,15 @@
 """Implement AST vistor."""
 
 import re
-
-from invenio.utils.memoise import memoize
-
-from invenio_query_parser.ast import (
-    AndOp, KeywordOp, OrOp,
-    NotOp, Keyword, Value,
-    SingleQuotedValue,
-    DoubleQuotedValue,
-    RegexValue, RangeOp,
-    ValueQuery, EmptyQuery
-)
-from invenio_query_parser.visitor import make_visitor
+from collections import MutableMapping, MutableSequence
 
 import six
+from invenio_query_parser.ast import AndOp, DoubleQuotedValue, EmptyQuery, \
+    Keyword, KeywordOp, NotOp, OrOp, RangeOp, RegexValue, SingleQuotedValue, \
+    Value, ValueQuery
+from invenio_query_parser.visitor import make_visitor
+
+from invenio.utils.memoise import memoize
 
 
 @memoize
@@ -62,16 +57,16 @@ def match_unit(record, p, f=None, m='a', wl=None):
     if m != 'e' and isinstance(p, six.string_types):
         p = re.compile(p)
 
-    if isinstance(record, list):
+    if isinstance(record, MutableSequence):
         return any([match_unit(field, p, f=f, m=m, wl=wl)
                     for field in record])
-    elif isinstance(record, dict):
+    elif isinstance(record, MutableMapping):
         return any([match_unit(field, p, f=f, m=m, wl=wl)
                     for field in record.values()])
 
     if m == 'e':
-        return str(record) == p
-    return p.search(str(record)) is not None
+        return six.text_type(record) == p
+    return p.search(six.text_type(record)) is not None
 
 
 class MatchUnit(object):
