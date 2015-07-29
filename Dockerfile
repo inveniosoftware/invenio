@@ -77,8 +77,8 @@ RUN useradd --home-dir /home/invenio --create-home --shell /bin/bash --uid 1000 
 
 # select proper requierments level
 #ENV REQUIREMENTS lowest
-ENV REQUIREMENTS release
-#ENV REQUIREMENTS devel
+#ENV REQUIREMENTS release
+ENV REQUIREMENTS devel
 ENV REXTRAS development,docs
 
 # add requirement files
