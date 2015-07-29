@@ -21,7 +21,7 @@ web:
   build: .
   command: inveniomanage runserver -h 0.0.0.0 -p 28080 -d -r
   ports:
-    - "127.0.0.1:28080:28080"
+    - "28080:28080"
   environment:
     - CACHE_REDIS_HOST=cache
     - CFG_DATABASE_HOST=db
@@ -55,11 +55,11 @@ worker:
 redis:
   image: redis
   ports:
-    - "127.0.0.1:26379:6379"
+    - "26379:6379"
 mysql:
   image: mysql
   ports:
-    - "127.0.0.1:23306:3306"
+    - "23306:3306"
   environment:
     - MYSQL_DATABASE=invenio
     - MYSQL_USER=invenio
