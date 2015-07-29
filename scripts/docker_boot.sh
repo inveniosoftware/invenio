@@ -146,6 +146,14 @@ CFG_WEBDIR = u'/home/invenio/var/www'
 DEPOSIT_STORAGEDIR = u'/home/invenio/var/data/deposit/storage'
 EOF
 
+    # additional config through hook
+    # this can be used by overlays and module testers
+    if [ -n "$INVENIO_ADD_CONFIG" ]; then
+        for c in $INVENIO_ADD_CONFIG; do
+            cat $c >> "$cfgfile"
+        done
+    fi
+
     # load dev config
     /code/scripts/setup_devmode.sh
 
