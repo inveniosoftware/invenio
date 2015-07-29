@@ -21,20 +21,21 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime
 import logging
 import re
 import sys
 import warnings
+from datetime import datetime
 
 from flask import current_app
-from flask_registry import RegistryProxy, ImportPathRegistry
+from flask_registry import ImportPathRegistry, RegistryProxy
 from sqlalchemy import desc
+
 from invenio.ext.sqlalchemy import db
 
-from .models import Upgrade
-from .logging import InvenioUpgraderLogFormatter
 from .checks import post_check_bibsched
+from .logging import InvenioUpgraderLogFormatter
+from .models import Upgrade
 
 
 class InvenioUpgrader(object):
@@ -410,12 +411,13 @@ class InvenioUpgrader(object):
                                 self.order_upgrades(plugins, self.history))
         return self.upgrades
 
-    def _create_graph(self, upgrades, history={}):
+    def _create_graph(self, upgrades, history=None):
         """Create dependency graph from upgrades.
 
         @param upgrades: Dict of upgrades
         @param history: Dict of applied upgrades
         """
+        history = history or {}
         graph_incoming = {}  # nodes their incoming edges
         graph_outgoing = {}  # nodes their outgoing edges
 
@@ -450,7 +452,7 @@ class InvenioUpgrader(object):
 
         return endpoints
 
-    def order_upgrades(self, upgrades, history={}):
+    def order_upgrades(self, upgrades, history=None):
         """Order upgrades according to their dependencies.
 
         (topological sort using
@@ -459,6 +461,7 @@ class InvenioUpgrader(object):
         @param upgrades: Dict of upgrades
         @param history: Dict of applied upgrades
         """
+        history = history or {}
         graph_incoming, graph_outgoing = self._create_graph(upgrades, history)
 
         # Removed already applied upgrades (assumes all dependencies prior to

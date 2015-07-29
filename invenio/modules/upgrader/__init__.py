@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -74,14 +74,15 @@ the graph and will refuse to run any upgrades until the cycles have been
 broken.
 """
 
+from invenio.base import signals
+from invenio.base.scripts.database import create, recreate
+
 
 def populate_existing_upgrades(sender, yes_i_know=False, drop=True, **kwargs):
     """Populate existing upgrades."""
     from .engine import InvenioUpgrader
     iu = InvenioUpgrader()
-    map(iu.register_success, iu.get_upgrades())
+    map(iu.register_success, iu._load_upgrades().values())
 
-from invenio.base import signals
-from invenio.base.scripts.database import create, recreate
 signals.post_command.connect(populate_existing_upgrades, sender=create)
 signals.post_command.connect(populate_existing_upgrades, sender=recreate)
