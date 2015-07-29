@@ -17,10 +17,4 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 -#}
 {#- Prints list of records' IDs. -#}
-{% block list_records_ids %}
-    {% set record_list = [] %}
-    {% for r in records %}
-        {{ record_list.append(r['recid']) }}
-    {% endfor %}
-    {{ record_list|tojson }}
-{% endblock %}
+{{- records or [] | map(attribute="recid") | list | tojson -}}
