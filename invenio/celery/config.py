@@ -28,7 +28,7 @@ def default_config(config):
     # Broker settings
     # ---------------
     config.setdefault("BROKER_URL", "redis://localhost:6379/1")
-    config.setdefault("CELERY_ACCEPT_CONTENT", ['msgpack'])
+    config.setdefault("CELERY_ACCEPT_CONTENT", ['msgpack_append'])
 
     # Extra modules with tasks which should be loaded
     # The Invenio Celery loader automatically takes care of loading tasks
@@ -41,7 +41,7 @@ def default_config(config):
     # Result backend
     # --------------
     config.setdefault("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
-    config.setdefault("CELERY_RESULT_SERIALIZER", "msgpack")
+    config.setdefault("CELERY_RESULT_SERIALIZER", "msgpack_append")
 
     # Routing
     # -------
@@ -56,7 +56,7 @@ def default_config(config):
     # --------------
     config.setdefault("CELERY_ALWAYS_EAGER", False)
     config.setdefault("CELERY_IGNORE_RESULT", False)
-    config.setdefault("CELERY_TASK_SERIALIZER", "msgpack")
+    config.setdefault("CELERY_TASK_SERIALIZER", "msgpack_append")
 
     # Worker
     # ------

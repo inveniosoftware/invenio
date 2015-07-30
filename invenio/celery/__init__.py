@@ -152,6 +152,10 @@ class InvenioLoader(BaseLoader):
             mod.__name__ for mod in registry.tasks or ())
 
 
+# Register our extended serializer
+from .msgpack_append import register
+register()
+
 #
 #  Create main celery application
 #
