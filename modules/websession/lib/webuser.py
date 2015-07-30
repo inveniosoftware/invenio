@@ -139,7 +139,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                 if text:
                     body = text
                 else:
-                    body = "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % cgi.escape(res[0][0]),
+                    message_index = 1 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0 else 9
+                    body = "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[message_index] % cgi.escape(res[0][0]),
                                       ("%s %s" % (CFG_WEBACCESS_MSGS[0] % urllib.quote(referer), CFG_WEBACCESS_MSGS[1])))
             else:
                 if text:
