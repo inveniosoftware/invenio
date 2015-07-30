@@ -56,17 +56,19 @@ EXTENSIONS = [
     'invenio.ext.jasmine',  # after assets
     'flask_breadcrumbs:Breadcrumbs',
     'invenio.modules.deposit.url_converters',
-    'invenio.ext.iiif',
+    # TODO 'invenio.ext.iiif',
     'invenio.ext.es',
 ]
 
 PACKAGES = [
     'invenio_records',
     'invenio_comments',
+    # TODO 'invenio_comments',
     # TODO 'invenio_documents',
     'invenio_pidstore',
     'invenio.modules.*',
     'invenio.base',
+    'invenio_groups',
 ]
 
 PACKAGES_EXCLUDE = [
@@ -75,6 +77,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.documents',
+    'invenio.modules.groups',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
     'invenio.modules.pidstore',
