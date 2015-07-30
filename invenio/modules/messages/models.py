@@ -27,8 +27,10 @@ from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 from string import strip
-from invenio.modules.accounts.models import User, Usergroup
+from invenio.modules.accounts.models import User
 from sqlalchemy.ext.associationproxy import association_proxy
+
+from invenio_groups.models import Group
 
 
 class MsgMESSAGE(db.Model):
@@ -90,7 +92,7 @@ class MsgMESSAGE(db.Model):
         assert len(group_names) == len(set(group_names))
         if len(group_names) > 0:
             assert len(group_names) == \
-                Usergroup.query.filter(Usergroup.name.in_(group_names)).count()
+                Group.query.filter(Group.name.in_(group_names)).count()
         return cfg['CFG_WEBMESSAGE_SEPARATOR'].join(group_names)
 
 
@@ -102,8 +104,8 @@ class MsgMESSAGE(db.Model):
         to_del = set(old_user_nicks)-set(self.user_nicks)
         if len(self.group_names):
             to_del = to_del-set([u.nickname for u in User.query.\
-                join(User.usergroups).filter(
-                Usergroup.name.in_(self.group_names)).\
+                join(User.groups).filter(
+                Group.name.in_(self.group_names)).\
                 all()])
         if len(to_del):
             is_to_del = lambda u: u.nickname in to_del
@@ -124,16 +126,16 @@ class MsgMESSAGE(db.Model):
         groups_to_del = set(old_group_names)-set(self.group_names)
         if len(groups_to_del):
             to_del = set([u.nickname for u in User.query.\
-                join(User.usergroups).filter(
-                Usergroup.name.in_(groups_to_del)).\
+                join(User.groups).filter(
+                Group.name.in_(groups_to_del)).\
                 all()])-set(self.user_nicks)
             is_to_del = lambda u: u.nickname in to_del
             remove_old = filter(is_to_del, self.recipients)
             for u in remove_old:
                 self.recipients.remove(u)
         if len(groups_to_add):
-            for u in User.query.join(User.usergroups).filter(db.and_(
-                Usergroup.name.in_(groups_to_add),
+            for u in User.query.join(User.groups).filter(db.and_(
+                Group.name.in_(groups_to_add),
                 db.not_(User.nickname.in_(self.user_nicks)))).all():
                 if u not in self.recipients:
                     self.recipients.append(u)

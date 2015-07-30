@@ -23,7 +23,6 @@ from datetime import datetime
 
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import rlike, run_sql
-from invenio.modules.accounts.models import UserUsergroup
 from invenio.modules.messages.config import CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS, \
     CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
     CFG_WEBMESSAGE_STATUS_CODE
@@ -310,7 +309,7 @@ def get_gids_from_groupnames(groupnames):
     if not((type(groupnames) is list) or (type(groupnames) is tuple)):
         groupnames = [groupnames]
     groups = {}
-    query = "SELECT name, id FROM usergroup WHERE BINARY name IN ("
+    query = "SELECT name, id FROM group WHERE BINARY name IN ("
     query_params = ()
     if len(groupnames) > 0:
         for groupname in groupnames:
@@ -337,15 +336,15 @@ def get_uids_members_of_groups(gids):
     if not((type(gids) is list) or (type(gids) is tuple)):
         gids = [gids]
     query = """SELECT DISTINCT id_user
-               FROM user_usergroup
+               FROM groupMEMBER
                WHERE user_status!=%s AND (
             """
-    query_params = [UserUsergroup.USER_STATUS['PENDING']]
+    query_params = ['PENDING']
     if len(gids) > 0:
         for gid in gids[0:-1]:
-            query += " id_usergroup=%s OR"
+            query += " id_group=%s OR"
             query_params.append(gid)
-        query += " id_usergroup=%s)"
+        query += " id_group=%s)"
         query_params.append(gids[-1])
         return sorted(map(get_element, run_sql(query, tuple(query_params))))
     return []
@@ -492,7 +491,7 @@ def get_groupnames_like(uid, pattern):
     groups = {}
     if pattern:
         # For this use case external groups are like invisible one
-        query1 = "SELECT id, name FROM usergroup WHERE name "+rlike_op+" %s AND join_policy like 'V%%' AND join_policy<>'VE'"
+        query1 = "SELECT id, name FROM group WHERE name "+rlike_op+" %s AND join_policy like 'V%%' AND join_policy<>'VE'"
         try:
             res = run_sql(query1, (pattern,))
         except OperationalError:
@@ -501,8 +500,8 @@ def get_groupnames_like(uid, pattern):
         # assuming field0=key and field1=value
         map(lambda x: groups.setdefault(x[0], x[1]), res)
         query2 = """SELECT g.id, g.name
-                    FROM usergroup g, user_usergroup ug
-                    WHERE g.id=ug.id_usergroup AND ug.id_user=%s AND g.name """+rlike_op+""" %s"""
+                    FROM group g, groupMEMBER ug
+                    WHERE g.id=ug.id_group AND ug.id_user=%s AND g.name """+rlike_op+""" %s"""
         try:
             res = run_sql(query2, (uid, pattern))
         except OperationalError:
