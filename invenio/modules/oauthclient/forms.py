@@ -20,8 +20,8 @@
 """Forms for module."""
 
 from invenio.base.i18n import _
-from invenio.modules.accounts.models import User
-from invenio.modules.accounts.validators import validate_email
+from invenio_accounts.models import User
+from invenio_accounts.validators import validate_email
 from invenio.utils.forms import InvenioBaseForm
 
 from sqlalchemy.exc import SQLAlchemyError

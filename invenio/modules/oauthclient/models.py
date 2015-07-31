@@ -24,7 +24,7 @@ from sqlalchemy_utils.types.encrypted import EncryptedType
 
 from invenio.config import SECRET_KEY as secret_key
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 class TextEncryptedType(EncryptedType):
 

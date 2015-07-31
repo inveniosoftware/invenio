@@ -31,7 +31,7 @@ from invenio.base.decorators import sorted_by, templated
 from invenio.base.i18n import _
 from invenio.ext.principal import permission_required
 from invenio.modules.access.models import AccACTION, AccROLE
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 
 # from invenio.modules.access.local_config import \

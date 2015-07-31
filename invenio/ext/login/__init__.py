@@ -68,7 +68,7 @@ def authenticate(nickname_or_email=None, password=None,
     """
     from invenio.base.i18n import _
     from invenio.ext.sqlalchemy import db
-    from invenio.modules.accounts.models import User
+    from invenio_accounts.models import User
     from sqlalchemy.orm.exc import NoResultFound
 
     where = [db.or_(User.nickname == nickname_or_email,
@@ -121,7 +121,7 @@ def setup_app(app):
         if current_user.is_guest:
             if not session.get('_flashes'):
                 flash(g._("Please sign in to continue."), 'info')
-            from invenio.modules.accounts.views.accounts import login
+            from invenio_accounts.views.accounts import login
             return login(referer=request.url)
         else:
             from flask import render_template
@@ -137,7 +137,7 @@ def setup_app(app):
     @user_logged_in.connect_via(app)
     def _logged_in(sender, user):
         """Update last login date."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         User.query.filter_by(id=user.get_id()).update(dict(
             last_login=datetime.now()
         ))

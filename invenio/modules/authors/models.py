@@ -22,7 +22,7 @@
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from invenio.ext.sqlalchemy import db, utils
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from invenio_records.models import Record
 from invenio_records.api import get_record
 

@@ -29,7 +29,7 @@ from ..models import Receiver
 
 class WebHooksTestCase(APITestCase):
     def setUp(self):
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         self.user = User(
             email='info@invenio-software.org', nickname='tester'
         )
@@ -128,7 +128,7 @@ class WebHooksTestCase(APITestCase):
 
 class WebHooksScopesTestCase(APITestCase):
     def setUp(self):
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         self.user = User(
             email='info@invenio-software.org', nickname='tester'
         )

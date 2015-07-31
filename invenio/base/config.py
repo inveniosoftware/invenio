@@ -63,15 +63,16 @@ EXTENSIONS = [
 PACKAGES = [
     'invenio_records',
     'invenio_comments',
-    # TODO 'invenio_comments',
-    # TODO 'invenio_documents',
+    'invenio_documents',
     'invenio_pidstore',
     'invenio.modules.*',
-    'invenio.base',
     'invenio_groups',
+    'invenio_accounts',
+    'invenio.base',
 ]
 
 PACKAGES_EXCLUDE = [
+    'invenio.modules.accounts',
     'invenio.modules.annotations',
     'invenio.modules.archiver',
     'invenio.modules.comments',

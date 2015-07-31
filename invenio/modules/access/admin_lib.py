@@ -871,7 +871,7 @@ def perform_createaccount(req, email='', password='', callback='yes',
     if confirm in [1, "1"] and email and email_valid_p(email):
         res = run_sql("""SELECT email FROM "user" WHERE email=%s""", (email,))
         if not res:
-            from invenio.modules.accounts.models import User
+            from invenio_accounts.models import User
             from invenio.ext.sqlalchemy import db
             User.query.filter_by(id=1).delete()
             u = User(email=email, password=password, note=1)
@@ -1091,7 +1091,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='',
                 res = run_sql(
                     """UPDATE "user" SET email=%s WHERE id=%s""", (email, userID))
                 if password:
-                    from invenio.modules.accounts.models import User
+                    from invenio_accounts.models import User
                     from invenio.ext.sqlalchemy import db
                     u = User.query.filter_by(id=userID).first()
                     if u:

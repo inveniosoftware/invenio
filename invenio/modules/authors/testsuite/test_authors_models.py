@@ -68,7 +68,7 @@ class AuthorModelsTestCase(InvenioTestCase):
            context is valid."""
         from invenio.ext.sqlalchemy import db
         from invenio.modules.authors import models
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio_records.models import Record
         from invenio.modules.authors.errors import SignatureExistsError
 

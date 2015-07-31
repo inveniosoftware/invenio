@@ -1203,7 +1203,7 @@ def acc_get_role_users(id_role):
 
 def acc_get_roles_emails(id_roles):
     """Get emails by roles."""
-    from invenio.modules.accounts.models import User
+    from invenio_accounts.models import User
     return set(map(lambda u: u.email.lower().strip(),
                    db.session.query(db.func.distinct(User.email)).join(
         User.active_roles

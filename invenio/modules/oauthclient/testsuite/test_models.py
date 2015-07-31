@@ -59,7 +59,7 @@ class RemoteAccountTestCase(BaseTestCase):
 class RemoteTokenTestCase(BaseTestCase):
     def setUp(self):
         super(RemoteTokenTestCase, self).setUp()
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         u1 = User(nickname='RemoteTokenTestCaseUser1', password='')
         u2 = User(nickname='RemoteTokenTestCaseUser2', password='')
         u3 = User(nickname='RemoteTokenTestCaseUser3', password='')
@@ -75,7 +75,7 @@ class RemoteTokenTestCase(BaseTestCase):
 
     def tearDown(self):
         super(RemoteTokenTestCase, self).tearDown()
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         User.query.filter_by(id=self.u1).delete()
         User.query.filter_by(id=self.u2).delete()
         User.query.filter_by(id=self.u3).delete()

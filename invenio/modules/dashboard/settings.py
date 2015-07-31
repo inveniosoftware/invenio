@@ -23,7 +23,7 @@ Invenio utilities to settings manipulation.
 from werkzeug.utils import cached_property
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from invenio.ext.login import current_user, login_user, logout_user
 
 

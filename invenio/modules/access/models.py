@@ -28,7 +28,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
 from invenio.modules.access.local_config import CFG_ACC_ACTIVITIES_URLS, \
     SUPERADMINROLE
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from invenio.utils.hash import md5
 
 from random import random

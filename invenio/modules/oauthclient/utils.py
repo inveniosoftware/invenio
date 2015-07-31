@@ -26,7 +26,7 @@ from flask_login import logout_user
 from invenio.base.globals import cfg
 from invenio.ext.login import UserInfo, authenticate
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User, UserEXT
+from invenio_accounts.models import User, UserEXT
 
 from .models import RemoteAccount, RemoteToken
 
@@ -81,7 +81,7 @@ def oauth_authenticate(client_id, userinfo, require_existing_link=False,
 
 def oauth_register(account_info, form_data=None):
     """Register user if possible."""
-    from invenio.modules.accounts.models import User
+    from invenio_accounts.models import User
 
     email = account_info.get("email")
     if form_data and form_data.get("email"):

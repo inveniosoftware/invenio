@@ -27,7 +27,7 @@ from flask_login import current_user
 
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 from sqlalchemy.schema import Index
 

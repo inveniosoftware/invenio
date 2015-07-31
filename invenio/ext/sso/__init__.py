@@ -104,7 +104,7 @@ def setup_app(app):
         Function should not raise an exception if `user_info` is not valid
         or `User` was not found in database.
         """
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.ext.login import (authenticate, login_redirect,
                                        current_user)
         from invenio.ext.sqlalchemy import db

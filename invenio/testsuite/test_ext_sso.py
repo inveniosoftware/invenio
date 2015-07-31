@@ -87,7 +87,7 @@ class TestSSO(InvenioTestCase):
 
         # FIXME mock user table
         from invenio.ext.sqlalchemy import db
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         admin = User.query.get(1)
         old_settings = admin.settings
         admin.settings = {'login_method': 'SSO'}

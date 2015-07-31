@@ -82,7 +82,7 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         if requestor:
             requestorset = " requestor: %s\n" % requestor
         if owner:
-            from invenio.modules.accounts.models import User
+            from invenio_accounts.models import User
             user = User.query.filter_by(nickname=owner).first()
             if user:
                 ownerprefs = invenio.legacy.webuser.get_user_preferences(user.id)

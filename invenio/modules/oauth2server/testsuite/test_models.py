@@ -27,7 +27,7 @@ from invenio.testsuite import InvenioTestCase, make_test_suite, \
 class OAuth2ModelsTestCase(InvenioTestCase):
     def setUp(self):
         from ..models import Scope
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Client, Token
 
         from ..registry import scopes as scopes_registry
@@ -181,7 +181,7 @@ class OAuth2ModelsTestCase(InvenioTestCase):
 
     def test_deletion_of_consumer_resource_owner(self):
         """Test deleting of connected user."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Client, Token
 
         uid_1 = self.resource_owner.id
@@ -224,7 +224,7 @@ class OAuth2ModelsTestCase(InvenioTestCase):
 
     def test_deletion_of_resource_owner_consumer(self):
         """Test deleting of connected user."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Client, Token
 
         uid_consumer = self.consumer.id
@@ -258,7 +258,7 @@ class OAuth2ModelsTestCase(InvenioTestCase):
 
     def test_deletion_of_client1(self):
         """Test deleting of connected user."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Token
 
         uid_resource_manager = self.resource_owner.id
@@ -292,7 +292,7 @@ class OAuth2ModelsTestCase(InvenioTestCase):
 
     def test_deletion_of_token1(self):
         """Test deleting of connected user."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Client, Token
 
         uid_resource_manager = self.resource_owner.id
@@ -326,7 +326,7 @@ class OAuth2ModelsTestCase(InvenioTestCase):
 
     def test_deletion_of_token2(self):
         """Test deleting of connected user."""
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from invenio.modules.oauth2server.models import Client, Token
 
         uid_resource_manager = self.resource_owner.id

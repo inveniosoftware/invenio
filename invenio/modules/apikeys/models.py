@@ -45,7 +45,7 @@ from invenio.ext.sqlalchemy import db
 
 
 # Create your models here.
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 
 def allowed_urls():

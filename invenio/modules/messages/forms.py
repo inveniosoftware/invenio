@@ -24,7 +24,7 @@ from string import strip
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from invenio.modules.messages.config import CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
 from invenio.utils.forms import DateTimePickerWidget, FilterForm, \
     FilterStringField, InvenioBaseForm

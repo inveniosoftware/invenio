@@ -81,7 +81,7 @@ from invenio.base.i18n import gettext_set_language, wash_languages, wash_languag
 from invenio.ext.email import send_email
 from invenio.ext.logging import register_exception
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 from sqlalchemy.exc import OperationalError
 
@@ -668,7 +668,7 @@ def get_user_preferences(uid):
     user = User.query.get(uid)
     if user is not None:
         return user.settings
-    from invenio.modules.accounts.models import get_default_user_preferences
+    from invenio_accounts.models import get_default_user_preferences
     return get_default_user_preferences() # empty dict mean no preferences
 
 def set_user_preferences(uid, pref):

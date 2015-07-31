@@ -29,7 +29,7 @@ from invenio.base.i18n import _
 from invenio.config import SECRET_KEY as secret_key
 from invenio.ext.login.legacy_user import UserInfo
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 
 import six
 

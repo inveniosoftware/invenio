@@ -26,7 +26,7 @@ from flask_login import current_user
 from flask_oauthlib.provider import OAuth2Provider
 
 from invenio.ext.sqlalchemy import db
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from .models import Token, Client
 
 

@@ -77,7 +77,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
         """Setup test."""
         from invenio.modules.oauthclient.models import RemoteToken, \
             RemoteAccount
-        from invenio.modules.accounts.models import UserEXT, User
+        from invenio_accounts.models import UserEXT, User
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
         UserEXT.query.delete()
@@ -92,7 +92,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
         """Tear down test."""
         from invenio.modules.oauthclient.models import RemoteToken, \
             RemoteAccount
-        from invenio.modules.accounts.models import UserEXT, User
+        from invenio_accounts.models import UserEXT, User
         RemoteToken.query.delete()
         RemoteAccount.query.delete()
         UserEXT.query.delete()
@@ -155,7 +155,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
 
     def test_authorized_signup(self):
         """Test authorized callback with sign-up."""
-        from invenio.modules.accounts.models import UserEXT, User
+        from invenio_accounts.models import UserEXT, User
 
         with self.app.test_client() as c:
             from invenio.modules.oauthclient.testsuite.fixture import orcid_bio
@@ -238,7 +238,7 @@ class OrcidTestCase(OAuth2ClientTestCase):
 
     def test_authorized_already_authenticated(self):
         """Test authorized callback with sign-up."""
-        from invenio.modules.accounts.models import UserEXT, User
+        from invenio_accounts.models import UserEXT, User
         from invenio.modules.oauthclient.testsuite.fixture import orcid_bio
 
         # User logins

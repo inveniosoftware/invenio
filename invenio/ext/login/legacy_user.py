@@ -145,7 +145,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         if not force and data is not None:
             return data
 
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         data = {}
 
         try:

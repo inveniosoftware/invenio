@@ -63,7 +63,7 @@ from intbitset import intbitset
 from socket import gethostname
 
 from invenio.legacy.dbquery import run_sql, _db_login
-from invenio.modules.accounts.models import User
+from invenio_accounts.models import User
 from invenio.modules.access.engine import acc_authorize_action
 from invenio.config import (
     CFG_BIBSCHED_PROCESS_USER,

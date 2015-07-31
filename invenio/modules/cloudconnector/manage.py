@@ -31,7 +31,7 @@ def upload(service, src, dest, user=None):
     from invenio.ext.login import login_user, logout_user
     from invenio.ext.sqlalchemy import db
 
-    from invenio.modules.accounts.models import User
+    from invenio_accounts.models import User
     from invenio.modules.cloudconnector import utils
     from invenio.modules.oauthclient.views.client import setup_app
 

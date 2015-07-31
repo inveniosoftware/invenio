@@ -95,7 +95,7 @@ class ProviderTestCase(InvenioTestCase):
             os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
 
         from ..models import Client, Scope
-        from invenio.modules.accounts.models import User
+        from invenio_accounts.models import User
         from ..registry import scopes as scopes_registry
 
         # Register a test scope
