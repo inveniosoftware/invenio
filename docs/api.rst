@@ -51,7 +51,6 @@ Modules
 .. toctree::
    :maxdepth: 1
 
-   modules/apikeys
    modules/documentation
    modules/formatter
    modules/jsonalchemy

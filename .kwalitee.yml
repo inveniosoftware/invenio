@@ -24,7 +24,6 @@ components:
 - accounts
 - admin
 - alerts
-- apikeys
 - archiver
 - arxiv
 - assets

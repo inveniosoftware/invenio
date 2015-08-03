@@ -1205,50 +1205,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 def perform_modifyapikeydata(req, userID, keyID='', status='', callback='yes',
                              confirm=0):
     """modify REST API keys of an account."""
-    from invenio.modules.apikeys.models import WebAPIKey
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    subtitle = """<a name="4"></a>4. Edit REST API Keys.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_SECURE_URL
-
-    if confirm in [1, "1"]:
-        run_sql("UPDATE webapikey SET status=%s WHERE id=%s", (status, keyID))
-
-    res = run_sql(
-        "SELECT id, description, status FROM webapikey WHERE id_user=%s",
-        (userID, ))
-    output = ""
-    if res:
-        for key_info in res:
-            text = ''
-            text += ' <span class="adminlabel">Key: </span><code>%s</code><br />\n' % key_info[
-                0]
-            text += ' <input class="admin_wvar" type="hidden" name="keyID" value="%s" />' % key_info[
-                0]
-            text += ' <span class="adminlabel">Description: </span>%s<br />\n' % key_info[
-                1]
-            text += ' <select name="status"> '
-            for status in WebAPIKey.CFG_WEB_API_KEY_STATUS.values():
-                text += ' <option %s value="%s">%s</option>' % (
-                    ("", "selected")[key_info[2] == status], status, status)
-            text += ' </select> <br />\n'
-            if key_info[0] == keyID:
-                text += '<b><span class="info">Key status modified</span></b>'
-            output += createhiddenform(action="modifyapikeydata",
-                                       text=text,
-                                       userID=userID,
-                                       confirm=1,
-                                       button="Modify")
-    else:
-        output += '<b><span class="info">The account id given does not have REST API Keys.</span></b>'
-
-    body = [output]
-
-    if callback:
-        return perform_editaccount(req, userID, mtype='perform_modifyapikeydata', content=addadminbox(subtitle, body), callback='yes')
-    else:
-        return addadminbox(subtitle, body)
+    raise RuntimeError('WebAPI keys have been removed.')
 
 
 def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage,

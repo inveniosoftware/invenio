@@ -42,7 +42,6 @@ from invenio.config import (
 from invenio.ext.logging import register_exception
 from invenio.ext.login import current_user, login_user
 from invenio.legacy.wsgi.utils import StringField
-from invenio.modules import apikeys as web_api_key
 from invenio.utils import apache
 from invenio.utils.url import redirect_to_url
 
@@ -280,16 +279,6 @@ def create_handler(root):
 
         # Set user agent for fckeditor.py, which needs it here
         os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
-
-        # Check if REST authentication can be performed
-        if req.args:
-            args = cgi.parse_qs(req.args)
-            if 'apikey' in args and req.is_https():
-                uid = web_api_key.acc_get_uid_from_request()
-                if uid < 0:
-                    raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
-                else:
-                    login_user(uid)
 
         guest_p = int(current_user.is_guest)
 

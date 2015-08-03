@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -33,19 +33,6 @@ class APITestCase(InvenioTestCase):
         """Set instance variables."""
         super(APITestCase, self).__init__(*args, **kwargs)
         self.accesstoken = dict()
-        self.apikey = None
-
-    def create_api_key(self, user_id):
-        """Create api-key."""
-        from invenio.modules.apikeys import create_new_web_api_key, \
-            get_available_web_api_keys
-
-        create_new_web_api_key(
-            user_id,
-            key_description='test key for user id %s' % user_id
-        )
-        keys = get_available_web_api_keys(self.userid)
-        self.apikey = keys[0].id
 
     def create_oauth_token(self, user_id, scopes, is_internal=True):
         """Create an OAuth personal access_token."""
@@ -69,16 +56,6 @@ class APITestCase(InvenioTestCase):
                     db.session.delete(t)
         db.session.commit()
         self.accesstoken = dict()
-
-    def remove_api_key(self):
-        """Remove api key."""
-        from invenio.ext.sqlalchemy import db
-        if self.apikey:
-            from invenio.modules.apikeys.models import WebAPIKey
-            k = WebAPIKey.filter_by(id=self.apikey).first()
-            if k:
-                db.session.delete(k)
-                db.session.commit()
 
     def get(self, *args, **kwargs):
         """See APITestCase.make_request()."""
@@ -141,9 +118,7 @@ class APITestCase(InvenioTestCase):
                 user_id = self.accesstoken.keys()[0]
         assert user_id is not None, "Please provide a user_id argument."
 
-        if self.apikey:
-            urlargs['apikey'] = self.apikey,
-        elif user_id in self.accesstoken:
+        if user_id in self.accesstoken:
             urlargs['access_token'] = self.accesstoken[user_id]
 
         url = url_for(endpoint, **urlargs)

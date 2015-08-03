@@ -269,32 +269,14 @@ def require_api_auth(*scopes):
     #   is_bound = hasattr(f, '__self__') and f.__self__
 
     def wrapper(f):
-        # Wrap function with oauth require decorator
+        """Wrap function with oauth require decorator."""
         from invenio.modules.oauth2server.provider import oauth2
         f_oauth_required = oauth2.require_oauth()(f)
 
         @wraps(f)
         def decorated(*args, **kwargs):
-            if 'apikey' in request.values:
-                # API key authentication
-                warnings.warn(
-                    "API keys will be superseded by OAuth personal access "
-                    "tokens",
-                    PendingDeprecationWarning
-                )
-
-                from invenio.modules.apikeys.models import WebAPIKey
-                from invenio.ext.login import login_user
-
-                user_id = WebAPIKey.acc_get_uid_from_request()
-                if user_id == -1:
-                    restful.abort(401)
-
-                login_user(user_id)
-                resp = f(None, *args, **kwargs)
-            else:
-                # OAuth 2.0 Authentication
-                resp = f_oauth_required(*args, **kwargs)
+            """OAuth 2.0 Authentication."""
+            resp = f_oauth_required(*args, **kwargs)
             session.clear()
             return resp
         return decorated
