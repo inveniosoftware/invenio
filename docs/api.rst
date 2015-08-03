@@ -55,7 +55,6 @@ Modules
    modules/formatter
    modules/jsonalchemy
    modules/knowledge
-   modules/oauthclient
    modules/redirector
    modules/upgrader
    modules/workflows

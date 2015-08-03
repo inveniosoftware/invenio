@@ -18,6 +18,7 @@
 -e git+git://github.com/inveniosoftware/invenio-client.git#egg=invenio-client
 -e git+git://github.com/inveniosoftware/invenio-comments.git#egg=invenio-comments
 -e git+git://github.com/inveniosoftware/invenio-documents.git#egg=invenio-documents
+-e git+git://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
 -e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
 -e git+git://github.com/inveniosoftware/invenio-query-parser.git#egg=invenio-query-parser
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records

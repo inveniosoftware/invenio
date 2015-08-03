@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -51,12 +51,14 @@ You might need to add following config variable::
 """
 
 from flask import url_for
+
 from fs.errors import ResourceNotFoundError
 
 from invenio.ext.fs.cloudfs.dropboxfs import DropboxFS
 from invenio.modules.cloudconnector.errors import CloudRedirectUrl
-from invenio.modules.oauthclient.models import RemoteToken
-from invenio.modules.oauthclient.views.client import oauth
+
+from invenio_oauthclient.models import RemoteToken
+from invenio_oauthclient.views.client import oauth
 
 
 class Factory(object):
@@ -83,7 +85,7 @@ class Factory(object):
                 filesystem.makedir(root, recursive=True)
                 filesystem = DropboxFS(root, credentials)
                 return filesystem
-            except:
+            except Exception:
                 raise CloudRedirectUrl(url, __name__)
         else:
             raise CloudRedirectUrl(url, __name__)

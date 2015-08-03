@@ -27,7 +27,7 @@ Incompatible changes
     (#2972)
 
   - Removes external authentication engines. Please use
-    `invenio.modules.oauthclient` or Flask-SSO instead.  (#1083)
+    `invenio_oauthclient` or Flask-SSO instead.  (#1083)
 
 + assets:
 

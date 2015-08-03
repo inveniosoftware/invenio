@@ -81,7 +81,6 @@ components:
 - oaiharvester
 - oairepository
 - oauth2server
-- oauthclient
 - pages
 - pidstore
 - previewer
