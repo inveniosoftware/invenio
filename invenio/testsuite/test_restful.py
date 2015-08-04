@@ -30,8 +30,8 @@ from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 class DecoratorsTestCase(InvenioTestCase):
     def setUp(self):
         from invenio_accounts.models import User
-        from invenio.modules.oauth2server.registry import scopes
-        from invenio.modules.oauth2server.models import Token, Scope
+        from invenio_oauth2server.registry import scopes
+        from invenio_oauth2server.models import Token, Scope
 
         # Setup variables:
         self.called = dict()
@@ -172,7 +172,7 @@ class RestfulPaginationTestCase(InvenioTestCase):
     def setUp(self):
         """Set up some dummy data and a resource."""
         from invenio_accounts.models import User
-        from invenio.modules.oauth2server.models import Token
+        from invenio_oauth2server.models import Token
 
         self.data = range(25)
 
@@ -394,7 +394,7 @@ class RestfulSQLAlchemyPaginationTestCase(InvenioTestCase):
     def setUp(self):
         from flask_restful import Resource, fields, marshal
         from invenio_accounts.models import User
-        from invenio.modules.oauth2server.models import Token
+        from invenio_oauth2server.models import Token
 
         class TagRepresenation(object):
 

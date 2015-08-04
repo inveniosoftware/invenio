@@ -80,7 +80,6 @@ components:
 - multimedia
 - oaiharvester
 - oairepository
-- oauth2server
 - pages
 - pidstore
 - previewer

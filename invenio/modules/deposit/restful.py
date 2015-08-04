@@ -634,8 +634,8 @@ def setup_app(app, api):
 
     # Register scopes
     with app.app_context():
-        from invenio.modules.oauth2server.models import Scope
-        from invenio.modules.oauth2server.registry import scopes
+        from invenio_oauth2server.models import Scope
+        from invenio_oauth2server.registry import scopes
         scopes.register(Scope(
             'deposit:write',
             group='Deposit',

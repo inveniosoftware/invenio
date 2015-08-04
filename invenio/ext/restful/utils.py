@@ -37,7 +37,7 @@ class APITestCase(InvenioTestCase):
     def create_oauth_token(self, user_id, scopes, is_internal=True):
         """Create an OAuth personal access_token."""
         # Create a personal access token as well.
-        from invenio.modules.oauth2server.models import Token
+        from invenio_oauth2server.models import Token
         self.accesstoken[user_id] = Token.create_personal(
             'test-personal-%s' % user_id,
             user_id,
@@ -50,7 +50,7 @@ class APITestCase(InvenioTestCase):
         from invenio.ext.sqlalchemy import db
         for t in six.itervalues(self.accesstoken):
             if t:
-                from invenio.modules.oauth2server.models import Token
+                from invenio_oauth2server.models import Token
                 t = Token.query.filter_by(access_token=t).first()
                 if t:
                     db.session.delete(t)

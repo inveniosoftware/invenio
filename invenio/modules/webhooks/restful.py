@@ -24,8 +24,8 @@ from functools import wraps
 from flask import request
 from flask_restful import Resource, abort
 from invenio.ext.restful import require_api_auth, require_oauth_scopes
-from invenio.modules.oauth2server.models import Scope
-from invenio.modules.oauth2server.registry import scopes
+from invenio_oauth2server.models import Scope
+from invenio_oauth2server.registry import scopes
 from .models import Receiver, ReceiverDoesNotExists, InvalidPayload, \
     WebhookError
 

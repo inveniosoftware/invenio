@@ -270,7 +270,7 @@ def require_api_auth(*scopes):
 
     def wrapper(f):
         """Wrap function with oauth require decorator."""
-        from invenio.modules.oauth2server.provider import oauth2
+        from invenio_oauth2server.provider import oauth2
         f_oauth_required = oauth2.require_oauth()(f)
 
         @wraps(f)
