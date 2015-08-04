@@ -106,6 +106,11 @@ def setup_app(app):
         base_template="admin_base.html",
         template_mode='bootstrap3'
     )
+
+    # TODO remove when 1.2.1 is released
+    if not hasattr(admin, 'category_icon_classes'):
+        admin.category_icon_classes = {}
+
     admin.init_app(app)
 
     # Create registry and run discovery
