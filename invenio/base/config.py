@@ -69,6 +69,7 @@ PACKAGES = [
     'invenio_oauthclient',
     'invenio_groups',
     'invenio_accounts',
+    'invenio_jsonref',
     'invenio.base',
 ]
 
