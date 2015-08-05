@@ -71,6 +71,21 @@ def item_search_result(req, p=None, f=None, ln=CFG_SITE_LANG):
 
     return bal.item_search_result(req, p, f, ln)
 
+
+def loan_period_calculate(req, ln=CFG_SITE_LANG):
+    """
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_period_calculate
+    """
+    return bal.loan_period_calculate(req, ln)
+
+def loan_period_result(req, startDate=None, endDate=None, numberOfResults=None, ln=CFG_SITE_LANG):
+    """
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_period_result
+    """
+
+    return bal.loan_period_result(req, startDate, endDate, numberOfResults, ln)
+
+
 def loan_return(req, ln=CFG_SITE_LANG):
     """
     http://cds.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_return
