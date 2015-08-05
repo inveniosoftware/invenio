@@ -66,6 +66,7 @@ PACKAGES = [
     'invenio_documents',
     'invenio_pidstore',
     'invenio.modules.*',
+    'invenio_webhooks',
     'invenio_oauthclient',
     'invenio_oauth2server',
     'invenio_groups',
@@ -89,6 +90,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.oaiharvester',
     'invenio.modules.records',
     'invenio.modules.tags',
+    'invenio.modules.webhooks',
 ]
 
 LEGACY_WEBINTERFACE_EXCLUDE = []

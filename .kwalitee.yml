@@ -110,7 +110,6 @@ components:
 - unapi
 - upgrader
 - version
-- webhooks
 - workflows
 
 excludes:
