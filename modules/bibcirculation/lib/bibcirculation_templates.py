@@ -143,6 +143,7 @@ def load_menu(ln=CFG_SITE_LANG):
                     <li><a href="%(url)s/admin2/bibcirculation/update_vendor_info_step1?ln=%(ln)s">%(Update_info)s</a></li>
                 </ul>
             </li>
+            <li> <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_period_calculate?ln=%(ln)s">%(LoanPeriod)s</a></li>
         </ul>
     </li>
     """ % {'url': CFG_SITE_URL, 'Lists': _("Loan Lists"),
@@ -151,7 +152,7 @@ def load_menu(ln=CFG_SITE_LANG):
            'Items_on_shelf_with_holds': _("Items on shelf with holds"),
            'Items_on_loan_with_holds': _("Items on loan with holds"),
            'Overdue_loans_with_holds': _("Overdue loans with holds"),
-           'Others': _("Others"), 'Libraries': _("Libraries"),
+           'Others': _("Others"), 'Libraries': _("Libraries"), 'LoanPeriod': _("Loan Period"),
            'Search': _("Search"), 'Add_new_library': _("Add new library"),
            'Update_info': _("Update info"), 'Vendors': _("Vendors"),
            'Add_new_vendor': _("Add new vendor"), 'ln': ln}
@@ -1970,6 +1971,142 @@ onClick="location.href='%s/admin2/bibcirculation/create_loan?ln=%s&request_id=%s
 
         return out
 
+    def tmpl_loan_period_calculate(self, infos, ln=CFG_SITE_LANG):
+        """
+        @param ln: language of the page
+        """
+        _ = gettext_set_language(ln)
+        
+        out = self.tmpl_infobox(infos, ln)
+
+        out += load_menu(ln)
+
+        out += """
+        <div class="bibcircbottom">
+          <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_period_result" method="get" >
+            <br />
+            <br />
+            <br />
+            <input type=hidden value="0" />
+            <input type=hidden value="10" />
+            <table class="bibcirctable">
+              <tr align="center">
+                <td class="bibcirctableheader">
+                  Calculate Loan Period
+                  <br />
+                  <br />
+                </td>
+              </tr>
+              <tr align="center">
+                <td> <strong>Start Date :</strong>(Format : 2014-01-01 00:00:00) <input type="text" size="20" name="startDate" style='border: 1px solid #cfcfcf'></td>
+              </tr>
+              <tr align="center">
+                <td><strong>End Date :</strong>(Format : 2015-06-01 09:00:01) <input type="text" size="20" name="endDate" style='border: 1px solid #cfcfcf'></td> 
+              </tr>
+              <tr align="center">
+                <td><strong>Number of Top Results :</strong>(Format : 10) <input type="text" size="20" name="numberOfResults" style='border: 1px solid #cfcfcf'></td>
+              </tr>
+            </table>
+            <br />
+            <table class="bibcirctable">
+              <tr align="center">
+                <td>
+                  <input type=button value='%s' onClick="history.go(-1)" class="formbutton">
+                  <input type="submit" value='%s' class="formbutton"> 
+                </td>
+              </tr>
+            </table>
+            <br />
+            <br />
+            <br />
+            <br />
+          </form>
+        </div>
+
+        """ % (CFG_SITE_URL, _("Back"), _("Search"))
+
+        return out
+    
+    def tmpl_loan_period_result(self, result, ln=CFG_SITE_LANG):
+        """
+        @param ln: language of the page
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """  """
+
+        out += load_menu(ln)
+
+        if result == None:
+            out += """
+            <div class="bibcircbottom">
+              <br />
+              <div class="infoboxmsg">%s</div>
+              <br />
+            """ % (_("0 item(s) found."))
+
+        else:
+            out += """
+            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <div class="bibcircbottom">
+              <br />
+              <table class="bibcirctable">
+                <tr align="center">
+                  <td>
+                    <strong>%s item(s) found</strong>
+                  </td>
+                </tr>
+              </table>
+              <br />
+              <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                <thead>
+                  <tr>
+                    <th>%s</th>
+                    <th>%s</th>
+                    <th>%s</th>
+                    <th>%s</th>
+                    <th>%s</th>
+                  </tr>
+                </thead>
+                <tbody>
+            """ % (len(result), _("Recorrd No"), _("No of items"),
+                   _("Loan Period(in days)"), _("Item List"), 
+                   _("Volume"))
+            
+            for volume, loanPeriod, itemList, noOfItems, recordNo in result:
+                
+                out += """
+                  <tr>
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
+                    <td>%s</td>
+		    <td>%s</td>
+                  </tr>
+                """ % (volume, loanPeriod, itemList,
+                       noOfItems, recordNo)
+
+        out += """
+                </tbody>
+              </table>
+              <br />
+              <table class="bibcirctable">
+                <tr align="center">
+                  <td>
+                    <input type=button value='%s' onClick="history.go(-1)" class="formbutton">
+                  </td>
+                </tr>
+              </table>
+              <br />
+              <br />
+              <br />
+            </div>
+        
+        """ % (_("Back"))
+        
+        return out
+        
     def tmpl_item_search(self, infos, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
