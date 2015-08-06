@@ -395,7 +395,7 @@ def main():
                 if not base_url.lower().startswith('http'):
                     base_url = 'http://' + base_url
                 (addressing_scheme, network_location, path, dummy1,
-                 dummy2, dummy3) = urllib.parse(base_url)
+                 dummy2, dummy3) = urllib.parse.urlparse(base_url)
                 secure = (addressing_scheme == "https")
 
                 if (cert_file and not key_file) or \
