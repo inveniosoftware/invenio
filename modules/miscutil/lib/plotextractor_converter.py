@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-import re
+import tarfile
 
 from invenio.shellutils import run_shell_command, run_process_with_timeout, Timeout
 from invenio.plotextractor_output_utils import get_converted_image_name, \
@@ -40,20 +40,11 @@ def untar(original_tarball, sdir):
         tarball.
     """
 
-    tarball = check_for_gzip(original_tarball)
-    dummy1, cmd_out, cmd_err = run_shell_command('file %s', (tarball,))
-    tarball_output = 'tar archive'
-    if re.search(tarball_output, cmd_out) == None:
-        run_shell_command('rm %s', (tarball,))
+    if not tarfile.is_tarfile(original_tarball):
         return ([], [], None)
-    cmd_list = ['tar', 'xvf', tarball, '-C', sdir]
-    dummy1, cmd_out, cmd_err = run_process_with_timeout(cmd_list)
 
-    if cmd_err != '':
-        return ([], [], None)
-    if original_tarball != tarball:
-        run_shell_command('rm %s', (tarball,))
-    cmd_out = cmd_out.split('\n')
+    tarball = tarfile.open(original_tarball)
+    tarball.extractall(sdir)
 
     tex_output_contains = 'TeX'
 
@@ -66,7 +57,7 @@ def untar(original_tarball, sdir):
     image_list = []
     might_be_tex = []
 
-    for extracted_file in cmd_out:
+    for extracted_file in tarball.getnames():
         if extracted_file == '':
             break
         if extracted_file.startswith('./'):
@@ -108,8 +99,8 @@ def untar(original_tarball, sdir):
         # well, that's tragic
         # could not find TeX file in tar archive
         return ([], [], [])
-
     return (file_list, image_list, might_be_tex)
+
 
 def check_for_gzip(tfile):
     """

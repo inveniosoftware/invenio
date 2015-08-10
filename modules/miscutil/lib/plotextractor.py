@@ -27,7 +27,7 @@ from invenio.shellutils import run_shell_command, Timeout, run_process_with_time
 from invenio.invenio_connector import InvenioConnector
 from invenio.textutils import wrap_text_in_a_box, \
                               wait_for_user
-from invenio.config import CFG_TMPSHAREDDIR, CFG_SITE_URL, \
+from invenio.config import CFG_TMPSHAREDDIR, CFG_TMPDIR, CFG_SITE_URL, \
                            CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
                            CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
                            CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
@@ -223,7 +223,7 @@ def main():
         if upload_plots:
             upload_to_site(squash_path, yes_i_know, upload_mode)
 
-def process_single(tarball, sdir=CFG_TMPSHAREDDIR, xtract_text=False, \
+def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False, \
                    upload_plots=False, force=False, squash="", \
                    yes_i_know=False, refno_url="", \
                    clean=False, recid=None, upload_mode='append'):
