@@ -19,16 +19,16 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.6\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
-"PO-Revision-Date: 2012-02-17 11:55+0100\n"
+"PO-Revision-Date: 2015-08-11 14:32+0200\n"
 "Last-Translator: Flavio Costa <flavio.costa@cern.ch>\n"
 "Language-Team: IT <info@invenio-software.org>\n"
-"Language: \n"
+"Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
-"X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/websearch/doc/search-guide.webdoc:361
 #: modules/websearch/doc/search-guide.webdoc:396
@@ -1394,71 +1394,63 @@ msgstr "O"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:257
 msgid "Click here to review the transactions."
-msgstr ""
+msgstr "Fare clic qui per visualizzare le transazioni."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:309
-#, fuzzy
 msgid "Quit searching."
-msgstr "Esegui ricerca"
+msgstr "Chiudere la ricerca"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:515
-#, fuzzy
 msgid "Your options"
-msgstr "Opzioni di ricerca:"
+msgstr "Sue opzioni"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:525
 msgid "Claim for yourself"
-msgstr ""
+msgstr "Rivendica per te"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:529
 msgid "Attribute to"
-msgstr ""
+msgstr "Attribuire a"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:533
-#, fuzzy
 msgid "Search for a person to attribute the paper to"
-msgstr "Sei un membro dei seguenti gruppi:"
+msgstr "Ricerca una persona a chi attribuire il saggio"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:593
 #: modules/bibauthorid/lib/bibauthorid_templates.py:687
 #: modules/bibauthorid/lib/bibauthorid_templates.py:759
-#, fuzzy
 msgid "Select All"
-msgstr "Cancella tutti"
+msgstr "Selezioni tutto"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:594
 #: modules/bibauthorid/lib/bibauthorid_templates.py:688
 #: modules/bibauthorid/lib/bibauthorid_templates.py:760
-#, fuzzy
 msgid "Select None"
-msgstr "Seleziona un punteggio"
+msgstr "Seleziona Nessuno"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:595
 #: modules/bibauthorid/lib/bibauthorid_templates.py:689
 #: modules/bibauthorid/lib/bibauthorid_templates.py:761
-#, fuzzy
 msgid "Invert Selection"
-msgstr "Selezione referee"
+msgstr "Inverti selezione"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:597
 #: modules/bibauthorid/lib/bibauthorid_templates.py:691
 msgid "Hide successful claims"
-msgstr ""
+msgstr "Nascondere le rivendicazioni che hanno avuto successo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:616
 #: modules/bibauthorid/lib/bibauthorid_templates.py:735
 msgid "Paper Short Info"
-msgstr ""
+msgstr "Carta Corta Info"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:617
-#, fuzzy
 msgid "Author Name"
-msgstr "Autore"
+msgstr "Nome dell’autore"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:618
-#, fuzzy
 msgid "Affiliation"
-msgstr "Affiliazioni:"
+msgstr "Affiliazione"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:619
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1469,9 +1461,8 @@ msgid "Date"
 msgstr "Data"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:620
-#, fuzzy
 msgid "Experiment"
-msgstr "esperimento"
+msgstr "Esperimento"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:621
 #: modules/bibauthorid/lib/bibauthorid_templates.py:736
@@ -1481,141 +1472,132 @@ msgid "Actions"
 msgstr "Azioni"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:641
-#, fuzzy
 msgid "Not assigned"
-msgstr "Nota"
+msgstr "Non assegnato"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:657
-#, fuzzy
 msgid "No status information found."
-msgstr "Ulteriori informazioni:"
+msgstr "Nessuna informazione di stato."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:678
 msgid "Operator review of user actions pending"
-msgstr ""
+msgstr "Revisione operatore delle azioni dell'utente in attesa"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:722
 msgid "Sorry, there are currently no records to be found in this category."
 msgstr ""
+"Siamo spiacenti, al momento non ci sono i record presenti in questa "
+"categoria."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:751
-#, fuzzy
 msgid "Review Transaction"
-msgstr "divisione"
+msgstr "Revisione di transazione"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:758
-#, fuzzy
 msgid "On all pages"
-msgstr "Memorizza modifiche"
+msgstr "Su tutte le pagine"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:765
-#, fuzzy
 msgid "With selected do"
-msgstr "È stato rifiutato il:"
+msgstr "With selected do"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:794
 msgid "Names variants"
-msgstr ""
+msgstr "Varianti di nomi"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:916
 msgid "These records have been marked as not being from this person."
 msgstr ""
+"Questi record sono stati contrassegnati come non essere da questa persona."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:917
 msgid "They will be regarded in the next run of the author "
-msgstr ""
+msgstr "Saranno considerate nella prossima corsa dell’autore"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:918
 msgid "disambiguation algorithm and might disappear from this listing."
-msgstr ""
+msgstr "algoritmo disambigua  e potrebbe scomparire da questo elenco."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:944
 #: modules/bibauthorid/lib/bibauthorid_templates.py:945
 #: modules/bibauthorid/lib/bibauthorid_templates.py:948
-#, fuzzy
 msgid "Not provided"
-msgstr "Non ancora recensito"
+msgstr "Non fornito"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:946
-#, fuzzy
 msgid "Not available"
-msgstr "Nessun giornale disponibile"
+msgstr "Non disponibile"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:947
-#, fuzzy
 msgid "No comments"
-msgstr "commenti"
+msgstr "Nessun commento"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:949
-#, fuzzy
 msgid "Not Available"
-msgstr "Nessun giornale disponibile"
+msgstr "Non disponibile"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:969
-#, fuzzy
 msgid " Delete this ticket"
-msgstr "Cancella cestino"
+msgstr " Cancella questo biglietto"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid " Commit this entire ticket"
-msgstr ""
+msgstr " Mandare l’intero biglietto"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:993
-#, fuzzy
 msgid "No title available"
-msgstr "Nessun giornale disponibile"
+msgstr "Nessun titolo disponibile"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1080
-#, fuzzy
 msgid "Choose system"
-msgstr "Scegli argomento"
+msgstr "Scegli sistema"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1108
 msgid "Make sure we match the right names!"
-msgstr ""
+msgstr "Assicurare che accoppiamo i nomi giusti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1110
 msgid "Please select an author on each of the records that will be assigned."
-msgstr ""
+msgstr "Selezionare un autore su ciascuno dei record che verranno assegnati."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1111
 msgid "Papers without a name selected will be ignored in the process."
-msgstr ""
+msgstr "I documenti senza un nome selezionato saranno ignorati nel processo."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1120
 msgid "Claim for person with id"
-msgstr ""
+msgstr "Richiedi una persona con id"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1121
 msgid "This seems to be an empty profile without names associated to it yet"
 msgstr ""
+"Questo sembra essere un profilo vuoto senza nome associato ad esso finora"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1122
 msgid ""
 "(the names will be automatically gathered when the first paper is claimed to "
 "this profile)."
 msgstr ""
+"(I nomi saranno raccolti automaticamente quando il primo saggio è "
+"rivendicato per questo profilo)."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1124
-#, fuzzy
 msgid "Select name for"
-msgstr "Seleziona un punteggio"
+msgstr "Seleziona nome per"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1133
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1160
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1304
 msgid "Error retrieving record title"
-msgstr ""
+msgstr "Errore durante il recupero del titolo del record"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1136
-#, fuzzy
 msgid "Paper title: "
-msgstr "Articoli:"
+msgstr "Titolo del saggio: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1148
-#, fuzzy
 msgid "The following names have been automatically chosen:"
-msgstr "Sono stati riscontrati i seguenti errori"
+msgstr "I seguenti nomi sono stati scelti automaticamente:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1153
 #: modules/websubmit/lib/websubmit_templates.py:1212
@@ -1624,179 +1606,176 @@ msgstr "Per"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1164
 msgid " --  With name: "
-msgstr ""
+msgstr " --  Con nome: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1169
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorare"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1218
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1234
-#, fuzzy
 msgid "Navigation:"
-msgstr "Citazioni:"
+msgstr "Navigazione:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1219
 msgid "Run paper attribution for another author"
-msgstr ""
+msgstr "Far scorrere l’attribuzione di saggi per un’altro autore"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1220
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1237
-#, fuzzy
 msgid "Person Interface FAQ"
-msgstr "Interfaccia di pubblicazione"
+msgstr "Interfaccia di persona Domande frequenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1235
-#, fuzzy
 msgid "Person Search"
-msgstr "Cerca"
+msgstr "Cerca persone"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1236
-#, fuzzy
 msgid "Open tickets"
-msgstr "volte"
+msgstr "Biglietti aperti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1265
 msgid "Symbols legend: "
-msgstr ""
+msgstr "Leggenda simboli: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1270
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1329
 msgid "Everything is shiny, captain!"
-msgstr ""
+msgstr "Tutto brilla, comandante!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1271
 msgid "The result of this request will be visible immediately"
-msgstr ""
+msgstr "Il risultato di questa richiesta sarà visibile immediatamente"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1276
 msgid "Confirmation needed to continue"
-msgstr ""
+msgstr "Per proseguire è necessario una confermazione"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1277
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper has been manually claimed before"
 msgstr ""
+"Il risultato di questa richiesta sarà visibile immediatamente pero è "
+"necessario che otteniamo la sua confermazione per farlo perché questo saggio "
+"è già stato richiesto manualmente prima."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1282
 msgid "This will create a change request for the operators"
-msgstr ""
+msgstr "Questo crea una richiesta di modifica per gli operatori"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1283
 msgid ""
 "The result of this request will be visible upon confirmation through an "
 "operator"
 msgstr ""
+"Il risultato di questa richiesta sarà visibile dopo conferma attraverso un "
+"operatore"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1322
-#, fuzzy
 msgid "Selected name on paper"
-msgstr "Seleziona un punteggio"
+msgstr "Seleziona nome su carta"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1333
 msgid "Verification needed to continue"
-msgstr ""
+msgstr "E necessaria una verificazione per potere continuare"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1337
 msgid "This will create a request for the operators"
-msgstr ""
+msgstr "Questo crea un password per gli operatori"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1375
-#, fuzzy
 msgid "Please provide your information"
-msgstr "Ulteriori informazioni:"
+msgstr "La pregiamo di fornire le sue informazioni"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1382
-#, fuzzy
 msgid "Please provide your first name"
-msgstr "Per favore, autentificati."
+msgstr "La pregiamo di fornire suo nome"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1386
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1388
 msgid "Your first name:"
-msgstr ""
+msgstr "Nome:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1394
 msgid "Please provide your last name"
-msgstr ""
+msgstr "La pregiamo di fornire suo cognome"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1399
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1401
-#, fuzzy
 msgid "Your last name:"
-msgstr "Tuoi prestiti"
+msgstr "Cognome"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1409
 msgid "Please provide your eMail address"
-msgstr ""
+msgstr "La pregiamo di fornire il suo indirizzo email"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1415
 msgid ""
 "This eMail address is reserved by a user. Please log in or provide an "
 "alternative eMail address"
 msgstr ""
+"Questo indirizzo eMail è riservato da un utente. Effettuare il login o "
+"fornire un indirizzo e-mail alternativo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1420
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1422
-#, fuzzy
 msgid "Your eMail:"
-msgstr "I tuoi avvisi"
+msgstr "La sua eMail:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1426
 msgid "You may leave a comment (optional)"
-msgstr ""
+msgstr "Può lasciare un commento (facoltativo)"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1439
 msgid "Continue claiming*"
-msgstr ""
+msgstr "Fare più richieste*"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1441
 msgid "Confirm these changes**"
-msgstr ""
+msgstr "Confermare questi cambiamenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1444
-#, fuzzy
 msgid "!Delete the entire request!"
-msgstr "Cancella le recensioni selezionate"
+msgstr "!Cancella l’intera richiesta!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1457
-#, fuzzy
 msgid "Mark as your documents"
-msgstr "tutti i tipi di documento"
+msgstr "Segnare come suoi documenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1472
 msgid "Mark as _not_ your documents"
-msgstr ""
+msgstr "Segnare come non_essendo_suoi_documenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1483
 msgid "Nothing staged as not yours"
-msgstr ""
+msgstr "Niente compare come non essendo suo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1487
-#, fuzzy
 msgid "Mark as their documents"
-msgstr "Torna al documento"
+msgstr "Segnare come i loro documenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1498
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1513
 msgid "Nothing staged in this category"
-msgstr ""
+msgstr "Niente compare in questa categoria"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1502
-#, fuzzy
 msgid "Mark as _not_ their documents"
-msgstr "Torna al documento"
+msgstr "Segna come non_essendo_i_loro_documenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1519
 msgid "  * You can come back to this page later. Nothing will be lost. <br />"
-msgstr ""
+msgstr "  *Può ritornare più tardi a questa pagina. Niente sarà perso"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1520
 msgid ""
 "  ** Performs all requested changes. Changes subject to permission "
 "restrictions will be submitted to an operator for manual review."
 msgstr ""
+"  **Eseguisce tutte le modifiche richieste. Le modifiche soggette a "
+"restrizioni di autorizzazione saranno sottoposte ad un operatore di "
+"controllo manuale."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1576
 #, python-format
@@ -1805,53 +1784,55 @@ msgid ""
 "name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
+"Non abbiamo un elenco delle pubblicazioni per \" %s\".  Provare ad "
+"utilizzare un nome d'autore meno specifico, o torna in pochi giorni siccome "
+"attribuzioni sono spesso aggiornate. Oppure potete inviarci il vostro "
+"feedback, a"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1589
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1701
-#, fuzzy
 msgid "Create a new Person for your search"
-msgstr "Nessun risultato trovato."
+msgstr "Creare una nuova persona per la sua ricerca"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1644
-#, fuzzy
 msgid "Recent Papers"
-msgstr "Articoli:"
+msgstr "Saggi recenti:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1658
 msgid "YES!"
-msgstr ""
+msgstr "SI!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1659
 msgid " Attribute Papers To "
-msgstr ""
+msgstr " Attribuire Saggi A"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1665
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1687
-#, fuzzy
 msgid "Publication List "
-msgstr "Data creazione"
+msgstr "Lista delle pubblicazioni "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
 msgid "Showing the"
-msgstr ""
+msgstr "Mostrando i/gli/le"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1672
-#, fuzzy
 msgid "most recent documents:"
-msgstr "Elenco dei documenti con referee"
+msgstr "documenti più recenti"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1681
 msgid "Sorry, there are no documents known for this person"
-msgstr ""
+msgstr "Siamo spiacenti, non vi sono documenti conosciuti per questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1683
 msgid ""
 "Information not shown to increase performances. Please refine your search."
 msgstr ""
+"Informazioni nascoste per aumentare le prestazioni. Si prega di affinare la "
+"ricerca."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1877
 msgid "Correct my publication lists!"
-msgstr ""
+msgstr "Correggere il mio elenco di pubblicazioni."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:263
 msgid "Fatal: Author ID capabilities are disabled on this system."
@@ -6751,8 +6732,7 @@ msgstr "Batchuploader: monitor dei demoni"
 #: modules/miscutil/lib/dateutils.py:98 modules/miscutil/lib/dateutils.py:125
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
-#: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:311
+#: modules/webbasket/lib/webbasket.py:968 modules/websession/lib/webuser.py:311
 #: modules/webstyle/lib/webstyle_templates.py:596
 msgid "N/A"
 msgstr "N.d."
@@ -7278,8 +7258,7 @@ msgstr "Ritorna alla selezione principale"
 
 #: modules/webaccess/lib/access_control_config.py:306
 #: modules/websession/lib/websession_templates.py:1210
-#: modules/websession/lib/webuser.py:994
-#: modules/websession/lib/webuser.py:1003
+#: modules/websession/lib/webuser.py:994 modules/websession/lib/webuser.py:1003
 #: modules/websession/lib/webuser.py:1004
 msgid "Run Record Editor"
 msgstr "Esegui Record Editor"
@@ -7291,8 +7270,7 @@ msgstr "Esegui Multi-Record Editor"
 
 #: modules/webaccess/lib/access_control_config.py:308
 #: modules/websession/lib/websession_templates.py:1244
-#: modules/websession/lib/webuser.py:995
-#: modules/websession/lib/webuser.py:1005
+#: modules/websession/lib/webuser.py:995 modules/websession/lib/webuser.py:1005
 #: modules/websession/lib/webuser.py:1006
 msgid "Run Document File Manager"
 msgstr "Esegui Document File Manager"
