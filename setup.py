@@ -105,6 +105,7 @@ install_requires = [
     "invenio-groups>=0.1.0",
     "invenio-query-parser>=0.2",
     "invenio-records>=0.2.0",
+    "invenio-jsonref>=0.1.0",
     "invenio-comments>=0.1.1",
     "invenio-oauthclient>=0.1.0",
     "invenio-oauth2server>=0.1.0",

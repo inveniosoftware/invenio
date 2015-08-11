@@ -72,6 +72,7 @@ PACKAGES = [
     # TODO 'invenio_messages',
     'invenio_groups',
     'invenio_accounts',
+    'invenio_jsonref',
     'invenio.base',
 ]
 
