@@ -69,6 +69,7 @@ PACKAGES = [
     'invenio_webhooks',
     'invenio_oauthclient',
     'invenio_oauth2server',
+    # TODO 'invenio_messages',
     'invenio_groups',
     'invenio_accounts',
     'invenio.base',
@@ -82,6 +83,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.documents',
     'invenio.modules.groups',
+    'invenio.modules.messages',
     'invenio.modules.multimedia',
     'invenio.modules.pages',
     'invenio.modules.pidstore',

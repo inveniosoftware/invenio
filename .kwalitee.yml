@@ -75,7 +75,6 @@ components:
 - matcher
 - menu
 - merger
-- messages
 - mixer
 - multimedia
 - oaiharvester

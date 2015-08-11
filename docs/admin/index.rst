@@ -35,6 +35,5 @@ Admin's Guide
    oaiharvest-admin-guide
    oairepository-admin-guide
    publiline-admin-guide
-   webmessage-admin-guide
    websession-admin-guide
    webstyle-admin-guide
