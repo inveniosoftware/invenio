@@ -90,6 +90,9 @@ Several people contributed language translations:
   - Mehdi Zahedi <mehdizahedin@gmail.com>
     Contributions to the Persian (Farsi) translation.
 
+  - Guillaume Dorsival <guillaume.dorsival@orange.fr>
+    Contributions to the French translation.
+
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
 All Rights Reserved''.

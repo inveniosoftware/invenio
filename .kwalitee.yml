@@ -47,6 +47,7 @@ components:
 - BibSword
 - DocExtract
 - ElmSubmit
+- I18N
 - OAIHarvest
 - OAIRepositoy
 - PdfChecker
