@@ -24,7 +24,6 @@ Admin's Guide
 .. toctree::
    :maxdepth: 1
 
-   bibauthority-admin-guide
    bibconvert-admin-guide
    bibedit-admin-guide
    bibknowledge-admin-guide
