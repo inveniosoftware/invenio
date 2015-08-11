@@ -30,7 +30,7 @@ from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
 from invenio.ext.template.context_processor import \
     register_template_context_processor
-from invenio.modules.formatter import format_record
+from invenio_formatter import format_record
 from invenio.modules.search.forms import EasySearchForm
 from invenio.utils.text import slugify
 

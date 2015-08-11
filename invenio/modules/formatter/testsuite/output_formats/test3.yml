@@ -1,4 +1,0 @@
-rules:
-- {field: 980.a, template: Unknown.tpl, value: 'PICTURE'}
-- {field: 980.a, template: Test3.tpl, value: 'ARTICLE'}
-default: Default_unknown.tpl

@@ -1,3 +1,0 @@
-<name>Excel</name>
-<description>Prints a record as a single row of an html table. Used for Excel output.</description>
-<tr valign="top" style="border-color:#dddddd; border-style:solid; border-width:thin"><td><BFE_REPORT_NUMBERS separator="; "/></td><td><BFE_TITLE/></td><td><BFE_AUTHORS print_links='no'/></td><td><BFE_ADDRESSES print_link='no'/></td><td><BFE_AFFILIATION /></td><td><BFE_DATE /></td><td><BFE_PUBLISHER /></td><td><BFE_PLACE /></td><td><BFE_ABSTRACT /></td><td><BFE_KEYWORDS link='no'/></td><td><BFE_NOTES /></td></tr>

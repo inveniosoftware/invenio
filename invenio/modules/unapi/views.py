@@ -23,7 +23,7 @@ from flask import (Blueprint, make_response, redirect, render_template,
                    request, url_for)
 
 from invenio.base.globals import cfg
-from invenio.modules.formatter.registry import output_formats
+from invenio_formatter.registry import output_formats
 
 from six import iteritems
 

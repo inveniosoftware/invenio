@@ -55,7 +55,7 @@ from invenio.base.decorators import wash_arguments
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.modules.collections.decorators import check_collection
-from invenio.modules.formatter import (
+from invenio_formatter import (
     format_records, get_output_format_content_type
 )
 from invenio.utils.pagination import Pagination

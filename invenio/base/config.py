@@ -66,6 +66,7 @@ PACKAGES = [
     'invenio_documents',
     'invenio_pidstore',
     'invenio.modules.*',
+    'invenio_formatter',
     'invenio_webhooks',
     'invenio_oauthclient',
     'invenio_oauth2server',
@@ -82,6 +83,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.documents',
+    'invenio.modules.formatter',
     'invenio.modules.groups',
     'invenio.modules.messages',
     'invenio.modules.multimedia',

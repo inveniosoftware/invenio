@@ -697,7 +697,7 @@ def process_batch_job(batch_job_file):
         pbcore = pbcore_metadata(input_file = getval(batch_job, 'input'),
                                  pbcoreIdentifier = batch_job['recid'],
                                  aspect_override = getval(batch_job, 'aspect'))
-        from invenio.modules.formatter.engines.xslt import format
+        from invenio_formatter.engines.xslt import format
         marcxml = format(pbcore, CFG_BIBENCODE_PBCORE_MARC_XSLT)
         upload_marcxml_file(marcxml)
 

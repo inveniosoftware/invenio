@@ -376,7 +376,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     method or a certain sort field was selected, keep it selected in
     any dynamic search links that may be printed.
     """
-    from invenio.modules.formatter import format_record
+    from invenio_formatter import format_record
     return format_record(
         recID, of=format, ln=ln, verbose=verbose,
         search_pattern=search_pattern

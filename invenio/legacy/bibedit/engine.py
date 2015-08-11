@@ -32,7 +32,7 @@ import json
 import sys
 
 from flask import url_for
-from invenio.modules import formatter as bibformat
+import invenio_formatter as bibformat
 
 from invenio.ext.logging import register_exception
 from invenio.utils.json import CFG_JSON_AVAILABLE

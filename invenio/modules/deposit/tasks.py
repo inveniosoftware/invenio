@@ -38,7 +38,7 @@ from invenio.modules.deposit.models import Deposition, Agent, \
     DepositionDraftCacheManager
 from invenio.ext.logging import register_exception
 from invenio.ext.restful import error_codes
-from invenio.modules.formatter import format_record
+from invenio_formatter import format_record
 from .helpers import record_to_draft, make_record, \
     deposition_record
 from invenio.legacy.bibdocfile.api import BibRecDocs

@@ -38,7 +38,7 @@ class AutodiscoveryTest(InvenioTestCase):
         modules = autodiscover_modules(['invenio.not_an_existing_folder'], related_name_re='foo_.+')
         assert(len(modules) == 0)
         assert(None not in modules)
-        modules = autodiscover_modules(['invenio.modules.formatter.format_elements'], related_name_re='not_an_existing_package_name_.+')
+        modules = autodiscover_modules(['invenio_formatter.format_elements'], related_name_re='not_an_existing_package_name_.+')
         assert(len(modules) == 0)
         assert(None not in modules)
 

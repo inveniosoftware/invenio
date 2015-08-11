@@ -1,6 +1,0 @@
-content_type: application/ms-excel
-default: Excel.bft
-description: Excel csv output
-name: Excel
-rules: []
-visibility: 0

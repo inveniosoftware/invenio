@@ -94,7 +94,7 @@ class GetOutputFormats(object):
 
     def __iter__(self):
         """Get all the output formats."""
-        from invenio.modules.formatter import registry
+        from invenio_formatter import registry
 
         yield ('', _('Default'))
         for code, format_ in iteritems(registry.output_formats):

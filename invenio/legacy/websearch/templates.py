@@ -74,7 +74,7 @@ from invenio.utils.url import make_canonical_urlargd, drop_default_urlargd, crea
 from invenio.utils.html import nmtoken_from_string
 from invenio.ext.legacy.handler import wash_urlargd
 from invenio.legacy.webuser import session_param_get
-from invenio.modules.formatter import format_record
+from invenio_formatter import format_record
 
 from intbitset import intbitset
 

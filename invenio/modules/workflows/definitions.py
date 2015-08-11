@@ -142,7 +142,7 @@ class RecordWorkflow(WorkflowBase):
             # If already XML, format_record does not like it.
             if of and of != 'xm':
                 try:
-                    from invenio.modules.formatter import format_record
+                    from invenio_formatter import format_record
                     formatted_data = format_record(
                         recID=None,
                         of=of,

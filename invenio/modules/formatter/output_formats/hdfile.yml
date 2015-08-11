@@ -1,6 +1,0 @@
-content_type: text/html
-default: Default_HTML_files.bft
-description: Used to show fulltext files in mini-panel of detailed record pages.
-name: File mini-panel
-rules: []
-visibility: 0

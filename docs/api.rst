@@ -52,7 +52,6 @@ Modules
    :maxdepth: 1
 
    modules/documentation
-   modules/formatter
    modules/jsonalchemy
    modules/knowledge
    modules/redirector

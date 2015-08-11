@@ -29,15 +29,6 @@ Templates
    :show-inheritance:
 
 
-Jinja2 extensions
------------------
-
-.. automodule:: invenio.ext.template.extensions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
 Config
 ------
 

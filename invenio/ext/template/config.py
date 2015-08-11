@@ -22,7 +22,6 @@
 from __future__ import unicode_literals
 
 JINJA2_EXTENSIONS = [
-    'invenio.ext.template.extensions:LangExtension',
-    'jinja2.ext.do'
+    'jinja2.ext.do',
 ]
 """List of automatically loaded extensions."""

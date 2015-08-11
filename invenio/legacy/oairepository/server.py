@@ -69,7 +69,7 @@ from invenio.legacy.dbquery import run_sql, wash_table_column_name, \
 from invenio.legacy.oairepository.config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 from invenio.legacy.search_engine import record_exists, \
     search_unit_in_bibxxx, get_record
-from invenio.modules.formatter import format_record
+from invenio_formatter import format_record
 from invenio.modules.search.api import Query
 from invenio.utils.date import localtime_to_utc, utc_to_localtime
 from invenio.utils.html import X, EscapedXMLString

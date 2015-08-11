@@ -21,7 +21,7 @@ from flask_login import current_user
 from flask import render_template
 
 from invenio.modules.deposit.models import DepositionType, Deposition
-from invenio.modules.formatter import format_record
+from invenio_formatter import format_record
 from invenio.modules.deposit.tasks import render_form, \
     create_recid, \
     prepare_sip, \
