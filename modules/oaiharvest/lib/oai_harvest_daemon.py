@@ -41,7 +41,6 @@ import traceback
 
 from invenio.config import \
      CFG_BINDIR, \
-     CFG_TMPSHAREDDIR, \
      CFG_INSPIRE_SITE, \
      CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT, \
      CFG_SITE_URL, \
@@ -107,7 +106,7 @@ def task_run_core():
     reposlist = []
     datelist = []
     identifiers = None
-    filepath_prefix = "%s/oaiharvest_%s" % (CFG_TMPSHAREDDIR, str(task_get_task_param("task_id")))
+    filepath_prefix = "%s/oaiharvest_%s" % (CFG_TMPDIR, str(task_get_task_param("task_id")))
     ### go ahead: build up the reposlist
     if task_get_option("repository") is not None:
         ### user requests harvesting from selected repositories
@@ -1149,7 +1148,7 @@ def authorlist_extract(tarball_path, identifier, downloaded_files, stylesheet):
     exitcode = 0
     if "tarball-extracted" not in downloaded_files[identifier]:
         # tarball has not been extracted
-        tar_dir, dummy = get_defaults(tarball=tarball_path, sdir=CFG_TMPSHAREDDIR, refno_url="")
+        tar_dir, dummy = get_defaults(tarball=tarball_path, sdir=CFG_TMPDIR, refno_url="")
         try:
             untar(tarball_path, tar_dir)
         except Timeout:
