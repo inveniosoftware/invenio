@@ -464,7 +464,7 @@ def hold_for_approval():
     """Hold deposition on the Holding Pen for admin approval."""
     @wraps(hold_for_approval)
     def _hold_for_approval(obj, dummy_eng):
-        from invenio.modules.workflows.tasks.marcxml_tasks import approve_record
+        from invenio_workflows.tasks.marcxml_tasks import approve_record
         d = Deposition(obj)
         if d.type.hold_for_upload:
             approve_record(obj, dummy_eng)

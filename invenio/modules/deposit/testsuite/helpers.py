@@ -48,7 +48,7 @@ class DepositionTestCase(InvenioTestCase):
         """
         Remove all traces of the specified deposition type
         """
-        from invenio.modules.workflows.models import Workflow, \
+        from invenio_workflows.models import Workflow, \
             BibWorkflowObject, BibWorkflowObjectLog, BibWorkflowEngineLog
         from invenio.ext.sqlalchemy import db
 

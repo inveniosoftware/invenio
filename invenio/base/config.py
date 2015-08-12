@@ -68,6 +68,7 @@ PACKAGES = [
     'invenio.modules.*',
     'invenio_formatter',
     'invenio_webhooks',
+    'invenio_workflows',
     'invenio_oauthclient',
     'invenio_oauth2server',
     # TODO 'invenio_messages',
@@ -95,6 +96,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.records',
     'invenio.modules.tags',
     'invenio.modules.webhooks',
+    'invenio.modules.workflows',
 ]
 
 LEGACY_WEBINTERFACE_EXCLUDE = []

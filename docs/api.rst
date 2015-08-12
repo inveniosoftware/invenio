@@ -56,7 +56,6 @@ Modules
    modules/knowledge
    modules/redirector
    modules/upgrader
-   modules/workflows
 
 
 Utilities

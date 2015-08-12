@@ -22,4 +22,5 @@
 -e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
 -e git+git://github.com/inveniosoftware/invenio-query-parser.git#egg=invenio-query-parser
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-workflows.git#egg=invenio-workflows
 -e git+git://github.com/inveniosoftware/workflow.git#egg=workflow

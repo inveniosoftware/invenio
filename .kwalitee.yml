@@ -109,7 +109,6 @@ components:
 - unapi
 - upgrader
 - version
-- workflows
 
 excludes:
 - (.)+/legacy/(.)+

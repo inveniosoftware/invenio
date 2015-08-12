@@ -44,8 +44,8 @@ from invenio.ext.restful import UTCISODateTime
 
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.workflows.engine import WorkflowStatus
-from invenio.modules.workflows.models import BibWorkflowObject, ObjectVersion, \
+from invenio_workflows.engine import WorkflowStatus
+from invenio_workflows.models import BibWorkflowObject, ObjectVersion, \
     Workflow
 
 from sqlalchemy.orm.exc import NoResultFound

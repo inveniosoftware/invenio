@@ -24,7 +24,7 @@ from flask import current_app
 from flask_registry import ImportPathRegistry, SingletonRegistry, \
     RegistryProxy, RegistryError
 from invenio.modules.deposit.models import DepositionType
-from invenio.modules.workflows.registry import workflows
+from invenio_workflows.registry import workflows
 
 
 class DepositSingletonRegistry(SingletonRegistry):

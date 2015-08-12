@@ -35,7 +35,7 @@ def default_config(config):
     # defined in *_tasks.py files in 'invenio' package.
     config.setdefault("CELERY_INCLUDE", [
         # "invenio.celery.tasks",
-        # "invenio.modules.workflows.workers.worker_celery",
+        # "invenio_workflows.workers.worker_celery",
     ])
 
     # Result backend
