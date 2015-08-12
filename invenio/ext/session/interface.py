@@ -172,8 +172,6 @@ class SessionInterface(FlaskSessionInterface):
             return
         elif not session.modified:
             return
-        import warnings
-        warnings.warn(str(session))
 
         session.uid = uid
         self.backend.set(sid,
