@@ -1,6 +1,6 @@
 {#
 # This file is part of Invenio.
-# Copyright (C) 2014 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,24 +16,27 @@
 # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+<tr>
+<td class="row-checkbox">
+    <input type="checkbox" value="{{object.id}}">
+</td>
 
-<!--sep-->
-{{ object.id }}
-<!--sep-->
-<a href="{{url_for('holdingpen.details', objectid=object.id)}}">
-  {{ title }}
-</a>
-<!--sep-->
-{{ description|safe }}
-<!--sep-->
-{{ pretty_date(object.created) }}
-<!--sep-->
-<span class="label label-{{object._class}}">{{ object.message }}</span>
-<!--sep-->
-{{ object.data_type }}
-<!--sep-->
-{% if mini_action != None %}
-  {% set action = action() %}
-  {{ action.render_mini(object)|safe }}
-{% endif %}
+<td class="row-content">
+    <h4>
+    <a href="{{url_for('holdingpen.details', objectid=object.id)}}">
+      {{ title }}
+    </a>
+    <small>on
+    <time datetime="{{object.modified.isoformat()}}" title="{{object.modified.isoformat()}}">{{object.created.strftime("%b %d %H:%m")}}</time></small>
+    </h4>
+    {{ description|safe }}
+</td>
 
+<td class="row-additional">
+    {{ additional|safe }}
+</td>
+
+<td class="row-action">
+    {{ action|safe}}
+</td>
+</tr>

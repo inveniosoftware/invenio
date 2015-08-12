@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2014, 2015 CERN.
+ * Copyright (C) 2015 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -17,43 +17,43 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
 
 define(
   [
     'jquery',
-    'flight/lib/component',
+    'flight/lib/component'
   ],
   function(
     $,
     defineComponent) {
 
-    return defineComponent(DetailsPreviewMenu);
+    'use strict';
+
+    return defineComponent(HoldingPenPerPage);
 
     /**
-    * .. js:class:: DetailsPreviewMenu()
+    * .. js:class:: HoldingPenPerPage()
     *
-    * UI component for handling the preview menu buttons for the object data.
+    * Holding Pen per page dropdown.
     *
-    * :param string previewMenuItemSelector: DOM selector for each menu item
     *
     */
-    function DetailsPreviewMenu() {
+    function HoldingPenPerPage() {
       this.attributes({
-        previewMenuItemSelector: ".preview"
+        perpageSelector: "#perpage-menu"
       });
 
-      this.setPreviewByFormat = function(ev, data) {
-        this.trigger(document, "setPreviewByFormat", {
-          format: data.el.name
-        });
+      this.changePerPage = function(ev, data) {
+        console.log($(data.el).val());
+        var per_page = $(data.el).val();
+        this.trigger(document, "reloadHoldingPenTable", {"per_page": per_page});
       };
 
       this.after('initialize', function() {
-        this.on("click", {
-          previewMenuItemSelector: this.setPreviewByFormat
+        this.on("change", {
+          perpageSelector: this.changePerPage,
         });
-        console.log("Details preview menu init");
+        console.log("Perpage init");
       });
     }
 });

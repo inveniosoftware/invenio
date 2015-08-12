@@ -20,14 +20,15 @@
 require(
   [
     "jquery",
-    "datatables",
-    "datatables-plugins",
-    "datatables-tabletools",
     "bootstrap-tagsinput",
     "prism",
     "js/workflows/common",
     "js/workflows/maintable",
     "js/workflows/holdingpen",
+    "js/workflows/pagination",
+    "js/workflows/perpage_menu",
+    "js/workflows/sort_menu",
+    "js/workflows/selection",
     "js/workflows/tags",
     "js/workflows/tags_menu",
     "js/workflows/details",
@@ -35,6 +36,7 @@ require(
     "js/workflows/details_actions_buttons",
     "js/workflows/details_preview",
     "js/workflows/details_preview_menu",
+    "js/workflows/details_page",
     "js/workflows/actions/init"
   ],
   function() {
@@ -42,6 +44,6 @@ require(
     // properly loaded and ready to be used by inline scripts.
     //
     // Without it, we have to rely on non-anonymous modules.
-    console.info("js/workflows/init is loaded")
+    console.info("js/workflows/init is loaded");
   }
-)
+);

@@ -41,7 +41,17 @@
         delete_url: "{{ url_for('holdingpen.delete_from_db')|safe }}",
         action_url: "{{ url_for('holdingpen.resolve_action')|safe }}",
         id_object: "{{ bwobject.id }}",
-        attach_action_to: document,
+
+        {% if next_object %}
+          next_page_url: "{{ url_for('holdingpen.details', objectid=next_object) }}",
+        {% endif %}
+        {% if previous_object %}
+          previous_page_url: "{{ url_for('holdingpen.details', objectid=previous_object) }}",
+        {% endif %}
+
+        main_list_url: "{{ url_for('holdingpen.list_objects') }}",
+
+        attach_action_to: document
       };
       initialize(context);
       initialize_actions(context);
@@ -56,7 +66,7 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       {% block top_left %}
         <ul class="nav navbar-nav">
-          <li><a href="{{url_for('holdingpen.maintable')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
+          <li><a href="{{url_for('holdingpen.list_objects')}}" class="navbar-btn-sm"><span class="glyphicon glyphicon-hand-left"></span> {{ _('Back') }}</a>
           </li>
         </ul>
       {% endblock %}
@@ -145,8 +155,10 @@
                     <div class="muted"><strong>{{ _('Completed tasks') }}:</strong></div>
                     <div class="list-group">
                       {% for item in task_history %}
-                        {{ utils.display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length, true) }}
-                        {% do id.append(1) %}
+                        {% if item %}
+                          {{ utils.display_task(item.get("nicename"), item.get("doc"), item.get("parameters"), item.get("name"), id|length, true) }}
+                          {% do id.append(1) %}
+                        {% endif %}
                       {% endfor %}
                     </div>
                   </div>

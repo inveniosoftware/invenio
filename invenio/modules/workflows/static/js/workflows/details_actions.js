@@ -45,8 +45,15 @@ define(
         restart_url: "",
 
         // BibWorkflowObject id
-        id_object: "",
+        id_object: ""
       });
+
+      this.handleAction = function(ev, data) {
+        this.trigger("return_data_for_exec", {
+            "value": data.value,
+            "selectedIDs": [this.attr.id_object]
+        });
+      }
 
       this.handleDetailsButton = function(ev, data) {
         var url;
@@ -76,7 +83,8 @@ define(
       };
 
       this.after('initialize', function() {
-        this.on(document, "detailsButtonClick", this.handleDetailsButton)
+        this.on(document, "detailsButtonClick", this.handleDetailsButton);
+        this.on(document, "execute", this.handleAction);
         console.log("Details actions init");
       });
     }

@@ -21,14 +21,17 @@
 
 import msgpack
 
-from flask import current_app, jsonify
 from functools import wraps
+from flask import current_app, jsonify, render_template
+from operator import attrgetter
 from six import text_type
+
+from sqlalchemy import or_
 
 from invenio.base.helpers import unicodifier
 from invenio.ext.cache import cache
 
-from .registry import workflows
+from .registry import actions, workflows
 
 
 def convert_marcxml_to_bibfield(marcxml, model=None):
@@ -159,12 +162,15 @@ class dictproperty(object):
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
 
-def _sort_from_cache(name):
+def _sort_from_cache(name, from_data=False):
     def _sorter(item):
         try:
-            results = cache.get("workflows_holdingpen_{0}".format(item.id))
-            if results:
-                return msgpack.loads(results)[name]
+            cached_results = get_formatted_holdingpen_object(item)
+            if from_data:
+                # Get value from sort_data
+                return cached_results.get("sort_data", {}).get(name)
+            else:
+                return cached_results.get(name)
         except Exception:
             current_app.logger.exception(
                 "Invalid format for object {0}: {1}".format(
@@ -175,29 +181,29 @@ def _sort_from_cache(name):
     return _sorter
 
 
-def sort_bwolist(bwolist, iSortCol_0, sSortDir_0):
-    """Sort a list of BibWorkflowObjects for DataTables."""
-    should_we_reverse = False
-    if sSortDir_0 == 'desc':
-        should_we_reverse = True
-    if iSortCol_0 == 0:
-        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    elif iSortCol_0 == 1:
-        bwolist.sort(key=lambda x: x.id, reverse=should_we_reverse)
-    elif iSortCol_0 == 2:
-        bwolist.sort(key=_sort_from_cache("title"), reverse=should_we_reverse)
-    elif iSortCol_0 == 3:
-        bwolist.sort(key=_sort_from_cache("description"), reverse=should_we_reverse)
-    elif iSortCol_0 == 4:
-        bwolist.sort(key=lambda x: x.created, reverse=should_we_reverse)
-    elif iSortCol_0 == 5:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 6:
-        bwolist.sort(key=lambda x: x.data_type, reverse=should_we_reverse)
-    elif iSortCol_0 == 7:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
-    elif iSortCol_0 == 8:
-        bwolist.sort(key=lambda x: x.version, reverse=should_we_reverse)
+def sort_bwolist(bwolist, sort_key):
+    """Sort a list of workflow objects for the list."""
+    if sort_key == "newest":
+        bwolist.sort(key=attrgetter("created"), reverse=True)
+    elif sort_key == "oldest":
+        bwolist.sort(key=attrgetter("created"), reverse=False)
+    elif sort_key == "updated":
+        bwolist.sort(key=attrgetter("modified"), reverse=True)
+    elif sort_key == "least_updated":
+        bwolist.sort(key=attrgetter("modified"), reverse=False)
+    elif sort_key == "title":
+        bwolist.sort(key=_sort_from_cache("title"), reverse=False)
+    elif sort_key == "title_desc":
+        bwolist.sort(key=_sort_from_cache("title"), reverse=True)
+    else:
+        # Try a sort from sort_data
+        reverse = False
+        if sort_key.endswith("_desc"):
+            # Remove the suffix to get the correct data and set reverse
+            reverse = True
+            sort_key = sort_key[:-5]
+        bwolist.sort(key=_sort_from_cache(sort_key, from_data=True),
+                     reverse=reverse)
     return bwolist
 
 
@@ -220,16 +226,34 @@ def get_holdingpen_objects(ptags=None):
 
     tags_copy = ptags[:]
     version_showing = []
+    type_showing = []
+    uri_showing = []
+    status_showing = []
     for tag in ptags:
         if tag in ObjectVersion.MAPPING:
             version_showing.append(ObjectVersion.MAPPING[tag])
+            tags_copy.remove(tag)
+        elif tag.startswith("type:"):
+            type_showing.append(":".join(tag.split(":")[1:]))
+            tags_copy.remove(tag)
+        elif tag.startswith("uri:"):
+            uri_showing.append(":".join(tag.split(":")[1:]))
+            tags_copy.remove(tag)
+        elif tag.startswith("status:"):
+            status_showing.append(":".join(tag.split(":")[1:]))
             tags_copy.remove(tag)
 
     ssearch = tags_copy
     bwobject_list = BibWorkflowObject.query.filter(
         BibWorkflowObject.id_parent == None  # noqa E711
-    ).filter(not version_showing or BibWorkflowObject.version.in_(
-        version_showing)).all()
+    ).filter(not version_showing or BibWorkflowObject.version.in_(version_showing),
+        or_(*[BibWorkflowObject.data_type.like(type_.replace("*", "%"))
+              for type_ in type_showing]),
+        or_(*[BibWorkflowObject.uri.like(uri.replace("*", "%"))
+              for uri in uri_showing]),
+        or_(*[BibWorkflowObject.status.like(status.replace("*", "%"))
+              for status in status_showing])
+    ).all()
 
     if ssearch and ssearch[0]:
         if not isinstance(ssearch, list):
@@ -281,7 +305,9 @@ def get_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'):
             return results
     results = generate_formatted_holdingpen_object(bwo)
     if results:
-        cache.set("workflows_holdingpen_{0}".format(bwo.id), msgpack.dumps(results))
+        cache.set("workflows_holdingpen_{0}".format(bwo.id),
+                  msgpack.dumps(results),
+                  timeout=current_app.config.get("WORKFLOWS_HOLDING_PEN_CACHE_TIMEOUT"))
     return results
 
 
@@ -297,11 +323,23 @@ def generate_formatted_holdingpen_object(bwo, date_format='%Y-%m-%d %H:%M:%S.%f'
     else:
         workflow_definition = WorkflowBase
 
+    bwo.data = bwo.get_data()
+    bwo.extra_data = bwo.get_extra_data()
+
+    action_name = bwo.get_action() or ""
+    action = actions.get(action_name, None)
+    mini_action = getattr(action, "render_mini", "")
+    if mini_action:
+        mini_action = action().render_mini(bwo)
+
     results = {
         "name": workflows_name,
         "description": workflow_definition.get_description(bwo),
         "title": workflow_definition.get_title(bwo),
-        "date": bwo.modified.strftime(date_format)
+        "date": bwo.modified.strftime(date_format),
+        "additional": workflow_definition.get_additional(bwo),
+        "action": mini_action,
+        "sort_data": workflow_definition.get_sort_data(bwo)
     }
     return results
 
@@ -391,14 +429,24 @@ def extract_data(bwobject):
     return extracted_data
 
 
+def get_data_types():
+    """Return a list of distinct data types from BibWorkflowObject."""
+    from .models import BibWorkflowObject
+    return [
+        t[0] for t in BibWorkflowObject.query.with_entities(
+            BibWorkflowObject.data_type
+        ).distinct(
+            BibWorkflowObject.data_type
+        )
+    ]
+
+
 def get_action_list(object_list):
     """Return a dict of action names mapped to halted objects.
 
     Get a dictionary mapping from action name to number of Pending
     actions (i.e. halted objects). Used in the holdingpen.index page.
     """
-    from .registry import actions
-
     action_dict = {}
     found_actions = []
 
@@ -422,8 +470,6 @@ def get_action_list(object_list):
 
 def get_rendered_task_results(obj):
     """Return a list of rendered results from BibWorkflowObject task results."""
-    from flask import render_template
-
     results = {}
     for name, res in obj.get_tasks_results().items():
         for result in res:
@@ -433,6 +479,25 @@ def get_rendered_task_results(obj):
                 obj=obj
             )
     return results
+
+
+def get_rendered_row(bwo):
+    """Return a single formatted row."""
+    preformatted = get_formatted_holdingpen_object(bwo)
+    return render_template(
+        'workflows/list_row.html',
+        title=preformatted.get("title", ""),
+        object=bwo,
+        action=preformatted.get("action", ""),
+        description=preformatted.get("description", ""),
+        additional=preformatted.get("additional", "")
+    )
+
+
+def get_rows(object_list):
+    """Return all rows formatted."""
+    return [get_rendered_row(bwo)
+            for bwo in object_list]
 
 
 def get_previous_next_objects(object_list, current_object_id):

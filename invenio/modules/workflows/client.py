@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+#
 # This file is part of Invenio.
-# Copyright (C) 2012, 2013, 2014 CERN.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -19,9 +20,11 @@
 """Low-level functions to run workflows."""
 
 import traceback
-from .errors import WorkflowHalt, WorkflowError
-from .models import ObjectVersion
+
 from .engine import WorkflowStatus
+from .errors import WorkflowError, WorkflowHalt
+from .models import ObjectVersion
+from .signals import workflow_error, workflow_halted
 
 
 def run_workflow(wfe, data, stop_on_halt=False,
@@ -71,6 +74,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                        wfe.get_current_taskname() or "Unknown",
                        workflowhalt_triggered.message)
             wfe.log.warning(message)
+            workflow_halted.send(current_obj)
             if stop_on_halt:
                 break
         except Exception as exception_triggered:
@@ -87,6 +91,7 @@ def run_workflow(wfe, data, stop_on_halt=False,
                     id_workflow=wfe.uuid
                 )
             wfe.save(status=WorkflowStatus.ERROR)
+            workflow_error.send(current_obj)
             if stop_on_error:
                 if isinstance(exception_triggered, WorkflowError):
                     raise exception_triggered

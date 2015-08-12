@@ -45,13 +45,13 @@ define(
 
       this.triggerActionButton = function(ev, data) {
         this.trigger(document, "detailsButtonClick", {
-          action: $(data.el).data("action"),
+          action: $(data.el).data("action")
         });
       };
 
       this.after('initialize', function() {
         this.on("click", {
-          actionButtonSelector: this.triggerActionButton,
+          actionButtonSelector: this.triggerActionButton
         });
         console.log("Details preview menu init");
       });

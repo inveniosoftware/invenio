@@ -1,66 +1,130 @@
 /*
-* -*- mode: text; coding: utf-8; -*-
+ * This file is part of Invenio.
+ * Copyright (C) 2014, 2015 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
 
-   This file is part of Invenio.
-   Copyright (C) 2014 CERN.
+#list {
+  background-color: white;
+  border: 1px solid #e5e5e5;
+}
 
-   Invenio is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of the
-   License, or (at your option) any later version.
+#list-select-all {
+  margin-top: 10px;
+}
 
-   Invenio is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+.row-action {
+  width: 10%;
+  text-align: right;
+}
 
-   You should have received a copy of the GNU General Public License
-   along with Invenio; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-*/
-
-/* Add nice looking Font Awesome checkboxes in main table */
-
-#maintable tr td:first-child {
+.row-checkbox {
+  width: 2%;
   text-align: center;
 }
 
-#maintable tr td:first-child:before {
-  content: "\f096"; /* fa-square-o */
+.row-content h4 {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+
+.row-content h4 a {
+  color: rgb(29, 51, 82);
+}
+
+.row-content a.faded {
+  color: rgb(125, 127, 130);
+}
+
+.row-content h5 span {
+  color: rgb(29, 51, 82);
+  background-color: #eee;
+}
+
+.row-icon {
+  width: 2%;
+  text-align: center;
+}
+
+.row-additional {
+  width: 15%;
+}
+
+#list-header {
+  margin-bottom: 0px;
+}
+
+#help-bar {
+  margin-bottom: 5px;
+}
+
+table tr:hover {
+  background-color: rgb(239, 239, 234);
+}
+
+table tr a.greyfaded {
+  color: rgb(125, 127, 130);
+}
+
+table tr:hover a.greyfaded {
+  color: #428bca;
+}
+
+table tr a.faded {
+  color: rgb(125, 127, 130);
+}
+
+table tr .action{
+  display: none;
+}
+
+table tr:hover .action {
+  display: block;
+}
+
+table tr:hover a.faded {
+  color: #428bca;
+}
+
+.in.collapse+a.toggle:after
+{
+    content:'\f102';
+    font-family: FontAwesome;
+}
+.collapse+a.toggle:after
+{
+    content:'\f103';
+    font-family: FontAwesome;
+}
+
+/* Add nice looking Font Awesome checkboxes in main table
+
+#list tr td:first-child {
+  text-align: center;
+}
+
+#list tr td:first-child:before {
+  content: "\f096";
   font-family: FontAwesome;
 }
 
-#maintable tr.selected td:first-child:before {
-  content: "\f046"; /* fa-check-square-o */
+#list tr.selected td:first-child:before {
+  content: "\f046";
 }
 
+*/
 
-/* Override default DataTables TableTools selection color */
-
-#maintable tr:hover {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.even td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.odd td.sorting_1 {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.even {
-  background-color: #ffa;
-}
-
-table.dataTable tr.DTTT_selected.odd {
-  background-color: #ffa;
-}

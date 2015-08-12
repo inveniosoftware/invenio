@@ -57,7 +57,6 @@ from .models import (
     Workflow,
 )
 from .signals import (workflow_finished,
-                      workflow_halted,
                       workflow_started)
 from .utils import dictproperty, get_task_history
 
@@ -431,22 +430,16 @@ BibWorkflowEngine
                 try:
                     self.run_callbacks(callbacks, objects, obj)
                 except SkipToken:
-                    msg = "Skipped running this object: '%s' (object: %s)" % \
-                          (str(callbacks), repr(obj))
+                    msg = "Skipped running this object: {0}".format(obj.id)
                     self.log.debug(msg)
-                    obj.log.debug(msg)
                     continue
                 except AbortProcessing:
-                    msg = "Processing was aborted: '%s' (object: %s)" % \
-                          (str(callbacks), repr(obj))
+                    msg = "Processing was aborted for object: {0}".format(obj.id)
                     self.log.debug(msg)
-                    obj.log.debug(msg)
                     break
                 except StopProcessing:
-                    msg = "Processing was stopped: '%s' (object: %s)" % \
-                          (str(callbacks), repr(obj))
+                    msg = "Processing was stopped for object: {0}".format(obj.id)
                     self.log.debug(msg)
-                    obj.log.debug(msg)
 
                     # Processing for the object is stopped!
                     obj.save(version=ObjectVersion.COMPLETED)
@@ -460,10 +453,6 @@ BibWorkflowEngine
                                    step.args[0])
                     i[0] = max(-1, i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
-
-                    # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.COMPLETED)
-                    self.increase_counter_finished()
                 except JumpTokenForward as step:
                     if step.args[0] < 0:
                         raise WorkflowError("JumpTokenForward cannot"
@@ -471,10 +460,6 @@ BibWorkflowEngine
                     self.log.debug('We skip [%s] objects' % step.args[0])
                     i[0] = min(len(objects), i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
-
-                    # This object is skipped for some reason. So we're done
-                    obj.save(version=ObjectVersion.COMPLETED)
-                    self.increase_counter_finished()
                 except ContinueNextToken:
                     self.log.debug('Stop processing for this object, '
                                    'continue with next')
@@ -491,7 +476,6 @@ BibWorkflowEngine
                     extra_data = obj.get_extra_data()
                     obj.set_extra_data(extra_data)
 
-                    workflow_halted.send(obj)
                     if type(e) == WorkflowHalt:
                         reraise(*sys.exc_info())
                     else:
@@ -534,10 +518,11 @@ BibWorkflowEngine
             obj.extra_data["_task_counter"] = self._i[1]
             obj.extra_data["_last_task_name"] = callback.func_name
             task_history = get_task_history(callback)
-            if "_task_history" not in obj:
-                obj.extra_data["_task_history"] = [task_history]
-            else:
-                obj.extra_data["_task_history"].append(task_history)
+            if task_history:
+                if "_task_history" not in obj:
+                    obj.extra_data["_task_history"] = [task_history]
+                else:
+                    obj.extra_data["_task_history"].append(task_history)
             obj.set_extra_data(obj.extra_data)
 
     def get_current_taskname(self):

@@ -129,6 +129,7 @@ def start_async_workflow(workflow_to_run="",
     def _start_workflow(obj, eng):
         record_object = BibWorkflowObject.create_object()
         record_object.save()  # Saving to set default extra_data and data
+        obj_id = record_object.id
 
         if preserve_extra_data_keys:
             record_object.extra_data = record_object.get_extra_data()
@@ -155,10 +156,10 @@ def start_async_workflow(workflow_to_run="",
         eng.log.debug("New workflow '{0}' launched".format(workflow_to_run))
         try:
             eng.extra_data["_workflow_ids"].append(workflow_id)
-            obj.extra_data["objects_spawned"].append(record_object.id)
+            obj.extra_data["objects_spawned"].append(obj_id)
         except KeyError:
             eng.extra_data["_workflow_ids"] = [workflow_id]
-            obj.extra_data["objects_spawned"] = [record_object.id]
+            obj.extra_data["objects_spawned"] = [obj_id]
 
         try:
             eng.extra_data["_nb_workflow"] += 1

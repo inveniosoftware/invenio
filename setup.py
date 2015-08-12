@@ -63,7 +63,7 @@ class _install_lib(install_lib):  # noqa
 
 
 install_requires = [
-    "alembic>=0.6.6",
+    "alembic>=0.7.6",
     "Babel>=1.3",
     "backports.lzma>=0.0.3",
     "bagit>=1.5.1",

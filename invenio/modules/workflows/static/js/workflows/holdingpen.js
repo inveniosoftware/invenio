@@ -17,102 +17,118 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
-'use strict';
-
 define(
   [
     'jquery',
-    'flight/lib/component',
-    'datatables',
-    'datatables-plugins',
-    'datatables-tabletools'
+    'flight/lib/component'
   ],
   function(
     $,
     defineComponent) {
+
+    'use strict';
 
     return defineComponent(HoldingPen);
 
     /**
     * .. js:class:: HoldingPen()
     *
-    * Holding Pen table using DataTables (+ plugins)
+    * Holding Pen table rendering. Trigger "reloadTable" event to render table.
     *
     * :param string load_url: URL to asynchronously load table rows.
-    * :param object oSettings: configuration of DataTables.
     *
     */
     function HoldingPen() {
+      var request = false;
+
       this.attributes({
+        // Selectors
+        totalSelector: "#total_found",
+        nextSelector: "a[aria-label='Next']",
+        previousSelector: "a[aria-label='Previous']",
+
         // URLs
         load_url: "",
-        oSettings: {
-          dom: 'T<"clear">lfrtip',
-          bFilter: false,
-          bProcessing: true,
-          bServerSide: true,
-          bDestroy: true,
-          aoColumnDefs: [
-            {'bSortable': false, 'defaultContent': "", 'aTargets': [0]},
-            {'bSearchable': false, 'bVisible': false, 'aTargets': [1]},
-            {'sWidth': "25%", 'aTargets': [2]},
-            {'sWidth': "25%", 'aTargets': [3]}
-          ],
-          order: [[ 4, "desc" ]],  // Default sort by modified date "newest first"
-          tableTools: {
-            "sRowSelect": "multi",
-            "sRowSelector": 'td:first-child',
-            "aButtons": [
-              {
-                "sExtends": "select_all",
-                "sButtonClass": "btn btn-default"
-              },
-              {
-                "sExtends": "select_none",
-                "sButtonClass": "btn btn-danger"
-              }
-            ]
-          },
-          deferRender: true,
-        }
+
+        // Data
+        page: 1,
       });
 
-      this.init_datatables = function(ev, data) {
-        // DataTables ajax settings
-        this.attr.oSettings["sAjaxSource"] = this.attr.load_url;
-        this.$node.DataTable(this.attr.oSettings);
-        // Bootstrap TableTools
-        var tt = $.fn.dataTable.TableTools.fnGetInstance(this.$node.attr("id"));
-        $(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
-      }
+      this.preparePayload = function (data) {
+        // We consider current attributes as default and then override.
+        var payload = this.attr;
+        for (var attrname in data || {}) {
+          payload[attrname] = data[attrname];
+        }
+        return payload;
+      };
 
       this.reloadTable = function (ev, data) {
+        // $node is the list element this component is attached to.
         var $node = this.$node;
-        $.ajax({
-            type: "POST",
-            url: this.attr.load_url,
-            data: JSON.stringify(data),
-            contentType: "application/json;charset=UTF-8",
-            traditional: true,
-            success: function(result) {
-                $node.dataTable().fnDraw(false);
-            }
+        var that = this;
+
+        if (this.request && this.request.readyState !== 4) {
+          console.log("Abort");
+          this.request.abort();
+        }
+
+        this.request = $.ajax({
+          type: "GET",
+          url: this.attr.load_url,
+          data: this.preparePayload(data),
+          beforeSend: function() {
+            console.log("Starting");
+            $("#list-loading").show();
+          },
+          success: function(result) {
+            var table = $node.find("tbody");
+            table.html(result.rendered_rows);
+            $(that.attr.totalSelector).html(result.pagination.total_count);
+            that.trigger(document, "tableReloaded", result);
+          },
+          complete: function() {
+            console.log("Ending request");
+            $("#list-loading").hide();
+          }
         });
       };
 
-      this.holdingPenKeyCodes = function(ev) {
-        var keycodes = {
-          escape: 27,
-        }
+      this.holdingPenKeyCodes = function(event) {
+        var keyCodes = {
+          escKey: 27,
+          aKey: 65,
+          wKey: 87,
+          qKey: 81
+        };
 
-        console.log(ev.keyCode);
-        console.log(keycodes.escape);
-      }
+        var data = {};
+
+        if (event.ctrlKey && event.keyCode === keyCodes.aKey) {
+          this.trigger(document, "selectAll");
+          event.preventDefault();
+        }
+        if (event.keyCode === keyCodes.escKey) {
+          this.trigger(document, "deselectAll");
+          event.preventDefault();
+        }
+        if (event.altKey && event.keyCode === keyCodes.wKey) {
+          data.el = $(this.attr.nextSelector);
+
+          this.trigger(document,"hotkeysPagination", data);
+          event.preventDefault();
+        }
+        if (event.altKey && event.keyCode === keyCodes.qKey) {
+          data.el = $(this.attr.previousSelector);
+
+          this.trigger(document,"hotkeysPagination", data);
+          event.preventDefault();
+        }
+      };
 
       this.after('initialize', function() {
-        this.on(document, "initHoldingPenTable", this.init_datatables);
         this.on(document, "reloadHoldingPenTable", this.reloadTable);
-        this.on(document, "keyup", this.holdingPenKeyCodes);
+        this.on(document, "keydown", this.holdingPenKeyCodes);
         console.log("HP init");
       });
     }
