@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.6\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2014-08-31 22:26+0200\n"
-"PO-Revision-Date: 2015-08-11 14:32+0200\n"
+"PO-Revision-Date: 2015-08-12 12:03+0200\n"
 "Last-Translator: Flavio Costa <flavio.costa@cern.ch>\n"
 "Language-Team: IT <info@invenio-software.org>\n"
 "Language: it\n"
@@ -1837,18 +1837,18 @@ msgstr "Correggere il mio elenco di pubblicazioni."
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:263
 msgid "Fatal: Author ID capabilities are disabled on this system."
 msgstr ""
+"Fatale: le capacità del ID dell'autore sono disabilitate su questo sistema."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:266
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:309
-#, fuzzy
 msgid "Fatal: You are not allowed to access this functionality."
-msgstr "Non sei autorizzato ad accedere alle funzioni amministrative."
+msgstr "Fatale: Non sei autorizzato ad accedere a queste funzioni."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:653
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:754
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:910
 msgid "Papers removed from this profile"
-msgstr ""
+msgstr "Saggi rimossi da questo profilo"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:654
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:658
@@ -1859,43 +1859,41 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:911
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:915
 msgid "Papers in need of review"
-msgstr ""
+msgstr "Saggi necessitano riesaminazione"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:655
-#, fuzzy
 msgid "Open Tickets"
-msgstr "Tuoi cestini"
+msgstr "Biglietti Aperti"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:655
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:720
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:756
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:912
 msgid "Data"
-msgstr ""
+msgstr "Dati"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:656
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:757
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:913
 msgid "Papers of this Person"
-msgstr ""
+msgstr "Saggi di questa Persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:657
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:758
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:914
 msgid "Papers _not_ of this Person"
-msgstr ""
+msgstr "Saggi _non_ di questa Persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:659
 msgid "Tickets for this Person"
-msgstr ""
+msgstr "Biglietti per questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:660
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:725
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:761
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:917
-#, fuzzy
 msgid "Additional Data for this Person"
-msgstr "file aggiuntivi"
+msgstr "Dati Aggiuntivi per questa Persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:662
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:726
@@ -1903,32 +1901,33 @@ msgstr "file aggiuntivi"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:937
 msgid "Sorry, there are currently no documents to be found in this category."
 msgstr ""
+"Siamo spiacenti, al momento non ci sono documenti presenti in questa "
+"categoria."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:663
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:763
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:938
 msgid "Yes, those papers are by this person."
-msgstr ""
+msgstr "Si, quelli saggi sono di questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:664
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:764
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:939
 msgid "No, those papers are not by this person"
-msgstr ""
+msgstr "No, quelli saggi non sono  di questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:665
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:765
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:940
 msgid "Assign to other person"
-msgstr ""
+msgstr "Assegnare ad un altra persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:666
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:730
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:766
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:941
-#, fuzzy
 msgid "Forget decision"
-msgstr "Prendi una decisione"
+msgstr "Dimentica decisione"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:667
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:681
@@ -1937,26 +1936,25 @@ msgstr "Prendi una decisione"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:942
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:956
 msgid "Confirm!"
-msgstr ""
+msgstr "Confermare!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:668
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:768
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:943
 msgid "Yes, this paper is by this person."
-msgstr ""
+msgstr "Si, questo saggio e di questa persona."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:669
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:769
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:944
-#, fuzzy
 msgid "Rejected!"
-msgstr "Rifiutato"
+msgstr "Rifiutato!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:670
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:770
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:945
 msgid "No, this paper is <i>not</i> by this person"
-msgstr ""
+msgstr "No, questo saggio <i>non</i> è di questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:671
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:679
@@ -1971,7 +1969,7 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:954
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:962
 msgid "Assign to another person"
-msgstr ""
+msgstr "Assegnare ad un altra persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:672
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:680
@@ -1986,19 +1984,19 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:955
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:963
 msgid "To other person!"
-msgstr ""
+msgstr "Ad un altra persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:673
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:773
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:948
 msgid "Confirmed."
-msgstr ""
+msgstr "Confermato."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:674
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:774
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:949
 msgid "Marked as this person's paper"
-msgstr ""
+msgstr "Segnare come saggio di questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:675
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:683
@@ -2009,9 +2007,8 @@ msgstr ""
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:783
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:950
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:958
-#, fuzzy
 msgid "Forget decision!"
-msgstr "Prendi una decisione"
+msgstr "Dimentica decisione!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:676
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:684
@@ -2019,51 +2016,48 @@ msgstr "Prendi una decisione"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:784
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:951
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:959
-#, fuzzy
 msgid "Forget decision."
-msgstr "Prendi una decisione"
+msgstr "Dimentica decisione"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:677
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:777
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:952
 msgid "Repeal!"
-msgstr ""
+msgstr "Abroga!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:678
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:778
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:953
 msgid "But it's <i>not</i> this person's paper."
-msgstr ""
+msgstr "Ma <i>non</i> è il saggio di questa persona."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:682
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:782
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:957
 msgid "But it <i>is</i> this person's paper."
-msgstr ""
+msgstr "Ma <i>è</i> il saggio di questa persona."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:685
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:785
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:960
 msgid "Repealed"
-msgstr ""
+msgstr "Abrogato"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:686
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:786
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:961
 msgid "Marked as not this person's paper"
-msgstr ""
+msgstr "Segnato come non essendo il saggio di questa persona"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:721
-#, fuzzy
 msgid "Your papers"
-msgstr "I tuoi avvisi"
+msgstr "I suoi saggi"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:718
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:722
-#, fuzzy
 msgid "Not your papers"
-msgstr "Password dimenticata?"
+msgstr "Saggio che non sono i suoi"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:720
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:724
@@ -2073,45 +2067,41 @@ msgid "Your tickets"
 msgstr "I tuoi ticket"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:727
-#, fuzzy
 msgid "These are mine!"
-msgstr "Ci sono %i cestini"
+msgstr "Questi sono miei!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:728
-#, fuzzy
 msgid "These are not mine!"
-msgstr "Ci sono %i cestini"
+msgstr "Questi non sono miei!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:729
 msgid "It's not mine, but I know whose it is!"
-msgstr ""
+msgstr "Non è mio, ma so di chi è!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:731
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:745
 msgid "Mine!"
-msgstr ""
+msgstr "Mio!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:732
 msgid "This is my paper!"
-msgstr ""
+msgstr "Questo è mio saggio!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:733
-#, fuzzy
 msgid "Not mine!"
-msgstr "Nota"
+msgstr "Non è mio!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:734
 msgid "This is not my paper!"
-msgstr ""
+msgstr "Questo non è il mio saggio!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:737
-#, fuzzy
 msgid "Not Mine."
-msgstr "Nota"
+msgstr "Non è mio."
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:738
 msgid "Marked as my paper!"
-msgstr ""
+msgstr "Segnato come il mio saggio!"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:740
 msgid "Forget assignment decision"
