@@ -300,7 +300,7 @@ def run_py_func(manager_run, command_line, passthrough=False):
         else:
             sys.argv = shlex.split(command_line)
     else:
-        sys.argv = command_line
+        sys.argv = list(command_line)  # argv should be mutable
 
     exit_code = None
     try:
