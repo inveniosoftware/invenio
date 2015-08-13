@@ -37,7 +37,6 @@ components:
 - celery
 - circulation
 - classifier
-- cloudconnector
 - collect
 - collections
 - comments

@@ -82,6 +82,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.accounts',
     'invenio.modules.annotations',
     'invenio.modules.archiver',
+    'invenio.modules.cloudconnector',
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
     'invenio.modules.documentation',
