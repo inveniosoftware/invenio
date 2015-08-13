@@ -50,7 +50,6 @@ components:
 - deposit
 - docker
 - docs
-- documentation
 - documents
 - editor
 - elasticsearch

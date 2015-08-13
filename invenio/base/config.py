@@ -84,6 +84,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.archiver',
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
+    'invenio.modules.documentation',
     'invenio.modules.documents',
     'invenio.modules.formatter',
     'invenio.modules.groups',

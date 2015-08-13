@@ -51,7 +51,6 @@ Modules
 .. toctree::
    :maxdepth: 1
 
-   modules/documentation
    modules/jsonalchemy
    modules/knowledge
    modules/redirector
