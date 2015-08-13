@@ -81,7 +81,6 @@ components:
 - oairepository
 - pages
 - pidstore
-- previewer
 - principal
 - ranker
 - records

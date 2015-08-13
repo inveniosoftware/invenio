@@ -112,6 +112,7 @@ install_requires = [
     # TODO "invenio-messages>=0.1.0",
     "invenio-webhooks>=0.1.0",
     "invenio-pidstore[datacite]>=0.1.0",
+    "invenio-previewer>=0.1.0",
     "invenio-documents>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
