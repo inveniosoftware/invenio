@@ -297,7 +297,6 @@ setup(
             'alertengine = invenio.legacy.webalert.scripts.alertengine:main',
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
-            'bibconvert = invenio.legacy.bibconvert.scripts.bibconvert:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
             'bibencode = invenio.modules.encoder.scripts.encoder:main',
             'bibexport = invenio.legacy.bibexport.scripts.bibexport:main',
