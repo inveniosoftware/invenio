@@ -29,7 +29,6 @@ Admin's Guide
    bibknowledge-admin-guide
    bibsched-admin-guide
    bibupload-admin-guide
-   classifier-admin-guide
    docextract-admin-guide
    oaiharvest-admin-guide
    publiline-admin-guide

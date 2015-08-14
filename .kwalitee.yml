@@ -36,7 +36,6 @@ components:
 - checker
 - celery
 - circulation
-- classifier
 - collect
 - collections
 - comments
