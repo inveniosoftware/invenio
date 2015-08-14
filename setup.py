@@ -297,7 +297,6 @@ setup(
             'bibcatalog = invenio.legacy.bibcatalog.scripts.bibcatalog:main',
             'bibconvert = invenio.legacy.bibconvert.scripts.bibconvert:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
-            'bibedit = invenio.legacy.bibedit.scripts.bibedit:main',
             'bibencode = invenio.modules.encoder.scripts.encoder:main',
             'bibexport = invenio.legacy.bibexport.scripts.bibexport:main',
             'bibsched = invenio.legacy.bibsched.scripts.bibsched:main',

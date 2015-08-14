@@ -21,7 +21,7 @@
 
 from __future__ import print_function
 
-from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.search_engine import get_record as get_bibrecord
 from invenio.legacy.bibrecord import create_record, record_get_field_value
 from invenio.legacy.dbquery import run_sql
 from invenio.legacy.search_engine import perform_request_search

@@ -124,7 +124,6 @@ CFG_WEBDIR = join(_cfg_prefix, "var", "www")
 CFG_PYLIBDIR = join(_cfg_prefix, "lib", "python")
 CFG_LOCALEDIR = join(_cfg_prefix, "share", "locale")
 CFG_TMPSHAREDDIR = join(_cfg_prefix, "var", "tmp-shared")
-CFG_BIBEDIT_CACHEDIR = join(_cfg_prefix, "var", "tmp-shared", "bibedit-cache")
 CFG_COMMENTSDIR = join(CFG_DATADIR, "comments")
 
 # FIXME check the usage and replace by SQLALCHEMY_URL
@@ -324,13 +323,6 @@ CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING = {
     'text/plain': '.txt',
     'video/mpeg': '.mpeg',
 }
-CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE = {'POETRY': 'record_poem'}
-CFG_BIBEDIT_KB_SUBJECTS = "Subjects"
-CFG_BIBEDIT_LOCKLEVEL = 3
-CFG_BIBEDIT_PROTECTED_FIELDS = ""
-CFG_BIBEDIT_QUEUE_CHECK_METHOD = "bibrecord"
-CFG_BIBEDIT_TIMEOUT = 3600
-CFG_BIBEDIT_ADD_TICKET_RT_QUEUES = []
 CFG_BIBFIELD_MASTER_FORMATS = ['marc', ]
 CFG_BIBFORMAT_ADDTHIS_ID = ""
 CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS = []

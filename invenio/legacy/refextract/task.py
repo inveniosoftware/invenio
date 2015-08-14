@@ -48,7 +48,7 @@ from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.legacy.docextract.task import task_run_core_wrapper, split_ids
 from invenio.legacy.docextract.utils import setup_loggers
 from invenio.legacy.docextract.record import print_records
-from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.search_engine import get_record as get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values
 from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM

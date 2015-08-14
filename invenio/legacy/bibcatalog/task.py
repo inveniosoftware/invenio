@@ -48,7 +48,7 @@ from invenio.legacy.bibcatalog.utils import record_id_from_record
 from invenio.legacy.bibcatalog.dblayer import \
     get_all_new_records, \
     get_all_modified_records
-from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.search_engine import get_record as get_bibrecord
 from invenio.pluginutils import PluginContainer
 
 

@@ -28,7 +28,7 @@ import string
 import time
 
 from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
-from invenio.legacy.bibedit.utils import get_bibrecord
+from invenio.legacy.search_engine import get_record as get_bibrecord
 from invenio.legacy.bibrecord import create_record, \
     field_get_subfield_values, print_rec, record_add_field, \
     record_get_field_instances, record_get_field_value
