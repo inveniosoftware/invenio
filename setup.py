@@ -119,7 +119,6 @@ install_requires = [
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",
-    "jsonschema>=2.4.0",
     "libmagic>=1.0",
     "lxml>=3.3",
     "mechanize>=0.2.5",
