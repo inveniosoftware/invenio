@@ -216,7 +216,7 @@ Bibsched command line interface
         -S, --since=TIME       Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
         is 30 days)
         -t, --tasks=LIST       Comma separated list of BibTask to consider (default
-        is bibindex,bibreformat,webcoll,bibrank,inveniogc,bibupload,oairepositoryupdater)
+        is bibindex,bibreformat,webcoll,bibrank,inveniogc,bibupload)
 
 Bibtasks command line interface
 -------------------------------

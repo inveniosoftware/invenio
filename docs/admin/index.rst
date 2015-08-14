@@ -32,7 +32,6 @@ Admin's Guide
    classifier-admin-guide
    docextract-admin-guide
    oaiharvest-admin-guide
-   oairepository-admin-guide
    publiline-admin-guide
    websession-admin-guide
    webstyle-admin-guide

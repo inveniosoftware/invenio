@@ -427,7 +427,7 @@ CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT = 15
 CFG_BIBMATCH_MIN_VALIDATION_COMPARISONS = 2
 CFG_BIBSCHED_EDITOR = which("vim")
 CFG_BIBSCHED_GC_TASKS_OLDER_THAN = 30
-CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', 'oairepositoryupdater', ]
+CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE = ['bibupload', ]
 CFG_BIBSCHED_GC_TASKS_TO_REMOVE = [
     'bibindex', 'bibreformat', 'webcoll', 'bibrank', 'inveniogc', ]
 CFG_BIBSCHED_LOG_PAGER = which("less")

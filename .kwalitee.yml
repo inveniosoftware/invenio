@@ -76,7 +76,6 @@ components:
 - mixer
 - multimedia
 - oaiharvester
-- oairepository
 - pages
 - pidstore
 - principal
