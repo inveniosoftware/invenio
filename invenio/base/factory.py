@@ -21,20 +21,12 @@
 
 from __future__ import absolute_import
 
-import ast
 import os
-import re
 import sys
 import urllib
 import warnings
 
-from flask_registry import (
-    BlueprintAutoDiscoveryRegistry,
-    ConfigurationRegistry,
-    ExtensionRegistry,
-    PackageRegistry,
-    Registry
-)
+from flask_appfactory.app import base_app, load_application, load_config
 
 from pkg_resources import iter_entry_points
 
@@ -43,7 +35,6 @@ from six.moves.urllib.parse import urlparse
 from werkzeug.local import LocalProxy
 
 from .helpers import unicodifier, with_app_context
-from .utils import captureWarnings
 from .wrappers import Flask
 
 
@@ -103,33 +94,8 @@ def cleanup_legacy_configuration(app):
     app.config['CFG_WEBDIR'] = app.static_folder
 
 
-def register_legacy_blueprints(app):
-    """Register some legacy blueprints."""
-    @app.route('/testing')
-    def testing():
-        from flask import render_template
-        return render_template('404.html')
-
-
-def register_secret_key(app):
-    """Register sercret key in application configuration."""
-    SECRET_KEY = app.config.get('SECRET_KEY') or \
-        app.config.get('CFG_SITE_SECRET_KEY', 'change_me')
-
-    if not SECRET_KEY or SECRET_KEY == 'change_me':
-        fill_secret_key = """
-    Set variable SECRET_KEY with random string in invenio.cfg.
-
-    You can use following commands:
-    $ %s
-        """ % ('inveniomanage config create secret-key', )
-        warnings.warn(fill_secret_key, UserWarning)
-
-    app.config["SECRET_KEY"] = SECRET_KEY
-
-
-def load_site_config(app):
-    """Load default site-configuration via entry points."""
+def get_site_config():
+    """Get default site-configuration via entry points."""
     entry_points = list(iter_entry_points("invenio.config"))
     if len(entry_points) > 1:
         warnings.warn(
@@ -138,26 +104,11 @@ def load_site_config(app):
             UserWarning
         )
 
-    for ep in entry_points:
-        app.config.from_object(ep.module_name)
+    return entry_points[0].module_name if entry_points else None
 
 
-def configure_warnings():
-    """Configure warnings by routing warnings to the logging system.
-
-    It also unhides DeprecationWarning.
-    """
-    if not sys.warnoptions:
-        # Route warnings through python logging
-        captureWarnings(True)
-
-        # DeprecationWarning is by default hidden, hence we force the
-        # "default" behavior on deprecation warnings which is not to hide
-        # errors.
-        warnings.simplefilter("default", DeprecationWarning)
-
-
-def create_app(instance_path=None, static_folder=None, **kwargs_config):
+def create_app(instance_path=None, static_folder=None, load=True,
+               **kwargs_config):
     """Prepare Invenio application based on Flask.
 
     Invenio consists of a new Flask application with legacy support for
@@ -177,115 +128,30 @@ def create_app(instance_path=None, static_folder=None, **kwargs_config):
         variable will be used. If that one does not exist, a path inside the
         detected `instance_path` will be used.
     """
-    configure_warnings()
-
-    # Flask application name
-    app_name = '.'.join(__name__.split('.')[0:2])
-
-    # Prefix for env variables
-    env_prefix = re.sub('[^A-Z]', '', app_name.upper())
-
-    # Detect instance path
+    # Legacy instance path
     instance_path = instance_path or \
-        os.getenv(env_prefix + '_INSTANCE_PATH') or \
-        os.path.join(
-            sys.prefix, 'var', app_name + '-instance'
-        )
+        os.getenv('INVENIO_INSTANCE_PATH') or \
+        os.path.join(sys.prefix, 'var', 'invenio.base-instance')
 
-    # Detect static files path
-    static_folder = static_folder or \
-        os.getenv(env_prefix + '_STATIC_FOLDER') or \
-        os.path.join(instance_path, 'static')
-
-    # Create instance path
-    try:
-        if not os.path.exists(instance_path):
-            os.makedirs(instance_path)
-    except Exception:
-        pass
-
-    # Create the Flask application instance
-    app = Flask(
-        app_name,
-        # Static files are usually handled directly by the webserver (e.g.
-        # Apache) However in case WSGI is required to handle static files too
-        # (such as when running simple server), then this flag can be
-        # turned on (it is done automatically by wsgi_handler_test).
-        # We assume anything under '/' which is static to be server directly
-        # by the webserver from CFG_WEBDIR. In order to generate independent
-        # url for static files use func:`url_for('static', filename='test')`.
-        static_url_path='',
-        static_folder=static_folder,
-        template_folder='templates',
-        instance_relative_config=True,
-        instance_path=instance_path,
-    )
+    app = base_app("invenio", static_url_path='', instance_path=instance_path,
+                   flask_cls=Flask)
 
     # Handle both URLs with and without trailing slashes by Flask.
     # @blueprint.route('/test')
     # @blueprint.route('/test/') -> not necessary when strict_slashes == False
     app.url_map.strict_slashes = False
 
-    #
-    # Configuration loading
-    #
-
-    # Load default configuration
+    # Load Invenio default configuration
     app.config.from_object('invenio.base.config')
 
-    # Load site specific default configuration from entry points
-    load_site_config(app)
+    # Load configuration
+    load_config(app, get_site_config(), **kwargs_config)
 
-    # Load invenio.cfg from instance folder
-    app.config.from_pyfile('invenio.cfg', silent=True)
-
-    # Update application config from parameters.
-    app.config.update(kwargs_config)
-
-    # Ensure SECRET_KEY has a value in the application configuration
-    register_secret_key(app)
-
-    # Update config with specified environment variables.
-    for cfg_name in app.config.get('INVENIO_APP_CONFIG_ENVS',
-                                   os.getenv('INVENIO_APP_CONFIG_ENVS',
-                                             '').split(',')):
-        cfg_name = cfg_name.strip().upper()
-        if cfg_name:
-            cfg_value = app.config.get(cfg_name)
-            cfg_value = os.getenv(cfg_name, cfg_value)
-            try:
-                cfg_value = ast.literal_eval(cfg_value)
-            except (SyntaxError, ValueError):
-                pass
-            app.config[cfg_name] = cfg_value
-            app.logger.debug("{0} = {1}".format(cfg_name, cfg_value))
-
-    # ====================
-    # Application assembly
-    # ====================
-    # Initialize application registry, used for discovery and loading of
-    # configuration, extensions and Invenio packages
-    Registry(app=app)
-
-    app.extensions['registry'].update(
-        # Register packages listed in invenio.cfg
-        packages=PackageRegistry(app))
-
-    app.extensions['registry'].update(
-        # Register extensions listed in invenio.cfg
-        extensions=ExtensionRegistry(app),
-        # Register blueprints
-        blueprints=BlueprintAutoDiscoveryRegistry(app=app),
-    )
-
-    # Extend application config with configuration from packages (app config
-    # takes precedence)
-    ConfigurationRegistry(app)
+    if load:
+        load_application(app)
 
     # Legacy conf cleanup
     cleanup_legacy_configuration(app)
-
-    register_legacy_blueprints(app)
 
     return app
 
