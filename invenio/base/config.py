@@ -55,7 +55,7 @@ EXTENSIONS = [
     'invenio.ext.menu',
     'invenio.ext.jasmine',  # after assets
     'flask_breadcrumbs:Breadcrumbs',
-    'invenio.modules.deposit.url_converters',
+    'invenio_deposit.url_converters',
     # TODO 'invenio.ext.iiif',
     'invenio.ext.es',
 ]
@@ -68,6 +68,7 @@ PACKAGES = [
     'invenio.modules.*',
     'invenio_formatter',
     'invenio_webhooks',
+    'invenio_deposit',
     'invenio_workflows',
     'invenio_oauthclient',
     'invenio_oauth2server',
@@ -85,6 +86,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.cloudconnector',
     'invenio.modules.comments',
     'invenio.modules.communities',  # remove with invenio/modules/communities
+    'invenio.modules.deposit',
     'invenio.modules.documentation',
     'invenio.modules.documents',
     'invenio.modules.formatter',

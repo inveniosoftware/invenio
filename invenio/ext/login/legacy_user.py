@@ -191,7 +191,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
             acc_is_user_in_role
         from invenio.modules.search.utils import \
             get_permitted_restricted_collections
-        from invenio.modules.deposit.cache import \
+        from invenio_deposit.cache import \
             get_authorized_deposition_types
 
         data = {}

@@ -46,7 +46,6 @@ components:
 - crossref
 - dashboard
 - debug_toolbar
-- deposit
 - docker
 - docs
 - documents

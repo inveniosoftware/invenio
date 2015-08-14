@@ -113,7 +113,7 @@ def classify_paper_with_deposit(taxonomy, rebuild_cache=False, no_cache=False,
     )
 
     def _classify_paper_with_deposit(obj, eng):
-        from invenio.modules.deposit.models import Deposition
+        from invenio_deposit.models import Deposition
         deposition = Deposition(obj)
         data = None
         if not fast_mode:
