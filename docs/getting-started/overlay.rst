@@ -73,8 +73,7 @@ solely required for development purposes.
     $ sudo apt-get install mysql-server
 
     # Install Node.js
-    $ sudo add-apt-repository ppa:chris-lea/node.js
-    $ sudo apt-get update
+    $ curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
     $ sudo apt-get install nodejs
 
 The virtual environment
