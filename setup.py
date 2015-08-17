@@ -105,6 +105,7 @@ install_requires = [
     "invenio-formatter>=0.2.0",
     "invenio-groups>=0.1.0",
     "invenio-search>=0.1.0",
+    "invenio-collections>=0.1.0",
     "invenio-records>=0.2.1",
     "invenio-comments>=0.1.1",
     "invenio-oauthclient>=0.1.0",

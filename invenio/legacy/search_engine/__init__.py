@@ -134,14 +134,14 @@ EM_REPOSITORY={"body" : "B",
                "rt_portalbox" : "Prt",
                "search_services": "SER"};
 
-from invenio.modules.collections.cache import collection_restricted_p
-from invenio.modules.collections.cache import restricted_collection_cache
+from invenio_collections.cache import collection_restricted_p
+from invenio_collections.cache import restricted_collection_cache
 from invenio_search.utils import get_permitted_restricted_collections
 
 
 from invenio_records.access import check_user_can_view_record
 
-from invenio.modules.collections.cache import get_coll_i18nname
+from invenio_collections.cache import get_coll_i18nname
 from invenio_search.cache import get_field_i18nname
 
 
@@ -176,7 +176,7 @@ def get_coll_ancestors(coll):
     return coll_ancestors
 
 
-from invenio.modules.collections.cache import get_collection_allchildren
+from invenio_collections.cache import get_collection_allchildren
 
 
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,

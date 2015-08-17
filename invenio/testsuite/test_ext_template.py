@@ -78,7 +78,7 @@ class TemplateArgsTest(InvenioTestCase):
     def setup_app(cls, app):
         """Custom setup function."""
         from invenio.ext.template.context_processor import template_args
-        from invenio.modules.collections.views.collections import index
+        from invenio_collections.views.collections import index
 
         @template_args(index)
         def foo():

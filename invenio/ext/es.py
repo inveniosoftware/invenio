@@ -276,7 +276,7 @@ def setup_app(app):
 
     # FIXME add after_delete
 
-    from invenio.modules.collections.models import Collection
+    from invenio_collections.models import Collection
 
     @listens_for(Collection, 'after_insert')
     @listens_for(Collection, 'after_update')

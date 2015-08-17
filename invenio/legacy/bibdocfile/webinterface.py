@@ -57,7 +57,7 @@ from invenio.legacy.bibdocfile.api import BibRecDocs, normalize_format, file_str
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
 from invenio.ext.logging import register_exception
-from invenio.modules.collections.models import Collection
+from invenio_collections.models import Collection
 import invenio.legacy.template
 bibdocfile_templates = invenio.legacy.template.load('bibdocfile')
 webstyle_templates = invenio.legacy.template.load('webstyle')

@@ -27,7 +27,7 @@ from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.collections.models import Collection
+from invenio_collections.models import Collection
 from invenio.utils.memoise import Memoise
 
 from sqlalchemy.exc import IntegrityError

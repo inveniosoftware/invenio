@@ -61,7 +61,7 @@ class template_args(object):
 
     .. code-block:: python
 
-        from invenio.modules.collections.views.collections import index
+        from invenio_collections.views.collections import index
 
         @template_args(index)
         def bar():

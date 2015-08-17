@@ -24,7 +24,7 @@ import os
 from invenio.base.globals import cfg
 from invenio.ext.sqlalchemy import db
 from invenio.ext.sqlalchemy.utils import session_manager
-from invenio.modules.collections.models import Collection
+from invenio_collections.models import Collection
 from invenio.utils.text import slugify
 
 from sqlalchemy.dialects import mysql

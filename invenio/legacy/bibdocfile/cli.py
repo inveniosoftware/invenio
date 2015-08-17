@@ -432,7 +432,7 @@ def cli_get_stats(dummy):
             for row in table:
                 print("\t".join(str(elem) for elem in row))
 
-    from invenio.modules.collections.cache import get_collection_reclist
+    from invenio_collections.cache import get_collection_reclist
     for collection, in run_sql("SELECT name FROM collection ORDER BY name"):
         print("-" * 79)
         print("Statistic for: %s " % collection)
