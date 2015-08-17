@@ -29,7 +29,7 @@ RUN apt-get update && \
     apt-get -qy install --fix-missing --no-install-recommends \
         curl \
         && \
-    curl -sL https://deb.nodesource.com/setup | bash -
+    curl -sL https://deb.nodesource.com/setup_0.10 | bash -
 
 # install requirements from repos
 # also clean up apt

@@ -51,13 +51,12 @@ refer to it as ``$MYSQL_ROOT``.
 2.1.2. Node.js
 ++++++++++++++
 
-`node.js <http://nodejs.org/>`_ and `npm <https://www.npmjs.org/>`_ from Ubuntu
-are troublesome so we recommend you to install them from Chris Lea's PPA.
+`node.js <http://nodejs.org/>`_ and `npm <https://www.npmjs.org/>`_ can be
+installed using NodeSource's script.
 
 .. code-block:: console
 
-    $ sudo add-apt-repository ppa:chris-lea/node.js
-    $ sudo apt-get update
+    $ curl -sL https://deb.nodesource.com/setup_0.10 | sudo bash -
     $ sudo apt-get install nodejs
 
 2.2. Centos / RHEL
