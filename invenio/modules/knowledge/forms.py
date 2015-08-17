@@ -20,7 +20,6 @@
 """Knowledge Forms."""
 
 from invenio.base.i18n import _
-from invenio_collections.models import Collection
 from invenio.utils.forms import InvenioBaseForm
 
 from werkzeug.local import LocalProxy
@@ -61,6 +60,14 @@ class WrittenAsKnowledgeForm(KnowledgeForm):
     """Written As Knowledge form."""
 
 
+def collection_choices():
+    """Return collection choices."""
+    from invenio_collections.models import Collection
+    return [(0, _('-None-'))] + [
+        (c.id, c.name) for c in Collection.query.all()
+    ]
+
+
 class DynamicKnowledgeForm(KnowledgeForm):
 
     """Dynamic Knowledge form."""
@@ -70,9 +77,7 @@ class DynamicKnowledgeForm(KnowledgeForm):
     id_collection = SelectField(
         'Collection',
         coerce=int,
-        choices=LocalProxy(lambda:
-                           [(0, _('-None-'))] +
-                           [(c.id, c.name) for c in Collection.query.all()])
+        choices=LocalProxy(collection_choices),
     )
 
 
