@@ -247,7 +247,7 @@ def create_update_jobs_by_collection(
     @param job_directory: fullpath to the directory storing the job files
     @type job_directory: string
     """
-    from invenio.modules.search.api import Query
+    from invenio_search.api import Query
     recids = Query().search(collection=collection)
     return create_update_jobs_by_recids(recids, batch_template_file,
                                         job_directory)
@@ -265,7 +265,7 @@ def create_update_jobs_by_search(pattern,
     @param job_directory: fullpath to the directory storing the job files
     @type job_directory: string
     """
-    from invenio.modules.search.api import Query
+    from invenio_search.api import Query
     recids = Query(pattern).search()
     return create_update_jobs_by_recids(recids, batch_template_file,
                                         job_directory)

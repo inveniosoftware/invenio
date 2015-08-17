@@ -20,7 +20,7 @@
 """Record field function."""
 
 from invenio_records.signals import before_record_insert
-from invenio.modules.search.api import Query
+from invenio_search.api import Query
 from invenio.utils.datastructures import LazyDict
 
 from six import iteritems

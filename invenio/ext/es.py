@@ -227,8 +227,8 @@ def index_record(recid):
 @celery.task
 def index_collection_percolator(name, dbquery):
     """Create an elasticsearch percolator for a given query."""
-    from invenio.modules.search.api import Query
-    from invenio.modules.search.walkers.elasticsearch import ElasticSearchDSL
+    from invenio_search.api import Query
+    from invenio_search.walkers.elasticsearch import ElasticSearchDSL
     es.index(
         index='records',
         doc_type='.percolator',

@@ -22,5 +22,5 @@ import warnings
 from invenio.utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("Legacy WebSearch will be removed in 2.3. Please check "
-              "'invenio.modules.search' module.",
+              "'invenio_search' module.",
               RemovedInInvenio23Warning)

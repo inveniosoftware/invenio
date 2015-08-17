@@ -663,7 +663,7 @@ def load_kb_from_records(kb_name, builder):
                 yield value
 
     def lazy_parser(collection, left_tags, right_tags):
-        from invenio.modules.search.api import Query
+        from invenio_search.api import Query
         for recid in Query().search(collection=collection):
             try:
                 # Key tag

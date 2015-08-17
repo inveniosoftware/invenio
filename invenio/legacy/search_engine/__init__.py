@@ -27,7 +27,7 @@ import warnings
 from invenio.utils.deprecation import RemovedInInvenio23Warning
 
 warnings.warn("Legacy search_engine will be removed in 2.3. Please check "
-              "'invenio.modules.search' module.",
+              "'invenio_search' module.",
               RemovedInInvenio23Warning)
 
 __lastupdated__ = """$Date$"""
@@ -77,9 +77,9 @@ from invenio.config import \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_WEBSEARCH_WILDCARD_LIMIT
 
-from invenio.modules.search.searchext.engines.native import search_unit
-from invenio.modules.search.utils import get_most_popular_field_values
-from invenio.modules.search.errors import \
+from invenio_search.searchext.engines.native import search_unit
+from invenio_search.utils import get_most_popular_field_values
+from invenio_search.errors import \
      InvenioWebSearchUnknownCollectionError, \
      InvenioWebSearchWildcardLimitError, \
      InvenioWebSearchReferstoLimitError, \
@@ -136,13 +136,13 @@ EM_REPOSITORY={"body" : "B",
 
 from invenio.modules.collections.cache import collection_restricted_p
 from invenio.modules.collections.cache import restricted_collection_cache
-from invenio.modules.search.utils import get_permitted_restricted_collections
+from invenio_search.utils import get_permitted_restricted_collections
 
 
 from invenio_records.access import check_user_can_view_record
 
 from invenio.modules.collections.cache import get_coll_i18nname
-from invenio.modules.search.cache import get_field_i18nname
+from invenio_search.cache import get_field_i18nname
 
 
 def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
@@ -152,7 +152,7 @@ def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, t
     """
     return ''
 
-from invenio.modules.search.washers import *
+from invenio_search.washers import *
 
 
 def get_coll_ancestors(coll):
@@ -211,7 +211,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
        This function is suitable as a mid-level API.
     """
     if f is None:
-        from invenio.modules.search.api import Query
+        from invenio_search.api import Query
         results = Query(p).search()
     else:
         results = search_unit(p, f, m, wl=wl)
@@ -224,7 +224,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0,
     return results
 
 
-from invenio.modules.search.searchext.engines.native import *
+from invenio_search.searchext.engines.native import *
 
 
 def guess_primary_collection_of_a_record(recID):
@@ -446,7 +446,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=No
     import warnings
     warnings.warn('Deprecated perform_request_search({}).'.format(str(kwargs)),
                   stacklevel=2)
-    from invenio.modules.search.api import Query
+    from invenio_search.api import Query
     p = create_add_to_search_pattern(p, p1, f1, m1, "")
     p = create_add_to_search_pattern(p, p2, f2, m2, op1)
     p = create_add_to_search_pattern(p, p3, f3, m3, op2)

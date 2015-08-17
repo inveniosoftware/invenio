@@ -83,7 +83,6 @@ components:
 - restful
 - scheduler
 - script
-- search
 - sequencegenerator
 - session
 - sorter

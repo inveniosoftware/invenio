@@ -534,7 +534,7 @@ def get_kbd_values_by_def(confdict, searchwith=""):
     :param searchwith: a term to search with
     :return: list of values
     """
-    from invenio.modules.search.api import Query
+    from invenio_search.api import Query
 
     # get the configuration so that we see what the field is
     if not confdict:

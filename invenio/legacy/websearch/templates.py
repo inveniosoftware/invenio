@@ -122,7 +122,7 @@ class Template:
     # Type of the allowed parameters for the web interface for search results
     @property
     def search_results_default_urlargd(self):
-        from invenio.modules.search.washers import \
+        from invenio_search.washers import \
             search_results_default_urlargd
         return search_results_default_urlargd
 

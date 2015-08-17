@@ -62,6 +62,7 @@ EXTENSIONS = [
 
 PACKAGES = [
     'invenio_records',
+    'invenio_search',
     'invenio_comments',
     'invenio_documents',
     'invenio_pidstore',
@@ -100,6 +101,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.pidstore',
     'invenio.modules.previewer',
     'invenio.modules.records',
+    'invenio.modules.search',
     'invenio.modules.tags',
     'invenio.modules.webhooks',
     'invenio.modules.workflows',

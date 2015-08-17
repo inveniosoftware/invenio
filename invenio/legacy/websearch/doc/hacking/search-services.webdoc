@@ -129,7 +129,7 @@ For eg. a spellchecker service could exist
 in <code>/opt/invenio/lib/python/invenio/search_services/SpellCheckerService.py</code>,
 with the following content:
 <pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
-from invenio.modules.search.services import SearchService
+from invenio_search.services import SearchService
 
 __plugin_version__ = "Search Service Plugin API 1.0"
 
@@ -194,7 +194,7 @@ additional helper functions:
 
 
 <pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
-from invenio.modules.search.services import ListLinksService
+from invenio_search.services import ListLinksService
 from invenio.base.i18n import gettext_set_language
 
 __plugin_version__ = "Search Service Plugin API 1.0"
@@ -265,7 +265,7 @@ implemented for you:
 </p>
 
 <pre style="border:1px solid #bbb; overflow-x:auto;padding:5px;">
-from invenio.modules.search.services import KnowledgeBaseService
+from invenio_search.services import KnowledgeBaseService
 from invenio.base.i18n import gettext_set_language
 
 __plugin_version__ = "Search Service Plugin API 1.0"
