@@ -185,3 +185,14 @@ SEARCH_ELASTIC_KEYWORD_MAPPING = {
     "980__b": ["collections.secondary"],
     "542__l": ["information_relating_to_copyright_status.copyright_status"],
 }
+
+
+# SEARCH_ELASTIC_COLLECTION_INDEX_MAPPING -- this variable holds a dictionary
+# to map invenio collections to elasticsearch indices.
+SEARCH_ELASTIC_COLLECTION_INDEX_MAPPING = {
+}
+
+
+# SEARCH_ELASTIC_DEFAULT_INDEX -- elasticsearch default index used when
+# indexing and searching for records.
+SEARCH_ELASTIC_DEFAULT_INDEX = 'records'
