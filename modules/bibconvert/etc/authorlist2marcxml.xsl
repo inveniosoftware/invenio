@@ -68,10 +68,10 @@ along with Invenio; if not, write to the Free Software Foundation, Inc.,
   <!-- FUNCTION  print-i-authorinspireid: prints the authors INSPIRE ID inside xxx__i subfield -->
   <xsl:template name="print-i-authorinspireid">
     <xsl:param name="authorid"/>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and $authorid!='' and contains($authorid, 'INSPIRE') ">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and not($authorid = 'INSPIRE-') and not ($authorid = 'inspire-') and $authorid!='' and contains($authorid, 'INSPIRE') ">
       <subfield code="i"><xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
-    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and not(contains($authorid, 'INSPIRE'))  and $authorid!=''">
+    <xsl:if test="not(contains($authorid, 'UNDEFINED')) and not(contains($authorid, 'undefined')) and not(contains($authorid, 'INSPIRE'))  and not($authorid = 'INSPIRE-') and not ($authorid = 'inspire-') and not(normalize-space($authorid) = '') and $authorid!=''">
       <subfield code="i">INSPIRE-<xsl:value-of select="normalize-space($authorid)"/></subfield>
     </xsl:if>
   </xsl:template>
