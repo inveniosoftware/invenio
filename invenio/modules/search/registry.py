@@ -19,13 +19,16 @@
 
 """Registries for search module."""
 
-from flask_registry import RegistryError, ModuleAutoDiscoveryRegistry, \
-    RegistryProxy
+import os
+
+from flask_registry import RegistryError, PkgResourcesDirDiscoveryRegistry, \
+    ModuleAutoDiscoveryRegistry, RegistryProxy
 from werkzeug.utils import cached_property
 
 from invenio.ext.registry import DictModuleAutoDiscoverySubRegistry, \
     ModuleAutoDiscoverySubRegistry
 from invenio.modules.collections.models import FacetCollection
+from invenio.utils.datastructures import LazyDict
 from invenio.utils.memoise import memoize
 
 searchext = RegistryProxy('searchext', ModuleAutoDiscoveryRegistry,
@@ -145,3 +148,13 @@ units = RegistryProxy(
     valuegetter=lambda value: value.search_unit,
     registry_namespace=searchext,
 )
+
+mappings_proxy = RegistryProxy(
+    "searchext.mappings", PkgResourcesDirDiscoveryRegistry, "mappings",
+    registry_namespace=searchext
+    )
+
+mappings = LazyDict(lambda: dict((os.path.basename(f), f)
+                    for f in mappings_proxy))
+
+___all__ = ('mappings_proxy', 'mappings')
