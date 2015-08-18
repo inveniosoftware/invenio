@@ -85,7 +85,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.archiver',
     'invenio.modules.cloudconnector',
     'invenio.modules.comments',
-    'invenio.modules.communities',  # remove with invenio/modules/communities
+    'invenio.modules.communities',
     'invenio.modules.deposit',
     'invenio.modules.documentation',
     'invenio.modules.documents',
