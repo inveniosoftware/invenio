@@ -795,6 +795,9 @@ def standardize_report_number(report_number):
                   ur'arXiv:\g<1>',
                   report_number,
                   re.I | re.U)
+    if len(report_number) > len("arXiv:") and not report_number[len("arXiv:")].isdigit():
+        # Quick hack to strip arXiv: prefix in case of legacy arXiv IDs
+        report_number = report_number[len("arXiv:"):]
     return report_number
 
 
