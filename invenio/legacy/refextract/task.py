@@ -51,7 +51,6 @@ from invenio.legacy.docextract.record import print_records
 from invenio.legacy.search_engine import get_record as get_bibrecord
 from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values
-from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 
 
 def check_options():
@@ -240,7 +239,7 @@ def cb_submit_bibupload(bibcatalog_system=None, records=None):
 
 def main():
     """Constructs the refextract bibtask."""
-    extra_vars = {'bibcatalog_system': BIBCATALOG_SYSTEM, 'records': []}
+    extra_vars = {'bibcatalog_system': None, 'records': []}
     # Build and submit the task
     task_init(authorization_action='runrefextract',
         authorization_msg="Refextract Task Submission",

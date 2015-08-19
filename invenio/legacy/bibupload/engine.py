@@ -88,7 +88,6 @@ from invenio.legacy.bibrecord import create_records, \
 from invenio.legacy.search_engine import get_record, record_exists, search_pattern
 from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.ext.logging import register_exception
-from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from intbitset import intbitset
 from invenio.utils.url import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
@@ -132,10 +131,7 @@ def check_bibcatalog():
     if CFG_HAS_BIBCATALOG != "UNKNOWN":
         return CFG_HAS_BIBCATALOG
     CFG_HAS_BIBCATALOG = True
-    if BIBCATALOG_SYSTEM is not None:
-        bibcatalog_response = BIBCATALOG_SYSTEM.check_system()
-    else:
-        bibcatalog_response = "No ticket system configured"
+    bibcatalog_response = "No ticket system configured"
     if bibcatalog_response != "":
         write_message("BibCatalog error: %s\n" % (bibcatalog_response,))
         CFG_HAS_BIBCATALOG = False
@@ -775,29 +771,6 @@ def submit_ticket_for_holding_pen(rec_id, err, msg, pretend=False):
         except Exception as err:
             write_message("WARNING: can't reliably retrieve uid for user %s: %s" % (user, err), stream=sys.stderr)
 
-    if check_bibcatalog():
-        text = """
-%(msg)s found for record %(rec_id)s: %(err)s
-
-See: <%(siteurl)s/record/edit/#state=edit&recid=%(rec_id)s>
-
-BibUpload task information:
-    task_id: %(task_id)s
-    task_specific_name: %(task_specific_name)s
-    user: %(user)s
-    task_params: %(task_params)s
-    task_options: %(task_options)s""" % {
-            "msg": msg,
-            "rec_id": rec_id,
-            "err": err,
-            "siteurl": CFG_SITE_SECURE_URL,
-            "task_id": task_get_task_param("task_id"),
-            "task_specific_name": task_get_task_param("task_specific_name"),
-            "user": user,
-            "task_params": bibtask._TASK_PARAMS,
-            "task_options": bibtask._OPTIONS}
-        if not pretend:
-            BIBCATALOG_SYSTEM.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, owner=uid)
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = """INSERT INTO "bibHOLDINGPEN" (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"""

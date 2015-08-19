@@ -119,7 +119,6 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBDOCFILE_PREFERRED_MIMETYPES_MAPPING, \
     CFG_BIBCATALOG_SYSTEM
-from invenio.legacy.bibcatalog.api import BIBCATALOG_SYSTEM
 from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.utils.hash import md5
