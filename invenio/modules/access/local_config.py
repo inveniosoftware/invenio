@@ -185,7 +185,6 @@ DEF_ACTIONS = (
                ('claimpaper_change_others_data', 'Change data of any person ID', '', 'no'),
                ('runbibtasklet', 'run BibTaskLet', '', 'no'),
                ('cfgbibsched', 'configure BibSched', '', 'no'),
-               ('runinfomanager', 'run Info Space Manager', '', 'no')
               )
 
 
@@ -227,7 +226,6 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/oaiharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
-    'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
     'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }
 
