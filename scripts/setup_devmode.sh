@@ -40,7 +40,6 @@ cfgfile=$(inveniomanage config locate)
 cat <<EOF >> "$cfgfile"
 CFG_EMAIL_BACKEND = u'flask_email.backends.console.Mail'
 CFG_BIBSCHED_PROCESS_USER = u'`whoami`'
-PACKAGES_EXCLUDE = []
 CFG_TMPDIR = u'/tmp'
 COLLECT_STORAGE = u'flask_collect.storage.link'
 EOF
