@@ -21,7 +21,7 @@
 
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 from invenio.utils.text import slugify
 
 depends_on = [u'knowledge_2014_10_30_knwKBRVAL_id_column_removal']

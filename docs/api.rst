@@ -54,7 +54,6 @@ Modules
    modules/jsonalchemy
    modules/knowledge
    modules/redirector
-   modules/upgrader
 
 
 Utilities

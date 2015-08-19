@@ -78,6 +78,7 @@ PACKAGES = [
     # TODO 'invenio_messages',
     'invenio_groups',
     'invenio_accounts',
+    'invenio_upgrader',
     'invenio.base',
 ]
 
@@ -105,6 +106,7 @@ PACKAGES_EXCLUDE = [
     'invenio.modules.records',
     'invenio.modules.search',
     'invenio.modules.tags',
+    'invenio.modules.upgrader',
     'invenio.modules.webhooks',
     'invenio.modules.workflows',
 ]

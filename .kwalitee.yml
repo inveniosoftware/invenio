@@ -97,7 +97,6 @@ components:
 - tickets
 - travis
 - unapi
-- upgrader
 - version
 
 excludes:

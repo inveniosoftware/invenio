@@ -63,7 +63,6 @@ class _install_lib(install_lib):  # noqa
 
 
 install_requires = [
-    "alembic>=0.6.6",
     "Babel>=1.3",
     "backports.lzma>=0.0.3",
     "bagit>=1.5.1",
@@ -117,6 +116,7 @@ install_requires = [
     "invenio-workflows>=0.1.0",
     "invenio-deposit>=0.1.0",
     "invenio-documents>=0.1.0.post2",
+    "invenio-upgrader>=0.1.0",
     "itsdangerous>=0.24",
     "jellyfish>=0.3.2",
     "Jinja2>=2.7",

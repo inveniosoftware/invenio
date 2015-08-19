@@ -21,7 +21,7 @@
 
 import sqlalchemy as sa
 import warnings
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 from sqlalchemy.exc import OperationalError
 from invenio.legacy.dbquery import run_sql
 

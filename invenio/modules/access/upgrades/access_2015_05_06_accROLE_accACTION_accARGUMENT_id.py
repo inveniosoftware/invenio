@@ -23,7 +23,7 @@ import warnings
 
 from invenio.ext.sqlalchemy import db
 from invenio.legacy.dbquery import run_sql
-from invenio.modules.upgrader.api import op
+from invenio_upgrader.api import op
 
 from sqlalchemy.engine import reflection
 
