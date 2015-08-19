@@ -19,14 +19,15 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2015-05-21 17:22+0200\n"
-"PO-Revision-Date: 2013-02-25 11:40+0100\n"
+"PO-Revision-Date: 2015-08-19 11:47+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 1.8.3\n"
 
 #: modules/websearch/doc/search-guide.webdoc:456
 #: modules/websearch/doc/search-guide.webdoc:492
@@ -595,9 +596,8 @@ msgid "Export as"
 msgstr "Exportar como"
 
 #: modules/websearch/doc/hacking/search-services.webdoc:20
-#, fuzzy
 msgid "Search Services"
-msgstr "Consejos para la búsqueda"
+msgstr "Servicios de búsqueda"
 
 #: modules/websearch/doc/search-guide.webdoc:429
 #: modules/websearch/doc/search-guide.webdoc:464
@@ -1678,34 +1678,35 @@ msgid ""
 "After merging, only the primary profile will remain in the system, all other "
 "profiles will be automatically deleted.</br>"
 msgstr ""
+"Al combinar un conjunto de perfiles, toda la información almacenada será "
+"asignada al perfil primario. Esto incluye papeles, ids o citas. Después de "
+"la fusión, sólo el perfil principal permanecerá en el sistema, todos los "
+"otros perfiles se eliminarán de forma automática.</br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:754
-#, fuzzy
 msgid "Cancel merging"
-msgstr "Cancelado"
+msgstr "Cancelar unión"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:756
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3177
 msgid "Merge profiles"
-msgstr ""
+msgstr "Unir perfiles"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:963
-#, fuzzy
 msgid "Your options"
-msgstr "Opciones de préstamo"
+msgstr "Su opciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid "Claim for yourself"
-msgstr ""
+msgstr "Reclamación por usted mismo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:977
 msgid "Assign to"
-msgstr ""
+msgstr "Asignar a"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:981
-#, fuzzy
 msgid "Search for a person to assign the paper to"
-msgstr " Buscar a una persona para atribuirle el documento"
+msgstr "Buscar a una persona para atribuirle el papel"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1042
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1136
@@ -1733,17 +1734,15 @@ msgstr "Esconder las reivindicaciones satisfechas"
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1065
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1184
 msgid "Paper Short Info"
-msgstr ""
+msgstr "Papel Corto Info"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1066
-#, fuzzy
 msgid "Author Name"
-msgstr "Autor"
+msgstr "Nombre del Autor"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1067
-#, fuzzy
 msgid "Affiliation"
-msgstr "Afiliaciones"
+msgstr "Afiliacion"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1068
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1754,9 +1753,8 @@ msgid "Date"
 msgstr "Fecha"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1069
-#, fuzzy
 msgid "Experiment"
-msgstr "experimento"
+msgstr "Experimento"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1070
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1185
@@ -1767,9 +1765,8 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1090
-#, fuzzy
 msgid "Not assigned"
-msgstr "¡No es mío!"
+msgstr "No asignado"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1106
 msgid "No status information found."
@@ -1788,24 +1785,20 @@ msgid "Review Transaction"
 msgstr "Revise la transacción"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1207
-#, fuzzy
 msgid "On all pages"
-msgstr " En todos los documentos: "
+msgstr "En todas las paginas."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1214
-#, fuzzy
 msgid "With selected do"
-msgstr "Fue rechazado el:"
+msgstr "Con seleccionado hacer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1247
-#, fuzzy
 msgid "View name variants"
-msgstr "Variantes del nombre"
+msgstr "Ver variantes del nombre"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1357
-#, fuzzy
 msgid "The author has an internal ID!"
-msgstr "Ha habido un error interno"
+msgstr "El autor tiene un ID interno!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1375
 msgid "These records have been marked as not being from this person."
@@ -1846,9 +1839,8 @@ msgid " Commit this entire ticket"
 msgstr " Dar por buena toda esta tarea"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1452
-#, fuzzy
 msgid "No title available"
-msgstr "No disponible"
+msgstr "Ningún título disponible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1528
 msgid "Make sure we match the right names!"
@@ -1865,17 +1857,19 @@ msgstr "En el proceso, se ignoraran los documentos sin un nombre seleccionado."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1540
 msgid "Claim for person with id"
-msgstr ""
+msgstr "Reclamar por persona con id"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1541
 msgid "This seems to be an empty profile without names associated to it yet"
-msgstr ""
+msgstr "Esto parece ser un perfil vacío sin nombres todavía asociados a el "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1542
 msgid ""
 "(the names will be automatically gathered when the first paper is claimed to "
 "this profile)."
 msgstr ""
+"(los nombres se recogerán automáticamente cuando se reclama el primer papel "
+"para este perfil)."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1544
 msgid "Select name for"
@@ -2052,29 +2046,24 @@ msgstr ""
 "restricciones de permisos se enviaran a un operador para la revisión manual."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1979
-#, fuzzy
 msgid "Create new profile"
-msgstr "Crear un nuevo tema"
+msgstr "Crear nuevo perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1987
-#, fuzzy
 msgid "Create a new Person"
-msgstr "Crear un nuevo grupo"
+msgstr "Crear nueva Persona"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1999
-#, fuzzy
 msgid "This is my profile"
-msgstr "¡Este es mi documento!"
+msgstr "Esto es mi perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2011
-#, fuzzy
 msgid "Assign paper"
-msgstr "Asignarlo a una otra persona"
+msgstr "Asignar papel"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2026
-#, fuzzy
 msgid "Add to merge list"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir a la lista de unión"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2110
 #, python-format
@@ -2083,6 +2072,9 @@ msgid ""
 "name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
+"No tenemos una lista de publicaciones para '% s'. Trate de usar un nombre de "
+"autor menos específico, o comprobar de nuevo en unos días como atribuciones "
+"se actualizan con frecuencia. O usted puede enviarnos sus comentarios, por"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2187
 msgid "Recent Papers"
@@ -2106,19 +2098,23 @@ msgstr "No hay documentos conocidos de esta persona"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2325
 msgid "The following profile is the one you were viewing before logging in: "
-msgstr ""
+msgstr "El siguiente perfil es el que estaba viendo antes de iniciar sesión:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2334
 #, python-format
 msgid ""
 "Out of %s paper(s) claimed to your arXiv account, %s match this profile: "
 msgstr ""
+"De %s papel(es) reclamado(s) a su cuenta arxIV, %S coincidan con este "
+"perfil: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2353
 msgid ""
 "If none of the options suggested above apply, you can look for other "
 "possible options from the list below:"
 msgstr ""
+"Si ninguna de las opciones sugeridas anteriormente se aplica, puede buscar "
+"otras opciones posibles en la siguiente lista:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2921
 msgid ""
@@ -2135,6 +2131,8 @@ msgid ""
 "You have succesfully logged in via arXiv. </br> You can now manage your "
 "profile.</br>"
 msgstr ""
+"Ha iniciado sesión con éxito en medio de arXiv. </ br> Ahora puede "
+"administrar su perfil. </ br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2928
 msgid ""
@@ -2142,11 +2140,12 @@ msgid ""
 "color='red'>However the profile you are viewing is not your profile.</br></"
 "br></font>"
 msgstr ""
+"Ha iniciado sesión con éxito en medio de arXiv.</br><div> <font color='red'> "
+"Sin embargo, el perfil que está viendo no es su perfil. </br></br></font>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2930
-#, fuzzy
 msgid "Manage your profile"
-msgstr "Gestionar los ficheros de los documentos"
+msgstr "Gestionar su perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2933
 msgid ""
@@ -2154,19 +2153,21 @@ msgid ""
 "associated to a person yet. Please use the button below to choose your "
 "profile </br></br></font>"
 msgstr ""
+"Ha iniciado sesión con éxito, pero </br><div><font color='red'> todavía no "
+"esta asociado a una persona. Utilice el botón para cambiar de perfil </br></"
+"br></font>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2935
-#, fuzzy
 msgid "Choose your profile"
-msgstr "Escoja el fichero"
+msgstr "Escoja su perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2938
 msgid "Please log in through arXiv to manage your profile.</br>"
-msgstr ""
+msgstr "Por favor, ingrese a través arXiv para gestionar tu perfil.</br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2940
 msgid "Login into Inspire through arXiv.org"
-msgstr ""
+msgstr "Ingresa en Inspire a través arXiv.org"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2953
 msgid ""
@@ -2183,22 +2184,23 @@ msgid ""
 "This profile is already connected to the following ORCiD: <strong>%s</"
 "strong></br>"
 msgstr ""
+"Este perfil ya está conectado a la siguiente ORCiD: <strong>%s</strong></br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2961
 msgid "Import your publications from ORCID"
-msgstr ""
+msgstr "Importa tus publicaciones de ORCID"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2962
 msgid "Visit your profile in ORCID"
-msgstr ""
+msgstr "Visita su perfil en ORCID"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2967
 msgid "Connect an ORCiD to this profile"
-msgstr ""
+msgstr "Conectar un ORCID a este perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2970
 msgid "Suggest an ORCiD for this profile:"
-msgstr ""
+msgstr "Sugiera una ORCID para este perfil:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2996
 msgid ""
@@ -2210,23 +2212,20 @@ msgid ""
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3001
-#, fuzzy
 msgid "Manage publication list"
-msgstr "Lista de publicaciones"
+msgstr "Gestionar lista de publicaciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3015
 msgid "<strong> Person identifiers, internal and external </strong>"
-msgstr ""
+msgstr "<strong> Identificadores persona, internos y externos </strong>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3023
-#, fuzzy
 msgid "add external id"
-msgstr "enlace externo"
+msgstr "añadir enlace externo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3025
-#, fuzzy
 msgid "delete selected ids"
-msgstr "Recuperar las reseñas eliminadas"
+msgstr "eliminar los ids seleccionados"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3027
 msgid "Harvest missing external ids from claimed papers"
@@ -2234,20 +2233,19 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3030
 msgid "suggest external id to add"
-msgstr ""
+msgstr "Sugerir id externo para añadir"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3032
 msgid "suggest selected ids to delete"
-msgstr ""
+msgstr "sugerir ids seleccionados para eliminar"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3034
 msgid "suggest missing ids"
-msgstr ""
+msgstr "sugerir ids que faltan"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3062
-#, fuzzy
 msgid "Choose system"
-msgstr "Escoja la plantilla"
+msgstr "Escoja sistema"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3100
 msgid ""
@@ -2265,24 +2263,27 @@ msgid ""
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3133
-#, fuzzy
 msgid ""
 "The following publications have been successfully assigned to your profile:"
-msgstr "Ficheros que están correctamente en la cola:"
+msgstr ""
+"Las siguientes publicaciones han sido asignados correctamente a su perfil:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3154
 msgid "Get help!"
-msgstr ""
+msgstr "¡Consigue ayuda!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3155
 msgid "<strong> Contact </strong>"
-msgstr ""
+msgstr "<strong> Contacto </strong>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3156
 msgid ""
 "Please contact our user support in case you need help or you just want to "
 "suggest some new ideas. We will get back to you. </br>"
 msgstr ""
+"Por favor, póngase en contacto con nuestro soporte al usuario en caso de que "
+"necesite ayuda o simplemente quiere sugerir algunas ideas nuevas. Nos "
+"pondremos en contacto con usted."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3170
 msgid ""
@@ -2339,7 +2340,6 @@ msgstr "Atención"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2712
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2926
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2961
-#, fuzzy
 msgid "This page is not accessible directly."
 msgstr "No puede acceder a esta página directamente."
 
@@ -2349,7 +2349,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2950
 msgid "Profile management"
-msgstr ""
+msgstr "gestión de Perfil"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:35
 msgid "Error: No BibCatalog system configured."
@@ -2403,28 +2403,25 @@ msgstr "Siguiente"
 #: modules/bibcirculation/lib/bibcirculation.py:100
 #: modules/bibcirculation/lib/bibcirculation.py:127
 msgid "Another user is waiting for this book."
-msgstr ""
+msgstr "Un otro usuario está esperando este libro."
 
 #: modules/bibcirculation/lib/bibcirculation.py:108
-#, fuzzy
 msgid "Your loan has been renewed with success."
-msgstr "Se ha cursado correctamente una nueva compra."
+msgstr "Su préstamo se ha renovado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculation.py:136
-#, fuzzy
 msgid "All loans have been renewed with success."
-msgstr "Su registrado correctamente la nueva petición."
+msgstr "Todos los préstamos se han renovado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculation.py:191
 #, python-format
 msgid "The publication date of this book is %s."
-msgstr ""
+msgstr "La fecha de publicación de este libro esta %s"
 
 #: modules/bibcirculation/lib/bibcirculation.py:194
 #: modules/bibcirculation/lib/bibcirculation.py:196
-#, fuzzy
 msgid "This book has no copies in the library. "
-msgstr "Este registro no tiene ejemplares."
+msgstr "Este libro no tiene copias en la biblioteca. "
 
 #: modules/bibcirculation/lib/bibcirculation.py:198
 msgid ""
@@ -2433,25 +2430,30 @@ msgid ""
 "your opinion and if we decide to buy the                   book, we will "
 "issue a loan for you as soon as it arrives and send it by internal mail."
 msgstr ""
+"Si crees que este libro es interesante, sugerir y decirnos por qué piensa "
+"que este libro es importante. La biblioteca tendrá en cuenta su opinión y si "
+"nos decidimos a comprar el libro, vamos a emitir un préstamo para usted tan "
+"pronto como llegue y enviarlo por correo interno."
 
 #: modules/bibcirculation/lib/bibcirculation.py:202
 msgid ""
 "In case we decide not to buy the book, we will offer you an interlibrary loan"
 msgstr ""
+"En caso decidimos no comprar el libro, le ofreceremos un préstamo "
+"interbibliotecario"
 
 #: modules/bibcirculation/lib/bibcirculation.py:268
 msgid "This book was suggested for acquisition"
-msgstr ""
+msgstr "Este libro fue sugerido para la adquisición"
 
 #: modules/bibcirculation/lib/bibcirculation.py:278
-#, fuzzy
 msgid "This item already has copies."
-msgstr "Este registro no tiene ejemplares."
+msgstr "Este artículo ya tiene ejemplares."
 
 #: modules/bibcirculation/lib/bibcirculation.py:552
 #: modules/bibcirculation/lib/bibcirculation.py:681
 msgid "You didn't accept the ILL conditions."
-msgstr ""
+msgstr "No ha aceptado las condiciones ILL."
 
 #: modules/bibcirculation/lib/bibcirculation.py:666
 #: modules/bibcirculation/lib/bibcirculation.py:710
@@ -8145,8 +8147,7 @@ msgstr "Subida masiva: seguimiento del proceso"
 #: modules/miscutil/lib/dateutils_unit_tests.py:128
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
-#: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:312
+#: modules/webbasket/lib/webbasket.py:968 modules/websession/lib/webuser.py:312
 #: modules/webstyle/lib/webstyle_templates.py:655
 msgid "N/A"
 msgstr "N/D"
