@@ -61,7 +61,6 @@ components:
 - installation
 - jasmine
 - jsonalchemy
-- knowledge
 - kwalitee
 - legacy
 - logging

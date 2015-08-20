@@ -52,7 +52,6 @@ Modules
    :maxdepth: 1
 
    modules/jsonalchemy
-   modules/knowledge
 
 
 Utilities
