@@ -63,7 +63,8 @@ from invenio.bibrecord import create_records, \
                               create_record, record_add_fields, \
                               record_delete_fields, record_xml_output, \
                               record_get_field_instances, \
-                              field_xml_output
+                              field_xml_output, \
+                              field_get_subfield_instances
 from invenio import oai_harvest_getter
 from invenio.errorlib import register_exception
 from invenio.plotextractor_getter import harvest_single, make_single_directory
@@ -1039,6 +1040,22 @@ def call_authorlist_extract(active_file, extracted_file,
                     record_delete_fields(existing_record, '700')
                     first_author = record_get_field_instances(authorlist_record, '100')
                     additional_authors = record_get_field_instances(authorlist_record, '700')
+
+                    # Check if $$i is missing and report it
+                    missing_identifier_fields = []
+                    for field in first_author + additional_authors:
+                        subfields = dict(field_get_subfield_instances(field))
+                        if "i" not in subfields:
+                            missing_identifier_fields.append(field)
+                    if missing_identifier_fields:
+                        ticketid = create_authorlist_ticket(
+                            [("700", missing_identifier_fields)],
+                            identifier, "AUTHORS_long_list"
+                        )
+                        if ticketid:
+                            write_message("authorlist RT ticket %d submitted for %s" % (ticketid, identifier))
+                        else:
+                            all_err_msg.append("Error while submitting RT ticket for %s" % (identifier,))
                     record_add_fields(existing_record, '100', first_author)
                     record_add_fields(existing_record, '700', additional_authors)
 
@@ -1275,6 +1292,10 @@ def create_ticket(queue, subject, text=""):
     if bibcatalog_response != "":
         write_message("BibCatalog error: %s\n" % (bibcatalog_response,))
         return None
+
+    if CFG_INSPIRE_SITE and not CFG_SITE_URL.startswith("http://inspirehep.net"):
+        write_message("Non production instance detected - adding tickets to Test queue.")
+        queue = "Test"
 
     try:
         ticketid = BIBCATALOG_SYSTEM.ticket_submit(subject=subject, queue=queue)
