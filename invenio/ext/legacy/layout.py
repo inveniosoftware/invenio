@@ -189,7 +189,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         'ping',
         'admin2',
         'textmining',
-        'goto',
         'info',
     ]
 
@@ -212,7 +211,6 @@ class WebInterfaceInvenio(WebInterfaceDirectory):
         admin2='WebInterfaceAdminPages',
         textmining='WebInterfaceDocExtract',
         yourcomments='WebInterfaceYourCommentsPages',
-        goto='WebInterfaceGotoPages',
     )
 
     def __new__(cls):

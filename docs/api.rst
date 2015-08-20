@@ -53,7 +53,6 @@ Modules
 
    modules/jsonalchemy
    modules/knowledge
-   modules/redirector
 
 
 Utilities

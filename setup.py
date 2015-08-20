@@ -306,7 +306,6 @@ setup(
             'bibupload = invenio.legacy.bibupload.scripts.bibupload:main',
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
             'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
-            'gotoadmin = invenio.modules.redirector.scripts.redirector:main',
             'inveniogc = invenio.legacy.websession.scripts.inveniogc:main',
             'textmarc2xmlmarc = '
             ' invenio.legacy.bibrecord.scripts.textmarc2xmlmarc:main',
