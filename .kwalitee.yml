@@ -96,7 +96,6 @@ components:
 - textminer
 - tickets
 - travis
-- unapi
 - version
 
 excludes:
