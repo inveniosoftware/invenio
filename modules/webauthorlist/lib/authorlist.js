@@ -39,8 +39,8 @@ Array.prototype.remove = function( value ) {
 
 /*
 * Variable: Authorlist.CSS
-* Purpose:  Central enumeration and mapping for the CSS classes used in the 
-*           Authorlist prototype. Eases consistent look up and renaming if 
+* Purpose:  Central enumeration and mapping for the CSS classes used in the
+*           Authorlist prototype. Eases consistent look up and renaming if
 *           required.
 *
 */
@@ -49,7 +49,7 @@ Authorlist.CSS = {
     'Active'            : 'ui-state-active',
     'Loading'           : 'AuthorlistLoading',
     'Progress'          : 'AuthorlistProgress',
-    
+
 
     // Section classes
     'Affiliations'      : 'AuthorlistAffiliations',
@@ -62,11 +62,11 @@ Authorlist.CSS = {
     'Menu'              : 'AuthorlistMenu',
     'Paper'             : 'AuthorlistPaper',
     'Reference'         : 'AuthorlistReference',
-    
+
     // Input classes
     'Input'             : 'AuthorlistInput',
     'Label'             : 'AuthorlistLabel',
-    
+
     // Button classes
     'Add'               : 'AuthorlistAdd',
     'AddIcon'           : 'ui-icon-plusthick',
@@ -88,7 +88,7 @@ Authorlist.CSS = {
     'RemoveIcon'        : 'ui-icon-minusthick',
     'Save'              : 'AuthorlistSave',
     'SaveIcon'          : 'ui-icon-disk',
-    
+
     // Dialog classes
     'Bullet'            : 'AuthorlistBullet',
     'BulletIcon'        : 'ui-icon-carat-1-e',
@@ -115,7 +115,7 @@ Authorlist.DEFAULT_ERROR = [ 'Site is currently not reachable',
 
 /*
 * Variable: Authorlist.EMPTY
-* Purpose:  RegEx that defines that a field is considered to be empty if it 
+* Purpose:  RegEx that defines that a field is considered to be empty if it
 *           contains only whitespaces or no characters at all.
 *
 */
@@ -130,7 +130,7 @@ Authorlist.ID = /id=([^&$]+)/;
 
 /*
 * Variable: Authorlist.Indices
-* Purpose:  Names for the indices into the result arrays of the authors and 
+* Purpose:  Names for the indices into the result arrays of the authors and
 *           affiliations .fnGetData() arrays
 *
 */
@@ -146,7 +146,7 @@ Authorlist.INDICES = {
 
 /*
 * Variable: Authorlist.URLS
-* Purpose:  Sets up a mapping of commonly used URLS for the save and export 
+* Purpose:  Sets up a mapping of commonly used URLS for the save and export
 *           functionality.
 *
 */
@@ -192,7 +192,7 @@ function Authorlist( sId ) {
 
 /*
 * Function: fnGetData
-* Purpose:  Returns the whole content of the authorlist tool as an objects. It 
+* Purpose:  Returns the whole content of the authorlist tool as an objects. It
 *           includes the values of the paper information, the author SpreadSheet
 *           as well as the ones of the affiliations sheet.
 * Input(s): void
@@ -223,11 +223,11 @@ Authorlist.prototype.fnLoadData = function( oData ) {
 
 /*
 * Function: fnValidate
-* Purpose:  Returns a list of errors if the entered data in the author list 
-*           fields are in valid. This means it checks whether all required 
+* Purpose:  Returns a list of errors if the entered data in the author list
+*           fields are in valid. This means it checks whether all required
 *           fields are set as well as whether every link string is correct. If
 *           so the array with error message is empty.
-* Input(s): object:oData - the data of the authorlist as it can be obtained by 
+* Input(s): object:oData - the data of the authorlist as it can be obtained by
                            the fnGetData() call
 * Returns:  array string:asErrors - true if data is sane, else false
 *
@@ -256,7 +256,7 @@ Authorlist.prototype.fnValidate = function( oData ) {
 
 /*
 * Function: _fnBackToMainPage
-* Purpose:  Invoking this function sends the user immediately back to the main 
+* Purpose:  Invoking this function sends the user immediately back to the main
 *           page. All unchanged state is lost.
 * Input(s): void
 * Returns:  void
@@ -317,8 +317,8 @@ Authorlist.prototype._fnConfirm = function( fnCallback, sMessage ) {
 
 /*
 * Function: _fnCreateAffiliations
-* Purpose:  Creates all DOM-elements required for the affiliations - i.e. the 
-*           headline and the wrapping div - embeds a SpreadSheet instance in it 
+* Purpose:  Creates all DOM-elements required for the affiliations - i.e. the
+*           headline and the wrapping div - embeds a SpreadSheet instance in it
 *           and returns the created object afterwards.
 * Input(s): node:nParent - the node where the affiliations will be embedded
 * Returns:  object:oAffiliations - the SpreadSheet instance
@@ -365,8 +365,8 @@ Authorlist.prototype._fnCreateAffiliations = function( nParent ) {
 
 /*
 * Function: _fnCreateAuthors
-* Purpose:  Creates all DOM-elements required for the authors - i.e. the 
-*           headline and the wrapping div - embeds a SpreadSheet instance in it 
+* Purpose:  Creates all DOM-elements required for the authors - i.e. the
+*           headline and the wrapping div - embeds a SpreadSheet instance in it
 *           and returns the created object afterwards.
 * Input(s): node:nParent - the node where the authors will be embedded
 * Returns:  object:oAffiliations - the SpreadSheet instance
@@ -419,8 +419,8 @@ Authorlist.prototype._fnCreateAuthors = function( nParent ) {
 
 /*
 * Function: _fnCreateButton
-* Purpose:  Creates a button in the given parent element with the given label 
-*           and - if set - given icon and returns the new button. The button is 
+* Purpose:  Creates a button in the given parent element with the given label
+*           and - if set - given icon and returns the new button. The button is
 *           a jQuery UI button widget.
 * Input(s): node:nParent - the parent element
 *           string:sLabel - the button label
@@ -506,7 +506,7 @@ Authorlist.prototype._fnCreateHeadline = function( nParent, sTitle ) {
 
 /*
 * Function: _fnCreateMenu
-* Purpose:  Creates a new headline for the menu, creates the buttons and embeds 
+* Purpose:  Creates a new headline for the menu, creates the buttons and embeds
 *           it into the parent and returns the created node.
 * Input(s): node:nParent - where to append the paper information to
 * Returns:  node:nMenu - the menu node
@@ -533,7 +533,7 @@ Authorlist.prototype._fnCreateMenu = function( nParent ) {
     var nImport = this._fnCreateButton( nMenu, 'Import', Authorlist.CSS.ImportIcon );
     var nImportXML = this._fnCreateButton( nMenu, 'ImportXML', Authorlist.CSS.ImportIcon );
 
-    // Add classes   
+    // Add classes
     nBackButton.addClass( Authorlist.CSS.Back );
     nSave.addClass( Authorlist.CSS.Save );
     nDeleteButton.addClass( Authorlist.CSS.Delete );
@@ -573,7 +573,7 @@ Authorlist.prototype._fnCreateMenu = function( nParent ) {
 
 /*
 * Function: _fnCreatePaper
-* Purpose:  Creates a new headline for the paper information, creates a Paper 
+* Purpose:  Creates a new headline for the paper information, creates a Paper
 *           objects, embeds it into the parent and returns it.
 * Input(s): node:nParent - where to append the paper information to
 * Returns:  object:oPaper - the Paper instance.
@@ -591,7 +591,7 @@ Authorlist.prototype._fnCreatePaper = function( nParent ) {
 /*
 * Function: _fnDelete
 * Purpose:  Deletes the currently open sheet completely from the database. There
-*           is no backup copy or safety net. Sends the user on success back to 
+*           is no backup copy or safety net. Sends the user on success back to
 *           the main page or shows an error on failure.
 * Input(s): void
 * Returns:  void.
@@ -812,7 +812,7 @@ Authorlist.prototype._fnImportXMLDialog = function(nDialog, nOptions) {
                 if (jQuery.isEmptyObject(oData) || typeof oData.authors === 'undefined') {
                     var warning = 'There was no data to import from this file. \
                     Please make sure the file meets the requirements of the \
-                    specification: http://www.slac.stanford.edu/spires/hepnames/authors_xml';
+                    specification: http://inspirehep.net/info/HepNames/tools/authors_xml/index';
                     self._fnShowErrors(warning, []);
                     return;
                 }
@@ -880,7 +880,7 @@ Authorlist.prototype._fnCleanEmptyAffiliations= function( oData ) {
 
 /*
 * Function: _fnExport
-* Purpose:  Exports the data of the authorlist instance on the server as long as 
+* Purpose:  Exports the data of the authorlist instance on the server as long as
 *           there are no errors, which will be displayed in a dialog otherwise.
 * Input(s): node:nButton - the pressed export button
 * Returns:  void
@@ -945,8 +945,8 @@ Authorlist.prototype._fnProgress = function() {
 
 /*
 * Function: _fnProgressDone
-* Purpose:  Remove the progressing cursor from the body and the loading bar on 
-*           the upper 
+* Purpose:  Remove the progressing cursor from the body and the loading bar on
+*           the upper
 * Input(s): string:sId - the paper id to be loaded
 * Returns:  void
 *
@@ -960,8 +960,8 @@ Authorlist.prototype._fnProgressDone = function() {
 
 /*
 * Function: _fnRetrieve
-* Purpose:  Retrieves the data of the given paper id from the server an sets 
-*           them on success as the preset values of the table or shows an error 
+* Purpose:  Retrieves the data of the given paper id from the server an sets
+*           them on success as the preset values of the table or shows an error
 *           if a failure occures.
 * Input(s): string:sId - the paper id to be loaded
 * Returns:  void
@@ -989,7 +989,7 @@ Authorlist.prototype._fnRetrieve = function( sId ) {
 
 /*
 * Function: _fnSave
-* Purpose:  Saves the data of the authorlist instance on the server as long as 
+* Purpose:  Saves the data of the authorlist instance on the server as long as
 *           there are no errors, which will be displayed in a dialog otherwise.
 * Input(s): void
 * Returns:  void
@@ -1098,14 +1098,14 @@ Authorlist.prototype._fnShowErrors = function( sPreamble, asErrors, fnCallback) 
 
 /*
 * Function: _fnValidateAffiliations
-* Purpose:  Validates a subset - namely the affiliations - of the whole data of 
-*           the fnGetData() call in fnValidate. It makes sure that all acronyms 
-*           and names/addresses of an affiliation is set. At the same time it 
-*           generates errors messages if this is not the case and appends them 
+* Purpose:  Validates a subset - namely the affiliations - of the whole data of
+*           the fnGetData() call in fnValidate. It makes sure that all acronyms
+*           and names/addresses of an affiliation is set. At the same time it
+*           generates errors messages if this is not the case and appends them
 *           to the passed error messages array.
 * Input(s): array array object:aaoAffiliations - the affiliations data entry
 *           array string:asErrors - the error messages array
-* Returns:  array string:asAcronyms - an array containing the valid affiliation 
+* Returns:  array string:asAcronyms - an array containing the valid affiliation
                                       acronyms; used in _fnValidateAuthors()
 *
 */
@@ -1120,7 +1120,7 @@ Authorlist.prototype._fnValidateAffiliations = function( aaoAffiliations, asErro
         var sAcronym = aoAffiliation[ Authorlist.INDICES.Acronym ];
         var sAddress = aoAffiliation[ Authorlist.INDICES.Address ];
 
-        // If acronym field is empty save it in missing acronyms, otherwise save 
+        // If acronym field is empty save it in missing acronyms, otherwise save
         // it in present acronyms
         var bAcronymEmpty = sAcronym.match( Authorlist.EMPTY ) !== null;
         if ( bAcronymEmpty ) {
@@ -1161,10 +1161,10 @@ Authorlist.prototype._fnValidateAffiliations = function( aaoAffiliations, asErro
 
 /*
 * Function: _fnValidateAuthors
-* Purpose:  Validates a subset - namely the authors - of the whole data of the 
-*           fnGetData() call in fnValidate. It makes sure that all paper names 
-*           and affiliations are present and linkable. At the same time it 
-*           generates errors messages if this is not the case and appends them 
+* Purpose:  Validates a subset - namely the authors - of the whole data of the
+*           fnGetData() call in fnValidate. It makes sure that all paper names
+*           and affiliations are present and linkable. At the same time it
+*           generates errors messages if this is not the case and appends them
 *           to the passed error messages array.
 * Input(s): array array object:aaoAuthors - the authors data entry
             array string:asErrors - the error messages array
@@ -1222,12 +1222,12 @@ Authorlist.prototype._fnValidateAuthors = function( aaoAuthors, asAcronyms, asEr
 /*
 * Function: _fnValidateUmbrellas
 * Purpose:  Validates a subset - namely the umbrella organizatons - of the whole
-*           data as retrieved by the fnGetData() call in fnValidate. It ensures 
+*           data as retrieved by the fnGetData() call in fnValidate. It ensures
 *           that each umbrella acronym is present in the list of all acronyms.
-*           Otherwise is generates a error message and appends it to the error 
-*           messages array. 
+*           Otherwise is generates a error message and appends it to the error
+*           messages array.
 * Input(s): array array object:aaoAffiliations - the affiliations data entry
-*           array string:asAcronyms - an array containing all the acronyms in 
+*           array string:asAcronyms - an array containing all the acronyms in
 *                                     the affiliations table
 *           array string:asErrors - the error messages array
 * Returns:  void
@@ -1247,7 +1247,7 @@ Authorlist.prototype._fnValidateUmbrellas = function( aaoAffiliations, asAcronym
         }
     } );
 
-    // Invalid umbrellas present? 
+    // Invalid umbrellas present?
     if ( asInvalidUmbrellas.length > 0 ) {
         var sInvalidError = '<strong>Unknown</strong> umbrella organization in line(s): ';
         sInvalidError += '<strong>' + asInvalidUmbrellas.join( ',' ) + '</strong>';
@@ -1273,8 +1273,8 @@ AuthorlistIndex.TO_MILLIS = 1000;
 
 /*
 * Variable: AuthorlistIndex.CSS
-* Purpose:  Central enumeration and mapping for the CSS classes used in the 
-*           AuthorlistIndex prototype. Eases consistent look up and renaming if 
+* Purpose:  Central enumeration and mapping for the CSS classes used in the
+*           AuthorlistIndex prototype. Eases consistent look up and renaming if
 *           required.
 
 *
@@ -1306,7 +1306,7 @@ AuthorlistIndex.CSS = {
 
 * Function: AuthorlistIndex
 * Purpose:  Constructor
-* Input(s): string:sId - Id of the html element the AuthorlistIndex will be 
+* Input(s): string:sId - Id of the html element the AuthorlistIndex will be
 *                        embedded into (preferably a div).
 * Returns:  AuthorlistIndex instance when called with new, else undefined
 *
@@ -1324,8 +1324,8 @@ AuthorlistIndex.prototype._fnCreateButton = Authorlist.prototype._fnCreateButton
 
 /*
 * Function: _fnCloneClicked
-* Purpose:  Defines the callback for clicking on a clone link on a respective 
-*           paper container. Sends a request to the server to clone the paper 
+* Purpose:  Defines the callback for clicking on a clone link on a respective
+*           paper container. Sends a request to the server to clone the paper
 *           and displays it in the list on success or outputs an error.
 * Input(s): node:nParent - the paper container of the clicked clone link
 *           string:sId - the id of the clicked paper
@@ -1355,8 +1355,8 @@ AuthorlistIndex.prototype._fnCloneClicked = function( nPaper, sId ) {
 
 /*
 * Function: _fnCreatePaper
-* Purpose:  Creates a single paper record node based on the data passed in the 
-*           oPaper object. 
+* Purpose:  Creates a single paper record node based on the data passed in the
+*           oPaper object.
 * Input(s): string:sLabel - label string
 *           string:sDetail - the detail string
 * Returns:  node:nWrapper - the paper detail node
@@ -1386,8 +1386,8 @@ AuthorlistIndex.prototype._fnCreateEditLinks = function( nParent, sId ) {
 
 /*
 * Function: _fnCreateNewButton
-* Purpose:  Creates the new button that allows users to create a new document. 
-*           Refers the user to a clean new sheet. The button is placed on the 
+* Purpose:  Creates the new button that allows users to create a new document.
+*           Refers the user to a clean new sheet. The button is placed on the
 *           passed parent element.
 * Input(s): node:nParent - the parent node
 * Returns:  void
@@ -1408,8 +1408,8 @@ AuthorlistIndex.prototype._fnCreateNewButton = function( nParent ) {
 
 /*
 * Function: _fnCreatePaper
-* Purpose:  Creates a single paper record node based on the data passed in the 
-*           oPaper object. 
+* Purpose:  Creates a single paper record node based on the data passed in the
+*           oPaper object.
 * Input(s): string:sLabel - label string
 *           string:sDetail - the detail string
 * Returns:  node:nWrapper - the paper detail node
@@ -1470,7 +1470,7 @@ AuthorlistIndex.prototype._fnCreatePaper = function( oPaper ) {
 
 /*
 * Function: _fnCreatePaperDetail
-* Purpose:  Creates a paper detail consisting of a label as defined in the 
+* Purpose:  Creates a paper detail consisting of a label as defined in the
 *           string sLabel with the values sDetail
 * Input(s): string:sLabel - label string
 *           string:sDetail - the detail string
@@ -1492,10 +1492,10 @@ AuthorlistIndex.prototype._fnCreatePaperDetail = function( sLabel, sDetail ) {
 
 /*
 * Function: _fnDeleteClicked
-* Purpose:  Defines the callback for clicking a delete link. On confirmation by 
-*           the user a request is sent a request to the server to delete the 
-*           paper. Afterwards the paper is removed from the list of all papers. 
-*           If an error occurs during the communication an error message is 
+* Purpose:  Defines the callback for clicking a delete link. On confirmation by
+*           the user a request is sent a request to the server to delete the
+*           paper. Afterwards the paper is removed from the list of all papers.
+*           If an error occurs during the communication an error message is
 *           displayed instead.
 * Input(s): node:nParent - the paper container where the delete link was clicked
 *           string:sId - the id of the clicked paper
@@ -1528,7 +1528,7 @@ AuthorlistIndex.prototype._fnDeleteClicked = function( nPaper, sId ) {
 
 /*
 * Function: _fnDisplay
-* Purpose:  Displays each of the passed papers in the oData object on the 
+* Purpose:  Displays each of the passed papers in the oData object on the
 *           nParent element.
 * Input(s): object:oData - the object containing all papers
 *           node:nParent - the element to display the papers on
@@ -1555,7 +1555,7 @@ AuthorlistIndex.prototype._fnDisplay = function( oData, nParent ) {
 
 /*
 * Function: _fnDisplayClonedPaper
-* Purpose:  Displays a new paper that is added to the list of all papers on the 
+* Purpose:  Displays a new paper that is added to the list of all papers on the
 *           front page
 * Input(s): node:nParent - the node containing the to be cloned paper
 *           object:oData - the data of the newly cloned paper
@@ -1569,7 +1569,7 @@ AuthorlistIndex.prototype._fnDisplayClonedPaper = function( nParent, oData ) {
 
 /*
 * Function: _fnDisplayEmptyDatabase
-* Purpose:  Gives a short note to the user that there are no records in the 
+* Purpose:  Gives a short note to the user that there are no records in the
 *           database and therefore nothing else can be displayed.
 * Input(s): node:nParent - the node indicating where to display the message
 * Returns:  void
@@ -1611,7 +1611,7 @@ AuthorlistIndex.prototype._fnRemovePaper = function( nParent ) {
 
 /*
 * Function: _fnRetrieve
-* Purpose:  Retrieves all available papers from the database and displays them 
+* Purpose:  Retrieves all available papers from the database and displays them
 *           nicely on the webpage on success.
 * Input(s): node:nParent - the parent element where to display the records
 * Returns:  void
@@ -1704,7 +1704,7 @@ Paper.prototype.fnGetData = function() {
 
 /*
 * Function: fnLoadData
-* Purpose:  Loads data from the passed object (same layout as generated in 
+* Purpose:  Loads data from the passed object (same layout as generated in
 *           fnGetData()) as the preset values
 * Input(s): object:oData - the fnGetData()-like load object
 * Returns:  void
@@ -1735,7 +1735,7 @@ Paper.prototype._fnCreateButton = Authorlist.prototype._fnCreateButton;
 
 /*
 * Function: _fnCreateButtons
-* Purpose:  Creates the add and remove buttons next to the passed parent and 
+* Purpose:  Creates the add and remove buttons next to the passed parent and
 *           assigns callbacks to them.
 * Input(s): node:nParent - the parent node to which to append the buttons
 * Returns:  void

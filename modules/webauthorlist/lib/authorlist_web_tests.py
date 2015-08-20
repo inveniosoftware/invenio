@@ -247,7 +247,7 @@ class InvenioWebAuthorlistWebTest(InvenioWebTestCase):
         # remove timestamp
         downloaded = re.sub("\n    <cal:creationDate>[^<].*</cal:creationDate>", '', downloaded)
         valid = """<?xml version="1.0" encoding="utf-8"?>
-<collaborationauthorlist xmlns:cal="http://www.slac.stanford.edu/spires/hepnames/authors_xml/" xmlns:foaf="http://xmlns.com/foaf/0.1/">
+<collaborationauthorlist xmlns:cal="http://inspirehep.net/info/HepNames/tools/authors_xml/" xmlns:foaf="http://xmlns.com/foaf/0.1/">
     <cal:experimentNumber>text_experiment_number</cal:experimentNumber>
     <cal:organizations>
         <foaf:Organization id="o0">
@@ -316,8 +316,8 @@ class InvenioWebAuthorlistWebTest(InvenioWebTestCase):
         downloaded = fopen.read()
         valid = """<?xml version="1.0"?>
 
-\\author{Banana, J.$^{o0}$}  
-\\author{Apple, M.$^{o0}$}  
+\\author{Banana, J.$^{o0}$}
+\\author{Apple, M.$^{o0}$}
 \\affiliation{$^{o0}$ example 100}
 
 """

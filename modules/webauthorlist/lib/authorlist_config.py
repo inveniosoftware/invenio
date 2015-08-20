@@ -72,7 +72,7 @@ class JSON:
     NAME                   = 4
     DOMAIN                 = 5
     MEMBER                 = 6
-    SPIRES_ID              = 7
+    INSPIRE_ID             = 7
 
 
 class AuthorsXML:
@@ -81,7 +81,7 @@ class AuthorsXML:
     MEMBER                 = 'member'
     NONMEMBER              = 'nonmember'
     ORGANIZATION_ID        = 'o'
-    SPIRES                 = 'SPIRES'
+    INSPIRE                = 'INSPIRE'
     TIME_FORMAT            = '%Y-%m-%d_%H:%M'
 
 
