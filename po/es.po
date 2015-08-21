@@ -19,14 +19,15 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2015-03-03 18:01+0100\n"
-"PO-Revision-Date: 2013-02-25 11:40+0100\n"
-"Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
+"PO-Revision-Date: 2015-08-21 13:08+0200\n"
+"Last-Translator: Charlotte Iris Cattaneo <ciris.cattaneo@gmail.com>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
-"Language: \n"
+"Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
+"X-Generator: Poedit 1.8.3\n"
 
 #: modules/websearch/doc/search-guide.webdoc:456
 #: modules/websearch/doc/search-guide.webdoc:492
@@ -595,9 +596,8 @@ msgid "Export as"
 msgstr "Exportar como"
 
 #: modules/websearch/doc/hacking/search-services.webdoc:20
-#, fuzzy
 msgid "Search Services"
-msgstr "Consejos para la búsqueda"
+msgstr "Servicios de búsqueda"
 
 #: modules/websearch/doc/search-guide.webdoc:429
 #: modules/websearch/doc/search-guide.webdoc:464
@@ -1678,34 +1678,35 @@ msgid ""
 "After merging, only the primary profile will remain in the system, all other "
 "profiles will be automatically deleted.</br>"
 msgstr ""
+"Al combinar un conjunto de perfiles, toda la información almacenada será "
+"asignada al perfil primario. Esto incluye papeles, ids o citas. Después de "
+"la fusión, sólo el perfil principal permanecerá en el sistema, todos los "
+"otros perfiles se eliminarán de forma automática.</br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:754
-#, fuzzy
 msgid "Cancel merging"
-msgstr "Cancelado"
+msgstr "Cancelar unión"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:756
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3177
 msgid "Merge profiles"
-msgstr ""
+msgstr "Unir perfiles"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:963
-#, fuzzy
 msgid "Your options"
-msgstr "Opciones de préstamo"
+msgstr "Su opciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:973
 msgid "Claim for yourself"
-msgstr ""
+msgstr "Reclamación por usted mismo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:977
 msgid "Assign to"
-msgstr ""
+msgstr "Asignar a"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:981
-#, fuzzy
 msgid "Search for a person to assign the paper to"
-msgstr " Buscar a una persona para atribuirle el documento"
+msgstr "Buscar a una persona para atribuirle el papel"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1042
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1136
@@ -1733,17 +1734,15 @@ msgstr "Esconder las reivindicaciones satisfechas"
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1065
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1184
 msgid "Paper Short Info"
-msgstr ""
+msgstr "Papel Corto Info"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1066
-#, fuzzy
 msgid "Author Name"
-msgstr "Autor"
+msgstr "Nombre del Autor"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1067
-#, fuzzy
 msgid "Affiliation"
-msgstr "Afiliaciones"
+msgstr "Afiliacion"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1068
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
@@ -1754,9 +1753,8 @@ msgid "Date"
 msgstr "Fecha"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1069
-#, fuzzy
 msgid "Experiment"
-msgstr "experimento"
+msgstr "Experimento"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1070
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1185
@@ -1767,9 +1765,8 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1090
-#, fuzzy
 msgid "Not assigned"
-msgstr "¡No es mío!"
+msgstr "No asignado"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1106
 msgid "No status information found."
@@ -1788,24 +1785,20 @@ msgid "Review Transaction"
 msgstr "Revise la transacción"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1207
-#, fuzzy
 msgid "On all pages"
-msgstr " En todos los documentos: "
+msgstr "En todas las paginas."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1214
-#, fuzzy
 msgid "With selected do"
-msgstr "Fue rechazado el:"
+msgstr "Con seleccionado hacer"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1247
-#, fuzzy
 msgid "View name variants"
-msgstr "Variantes del nombre"
+msgstr "Ver variantes del nombre"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1357
-#, fuzzy
 msgid "The author has an internal ID!"
-msgstr "Ha habido un error interno"
+msgstr "El autor tiene un ID interno!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1375
 msgid "These records have been marked as not being from this person."
@@ -1846,9 +1839,8 @@ msgid " Commit this entire ticket"
 msgstr " Dar por buena toda esta tarea"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1452
-#, fuzzy
 msgid "No title available"
-msgstr "No disponible"
+msgstr "Ningún título disponible"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1528
 msgid "Make sure we match the right names!"
@@ -1865,17 +1857,19 @@ msgstr "En el proceso, se ignoraran los documentos sin un nombre seleccionado."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1540
 msgid "Claim for person with id"
-msgstr ""
+msgstr "Reclamar por persona con id"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1541
 msgid "This seems to be an empty profile without names associated to it yet"
-msgstr ""
+msgstr "Esto parece ser un perfil vacío sin nombres todavía asociados a el "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1542
 msgid ""
 "(the names will be automatically gathered when the first paper is claimed to "
 "this profile)."
 msgstr ""
+"(los nombres se recogerán automáticamente cuando se reclama el primer papel "
+"para este perfil)."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1544
 msgid "Select name for"
@@ -2052,29 +2046,24 @@ msgstr ""
 "restricciones de permisos se enviaran a un operador para la revisión manual."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1979
-#, fuzzy
 msgid "Create new profile"
-msgstr "Crear un nuevo tema"
+msgstr "Crear nuevo perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1987
-#, fuzzy
 msgid "Create a new Person"
-msgstr "Crear un nuevo grupo"
+msgstr "Crear nueva Persona"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1999
-#, fuzzy
 msgid "This is my profile"
-msgstr "¡Este es mi documento!"
+msgstr "Esto es mi perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2011
-#, fuzzy
 msgid "Assign paper"
-msgstr "Asignarlo a una otra persona"
+msgstr "Asignar papel"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2026
-#, fuzzy
 msgid "Add to merge list"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir a la lista de unión"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2110
 #, python-format
@@ -2083,6 +2072,9 @@ msgid ""
 "name, or check back in a few days as attributions are updated frequently.  "
 "Or you can send us feedback, at "
 msgstr ""
+"No tenemos una lista de publicaciones para '% s'. Trate de usar un nombre de "
+"autor menos específico, o comprobar de nuevo en unos días como atribuciones "
+"se actualizan con frecuencia. O usted puede enviarnos sus comentarios, por"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2187
 msgid "Recent Papers"
@@ -2106,19 +2098,21 @@ msgstr "No hay documentos conocidos de esta persona"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2325
 msgid "The following profile is the one you were viewing before logging in: "
-msgstr ""
+msgstr "El siguiente perfil es el que estaba viendo antes de iniciar sesión:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2334
 #, python-format
 msgid ""
 "Out of %s paper(s) claimed to your arXiv account, %s match this profile: "
-msgstr ""
+msgstr "De %s papel(es) reclamado(s) a su cuenta arxIV, %s coincidan con este perfil: "
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2353
 msgid ""
 "If none of the options suggested above apply, you can look for other "
 "possible options from the list below:"
 msgstr ""
+"Si ninguna de las opciones sugeridas anteriormente se aplica, puede buscar "
+"otras opciones posibles en la siguiente lista:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2921
 msgid ""
@@ -2135,6 +2129,8 @@ msgid ""
 "You have succesfully logged in via arXiv. </br> You can now manage your "
 "profile.</br>"
 msgstr ""
+"Ha iniciado sesión con éxito en medio de arXiv. </ br> Ahora puede "
+"administrar su perfil. </ br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2928
 msgid ""
@@ -2142,11 +2138,12 @@ msgid ""
 "color='red'>However the profile you are viewing is not your profile.</br></"
 "br></font>"
 msgstr ""
+"Ha iniciado sesión con éxito en medio de arXiv.</br><div> <font color='red'> "
+"Sin embargo, el perfil que está viendo no es su perfil. </br></br></font>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2930
-#, fuzzy
 msgid "Manage your profile"
-msgstr "Gestionar los ficheros de los documentos"
+msgstr "Gestionar su perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2933
 msgid ""
@@ -2154,19 +2151,21 @@ msgid ""
 "associated to a person yet. Please use the button below to choose your "
 "profile </br></br></font>"
 msgstr ""
+"Ha iniciado sesión con éxito, pero </br><div><font color='red'> todavía no "
+"esta asociado a una persona. Utilice el botón para cambiar de perfil </br></"
+"br></font>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2935
-#, fuzzy
 msgid "Choose your profile"
-msgstr "Escoja el fichero"
+msgstr "Escoja su perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2938
 msgid "Please log in through arXiv to manage your profile.</br>"
-msgstr ""
+msgstr "Por favor, ingrese a través arXiv para gestionar tu perfil.</br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2940
 msgid "Login into Inspire through arXiv.org"
-msgstr ""
+msgstr "Ingresa en Inspire a través arXiv.org"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2953
 msgid ""
@@ -2183,22 +2182,23 @@ msgid ""
 "This profile is already connected to the following ORCiD: <strong>%s</"
 "strong></br>"
 msgstr ""
+"Este perfil ya está conectado a la siguiente ORCiD: <strong>%s</strong></br>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2961
 msgid "Import your publications from ORCID"
-msgstr ""
+msgstr "Importa tus publicaciones de ORCID"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2962
 msgid "Visit your profile in ORCID"
-msgstr ""
+msgstr "Visita su perfil en ORCID"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2967
 msgid "Connect an ORCiD to this profile"
-msgstr ""
+msgstr "Conectar un ORCID a este perfil"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2970
 msgid "Suggest an ORCiD for this profile:"
-msgstr ""
+msgstr "Sugiera una ORCID para este perfil:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:2996
 msgid ""
@@ -2210,23 +2210,20 @@ msgid ""
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3001
-#, fuzzy
 msgid "Manage publication list"
-msgstr "Lista de publicaciones"
+msgstr "Gestionar lista de publicaciones"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3015
 msgid "<strong> Person identifiers, internal and external </strong>"
-msgstr ""
+msgstr "<strong> Identificadores persona, internos y externos </strong>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3023
-#, fuzzy
 msgid "add external id"
-msgstr "enlace externo"
+msgstr "añadir enlace externo"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3025
-#, fuzzy
 msgid "delete selected ids"
-msgstr "Recuperar las reseñas eliminadas"
+msgstr "eliminar los ids seleccionados"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3027
 msgid "Harvest missing external ids from claimed papers"
@@ -2234,20 +2231,19 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3030
 msgid "suggest external id to add"
-msgstr ""
+msgstr "Sugerir id externo para añadir"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3032
 msgid "suggest selected ids to delete"
-msgstr ""
+msgstr "sugerir ids seleccionados para eliminar"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3034
 msgid "suggest missing ids"
-msgstr ""
+msgstr "sugerir ids que faltan"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3062
-#, fuzzy
 msgid "Choose system"
-msgstr "Escoja la plantilla"
+msgstr "Escoja sistema"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3100
 msgid ""
@@ -2265,24 +2261,27 @@ msgid ""
 msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3133
-#, fuzzy
 msgid ""
 "The following publications have been successfully assigned to your profile:"
-msgstr "Ficheros que están correctamente en la cola:"
+msgstr ""
+"Las siguientes publicaciones han sido asignados correctamente a su perfil:"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3154
 msgid "Get help!"
-msgstr ""
+msgstr "¡Consigue ayuda!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3155
 msgid "<strong> Contact </strong>"
-msgstr ""
+msgstr "<strong> Contacto </strong>"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3156
 msgid ""
 "Please contact our user support in case you need help or you just want to "
 "suggest some new ideas. We will get back to you. </br>"
 msgstr ""
+"Por favor, póngase en contacto con nuestro soporte al usuario en caso de que "
+"necesite ayuda o simplemente quiere sugerir algunas ideas nuevas. Nos "
+"pondremos en contacto con usted."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:3170
 msgid ""
@@ -2339,7 +2338,6 @@ msgstr "Atención"
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2710
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2924
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2959
-#, fuzzy
 msgid "This page is not accessible directly."
 msgstr "No puede acceder a esta página directamente."
 
@@ -2349,7 +2347,7 @@ msgstr ""
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:2948
 msgid "Profile management"
-msgstr ""
+msgstr "gestión de Perfil"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:35
 msgid "Error: No BibCatalog system configured."
@@ -2403,28 +2401,25 @@ msgstr "Siguiente"
 #: modules/bibcirculation/lib/bibcirculation.py:100
 #: modules/bibcirculation/lib/bibcirculation.py:127
 msgid "Another user is waiting for this book."
-msgstr ""
+msgstr "Un otro usuario está esperando este libro."
 
 #: modules/bibcirculation/lib/bibcirculation.py:108
-#, fuzzy
 msgid "Your loan has been renewed with success."
-msgstr "Se ha cursado correctamente una nueva compra."
+msgstr "Su préstamo se ha renovado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculation.py:136
-#, fuzzy
 msgid "All loans have been renewed with success."
-msgstr "Su registrado correctamente la nueva petición."
+msgstr "Todos los préstamos se han renovado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculation.py:191
 #, python-format
 msgid "The publication date of this book is %s."
-msgstr ""
+msgstr "La fecha de publicación de este libro esta %s."
 
 #: modules/bibcirculation/lib/bibcirculation.py:194
 #: modules/bibcirculation/lib/bibcirculation.py:196
-#, fuzzy
 msgid "This book has no copies in the library. "
-msgstr "Este registro no tiene ejemplares."
+msgstr "Este libro no tiene copias en la biblioteca. "
 
 #: modules/bibcirculation/lib/bibcirculation.py:198
 msgid ""
@@ -2433,25 +2428,30 @@ msgid ""
 "your opinion and if we decide to buy the                   book, we will "
 "issue a loan for you as soon as it arrives and send it by internal mail."
 msgstr ""
+"Si crees que este libro es interesante, sugerir y decirnos por qué piensa "
+"que este libro es importante. La biblioteca tendrá en cuenta su opinión y si "
+"nos decidimos a comprar el libro, vamos a emitir un préstamo para usted tan "
+"pronto como llegue y enviarlo por correo interno."
 
 #: modules/bibcirculation/lib/bibcirculation.py:202
 msgid ""
 "In case we decide not to buy the book, we will offer you an interlibrary loan"
 msgstr ""
+"En caso decidimos no comprar el libro, le ofreceremos un préstamo "
+"interbibliotecario"
 
 #: modules/bibcirculation/lib/bibcirculation.py:268
 msgid "This book was suggested for acquisition"
-msgstr ""
+msgstr "Este libro fue sugerido para la adquisición"
 
 #: modules/bibcirculation/lib/bibcirculation.py:278
-#, fuzzy
 msgid "This item already has copies."
-msgstr "Este registro no tiene ejemplares."
+msgstr "Este artículo ya tiene ejemplares."
 
 #: modules/bibcirculation/lib/bibcirculation.py:552
 #: modules/bibcirculation/lib/bibcirculation.py:681
 msgid "You didn't accept the ILL conditions."
-msgstr ""
+msgstr "No ha aceptado las condiciones ILL."
 
 #: modules/bibcirculation/lib/bibcirculation.py:666
 #: modules/bibcirculation/lib/bibcirculation.py:710
@@ -2460,32 +2460,33 @@ msgid ""
 "Your ILL request has been registered and the document will be sent to you "
 "via internal mail."
 msgstr ""
+"Su solicitud ILL ha sido registrado y el documento será enviado a usted a "
+"través de correo interno."
 
 #: modules/bibcirculation/lib/bibcirculation.py:672
 #: modules/bibcirculation/lib/bibcirculation.py:717
-#, fuzzy
 msgid "ILL request for books confirmation"
-msgstr "Información del usuario"
+msgstr "Petición ILL para la confirmación de libros"
 
 #: modules/bibcirculation/lib/bibcirculation.py:723
 #: modules/bibcirculation/lib/bibcirculation.py:791
 msgid "It is not possible to validate your request."
-msgstr ""
+msgstr "No es posible validar su solicitud."
 
 #: modules/bibcirculation/lib/bibcirculation.py:724
 #: modules/bibcirculation/lib/bibcirculation.py:792
 msgid "Your office address is not available."
-msgstr ""
+msgstr "Su dirección de la oficina no está disponible."
 
 #: modules/bibcirculation/lib/bibcirculation.py:725
 #: modules/bibcirculation/lib/bibcirculation.py:793
-#, fuzzy, python-format
+#, python-format
 msgid "Please contact %(contact_email)s"
-msgstr "En caso de duda, póngase en contacto con %(x_admin_email)s"
+msgstr "Por favor, póngase en contacto con %(contact_email)s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:113
 msgid "Main navigation links"
-msgstr ""
+msgstr "Enlaces de navegación principales"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:114
 #: modules/webstyle/lib/webstyle_templates.py:92
@@ -2494,16 +2495,14 @@ msgid "Home"
 msgstr "Página principal"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:114
-#, fuzzy
 msgid "Loan"
-msgstr "Préstamos"
+msgstr "Préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:114
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5887
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8362
-#, fuzzy
 msgid "Return"
-msgstr "Devuelto"
+msgstr "Vuelta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:115
 #: modules/bibcirculation/lib/bibcirculation_templates.py:404
@@ -2512,9 +2511,8 @@ msgid "Request"
 msgstr "Petición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:115
-#, fuzzy
 msgid "Borrowers"
-msgstr "Usuario"
+msgstr "Prestatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:116
 #: modules/webbasket/lib/webbasket_templates.py:1199
@@ -2522,20 +2520,17 @@ msgid "Items"
 msgstr "Elementos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:148
-#, fuzzy
 msgid "Loan Lists"
-msgstr "Estado del préstamo"
+msgstr "Listas de préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:149
-#, fuzzy
 msgid "Last loans"
-msgstr "Última actualización"
+msgstr "Últimos préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:150
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2027
-#, fuzzy
 msgid "Overdue loans"
-msgstr "Cartas de reclamación"
+msgstr "Préstamos vencidos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:151
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2076
@@ -2554,12 +2549,11 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:154
 msgid "Others"
-msgstr ""
+msgstr "Otros"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:154
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14654
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15001
-#, fuzzy
 msgid "Libraries"
 msgstr "Bibliotecas"
 
@@ -2567,27 +2561,23 @@ msgstr "Bibliotecas"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5565
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5594
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5622
-#, fuzzy
 msgid "Add new library"
-msgstr "Añadir otro fichero"
+msgstr "Añadir nueva biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:156
-#, fuzzy
 msgid "Update info"
-msgstr "Actualizar"
+msgstr "Actualizar información"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:156
-#, fuzzy
 msgid "Vendors"
-msgstr "Proveedor"
+msgstr "Vendedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:157
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5970
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5998
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6025
-#, fuzzy
 msgid "Add new vendor"
-msgstr "Añadir otro fichero"
+msgstr "Añadir nuevo vendedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:195
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8121
@@ -2596,14 +2586,12 @@ msgid "ILL"
 msgstr "PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:196
-#, fuzzy
 msgid "Register Book request"
-msgstr "No hay peticiones."
+msgstr "Registrar solicitud de Libro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:197
-#, fuzzy
 msgid "Register Article"
-msgstr "Noticias"
+msgstr "Registrar artículo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:198
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:806
@@ -2611,20 +2599,19 @@ msgstr "Noticias"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4733
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4828
 msgid "Register purchase request"
-msgstr ""
+msgstr "Registrar solicitud de compra"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:200
-#, fuzzy
 msgid "ILL Lists"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "Listas ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:201
 msgid "Purchase"
-msgstr ""
+msgstr "Adquisición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:202
 msgid "Proposal"
-msgstr ""
+msgstr "Propuesta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:211
 #: modules/webstyle/lib/webstyle_templates.py:495
@@ -2633,38 +2620,32 @@ msgid "Help"
 msgstr "Ayuda"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:212
-#, fuzzy
 msgid "Admin guide"
-msgstr "Páginas de administración"
+msgstr "Guía de administración"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:213
 msgid "Contact Support"
-msgstr ""
+msgstr "Contacto Soporte"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:269
-#, fuzzy
 msgid "No messages to be displayed"
-msgstr "El mensaje no se ha podido suprimir."
+msgstr "No hay mensajes a visualizar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:301
-#, fuzzy
 msgid "This record does not exist."
-msgstr "La página solicitada no existe"
+msgstr "No existe este registro."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:305
-#, fuzzy
 msgid "This record has no copies."
-msgstr "Este registro no tiene ejemplares."
+msgstr "Este registro no tiene copias."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:312
-#, fuzzy
 msgid "Add a new copy"
-msgstr "Añadir otra copia"
+msgstr "Añadir una nueva copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:325
-#, fuzzy
 msgid "ILL services"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "Servicios ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:329
 #, python-format
@@ -2989,52 +2970,52 @@ msgstr "Atrás"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:501
 msgid "Suggest"
-msgstr ""
+msgstr "Sugerir"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:509
-#, fuzzy
 msgid "This item is not for loan."
-msgstr "Este elemento no tiene ejemplares."
+msgstr "Este artículo no es para préstamo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:514
 msgid "You already have a request on, or are in possession of this document."
-msgstr ""
+msgstr "Usted ya tiene una solicitud en, o está en posesión de este documento."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:519
 msgid ""
 "Your request has been registered and the document will be sent to you via "
 "internal mail."
 msgstr ""
+"Su solicitud ha sido registrada y el documento será enviado a usted a través "
+"de correo interno."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:524
-#, fuzzy
 msgid "Your request has been registered."
-msgstr "Su mensaje se ha enviado al revisor."
+msgstr "Su solicitud ha sido registrada."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:529
 #: modules/bibcirculation/lib/bibcirculation_templates.py:537
 msgid "It is not possible to validate your request. "
-msgstr ""
+msgstr "No es posible validar su solicitud."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:531
 #: modules/bibcirculation/lib/bibcirculation_templates.py:539
-#, fuzzy, python-format
+#, python-format
 msgid "Please contact %(librarian_email)s"
-msgstr "En caso de duda, póngase en contacto con %(x_admin_email)s"
+msgstr "Por favor, póngase en contacto con %(librarian_email)s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:545
 #: modules/bibcirculation/lib/bibcirculation_templates.py:550
 msgid "Thank you for your suggestion. We will get back to you shortly."
 msgstr ""
+"Gracias por su sugerencia. Nos pondremos en contacto con usted en breve."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:555
-#, fuzzy
 msgid "Your purchase request has been registered."
-msgstr "Su registrado correctamente la nueva petición."
+msgstr "Su solicitud de compra ha sido registrada."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:560
 msgid "Server busy. Please, try again in a few seconds."
-msgstr ""
+msgstr "Servidor ocupado. Por favor, intenta de nuevo en unos pocos segundos."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:584
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8396
@@ -3159,13 +3140,12 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:752
-#, fuzzy
 msgid "Your Proposals"
-msgstr "Sus grupos"
+msgstr "Sus Propuestas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:753
 msgid "You did not propose any acquisitions."
-msgstr ""
+msgstr "Usted no propuso ninguna adquisición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:755
 #: modules/bibcirculation/lib/bibcirculation_templates.py:817
@@ -3188,13 +3168,12 @@ msgstr "Volver al inicio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:776
 msgid "Your Proposals under review"
-msgstr ""
+msgstr "Sus Propuestas en examen"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:778
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13777
-#, fuzzy
 msgid "Proposal date"
-msgstr "Fecha de llegada"
+msgstr "Fecha de propuesta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:853
 msgid "Loaned"
@@ -3216,7 +3195,7 @@ msgstr "Renovaciones"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:933
 msgid "Why do you suggest this book for the library?"
-msgstr ""
+msgstr "¿Por qué sugiere este libro para la biblioteca?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:982
 msgid "Enter your period of interest"
@@ -3273,20 +3252,19 @@ msgid "Confirm"
 msgstr "Confirmar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1037
-#, fuzzy, python-format
+#, python-format
 msgid "You can see your library account %(x_url_open)shere%(x_url_close)s."
-msgstr "Si lo desea puede %(x_url_open)sidentificarse aquí%(x_url_close)s."
+msgstr ""
+"Usted puede ver su cuenta de la biblioteca %(x_url_open)saquí%(x_url_close)s."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1115
-#, fuzzy
 msgid "Delete this request?"
-msgstr "Eliminar las reseñas seleccionadas"
+msgstr "Eliminar esta petición?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1116
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1373
-#, fuzzy
 msgid "Request not deleted."
-msgstr "Fecha de petición"
+msgstr "Solicite no eliminado."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1137
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1329
@@ -3356,11 +3334,11 @@ msgstr "Nombre"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1166
 msgid "Vol."
-msgstr ""
+msgstr "Vol."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1167
 msgid "Ed."
-msgstr ""
+msgstr "Ed."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1229
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5108
@@ -3385,9 +3363,8 @@ msgstr "Suprimir"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1231
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5753
-#, fuzzy
 msgid "Create loan"
-msgstr "Crear otro"
+msgstr "Crear préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1422
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5115
@@ -3395,9 +3372,8 @@ msgstr "Crear otro"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:657
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:667
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:758
-#, fuzzy
 msgid "Create Loan"
-msgstr "Crear otro"
+msgstr "Crear préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1517
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1756
@@ -3414,18 +3390,21 @@ msgid "OK"
 msgstr "De acuerdo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1560
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, with "
 "barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has been "
 "returned with success."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"El elemento %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, con el "
+"código de barras %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, "
+"se ha vuelto con éxito"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1574
 msgid "The next(pending) request on the returned book is shown below."
 msgstr ""
+"La siguiente solicitud (pendiente) en el libro devuelto se muestra a "
+"continuación."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1633
 msgid "Loan informations"
@@ -3564,9 +3543,8 @@ msgid "Select request"
 msgstr "Escoja petición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1739
-#, fuzzy
 msgid "Return another book"
-msgstr "Fecha de devolución"
+msgstr "Vuelva otro libro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1777
 msgid "Welcome to Invenio BibCirculation Admin"
@@ -3588,14 +3566,12 @@ msgstr "Bienvenidos a la administración BibCirculation de Invenio"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11311
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11318
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11325
-#, fuzzy
 msgid "id"
-msgstr "Esconder"
+msgstr "id"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1816
-#, fuzzy
 msgid "register new borrower"
-msgstr "Escriba la nota"
+msgstr "registrar nuevo prestatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1847
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2186
@@ -3648,9 +3624,8 @@ msgstr "Buscar usuario por"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14928
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15478
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15797
-#, fuzzy
 msgid "name"
-msgstr "Alias"
+msgstr "nombre"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1848
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2166
@@ -3694,7 +3669,6 @@ msgstr "Alias"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14928
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15479
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15798
-#, fuzzy
 msgid "email"
 msgstr "Dirección electrónica"
 
@@ -3711,9 +3685,8 @@ msgstr "Dirección electrónica"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4495
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4714
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4719
-#, fuzzy
 msgid "0 borrowers found."
-msgstr "No se ha encontrado ningún usuario."
+msgstr "No se ha encontrado ningún prestatario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1901
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:257
@@ -3721,9 +3694,8 @@ msgstr "No se ha encontrado ningún usuario."
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1428
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4490
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4714
-#, fuzzy
 msgid "Search by CCID."
-msgstr "Buscar biblioteca por"
+msgstr "Buscar por CCID."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1905
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:261
@@ -3732,7 +3704,7 @@ msgstr "Buscar biblioteca por"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4494
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4718
 msgid "Register new borrower."
-msgstr ""
+msgstr "Registrar nuevo prestatario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1931
 msgid "Borrower(s)"
@@ -3743,9 +3715,8 @@ msgstr "Usuarios"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6151
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6760
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10251
-#, fuzzy
 msgid "Search item by"
-msgstr "Buscar proveedor por"
+msgstr "Buscar artículo por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2006
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3383
@@ -3783,23 +3754,22 @@ msgstr "Detalles del elemento"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2952
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5251
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10251
-#, fuzzy
 msgid "barcode"
 msgstr "Código de barras"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2006
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5251
 msgid "recid"
-msgstr ""
+msgstr "recid"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2062
 msgid "0 item(s) found."
 msgstr "No se ha encontrado ninguno."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2087
-#, fuzzy, python-format
+#, python-format
 msgid "%i items found."
-msgstr "%i elementos encontrados"
+msgstr "%i elementos encontrados."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2087
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2727
@@ -3822,9 +3792,8 @@ msgstr "Título"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2089
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10347
-#, fuzzy
 msgid "# copies"
-msgstr "Ejemplares"
+msgstr "# ejemplares"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2159
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3408
@@ -3833,9 +3802,8 @@ msgstr "Ejemplares"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9844
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10733
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11277
-#, fuzzy
 msgid "Search user by"
-msgstr "Buscar proveedor por"
+msgstr "Buscar usuario por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2265
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3514
@@ -3873,7 +3841,7 @@ msgstr "Id"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7885
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10015
 msgid "CCID"
-msgstr ""
+msgstr "CCID"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2305
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2488
@@ -3993,9 +3961,8 @@ msgid "Phone"
 msgstr "Teléfono"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2365
-#, fuzzy
 msgid "Enter the barcode"
-msgstr "Período de interés"
+msgstr "Introduzca el código de barras"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2366
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2559
@@ -4024,9 +3991,8 @@ msgid "Continue"
 msgstr "Continuar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2370
-#, fuzzy
 msgid "See all loans"
-msgstr "Renovar todos los préstamos"
+msgstr "Ver todos los préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2495
 msgid "List of borrowed books"
@@ -4084,9 +4050,8 @@ msgstr "Escriba notas"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2936
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2944
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2952
-#, fuzzy
 msgid "Any field"
-msgstr "cualquier campo"
+msgstr "Cualquier campo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3013
 msgid "Select item"
@@ -4130,13 +4095,12 @@ msgstr "Su registrado correctamente la nueva petición."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3897
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3904
 msgid "ccid"
-msgstr ""
+msgstr "ccid"
 
 # Una?
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3966
-#, fuzzy
 msgid "Please select one borrower to continue."
-msgstr "Seleccione uno o más:"
+msgstr "Por favor, seleccione un prestatario para continuar."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4213
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4288
@@ -4152,7 +4116,7 @@ msgstr "Prestado en"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4217
 msgid "This note will be associated to this new loan, not to the borrower."
-msgstr ""
+msgstr "Esta nota se asociará a este nuevo préstamo, no al prestatario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4293
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5837
@@ -4177,9 +4141,8 @@ msgid "The due date has been updated. New due date: %s"
 msgstr "Se ha actualizado la fecha de devolución.  Ahora es: %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4385
-#, fuzzy
 msgid "Back to borrower's loans"
-msgstr "Volver a los préstamos"
+msgstr "Volver a los préstamos del prestatario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4420
 msgid "Notification has been sent!"
@@ -4264,14 +4227,12 @@ msgid "Edit this record"
 msgstr "Edite este registro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5232
-#, fuzzy
 msgid "Book Cover"
-msgstr "Título del libro"
+msgstr "Tapa del libro"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5250
-#, fuzzy
 msgid "Search another item by"
-msgstr "Buscar proveedor por"
+msgstr "Buscar otro artículo por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5291
 msgid "Additional details"
@@ -4291,7 +4252,6 @@ msgstr "Préstamos"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5504
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5885
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8360
-#, fuzzy
 msgid "Select an action"
 msgstr "Seleccionar una acción"
 
@@ -4313,9 +4273,8 @@ msgstr "Actualizar"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5464
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5485
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5506
-#, fuzzy
 msgid "Add similar copy"
-msgstr "similitud de palabras"
+msgstr "Añadir ejemplares similares"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5444
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5465
@@ -4358,9 +4317,8 @@ msgstr "Nuevo préstamo"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5488
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5509
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2766
-#, fuzzy
 msgid "Delete copy"
-msgstr "Suprimir el grupo"
+msgstr "Suprimir ejemplar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5636
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2558
@@ -4375,9 +4333,9 @@ msgid "Add new copy"
 msgstr "Añadir otra copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5637
-#, fuzzy, python-format
+#, python-format
 msgid "Hold requests and loans overview on %(date)s"
-msgstr "Reservas y préstamos para"
+msgstr "Mantenga las solicitudes y préstamos visión general sobre %(date)s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5639
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5643
@@ -4413,9 +4371,8 @@ msgstr "Préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5641
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5645
-#, fuzzy
 msgid "Purchases"
-msgstr "Nueva petición"
+msgstr "Adquisiciónes"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5643
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8125
@@ -4430,9 +4387,8 @@ msgid "There are no requests."
 msgstr "No hay peticiones."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5718
-#, fuzzy
 msgid "Item Desc"
-msgstr "Elementos"
+msgstr "Elementos Desc"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5794
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8265
@@ -4480,9 +4436,8 @@ msgstr "Ver notas"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8371
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1007
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1049
-#, fuzzy
 msgid "Change due date"
-msgstr "Nueva fecha de devolución: "
+msgstr "Cambiar de devolución"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6075
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8559
@@ -4492,14 +4447,13 @@ msgstr "Devuelto el"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6151
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6760
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10251
-#, fuzzy
 msgid "RecId/Item details"
-msgstr "Detalles del elemento"
+msgstr "Detalles RecId/Item"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6209
-#, fuzzy, python-format
+#, python-format
 msgid "%(nb_items_found)i items found"
-msgstr "%i elementos encontrados"
+msgstr "%(nb_items_found)i elementos encontrados"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6502
 msgid "Update copy information"
@@ -4509,9 +4463,8 @@ msgstr "Actualizar información de la copia"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6718
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7264
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7355
-#, fuzzy
 msgid "Expected arrival date"
-msgstr "Fecha prevista"
+msgstr "Fecha prevista de llegada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6710
 msgid "New copy information"
@@ -4528,14 +4481,11 @@ msgid "New copy details"
 msgstr "Detalles de la nueva copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7397
-#, fuzzy, python-format
+#, python-format
 msgid "A %(x_url_open)snew copy%(x_url_close)s has been added."
-msgstr ""
-"Debería %(x_url_open)saceptar o rechazar%(x_url_close)s la petición de este "
-"usuario."
+msgstr "A %(x_url_open)snuevo ejemplar %(x_url_close)s añadido."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7421
-#, fuzzy
 msgid "Back to the record"
 msgstr "Volver al registro"
 
@@ -4593,7 +4543,7 @@ msgstr "Peticiones"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8123
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8132
 msgid "Proposals"
-msgstr ""
+msgstr "Propuestas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8193
 msgid "Request option(s)"
@@ -4655,31 +4605,28 @@ msgid "Notification"
 msgstr "Notificación"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8710
-#, fuzzy
 msgid "Loan recall"
-msgstr "Enviar reclamación"
+msgstr "Reclamación préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8711
-#, fuzzy
 msgid "ILL recall"
-msgstr "Enviar reclamación"
+msgstr "reclamación ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8712
 msgid "Proposal-accept"
-msgstr ""
+msgstr "Propuesta-aceptar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8713
 msgid "Proposal-refuse"
-msgstr ""
+msgstr "Propuesta-negar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8714
-#, fuzzy
 msgid "Purchase-received-cash"
-msgstr "Nueva petición"
+msgstr "Compra-recibido-dinero en efectivo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8715
 msgid "Purchase-received-TID"
-msgstr ""
+msgstr "Compra-recibido-TID"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8716
 msgid "Load"
@@ -4702,9 +4649,8 @@ msgid "Borrower information"
 msgstr "Información del usuario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9206
-#, fuzzy
 msgid "ILL ID"
-msgstr "Código de petición PI"
+msgstr "ILL TID"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9208
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13526
@@ -4804,30 +4750,31 @@ msgid "Additional comments"
 msgstr "Comentario adicionales"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9463
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "I accept the %(x_url_open)sconditions%(x_url_close)s of the service in "
 "particular the return of books in due time."
 msgstr ""
-"Acepto los %s del servicio, en particular devolver los libros a tiempo."
+"Acepto las %(x_url_open)scondiciones%(x_url_close)s del servicio, en "
+"particular devolver los libros a tiempo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9464
 msgid "I want this edition only."
 msgstr "Sólo quiero esta edición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9495
-#, fuzzy, python-format
+#, python-format
 msgid "Check your library account %(here_link)s."
-msgstr "Puede ver sus préstamos "
+msgstr "Revise su cuenta de la biblioteca %(here_link)s."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9497
 msgid "here"
 msgstr "aquí"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9531
-#, fuzzy, python-format
+#, python-format
 msgid "Book does not exist in %(CFG_SITE_NAME)s"
-msgstr "Este libro no existe en Invenio."
+msgstr "Este libro no existe en %(CFG_SITE_NAME)s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9533
 msgid "Please fill the following form."
@@ -4890,13 +4837,13 @@ msgid "Period of interest (To)"
 msgstr "Período de interés (hasta)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9693
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Borrower accepts the %(x_url_open)sconditions%(x_url_close)s of the service "
 "in particular the return of books in due time."
 msgstr ""
-"El lector acepta el %s del servicio, en particular devolver los libros en el "
-"plazo."
+"Prestatario acepta las %(x_url_open)scondiciones%(x_url_close)s del "
+"servicio, en particular devolver los libros en el plazo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9694
 msgid "Borrower wants this edition only."
@@ -4911,13 +4858,13 @@ msgid "Only this edition"
 msgstr "Solamente esta edición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10233
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Check if the book already exists on %(CFG_SITE_NAME)s, before sending your "
 "ILL request."
 msgstr ""
-"Compruebe si el libro existe en Invenio antes de solicitar una petición de "
-"PI."
+"Compruebe si el libro ya existe en I%(CFG_SITE_NAME)s antes de enviar una "
+"solicitud de ILL."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10305
 msgid "0 items found."
@@ -4976,6 +4923,8 @@ msgid ""
 "you                                         as soon as the document is "
 "received."
 msgstr ""
+"Nosotros procesaremos su pedido de inmediato y nos pondremos en contacto con "
+"usted tan pronto como recibimos el documento."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10916
 msgid ""
@@ -4984,66 +4933,62 @@ msgid ""
 "accounts will be added to the Library catalogue,             with the "
 "indication of the purchaser."
 msgstr ""
+"De acuerdo con una decisión del Consejo de Política de Información "
+"Científica, los libros comprados con códigos presupuestarios distintos de "
+"cuentas de Equipo se añadirán al catálogo Biblioteca, con la indicación del "
+"comprador."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10934
-#, fuzzy
 msgid "Document details"
-msgstr "Más detalles"
+msgstr "Detalles del documento"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10970
-#, fuzzy
 msgid "Document type"
-msgstr "Tipo de documento desconocido"
+msgstr "Tipo de documento"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11061
-#, fuzzy
 msgid "This edition only"
-msgstr "Sólo quiero esta edición."
+msgstr "Sólo esta edición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11063
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11225
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12780
 msgid "Standard number"
-msgstr ""
+msgstr "Número estándar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11133
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11255
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12844
-#, fuzzy
 msgid "Request details"
-msgstr "Detalles de la petición PI"
+msgstr "Detalles de la petición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11134
 msgid "Cash"
-msgstr ""
+msgstr "Dinero en efectivo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11474
-#, fuzzy
 msgid "Search ILL request by"
-msgstr "Nueva petición de PI"
+msgstr "Busca petición de ILL por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11474
-#, fuzzy
 msgid "ILL RecId/Item details"
-msgstr "Detalles del elemento"
+msgstr "Detalles ILL RecId/Item"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11475
-#, fuzzy
 msgid "ILL request id"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "ILL solicitud id"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11475
 msgid "cost"
-msgstr ""
+msgstr "costo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11475
 msgid "notes"
 msgstr "notes"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11514
-#, fuzzy
 msgid "date restriction"
-msgstr "Actualizar los parámetros"
+msgstr "restricción de fecha"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11896
 msgid "Periodical Title"
@@ -5113,18 +5058,16 @@ msgid "Cost"
 msgstr "Coste"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12830
-#, fuzzy
 msgid "Date of request"
-msgstr "Nueva petición"
+msgstr "Fecha de solicitud"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12953
 msgid "Vendor"
 msgstr "Proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13416
-#, fuzzy
 msgid "Notes about ILL"
-msgstr "Notas sobre este PI"
+msgstr "Notas sobre ILL"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13529
 msgid "Interest from"
@@ -5139,57 +5082,49 @@ msgid "select"
 msgstr "seleccionar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13600
-#, fuzzy
 msgid "Inter library loan recall: "
-msgstr "Peticiones de préstamo interbibliotecario de libros"
+msgstr "Reclamación préstamo interbibliotecario de libros: "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13605
-#, fuzzy
 msgid "Send Recall"
-msgstr "Enviar reclamación"
+msgstr "Enviar Reclamación"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13659
-#, fuzzy
 msgid "No. purchases"
-msgstr "Ejemplares"
+msgstr "No. adquisiciónES"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13664
-#, fuzzy
 msgid "Date requested"
-msgstr "Nueva petición"
+msgstr "Fecha requerida"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13778
 msgid "Proposer"
-msgstr ""
+msgstr "Proponer"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13843
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13938
-#, fuzzy
 msgid "Create ILL req"
-msgstr "Crear otro"
+msgstr "Crear  ILL req"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13893
 msgid "Req.ID"
-msgstr ""
+msgstr "Req.ID"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13894
-#, fuzzy
 msgid "Requester"
-msgstr "Petición"
+msgstr "Solicitante"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13895
-#, fuzzy
 msgid "Period of Interest: From"
-msgstr "Período de interés - Desde"
+msgstr "Período de interés: Desde"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13896
-#, fuzzy
 msgid "Period of Interest: To"
-msgstr "Período de interés - Hasta"
+msgstr "Período de interés: Hasta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13935
 msgid "Go to Proposal"
-msgstr ""
+msgstr "Ir a Propuesta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13981
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14175
@@ -5200,9 +5135,8 @@ msgstr "Notas sobre esta biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14030
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14253
-#, fuzzy
 msgid "Library to be deleted"
-msgstr "Notes de la biblioteca"
+msgstr "Biblioteca a eliminar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14037
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14260
@@ -5214,29 +5148,25 @@ msgstr "Número de elementos"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14075
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5855
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5902
-#, fuzzy
 msgid "Search library"
-msgstr "Buscar biblioteca por"
+msgstr "Buscar biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14113
-#, fuzzy
 msgid "Select library"
-msgstr "Buscar biblioteca por"
+msgstr "Selecionar biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14206
 msgid "Please, note that this action is NOT reversible"
-msgstr ""
+msgstr "Por favor, tenga en cuenta que esta acción NO es reversible"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14265
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14326
-#, fuzzy
 msgid "Library not found"
-msgstr "Notes de la biblioteca"
+msgstr "Biblioteca no encontrada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14314
-#, fuzzy
 msgid "Merged library"
-msgstr "Buscar biblioteca por"
+msgstr "Biblioteca combinada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14416
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14518
@@ -5263,9 +5193,8 @@ msgid "The information has been updated."
 msgstr "Se ha actualizado la información."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14983
-#, fuzzy
 msgid "0 libraries found."
-msgstr "No se ha encontrado ninguna biblioteca"
+msgstr "0 bibliotecas encontradas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15120
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5432
@@ -5274,7 +5203,7 @@ msgstr "Detalles de la biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15129
 msgid "Duplicated library?"
-msgstr ""
+msgstr "Biblioteca duplicada?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15193
 msgid "Notes about library"
@@ -5319,9 +5248,8 @@ msgid "Add notes"
 msgstr "Añadir notas"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:401
-#, fuzzy
 msgid "This book has been sent to you:"
-msgstr "Se le ha enviado este libro..."
+msgstr "Se le ha enviado este libro:"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:428
 msgid "Editor"
@@ -5354,30 +5282,29 @@ msgid "You are not authorized to use ill."
 msgstr "No está autorizado a hacer uso del préstamo interbibliotecario."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:534
-#, fuzzy
 msgid "Interlibrary loan request for articles"
-msgstr "Peticiones de préstamo interbibliotecario de libros"
+msgstr "Peticiones de préstamo interbibliotecario para articúlos"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:606
 msgid "Wrong user id"
-msgstr ""
+msgstr "ID de usuario incorrecto"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:687
-#, fuzzy
 msgid "Purchase request"
-msgstr "Nueva petición"
+msgstr "Petición de adquisición"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:760
 msgid ""
 "Payment method information is mandatory.             Please, type your "
 "budget code or tick the 'cash' checkbox."
 msgstr ""
+"Información de la forma de pago es obligatorio. Por favor, escriba su código "
+"presupuestario o marque la casilla de verificación 'efectivo'."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:797
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4816
-#, fuzzy
 msgid "Your book purchase request"
-msgstr "Nueva petición"
+msgstr "Su solicitud de adquisición de libros"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:853
 #: modules/webcomment/lib/webcomment.py:1861
@@ -5406,20 +5333,17 @@ msgid "Requested record does not seem to exist."
 msgstr "El registro solicitado no existe."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:197
-#, fuzzy
 msgid "BibCirculation Admin"
-msgstr "Ejecutar BibCirculation"
+msgstr "Administrador BibCirculation"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:236
-#, fuzzy
 msgid "Empty string. Please, try again."
-msgstr "Vuélvalo a intentar."
+msgstr "String vacío. Por favor, vuelva a intentarlo."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:245
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:490
-#, fuzzy
 msgid "Loan on desk"
-msgstr "Notas de préstamo"
+msgstr "Préstamo en el escritorio"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:282
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:318
@@ -5427,7 +5351,7 @@ msgstr "Notas de préstamo"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:516
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:547
 msgid "Circulation management"
-msgstr ""
+msgstr "Gestión de Circulación"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:367
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:644
@@ -5457,39 +5381,41 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5881
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6072
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6272
-#, fuzzy
 msgid "Please, try again."
-msgstr "Vuélvalo a intentar."
+msgstr "Por favor, vuélvalo a intentar."
 
 # Una?
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:377
-#, fuzzy
 msgid "You must select one borrower."
-msgstr "Seleccione uno o más:"
+msgstr "Debe seleccionar un prestatario."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:393
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(x_strong_tag_open)sWARNING:%(x_strong_tag_close)s Note that item "
 "%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s status is "
 "%(x_strong_tag_open)s%(x_status)s%(x_strong_tag_close)s"
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"%(x_strong_tag_open)sADVERTENCIA:%(x_strong_tag_close)s Tenga en cuenta la "
+"que el elemento %(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s el estado es %(x_strong_tag_open)s%(x_status)s"
+"%(x_strong_tag_close)s"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:401
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:898
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(x_strong_tag_open)sWARNING:%(x_strong_tag_close)s Note that item "
 "%(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s location is "
 "%(x_strong_tag_open)s%(x_location)s%(x_strong_tag_close)s"
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"%(x_strong_tag_open)sADVERTENCIA:%(x_strong_tag_close)s Tenga en cuenta la "
+"ubicación del elemento %(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s es %(x_strong_tag_open)s%(x_location)s"
+"%(x_strong_tag_close)s"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:405
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Another user is waiting for the book: %(x_strong_tag_open)s%(x_title)s"
 "%(x_strong_tag_close)s. \n"
@@ -5497,22 +5423,24 @@ msgid ""
 " If you want continue with this loan choose "
 "%(x_strong_tag_open)s[Continue]%(x_strong_tag_close)s."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"Un otro usuario está esperando el libro %(x_strong_tag_open)s%(x_title)s"
+"%(x_strong_tag_close)s. \n"
+"\n"
+"Si desea continuar con este préstamo elegir "
+"%(x_strong_tag_open)s[Continue]%(x_strong_tag_close)s."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:413
-#, fuzzy
 msgid "Empty barcode."
-msgstr "Código de barras"
+msgstr "Código de barras vacío."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:483
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The items with barcode %(x_strong_tag_open)s%(x_barcode)s"
 "%(x_strong_tag_close)s are already on loan."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"Los artículos con el código de barras%(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s ya están en préstamo."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:501
 #, python-format
@@ -5520,79 +5448,83 @@ msgid ""
 "The given due date %(x_strong_tag_open)s%(x_date)s%(x_strong_tag_close)s is "
 "not a valid date or date format"
 msgstr ""
+"La fecha de vencimiento determinada %(x_strong_tag_open)s%(x_date)s"
+"%(x_strong_tag_close)s no es un formato de fecha valido o una fecha válida"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:543
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "A loan for the item %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s, "
 "with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s, has "
 "been registered with success."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"Un préstamo para el artículo %(x_strong_tag_open)s%(x_title)s"
+"%(x_strong_tag_close)s,  con código de barras %(x_strong_tag_open)s"
+"%(x_barcode)s%(x_strong_tag_close)s, ha sido registrado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:544
 msgid "You could enter the barcode for this user's next loan, if any."
 msgstr ""
+"Usted podría entrar en el código de barras para el próximo préstamo de este "
+"usuario, en su caso."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:587
 msgid "Loan on desk confirm"
-msgstr ""
+msgstr "Confirmar préstamo en el escritorio"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:655
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1884
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The item with the barcode %(x_strong_tag_open)s%(x_barcode)s"
 "%(x_strong_tag_close)s is on loan."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"El artículo con el código de barras %(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s es en calidad de préstamo."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:665
 #, python-format
 msgid ""
 "The given barcode \"%(x_barcode)s\" does not correspond to requested item."
 msgstr ""
+"El código de barras dado \"%(x_barcode)s\" no se corresponde con el elemento "
+"solicitado."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:704
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:799
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1902
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1976
-#, fuzzy
 msgid "A new loan has been registered with success."
-msgstr "Se ha cursado correctamente una nueva compra."
+msgstr "Un nuevo préstamo ha sido registrado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:706
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1901
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1989
-#, fuzzy
 msgid "Current loans"
-msgstr "Sus préstamos"
+msgstr "Préstamos actuales"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:821
-#, fuzzy
 msgid "New Loan"
-msgstr "Nuevo préstamo"
+msgstr "Nuevo Préstamo"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:852
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:925
-#, fuzzy
 msgid "Loan return"
-msgstr "Período de préstamo"
+msgstr "Devolución del préstamo"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:886
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The item the with barcode %(x_strong_tag_open)s%(x_barcode)s"
 "%(x_strong_tag_close)s is not on loan. Please, try again."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"El elemento con el código de barras %(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s no es en calidad de préstamo. Por favor, vuelva a "
+"intentarlo."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:971
 msgid "Claim return"
-msgstr ""
+msgstr "Reclamar devolución"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1086
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1196
@@ -5600,9 +5532,8 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2776
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2831
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3096
-#, fuzzy
 msgid "Item search"
-msgstr "Ejecutar la búsqueda"
+msgstr "Búsqueda elementos"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1094
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1398
@@ -5617,7 +5548,7 @@ msgstr "Ejecutar la búsqueda"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6072
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6272
 msgid "Empty string."
-msgstr ""
+msgstr "String vacío"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1275
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4143
@@ -5627,6 +5558,8 @@ msgid ""
 "The period of interest %(x_strong_tag_open)sFrom: %(x_date)s"
 "%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
+"El período de interés %(x_strong_tag_open)sFrom: %(x_date)s"
+"%(x_strong_tag_close)s no es un formato de fecha valido o una fecha válida"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1293
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4153
@@ -5636,20 +5569,21 @@ msgid ""
 "The period of interest %(x_strong_tag_open)sTo: %(x_date)s"
 "%(x_strong_tag_close)s is not a valid date or date format"
 msgstr ""
+"El período de interés %(x_strong_tag_open)sTo: %(x_date)s"
+"%(x_strong_tag_close)s no es un formato de fecha valido o una fecha válida"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1542
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Item with barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s "
 "is already on loan."
 msgstr ""
-"Se ha devuelto correctamente el elemento %(x_title)s, con el código de "
-"barras %(x_barcode)s."
+"El elemento con el código de barras %(x_strong_tag_open)s%(x_barcode)s"
+"%(x_strong_tag_close)s ya está en préstamo."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1634
-#, fuzzy
 msgid "Empty borrower ID."
-msgstr "No se ha encontrado ningún usuario."
+msgstr "ID prestatario vacía."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1646
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3136
@@ -5659,24 +5593,23 @@ msgid ""
 "The barcode %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s does "
 "not exist on BibCirculation database."
 msgstr ""
+"El código de barras %(x_strong_tag_open)s%(x_barcode)s%(x_strong_tag_close)s "
+"no existe en la base de datos BibCirculation."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:1947
-#, fuzzy
 msgid "List of hold requests"
 msgstr "Lista de peticiones de reserva pendientes"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2308
-#, fuzzy
 msgid "Record id not valid"
-msgstr "%s no es un identificador válido de registro."
+msgstr "ID de registro no es válido "
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2419
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2450
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3569
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3575
-#, fuzzy
 msgid "Loan renewed with success."
-msgstr "Su registrado correctamente la nueva petición."
+msgstr "Préstamo renovado con éxito."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2431
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3544
@@ -5715,76 +5648,76 @@ msgid ""
 "Another user is waiting for this book %(x_strong_tag_open)s%(x_title)s"
 "%(x_strong_tag_close)s."
 msgstr ""
+"Otro usuario está esperando este libro %(x_strong_tag_open)s%(x_title)s"
+"%(x_strong_tag_close)s."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2442
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3560
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3594
 msgid "Do you want renew this loan anyway?"
-msgstr ""
+msgstr "¿Quiere renovar el préstamo de todos modos?"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2463
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3617
-#, fuzzy
 msgid "Loans details"
-msgstr "Más detalles"
+msgstr "Detalles préstamo"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2498
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2532
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3652
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3687
-#, fuzzy
 msgid "historical overview"
-msgstr "Visión histórica"
+msgstr "Panorama historico"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2655
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2727
 #, python-format
 msgid "The given barcode <strong>%s</strong> is already in use."
-msgstr ""
+msgstr "El código de barras determinado <strong>%s</strong> ya está en uso."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2665
-#, fuzzy
 msgid "The given barcode is empty."
-msgstr "La base de conocimiento está vacía"
+msgstr "El código de barras determinado esta vacío."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2678
 msgid "The status selected does not accept tamporary barcodes."
-msgstr ""
+msgstr "El estado seleccionado no acepta códigos de barras temporales."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2762
-#, fuzzy
 msgid "Do you really want to delete this copy of the book?"
-msgstr "¿Está seguro de que quiere borrar este grupo?"
+msgstr "¿Está seguro de que quiere borrar este ejemplar del libro?"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2774
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2829
 #, python-format
 msgid "The barcode <strong>%s</strong> was not found"
-msgstr ""
+msgstr "El código de barras <strong>%s</strong> no fue encontrado"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2803
 #, python-format
 msgid "The copy with barcode <strong>%s</strong> has been deleted."
 msgstr ""
+"El ejemplar con el código de barras <strong>%s</strong> ha sido eliminado."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2805
 #, python-format
 msgid "It was NOT possible to delete the copy with barcode <strong>%s</strong>"
 msgstr ""
+"NO fue posible eliminar el ejemplar con el código de barras <strong>%s</"
+"strong>"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2862
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2917
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2957
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2990
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3064
-#, fuzzy
 msgid "Update item information"
-msgstr "Actualizar información de la copia"
+msgstr "Actualizar información del elemento"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:2948
 #, python-format
 msgid "Barcode <strong>%s</strong> not found"
-msgstr ""
+msgstr "Código de barras <strong>%s</strong> no fue encontrado"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3025
 #, python-format
@@ -5792,6 +5725,8 @@ msgid ""
 "Item <strong>[%s]</strong> updated, but the <strong>status was not modified</"
 "strong>."
 msgstr ""
+"Elemento <strong>[%s]</strong> actualizado, pero el estado<strong> no fue "
+"modificado </strong>."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3037
 #, python-format
@@ -5799,12 +5734,15 @@ msgid ""
 "Item <strong>[%s]</strong> updated, but the <strong>barcode was not "
 "modified</strong> because it is already in use."
 msgstr ""
+"Elemento <strong>[%s]</strong> actualizado, pero el <strong> código de "
+"barras no fue modificado</strong> porqué ya esta en uso."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3040
 #, python-format
 msgid ""
 "Item <strong>[%s]</strong> updated to <strong>[%s]</strong> with success."
 msgstr ""
+"Elemento <strong>[%s]</strong> actualizado a <strong>[%s]</strong> con éxito."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3042
 #, python-format
@@ -5812,110 +5750,95 @@ msgid ""
 "Item <strong>[%s]</strong> updated, but the <strong>barcode was not "
 "modified</strong> because it was not found (!?)."
 msgstr ""
+"Elemento <strong>[%s]</strong> actualizado, pero el <strong> código de "
+"barras no fue modificado </strong> porché no se podía encontrar (!?)"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3162
-#, fuzzy
 msgid "Item search result"
-msgstr "Volver al resultado de la búsqueda"
+msgstr "Resultado de la búsqueda de elementos"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3199
-#, fuzzy
 msgid "Borrower not found."
-msgstr "No se ha encontrado ningún usuario."
+msgstr "Prestatario no encontrado."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3254
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3303
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3362
-#, fuzzy
 msgid "Add new borrower"
-msgstr "Añadir otro fichero"
+msgstr "Añadir nuevo prestatario"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3284
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3420
-#, fuzzy
 msgid "Please, insert a name"
-msgstr "Introduzca un nombre grupo."
+msgstr "Por favor, introduzca un nombre"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3287
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3423
-#, fuzzy
 msgid "Please, insert a valid email address"
-msgstr "Su dirección de correo electrónico"
+msgstr "Por favor, introduzca una dirección de correo electrónico válida"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3291
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3427
-#, fuzzy
 msgid "There is already a borrower using the following email:"
-msgstr "Este sitio también está disponible en los siguientes idiomas:"
+msgstr "Ya existe un prestatario mediante el siguiente correo electrónico:"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3396
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3447
-#, fuzzy
 msgid "Update borrower information"
-msgstr "Información del usuario"
+msgstr "Actualizar información del usuario"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3489
-#, fuzzy
 msgid "Hold requests details"
-msgstr "Detalles de la petición PI"
+msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3604
-#, fuzzy
 msgid "All loans renewed with success."
-msgstr "Su registrado correctamente la nueva petición."
+msgstr " Todos los préstamos renovados con éxito."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3727
-#, fuzzy
 msgid "ILL details"
-msgstr "Detalles del elemento"
+msgstr "Detalles ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3759
-#, fuzzy
 msgid "ILL historical overview"
-msgstr "Visión histórica"
+msgstr "Visión histórica ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3906
-#, fuzzy
 msgid "Borrower notes"
-msgstr "Usuario"
+msgstr "Notas del prestatario"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3948
-#, fuzzy
 msgid "New Request"
 msgstr "Nueva petición"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:3950
-#, fuzzy
 msgid "Borrower Search"
-msgstr "Detalles del lector"
+msgstr "Búsqueda Prestatarios"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4008
-#, fuzzy
 msgid "Borrower search result"
-msgstr "Volver al resultado de la búsqueda"
+msgstr "Resultado búsqueda prestarios"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4058
 msgid "This ILL has been created from a proposal."
-msgstr ""
+msgstr "Este ILL ha sido creado a partir de una propuesta."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4061
-#, fuzzy
 msgid "An ILL has been created for the user."
-msgstr "Se ha creado su cuenta en «%s»:"
+msgstr "Un ILL ha sido creada para el usuario."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4063
 msgid "An active ILL already exists for this user on this record."
-msgstr ""
+msgstr "Un ILL activo ya existe para este usuario en este registro."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4065
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4067
 msgid "Could not create an ILL from the proposal"
-msgstr ""
+msgstr "Imposible crear un ILL de la propuesta"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4071
-#, fuzzy
 msgid "ILL requests"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "Peticiones ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4103
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4198
@@ -5924,24 +5847,21 @@ msgstr "Petición de préstamo interbibliotecario"
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4478
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4538
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4702
-#, fuzzy
 msgid "Register ILL request"
-msgstr "No hay peticiones."
+msgstr "Registrar petición ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4286
 msgid "<strong>Request not registered:</strong> wrong borrower id"
-msgstr ""
+msgstr "<strong> Petición no registrada:</strong> id prestatario incorrecto"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4336
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4404
-#, fuzzy
 msgid "Register ILL Book request"
-msgstr "No hay peticiones."
+msgstr "Registrar petición ILL para libro"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4432
-#, fuzzy
 msgid "Register ILL Article request"
-msgstr "Noticias"
+msgstr "Registrar petición ILL para artículo"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4679
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4778
@@ -5949,115 +5869,101 @@ msgid ""
 "Payment method information is mandatory.                         Please, "
 "type your budget code or tick the 'cash' checkbox."
 msgstr ""
+"Entregar información de la forma de pago es obligatorio. Por favor, escriba "
+"su código presupuestario o marque la casilla de verificación ‘en efectivo'."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4867
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5005
-#, fuzzy
 msgid "Borrower request details not found."
-msgstr "Petición del lector"
+msgstr "Los detalles de la petición del prestatario no han sido encontrados."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4871
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5009
-#, fuzzy
 msgid "Request not found."
-msgstr "Fecha de petición"
+msgstr "Petición no encontrada."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:4954
-#, fuzzy
 msgid "ILL received: "
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "ILL recibido: "
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5024
-#, fuzzy
 msgid "Purchase details"
-msgstr "Más detalles"
+msgstr "Detalles adquisición"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5088
 msgid "Book suggestion accepted: "
-msgstr ""
+msgstr "Sugerencia libro aceptada: "
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5092
 msgid "Book suggestion refused: "
-msgstr ""
+msgstr "Sugerencia libro negada: "
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5131
-#, fuzzy
 msgid "Purchase received: "
-msgstr "Nueva petición"
+msgstr "Adquisición recibida: "
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5206
-#, fuzzy
 msgid "ILL notes"
-msgstr "Notas de préstamo"
+msgstr "Notas ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5231
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5380
-#, fuzzy
 msgid "List of ILL requests"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "Lista de peticiones ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5260
-#, fuzzy
 msgid "List of purchase requests"
-msgstr "Nueva petición"
+msgstr "Lista de peticiones de adquisición"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5284
 msgid "List of requests on put aside proposals"
-msgstr ""
+msgstr "Lista de peticiones de propuestas puestas a un lado"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5288
-#, fuzzy
 msgid "List of proposals"
-msgstr "Lista de libros en préstamo"
+msgstr "Lista de propuestas"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5319
-#, fuzzy
 msgid "ILL search"
-msgstr "Petición de préstamo interbibliotecario"
+msgstr "Búsqueda ILL"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5423
-#, fuzzy
 msgid "Library ID not found."
-msgstr "Notes de la biblioteca"
+msgstr "ID Biblioteca no encontrado"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5482
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5523
-#, fuzzy
 msgid "Merge libraries"
-msgstr "Buscar biblioteca por"
+msgstr "Unir las bibliotecas"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5648
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5685
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5717
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5746
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5776
-#, fuzzy
 msgid "Update library information"
-msgstr "Información de la nueva biblioteca"
+msgstr "Actualizar la información de la biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:5881
 msgid "Emptry string."
-msgstr ""
+msgstr "String vacío."
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6052
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6092
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6123
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6151
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6178
-#, fuzzy
 msgid "Update vendor information"
-msgstr "Información del nuevo proveedor"
+msgstr "Actualizar la información del vendedor"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6219
-#, fuzzy
 msgid "Vendor notes"
-msgstr "sin notas"
+msgstr "Notas del vendedor"
 
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6246
 #: modules/bibcirculation/lib/bibcirculationadminlib.py:6290
-#, fuzzy
 msgid "Search vendor"
-msgstr "Buscar proveedor por"
+msgstr "Buscar vendedor por"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:128
 #: modules/bibclassify/lib/bibclassify_templates.py:187
@@ -6267,14 +6173,12 @@ msgid "Upload"
 msgstr "Subir"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:904
-#, fuzzy
 msgid "Uploading..."
-msgstr "Subir"
+msgstr "Cargando…"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:905
-#, fuzzy
 msgid "Please wait..."
-msgstr "Vuélvalo a intentar."
+msgstr "Por favor espera…"
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:918
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:465
@@ -6519,14 +6423,12 @@ msgid "Define new subfield action"
 msgstr "Definir una nueva acción para el subcampo"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:617
-#, fuzzy
 msgid "Add new condition value"
-msgstr "Añadir otro fichero"
+msgstr "Añadir nuevo valor de condición"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:618
-#, fuzzy
 msgid "Remove this condition value"
-msgstr "eliminar esta colección"
+msgstr "Eliminar este valor de condición"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:619
 #: modules/webalert/lib/webalert_templates.py:77
@@ -7291,12 +7193,11 @@ msgstr "Mostrar todos los %i autores"
 
 #: modules/bibformat/lib/elements/bfe_arxiv_link.py:36
 msgid "This article on arXiv.org"
-msgstr ""
+msgstr "Este artículo sobre arXiv.org"
 
 #: modules/bibformat/lib/elements/bfe_authority_author.py:61
-#, fuzzy
 msgid "Name variant(s)"
-msgstr "Variantes del nombre"
+msgstr "Variante(s) del nombre"
 
 #: modules/bibformat/lib/elements/bfe_authority_author.py:66
 #: modules/bibformat/lib/elements/bfe_authority_journal.py:62
@@ -7307,43 +7208,38 @@ msgstr "Véase también"
 
 #: modules/bibformat/lib/elements/bfe_authority_author_publications.py:75
 #: modules/bibformat/lib/elements/bfe_authority_publications.py:88
-#, fuzzy
 msgid "Publication(s)"
-msgstr "Lista de publicaciones"
+msgstr "Publicación(es)"
 
 #: modules/bibformat/lib/elements/bfe_authority_control_no.py:113
-#, fuzzy
 msgid "Control Number(s)"
-msgstr "Número de informe"
+msgstr "Número(s) de controlo"
 
 #: modules/bibformat/lib/elements/bfe_authority_institute.py:59
 #: modules/bibformat/lib/elements/bfe_authority_journal.py:57
 #: modules/bibformat/lib/elements/bfe_authority_subject.py:57
-#, fuzzy
 msgid "Variant(s)"
-msgstr "Sin nombres variantes"
+msgstr "Variante(s)"
 
 #: modules/bibformat/lib/elements/bfe_authority_institute.py:80
 msgid "Parent"
-msgstr ""
+msgstr "Padre"
 
 #: modules/bibformat/lib/elements/bfe_authority_institute.py:82
 msgid "Children"
-msgstr ""
+msgstr "Niños"
 
 #: modules/bibformat/lib/elements/bfe_authority_institute.py:84
 msgid "Predecessor"
-msgstr ""
+msgstr "Predecesor"
 
 #: modules/bibformat/lib/elements/bfe_authority_institute.py:86
-#, fuzzy
 msgid "Successor"
-msgstr "Acceso"
+msgstr "Sucesor"
 
 #: modules/bibformat/lib/elements/bfe_authority_links.py:81
-#, fuzzy
 msgid "Useful links"
-msgstr "Enlaces externos"
+msgstr "Enlaces útiles"
 
 #: modules/bibformat/lib/elements/bfe_edit_files.py:50
 msgid "Manage Files of This Record"
@@ -7397,9 +7293,8 @@ msgid "Fulltext"
 msgstr "Texto completo"
 
 #: modules/bibformat/lib/elements/bfe_plots.py:90
-#, fuzzy
 msgid "Show more plots"
-msgstr "Mostrar más..."
+msgstr "Mostrar más tramas"
 
 #: modules/bibformat/lib/elements/bfe_sciencewise.py:99
 msgid "Add this document to your ScienceWise.info bookmarks"
@@ -7953,9 +7848,8 @@ msgstr "Ejemplo"
 
 #: modules/bibupload/lib/batchuploader_templates.py:240
 #: modules/bibupload/lib/batchuploader_templates.py:475
-#, fuzzy
 msgid "Email logs to"
-msgstr "Edite el método de identificación"
+msgstr "Los registros de correo electrónico a"
 
 #: modules/bibupload/lib/batchuploader_templates.py:241
 #: modules/bibupload/lib/batchuploader_templates.py:473
@@ -7970,7 +7864,7 @@ msgstr "Prioridad de los envíos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:244
 msgid "Skip upload simulation"
-msgstr ""
+msgstr "Saltar de simulación de carga"
 
 #: modules/bibupload/lib/batchuploader_templates.py:266
 #, python-format
@@ -8038,38 +7932,35 @@ msgstr "Ficheros del tipo"
 
 #: modules/bibupload/lib/batchuploader_templates.py:492
 msgid "The job is scheduled to run on"
-msgstr ""
+msgstr "El trabajo está programado para ejecutarse en"
 
 #: modules/bibupload/lib/batchuploader_templates.py:538
 msgid "You are about to submit a"
-msgstr ""
+msgstr "Usted está a punto de presentar uno/una"
 
 #: modules/bibupload/lib/batchuploader_templates.py:539
-#, fuzzy
 msgid "file with name"
-msgstr "Nombre del fichero"
+msgstr "Fichero con nombre"
 
 #: modules/bibupload/lib/batchuploader_templates.py:540
-#, fuzzy
 msgid "and content"
-msgstr "añadir comentarios"
+msgstr "añadir contenido"
 
 #: modules/bibupload/lib/batchuploader_templates.py:541
 msgid "This file will be uploaded with priority"
-msgstr ""
+msgstr "Este archivo se cargará con prioridad"
 
 #: modules/bibupload/lib/batchuploader_templates.py:542
-#, fuzzy
 msgid "and in mode"
-msgstr "Modo de carga"
+msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:543
 msgid "Do you want to submit the changes?"
-msgstr ""
+msgstr "¿Quieres presentar los cambios?"
 
 #: modules/bibupload/lib/batchuploader_templates.py:544
 msgid "record(s) will be affected"
-msgstr ""
+msgstr "registro(s) se verá/verán afectado(s)"
 
 #: modules/bibupload/lib/batchuploader_templates.py:567
 #, python-format
@@ -8145,8 +8036,7 @@ msgstr "Subida masiva: seguimiento del proceso"
 #: modules/miscutil/lib/dateutils_unit_tests.py:128
 #: modules/webbasket/lib/webbasket.py:210
 #: modules/webbasket/lib/webbasket.py:851
-#: modules/webbasket/lib/webbasket.py:968
-#: modules/websession/lib/webuser.py:312
+#: modules/webbasket/lib/webbasket.py:968 modules/websession/lib/webuser.py:312
 #: modules/webstyle/lib/webstyle_templates.py:655
 msgid "N/A"
 msgstr "N/D"
@@ -8418,7 +8308,7 @@ msgstr ""
 #: modules/miscutil/lib/mailutils.py:291
 #, python-format
 msgid "Error while sending an email: %s"
-msgstr ""
+msgstr "Error al enviar un correo electrónico: %s"
 
 #: modules/miscutil/lib/mailutils.py:292
 #, python-format
@@ -8433,6 +8323,15 @@ msgid ""
 "The content of the mail was as follows:\n"
 "%s"
 msgstr ""
+"\n"
+"Error al enviar un correo electrónico.\n"
+"Motivo: %s\n"
+"Detalles: %s\n"
+"Remitente: “%s”\n"
+"Destinatario(s): “%s”\n"
+"\n"
+"El contenido del correo fue como sigue:\n"
+"%s"
 
 #: modules/miscutil/lib/mailutils.py:307
 #, python-format
@@ -8552,20 +8451,19 @@ msgstr "Página anterior"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1115
 msgid "Record OAI IDs ( as recognized by the data source )"
-msgstr ""
+msgstr "Record OAI IDs (como se reconoce en la fuente de datos)"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1138
-#, fuzzy
 msgid "Harvest"
-msgstr "recolectar"
+msgstr "Recolectar"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1158
 msgid "Error while submitting harvesting task. Contact administrators."
-msgstr ""
+msgstr "Error al enviar tarea de recolección. Contactar los administradores."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1160
 msgid "No OAI IDs defined. Provide at least one ID."
-msgstr ""
+msgstr "Ningúnos IDs OAI definidos. Proveer al menos un ID."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1185
 msgid "Compare with original"
@@ -8664,16 +8562,17 @@ msgid ""
 "Do you want to touch the OAI set %s? Note that this will force all clients "
 "to re-harvest the whole set."
 msgstr ""
+"¿Quieres tocar el OAI establecido % s? Tenga en cuenta que esto obligará a "
+"todos los clientes a volver a recolectar toda la colección."
 
 #: modules/oairepository/lib/oai_repository_admin.py:360
-#, fuzzy
 msgid "OAI set does not exist."
-msgstr "El usuario %s no existe"
+msgstr "colección OAI no existe."
 
 #: modules/oairepository/lib/oai_repository_admin.py:363
 #, python-format
 msgid "OAI set %s touched."
-msgstr ""
+msgstr "colección OAI %s tocado."
 
 #: modules/webaccess/lib/access_control_config.py:653
 #: modules/websession/lib/websession_templates.py:1262
@@ -8747,9 +8646,8 @@ msgstr "Configurar WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:666
 #: modules/websession/lib/websession_templates.py:1292
-#, fuzzy
 msgid "Configure WebLinkback"
-msgstr "Configurar WebSearch"
+msgstr "Configurar WebLinkback"
 
 #: modules/webaccess/lib/access_control_config.py:667
 #: modules/websession/lib/websession_templates.py:1296
@@ -8783,9 +8681,8 @@ msgstr "Ejecutar el gestor de cargas masivas"
 
 #: modules/webaccess/lib/access_control_config.py:673
 #: modules/websession/lib/websession_templates.py:1304
-#, fuzzy
 msgid "Run Info Space Manager"
-msgstr "Ejecutar el gestor de ficheros del documento"
+msgstr "Ejecutar Info Space Manager"
 
 #: modules/webaccess/lib/access_control_config.py:674
 msgid "Run Person/Author Manager"
@@ -9258,9 +9155,8 @@ msgstr "Mostrar alertas:"
 
 #: modules/webauthorlist/lib/authorlist_webinterface.py:86
 #: modules/webauthorlist/lib/authorlist_webinterface.py:111
-#, fuzzy
 msgid "Author List Manager"
-msgstr "Ejecutar el gestor de personas/autores"
+msgstr "Gestor de Listas de Autores"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:182
 #: modules/websearch/lib/websearch_templates.py:4577
@@ -9299,11 +9195,11 @@ msgstr "Palabras clave frecuentes"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:385
 msgid "No Subject categories"
-msgstr ""
+msgstr "No hay categorías temáticas"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:392
 msgid "Subject categories"
-msgstr ""
+msgstr "Categorías temáticas"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:447
 msgid "No Collaborations"
@@ -9338,28 +9234,25 @@ msgid "No Frequent Co-authors"
 msgstr "Co-autores poco frecuentes"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:546
-#, fuzzy, python-format
+#, python-format
 msgid "Citations%s"
-msgstr "Citaciones%s:"
+msgstr "Citaciones%s"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:572
 msgid "<strong> Publications per year </strong>"
-msgstr ""
+msgstr "<strong> Publicaciones por año </strong>"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:573
-#, fuzzy
 msgid "No Publication Graph"
-msgstr "Fecha de publicación"
+msgstr "Ningún Gráfico de publicación"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:601
-#, fuzzy
 msgid "<strong> Publications list </strong>"
-msgstr "Lista de publicaciones"
+msgstr "<strong> Lista de publicaciones </strong>"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:635
-#, fuzzy
 msgid "No publications available"
-msgstr "No hay información disponible"
+msgstr "No hay publicaciones disponible"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:758
 msgid "Recompute Now!"
@@ -9490,6 +9383,8 @@ msgid ""
 "Some items could not be moved. The destination basket already contains those "
 "items."
 msgstr ""
+"Algunos elementos no se han podido mover. La cesta de destino ya contiene "
+"esos elementos."
 
 #: modules/webbasket/lib/webbasket.py:1971
 #: modules/webbasket/lib/webbasket.py:2822
@@ -9820,9 +9715,9 @@ msgid " or return to your %(x_url_open)sprevious basket%(x_url_close)s"
 msgstr " o vuelva a su %(x_url_open)scesta anterior%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1655
-#, fuzzy, python-format
+#, python-format
 msgid " or go %(x_url_open)sback%(x_url_close)s"
-msgstr "Continuar a la %(x_url_open)scesta%(x_url_close)s"
+msgstr "o ir %(x_url_open)s atrás%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1768
 #, python-format
@@ -10087,9 +9982,8 @@ msgid "Copy item"
 msgstr "Copiarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2648
-#, fuzzy
 msgid "Move item"
-msgstr "Subirlo"
+msgstr "Mover artículo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2664
 msgid "Remove item"
@@ -10281,9 +10175,8 @@ msgid "Delete a basket"
 msgstr "Suprimir una cesta"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:882
-#, fuzzy
 msgid "Move record to basket"
-msgstr "Copiar el registro a la cesta"
+msgstr "Mover el registro a la cesta"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:885
 msgid "Copy record to basket"
@@ -10754,11 +10647,13 @@ msgid "Back to record"
 msgstr "Volver al registro"
 
 #: modules/webcomment/lib/webcomment_templates.py:1512
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can also view all the comments you have submitted so far on "
 "\"%(x_url_open)sYour Comments%(x_url_close)s\" page."
-msgstr "Puede consultar la lista de %(x_url_open)ssus tareas%(x_url_close)s."
+msgstr ""
+"También puede ver todos los comentarios que ha presentado hasta ahora en la "
+"pagina siguiente: \"%(x_url_open)sYour Comments%(x_url_close)s”."
 
 #: modules/webcomment/lib/webcomment_templates.py:1592
 #: modules/webcomment/web/admin/webcommentadmin.py:171
@@ -11047,92 +10942,86 @@ msgid "Your comment will be lost."
 msgstr "Su comentario se perderá."
 
 #: modules/webcomment/lib/webcomment_templates.py:2406
-#, fuzzy
 msgid "Oldest comment first"
-msgstr "Suprimir comentarios"
+msgstr "Comentario más antiguo primero"
 
 #: modules/webcomment/lib/webcomment_templates.py:2407
-#, fuzzy
 msgid "Latest comment first"
-msgstr "el último primero"
+msgstr "El último comentario primero"
 
 #: modules/webcomment/lib/webcomment_templates.py:2408
 msgid "Group by record, oldest commented first"
-msgstr ""
+msgstr "Agrupar por registro, comentario más antiguo primero"
 
 #: modules/webcomment/lib/webcomment_templates.py:2409
-#, fuzzy
 msgid "Group by record, latest commented first"
-msgstr "Ver los registros con los comentarios más recientes"
+msgstr "Agrupar por registro, comentario más reciente primero"
 
 #: modules/webcomment/lib/webcomment_templates.py:2411
-#, fuzzy
 msgid "Records and comments"
-msgstr "añadir comentarios"
+msgstr "Registros y comentarios"
 
 #: modules/webcomment/lib/webcomment_templates.py:2412
-#, fuzzy
 msgid "Records only"
-msgstr "registros encontrados"
+msgstr "Solo registros"
 
 #: modules/webcomment/lib/webcomment_templates.py:2413
-#, fuzzy
 msgid "Comments only"
-msgstr "Comentarios"
+msgstr "Solo comentarios"
 
 #: modules/webcomment/lib/webcomment_templates.py:2415
 #: modules/webcomment/lib/webcomment_templates.py:2416
 #: modules/webcomment/lib/webcomment_templates.py:2417
 #: modules/webcomment/lib/webcomment_templates.py:2418
-#, fuzzy, python-format
+#, python-format
 msgid "%s items"
-msgstr "%i elementos"
+msgstr "%s elementos"
 
 #: modules/webcomment/lib/webcomment_templates.py:2419
-#, fuzzy
 msgid "All items"
-msgstr "Añadir elementos"
+msgstr "Todos los elementos"
 
 #: modules/webcomment/lib/webcomment_templates.py:2422
 msgid "Below is the list of the comments you have submitted so far."
 msgstr ""
+"Más abajo hay la lista de los comentarios que ha presentado hasta el momento."
 
 #: modules/webcomment/lib/webcomment_templates.py:2426
 msgid ""
 "You have not yet submitted any comment in the document \"discussion\" tab."
 msgstr ""
+"Aún no ha presentado ningún comentario en la pestaña \"discusión\" de "
+"documentos."
 
 #: modules/webcomment/lib/webcomment_templates.py:2429
 #: modules/webcomment/lib/webcomment_templates.py:2437
 #: modules/webcomment/lib/webcomment_templates.py:2445
 msgid "You might find other comments here: "
-msgstr ""
+msgstr "Usted puede encontrar otros comentarios aquí: "
 
 #: modules/webcomment/lib/webcomment_templates.py:2457
 msgid ""
 "You have not yet submitted any comment. Browse documents from the search "
 "interface and take part to discussions!"
 msgstr ""
+"Aún no ha presentado ningún comentario. Examina los documentos de la "
+"interfaz de búsqueda y participa a las discusiones!"
 
 #: modules/webcomment/lib/webcomment_templates.py:2485
-#, fuzzy
 msgid "Display"
-msgstr "Mostrar alertas:"
+msgstr "Display"
 
 #: modules/webcomment/lib/webcomment_templates.py:2486
-#, fuzzy
 msgid "Order by"
-msgstr "Fecha de petición"
+msgstr "Ordenar por"
 
 #: modules/webcomment/lib/webcomment_templates.py:2487
-#, fuzzy
 msgid "Per page"
-msgstr "Página siguiente"
+msgstr "Por página"
 
 #: modules/webcomment/lib/webcomment_templates.py:2491
-#, fuzzy
 msgid "Display options"
-msgstr "Mostrar alertas:"
+msgstr "Mostrar opciones"
 
 #: modules/webcomment/lib/webcomment_templates.py:2492
 #: modules/webjournal/lib/webjournal_templates.py:454
@@ -11144,30 +11033,30 @@ msgstr "Refrescar"
 
 #: modules/webcomment/lib/webcomment_templates.py:2521
 msgid "Comment deleted by the moderator"
-msgstr ""
+msgstr "Comentario eliminado por el moderador"
 
 #: modules/webcomment/lib/webcomment_templates.py:2523
 msgid "You have deleted this comment: it is not visible by other users"
-msgstr ""
+msgstr "Ha eliminado este comentario: no es visible por otros usuarios"
 
 #: modules/webcomment/lib/webcomment_templates.py:2530
-#, fuzzy
 msgid "(in reply to a comment)"
-msgstr "Suprimir la denuncia al comentario"
+msgstr "(en respuesta a un comentario)"
 
 #: modules/webcomment/lib/webcomment_templates.py:2535
 msgid "See comment on discussion page"
-msgstr ""
+msgstr "Ver comentario en la página de discusión"
 
 #: modules/webcomment/lib/webcomment_templates.py:2574
 #, python-format
 msgid "%i comments found in total (not shown on this page)"
 msgstr ""
+"se han encontrado %i comentarios en total (no se muestran en esta página)"
 
 #: modules/webcomment/lib/webcomment_templates.py:2576
-#, fuzzy, python-format
+#, python-format
 msgid "%i items found in total"
-msgstr "%i elementos encontrados"
+msgstr "%i elementos encontrados en total"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:269
 #: modules/webcomment/lib/webcomment_webinterface.py:526
@@ -11227,21 +11116,19 @@ msgid "The requested file could not be found"
 msgstr "No se ha encontrado el fichero solicitado"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:906
-#, fuzzy
 msgid "You are not authorized to use comments."
-msgstr "No está autorizado a hacer uso del préstamo."
+msgstr "No está autorizado a utilizar comentarios."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:908
 #: modules/websession/lib/websession_templates.py:621
 #: modules/websession/lib/websession_templates.py:774
-#, fuzzy
 msgid "Your Comments"
-msgstr "Comentarios"
+msgstr "Su Comentarios"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:920
 #, python-format
 msgid "%s View your previously submitted comments"
-msgstr ""
+msgstr "%s Ver sus comentarios presentados anteriormente"
 
 #: modules/webcomment/lib/webcommentadminlib.py:122
 msgid "Invalid comment ID."
@@ -11647,22 +11534,19 @@ msgid "Edit Settings"
 msgstr "Editar parámetros"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:50
-#, fuzzy
 msgid "Trackback URL: "
-msgstr "Traceback"
+msgstr "Traceback URL: "
 
 #: modules/weblinkback/lib/weblinkback_templates.py:80
-#, fuzzy
 msgid "to review"
-msgstr "1 reseña"
+msgstr "da revisar"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:99
 #, python-format
 msgid "Linkbacks%s: %s"
-msgstr ""
+msgstr "Linkbacks%s: %s"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:159
-#, fuzzy
 msgid "Submitted on"
 msgstr "Enviado el"
 
@@ -11679,100 +11563,100 @@ msgid "Reject"
 msgstr "Rechazar"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:197
-#, fuzzy
 msgid "View last"
-msgstr "Visualizar como:"
+msgstr "Visualizar último"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:261
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:134
 msgid "Pending Linkbacks"
-msgstr ""
+msgstr "Linkbacks pendientes"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:267
-#, fuzzy
 msgid "Recent Linkbacks"
 msgstr "Documentos recientes"
 
 #: modules/weblinkback/lib/weblinkback_templates.py:273
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:83
 msgid "Linkback Whitelist/Blacklist Manager"
-msgstr ""
+msgstr "Linkback Gestion Lista blanca/Lista negra"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:85
 #: modules/weblinkback/lib/weblinkbackadminlib.py:184
-#, fuzzy
 msgid "Unknown error"
-msgstr "Acción desconocida"
+msgstr "Error desconocido"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:87
 msgid "The URL already exists in one of the lists"
-msgstr ""
+msgstr "La dirección URL ya existe en una de las listas"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:89
 #: modules/weblinkback/lib/weblinkbackadminlib.py:186
-#, fuzzy
 msgid "Invalid action"
-msgstr "Número de comentario no válido."
+msgstr "Acción no válida"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:91
 msgid "Invalid URL, might contain spaces"
-msgstr ""
+msgstr "URL no válida, puede contener espacios"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:120
-#, fuzzy
 msgid "Whitelist"
-msgstr "lista"
+msgstr "lista blanca"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:121
 msgid "linkback requests from these URLs will be approved automatically."
-msgstr ""
+msgstr "peticiones LinkBack de estas URLs serán aprobadas automáticamente."
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:122
-#, fuzzy
 msgid "Blacklist"
-msgstr "lista"
+msgstr "lista negra"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:123
 msgid ""
 "linkback requests from these URLs will be refused automatically, no data "
 "will be saved."
 msgstr ""
+"peticiones LinkBack de estas URLs serán rechazados automáticamente, no se "
+"guardarán los datos."
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:124
 msgid ""
 "All URLs in these lists are checked for containment (infix) in any linkback "
 "request URL. A whitelist match has precedence over a blacklist match."
 msgstr ""
+"Todas las direcciones URL en estas listas se comprueban para la contención "
+"(infija) en cualquier solicitud linkback URL. Una combinación de lista "
+"blanca tiene prioridad sobre una combinación de lista negra."
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:127
 msgid "Add URL"
-msgstr ""
+msgstr "Agregar URL"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:134
-#, fuzzy
 msgid "There are no URLs in both lists."
-msgstr "No hay registros citados por a %s."
+msgstr "No hay URL en ambas listas"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:136
 msgid "Reduce the amount of future pending linkback requests"
-msgstr ""
+msgstr "Reducir la cantidad de futuras solicitudes pendientes LinkBack"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:198
 msgid "Pending linkbacks"
-msgstr ""
+msgstr "Linkbacks pendientes"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:199
 msgid ""
 "these linkbacks are not visible to users, they must be approved or rejected."
 msgstr ""
+"estos LinkBacks no son visibles para los usuarios, deben ser aprobados o "
+"rechazados."
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:208
 msgid "Reduce the amount of currently pending linkback requests"
-msgstr ""
+msgstr "Reducir la cantidad de solicitudes LinkBack actualmente pendientes"
 
 #: modules/weblinkback/lib/weblinkbackadminlib.py:210
 msgid "Currently only pending linkbacks are supported."
-msgstr ""
+msgstr "Actualmente se admiten solamente LinkBacks  pendientes."
 
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:46
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:54
@@ -11780,16 +11664,14 @@ msgstr ""
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:101
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:126
 #: modules/weblinkback/web/admin/weblinkbackadmin.py:152
-#, fuzzy
 msgid "WebLinkback Admin"
-msgstr "Administración de WebJournal"
+msgstr "Administración WebLinkback"
 
 #: modules/webmessage/lib/webmessage.py:58
 #: modules/webmessage/lib/webmessage.py:137
 #: modules/webmessage/lib/webmessage.py:203
-#, fuzzy
 msgid "Sorry, this message is not in your mailbox."
-msgstr "Por desgracia, este mensaje no está en su buzón."
+msgstr "Lo sentimos, este mensaje no está en su buzón de correo."
 
 #: modules/webmessage/lib/webmessage.py:75
 #: modules/webmessage/lib/webmessage.py:219
@@ -11818,12 +11700,12 @@ msgid "Please enter a user name or a group name."
 msgstr "Introduzca un nombre de usuario o de grupo."
 
 #: modules/webmessage/lib/webmessage.py:381
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your message is too long, please shorten it. Maximum size allowed is %i "
 "characters."
 msgstr ""
-"Su mensaje es demasiado largo, edítelo por favor.  El tamaño máximo es de %i "
+"Su mensaje es demasiado largo, acorta por favor.  El tamaño máximo es de %i "
 "caracteres."
 
 #: modules/webmessage/lib/webmessage.py:396
@@ -11843,7 +11725,6 @@ msgid "Write a message"
 msgstr "Escriba un mensaje"
 
 #: modules/webmessage/lib/webmessage.py:449
-#, fuzzy
 msgid ""
 "Your message could not be sent to the following recipients as it would "
 "exceed their quotas:"
@@ -12036,7 +11917,7 @@ msgstr "cualquier año"
 #: modules/websearch/lib/search_engine.py:1213
 #: modules/websearch/lib/search_engine.py:1232
 msgid "any publisher or journal"
-msgstr ""
+msgstr "cualquier editor o revista"
 
 #: modules/websearch/lib/search_engine.py:1213
 #: modules/websearch/lib/search_engine.py:1232
@@ -12044,9 +11925,8 @@ msgid "any public collection"
 msgstr "cualquier colección pública"
 
 #: modules/websearch/lib/search_engine.py:1217
-#, fuzzy
 msgid "remove this publisher or journal"
-msgstr "eliminar este usuario"
+msgstr "Eliminar este editor o revista"
 
 #: modules/websearch/lib/search_engine.py:1217
 msgid "remove this collection"
@@ -12054,7 +11934,7 @@ msgstr "eliminar esta colección"
 
 #: modules/websearch/lib/search_engine.py:1228
 msgid "add another publisher or journal"
-msgstr ""
+msgstr "añadir otro editor o revista"
 
 #: modules/websearch/lib/search_engine.py:1228
 msgid "add another collection"
@@ -12107,7 +11987,6 @@ msgstr ""
 "parciales..."
 
 #: modules/websearch/lib/search_engine.py:2165
-#, fuzzy
 msgid ""
 "Search term after reference operator too generic, displaying only partial "
 "results..."
@@ -12116,13 +11995,12 @@ msgstr ""
 "parciales..."
 
 #: modules/websearch/lib/search_engine.py:2169
-#, fuzzy
 msgid ""
 "Search term after citedby operator too generic, displaying only partial "
 "results..."
 msgstr ""
-"Término de búsqueda demasiado genérico, solo se mostrarán unos resultados "
-"parciales..."
+"Término de búsqueda después de citedby demasiado genérico, solo se mostran "
+"unos resultados parciales..."
 
 #: modules/websearch/lib/search_engine.py:2173
 msgid ""
@@ -12148,24 +12026,23 @@ msgstr ""
 "a intentarlo."
 
 #: modules/websearch/lib/search_engine.py:3161
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "No se ha encontrado ninguna coincidencia en la colección %(x_collection)s. "
-"Las otras colecciones públicas dieron %(x_url_open)s%(x_nb_hits)d resultados"
+"Las otras colecciones dieron %(x_url_open)s%(x_nb_hits)d resultados"
 "%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:3178
-#, fuzzy
 msgid ""
 "No public collection matched your query. If you were looking for a hidden "
 "document, please type the correct URL for this record."
 msgstr ""
 "Ninguna colección pública coincide con su búsqueda. Si estaba buscando "
-"documentos no públicos, por favor escoja primero la colección restringida "
-"deseada."
+"documentos no públicos, por favor escriba la dirección URL correcta para "
+"este registro."
 
 #: modules/websearch/lib/search_engine.py:3182
 msgid ""
@@ -12190,9 +12067,9 @@ msgid "There are no records referring to %s."
 msgstr "No hay registros que se refieran a %s."
 
 #: modules/websearch/lib/search_engine.py:3306
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records modified by %s."
-msgstr "No hay registros citados por a %s."
+msgstr "No hay registros modificados por a %s."
 
 #: modules/websearch/lib/search_engine.py:3308
 #, python-format
@@ -12268,30 +12145,29 @@ msgstr ""
 
 #: modules/websearch/lib/services/CollectionNameSearchService.py:51
 msgid "Looking for a particular collection? Try:"
-msgstr ""
+msgstr "Buscando una colección particular? Probar:"
 
 #: modules/websearch/lib/services/CollectionNameSearchService.py:113
 #: modules/websearch/lib/services/CollectionNameSearchService.py:114
-#, fuzzy
 msgid "submit"
 msgstr "Enviar"
 
 #: modules/websearch/lib/services/FAQKBService.py:37
 msgid "You might be interested in:"
-msgstr ""
+msgstr "Usted puede estar interesado en:"
 
 #: modules/websearch/lib/services/JournalHintService.py:99
 msgid "Were you looking for this paper?"
-msgstr ""
+msgstr "¿Estabas buscando este trabajo?"
 
 #: modules/websearch/lib/services/JournalHintService.py:105
 #, python-format
 msgid "Were you looking for a journal reference? Try: %(x_href)s"
-msgstr ""
+msgstr "¿Estabas buscando una referencia diario? Probar: %(x_href)s"
 
 #: modules/websearch/lib/services/SubmissionNameSearchService.py:61
 msgid "Looking for a particular submission? Try:"
-msgstr ""
+msgstr "Busca una presentación particular? Probar:"
 
 #: modules/websearch/lib/services/SubmissionNameSearchService.py:130
 #: modules/webstyle/lib/webstyle_templates.py:493
@@ -12304,13 +12180,12 @@ msgid "Submit"
 msgstr "Enviar"
 
 #: modules/websearch/lib/services/SubmissionNameSearchService.py:131
-#, fuzzy
 msgid "Revise"
-msgstr "revisar"
+msgstr "Revisar"
 
 #: modules/websearch/lib/services/WeatherService.py:62
 msgid "weather"
-msgstr ""
+msgstr "tiempo"
 
 #: modules/websearch/lib/websearch_external_collections.py:148
 msgid "in"
@@ -12443,9 +12318,8 @@ msgstr "Formato de visualización:"
 
 #: modules/websearch/lib/websearch_templates.py:1240
 #: modules/websearch/lib/websearch_templates.py:1265
-#, fuzzy
 msgid "Add to Search"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir a la Busqueda"
 
 #: modules/websearch/lib/websearch_templates.py:1423
 msgid "Added since:"
@@ -12592,14 +12466,12 @@ msgstr ""
 "registros encontrados en %(x_nb_seconds)s segundos."
 
 #: modules/websearch/lib/websearch_templates.py:3207
-#, fuzzy
 msgid "Show less collections"
-msgstr "colecciones"
+msgstr "Mostrar menos colecciones"
 
 #: modules/websearch/lib/websearch_templates.py:3208
-#, fuzzy
 msgid "Show all collections"
-msgstr "colecciones"
+msgstr "Mostrar todas las colecciones"
 
 #: modules/websearch/lib/websearch_templates.py:3265
 msgid "No results found..."
@@ -12607,12 +12479,11 @@ msgstr "No se han encontrado resultados..."
 
 #: modules/websearch/lib/websearch_templates.py:3314
 msgid "Less suggestions"
-msgstr ""
+msgstr "Menos sugerencias"
 
 #: modules/websearch/lib/websearch_templates.py:3315
-#, fuzzy
 msgid "More suggestions"
-msgstr "Más detalles"
+msgstr "Más sugerencias"
 
 #: modules/websearch/lib/websearch_templates.py:3348
 msgid ""
@@ -12741,28 +12612,25 @@ msgid "No Citation Information available"
 msgstr "No hay información de citas disponible"
 
 #: modules/websearch/lib/websearch_templates.py:4834
-#, fuzzy
 msgid "Back to citesummary"
-msgstr "Volver a la búsqueda"
+msgstr "Volver a citesummary"
 
 #: modules/websearch/lib/websearch_templates.py:4845
 #, python-format
 msgid "<p><a href=\"%(url)s\">%(msg)s</a></p>"
-msgstr ""
+msgstr "<p><a href=\"%(url)s\">%(msg)s</a></p>"
 
 #: modules/websearch/lib/websearch_templates.py:4852
-#, fuzzy
 msgid "Exclude self-citations"
-msgstr "Seleccione una acción"
+msgstr "Excluir autocitas"
 
 #: modules/websearch/lib/websearch_templates.py:4866
 msgid "Citation summary results"
 msgstr "Reccuento de citaciones"
 
 #: modules/websearch/lib/websearch_templates.py:4871
-#, fuzzy
 msgid "Total number of papers analyzed:"
-msgstr "Número total de artículos citables analizados:"
+msgstr "Número total de artículos analizados:"
 
 #: modules/websearch/lib/websearch_templates.py:4895
 msgid "Total number of citations:"
@@ -12785,7 +12653,6 @@ msgid "Breakdown of papers by citations:"
 msgstr "Clasificación de artículos por citas:"
 
 #: modules/websearch/lib/websearch_templates.py:4987
-#, fuzzy
 msgid "Citation metrics"
 msgstr "Métrica de citas"
 
@@ -12795,6 +12662,8 @@ msgid ""
 "For some unknown reason multiple records matching the specified DOI \"%s\" "
 "have been found."
 msgstr ""
+"Por alguna razón desconocida se ha encontrado varios registros que coincidan "
+"con el DOI \"% s\" especificado."
 
 #: modules/websearch/lib/websearch_templates.py:5065
 #: modules/webstyle/lib/webstyle_templates.py:1014
@@ -12803,16 +12672,15 @@ msgstr "Los administradores del sistema han sido avisados."
 
 #: modules/websearch/lib/websearch_templates.py:5066
 msgid "In the meantime you can pick one of the retrieved candidates:"
-msgstr ""
+msgstr "Mientras tanto, puede elegir uno de los recuperados los candidatos:"
 
 #: modules/websearch/lib/websearch_webcoll.py:228
 msgid "Focus on:"
 msgstr "Enfocado a:"
 
 #: modules/websearch/lib/websearch_webcoll.py:231
-#, fuzzy
 msgid "Narrow by publisher/journal:"
-msgstr "Búsqueda por colección:"
+msgstr "Limitar por editor / diario:"
 
 #: modules/websearch/lib/websearch_webcoll.py:235
 msgid "Latest additions:"
@@ -12820,7 +12688,7 @@ msgstr "Últimas adquisiciones:"
 
 #: modules/websearch/lib/websearch_webcoll.py:659
 msgid "split by publisher/journal"
-msgstr ""
+msgstr "dividir por editor / diario:"
 
 #: modules/websearch/lib/websearch_webcoll.py:681
 msgid "brief"
@@ -12836,23 +12704,23 @@ msgid "Not found"
 msgstr "No se ha encontrado"
 
 #: modules/websearch/lib/websearch_webinterface.py:964
-#, fuzzy, python-format
+#, python-format
 msgid "Sorry, DOI %s could not be resolved."
-msgstr "No se ha encontrado el elemento de formato %s."
+msgstr "Lo sentimos, DOI %s no se pudo resolver."
 
 #: modules/websearch/lib/websearch_webinterface.py:968
-#, fuzzy, python-format
+#, python-format
 msgid "DOI \"%s\" Not Found"
-msgstr "No se ha encontrado la página %s"
+msgstr "No se ha encontrado DOI \"%s\""
 
 #: modules/websearch/lib/websearch_webinterface.py:983
 #, python-format
 msgid "Found multiple records matching DOI %s"
-msgstr ""
+msgstr "Se ha encontrado varios registros que coincidan con DOI %s"
 
 #: modules/websearch/lib/websearch_webinterface.py:985
 msgid "Found multiple records matching DOI"
-msgstr ""
+msgstr "Se ha encontrado varios registros que coincidan con DOI"
 
 #: modules/websearch/lib/websearchadminlib.py:3454
 msgid "Information"
@@ -12888,12 +12756,11 @@ msgstr "Disponibilidad"
 
 #: modules/websearch/lib/websearchadminlib.py:3463
 msgid "Linkbacks"
-msgstr ""
+msgstr "Linkbacks"
 
 #: modules/websearch/lib/websearchadminlib.py:3464
-#, fuzzy
 msgid "HepData"
-msgstr "Datos"
+msgstr "HepData"
 
 #: modules/websession/lib/webaccount.py:117
 #, python-format
@@ -12935,34 +12802,39 @@ msgstr ""
 
 #: modules/websession/lib/webaccount.py:399
 msgid "The OpenID identifier is invalid"
-msgstr ""
+msgstr "El identificador OpenID no es válido"
 
 #: modules/websession/lib/webaccount.py:400
 msgid ""
 "python-openid package must be installed: run make install-openid-package or "
 "download manually from https://github.com/openid/python-openid/"
 msgstr ""
+"paquete python-openid debe ser instalado: run make install-openid-package or "
+"download manually from https://github.com/openid/python-openid/"
 
 #: modules/websession/lib/webaccount.py:400
 #: modules/websession/lib/webaccount.py:401
 #: modules/websession/lib/webaccount.py:402
 #, python-format
 msgid "Please inform the <a href='mailto%s'>administator</a>"
-msgstr ""
+msgstr "Por favor, informe al <a href='mailto%s'>administrador</a>"
 
 #: modules/websession/lib/webaccount.py:401
 msgid ""
 "rauth package must be installed: run make install-oauth-package or download "
 "manually from https://github.com/litl/rauth/"
 msgstr ""
+"paquete rauth debe ser instalado: run make install-oauth-package or download "
+"manually from https://github.com/litl/rauth/"
 
 #: modules/websession/lib/webaccount.py:402
 msgid "The configuration isn't set properly"
-msgstr ""
+msgstr "La configuración no está configurada correctamente"
 
 #: modules/websession/lib/webaccount.py:403
 msgid "Cannot connect the provider. Please try again later."
 msgstr ""
+"No se puede conectar al proveedor. Por favor, inténtar de nuevo más tarde."
 
 #: modules/websession/lib/webgroup.py:158
 #: modules/websession/lib/webgroup.py:432
@@ -13229,17 +13101,16 @@ msgid "Select desired language of the web interface."
 msgstr "Escoja la lengua que prefiera para la web."
 
 #: modules/websession/lib/websession_templates.py:409
-#, fuzzy
 msgid "Edit profiling settings"
-msgstr "Editar parámetros"
+msgstr "Editar parámetros de perfil"
 
 #: modules/websession/lib/websession_templates.py:413
 msgid "Disabled"
-msgstr ""
+msgstr "Discapacitado"
 
 #: modules/websession/lib/websession_templates.py:417
 msgid "Enabled"
-msgstr ""
+msgstr "Capacitado"
 
 #: modules/websession/lib/websession_templates.py:441
 msgid "Edit search-related settings"
@@ -13360,7 +13231,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:622
 msgid "Display all the comments you have submitted so far."
-msgstr ""
+msgstr "Mostrar todos los comentarios que ha presentado hasta el momento."
 
 #: modules/websession/lib/websession_templates.py:629
 msgid ""
@@ -13399,11 +13270,13 @@ msgstr ""
 "%(x_url2_open)spreferencias de su cuenta%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:771
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour comments%(x_url_close)s "
 "submitted so far."
-msgstr "Puede consultar la lista de %(x_url_open)ssus tareas%(x_url_close)s."
+msgstr ""
+"Puede consultar la lista de %(x_url_open)ssus comentarios%(x_url_close)s "
+"presentados hasta el momento."
 
 #: modules/websession/lib/websession_templates.py:776
 msgid "Your Alert Searches"
@@ -13688,9 +13561,8 @@ msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "Tiene activados los siguientes roles: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1266
-#, fuzzy
 msgid "Run Author List Manager"
-msgstr "Ejecutar el gestor de personas/autores"
+msgstr "Ejecutar Gestor Lista Autores"
 
 #: modules/websession/lib/websession_templates.py:1272
 msgid "Run BibSword Client"
@@ -13740,9 +13612,8 @@ msgid "Your baskets"
 msgstr "Sus cestas"
 
 #: modules/websession/lib/websession_templates.py:1457
-#, fuzzy
 msgid "Your comments"
-msgstr "Sin comentarios"
+msgstr "Sus comentarios"
 
 #: modules/websession/lib/websession_templates.py:1463
 msgid "Your groups"
@@ -14094,6 +13965,9 @@ msgid ""
 "Your e-mail is auto-generated by the system. Please change your e-mail from "
 "<a href='%s/youraccount/edit?ln=%s'>account settings</a>."
 msgstr ""
+"Su correo electrónico es generado automáticamente por el sistema. Por favor "
+"cambia su dirección de e-mail en <a href='%s/youraccount/edit?ln=%s'>account "
+"settings</a>."
 
 #: modules/websession/lib/websession_webinterface.py:98
 msgid "Mail Cookie Service"
@@ -14670,7 +14544,7 @@ msgstr "Por favor contacte con %s indicando la siguiente información:"
 
 #: modules/webstyle/lib/webstyle_templates.py:809
 msgid "Restricted (Processing Record)"
-msgstr ""
+msgstr "Restringido (Procesamiento Record)"
 
 #: modules/webstyle/lib/webstyle_templates.py:942
 #, python-format
@@ -14690,13 +14564,12 @@ msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr "En caso de duda, póngase en contacto con %(x_admin_email)s"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:200
-#, fuzzy
 msgid ""
 "Note that your submission has been inserted into the bibliographic task "
 "queue and is waiting for execution.\n"
 msgstr ""
-"Su contribución ha sido enviada a la cola de tareas bibliográficas y está "
-"esperando su ejecución.\n"
+"Tenga en cuenta que su presentación se ha insertado en la cola de tareas "
+"bibliográficas y está en espera de ejecución.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:203
 #, python-format
@@ -14809,9 +14682,8 @@ msgid "Unable to find document type: %s"
 msgstr "Imposible encontrar el tipo de documento: %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:1537
-#, fuzzy
 msgid "You are not authorized to access this submission interface."
-msgstr "No está autorizado a acceder a este recurso."
+msgstr "No está autorizado a acceder a esta interfaz presentación."
 
 #: modules/websubmit/lib/websubmit_engine.py:1808
 msgid "The chosen action is not supported by the document type."
@@ -15431,9 +15303,8 @@ msgstr ""
 "especificado"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:738
-#, fuzzy
 msgid "Submissions are not available"
-msgstr "Envío nº"
+msgstr "Las presentaciones no están disponibles"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:742
 msgid "Sorry, 'sub' parameter missing..."
