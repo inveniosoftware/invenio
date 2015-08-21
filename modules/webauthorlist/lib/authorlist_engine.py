@@ -41,7 +41,7 @@ from invenio.textutils import escape_latex
 # default name that will be used, when affiliation name is missing
 UNKNOWN_AFFILIATION = 'Unknown Affiliation'
 # Namespaces used in the xml file
-NAMESPACES = {'cal': 'http://www.slac.stanford.edu/spires/hepnames/authors_xml/',
+NAMESPACES = {'cal': 'http://inspirehep.net/info/HepNames/tools/authors_xml/',
               'foaf': 'http://xmlns.com/foaf/0.1/',
               }
 
@@ -53,6 +53,9 @@ def retrieve_data_from_record(recid):
     """
     if not record_exists(recid):
         return
+
+    from invenio.bibformat_engine import BibFormatObject
+    from invenio.bibformat_elements.bfe_INSPIRE_inst_address import format_element as get_address
 
     output = {}
 
@@ -130,6 +133,8 @@ def retrieve_data_from_record(recid):
     for i, affiliation in enumerate(unique_affiliations, 1):
         institution = perform_request_search(c="Institutions", p='110__u:"' + affiliation + '"')
         full_name = affiliation
+        inspire_id = ''
+        domain = ''
         if len(institution) == 1:
             full_name_110_a = get_fieldvalues(institution[0], '110__a')
             if full_name_110_a:
@@ -137,14 +142,20 @@ def retrieve_data_from_record(recid):
             full_name_110_b = get_fieldvalues(institution[0], '110__b')
             if full_name_110_b:
                 full_name += ', ' + str(full_name_110_b[0])
+            domain = get_fieldvalues(institution[0], '8564_u')
+            inspire_id = affiliation
+            address = get_address(BibFormatObject(institution[0]))
+            if address:
+                full_name += ', ' + address
+
         affiliation = [i,
                        '',
                        affiliation,
                        '',
                        full_name,
-                       '',
+                       domain,
                        True,
-                       '']
+                       inspire_id]
         affiliation_list.append(affiliation)
 
     output.update({'affiliations': affiliation_list})
@@ -209,6 +220,13 @@ def retrieve_data_from_xml(xml):
         if not affiliation_acronym:
             # No acronym ? Use the name instead
             affiliation_acronym = affiliation_name
+        inspire_id = ''
+        for org_name in affiliation.getElementsByTagName('cal:orgName'):
+            if org_name.getAttribute('source') in ('INSPIRE', 'SPIRES'):
+                child = org_name.firstChild
+                if child:
+                    inspire_id = child.nodeValue
+                    break
         affiliation_address = get_element_value_helper(affiliation, 'cal:orgAddress')
         if not affiliation_address:
             affiliation_address = affiliation_name
@@ -231,7 +249,7 @@ def retrieve_data_from_xml(xml):
                             affiliation_address,
                             affiliation_domain,
                             True,
-                            '']
+                            inspire_id]
         affiliation_list.append(affiliation_info)
 
     # Extract authors
@@ -341,7 +359,7 @@ class NA62Latex(Converter):
 class ElsevierArticle(Converter):
     CONTENT_TYPE = 'text/plain'
     FILE_NAME = 'elsarticle.tex'
-    cal = '{http://www.slac.stanford.edu/spires/hepnames/authors_xml/}'
+    cal = '{http://inspirehep.net/info/HepNames/tools/authors_xml/}'
     foaf = '{http://xmlns.com/foaf/0.1/}'
 
     def __init__(self):
@@ -677,7 +695,7 @@ class AuthorsXML(Converter):
         root = document.documentElement
 
         root.setAttribute('xmlns:foaf', 'http://xmlns.com/foaf/0.1/')
-        root.setAttribute('xmlns:cal', 'http://www.slac.stanford.edu/spires/hepnames/authors_xml/')
+        root.setAttribute('xmlns:cal', 'http://inspirehep.net/info/HepNames/tools/authors_xml/')
 
         return document, root
 
@@ -735,10 +753,10 @@ class AuthorsXML(Converter):
         organization.appendChild(org_acronym)
 
         # organization identifier
-        org_name_info = parsed[cfg.JSON.SPIRES_ID]
+        org_name_info = parsed[cfg.JSON.INSPIRE_ID]
         if (cfg.EMPTY.match(org_name_info) is None):
             org_name = document.createElement('cal:orgName')
-            org_name.setAttribute('source', cfg.AuthorsXML.SPIRES)
+            org_name.setAttribute('source', cfg.AuthorsXML.INSPIRE)
             org_name_text = document.createTextNode(org_name_info)
             org_name.appendChild(org_name_text)
             organization.appendChild(org_name)
