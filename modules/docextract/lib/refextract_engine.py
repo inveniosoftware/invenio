@@ -513,7 +513,7 @@ def look_for_implied_ibids(splitted_citations):
                                    'title'      : current_journal['title'],
                                    'volume'     : volume,
                                    'year'       : numeration['year'],
-                                   'page'       : numeration['page'],
+                                   'page'       : numeration['page'] or numeration['jinst_page'],
                                    'page_end'   : numeration['page_end'],
                                    'is_ibid'    : True,
                                    'extra_ibids': []}

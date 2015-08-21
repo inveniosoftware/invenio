@@ -443,9 +443,11 @@ re_year = ur"""
 re_page_prefix = ur"[pP]?[p]?\.?\s?"  # Starting page num: optional Pp.
 re_page_num = ur"[RL]?\w?\d+[cC]?"    # pagenum with optional R/L
 re_page_sep = ur"\s*-\s*"             # optional separator between pagenums
-re_page = re_page_prefix + \
-    u"(?P<page>" + re_page_num + u")(?:" + re_page_sep + \
-    u"(?P<page_end>" + re_page_num + u"))?"
+re_jinst_page = ur'(?P<jinst_page>[pP]\d{5}\d*)'
+re_page = ur"(%s|%s)" % (re_jinst_page, re_page_prefix +
+    u"(?P<page>" + re_page_num + u")(?:" + re_page_sep +
+    u"(?P<page_end>" + re_page_num + u"))?")
+
 
 # Series
 re_series = ur"(?P<series>[A-H])"
