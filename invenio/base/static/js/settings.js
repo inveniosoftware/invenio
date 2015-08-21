@@ -54,7 +54,9 @@ require.config({
     "jasmine-initialization": "js/jasmine/initialization_checker",
     "select2": "vendor/select2/select2.min",
     "ckeditor-core": "vendors/ckeditor/ckeditor",
-    "ckeditor-jquery": "vendors/ckeditor/adapters/jquery"
+    "ckeditor-jquery": "vendors/ckeditor/adapters/jquery",
+    "watable": "vendors/watable/jquery.watable",
+    "bootstrap-datepicker-eyecon": "vendors/bootstrap-datepicker-eyecon/js/bootstrap-datepicker"
   },
   shim: {
     jquery: {
@@ -158,6 +160,14 @@ require.config({
     },
     "ckeditor-jquery": {
       deps: ["jquery", "ckeditor-core"]
-    }
+    },
+    "watable": {
+      deps: ["jquery", "bootstrap"],
+      exports: "$.fn.WATable"
+    },
+    "bootstrap-datepicker-eyecon": {
+      deps: ["jquery", "bootstrap"],
+      exports: "$.fn.datepicker"
+	}
   }
 });
