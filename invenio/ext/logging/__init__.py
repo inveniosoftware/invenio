@@ -160,6 +160,12 @@ import logging
 
 from .wrappers import get_pretty_traceback, register_exception
 
+import warnings
+from invenio.utils.deprecation import warn_with_traceback
+
+
+original_showwarning = warnings.showwarning
+
 
 def setup_app(app):
     """Setup logging extesions."""
@@ -168,3 +174,4 @@ def setup_app(app):
         logger = logging.getLogger('py.warnings')
         logger.addHandler(logging.StreamHandler())
         logger.setLevel(logging.WARNING)
+        warnings.showwarning = warn_with_traceback
