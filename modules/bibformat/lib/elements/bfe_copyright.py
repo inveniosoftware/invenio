@@ -3,7 +3,8 @@
 # $Id$
 #
 # This file is part of Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012, 2013, 2014 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
+# 2012, 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -36,7 +37,7 @@ CFG_CERN_LICENSE_URL = 'http://copyright.cern.ch/'
 
 def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", instances_separator=", ",
                    link_to_licenses='yes', auto_link_to_CERN_license='no', remove_link_to_CERN_license='yes',
-                   show_licenses='yes', show_material="yes", 
+                   show_licenses='yes', show_material="yes",
                    show_sponsor="yes", license_to_url_kb='LICENSE2URL'):
     """
     Print copyright information
@@ -84,12 +85,19 @@ def format_element(bfo, copyrights_separator=", ", licenses_separator=", ", inst
             if copyright_info.has_key('f'):
                 # Copyright message. Use this as label
                 label = copyright_info['f']
-            elif copyright_info.has_key('d'):
+            elif 'd' in copyright_info:
                 # Copyright holder
                 year = ''
-                if copyright_info.has_key('g'):
+                if 'g' in copyright_info:
                     # Year was given. Use it too
-                    year = "%s " % copyright_info['g']
+                    # Also include the current year, if different
+                    from datetime import date
+                    current_year = date.today().year
+                    if current_year > int(copyright_info['g']):
+                        year_end = "-{0}".format(current_year)
+                    else:
+                        year_end = ""
+                    year = "{0}{1} ".format(copyright_info['g'], year_end)
                 label = "&copy; " + year + copyright_info['d']
                 if copyright_info['d'] == 'CERN' and \
                    len(licenses_info) == 0 and \
