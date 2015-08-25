@@ -18,10 +18,13 @@
 -e git+git://github.com/inveniosoftware/invenio-client.git#egg=invenio-client
 -e git+git://github.com/inveniosoftware/invenio-collections.git#egg=invenio-collections
 -e git+git://github.com/inveniosoftware/invenio-comments.git#egg=invenio-comments
+-e git+git://github.com/inveniosoftware/invenio-deposit.git#egg=invenio-deposit
 -e git+git://github.com/inveniosoftware/invenio-documents.git#egg=invenio-documents
+-e git+git://github.com/inveniosoftware/invenio-groups.git#egg=invenio-groups
 -e git+git://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
 -e git+git://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
 -e git+git://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
+-e git+git://github.com/inveniosoftware/invenio-schema.git#egg=invenio-jsonschemas
 -e git+git://github.com/inveniosoftware/invenio-search.git#egg=invenio-search
 -e git+git://github.com/inveniosoftware/invenio-upgrader.git#egg=invenio-upgrader
 -e git+git://github.com/inveniosoftware/invenio-workflows.git#egg=invenio-workflows
