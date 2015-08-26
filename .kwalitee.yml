@@ -47,7 +47,6 @@ components:
 - documents
 - elasticsearch
 - email
-- encoder
 - exporter
 - fixtures
 - formatter

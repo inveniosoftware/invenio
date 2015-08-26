@@ -298,7 +298,6 @@ setup(
             'bibauthorid = '
             ' invenio.legacy.bibauthorid.scripts.bibauthorid:main',
             'bibdocfile = invenio.legacy.bibdocfile.scripts.bibdocfile:main',
-            'bibencode = invenio.modules.encoder.scripts.encoder:main',
             'bibexport = invenio.legacy.bibexport.scripts.bibexport:main',
             'bibsched = invenio.legacy.bibsched.scripts.bibsched:main',
             'bibtaskex = invenio.legacy.bibsched.scripts.bibtaskex:main',
