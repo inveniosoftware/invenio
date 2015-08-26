@@ -24,5 +24,4 @@ Admin's Guide
 .. toctree::
    :maxdepth: 1
 
-   bibupload-admin-guide
    webstyle-admin-guide
