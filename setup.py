@@ -272,7 +272,6 @@ setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            'plotextractor = invenio.utils.scripts.plotextractor:main',
             # Legacy
             'alertengine = invenio.legacy.webalert.scripts.alertengine:main',
             'bibauthorid = '
