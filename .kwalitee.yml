@@ -40,7 +40,6 @@ components:
 - comments
 - communities
 - config
-- converter
 - crossref
 - dashboard
 - debug_toolbar
