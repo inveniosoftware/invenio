@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # This file is part of Invenio.
-# Copyright (C) 2013, 2014 CERN.
+# Copyright (C) 2013, 2014, 2015 CERN.
 #
 # Invenio is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -31,19 +31,6 @@ before_handle_user_exception = _signals.signal(
     'before-handle-user-exception')
 """
 This signal is sent right before user exception handler is called.
-"""
-
-# WebSearch signals
-websearch_before_search = _signals.signal(
-    'websearch-before-search')
-"""
-This signal is sent right before search handler is called.
-"""
-
-websearch_before_browse = _signals.signal(
-    'websearch-before-browse')
-"""
-This signal is sent right before browse handler is called.
 """
 
 webcoll_after_webpage_cache_update = _signals.signal(

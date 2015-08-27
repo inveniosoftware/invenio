@@ -30,27 +30,18 @@ import string
 from bs4 import BeautifulSoup
 from invenio.ext.template import render_template_to_string
 from invenio.config import \
-     CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL, \
      CFG_BASE_URL, \
-     CFG_SITE_URL, \
-     CFG_VERSION, \
-     CFG_WEBSTYLE_TEMPLATE_SKIN, \
-     CFG_INSPIRE_SITE
+     CFG_SITE_URL
 
-from invenio.base.i18n import gettext_set_language, language_list_long, is_language_rtl
-from invenio.utils.url import make_canonical_urlargd, create_html_link, \
-                             get_canonical_and_alternates_urls
-from invenio.utils.date import convert_datecvs_to_datestruct, \
-                              convert_datestruct_to_dategui
+from invenio.base.i18n import gettext_set_language, language_list_long
+from invenio.utils.url import make_canonical_urlargd, create_html_link
+from invenio.utils.date import convert_datecvs_to_datestruct
 from invenio_formatter import format_record
 from invenio.utils.html import get_mathjax_header
-import invenio.legacy.template
-websearch_templates = invenio.legacy.template.load('websearch')
 
 
 class Template:
@@ -474,8 +465,6 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        # load the right message language
-        _ = gettext_set_language(ln)
 
         # Prepare restriction flag
         restriction_flag = ''
@@ -591,25 +580,15 @@ URI: http://%(host)s%(page)s
         # load the right message language
         _ = gettext_set_language(ln)
 
-        similar = ""
-
-        if show_similar_rec_p and not CFG_INSPIRE_SITE:
-            similar = create_html_link(
-                websearch_templates.build_search_url(p='recid:%d' % \
-                                                     recid,
-                                                     rm='wrd',
-                                                     ln=ln),
-                {}, _("Similar records"),{'class': "moreinfo"})
-
         out = """
             <div class="bottom-left-folded">%(dates)s</div>
             <div class="bottom-right-folded" style="text-align:right;padding-bottom:2px;">
-                <span class="moreinfo" style="margin-right:10px;">%(similar)s</span></div>
+                </div>
           </div>
       </div>
     </div>
     <br/>
-    """ % {'similar' : similar,
+    """ % {
            'dates' : creationdate and '<div class="recordlastmodifiedbox" style="position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
                 'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s",
                            x_date_creation=creationdate,
@@ -637,9 +616,6 @@ URI: http://%(host)s%(page)s
          - reviews *string* - the small panel representing the reviews
          - actions *string* - the small panel representing the possible user's action
         """
-        # load the right message language
-        _ = gettext_set_language(ln)
-
         out = """
         <br />
 <div class="detailedrecordminipanel">
@@ -699,9 +675,6 @@ URI: http://%(host)s%(page)s
 
           - 'msg' *string* - The message to display
         """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
 
         return """<center><font color="red">%s</font></center>""" % msg
 
