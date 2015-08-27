@@ -47,7 +47,6 @@ The code taken from mod_python is under the following License.
 from wsgiref.headers import Headers
 import time
 import re
-import os
 import cgi
 import cStringIO
 import tempfile
@@ -56,10 +55,7 @@ from invenio.config import CFG_TMPDIR, CFG_TMPSHAREDDIR
 from invenio.utils.apache import \
     SERVER_RETURN, \
     HTTP_LENGTH_REQUIRED, \
-    HTTP_BAD_REQUEST, \
-    InvenioWebInterfaceWSGIContentLenghtError, \
-    InvenioWebInterfaceWSGIContentTypeError, \
-    InvenioWebInterfaceWSGIContentMD5Error
+    HTTP_BAD_REQUEST
 
 class table(Headers):
     add = Headers.add_header
@@ -817,67 +813,3 @@ def apply_fs_data(object, fs, **args):
                 del args[name]
 
     return object(**args)
-
-RE_CDISPOSITION_FILENAME = re.compile(r'filename=(?P<filename>[\w\.]*)')
-def handle_file_post(req, allowed_mimetypes=None):
-    """
-    Handle the POST of a file.
-    @return: the a tuple with the full path to the file saved on disk,
-    and it's mimetype as provided by the request.
-    @rtype: (string, string)
-    """
-    from invenio.legacy.bibdocfile.api import decompose_file, md5
-    ## We retrieve the length
-    clen = req.headers_in["Content-Length"]
-    if clen is None:
-        raise InvenioWebInterfaceWSGIContentLenghtError("Content-Length header is missing")
-    try:
-        clen = int(clen)
-        assert (clen > 1)
-    except (ValueError, AssertionError):
-        raise InvenioWebInterfaceWSGIContentLenghtError("Content-Length header should contain a positive integer")
-    ## Let's take the content type
-    ctype = req.headers_in["Content-Type"]
-    if allowed_mimetypes and ctype not in allowed_mimetypes:
-        raise InvenioWebInterfaceWSGIContentTypeError("Content-Type not in allowed list of content types: %s" % allowed_mimetypes)
-    ## Let's optionally accept a suggested filename
-    suffix = prefix = ''
-    g = RE_CDISPOSITION_FILENAME.search(req.headers_in.get("Content-Disposition", ""))
-    if g:
-        dummy, prefix, suffix = decompose_file(g.group("filename"))
-    ## Let's optionally accept an MD5 hash (and use it later for comparison)
-    cmd5 = req.headers_in.get("Content-MD5")
-    if cmd5:
-        the_md5 = md5()
-
-    ## Ok. We can initialize the file
-    fd, path = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=CFG_TMPDIR)
-    the_file = os.fdopen(fd, 'w')
-    ## Let's read the file
-    while True:
-        chunk = req.read(min(10240, clen))
-        if len(chunk) < min(10240, clen):
-            ## We expected to read at least clen (which is different than 0)
-            ## but chunk was shorter! Gosh! Error! Panic!
-            the_file.close()
-            os.close(fd)
-            os.remove(path)
-            raise InvenioWebInterfaceWSGIContentLenghtError("File shorter than what specified in Content-Length")
-        if cmd5:
-            ## MD5 was in the header let's compute it
-            the_md5.update(chunk)
-        ## And let's definitively write the content to disk :-)
-        the_file.write(chunk)
-        clen -= len(chunk)
-        if clen == 0:
-            ## That's it. Everything was read.
-            break
-    if cmd5 and the_md5.hexdigest().lower() != cmd5.strip().lower():
-        ## Let's check the MD5
-        the_file.close()
-        os.close(fd)
-        os.remove(path)
-        raise InvenioWebInterfaceWSGIContentMD5Error("MD5 checksum does not match")
-    ## Let's clean everything up
-    the_file.close()
-    return (path, ctype)
