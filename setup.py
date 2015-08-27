@@ -276,12 +276,6 @@ setup(
         'console_scripts': [
             # Legacy
             'dbexec = invenio.legacy.miscutil.scripts.dbexec:main',
-            'dbdump = invenio.legacy.miscutil.scripts.dbdump:main',
-            'textmarc2xmlmarc = '
-            ' invenio.legacy.bibrecord.scripts.textmarc2xmlmarc:main',
-            'xmlmarc2textmarc = '
-            ' invenio.legacy.bibrecord.scripts.xmlmarc2textmarc:main',
-            'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',
         ],
     },
     setup_requires=setup_requires,
