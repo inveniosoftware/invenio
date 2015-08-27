@@ -33,8 +33,8 @@ from wsgiref.util import FileWrapper
 from invenio.legacy.wsgi.utils import table
 from invenio.utils.apache import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
-    HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
-from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
+    HTTP_NOT_FOUND
+from invenio.config import CFG_WEBDIR, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.ext.logging import register_exception
@@ -491,7 +491,6 @@ def application(environ, start_response, handler=None):
                 register_exception(req=req, alert_admin=True)
             if not req.response_sent_p:
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-            map(req.write, generate_error_page(req, admin_to_be_alerted))
 
         req.flush()
 
@@ -516,19 +515,6 @@ def application(environ, start_response, handler=None):
         del gc.garbage[:]
     return req.response
 
-
-def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
-    """
-    Returns an iterable with the error page to be sent to the user browser.
-    """
-    from invenio.legacy.webpage import page
-    from invenio.legacy import template
-    webstyle_templates = template.load('webstyle')
-    ln = req.form.get('ln', CFG_SITE_LANG)
-    if page_already_started:
-        return [webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted)]
-    else:
-        return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted), language=ln, req=req)]
 
 def is_static_path(path):
     """
